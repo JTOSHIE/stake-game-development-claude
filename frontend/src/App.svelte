@@ -17,10 +17,9 @@
   let gridRef: GameGrid
 
   onMount(async () => {
-    // In production, obtain sessionToken from URL params / RGS launch URL
-    const params   = new URLSearchParams(window.location.search)
-    const token    = params.get('session') ?? 'dev-mock-token'
-    const gameId   = 'future_spinner'
+    const params  = new URLSearchParams(window.location.search)
+    const token   = params.get('session') ?? 'dev-mock-token'
+    const gameId  = 'future_spinner'
 
     await initRGS(gameId, token)
     isLoading.set(false)
@@ -36,26 +35,18 @@
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode })
 
-      // Animate reels, then reveal result
-      if (gridRef) {
-        await gridRef.animateSpin(result.board)
-      }
+      if (gridRef) await gridRef.animateSpin(result.board)
 
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
       recordSpinResult(result.totalWin, bet)
-
       buyBonusActive.set(false)
 
-      // Auto-play continuation
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
-        if ($autoPlayCount <= 0) {
-          isAutoPlay.set(false)
-        } else {
-          setTimeout(handleSpin, 800)
-        }
+        if ($autoPlayCount <= 0) isAutoPlay.set(false)
+        else setTimeout(handleSpin, 800)
       }
     } catch (err) {
       console.error('[Spin error]', err)
@@ -69,7 +60,7 @@
   }
 </script>
 
-<main class="game-wrapper">
+<main class="game-wrapper" class:bonus-bg={$buyBonusActive}>
   {#if $isLoading}
     <LoadingScreen />
   {/if}
@@ -103,11 +94,24 @@
   }
 
   :global(body) {
-    background: #06060f;
+    /* Desktop cyberpunk background */
+    background-color: #06060f;
+    background-image: url('/assets/symbols/bg1_main_game_desktop_variant_01.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: #fff;
     font-family: 'Segoe UI', system-ui, sans-serif;
     overflow: hidden;
     height: 100dvh;
+  }
+
+  /* Mobile: swap to portrait-optimised background */
+  @media (max-width: 480px) {
+    :global(body) {
+      background-image: url('/assets/symbols/bg1_main_game_mobile_variant_04.png');
+    }
   }
 
   .game-wrapper {
@@ -116,6 +120,24 @@
     height: 100dvh;
     max-width: 720px;
     margin: 0 auto;
+    /* Subtle dark overlay so grid and UI stay readable over the background */
+    background: linear-gradient(
+      to bottom,
+      rgba(6,6,15,0.55) 0%,
+      rgba(6,6,15,0.35) 40%,
+      rgba(6,6,15,0.65) 100%
+    );
+    transition: background 0.6s ease;
+  }
+
+  /* Bonus buy: shift tint toward deep purple */
+  .game-wrapper.bonus-bg {
+    background: linear-gradient(
+      to bottom,
+      rgba(20,0,40,0.65) 0%,
+      rgba(10,0,25,0.40) 40%,
+      rgba(20,0,40,0.70) 100%
+    );
   }
 
   .game-header {
@@ -132,11 +154,13 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    /* Legible on any background colour */
+    filter: drop-shadow(0 1px 6px rgba(0,0,0,0.9));
   }
 
   .provider {
     font-size: 0.65rem;
-    color: #555;
+    color: rgba(255,255,255,0.4);
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-top: 2px;
@@ -165,9 +189,9 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 0.5rem 1.5rem;
-    background: rgba(0,0,0,0.4);
-    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 0.4rem 1.5rem;
+    background: rgba(0,0,0,0.25);
+    border-top: 1px solid rgba(255,255,255,0.06);
     flex-shrink: 0;
   }
 </style>

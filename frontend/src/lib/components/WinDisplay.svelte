@@ -9,18 +9,25 @@
                 : null
 </script>
 
-<div class="win-display" class:visible={showWin}>
+<!--
+  Win display uses ui_paytable_frame_variant_02_original.png as the panel frame.
+  The win amount and scatter label are layered on top.
+-->
+<div class="win-panel" class:visible={showWin} class:wincap-active={$isWincap}>
+
   {#if $isWincap}
     <div class="win-label wincap">{t($locale, 'wincap')}</div>
   {:else if scatterKey}
     <div class="win-label scatter">{t($locale, scatterKey)}</div>
+  {:else}
+    <div class="win-label idle">{t($locale, 'win')}</div>
   {/if}
 
   <div class="win-amount" class:wincap={$isWincap}>
     {#if showWin}
       <span class="currency">$</span>{$winAmount.toFixed(2)}
     {:else}
-      <span class="label">{t($locale, 'win')}</span>
+      —
     {/if}
   </div>
 
@@ -30,64 +37,74 @@
 </div>
 
 <style>
-  .win-display {
+  .win-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 140px;
-    opacity: 0.35;
-    transition: opacity 0.3s;
+    justify-content: center;
+
+    /* Paytable frame image as the panel art */
+    background-image: url('/assets/symbols/ui_paytable_frame_variant_02_original.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+
+    min-width: 160px;
+    height: 56px;
+    padding: 0 1rem;
+
+    opacity: 0.4;
+    transition: opacity 0.3s, filter 0.3s;
   }
 
-  .win-display.visible {
+  .win-panel.visible {
     opacity: 1;
   }
 
-  .label {
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    color: #888;
-    text-transform: uppercase;
+  .win-panel.wincap-active {
+    filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.9));
   }
 
   .win-label {
-    font-size: 0.7rem;
+    font-size: 0.58rem;
     letter-spacing: 0.1em;
     font-weight: 700;
     text-transform: uppercase;
-    margin-bottom: 2px;
+    line-height: 1;
   }
 
+  .win-label.idle    { color: rgba(255,255,255,0.35); }
   .win-label.scatter { color: #a0e4ff; }
   .win-label.wincap  { color: #ffd700; }
 
   .win-amount {
-    font-size: 1.6rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: #4eff91;
     font-family: 'Courier New', monospace;
+    line-height: 1.3;
+    text-shadow: 0 0 8px rgba(78, 255, 145, 0.4);
     transition: color 0.3s;
   }
 
   .win-amount.wincap {
     color: #ffd700;
-    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+    text-shadow: 0 0 14px rgba(255, 215, 0, 0.9);
     animation: pulse 0.6s ease-in-out infinite alternate;
   }
 
   @keyframes pulse {
-    from { transform: scale(1);    }
-    to   { transform: scale(1.08); }
+    from { transform: scale(1); }
+    to   { transform: scale(1.1); }
   }
 
   .currency {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     vertical-align: super;
   }
 
   .multiplier {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     color: #ffc832;
-    margin-top: 2px;
+    line-height: 1;
   }
 </style>
