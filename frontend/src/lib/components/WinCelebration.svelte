@@ -236,9 +236,10 @@
   .win-text {
     display: block;
     font-weight: 900;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    /* Impact gives that punchy slot-machine punch; fall back to heavy system fonts */
+    font-family: Impact, 'Arial Black', 'Segoe UI Black', system-ui, sans-serif;
     line-height: 1;
   }
 
@@ -247,8 +248,10 @@
     font-size: clamp(2rem, 6vw, 3.5rem);
     color: #ffd700;
     text-shadow:
-      0 0 20px rgba(255, 215, 0, 0.95),
-      0 0 40px rgba(255, 215, 0, 0.55);
+      0 0  8px #fff8c0,
+      0 0 18px rgba(255, 215, 0, 1),
+      0 0 35px rgba(255, 200, 0, 0.85),
+      0 0 60px rgba(255, 160, 0, 0.5);
     animation: flash-small 0.95s ease-out forwards;
   }
 
@@ -259,25 +262,31 @@
     100% { opacity: 0; transform: scale(0.8)  translateY(-34px); }
   }
 
-  /* ── Big Win: gold bounce ──────────────────────────────────────────────── */
+  /* ── Big Win: deep gold neon glow ──────────────────────────────────────── */
   .big-text {
     font-size: clamp(2.8rem, 9vw, 5.5rem);
-    color: #ffd700;
+    color: #ffe566;
     text-shadow:
-      0 0 30px rgba(255, 215, 0, 0.95),
-      0 0 60px rgba(255, 180, 0, 0.65),
-      0 4px 0   rgba(0, 0, 0, 0.55);
+      0 0  4px #fff8d0,
+      0 0 12px #ffd700,
+      0 0 28px rgba(255, 200, 0, 1),
+      0 0 55px rgba(255, 160, 0, 0.85),
+      0 0 90px rgba(255, 100, 0, 0.55),
+      0 4px 0   rgba(0, 0, 0, 0.7);
     animation: bounce-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  /* ── Mega Win: magenta/purple bounce ──────────────────────────────────── */
+  /* ── Mega Win: magenta/purple neon flare ──────────────────────────────── */
   .mega-text {
     font-size: clamp(3.2rem, 11vw, 7rem);
-    color: #ff44ff;
+    color: #ff88ff;
     text-shadow:
-      0 0 40px rgba(255, 0, 255, 0.95),
-      0 0 80px rgba(200, 0, 200, 0.6),
-      0 4px 0   rgba(0, 0, 0, 0.6);
+      0 0  4px #fff0ff,
+      0 0 12px #ff44ff,
+      0 0 28px rgba(255, 0, 255, 1),
+      0 0 55px rgba(200, 0, 255, 0.85),
+      0 0 90px rgba(140, 0, 200, 0.6),
+      0 4px 0   rgba(0, 0, 0, 0.7);
     animation: bounce-in 0.60s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
@@ -288,9 +297,14 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    /* Multiple drop-shadows build the composite neon corona */
     filter:
-      drop-shadow(0 0 24px rgba(0, 255, 255, 0.8))
-      drop-shadow(0 0 48px rgba(255, 0, 255, 0.55));
+      drop-shadow(0 0  4px rgba(255, 255, 255, 0.9))
+      drop-shadow(0 0 14px rgba(0,   255, 255, 1))
+      drop-shadow(0 0 30px rgba(0,   200, 255, 0.9))
+      drop-shadow(0 0 55px rgba(255,   0, 255, 0.75))
+      drop-shadow(0 0 90px rgba(180,   0, 220, 0.5))
+      drop-shadow(0  4px 0   rgba(0,   0,   0, 0.75));
     animation: scale-huge 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 

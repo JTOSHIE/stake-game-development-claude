@@ -362,21 +362,27 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    line-height: 1.15;
+    /* 1px top nudge optically centres the two-line stack inside the 44px frame */
+    padding-top: 1px;
+    gap: 1px;
   }
 
   .bet-label {
-    font-size: 0.52rem;
+    font-size: 0.50rem;
     letter-spacing: 0.12em;
-    color: rgba(255, 200, 50, 0.65);
+    color: rgba(255, 200, 50, 0.70);
     text-transform: uppercase;
+    line-height: 1;
+    display: block;
   }
 
   .bet-value {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: #fff;
     font-family: 'Courier New', monospace;
+    line-height: 1.2;
+    display: block;
   }
 
   /* Max Bet image button */

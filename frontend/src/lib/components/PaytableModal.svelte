@@ -12,18 +12,18 @@
     if (e.key === 'Escape') close()
   }
 
-  // Symbol pay table (ways wins — multiplier per bet)
+  // Symbol pay table — paths mirror SYMBOL_TEXTURES in GameGrid.svelte
   const SYMBOLS = [
-    { name: 'WILD',     src: '/assets/symbols/symbol_wild_variant_04.png',       pays: [null, null, 50, 100, 200] },
-    { name: 'SCATTER',  src: '/assets/symbols/symbol_scatter_variant_04.png',     pays: [null, null, null, null, null] },
-    { name: 'CYBER',    src: '/assets/symbols/symbol_cyber_a_variant_04.png',     pays: [null, null, 25,  75,  150] },
-    { name: 'NEON',     src: '/assets/symbols/symbol_neon_b_variant_04.png',      pays: [null, null, 20,  60,  120] },
-    { name: 'PULSE',    src: '/assets/symbols/symbol_pulse_c_variant_04.png',     pays: [null, null, 15,  40,   80] },
-    { name: 'GRID',     src: '/assets/symbols/symbol_grid_d_variant_04.png',      pays: [null, null, 10,  25,   50] },
-    { name: 'BYTE',     src: '/assets/symbols/symbol_byte_e_variant_04.png',      pays: [null, null,  5,  15,   30] },
-    { name: 'BIT',      src: '/assets/symbols/symbol_bit_f_variant_04.png',       pays: [null, null,  3,   8,   15] },
-    { name: 'LOW-A',    src: '/assets/symbols/symbol_low_a_variant_04.png',       pays: [null, null,  2,   5,   10] },
-    { name: 'LOW-B',    src: '/assets/symbols/symbol_low_b_variant_04.png',       pays: [null, null,  2,   4,    8] },
+    { name: 'WILD', src: '/assets/symbols/wild_cyberpunk_logo_variant_04.png',                  pays: [null, null, 50,  100, 200] },
+    { name: 'SCAT', src: '/assets/symbols/scatter_energy_burst_variant_01.png',                 pays: [null, null, null, null, null] },
+    { name: 'H1',   src: '/assets/symbols/h1_futuristic_rim_variant_02.png',                    pays: [null, null, 25,   75, 150] },
+    { name: 'H2',   src: '/assets/symbols/h2_neon_turbocharger_variant_01.png',                 pays: [null, null, 20,   60, 120] },
+    { name: 'M1',   src: '/assets/symbols/m1_holographic_grille_variant_09_original.png',       pays: [null, null, 15,   40,  80] },
+    { name: 'M2',   src: '/assets/symbols/m2_glowing_exhaust_variant_01.png',                   pays: [null, null, 10,   25,  50] },
+    { name: 'M3',   src: '/assets/symbols/m3_holographic_steering_wheel_variant_03.png',        pays: [null, null,  5,   15,  30] },
+    { name: 'L1',   src: '/assets/symbols/l1_chrome_lug_nut_variant_05.png',                    pays: [null, null,  3,    8,  15] },
+    { name: 'L2',   src: '/assets/symbols/l2_chrome_spark_plug_variant_05.png',                 pays: [null, null,  2,    5,  10] },
+    { name: 'L3',   src: '/assets/symbols/l3_neon_piston_variant_08.png',                       pays: [null, null,  2,    4,   8] },
   ] as const
 </script>
 
@@ -72,7 +72,7 @@
                 <img src={sym.src} alt={sym.name} class="sym-icon" />
                 <span class="sym-name">{sym.name}</span>
               </td>
-              {#if sym.name === 'SCATTER'}
+              {#if sym.name === 'SCAT'}
                 <td colspan="3" class="scatter-note">Triggers Free Rounds</td>
               {:else}
                 <td class="pay-cell">{sym.pays[2] ?? '—'}</td>

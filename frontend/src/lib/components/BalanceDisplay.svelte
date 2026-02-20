@@ -24,7 +24,7 @@
 <style>
   .balance-panel {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
 
     /* Cyberpunk balance panel image as the frame */
@@ -35,9 +35,9 @@
     /* Size the panel to show a reasonable portion of the art */
     min-width: 220px;
     height: 56px;
-    padding: 0 1.5rem;
+    /* Horizontal padding keeps text off the decorative left/right edges */
+    padding: 0 1.4rem;
 
-    /* Readable text on the dark panel image */
     position: relative;
   }
 
@@ -47,29 +47,37 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Nudge the stack 1px upward so the optical centre sits on the panel midline */
+    padding-top: 1px;
+    gap: 1px;
   }
 
   .divider {
     width: 1px;
-    height: 60%;
+    align-self: center;
+    height: 55%;
     background: rgba(255, 200, 50, 0.25);
     flex-shrink: 0;
   }
 
   .label {
-    font-size: 0.58rem;
+    font-size: 0.56rem;
     letter-spacing: 0.14em;
-    color: rgba(255, 200, 50, 0.7);
+    color: rgba(255, 200, 50, 0.75);
     text-transform: uppercase;
     line-height: 1;
+    /* Keep baseline flush — no extra descender space */
+    display: block;
   }
 
   .value {
-    font-size: 1.05rem;
+    font-size: 1.0rem;
     font-weight: 700;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    line-height: 1.3;
+    /* Tight line-height keeps it snug against the label */
+    line-height: 1.2;
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    display: block;
   }
 </style>

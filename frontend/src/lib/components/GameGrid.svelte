@@ -138,10 +138,10 @@
   function _makeCell(symbol: string, highlighted: boolean): Container {
     const c = new Container()
 
-    // Background panel
+    // Background panel — use low alpha so PNG symbols read against the city bg
     const bg = new Graphics()
-    bg.beginFill(highlighted ? 0x1e1a00 : 0x111120, highlighted ? 1 : 0.85)
-    bg.lineStyle(highlighted ? 2 : 1, highlighted ? 0xffd700 : 0x22224a)
+    bg.beginFill(highlighted ? 0x1e1a00 : 0x090914, highlighted ? 0.82 : 0.45)
+    bg.lineStyle(highlighted ? 2 : 1, highlighted ? 0xffd700 : 0x1e1e38, highlighted ? 1 : 0.7)
     bg.drawRoundedRect(0, 0, CELL_W, CELL_H, 8)
     bg.endFill()
     c.addChild(bg)
