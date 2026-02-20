@@ -5,14 +5,15 @@
   import BalanceDisplay from './lib/components/BalanceDisplay.svelte'
   import WinDisplay     from './lib/components/WinDisplay.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
-  import WinCelebration   from './lib/components/WinCelebration.svelte'
-  import PaytableModal    from './lib/components/PaytableModal.svelte'
+  import WinCelebration      from './lib/components/WinCelebration.svelte'
+  import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
+  import PaytableModal       from './lib/components/PaytableModal.svelte'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     buyBonusActive, recordSpinResult, resetWin, errorMessage,
-    winMultiplier, showPaytable,
+    winMultiplier, showPaytable, isWincap,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -44,13 +45,18 @@
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
-      recordSpinResult(result.totalWin, bet, result.newBalance)
+      recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
       buyBonusActive.set(false)
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
-        if ($autoPlayCount <= 0) isAutoPlay.set(false)
-        else setTimeout(handleSpin, 800)
+        // Stop auto-play immediately on wincap — player must manually collect
+        if ($autoPlayCount <= 0 || $isWincap) {
+          isAutoPlay.set(false)
+          autoPlayCount.set(0)
+        } else {
+          setTimeout(handleSpin, 800)
+        }
       }
     } catch (err) {
       console.error('[Spin error]', err)
@@ -65,6 +71,12 @@
 </script>
 
 <main class="game-wrapper" class:bonus-bg={$buyBonusActive}>
+  <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
+  <MaxWinCelebration
+    show={$isWincap}
+    on:collect={() => isWincap.set(false)}
+  />
+
   {#if $isLoading}
     <LoadingScreen />
   {/if}
@@ -79,7 +91,8 @@
   {/if}
 
   <section class="grid-section">
-    <WinCelebration winMultiplier={$winMultiplier} />
+    <!-- Suppress standard celebration while the max-win overlay is active -->
+    <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
     <GameGrid bind:this={gridRef} />
   </section>
 

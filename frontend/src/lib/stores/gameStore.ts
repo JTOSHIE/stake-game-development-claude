@@ -142,14 +142,20 @@ export function setMinBet(): void {
   betAmount.set(BET_LEVELS[0])
 }
 
-export function recordSpinResult(win: number, bet: number, authBalance?: number): void {
+export function recordSpinResult(
+  win:          number,
+  bet:          number,
+  authBalance?: number,
+  wincapHit?:   boolean,   // authoritative flag from SpinResult; fallback to local ratio check
+): void {
   winAmount.set(win)
   if (authBalance !== undefined) {
     balance.set(authBalance)          // RGS authoritative — never apply local math
   } else {
     balance.update($bal => $bal - bet + win)   // mock: manage locally
   }
-  isWincap.set(win / bet >= WINCAP)
+  // Prefer the server-computed flag; fall back to local ratio only if absent
+  isWincap.set(wincapHit !== undefined ? wincapHit : win / bet >= WINCAP)
   sessionStats.update(s => ({
     spinsPlayed: s.spinsPlayed + 1,
     totalBet:    s.totalBet + bet,
