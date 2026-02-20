@@ -1,12 +1,14 @@
 <script lang="ts">
   import {
-    betAmount, canSpin, canBuyBonus, isSpinning, isAutoPlay,
-    autoPlayCount, buyBonusActive,
+    betAmount, canSpin, canBuyBonus, canIncreaseBet, canSetMaxBet,
+    isSpinning, isAutoPlay, autoPlayCount, buyBonusActive,
+    isTurbo, isMuted, showPaytable,
     increaseBet, decreaseBet, setMaxBet, setMinBet,
     locale, currencyCode, BET_LEVELS,
   } from '../stores/gameStore'
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { playClick } from '../services/soundService'
   import { createEventDispatcher } from 'svelte'
 
   const dispatch = createEventDispatcher<{ spin: void; buyBonus: void }>()
@@ -20,12 +22,14 @@
 
   function handleBuyBonus() {
     if ($canBuyBonus) {
+      playClick()
       buyBonusActive.set(true)
       dispatch('buyBonus')
     }
   }
 
   function startAuto(count: number) {
+    playClick()
     autoPlayCount.set(count)
     isAutoPlay.set(true)
     showAutoMenu = false
@@ -33,30 +37,91 @@
   }
 
   function stopAuto() {
+    playClick()
     isAutoPlay.set(false)
     autoPlayCount.set(0)
+  }
+
+  function handleIncreaseBet() {
+    playClick()
+    increaseBet()
+  }
+
+  function handleDecreaseBet() {
+    playClick()
+    decreaseBet()
+  }
+
+  function handleMaxBet() {
+    playClick()
+    setMaxBet()
+  }
+
+  function toggleTurbo() {
+    playClick()
+    isTurbo.update(v => !v)
+  }
+
+  function toggleMute() {
+    isMuted.update(v => !v)
+  }
+
+  function openPaytable() {
+    playClick()
+    showPaytable.set(true)
   }
 </script>
 
 <div class="control-bar">
+
+  <!-- ── Utility row: Turbo / Mute / Info ─────────────────────────────────── -->
+  <div class="utility-row">
+    <button
+      class="util-btn"
+      class:util-active={$isTurbo}
+      on:click={toggleTurbo}
+      disabled={$isSpinning}
+      aria-label="Toggle turbo mode"
+      title="Turbo"
+    >⚡</button>
+
+    <button
+      class="util-btn"
+      class:util-active={!$isMuted}
+      on:click={toggleMute}
+      aria-label={$isMuted ? 'Unmute' : 'Mute'}
+      title={$isMuted ? 'Unmute' : 'Mute'}
+    >{$isMuted ? '🔇' : '🔊'}</button>
+
+    <button
+      class="util-btn"
+      on:click={openPaytable}
+      disabled={$isSpinning}
+      aria-label={t($locale, 'paytable')}
+      title={t($locale, 'paytable')}
+    >ℹ</button>
+  </div>
+
+  <!-- ── Main controls row ────────────────────────────────────────────────── -->
+  <div class="main-row">
 
   <!-- ── Left cluster: Bet selector + Min/Max ─────────────────────────────── -->
   <div class="bet-cluster">
 
     <!-- Bet selector panel (image background) -->
     <div class="bet-selector-panel">
-      <button class="nudge-btn" on:click={decreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
+      <button class="nudge-btn" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
 
       <div class="bet-value-wrap">
         <span class="bet-label">{t($locale, 'bet')}</span>
         <span class="bet-value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
       </div>
 
-      <button class="nudge-btn" on:click={increaseBet} disabled={$isSpinning} aria-label="Increase bet">+</button>
+      <button class="nudge-btn" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
     </div>
 
     <!-- Max Bet image button -->
-    <button class="img-btn maxbet-btn" on:click={setMaxBet} disabled={$isSpinning} aria-label={t($locale, 'maxBet')}>
+    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
       <img src="/assets/symbols/ui_maxbet_button_variant_02.png" alt="Max Bet" draggable="false" />
     </button>
   </div>
@@ -119,21 +184,73 @@
       {t($locale, 'buyBonus')}
     </button>
   </div>
+
+  </div><!-- /main-row -->
 </div>
 
 <style>
   /* ── Bar container ──────────────────────────────────────────────────────── */
   .control-bar {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1.2rem;
-    padding: 0.6rem 1rem 0.8rem;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem 0.8rem;
     /* Semi-transparent dark strip — keeps art visible through it */
     background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 100%);
     border-top: 1px solid rgba(255, 200, 50, 0.12);
     flex-shrink: 0;
     position: relative;
+  }
+
+  /* ── Utility row ─────────────────────────────────────────────────────────── */
+  .utility-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .util-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 0.9rem;
+    width: 30px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .util-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .util-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .util-btn.util-active {
+    background: rgba(255, 200, 50, 0.12);
+    border-color: rgba(255, 200, 50, 0.35);
+    color: #ffc832;
+  }
+
+  /* Inner buttons row (bet + spin + aux) keeps its horizontal layout */
+  .main-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    width: 100%;
   }
 
   /* ── Generic image-button reset ─────────────────────────────────────────── */

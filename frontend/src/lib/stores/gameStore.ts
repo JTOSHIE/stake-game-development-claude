@@ -39,11 +39,20 @@ export const locale = writable<Locale>('en')
 /** ISO 4217 currency code from the RGS authenticate response (e.g. "USD", "JPY", "XGC") */
 export const currencyCode = writable<string>('USD')
 
+/** Turbo mode — greatly reduces reel animation duration */
+export const isTurbo = writable<boolean>(false)
+
+/** Whether all audio is muted */
+export const isMuted = writable<boolean>(false)
+
+/** Whether the paytable modal is open */
+export const showPaytable = writable<boolean>(false)
+
 /** Raw board result from last spin — 5 reels × 4 rows */
 export const boardSymbols = writable<string[][]>([])
 
-/** Win lines / ways highlighted after last spin */
-export const activeWins = writable<Array<{ symbol: string; ways: number; payout: number }>>([])
+/** Win events after last spin (kind = match length 3|4|5) */
+export const activeWins = writable<Array<{ symbol: string; kind: number; ways: number; payout: number }>>([])
 
 /** Scatter count on last spin (0 if none) */
 export const scatterCount = writable<number>(0)
@@ -87,12 +96,32 @@ export const canBuyBonus = derived(
   ([$bal, $bet, $spinning, $loading]) => $bal >= $bet * 100 && !$spinning && !$loading
 )
 
+/** Whether the bet can be increased without exceeding balance */
+export const canIncreaseBet = derived(
+  [betAmount, balance],
+  ([$bet, $bal]) => {
+    const idx = BET_LEVELS.indexOf($bet)
+    return idx < BET_LEVELS.length - 1 && BET_LEVELS[idx + 1] <= $bal
+  }
+)
+
+/** Whether the current bet is already the max affordable level */
+export const canSetMaxBet = derived(
+  [betAmount, balance],
+  ([$bet, $bal]) => {
+    const affordable = BET_LEVELS.filter(l => l <= $bal)
+    return affordable.length > 0 && affordable[affordable.length - 1] !== $bet
+  }
+)
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 export function increaseBet(): void {
+  const bal = get(balance)
   betAmount.update($bet => {
     const idx = BET_LEVELS.indexOf($bet)
-    return idx < BET_LEVELS.length - 1 ? BET_LEVELS[idx + 1] : $bet
+    if (idx < BET_LEVELS.length - 1 && BET_LEVELS[idx + 1] <= bal) return BET_LEVELS[idx + 1]
+    return $bet
   })
 }
 
@@ -104,7 +133,9 @@ export function decreaseBet(): void {
 }
 
 export function setMaxBet(): void {
-  betAmount.set(BET_LEVELS[BET_LEVELS.length - 1])
+  const bal = get(balance)
+  const affordable = BET_LEVELS.filter(l => l <= bal)
+  if (affordable.length) betAmount.set(affordable[affordable.length - 1])
 }
 
 export function setMinBet(): void {

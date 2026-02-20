@@ -7,10 +7,14 @@
    * Falls back to coloured placeholder rectangles if a texture is missing.
    *
    * Spin animation: reels scroll downward sequentially, stopping one-by-one.
+   * Turbo mode halves all durations.
+   * Win highlights: gold bounding boxes drawn on a dedicated Graphics overlay.
    */
   import { onMount, onDestroy } from 'svelte'
+  import { get } from 'svelte/store'
   import { Assets, Application, Container, Graphics, Sprite, Texture, Text } from 'pixi.js'
-  import { boardSymbols, activeWins, isSpinning } from '../stores/gameStore'
+  import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
+  import { playSpin, playReelStop } from '../services/soundService'
 
   // ── Layout constants ──────────────────────────────────────────────────────
   const REELS    = 5
@@ -48,6 +52,7 @@
   let app: Application
   let reelContainers: Container[] = []
   let cellContainers: Container[][] = []   // [reel][row]
+  let winHighlightLayer: Graphics
   let assetsReady = false
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -71,7 +76,15 @@
       if (assetsReady && board && board.length === REELS) _updateBoard(board)
     })
 
-    return unsubBoard
+    // React to win events — draw bounding boxes after activeWins is updated
+    const unsubWins = activeWins.subscribe(() => {
+      if (assetsReady) _applyWinHighlights()
+    })
+
+    return () => {
+      unsubBoard()
+      unsubWins()
+    }
   })
 
   onDestroy(() => {
@@ -115,6 +128,10 @@
 
       app.stage.addChild(rc)
     }
+
+    // Win highlight overlay — sits above all reels, cleared each spin
+    winHighlightLayer = new Graphics()
+    app.stage.addChild(winHighlightLayer)
   }
 
   // ── Cell factory ──────────────────────────────────────────────────────────
@@ -128,14 +145,6 @@
     bg.drawRoundedRect(0, 0, CELL_W, CELL_H, 8)
     bg.endFill()
     c.addChild(bg)
-
-    // Glow border on highlighted (win) cells
-    if (highlighted) {
-      const glow = new Graphics()
-      glow.lineStyle(4, 0xffd700, 0.35)
-      glow.drawRoundedRect(-2, -2, CELL_W + 4, CELL_H + 4, 10)
-      c.addChild(glow)
-    }
 
     // Symbol sprite (or fallback placeholder)
     const url = SYMBOL_TEXTURES[symbol]
@@ -185,7 +194,7 @@
         _replaceCell(r, row, board[r]?.[row] ?? 'L3', false)
       }
     }
-    _applyWinHighlights()
+    // Highlights are drawn separately when activeWins subscription fires
   }
 
   function _replaceCell(reel: number, row: number, symbol: string, highlighted: boolean): void {
@@ -199,27 +208,62 @@
     cellContainers[reel][row] = newCell
   }
 
+  // ── Win bounding-box highlights ───────────────────────────────────────────
   function _applyWinHighlights(): void {
-    // activeWins contains { symbol, kind, ways, payout }
-    // Highlight every cell whose symbol matches a winning combination
-    import('../stores/gameStore').then(({ activeWins: aw }) => {
-      const wins = (aw as typeof activeWins)
-      const board = (boardSymbols as typeof boardSymbols)
-      // Use store values directly via module re-import
-    })
+    if (!winHighlightLayer) return
+    winHighlightLayer.clear()
+
+    const wins = get(activeWins)
+    const board = get(boardSymbols)
+    if (!wins.length || !board.length) return
+
+    const STRIP_H = CELL_H + GAP
+    const STRIP_W = CELL_W + GAP
+
+    for (const win of wins) {
+      // kind = match length (3 | 4 | 5): highlight reels 0..kind-1
+      const reelCount = win.kind ?? 3
+
+      for (let r = 0; r < reelCount; r++) {
+        const reelSymbols = board[r] ?? []
+        for (let row = 0; row < ROWS; row++) {
+          const sym = reelSymbols[row]
+          // Match the win symbol; WILD substitutes for everything
+          if (sym === win.symbol || sym === 'W' || win.symbol === 'W') {
+            const cx = r   * STRIP_W
+            const cy = row * STRIP_H
+
+            // Gold glow outline
+            winHighlightLayer.lineStyle(3, 0xffd700, 0.9)
+            winHighlightLayer.drawRoundedRect(cx + 1, cy + 1, CELL_W - 2, CELL_H - 2, 8)
+
+            // Inner tint fill
+            winHighlightLayer.beginFill(0xffd700, 0.12)
+            winHighlightLayer.drawRoundedRect(cx + 1, cy + 1, CELL_W - 2, CELL_H - 2, 8)
+            winHighlightLayer.endFill()
+          }
+        }
+      }
+    }
   }
 
   // ── Public API — called by App.svelte ─────────────────────────────────────
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
 
-    isSpinning.set(true)
+    // Clear previous win highlights immediately
+    winHighlightLayer?.clear()
 
-    // Staggered reel stop — reel r stops at (500 + r×150) ms
+    isSpinning.set(true)
+    playSpin()
+
+    const isT = get(isTurbo)
+
+    // Staggered reel stop — normal: (500 + r×150) ms, turbo: (150 + r×50) ms
     const spinPromises = reelContainers.map((rc, r) =>
       new Promise<void>(resolve => {
         const startTime = performance.now()
-        const duration  = 500 + r * 150
+        const duration  = isT ? 150 + r * 50 : 500 + r * 150
 
         const STRIP_H = CELL_H + GAP
 
@@ -237,7 +281,7 @@
           if (progress < 1) {
             requestAnimationFrame(tick)
           } else {
-            // Snap to final symbols with a tiny elastic bounce
+            // Snap to final symbols
             const reel = finalBoard[r] ?? []
             for (let row = 0; row < ROWS; row++) {
               _replaceCell(r, row, reel[row] ?? 'L3', false)
@@ -245,11 +289,12 @@
             }
 
             // Brief overshoot then snap back
-            reelContainers[r].y = 6
+            reelContainers[r].y = isT ? 3 : 6
             setTimeout(() => {
               if (reelContainers[r]) reelContainers[r].y = 0
-            }, 80)
+            }, isT ? 40 : 80)
 
+            playReelStop(r)
             resolve()
           }
         }

@@ -6,12 +6,13 @@
   import WinDisplay     from './lib/components/WinDisplay.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
   import WinCelebration   from './lib/components/WinCelebration.svelte'
+  import PaytableModal    from './lib/components/PaytableModal.svelte'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     buyBonusActive, recordSpinResult, resetWin, errorMessage,
-    winMultiplier,
+    winMultiplier, showPaytable,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -88,6 +89,10 @@
   </footer>
 
   <ControlBar on:spin={handleSpin} on:buyBonus={handleBuyBonus} />
+
+  {#if $showPaytable}
+    <PaytableModal />
+  {/if}
 </main>
 
 <style>
