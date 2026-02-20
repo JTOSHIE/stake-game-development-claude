@@ -3,9 +3,10 @@
     betAmount, canSpin, canBuyBonus, isSpinning, isAutoPlay,
     autoPlayCount, buyBonusActive,
     increaseBet, decreaseBet, setMaxBet, setMinBet,
-    locale, BET_LEVELS,
+    locale, currencyCode, BET_LEVELS,
   } from '../stores/gameStore'
   import { t } from '../i18n/translations'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { createEventDispatcher } from 'svelte'
 
   const dispatch = createEventDispatcher<{ spin: void; buyBonus: void }>()
@@ -48,7 +49,7 @@
 
       <div class="bet-value-wrap">
         <span class="bet-label">{t($locale, 'bet')}</span>
-        <span class="bet-value">${$betAmount.toFixed(2)}</span>
+        <span class="bet-value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
       </div>
 
       <button class="nudge-btn" on:click={increaseBet} disabled={$isSpinning} aria-label="Increase bet">+</button>

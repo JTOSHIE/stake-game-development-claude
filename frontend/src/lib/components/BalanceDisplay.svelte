@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { balance, betAmount, locale } from '../stores/gameStore'
+  import { balance, betAmount, locale, currencyCode } from '../stores/gameStore'
   import { t } from '../i18n/translations'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 </script>
 
 <!--
@@ -11,12 +12,12 @@
 <div class="balance-panel">
   <div class="field">
     <span class="label">{t($locale, 'balance')}</span>
-    <span class="value">${$balance.toFixed(2)}</span>
+    <span class="value">{formatBalance($balance * CURRENCY_SCALE, $currencyCode)}</span>
   </div>
   <div class="divider"></div>
   <div class="field">
     <span class="label">{t($locale, 'bet')}</span>
-    <span class="value">${$betAmount.toFixed(2)}</span>
+    <span class="value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
   </div>
 </div>
 

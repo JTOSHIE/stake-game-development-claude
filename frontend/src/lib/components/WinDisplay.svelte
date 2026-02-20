@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { winAmount, winMultiplier, isWincap, scatterCount, locale } from '../stores/gameStore'
+  import { winAmount, winMultiplier, isWincap, scatterCount, locale, currencyCode } from '../stores/gameStore'
   import { t } from '../i18n/translations'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 
   $: showWin = $winAmount > 0
   $: scatterKey = $scatterCount >= 5 ? 'scatter5'
@@ -25,7 +26,7 @@
 
   <div class="win-amount" class:wincap={$isWincap}>
     {#if showWin}
-      <span class="currency">$</span>{$winAmount.toFixed(2)}
+      {formatBalance($winAmount * CURRENCY_SCALE, $currencyCode)}
     {:else}
       —
     {/if}

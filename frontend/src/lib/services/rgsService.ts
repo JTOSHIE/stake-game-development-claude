@@ -13,7 +13,7 @@
  * NEVER use floats for monetary values sent to the API.
  */
 
-import { errorMessage, isLoading, balance } from '../stores/gameStore'
+import { errorMessage, isLoading, balance, currencyCode } from '../stores/gameStore'
 
 // ── Currency ──────────────────────────────────────────────────────────────────
 /** 1 dollar = 1,000,000 micros. Use ONLY integer arithmetic for money. */
@@ -398,8 +398,9 @@ export async function initRGS(_gameId: string, _legacyToken: string): Promise<vo
     _sessionParams = parseSessionParams()
     const auth     = await authenticate(_sessionParams)
 
-    // Sync balance from RGS into the game store
+    // Sync balance and currency from RGS into the game store
     balance.set(auth.balance)
+    if (auth.currency) currencyCode.set(auth.currency)
 
     _rgsMode = true
     _devLog('RGS connected — auth OK', { balance: auth.balance, betLevels: auth.betLevels })

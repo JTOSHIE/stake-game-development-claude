@@ -36,6 +36,9 @@ export const errorMessage = writable<string | null>(null)
 /** Active locale */
 export const locale = writable<Locale>('en')
 
+/** ISO 4217 currency code from the RGS authenticate response (e.g. "USD", "JPY", "XGC") */
+export const currencyCode = writable<string>('USD')
+
 /** Raw board result from last spin — 5 reels × 4 rows */
 export const boardSymbols = writable<string[][]>([])
 
