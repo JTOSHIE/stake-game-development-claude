@@ -4,12 +4,14 @@
   import ControlBar     from './lib/components/ControlBar.svelte'
   import BalanceDisplay from './lib/components/BalanceDisplay.svelte'
   import WinDisplay     from './lib/components/WinDisplay.svelte'
-  import LoadingScreen  from './lib/components/LoadingScreen.svelte'
+  import LoadingScreen    from './lib/components/LoadingScreen.svelte'
+  import WinCelebration   from './lib/components/WinCelebration.svelte'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     buyBonusActive, recordSpinResult, resetWin, errorMessage,
+    winMultiplier,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -76,6 +78,7 @@
   {/if}
 
   <section class="grid-section">
+    <WinCelebration winMultiplier={$winMultiplier} />
     <GameGrid bind:this={gridRef} />
   </section>
 
