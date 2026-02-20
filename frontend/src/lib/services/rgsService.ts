@@ -120,7 +120,7 @@ export interface SpinResult {
   winEvents:    WinEvent[]
   scatterEvent: ScatterEvent | null
   totalWin:     number             // dollars
-  newBalance:   number             // dollars (0 = managed by store)
+  newBalance?:  number             // dollars; present = RGS authoritative; absent = mock (store manages)
   isWincap:     boolean
   roundId:      string
 }
@@ -441,14 +441,18 @@ async function _rgsSpinReal(req: SpinRequest): Promise<SpinResult> {
   try {
     const playResp = await play(params, req.betAmount)
 
-    // Close the round if there is a win (required by RGS contract)
+    // authBalance starts as the post-play value (bet already deducted by RGS)
+    let authBalance = playResp.balance
+
+    // Close the round on a win — RGS credits the prize and returns updated balance
     if (playResp.winMicros > 0) {
       const endResp = await endRound(params, playResp.roundId)
-      // Authoritative post-round balance from RGS
-      balance.set(endResp.balance)
+      authBalance = endResp.balance   // post-credit authoritative balance
     }
 
-    return _parsePlayResponse(playResp, req.betAmount)
+    const result = _parsePlayResponse(playResp, req.betAmount)
+    result.newBalance = authBalance   // carry authoritative balance to App.svelte
+    return result
   } catch (err) {
     const rgsErr = handleRGSError(err)
     errorMessage.set(rgsErr.message)
@@ -503,9 +507,9 @@ function _parsePlayResponse(resp: PlayResponse, betDollars: number): SpinResult 
     winEvents,
     scatterEvent,
     totalWin:   resp.win,
-    newBalance: resp.balance,
     isWincap:   resp.win / betDollars >= 5000,
     roundId:    resp.roundId,
+    // newBalance is set by _rgsSpinReal after endRound completes
   }
 }
 
@@ -590,8 +594,8 @@ function _mockSpin(req: SpinRequest): SpinResult {
     winEvents,
     scatterEvent,
     totalWin,
-    newBalance: 0,      // App.svelte calls recordSpinResult() which manages store
-    isWincap:   totalWin / req.betAmount >= 5000,
-    roundId:    `mock-${Date.now()}`,
+    // newBalance intentionally absent — recordSpinResult manages balance locally in mock mode
+    isWincap: totalWin / req.betAmount >= 5000,
+    roundId:  `mock-${Date.now()}`,
   }
 }

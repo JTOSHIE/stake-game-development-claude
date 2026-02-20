@@ -108,9 +108,13 @@ export function setMinBet(): void {
   betAmount.set(BET_LEVELS[0])
 }
 
-export function recordSpinResult(win: number, bet: number): void {
+export function recordSpinResult(win: number, bet: number, authBalance?: number): void {
   winAmount.set(win)
-  balance.update($bal => $bal - bet + win)
+  if (authBalance !== undefined) {
+    balance.set(authBalance)          // RGS authoritative — never apply local math
+  } else {
+    balance.update($bal => $bal - bet + win)   // mock: manage locally
+  }
   isWincap.set(win / bet >= WINCAP)
   sessionStats.update(s => ({
     spinsPlayed: s.spinsPlayed + 1,

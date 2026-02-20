@@ -22,11 +22,12 @@
     const gameId  = 'future_spinner'
 
     await initRGS(gameId, token)
-    isLoading.set(false)
+    // isLoading is cleared inside initRGS's finally block
   })
 
   async function handleSpin() {
     if ($isSpinning) return
+    isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
 
     const mode = $buyBonusActive ? 'bonus' : 'base'
@@ -40,7 +41,7 @@
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
-      recordSpinResult(result.totalWin, bet)
+      recordSpinResult(result.totalWin, bet, result.newBalance)
       buyBonusActive.set(false)
 
       if ($isAutoPlay) {
