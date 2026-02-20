@@ -1,0 +1,19 @@
+{
+  "gameName": "future_spinner",
+  "studioName": "We Roll Spinners",
+  "version": "1.0.0",
+  "gridSize": {
+    "columns": 5,
+    "rows": 4
+  },
+  "waysToWin": 1024,
+  "rtpTarget": 96.35,
+  "modes": ["base"],
+  "betLevels": [0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00, 100.00],
+  "minBet": 0.10,
+  "maxBet": 100.00,
+  "stepBet": 0.10,
+  "symbols": ["H1", "H2", "M1", "M2", "M3", "L1", "L2", "L3", "WILD", "SCATTER"],
+  "bonusFeature": "instant_scatter_multiplier",
+  "stateless": true
+}
