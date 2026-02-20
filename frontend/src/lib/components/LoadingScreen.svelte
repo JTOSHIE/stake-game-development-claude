@@ -1,45 +1,48 @@
 <script lang="ts">
-  import { locale } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  // No reactive stores needed — this renders until isLoading clears
 </script>
 
 <div class="loading-screen">
-  <div class="spinner"></div>
-  <p class="label">{t($locale, 'loading')}</p>
+  <div class="glow-ring">
+    <div class="spinner"></div>
+  </div>
+  <p class="label">LOADING CYBERNETICS...</p>
 </div>
 
 <style>
   .loading-screen {
     position: fixed;
     inset: 0;
+    z-index: 200;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Loading screen background */
-    background-color: #06060f;
-    background-image: url('/assets/symbols/bg3_loading_screen_desktop_variant_02.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 100;
+    background: rgba(13, 13, 31, 0.95);
   }
 
-  @media (max-width: 480px) {
-    .loading-screen {
-      background-image: url('/assets/symbols/bg3_loading_screen_mobile_variant_02.png');
-    }
+  /* Outer ambient glow ring so the spinner looks embedded in neon light */
+  .glow-ring {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 24px rgba(255, 200, 50, 0.35),
+      0 0 60px rgba(255, 150, 0, 0.18);
   }
 
   .spinner {
     width: 64px;
     height: 64px;
-    border: 4px solid rgba(255, 200, 50, 0.2);
+    border: 4px solid rgba(255, 200, 50, 0.15);
     border-top-color: #ffc832;
+    border-right-color: rgba(255, 200, 50, 0.55);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    /* Lift above background */
-    filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.6));
+    animation: spin 0.75s linear infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 200, 50, 0.75));
   }
 
   @keyframes spin {
@@ -47,11 +50,22 @@
   }
 
   .label {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     color: #ffc832;
-    font-size: 1rem;
-    letter-spacing: 0.12em;
-    font-family: sans-serif;
-    text-shadow: 0 0 12px rgba(255, 200, 50, 0.8);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 10px rgba(255, 200, 50, 0.9),
+      0 0 24px rgba(255, 150, 0, 0.5);
+    /* Subtle pulse so it feels alive */
+    animation: pulse 1.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { opacity: 0.75; }
+    to   { opacity: 1; }
   }
 </style>

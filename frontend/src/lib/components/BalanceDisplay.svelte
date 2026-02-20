@@ -11,13 +11,17 @@
 -->
 <div class="balance-panel">
   <div class="field">
-    <span class="label">{t($locale, 'balance')}</span>
-    <span class="value">{formatBalance($balance * CURRENCY_SCALE, $currencyCode)}</span>
+    <div class="text-pill">
+      <span class="label">{t($locale, 'balance')}</span>
+      <span class="value">{formatBalance($balance * CURRENCY_SCALE, $currencyCode)}</span>
+    </div>
   </div>
   <div class="divider"></div>
   <div class="field">
-    <span class="label">{t($locale, 'bet')}</span>
-    <span class="value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
+    <div class="text-pill">
+      <span class="label">{t($locale, 'bet')}</span>
+      <span class="value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
+    </div>
   </div>
 </div>
 
@@ -44,12 +48,19 @@
   .field {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* Nudge the stack 1px upward so the optical centre sits on the panel midline */
-    padding-top: 1px;
+  }
+
+  /* Dark pill ensures contrast over any background image colour */
+  .text-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1px;
+    background: rgba(0, 0, 0, 0.60);
+    border-radius: 4px;
+    padding: 3px 8px;
   }
 
   .divider {
@@ -61,23 +72,21 @@
   }
 
   .label {
-    font-size: 0.56rem;
+    font-size: 0.60rem;
     letter-spacing: 0.14em;
-    color: rgba(255, 200, 50, 0.75);
+    color: rgba(255, 200, 50, 0.9);
     text-transform: uppercase;
     line-height: 1;
-    /* Keep baseline flush — no extra descender space */
     display: block;
   }
 
   .value {
-    font-size: 1.0rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    /* Tight line-height keeps it snug against the label */
     line-height: 1.2;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
     display: block;
   }
 </style>

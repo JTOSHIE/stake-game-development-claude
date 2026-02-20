@@ -49,10 +49,14 @@
     <!-- ── Scrollable body ─────────────────────────────────────────── -->
     <div class="modal-body">
 
-      <!-- Ways to win callout -->
-      <div class="ways-callout">
-        <span class="ways-number">1,024</span>
-        <span class="ways-label">WAYS TO WIN</span>
+      <!-- How-to-win banner -->
+      <div class="how-to-win">
+        <p class="htw-headline">Match symbols on adjacent reels starting from reel 1 (left to right).</p>
+        <p class="htw-sub">All matching symbol positions count — no fixed paylines.</p>
+        <div class="ways-callout">
+          <span class="ways-number">1,024</span>
+          <span class="ways-label">WAYS TO WIN</span>
+        </div>
       </div>
 
       <!-- Symbol pay table -->
@@ -188,15 +192,42 @@
     gap: 1.2rem;
   }
 
+  /* ── How-to-win banner ────────────────────────────────────────────── */
+  .how-to-win {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.7rem 0.9rem;
+    background: rgba(0, 200, 255, 0.05);
+    border: 1px solid rgba(0, 200, 255, 0.18);
+    border-radius: 8px;
+  }
+
+  .htw-headline {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .htw-sub {
+    font-size: 0.72rem;
+    color: rgba(160, 228, 255, 0.75);
+    line-height: 1.35;
+    margin: 0;
+  }
+
   /* ── Ways callout ─────────────────────────────────────────────────── */
   .ways-callout {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    margin-top: 0.3rem;
     background: rgba(255, 200, 50, 0.06);
     border: 1px solid rgba(255, 200, 50, 0.2);
-    border-radius: 8px;
+    border-radius: 6px;
   }
 
   .ways-number {

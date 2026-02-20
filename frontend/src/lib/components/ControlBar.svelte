@@ -113,8 +113,10 @@
       <button class="nudge-btn" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
 
       <div class="bet-value-wrap">
-        <span class="bet-label">{t($locale, 'bet')}</span>
-        <span class="bet-value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
+        <div class="bet-text-pill">
+          <span class="bet-label">{t($locale, 'bet')}</span>
+          <span class="bet-value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
+        </div>
       </div>
 
       <button class="nudge-btn" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
@@ -331,19 +333,24 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 
-    width: 140px;
-    height: 44px;
-    padding: 0 6px;
+    width: 148px;
+    height: 48px;
+    padding: 0 2px;
   }
 
   .nudge-btn {
     background: none;
     border: none;
     color: #ffc832;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    padding: 0 6px;
+    /* 44×44 minimum tap target — icon is visually smaller via padding */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
     transition: color 0.1s, transform 0.1s;
     flex-shrink: 0;
@@ -351,7 +358,7 @@
 
   .nudge-btn:hover:not(:disabled) {
     color: #fff;
-    transform: scale(1.2);
+    transform: scale(1.25);
   }
 
   .nudge-btn:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -359,25 +366,32 @@
   .bet-value-wrap {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* 1px top nudge optically centres the two-line stack inside the 44px frame */
-    padding-top: 1px;
+  }
+
+  /* Dark pill — same treatment as BalanceDisplay for consistent contrast */
+  .bet-text-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1px;
+    background: rgba(0, 0, 0, 0.60);
+    border-radius: 4px;
+    padding: 2px 6px;
   }
 
   .bet-label {
-    font-size: 0.50rem;
+    font-size: 0.52rem;
     letter-spacing: 0.12em;
-    color: rgba(255, 200, 50, 0.70);
+    color: rgba(255, 200, 50, 0.90);
     text-transform: uppercase;
     line-height: 1;
     display: block;
   }
 
   .bet-value {
-    font-size: 0.92rem;
+    font-size: 0.98rem;
     font-weight: 700;
     color: #fff;
     font-family: 'Courier New', monospace;
@@ -385,10 +399,12 @@
     display: block;
   }
 
-  /* Max Bet image button */
+  /* Max Bet image button — min 44px tall for a safe tap target */
   .maxbet-btn {
-    width: 80px;
-    height: 28px;
+    width: 96px;
+    height: 36px;
+    /* Visible hit-area extension via padding keeps the image its natural size */
+    padding: 4px 0;
   }
 
   /* ── Right cluster ────────────────────────────────────────────────────────── */
