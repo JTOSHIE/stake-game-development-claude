@@ -233,11 +233,14 @@
     background: rgba(255, 255, 255, 0.12);
     color: #fff;
     border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    filter: brightness(1.1);
   }
 
   .util-btn:disabled {
-    opacity: 0.3;
+    opacity: 0.45;
     cursor: not-allowed;
+    filter: grayscale(0.4);
   }
 
   .util-btn.util-active {
@@ -287,8 +290,9 @@
   }
 
   .img-btn:disabled {
-    opacity: 0.35;
+    opacity: 0.45;
     cursor: not-allowed;
+    filter: grayscale(0.4);
   }
 
   /* ── Spin button ─────────────────────────────────────────────────────────── */
@@ -296,6 +300,18 @@
     width: 96px;
     height: 96px;
     flex-shrink: 0;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .spin-btn:hover:not(:disabled) {
+    transform: scale(1.04);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.7), 0 0 40px rgba(255, 0, 255, 0.3);
+    filter: brightness(1.15);
+  }
+
+  .spin-btn:active:not(:disabled) {
+    transform: scale(0.97);
+    transition-duration: 0.05s;
   }
 
   .spin-btn.spinning img {
@@ -357,11 +373,18 @@
   }
 
   .nudge-btn:hover:not(:disabled) {
-    color: #fff;
-    transform: scale(1.25);
+    transform: scale(1.06);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+    color: #00ffff;
+    border-color: #00ffff;
   }
 
-  .nudge-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nudge-btn:active:not(:disabled) {
+    transform: scale(0.95);
+    transition-duration: 0.05s;
+  }
+
+  .nudge-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
 
   .bet-value-wrap {
     flex: 1;
@@ -498,5 +521,5 @@
     color: #fff;
   }
 
-  .bonus-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .bonus-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
 </style>

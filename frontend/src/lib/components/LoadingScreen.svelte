@@ -1,5 +1,5 @@
 <script lang="ts">
-  // No reactive stores needed — this renders until isLoading clears
+  import { assetLoadProgress } from '../stores/loadingStore'
 </script>
 
 <div class="loading-screen">
@@ -7,6 +7,11 @@
     <div class="spinner"></div>
   </div>
   <p class="label">LOADING CYBERNETICS...</p>
+
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" style="width: {$assetLoadProgress}%"></div>
+  </div>
+  <p class="progress-label">{$assetLoadProgress}%</p>
 </div>
 
 <style>
@@ -60,12 +65,36 @@
     text-shadow:
       0 0 10px rgba(255, 200, 50, 0.9),
       0 0 24px rgba(255, 150, 0, 0.5);
-    /* Subtle pulse so it feels alive */
     animation: pulse 1.6s ease-in-out infinite alternate;
   }
 
   @keyframes pulse {
     from { opacity: 0.75; }
     to   { opacity: 1; }
+  }
+
+  .progress-bar-track {
+    margin-top: 1.2rem;
+    width: 180px;
+    height: 4px;
+    background: rgba(255, 200, 50, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffc832, #ff8c00);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(255, 200, 50, 0.7);
+  }
+
+  .progress-label {
+    margin-top: 0.4rem;
+    color: rgba(255, 200, 50, 0.6);
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.15em;
   }
 </style>

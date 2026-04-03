@@ -8,12 +8,14 @@
    *
    * Spin animation: reels scroll downward sequentially, stopping one-by-one.
    * Turbo mode halves all durations.
-   * Win highlights: gold bounding boxes drawn on a dedicated Graphics overlay.
+   * Win highlights: scale-up + white flash on winning cells; non-winners dimmed.
+   * S symbol: pulsing cyan/magenta glow via PIXI Ticker.
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
-  import { Assets, Application, Container, Graphics, Sprite, Texture, Text } from 'pixi.js'
+  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
+  import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpin, playReelStop } from '../services/soundService'
 
   // ── Layout constants ──────────────────────────────────────────────────────
@@ -55,6 +57,11 @@
   let winHighlightLayer: Graphics
   let assetsReady = false
 
+  /** Live scatter sprites — pulsed by the scatter glow ticker */
+  let scatterSprites: Sprite[] = []
+  /** Ticker listener reference so we can remove it on destroy */
+  let scatterTickerFn: ((dt: number) => void) | null = null
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMount(async () => {
     app = new Application({
@@ -70,13 +77,14 @@
 
     assetsReady = true
     _buildGrid()
+    _startScatterGlow()
 
     // React to board store updates (called after spin resolves)
     const unsubBoard = boardSymbols.subscribe(board => {
       if (assetsReady && board && board.length === REELS) _updateBoard(board)
     })
 
-    // React to win events — draw bounding boxes after activeWins is updated
+    // React to win events — apply highlights after activeWins is updated
     const unsubWins = activeWins.subscribe(() => {
       if (assetsReady) _applyWinHighlights()
     })
@@ -88,18 +96,37 @@
   })
 
   onDestroy(() => {
+    if (scatterTickerFn && app?.ticker) app.ticker.remove(scatterTickerFn)
     app?.destroy(true)
   })
 
   // ── Asset preloading ──────────────────────────────────────────────────────
   async function _preloadTextures(): Promise<void> {
     const urls = Object.values(SYMBOL_TEXTURES)
+    assetLoadProgress.set(0)
     try {
-      await Assets.load(urls)
+      await Assets.load(urls, (progress: number) => {
+        assetLoadProgress.set(Math.round(progress * 100))
+      })
     } catch (err) {
       // Non-fatal: _makeCell falls back to placeholder for any missing texture
       console.warn('[GameGrid] Some textures failed to load:', err)
     }
+    assetLoadProgress.set(100)
+  }
+
+  // ── Scatter glow (PIXI Ticker) ─────────────────────────────────────────────
+  function _startScatterGlow(): void {
+    scatterTickerFn = () => {
+      // Prune destroyed sprites
+      scatterSprites = scatterSprites.filter(s => !s.destroyed)
+      if (scatterSprites.length === 0) return
+
+      // Pulse alpha 0.6 → 1.0 over 1.5 s loop
+      const alpha = 0.6 + 0.4 * (0.5 + 0.5 * Math.sin((performance.now() / 1500) * Math.PI * 2))
+      for (const s of scatterSprites) s.alpha = alpha
+    }
+    app.ticker.add(scatterTickerFn)
   }
 
   // ── Grid construction ─────────────────────────────────────────────────────
@@ -129,7 +156,7 @@
       app.stage.addChild(rc)
     }
 
-    // Win highlight overlay — sits above all reels, cleared each spin
+    // Win highlight overlay — kept for potential future use; cleared each spin
     winHighlightLayer = new Graphics()
     app.stage.addChild(winHighlightLayer)
   }
@@ -163,8 +190,16 @@
       sprite.x = Math.round((CELL_W - sprite.width)  / 2)
       sprite.y = Math.round((CELL_H - sprite.height) / 2)
 
-      // Scatter: subtle pulse tint to draw attention
-      if (symbol === 'S') sprite.tint = highlighted ? 0xffd7ff : 0xff99ff
+      // Cyberpunk saturation boost via ColorMatrixFilter
+      const cmf = new ColorMatrixFilter()
+      cmf.saturate(0.2, true)
+      sprite.filters = [cmf]
+
+      if (symbol === 'S') {
+        // Scatter: cyan/magenta tint; alpha pulsed by scatter ticker
+        sprite.tint = 0xff99ff
+        scatterSprites.push(sprite)
+      }
 
       c.addChild(sprite)
     } else {
@@ -204,55 +239,118 @@
     newCell.y = y
     reelContainers[reel].addChild(newCell)
     reelContainers[reel].removeChild(old)
+    // Destroy removes sprites from PixiJS; scatter ticker filters out destroyed sprites
     old.destroy({ children: true })
     cellContainers[reel][row] = newCell
   }
 
-  // ── Win bounding-box highlights ───────────────────────────────────────────
+  // ── Win highlights — scale-up + white flash on winners; dim non-winners ───
   function _applyWinHighlights(): void {
     if (!winHighlightLayer) return
     winHighlightLayer.clear()
 
-    const wins = get(activeWins)
+    const wins  = get(activeWins)
     const board = get(boardSymbols)
+
+    // Reset all cells to full alpha and normal scale first
+    for (let r = 0; r < REELS; r++) {
+      for (let row = 0; row < ROWS; row++) {
+        const cell = cellContainers[r]?.[row]
+        if (cell) { cell.alpha = 1; cell.scale.set(1) }
+      }
+    }
+
     if (!wins.length || !board.length) return
 
-    const STRIP_H = CELL_H + GAP
-    const STRIP_W = CELL_W + GAP
-
+    // Determine which cells are winning
+    const winningCells = new Set<string>()
     for (const win of wins) {
-      // kind = match length (3 | 4 | 5): highlight reels 0..kind-1
       const reelCount = win.kind ?? 3
-
       for (let r = 0; r < reelCount; r++) {
         const reelSymbols = board[r] ?? []
         for (let row = 0; row < ROWS; row++) {
           const sym = reelSymbols[row]
-          // Match the win symbol; WILD substitutes for everything
           if (sym === win.symbol || sym === 'W' || win.symbol === 'W') {
-            const cx = r   * STRIP_W
-            const cy = row * STRIP_H
-
-            // Gold glow outline
-            winHighlightLayer.lineStyle(3, 0xffd700, 0.9)
-            winHighlightLayer.drawRoundedRect(cx + 1, cy + 1, CELL_W - 2, CELL_H - 2, 8)
-
-            // Inner tint fill
-            winHighlightLayer.beginFill(0xffd700, 0.12)
-            winHighlightLayer.drawRoundedRect(cx + 1, cy + 1, CELL_W - 2, CELL_H - 2, 8)
-            winHighlightLayer.endFill()
+            winningCells.add(`${r},${row}`)
           }
         }
       }
     }
+
+    for (let r = 0; r < REELS; r++) {
+      for (let row = 0; row < ROWS; row++) {
+        const cell = cellContainers[r]?.[row]
+        if (!cell) continue
+
+        if (winningCells.has(`${r},${row}`)) {
+          // Scale up 1.0 → 1.1 over 200 ms, then white flash over 300 ms
+          _animateScale(cell, 1.0, 1.1, 200)
+          _flashCell(cell)
+        } else {
+          // Dim non-winners to 0.4
+          _animateAlpha(cell, 1.0, 0.4, 150)
+        }
+      }
+    }
+  }
+
+  function _animateScale(target: Container, from: number, to: number, duration: number): void {
+    const start = performance.now()
+    target.scale.set(from)
+    function tick(): void {
+      const progress = Math.min((performance.now() - start) / duration, 1)
+      const eased    = 1 - Math.pow(1 - progress, 2)
+      target.scale.set(from + (to - from) * eased)
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }
+
+  function _animateAlpha(target: Container, from: number, to: number, duration: number): void {
+    const start = performance.now()
+    target.alpha = from
+    function tick(): void {
+      const progress = Math.min((performance.now() - start) / duration, 1)
+      target.alpha = from + (to - from) * progress
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }
+
+  function _flashCell(cell: Container): void {
+    const flash = new Graphics()
+    flash.beginFill(0xffffff, 0.6)
+    flash.drawRoundedRect(0, 0, CELL_W, CELL_H, 8)
+    flash.endFill()
+    cell.addChild(flash)
+
+    const start    = performance.now()
+    const duration = 300
+    function tick(): void {
+      const progress = Math.min((performance.now() - start) / duration, 1)
+      flash.alpha = 0.6 * (1 - progress)
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      } else {
+        if (!cell.destroyed) cell.removeChild(flash)
+        flash.destroy()
+      }
+    }
+    requestAnimationFrame(tick)
   }
 
   // ── Public API — called by App.svelte ─────────────────────────────────────
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
 
-    // Clear previous win highlights immediately
+    // Clear previous win highlights immediately; reset alpha/scale
     winHighlightLayer?.clear()
+    for (let r = 0; r < REELS; r++) {
+      for (let row = 0; row < ROWS; row++) {
+        const cell = cellContainers[r]?.[row]
+        if (cell) { cell.alpha = 1; cell.scale.set(1) }
+      }
+    }
 
     isSpinning.set(true)
     playSpin()
