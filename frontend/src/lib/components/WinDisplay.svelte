@@ -1,28 +1,37 @@
 <script lang="ts">
-  import { winAmount, winMultiplier, betAmount, isWincap, scatterCount, locale, currencyCode } from '../stores/gameStore'
+  import { winAmount, betAmount, isWincap, scatterCount, locale, currencyCode } from '../stores/gameStore'
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { onDestroy } from 'svelte'
 
 
 
+  let targetValue  = 0
   let displayValue = 0
   let animFrame: number
+  let animating    = false
 
-  // Trigger count-up whenever winAmount changes to a positive value
-  $: if ($winAmount > 0) {
-    startCountUp($winAmount)
-  } else {
-    cancelAnimationFrame(animFrame)
+  // Start a new count-up only when winAmount goes positive.
+  // Never reset mid-animation — wait until animation finishes.
+  $: if ($winAmount > 0 && $winAmount !== targetValue) {
+    targetValue = $winAmount
+    startCountUp(targetValue)
+  } else if ($winAmount === 0 && !animating) {
+    targetValue  = 0
     displayValue = 0
   }
 
-  // Derive tier from winMultiplier (win / bet)
-  $: winTier = $winMultiplier >= 50  ? 'mega'
-             : $winMultiplier >= 10  ? 'big'
-             : $winMultiplier >= 1   ? 'gold'
-             : $winMultiplier >  0   ? 'green'
-             : 'none'
+  // Derive tier from targetValue (not the derived $winMultiplier store) so
+  // colour/label stays correct for the full duration of the count-up animation,
+  // even after winAmount has been reset to 0 for the next spin.
+  $: winTier = (() => {
+    const mult = $betAmount > 0 ? targetValue / $betAmount : 0
+    if (mult >= 50) return 'mega'
+    if (mult >= 10) return 'big'
+    if (mult >= 1)  return 'gold'
+    if (mult > 0)   return 'green'
+    return 'none'
+  })()
 
   // Keep scatter labels and wincap flag for the label area
   $: scatterKey = $scatterCount >= 5 ? 'scatter5'
@@ -32,18 +41,20 @@
 
   function startCountUp(target: number): void {
     cancelAnimationFrame(animFrame)
+    animating      = true
     const start    = performance.now()
     const duration = 600
-    const from     = 0
 
     function tick(now: number): void {
-      const elapsed  = now - start
-      const progress = Math.min(elapsed / duration, 1)
-      // Ease-out cubic: fast start, slow finish
+      const progress = Math.min((now - start) / duration, 1)
       const eased    = 1 - Math.pow(1 - progress, 3)
-      displayValue   = from + (target - from) * eased
-      if (progress < 1) animFrame = requestAnimationFrame(tick)
-      else displayValue = target
+      displayValue   = target * eased
+      if (progress < 1) {
+        animFrame = requestAnimationFrame(tick)
+      } else {
+        displayValue = target
+        animating    = false
+      }
     }
 
     animFrame = requestAnimationFrame(tick)
@@ -73,9 +84,9 @@
       {formatBalance(Math.round(displayValue * CURRENCY_SCALE), $currencyCode)}
     </div>
 
-    <!-- Multiplier badge (≥ 1×) -->
-    {#if $winMultiplier >= 1}
-      <div class="multiplier">{$winMultiplier.toFixed(1)}×</div>
+    <!-- Multiplier badge (≥ 1×) — uses targetValue so badge persists during animation -->
+    {#if $betAmount > 0 && targetValue / $betAmount >= 1}
+      <div class="multiplier">{(targetValue / $betAmount).toFixed(1)}×</div>
     {/if}
   </div>
 {:else}
