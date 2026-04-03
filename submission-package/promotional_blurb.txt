@@ -1,0 +1,34 @@
+FUTURE SPINNER — We Roll Spinners
+
+Future Spinner is a high-volatility 5×4 cyberpunk slot game built for
+the Stake Engine platform, delivering 1,024 ways-to-win across a rain-
+soaked neon megacity where spinning rims never stopped evolving.
+
+GAME HIGHLIGHTS
+- Grid: 5 reels × 4 rows — 1,024 ways-to-win
+- RTP: 96.35% (GLI-11 compliant, validated at 100,000 simulations)
+- Win cap: 5,000× maximum win
+- Hit rate: 33.57%
+- Volatility: Medium-High (σ = 16.26×)
+
+THEME & VISUALS
+Futuristic cyberpunk automotive culture — chrome spinning rims,
+turbochargers, holographic grilles, and neon exhaust pipes form the
+symbol set. Dark backgrounds, magenta and cyan neon glow, and looping
+cyberpunk cityscape video create an immersive premium aesthetic.
+
+BONUS FEATURE
+Stateless scatter multiplier — land 3, 4, or 5 Scatter symbols anywhere
+on the grid to win 5×, 15×, or 50× your total bet instantly. No free
+spin rounds — clean, fast, compliant.
+
+TECHNICAL
+- Platform: Stake Engine (Carrot RGS)
+- Frontend: Svelte 5 + PixiJS v7
+- Math: Carrot Math SDK (Python 3.12 + Rust optimiser)
+- Languages: 16 (ar, de, en, es, fi, fr, hi, id, ja, ko, pl, pt, ru, tr, vi, zh)
+- Currencies: 43 Stake Engine supported currencies
+- Studio: We Roll Spinners
+
+GitHub (math publish files):
+https://github.com/JTOSHIE/stake-game-development-claude
