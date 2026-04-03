@@ -13,7 +13,7 @@
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
-  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker } from 'pixi.js'
+  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpin, playReelStop } from '../services/soundService'
@@ -339,11 +339,42 @@
     requestAnimationFrame(tick)
   }
 
+  // ── Blur helpers ──────────────────────────────────────────────────────────
+  function _blurReel(reelIndex: number): void {
+    const blur = new BlurFilter()
+    blur.blurX = 0
+    blur.blurY = 10
+    reelContainers[reelIndex].filters = [blur]
+  }
+
+  function _clearBlur(reelIndex: number): void {
+    reelContainers[reelIndex].filters = []
+  }
+
+  // ── Snap-back bounce helper ───────────────────────────────────────────────
+  function _snapBounce(rc: Container, isT: boolean): Promise<void> {
+    return new Promise(resolve => {
+      const overshoot = isT ? 3 : 6
+      const duration  = isT ? 40 : 80
+      rc.y = overshoot
+      const start = performance.now()
+
+      function tick(): void {
+        const p = Math.min((performance.now() - start) / duration, 1)
+        rc.y = overshoot * (1 - p)
+        if (p < 1) requestAnimationFrame(tick)
+        else { rc.y = 0; resolve() }
+      }
+
+      requestAnimationFrame(tick)
+    })
+  }
+
   // ── Public API — called by App.svelte ─────────────────────────────────────
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
 
-    // Clear previous win highlights immediately; reset alpha/scale
+    // Clear previous win highlights; reset cell alpha/scale
     winHighlightLayer?.clear()
     for (let r = 0; r < REELS; r++) {
       for (let row = 0; row < ROWS; row++) {
@@ -355,21 +386,24 @@
     isSpinning.set(true)
     playSpin()
 
-    const isT = get(isTurbo)
+    const isT    = get(isTurbo)
+    const STRIP_H = CELL_H + GAP
 
-    // Staggered reel stop — normal: (500 + r×150) ms, turbo: (150 + r×50) ms
-    const spinPromises = reelContainers.map((rc, r) =>
+    // Apply vertical blur to all reels at spin start
+    for (let r = 0; r < REELS; r++) _blurReel(r)
+
+    // Staggered reel stop — normal: reel 0 at 500ms, +150ms per reel
+    //                         turbo: reel 0 at 150ms, +50ms per reel
+    const spinPromises = reelContainers.map((_rc, r) =>
       new Promise<void>(resolve => {
         const startTime = performance.now()
         const duration  = isT ? 150 + r * 50 : 500 + r * 150
-
-        const STRIP_H = CELL_H + GAP
 
         function tick(): void {
           const elapsed  = performance.now() - startTime
           const progress = Math.min(elapsed / duration, 1)
 
-          // Scroll cells downward during spin
+          // Scroll cells downward — speed proportional to elapsed time
           for (let row = 0; row < ROWS; row++) {
             const cell  = cellContainers[r][row]
             const baseY = row * STRIP_H
@@ -379,21 +413,42 @@
           if (progress < 1) {
             requestAnimationFrame(tick)
           } else {
-            // Snap to final symbols
+            // Snap final symbols into place
             const reel = finalBoard[r] ?? []
             for (let row = 0; row < ROWS; row++) {
               _replaceCell(r, row, reel[row] ?? 'L3', false)
               cellContainers[r][row].y = row * STRIP_H
             }
 
-            // Brief overshoot then snap back
-            reelContainers[r].y = isT ? 3 : 6
-            setTimeout(() => {
-              if (reelContainers[r]) reelContainers[r].y = 0
-            }, isT ? 40 : 80)
+            // Remove blur on stop — clean up filter memory
+            _clearBlur(r)
 
-            playReelStop(r)
-            resolve()
+            // Brief scale snap: 1.0 → 1.05 → 1.0 over ~80ms
+            const snapStart = performance.now()
+            const snapDur   = isT ? 40 : 80
+            function snapTick(): void {
+              const sp = Math.min((performance.now() - snapStart) / snapDur, 1)
+              // Triangle: goes up to 1.05 at sp=0.5 then back
+              const scale = 1 + 0.05 * Math.sin(sp * Math.PI)
+              for (let row = 0; row < ROWS; row++) {
+                const cell = cellContainers[r]?.[row]
+                if (cell) cell.scale.set(scale)
+              }
+              if (sp < 1) requestAnimationFrame(snapTick)
+              else {
+                for (let row = 0; row < ROWS; row++) {
+                  const cell = cellContainers[r]?.[row]
+                  if (cell) cell.scale.set(1)
+                }
+              }
+            }
+            requestAnimationFrame(snapTick)
+
+            // Overshoot bounce on the reel container
+            _snapBounce(reelContainers[r], isT).then(() => {
+              playReelStop(r)
+              resolve()
+            })
           }
         }
 
