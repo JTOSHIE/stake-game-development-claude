@@ -1,14 +1,17 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-03 | Full visual polish session in progress
-
----
+## Last updated: 2026-04-03 | Full visual polish session complete
 
 ## CURRENT STATE
 
-Full visual polish session running. Task 1 (loading screen) complete.
-Tasks 2–9 in progress.
+All visual polish tasks complete. Game is submission-ready pending
+artwork upload to Google Drive / Dropbox and final Stake Engine portal
+upload. Production build passes with 0 TypeScript errors.
 
----
+Note on assets: `public/assets/frames/` and `public/assets/videos/`
+directories do not exist on disk yet. Task 2 implements the CSS frame
+glow structure ready to accept a frame image; Task 3 implements the
+`bg-layer` structure ready to accept video files. Both degrade
+gracefully with no errors in the current state.
 
 ## COMPONENT STATUS
 
@@ -17,40 +20,44 @@ Tasks 2–9 in progress.
 | Math SDK | ✅ LOCKED | 96.35% RTP, 100k sim |
 | rgsService.ts | ✅ LOCKED | Mock mode working, unit: dollars |
 | gameStore.ts | ✅ LOCKED | winAmount unit: dollars |
-| GameGrid.svelte | ✅ Complete | PNGs, scatter glow, win highlights |
-| LoadingScreen.svelte | ✅ Complete (Task 1) | Dual-ring logo, cyan/magenta branding, gradient progress bar |
+| GameGrid.svelte | ✅ Complete | PNGs, BlurFilter reel tumble, staggered stops, win highlights |
+| LoadingScreen.svelte | ✅ Complete | FUTURE SPINNER logo, dual rings, gradient progress bar |
 | WinDisplay.svelte | ✅ Complete | Count-up, flicker-free, colour tiers |
-| WinCelebration.svelte | ✅ Already complete | small/big/mega/huge tiers with particles — was already implemented |
+| WinCelebration.svelte | ✅ Complete | small/big/mega/huge tiers + particles |
 | ControlBar.svelte | ✅ Complete | Cyberpunk hover effects |
-| BalanceDisplay.svelte | ✅ Working | |
-| App.svelte | 🔄 In progress | Frame overlay + video BG pending |
-| translations.ts | ✅ Complete | All 16 languages already present |
-| PAR Sheet PDF | 🟡 Pending | Task 8 |
-| Submission package | 🟡 Pending | Task 9 |
+| BalanceDisplay.svelte | ✅ Complete | |
+| App.svelte | ✅ Complete | CSS frame overlay, video BG layer, mobile responsive |
+| translations.ts | ✅ Complete | 16 languages (was already complete) |
+| PAR Sheet | ✅ Complete | submission-package/FUTURE_SPINNER_PAR_SHEET.html |
+| Submission package | ✅ Complete | Checklist + blurb created |
 
----
+## CONFIRMED WIN DISPLAY BEHAVIOUR
 
-## ASSET INVENTORY NOTE
+- Unit flow: rgsService → dollars → gameStore (winAmount) → WinDisplay (targetValue) → × CURRENCY_SCALE → formatBalance (micros)
+- $1.00 bet × 2× win = $2.00 displayed: ✅ confirmed
+- BIG WIN threshold (10×+): ✅ working
+- MEGA WIN threshold (50×+): ✅ working
+- Flicker fixed: ✅ confirmed
 
-- `public/assets/frames/` — directory does not exist (no frame PNGs on disk)
-- `public/assets/videos/` — directory does not exist (no video files on disk)
-- All visual assets currently in `public/assets/symbols/`
-- Tasks 2 and 3 implement the CSS structure/code ready for when assets are added
+## OUTSTANDING (manual steps — requires human)
 
----
+1. Upload artwork folder (symbols + frames + videos) to Google Drive/Dropbox (public link)
+2. Upload dist/ + math publish files to Stake Engine portal
+3. IP/trademark review for "Future Spinner" and "We Roll Spinners"
+4. Test with real RGS endpoint (not mock mode)
+5. Install pdflatex (e.g. `brew install --cask basictex`) if PDF PAR sheet needed
 
 ## SESSIONS LOG
 
 | Session | Date | What was done |
 |---------|------|---------------|
-| Full polish | 2026-04-03 | Tasks 1–9 in progress |
+| Full polish | 2026-04-03 | Tasks 1–9: loading screen, frame overlay, video BG, mobile layout, win celebrations (pre-existing), reel tumble blur, 16 langs (pre-existing), PAR HTML, submission package |
 | Bugfix | 2026-04-03 | Win display flicker fixed, payout units confirmed |
 | Symbol Integration | 2026-04-03 | PNG sprites, hover effects, count-up animation |
-
----
 
 ## REPOSITORY
 
 - Repo: https://github.com/JTOSHIE/stake-game-development-claude
 - Frontend: ~/math-sdk/frontend/
 - Branch: main
+- Last commit: 2742626 feat(submission): promotional blurb, checklist, production build
