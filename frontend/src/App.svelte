@@ -307,6 +307,37 @@
     }
   }
 
+  /* ── Mobile responsive ─────────────────────────────────────────────────── */
+
+  /* Tablet and below */
+  @media (max-width: 768px) {
+    .grid-wrapper {
+      transform: scale(0.75);
+      transform-origin: top center;
+    }
+
+    button {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Phone portrait */
+  @media (max-width: 480px) {
+    .grid-wrapper {
+      transform: scale(0.58);
+      transform-origin: top center;
+    }
+  }
+
+  /* Phone landscape — extra height needed */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .grid-wrapper {
+      transform: scale(0.55);
+      transform-origin: top left;
+    }
+  }
+
   .hud {
     display: flex;
     justify-content: space-around;
