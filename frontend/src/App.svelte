@@ -18,6 +18,11 @@
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
 
+  // Respect prefers-reduced-motion for accessibility
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   let gridRef: GameGrid
 
   onMount(async () => {
@@ -69,6 +74,23 @@
     handleSpin()
   }
 </script>
+
+<!-- Background video — behind all UI elements -->
+<div class="bg-layer" class:reduce-motion={prefersReducedMotion}>
+  {#if !prefersReducedMotion}
+    <video
+      class="bg-video"
+      autoplay
+      loop
+      muted
+      playsinline
+      aria-hidden="true"
+    >
+      <!-- Source added when video assets are available in public/assets/videos/ -->
+    </video>
+  {/if}
+  <div class="bg-overlay"></div>
+</div>
 
 <main class="game-wrapper" class:bonus-bg={$buyBonusActive}>
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
@@ -210,6 +232,38 @@
     justify-content: center;
     padding: 0.5rem;
     min-height: 0;
+  }
+
+  /* ── Background video layer ───────────────────────────────────────────── */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+
+  .bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.35;  /* subtle — game elements must remain clear */
+  }
+
+  .bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65); /* ensures readability over video */
+  }
+
+  /* Reduced-motion fallback: static gradient instead of video */
+  .bg-layer.reduce-motion {
+    background: radial-gradient(
+      ellipse at center,
+      #0a0a1a 0%,
+      #000000 70%
+    );
   }
 
   /* ── Cyberpunk frame overlay ──────────────────────────────────────────── */
