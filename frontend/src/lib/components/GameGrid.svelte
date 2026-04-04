@@ -441,21 +441,37 @@
     reelContainers[reelIndex].filters = []
   }
 
-  // ── Snap-back bounce helper ───────────────────────────────────────────────
-  function _snapBounce(rc: Container, isT: boolean): Promise<void> {
+  // ── Elastic two-stage bounce on reel stop ────────────────────────────────
+  function _bounceReel(rc: Container): Promise<void> {
+    const OVERSHOOT = 8
+    const DUR1      = 80
+    const DUR2      = 40
+
     return new Promise(resolve => {
-      const overshoot = isT ? 3 : 6
-      const duration  = isT ? 40 : 80
-      rc.y = overshoot
+      rc.y = OVERSHOOT
       const start = performance.now()
 
-      function tick(): void {
-        const p = Math.min((performance.now() - start) / duration, 1)
-        rc.y = overshoot * (1 - p)
-        if (p < 1) requestAnimationFrame(tick)
-        else { rc.y = 0; resolve() }
+      const tick = () => {
+        const t = Math.min((performance.now() - start) / DUR1, 1)
+        if (t < 1) {
+          rc.y = OVERSHOOT * (1 - t)
+          requestAnimationFrame(tick)
+        } else {
+          rc.y = 0
+          const start2 = performance.now()
+          const tick2 = () => {
+            const t2 = Math.min((performance.now() - start2) / DUR2, 1)
+            if (t2 < 1) {
+              rc.y = -2 * Math.sin(t2 * Math.PI)
+              requestAnimationFrame(tick2)
+            } else {
+              rc.y = 0
+              resolve()
+            }
+          }
+          requestAnimationFrame(tick2)
+        }
       }
-
       requestAnimationFrame(tick)
     })
   }
@@ -534,7 +550,7 @@
           }
           requestAnimationFrame(snapTick)
 
-          _snapBounce(reelContainers[r], isT).then(() => {
+          _bounceReel(reelContainers[r]).then(() => {
             playReelStop(r)
             // Play scatter land sound if this reel contains a scatter
             if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
