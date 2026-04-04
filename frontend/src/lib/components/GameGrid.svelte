@@ -16,7 +16,7 @@
   import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter, BLEND_MODES } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
-  import { playSpinStart, playReelStop } from '../services/soundService'
+  import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
 
   // ── Layout constants ──────────────────────────────────────────────────────
   const REELS    = 5
@@ -491,6 +491,8 @@
 
           _snapBounce(reelContainers[r], isT).then(() => {
             playReelStop(r)
+            // Play scatter land sound if this reel contains a scatter
+            if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
             resolve()
           })
         }
@@ -536,6 +538,7 @@
 
     // Anticipation: if first 4 reels have a near-match, slow reel 4 by 600ms
     const anticipate = !isT && _checkAnticipation(finalBoard)
+    if (anticipate) playAnticipation()
     await _spinReel(4, finalBoard, isT, anticipate ? 600 : 0)
     reelContainers[4].filters = []
 
