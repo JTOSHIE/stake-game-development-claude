@@ -1,18 +1,16 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-04 | Compliance + polish session complete
+## Last updated: 2026-04-04 | R3 wiring complete
 
 ## CURRENT STATE
-Buy Bonus button removed (Stake Engine compliance — stateless requirement).
-Frame repositioned to sit outside grid area. Background video opacity
-increased. Audio now dynamic — dead spins silent, wins escalate by tier.
+R3 assets wired. WILD black square fixed. Enhanced background video active.
+New bet button v2 assets. Green fully removed from bet selector area.
+Game is visually complete and compliance-clean.
 0 TypeScript errors, production build passing.
 
 ## COMPLIANCE STATUS (Stake Engine)
 - ✅ Stateless design — no continuation mechanics
-- ✅ Buy Bonus removed — no paid bonus entry
-- ✅ No free spins
-- ✅ No jackpots
-- ✅ Win cap: 5,000× enforced
+- ✅ No Buy Bonus / no free spins / no jackpots
+- ✅ Win cap: 5,000×
 - ✅ RTP: 96.3500%
 - ✅ 16 languages
 - ✅ No Stake branding
@@ -22,39 +20,39 @@ increased. Audio now dynamic — dead spins silent, wins escalate by tier.
 - ⏳ Google Drive artwork upload pending
 
 ## COMPONENT STATUS
-
 | Component | Status | Notes |
 |-----------|--------|-------|
 | Math SDK | ✅ LOCKED | 96.35% RTP, 100k sim |
 | rgsService.ts | ✅ LOCKED | Mock mode |
 | gameStore.ts | ✅ LOCKED | |
-| GameGrid.svelte | ✅ Complete | PNG sprites, WILD blend fix, blur tumble |
+| GameGrid.svelte | ✅ Complete | All symbols, WILD fix (CMF not MULTIPLY), blur tumble |
 | LoadingScreen.svelte | ✅ Complete | Logo, rings, progress bar |
-| WinDisplay.svelte | ✅ Complete | panel_win.png, no green, count-up |
+| WinDisplay.svelte | ✅ Complete | panel_win.png, no green |
 | WinCelebration.svelte | ✅ Complete | small/big/mega/epic + particles |
-| ControlBar.svelte | ✅ Complete | spin_button.png, btn+/−, btn_menu, Buy Bonus removed |
+| ControlBar.svelte | ✅ Complete | R3 v2 bet buttons, max bet glow, no green |
 | BalanceDisplay.svelte | ✅ Complete | panel_balance.png |
-| App.svelte | ✅ Complete | frame outside grid, video 50% opacity, playWin wired |
+| App.svelte | ✅ Complete | Frame, video bg_rain_street_v2, mobile |
 | soundService.ts | ✅ Complete | Dynamic win tiers, BGM duck on spin |
 | translations.ts | ✅ Complete | 16 languages |
-| Background video | ✅ Wired | 1000062179.mp4 at 50% opacity |
-| Frame overlay | ✅ Wired | frame_clean_ornate.png — -70px inset, outside grid |
-| Symbol PNGs | ✅ Wired | 10 symbols, WILD white bg fixed |
-| UI assets | ✅ Wired | spin_button, panels, +/− buttons, btn_menu |
-| Sounds | ✅ Wired | R2 versions, dynamic win tiers |
+| Background video | ✅ Wired | bg_rain_street_v2.mp4 at 50% opacity |
+| Frame overlay | ✅ Wired | frame_clean_ornate.png — -70px inset |
+| Symbol PNGs | ✅ Wired | All 10, WILD fixed (CMF brightness/contrast) |
+| UI assets | ✅ Wired | R3 v2 bet buttons, display panel, max bet glow |
+| Sounds | ✅ Wired | Dynamic tiers active |
 | PAR Sheet | ✅ Complete | submission-package/FUTURE_SPINNER_PAR_SHEET.html |
 | Submission package | ✅ Complete | Checklist + blurb |
 
 ## OUTSTANDING (manual steps only)
-1. Upload artwork to Google Drive/Dropbox with public link
+1. Upload artwork folder to Google Drive/Dropbox — public link
 2. Upload dist/ + math publish files to Stake Engine portal
 3. IP/trademark review — "Future Spinner" / "We Roll Spinners"
 4. Test against real RGS endpoint (currently mock mode)
-5. Optional: brew install --cask basictex → PDF PAR sheet
+5. Optional: PDF PAR sheet (brew install --cask basictex)
 
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| R3 wiring | 2026-04-04 | WILD CMF fix, video v2, R3 bet buttons, max bet glow |
 | Compliance + polish | 2026-04-04 | Buy Bonus removed, frame fix, video opacity, dynamic audio |
 | R2 wiring | 2026-04-04 | Clean frame, WILD fix, all UI panels, R2 sounds |
 | Emergency frame | 2026-04-04 | CSS fallback frame |
