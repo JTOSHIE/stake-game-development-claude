@@ -428,12 +428,23 @@
     display: block;
   }
 
-  /* Max Bet image button — min 44px tall for a safe tap target */
+  /* Max Bet image button — cyberpunk styled */
   .maxbet-btn {
     width: 96px;
     height: 36px;
-    /* Visible hit-area extension via padding keeps the image its natural size */
     padding: 4px 0;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.35));
+    transition: filter 0.15s, transform 0.1s;
+  }
+
+  .maxbet-btn:hover:not(:disabled) {
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(0, 255, 255, 0.7));
+    transform: scale(1.06);
+  }
+
+  .maxbet-btn:active:not(:disabled) {
+    transform: scale(0.95);
+    transition-duration: 0.05s;
   }
 
   /* ── Right cluster ────────────────────────────────────────────────────────── */
