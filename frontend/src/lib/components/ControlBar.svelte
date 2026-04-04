@@ -367,28 +367,37 @@
   }
 
   .nudge-btn {
-    background: none;
+    background-color: transparent;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     border: none;
-    color: #ffc832;
+    color: transparent; /* hide the − / + text characters */
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    /* 44×44 minimum tap target — icon is visually smaller via padding */
+    /* 44×44 minimum tap target */
     min-width: 44px;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    transition: color 0.1s, transform 0.1s;
+    transition: opacity 0.1s, transform 0.1s, filter 0.1s;
     flex-shrink: 0;
+  }
+
+  .nudge-btn[aria-label="Decrease bet"] {
+    background-image: url('/assets/ui/btn_bet_minus.png');
+  }
+
+  .nudge-btn[aria-label="Increase bet"] {
+    background-image: url('/assets/ui/btn_bet_plus.png');
   }
 
   .nudge-btn:hover:not(:disabled) {
     transform: scale(1.06);
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
-    color: #00ffff;
-    border-color: #00ffff;
+    filter: brightness(1.2) drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));
   }
 
   .nudge-btn:active:not(:disabled) {
@@ -511,26 +520,24 @@
 
   .menu-item:hover { background: rgba(255, 200, 50, 0.15); }
 
-  /* ── Buy Bonus text button (no dedicated image) ──────────────────────────── */
+  /* ── Buy Bonus button — btn_menu.png ────────────────────────────────────── */
   .bonus-btn {
-    background: rgba(160, 228, 255, 0.08);
-    border: 1px solid rgba(160, 228, 255, 0.35);
-    color: #a0e4ff;
-    border-radius: 6px;
+    background-image: url('/assets/ui/btn_menu.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    border: none;
+    color: transparent; /* image carries the visual label */
     cursor: pointer;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.7rem;
-    text-transform: uppercase;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
     width: 80px;
+    height: 44px;
+    transition: filter 0.15s, transform 0.1s;
   }
 
   .bonus-btn:hover:not(:disabled) {
-    background: rgba(160, 228, 255, 0.18);
-    border-color: #a0e4ff;
-    color: #fff;
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+    transform: scale(1.04);
   }
 
   .bonus-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
