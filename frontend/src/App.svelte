@@ -86,7 +86,7 @@
       playsinline
       aria-hidden="true"
     >
-      <!-- Source added when video assets are available in public/assets/videos/ -->
+      <source src="assets/videos/1000062179.mp4" type="video/mp4" />
     </video>
   {/if}
   <div class="bg-overlay"></div>
