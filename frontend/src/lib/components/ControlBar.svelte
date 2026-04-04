@@ -147,7 +147,7 @@
     <div class="auto-wrapper">
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
-          <img src="/assets/symbols/ui_autoplay_button_variant_02_original.png" alt="Autoplay" draggable="false" />
+          <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
           <span class="auto-count">{$autoPlayCount}</span>
         </button>
       {:else}
@@ -157,7 +157,7 @@
           disabled={$isSpinning}
           aria-label={t($locale, 'autoPlay')}
         >
-          <img src="/assets/symbols/ui_autoplay_button_variant_02_original.png" alt="Autoplay" draggable="false" />
+          <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
         </button>
         {#if showAutoMenu}
           <div class="auto-menu">
