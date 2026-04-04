@@ -104,18 +104,17 @@
     align-items: center;
     justify-content: center;
 
-    background-image: url('/assets/symbols/ui_paytable_frame_variant_02_original.png');
+    background-image: url('/assets/ui/panel_win.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    background-color: transparent;
 
     min-width: 160px;
     height: 56px;
     padding: 0 1rem;
 
-    /* Cyberpunk panel border */
-    border: 1px solid rgba(157, 0, 255, 0.4);
-    box-shadow: 0 0 12px rgba(157, 0, 255, 0.3);
-    border-radius: 8px;
+    border: none;
+    box-shadow: none;
     outline: none;
 
     font-family: 'Courier New', monospace;
@@ -123,8 +122,14 @@
     transition: filter 0.3s;
   }
 
-  /* Green tier: text colour only — inherits panel border */
-  .win-green { }
+  /* Ensure no green border/shadow on any panel state */
+  .win-panel,
+  .win-panel.win-green,
+  .win-panel.win-idle {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
 
   .win-idle {
     opacity: 0.4;
