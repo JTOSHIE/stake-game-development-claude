@@ -339,9 +339,12 @@
     align-items: center;
     gap: 0;
 
-    background-image: url('/assets/symbols/ui_bet_selector_variant_04_original.png');
+    background-image: url('/assets/ui/btn_bet_display_v2.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 
     width: 148px;
     height: 48px;
@@ -370,11 +373,11 @@
   }
 
   .nudge-btn[aria-label="Decrease bet"] {
-    background-image: url('/assets/ui/btn_bet_minus.png');
+    background-image: url('/assets/ui/btn_bet_minus_v2.png');
   }
 
   .nudge-btn[aria-label="Increase bet"] {
-    background-image: url('/assets/ui/btn_bet_plus.png');
+    background-image: url('/assets/ui/btn_bet_plus_v2.png');
   }
 
   .nudge-btn:hover:not(:disabled) {
