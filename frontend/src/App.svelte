@@ -119,7 +119,12 @@
     <div class="grid-wrapper">
       <GameGrid bind:this={gridRef} />
       <!-- Frame image overlay — replace src when frame PNGs are available -->
-      <div class="game-frame" aria-hidden="true"></div>
+      <img
+        src="assets/frames/1000062174.png"
+        class="game-frame"
+        alt=""
+        aria-hidden="true"
+      />
     </div>
   </section>
 
@@ -274,37 +279,18 @@
 
   .game-frame {
     position: absolute;
-    inset: -6px;                /* extend slightly beyond canvas edges */
-    pointer-events: none;       /* never intercept clicks */
-    z-index: 10;                /* above canvas (z 0), below UI controls */
-    border-radius: 14px;
-    border: 2px solid rgba(0, 255, 255, 0.4);
-    /* Pulsing cyan border glow */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    z-index: 10;
     animation: frame-glow 3s ease-in-out infinite;
   }
 
-  /* When a real frame image is added, swap this for an <img> with object-fit:fill */
-  .game-frame::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 0, 255, 0.2);
-  }
-
   @keyframes frame-glow {
-    0%, 100% {
-      border-color: rgba(0, 255, 255, 0.3);
-      box-shadow:
-        0 0  6px rgba(0, 255, 255, 0.3),
-        inset 0 0  6px rgba(0, 255, 255, 0.1);
-    }
-    50% {
-      border-color: rgba(0, 255, 255, 0.7);
-      box-shadow:
-        0 0 16px rgba(0, 255, 255, 0.7),
-        inset 0 0 10px rgba(0, 255, 255, 0.15);
-    }
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,255,0.4)); }
+    50%       { filter: drop-shadow(0 0 18px rgba(0,255,255,0.8)); }
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */
