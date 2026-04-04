@@ -310,8 +310,8 @@
         if (!cell) continue
 
         if (winningCells.has(`${r},${row}`)) {
-          // Scale up 1.0 → 1.1 over 200 ms, then white flash over 300 ms
-          _animateScale(cell, 1.0, 1.1, 200)
+          // Pulse scale 1.0 → 1.08 → 1.0 via Ticker (3 cycles), then white flash
+          _pulseWinCell(cell)
           _flashCell(cell)
         } else {
           // Dim non-winners to 0.4
@@ -342,6 +342,28 @@
       if (progress < 1) requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
+  }
+
+  function _pulseWinCell(cell: Container, duration = 600, repeats = 3): void {
+    let elapsed = 0
+    let count   = 0
+    const ticker = new Ticker()
+    ticker.add((delta) => {
+      if (cell.destroyed) { ticker.destroy(); return }
+      elapsed += delta * (1000 / 60)
+      const t = (elapsed % duration) / duration
+      const scale = 1.0 + 0.08 * Math.sin(t * Math.PI)
+      cell.scale.set(scale)
+      if (elapsed >= duration) {
+        elapsed -= duration
+        count++
+        if (count >= repeats) {
+          cell.scale.set(1.0)
+          ticker.destroy()
+        }
+      }
+    })
+    ticker.start()
   }
 
   function _flashCell(cell: Container): void {
