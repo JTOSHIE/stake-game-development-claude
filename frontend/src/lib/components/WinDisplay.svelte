@@ -151,8 +151,8 @@
     color: rgba(255,255,255,0.35);
   }
 
-  .win-green  .win-amount { color: #00cc44; }
-  .win-gold   .win-amount { color: #ffcc00; text-shadow: 0 0 8px rgba(255,204,0,0.5); }
+  .win-green  .win-amount { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+  .win-gold   .win-amount { color: #ffcc00; text-shadow: 0 0 12px rgba(255, 204, 0, 0.7); }
   .win-big    .win-amount { color: #ff00ff; text-shadow: 0 0 15px #ff00ff; animation: pulse-glow 1.2s infinite; }
   .win-mega   .win-amount { color: #00ffff; text-shadow: 0 0 20px #00ffff; animation: pulse-glow 1.2s infinite; }
 
