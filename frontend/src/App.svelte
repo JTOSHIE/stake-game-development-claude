@@ -112,18 +112,20 @@
   {/if}
 
   <header class="game-header">
-    <img
-      src="assets/ui/logo_future_spinner.png"
-      class="game-logo"
-      alt="FUTURE SPINNER"
-      draggable="false"
-    />
-    <img
-      src="assets/ui/logo_we_roll_spinners.png"
-      class="game-subtitle-logo"
-      alt="WE ROLL SPINNERS"
-      draggable="false"
-    />
+    <div class="logo-stack">
+      <img
+        src="assets/ui/logo_future_spinner.png"
+        class="game-logo"
+        alt="FUTURE SPINNER"
+        draggable="false"
+      />
+      <img
+        src="assets/ui/logo_we_roll_spinners.png"
+        class="game-subtitle-logo"
+        alt="WE ROLL SPINNERS"
+        draggable="false"
+      />
+    </div>
   </header>
 
   {#if $errorMessage}
@@ -210,6 +212,13 @@
     flex-shrink: 0;
   }
 
+  .logo-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
   .game-logo {
     height: clamp(40px, 6vw, 70px);
     width: auto;
@@ -285,12 +294,13 @@
   .grid-wrapper {
     position: relative;
     display: inline-block;
+    overflow: visible;
   }
 
   .game-frame {
     position: absolute;
-    inset: -70px -60px -70px -70px;
-    width: calc(100% + 130px);
+    inset: -70px;
+    width: calc(100% + 140px);
     height: calc(100% + 140px);
     object-fit: fill;
     pointer-events: none;
