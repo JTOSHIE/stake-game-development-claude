@@ -112,18 +112,19 @@
     height: 56px;
     padding: 0 1rem;
 
-    /* Explicit reset — no border or glow on the panel itself */
-    border: none;
+    /* Cyberpunk panel border */
+    border: 1px solid rgba(157, 0, 255, 0.4);
+    box-shadow: 0 0 12px rgba(157, 0, 255, 0.3);
+    border-radius: 8px;
     outline: none;
-    box-shadow: none;
 
     font-family: 'Courier New', monospace;
     font-weight: 900;
     transition: filter 0.3s;
   }
 
-  /* Green tier: text colour only — zero panel effect */
-  .win-green { border: none; box-shadow: none; outline: none; }
+  /* Green tier: text colour only — inherits panel border */
+  .win-green { }
 
   .win-idle {
     opacity: 0.4;

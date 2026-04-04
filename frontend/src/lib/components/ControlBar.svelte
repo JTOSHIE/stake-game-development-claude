@@ -300,18 +300,30 @@
     width: 96px;
     height: 96px;
     flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.4),
+      0 0 40px rgba(0, 255, 255, 0.2);
     transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
   }
 
   .spin-btn:hover:not(:disabled) {
-    transform: scale(1.04);
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.7), 0 0 40px rgba(255, 0, 255, 0.3);
-    filter: brightness(1.15);
+    transform: scale(1.05);
+    box-shadow:
+      0 0 30px rgba(255, 0, 255, 0.6),
+      0 0 60px rgba(255, 0, 255, 0.3);
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 0, 255, 0.8));
   }
 
   .spin-btn:active:not(:disabled) {
-    transform: scale(0.97);
+    transform: scale(0.96);
     transition-duration: 0.05s;
+  }
+
+  .spin-btn:disabled {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+    box-shadow: none;
   }
 
   .spin-btn.spinning img {
@@ -446,14 +458,14 @@
     height: 44px;
   }
 
-  /* Active auto-play: gold glow */
+  /* Active auto-play: cyan glow */
   .auto-btn.active img {
-    filter: drop-shadow(0 0 8px rgba(78, 255, 145, 0.8));
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
     animation: pulse-glow 1s ease-in-out infinite alternate;
   }
 
   @keyframes pulse-glow {
-    to { filter: drop-shadow(0 0 4px rgba(78, 255, 145, 0.3)); }
+    to { filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.3)); }
   }
 
   /* Remaining spin count badge */
@@ -461,8 +473,8 @@
     position: absolute;
     top: 2px;
     right: 4px;
-    background: #4eff91;
-    color: #001a09;
+    background: #00ffff;
+    color: #000020;
     font-size: 0.65rem;
     font-weight: 800;
     border-radius: 10px;

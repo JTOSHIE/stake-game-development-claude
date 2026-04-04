@@ -110,7 +110,15 @@
       })
     } catch (err) {
       // Non-fatal: _makeCell falls back to placeholder for any missing texture
-      console.warn('[GameGrid] Some textures failed to load:', err)
+      console.warn('[GameGrid] Texture load error:', err)
+      for (const [key, url] of Object.entries(SYMBOL_TEXTURES)) {
+        try {
+          await Assets.load(url)
+          console.log(`[GameGrid] ✅ ${key}: ${url}`)
+        } catch (e) {
+          console.error(`[GameGrid] ❌ FAILED: ${key}: ${url}`, e)
+        }
+      }
     }
     assetLoadProgress.set(100)
   }

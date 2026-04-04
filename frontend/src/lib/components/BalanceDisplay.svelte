@@ -43,6 +43,11 @@
     padding: 0 1.4rem;
 
     position: relative;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow:
+      0 0 10px rgba(0, 255, 255, 0.2),
+      inset 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
   }
 
   .field {
@@ -73,11 +78,12 @@
 
   .label {
     font-size: 0.60rem;
-    letter-spacing: 0.14em;
-    color: rgba(255, 200, 50, 0.9);
+    letter-spacing: 0.2em;
+    color: rgba(0, 255, 255, 0.6);
     text-transform: uppercase;
     line-height: 1;
     display: block;
+    font-family: 'Courier New', monospace;
   }
 
   .value {
@@ -86,7 +92,7 @@
     color: #ffffff;
     font-family: 'Courier New', monospace;
     line-height: 1.2;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
     display: block;
   }
 </style>

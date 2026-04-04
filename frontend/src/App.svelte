@@ -122,7 +122,7 @@
       <GameGrid bind:this={gridRef} />
       <!-- Frame image overlay — replace src when frame PNGs are available -->
       <img
-        src="assets/frames/1000062174.png"
+        src="assets/frames/1000062175.png"
         class="game-frame"
         alt=""
         aria-hidden="true"
@@ -276,14 +276,16 @@
   /* ── Cyberpunk frame overlay ──────────────────────────────────────────── */
   .grid-wrapper {
     position: relative;
-    display: inline-block; /* shrink-wrap around the canvas */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .game-frame {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    inset: -8px;
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
@@ -292,7 +294,7 @@
 
   @keyframes frame-glow {
     0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,255,0.4)); }
-    50%       { filter: drop-shadow(0 0 18px rgba(0,255,255,0.8)); }
+    50%       { filter: drop-shadow(0 0 20px rgba(0,255,255,0.9)); }
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */
