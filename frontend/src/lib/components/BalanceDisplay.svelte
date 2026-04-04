@@ -31,10 +31,11 @@
     align-items: stretch;
     gap: 0;
 
-    /* Cyberpunk balance panel image as the frame */
-    background-image: url('/assets/symbols/ui_balance_panel_variant_02.png');
+    /* R2 balance panel image */
+    background-image: url('/assets/ui/panel_balance.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
+    background-color: transparent;
 
     /* Size the panel to show a reasonable portion of the art */
     min-width: 220px;
@@ -43,11 +44,8 @@
     padding: 0 1.4rem;
 
     position: relative;
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow:
-      0 0 10px rgba(0, 255, 255, 0.2),
-      inset 0 0 10px rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
+    border: none;
+    box-shadow: none;
   }
 
   .field {
