@@ -137,7 +137,7 @@
     aria-label={t($locale, 'spin')}
   >
     <img
-      src="/assets/symbols/ui_spin_button_variant_03.png"
+      src="/assets/ui/spin_button.png"
       alt={t($locale, 'spin')}
       draggable="false"
     />
