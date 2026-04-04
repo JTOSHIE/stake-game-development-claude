@@ -204,8 +204,13 @@
       sprite.filters = [cmf]
 
       if (symbol === 'W') {
-        // WILD: multiply blend knocks out the white background on dark cells
-        sprite.blendMode = BLEND_MODES.MULTIPLY
+        // Remove white background using ColorMatrixFilter
+        const wildCmf = new ColorMatrixFilter()
+        wildCmf.contrast(0.3, false)
+        wildCmf.brightness(0.85, false)
+        sprite.filters = [wildCmf]
+        sprite.alpha = 1
+        sprite.blendMode = BLEND_MODES.NORMAL
       }
 
       if (symbol === 'S') {
