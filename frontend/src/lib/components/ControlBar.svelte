@@ -66,39 +66,17 @@
 
 <div class="control-bar">
 
-  <!-- ── Utility row: Turbo / Mute / Info ─────────────────────────────────── -->
-  <div class="utility-row">
-    <button
-      class="util-btn"
-      class:util-active={$isTurbo}
-      on:click={toggleTurbo}
-      disabled={$isSpinning}
-      aria-label="Toggle turbo mode"
-      title="Turbo"
-    >⚡</button>
-
-    <button
-      class="util-btn"
-      class:util-active={!$isMuted}
-      on:click={toggleMute}
-      aria-label={$isMuted ? 'Unmute' : 'Mute'}
-      title={$isMuted ? 'Unmute' : 'Mute'}
-    >{$isMuted ? '🔇' : '🔊'}</button>
-
-    <button
-      class="util-btn"
-      on:click={openPaytable}
-      disabled={$isSpinning}
-      aria-label={t($locale, 'paytable')}
-      title={t($locale, 'paytable')}
-    >ℹ</button>
-  </div>
-
-  <!-- ── Main controls row ────────────────────────────────────────────────── -->
+  <!-- ── Single controls row ─────────────────────────────────────────────── -->
   <div class="main-row">
 
-  <!-- ── Left cluster: Bet selector + Min/Max ─────────────────────────────── -->
+  <!-- ── Left cluster: Max Bet + Bet selector ────────────────────────────── -->
   <div class="bet-cluster">
+
+    <!-- Max Bet button — left of bet selector -->
+    <button class="maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
+      <img src="/assets/symbols/ui_maxbet_button_variant_02.png" alt="Max Bet" draggable="false" />
+      <span class="maxbet-label">MAX</span>
+    </button>
 
     <!-- Bet selector panel (image background) -->
     <div class="bet-selector-panel">
@@ -113,12 +91,6 @@
 
       <button class="nudge-btn" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
     </div>
-
-    <!-- Max Bet image button -->
-    <button class="maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
-      <img src="/assets/symbols/ui_maxbet_button_variant_02.png" alt="Max Bet" draggable="false" />
-      <span class="maxbet-label">MAX</span>
-    </button>
   </div>
 
   <!-- ── Centre: Spin button (image) ─────────────────────────────────────── -->
@@ -141,10 +113,10 @@
     </button>
   </div>
 
-  <!-- ── Right cluster: Autoplay + Buy Bonus ──────────────────────────────── -->
+  <!-- ── Right cluster: Auto + Turbo / Mute / Info ──────────────────���────── -->
   <div class="aux-cluster">
 
-    <!-- Autoplay image button -->
+    <!-- Autoplay button -->
     <div class="auto-wrapper">
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
@@ -172,6 +144,34 @@
       {/if}
     </div>
 
+    <!-- Utility buttons: Turbo / Mute / Info -->
+    <div class="util-group">
+      <button
+        class="util-btn"
+        class:util-active={$isTurbo}
+        on:click={toggleTurbo}
+        disabled={$isSpinning}
+        aria-label="Toggle turbo mode"
+        title="Turbo"
+      >⚡</button>
+
+      <button
+        class="util-btn"
+        class:util-active={!$isMuted}
+        on:click={toggleMute}
+        aria-label={$isMuted ? 'Unmute' : 'Mute'}
+        title={$isMuted ? 'Unmute' : 'Mute'}
+      >{$isMuted ? '🔇' : '🔊'}</button>
+
+      <button
+        class="util-btn"
+        on:click={openPaytable}
+        disabled={$isSpinning}
+        aria-label={t($locale, 'paytable')}
+        title={t($locale, 'paytable')}
+      >ℹ</button>
+    </div>
+
   </div>
 
   </div><!-- /main-row -->
@@ -183,8 +183,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 1rem 0.8rem;
+    gap: 0;
+    padding: 0.6rem 1rem 0.8rem;
     /* Semi-transparent dark strip — keeps art visible through it */
     background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 100%);
     border-top: 1px solid rgba(255, 200, 50, 0.12);
@@ -192,13 +192,11 @@
     position: relative;
   }
 
-  /* ── Utility row ─────────────────────────────────────────────────────────── */
-  .utility-row {
+  /* ── Utility group (inside aux-cluster) ────────────────────────────────── */
+  .util-group {
     display: flex;
-    gap: 12px;
+    gap: 6px;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 6px;
   }
 
   .util-btn {
@@ -238,15 +236,15 @@
     color: #ffc832;
   }
 
-  /* Inner buttons row (bet + spin + aux) — three clear zones */
+  /* Single controls row — three zones spread across full width */
   .main-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 600px;
+    max-width: 640px;
     margin: 0 auto;
-    padding: 0 12px;
+    padding: 0 8px;
     gap: 0;
   }
 
@@ -335,12 +333,11 @@
     pointer-events: none;
   }
 
-  /* ── Left zone — bet cluster ────────────────────────────────────────────── */
+  /* ── Left zone — bet cluster (horizontal: MAX | − BET +) ───────────────── */
   .bet-cluster {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
     gap: 6px;
     flex: 0 0 auto;
   }
@@ -496,9 +493,10 @@
     padding: 0 16px;
   }
 
-  /* ── Right zone — utility cluster ──────────────────────────────────────── */
+  /* ── Right zone — aux cluster (AUTO + util group) ──────────────────────── */
   .aux-cluster {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 8px;
     flex: 0 0 auto;
