@@ -1,11 +1,11 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-03 | Immediate fixes session complete
+## Last updated: 2026-04-04 | Emergency frame fix complete
 
 ## CURRENT STATE
-All immediate visual fixes applied. Frame switched to minimal variant (1000062175.png),
-grid-wrapper fixed to inline-flex so frame extends around canvas without cropping.
-All green UI elements replaced with cyan (#00ffff). Spin button has cyberpunk
-cyan/magenta glow treatment. Balance and win panels have cyberpunk border/glow.
+Frame PNG removed (1000062175.png had opaque centre blocking the game grid).
+Replaced with CSS-only neon border (cyan/magenta pulsing glow + corner accents).
+Game grid is now fully visible. Waiting on Manus to deliver a clean frame PNG
+with transparent centre.
 Production build passing with 0 TypeScript errors.
 
 ## COMPONENT STATUS
@@ -21,11 +21,11 @@ Production build passing with 0 TypeScript errors.
 | WinCelebration.svelte | ✅ Complete | small/big/mega/huge + particles |
 | ControlBar.svelte | ✅ Complete | Cyberpunk spin btn, cyan auto-play badge, no green |
 | BalanceDisplay.svelte | ✅ Complete | Cyan border/glow, Courier New monospace |
-| App.svelte | ✅ Complete | Frame 1000062175.png, grid-wrapper inline-flex |
+| App.svelte | ✅ Complete | CSS neon border frame (PNG removed, opaque centre) |
 | soundService.ts | ✅ Complete | Real MP3s — bgm/spin/reelStop/win/scatter/ui |
 | translations.ts | ✅ Complete | 16 languages |
 | Background video | ✅ Wired | 1000062179.mp4 playing at 35% opacity |
-| Frame overlay | ✅ Wired | 1000062175.png (minimal, no baked WIN text) |
+| Frame overlay | ⏳ CSS-only | Neon border active; clean frame PNG pending from Manus |
 | Symbol PNGs | ✅ Wired | 10 symbols in assets/symbols/ |
 | Sounds | ✅ Wired | 6 MP3 files active (bgm/spin/reelStop/win/scatter/uiClick) |
 | PAR Sheet | ✅ Complete | submission-package/FUTURE_SPINNER_PAR_SHEET.html |
@@ -45,12 +45,14 @@ Production build passing with 0 TypeScript errors.
 3. IP/trademark review — "Future Spinner" / "We Roll Spinners"
 4. Test against real RGS endpoint (currently mock mode)
 5. Optional: brew install --cask basictex → PDF version of PAR sheet
-6. New assets from Manus incoming — frame PNG, UI panel images, spin button image → wire in next session
+6. **MANUS PENDING: clean frame PNG** (transparent centre) — wire in as soon as delivered
+7. UI panel images, spin button image from Manus → wire in next session
 
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
-| Immediate fixes | 2026-04-03 | Frame → 1000062175, grid-wrapper fix, green→cyan, spin btn glow, panel styling |
+| Emergency frame fix | 2026-04-04 | Removed opaque frame PNG; CSS neon border replaces it until clean PNG arrives |
+| Immediate fixes | 2026-04-04 | Frame → 1000062175, grid-wrapper fix, green→cyan, spin btn glow, panel styling |
 | Asset wiring | 2026-04-03 | Video, frame PNG, sounds (real MP3s), win display green border fix |
 | Full polish | 2026-04-03 | All visual tasks, loading screen, reel tumble |
 | Bugfix | 2026-04-03 | Win display flicker fixed |
