@@ -102,7 +102,7 @@
     if      (winMultiplier >= 100) show('huge',  null)
     else if (winMultiplier >= 20)  show('mega',  5000)
     else if (winMultiplier >= 5)   show('big',   3000)
-    else if (winMultiplier >= 1)   show('small', 1000)
+    else if (winMultiplier >= 1)   show('small', 1500)
     else                           dismiss()
   }
 
