@@ -1,14 +1,14 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-04 | R5 audio wiring complete
+## Last updated: 2026-04-05 | Mechanics + animation upgrade complete
 
 ## CURRENT STATE
-R4 assets wired. Logo PNGs in header and loading screen.
-win_epic.mp3 added for mega/epic wins. Win multiplier display restored.
-Win highlighting upgraded — non-winners dim, winners pulse at 1.08x scale.
-Reel anticipation implemented. Scatter anticipation glow added.
-R5 audio system active. 12 tracks wired. Tiered win sounds (small/
-medium/big/epic). Dedicated scatter land sound. Anticipation audio
-(tension build + heavy reel stop). New BGM (932KB, 33s loop).
+R5 audio system active. 12 tracks wired. Tiered win sounds (small/medium/big/epic).
+Dedicated scatter land sound. Anticipation audio (tension build + heavy reel stop).
+Spin blur reduced to Y=3, clears 200ms before stop. Anticipation: reel 5 only,
+requires 3-reel high-value match. Gold win line connector draws across matching
+symbols. Win multiplier banner appears centred on grid. Elastic two-stage bounce
+on reel stop. Autoplay pauses on big wins (1.5s/3.5s/6s/stop by tier).
+Subtitle centred in logo-stack. Frame inset symmetric at -70px all sides.
 Production build passing, 0 TypeScript errors.
 
 ## COMPLIANCE STATUS (Stake Engine)
@@ -56,6 +56,7 @@ Production build passing, 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Mechanics upgrade | 2026-04-05 | Blur fix, anticipation fix, win connector, banner, bounce, autoplay pause |
 | R5 audio | 2026-04-04 | 12-track audio system, tiered wins, anticipation, scatter land |
 | R4 mechanics | 2026-04-04 | Logo PNGs, win_epic.mp3, win multiplier, win pulse, reel/scatter anticipation |
 | UI polish | 2026-04-04 | Header shimmer, win colours, button sizes, single-row layout, frame fix |
