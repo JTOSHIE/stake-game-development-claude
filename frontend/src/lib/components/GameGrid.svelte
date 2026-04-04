@@ -13,7 +13,7 @@
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
-  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter } from 'pixi.js'
+  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter, BLEND_MODES } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpin, playReelStop } from '../services/soundService'
@@ -202,6 +202,11 @@
       const cmf = new ColorMatrixFilter()
       cmf.saturate(0.2, true)
       sprite.filters = [cmf]
+
+      if (symbol === 'W') {
+        // WILD: multiply blend knocks out the white background on dark cells
+        sprite.blendMode = BLEND_MODES.MULTIPLY
+      }
 
       if (symbol === 'S') {
         // Scatter: cyan/magenta tint; alpha pulsed by scatter ticker
