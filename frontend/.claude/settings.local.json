@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node:*)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)",
+      "Bash(pandoc --version)",
+      "Bash(brew install:*)",
+      "Bash(pandoc '~/math-sdk/games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md' -o '~/math-sdk/submission-package/FUTURE_SPINNER_PAR_SHEET.pdf')",
+      "Bash(pandoc '~/math-sdk/games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md' -o '~/math-sdk/submission-package/FUTURE_SPINNER_PAR_SHEET.html' --standalone --metadata 'title=Future Spinner PAR Sheet — We Roll Spinners')"
+    ]
+  }
+}
