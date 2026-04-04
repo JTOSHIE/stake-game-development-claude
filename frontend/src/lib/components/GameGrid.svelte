@@ -433,6 +433,15 @@
     return false
   }
 
+  // ── Scatter anticipation glow ─────────────────────────────────────────────
+  function _scatterAnticipation(lastStoppedReel: number): void {
+    for (let r = lastStoppedReel + 1; r < REELS; r++) {
+      const glow = new ColorMatrixFilter()
+      glow.brightness(1.15, false)
+      reelContainers[r].filters = [glow]
+    }
+  }
+
   // ── Single-reel spin helper ────────────────────────────────────────────────
   function _spinReel(r: number, finalBoard: string[][], isT: boolean, extraMs = 0): Promise<void> {
     const STRIP_H = CELL_H + GAP
@@ -512,12 +521,23 @@
     // Apply vertical blur to all reels at spin start
     for (let r = 0; r < REELS; r++) _blurReel(r)
 
-    // Reels 0–3 spin in parallel
-    await Promise.all([0, 1, 2, 3].map(r => _spinReel(r, finalBoard, isT)))
+    // Reels 0–1 first so we can check scatter count before 2–4 land
+    await Promise.all([0, 1].map(r => _spinReel(r, finalBoard, isT)))
+
+    // Scatter anticipation: if reels 0–1 have 2 scatters, glow remaining reels gold
+    const scattersLanded = [0, 1].reduce((acc, r) =>
+      acc + (finalBoard[r] ?? []).filter(s => s === 'S').length, 0)
+    if (scattersLanded >= 2) _scatterAnticipation(1)
+
+    // Reels 2–3 spin in parallel
+    await Promise.all([2, 3].map(r => _spinReel(r, finalBoard, isT)))
+    // Clear any scatter glow on reel 2 and 3 as they stop
+    ;[2, 3].forEach(r => { reelContainers[r].filters = [] })
 
     // Anticipation: if first 4 reels have a near-match, slow reel 4 by 600ms
     const anticipate = !isT && _checkAnticipation(finalBoard)
     await _spinReel(4, finalBoard, isT, anticipate ? 600 : 0)
+    reelContainers[4].filters = []
 
     isSpinning.set(false)
   }
