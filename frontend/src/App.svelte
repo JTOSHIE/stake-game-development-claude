@@ -83,7 +83,7 @@
       playsinline
       aria-hidden="true"
     >
-      <source src="assets/videos/1000062179.mp4" type="video/mp4" />
+      <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
     </video>
   {/if}
   <div class="bg-overlay"></div>
