@@ -149,6 +149,7 @@
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
           <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
+          <span class="auto-label">AUTO</span>
           <span class="auto-count">{$autoPlayCount}</span>
         </button>
       {:else}
@@ -159,6 +160,7 @@
           aria-label={t($locale, 'autoPlay')}
         >
           <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
+          <span class="auto-label">AUTO</span>
         </button>
         {#if showAutoMenu}
           <div class="auto-menu">
@@ -504,8 +506,27 @@
   .auto-wrapper { position: relative; }
 
   .auto-btn {
-    width: 80px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .auto-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: rgba(0, 255, 255, 0.7);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+
+  .auto-btn.active .auto-label {
+    color: #00ffff;
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
   }
 
   /* Active auto-play: cyan glow */
