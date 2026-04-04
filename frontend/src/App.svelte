@@ -57,7 +57,24 @@
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {
-          setTimeout(handleSpin, 800)
+          const multiplier = bet > 0 ? result.totalWin / bet : 0
+          if (multiplier >= 100) {
+            // Epic win — stop autoplay entirely
+            isAutoPlay.set(false)
+            autoPlayCount.set(0)
+          } else if (multiplier >= 30) {
+            // Mega win — pause 6 seconds
+            setTimeout(handleSpin, 6000)
+          } else if (multiplier >= 10) {
+            // Big win — pause 3.5 seconds
+            setTimeout(handleSpin, 3500)
+          } else if (multiplier > 0) {
+            // Small/medium win — pause 1.5 seconds
+            setTimeout(handleSpin, 1500)
+          } else {
+            // Dead spin — continue at normal pace
+            setTimeout(handleSpin, 800)
+          }
         }
       }
     } catch (err) {
