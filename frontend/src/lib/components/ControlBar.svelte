@@ -121,22 +121,24 @@
   </div>
 
   <!-- ── Centre: Spin button (image) ─────────────────────────────────────── -->
-  <button
-    class="img-btn spin-btn"
-    class:spinning={$isSpinning}
-    disabled={!$canSpin}
-    on:click={handleSpin}
-    aria-label={t($locale, 'spin')}
-  >
-    <img
-      src="/assets/ui/spin_button.png"
-      alt={t($locale, 'spin')}
-      draggable="false"
-    />
-    {#if $isSpinning}
-      <span class="spin-overlay">⟳</span>
-    {/if}
-  </button>
+  <div class="spin-wrap">
+    <button
+      class="img-btn spin-btn"
+      class:spinning={$isSpinning}
+      disabled={!$canSpin}
+      on:click={handleSpin}
+      aria-label={t($locale, 'spin')}
+    >
+      <img
+        src="/assets/ui/spin_button.png"
+        alt={t($locale, 'spin')}
+        draggable="false"
+      />
+      {#if $isSpinning}
+        <span class="spin-overlay">⟳</span>
+      {/if}
+    </button>
+  </div>
 
   <!-- ── Right cluster: Autoplay + Buy Bonus ──────────────────────────────── -->
   <div class="aux-cluster">
@@ -231,13 +233,16 @@
     color: #ffc832;
   }
 
-  /* Inner buttons row (bet + spin + aux) keeps its horizontal layout */
+  /* Inner buttons row (bet + spin + aux) — three clear zones */
   .main-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 1.2rem;
+    justify-content: space-between;
     width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 12px;
+    gap: 0;
   }
 
   /* ── Generic image-button reset ─────────────────────────────────────────── */
@@ -325,12 +330,13 @@
     pointer-events: none;
   }
 
-  /* ── Bet cluster ─────────────────────────────────────────────────────────── */
+  /* ── Left zone — bet cluster ────────────────────────────────────────────── */
   .bet-cluster {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.3rem;
+    gap: 6px;
+    flex: 0 0 auto;
   }
 
   /* Bet selector: image panel as background frame */
@@ -447,12 +453,21 @@
     transition-duration: 0.05s;
   }
 
-  /* ── Right cluster ────────────────────────────────────────────────────────── */
+  /* ── Centre zone — spin button ─────────────────────────────────────────── */
+  .spin-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ── Right zone — utility cluster ──────────────────────────────────────── */
   .aux-cluster {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 0.3rem;
+    gap: 8px;
+    flex: 0 0 auto;
   }
 
   /* Autoplay button */
