@@ -8,6 +8,7 @@
   import WinCelebration      from './lib/components/WinCelebration.svelte'
   import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
   import PaytableModal       from './lib/components/PaytableModal.svelte'
+  import WinBanner           from './lib/components/WinBanner.svelte'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
@@ -124,6 +125,7 @@
         alt=""
         aria-hidden="true"
       />
+      <WinBanner />
     </div>
   </section>
 
