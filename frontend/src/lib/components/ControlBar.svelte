@@ -335,6 +335,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     flex: 0 0 auto;
   }
@@ -363,13 +364,14 @@
     background-repeat: no-repeat;
     background-position: center;
     border: none;
-    color: transparent; /* hide the − / + text characters */
+    color: transparent;
     font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
-    /* 44×44 minimum tap target */
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 52px;
+    min-height: 52px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
