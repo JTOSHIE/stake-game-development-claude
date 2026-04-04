@@ -17,6 +17,7 @@
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
+  import { playBGM } from './lib/services/soundService'
 
   // Respect prefers-reduced-motion for accessibility
   const prefersReducedMotion =
@@ -32,6 +33,7 @@
 
     await initRGS(gameId, token)
     // isLoading is cleared inside initRGS's finally block
+    playBGM()
   })
 
   async function handleSpin() {
