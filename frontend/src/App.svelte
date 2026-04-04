@@ -94,8 +94,18 @@
   {/if}
 
   <header class="game-header">
-    <h1 class="game-title">FUTURE SPINNER</h1>
-    <p class="game-subtitle">We Roll Spinners</p>
+    <img
+      src="assets/ui/logo_future_spinner.png"
+      class="game-logo"
+      alt="FUTURE SPINNER"
+      draggable="false"
+    />
+    <img
+      src="assets/ui/logo_we_roll_spinners.png"
+      class="game-subtitle-logo"
+      alt="WE ROLL SPINNERS"
+      draggable="false"
+    />
   </header>
 
   {#if $errorMessage}
@@ -181,37 +191,28 @@
     flex-shrink: 0;
   }
 
-  .game-title {
-    font-family: 'Courier New', 'Orbitron', monospace;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    font-weight: 900;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    background: linear-gradient(90deg, #FFD700 0%, #00FFFF 50%, #FFD700 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6))
-            drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-    animation: title-shimmer 4s linear infinite;
-    margin: 0;
-    padding: 0;
+  .game-logo {
+    height: clamp(40px, 6vw, 70px);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(0,255,255,0.5))
+            drop-shadow(0 0 24px rgba(255,215,0,0.3));
+    animation: logo-pulse 4s ease-in-out infinite;
   }
 
-  @keyframes title-shimmer {
-    0%   { background-position: 0% center; }
-    100% { background-position: 200% center; }
+  @keyframes logo-pulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(0,255,255,0.4))
+                       drop-shadow(0 0 20px rgba(255,215,0,0.25)); }
+    50%       { filter: drop-shadow(0 0 18px rgba(0,255,255,0.7))
+                       drop-shadow(0 0 36px rgba(255,215,0,0.45)); }
   }
 
-  .game-subtitle {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(0.55rem, 1.5vw, 0.75rem);
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: rgba(0, 255, 255, 0.6);
-    margin: 2px 0 0 0;
-    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+  .game-subtitle-logo {
+    height: clamp(14px, 2vw, 20px);
+    width: auto;
+    object-fit: contain;
+    opacity: 0.8;
+    margin-top: 2px;
   }
 
   .error-banner {

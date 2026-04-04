@@ -6,8 +6,12 @@
 
   <!-- Game logo -->
   <div class="logo-block">
-    <div class="logo-title">FUTURE SPINNER</div>
-    <div class="logo-subtitle">WE ROLL SPINNERS</div>
+    <img
+      src="assets/ui/logo_future_spinner_loading.png"
+      class="loading-logo"
+      alt="FUTURE SPINNER"
+      draggable="false"
+    />
   </div>
 
   <!-- Animated spinner ring -->
@@ -43,26 +47,13 @@
     animation: fade-in 0.8s ease both;
   }
 
-  .logo-title {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    color: #00ffff;
-    text-shadow:
-      0 0 20px rgba(0, 255, 255, 0.9),
-      0 0 60px rgba(0, 255, 255, 0.4);
+  .loading-logo {
+    height: clamp(80px, 15vw, 140px);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(0,255,255,0.7))
+            drop-shadow(0 0 40px rgba(255,215,0,0.3));
     animation: title-glow 2s ease-in-out infinite alternate;
-  }
-
-  .logo-subtitle {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(0.7rem, 2vw, 0.95rem);
-    letter-spacing: 0.35em;
-    color: #ff00ff;
-    text-shadow: 0 0 12px rgba(255, 0, 255, 0.7);
-    margin-top: 0.3rem;
-    animation: fade-in 1.2s ease 0.3s both;
   }
 
   /* ── Spinner ring ── */
