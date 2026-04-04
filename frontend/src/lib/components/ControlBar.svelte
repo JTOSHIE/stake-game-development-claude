@@ -195,33 +195,35 @@
   /* ── Utility row ─────────────────────────────────────────────────────────── */
   .utility-row {
     display: flex;
-    gap: 0.5rem;
+    gap: 12px;
     align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
   }
 
   .util-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 50%;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    font-size: 0.9rem;
-    width: 30px;
-    height: 24px;
+    font-size: 1.1rem;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: border-color 0.15s, filter 0.15s, color 0.15s;
     padding: 0;
     line-height: 1;
   }
 
   .util-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(0, 255, 255, 0.6);
     color: #fff;
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
-    filter: brightness(1.1);
+    filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.4));
   }
 
   .util-btn:disabled {
