@@ -204,13 +204,22 @@
       sprite.filters = [cmf]
 
       if (symbol === 'W') {
-        // Remove white background using ColorMatrixFilter
-        const wildCmf = new ColorMatrixFilter()
-        wildCmf.contrast(0.3, false)
-        wildCmf.brightness(0.85, false)
-        sprite.filters = [wildCmf]
-        sprite.alpha = 1
+        // Draw a dark background panel behind the WILD sprite to mask white PNG background
+        const wildMask = new Graphics()
+        wildMask.beginFill(0x080818, 1.0)
+        wildMask.drawRoundedRect(
+          PADDING,
+          PADDING,
+          CELL_W - PADDING * 2,
+          CELL_H - PADDING * 2,
+          8
+        )
+        wildMask.endFill()
+        c.addChild(wildMask)  // add before sprite so it sits behind
+        // Clear any filters or blend modes
+        sprite.filters = []
         sprite.blendMode = BLEND_MODES.NORMAL
+        sprite.tint = 0xffffff
       }
 
       if (symbol === 'S') {
