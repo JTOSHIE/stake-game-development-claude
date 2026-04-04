@@ -1,13 +1,12 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-04 | UI polish session complete
+## Last updated: 2026-04-04 | R4 mechanics upgrade complete
 
 ## CURRENT STATE
-UI polish complete. "FUTURE SPINNER" header has premium logo treatment (gold→cyan shimmer).
-Win amount text is gold/cyan themed (no green). Bet +/− buttons larger (52px).
-Max Bet button is bigger with MAX label. Autoplay button has AUTO label.
-Utility buttons (⚡🔊ℹ) moved into single main row alongside AUTO — cohesive layout.
-Reel 5 frame clipping fixed (asymmetric inset -60px on right).
-0 TypeScript errors, production build passing.
+R4 assets wired. Logo PNGs in header and loading screen.
+win_epic.mp3 added for mega/epic wins. Win multiplier display restored.
+Win highlighting upgraded — non-winners dim, winners pulse at 1.08x scale.
+Reel anticipation implemented. Scatter anticipation glow added.
+Production build passing, 0 TypeScript errors.
 
 ## COMPLIANCE STATUS (Stake Engine)
 - ✅ Stateless design — no continuation mechanics

@@ -8,7 +8,13 @@
       "Bash(pandoc --version)",
       "Bash(brew install:*)",
       "Bash(pandoc '~/math-sdk/games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md' -o '~/math-sdk/submission-package/FUTURE_SPINNER_PAR_SHEET.pdf')",
-      "Bash(pandoc '~/math-sdk/games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md' -o '~/math-sdk/submission-package/FUTURE_SPINNER_PAR_SHEET.html' --standalone --metadata 'title=Future Spinner PAR Sheet — We Roll Spinners')"
+      "Bash(pandoc '~/math-sdk/games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md' -o '~/math-sdk/submission-package/FUTURE_SPINNER_PAR_SHEET.html' --standalone --metadata 'title=Future Spinner PAR Sheet — We Roll Spinners')",
+      "Skill(telegram:configure)",
+      "Bash(mkdir -p ~/.claude/channels/telegram)",
+      "Read(//Users/jt/.claude/channels/**)",
+      "Bash(chmod 600:*)",
+      "Bash(mkdir -p ~/.claude/channels/telegram/approved)",
+      "mcp__plugin_telegram_telegram__reply"
     ]
   }
 }
