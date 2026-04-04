@@ -419,6 +419,78 @@
     })
   }
 
+  // ── Anticipation check — true if first 4 reels have ≥3 matching high-value symbols ──
+  function _checkAnticipation(board: string[][]): boolean {
+    const highValue = ['H1', 'H2', 'S']
+    // Check any row across first 4 reels
+    for (let row = 0; row < ROWS; row++) {
+      const syms = [board[0]?.[row], board[1]?.[row], board[2]?.[row], board[3]?.[row]]
+      for (const sym of highValue) {
+        const count = syms.filter(s => s === sym || s === 'W').length
+        if (count >= 3) return true
+      }
+    }
+    return false
+  }
+
+  // ── Single-reel spin helper ────────────────────────────────────────────────
+  function _spinReel(r: number, finalBoard: string[][], isT: boolean, extraMs = 0): Promise<void> {
+    const STRIP_H = CELL_H + GAP
+    return new Promise<void>(resolve => {
+      const startTime = performance.now()
+      const duration  = (isT ? 150 + r * 50 : 500 + r * 150) + extraMs
+
+      function tick(): void {
+        const elapsed  = performance.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+
+        for (let row = 0; row < ROWS; row++) {
+          const cell  = cellContainers[r][row]
+          const baseY = row * STRIP_H
+          cell.y = baseY + ((elapsed * 0.35) % STRIP_H)
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(tick)
+        } else {
+          const reel = finalBoard[r] ?? []
+          for (let row = 0; row < ROWS; row++) {
+            _replaceCell(r, row, reel[row] ?? 'L3', false)
+            cellContainers[r][row].y = row * STRIP_H
+          }
+
+          _clearBlur(r)
+
+          const snapStart = performance.now()
+          const snapDur   = isT ? 40 : 80
+          function snapTick(): void {
+            const sp    = Math.min((performance.now() - snapStart) / snapDur, 1)
+            const scale = 1 + 0.05 * Math.sin(sp * Math.PI)
+            for (let row = 0; row < ROWS; row++) {
+              const cell = cellContainers[r]?.[row]
+              if (cell) cell.scale.set(scale)
+            }
+            if (sp < 1) requestAnimationFrame(snapTick)
+            else {
+              for (let row = 0; row < ROWS; row++) {
+                const cell = cellContainers[r]?.[row]
+                if (cell) cell.scale.set(1)
+              }
+            }
+          }
+          requestAnimationFrame(snapTick)
+
+          _snapBounce(reelContainers[r], isT).then(() => {
+            playReelStop(r)
+            resolve()
+          })
+        }
+      }
+
+      requestAnimationFrame(tick)
+    })
+  }
+
   // ── Public API — called by App.svelte ─────────────────────────────────────
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
@@ -435,77 +507,18 @@
     isSpinning.set(true)
     playSpinStart()
 
-    const isT    = get(isTurbo)
-    const STRIP_H = CELL_H + GAP
+    const isT = get(isTurbo)
 
     // Apply vertical blur to all reels at spin start
     for (let r = 0; r < REELS; r++) _blurReel(r)
 
-    // Staggered reel stop — normal: reel 0 at 500ms, +150ms per reel
-    //                         turbo: reel 0 at 150ms, +50ms per reel
-    const spinPromises = reelContainers.map((_rc, r) =>
-      new Promise<void>(resolve => {
-        const startTime = performance.now()
-        const duration  = isT ? 150 + r * 50 : 500 + r * 150
+    // Reels 0–3 spin in parallel
+    await Promise.all([0, 1, 2, 3].map(r => _spinReel(r, finalBoard, isT)))
 
-        function tick(): void {
-          const elapsed  = performance.now() - startTime
-          const progress = Math.min(elapsed / duration, 1)
+    // Anticipation: if first 4 reels have a near-match, slow reel 4 by 600ms
+    const anticipate = !isT && _checkAnticipation(finalBoard)
+    await _spinReel(4, finalBoard, isT, anticipate ? 600 : 0)
 
-          // Scroll cells downward — speed proportional to elapsed time
-          for (let row = 0; row < ROWS; row++) {
-            const cell  = cellContainers[r][row]
-            const baseY = row * STRIP_H
-            cell.y = baseY + ((elapsed * 0.35) % STRIP_H)
-          }
-
-          if (progress < 1) {
-            requestAnimationFrame(tick)
-          } else {
-            // Snap final symbols into place
-            const reel = finalBoard[r] ?? []
-            for (let row = 0; row < ROWS; row++) {
-              _replaceCell(r, row, reel[row] ?? 'L3', false)
-              cellContainers[r][row].y = row * STRIP_H
-            }
-
-            // Remove blur on stop — clean up filter memory
-            _clearBlur(r)
-
-            // Brief scale snap: 1.0 → 1.05 → 1.0 over ~80ms
-            const snapStart = performance.now()
-            const snapDur   = isT ? 40 : 80
-            function snapTick(): void {
-              const sp = Math.min((performance.now() - snapStart) / snapDur, 1)
-              // Triangle: goes up to 1.05 at sp=0.5 then back
-              const scale = 1 + 0.05 * Math.sin(sp * Math.PI)
-              for (let row = 0; row < ROWS; row++) {
-                const cell = cellContainers[r]?.[row]
-                if (cell) cell.scale.set(scale)
-              }
-              if (sp < 1) requestAnimationFrame(snapTick)
-              else {
-                for (let row = 0; row < ROWS; row++) {
-                  const cell = cellContainers[r]?.[row]
-                  if (cell) cell.scale.set(1)
-                }
-              }
-            }
-            requestAnimationFrame(snapTick)
-
-            // Overshoot bounce on the reel container
-            _snapBounce(reelContainers[r], isT).then(() => {
-              playReelStop(r)
-              resolve()
-            })
-          }
-        }
-
-        requestAnimationFrame(tick)
-      })
-    )
-
-    await Promise.all(spinPromises)
     isSpinning.set(false)
   }
 </script>
