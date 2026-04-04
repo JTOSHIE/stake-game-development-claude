@@ -319,6 +319,46 @@
         }
       }
     }
+
+    // Draw gold connecting lines through winning symbol centres
+    _drawWinConnector(wins, board)
+  }
+
+  function _drawWinConnector(wins: ReturnType<typeof get<typeof activeWins>>, board: string[][]): void {
+    if (!winHighlightLayer || wins.length === 0) return
+    const STRIP_W = CELL_W + GAP
+    const STRIP_H = CELL_H + GAP
+
+    for (const win of wins) {
+      const reelCount = win.kind ?? 3
+      const points: { x: number; y: number }[] = []
+
+      for (let r = 0; r < reelCount; r++) {
+        const reelSymbols = board[r] ?? []
+        for (let row = 0; row < ROWS; row++) {
+          const sym = reelSymbols[row]
+          if (sym === win.symbol || sym === 'W') {
+            points.push({
+              x: r * STRIP_W + CELL_W / 2,
+              y: row * STRIP_H + CELL_H / 2,
+            })
+            break  // one point per reel
+          }
+        }
+      }
+
+      if (points.length >= 2) {
+        // Inner solid line
+        winHighlightLayer.lineStyle(2, 0xffd700, 0.6)
+        winHighlightLayer.moveTo(points[0].x, points[0].y)
+        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
+
+        // Outer glow line
+        winHighlightLayer.lineStyle(6, 0xffd700, 0.15)
+        winHighlightLayer.moveTo(points[0].x, points[0].y)
+        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
+      }
+    }
   }
 
   function _animateScale(target: Container, from: number, to: number, duration: number): void {
