@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    betAmount, canSpin, canBuyBonus, canIncreaseBet, canSetMaxBet,
-    isSpinning, isAutoPlay, autoPlayCount, buyBonusActive,
+    betAmount, canSpin, canIncreaseBet, canSetMaxBet,
+    isSpinning, isAutoPlay, autoPlayCount,
     isTurbo, isMuted, showPaytable,
     increaseBet, decreaseBet, setMaxBet, setMinBet,
     locale, currencyCode, BET_LEVELS,
@@ -11,21 +11,13 @@
   import { playClick } from '../services/soundService'
   import { createEventDispatcher } from 'svelte'
 
-  const dispatch = createEventDispatcher<{ spin: void; buyBonus: void }>()
+  const dispatch = createEventDispatcher<{ spin: void }>()
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
   let showAutoMenu = false
 
   function handleSpin() {
     if ($canSpin) dispatch('spin')
-  }
-
-  function handleBuyBonus() {
-    if ($canBuyBonus) {
-      playClick()
-      buyBonusActive.set(true)
-      dispatch('buyBonus')
-    }
   }
 
   function startAuto(count: number) {
@@ -175,16 +167,6 @@
       {/if}
     </div>
 
-    <!-- Buy Bonus text button (no dedicated image asset) -->
-    <button
-      class="bonus-btn"
-      on:click={handleBuyBonus}
-      disabled={!$canBuyBonus}
-      title={t($locale, 'buyBonusDesc')}
-      aria-label={t($locale, 'buyBonus')}
-    >
-      {t($locale, 'buyBonus')}
-    </button>
   </div>
 
   </div><!-- /main-row -->
@@ -520,25 +502,4 @@
 
   .menu-item:hover { background: rgba(255, 200, 50, 0.15); }
 
-  /* ── Buy Bonus button — btn_menu.png ────────────────────────────────────── */
-  .bonus-btn {
-    background-image: url('/assets/ui/btn_menu.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: transparent;
-    border: none;
-    color: transparent; /* image carries the visual label */
-    cursor: pointer;
-    width: 80px;
-    height: 44px;
-    transition: filter 0.15s, transform 0.1s;
-  }
-
-  .bonus-btn:hover:not(:disabled) {
-    filter: brightness(1.2) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
-    transform: scale(1.04);
-  }
-
-  .bonus-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
 </style>

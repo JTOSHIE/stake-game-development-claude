@@ -16,7 +16,7 @@
   import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter, BLEND_MODES } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
-  import { playSpin, playReelStop } from '../services/soundService'
+  import { playSpinStart, playReelStop } from '../services/soundService'
 
   // ── Layout constants ──────────────────────────────────────────────────────
   const REELS    = 5
@@ -397,7 +397,7 @@
     }
 
     isSpinning.set(true)
-    playSpin()
+    playSpinStart()
 
     const isT    = get(isTurbo)
     const STRIP_H = CELL_H + GAP

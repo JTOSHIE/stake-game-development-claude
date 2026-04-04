@@ -77,7 +77,7 @@
                 <span class="sym-name">{sym.name}</span>
               </td>
               {#if sym.name === 'SCAT'}
-                <td colspan="3" class="scatter-note">Triggers Free Rounds</td>
+                <td colspan="3" class="scatter-note">3× = 5× · 4× = 15× · 5× = 50× multiplier</td>
               {:else}
                 <td class="pay-cell">{sym.pays[2] ?? '—'}</td>
                 <td class="pay-cell">{sym.pays[3] ?? '—'}</td>
@@ -94,8 +94,7 @@
         <ul class="rules-list">
           <li>Wins pay left to right on adjacent reels starting from reel 1.</li>
           <li>WILD substitutes for all symbols except SCATTER.</li>
-          <li>3, 4, or 5 SCATTERs anywhere trigger 8, 15, or 25 Free Rounds respectively.</li>
-          <li>Free Rounds can retrigger. All wins during Free Rounds are multiplied by the active scatter multiplier.</li>
+          <li>3, 4, or 5 SCATTERs anywhere apply a 5×, 15×, or 50× multiplier to your total bet win.</li>
           <li>Maximum win per spin is capped at 5,000× your total bet.</li>
           <li>Malfunctions void all pays and plays.</li>
         </ul>

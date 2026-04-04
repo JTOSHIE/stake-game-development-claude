@@ -1,11 +1,25 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-04 | R2 asset wiring complete
+## Last updated: 2026-04-04 | Compliance + polish session complete
 
 ## CURRENT STATE
-All R2 assets wired. Clean ornate frame PNG active with transparent centre.
-WILD white background fixed. All UI panels, buttons, and win display
-now using Manus-generated image assets. Green removed throughout.
-Production build passing with 0 TypeScript errors.
+Buy Bonus button removed (Stake Engine compliance — stateless requirement).
+Frame repositioned to sit outside grid area. Background video opacity
+increased. Audio now dynamic — dead spins silent, wins escalate by tier.
+0 TypeScript errors, production build passing.
+
+## COMPLIANCE STATUS (Stake Engine)
+- ✅ Stateless design — no continuation mechanics
+- ✅ Buy Bonus removed — no paid bonus entry
+- ✅ No free spins
+- ✅ No jackpots
+- ✅ Win cap: 5,000× enforced
+- ✅ RTP: 96.3500%
+- ✅ 16 languages
+- ✅ No Stake branding
+- ✅ No underage appeal
+- ⏳ IP/trademark review pending
+- ⏳ Real RGS endpoint test pending
+- ⏳ Google Drive artwork upload pending
 
 ## COMPONENT STATUS
 
@@ -18,16 +32,16 @@ Production build passing with 0 TypeScript errors.
 | LoadingScreen.svelte | ✅ Complete | Logo, rings, progress bar |
 | WinDisplay.svelte | ✅ Complete | panel_win.png, no green, count-up |
 | WinCelebration.svelte | ✅ Complete | small/big/mega/epic + particles |
-| ControlBar.svelte | ✅ Complete | spin_button.png, btn+/−, btn_menu, no green |
+| ControlBar.svelte | ✅ Complete | spin_button.png, btn+/−, btn_menu, Buy Bonus removed |
 | BalanceDisplay.svelte | ✅ Complete | panel_balance.png |
-| App.svelte | ✅ Complete | frame_clean_ornate.png, video BG, mobile |
-| soundService.ts | ✅ Complete | R2 sounds — better BGM/spin/win/scatter |
+| App.svelte | ✅ Complete | frame outside grid, video 50% opacity, playWin wired |
+| soundService.ts | ✅ Complete | Dynamic win tiers, BGM duck on spin |
 | translations.ts | ✅ Complete | 16 languages |
-| Background video | ✅ Wired | 1000062179.mp4 at 35% opacity |
-| Frame overlay | ✅ Wired | frame_clean_ornate.png — transparent centre |
+| Background video | ✅ Wired | 1000062179.mp4 at 50% opacity |
+| Frame overlay | ✅ Wired | frame_clean_ornate.png — -70px inset, outside grid |
 | Symbol PNGs | ✅ Wired | 10 symbols, WILD white bg fixed |
 | UI assets | ✅ Wired | spin_button, panels, +/− buttons, btn_menu |
-| Sounds | ✅ Wired | R2 versions active |
+| Sounds | ✅ Wired | R2 versions, dynamic win tiers |
 | PAR Sheet | ✅ Complete | submission-package/FUTURE_SPINNER_PAR_SHEET.html |
 | Submission package | ✅ Complete | Checklist + blurb |
 
@@ -41,16 +55,17 @@ Production build passing with 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Compliance + polish | 2026-04-04 | Buy Bonus removed, frame fix, video opacity, dynamic audio |
 | R2 wiring | 2026-04-04 | Clean frame, WILD fix, all UI panels, R2 sounds |
-| Emergency frame | 2026-04-04 | Removed opaque frame, CSS fallback |
+| Emergency frame | 2026-04-04 | CSS fallback frame |
 | Immediate fixes | 2026-04-04 | Green→cyan, spin glow, panel styling |
-| Asset wiring | 2026-04-04 | Video, sounds, frame source tags |
-| Full polish | 2026-04-03 | All visual tasks, reel tumble |
+| Asset wiring | 2026-04-04 | Video, sounds wired |
+| Full polish | 2026-04-03 | All visual tasks |
 | Bugfix | 2026-04-03 | Win display flicker |
-| Symbol Integration | 2026-04-03 | PNG sprites, hover, count-up |
+| Symbol Integration | 2026-04-03 | PNG sprites |
 
 ## REPOSITORY
 - Repo: https://github.com/JTOSHIE/stake-game-development-claude
 - Frontend: ~/math-sdk/frontend/
 - Branch: main
-- Last commit: 58bf477 feat(sounds): upgrade bgm, spin, win, scatter to R2 versions
+- Last commit: see `git log --oneline -1`

@@ -51,10 +51,13 @@ export function playBGM(): void {
   bgmStarted = true
 }
 
-export function playSpin(): void {
+export function playSpinStart(): void {
   if (muted) return
   sounds.spin.currentTime = 0
   sounds.spin.play().catch(() => {})
+  // Duck BGM during spin, restore after reel settle
+  sounds.bgm.volume = 0.15
+  setTimeout(() => { sounds.bgm.volume = 0.3 }, 1500)
 }
 
 export function playReelStop(_reelIndex: number = 0): void {
@@ -65,14 +68,41 @@ export function playReelStop(_reelIndex: number = 0): void {
   clone.play().catch(() => {})
 }
 
+/**
+ * Play win sound based on win multiplier (winAmount / betAmount).
+ * Dead spins: call playWin(0) — no sound plays.
+ * Small wins (>0 to <2×): soft win chime
+ * Medium wins (2× to <10×): regular win fanfare
+ * Big wins (10× to <50×): scatter/celebration sound
+ * Epic wins (50×+): scatter sound + repeat for emphasis
+ */
 export function playWin(multiplier: number): void {
-  if (muted) return
-  if (multiplier >= 5) {
+  if (muted || multiplier <= 0) return  // dead spin — silence
+
+  if (multiplier >= 50) {
+    // Epic — play scatter twice with slight delay
     sounds.scatter.currentTime = 0
     sounds.scatter.play().catch(() => {})
-  } else if (multiplier > 0) {
+    setTimeout(() => {
+      if (!muted) {
+        const echo = sounds.scatter.cloneNode() as HTMLAudioElement
+        echo.volume = 0.6
+        echo.play().catch(() => {})
+      }
+    }, 800)
+  } else if (multiplier >= 10) {
+    // Big win — scatter/celebration sound
+    sounds.scatter.currentTime = 0
+    sounds.scatter.play().catch(() => {})
+  } else if (multiplier >= 2) {
+    // Medium win — win fanfare
     sounds.win.currentTime = 0
     sounds.win.play().catch(() => {})
+  } else {
+    // Small win (>0 but <2×) — quiet win sound at lower volume
+    const softWin = sounds.win.cloneNode() as HTMLAudioElement
+    softWin.volume = 0.4
+    softWin.play().catch(() => {})
   }
 }
 

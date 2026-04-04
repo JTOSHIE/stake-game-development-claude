@@ -12,12 +12,12 @@
   import {
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
-    buyBonusActive, recordSpinResult, resetWin, errorMessage,
+    recordSpinResult, resetWin, errorMessage,
     winMultiplier, showPaytable, isWincap,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
-  import { playBGM } from './lib/services/soundService'
+  import { playBGM, playWin } from './lib/services/soundService'
 
   // Respect prefers-reduced-motion for accessibility
   const prefersReducedMotion =
@@ -41,11 +41,10 @@
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
 
-    const mode = $buyBonusActive ? 'bonus' : 'base'
     const bet  = $betAmount
 
     try {
-      const result: SpinResult = await spin({ betAmount: bet, mode })
+      const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
 
       if (gridRef) await gridRef.animateSpin(result.board)
 
@@ -53,7 +52,7 @@
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
-      buyBonusActive.set(false)
+      playWin(bet > 0 ? result.totalWin / bet : 0)
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
@@ -71,10 +70,6 @@
     }
   }
 
-  function handleBuyBonus() {
-    buyBonusActive.set(true)
-    handleSpin()
-  }
 </script>
 
 <!-- Background video — behind all UI elements -->
@@ -94,7 +89,7 @@
   <div class="bg-overlay"></div>
 </div>
 
-<main class="game-wrapper" class:bonus-bg={$buyBonusActive}>
+<main class="game-wrapper">
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
   <MaxWinCelebration
     show={$isWincap}
@@ -134,7 +129,7 @@
     <WinDisplay />
   </footer>
 
-  <ControlBar on:spin={handleSpin} on:buyBonus={handleBuyBonus} />
+  <ControlBar on:spin={handleSpin} />
 
   {#if $showPaytable}
     <PaytableModal />
@@ -183,16 +178,6 @@
       rgba(6,6,15,0.65) 100%
     );
     transition: background 0.6s ease;
-  }
-
-  /* Bonus buy: shift tint toward deep purple */
-  .game-wrapper.bonus-bg {
-    background: linear-gradient(
-      to bottom,
-      rgba(20,0,40,0.65) 0%,
-      rgba(10,0,25,0.40) 40%,
-      rgba(20,0,40,0.70) 100%
-    );
   }
 
   .game-header {
@@ -254,13 +239,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.35;  /* subtle — game elements must remain clear */
+    opacity: 0.5;
   }
 
   .bg-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65); /* ensures readability over video */
+    background: rgba(0, 0, 0, 0.55);
   }
 
   /* Reduced-motion fallback: static gradient instead of video */
@@ -280,9 +265,9 @@
 
   .game-frame {
     position: absolute;
-    inset: -20px;
-    width: calc(100% + 40px);
-    height: calc(100% + 40px);
+    inset: -70px;
+    width: calc(100% + 140px);
+    height: calc(100% + 140px);
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
