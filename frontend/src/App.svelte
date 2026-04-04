@@ -120,7 +120,12 @@
     <!-- Cyberpunk frame overlay — sits above canvas, below controls -->
     <div class="grid-wrapper">
       <GameGrid bind:this={gridRef} />
-      <div class="game-frame" aria-hidden="true"></div>
+      <img
+        src="assets/frames/frame_clean_ornate.png"
+        class="game-frame"
+        alt=""
+        aria-hidden="true"
+      />
     </div>
   </section>
 
@@ -275,65 +280,19 @@
 
   .game-frame {
     position: absolute;
-    inset: -12px;
+    inset: -20px;
+    width: calc(100% + 40px);
+    height: calc(100% + 40px);
+    object-fit: fill;
     pointer-events: none;
     z-index: 10;
-    border-radius: 16px;
-    /* Layered neon border — cyan inner, magenta outer */
-    border: 3px solid rgba(0, 255, 255, 0.7);
-    box-shadow:
-      0 0 0 1px rgba(255, 0, 255, 0.3),
-      0 0 20px rgba(0, 255, 255, 0.5),
-      0 0 40px rgba(0, 255, 255, 0.2),
-      0 0 80px rgba(157, 0, 255, 0.15),
-      inset 0 0 20px rgba(0, 255, 255, 0.05);
     animation: frame-pulse 3s ease-in-out infinite;
   }
 
-  /* Corner accent markers */
-  .game-frame::before,
-  .game-frame::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: #00ffff;
-    border-style: solid;
-    opacity: 0.8;
-  }
-
-  .game-frame::before {
-    top: -3px;
-    left: -3px;
-    border-width: 3px 0 0 3px;
-    border-radius: 4px 0 0 0;
-  }
-
-  .game-frame::after {
-    bottom: -3px;
-    right: -3px;
-    border-width: 0 3px 3px 0;
-    border-radius: 0 0 4px 0;
-  }
-
   @keyframes frame-pulse {
-    0%, 100% {
-      border-color: rgba(0, 255, 255, 0.6);
-      box-shadow:
-        0 0 0 1px rgba(255, 0, 255, 0.2),
-        0 0 15px rgba(0, 255, 255, 0.4),
-        0 0 30px rgba(0, 255, 255, 0.15),
-        inset 0 0 15px rgba(0, 255, 255, 0.03);
-    }
-    50% {
-      border-color: rgba(0, 255, 255, 0.95);
-      box-shadow:
-        0 0 0 1px rgba(255, 0, 255, 0.5),
-        0 0 25px rgba(0, 255, 255, 0.7),
-        0 0 60px rgba(0, 255, 255, 0.3),
-        0 0 100px rgba(157, 0, 255, 0.2),
-        inset 0 0 25px rgba(0, 255, 255, 0.08);
-    }
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(0,255,255,0.5)); }
+    50%       { filter: drop-shadow(0 0 20px rgba(0,255,255,0.9))
+                        drop-shadow(0 0 40px rgba(157,0,255,0.4)); }
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */
