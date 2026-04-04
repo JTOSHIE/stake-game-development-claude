@@ -53,6 +53,7 @@ Production build passing, 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| R4 mechanics | 2026-04-04 | Logo PNGs, win_epic.mp3, win multiplier, win pulse, reel/scatter anticipation |
 | UI polish | 2026-04-04 | Header shimmer, win colours, button sizes, single-row layout, frame fix |
 | Definitive fix | 2026-04-04 | Video fix, WILD mask, layout, green removed, celebrations |
 | R3 wiring | 2026-04-04 | WILD CMF, video v2, R3 bet buttons |
