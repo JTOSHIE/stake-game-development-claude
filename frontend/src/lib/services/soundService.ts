@@ -11,6 +11,7 @@ const sounds: Record<string, HTMLAudioElement> = {
   spin:     new Audio(`${BASE}spin.mp3`),
   reelStop: new Audio(`${BASE}reel_stop.mp3`),
   win:      new Audio(`${BASE}win.mp3`),
+  winEpic:  new Audio(`${BASE}win_epic.mp3`),
   uiClick:  new Audio(`${BASE}ui_click.mp3`),
   scatter:  new Audio(`${BASE}scatter.mp3`),
 }
@@ -23,6 +24,7 @@ sounds.bgm.volume = 0.3
 sounds.spin.volume     = 0.7
 sounds.reelStop.volume = 0.85
 sounds.win.volume      = 0.8
+sounds.winEpic.volume  = 0.95
 sounds.uiClick.volume  = 0.6
 sounds.scatter.volume  = 0.9
 
@@ -80,16 +82,14 @@ export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return  // dead spin — silence
 
   if (multiplier >= 50) {
-    // Epic — play scatter twice with slight delay
-    sounds.scatter.currentTime = 0
-    sounds.scatter.play().catch(() => {})
-    setTimeout(() => {
-      if (!muted) {
-        const echo = sounds.scatter.cloneNode() as HTMLAudioElement
-        echo.volume = 0.6
-        echo.play().catch(() => {})
-      }
-    }, 800)
+    // Epic — winEpic sound at full volume
+    sounds.winEpic.currentTime = 0
+    sounds.winEpic.play().catch(() => {})
+  } else if (multiplier >= 20) {
+    // Mega — winEpic at slightly lower volume
+    const megaClone = sounds.winEpic.cloneNode() as HTMLAudioElement
+    megaClone.volume = 0.8
+    megaClone.play().catch(() => {})
   } else if (multiplier >= 10) {
     // Big win — scatter/celebration sound
     sounds.scatter.currentTime = 0
