@@ -86,7 +86,7 @@
 
     <!-- Multiplier badge (≥ 1×) — uses targetValue so badge persists during animation -->
     {#if $betAmount > 0 && targetValue / $betAmount >= 1}
-      <div class="multiplier">{(targetValue / $betAmount).toFixed(1)}×</div>
+      <div class="win-multiplier">{(targetValue / $betAmount).toFixed(1)}×</div>
     {/if}
   </div>
 {:else}
@@ -185,10 +185,15 @@
   }
 
   /* ── Multiplier badge ────────────────────────────────────────────────────── */
-  .multiplier {
-    font-size: 0.7rem;
-    color: #ffc832;
-    line-height: 1;
+  .win-multiplier {
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: rgba(255, 215, 0, 0.85);
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    margin-top: 1px;
+    display: block;
   }
 
   /* ── Keyframes ───────────────────────────────────────────────────────────── */
