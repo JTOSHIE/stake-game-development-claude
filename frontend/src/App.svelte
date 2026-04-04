@@ -19,11 +19,6 @@
   import type { SpinResult } from './lib/services/rgsService'
   import { playBGM, playWin } from './lib/services/soundService'
 
-  // Respect prefers-reduced-motion for accessibility
-  const prefersReducedMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
   let gridRef: GameGrid
 
   onMount(async () => {
@@ -72,20 +67,18 @@
 
 </script>
 
-<!-- Background video — behind all UI elements -->
-<div class="bg-layer" class:reduce-motion={prefersReducedMotion}>
-  {#if !prefersReducedMotion}
-    <video
-      class="bg-video"
-      autoplay
-      loop
-      muted
-      playsinline
-      aria-hidden="true"
-    >
-      <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
-    </video>
-  {/if}
+<!-- Background video — always render, CSS handles reduced motion -->
+<div class="bg-layer">
+  <video
+    class="bg-video"
+    autoplay
+    loop
+    muted
+    playsinline
+    aria-hidden="true"
+  >
+    <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
+  </video>
   <div class="bg-overlay"></div>
 </div>
 
@@ -170,6 +163,8 @@
     height: 100dvh;
     max-width: 720px;
     margin: 0 auto;
+    position: relative;
+    z-index: 2;  /* above video layer */
     /* Subtle dark overlay so grid and UI stay readable over the background */
     background: linear-gradient(
       to bottom,
@@ -229,7 +224,7 @@
   .bg-layer {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     overflow: hidden;
   }
 
@@ -246,15 +241,11 @@
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.55);
+    z-index: 1;
   }
 
-  /* Reduced-motion fallback: static gradient instead of video */
-  .bg-layer.reduce-motion {
-    background: radial-gradient(
-      ellipse at center,
-      #0a0a1a 0%,
-      #000000 70%
-    );
+  @media (prefers-reduced-motion: reduce) {
+    .bg-video { animation: none; filter: none; }
   }
 
   /* ── Cyberpunk frame overlay ──────────────────────────────────────────── */
