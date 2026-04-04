@@ -115,8 +115,9 @@
     </div>
 
     <!-- Max Bet image button -->
-    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
+    <button class="maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
       <img src="/assets/symbols/ui_maxbet_button_variant_02.png" alt="Max Bet" draggable="false" />
+      <span class="maxbet-label">MAX</span>
     </button>
   </div>
 
@@ -436,13 +437,38 @@
     display: block;
   }
 
-  /* Max Bet image button — cyberpunk styled */
+  /* Max Bet button — cyberpunk styled with label */
   .maxbet-btn {
-    width: 96px;
-    height: 36px;
-    padding: 4px 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
     filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.35));
     transition: filter 0.15s, transform 0.1s;
+  }
+
+  .maxbet-btn img {
+    width: 40px;
+    height: 28px;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .maxbet-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: rgba(0, 255, 255, 0.8);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
   }
 
   .maxbet-btn:hover:not(:disabled) {
@@ -454,6 +480,8 @@
     transform: scale(0.95);
     transition-duration: 0.05s;
   }
+
+  .maxbet-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
 
   /* ── Centre zone — spin button ─────────────────────────────────────────── */
   .spin-wrap {
