@@ -95,7 +95,7 @@
 
   <header class="game-header">
     <h1 class="game-title">FUTURE SPINNER</h1>
-    <p class="provider">We Roll Spinners</p>
+    <p class="game-subtitle">We Roll Spinners</p>
   </header>
 
   {#if $errorMessage}
@@ -182,23 +182,36 @@
   }
 
   .game-title {
-    font-size: 1.4rem;
+    font-family: 'Courier New', 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
     font-weight: 900;
-    letter-spacing: 0.2em;
-    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #FFD700 0%, #00FFFF 50%, #FFD700 100%);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    /* Legible on any background colour */
-    filter: drop-shadow(0 1px 6px rgba(0,0,0,0.9));
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6))
+            drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+    animation: title-shimmer 4s linear infinite;
+    margin: 0;
+    padding: 0;
   }
 
-  .provider {
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.15em;
+  @keyframes title-shimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .game-subtitle {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+    letter-spacing: 0.4em;
     text-transform: uppercase;
-    margin-top: 2px;
+    color: rgba(0, 255, 255, 0.6);
+    margin: 2px 0 0 0;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
   }
 
   .error-banner {
