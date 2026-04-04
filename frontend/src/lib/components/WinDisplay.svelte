@@ -112,10 +112,18 @@
     height: 56px;
     padding: 0 1rem;
 
+    /* Explicit reset — no border or glow on the panel itself */
+    border: none;
+    outline: none;
+    box-shadow: none;
+
     font-family: 'Courier New', monospace;
     font-weight: 900;
     transition: filter 0.3s;
   }
+
+  /* Green tier: text colour only — zero panel effect */
+  .win-green { border: none; box-shadow: none; outline: none; }
 
   .win-idle {
     opacity: 0.4;
