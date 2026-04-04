@@ -269,8 +269,8 @@
 
   .game-frame {
     position: absolute;
-    inset: -70px;
-    width: calc(100% + 140px);
+    inset: -70px -60px -70px -70px;
+    width: calc(100% + 130px);
     height: calc(100% + 140px);
     object-fit: fill;
     pointer-events: none;
