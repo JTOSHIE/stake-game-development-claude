@@ -420,16 +420,17 @@
     })
   }
 
-  // ── Anticipation check — true if first 4 reels have ≥3 matching high-value symbols ──
+  // ── Anticipation check — true if reels 0, 1, 2 have matching high-value symbols ──
   function _checkAnticipation(board: string[][]): boolean {
     const highValue = ['H1', 'H2', 'S']
-    // Check any row across first 4 reels
+    const isWild = (s: string | undefined) => s === 'W'
+    const matches = (a: string | undefined, b: string | undefined) =>
+      a !== undefined && b !== undefined && (a === b || isWild(a) || isWild(b))
     for (let row = 0; row < ROWS; row++) {
-      const syms = [board[0]?.[row], board[1]?.[row], board[2]?.[row], board[3]?.[row]]
-      for (const sym of highValue) {
-        const count = syms.filter(s => s === sym || s === 'W').length
-        if (count >= 3) return true
-      }
+      const s0 = board[0]?.[row]
+      const s1 = board[1]?.[row]
+      const s2 = board[2]?.[row]
+      if (s0 !== undefined && highValue.includes(s0) && matches(s0, s1) && matches(s0, s2)) return true
     }
     return false
   }
