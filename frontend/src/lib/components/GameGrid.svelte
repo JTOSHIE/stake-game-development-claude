@@ -391,8 +391,9 @@
   // ── Blur helpers ──────────────────────────────────────────────────────────
   function _blurReel(reelIndex: number): void {
     const blur = new BlurFilter()
-    blur.blurX = 0
-    blur.blurY = 10
+    blur.blurX   = 0
+    blur.blurY   = 3
+    blur.quality = 1
     reelContainers[reelIndex].filters = [blur]
   }
 
@@ -458,6 +459,9 @@
           const baseY = row * STRIP_H
           cell.y = baseY + ((elapsed * 0.35) % STRIP_H)
         }
+
+        // Clear blur before deceleration phase so symbols are readable as they land
+        if (elapsed > duration - 200) _clearBlur(r)
 
         if (progress < 1) {
           requestAnimationFrame(tick)
