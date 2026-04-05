@@ -17,6 +17,7 @@
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
+  import { themeAssets } from '../stores/themeStore'
 
   // ── Layout constants ──────────────────────────────────────────────────────
   const REELS    = 5
@@ -28,18 +29,9 @@
   const CANVAS_W = REELS * CELL_W + (REELS - 1) * GAP
   const CANVAS_H = ROWS  * CELL_H + (ROWS  - 1) * GAP
 
-  // ── Symbol → asset filename map ───────────────────────────────────────────
-  const SYMBOL_TEXTURES: Record<string, string> = {
-    H1: 'assets/symbols/h1_futuristic_rim_variant_02.png',
-    H2: 'assets/symbols/h2_neon_turbocharger_variant_01.png',
-    M1: 'assets/symbols/m1_holographic_grille_variant_09_original.png',
-    M2: 'assets/symbols/m2_glowing_exhaust_variant_01.png',
-    M3: 'assets/symbols/m3_holographic_steering_wheel_variant_03.png',
-    L1: 'assets/symbols/l1_chrome_lug_nut_variant_05.png',
-    L2: 'assets/symbols/l2_chrome_spark_plug_variant_05.png',
-    L3: 'assets/symbols/l3_neon_piston_variant_08.png',
-    W:  'assets/symbols/wild_cyberpunk_logo_variant_04.png',
-    S:  'assets/symbols/scatter_energy_burst_variant_01.png',
+  // ── Symbol → asset path (reads active theme at call time) ─────────────────
+  function getSymbolTextures(): Record<string, string> {
+    return get(themeAssets).symbols
   }
 
   // Fallback colours — used if a texture fails to load
@@ -102,7 +94,8 @@
 
   // ── Asset preloading ──────────────────────────────────────────────────────
   async function _preloadTextures(): Promise<void> {
-    const urls = Object.values(SYMBOL_TEXTURES)
+    const symbolTextures = getSymbolTextures()
+    const urls = Object.values(symbolTextures)
     assetLoadProgress.set(0)
     try {
       await Assets.load(urls, (progress: number) => {
@@ -111,7 +104,7 @@
     } catch (err) {
       // Non-fatal: _makeCell falls back to placeholder for any missing texture
       console.warn('[GameGrid] Texture load error:', err)
-      for (const [key, url] of Object.entries(SYMBOL_TEXTURES)) {
+      for (const [key, url] of Object.entries(symbolTextures)) {
         try {
           await Assets.load(url)
           console.log(`[GameGrid] ✅ ${key}: ${url}`)
@@ -182,7 +175,7 @@
     c.addChild(bg)
 
     // Symbol sprite (or fallback placeholder)
-    const url = SYMBOL_TEXTURES[symbol]
+    const url = getSymbolTextures()[symbol]
     const tex  = url ? Assets.get<Texture>(url) : null
 
     if (tex && tex !== Texture.EMPTY) {
