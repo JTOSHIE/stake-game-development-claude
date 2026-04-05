@@ -25,8 +25,10 @@ export const themeAssets = derived(activeTheme, ($t) => ({
     W:  `${$t.assetBase}/symbols/wild.png`,
     S:  `${$t.assetBase}/symbols/scatter.png`,
   },
-  background:   `${$t.assetBase}/backgrounds/bg-1.${$t.videoBackground ? 'mp4' : 'jpg'}`,
-  frame:        `${$t.assetBase}/frames/frame-1.png`,
+  // Background — jpg for all themes, separate mp4 for future-spinner video
+  background:    `${$t.assetBase}/backgrounds/bg-1.jpg`,
+  backgroundMp4: `${$t.assetBase}/backgrounds/bg-1.mp4`,
+  frame:         `${$t.assetBase}/frames/frame-1.png`,
   spinButton:   `${$t.assetBase}/ui/spin_button.png`,
   panelBalance: `${$t.assetBase}/ui/panel_balance.png`,
   panelWin:     `${$t.assetBase}/ui/panel_win.png`,
