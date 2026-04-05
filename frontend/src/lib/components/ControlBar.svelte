@@ -9,6 +9,7 @@
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
+  import { themeAssets } from '../stores/themeStore'
   import { createEventDispatcher } from 'svelte'
 
   const dispatch = createEventDispatcher<{ spin: void }>()
@@ -80,7 +81,7 @@
 
     <!-- Bet selector panel (image background) -->
     <div class="bet-selector-panel">
-      <button class="nudge-btn" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
+      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnMinus}')" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
 
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
@@ -89,7 +90,7 @@
         </div>
       </div>
 
-      <button class="nudge-btn" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
+      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnPlus}')" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
     </div>
   </div>
 
@@ -103,7 +104,7 @@
       aria-label={t($locale, 'spin')}
     >
       <img
-        src="/assets/ui/spin_button.png"
+        src="{$themeAssets.spinButton}"
         alt={t($locale, 'spin')}
         draggable="false"
       />
@@ -120,7 +121,7 @@
     <div class="auto-wrapper">
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
-          <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
+          <img src="{$themeAssets.btnMenu}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
           <span class="auto-count">{$autoPlayCount}</span>
         </button>
@@ -131,7 +132,7 @@
           disabled={$isSpinning}
           aria-label={t($locale, 'autoPlay')}
         >
-          <img src="/assets/ui/btn_menu.png" alt="Autoplay" draggable="false" />
+          <img src="{$themeAssets.btnMenu}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
         </button>
         {#if showAutoMenu}
@@ -380,14 +381,6 @@
     line-height: 1;
     transition: opacity 0.1s, transform 0.1s, filter 0.1s;
     flex-shrink: 0;
-  }
-
-  .nudge-btn[aria-label="Decrease bet"] {
-    background-image: url('/assets/ui/btn_bet_minus_v2.png');
-  }
-
-  .nudge-btn[aria-label="Increase bet"] {
-    background-image: url('/assets/ui/btn_bet_plus_v2.png');
   }
 
   .nudge-btn:hover:not(:disabled) {
