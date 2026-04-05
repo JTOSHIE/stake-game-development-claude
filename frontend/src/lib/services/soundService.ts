@@ -1,40 +1,46 @@
 // soundService.ts — Future Spinner R5 Audio System
 // Full tiered audio: 5 win tiers, anticipation, scatter events
 
+import { get } from 'svelte/store'
 import { isMuted as isMutedStore } from '../stores/gameStore'
+import { themeAssets } from '../stores/themeStore'
 
-const BASE = 'assets/sounds/'
+function buildSounds(): Record<string, HTMLAudioElement> {
+  const s = get(themeAssets).sounds
+  const sounds: Record<string, HTMLAudioElement> = {
+    bgm:                  new Audio(s.bgm),
+    bgmTension:           new Audio(s.bgmTension),
+    spin:                 new Audio(s.spin),
+    reelStop:             new Audio(s.reelStop),
+    reelStopAnticipation: new Audio(s.reelStopAnticipation),
+    winSmall:             new Audio(s.winSmall),
+    winMedium:            new Audio(s.winMedium),
+    winBig:               new Audio(s.winBig),
+    winEpic:              new Audio(s.winEpic),
+    scatterLand:          new Audio(s.scatterLand),
+    anticipationBuild:    new Audio(s.anticipationBuild),
+    uiClick:              new Audio(s.uiClick),
+  }
 
-// All 12 audio files
-const sounds: Record<string, HTMLAudioElement> = {
-  bgm:                  new Audio(`${BASE}bgm_loop.mp3`),
-  bgmTension:           new Audio(`${BASE}bgm_tension.mp3`),
-  spin:                 new Audio(`${BASE}spin.mp3`),
-  reelStop:             new Audio(`${BASE}reel_stop.mp3`),
-  reelStopAnticipation: new Audio(`${BASE}reel_stop_anticipation.mp3`),
-  winSmall:             new Audio(`${BASE}win_small.mp3`),
-  winMedium:            new Audio(`${BASE}win_medium.mp3`),
-  winBig:               new Audio(`${BASE}win_big.mp3`),
-  winEpic:              new Audio(`${BASE}win_epic.mp3`),
-  scatterLand:          new Audio(`${BASE}scatter_land.mp3`),
-  anticipationBuild:    new Audio(`${BASE}anticipation_build.mp3`),
-  uiClick:              new Audio(`${BASE}ui_click.mp3`),
+  // Volume levels
+  sounds.bgm.loop              = true
+  sounds.bgm.volume            = 0.30
+  sounds.bgmTension.volume     = 0.50
+  sounds.spin.volume           = 0.70
+  sounds.reelStop.volume       = 0.85
+  sounds.reelStopAnticipation.volume = 0.90
+  sounds.winSmall.volume       = 0.65
+  sounds.winMedium.volume      = 0.75
+  sounds.winBig.volume         = 0.85
+  sounds.winEpic.volume        = 0.95
+  sounds.scatterLand.volume    = 0.80
+  sounds.anticipationBuild.volume = 0.60
+  sounds.uiClick.volume        = 0.60
+
+  return sounds
 }
 
-// Volume levels
-sounds.bgm.loop              = true
-sounds.bgm.volume            = 0.30
-sounds.bgmTension.volume     = 0.50
-sounds.spin.volume           = 0.70
-sounds.reelStop.volume       = 0.85
-sounds.reelStopAnticipation.volume = 0.90
-sounds.winSmall.volume       = 0.65
-sounds.winMedium.volume      = 0.75
-sounds.winBig.volume         = 0.85
-sounds.winEpic.volume        = 0.95
-sounds.scatterLand.volume    = 0.80
-sounds.anticipationBuild.volume = 0.60
-sounds.uiClick.volume        = 0.60
+let sounds = buildSounds()
 
 let bgmStarted = false
 let muted = false
