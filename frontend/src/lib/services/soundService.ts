@@ -6,20 +6,30 @@ import { isMuted as isMutedStore } from '../stores/gameStore'
 import { themeAssets } from '../stores/themeStore'
 
 function buildSounds(): Record<string, HTMLAudioElement> {
-  const s = get(themeAssets).sounds
+  const paths = get(themeAssets).sounds
+  const base = 'assets/themes/future-spinner/sounds'
+
+  function audio(url: string, fallback: string): HTMLAudioElement {
+    const el = new Audio(url)
+    el.addEventListener('error', () => {
+      if (el.src !== fallback) el.src = fallback
+    })
+    return el
+  }
+
   const sounds: Record<string, HTMLAudioElement> = {
-    bgm:                  new Audio(s.bgm),
-    bgmTension:           new Audio(s.bgmTension),
-    spin:                 new Audio(s.spin),
-    reelStop:             new Audio(s.reelStop),
-    reelStopAnticipation: new Audio(s.reelStopAnticipation),
-    winSmall:             new Audio(s.winSmall),
-    winMedium:            new Audio(s.winMedium),
-    winBig:               new Audio(s.winBig),
-    winEpic:              new Audio(s.winEpic),
-    scatterLand:          new Audio(s.scatterLand),
-    anticipationBuild:    new Audio(s.anticipationBuild),
-    uiClick:              new Audio(s.uiClick),
+    bgm:                  audio(paths.bgm,                  `${base}/bgm_loop.mp3`),
+    bgmTension:           audio(paths.bgmTension,           `${base}/bgm_tension.mp3`),
+    spin:                 audio(paths.spin,                 `${base}/spin.mp3`),
+    reelStop:             audio(paths.reelStop,             `${base}/reel_stop.mp3`),
+    reelStopAnticipation: audio(paths.reelStopAnticipation, `${base}/reel_stop_anticipation.mp3`),
+    winSmall:             audio(paths.winSmall,             `${base}/win_small.mp3`),
+    winMedium:            audio(paths.winMedium,            `${base}/win_medium.mp3`),
+    winBig:               audio(paths.winBig,               `${base}/win_big.mp3`),
+    winEpic:              audio(paths.winEpic,              `${base}/win_epic.mp3`),
+    scatterLand:          audio(paths.scatterLand,          `${base}/scatter_land.mp3`),
+    anticipationBuild:    audio(paths.anticipationBuild,    `${base}/anticipation_build.mp3`),
+    uiClick:              audio(paths.uiClick,              `${base}/ui_click.mp3`),
   }
 
   // Volume levels
