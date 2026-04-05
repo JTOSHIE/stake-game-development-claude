@@ -1,5 +1,19 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-05 | Definitive theme overhaul — all assets reinstalled
+## Last updated: 2026-04-05 | Master theme install — T3-B, T4-E, T5-C complete
+
+## ACTIVE THEME INSTALLATIONS (2026-04-05)
+
+| Theme | Concept | Symbols | UI | Frame | Status |
+|-------|---------|---------|-----|-------|--------|
+| future-spinner | Original cyberpunk | ✅ | ✅ | ✅ | Complete |
+| trap-lane | B — Classic Greyhound | ✅ | ✅ T3-B | ✅ | Complete |
+| oil-and-fire | E — Ancient Empires | ✅ | ✅ R1+R3 | ✅ R1+R3 | Complete |
+| beautiful-game | C — World Cup | ✅ | ✅ R1+R3 | ✅ R1+R3 | Complete |
+
+UI asset sources:
+- trap-lane: T3-B source ZIP (all UI)
+- oil-and-fire: Round 1 (logo, spin, info, frame_ornate) + Round 3 (panels, distinct buttons, frame_minimal)
+- beautiful-game: Round 1 (logo, spin, info, frame_ornate) + Round 3 (panels, distinct buttons, frame_minimal)
 
 ## THEME SYSTEM STATUS — Updated 2026-04-05
 - ✅ 4 themes active and fully working
