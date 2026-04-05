@@ -383,11 +383,7 @@
     position: relative;
     display: inline-block;
     overflow: visible;
-    /* CSS fallback border: visible when frame PNG fails or is blank */
-    box-shadow:
-      0 0 0 2px var(--theme-primary, #00ffff),
-      0 0 16px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent),
-      0 0 40px color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
+    /* Frame PNG provides the border — no CSS border here */
   }
 
   .game-frame {
