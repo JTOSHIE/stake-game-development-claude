@@ -380,8 +380,8 @@
   }
 
   .nudge-btn:hover:not(:disabled) {
-    transform: scale(1.06);
-    filter: brightness(1.2) drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent));
+    transform: scale(1.08);
+    filter: brightness(1.2) drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent));
   }
 
   .nudge-btn:active:not(:disabled) {
@@ -436,7 +436,7 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    background: rgba(0, 0, 0, 0.4);
+    background: transparent;
     border: 2px solid var(--theme-primary, #00ffff);
     border-radius: 6px;
     cursor: pointer;
