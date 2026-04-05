@@ -5,49 +5,50 @@ import { get } from 'svelte/store'
 import { isMuted as isMutedStore } from '../stores/gameStore'
 import { themeAssets } from '../stores/themeStore'
 
-function buildSounds(): Record<string, HTMLAudioElement> {
-  const paths = get(themeAssets).sounds
-  const base = 'assets/themes/future-spinner/sounds'
+const FS_BASE = 'assets/themes/future-spinner/sounds'
 
-  function audio(url: string, fallback: string): HTMLAudioElement {
-    const el = new Audio(url)
-    el.addEventListener('error', () => {
-      if (el.src !== fallback) el.src = fallback
-    })
-    return el
+function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
+  const el = new Audio(url)
+  el.addEventListener('error', () => {
+    const fb = `${FS_BASE}/${fallbackName}.mp3`
+    if (el.src !== fb) {
+      console.warn(`[Sound] Failed: ${url} — using fallback: ${fb}`)
+      el.src = fb
+    }
+  }, { once: true })
+  return el
+}
+
+function buildSounds() {
+  const p = get(themeAssets).sounds
+  const s = {
+    bgm:                  makeAudio(p.bgm,                  'bgm_loop'),
+    bgmTension:           makeAudio(p.bgmTension,           'bgm_tension'),
+    spin:                 makeAudio(p.spin,                 'spin'),
+    reelStop:             makeAudio(p.reelStop,             'reel_stop'),
+    reelStopAnticipation: makeAudio(p.reelStopAnticipation, 'reel_stop_anticipation'),
+    winSmall:             makeAudio(p.winSmall,             'win_small'),
+    winMedium:            makeAudio(p.winMedium,            'win_medium'),
+    winBig:               makeAudio(p.winBig,               'win_big'),
+    winEpic:              makeAudio(p.winEpic,              'win_epic'),
+    scatterLand:          makeAudio(p.scatterLand,          'scatter_land'),
+    anticipationBuild:    makeAudio(p.anticipationBuild,    'anticipation_build'),
+    uiClick:              makeAudio(p.uiClick,              'ui_click'),
   }
-
-  const sounds: Record<string, HTMLAudioElement> = {
-    bgm:                  audio(paths.bgm,                  `${base}/bgm_loop.mp3`),
-    bgmTension:           audio(paths.bgmTension,           `${base}/bgm_tension.mp3`),
-    spin:                 audio(paths.spin,                 `${base}/spin.mp3`),
-    reelStop:             audio(paths.reelStop,             `${base}/reel_stop.mp3`),
-    reelStopAnticipation: audio(paths.reelStopAnticipation, `${base}/reel_stop_anticipation.mp3`),
-    winSmall:             audio(paths.winSmall,             `${base}/win_small.mp3`),
-    winMedium:            audio(paths.winMedium,            `${base}/win_medium.mp3`),
-    winBig:               audio(paths.winBig,               `${base}/win_big.mp3`),
-    winEpic:              audio(paths.winEpic,              `${base}/win_epic.mp3`),
-    scatterLand:          audio(paths.scatterLand,          `${base}/scatter_land.mp3`),
-    anticipationBuild:    audio(paths.anticipationBuild,    `${base}/anticipation_build.mp3`),
-    uiClick:              audio(paths.uiClick,              `${base}/ui_click.mp3`),
-  }
-
-  // Volume levels
-  sounds.bgm.loop              = true
-  sounds.bgm.volume            = 0.30
-  sounds.bgmTension.volume     = 0.50
-  sounds.spin.volume           = 0.70
-  sounds.reelStop.volume       = 0.85
-  sounds.reelStopAnticipation.volume = 0.90
-  sounds.winSmall.volume       = 0.65
-  sounds.winMedium.volume      = 0.75
-  sounds.winBig.volume         = 0.85
-  sounds.winEpic.volume        = 0.95
-  sounds.scatterLand.volume    = 0.80
-  sounds.anticipationBuild.volume = 0.60
-  sounds.uiClick.volume        = 0.60
-
-  return sounds
+  s.bgm.loop    = true
+  s.bgm.volume  = 0.30
+  s.bgmTension.volume           = 0.50
+  s.spin.volume                 = 0.70
+  s.reelStop.volume             = 0.85
+  s.reelStopAnticipation.volume = 0.90
+  s.winSmall.volume             = 0.65
+  s.winMedium.volume            = 0.75
+  s.winBig.volume               = 0.85
+  s.winEpic.volume              = 0.95
+  s.scatterLand.volume          = 0.80
+  s.anticipationBuild.volume    = 0.60
+  s.uiClick.volume              = 0.60
+  return s
 }
 
 let sounds = buildSounds()
