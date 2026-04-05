@@ -88,14 +88,23 @@
 
 </script>
 
-<!-- Background layer — video for future-spinner, static image for other themes -->
+<!-- Background — video for future-spinner, image for all other themes -->
 <div class="bg-layer">
-  {#if $activeTheme.videoBackground}
-    <video class="bg-video" autoplay loop muted playsinline aria-hidden="true">
-      <source src="{$themeAssets.background}" type="video/mp4" />
+  {#if $activeTheme.id === 'future-spinner'}
+    <video
+      class="bg-video"
+      autoplay loop muted playsinline aria-hidden="true"
+    >
+      <source src="{$themeAssets.backgroundMp4}" type="video/mp4" />
     </video>
   {:else}
-    <img class="bg-video" src="{$themeAssets.background}" alt="" aria-hidden="true" />
+    <img
+      class="bg-video"
+      src="{$themeAssets.background}"
+      alt=""
+      aria-hidden="true"
+      style="object-fit: cover; width: 100%; height: 100%;"
+    />
   {/if}
   <div class="bg-overlay"></div>
 </div>
@@ -137,6 +146,9 @@
         class="game-frame"
         alt=""
         aria-hidden="true"
+        on:error={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = 'none'
+        }}
       />
       <WinBanner />
     </div>
@@ -315,9 +327,9 @@
 
   .game-frame {
     position: absolute;
-    inset: -70px;
-    width: calc(100% + 140px);
-    height: calc(100% + 140px);
+    inset: -80px;
+    width: calc(100% + 160px);
+    height: calc(100% + 160px);
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
