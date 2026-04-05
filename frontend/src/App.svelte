@@ -10,7 +10,7 @@
   import PaytableModal       from './lib/components/PaytableModal.svelte'
   import WinBanner           from './lib/components/WinBanner.svelte'
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
-  import { activeTheme, themeAssets } from './lib/stores/themeStore'
+  import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
@@ -89,31 +89,36 @@
 </script>
 
 <svelte:head>
-  {@html `<style>:root{--theme-primary:${$activeTheme.palette.primary};--theme-secondary:${$activeTheme.palette.secondary};--theme-bg:${$activeTheme.palette.background}}</style>`}
+  <title>{$activeTheme.name} — We Roll Spinners</title>
 </svelte:head>
 
-<!-- Background — video for future-spinner, image for all other themes -->
 <div class="bg-layer">
-  {#if $activeTheme.id === 'future-spinner'}
+  {#if $themeAssets.isVideo}
     <video
-      class="bg-video"
+      class="bg-media"
       autoplay loop muted playsinline aria-hidden="true"
     >
-      <source src="{$themeAssets.backgroundMp4}" type="video/mp4" />
+      <source src="{$themeAssets.backgroundVideo}" type="video/mp4" />
     </video>
   {:else}
     <img
-      class="bg-video"
+      class="bg-media"
       src="{$themeAssets.background}"
       alt=""
       aria-hidden="true"
-      style="object-fit: cover; width: 100%; height: 100%;"
     />
   {/if}
   <div class="bg-overlay"></div>
 </div>
 
-<main class="game-wrapper">
+<main
+  class="game-wrapper"
+  style="
+    --theme-primary: {$activeTheme.palette.primary};
+    --theme-secondary: {$activeTheme.palette.secondary};
+    --theme-bg: {$activeTheme.palette.background};
+  "
+>
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
   <MaxWinCelebration
     show={$isWincap}
@@ -125,12 +130,23 @@
   {/if}
 
   <header class="game-header">
-    <div class="logo-stack">
+    <div class="game-title-area">
       <img
         src="{$themeAssets.logo}"
-        class="game-logo"
+        class="game-logo-img"
         alt="{$activeTheme.name}"
         draggable="false"
+        on:error={(e) => {
+          const el = e.currentTarget as HTMLImageElement
+          el.style.display = 'none'
+          const parent = el.parentElement
+          if (parent && !parent.querySelector('.logo-text-fallback')) {
+            const t = document.createElement('div')
+            t.className = 'logo-text-fallback'
+            t.textContent = $activeTheme.name
+            parent.appendChild(t)
+          }
+        }}
       />
     </div>
   </header>
@@ -166,7 +182,12 @@
   <ControlBar on:spin={handleSpin} />
 
   <!-- Theme selector button -->
-  <button class="theme-toggle-btn" on:click={() => showThemeSelector = true} aria-label="Select theme">🎨</button>
+  <button
+    class="util-btn theme-btn"
+    on:click={() => showThemeSelector = true}
+    aria-label="Change theme"
+    title="Change theme"
+  >🎨</button>
 
   {#if $showPaytable}
     <PaytableModal />
@@ -229,27 +250,36 @@
     flex-shrink: 0;
   }
 
-  .logo-stack {
+  .game-title-area {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
   }
 
-  .game-logo {
-    height: clamp(40px, 6vw, 70px);
-    width: auto;
+  .game-logo-img {
+    max-height: 70px;
+    max-width: 400px;
     object-fit: contain;
-    filter: drop-shadow(0 0 12px rgba(0,255,255,0.5))
-            drop-shadow(0 0 24px rgba(255,215,0,0.3));
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent));
     animation: logo-pulse 4s ease-in-out infinite;
   }
 
+  .logo-text-fallback {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    color: var(--theme-primary, #00ffff);
+    text-shadow: 0 0 20px currentColor;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
   @keyframes logo-pulse {
-    0%, 100% { filter: drop-shadow(0 0 10px rgba(0,255,255,0.4))
-                       drop-shadow(0 0 20px rgba(255,215,0,0.25)); }
-    50%       { filter: drop-shadow(0 0 18px rgba(0,255,255,0.7))
-                       drop-shadow(0 0 36px rgba(255,215,0,0.45)); }
+    0%, 100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent)); }
+    50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent)); }
   }
 
   .error-banner {
@@ -279,17 +309,18 @@
     overflow: hidden;
   }
 
-  .bg-video {
+  .bg-media {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0.5;
+    pointer-events: none;
   }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
-  .theme-toggle-btn {
+  .util-btn.theme-btn {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
@@ -305,10 +336,11 @@
     align-items: center;
     justify-content: center;
     transition: background 0.15s, border-color 0.15s;
+    color: #fff;
   }
-  .theme-toggle-btn:hover {
-    background: rgba(0,255,255,0.12);
-    border-color: rgba(0,255,255,0.45);
+  .util-btn.theme-btn:hover {
+    background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
+    border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
   }
 
   .bg-overlay {
@@ -319,7 +351,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .bg-video { animation: none; filter: none; }
+    .bg-media { animation: none; filter: none; }
   }
 
   /* ── Cyberpunk frame overlay ──────────────────────────────────────────── */
