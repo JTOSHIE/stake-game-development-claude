@@ -266,7 +266,7 @@
     animation: logo-pulse 4s ease-in-out infinite;
   }
 
-  .logo-text-fallback {
+  :global(.logo-text-fallback) {
     font-family: 'Courier New', monospace;
     font-size: clamp(1.2rem, 3vw, 2rem);
     font-weight: 900;

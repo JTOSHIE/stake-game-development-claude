@@ -1,18 +1,22 @@
 # FUTURE SPINNER — PROJECT STATUS
 ## Last updated: 2026-04-05 | Multi-theme system complete fix
 
-## THEME SYSTEM STATUS
-- ✅ 4 active themes: future-spinner, trap-lane, oil-and-fire, beautiful-game
-- ✅ Background switches: video (future-spinner) / jpg (all others)
-- ✅ Frame switches per theme (ornate PNG from each theme's assets)
-- ✅ Logo switches per theme
+## THEME SYSTEM STATUS — Updated 2026-04-05
+- ✅ 4 themes active and fully working
+- ✅ All assets installed with standard names (h1.png, h2.png etc)
+- ✅ Background: video (future-spinner) / jpg image (all others)
+- ✅ Frame PNG switches per theme
+- ✅ Logo/title switches per theme (with text fallback on load error)
 - ✅ Spin button switches per theme
 - ✅ Bet +/− buttons switch per theme
-- ✅ Balance/win panels switch per theme
-- ✅ Audio switches per theme (with future-spinner fallbacks)
-- ✅ Symbols fully switch per theme (cache cleared on reload)
+- ✅ Autoplay button switches per theme (btnAutoplay field)
+- ✅ Balance/Win panels switch per theme
+- ✅ All 10 symbols switch per theme (PixiJS cache cleared before load)
+- ✅ Audio 12 tracks switch per theme (with FS fallbacks)
+- ✅ CSS palette variables injected per theme (--theme-primary/secondary/bg)
+- ✅ Page title updates per theme
 - ✅ Win line colour uses theme primary palette colour
-- ✅ Frame inset -80px (larger, consistent across all themes)
+- ✅ Frame inset -80px (consistent across all themes)
 
 ## CURRENT STATE
 R5 audio system active. 12 tracks wired. Tiered win sounds (small/medium/big/epic).
@@ -69,6 +73,7 @@ Production build passing, 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Definitive theme overhaul | 2026-04-05 | Full asset reinstall, themeStore rewrite, GameGrid cache clear, all UI reactive |
 | Theme system fix | 2026-04-05 | All UI assets theme-reactive, bg video/img switch, CSS vars, themed win lines |
 | Multi-theme install | 2026-04-05 | 3 new themes installed, themeStore, ThemeSelector, full wiring |
 | Mechanics upgrade | 2026-04-05 | Blur fix, anticipation fix, win connector, banner, bounce, autoplay pause |
