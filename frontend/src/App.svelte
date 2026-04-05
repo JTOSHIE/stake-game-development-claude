@@ -145,18 +145,26 @@
 
   <header class="game-header">
     <div class="game-title-area">
-      <!-- Theme name text always rendered: visible for transparent/blank logos -->
-      <div class="logo-text">{$activeTheme.name}</div>
-      <!-- Logo img sits on top: opaque real logos cover the text; blank logos are invisible -->
       <img
-        src="{$themeAssets.logo}"
         class="game-logo-img"
+        src="{$themeAssets.logo}"
         alt="{$activeTheme.name}"
         draggable="false"
-        on:error={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = 'none'
+        id="theme-logo-img"
+        on:error={() => {
+          const img = document.getElementById('theme-logo-img') as HTMLImageElement
+          if (img) img.style.display = 'none'
+          const txt = document.getElementById('theme-logo-txt')
+          if (txt) (txt as HTMLElement).style.display = 'block'
         }}
       />
+      <div
+        class="logo-text"
+        id="theme-logo-txt"
+        style="display: none;"
+      >
+        {$activeTheme.name}
+      </div>
     </div>
   </header>
 
@@ -262,42 +270,34 @@
   }
 
   .game-title-area {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 60px;
+    pointer-events: none;
   }
 
-  /* Text always present — shows for transparent/blank logos, hidden under real logos */
+  /* Text hidden by default — only shown by JS when img fails to load */
   .logo-text {
-    position: absolute;
     font-family: 'Courier New', monospace;
-    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
     font-weight: 900;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--theme-primary, #00ffff);
-    text-shadow: 0 0 20px currentColor, 0 2px 8px rgba(0,0,0,0.9);
+    text-shadow:
+      0 0 20px currentColor,
+      0 0 40px color-mix(in srgb, currentColor 40%, transparent),
+      0 2px 8px rgba(0,0,0,0.9);
     white-space: nowrap;
-    z-index: 0;
   }
 
   .game-logo-img {
-    max-height: 70px;
-    max-width: 400px;
+    max-height: 72px;
+    max-width: 440px;
     object-fit: contain;
     display: block;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;  /* on top of .logo-text */
-    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent));
-    animation: logo-pulse 4s ease-in-out infinite;
-  }
-
-  @keyframes logo-pulse {
-    0%, 100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent)); }
-    50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent)); }
+    filter: drop-shadow(0 2px 12px rgba(0,0,0,0.9));
   }
 
   .error-banner {
