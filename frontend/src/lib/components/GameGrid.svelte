@@ -40,35 +40,28 @@
 
   // ── Symbol → asset path map (reads active theme at call time) ────────────
   function getSymbolMap(): Record<string, string> {
-    const assets = get(themeAssets)
-    return {
-      H1: assets.symbols.H1,
-      H2: assets.symbols.H2,
-      M1: assets.symbols.M1,
-      M2: assets.symbols.M2,
-      M3: assets.symbols.M3,
-      L1: assets.symbols.L1,
-      L2: assets.symbols.L2,
-      L3: assets.symbols.L3,
-      W:  assets.symbols.W,
-      S:  assets.symbols.S,
-      // Lowercase aliases in case board data uses lowercase
-      h1: assets.symbols.H1,
-      h2: assets.symbols.H2,
-      m1: assets.symbols.M1,
-      m2: assets.symbols.M2,
-      m3: assets.symbols.M3,
-      l1: assets.symbols.L1,
-      l2: assets.symbols.L2,
-      l3: assets.symbols.L3,
-      w:  assets.symbols.W,
-      s:  assets.symbols.S,
-      // Full-word aliases in case board data ever uses them
-      WILD:    assets.symbols.W,
-      SCATTER: assets.symbols.S,
-      wild:    assets.symbols.W,
-      scatter: assets.symbols.S,
+    const assets = get(themeAssets).symbols
+    const map: Record<string, string> = {
+      // Uppercase (rgsService codes)
+      'H1': assets.H1, 'H2': assets.H2,
+      'M1': assets.M1, 'M2': assets.M2, 'M3': assets.M3,
+      'L1': assets.L1, 'L2': assets.L2, 'L3': assets.L3,
+      'W':  assets.W,  'S':  assets.S,
+      // Lowercase aliases
+      'h1': assets.H1, 'h2': assets.H2,
+      'm1': assets.M1, 'm2': assets.M2, 'm3': assets.M3,
+      'l1': assets.L1, 'l2': assets.L2, 'l3': assets.L3,
+      'w':  assets.W,  's':  assets.S,
+      // Full-word aliases
+      'WILD': assets.W, 'SCATTER': assets.S,
+      'wild': assets.W, 'scatter': assets.S,
     }
+    // Debug: log all resolved paths so mismatches are visible in console
+    console.log('[GameGrid] Symbol map paths:', JSON.stringify({
+      H1: map.H1, H2: map.H2, M1: map.M1, M2: map.M2, M3: map.M3,
+      L1: map.L1, L2: map.L2, L3: map.L3, W: map.W, S: map.S,
+    }, null, 2))
+    return map
   }
 
   // Fallback colours — used if a texture fails to load
@@ -132,38 +125,42 @@
   // ── Asset preloading ──────────────────────────────────────────────────────
   async function _preloadTextures(): Promise<void> {
     const symbolMap = getSymbolMap()
-    const allUrls = Object.values(symbolMap)
     // Deduplicate — uppercase + lowercase aliases point to same file
-    const uniqueUrls = [...new Set(allUrls)]
+    const uniqueUrls = [...new Set(Object.values(symbolMap))]
+
+    // Nuclear option: reset ALL PixiJS asset caches so no stale textures survive
+    try {
+      Assets.reset()
+      console.log('[GameGrid] Assets.reset() — all caches cleared')
+    } catch {
+      // Fallback: unload each URL individually
+      for (const url of uniqueUrls) {
+        try { await Assets.unload(url) } catch { /* ignore */ }
+      }
+    }
 
     assetLoadProgress.set(0)
 
-    // Force-unload any cached versions to prevent stale textures on theme switch
-    for (const url of uniqueUrls) {
+    // Load each unique URL with a timestamp cache-bust to bypass browser HTTP cache
+    const ts = Date.now()
+    for (let i = 0; i < uniqueUrls.length; i++) {
+      const url = uniqueUrls[i]
       try {
-        if (Assets.cache.has(url)) {
-          await Assets.unload(url)
-        }
-      } catch { /* ignore */ }
-    }
-
-    // Load each URL individually with progress tracking
-    try {
-      for (let i = 0; i < uniqueUrls.length; i++) {
-        await Assets.load(uniqueUrls[i])
-        assetLoadProgress.set(Math.round(((i + 1) / uniqueUrls.length) * 100))
-        console.log(`[GameGrid] ✅ Loaded: ${uniqueUrls[i]}`)
-      }
-    } catch (err) {
-      console.warn('[GameGrid] Texture load error — trying individually:', err)
-      for (const url of uniqueUrls) {
+        // Register busted URL as alias for original URL so Assets.get(url) works
+        const bustedUrl = `${url}?t=${ts}`
+        Assets.add({ alias: url, src: bustedUrl })
+        await Assets.load(url)
+        console.log(`[GameGrid] ✅ ${url}`)
+      } catch (e) {
+        // Fallback: try loading original URL directly
         try {
           await Assets.load(url)
-          console.log(`[GameGrid] ✅ ${url}`)
-        } catch (e) {
-          console.error(`[GameGrid] ❌ FAILED: ${url}`, e)
+          console.log(`[GameGrid] ✅ (fallback) ${url}`)
+        } catch (e2) {
+          console.error(`[GameGrid] ❌ FAILED: ${url}`, e2)
         }
       }
+      assetLoadProgress.set(Math.round(((i + 1) / uniqueUrls.length) * 100))
     }
     assetLoadProgress.set(100)
   }
@@ -260,6 +257,11 @@
         cmf.saturate(0.2, true)
         sprite.filters = [cmf]
 
+        // Multiply blend: removes white backgrounds from Manus assets.
+        // White pixels (1,1,1) × dark cell background = dark → invisible.
+        // Applied to all symbols except WILD (which has its own mask treatment).
+        sprite.blendMode = BLEND_MODES.MULTIPLY
+
         const symUpper = symbol?.toUpperCase()
         if (symUpper === 'W') {
           // Dark mask behind WILD to hide white PNG background
@@ -269,12 +271,13 @@
           wildMask.endFill()
           c.addChild(wildMask)
           sprite.filters = []
-          sprite.blendMode = BLEND_MODES.NORMAL
+          sprite.blendMode = BLEND_MODES.NORMAL  // WILD uses normal + dark mask
           sprite.tint = 0xffffff
         }
 
         if (symUpper === 'S') {
           sprite.tint = 0xff99ff
+          sprite.blendMode = BLEND_MODES.NORMAL  // scatter: keep tint, no multiply
           scatterSprites.push(sprite)
         }
 

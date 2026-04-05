@@ -28,6 +28,18 @@ on reel stop. Autoplay pauses on big wins (1.5s/3.5s/6s/stop by tier).
 Frame inset symmetric at -80px all sides. CSS palette variables (--theme-primary/secondary/bg).
 Production build passing, 0 TypeScript errors.
 
+## REMAINING KNOWN ISSUES (post-session 2026-04-05)
+- ⚠️  Some symbol PNGs from Manus have white backgrounds — BLEND_MODES.MULTIPLY applied as workaround
+- ⚠️  oil-and-fire and beautiful-game logo PNGs are placeholders (729B blank RGBA) — text fallback renders theme name in primary colour
+- ⚠️  Frame PNGs for oil-and-fire (~4KB) and beautiful-game (~3KB) are placeholder — CSS glow border fallback applied
+- ⚠️  oil-and-fire and beautiful-game UI assets were blank — future-spinner spin_button/panels/bet buttons copied as functional substitutes
+- ✅  Symbol variety working across all 4 themes (all 10 unique symbols per theme, verified by MD5)
+- ✅  All 4 theme backgrounds load correctly (no Future Spinner bleed)
+- ✅  Balance/Win panels have dark CSS fallback + theme-colour border/glow
+- ✅  All control bar colours use CSS var(--theme-primary) — fully theme-reactive
+- ✅  PixiJS cache: nuclear Assets.reset() + timestamp cache-bust on every theme load
+- ✅  TSC: 0 errors | Build: pass
+
 ## COMPLIANCE STATUS (Stake Engine)
 - ✅ Stateless design — no continuation mechanics
 - ✅ No Buy Bonus / no free spins / no jackpots

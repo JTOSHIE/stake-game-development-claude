@@ -65,7 +65,7 @@
 </script>
 
 {#if winTier !== 'none'}
-  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
+  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat; background-color: rgba(0,0,0,0.75); border: 1px solid var(--theme-primary, #00ffff); box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);">
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
     {#if winTier === 'mega'}
@@ -92,7 +92,7 @@
   </div>
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
-  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
+  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat; background-color: rgba(0,0,0,0.75); border: 1px solid var(--theme-primary, #00ffff); box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);">
     <div class="win-label idle">{t($locale, 'win')}</div>
     <div class="win-amount win-amount--empty">—</div>
   </div>
@@ -108,29 +108,18 @@
     /* Background image set via inline style from themeStore */
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-color: transparent;
 
     min-width: 160px;
     height: 56px;
     padding: 0 1rem;
-
-    border: none;
-    box-shadow: none;
-    outline: none;
+    border-radius: 6px;
 
     font-family: 'Courier New', monospace;
     font-weight: 900;
     transition: filter 0.3s;
   }
 
-  /* Ensure no green border/shadow on any panel state */
-  .win-panel,
-  .win-panel.win-green,
-  .win-panel.win-idle {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
+  .win-panel { outline: none; }
 
   .win-idle {
     opacity: 0.4;

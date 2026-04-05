@@ -75,7 +75,6 @@
 
     <!-- Max Bet button — left of bet selector -->
     <button class="maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
-      <img src="/assets/symbols/ui_maxbet_button_variant_02.png" alt="Max Bet" draggable="false" />
       <span class="maxbet-label">MAX</span>
     </button>
 
@@ -203,7 +202,7 @@
 
   .util-btn {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0, 255, 255, 0.2);
+    border: 1px solid color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
     border-radius: 50%;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
@@ -221,9 +220,9 @@
   }
 
   .util-btn:hover:not(:disabled) {
-    border-color: rgba(0, 255, 255, 0.6);
+    border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
     color: #fff;
-    filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.4));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent));
   }
 
   .util-btn:disabled {
@@ -294,8 +293,8 @@
     flex-shrink: 0;
     border-radius: 50%;
     box-shadow:
-      0 0 20px rgba(0, 255, 255, 0.4),
-      0 0 40px rgba(0, 255, 255, 0.2);
+      0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent),
+      0 0 40px color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
     transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
   }
 
@@ -344,18 +343,16 @@
     flex: 0 0 auto;
   }
 
-  /* Bet selector: image panel as background frame */
+  /* Bet selector: theme-reactive border frame */
   .bet-selector-panel {
     display: flex;
     align-items: center;
     gap: 0;
 
-    background-image: url('/assets/ui/btn_bet_display_v2.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
+    background: rgba(0, 0, 0, 0.50);
+    border: 1px solid var(--theme-primary, #00ffff);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
+    border-radius: 6px;
 
     width: 148px;
     height: 48px;
@@ -386,7 +383,7 @@
 
   .nudge-btn:hover:not(:disabled) {
     transform: scale(1.06);
-    filter: brightness(1.2) drop-shadow(0 0 8px rgba(0, 255, 255, 0.6));
+    filter: brightness(1.2) drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent));
   }
 
   .nudge-btn:active:not(:disabled) {
@@ -432,7 +429,7 @@
     display: block;
   }
 
-  /* Max Bet button — cyberpunk styled with label */
+  /* Max Bet button — theme-reactive styled with label */
   .maxbet-btn {
     width: 56px;
     height: 56px;
@@ -441,33 +438,26 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    background: none;
-    border: none;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid var(--theme-primary, #00ffff);
+    border-radius: 6px;
     cursor: pointer;
     padding: 0;
-    filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.35));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 35%, transparent));
     transition: filter 0.15s, transform 0.1s;
-  }
-
-  .maxbet-btn img {
-    width: 40px;
-    height: 28px;
-    object-fit: contain;
-    user-select: none;
-    -webkit-user-drag: none;
   }
 
   .maxbet-label {
     font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: rgba(0, 255, 255, 0.8);
+    color: var(--theme-primary, #00ffff);
     font-family: 'Courier New', monospace;
     text-transform: uppercase;
   }
 
   .maxbet-btn:hover:not(:disabled) {
-    filter: brightness(1.2) drop-shadow(0 0 12px rgba(0, 255, 255, 0.7));
+    filter: brightness(1.2) drop-shadow(0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent));
     transform: scale(1.06);
   }
 
@@ -513,24 +503,24 @@
     font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: rgba(0, 255, 255, 0.7);
+    color: color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent);
     font-family: 'Courier New', monospace;
     text-transform: uppercase;
   }
 
   .auto-btn.active .auto-label {
-    color: #00ffff;
-    text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+    color: var(--theme-primary, #00ffff);
+    text-shadow: 0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 80%, transparent);
   }
 
-  /* Active auto-play: cyan glow */
+  /* Active auto-play: theme glow */
   .auto-btn.active img {
-    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 80%, transparent));
     animation: pulse-glow 1s ease-in-out infinite alternate;
   }
 
   @keyframes pulse-glow {
-    to { filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.3)); }
+    to { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--theme-primary, #00ffff) 30%, transparent)); }
   }
 
   /* Remaining spin count badge */
@@ -538,7 +528,7 @@
     position: absolute;
     top: 2px;
     right: 4px;
-    background: #00ffff;
+    background: var(--theme-primary, #00ffff);
     color: #000020;
     font-size: 0.65rem;
     font-weight: 800;

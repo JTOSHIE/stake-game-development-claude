@@ -10,7 +10,7 @@
   The two data fields (balance / bet) are layered on top using absolute positioning
   within the panel's natural aspect ratio container.
 -->
-<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}'); background-size: 100% 100%; background-repeat: no-repeat;">
+<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}'); background-size: 100% 100%; background-repeat: no-repeat; background-color: rgba(0,0,0,0.75); border: 1px solid var(--theme-primary, #00ffff); box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);">
   <div class="field">
     <div class="text-pill">
       <span class="label">{t($locale, 'balance')}</span>
@@ -35,17 +35,15 @@
     /* Background image set via inline style from themeStore */
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-color: transparent;
 
     /* Size the panel to show a reasonable portion of the art */
     min-width: 220px;
     height: 56px;
     /* Horizontal padding keeps text off the decorative left/right edges */
     padding: 0 1.4rem;
+    border-radius: 6px;
 
     position: relative;
-    border: none;
-    box-shadow: none;
   }
 
   .field {
@@ -77,7 +75,7 @@
   .label {
     font-size: 0.60rem;
     letter-spacing: 0.2em;
-    color: rgba(0, 255, 255, 0.6);
+    color: color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
     text-transform: uppercase;
     line-height: 1;
     display: block;
@@ -90,7 +88,7 @@
     color: #ffffff;
     font-family: 'Courier New', monospace;
     line-height: 1.2;
-    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
     display: block;
   }
 </style>

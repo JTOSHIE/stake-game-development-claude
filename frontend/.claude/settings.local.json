@@ -15,7 +15,13 @@
       "Bash(chmod 600:*)",
       "Bash(mkdir -p ~/.claude/channels/telegram/approved)",
       "mcp__plugin_telegram_telegram__reply",
-      "Bash(echo \"DIRECTORY MISSING\" echo \"\" echo \"=== TRAP LANE SYMBOL FILE SIZES ===\" du -sh ~/math-sdk/frontend/public/assets/themes/trap-lane/symbols/*.png)"
+      "Bash(echo \"DIRECTORY MISSING\" echo \"\" echo \"=== TRAP LANE SYMBOL FILE SIZES ===\" du -sh ~/math-sdk/frontend/public/assets/themes/trap-lane/symbols/*.png)",
+      "Bash(python3:*)",
+      "Bash(md5 ~/math-sdk/frontend/public/assets/themes/trap-lane/symbols/*.png)",
+      "Bash(md5 ~/math-sdk/frontend/public/assets/themes/oil-and-fire/symbols/*.png)",
+      "Bash(md5 ~/math-sdk/frontend/public/assets/themes/beautiful-game/symbols/*.png)",
+      "Bash(wc -c ~/math-sdk/frontend/public/assets/themes/source/theme-4-geopolitical/concept-A/frames/*.png)",
+      "Bash(wc -c ~/math-sdk/frontend/public/assets/themes/source/theme-5-soccer/concept-A/frames/*.png)"
     ]
   }
 }

@@ -145,21 +145,16 @@
 
   <header class="game-header">
     <div class="game-title-area">
+      <!-- Theme name text always rendered: visible for transparent/blank logos -->
+      <div class="logo-text">{$activeTheme.name}</div>
+      <!-- Logo img sits on top: opaque real logos cover the text; blank logos are invisible -->
       <img
         src="{$themeAssets.logo}"
         class="game-logo-img"
         alt="{$activeTheme.name}"
         draggable="false"
         on:error={(e) => {
-          const el = e.currentTarget as HTMLImageElement
-          el.style.display = 'none'
-          const parent = el.parentElement
-          if (parent && !parent.querySelector('.logo-text-fallback')) {
-            const t = document.createElement('div')
-            t.className = 'logo-text-fallback'
-            t.textContent = $activeTheme.name
-            parent.appendChild(t)
-          }
+          (e.currentTarget as HTMLImageElement).style.display = 'none'
         }}
       />
     </div>
@@ -175,15 +170,17 @@
     <!-- Cyberpunk frame overlay — sits above canvas, below controls -->
     <div class="grid-wrapper">
       <GameGrid bind:this={gridRef} />
-      <img
-        src="{$themeAssets.frame}"
-        class="game-frame"
-        alt=""
-        aria-hidden="true"
-        on:error={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = 'none'
-        }}
-      />
+      {#if $themeAssets.frame}
+        <img
+          src="{$themeAssets.frame}"
+          class="game-frame"
+          alt=""
+          aria-hidden="true"
+          on:error={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = 'none'
+          }}
+        />
+      {/if}
       <WinBanner />
     </div>
   </section>
@@ -265,9 +262,25 @@
   }
 
   .game-title-area {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 60px;
+  }
+
+  /* Text always present — shows for transparent/blank logos, hidden under real logos */
+  .logo-text {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--theme-primary, #00ffff);
+    text-shadow: 0 0 20px currentColor, 0 2px 8px rgba(0,0,0,0.9);
+    white-space: nowrap;
+    z-index: 0;
   }
 
   .game-logo-img {
@@ -276,19 +289,10 @@
     object-fit: contain;
     display: block;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;  /* on top of .logo-text */
     filter: drop-shadow(0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent));
     animation: logo-pulse 4s ease-in-out infinite;
-  }
-
-  :global(.logo-text-fallback) {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(1.2rem, 3vw, 2rem);
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    color: var(--theme-primary, #00ffff);
-    text-shadow: 0 0 20px currentColor;
-    text-align: center;
-    text-transform: uppercase;
   }
 
   @keyframes logo-pulse {
@@ -379,13 +383,21 @@
     position: relative;
     display: inline-block;
     overflow: visible;
+    /* CSS fallback border: visible when frame PNG fails or is blank */
+    box-shadow:
+      0 0 0 2px var(--theme-primary, #00ffff),
+      0 0 16px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent),
+      0 0 40px color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
   }
 
   .game-frame {
     position: absolute;
-    inset: -100px;
-    width: calc(100% + 200px);
-    height: calc(100% + 200px);
+    top: -80px;
+    left: -80px;
+    right: -80px;
+    bottom: -40px;    /* Less extension at bottom — avoids covering panels */
+    width: calc(100% + 160px);
+    height: calc(100% + 120px);  /* top 80 + bottom 40 */
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
