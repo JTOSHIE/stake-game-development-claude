@@ -2,6 +2,7 @@
   import { balance, betAmount, locale, currencyCode } from '../stores/gameStore'
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { themeAssets } from '../stores/themeStore'
 </script>
 
 <!--
@@ -9,7 +10,7 @@
   The two data fields (balance / bet) are layered on top using absolute positioning
   within the panel's natural aspect ratio container.
 -->
-<div class="balance-panel">
+<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}')">
   <div class="field">
     <div class="text-pill">
       <span class="label">{t($locale, 'balance')}</span>
@@ -31,8 +32,7 @@
     align-items: stretch;
     gap: 0;
 
-    /* R2 balance panel image */
-    background-image: url('/assets/ui/panel_balance.png');
+    /* Background image set via inline style from themeStore */
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;

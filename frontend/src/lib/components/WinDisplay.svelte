@@ -3,6 +3,7 @@
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { onDestroy } from 'svelte'
+  import { themeAssets } from '../stores/themeStore'
 
 
 
@@ -64,7 +65,7 @@
 </script>
 
 {#if winTier !== 'none'}
-  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap}>
+  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}')">
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
     {#if winTier === 'mega'}
@@ -91,7 +92,7 @@
   </div>
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
-  <div class="win-panel win-idle">
+  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}')">
     <div class="win-label idle">{t($locale, 'win')}</div>
     <div class="win-amount win-amount--empty">—</div>
   </div>
@@ -104,7 +105,7 @@
     align-items: center;
     justify-content: center;
 
-    background-image: url('/assets/ui/panel_win.png');
+    /* Background image set via inline style from themeStore */
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
