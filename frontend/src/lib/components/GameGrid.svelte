@@ -13,7 +13,7 @@
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
-  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter, BLEND_MODES } from 'pixi.js'
+  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
@@ -257,11 +257,6 @@
         cmf.saturate(0.2, true)
         sprite.filters = [cmf]
 
-        // Multiply blend: removes white backgrounds from Manus assets.
-        // White pixels (1,1,1) × dark cell background = dark → invisible.
-        // Applied to all symbols except WILD (which has its own mask treatment).
-        sprite.blendMode = BLEND_MODES.MULTIPLY
-
         const symUpper = symbol?.toUpperCase()
         if (symUpper === 'W') {
           // Dark mask behind WILD to hide white PNG background
@@ -271,13 +266,11 @@
           wildMask.endFill()
           c.addChild(wildMask)
           sprite.filters = []
-          sprite.blendMode = BLEND_MODES.NORMAL  // WILD uses normal + dark mask
           sprite.tint = 0xffffff
         }
 
         if (symUpper === 'S') {
           sprite.tint = 0xff99ff
-          sprite.blendMode = BLEND_MODES.NORMAL  // scatter: keep tint, no multiply
           scatterSprites.push(sprite)
         }
 
