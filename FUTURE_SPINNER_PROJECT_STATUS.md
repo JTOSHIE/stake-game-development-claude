@@ -28,6 +28,11 @@ on reel stop. Autoplay pauses on big wins (1.5s/3.5s/6s/stop by tier).
 Frame inset symmetric at -80px all sides. CSS palette variables (--theme-primary/secondary/bg).
 Production build passing, 0 TypeScript errors.
 
+## REMAINING KNOWN ISSUES (post-session 2026-04-05, updated)
+- ✅  MULTIPLY blend mode removed — symbols now render with correct colours
+- ✅  Logo overlap fixed — text fallback hidden by default (display:none), only shows on img error
+- ✅  Double border removed — CSS box-shadow stripped from grid-wrapper; frame PNG is sole border
+
 ## REMAINING KNOWN ISSUES (post-session 2026-04-05)
 - ⚠️  Some symbol PNGs from Manus have white backgrounds — BLEND_MODES.MULTIPLY applied as workaround
 - ⚠️  oil-and-fire and beautiful-game logo PNGs are placeholders (729B blank RGBA) — text fallback renders theme name in primary colour
