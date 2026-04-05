@@ -107,6 +107,7 @@
         src="{$themeAssets.spinButton}"
         alt={t($locale, 'spin')}
         draggable="false"
+        on:error={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0' }}
       />
       {#if $isSpinning}
         <span class="spin-overlay">⟳</span>
@@ -121,7 +122,7 @@
     <div class="auto-wrapper">
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
-          <img src="{$themeAssets.btnMenu}" alt="Autoplay" draggable="false" />
+          <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
           <span class="auto-count">{$autoPlayCount}</span>
         </button>
@@ -132,7 +133,7 @@
           disabled={$isSpinning}
           aria-label={t($locale, 'autoPlay')}
         >
-          <img src="{$themeAssets.btnMenu}" alt="Autoplay" draggable="false" />
+          <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
         </button>
         {#if showAutoMenu}
