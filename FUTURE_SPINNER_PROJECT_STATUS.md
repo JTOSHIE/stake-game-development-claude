@@ -1,14 +1,27 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-05 | Mechanics + animation upgrade complete
+## Last updated: 2026-04-05 | Multi-theme system complete fix
+
+## THEME SYSTEM STATUS
+- ✅ 4 active themes: future-spinner, trap-lane, oil-and-fire, beautiful-game
+- ✅ Background switches: video (future-spinner) / jpg (all others)
+- ✅ Frame switches per theme (ornate PNG from each theme's assets)
+- ✅ Logo switches per theme
+- ✅ Spin button switches per theme
+- ✅ Bet +/− buttons switch per theme
+- ✅ Balance/win panels switch per theme
+- ✅ Audio switches per theme (with future-spinner fallbacks)
+- ✅ Symbols fully switch per theme (cache cleared on reload)
+- ✅ Win line colour uses theme primary palette colour
+- ✅ Frame inset -80px (larger, consistent across all themes)
 
 ## CURRENT STATE
 R5 audio system active. 12 tracks wired. Tiered win sounds (small/medium/big/epic).
 Dedicated scatter land sound. Anticipation audio (tension build + heavy reel stop).
 Spin blur reduced to Y=3, clears 200ms before stop. Anticipation: reel 5 only,
-requires 3-reel high-value match. Gold win line connector draws across matching
-symbols. Win multiplier banner appears centred on grid. Elastic two-stage bounce
+requires 3-reel high-value match. Win line connector draws in theme primary colour.
+Win multiplier banner appears centred on grid. Elastic two-stage bounce
 on reel stop. Autoplay pauses on big wins (1.5s/3.5s/6s/stop by tier).
-Subtitle centred in logo-stack. Frame inset symmetric at -70px all sides.
+Frame inset symmetric at -80px all sides. CSS palette variables (--theme-primary/secondary/bg).
 Production build passing, 0 TypeScript errors.
 
 ## COMPLIANCE STATUS (Stake Engine)
@@ -56,6 +69,8 @@ Production build passing, 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Theme system fix | 2026-04-05 | All UI assets theme-reactive, bg video/img switch, CSS vars, themed win lines |
+| Multi-theme install | 2026-04-05 | 3 new themes installed, themeStore, ThemeSelector, full wiring |
 | Mechanics upgrade | 2026-04-05 | Blur fix, anticipation fix, win connector, banner, bounce, autoplay pause |
 | R5 audio | 2026-04-04 | 12-track audio system, tiered wins, anticipation, scatter land |
 | R4 mechanics | 2026-04-04 | Logo PNGs, win_epic.mp3, win multiplier, win pulse, reel/scatter anticipation |
