@@ -65,7 +65,7 @@
 </script>
 
 {#if winTier !== 'none'}
-  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}')">
+  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
     {#if winTier === 'mega'}
@@ -92,7 +92,7 @@
   </div>
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
-  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}')">
+  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
     <div class="win-label idle">{t($locale, 'win')}</div>
     <div class="win-amount win-amount--empty">—</div>
   </div>

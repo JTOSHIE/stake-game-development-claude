@@ -10,7 +10,7 @@
   The two data fields (balance / bet) are layered on top using absolute positioning
   within the panel's natural aspect ratio container.
 -->
-<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}')">
+<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}'); background-size: 100% 100%; background-repeat: no-repeat;">
   <div class="field">
     <div class="text-pill">
       <span class="label">{t($locale, 'balance')}</span>
