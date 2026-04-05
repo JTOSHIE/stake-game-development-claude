@@ -38,9 +38,32 @@
   const CANVAS_W = REELS * CELL_W + (REELS - 1) * GAP
   const CANVAS_H = ROWS  * CELL_H + (ROWS  - 1) * GAP
 
-  // ── Symbol → asset path (reads active theme at call time) ─────────────────
-  function getSymbolTextures(): Record<string, string> {
-    return get(themeAssets).symbols
+  // ── Symbol → asset path map (reads active theme at call time) ────────────
+  function getSymbolMap(): Record<string, string> {
+    const assets = get(themeAssets)
+    return {
+      H1: assets.symbols.H1,
+      H2: assets.symbols.H2,
+      M1: assets.symbols.M1,
+      M2: assets.symbols.M2,
+      M3: assets.symbols.M3,
+      L1: assets.symbols.L1,
+      L2: assets.symbols.L2,
+      L3: assets.symbols.L3,
+      W:  assets.symbols.W,
+      S:  assets.symbols.S,
+      // Lowercase aliases in case board data uses lowercase
+      h1: assets.symbols.H1,
+      h2: assets.symbols.H2,
+      m1: assets.symbols.M1,
+      m2: assets.symbols.M2,
+      m3: assets.symbols.M3,
+      l1: assets.symbols.L1,
+      l2: assets.symbols.L2,
+      l3: assets.symbols.L3,
+      w:  assets.symbols.W,
+      s:  assets.symbols.S,
+    }
   }
 
   // Fallback colours — used if a texture fails to load
@@ -103,34 +126,37 @@
 
   // ── Asset preloading ──────────────────────────────────────────────────────
   async function _preloadTextures(): Promise<void> {
-    const symbolTextures = getSymbolTextures()
-    const urls = Object.values(symbolTextures)
+    const symbolMap = getSymbolMap()
+    const allUrls = Object.values(symbolMap)
+    // Deduplicate — uppercase + lowercase aliases point to same file
+    const uniqueUrls = [...new Set(allUrls)]
+
     assetLoadProgress.set(0)
 
-    // Clear PixiJS asset cache to force fresh load for new theme
-    try {
-      for (const url of urls) {
+    // Force-unload any cached versions to prevent stale textures on theme switch
+    for (const url of uniqueUrls) {
+      try {
         if (Assets.cache.has(url)) {
-          await Assets.unload(url).catch(() => {})
+          await Assets.unload(url)
         }
-      }
-    } catch {
-      // Ignore cache clear errors
+      } catch { /* ignore */ }
     }
 
+    // Load each URL individually with progress tracking
     try {
-      await Assets.load(urls, (progress: number) => {
-        assetLoadProgress.set(Math.round(progress * 100))
-      })
+      for (let i = 0; i < uniqueUrls.length; i++) {
+        await Assets.load(uniqueUrls[i])
+        assetLoadProgress.set(Math.round(((i + 1) / uniqueUrls.length) * 100))
+        console.log(`[GameGrid] ✅ Loaded: ${uniqueUrls[i]}`)
+      }
     } catch (err) {
-      // Non-fatal: _makeCell falls back to placeholder for any missing texture
-      console.warn('[GameGrid] Texture load error:', err)
-      for (const [key, url] of Object.entries(symbolTextures)) {
+      console.warn('[GameGrid] Texture load error — trying individually:', err)
+      for (const url of uniqueUrls) {
         try {
           await Assets.load(url)
-          console.log(`[GameGrid] ✅ ${key}: ${url}`)
+          console.log(`[GameGrid] ✅ ${url}`)
         } catch (e) {
-          console.error(`[GameGrid] ❌ FAILED: ${key}: ${url}`)
+          console.error(`[GameGrid] ❌ FAILED: ${url}`, e)
         }
       }
     }
@@ -185,9 +211,20 @@
 
   // ── Cell factory ──────────────────────────────────────────────────────────
   function _makeCell(symbol: string, highlighted: boolean): Container {
+    const symbolMap = getSymbolMap()
+
+    // Try exact key, then uppercase, then lowercase
+    const url = symbolMap[symbol]
+      ?? symbolMap[symbol?.toUpperCase()]
+      ?? symbolMap[symbol?.toLowerCase()]
+
+    if (!url) {
+      console.warn(`[GameGrid] Unknown symbol: "${symbol}"`)
+    }
+
     const c = new Container()
 
-    // Background panel — use low alpha so PNG symbols read against the city bg
+    // Background panel
     const bg = new Graphics()
     bg.beginFill(highlighted ? 0x1e1a00 : 0x090914, highlighted ? 0.82 : 0.45)
     bg.lineStyle(highlighted ? 2 : 1, highlighted ? 0xffd700 : 0x1e1e38, highlighted ? 1 : 0.7)
@@ -195,72 +232,72 @@
     bg.endFill()
     c.addChild(bg)
 
-    // Symbol sprite (or fallback placeholder)
-    const url = getSymbolTextures()[symbol]
-    const tex  = url ? Assets.get<Texture>(url) : null
+    if (url) {
+      try {
+        const tex = Assets.get<Texture>(url) ?? Texture.WHITE
+        const sprite = new Sprite(tex)
 
-    if (tex && tex !== Texture.EMPTY) {
-      const sprite = new Sprite(tex)
+        // Scale to fit within the cell with padding, preserving aspect ratio
+        if (tex !== Texture.WHITE) {
+          const maxW  = CELL_W - PADDING * 2
+          const maxH  = CELL_H - PADDING * 2
+          const scale = Math.min(maxW / tex.width, maxH / tex.height)
+          sprite.scale.set(scale)
+          sprite.x = Math.round((CELL_W - sprite.width)  / 2)
+          sprite.y = Math.round((CELL_H - sprite.height) / 2)
+        } else {
+          sprite.width  = CELL_W
+          sprite.height = CELL_H
+        }
 
-      // Scale to fit within the cell with padding, preserving aspect ratio
-      const maxW  = CELL_W - PADDING * 2
-      const maxH  = CELL_H - PADDING * 2
-      const scale = Math.min(maxW / tex.width, maxH / tex.height)
-      sprite.scale.set(scale)
+        // Saturation boost
+        const cmf = new ColorMatrixFilter()
+        cmf.saturate(0.2, true)
+        sprite.filters = [cmf]
 
-      // Centre within the cell
-      sprite.x = Math.round((CELL_W - sprite.width)  / 2)
-      sprite.y = Math.round((CELL_H - sprite.height) / 2)
+        const symUpper = symbol?.toUpperCase()
+        if (symUpper === 'W') {
+          // Dark mask behind WILD to hide white PNG background
+          const wildMask = new Graphics()
+          wildMask.beginFill(0x080818, 1.0)
+          wildMask.drawRoundedRect(PADDING, PADDING, CELL_W - PADDING * 2, CELL_H - PADDING * 2, 8)
+          wildMask.endFill()
+          c.addChild(wildMask)
+          sprite.filters = []
+          sprite.blendMode = BLEND_MODES.NORMAL
+          sprite.tint = 0xffffff
+        }
 
-      // Cyberpunk saturation boost via ColorMatrixFilter
-      const cmf = new ColorMatrixFilter()
-      cmf.saturate(0.2, true)
-      sprite.filters = [cmf]
+        if (symUpper === 'S') {
+          sprite.tint = 0xff99ff
+          scatterSprites.push(sprite)
+        }
 
-      if (symbol === 'W') {
-        // Draw a dark background panel behind the WILD sprite to mask white PNG background
-        const wildMask = new Graphics()
-        wildMask.beginFill(0x080818, 1.0)
-        wildMask.drawRoundedRect(
-          PADDING,
-          PADDING,
-          CELL_W - PADDING * 2,
-          CELL_H - PADDING * 2,
-          8
-        )
-        wildMask.endFill()
-        c.addChild(wildMask)  // add before sprite so it sits behind
-        // Clear any filters or blend modes
-        sprite.filters = []
-        sprite.blendMode = BLEND_MODES.NORMAL
-        sprite.tint = 0xffffff
+        c.addChild(sprite)
+      } catch (err) {
+        console.error(`[GameGrid] Sprite error for ${symbol}:`, err)
+        _addFallbackCell(c, symbol)
       }
-
-      if (symbol === 'S') {
-        // Scatter: cyan/magenta tint; alpha pulsed by scatter ticker
-        sprite.tint = 0xff99ff
-        scatterSprites.push(sprite)
-      }
-
-      c.addChild(sprite)
     } else {
-      // Fallback: coloured circle + symbol name
-      const dot = new Graphics()
-      dot.beginFill(FALLBACK_COLOURS[symbol] ?? 0x666666)
-      dot.drawCircle(CELL_W / 2, CELL_H / 2 - 10, 22)
-      dot.endFill()
-      c.addChild(dot)
-
-      const label = new Text(symbol, {
-        fontFamily: 'Arial', fontSize: 14, fontWeight: 'bold', fill: 0xffffff,
-      })
-      label.anchor.set(0.5)
-      label.x = CELL_W / 2
-      label.y = CELL_H / 2 + 20
-      c.addChild(label)
+      _addFallbackCell(c, symbol)
     }
 
     return c
+  }
+
+  function _addFallbackCell(c: Container, symbol: string): void {
+    const dot = new Graphics()
+    dot.beginFill(FALLBACK_COLOURS[symbol?.toUpperCase()] ?? 0x666666)
+    dot.drawCircle(CELL_W / 2, CELL_H / 2 - 10, 22)
+    dot.endFill()
+    c.addChild(dot)
+    const label = new Text(symbol, {
+      fontFamily: 'Arial', fontSize: 14, fontWeight: 'bold', fill: 0xffffff,
+    })
+    label.anchor.set(0.5)
+    label.x = CELL_W / 2
+    label.y = CELL_H / 2 + 20
+    c.addChild(label)
   }
 
   // ── Board update (called after spin resolves) ─────────────────────────────
