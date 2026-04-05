@@ -92,15 +92,24 @@
   <title>{$activeTheme.name} — We Roll Spinners</title>
 </svelte:head>
 
+<!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
-  {#if $themeAssets.isVideo}
+  {#if $activeTheme.id === 'future-spinner'}
+    <!-- Video background — only mounted for future-spinner -->
     <video
       class="bg-media"
-      autoplay loop muted playsinline aria-hidden="true"
+      autoplay
+      loop
+      muted
+      playsinline
+      aria-hidden="true"
     >
-      <source src="{$themeAssets.backgroundVideo}" type="video/mp4" />
+      <source src="assets/themes/future-spinner/backgrounds/bg-1.mp4" type="video/mp4" />
+      <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
     </video>
   {:else}
+    <!-- Static image background — all other themes -->
+    <!-- Image is ONLY element, video is NOT in DOM -->
     <img
       class="bg-media"
       src="{$themeAssets.background}"
@@ -108,7 +117,8 @@
       aria-hidden="true"
     />
   {/if}
-  <div class="bg-overlay"></div>
+  <!-- Dark overlay to ensure game readability -->
+  <div class="bg-overlay" aria-hidden="true"></div>
 </div>
 
 <main
@@ -317,6 +327,7 @@
     object-fit: cover;
     opacity: 0.5;
     pointer-events: none;
+    display: block;
   }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
@@ -346,8 +357,8 @@
   .bg-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 1;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
