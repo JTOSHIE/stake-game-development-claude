@@ -186,9 +186,7 @@
     align-items: center;
     gap: 0;
     padding: 0.6rem 1rem 0.8rem;
-    /* Semi-transparent dark strip — keeps art visible through it */
-    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 100%);
-    border-top: 1px solid rgba(255, 200, 50, 0.12);
+    background: transparent;
     flex-shrink: 0;
     position: relative;
   }
