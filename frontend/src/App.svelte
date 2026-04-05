@@ -88,6 +88,10 @@
 
 </script>
 
+<svelte:head>
+  {@html `<style>:root{--theme-primary:${$activeTheme.palette.primary};--theme-secondary:${$activeTheme.palette.secondary};--theme-bg:${$activeTheme.palette.background}}</style>`}
+</svelte:head>
+
 <!-- Background — video for future-spinner, image for all other themes -->
 <div class="bg-layer">
   {#if $activeTheme.id === 'future-spinner'}
@@ -337,9 +341,8 @@
   }
 
   @keyframes frame-pulse {
-    0%, 100% { filter: drop-shadow(0 0 8px rgba(0,255,255,0.5)); }
-    50%       { filter: drop-shadow(0 0 20px rgba(0,255,255,0.9))
-                        drop-shadow(0 0 40px rgba(157,0,255,0.4)); }
+    0%, 100% { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent)); }
+    50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 90%, transparent)); }
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */

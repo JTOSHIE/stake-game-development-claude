@@ -17,7 +17,16 @@
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
-  import { themeAssets } from '../stores/themeStore'
+  import { themeAssets, activeTheme } from '../stores/themeStore'
+
+  // ── Theme-aware win line colour ───────────────────────────────────────────
+  function hexToPixi(hex: string): number {
+    return parseInt(hex.replace('#', ''), 16)
+  }
+
+  function getWinLineColour(): number {
+    return hexToPixi(get(activeTheme).palette.primary)
+  }
 
   // ── Layout constants ──────────────────────────────────────────────────────
   const REELS    = 5
@@ -353,13 +362,14 @@
       }
 
       if (points.length >= 2) {
+        const wlc = getWinLineColour()
         // Inner solid line
-        winHighlightLayer.lineStyle(2, 0xffd700, 0.6)
+        winHighlightLayer.lineStyle(2, wlc, 0.6)
         winHighlightLayer.moveTo(points[0].x, points[0].y)
         for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
 
         // Outer glow line
-        winHighlightLayer.lineStyle(6, 0xffd700, 0.15)
+        winHighlightLayer.lineStyle(6, wlc, 0.15)
         winHighlightLayer.moveTo(points[0].x, points[0].y)
         for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
       }
