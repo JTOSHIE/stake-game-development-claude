@@ -9,6 +9,8 @@
   import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
   import PaytableModal       from './lib/components/PaytableModal.svelte'
   import WinBanner           from './lib/components/WinBanner.svelte'
+  import ThemeSelector       from './lib/components/ThemeSelector.svelte'
+  import { activeTheme, themeAssets } from './lib/stores/themeStore'
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
@@ -21,6 +23,7 @@
   import { playBGM, playWin } from './lib/services/soundService'
 
   let gridRef: GameGrid
+  let showThemeSelector = false
 
   onMount(async () => {
     const params  = new URLSearchParams(window.location.search)
@@ -85,18 +88,15 @@
 
 </script>
 
-<!-- Background video — always render, CSS handles reduced motion -->
+<!-- Background layer — video for future-spinner, static image for other themes -->
 <div class="bg-layer">
-  <video
-    class="bg-video"
-    autoplay
-    loop
-    muted
-    playsinline
-    aria-hidden="true"
-  >
-    <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
-  </video>
+  {#if $activeTheme.videoBackground}
+    <video class="bg-video" autoplay loop muted playsinline aria-hidden="true">
+      <source src="{$themeAssets.background}" type="video/mp4" />
+    </video>
+  {:else}
+    <img class="bg-video" src="{$themeAssets.background}" alt="" aria-hidden="true" />
+  {/if}
   <div class="bg-overlay"></div>
 </div>
 
@@ -114,15 +114,9 @@
   <header class="game-header">
     <div class="logo-stack">
       <img
-        src="assets/ui/logo_future_spinner.png"
+        src="{$themeAssets.logo}"
         class="game-logo"
-        alt="FUTURE SPINNER"
-        draggable="false"
-      />
-      <img
-        src="assets/ui/logo_we_roll_spinners.png"
-        class="game-subtitle-logo"
-        alt="WE ROLL SPINNERS"
+        alt="{$activeTheme.name}"
         draggable="false"
       />
     </div>
@@ -139,7 +133,7 @@
     <div class="grid-wrapper">
       <GameGrid bind:this={gridRef} />
       <img
-        src="assets/frames/frame_clean_ornate.png"
+        src="{$themeAssets.frame}"
         class="game-frame"
         alt=""
         aria-hidden="true"
@@ -155,8 +149,15 @@
 
   <ControlBar on:spin={handleSpin} />
 
+  <!-- Theme selector button -->
+  <button class="theme-toggle-btn" on:click={() => showThemeSelector = true} aria-label="Select theme">🎨</button>
+
   {#if $showPaytable}
     <PaytableModal />
+  {/if}
+
+  {#if showThemeSelector}
+    <ThemeSelector on:close={() => showThemeSelector = false} />
   {/if}
 </main>
 
@@ -235,14 +236,6 @@
                        drop-shadow(0 0 36px rgba(255,215,0,0.45)); }
   }
 
-  .game-subtitle-logo {
-    height: clamp(14px, 2vw, 20px);
-    width: auto;
-    object-fit: contain;
-    opacity: 0.8;
-    margin-top: 2px;
-  }
-
   .error-banner {
     background: rgba(255, 50, 50, 0.15);
     border: 1px solid rgba(255, 50, 50, 0.4);
@@ -277,6 +270,29 @@
     height: 100%;
     object-fit: cover;
     opacity: 0.5;
+  }
+
+  /* ── Theme toggle button ──────────────────────────────────────────────── */
+  .theme-toggle-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 50;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .theme-toggle-btn:hover {
+    background: rgba(0,255,255,0.12);
+    border-color: rgba(0,255,255,0.45);
   }
 
   .bg-overlay {
