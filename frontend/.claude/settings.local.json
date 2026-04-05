@@ -14,7 +14,8 @@
       "Read(//Users/jt/.claude/channels/**)",
       "Bash(chmod 600:*)",
       "Bash(mkdir -p ~/.claude/channels/telegram/approved)",
-      "mcp__plugin_telegram_telegram__reply"
+      "mcp__plugin_telegram_telegram__reply",
+      "Bash(echo \"DIRECTORY MISSING\" echo \"\" echo \"=== TRAP LANE SYMBOL FILE SIZES ===\" du -sh ~/math-sdk/frontend/public/assets/themes/trap-lane/symbols/*.png)"
     ]
   }
 }

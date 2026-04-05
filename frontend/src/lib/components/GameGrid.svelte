@@ -63,6 +63,11 @@
       l3: assets.symbols.L3,
       w:  assets.symbols.W,
       s:  assets.symbols.S,
+      // Full-word aliases in case board data ever uses them
+      WILD:    assets.symbols.W,
+      SCATTER: assets.symbols.S,
+      wild:    assets.symbols.W,
+      scatter: assets.symbols.S,
     }
   }
 

@@ -48,8 +48,11 @@ export const themeAssets = derived(activeTheme, ($t) => {
     background:      `${b}/backgrounds/bg-1.jpg`,
     backgroundVideo: `${b}/backgrounds/bg-1.mp4`,
     isVideo:         $t.id === 'future-spinner',
-    // Frame
-    frame:           `${b}/frames/frame-1.png`,
+    // Frame — ornate (frame-1) for future-spinner; minimal (frame-2) for others
+    // frame-2 has a larger transparent centre window, avoids clipping the canvas
+    frame:           $t.id === 'future-spinner'
+      ? `${b}/frames/frame-1.png`
+      : `${b}/frames/frame-2.png`,
     // Logo
     logo:            `${b}/ui/logo.png`,
     // Buttons

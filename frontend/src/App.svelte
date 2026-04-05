@@ -90,6 +90,10 @@
 
 <svelte:head>
   <title>{$activeTheme.name} — We Roll Spinners</title>
+  {#if $activeTheme.id !== 'future-spinner'}
+    <!-- Remove cyberpunk body PNG for non-FS themes so it doesn't bleed through -->
+    <style>body { background-image: none !important; }</style>
+  {/if}
 </svelte:head>
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
@@ -325,10 +329,15 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.5;
     pointer-events: none;
     display: block;
   }
+
+  /* Video (future-spinner): semi-transparent — body PNG shows through for depth */
+  video.bg-media { opacity: 0.5; }
+
+  /* Static image (all other themes): high opacity — body PNG must not bleed through */
+  img.bg-media { opacity: 0.92; }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
   .util-btn.theme-btn {
@@ -374,9 +383,9 @@
 
   .game-frame {
     position: absolute;
-    inset: -80px;
-    width: calc(100% + 160px);
-    height: calc(100% + 160px);
+    inset: -100px;
+    width: calc(100% + 200px);
+    height: calc(100% + 200px);
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
