@@ -97,6 +97,18 @@
     const symbolTextures = getSymbolTextures()
     const urls = Object.values(symbolTextures)
     assetLoadProgress.set(0)
+
+    // Clear PixiJS asset cache to force fresh load for new theme
+    try {
+      for (const url of urls) {
+        if (Assets.cache.has(url)) {
+          await Assets.unload(url).catch(() => {})
+        }
+      }
+    } catch {
+      // Ignore cache clear errors
+    }
+
     try {
       await Assets.load(urls, (progress: number) => {
         assetLoadProgress.set(Math.round(progress * 100))
@@ -109,7 +121,7 @@
           await Assets.load(url)
           console.log(`[GameGrid] ✅ ${key}: ${url}`)
         } catch (e) {
-          console.error(`[GameGrid] ❌ FAILED: ${key}: ${url}`, e)
+          console.error(`[GameGrid] ❌ FAILED: ${key}: ${url}`)
         }
       }
     }
