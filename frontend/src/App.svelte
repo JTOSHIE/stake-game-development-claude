@@ -447,12 +447,12 @@
 
   .game-frame {
     position: absolute;
-    top: -90px;
+    top: -70px;
     left: -80px;
     right: -80px;
-    bottom: -40px;
+    bottom: -60px;
     width: calc(100% + 160px);
-    height: calc(100% + 130px);  /* top 90 + bottom 40 */
+    height: calc(100% + 130px);  /* top 70 + bottom 60 */
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
