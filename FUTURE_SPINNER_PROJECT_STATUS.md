@@ -174,3 +174,11 @@ Production build passing, 0 TypeScript errors.
 - ✅ Z-index stack enforced (grid:10, winpod:50, controlbar:60, logo:70, banner:100)
 - ✅ Build: 0 errors, 0 warnings | TSC: clean
 - ✅ Developer handover spec generated (WRS_GameTemplate_Spec_v1.0.md)
+
+## SURGICAL FIXES — 2026-04-11
+- ✅ Frame shifted: top:-70px bottom:-60px — surrounds all 4 symbol rows
+- ✅ Panel double-background removed: background-color/border/box-shadow stripped from BalanceDisplay + WinDisplay
+- ✅ Spin overlay system: column-covering dark scroll overlay fades in/out cleanly per reel land
+- ✅ _startSpinAnimation/_stopSpinAnimation removed — single _blurCol/_clearColBlur path
+- ✅ Scatter anticipation: overlay brightness tint (not filter on col)
+- ✅ TSC: 0 errors | Build: 0 warnings
