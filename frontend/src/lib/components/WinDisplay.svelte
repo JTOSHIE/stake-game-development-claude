@@ -85,10 +85,6 @@
       {formatBalance(Math.round(displayValue * CURRENCY_SCALE), $currencyCode)}
     </div>
 
-    <!-- Multiplier badge (≥ 1×) — uses targetValue so badge persists during animation -->
-    {#if $betAmount > 0 && targetValue / $betAmount >= 1}
-      <div class="win-multiplier">{(targetValue / $betAmount).toFixed(1)}×</div>
-    {/if}
   </div>
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
@@ -172,18 +168,6 @@
     color: #00ffff;
     text-shadow: 0 0 30px #00ffff;
     animation: label-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-
-  /* ── Multiplier badge ────────────────────────────────────────────────────── */
-  .win-multiplier {
-    font-size: 0.75rem;
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    color: rgba(255, 215, 0, 0.85);
-    letter-spacing: 0.1em;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-    margin-top: 1px;
-    display: block;
   }
 
   /* ── Keyframes ───────────────────────────────────────────────────────────── */
