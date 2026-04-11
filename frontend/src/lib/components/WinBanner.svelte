@@ -14,21 +14,25 @@
   let displayAmount = 0
   let dismissTimer: ReturnType<typeof setTimeout> | null = null
   let countUpFrame: number | null = null
+  let lastShownWin = 0
 
-  $: if ($winMultiplier >= BIG_WIN_THRESHOLD && !$isSpinning) {
-    showBanner($winAmount)
+  $: if ($winAmount > 0 && !$isSpinning && $winMultiplier >= BIG_WIN_THRESHOLD) {
+    if ($winAmount !== lastShownWin) {
+      lastShownWin = $winAmount
+      showBanner($winAmount)
+    }
   }
 
   $: if ($isSpinning) {
     visible = false
     displayAmount = 0
+    lastShownWin = 0
   }
 
-  function showBanner(targetMicros: number): void {
+  function showBanner(winDollars: number): void {
     if (dismissTimer) clearTimeout(dismissTimer)
     if (countUpFrame) cancelAnimationFrame(countUpFrame)
 
-    const targetDollars = targetMicros / 1_000_000
     displayAmount = 0
     visible = true
 
@@ -40,11 +44,11 @@
       const elapsed = Math.min(performance.now() - startTime, duration)
       const progress = elapsed / duration
       // Ease-out so counting slows near the end
-      displayAmount = targetDollars * (1 - Math.pow(1 - progress, 3))
+      displayAmount = winDollars * (1 - Math.pow(1 - progress, 3))
       if (progress < 1) {
         countUpFrame = requestAnimationFrame(countUp)
       } else {
-        displayAmount = targetDollars
+        displayAmount = winDollars
         countUpFrame = null
       }
     }
