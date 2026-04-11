@@ -106,10 +106,6 @@
 
 <svelte:head>
   <title>{$activeTheme.name} — We Roll Spinners</title>
-  {#if $activeTheme.id !== 'future-spinner'}
-    <!-- Remove cyberpunk body PNG for non-FS themes so it doesn't bleed through -->
-    <style>body { background-image: none !important; }</style>
-  {/if}
 </svelte:head>
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
@@ -204,7 +200,9 @@
           }}
         />
       {/if}
-      <WinBanner />
+      <!-- WinBanner disabled — large overlay text covers win burst animations;
+           win amount is shown clearly in WinDisplay panel below -->
+      <!-- <WinBanner /> -->
     </div>
   </section>
 
@@ -240,24 +238,13 @@
   }
 
   :global(body) {
-    /* Desktop cyberpunk background */
-    background-color: #06060f;
-    background-image: url('/assets/symbols/bg1_main_game_desktop_variant_01.png');
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: #060610;
+    margin: 0;
+    padding: 0;
     color: #fff;
     font-family: 'Segoe UI', system-ui, sans-serif;
     overflow: hidden;
     height: 100dvh;
-  }
-
-  /* Mobile: swap to portrait-optimised background */
-  @media (max-width: 480px) {
-    :global(body) {
-      background-image: url('/assets/symbols/bg1_main_game_mobile_variant_04.png');
-    }
   }
 
   .game-wrapper {
@@ -344,18 +331,20 @@
 
   .bg-media {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     object-fit: cover;
     pointer-events: none;
     display: block;
+    opacity: 0.85;
   }
 
-  /* Video (future-spinner): semi-transparent — body PNG shows through for depth */
-  video.bg-media { opacity: 0.5; }
+  /* Video background: slightly more transparent for readability */
+  video.bg-media { opacity: 0.75; }
 
-  /* Static image (all other themes): high opacity — body PNG must not bleed through */
+  /* Static image backgrounds: near-full opacity */
   img.bg-media { opacity: 0.92; }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
@@ -398,17 +387,18 @@
     position: relative;
     display: inline-block;
     overflow: visible;
+    z-index: 1;
     /* Frame PNG provides the border — no CSS border here */
   }
 
   .game-frame {
     position: absolute;
-    top: -80px;
+    top: -90px;       /* extended 10px further up to close top gap */
     left: -80px;
     right: -80px;
-    bottom: -40px;    /* Less extension at bottom — avoids covering panels */
+    bottom: -40px;    /* less extension at bottom — avoids covering panels */
     width: calc(100% + 160px);
-    height: calc(100% + 120px);  /* top 80 + bottom 40 */
+    height: calc(100% + 130px);  /* top 90 + bottom 40 */
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
