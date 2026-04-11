@@ -394,15 +394,16 @@
 
   .game-frame {
     position: absolute;
-    top: -90px;       /* extended 10px further up to close top gap */
+    top: -90px;
     left: -80px;
     right: -80px;
-    bottom: -40px;    /* less extension at bottom — avoids covering panels */
+    bottom: -40px;
     width: calc(100% + 160px);
     height: calc(100% + 130px);  /* top 90 + bottom 40 */
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
+    transform: translateY(8px);  /* nudge down ~8px to close top gap */
     animation: frame-pulse 3s ease-in-out infinite;
   }
 
