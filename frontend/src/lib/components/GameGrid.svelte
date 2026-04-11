@@ -57,6 +57,9 @@
   // Column wrapper refs for blur/bounce
   let colRefs: (HTMLDivElement | null)[] = Array.from({ length: REELS }, (): HTMLDivElement | null => null)
 
+  // Spin overlay refs — one per column, covers column during spin
+  let spinOverlayRefs: (HTMLDivElement | null)[] = Array.from({ length: REELS }, (): HTMLDivElement | null => null)
+
   // Win burst state
   let winBurstTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -204,15 +207,33 @@
     }
   }
 
-  // ── CSS-based column blur (replaces PixiJS BlurFilter) ────────────────────
+  // ── Spin overlay — covers column during spin, fades out on land ──────────
   function _blurCol(colIndex: number): void {
     const col = colRefs[colIndex]
-    if (col) col.style.filter = 'blur(3px)'
+    const overlay = spinOverlayRefs[colIndex]
+    if (col) col.style.filter = 'blur(2px) brightness(0.3)'
+    if (overlay) {
+      overlay.style.opacity = '1'
+      overlay.style.animation = 'spin-scroll 0.08s linear infinite'
+    }
   }
 
   function _clearColBlur(colIndex: number): void {
     const col = colRefs[colIndex]
-    if (col) col.style.filter = ''
+    const overlay = spinOverlayRefs[colIndex]
+    // Smooth ease-out fade
+    if (col) {
+      col.style.transition = 'filter 0.18s ease-out'
+      col.style.filter = ''
+      setTimeout(() => {
+        if (col) col.style.transition = ''
+      }, 200)
+    }
+    if (overlay) {
+      overlay.style.opacity = '0'
+      overlay.style.animation = ''
+      overlay.style.filter = ''
+    }
   }
 
   // ── CSS column bounce (replaces PixiJS container.y animation) ────────────
@@ -248,12 +269,11 @@
     })
   }
 
-  // ── Scatter anticipation — glow on upcoming columns ───────────────────────
+  // ── Scatter anticipation — glow tint on spinning overlay of upcoming columns
   function _scatterAnticipation(lastStoppedReel: number): void {
     for (let r = lastStoppedReel + 1; r < REELS; r++) {
-      const col = colRefs[r]
-      // Combine with existing blur so spin blur isn't lost
-      if (col) col.style.filter = 'blur(3px) brightness(1.15) saturate(1.3)'
+      const overlay = spinOverlayRefs[r]
+      if (overlay) overlay.style.filter = 'brightness(1.4) saturate(1.6)'
     }
   }
 
@@ -341,20 +361,8 @@
     _triggerWinBurst(wins, board)
   }
 
-  // ── Spin animation helpers — add/remove CSS spinning class ──────────────
-  function _startSpinAnimation(colIndex: number): void {
-    const col = colRefs[colIndex]
-    if (col) col.classList.add('spinning')
-  }
-
-  function _stopSpinAnimation(colIndex: number): void {
-    const col = colRefs[colIndex]
-    if (col) col.classList.remove('spinning')
-  }
-
   // ── Land a single reel — update videos, sounds, bounce ───────────────────
   async function _landReel(r: number, finalBoard: string[][]): Promise<void> {
-    _stopSpinAnimation(r)
     _clearColBlur(r)
 
     const reel = finalBoard[r] ?? []
@@ -388,10 +396,9 @@
 
     const isT = get(isTurbo)
 
-    // START all reels simultaneously — blur + CSS scroll animation
+    // START all reels simultaneously — overlay + blur on all columns
     for (let r = 0; r < REELS; r++) {
       _blurCol(r)
-      _startSpinAnimation(r)
     }
 
     // STOP reels sequentially left to right — staggered delays
@@ -452,6 +459,12 @@
             {/if}
           </div>
         {/each}
+        <!-- Spin overlay — covers entire column during spin, fades out on land -->
+        <div
+          class="spin-overlay"
+          bind:this={spinOverlayRefs[col]}
+          aria-hidden="true"
+        ></div>
       </div>
     {/each}
   </div>
@@ -485,22 +498,34 @@
 
   /* Each column: 120 px wide, 4 rows stacked, row gap 4 px */
   .symbol-col {
+    position: relative;   /* Required: spin-overlay uses absolute inset */
     display: flex;
     flex-direction: column;
     gap: 4px;
     will-change: transform, filter;
-    transition: filter 0.15s ease-out;
+    overflow: hidden;     /* Clips overlay to column bounds */
   }
 
-  /* CSS spin animation — added via classList.add('spinning') in JS */
-  .symbol-col:global(.spinning) {
-    filter: blur(4px) brightness(0.7);
-    animation: reel-scroll 0.12s linear infinite;
+  /* Spin overlay — covers entire column, animates to simulate scrolling */
+  .spin-overlay {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 10, 30, 0.85) 0px,
+      rgba(10, 20, 50, 0.75) 8px,
+      rgba(0, 200, 255, 0.08) 12px,
+      rgba(0, 10, 30, 0.85) 16px
+    );
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+    z-index: 3;
   }
 
-  @keyframes reel-scroll {
-    0%   { transform: translateY(0); }
-    100% { transform: translateY(-8px); }
+  @keyframes spin-scroll {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 -32px; }
   }
 
   /* Each cell: 120 × 100 px — matches CELL_W / CELL_H */
