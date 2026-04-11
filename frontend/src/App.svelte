@@ -455,7 +455,7 @@
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
-    transform: translateY(8px);  /* nudge down ~8px to close top gap */
+    transform: none;
     animation: frame-pulse 3s ease-in-out infinite;
   }
 
