@@ -1,5 +1,5 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-11 | Compliance + frame fix + dynamic audio complete
+## Last updated: 2026-04-12 | Three new themes installed
 
 ## ANIMATED SYMBOL SYSTEM — 2026-04-05
 - ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
@@ -175,6 +175,15 @@ Production build passing, 0 TypeScript errors.
 - ✅ Z-index stack enforced (grid:10, winpod:50, controlbar:60, logo:70, banner:100)
 - ✅ Build: 0 errors, 0 warnings | TSC: clean
 - ✅ Developer handover spec generated (WRS_GameTemplate_Spec_v1.0.md)
+
+## THREE NEW THEMES INSTALLED — 2026-04-12
+- ✅ trap-lane: 12 symbols, 10 UI, 3 bg, 12 sounds, frames/frame-2.png
+- ✅ oil-and-fire: 12 symbols, 10 UI, 3 bg, 12 sounds, frames/frame-2.png
+- ✅ beautiful-game: 12 symbols, 10 UI, 3 bg, 12 sounds, frames/frame-2.png
+- ✅ All three already registered in themes.ts (with subtitle, description, text, videoBackground fields)
+- ✅ Sound wiring: dynamic via themeAssets.sounds + page reload on switch — no soundService changes needed
+- ✅ Frame path fix: ui/frame.png copied to frames/frame-2.png per themeStore expectation
+- ✅ TSC: 0 errors | Build: pass | Commit: d0efe18
 
 ## COMPLIANCE + FRAME + AUDIO — 2026-04-11
 - ✅ Buy Bonus / free spins: confirmed absent (removed in prior session) — Stake Engine compliant
