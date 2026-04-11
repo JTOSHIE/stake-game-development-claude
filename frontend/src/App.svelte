@@ -26,6 +26,22 @@
   let showThemeSelector = false
 
   onMount(async () => {
+    // Video background fallback: if animated loop doesn't load in 2s, swap to static PNG
+    const bgVideo = document.getElementById('bg-video') as HTMLVideoElement | null
+    if (bgVideo) {
+      const fallbackTimer = setTimeout(() => {
+        if (bgVideo.readyState < 3) {
+          bgVideo.style.display = 'none'
+          const fallback = document.createElement('img')
+          fallback.src = 'assets/videos/bg_master_fallback.png'
+          fallback.className = 'bg-media'
+          fallback.setAttribute('aria-hidden', 'true')
+          bgVideo.parentElement?.appendChild(fallback)
+        }
+      }, 2000)
+      bgVideo.addEventListener('canplay', () => clearTimeout(fallbackTimer), { once: true })
+    }
+
     const params  = new URLSearchParams(window.location.search)
     const token   = params.get('session') ?? 'dev-mock-token'
     const gameId  = 'future_spinner'
@@ -99,7 +115,7 @@
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
   {#if $activeTheme.id === 'future-spinner'}
-    <!-- Video background — only mounted for future-spinner -->
+    <!-- Animated video background — only mounted for future-spinner; 2s fallback in onMount -->
     <video
       class="bg-media"
       autoplay
@@ -107,13 +123,12 @@
       muted
       playsinline
       aria-hidden="true"
+      id="bg-video"
     >
-      <source src="assets/themes/future-spinner/backgrounds/bg-1.mp4" type="video/mp4" />
-      <source src="assets/videos/bg_rain_street_v2.mp4" type="video/mp4" />
+      <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
     </video>
   {:else}
-    <!-- Static image background — all other themes -->
-    <!-- Image is ONLY element, video is NOT in DOM -->
+    <!-- Static image background — all other themes; video is NOT in DOM -->
     <img
       class="bg-media"
       src="{$themeAssets.background}"

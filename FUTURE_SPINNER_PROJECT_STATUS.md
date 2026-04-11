@@ -1,5 +1,22 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-05 | Master theme install — T3-B, T4-E, T5-C complete
+## Last updated: 2026-04-05 | Animated two-state symbol system complete
+
+## ANIMATED SYMBOL SYSTEM — 2026-04-05
+- ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
+- ✅ 10 idle videos installed (H1-S _idle.mp4)
+- ✅ 10 win burst videos installed (H1-S _win.mp4)
+- ✅ 20 PNG fallbacks installed (idle-png/ and win-png/)
+- ✅ New animated background: bg_animated_loop.mp4
+- ✅ Background fallback: bg_master_fallback.png (2s timeout)
+- ✅ Win logic: winners swap to _win.mp4, non-winners dim to 40%
+- ✅ Win burst duration: exactly 4.0 seconds
+- ✅ After 4s: all symbols revert to _idle.mp4 loop
+- ✅ Spin start: all symbols reset to idle, opacity 100%
+- ✅ PixiJS retained for win lines and cell border overlays only
+- ✅ PNG fallback path active for low-power/no-video devices
+- ✅ Column blur (CSS filter) replaces PixiJS BlurFilter
+- ✅ Column bounce (CSS transform) replaces PixiJS container.y animation
+- ✅ TSC: 0 errors | Build: pass
 
 ## ACTIVE THEME INSTALLATIONS (2026-04-05)
 

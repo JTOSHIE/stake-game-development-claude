@@ -1,347 +1,148 @@
 <script lang="ts">
   /**
-   * GameGrid.svelte — PixiJS canvas wrapper for Future Spinner
+   * GameGrid.svelte — two-state animated symbol system
    *
-   * Renders a 5-reel × 4-row grid using the cyberpunk PNG assets.
-   * Assets are preloaded with PIXI.Assets.load() before the grid builds.
-   * Falls back to coloured placeholder rectangles if a texture is missing.
+   * Symbol display: HTML5 <video> elements in a CSS flex grid.
+   *   - Idle state : _idle.mp4 loops continuously
+   *   - Win state  : _win.mp4 plays once (4.0 s), then reverts to idle
    *
-   * Spin animation: reels scroll downward sequentially, stopping one-by-one.
-   * Turbo mode halves all durations.
-   * Win highlights: scale-up + white flash on winning cells; non-winners dimmed.
-   * S symbol: pulsing cyan/magenta glow via PIXI Ticker.
+   * Win overlay  : PixiJS canvas (transparent) draws gold cell borders
+   *                and connecting lines on top of the video layer.
+   *
+   * Spin animation: CSS blur on column wrappers + sequential reel timing.
+   * Public API  : animateSpin(board) called by App.svelte — unchanged contract.
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
-  import { Assets, Application, Container, Graphics, Sprite, Texture, Text, ColorMatrixFilter, Ticker, BlurFilter } from 'pixi.js'
+  import { Application, Graphics } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
-  import { themeAssets, activeTheme } from '../stores/themeStore'
+  import { activeTheme } from '../stores/themeStore'
 
   // ── Theme-aware win line colour ───────────────────────────────────────────
   function hexToPixi(hex: string): number {
     return parseInt(hex.replace('#', ''), 16)
   }
-
   function getWinLineColour(): number {
     return hexToPixi(get(activeTheme).palette.primary)
   }
 
-  // ── Layout constants ──────────────────────────────────────────────────────
+  // ── Layout constants — must match PixiJS canvas dimensions ───────────────
   const REELS    = 5
   const ROWS     = 4
   const CELL_W   = 120
   const CELL_H   = 100
   const GAP      = 4
-  const PADDING  = 8          // sprite inset within each cell
-  const CANVAS_W = REELS * CELL_W + (REELS - 1) * GAP
-  const CANVAS_H = ROWS  * CELL_H + (ROWS  - 1) * GAP
+  const CANVAS_W = REELS * CELL_W + (REELS - 1) * GAP   // 616
+  const CANVAS_H = ROWS  * CELL_H + (ROWS  - 1) * GAP   // 412
 
-  // ── Symbol → asset path map (reads active theme at call time) ────────────
-  function getSymbolMap(): Record<string, string> {
-    const assets = get(themeAssets).symbols
-    const map: Record<string, string> = {
-      // Uppercase (rgsService codes)
-      'H1': assets.H1, 'H2': assets.H2,
-      'M1': assets.M1, 'M2': assets.M2, 'M3': assets.M3,
-      'L1': assets.L1, 'L2': assets.L2, 'L3': assets.L3,
-      'W':  assets.W,  'S':  assets.S,
-      // Lowercase aliases
-      'h1': assets.H1, 'h2': assets.H2,
-      'm1': assets.M1, 'm2': assets.M2, 'm3': assets.M3,
-      'l1': assets.L1, 'l2': assets.L2, 'l3': assets.L3,
-      'w':  assets.W,  's':  assets.S,
-      // Full-word aliases
-      'WILD': assets.W, 'SCATTER': assets.S,
-      'wild': assets.W, 'scatter': assets.S,
-    }
-    // Debug: log all resolved paths so mismatches are visible in console
-    console.log('[GameGrid] Symbol map paths:', JSON.stringify({
-      H1: map.H1, H2: map.H2, M1: map.M1, M2: map.M2, M3: map.M3,
-      L1: map.L1, L2: map.L2, L3: map.L3, W: map.W, S: map.S,
-    }, null, 2))
-    return map
-  }
+  // ── Video symbol asset paths ──────────────────────────────────────────────
+  const IDLE_BASE = 'assets/symbols/idle'
+  const WIN_BASE  = 'assets/symbols/win'
+  const PNG_IDLE  = 'assets/symbols/idle-png'
 
-  // Fallback colours — used if a texture fails to load
-  const FALLBACK_COLOURS: Record<string, number> = {
-    H1: 0xffd700, H2: 0xff6b35, M1: 0x4fc3f7, M2: 0x81c784,
-    M3: 0xba68c8, L1: 0xe57373, L2: 0x4dd0e1, L3: 0xaed581,
-    W:  0xffffff, S:  0xff4081,
-  }
+  const videoSupported = typeof HTMLVideoElement !== 'undefined'
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let container: HTMLDivElement
+  let pixiContainer: HTMLDivElement
   let app: Application
-  let reelContainers: Container[] = []
-  let cellContainers: Container[][] = []   // [reel][row]
   let winHighlightLayer: Graphics
   let assetsReady = false
 
-  /** Live scatter sprites — pulsed by the scatter glow ticker */
-  let scatterSprites: Sprite[] = []
-  /** Ticker listener reference so we can remove it on destroy */
-  let scatterTickerFn: ((dt: number) => void) | null = null
+  // Video cell refs: videoRefs[col][row]
+  let videoRefs: (HTMLVideoElement | null)[][] =
+    Array.from({ length: REELS }, () => Array.from({ length: ROWS }, (): HTMLVideoElement | null => null))
+
+  // Column wrapper refs for blur/bounce
+  let colRefs: (HTMLDivElement | null)[] = Array.from({ length: REELS }, (): HTMLDivElement | null => null)
+
+  // Win burst state
+  let winBurstTimer: ReturnType<typeof setTimeout> | null = null
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
-  onMount(async () => {
+  onMount(() => {
+    // Transparent PixiJS canvas — win lines only, no symbol rendering
     app = new Application({
-      width:      CANVAS_W,
-      height:     CANVAS_H,
-      background: 0x0d0d1f,
-      antialias:  true,
+      width:           CANVAS_W,
+      height:          CANVAS_H,
+      backgroundAlpha: 0,
+      antialias:       true,
     })
-    container.appendChild(app.view as HTMLCanvasElement)
+    pixiContainer.appendChild(app.view as HTMLCanvasElement)
 
-    // Preload all symbol textures before building the grid
-    await _preloadTextures()
+    winHighlightLayer = new Graphics()
+    app.stage.addChild(winHighlightLayer)
 
     assetsReady = true
-    _buildGrid()
-    _startScatterGlow()
+    // No async texture loading — signal loading complete immediately
+    assetLoadProgress.set(100)
 
-    // React to board store updates (called after spin resolves)
+    // Initialize all cells to idle L3
+    for (let col = 0; col < REELS; col++) {
+      for (let row = 0; row < ROWS; row++) {
+        const vid = videoRefs[col][row]
+        if (vid) {
+          vid.setAttribute('data-symbol', 'L3')
+          vid.src = getIdleSrc('L3')
+          vid.loop = true
+          vid.play().catch(() => {})
+        }
+      }
+    }
+
     const unsubBoard = boardSymbols.subscribe(board => {
-      if (assetsReady && board && board.length === REELS) _updateBoard(board)
+      if (assetsReady && board && board.length === REELS) _updateSymbolVideos(board)
     })
 
-    // React to win events — apply highlights after activeWins is updated
     const unsubWins = activeWins.subscribe(() => {
       if (assetsReady) _applyWinHighlights()
     })
 
-    return () => {
-      unsubBoard()
-      unsubWins()
-    }
+    return () => { unsubBoard(); unsubWins() }
   })
 
   onDestroy(() => {
-    if (scatterTickerFn && app?.ticker) app.ticker.remove(scatterTickerFn)
+    if (winBurstTimer) clearTimeout(winBurstTimer)
     app?.destroy(true)
   })
 
-  // ── Asset preloading ──────────────────────────────────────────────────────
-  async function _preloadTextures(): Promise<void> {
-    const symbolMap = getSymbolMap()
-    // Deduplicate — uppercase + lowercase aliases point to same file
-    const uniqueUrls = [...new Set(Object.values(symbolMap))]
-
-    // Nuclear option: reset ALL PixiJS asset caches so no stale textures survive
-    try {
-      Assets.reset()
-      console.log('[GameGrid] Assets.reset() — all caches cleared')
-    } catch {
-      // Fallback: unload each URL individually
-      for (const url of uniqueUrls) {
-        try { await Assets.unload(url) } catch { /* ignore */ }
-      }
-    }
-
-    assetLoadProgress.set(0)
-
-    // Load each unique URL with a timestamp cache-bust to bypass browser HTTP cache
-    const ts = Date.now()
-    for (let i = 0; i < uniqueUrls.length; i++) {
-      const url = uniqueUrls[i]
-      try {
-        // Register busted URL as alias for original URL so Assets.get(url) works
-        const bustedUrl = `${url}?t=${ts}`
-        Assets.add({ alias: url, src: bustedUrl })
-        await Assets.load(url)
-        console.log(`[GameGrid] ✅ ${url}`)
-      } catch (e) {
-        // Fallback: try loading original URL directly
-        try {
-          await Assets.load(url)
-          console.log(`[GameGrid] ✅ (fallback) ${url}`)
-        } catch (e2) {
-          console.error(`[GameGrid] ❌ FAILED: ${url}`, e2)
-        }
-      }
-      assetLoadProgress.set(Math.round(((i + 1) / uniqueUrls.length) * 100))
-    }
-    assetLoadProgress.set(100)
+  // ── Video path helpers ────────────────────────────────────────────────────
+  function getIdleSrc(symbol: string): string {
+    return `${IDLE_BASE}/${symbol.toUpperCase()}_idle.mp4`
   }
 
-  // ── Scatter glow (PIXI Ticker) ─────────────────────────────────────────────
-  function _startScatterGlow(): void {
-    scatterTickerFn = () => {
-      // Prune destroyed sprites
-      scatterSprites = scatterSprites.filter(s => !s.destroyed)
-      if (scatterSprites.length === 0) return
-
-      // Pulse alpha 0.6 → 1.0 over 1.5 s loop
-      const alpha = 0.6 + 0.4 * (0.5 + 0.5 * Math.sin((performance.now() / 1500) * Math.PI * 2))
-      for (const s of scatterSprites) s.alpha = alpha
-    }
-    app.ticker.add(scatterTickerFn)
+  function getWinSrc(symbol: string): string {
+    return `${WIN_BASE}/${symbol.toUpperCase()}_win.mp4`
   }
 
-  // ── Grid construction ─────────────────────────────────────────────────────
-  function _buildGrid(): void {
-    for (let r = 0; r < REELS; r++) {
-      const rc = new Container()
-      rc.x = r * (CELL_W + GAP)
-
-      // Clip mask — symbols that scroll out of the reel window are hidden
-      const mask = new Graphics()
-      mask.beginFill(0xffffff)
-      mask.drawRect(0, 0, CELL_W, ROWS * CELL_H + (ROWS - 1) * GAP)
-      mask.endFill()
-      rc.addChild(mask)
-      rc.mask = mask
-
-      reelContainers.push(rc)
-      cellContainers.push([])
-
+  // ── Update all video cells to idle loop for given board ───────────────────
+  function _updateSymbolVideos(board: string[][]): void {
+    for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
-        const cell = _makeCell('L3', false)
-        cell.y = row * (CELL_H + GAP)
-        rc.addChild(cell)
-        cellContainers[r].push(cell)
-      }
-
-      app.stage.addChild(rc)
-    }
-
-    // Win highlight overlay — kept for potential future use; cleared each spin
-    winHighlightLayer = new Graphics()
-    app.stage.addChild(winHighlightLayer)
-  }
-
-  // ── Cell factory ──────────────────────────────────────────────────────────
-  function _makeCell(symbol: string, highlighted: boolean): Container {
-    const symbolMap = getSymbolMap()
-
-    // Try exact key, then uppercase, then lowercase
-    const url = symbolMap[symbol]
-      ?? symbolMap[symbol?.toUpperCase()]
-      ?? symbolMap[symbol?.toLowerCase()]
-
-    if (!url) {
-      console.warn(`[GameGrid] Unknown symbol: "${symbol}"`)
-    }
-
-    const c = new Container()
-
-    // Background panel
-    const bg = new Graphics()
-    bg.beginFill(highlighted ? 0x1e1a00 : 0x090914, highlighted ? 0.82 : 0.45)
-    bg.lineStyle(highlighted ? 2 : 1, highlighted ? 0xffd700 : 0x1e1e38, highlighted ? 1 : 0.7)
-    bg.drawRoundedRect(0, 0, CELL_W, CELL_H, 8)
-    bg.endFill()
-    c.addChild(bg)
-
-    if (url) {
-      try {
-        const tex = Assets.get<Texture>(url) ?? Texture.WHITE
-        const sprite = new Sprite(tex)
-
-        // Scale to fit within the cell with padding, preserving aspect ratio
-        if (tex !== Texture.WHITE) {
-          const maxW  = CELL_W - PADDING * 2
-          const maxH  = CELL_H - PADDING * 2
-          const scale = Math.min(maxW / tex.width, maxH / tex.height)
-          sprite.scale.set(scale)
-          sprite.x = Math.round((CELL_W - sprite.width)  / 2)
-          sprite.y = Math.round((CELL_H - sprite.height) / 2)
-        } else {
-          sprite.width  = CELL_W
-          sprite.height = CELL_H
+        const symbol = (board[col]?.[row] ?? 'L3').toUpperCase()
+        const vid = videoRefs[col][row]
+        if (!vid) continue
+        if (vid.getAttribute('data-symbol') !== symbol) {
+          vid.setAttribute('data-symbol', symbol)
+          vid.src = getIdleSrc(symbol)
+          vid.loop = true
+          vid.load()
+          vid.play().catch(() => {})
         }
-
-        // Saturation boost
-        const cmf = new ColorMatrixFilter()
-        cmf.saturate(0.2, true)
-        sprite.filters = [cmf]
-
-        const symUpper = symbol?.toUpperCase()
-        if (symUpper === 'W') {
-          // Dark mask behind WILD to hide white PNG background
-          const wildMask = new Graphics()
-          wildMask.beginFill(0x080818, 1.0)
-          wildMask.drawRoundedRect(PADDING, PADDING, CELL_W - PADDING * 2, CELL_H - PADDING * 2, 8)
-          wildMask.endFill()
-          c.addChild(wildMask)
-          sprite.filters = []
-          sprite.tint = 0xffffff
-        }
-
-        if (symUpper === 'S') {
-          sprite.tint = 0xff99ff
-          scatterSprites.push(sprite)
-        }
-
-        c.addChild(sprite)
-      } catch (err) {
-        console.error(`[GameGrid] Sprite error for ${symbol}:`, err)
-        _addFallbackCell(c, symbol)
-      }
-    } else {
-      _addFallbackCell(c, symbol)
-    }
-
-    return c
-  }
-
-  function _addFallbackCell(c: Container, symbol: string): void {
-    const dot = new Graphics()
-    dot.beginFill(FALLBACK_COLOURS[symbol?.toUpperCase()] ?? 0x666666)
-    dot.drawCircle(CELL_W / 2, CELL_H / 2 - 10, 22)
-    dot.endFill()
-    c.addChild(dot)
-    const label = new Text(symbol, {
-      fontFamily: 'Arial', fontSize: 14, fontWeight: 'bold', fill: 0xffffff,
-    })
-    label.anchor.set(0.5)
-    label.x = CELL_W / 2
-    label.y = CELL_H / 2 + 20
-    c.addChild(label)
-  }
-
-  // ── Board update (called after spin resolves) ─────────────────────────────
-  function _updateBoard(board: string[][]): void {
-    for (let r = 0; r < REELS; r++) {
-      for (let row = 0; row < ROWS; row++) {
-        _replaceCell(r, row, board[r]?.[row] ?? 'L3', false)
+        vid.style.opacity = '1'
       }
     }
-    // Highlights are drawn separately when activeWins subscription fires
   }
 
-  function _replaceCell(reel: number, row: number, symbol: string, highlighted: boolean): void {
-    const old = cellContainers[reel][row]
-    const y   = old.y
-    const newCell = _makeCell(symbol, highlighted)
-    newCell.y = y
-    reelContainers[reel].addChild(newCell)
-    reelContainers[reel].removeChild(old)
-    // Destroy removes sprites from PixiJS; scatter ticker filters out destroyed sprites
-    old.destroy({ children: true })
-    cellContainers[reel][row] = newCell
-  }
+  // ── Win burst — swap winning cells to _win.mp4, dim non-winners ──────────
+  function _triggerWinBurst(
+    wins: Array<{ symbol: string; kind: number; ways: number; payout: number }>,
+    board: string[][]
+  ): void {
+    if (winBurstTimer) clearTimeout(winBurstTimer)
 
-  // ── Win highlights — scale-up + white flash on winners; dim non-winners ───
-  function _applyWinHighlights(): void {
-    if (!winHighlightLayer) return
-    winHighlightLayer.clear()
-
-    const wins  = get(activeWins)
-    const board = get(boardSymbols)
-
-    // Reset all cells to full alpha and normal scale first
-    for (let r = 0; r < REELS; r++) {
-      for (let row = 0; row < ROWS; row++) {
-        const cell = cellContainers[r]?.[row]
-        if (cell) { cell.alpha = 1; cell.scale.set(1) }
-      }
-    }
-
-    if (!wins.length || !board.length) return
-
-    // Determine which cells are winning
+    // Derive winning cell set — same scan logic as _applyWinHighlights
     const winningCells = new Set<string>()
     for (const win of wins) {
       const reelCount = win.kind ?? 3
@@ -356,169 +157,87 @@
       }
     }
 
-    for (let r = 0; r < REELS; r++) {
+    for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
-        const cell = cellContainers[r]?.[row]
-        if (!cell) continue
+        const symbol = board[col]?.[row]
+        const vid = videoRefs[col][row]
+        if (!vid || !symbol) continue
+        const key = `${col},${row}`
 
-        if (winningCells.has(`${r},${row}`)) {
-          // Pulse scale 1.0 → 1.08 → 1.0 via Ticker (3 cycles), then white flash
-          _pulseWinCell(cell)
-          _flashCell(cell)
+        if (winningCells.has(key)) {
+          // Swap to win burst video — plays once
+          vid.style.opacity = '1'
+          vid.loop = false
+          vid.src = getWinSrc(symbol.toUpperCase())
+          vid.load()
+          vid.currentTime = 0
+          vid.play().catch(() => {})
         } else {
-          // Dim non-winners to 0.4
-          _animateAlpha(cell, 1.0, 0.4, 150)
+          // Non-winning: pause idle and dim to 40%
+          vid.pause()
+          vid.style.opacity = '0.4'
         }
       }
     }
 
-    // Draw gold connecting lines through winning symbol centres
-    _drawWinConnector(wins, board)
-  }
-
-  function _drawWinConnector(wins: ReturnType<typeof get<typeof activeWins>>, board: string[][]): void {
-    if (!winHighlightLayer || wins.length === 0) return
-    const STRIP_W = CELL_W + GAP
-    const STRIP_H = CELL_H + GAP
-
-    for (const win of wins) {
-      const reelCount = win.kind ?? 3
-      const points: { x: number; y: number }[] = []
-
-      for (let r = 0; r < reelCount; r++) {
-        const reelSymbols = board[r] ?? []
+    // After 4.0 s: restore all to idle loop
+    winBurstTimer = setTimeout(() => {
+      const currentBoard = get(boardSymbols)
+      if (currentBoard.length) _updateSymbolVideos(currentBoard)
+      for (let col = 0; col < REELS; col++) {
         for (let row = 0; row < ROWS; row++) {
-          const sym = reelSymbols[row]
-          if (sym === win.symbol || sym === 'W') {
-            points.push({
-              x: r * STRIP_W + CELL_W / 2,
-              y: row * STRIP_H + CELL_H / 2,
-            })
-            break  // one point per reel
-          }
+          const vid = videoRefs[col][row]
+          if (vid) { vid.loop = true; vid.style.opacity = '1' }
         }
       }
+    }, 4000)
+  }
 
-      if (points.length >= 2) {
-        const wlc = getWinLineColour()
-        // Inner solid line
-        winHighlightLayer.lineStyle(2, wlc, 0.6)
-        winHighlightLayer.moveTo(points[0].x, points[0].y)
-        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
-
-        // Outer glow line
-        winHighlightLayer.lineStyle(6, wlc, 0.15)
-        winHighlightLayer.moveTo(points[0].x, points[0].y)
-        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
+  // ── Reset all cells to idle (called at spin start) ────────────────────────
+  function _resetToIdle(): void {
+    if (winBurstTimer) { clearTimeout(winBurstTimer); winBurstTimer = null }
+    for (let col = 0; col < REELS; col++) {
+      for (let row = 0; row < ROWS; row++) {
+        const vid = videoRefs[col][row]
+        if (vid) { vid.loop = true; vid.style.opacity = '1' }
       }
     }
   }
 
-  function _animateScale(target: Container, from: number, to: number, duration: number): void {
-    const start = performance.now()
-    target.scale.set(from)
-    function tick(): void {
-      const progress = Math.min((performance.now() - start) / duration, 1)
-      const eased    = 1 - Math.pow(1 - progress, 2)
-      target.scale.set(from + (to - from) * eased)
-      if (progress < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
+  // ── CSS-based column blur (replaces PixiJS BlurFilter) ────────────────────
+  function _blurCol(colIndex: number): void {
+    const col = colRefs[colIndex]
+    if (col) col.style.filter = 'blur(3px)'
   }
 
-  function _animateAlpha(target: Container, from: number, to: number, duration: number): void {
-    const start = performance.now()
-    target.alpha = from
-    function tick(): void {
-      const progress = Math.min((performance.now() - start) / duration, 1)
-      target.alpha = from + (to - from) * progress
-      if (progress < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
+  function _clearColBlur(colIndex: number): void {
+    const col = colRefs[colIndex]
+    if (col) col.style.filter = ''
   }
 
-  function _pulseWinCell(cell: Container, duration = 600, repeats = 3): void {
-    let elapsed = 0
-    let count   = 0
-    const ticker = new Ticker()
-    ticker.add((delta) => {
-      if (cell.destroyed) { ticker.destroy(); return }
-      elapsed += delta * (1000 / 60)
-      const t = (elapsed % duration) / duration
-      const scale = 1.0 + 0.08 * Math.sin(t * Math.PI)
-      cell.scale.set(scale)
-      if (elapsed >= duration) {
-        elapsed -= duration
-        count++
-        if (count >= repeats) {
-          cell.scale.set(1.0)
-          ticker.destroy()
-        }
-      }
-    })
-    ticker.start()
-  }
-
-  function _flashCell(cell: Container): void {
-    const flash = new Graphics()
-    flash.beginFill(0xffffff, 0.6)
-    flash.drawRoundedRect(0, 0, CELL_W, CELL_H, 8)
-    flash.endFill()
-    cell.addChild(flash)
-
-    const start    = performance.now()
-    const duration = 300
-    function tick(): void {
-      const progress = Math.min((performance.now() - start) / duration, 1)
-      flash.alpha = 0.6 * (1 - progress)
-      if (progress < 1) {
-        requestAnimationFrame(tick)
-      } else {
-        if (!cell.destroyed) cell.removeChild(flash)
-        flash.destroy()
-      }
-    }
-    requestAnimationFrame(tick)
-  }
-
-  // ── Blur helpers ──────────────────────────────────────────────────────────
-  function _blurReel(reelIndex: number): void {
-    const blur = new BlurFilter()
-    blur.blurX   = 0
-    blur.blurY   = 3
-    blur.quality = 1
-    reelContainers[reelIndex].filters = [blur]
-  }
-
-  function _clearBlur(reelIndex: number): void {
-    reelContainers[reelIndex].filters = []
-  }
-
-  // ── Elastic two-stage bounce on reel stop ────────────────────────────────
-  function _bounceReel(rc: Container): Promise<void> {
-    const OVERSHOOT = 8
-    const DUR1      = 80
-    const DUR2      = 40
-
+  // ── CSS column bounce (replaces PixiJS container.y animation) ────────────
+  function _bounceCol(colIndex: number): Promise<void> {
     return new Promise(resolve => {
-      rc.y = OVERSHOOT
+      const col = colRefs[colIndex]
+      if (!col) { resolve(); return }
+      const OVERSHOOT = 8, DUR1 = 80, DUR2 = 40
+      col.style.transform = `translateY(${OVERSHOOT}px)`
       const start = performance.now()
-
       const tick = () => {
         const t = Math.min((performance.now() - start) / DUR1, 1)
         if (t < 1) {
-          rc.y = OVERSHOOT * (1 - t)
+          col.style.transform = `translateY(${OVERSHOOT * (1 - t)}px)`
           requestAnimationFrame(tick)
         } else {
-          rc.y = 0
+          col.style.transform = ''
           const start2 = performance.now()
           const tick2 = () => {
             const t2 = Math.min((performance.now() - start2) / DUR2, 1)
             if (t2 < 1) {
-              rc.y = -2 * Math.sin(t2 * Math.PI)
+              col.style.transform = `translateY(${-2 * Math.sin(t2 * Math.PI)}px)`
               requestAnimationFrame(tick2)
             } else {
-              rc.y = 0
+              col.style.transform = ''
               resolve()
             }
           }
@@ -529,7 +248,16 @@
     })
   }
 
-  // ── Anticipation check — true if reels 0, 1, 2 have matching high-value symbols ──
+  // ── Scatter anticipation — glow on upcoming columns ───────────────────────
+  function _scatterAnticipation(lastStoppedReel: number): void {
+    for (let r = lastStoppedReel + 1; r < REELS; r++) {
+      const col = colRefs[r]
+      // Combine with existing blur so spin blur isn't lost
+      if (col) col.style.filter = 'blur(3px) brightness(1.15) saturate(1.3)'
+    }
+  }
+
+  // ── Anticipation check — true if reels 0–2 have near-matching high-value ──
   function _checkAnticipation(board: string[][]): boolean {
     const highValue = ['H1', 'H2', 'S']
     const isWild = (s: string | undefined) => s === 'W'
@@ -544,18 +272,77 @@
     return false
   }
 
-  // ── Scatter anticipation glow ─────────────────────────────────────────────
-  function _scatterAnticipation(lastStoppedReel: number): void {
-    for (let r = lastStoppedReel + 1; r < REELS; r++) {
-      const glow = new ColorMatrixFilter()
-      glow.brightness(1.15, false)
-      reelContainers[r].filters = [glow]
+  // ── Win overlay — PixiJS draws gold borders + connecting lines ────────────
+  function _applyWinHighlights(): void {
+    if (!winHighlightLayer) return
+    winHighlightLayer.clear()
+
+    const wins  = get(activeWins)
+    const board = get(boardSymbols)
+    if (!wins.length || !board.length) return
+
+    const STRIP_W = CELL_W + GAP
+    const STRIP_H = CELL_H + GAP
+    const wlc     = getWinLineColour()
+
+    // Derive winning cells
+    const winningCells = new Set<string>()
+    for (const win of wins) {
+      const reelCount = win.kind ?? 3
+      for (let r = 0; r < reelCount; r++) {
+        const reelSymbols = board[r] ?? []
+        for (let row = 0; row < ROWS; row++) {
+          const sym = reelSymbols[row]
+          if (sym === win.symbol || sym === 'W' || win.symbol === 'W') {
+            winningCells.add(`${r},${row}`)
+          }
+        }
+      }
     }
+
+    // Gold cell borders on winning cells
+    for (const key of winningCells) {
+      const [r, row] = key.split(',').map(Number)
+      winHighlightLayer.lineStyle(2, wlc, 0.85)
+      winHighlightLayer.beginFill(wlc, 0.08)
+      winHighlightLayer.drawRoundedRect(
+        r * STRIP_W + 2, row * STRIP_H + 2, CELL_W - 4, CELL_H - 4, 6
+      )
+      winHighlightLayer.endFill()
+    }
+
+    // Gold connecting lines through winning symbol centres
+    for (const win of wins) {
+      const reelCount = win.kind ?? 3
+      const points: { x: number; y: number }[] = []
+      for (let r = 0; r < reelCount; r++) {
+        const reelSymbols = board[r] ?? []
+        for (let row = 0; row < ROWS; row++) {
+          const sym = reelSymbols[row]
+          if (sym === win.symbol || sym === 'W') {
+            points.push({ x: r * STRIP_W + CELL_W / 2, y: row * STRIP_H + CELL_H / 2 })
+            break  // one point per reel
+          }
+        }
+      }
+      if (points.length >= 2) {
+        // Inner solid line
+        winHighlightLayer.lineStyle(2, wlc, 0.6)
+        winHighlightLayer.moveTo(points[0].x, points[0].y)
+        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
+        // Outer glow line
+        winHighlightLayer.lineStyle(6, wlc, 0.15)
+        winHighlightLayer.moveTo(points[0].x, points[0].y)
+        for (let i = 1; i < points.length; i++) winHighlightLayer.lineTo(points[i].x, points[i].y)
+      }
+    }
+
+    // Trigger video win burst
+    _triggerWinBurst(wins, board)
   }
 
-  // ── Single-reel spin helper ────────────────────────────────────────────────
+  // ── Single-reel spin helper ───────────────────────────────────────────────
   function _spinReel(r: number, finalBoard: string[][], isT: boolean, extraMs = 0): Promise<void> {
-    const STRIP_H = CELL_H + GAP
     return new Promise<void>(resolve => {
       const startTime = performance.now()
       const duration  = (isT ? 150 + r * 50 : 500 + r * 150) + extraMs
@@ -563,52 +350,29 @@
       function tick(): void {
         const elapsed  = performance.now() - startTime
         const progress = Math.min(elapsed / duration, 1)
-
-        for (let row = 0; row < ROWS; row++) {
-          const cell  = cellContainers[r][row]
-          const baseY = row * STRIP_H
-          cell.y = baseY + ((elapsed * 0.35) % STRIP_H)
-        }
-
-        // Clear blur before deceleration phase so symbols are readable as they land
-        if (elapsed > duration - 200) _clearBlur(r)
-
+        // Clear blur 200 ms before landing so symbols are readable
+        if (elapsed > duration - 200) _clearColBlur(r)
         if (progress < 1) {
           requestAnimationFrame(tick)
         } else {
+          _clearColBlur(r)
+          // Update this reel's video cells to the final symbols
           const reel = finalBoard[r] ?? []
           for (let row = 0; row < ROWS; row++) {
-            _replaceCell(r, row, reel[row] ?? 'L3', false)
-            cellContainers[r][row].y = row * STRIP_H
-          }
-
-          _clearBlur(r)
-
-          const snapStart = performance.now()
-          const snapDur   = isT ? 40 : 80
-          function snapTick(): void {
-            const sp    = Math.min((performance.now() - snapStart) / snapDur, 1)
-            const scale = 1 + 0.05 * Math.sin(sp * Math.PI)
-            for (let row = 0; row < ROWS; row++) {
-              const cell = cellContainers[r]?.[row]
-              if (cell) cell.scale.set(scale)
-            }
-            if (sp < 1) requestAnimationFrame(snapTick)
-            else {
-              for (let row = 0; row < ROWS; row++) {
-                const cell = cellContainers[r]?.[row]
-                if (cell) cell.scale.set(1)
-              }
+            const sym = (reel[row] ?? 'L3').toUpperCase()
+            const vid = videoRefs[r][row]
+            if (vid) {
+              vid.setAttribute('data-symbol', sym)
+              vid.src = getIdleSrc(sym)
+              vid.loop = true
+              vid.load()
+              vid.play().catch(() => {})
+              vid.style.opacity = '1'
             }
           }
-          requestAnimationFrame(snapTick)
-
-          _bounceReel(reelContainers[r]).then(() => {
-            playReelStop(r)
-            // Play scatter land sound if this reel contains a scatter
-            if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
-            resolve()
-          })
+          playReelStop(r)
+          if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
+          _bounceCol(r).then(resolve)
         }
       }
 
@@ -620,52 +384,82 @@
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
 
-    // Clear previous win highlights; reset cell alpha/scale
     winHighlightLayer?.clear()
-    for (let r = 0; r < REELS; r++) {
-      for (let row = 0; row < ROWS; row++) {
-        const cell = cellContainers[r]?.[row]
-        if (cell) { cell.alpha = 1; cell.scale.set(1) }
-      }
-    }
+    _resetToIdle()
 
     isSpinning.set(true)
     playSpinStart()
 
     const isT = get(isTurbo)
 
-    // Apply vertical blur to all reels at spin start
-    for (let r = 0; r < REELS; r++) _blurReel(r)
+    // Blur all reels at spin start
+    for (let r = 0; r < REELS; r++) _blurCol(r)
 
-    // Reels 0–1 first so we can check scatter count before 2–4 land
+    // Reels 0–1 land first
     await Promise.all([0, 1].map(r => _spinReel(r, finalBoard, isT)))
 
-    // Scatter anticipation: if reels 0–1 have 2 scatters, glow remaining reels gold
+    // Scatter anticipation: 2+ scatters in first two reels → glow remaining
     const scattersLanded = [0, 1].reduce((acc, r) =>
       acc + (finalBoard[r] ?? []).filter(s => s === 'S').length, 0)
     if (scattersLanded >= 2) _scatterAnticipation(1)
 
-    // Reels 2–3 spin in parallel
+    // Reels 2–3 land
     await Promise.all([2, 3].map(r => _spinReel(r, finalBoard, isT)))
-    // Clear any scatter glow on reel 2 and 3 as they stop
-    ;[2, 3].forEach(r => { reelContainers[r].filters = [] })
+    ;[2, 3].forEach(r => _clearColBlur(r))
 
-    // Anticipation: if first 4 reels have a near-match, slow reel 4 by 600ms
+    // Anticipation on reel 4: slow it by 600 ms if reels 0–2 near-match high-value
     const anticipate = !isT && _checkAnticipation(finalBoard)
     if (anticipate) playAnticipation()
     await _spinReel(4, finalBoard, isT, anticipate ? 600 : 0)
-    reelContainers[4].filters = []
+    _clearColBlur(4)
 
     isSpinning.set(false)
   }
 </script>
 
-<div bind:this={container} class="game-grid"></div>
+<div class="grid-container">
+  <!-- Symbol video grid — 5 columns × 4 rows, absolutely positioned -->
+  <div class="symbol-grid">
+    {#each Array(REELS) as _, col}
+      <div class="symbol-col" bind:this={colRefs[col]} data-col={col}>
+        {#each Array(ROWS) as _, row}
+          <div class="symbol-cell" data-col={col} data-row={row}>
+            {#if videoSupported}
+              <video
+                bind:this={videoRefs[col][row]}
+                class="symbol-video"
+                autoplay
+                loop
+                muted
+                playsinline
+                data-col={col}
+                data-row={row}
+              ></video>
+            {:else}
+              <!-- PNG fallback for devices that cannot play video -->
+              <img
+                class="symbol-img"
+                src="{PNG_IDLE}/{($boardSymbols?.[col]?.[row] ?? 'L3').toUpperCase()}.png"
+                alt=""
+                draggable="false"
+              />
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+
+  <!-- PixiJS canvas — transparent overlay for win lines and cell borders -->
+  <div bind:this={pixiContainer} class="pixi-overlay"></div>
+</div>
 
 <style>
-  .game-grid {
-    display: flex;
-    justify-content: center;
+  /* Outer container — fixed to match PixiJS canvas dimensions (616 × 412) */
+  .grid-container {
+    position: relative;
+    width: 616px;
+    height: 412px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow:
@@ -674,7 +468,59 @@
       inset 0 0 60px rgba(0, 0, 30, 0.8);
   }
 
-  .game-grid :global(canvas) {
+  /* Five-column flex row; column gap matches GAP=4 so win-line coords align */
+  .symbol-grid {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  /* Each column: 120 px wide, 4 rows stacked, row gap 4 px */
+  .symbol-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    will-change: transform, filter;
+  }
+
+  /* Each cell: 120 × 100 px — matches CELL_W / CELL_H */
+  .symbol-cell {
+    width: 120px;
+    height: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(9, 9, 20, 0.85);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .symbol-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.15s ease;
+  }
+
+  .symbol-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.15s ease;
+  }
+
+  /* PixiJS canvas — transparent, drawn on top of the video grid */
+  .pixi-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .pixi-overlay :global(canvas) {
     display: block;
   }
 </style>
