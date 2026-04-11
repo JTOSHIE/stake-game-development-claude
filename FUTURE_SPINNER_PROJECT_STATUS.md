@@ -1,5 +1,5 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-11 | Premium UI + smooth spin + frame nudge complete
+## Last updated: 2026-04-11 | Compliance + frame fix + dynamic audio complete
 
 ## ANIMATED SYMBOL SYSTEM — 2026-04-05
 - ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
@@ -134,6 +134,7 @@ Production build passing, 0 TypeScript errors.
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Compliance + frame + audio | 2026-04-11 | Frame inset symmetric, playWin epic→50×+echo, small win softer, status updated |
 | Definitive theme overhaul R2 | 2026-04-05 | All 4 themes assets reinstalled exact source filenames, integrity audit 0 failures, TSC+build clean |
 | Definitive theme overhaul | 2026-04-05 | Full asset reinstall, themeStore rewrite, GameGrid cache clear, all UI reactive |
 | Theme system fix | 2026-04-05 | All UI assets theme-reactive, bg video/img switch, CSS vars, themed win lines |
@@ -174,6 +175,14 @@ Production build passing, 0 TypeScript errors.
 - ✅ Z-index stack enforced (grid:10, winpod:50, controlbar:60, logo:70, banner:100)
 - ✅ Build: 0 errors, 0 warnings | TSC: clean
 - ✅ Developer handover spec generated (WRS_GameTemplate_Spec_v1.0.md)
+
+## COMPLIANCE + FRAME + AUDIO — 2026-04-11
+- ✅ Buy Bonus / free spins: confirmed absent (removed in prior session) — Stake Engine compliant
+- ✅ Frame: symmetric inset:-70px replaces asymmetric top/left/right/bottom values
+- ✅ Background video: already at 0.85 opacity (dual-video crossfade; base opacity kept at 0 for crossfade integrity)
+- ✅ playWin: epic threshold raised 20×→50×, echo repeat at 800ms, small win uses cloneNode at 0.4 vol
+- ✅ playSpinStart: already exported and wired in GameGrid.svelte (BGM duck 0.30→0.12 on spin)
+- ✅ TSC: 0 errors | Build: pass
 
 ## SURGICAL FIXES — 2026-04-11
 - ✅ Frame shifted: top:-70px bottom:-60px — surrounds all 4 symbol rows

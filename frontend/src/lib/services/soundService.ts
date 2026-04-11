@@ -155,26 +155,38 @@ export function playScatterLand(): void {
 /**
  * Play tiered win sound based on multiplier (winAmount / betAmount).
  * 0         = dead spin, no sound
- * 0.01–1.9× = small win
+ * 0.01–1.9× = small win (quiet cloneNode at 0.4 vol)
  * 2×–9.9×   = medium win
- * 10×–19.9× = big win
- * 20×+      = epic win
+ * 10×–49.9× = big win
+ * 50×+      = epic win (plays twice with 800ms echo)
  */
 export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
 
-  if (multiplier >= 20) {
+  if (multiplier >= 50) {
+    // Epic win — play twice with slight delay for emphasis
     sounds.winEpic.currentTime = 0
     sounds.winEpic.play().catch(() => {})
+    setTimeout(() => {
+      if (!muted) {
+        const echo = sounds.winEpic.cloneNode() as HTMLAudioElement
+        echo.volume = 0.6
+        echo.play().catch(() => {})
+      }
+    }, 800)
   } else if (multiplier >= 10) {
+    // Big win
     sounds.winBig.currentTime = 0
     sounds.winBig.play().catch(() => {})
   } else if (multiplier >= 2) {
+    // Medium win
     sounds.winMedium.currentTime = 0
     sounds.winMedium.play().catch(() => {})
   } else {
-    sounds.winSmall.currentTime = 0
-    sounds.winSmall.play().catch(() => {})
+    // Small win — softer version
+    const softWin = sounds.winSmall.cloneNode() as HTMLAudioElement
+    softWin.volume = 0.4
+    softWin.play().catch(() => {})
   }
 }
 
