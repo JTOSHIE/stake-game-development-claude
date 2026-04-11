@@ -233,8 +233,7 @@
           }}
         />
       {/if}
-      <!-- WinBanner disabled — replaced by WinPod side display -->
-      <!-- <WinBanner /> -->
+      <WinBanner />
       <WinPod />
     </div>
   </section>
