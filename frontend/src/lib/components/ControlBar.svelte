@@ -455,8 +455,8 @@
     background: transparent;
   }
 
-  /* Fallback text if btn_max.png fails to load */
-  .maxbet-btn.maxbet-fallback {
+  /* Fallback text if btn_max.png fails to load — class added dynamically via JS */
+  .maxbet-btn:global(.maxbet-fallback) {
     background: transparent;
     border: 2px solid var(--theme-primary, #00ffff);
     border-radius: 6px;
@@ -467,7 +467,7 @@
     font-family: 'Courier New', monospace;
   }
 
-  .maxbet-btn.maxbet-fallback::after {
+  .maxbet-btn:global(.maxbet-fallback)::after {
     content: 'MAX';
   }
 
