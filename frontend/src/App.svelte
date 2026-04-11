@@ -9,6 +9,7 @@
   import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
   import PaytableModal       from './lib/components/PaytableModal.svelte'
   import WinBanner           from './lib/components/WinBanner.svelte'
+  import WinPod              from './lib/components/WinPod.svelte'
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
   import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
 
@@ -200,9 +201,9 @@
           }}
         />
       {/if}
-      <!-- WinBanner disabled — large overlay text covers win burst animations;
-           win amount is shown clearly in WinDisplay panel below -->
+      <!-- WinBanner disabled — replaced by WinPod side display -->
       <!-- <WinBanner /> -->
+      <WinPod />
     </div>
   </section>
 

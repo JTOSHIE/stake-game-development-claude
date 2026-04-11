@@ -109,7 +109,7 @@
     background-size: 100% 100%;
     background-repeat: no-repeat;
 
-    min-width: 200px;
+    min-width: 260px;
     height: auto;
     padding: 0 1.2rem;
     border-radius: 6px;
