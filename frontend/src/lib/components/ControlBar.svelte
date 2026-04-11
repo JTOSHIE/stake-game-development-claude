@@ -84,8 +84,8 @@
       />
     </button>
 
-    <!-- Bet selector panel (image background) -->
-    <div class="bet-selector-panel" style="background-image: url('assets/ui/bet_display.png'); background-size: 100% 100%;">
+    <!-- Bet selector panel (CSS-only — no baked-in image) -->
+    <div class="bet-selector-panel">
       <button class="nudge-btn" style="background-image: url('{$themeAssets.btnMinus}')" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
 
       <div class="bet-value-wrap">
@@ -348,16 +348,22 @@
     flex: 0 0 auto;
   }
 
-  /* Bet selector: theme-reactive border frame */
+  /* Bet selector: CSS-only gold glass panel — no bet_display.png */
   .bet-selector-panel {
     display: flex;
     align-items: center;
     gap: 0;
 
-    background: rgba(0, 0, 0, 0.50);
-    border: 1px solid var(--theme-primary, #00ffff);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
+    background: linear-gradient(135deg,
+      rgba(10, 8, 0, 0.92) 0%,
+      rgba(25, 20, 0, 0.88) 50%,
+      rgba(10, 8, 0, 0.92) 100%
+    );
+    border: 1px solid rgba(255, 215, 0, 0.4);
     border-radius: 6px;
+    box-shadow:
+      0 0 10px rgba(255, 215, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
     width: 148px;
     height: 48px;
