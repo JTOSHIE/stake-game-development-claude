@@ -1,94 +1,79 @@
 <script lang="ts">
-  import { balance, betAmount, locale, currencyCode } from '../stores/gameStore'
+  import { balance, betAmount, locale } from '../stores/gameStore'
   import { t } from '../i18n/translations'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { themeAssets } from '../stores/themeStore'
 </script>
 
-<!--
-  Balance panel uses ui_balance_panel_variant_02.png as a CSS background image.
-  The two data fields (balance / bet) are layered on top using absolute positioning
-  within the panel's natural aspect ratio container.
--->
-<div class="balance-panel" style="background-image: url('{$themeAssets.panelBalance}'); background-size: 100% 100%; background-repeat: no-repeat; background-color: rgba(0,0,0,0.75); border: 1px solid var(--theme-primary, #00ffff); box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);">
+<div
+  class="balance-panel"
+  style="background-image: url('{$themeAssets.panelBalance}'); background-size: 100% 100%;"
+>
   <div class="field">
-    <div class="text-pill">
-      <span class="label">{t($locale, 'balance')}</span>
-      <span class="value">{formatBalance($balance * CURRENCY_SCALE, $currencyCode)}</span>
-    </div>
+    <div class="led-label">{t($locale, 'balance')}</div>
+    <div class="led-value cyan">USD {$balance.toFixed(2)}</div>
   </div>
   <div class="divider"></div>
   <div class="field">
-    <div class="text-pill">
-      <span class="label">{t($locale, 'bet')}</span>
-      <span class="value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
-    </div>
+    <div class="led-label">{t($locale, 'bet')}</div>
+    <div class="led-value gold">USD {$betAmount.toFixed(2)}</div>
   </div>
 </div>
 
 <style>
   .balance-panel {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-
-    /* Background image set via inline style from themeStore */
-    background-size: 100% 100%;
+    min-width: 280px;
+    height: 90px;
     background-repeat: no-repeat;
-
-    /* Size the panel to show a reasonable portion of the art */
-    min-width: 220px;
-    height: 56px;
-    /* Horizontal padding keeps text off the decorative left/right edges */
-    padding: 0 1.4rem;
+    background-color: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--theme-primary, #00ffff);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
     border-radius: 6px;
-
-    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 1.2rem;
+    gap: 0.8rem;
   }
 
   .field {
     flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* Dark pill ensures contrast over any background image colour */
-  .text-pill {
-    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1px;
-    background: rgba(0, 0, 0, 0.60);
-    border-radius: 4px;
-    padding: 3px 8px;
+    gap: 2px;
   }
 
   .divider {
     width: 1px;
-    align-self: center;
     height: 55%;
     background: rgba(255, 200, 50, 0.25);
     flex-shrink: 0;
   }
 
-  .label {
-    font-size: 0.60rem;
+  .led-label {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
     letter-spacing: 0.2em;
-    color: color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
+    color: rgba(255, 255, 255, 0.5);
     text-transform: uppercase;
-    line-height: 1;
     display: block;
-    font-family: 'Courier New', monospace;
   }
 
-  .value {
+  .led-value {
+    font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #ffffff;
-    font-family: 'Courier New', monospace;
-    line-height: 1.2;
-    text-shadow: 0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
+    letter-spacing: 2px;
     display: block;
+  }
+
+  .led-value.cyan {
+    color: #00FFFF;
+    text-shadow: 0 0 8px #00FFFF;
+  }
+
+  .led-value.gold {
+    color: #FFD700;
+    text-shadow: 0 0 8px #FFD700;
   }
 </style>

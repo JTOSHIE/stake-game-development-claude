@@ -74,18 +74,24 @@
   <div class="bet-cluster">
 
     <!-- Max Bet button — left of bet selector -->
-    <button class="maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
-      <span class="maxbet-label">MAX</span>
+    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
+      <img src="assets/themes/future-spinner/ui/btn_max.png" alt="MAX" draggable="false"
+        on:error={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = 'none';
+          const btn = (e.currentTarget as HTMLImageElement).parentElement
+          if (btn) btn.classList.add('maxbet-fallback')
+        }}
+      />
     </button>
 
     <!-- Bet selector panel (image background) -->
-    <div class="bet-selector-panel">
+    <div class="bet-selector-panel" style="background-image: url('assets/ui/bet_display.png'); background-size: 100% 100%;">
       <button class="nudge-btn" style="background-image: url('{$themeAssets.btnMinus}')" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
 
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
           <span class="bet-label">{t($locale, 'bet')}</span>
-          <span class="bet-value">{formatBalance($betAmount * CURRENCY_SCALE, $currencyCode)}</span>
+          <span class="bet-value led-gold">USD {$betAmount.toFixed(2)}</span>
         </div>
       </div>
 
@@ -427,44 +433,42 @@
     display: block;
   }
 
-  /* Max Bet button — theme-reactive styled with label */
+  /* Orbitron LED gold — bet display */
+  .led-gold {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-shadow: 0 0 8px #FFD700;
+    letter-spacing: 2px;
+    display: block;
+    line-height: 1.2;
+  }
+
+  /* Max Bet button — image-based */
   .maxbet-btn {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+
+  /* Fallback text if btn_max.png fails to load */
+  .maxbet-btn.maxbet-fallback {
     background: transparent;
     border: 2px solid var(--theme-primary, #00ffff);
     border-radius: 6px;
-    cursor: pointer;
-    padding: 0;
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 35%, transparent));
-    transition: filter 0.15s, transform 0.1s;
-  }
-
-  .maxbet-label {
-    font-size: 0.5rem;
+    color: var(--theme-primary, #00ffff);
+    font-size: 0.55rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: var(--theme-primary, #00ffff);
     font-family: 'Courier New', monospace;
-    text-transform: uppercase;
   }
 
-  .maxbet-btn:hover:not(:disabled) {
-    filter: brightness(1.2) drop-shadow(0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent));
-    transform: scale(1.06);
+  .maxbet-btn.maxbet-fallback::after {
+    content: 'MAX';
   }
-
-  .maxbet-btn:active:not(:disabled) {
-    transform: scale(0.95);
-    transition-duration: 0.05s;
-  }
-
-  .maxbet-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
 
   /* ── Centre zone — spin button ─────────────────────────────────────────── */
   .spin-wrap {

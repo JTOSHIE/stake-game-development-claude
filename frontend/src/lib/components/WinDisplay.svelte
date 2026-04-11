@@ -114,7 +114,7 @@
     padding: 0 1.2rem;
     border-radius: 6px;
 
-    font-family: 'Courier New', monospace;
+    font-family: 'Orbitron', 'Courier New', monospace;
     font-weight: 900;
     transition: filter 0.3s;
   }
@@ -141,10 +141,10 @@
     color: rgba(255,255,255,0.35);
   }
 
-  .win-green  .win-amount { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
-  .win-gold   .win-amount { color: #ffcc00; text-shadow: 0 0 12px rgba(255, 204, 0, 0.7); }
-  .win-big    .win-amount { color: #ff00ff; text-shadow: 0 0 15px #ff00ff; animation: pulse-glow 1.2s infinite; }
-  .win-mega   .win-amount { color: #00ffff; text-shadow: 0 0 20px #00ffff; animation: pulse-glow 1.2s infinite; }
+  .win-green  .win-amount { color: #FF00FF; text-shadow: 0 0 8px #FF00FF; }
+  .win-gold   .win-amount { color: #FF00FF; text-shadow: 0 0 12px #FF00FF; }
+  .win-big    .win-amount { color: #FF00FF; text-shadow: 0 0 15px #FF00FF; animation: pulse-glow 1.2s infinite; }
+  .win-mega   .win-amount { color: #FF00FF; text-shadow: 0 0 20px #FF00FF; animation: pulse-glow 1.2s infinite; }
 
   /* Wincap overrides gold on the amount */
   .wincap-active .win-amount { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,0.9); animation: pulse 0.6s ease-in-out infinite alternate; }
