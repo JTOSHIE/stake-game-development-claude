@@ -3,7 +3,6 @@
   import { t } from '../i18n/translations'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { onDestroy } from 'svelte'
-  import { themeAssets } from '../stores/themeStore'
 
 
 
@@ -65,7 +64,7 @@
 </script>
 
 {#if winTier !== 'none'}
-  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap} style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
+  <div class="win-panel win-{winTier}" class:wincap-active={$isWincap}>
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
     {#if winTier === 'mega'}
@@ -88,7 +87,7 @@
   </div>
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
-  <div class="win-panel win-idle" style="background-image: url('{$themeAssets.panelWin}'); background-size: 100% 100%; background-repeat: no-repeat;">
+  <div class="win-panel win-idle">
     <div class="win-label idle">{t($locale, 'win')}</div>
     <div class="win-amount win-amount--empty">—</div>
   </div>
@@ -96,23 +95,31 @@
 
 <style>
   .win-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    /* Background image set via inline style from themeStore */
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-
-    min-width: 260px;
+    min-width: 200px;
     height: auto;
     padding: 0 1.2rem;
-    border-radius: 6px;
+    border-radius: 8px;
+
+    /* CSS-only dark glass panel — no background image */
+    background: linear-gradient(135deg,
+      rgba(20, 0, 30, 0.92) 0%,
+      rgba(40, 0, 50, 0.88) 50%,
+      rgba(20, 0, 30, 0.92) 100%
+    );
+    border: 1px solid rgba(255, 0, 255, 0.4);
+    box-shadow:
+      0 0 12px rgba(255, 0, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
     font-family: 'Orbitron', 'Courier New', monospace;
     font-weight: 900;
     transition: filter 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
   }
 
   .win-panel { outline: none; }
@@ -127,20 +134,24 @@
 
   /* ── Amount ──────────────────────────────────────────────────────────────── */
   .win-amount {
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #FF00FF;
+    text-shadow: 0 0 8px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4);
+    letter-spacing: 2px;
     line-height: 1.3;
-    transition: color 0.2s;
   }
 
   .win-amount--empty {
-    color: rgba(255,255,255,0.35);
+    color: rgba(255, 255, 255, 0.35);
+    text-shadow: none;
   }
 
-  .win-green  .win-amount { color: #FF00FF; text-shadow: 0 0 8px #FF00FF; }
-  .win-gold   .win-amount { color: #FF00FF; text-shadow: 0 0 12px #FF00FF; }
-  .win-big    .win-amount { color: #FF00FF; text-shadow: 0 0 15px #FF00FF; animation: pulse-glow 1.2s infinite; }
-  .win-mega   .win-amount { color: #FF00FF; text-shadow: 0 0 20px #FF00FF; animation: pulse-glow 1.2s infinite; }
+  .win-green  .win-amount { color: #FF00FF; text-shadow: 0 0 8px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4); }
+  .win-gold   .win-amount { color: #FF00FF; text-shadow: 0 0 12px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4); }
+  .win-big    .win-amount { color: #FF00FF; text-shadow: 0 0 15px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4); animation: pulse-glow 1.2s infinite; }
+  .win-mega   .win-amount { color: #FF00FF; text-shadow: 0 0 20px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4); animation: pulse-glow 1.2s infinite; }
 
   /* Wincap overrides gold on the amount */
   .wincap-active .win-amount { color: #ffd700; text-shadow: 0 0 14px rgba(255,215,0,0.9); animation: pulse 0.6s ease-in-out infinite alternate; }
