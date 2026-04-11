@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import GameGrid       from './lib/components/GameGrid.svelte'
   import ControlBar     from './lib/components/ControlBar.svelte'
   import BalanceDisplay from './lib/components/BalanceDisplay.svelte'
@@ -26,23 +26,12 @@
   let gridRef: GameGrid
   let showThemeSelector = false
 
-  onMount(async () => {
-    // Video background fallback: if animated loop doesn't load in 2s, swap to static PNG
-    const bgVideo = document.getElementById('bg-video') as HTMLVideoElement | null
-    if (bgVideo) {
-      const fallbackTimer = setTimeout(() => {
-        if (bgVideo.readyState < 3) {
-          bgVideo.style.display = 'none'
-          const fallback = document.createElement('img')
-          fallback.src = 'assets/videos/bg_master_fallback.png'
-          fallback.className = 'bg-media'
-          fallback.setAttribute('aria-hidden', 'true')
-          bgVideo.parentElement?.appendChild(fallback)
-        }
-      }, 2000)
-      bgVideo.addEventListener('canplay', () => clearTimeout(fallbackTimer), { once: true })
-    }
+  let bgVideo1: HTMLVideoElement
+  let bgVideo2: HTMLVideoElement
+  let bgVideo1Active = true
+  let crossfadeInterval: ReturnType<typeof setInterval> | null = null
 
+  onMount(async () => {
     const params  = new URLSearchParams(window.location.search)
     const token   = params.get('session') ?? 'dev-mock-token'
     const gameId  = 'future_spinner'
@@ -50,6 +39,30 @@
     await initRGS(gameId, token)
     // isLoading is cleared inside initRGS's finally block
     playBGM()
+
+    // Crossfade logic — offset video2 by half duration to eliminate loop jump
+    if (bgVideo1 && bgVideo2) {
+      bgVideo1.addEventListener('loadedmetadata', () => {
+        const half = bgVideo1.duration / 2
+        bgVideo2.currentTime = half
+
+        crossfadeInterval = setInterval(() => {
+          const v1 = bgVideo1
+          const v2 = bgVideo2
+          if (!v1 || !v2) return
+
+          if (bgVideo1Active && v1.duration > 0 && v1.currentTime > v1.duration - 1.5) {
+            bgVideo1Active = false
+          } else if (!bgVideo1Active && v2.duration > 0 && v2.currentTime > v2.duration - 1.5) {
+            bgVideo1Active = true
+          }
+        }, 100)
+      }, { once: true })
+    }
+  })
+
+  onDestroy(() => {
+    if (crossfadeInterval) clearInterval(crossfadeInterval)
   })
 
   async function handleSpin() {
@@ -116,18 +129,33 @@
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
   {#if $activeTheme.id === 'future-spinner'}
-    <!-- Animated video background — only mounted for future-spinner; 2s fallback in onMount -->
-    <video
-      class="bg-media"
-      autoplay
-      loop
-      muted
-      playsinline
-      aria-hidden="true"
-      id="bg-video"
-    >
-      <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
-    </video>
+    <!-- Dual video crossfade — eliminates the visible loop restart jump -->
+    <div class="bg-video-container">
+      <video
+        bind:this={bgVideo1}
+        class="bg-video"
+        class:active={bgVideo1Active}
+        autoplay
+        loop
+        muted
+        playsinline
+        aria-hidden="true"
+      >
+        <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
+      </video>
+      <video
+        bind:this={bgVideo2}
+        class="bg-video"
+        class:active={!bgVideo1Active}
+        autoplay
+        loop
+        muted
+        playsinline
+        aria-hidden="true"
+      >
+        <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
+      </video>
+    </div>
   {:else}
     <!-- Static image background — all other themes; video is NOT in DOM -->
     <img
@@ -334,6 +362,7 @@
     overflow: hidden;
   }
 
+  /* Static image backgrounds (non-future-spinner themes) */
   .bg-media {
     position: absolute;
     top: 0;
@@ -343,14 +372,33 @@
     object-fit: cover;
     pointer-events: none;
     display: block;
-    opacity: 0.85;
+    opacity: 0.92;
   }
 
-  /* Video background: slightly more transparent for readability */
-  video.bg-media { opacity: 0.75; }
+  /* Dual-video crossfade container (future-spinner) */
+  .bg-video-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 
-  /* Static image backgrounds: near-full opacity */
-  img.bg-media { opacity: 0.92; }
+  .bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+  }
+
+  .bg-video.active {
+    opacity: 0.85;
+  }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
   .util-btn.theme-btn {
