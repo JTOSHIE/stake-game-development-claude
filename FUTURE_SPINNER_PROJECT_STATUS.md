@@ -158,3 +158,19 @@ Production build passing, 0 TypeScript errors.
 - Frontend: ~/math-sdk/frontend/
 - Branch: main
 - Last commit: see `git log --oneline -1`
+
+## R2 BRIEF IMPLEMENTATION — 2026-04-11
+- ✅ 10 front-facing symbol PNGs installed (idle-png/)
+- ✅ 7 new UI assets installed (panels v2, win pod v2, banner, max bet)
+- ✅ Orbitron font added (Google Fonts)
+- ✅ Background video crossfade (dual-video, no loop jump)
+- ✅ Frame translateY hack removed — frame centred via flexbox
+- ✅ Win Pod v2 — dual LED zones (multiplier + amount), Orbitron
+- ✅ Big win compact banner (top-of-screen, reels visible)
+- ✅ Fullscreen win modal removed from DOM — WinCelebration is small-win-only
+- ✅ BalanceDisplay: Orbitron LED labels (cyan balance, gold bet)
+- ✅ WinDisplay: Orbitron magenta win amount
+- ✅ ControlBar: bet_display.png panel, btn_max.png image button, Orbitron gold bet value
+- ✅ Z-index stack enforced (grid:10, winpod:50, controlbar:60, logo:70, banner:100)
+- ✅ Build: 0 errors, 0 warnings | TSC: clean
+- ✅ Developer handover spec generated (WRS_GameTemplate_Spec_v1.0.md)
