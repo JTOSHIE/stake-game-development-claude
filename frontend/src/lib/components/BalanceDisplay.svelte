@@ -24,9 +24,7 @@
     min-width: 280px;
     height: 90px;
     background-repeat: no-repeat;
-    background-color: rgba(0, 0, 0, 0.75);
-    border: 1px solid var(--theme-primary, #00ffff);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent);
+    background-color: transparent;  /* NO fallback bg — PNG provides all visual */
     border-radius: 6px;
     display: flex;
     align-items: center;
