@@ -301,6 +301,8 @@
     text-align: center;
     padding: 0.75rem 1rem 0.25rem;
     flex-shrink: 0;
+    position: relative;
+    z-index: 70;  /* Z-INDEX STACK: logo / title */
   }
 
   .game-title-area {
@@ -439,7 +441,7 @@
     position: relative;
     display: inline-block;
     overflow: visible;
-    z-index: 1;
+    z-index: 10;  /* Z-INDEX STACK: reel frame + symbols */
     /* Frame PNG provides the border — no CSS border here */
   }
 

@@ -195,6 +195,7 @@
     background: transparent;
     flex-shrink: 0;
     position: relative;
+    z-index: 60;  /* Z-INDEX STACK: bottom controls */
   }
 
   /* ── Utility group (inside aux-cluster) ────────────────────────────────── */
