@@ -21,7 +21,11 @@
       "Bash(md5 ~/math-sdk/frontend/public/assets/themes/oil-and-fire/symbols/*.png)",
       "Bash(md5 ~/math-sdk/frontend/public/assets/themes/beautiful-game/symbols/*.png)",
       "Bash(wc -c ~/math-sdk/frontend/public/assets/themes/source/theme-4-geopolitical/concept-A/frames/*.png)",
-      "Bash(wc -c ~/math-sdk/frontend/public/assets/themes/source/theme-5-soccer/concept-A/frames/*.png)"
+      "Bash(wc -c ~/math-sdk/frontend/public/assets/themes/source/theme-5-soccer/concept-A/frames/*.png)",
+      "Bash(echo \"TSC_EXIT:$?\")",
+      "Bash(echo \"BUILD_EXIT:$?\")",
+      "Bash(grep -i \"premium\\\\|ui.*v1\\\\|FS_UI\\\\|future.*ui\\\\|3d\" echo \"---\" find ~/Downloads -name \"spin_btn.png\")",
+      "Bash(head -3 echo \"---\" ls ~/Downloads/*.zip)"
     ]
   }
 }

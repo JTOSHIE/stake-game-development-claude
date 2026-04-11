@@ -492,8 +492,8 @@
     transition: filter 0.15s ease-out;
   }
 
-  /* CSS spin animation — active while _startSpinAnimation class is set */
-  .symbol-col.spinning {
+  /* CSS spin animation — added via classList.add('spinning') in JS */
+  .symbol-col:global(.spinning) {
     filter: blur(4px) brightness(0.7);
     animation: reel-scroll 0.12s linear infinite;
   }

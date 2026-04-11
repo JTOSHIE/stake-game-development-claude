@@ -1,5 +1,5 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-05 | Animated two-state symbol system complete
+## Last updated: 2026-04-11 | Premium UI + smooth spin + frame nudge complete
 
 ## ANIMATED SYMBOL SYSTEM — 2026-04-05
 - ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
@@ -17,6 +17,19 @@
 - ✅ Column blur (CSS filter) replaces PixiJS BlurFilter
 - ✅ Column bounce (CSS transform) replaces PixiJS container.y animation
 - ✅ TSC: 0 errors | Build: pass
+
+## PREMIUM UI + SPIN FIX + FRAME NUDGE — 2026-04-11
+- ✅ 7 premium 3D UI assets installed (future-spinner theme): spin, bet+/-, autoplay, info/menu btns, balance+win panels
+- ✅ win_pod_idle.png + win_pod_active.png installed to public/assets/ui/
+- ✅ WinPod.svelte created — side multiplier display at right:-110px of grid
+- ✅ WinBanner centre-grid overlay replaced by WinPod
+- ✅ WinDisplay min-width 200→260px for new 340×90 panels
+- ✅ Smooth reel spin: all reels start simultaneously, stop sequentially L→R
+- ✅ Stop timings: 600/900/1200/1500ms (turbo: half); reel 4 last + optional +600ms anticipation
+- ✅ CSS reel-scroll animation + blur during spin; .symbol-col:global(.spinning)
+- ✅ Frame nudge: translateY(8px) closes top gap without changing inset values
+- ✅ Background bleed eliminated (body background-image removed)
+- ✅ TSC: 0 errors | Build: 0 warnings
 
 ## ACTIVE THEME INSTALLATIONS (2026-04-05)
 
