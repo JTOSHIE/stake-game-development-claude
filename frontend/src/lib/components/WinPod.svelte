@@ -1,69 +1,95 @@
 <script lang="ts">
   /**
-   * WinPod.svelte — Side win multiplier display
-   * Replaces the centre-grid WinBanner overlay.
-   * Positioned flush against right edge of frame at vertical centre.
-   * win_pod_active.png erupts on win; multiplier text overlaid via CSS.
+   * WinPod.svelte — Side multiplier/win display (v2)
+   * Positioned flush against right outer edge of reel frame.
+   * Two LED zones: upper = multiplier, lower = win amount.
+   * Uses Orbitron font for premium digital readout appearance.
    */
   import { winMultiplier, winAmount, isSpinning } from '../stores/gameStore'
 
-  // Show active state when there is a win and not spinning
   $: isActive = $winAmount > 0 && !$isSpinning
-  $: multiplierText = $winMultiplier > 0
-    ? `${$winMultiplier.toFixed(1)}×`
+  $: multiplierText = $winMultiplier > 0 ? `${$winMultiplier.toFixed(1)}×` : ''
+  $: amountText = $winAmount > 0
+    ? `${($winAmount / 1_000_000).toFixed(2)}`
     : ''
 </script>
 
 <div class="win-pod" class:active={isActive}>
+  <!-- Background image switches based on win state -->
   <img
-    class="pod-img"
-    src={isActive
-      ? 'assets/ui/win_pod_active.png'
-      : 'assets/ui/win_pod_idle.png'}
-    alt={isActive ? `Win ${multiplierText}` : ''}
+    class="pod-bg"
+    src={isActive ? 'assets/ui/win_pod_v2_active.png' : 'assets/ui/win_pod_v2_idle.png'}
+    alt=""
     draggable="false"
+    aria-hidden="true"
   />
-  {#if isActive && multiplierText}
-    <div class="multiplier-overlay">
-      {multiplierText}
-    </div>
+
+  {#if isActive}
+    <!-- Upper LED zone — multiplier value -->
+    <div class="multiplier-value">{multiplierText}</div>
+    <!-- Lower LED zone — win amount -->
+    <div class="win-value">{amountText}</div>
   {/if}
 </div>
 
 <style>
   .win-pod {
     position: absolute;
-    right: -110px;        /* flush against right outer edge of frame */
+    right: -220px;
     top: 50%;
     transform: translateY(-50%);
-    width: 100px;
-    height: 160px;
-    z-index: 15;
+    width: 200px;
+    height: 320px;
+    z-index: 50;
     pointer-events: none;
-    transition: opacity 0.3s ease;
   }
 
-  .pod-img {
+  .pod-bg {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
   }
 
-  /* Multiplier text overlaid on win_pod_active.png */
-  .multiplier-overlay {
+  /* Upper LED zone — multiplier */
+  .multiplier-value {
     position: absolute;
-    top: 45%;
+    top: 28%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Courier New', monospace;
-    font-size: 1.6rem;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 2rem;
     font-weight: 900;
     color: #FFD700;
-    text-shadow:
-      0 0 20px #FFD700,
-      0 0 40px rgba(255, 215, 0, 0.6);
+    text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+    letter-spacing: 2px;
     white-space: nowrap;
-    letter-spacing: -0.02em;
+  }
+
+  /* Lower LED zone — win amount */
+  .win-value {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #FF00FF;
+    text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  /* Active state glow */
+  .win-pod.active .pod-bg {
+    animation: podGlow 1.5s ease-in-out infinite;
+  }
+
+  @keyframes podGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
   }
 </style>
