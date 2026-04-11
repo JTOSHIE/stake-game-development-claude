@@ -10,7 +10,7 @@
   $: isActive = $winAmount > 0 && !$isSpinning
   $: multiplierText = $winMultiplier > 0 ? `${$winMultiplier.toFixed(1)}×` : ''
   $: amountText = $winAmount > 0
-    ? `${($winAmount / 1_000_000).toFixed(2)}`
+    ? `${$winAmount.toFixed(2)}`
     : ''
 </script>
 
