@@ -341,43 +341,39 @@
     _triggerWinBurst(wins, board)
   }
 
-  // ── Single-reel spin helper ───────────────────────────────────────────────
-  function _spinReel(r: number, finalBoard: string[][], isT: boolean, extraMs = 0): Promise<void> {
-    return new Promise<void>(resolve => {
-      const startTime = performance.now()
-      const duration  = (isT ? 150 + r * 50 : 500 + r * 150) + extraMs
+  // ── Spin animation helpers — add/remove CSS spinning class ──────────────
+  function _startSpinAnimation(colIndex: number): void {
+    const col = colRefs[colIndex]
+    if (col) col.classList.add('spinning')
+  }
 
-      function tick(): void {
-        const elapsed  = performance.now() - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        // Clear blur 200 ms before landing so symbols are readable
-        if (elapsed > duration - 200) _clearColBlur(r)
-        if (progress < 1) {
-          requestAnimationFrame(tick)
-        } else {
-          _clearColBlur(r)
-          // Update this reel's video cells to the final symbols
-          const reel = finalBoard[r] ?? []
-          for (let row = 0; row < ROWS; row++) {
-            const sym = (reel[row] ?? 'L3').toUpperCase()
-            const vid = videoRefs[r][row]
-            if (vid) {
-              vid.setAttribute('data-symbol', sym)
-              vid.src = getIdleSrc(sym)
-              vid.loop = true
-              vid.load()
-              vid.play().catch(() => {})
-              vid.style.opacity = '1'
-            }
-          }
-          playReelStop(r)
-          if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
-          _bounceCol(r).then(resolve)
-        }
+  function _stopSpinAnimation(colIndex: number): void {
+    const col = colRefs[colIndex]
+    if (col) col.classList.remove('spinning')
+  }
+
+  // ── Land a single reel — update videos, sounds, bounce ───────────────────
+  async function _landReel(r: number, finalBoard: string[][]): Promise<void> {
+    _stopSpinAnimation(r)
+    _clearColBlur(r)
+
+    const reel = finalBoard[r] ?? []
+    for (let row = 0; row < ROWS; row++) {
+      const sym = (reel[row] ?? 'L3').toUpperCase()
+      const vid = videoRefs[r][row]
+      if (vid) {
+        vid.setAttribute('data-symbol', sym)
+        vid.src = getIdleSrc(sym)
+        vid.loop = true
+        vid.load()
+        vid.play().catch(() => {})
+        vid.style.opacity = '1'
       }
+    }
 
-      requestAnimationFrame(tick)
-    })
+    playReelStop(r)
+    if ((finalBoard[r] ?? []).some(sym => sym === 'S')) playScatterLand()
+    await _bounceCol(r)
   }
 
   // ── Public API — called by App.svelte ─────────────────────────────────────
@@ -392,26 +388,36 @@
 
     const isT = get(isTurbo)
 
-    // Blur all reels at spin start
-    for (let r = 0; r < REELS; r++) _blurCol(r)
+    // START all reels simultaneously — blur + CSS scroll animation
+    for (let r = 0; r < REELS; r++) {
+      _blurCol(r)
+      _startSpinAnimation(r)
+    }
 
-    // Reels 0–1 land first
-    await Promise.all([0, 1].map(r => _spinReel(r, finalBoard, isT)))
+    // STOP reels sequentially left to right — staggered delays
+    // Normal: 600 / 900 / 1200 / 1500 ms   Turbo: half these
+    const BASE_STOPS = [600, 900, 1200, 1500]
 
-    // Scatter anticipation: 2+ scatters in first two reels → glow remaining
-    const scattersLanded = [0, 1].reduce((acc, r) =>
-      acc + (finalBoard[r] ?? []).filter(s => s === 'S').length, 0)
-    if (scattersLanded >= 2) _scatterAnticipation(1)
+    for (let r = 0; r < 4; r++) {
+      const dur = isT ? BASE_STOPS[r] / 2 : BASE_STOPS[r]
+      await new Promise<void>(resolve => setTimeout(resolve, dur))
+      await _landReel(r, finalBoard)
 
-    // Reels 2–3 land
-    await Promise.all([2, 3].map(r => _spinReel(r, finalBoard, isT)))
-    ;[2, 3].forEach(r => _clearColBlur(r))
+      // Scatter anticipation: check after reel 1 stops
+      if (r === 1) {
+        const scattersLanded = [0, 1].reduce((acc, ri) =>
+          acc + (finalBoard[ri] ?? []).filter(s => s === 'S').length, 0)
+        if (scattersLanded >= 2) _scatterAnticipation(1)
+      }
+    }
 
-    // Anticipation on reel 4: slow it by 600 ms if reels 0–2 near-match high-value
+    // Reel 4 (last) — optional anticipation extra 600 ms before landing
     const anticipate = !isT && _checkAnticipation(finalBoard)
-    if (anticipate) playAnticipation()
-    await _spinReel(4, finalBoard, isT, anticipate ? 600 : 0)
-    _clearColBlur(4)
+    if (anticipate) {
+      playAnticipation()
+      await new Promise<void>(resolve => setTimeout(resolve, 600))
+    }
+    await _landReel(4, finalBoard)
 
     isSpinning.set(false)
   }
@@ -483,6 +489,18 @@
     flex-direction: column;
     gap: 4px;
     will-change: transform, filter;
+    transition: filter 0.15s ease-out;
+  }
+
+  /* CSS spin animation — active while _startSpinAnimation class is set */
+  .symbol-col.spinning {
+    filter: blur(4px) brightness(0.7);
+    animation: reel-scroll 0.12s linear infinite;
+  }
+
+  @keyframes reel-scroll {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
   }
 
   /* Each cell: 120 × 100 px — matches CELL_W / CELL_H */
