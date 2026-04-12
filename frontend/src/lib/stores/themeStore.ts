@@ -31,7 +31,7 @@ export const activeTheme = writable<ThemeConfig>(loadSavedTheme())
 export const themeAssets = derived(activeTheme, ($t) => {
   const b = $t.assetBase
   return {
-    id:        t.id,
+    id:        $t.id,
     assetBase: b,
     // Symbols — standard names, theme folder changes
     symbols: {
