@@ -69,7 +69,10 @@ export function setMuted(val: boolean): void {
 
 export function playBGM(): void {
   if (muted || bgmStarted) return
-  sounds.bgm.play().catch(() => {
+  sounds.bgm.play().then(() => {
+    bgmStarted = true
+  }).catch(() => {
+    // Autoplay blocked — start BGM on first user interaction
     document.addEventListener('click', () => {
       if (!bgmStarted) {
         sounds.bgm.play().catch(() => {})
@@ -77,7 +80,6 @@ export function playBGM(): void {
       }
     }, { once: true })
   })
-  bgmStarted = true
 }
 
 // ── SPIN ────────────────────────────────────────────────────────────────────
