@@ -78,19 +78,24 @@
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMount(() => {
     // Transparent PixiJS canvas — win lines only, no symbol rendering
-    app = new Application({
-      width:           CANVAS_W,
-      height:          CANVAS_H,
-      backgroundAlpha: 0,
-      antialias:       true,
-    })
-    pixiContainer.appendChild(app.view as HTMLCanvasElement)
+    // Wrapped in try/catch: if PixiJS init fails for any reason,
+    // assetLoadProgress must still reach 100 so the loading screen dismisses.
+    try {
+      app = new Application({
+        width:           CANVAS_W,
+        height:          CANVAS_H,
+        backgroundAlpha: 0,
+        antialias:       true,
+      })
+      pixiContainer.appendChild(app.view as HTMLCanvasElement)
+      winHighlightLayer = new Graphics()
+      app.stage.addChild(winHighlightLayer)
+      assetsReady = true
+    } catch (err) {
+      console.error('[GameGrid] PixiJS init failed — win lines disabled:', err)
+    }
 
-    winHighlightLayer = new Graphics()
-    app.stage.addChild(winHighlightLayer)
-
-    assetsReady = true
-    // No async texture loading — signal loading complete immediately
+    // Always signal loading complete — must not stay stuck at 0%
     assetLoadProgress.set(100)
 
     // Initialize all cells to idle L3 (FS video only — non-FS uses reactive template src)
