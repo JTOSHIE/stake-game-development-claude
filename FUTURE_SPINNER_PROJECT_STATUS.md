@@ -200,3 +200,10 @@ Production build passing, 0 TypeScript errors.
 - ✅ _startSpinAnimation/_stopSpinAnimation removed — single _blurCol/_clearColBlur path
 - ✅ Scatter anticipation: overlay brightness tint (not filter on col)
 - ✅ TSC: 0 errors | Build: 0 warnings
+
+## THEME SYMBOL FIX — 2026-04-12
+- ✅ GameGrid.svelte: IDLE_BASE/WIN_BASE/PNG_IDLE now reactive to $themeAssets.id
+- ✅ future-spinner: still uses video symbols (MP4) — unchanged
+- ✅ trap-lane, oil-and-fire, beautiful-game: now load PNG symbols from themes/{id}/symbols/
+- ✅ Win burst: FS uses _win.mp4, other themes use CSS win-flash animation
+- ✅ TSC: 0 errors | Build: 0 warnings | Commit: 864448d

@@ -19,6 +19,7 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "@fontsource/orbitron": "^5.2.8",
     "pixi.js": "^7.4.3",
     "stake-engine": "github:StakeEngine/ts-client"
   }

@@ -120,10 +120,6 @@
 
 <svelte:head>
   <title>{$activeTheme.name} — We Roll Spinners</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"
-    rel="stylesheet"
-  />
 </svelte:head>
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->

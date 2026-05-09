@@ -25,7 +25,9 @@
       "Bash(echo \"TSC_EXIT:$?\")",
       "Bash(echo \"BUILD_EXIT:$?\")",
       "Bash(grep -i \"premium\\\\|ui.*v1\\\\|FS_UI\\\\|future.*ui\\\\|3d\" echo \"---\" find ~/Downloads -name \"spin_btn.png\")",
-      "Bash(head -3 echo \"---\" ls ~/Downloads/*.zip)"
+      "Bash(head -3 echo \"---\" ls ~/Downloads/*.zip)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npm install:*)"
     ]
   }
 }
