@@ -11,7 +11,20 @@
   import WinBanner           from './lib/components/WinBanner.svelte'
   import WinPod              from './lib/components/WinPod.svelte'
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
+  import ReplayMode          from './lib/components/ReplayMode.svelte'
+  import { parseReplayParams } from './lib/services/replayService'
   import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
+
+  // Determine mode synchronously at boot — no async needed.
+  // If replay=true with malformed params, treat as replay so ReplayMode shows
+  // the error state rather than silently falling back to live game.
+  const isReplay = (() => {
+    try {
+      return parseReplayParams() !== null
+    } catch {
+      return new URLSearchParams(window.location.search).get('replay') === 'true'
+    }
+  })()
 
   import {
     isLoading, betAmount, boardSymbols, activeWins,
@@ -32,6 +45,9 @@
   let crossfadeInterval: ReturnType<typeof setInterval> | null = null
 
   onMount(async () => {
+    // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
+    if (isReplay) return
+
     const params  = new URLSearchParams(window.location.search)
     const token   = params.get('session') ?? 'dev-mock-token'
     const gameId  = 'future_spinner'
@@ -165,6 +181,10 @@
   <div class="bg-overlay" aria-hidden="true"></div>
 </div>
 
+{#if isReplay}
+  <!-- Replay mode — no betting controls, balance, autoplay, or theme selector -->
+  <ReplayMode />
+{:else}
 <main
   class="game-wrapper"
   style="
@@ -257,6 +277,7 @@
     <ThemeSelector on:close={() => showThemeSelector = false} />
   {/if}
 </main>
+{/if}
 
 <style>
   :global(*, *::before, *::after) {
