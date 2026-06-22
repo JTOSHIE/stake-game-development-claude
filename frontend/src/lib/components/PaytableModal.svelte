@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { showPaytable, locale } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  import { showPaytable } from '../stores/gameStore'
+  import { tr } from '../i18n/tr'
+  import { isSocial } from '../stores/socialMode'
   import { playClick } from '../services/soundService'
 
   function close(): void {
@@ -11,6 +12,31 @@
   function handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape') close()
   }
+
+  // Social-aware prose. In social mode, gambling framing (win/wins/winnings,
+  // bet) switches to social framing (prize/prizes, play), keeping the seven
+  // disclaimer points intact.
+  $: waysLabel = $isSocial ? 'WAYS' : 'WAYS TO WIN'
+
+  $: rulesList = $isSocial
+    ? [
+        'Prizes pay left to right on adjacent reels starting from reel 1.',
+        'WILD substitutes for all symbols except SCATTER.',
+        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
+        'Maximum prize per play is capped at 5,000× your total play.',
+        'Malfunctions void all pays and plays.',
+      ]
+    : [
+        'Wins pay left to right on adjacent reels starting from reel 1.',
+        'WILD substitutes for all symbols except SCATTER.',
+        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.',
+        'Maximum win per spin is capped at 5,000× your total bet.',
+        'Malfunctions void all pays and plays.',
+      ]
+
+  $: disclaimerText = $isSocial
+    ? 'Malfunction voids all prizes and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Prizes are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
+    : 'Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Winnings are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
 
   // Symbol pay table — paths mirror SYMBOL_TEXTURES in GameGrid.svelte
   const SYMBOLS = [
@@ -35,15 +61,15 @@
   class="modal-backdrop"
   role="dialog"
   aria-modal="true"
-  aria-label={t($locale, 'paytable')}
+  aria-label={$tr('paytable')}
   on:click|self={close}
 >
   <div class="modal-panel">
 
     <!-- ── Header ──────────────────────────────────────────────────── -->
     <div class="modal-header">
-      <h2 class="modal-title">{t($locale, 'paytable')}</h2>
-      <button class="close-btn" on:click={close} aria-label={t($locale, 'close')}>✕</button>
+      <h2 class="modal-title">{$tr('paytable')}</h2>
+      <button class="close-btn" on:click={close} aria-label={$tr('close')}>✕</button>
     </div>
 
     <!-- ── Scrollable body ─────────────────────────────────────────── -->
@@ -55,7 +81,7 @@
         <p class="htw-sub">All matching symbol positions count — no fixed paylines.</p>
         <div class="ways-callout">
           <span class="ways-number">1,024</span>
-          <span class="ways-label">WAYS TO WIN</span>
+          <span class="ways-label">{waysLabel}</span>
         </div>
       </div>
 
@@ -90,13 +116,11 @@
 
       <!-- ── Rules ───────────────────────────────────────────────── -->
       <div class="rules-section">
-        <h3 class="rules-heading">{t($locale, 'rules')}</h3>
+        <h3 class="rules-heading">{$tr('rules')}</h3>
         <ul class="rules-list">
-          <li>Wins pay left to right on adjacent reels starting from reel 1.</li>
-          <li>WILD substitutes for all symbols except SCATTER.</li>
-          <li>3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.</li>
-          <li>Maximum win per spin is capped at 5,000× your total bet.</li>
-          <li>Malfunctions void all pays and plays.</li>
+          {#each rulesList as rule}
+            <li>{rule}</li>
+          {/each}
         </ul>
       </div>
 
@@ -109,19 +133,7 @@
       <!-- ── Disclaimer (Stake Engine seven-point requirement) ────── -->
       <div class="disclaimer-section">
         <h3 class="rules-heading">Disclaimer</h3>
-        <p class="disclaimer-text">
-          Malfunction voids all wins and plays. A stable internet
-          connection is required to play. If your connection drops during
-          a round, reload the game to finish any uncompleted round. The
-          theoretical return to player is calculated over many thousands
-          of plays and does not guarantee any result in a single session.
-          This game display is for illustrative purposes only and does not
-          represent a physical device. Winnings are settled according to
-          the result returned by the Remote Game Server, not from events
-          shown in the web browser. Future Spinner™ and We Roll Spinners™
-          are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All
-          rights reserved.
-        </p>
+        <p class="disclaimer-text">{disclaimerText}</p>
       </div>
 
     </div><!-- /modal-body -->

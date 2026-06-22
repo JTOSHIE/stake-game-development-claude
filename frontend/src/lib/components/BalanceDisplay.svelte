@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { balance, betAmount, locale, currencyCode } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  import { balance, betAmount, currencyCode } from '../stores/gameStore'
+  import { tr } from '../i18n/tr'
 
   // Live currency code from the RGS authenticate response (initRGS applies it
   // to currencyCode). Falls back to USD only if no code is available.
@@ -9,12 +9,12 @@
 
 <div class="balance-panel">
   <div class="field">
-    <div class="led-label">{t($locale, 'balance')}</div>
+    <div class="led-label">{$tr('balance')}</div>
     <div class="led-value cyan">{ccy} {$balance.toFixed(2)}</div>
   </div>
   <div class="divider"></div>
   <div class="field">
-    <div class="led-label">{t($locale, 'bet')}</div>
+    <div class="led-label">{$tr('bet')}</div>
     <div class="led-value gold">{ccy} {$betAmount.toFixed(2)}</div>
   </div>
 </div>

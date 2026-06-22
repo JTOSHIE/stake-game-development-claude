@@ -8,6 +8,7 @@
    */
 
   import { createEventDispatcher, onDestroy } from 'svelte'
+  import { isSocial } from '../stores/socialMode'
 
   export let show: boolean = false
 
@@ -90,14 +91,14 @@
 
       <div class="crown" aria-hidden="true">★ ★ ★</div>
 
-      <h1 class="headline">MAX WIN<br>REACHED!</h1>
+      <h1 class="headline">{$isSocial ? 'MAX PRIZE' : 'MAX WIN'}<br>REACHED!</h1>
 
       <div class="multiplier-wrap">
         <span class="multiplier-value">5,000</span><span class="multiplier-x">×</span>
-        <span class="multiplier-label">BET</span>
+        <span class="multiplier-label">{$isSocial ? 'PLAY' : 'BET'}</span>
       </div>
 
-      <button class="collect-btn" on:click={collect} aria-label="Collect max win">
+      <button class="collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'}>
         COLLECT
       </button>
 

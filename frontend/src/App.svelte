@@ -35,6 +35,18 @@
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
   import { playBGM, playWin } from './lib/services/soundService'
+  import { isSocial } from './lib/stores/socialMode'
+
+  // RGS error strings (set in the locked rgsService) are real-money framed
+  // ("bet", "balance"). In social mode, remap those nouns so no gambling term
+  // reaches the player. This is a display-only transform; the locked service
+  // is untouched.
+  $: errorDisplay = $errorMessage && $isSocial
+    ? $errorMessage
+        .replace(/\bInsufficient balance\b/gi, 'Insufficient coins')
+        .replace(/\bbalance\b/gi, 'coins')
+        .replace(/\bbets?\b/gi, (m) => (m[0] === m[0].toUpperCase() ? 'Play' : 'play'))
+    : $errorMessage
 
   let gridRef: GameGrid
   let showThemeSelector = false
@@ -258,7 +270,7 @@
   </header>
 
   {#if $errorMessage}
-    <div class="error-banner">{$errorMessage}</div>
+    <div class="error-banner">{errorDisplay}</div>
   {/if}
 
   <section class="grid-section">

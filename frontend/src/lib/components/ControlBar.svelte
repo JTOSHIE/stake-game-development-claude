@@ -3,10 +3,10 @@
     betAmount, balance, canSpin,
     isSpinning, isAutoPlay, autoPlayCount,
     isTurbo, isMuted, showPaytable,
-    locale, currencyCode, BET_LEVELS,
+    currencyCode, BET_LEVELS,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
-  import { t } from '../i18n/translations'
+  import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { themeAssets } from '../stores/themeStore'
@@ -112,7 +112,7 @@
   <div class="bet-cluster">
 
     <!-- Max Bet button — left of bet selector -->
-    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !canSetMax} aria-label={t($locale, 'maxBet')}>
+    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !canSetMax} aria-label={$tr('maxBet')}>
       <img src="assets/themes/future-spinner/ui/btn_max.png" alt="MAX" draggable="false"
         on:error={(e) => {
           (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -128,7 +128,7 @@
 
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
-          <span class="bet-label">{t($locale, 'bet')}</span>
+          <span class="bet-label">{$tr('bet')}</span>
           <span class="bet-value led-gold">{$currencyCode || 'USD'} {$betAmount.toFixed(2)}</span>
         </div>
       </div>
@@ -144,11 +144,11 @@
       class:spinning={$isSpinning}
       disabled={!$canSpin}
       on:click={handleSpin}
-      aria-label={t($locale, 'spin')}
+      aria-label={$tr('spin')}
     >
       <img
         src="{$themeAssets.spinButton}"
-        alt={t($locale, 'spin')}
+        alt={$tr('spin')}
         draggable="false"
         on:error={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0' }}
       />
@@ -174,7 +174,7 @@
           class="img-btn auto-btn"
           on:click={() => showAutoMenu = !showAutoMenu}
           disabled={$isSpinning}
-          aria-label={t($locale, 'autoPlay')}
+          aria-label={$tr('autoPlay')}
         >
           <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
@@ -213,8 +213,8 @@
       <button
         class="util-btn"
         on:click={openPaytable}
-        aria-label={t($locale, 'paytable')}
-        title={t($locale, 'paytable')}
+        aria-label={$tr('paytable')}
+        title={$tr('paytable')}
       >ℹ</button>
     </div>
 

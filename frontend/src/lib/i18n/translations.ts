@@ -638,12 +638,40 @@ export const locales: Record<Locale, Translations> = {
 }
 
 // ── Social casino overrides ───────────────────────────────────────────────────
-// In social (free-to-play) mode, remap three labels to non-gambling language.
+// In social (free-to-play) mode, every gambling-framed label is remapped to a
+// non-gambling form so the game complies with social-casino jurisdiction rules
+// (no "bet", "win", "balance", "gambling", or "wager" reaches the player).
+// These apply across all sixteen locales via t(); they are intentionally a
+// single shared map, consistent with the original spin/win/balance overrides.
+//
+//   bet/wager  -> PLAY        balance      -> COINS
+//   win        -> PRIZE       gambling     -> play
 
 export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
+  // Core HUD labels
   spin:    'PLAY',
   win:     'PRIZE',
   balance: 'COINS',
+  // Bet wording -> play wording
+  bet:     'PLAY',
+  betMin:  'MIN PLAY',
+  betMax:  'MAX PLAY',
+  maxBet:  'MAX PLAY',
+  minBet:  'MIN PLAY',
+  // Win wording -> prize wording
+  wincap:  '🏆 MAXIMUM PRIZE — 5,000×!',
+  bigWin:  'BIG PRIZE!',
+  hugeWin: 'HUGE PRIZE!!',
+  megaWin: 'MEGA PRIZE!!!',
+  // Buy-feature wording (no real-money framing)
+  buyBonus:     'BUY FEATURE',
+  buyBonusDesc: 'Guaranteed scatter play — 100× play',
+  // Error / status messages that name money or gambling
+  insufficientBalance:  'Insufficient coins. Please add coins.',
+  gamblingLimitReached: 'Play limit reached.',
+  // Replay disclaimer, social phrasing (no bet/wager framing)
+  replayDisclaimer:
+    'This is a replay of a previously completed play, shown for verification only. The outcome cannot be changed.',
 }
 
 // ── t() — translate a key ─────────────────────────────────────────────────────
