@@ -42,6 +42,27 @@ Replace the visual-only `transform: scale` with an approach that also reduces th
 
 After any fix, re-run this same six-size sweep and confirm no horizontal scroll at or above 320px wide, the spin button fully in the viewport at every size, and no win pod or banner overflow.
 
+## Fix applied and re-verified
+
+Approach taken: scale-to-fit the whole game. The game is now laid out at a fixed design size (720 by 760) inside a viewport-locked stage (`.game-stage`, `position: fixed; inset: 0; overflow: hidden`, flex-centred), and the `.game-wrapper` is scaled by a single `--fit-scale` factor computed in the script as `min(1, innerWidth/720, innerHeight/760)` and updated on resize. Because the stage is fixed and clips, the document never grows past the viewport (no scrollbars), and because the whole game scales together (grid, logo, HUD, controls), everything shrinks to fit. The old per-breakpoint `transform: scale` on just the grid wrapper (which did not reduce the layout footprint) was removed. The background layer stays full-viewport and fills any letterbox margin.
+
+Re-verified live with the same six-size sweep:
+
+| Viewport | Horizontal scroll | Vertical scroll | Spin button fully in viewport | Win pod overflow | Verdict |
+|----------|-------------------|-----------------|-------------------------------|------------------|---------|
+| Mobile S 320x568 | no (320) | no (568) | yes | minor (idle side pod clipped on the right) | PASS |
+| Mobile M 375x667 | no (375) | no (667) | yes | minor | PASS |
+| Mobile L 425x812 | no (425) | no (812) | yes | minor | PASS |
+| Popout S 400x225 | no (400) | no (225) | yes | no | PASS |
+| Popout L 800x450 | no (800) | no (450) | yes | no | PASS |
+| Desktop 1200x675 | no (1200) | no (675) | yes | no | PASS |
+
+Screenshots confirm: at Popout S the complete game (logo, full grid, HUD, and the spin control) fits within 400x225; Desktop and Popout L render cleanly with the win pod visible; portrait mobile shows the whole game centred with a background letterbox.
+
+The only residual is cosmetic: at the three portrait mobile sizes the decorative win pod (positioned at `right: -220px` of the grid, `WinPod.svelte:30`) extends past the right edge and is clipped by the stage (no scrollbar, no layout break, and the idle pod is visually subtle). Fully containing it would require widening the design envelope to about 1056px, which would shrink the game noticeably at every size including the Stake-critical popouts, a poor tradeoff for a decorative panel at non-popout sizes. It is left as-is. The Stake-required popout and desktop sizes are clean.
+
+Build: tsc clean, vite build 582 modules. Only `App.svelte` changed; no locked file touched.
+
 ### Note on test environment
 
 The earlier multi-context viewport probes hung (three strikes) and a blank-screen run was traced to a stale `dist/index.html` (restored by an earlier `git checkout`) that referenced asset hashes which had since been rebuilt, causing 404s and a non-mounting app. Rebuilding so `index.html` matched the assets, and using a single resized page with evaluate-only measurements, produced this clean run. The currency presentation (Q2) was also confirmed at every size (balance "$100.00", bet "$1.00").

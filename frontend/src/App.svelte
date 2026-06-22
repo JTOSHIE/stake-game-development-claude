@@ -58,6 +58,20 @@
   // Pending autoplay continuation, so it can be cancelled when autoplay stops.
   let autoSpinTimer: ReturnType<typeof setTimeout> | null = null
 
+  // ── Scale-to-fit ───────────────────────────────────────────────────────────
+  // The game is laid out at a fixed design size and scaled to fit the viewport,
+  // so the whole UI (grid, logo, HUD, controls) shrinks together and never
+  // overflows or clips at small popout sizes (for example Popout S, 400x225).
+  const DESIGN_W = 720
+  const DESIGN_H = 760
+  function fitFor(): number {
+    if (typeof window === 'undefined') return 1
+    // Never upscale beyond the design size (keeps the canvas crisp on large screens).
+    return Math.min(1, window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H)
+  }
+  let fitScale = fitFor()
+  function handleResize(): void { fitScale = fitFor() }
+
   onMount(async () => {
     // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
     if (isReplay) return
@@ -194,7 +208,7 @@
 
 <!-- Spacebar to spin. The handler is inert in replay mode and while a modal
      is open, so it only acts during normal play. -->
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} on:resize={handleResize} />
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
@@ -243,12 +257,16 @@
   <!-- Replay mode — no betting controls, balance, autoplay, or theme selector -->
   <ReplayMode />
 {:else}
+<!-- Stage clips the viewport and centres the fixed-size game, which is scaled
+     to fit so it never overflows at small popout sizes. -->
+<div class="game-stage">
 <main
   class="game-wrapper"
   style="
     --theme-primary: {$activeTheme.palette.primary};
     --theme-secondary: {$activeTheme.palette.secondary};
     --theme-bg: {$activeTheme.palette.background};
+    --fit-scale: {fitScale};
   "
 >
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
@@ -335,6 +353,7 @@
     <ThemeSelector on:close={() => showThemeSelector = false} />
   {/if}
 </main>
+</div>
 {/if}
 
 <style>
@@ -354,14 +373,30 @@
     height: 100dvh;
   }
 
+  /* Viewport-locked stage: clips overflow and centres the scaled game so the
+     document never grows past the viewport (no scrollbars at any size). */
+  .game-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 2;  /* above video layer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
   .game-wrapper {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
-    max-width: 720px;
-    margin: 0 auto;
+    /* Fixed design size, scaled to fit the viewport via --fit-scale (set in the
+       script and updated on resize). transform-origin centre keeps it centred
+       within the stage; the background layer fills any letterbox margin. */
+    width: 720px;
+    height: 760px;
+    flex: 0 0 auto;
+    transform: scale(var(--fit-scale, 1));
+    transform-origin: center center;
     position: relative;
-    z-index: 2;  /* above video layer */
     /* Subtle dark overlay so grid and UI stay readable over the background */
     background: linear-gradient(
       to bottom,
@@ -537,33 +572,14 @@
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */
-
-  /* Tablet and below */
+  /* The whole game is scaled to fit the viewport via --fit-scale (see the
+     game-stage and game-wrapper rules plus handleResize in the script), so no
+     per-breakpoint grid scaling is needed. The touch-target minimum below
+     applies before scaling. */
   @media (max-width: 768px) {
-    .grid-wrapper {
-      transform: scale(0.75);
-      transform-origin: top center;
-    }
-
     button {
       min-height: 44px;
       min-width: 44px;
-    }
-  }
-
-  /* Phone portrait */
-  @media (max-width: 480px) {
-    .grid-wrapper {
-      transform: scale(0.58);
-      transform-origin: top center;
-    }
-  }
-
-  /* Phone landscape — extra height needed */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .grid-wrapper {
-      transform: scale(0.55);
-      transform-origin: top left;
     }
   }
 
