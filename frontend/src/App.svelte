@@ -55,6 +55,8 @@
   let bgVideo2: HTMLVideoElement
   let bgVideo1Active = true
   let crossfadeInterval: ReturnType<typeof setInterval> | null = null
+  // Pending autoplay continuation, so it can be cancelled when autoplay stops.
+  let autoSpinTimer: ReturnType<typeof setTimeout> | null = null
 
   onMount(async () => {
     // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
@@ -91,7 +93,23 @@
 
   onDestroy(() => {
     if (crossfadeInterval) clearInterval(crossfadeInterval)
+    if (autoSpinTimer) clearTimeout(autoSpinTimer)
   })
+
+  // Q1 fix: cancel a pending autoplay continuation the moment autoplay stops,
+  // so pressing STOP during the inter-spin delay never fires one more bet.
+  $: if (!$isAutoPlay && autoSpinTimer !== null) {
+    clearTimeout(autoSpinTimer)
+    autoSpinTimer = null
+  }
+
+  // Schedule the next autoplay spin. The id is tracked so it can be cancelled.
+  function scheduleAutoSpin(delayMs: number): void {
+    autoSpinTimer = setTimeout(() => {
+      autoSpinTimer = null
+      handleSpin()
+    }, delayMs)
+  }
 
   async function handleSpin() {
     if ($isSpinning) return
@@ -124,22 +142,21 @@
             isAutoPlay.set(false)
             autoPlayCount.set(0)
           } else if (multiplier >= 30) {
-            // Mega win — pause 6 seconds
-            setTimeout(handleSpin, 6000)
+            scheduleAutoSpin(6000)   // Mega win — pause 6 seconds
           } else if (multiplier >= 10) {
-            // Big win — pause 3.5 seconds
-            setTimeout(handleSpin, 3500)
+            scheduleAutoSpin(3500)   // Big win — pause 3.5 seconds
           } else if (multiplier > 0) {
-            // Small/medium win — pause 1.5 seconds
-            setTimeout(handleSpin, 1500)
+            scheduleAutoSpin(1500)   // Small/medium win — pause 1.5 seconds
           } else {
-            // Dead spin — continue at normal pace
-            setTimeout(handleSpin, 800)
+            scheduleAutoSpin(800)    // Dead spin — continue at normal pace
           }
         }
       }
     } catch (err) {
       console.error('[Spin error]', err)
+    } finally {
+      // B1 fix: always release the spin lock, even if animateSpin early-returns
+      // (assets not ready) or throws, so the game can never deadlock after a spin.
       isSpinning.set(false)
     }
   }

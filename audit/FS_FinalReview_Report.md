@@ -29,6 +29,11 @@
 
 **Overall readiness call:** Not quite ready to merge. One BLOCKER (a spin lockup if the renderer fails to initialise) and one notable QUALITY issue (autoplay stop can place one extra bet) should be addressed first. Everything else is quality or cosmetic and can be triaged. The compliance work from prior passes (disclaimer, spacebar, bet levels, currency, scatter 1x/3x/10x, replay, social mode) all still holds and is internally consistent.
 
+> **Update (post-review): B1 and Q1 are now FIXED.** Both were resolved in `App.svelte` (non-locked) and re-verified.
+> - **B1:** `handleSpin` now releases the spin lock in a `finally` block, so the lock is always cleared even when `animateSpin` early-returns (assets not ready), `gridRef` is absent, or any step throws. No deadlock is possible after a spin.
+> - **Q1:** the autoplay continuation timer is now tracked (`autoSpinTimer`) and cancelled the moment autoplay stops (a reactive guard on `isAutoPlay`), and cleared on destroy. Pressing STOP no longer fires an extra bet.
+> - Re-verified live in headless Chromium: a normal spin disables during play and returns to ready (balance 100.00 to 99.00); autoplay started, then STOP left the balance unchanged over a 7 second window (no extra bet), with zero page errors. tsc clean, build 582 modules. With these resolved, the readiness call is now: ready to merge and submit, pending the remaining QUALITY/NOTE items, which are non-blocking.
+
 ---
 
 ## 3. Fixed in this pass (trivial, non-functional)
