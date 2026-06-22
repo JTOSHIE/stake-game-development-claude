@@ -91,7 +91,7 @@
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
           <span class="bet-label">{t($locale, 'bet')}</span>
-          <span class="bet-value led-gold">USD {$betAmount.toFixed(2)}</span>
+          <span class="bet-value led-gold">{$currencyCode || 'USD'} {$betAmount.toFixed(2)}</span>
         </div>
       </div>
 
