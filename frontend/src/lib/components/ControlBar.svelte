@@ -170,10 +170,11 @@
         title={$isMuted ? 'Unmute' : 'Mute'}
       >{$isMuted ? '🔇' : '🔊'}</button>
 
+      <!-- Info/rules stays enabled during a spin so the disclaimer is
+           reachable at all times (Stake Engine requirement). -->
       <button
         class="util-btn"
         on:click={openPaytable}
-        disabled={$isSpinning}
         aria-label={t($locale, 'paytable')}
         title={t($locale, 'paytable')}
       >ℹ</button>

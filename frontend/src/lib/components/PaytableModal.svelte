@@ -106,6 +106,24 @@
         <span class="rtp-value">96.35%</span>
       </div>
 
+      <!-- ── Disclaimer (Stake Engine seven-point requirement) ────── -->
+      <div class="disclaimer-section">
+        <h3 class="rules-heading">Disclaimer</h3>
+        <p class="disclaimer-text">
+          Malfunction voids all wins and plays. A stable internet
+          connection is required to play. If your connection drops during
+          a round, reload the game to finish any uncompleted round. The
+          theoretical return to player is calculated over many thousands
+          of plays and does not guarantee any result in a single session.
+          This game display is for illustrative purposes only and does not
+          represent a physical device. Winnings are settled according to
+          the result returned by the Remote Game Server, not from events
+          shown in the web browser. Future Spinner™ and We Roll Spinners™
+          are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All
+          rights reserved.
+        </p>
+      </div>
+
     </div><!-- /modal-body -->
   </div><!-- /modal-panel -->
 </div>
@@ -372,5 +390,20 @@
     color: #ffd700;
     font-family: 'Courier New', monospace;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  }
+
+  /* ── Disclaimer ───────────────────────────────────────────────────── */
+  .disclaimer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .disclaimer-text {
+    font-size: 0.68rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+    text-align: left;
   }
 </style>

@@ -30,7 +30,7 @@
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     recordSpinResult, resetWin, errorMessage,
-    winMultiplier, showPaytable, isWincap,
+    winMultiplier, showPaytable, isWincap, canSpin,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -132,11 +132,40 @@
     }
   }
 
+  // Spacebar triggers the same action as the spin button (Stake Engine
+  // requirement). Reuses handleSpin and the canSpin guard so it behaves
+  // identically to clicking spin.
+  function handleKeydown(e: KeyboardEvent): void {
+    // Normal-play branch only — never drive a spin in replay mode.
+    if (isReplay) return
+    if (e.code !== 'Space' && e.key !== ' ') return
+
+    // Let space behave normally while typing in a field.
+    const el = document.activeElement as HTMLElement | null
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) {
+      return
+    }
+
+    // Let space behave normally (for example scrolling the modal) while a
+    // modal or overlay is open.
+    if ($showPaytable || showThemeSelector || $isWincap) return
+
+    // From here we own the spacebar: stop the page from scrolling.
+    e.preventDefault()
+
+    // Respect the same guard the spin button uses.
+    if ($canSpin) handleSpin()
+  }
+
 </script>
 
 <svelte:head>
   <title>{$activeTheme.name} — We Roll Spinners</title>
 </svelte:head>
+
+<!-- Spacebar to spin. The handler is inert in replay mode and while a modal
+     is open, so it only acts during normal play. -->
+<svelte:window on:keydown={handleKeydown} />
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
