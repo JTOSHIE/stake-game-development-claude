@@ -23,7 +23,6 @@ function buildSounds() {
   const p = get(themeAssets).sounds
   const s = {
     bgm:                  makeAudio(p.bgm,                  'bgm_loop'),
-    bgmTension:           makeAudio(p.bgmTension,           'bgm_tension'),
     spin:                 makeAudio(p.spin,                 'spin'),
     reelStop:             makeAudio(p.reelStop,             'reel_stop'),
     reelStopAnticipation: makeAudio(p.reelStopAnticipation, 'reel_stop_anticipation'),
@@ -37,7 +36,6 @@ function buildSounds() {
   }
   s.bgm.loop    = true
   s.bgm.volume  = 0.30
-  s.bgmTension.volume           = 0.50
   s.spin.volume                 = 0.70
   s.reelStop.volume             = 0.85
   s.reelStopAnticipation.volume = 0.90
@@ -72,13 +70,19 @@ export function playBGM(): void {
   sounds.bgm.play().then(() => {
     bgmStarted = true
   }).catch(() => {
-    // Autoplay blocked — start BGM on first user interaction
-    document.addEventListener('click', () => {
-      if (!bgmStarted) {
-        sounds.bgm.play().catch(() => {})
-        bgmStarted = true
-      }
-    }, { once: true })
+    // Autoplay blocked — start BGM on the first genuine user gesture, whether
+    // that is a click/tap or a key press (for example the spacebar to spin).
+    // One-shot and idempotent: whichever fires first starts the music once and
+    // removes both listeners so the music never double-starts.
+    const startOnce = (): void => {
+      if (bgmStarted) return
+      bgmStarted = true
+      sounds.bgm.play().catch(() => {})
+      document.removeEventListener('click', startOnce)
+      document.removeEventListener('keydown', startOnce)
+    }
+    document.addEventListener('click', startOnce)
+    document.addEventListener('keydown', startOnce)
   })
 }
 

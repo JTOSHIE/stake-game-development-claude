@@ -7,6 +7,7 @@
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import { tr } from '../i18n/tr'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { themeAssets } from '../stores/themeStore'
   import { createEventDispatcher } from 'svelte'
@@ -128,7 +129,7 @@
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
           <span class="bet-label">{$tr('bet')}</span>
-          <span class="bet-value led-gold">{$currencyCode || 'USD'} {$betAmount.toFixed(2)}</span>
+          <span class="bet-value led-gold">{formatBalance(Math.round($betAmount * CURRENCY_SCALE), $currencyCode || 'USD')}</span>
         </div>
       </div>
 

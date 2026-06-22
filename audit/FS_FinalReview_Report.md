@@ -34,6 +34,12 @@
 > - **Q1:** the autoplay continuation timer is now tracked (`autoSpinTimer`) and cancelled the moment autoplay stops (a reactive guard on `isAutoPlay`), and cleared on destroy. Pressing STOP no longer fires an extra bet.
 > - Re-verified live in headless Chromium: a normal spin disables during play and returns to ready (balance 100.00 to 99.00); autoplay started, then STOP left the balance unchanged over a 7 second window (no extra bet), with zero page errors. tsc clean, build 582 modules. With these resolved, the readiness call is now: ready to merge and submit, pending the remaining QUALITY/NOTE items, which are non-blocking.
 
+> **Update (polish pass): Q2, Q3, and N5 now FIXED; N1, N2, N3, N4, N6 reported (not fixed); N7 deferred to live verification.**
+> - **Q2 (currency consistency):** `BalanceDisplay.svelte` and `ControlBar.svelte` now render balance and bet through the shared `formatBalance` helper (`utils/currency.ts`), matching the win display. Verified live: balance "$100.00", bet "$1.00" on both surfaces (previously "USD 100.00"). The helper maps XGC to "GC", XSC to "SC", and shows any unmapped code as the code itself.
+> - **Q3 (keyboard-first BGM):** `soundService.playBGM` now registers both a `click` and a `keydown` first-gesture listener; whichever fires first starts the music once and removes both listeners (one-shot, idempotent, gesture-gated). Spacebar-first players now get BGM. Verified by code review; headless audio playback is not reliably observable.
+> - **N5 (dead audio wiring):** removed the never-played `bgmTension` audio element from `soundService` (the themeStore path constant is left in place, now unused but harmless, to avoid churn across the four theme definitions).
+> - **Reported, not fixed (carry functional or replay or audio-behaviour risk):** N1 (replay amount NaN guard), N2 (social-by-currency init-order window), N3 (duplicate social resolution in replay), N4 (intentional `any` for dynamic RGS replay events), N6 (mute does not silence an already-playing one-shot clone). N7 (Popout S transform-scale) is left for the live viewport pass.
+
 ---
 
 ## 3. Fixed in this pass (trivial, non-functional)
