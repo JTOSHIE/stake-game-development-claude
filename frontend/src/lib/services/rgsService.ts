@@ -14,6 +14,7 @@
  */
 
 import { errorMessage, isLoading, balance, currencyCode } from '../stores/gameStore'
+import { rgsBetLevels } from '../stores/rgsBetLevels'
 
 // ── Currency ──────────────────────────────────────────────────────────────────
 /** 1 dollar = 1,000,000 micros. Use ONLY integer arithmetic for money. */
@@ -401,6 +402,7 @@ export async function initRGS(_gameId: string, _legacyToken: string): Promise<vo
     // Sync balance and currency from RGS into the game store
     balance.set(auth.balance)
     if (auth.currency) currencyCode.set(auth.currency)
+    rgsBetLevels.set(auth.betLevels)
 
     _rgsMode = true
     _devLog('RGS connected — auth OK', { balance: auth.balance, betLevels: auth.betLevels })
