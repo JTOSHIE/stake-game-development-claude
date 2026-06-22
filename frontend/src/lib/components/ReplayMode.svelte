@@ -32,6 +32,15 @@
 
   import type { ReplayParams, ReplayResponse } from '../services/replayService'
 
+  // i18n — replay supports the ?lang= param; the disclaimer must follow it.
+  import { t, type Locale, type GameMode } from '../i18n/translations'
+
+  // Resolve the locale/mode eagerly so the disclaimer renders correctly even
+  // during the initial loading phase (before onMount assigns `params`).
+  const search = new URLSearchParams(window.location.search)
+  const initialLang = (search.get('lang') ?? 'en') as Locale
+  const initialMode: GameMode = search.get('social') === 'true' ? 'social' : 'real'
+
   let params: ReplayParams | null = null
   let response: ReplayResponse | null = null
   let phase: 'loading' | 'ready' | 'playing' | 'complete' | 'error' = 'loading'
@@ -140,9 +149,18 @@
     ? microsToDisplay(totalBetSpentMicros(params.amount, response.costMultiplier))
     : 0
   $: showCostMultiplier = response ? response.costMultiplier !== 1.0 : false
+
+  // Disclaimer text — prefer parsed params once available, else the eager values.
+  $: locale = (params?.lang ?? initialLang) as Locale
+  $: mode = (params?.social ? 'social' : initialMode) as GameMode
+  $: disclaimer = t(locale, 'replayDisclaimer', mode)
 </script>
 
 <div class="replay-container">
+  <!-- Replay disclaimer — always visible, Stake Engine compliance. Makes clear
+       this is a non-interactive replay of a past round with no real wager. -->
+  <div class="replay-disclaimer" role="note">{disclaimer}</div>
+
   {#if phase === 'loading'}
     <div class="replay-status loading">Loading replay…</div>
   {:else if phase === 'error'}
@@ -208,6 +226,21 @@
     background: #060610;
     font-family: 'Orbitron', sans-serif;
     color: #00FFFF;
+  }
+
+  .replay-disclaimer {
+    flex: 0 0 auto;
+    max-width: 560px;
+    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.08);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    letter-spacing: 0.01em;
   }
 
   .grid-area {
@@ -314,6 +347,10 @@
     .replay-container {
       padding: 1rem 0.5rem;
       gap: 1rem;
+    }
+    .replay-disclaimer {
+      font-size: 0.75rem;
+      padding: 0.625rem 0.75rem;
     }
     .replay-btn {
       min-width: 240px;
