@@ -1,0 +1,113 @@
+{
+  "base_lut": {
+    "path": "/home/user/stake-game-development-claude/games/future_spinner/library/publish_files/lookUpTable_base_0.csv",
+    "n_entries": 100000,
+    "total_weight": "1125899906782849",
+    "weighted_centibets_sum": "108480455978893214",
+    "rtp_pct": 96.34999996479768,
+    "rtp_pct_4dp": 96.35,
+    "hit_rate_pct": 33.57242857075321,
+    "zero_win_pct": 66.42757142924678,
+    "hit_plus_zero_pct": 100.0,
+    "max_centibets": 500000,
+    "max_multiplier_x": 5000.0,
+    "mean_payout_x": 0.9634999996479768,
+    "volatility_std_x": 16.259865219970607,
+    "avg_win_per_winning_spin_x": 2.869914512193898
+  },
+  "buckets": [
+    {
+      "label": "0 (no win)",
+      "weight": 747907964800000.0,
+      "prob_pct": 66.4275714292468,
+      "rtp_contrib_pct": 0.0,
+      "count_rows": 40000
+    },
+    {
+      "label": "0-1x",
+      "weight": 208573539796644.0,
+      "prob_pct": 18.525051697767957,
+      "rtp_contrib_pct": 11.008934785431592,
+      "count_rows": 19560
+    },
+    {
+      "label": "1-2x",
+      "weight": 112453875033376.0,
+      "prob_pct": 9.987910502160194,
+      "rtp_contrib_pct": 12.721377705729642,
+      "count_rows": 11499
+    },
+    {
+      "label": "2-5x",
+      "weight": 12866011373165.0,
+      "prob_pct": 1.1427313649868214,
+      "rtp_contrib_pct": 3.8647704274247094,
+      "count_rows": 14913
+    },
+    {
+      "label": "5-10x",
+      "weight": 13148808675549.0,
+      "prob_pct": 1.167848811100843,
+      "rtp_contrib_pct": 8.5681935736184,
+      "count_rows": 8165
+    },
+    {
+      "label": "10-50x",
+      "weight": 30239462980639.0,
+      "prob_pct": 2.6858038444150303,
+      "rtp_contrib_pct": 51.17482800312536,
+      "count_rows": 5653
+    },
+    {
+      "label": "50-100x",
+      "weight": 647933497454.0,
+      "prob_pct": 0.057548054987002155,
+      "rtp_contrib_pct": 3.509712775707251,
+      "count_rows": 99
+    },
+    {
+      "label": "100-500x",
+      "weight": 51051627022.0,
+      "prob_pct": 0.004534295341392746,
+      "rtp_contrib_pct": 0.5021827238826386,
+      "count_rows": 11
+    },
+    {
+      "label": "500-5000x",
+      "weight": 11258999000.0,
+      "prob_pct": 0.0009999999939756198,
+      "rtp_contrib_pct": 4.9999999698780995,
+      "count_rows": 100
+    }
+  ],
+  "bonus_lut": {
+    "path": "/home/user/stake-game-development-claude/games/future_spinner/library/publish_files/lookUpTable_bonus_0.csv",
+    "n_entries": 100,
+    "total_weight": "100",
+    "mean_payout_x": 100.535,
+    "cost_x": 100.0,
+    "rtp_pct": 100.535,
+    "max_multiplier_x": 5000.0
+  },
+  "hashes": {
+    "game_metadata.json": "b1a8e47a80e6a5dd704b2ca84626fc0945e2cc969aeb45b85955a17beab1f6dc",
+    "lookUpTable_base_0.csv": "04c027b7fad49b5156c3a4dd95285adc441983ceff1fed2bbbb2502c58439470",
+    "lookUpTable_bonus_0.csv": "2da35dda8a0df4beda762ef626180fccdad09da21ec5244bf4568f3cf7c32aa2"
+  },
+  "index_json_present": false,
+  "books_present": false,
+  "scatter": {
+    "source": "library/statistics_summary.json (SDK weighted summary)",
+    "hit_rate_one_in_N": 16.096557805889148,
+    "trigger_rate_pct": 6.212508363956772,
+    "avg_win_x": 95.07297920192711,
+    "raw_sim_count": 6478
+  },
+  "rtp_decomposition": {
+    "basegame_rtp_pct": 71.35000000000001,
+    "scatter_rtp_pct": 20.0,
+    "wincap_rtp_pct": 5.0,
+    "sum_pct": 96.35
+  },
+  "rtp_from_top_1pct_outcomes": 36.518811116147546
+}
