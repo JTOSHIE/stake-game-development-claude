@@ -102,7 +102,7 @@ def main():
     else:
         print("\n(end-round skipped: zero-win round, closed automatically by the RGS)")
 
-    print("\nVERDICT: PASS — authenticate, play"
+    print("\nVERDICT: PASS, authenticate, play"
           + (", end-round" if win and win > 0 else "") + " completed against the live RGS.")
 
 
