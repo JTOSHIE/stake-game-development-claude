@@ -13,7 +13,20 @@
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
   import ReplayMode          from './lib/components/ReplayMode.svelte'
   import { parseReplayParams } from './lib/services/replayService'
-  import { activeTheme, themeAssets } from './lib/stores/themeStore'
+  import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
+  import { DEFAULT_THEME_ID } from './lib/config/themes'
+
+  // ── Submission scope ────────────────────────────────────────────────────────
+  // Ship only the finished, validated Future Spinner experience. The alternate
+  // themes (trap-lane, oil-and-fire, beautiful-game) are unvalidated visual
+  // skins that are not part of the approved maths/PAR submission and have minor
+  // defects (for example missing themed background music), so the theme selector
+  // is dev-only (gated in the markup) and the default theme is forced in the
+  // production build. Reversible: remove this block and the DEV guards on the
+  // theme button and selector to re-enable theme switching.
+  if (!import.meta.env.DEV) {
+    switchTheme(DEFAULT_THEME_ID)
+  }
 
   // Determine mode synchronously at boot — no async needed.
   // If replay=true with malformed params, treat as replay so ReplayMode shows
@@ -337,19 +350,23 @@
 
   <ControlBar on:spin={handleSpin} />
 
-  <!-- Theme selector button -->
-  <button
-    class="util-btn theme-btn"
-    on:click={() => showThemeSelector = true}
-    aria-label="Change theme"
-    title="Change theme"
-  >🎨</button>
+  <!-- Theme selector — dev-only. Hidden in the production submission build so
+       only the validated Future Spinner experience ships (see the scope note
+       in the script). Reversible: remove these import.meta.env.DEV guards. -->
+  {#if import.meta.env.DEV}
+    <button
+      class="util-btn theme-btn"
+      on:click={() => showThemeSelector = true}
+      aria-label="Change theme"
+      title="Change theme"
+    >🎨</button>
+  {/if}
 
   {#if $showPaytable}
     <PaytableModal />
   {/if}
 
-  {#if showThemeSelector}
+  {#if import.meta.env.DEV && showThemeSelector}
     <ThemeSelector on:close={() => showThemeSelector = false} />
   {/if}
 </main>
