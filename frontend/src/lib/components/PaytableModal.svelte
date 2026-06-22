@@ -21,6 +21,7 @@
   $: rulesList = $isSocial
     ? [
         'Prizes pay left to right on adjacent reels starting from reel 1.',
+        'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
         'WILD substitutes for all symbols except SCATTER.',
         '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
         'Maximum prize per play is capped at 5,000× your total play.',
@@ -28,6 +29,7 @@
       ]
     : [
         'Wins pay left to right on adjacent reels starting from reel 1.',
+        'Symbol values shown are per matching way; the total is that value times the number of ways times your bet.',
         'WILD substitutes for all symbols except SCATTER.',
         '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.',
         'Maximum win per spin is capped at 5,000× your total bet.',
@@ -38,18 +40,21 @@
     ? 'Malfunction voids all prizes and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Prizes are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
     : 'Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Winnings are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
 
-  // Symbol pay table — paths mirror SYMBOL_TEXTURES in GameGrid.svelte
+  // Symbol pay table — per-way multipliers, matching the validated maths in
+  // games/future_spinner/game_config.py exactly. Final payout = paytable value
+  // x ways count x bet. pays array is [_, _, 3-of, 4-of, 5-of]. WILD substitutes
+  // for all symbols and has no independent pay; SCAT pays via the scatter table.
   const SYMBOLS = [
-    { name: 'WILD', src: '/assets/symbols/wild_cyberpunk_logo_variant_04.png',                  pays: [null, null, 50,  100, 200] },
+    { name: 'WILD', src: '/assets/symbols/wild_cyberpunk_logo_variant_04.png',                  pays: [null, null, null, null, null] },
     { name: 'SCAT', src: '/assets/symbols/scatter_energy_burst_variant_01.png',                 pays: [null, null, null, null, null] },
-    { name: 'H1',   src: '/assets/symbols/h1_futuristic_rim_variant_02.png',                    pays: [null, null, 25,   75, 150] },
-    { name: 'H2',   src: '/assets/symbols/h2_neon_turbocharger_variant_01.png',                 pays: [null, null, 20,   60, 120] },
-    { name: 'M1',   src: '/assets/symbols/m1_holographic_grille_variant_09_original.png',       pays: [null, null, 15,   40,  80] },
-    { name: 'M2',   src: '/assets/symbols/m2_glowing_exhaust_variant_01.png',                   pays: [null, null, 10,   25,  50] },
-    { name: 'M3',   src: '/assets/symbols/m3_holographic_steering_wheel_variant_03.png',        pays: [null, null,  5,   15,  30] },
-    { name: 'L1',   src: '/assets/symbols/l1_chrome_lug_nut_variant_05.png',                    pays: [null, null,  3,    8,  15] },
-    { name: 'L2',   src: '/assets/symbols/l2_chrome_spark_plug_variant_05.png',                 pays: [null, null,  2,    5,  10] },
-    { name: 'L3',   src: '/assets/symbols/l3_neon_piston_variant_08.png',                       pays: [null, null,  2,    4,   8] },
+    { name: 'H1',   src: '/assets/symbols/h1_futuristic_rim_variant_02.png',                    pays: [null, null, 1.5,  6,    22]   },
+    { name: 'H2',   src: '/assets/symbols/h2_neon_turbocharger_variant_01.png',                 pays: [null, null, 0.8,  3,    10]   },
+    { name: 'M1',   src: '/assets/symbols/m1_holographic_grille_variant_09_original.png',       pays: [null, null, 0.45, 1.5,  5]    },
+    { name: 'M2',   src: '/assets/symbols/m2_glowing_exhaust_variant_01.png',                   pays: [null, null, 0.3,  1,    4]    },
+    { name: 'M3',   src: '/assets/symbols/m3_holographic_steering_wheel_variant_03.png',        pays: [null, null, 0.2,  0.6,  2]    },
+    { name: 'L1',   src: '/assets/symbols/l1_chrome_lug_nut_variant_05.png',                    pays: [null, null, 0.15, 0.45, 1.5]  },
+    { name: 'L2',   src: '/assets/symbols/l2_chrome_spark_plug_variant_05.png',                 pays: [null, null, 0.10, 0.25, 0.8]  },
+    { name: 'L3',   src: '/assets/symbols/l3_neon_piston_variant_08.png',                       pays: [null, null, 0.08, 0.20, 0.65] },
   ] as const
 </script>
 
@@ -104,6 +109,8 @@
               </td>
               {#if sym.name === 'SCAT'}
                 <td colspan="3" class="scatter-note">3× = 1× · 4× = 3× · 5× = 10× multiplier</td>
+              {:else if sym.name === 'WILD'}
+                <td colspan="3" class="scatter-note">Substitutes for all symbols except SCATTER</td>
               {:else}
                 <td class="pay-cell">{sym.pays[2] ?? '—'}</td>
                 <td class="pay-cell">{sym.pays[3] ?? '—'}</td>
