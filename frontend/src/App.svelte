@@ -13,7 +13,7 @@
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
   import ReplayMode          from './lib/components/ReplayMode.svelte'
   import { parseReplayParams } from './lib/services/replayService'
-  import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
+  import { activeTheme, themeAssets } from './lib/stores/themeStore'
 
   // Determine mode synchronously at boot — no async needed.
   // If replay=true with malformed params, treat as replay so ReplayMode shows

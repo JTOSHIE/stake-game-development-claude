@@ -7,7 +7,6 @@
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import { tr } from '../i18n/tr'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { themeAssets } from '../stores/themeStore'
   import { createEventDispatcher } from 'svelte'
