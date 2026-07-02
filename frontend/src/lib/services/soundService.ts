@@ -23,7 +23,6 @@ function buildSounds() {
   const p = get(themeAssets).sounds
   const s = {
     bgm:                  makeAudio(p.bgm,                  'bgm_loop'),
-    bgmTension:           makeAudio(p.bgmTension,           'bgm_tension'),
     spin:                 makeAudio(p.spin,                 'spin'),
     reelStop:             makeAudio(p.reelStop,             'reel_stop'),
     reelStopAnticipation: makeAudio(p.reelStopAnticipation, 'reel_stop_anticipation'),
@@ -37,7 +36,6 @@ function buildSounds() {
   }
   s.bgm.loop    = true
   s.bgm.volume  = 0.30
-  s.bgmTension.volume           = 0.50
   s.spin.volume                 = 0.70
   s.reelStop.volume             = 0.85
   s.reelStopAnticipation.volume = 0.90
@@ -57,12 +55,37 @@ let bgmStarted = false
 let muted = false
 let anticipationActive = false
 
+// One-shot cloned sounds currently playing (reel stops, scatters, small wins,
+// the epic-win echo). Tracked so muting can stop them immediately, not just
+// suppress future sounds.
+const activeClones = new Set<HTMLAudioElement>()
+
+/**
+ * Play a fresh one-shot clone of a base sound and track it so it can be
+ * stopped on mute. The clone removes itself from the set when it finishes.
+ */
+function playClone(base: HTMLAudioElement, volume?: number): void {
+  if (muted) return
+  const clone = base.cloneNode() as HTMLAudioElement
+  clone.volume = volume ?? base.volume
+  activeClones.add(clone)
+  const cleanup = () => activeClones.delete(clone)
+  clone.addEventListener('ended', cleanup, { once: true })
+  clone.play().catch(cleanup)
+}
+
 // Sync with isMuted store
 isMutedStore.subscribe(val => setMuted(val))
 
 export function setMuted(val: boolean): void {
   muted = val
   Object.values(sounds).forEach(s => { s.muted = val })
+  if (val) {
+    // Stop any one-shot clones already playing so disabling sound silences
+    // everything at once, not only future sounds.
+    activeClones.forEach(c => { c.pause(); c.currentTime = 0 })
+    activeClones.clear()
+  }
 }
 
 // ── BGM ─────────────────────────────────────────────────────────────────────
@@ -72,13 +95,19 @@ export function playBGM(): void {
   sounds.bgm.play().then(() => {
     bgmStarted = true
   }).catch(() => {
-    // Autoplay blocked — start BGM on first user interaction
-    document.addEventListener('click', () => {
-      if (!bgmStarted) {
-        sounds.bgm.play().catch(() => {})
-        bgmStarted = true
-      }
-    }, { once: true })
+    // Autoplay blocked — start BGM on the first genuine user gesture, whether
+    // that is a click/tap or a key press (for example the spacebar to spin).
+    // One-shot and idempotent: whichever fires first starts the music once and
+    // removes both listeners so the music never double-starts.
+    const startOnce = (): void => {
+      if (bgmStarted) return
+      bgmStarted = true
+      sounds.bgm.play().catch(() => {})
+      document.removeEventListener('click', startOnce)
+      document.removeEventListener('keydown', startOnce)
+    }
+    document.addEventListener('click', startOnce)
+    document.addEventListener('keydown', startOnce)
   })
 }
 
@@ -109,9 +138,7 @@ export function playReelStop(reelIndex: number = 0): void {
     sounds.reelStopAnticipation.play().catch(() => {})
     stopAnticipation()
   } else {
-    const clone = sounds.reelStop.cloneNode() as HTMLAudioElement
-    clone.volume = sounds.reelStop.volume
-    clone.play().catch(() => {})
+    playClone(sounds.reelStop)
   }
 }
 
@@ -147,9 +174,7 @@ export function stopAnticipation(): void {
  */
 export function playScatterLand(): void {
   if (muted) return
-  const clone = sounds.scatterLand.cloneNode() as HTMLAudioElement
-  clone.volume = sounds.scatterLand.volume
-  clone.play().catch(() => {})
+  playClone(sounds.scatterLand)
 }
 
 // ── WIN SOUNDS ──────────────────────────────────────────────────────────────
@@ -170,11 +195,7 @@ export function playWin(multiplier: number): void {
     sounds.winEpic.currentTime = 0
     sounds.winEpic.play().catch(() => {})
     setTimeout(() => {
-      if (!muted) {
-        const echo = sounds.winEpic.cloneNode() as HTMLAudioElement
-        echo.volume = 0.6
-        echo.play().catch(() => {})
-      }
+      playClone(sounds.winEpic, 0.6)
     }, 800)
   } else if (multiplier >= 10) {
     // Big win
@@ -186,9 +207,7 @@ export function playWin(multiplier: number): void {
     sounds.winMedium.play().catch(() => {})
   } else {
     // Small win — softer version
-    const softWin = sounds.winSmall.cloneNode() as HTMLAudioElement
-    softWin.volume = 0.4
-    softWin.play().catch(() => {})
+    playClone(sounds.winSmall, 0.4)
   }
 }
 

@@ -1,0 +1,126 @@
+{
+  "ways_to_win": {
+    "num_reels": 5,
+    "rows_per_reel": 4,
+    "computed": 1024,
+    "claim": 1024,
+    "match": true
+  },
+  "BR0": {
+    "n_rows": 65,
+    "n_reels": 5,
+    "per_reel_counts": [
+      {
+        "W": 3,
+        "L2": 12,
+        "H1": 2,
+        "L1": 10,
+        "L3": 14,
+        "H2": 3,
+        "S": 2,
+        "M3": 8,
+        "M1": 5,
+        "M2": 6
+      },
+      {
+        "L2": 12,
+        "M3": 8,
+        "M2": 6,
+        "H2": 3,
+        "L3": 14,
+        "M1": 5,
+        "L1": 10,
+        "H1": 2,
+        "W": 3,
+        "S": 2
+      },
+      {
+        "L1": 10,
+        "M2": 6,
+        "M3": 8,
+        "W": 3,
+        "L3": 14,
+        "L2": 12,
+        "M1": 5,
+        "H1": 2,
+        "H2": 3,
+        "S": 2
+      },
+      {
+        "L3": 14,
+        "L2": 12,
+        "M2": 6,
+        "S": 2,
+        "W": 3,
+        "M3": 8,
+        "M1": 5,
+        "H2": 3,
+        "L1": 10,
+        "H1": 2
+      },
+      {
+        "L3": 14,
+        "M3": 8,
+        "L2": 12,
+        "H1": 2,
+        "M2": 6,
+        "H2": 3,
+        "M1": 5,
+        "L1": 10,
+        "W": 3,
+        "S": 2
+      }
+    ],
+    "invalid_symbols": [],
+    "symbols_present": [
+      "H1",
+      "H2",
+      "L1",
+      "L2",
+      "L3",
+      "M1",
+      "M2",
+      "M3",
+      "S",
+      "W"
+    ],
+    "uniform_across_reels": true,
+    "pay_symbols_all_reachable": true
+  },
+  "BRWCAP": {
+    "n_rows": 65,
+    "n_reels": 5,
+    "symbols_present": [
+      "H1",
+      "L3",
+      "W"
+    ],
+    "invalid_symbols": [],
+    "comment": "wincap strip should be high-pay/wild heavy to reach 5000x"
+  },
+  "paytable": {
+    "negative_or_zero": [],
+    "monotonic_by_tier": true,
+    "monotonic_by_match": true,
+    "all_referenced_symbols_valid": true
+  },
+  "scatter_table": {
+    "config": {
+      "3": 1.0,
+      "4": 3.0,
+      "5": 10.0
+    },
+    "monotonic": true,
+    "par_section2_states": {
+      "3": 1.0,
+      "4": 3.0,
+      "5": 10.0
+    },
+    "matches_par_section2": true,
+    "note_stale_comment_values": {
+      "3": 5.0,
+      "4": 15.0,
+      "5": 50.0
+    }
+  }
+}

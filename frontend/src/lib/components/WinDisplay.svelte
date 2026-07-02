@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { winAmount, betAmount, isWincap, scatterCount, locale, currencyCode } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  import { winAmount, betAmount, isWincap, scatterCount, currencyCode } from '../stores/gameStore'
+  import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { onDestroy } from 'svelte'
 
@@ -68,15 +68,15 @@
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
     {#if winTier === 'mega'}
-      <div class="win-label mega">MEGA WIN!</div>
+      <div class="win-label mega">{$tr('megaWin')}</div>
     {:else if winTier === 'big'}
-      <div class="win-label big">BIG WIN!</div>
+      <div class="win-label big">{$tr('bigWin')}</div>
     {:else if $isWincap}
-      <div class="win-label wincap">{t($locale, 'wincap')}</div>
+      <div class="win-label wincap">{$tr('wincap')}</div>
     {:else if scatterKey}
-      <div class="win-label scatter">{t($locale, scatterKey)}</div>
+      <div class="win-label scatter">{$tr(scatterKey)}</div>
     {:else}
-      <div class="win-label idle">{t($locale, 'win')}</div>
+      <div class="win-label idle">{$tr('win')}</div>
     {/if}
 
     <!-- Count-up amount -->
@@ -88,7 +88,7 @@
 {:else}
   <!-- Zero-win state: dim panel matching original layout -->
   <div class="win-panel win-idle">
-    <div class="win-label idle">{t($locale, 'win')}</div>
+    <div class="win-label idle">{$tr('win')}</div>
     <div class="win-amount win-amount--empty">—</div>
   </div>
 {/if}

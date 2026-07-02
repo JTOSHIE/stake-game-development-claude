@@ -43,6 +43,18 @@
     opacity: 0.35;
   }
 
+  /* The pod is a decorative side panel that sits to the right of the grid.
+     In portrait viewports the scale-to-fit factor is width-bound, so the pod
+     would extend past the right edge and be clipped. Hide it there. The win
+     amount is still shown in WinDisplay, and the pod is position:absolute so
+     hiding it does not affect the grid centring. It stays visible at the
+     landscape popout (400x225, 800x450) and desktop (1200x675) sizes. */
+  @media (orientation: portrait) {
+    .win-pod {
+      display: none;
+    }
+  }
+
   .pod-img {
     position: absolute;
     inset: 0;

@@ -1,12 +1,12 @@
 <script lang="ts">
   import {
-    betAmount, canSpin, canIncreaseBet, canSetMaxBet,
+    betAmount, balance, canSpin,
     isSpinning, isAutoPlay, autoPlayCount,
     isTurbo, isMuted, showPaytable,
-    increaseBet, decreaseBet, setMaxBet, setMinBet,
-    locale, currencyCode, BET_LEVELS,
+    currencyCode, BET_LEVELS,
   } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  import { rgsBetLevels } from '../stores/rgsBetLevels'
+  import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { themeAssets } from '../stores/themeStore'
@@ -16,6 +16,39 @@
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
   let showAutoMenu = false
+
+  // ── Bet ladder ────────────────────────────────────────────────────────────
+  // Prefer the RGS-provided levels when present, otherwise the built-in
+  // defaults. Both are number[] in display currency units, so no mapping is
+  // needed. Navigation runs against this list via the public betAmount.set API
+  // (gameStore is not modified).
+  $: activeLevels = $rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS
+
+  /** Return the level in `levels` closest to `value`. */
+  function nearestLevel(levels: number[], value: number): number {
+    return levels.reduce(
+      (best, lvl) => (Math.abs(lvl - value) < Math.abs(best - value) ? lvl : best),
+      levels[0],
+    )
+  }
+
+  // Keep the selected bet valid against the active ladder. When the RGS levels
+  // arrive (or change) and the current bet is not on the ladder, snap to the
+  // nearest valid level so the UI never holds an unselectable value.
+  $: if (activeLevels.length > 0 && !activeLevels.includes($betAmount)) {
+    betAmount.set(nearestLevel(activeLevels, $betAmount))
+  }
+
+  // Affordability-aware guards, mirroring the gameStore behaviour against the
+  // active ladder.
+  $: curIndex = activeLevels.indexOf($betAmount)
+  $: canIncrease =
+    curIndex > -1 &&
+    curIndex < activeLevels.length - 1 &&
+    activeLevels[curIndex + 1] <= $balance
+  $: maxAffordable = activeLevels.filter((l) => l <= $balance)
+  $: canSetMax =
+    maxAffordable.length > 0 && maxAffordable[maxAffordable.length - 1] !== $betAmount
 
   function handleSpin() {
     if ($canSpin) dispatch('spin')
@@ -37,17 +70,22 @@
 
   function handleIncreaseBet() {
     playClick()
-    increaseBet()
+    const idx = activeLevels.indexOf($betAmount)
+    if (idx > -1 && idx < activeLevels.length - 1 && activeLevels[idx + 1] <= $balance) {
+      betAmount.set(activeLevels[idx + 1])
+    }
   }
 
   function handleDecreaseBet() {
     playClick()
-    decreaseBet()
+    const idx = activeLevels.indexOf($betAmount)
+    if (idx > 0) betAmount.set(activeLevels[idx - 1])
   }
 
   function handleMaxBet() {
     playClick()
-    setMaxBet()
+    const affordable = activeLevels.filter((l) => l <= $balance)
+    if (affordable.length) betAmount.set(affordable[affordable.length - 1])
   }
 
   function toggleTurbo() {
@@ -74,7 +112,7 @@
   <div class="bet-cluster">
 
     <!-- Max Bet button — left of bet selector -->
-    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !$canSetMaxBet} aria-label={t($locale, 'maxBet')}>
+    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !canSetMax} aria-label={$tr('maxBet')}>
       <img src="assets/themes/future-spinner/ui/btn_max.png" alt="MAX" draggable="false"
         on:error={(e) => {
           (e.currentTarget as HTMLImageElement).style.display = 'none';
@@ -90,12 +128,12 @@
 
       <div class="bet-value-wrap">
         <div class="bet-text-pill">
-          <span class="bet-label">{t($locale, 'bet')}</span>
-          <span class="bet-value led-gold">USD {$betAmount.toFixed(2)}</span>
+          <span class="bet-label">{$tr('bet')}</span>
+          <span class="bet-value led-gold">{formatBalance(Math.round($betAmount * CURRENCY_SCALE), $currencyCode || 'USD')}</span>
         </div>
       </div>
 
-      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnPlus}')" on:click={handleIncreaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
+      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnPlus}')" on:click={handleIncreaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">+</button>
     </div>
   </div>
 
@@ -106,11 +144,11 @@
       class:spinning={$isSpinning}
       disabled={!$canSpin}
       on:click={handleSpin}
-      aria-label={t($locale, 'spin')}
+      aria-label={$tr('spin')}
     >
       <img
         src="{$themeAssets.spinButton}"
-        alt={t($locale, 'spin')}
+        alt={$tr('spin')}
         draggable="false"
         on:error={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0' }}
       />
@@ -136,7 +174,7 @@
           class="img-btn auto-btn"
           on:click={() => showAutoMenu = !showAutoMenu}
           disabled={$isSpinning}
-          aria-label={t($locale, 'autoPlay')}
+          aria-label={$tr('autoPlay')}
         >
           <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
           <span class="auto-label">AUTO</span>
@@ -170,12 +208,13 @@
         title={$isMuted ? 'Unmute' : 'Mute'}
       >{$isMuted ? '🔇' : '🔊'}</button>
 
+      <!-- Info/rules stays enabled during a spin so the disclaimer is
+           reachable at all times (Stake Engine requirement). -->
       <button
         class="util-btn"
         on:click={openPaytable}
-        disabled={$isSpinning}
-        aria-label={t($locale, 'paytable')}
-        title={t($locale, 'paytable')}
+        aria-label={$tr('paytable')}
+        title={$tr('paytable')}
       >ℹ</button>
     </div>
 

@@ -14,6 +14,19 @@
   import ReplayMode          from './lib/components/ReplayMode.svelte'
   import { parseReplayParams } from './lib/services/replayService'
   import { activeTheme, themeAssets, switchTheme } from './lib/stores/themeStore'
+  import { DEFAULT_THEME_ID } from './lib/config/themes'
+
+  // ── Submission scope ────────────────────────────────────────────────────────
+  // Ship only the finished, validated Future Spinner experience. The alternate
+  // themes (trap-lane, oil-and-fire, beautiful-game) are unvalidated visual
+  // skins that are not part of the approved maths/PAR submission and have minor
+  // defects (for example missing themed background music), so the theme selector
+  // is dev-only (gated in the markup) and the default theme is forced in the
+  // production build. Reversible: remove this block and the DEV guards on the
+  // theme button and selector to re-enable theme switching.
+  if (!import.meta.env.DEV) {
+    switchTheme(DEFAULT_THEME_ID)
+  }
 
   // Determine mode synchronously at boot — no async needed.
   // If replay=true with malformed params, treat as replay so ReplayMode shows
@@ -30,11 +43,23 @@
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     recordSpinResult, resetWin, errorMessage,
-    winMultiplier, showPaytable, isWincap,
+    winMultiplier, showPaytable, isWincap, canSpin,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
   import { playBGM, playWin } from './lib/services/soundService'
+  import { isSocial } from './lib/stores/socialMode'
+
+  // RGS error strings (set in the locked rgsService) are real-money framed
+  // ("bet", "balance"). In social mode, remap those nouns so no gambling term
+  // reaches the player. This is a display-only transform; the locked service
+  // is untouched.
+  $: errorDisplay = $errorMessage && $isSocial
+    ? $errorMessage
+        .replace(/\bInsufficient balance\b/gi, 'Insufficient coins')
+        .replace(/\bbalance\b/gi, 'coins')
+        .replace(/\bbets?\b/gi, (m) => (m[0] === m[0].toUpperCase() ? 'Play' : 'play'))
+    : $errorMessage
 
   let gridRef: GameGrid
   let showThemeSelector = false
@@ -43,6 +68,22 @@
   let bgVideo2: HTMLVideoElement
   let bgVideo1Active = true
   let crossfadeInterval: ReturnType<typeof setInterval> | null = null
+  // Pending autoplay continuation, so it can be cancelled when autoplay stops.
+  let autoSpinTimer: ReturnType<typeof setTimeout> | null = null
+
+  // ── Scale-to-fit ───────────────────────────────────────────────────────────
+  // The game is laid out at a fixed design size and scaled to fit the viewport,
+  // so the whole UI (grid, logo, HUD, controls) shrinks together and never
+  // overflows or clips at small popout sizes (for example Popout S, 400x225).
+  const DESIGN_W = 720
+  const DESIGN_H = 760
+  function fitFor(): number {
+    if (typeof window === 'undefined') return 1
+    // Never upscale beyond the design size (keeps the canvas crisp on large screens).
+    return Math.min(1, window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H)
+  }
+  let fitScale = fitFor()
+  function handleResize(): void { fitScale = fitFor() }
 
   onMount(async () => {
     // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
@@ -79,7 +120,23 @@
 
   onDestroy(() => {
     if (crossfadeInterval) clearInterval(crossfadeInterval)
+    if (autoSpinTimer) clearTimeout(autoSpinTimer)
   })
+
+  // Q1 fix: cancel a pending autoplay continuation the moment autoplay stops,
+  // so pressing STOP during the inter-spin delay never fires one more bet.
+  $: if (!$isAutoPlay && autoSpinTimer !== null) {
+    clearTimeout(autoSpinTimer)
+    autoSpinTimer = null
+  }
+
+  // Schedule the next autoplay spin. The id is tracked so it can be cancelled.
+  function scheduleAutoSpin(delayMs: number): void {
+    autoSpinTimer = setTimeout(() => {
+      autoSpinTimer = null
+      handleSpin()
+    }, delayMs)
+  }
 
   async function handleSpin() {
     if ($isSpinning) return
@@ -112,24 +169,48 @@
             isAutoPlay.set(false)
             autoPlayCount.set(0)
           } else if (multiplier >= 30) {
-            // Mega win — pause 6 seconds
-            setTimeout(handleSpin, 6000)
+            scheduleAutoSpin(6000)   // Mega win — pause 6 seconds
           } else if (multiplier >= 10) {
-            // Big win — pause 3.5 seconds
-            setTimeout(handleSpin, 3500)
+            scheduleAutoSpin(3500)   // Big win — pause 3.5 seconds
           } else if (multiplier > 0) {
-            // Small/medium win — pause 1.5 seconds
-            setTimeout(handleSpin, 1500)
+            scheduleAutoSpin(1500)   // Small/medium win — pause 1.5 seconds
           } else {
-            // Dead spin — continue at normal pace
-            setTimeout(handleSpin, 800)
+            scheduleAutoSpin(800)    // Dead spin — continue at normal pace
           }
         }
       }
     } catch (err) {
       console.error('[Spin error]', err)
+    } finally {
+      // B1 fix: always release the spin lock, even if animateSpin early-returns
+      // (assets not ready) or throws, so the game can never deadlock after a spin.
       isSpinning.set(false)
     }
+  }
+
+  // Spacebar triggers the same action as the spin button (Stake Engine
+  // requirement). Reuses handleSpin and the canSpin guard so it behaves
+  // identically to clicking spin.
+  function handleKeydown(e: KeyboardEvent): void {
+    // Normal-play branch only — never drive a spin in replay mode.
+    if (isReplay) return
+    if (e.code !== 'Space' && e.key !== ' ') return
+
+    // Let space behave normally while typing in a field.
+    const el = document.activeElement as HTMLElement | null
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) {
+      return
+    }
+
+    // Let space behave normally (for example scrolling the modal) while a
+    // modal or overlay is open.
+    if ($showPaytable || showThemeSelector || $isWincap) return
+
+    // From here we own the spacebar: stop the page from scrolling.
+    e.preventDefault()
+
+    // Respect the same guard the spin button uses.
+    if ($canSpin) handleSpin()
   }
 
 </script>
@@ -137,6 +218,10 @@
 <svelte:head>
   <title>{$activeTheme.name} — We Roll Spinners</title>
 </svelte:head>
+
+<!-- Spacebar to spin. The handler is inert in replay mode and while a modal
+     is open, so it only acts during normal play. -->
+<svelte:window on:keydown={handleKeydown} on:resize={handleResize} />
 
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
@@ -185,12 +270,16 @@
   <!-- Replay mode — no betting controls, balance, autoplay, or theme selector -->
   <ReplayMode />
 {:else}
+<!-- Stage clips the viewport and centres the fixed-size game, which is scaled
+     to fit so it never overflows at small popout sizes. -->
+<div class="game-stage">
 <main
   class="game-wrapper"
   style="
     --theme-primary: {$activeTheme.palette.primary};
     --theme-secondary: {$activeTheme.palette.secondary};
     --theme-bg: {$activeTheme.palette.background};
+    --fit-scale: {fitScale};
   "
 >
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
@@ -229,7 +318,7 @@
   </header>
 
   {#if $errorMessage}
-    <div class="error-banner">{$errorMessage}</div>
+    <div class="error-banner">{errorDisplay}</div>
   {/if}
 
   <section class="grid-section">
@@ -261,22 +350,27 @@
 
   <ControlBar on:spin={handleSpin} />
 
-  <!-- Theme selector button -->
-  <button
-    class="util-btn theme-btn"
-    on:click={() => showThemeSelector = true}
-    aria-label="Change theme"
-    title="Change theme"
-  >🎨</button>
+  <!-- Theme selector — dev-only. Hidden in the production submission build so
+       only the validated Future Spinner experience ships (see the scope note
+       in the script). Reversible: remove these import.meta.env.DEV guards. -->
+  {#if import.meta.env.DEV}
+    <button
+      class="util-btn theme-btn"
+      on:click={() => showThemeSelector = true}
+      aria-label="Change theme"
+      title="Change theme"
+    >🎨</button>
+  {/if}
 
   {#if $showPaytable}
     <PaytableModal />
   {/if}
 
-  {#if showThemeSelector}
+  {#if import.meta.env.DEV && showThemeSelector}
     <ThemeSelector on:close={() => showThemeSelector = false} />
   {/if}
 </main>
+</div>
 {/if}
 
 <style>
@@ -296,14 +390,30 @@
     height: 100dvh;
   }
 
+  /* Viewport-locked stage: clips overflow and centres the scaled game so the
+     document never grows past the viewport (no scrollbars at any size). */
+  .game-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 2;  /* above video layer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
   .game-wrapper {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
-    max-width: 720px;
-    margin: 0 auto;
+    /* Fixed design size, scaled to fit the viewport via --fit-scale (set in the
+       script and updated on resize). transform-origin centre keeps it centred
+       within the stage; the background layer fills any letterbox margin. */
+    width: 720px;
+    height: 760px;
+    flex: 0 0 auto;
+    transform: scale(var(--fit-scale, 1));
+    transform-origin: center center;
     position: relative;
-    z-index: 2;  /* above video layer */
     /* Subtle dark overlay so grid and UI stay readable over the background */
     background: linear-gradient(
       to bottom,
@@ -479,33 +589,14 @@
   }
 
   /* ── Mobile responsive ─────────────────────────────────────────────────── */
-
-  /* Tablet and below */
+  /* The whole game is scaled to fit the viewport via --fit-scale (see the
+     game-stage and game-wrapper rules plus handleResize in the script), so no
+     per-breakpoint grid scaling is needed. The touch-target minimum below
+     applies before scaling. */
   @media (max-width: 768px) {
-    .grid-wrapper {
-      transform: scale(0.75);
-      transform-origin: top center;
-    }
-
     button {
       min-height: 44px;
       min-width: 44px;
-    }
-  }
-
-  /* Phone portrait */
-  @media (max-width: 480px) {
-    .grid-wrapper {
-      transform: scale(0.58);
-      transform-origin: top center;
-    }
-  }
-
-  /* Phone landscape — extra height needed */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .grid-wrapper {
-      transform: scale(0.55);
-      transform-origin: top left;
     }
   }
 

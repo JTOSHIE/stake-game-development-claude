@@ -87,8 +87,12 @@
     top: -120px;          /* above the reel frame */
     left: 50%;
     transform: translateX(-50%);
-    width: 800px;
-    height: 200px;
+    /* Fluid: caps at the 800px design width but shrinks to fit small popouts
+       (for example Popout S at 400x225). Aspect ratio keeps the 800x200 art
+       undistorted as it scales. */
+    width: min(800px, 90vw);
+    aspect-ratio: 4 / 1;
+    height: auto;
     z-index: 100;
     pointer-events: none;
   }

@@ -69,8 +69,12 @@ export function parseReplayParams(): ReplayParams | null {
   const social = params.get('social') === 'true'
   const currency = params.get('currency') ?? (social ? 'SC' : 'USD')
 
+  // Guard against a missing or malformed amount: parseInt can yield NaN (or a
+  // non-positive value) for junk input, which would render as "NaN" in the UI.
+  // Fall back to the default 1.00 (CURRENCY_SCALE micros) in that case.
   const rawAmount = params.get('amount')
-  const amount = rawAmount ? parseInt(rawAmount, 10) : CURRENCY_SCALE
+  const parsedAmount = rawAmount !== null ? parseInt(rawAmount, 10) : CURRENCY_SCALE
+  const amount = Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : CURRENCY_SCALE
 
   return {
     replay: true,

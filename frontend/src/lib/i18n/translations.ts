@@ -51,6 +51,8 @@ export interface Translations {
   paytable:             string
   close:                string
   settings:             string
+  // ── Replay mode ───────────────────────────────────────────────────────────
+  replayDisclaimer:     string
 }
 
 // ── English ───────────────────────────────────────────────────────────────────
@@ -86,6 +88,7 @@ const en: Translations = {
   paytable:             'PAYTABLE',
   close:                'CLOSE',
   settings:             'SETTINGS',
+  replayDisclaimer:     'This is a replay of a previously completed bet, shown for verification only. No funds are wagered and the outcome cannot be changed.',
 }
 
 // ── Arabic ────────────────────────────────────────────────────────────────────
@@ -121,6 +124,7 @@ const ar: Translations = {
   paytable:             'جدول الدفع',
   close:                'إغلاق',
   settings:             'الإعدادات',
+  replayDisclaimer:     'هذه إعادة لرهان مكتمل سابقاً، تُعرض للتحقق فقط. لا تتم المراهنة بأي أموال ولا يمكن تغيير النتيجة.',
 }
 
 // ── German ────────────────────────────────────────────────────────────────────
@@ -156,6 +160,7 @@ const de: Translations = {
   paytable:             'GEWINNTABELLE',
   close:                'SCHLIESSEN',
   settings:             'EINSTELLUNGEN',
+  replayDisclaimer:     'Dies ist die Wiederholung eines bereits abgeschlossenen Einsatzes und dient nur zur Überprüfung. Es wird kein Geld eingesetzt und das Ergebnis kann nicht geändert werden.',
 }
 
 // ── Spanish ───────────────────────────────────────────────────────────────────
@@ -191,6 +196,7 @@ const es: Translations = {
   paytable:             'TABLA DE PAGOS',
   close:                'CERRAR',
   settings:             'CONFIGURACIÓN',
+  replayDisclaimer:     'Esta es la repetición de una apuesta ya completada, mostrada solo con fines de verificación. No se apuesta dinero y el resultado no se puede cambiar.',
 }
 
 // ── Finnish ───────────────────────────────────────────────────────────────────
@@ -226,6 +232,7 @@ const fi: Translations = {
   paytable:             'MAKSUTAULUKKO',
   close:                'SULJE',
   settings:             'ASETUKSET',
+  replayDisclaimer:     'Tämä on aiemmin pelatun panoksen toisto, joka näytetään vain vahvistusta varten. Rahaa ei panosteta eikä lopputulosta voi muuttaa.',
 }
 
 // ── French ────────────────────────────────────────────────────────────────────
@@ -261,6 +268,7 @@ const fr: Translations = {
   paytable:             'TABLE DE PAIEMENT',
   close:                'FERMER',
   settings:             'PARAMÈTRES',
+  replayDisclaimer:     "Ceci est la relecture d'une mise déjà terminée, affichée à des fins de vérification uniquement. Aucun fonds n'est misé et le résultat ne peut pas être modifié.",
 }
 
 // ── Hindi ─────────────────────────────────────────────────────────────────────
@@ -296,6 +304,7 @@ const hi: Translations = {
   paytable:             'पे टेबल',
   close:                'बंद करें',
   settings:             'सेटिंग',
+  replayDisclaimer:     'यह पहले पूर्ण किए गए दांव का रीप्ले है, जो केवल सत्यापन के लिए दिखाया गया है। कोई धनराशि दांव पर नहीं लगाई जाती और परिणाम बदला नहीं जा सकता।',
 }
 
 // ── Indonesian ────────────────────────────────────────────────────────────────
@@ -331,6 +340,7 @@ const id: Translations = {
   paytable:             'TABEL BAYAR',
   close:                'TUTUP',
   settings:             'PENGATURAN',
+  replayDisclaimer:     'Ini adalah tayangan ulang taruhan yang sudah selesai, ditampilkan hanya untuk verifikasi. Tidak ada dana yang dipertaruhkan dan hasilnya tidak dapat diubah.',
 }
 
 // ── Japanese ──────────────────────────────────────────────────────────────────
@@ -366,6 +376,7 @@ const ja: Translations = {
   paytable:             '配当表',
   close:                '閉じる',
   settings:             '設定',
+  replayDisclaimer:     'これは完了済みのベットのリプレイで、確認のみを目的として表示されています。資金は賭けられておらず、結果を変更することはできません。',
 }
 
 // ── Korean ────────────────────────────────────────────────────────────────────
@@ -401,6 +412,7 @@ const ko: Translations = {
   paytable:             '배당표',
   close:                '닫기',
   settings:             '설정',
+  replayDisclaimer:     '이것은 이미 완료된 베팅의 리플레이이며 확인용으로만 표시됩니다. 자금이 베팅되지 않으며 결과를 변경할 수 없습니다.',
 }
 
 // ── Polish ────────────────────────────────────────────────────────────────────
@@ -436,6 +448,7 @@ const pl: Translations = {
   paytable:             'TABELA WYPŁAT',
   close:                'ZAMKNIJ',
   settings:             'USTAWIENIA',
+  replayDisclaimer:     'To powtórka wcześniej zakończonego zakładu, pokazana wyłącznie w celu weryfikacji. Nie stawia się żadnych środków, a wyniku nie można zmienić.',
 }
 
 // ── Portuguese ────────────────────────────────────────────────────────────────
@@ -471,6 +484,7 @@ const pt: Translations = {
   paytable:             'TABELA DE PRÊMIOS',
   close:                'FECHAR',
   settings:             'CONFIGURAÇÕES',
+  replayDisclaimer:     'Esta é a repetição de uma aposta já concluída, exibida apenas para verificação. Nenhum valor é apostado e o resultado não pode ser alterado.',
 }
 
 // ── Russian ───────────────────────────────────────────────────────────────────
@@ -506,6 +520,7 @@ const ru: Translations = {
   paytable:             'ТАБЛИЦА ВЫПЛАТ',
   close:                'ЗАКРЫТЬ',
   settings:             'НАСТРОЙКИ',
+  replayDisclaimer:     'Это повтор ранее завершённой ставки, показанный только для проверки. Средства не ставятся, и результат изменить нельзя.',
 }
 
 // ── Turkish ───────────────────────────────────────────────────────────────────
@@ -541,6 +556,7 @@ const tr: Translations = {
   paytable:             'ÖDEME TABLOSU',
   close:                'KAPAT',
   settings:             'AYARLAR',
+  replayDisclaimer:     'Bu, daha önce tamamlanmış bir bahsin yalnızca doğrulama amacıyla gösterilen tekrarıdır. Hiçbir para yatırılmaz ve sonuç değiştirilemez.',
 }
 
 // ── Vietnamese ────────────────────────────────────────────────────────────────
@@ -576,6 +592,7 @@ const vi: Translations = {
   paytable:             'BẢNG THƯỞNG',
   close:                'ĐÓNG',
   settings:             'CÀI ĐẶT',
+  replayDisclaimer:     'Đây là bản phát lại của một lượt cược đã hoàn tất, chỉ hiển thị để xác minh. Không có khoản tiền nào được đặt cược và kết quả không thể thay đổi.',
 }
 
 // ── Chinese (Simplified) ──────────────────────────────────────────────────────
@@ -611,6 +628,7 @@ const zh: Translations = {
   paytable:             '赔付表',
   close:                '关闭',
   settings:             '设置',
+  replayDisclaimer:     '这是先前已完成投注的回放，仅用于验证。不会下注任何资金，且结果无法更改。',
 }
 
 // ── Locale map ────────────────────────────────────────────────────────────────
@@ -620,12 +638,40 @@ export const locales: Record<Locale, Translations> = {
 }
 
 // ── Social casino overrides ───────────────────────────────────────────────────
-// In social (free-to-play) mode, remap three labels to non-gambling language.
+// In social (free-to-play) mode, every gambling-framed label is remapped to a
+// non-gambling form so the game complies with social-casino jurisdiction rules
+// (no "bet", "win", "balance", "gambling", or "wager" reaches the player).
+// These apply across all sixteen locales via t(); they are intentionally a
+// single shared map, consistent with the original spin/win/balance overrides.
+//
+//   bet/wager  -> PLAY        balance      -> COINS
+//   win        -> PRIZE       gambling     -> play
 
 export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
+  // Core HUD labels
   spin:    'PLAY',
   win:     'PRIZE',
   balance: 'COINS',
+  // Bet wording -> play wording
+  bet:     'PLAY',
+  betMin:  'MIN PLAY',
+  betMax:  'MAX PLAY',
+  maxBet:  'MAX PLAY',
+  minBet:  'MIN PLAY',
+  // Win wording -> prize wording
+  wincap:  '🏆 MAXIMUM PRIZE — 5,000×!',
+  bigWin:  'BIG PRIZE!',
+  hugeWin: 'HUGE PRIZE!!',
+  megaWin: 'MEGA PRIZE!!!',
+  // Buy-feature wording (no real-money framing)
+  buyBonus:     'BUY FEATURE',
+  buyBonusDesc: 'Guaranteed scatter play — 100× play',
+  // Error / status messages that name money or gambling
+  insufficientBalance:  'Insufficient coins. Please add coins.',
+  gamblingLimitReached: 'Play limit reached.',
+  // Replay disclaimer, social phrasing (no bet/wager framing)
+  replayDisclaimer:
+    'This is a replay of a previously completed play, shown for verification only. The outcome cannot be changed.',
 }
 
 // ── t() — translate a key ─────────────────────────────────────────────────────

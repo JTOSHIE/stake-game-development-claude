@@ -1,0 +1,75 @@
+{
+  "fresh_metrics": {
+    "rtp": 96.34999996368497,
+    "hit": 33.57242857081257,
+    "zero": 66.42757142918744,
+    "max": 5000.0,
+    "vol": 16.310166257958425,
+    "mean": 0.9634999996368496,
+    "total_weight": 1125899906783855,
+    "n": 100000
+  },
+  "committed_metrics": {
+    "rtp": 96.34999996479768,
+    "hit": 33.57242857075321,
+    "zero": 66.42757142924678,
+    "max": 5000.0,
+    "vol": 16.25986521997547,
+    "mean": 0.9634999996479768,
+    "total_weight": 1125899906782849,
+    "n": 100000
+  },
+  "payouts_identical": true,
+  "weights_identical": false,
+  "bundle": {
+    "index": {
+      "modes": [
+        {
+          "name": "base",
+          "cost": 1.0,
+          "events": "books_base.jsonl.zst",
+          "weights": "lookUpTable_base_0.csv"
+        },
+        {
+          "name": "bonus",
+          "cost": 100.0,
+          "events": "books_bonus.jsonl.zst",
+          "weights": "lookUpTable_bonus_0.csv"
+        }
+      ]
+    },
+    "files_exist": {
+      "books_base.jsonl.zst": true,
+      "lookUpTable_base_0.csv": true,
+      "books_bonus.jsonl.zst": true,
+      "lookUpTable_bonus_0.csv": true
+    },
+    "hashes": {
+      "books_base.jsonl.zst": "a646825de53c53144e6451265cec045108d4a0155d3780b4cd390f1b15bbacf7",
+      "lookUpTable_base_0.csv": "43d62d23a36d427a17eda09249a1748b56a595755a20909c0ccbfdee3d1c70b7",
+      "books_bonus.jsonl.zst": "625fef1602ef97b0b758cbda54d7fd5494b67402b5ec2304ab8c5a1ba238f34f",
+      "lookUpTable_bonus_0.csv": "4c07a2f4d82926298d9bb0f666dda22343e89b523339aa892bef6a028262c614"
+    }
+  },
+  "books": {
+    "round_count": 100000,
+    "sample_cross_checked": 2000,
+    "payout_mismatches_in_sample": 1665,
+    "scatter_award_factors": {
+      "3": [
+        100
+      ],
+      "4": [
+        300
+      ],
+      "5": [
+        1000
+      ]
+    }
+  },
+  "scatter_stats": {
+    "trigger_rate_pct": 6.376562959966709,
+    "avg_win_x": 95.86340913035068,
+    "raw_count": 6478
+  }
+}

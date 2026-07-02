@@ -3,6 +3,7 @@
   // Big wins (10×+) now handled by WinBanner.svelte (compact top banner)
   // Small wins (< 10×) show a brief non-blocking flash below
   import { onDestroy } from 'svelte'
+  import { isSocial } from '../stores/socialMode'
 
   export let winMultiplier: number = 0
 
@@ -28,7 +29,7 @@
 </script>
 
 {#if visible}
-  <div class="small-win-flash">WIN!</div>
+  <div class="small-win-flash">{$isSocial ? 'PRIZE!' : 'WIN!'}</div>
 {/if}
 
 <style>

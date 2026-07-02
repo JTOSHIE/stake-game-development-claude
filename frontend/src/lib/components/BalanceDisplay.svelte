@@ -1,17 +1,24 @@
 <script lang="ts">
-  import { balance, betAmount, locale } from '../stores/gameStore'
-  import { t } from '../i18n/translations'
+  import { balance, betAmount, currencyCode } from '../stores/gameStore'
+  import { tr } from '../i18n/tr'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+
+  // Render balance and bet through the shared currency helper so they present
+  // the same friendly form as the win display (for example "$100.00", "GC 500",
+  // "SC 10.00"). Falls back to USD if no code has arrived from the RGS yet, and
+  // formatBalance shows any unmapped code as the code itself.
+  $: ccy = $currencyCode || 'USD'
 </script>
 
 <div class="balance-panel">
   <div class="field">
-    <div class="led-label">{t($locale, 'balance')}</div>
-    <div class="led-value cyan">USD {$balance.toFixed(2)}</div>
+    <div class="led-label">{$tr('balance')}</div>
+    <div class="led-value cyan">{formatBalance(Math.round($balance * CURRENCY_SCALE), ccy)}</div>
   </div>
   <div class="divider"></div>
   <div class="field">
-    <div class="led-label">{t($locale, 'bet')}</div>
-    <div class="led-value gold">USD {$betAmount.toFixed(2)}</div>
+    <div class="led-label">{$tr('bet')}</div>
+    <div class="led-value gold">{formatBalance(Math.round($betAmount * CURRENCY_SCALE), ccy)}</div>
   </div>
 </div>
 
