@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git status*)", "Bash(git add *)", "Bash(git commit *)", "Bash(git push*)",
+      "Bash(git checkout *)", "Bash(git pull*)", "Bash(git fetch*)", "Bash(git diff*)",
+      "Bash(git log*)", "Bash(git branch*)", "Bash(git rm *)", "Bash(git show*)",
+      "Bash(npm *)", "Bash(npx *)", "Bash(node *)",
+      "Bash(python3 *)", "Bash(pip *)", "Bash(pip3 *)",
+      "Bash(ffmpeg *)", "Bash(ffprobe *)", "Bash(shasum *)",
+      "Bash(ls*)", "Bash(cat *)", "Bash(cp *)", "Bash(mkdir *)", "Bash(grep *)",
+      "Bash(find *)", "Bash(du *)", "Bash(head *)", "Bash(tail *)", "Bash(wc *)",
+      "Bash(diff *)", "Bash(sed *)", "Bash(brew install *)", "Bash(gh *)",
+      "WebFetch(domain:stake-engine.com)"
+    ],
+    "ask": ["Bash(rm *)"],
+    "deny": [
+      "Edit(frontend/src/lib/services/rgsService.ts)",
+      "Write(frontend/src/lib/services/rgsService.ts)",
+      "Edit(frontend/src/lib/stores/gameStore.ts)",
+      "Write(frontend/src/lib/stores/gameStore.ts)",
+      "Edit(games/future_spinner/**)",
+      "Write(games/future_spinner/**)",
+      "Bash(git push * --force*)",
+      "Bash(sudo *)"
+    ]
+  }
+}
