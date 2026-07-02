@@ -70,7 +70,9 @@ except ImportError:
 
 # Scatter multiplier table: {count → total-bet multiplier}
 # 0-2 scatters → no award; 3-5 scatters → instant multiplier on that spin.
-_SCATTER_MULTIPLIER_TABLE: dict[int, int] = {3: 5, 4: 15, 5: 50}
+# True shipped values: 3 → 1x, 4 → 3x, 5 → 10x (used by the standalone test
+# layer only; the pipeline reads GameConfig.scatter_multiplier_table).
+_SCATTER_MULTIPLIER_TABLE: dict[int, int] = {3: 1, 4: 3, 5: 10}
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -597,7 +599,17 @@ class GameCalculation(Executables):
         ``running_bet_win`` is updated inside ``update_spinwin()`` so that
         ``setTotalWin`` reflects the current spin total at emission time.
         """
-        self.win_data = Ways.get_ways_data(self.config, self.board)
+        # multiplier_strategy="global" applies the Overdrive meter
+        # (self.global_multiplier) uniformly to every ways win. In the base game
+        # the meter is 1x (no change); during free spins it is the current
+        # Overdrive value. Future Spinner Wilds carry no symbol multiplier, so
+        # the global strategy is the correct and only multiplier source.
+        self.win_data = Ways.get_ways_data(
+            self.config,
+            self.board,
+            global_multiplier=self.global_multiplier,
+            multiplier_strategy="global",
+        )
         if self.win_data["totalWin"] > 0:
             Ways.record_ways_wins(self)
             self.win_manager.update_spinwin(self.win_data["totalWin"])
@@ -605,105 +617,55 @@ class GameCalculation(Executables):
 
     def evaluate_scatter_multiplier(self) -> None:
         """
-        Award the instant scatter multiplier win and emit the corresponding events.
+        Award the instant scatter pay and emit its events. Scaled by the
+        Overdrive meter.
 
-        Design
-        ------
-        The scatter (S) is fully **stateless**: it pays a fixed bet-multiplier
-        the moment it lands and never triggers a free-spin round.  This method
-        is called after ``evaluate_ways_board()`` on every spin.
+        The scatter (S) pays a fixed multiple of TOTAL BET the moment 3+ land:
+        3 -> 1x, 4 -> 3x, 5 -> 10x (from ``GameConfig.scatter_multiplier_table``).
+        The award is multiplied by the current Overdrive meter
+        (``self.global_multiplier``): 1x in the base game, and the current meter
+        value during free spins.
 
-        Scatter multiplier table (from ``GameConfig.scatter_multiplier_table``):
+        This method ONLY pays the instant award. The free-spin TRIGGER (and its
+        force-file scatter record) is handled by the freegame flow in gamestate
+        (``run_freespin_from_base``), so this method does not set
+        ``triggered_freegame`` and does not record the trigger. Keeping the
+        record in one place gives a clean once-per-triggered-round trigger rate.
 
-        ========= =============
-        Scatters  Award
-        ========= =============
-        0 – 2     No award
-        3         5×  total bet
-        4         15× total bet
-        5         50× total bet
-        ========= =============
-
-        ``triggered_freegame`` and ``force_freegame``
-        ----------------------------------------------
-        Distributions with ``criteria="scatter"`` are configured with
-        ``force_freegame=True`` in ``GameConfig``.  ``check_repeat()`` sets
-        ``repeat=True`` if ``triggered_freegame`` is still ``False`` at loop
-        exit.  To prevent infinite resampling:
-
-        * ``self.triggered_freegame = True`` is set **before** any early return,
-          as soon as a qualifying scatter count (≥ 3) is detected.
-        * This flag is set even when ``wincap_triggered`` prevents an actual win.
-
-        Wincap guard
-        ------------
-        If ``evaluate_ways_board()`` already pushed the running total to
-        wincap, no additional win is awarded.  ``triggered_freegame`` and the
-        force-file record are both still set for correctness.
-
-        Event flow (scatter win awarded, wincap not pre-triggered)
-        -----------------------------------------------------------
-        ::
-
-            winInfo      ← scatter win breakdown (custom positions + amount)
-            [wincap]     ← only if this scatter win hits the cap
-            setWin       ← cumulative spin_win (skipped if wincap)
-            setTotalWin  ← running_bet_win (ways + scatter combined)
+        Event flow (award made, wincap not already reached):
+            winInfo -> [wincap] -> setWin -> setTotalWin
         """
         scatter_count = self.count_special_symbols("scatter")
 
-        # Counts 0-2: no qualifying scatter — return with no side-effects.
-        # Non-scatter criteria use force_freegame=False so triggered_freegame
-        # is irrelevant; scatter criteria always force ≥3 scatter symbols via
-        # draw_board(), so this branch is only reached for criteria "wincap",
-        # "0", and "basegame" when random scatter happen to land at low counts.
-        if scatter_count not in self.config.scatter_multiplier_table:
+        # 0-2 scatters pay nothing.
+        if scatter_count < min(self.config.scatter_multiplier_table.keys()):
             return
 
-        # -- Must set triggered_freegame BEFORE any further early return --------
-        # Satisfies check_repeat()'s force_freegame guard for scatter criteria.
-        self.triggered_freegame = True
-
-        # -- Record for force file / optimiser ---------------------------------
-        # Always record regardless of wincap state so the optimiser sees the
-        # true scatter-count distribution without gaps from early exits.
-        self.record(
-            {
-                "kind":     scatter_count,
-                "symbol":   "scatter",
-                "gametype": self.gametype,
-            }
-        )
-
-        # -- Wincap guard ------------------------------------------------------
-        # triggered_freegame and the force-file record are both set above.
+        # If the win cap was already reached this spin, award nothing further.
         if self.wincap_triggered:
             return
 
-        # -- Award scatter win -------------------------------------------------
-        # Multiplier is an integer (5, 15, or 50) expressed in bet-multiples.
-        # In SDK terms: 1.0 cost-unit == 1.0 bet-unit, so multiplier == win.
-        multiplier   = self.config.scatter_multiplier_table[scatter_count]
-        scatter_win  = float(multiplier)
+        # Free-spin draws are natural and scatters can stack, so counts above 5
+        # are possible; they pay the top (5-scatter) award. Instant award
+        # (bet-multiple) scaled by the current Overdrive meter.
+        award_count = min(scatter_count, max(self.config.scatter_multiplier_table.keys()))
+        base_award = self.config.scatter_multiplier_table[award_count]
+        scatter_win = round(base_award * self.global_multiplier, 2)
 
-        # Build win_data in the shape win_info_event() expects.
         # positions come from special_syms_on_board (populated by draw_board).
-        # The +1 row padding offset is applied inside win_info_event() automatically.
         scatter_positions = list(self.special_syms_on_board["scatter"])
         self.win_data = {
             "totalWin": scatter_win,
             "wins": [
                 {
-                    "symbol":   "S",
-                    "kind":     scatter_count,
-                    "win":      scatter_win,
+                    "symbol":    "S",
+                    "kind":      scatter_count,
+                    "win":       scatter_win,
                     "positions": scatter_positions,
                     "meta": {
-                        # Reuse "ways" key with scatter count for event-schema
-                        # consistency with the ways-win meta shape.
                         "ways":           scatter_count,
-                        "globalMult":     1,
-                        "winWithoutMult": scatter_win,
+                        "globalMult":     self.global_multiplier,
+                        "winWithoutMult": round(base_award, 2),
                         "symbolMult":     0,
                     },
                 }
@@ -711,13 +673,12 @@ class GameCalculation(Executables):
         }
 
         # Accumulate into spin_win AND running_bet_win simultaneously.
-        # After this call, set_total_event() will reflect ways + scatter total.
         self.win_manager.update_spinwin(scatter_win)
 
-        # Emit the scatter win event sequence
+        # Emit the scatter win event sequence.
         win_info_event(self)     # winInfo     — scatter win positions + amount
         self.evaluate_wincap()   # [wincap]    — emitted only if now triggered
-        set_win_event(self)      # setWin      — cumulative spin_win (skipped if wincap)
+        set_win_event(self)      # setWin      — cumulative spin_win
         set_total_event(self)    # setTotalWin — running bet win (ways + scatter)
 
 

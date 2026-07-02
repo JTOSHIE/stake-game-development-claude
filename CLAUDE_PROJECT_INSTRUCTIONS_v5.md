@@ -1,13 +1,17 @@
 # Claude Project Instructions: We Roll Spinners
 
-**Version:** 5.0
+**Version:** 5.1
 **Date:** July 2026
 **Status:** ACTIVE. Supersedes v4 and all earlier versions.
 
-> Provenance note: v4 was not present in the repository. This v5 is a full rewrite
+> Provenance note: v4 was not present in the repository. This manual is a full rewrite
 > derived from v3 (the latest predecessor on disk), the current state of the repository,
 > and the decisions recorded below. Australian English, metric units, and no em dashes or
 > en dashes anywhere in this project.
+>
+> v5.1 change: the owner decided Option C, to ship a real bonus feature. The game is now a
+> two-mode package (base + bonus buy) built around OVERDRIVE FREE SPINS. Sections 2, 3, 8
+> and 10 updated accordingly; the earlier base-only single-mode statement is superseded.
 
 ---
 
@@ -29,33 +33,39 @@
 |---|---|
 | Theme | Cyberpunk spinners: automotive parts in a neon megacity |
 | Grid | 5x4, 1,024 ways to win |
-| Modes | Base game only. Exactly one bet mode: `base`, cost 1.0x |
-| RTP | 96.3500% at four decimal places (exact arithmetic 96.34999996...%, matching the committed baseline) |
-| Hit rate | 33.5724% |
-| Max win | 5,000x |
-| Volatility | Medium-high, weighted SD 16.23x |
-| Scatter | Instant multiplier of total bet: 3 = 1x, 4 = 3x, 5 = 10x. Stateless, stacks with ways wins |
-| Scatter trigger rate | 6.37% |
-| Scatter average win | 97.6x |
-| Status | Canonical base-only package merged and verified. Design elevation in progress. Submission pending. |
+| Feature | OVERDRIVE FREE SPINS with a progressive win multiplier |
+| Modes | Two: `base` (cost 1.0x) and `bonus` buy (cost 100.0x). Stateless |
+| RTP | 96.3500% at 4dp both modes (base 10dp 96.3499998727%, bonus 96.3499999962%) |
+| Max win | 5,000x (hard cap both modes) |
+| Base hit rate | 29.11% |
+| Base volatility | Medium-high, weighted SD 17.28x |
+| Trigger rate | 1 in 184.7 base spins (0.5415%) |
+| Scatter | Instant 1x/3x/10x total bet on 3/4/5, plus 8/12/16 free spins. Retrigger 3+ gives +5 |
+| Bonus buy | 100.0x, guarantees a trigger; average bought outcome 96.35x |
+| Status | Two-mode Overdrive maths package built and verified. Feature frontend (Stage 2) pending. Submission pending. |
 
-Scatter is 1x/3x/10x everywhere: maths, PAR sheet, frontend paytable, and all blurbs.
+Scatter instant pays are 1x/3x/10x everywhere: maths and PAR. The frontend still reflects
+the old base-only presentation until the Stage 2 feature frontend wires the free spins.
 It is not 5x/15x/50x. Any surviving 5/15/50 reference is a bug to fix.
 
-## 3. Maths: canonical base-only package (merged and verified)
+## 3. Maths: two-mode Overdrive package (built and verified)
 
-The maths package is complete and canonical. The previously-present but unshipped 100x
-buy-bonus mode has been removed at source, the publish files were regenerated from the
-repo, and the PAR sheet was regenerated from the canonical artefact.
+The maths package ships two bet modes built around OVERDRIVE FREE SPINS (see Section 2 and
+the PAR sheet). 3/4/5 scatters award 8/12/16 free spins plus an instant 1x/3x/10x pay; the
+Overdrive meter rises +1x after every winning free spin and applies to all subsequent wins;
+3+ scatters retrigger +5; the bonus buy (100x) guarantees a trigger. The paytable is
+unchanged from the earlier package.
 
-Verified at merge:
-- New base payouts byte-identical to the prior committed lookup table, positionally and as
-  a sorted multiset.
-- Books match the lookup table (100,000 rounds), maximum exactly 5,000.00x, none over cap.
-- RTP 96.3500% at four decimal places, using the same integer arithmetic as `audit/analyze.py`.
-- PAR sheet section 11 is a Single Mode Declaration. No reviewer notes required.
+Verified at build (both modes, 100,000 rounds each):
+- RTP 96.3500% at 4dp in both modes (exact integer arithmetic, same method as `audit/analyze.py`).
+- Books match the lookup tables positionally by id and as sorted multisets.
+- Maximum win exactly 5,000.00x, zero rounds over cap.
+- Determinism: fixed seeds reproduce identical payouts.
+- Round-shape audit: correct trigger counts, retriggers, Overdrive multiplier progression,
+  instant scatter pays, and payout reconciliation in every sampled round.
+- index.json lists both modes with costs; game_metadata modes are ["base", "bonus"].
 
-No further maths work is expected. The maths directory is locked (see Section 5).
+The maths directory is locked again after this build (see Section 5).
 
 ## 4. Assets: in-house vector design system (Manus retired)
 
@@ -130,11 +140,18 @@ Never multiply dollars by a multiplier directly. Logic lives in `rgsService.ts`,
 
 ## 8. Remaining pass sequence
 
-1. **AssetForge v2**: after design batch approvals. Render the approved symbol lineup and
+1. **Feature frontend (Stage 2)**: wire the Overdrive Free Spins into the frontend (free-spin
+   loop, Overdrive meter display, retrigger, buy-bonus entry). Bonus-buy replays must display
+   the amount spent including the 100x cost multiplier, and the jurisdiction flag
+   `disabledBuyFeature` must hide the buy. Update the frontend paytable and blurbs to the
+   feature (scatter 1x/3x/10x plus 8/12/16 free spins).
+2. **AssetForge v2**: after design batch approvals. Render the approved symbol lineup and
    UI from the vector masters through the pipeline at exact target sizes.
-2. **Motion Polish v2**: animation and feel pass over the rendered assets.
-3. **Build Diet v2**: bundle size reduction (a named quality-ranking factor).
-4. **Submission**: upload the bundle, use the portal Developer Testing Tool, run the live
+3. **Motion Polish v2**: animation and feel pass over the rendered assets.
+4. **Build Diet v2**: bundle size reduction (a named quality-ranking factor).
+5. **Compliance re-validation**: re-run the checks against the live docs for the two-mode
+   feature game (buy-feature disclosure, replay of both modes, social mode).
+6. **Submission**: upload the bundle, use the portal Developer Testing Tool, run the live
    RGS check (authenticate, play, end-round), then request review with the blurb and the
    captured replay event IDs.
 
@@ -159,12 +176,14 @@ Never multiply dollars by a multiplier directly. Logic lives in `rgsService.ts`,
 Verified against the current live docs (see `docs/stake-engine-live/` and
 `COMPLIANCE_WATCH.md`): strictly stateless, no jackpot or gamble or continuation or early
 cashout, original in-house IP, no Stake branding, no underage appeal, social mode for
-stake.us jurisdiction terms, Bet Replay implemented. Open item from the quality-rankings
-page: base-only single-mode is fully compliant but may cap the star rating, since the docs
-list additional mechanics as expected in competitive submissions. This is an owner decision,
-recorded in `COMPLIANCE_WATCH.md`.
+stake.us jurisdiction terms, Bet Replay implemented. The earlier open item, that a base-only
+single-mode game might cap the star rating because the quality-rankings page expects
+additional mechanics, is now RESOLVED by shipping the Overdrive Free Spins feature (Option
+C). Two Stage 2 items are recorded in `COMPLIANCE_WATCH.md`: bonus-buy replays must display
+the amount spent including the cost multiplier, and the jurisdiction flag
+`disabledBuyFeature` must hide the buy.
 
 ---
 
-**Studio:** We Roll Spinners . **Game:** Future Spinner . **Instructions version:** 5.0 .
+**Studio:** We Roll Spinners . **Game:** Future Spinner . **Instructions version:** 5.1 .
 **Supersedes:** v4 and earlier.
