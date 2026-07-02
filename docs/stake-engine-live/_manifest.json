@@ -1,0 +1,45 @@
+{
+  "fetched": "2026-07-03",
+  "pages": [
+    {
+      "slug": "approval-guidelines",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines",
+      "sha256": "9e2713a17e0752804a2fc4f9db68904c95a1b2eab0fc4d662bdb5e4f7e400555",
+      "chars": 2250,
+      "looks_real": true,
+      "error": null
+    },
+    {
+      "slug": "jurisdiction-requirements",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements",
+      "sha256": "b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c",
+      "chars": 1375,
+      "looks_real": true,
+      "error": null
+    },
+    {
+      "slug": "game-quality-rankings",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-quality-rankings",
+      "sha256": "0454dcc257c08a49717e1cc27a856f5c696aaee02e5009848c60239dba265dcf",
+      "chars": 3245,
+      "looks_real": true,
+      "error": null
+    },
+    {
+      "slug": "game-replay-requirements",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-replay-requirements",
+      "sha256": "789dcfd5ff7bc592582440aae2e098156026bb88f40b2ec75224ad1cb3afa536",
+      "chars": 5037,
+      "looks_real": true,
+      "error": null
+    },
+    {
+      "slug": "changelog",
+      "resolved_url": "https://stake-engine.com/docs/updates",
+      "sha256": "312569dd18e2263f87e9467888e6d3180e8a4ea43dca437771d0abd248d1f69c",
+      "chars": 88,
+      "looks_real": false,
+      "error": null
+    }
+  ]
+}
