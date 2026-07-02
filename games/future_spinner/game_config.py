@@ -1,9 +1,46 @@
 # File: game_config.py
 # Game: Future Spinner by We Roll Spinners
-# Purpose: Complete static game configuration — grid, paytable, symbol tiers,
-#          reel definitions, win mechanics, bet modes, distributions, and
-#          optimizer parameters. This is the single source of truth for all
-#          math inputs to the simulation pipeline.
+# Purpose: Complete static game configuration for the two-mode OVERDRIVE FREE
+#          SPINS release. Grid, paytable, symbol tiers, reel definitions, win
+#          mechanics, free-spin triggers, and the two bet modes (base + bonus
+#          buy). Optimiser parameters live in game_optimization.py.
+#
+# FEATURE: OVERDRIVE FREE SPINS
+# -----------------------------
+# * Trigger: 3, 4 or 5 scatters in the base game award 8, 12 or 16 free spins
+#   AND still pay the instant scatter award of 1x, 3x or 10x total bet.
+# * Overdrive meter: the bonus starts at multiplier 1x. After every WINNING free
+#   spin the multiplier increases by +1x and applies to all subsequent free-spin
+#   wins (ways wins and scatter pays alike). It never resets during the bonus and
+#   is not retroactive. No cap beyond the round win cap.
+# * Retrigger: 3 or more scatters during free spins award +5 free spins and pay
+#   their instant scatter award multiplied by the current Overdrive multiplier.
+# * Bonus buy: second bet mode "bonus", cost 100.0x, guarantees a 3+ scatter
+#   trigger spin.
+# * Win cap: 5,000x total per round, hard, both modes.
+# * The whole feature resolves inside ONE stateless book round.
+#
+# RTP BUDGET (target 96.3500% both modes; final split reported in the PAR sheet)
+# -----------------------------------------------------------------------------
+# BASE MODE (cost 1.0x): the freegame fence bundles the instant scatter pays
+#   (~0.04) and the free-spin winnings (~0.34) because both occur in the same
+#   forced-trigger rounds.
+#   wincap    0.0500   maximum-win rounds (free spins reaching 5,000x)
+#   freegame  0.3800   instant scatter pays + free-spin winnings
+#   basegame  0.5335   base ways-to-win outcomes
+#   0         0.0000   zero-win spins
+#   TOTAL     0.9635
+# BONUS MODE (cost 100.0x): guaranteed trigger.
+#   wincap    0.0500
+#   freegame  0.9135
+#   TOTAL     0.9635
+#
+# TRIGGER RATE: free spins are designed to trigger roughly once per 150 to 220
+#   base spins. Base criteria "0" and "basegame" use force_freegame=False, and
+#   draw_board() resamples any board holding 3+ scatters (the minimum
+#   freespin_triggers key), so accidental triggers never occur there. Every
+#   trigger comes from the forced "freegame"/"wincap" criteria, giving precise
+#   control of the trigger rate through the freegame fence hit-rate.
 
 import os
 from src.config.config import Config
@@ -11,91 +48,40 @@ from src.config.distributions import Distribution
 from src.config.betmode import BetMode
 
 
-# ── RTP Budget Breakdown ──────────────────────────────────────────────────────
-#
-# Target RTP: 96.35% (0.9635)
-#
-# The RTP is split across four simulation criteria in the BASE mode. These
-# fractions are initial design estimates used to seed the optimizer — they
-# will be refined once reel strips are tuned.
-#
-# BASE MODE (cost = 1× bet):
-#   ┌────────────────┬────────┬──────────────────────────────────────────────┐
-#   │ Criteria       │  RTP   │ Description                                  │
-#   ├────────────────┼────────┼──────────────────────────────────────────────┤
-#   │ wincap         │ 0.0500 │ Rare maximum-win outcomes (≥5000×)           │
-#   │ scatter        │ 0.2000 │ Spins with 3–5 scatter symbols (instant mult)│
-#   │ 0              │ 0.0000 │ Zero-win spins (no payout to player)         │
-#   │ basegame       │ 0.7135 │ All other winning outcomes (ways-to-win)     │
-#   │ TOTAL          │ 0.9635 │                                              │
-#   └────────────────┴────────┴──────────────────────────────────────────────┘
-#
-# VOLATILITY NOTE:
-#   40% zero-win quota on base produces medium-high volatility.
-#   Premium symbols (H1/H2) are sparse (weight 2–3/65) so 5-of-kind H1
-#   wins are rare, but their 400× per-way value drives the tail. The wincap
-#   at 5000× is achievable when H1 lands across multiple rows (≥13 ways).
-# ─────────────────────────────────────────────────────────────────────────────
-
-# ── Simulator Trigger Architecture for Stateless Scatter ─────────────────────
-#
-# Future Spinner has NO free-spin round. The scatter (S) awards an instant
-# multiplier on the same spin it lands — it is "stateless". This conflicts
-# with the SDK's standard freegame trigger flow. The workaround:
-#
-#   1. scatter distribution: force_freegame=True
-#      draw_board() sees force_freegame=True and forces scatter symbols via
-#      scatter_triggers weights. This guarantees 3/4/5 scatters on the board.
-#
-#   2. gamestate.py responsibility: after evaluate_scatter_multiplier() detects
-#      scatters and awards the multiplier, it must set:
-#        self.triggered_freegame = True
-#      Without this, check_repeat() sees force_freegame=True and
-#      triggered_freegame=False, treats the spin as failed, and retries forever.
-#
-#   3. basegame / wincap / 0 distributions: force_freegame=False
-#      draw_board() draws freely. freespin_triggers threshold is set to 99
-#      (unreachable on a 5×4 grid, max 5 scatters) so the SDK's while-loop
-#      guard never fires. Scatters may still land naturally on these spins.
-# ─────────────────────────────────────────────────────────────────────────────
-
-_BASE_RTP  = 0.9635   # Shared RTP across both bet modes
-_WINCAP    = 5000.0   # Maximum payout multiplier (× bet amount)
+_BASE_RTP = 0.9635   # Shared RTP target across both bet modes
+_WINCAP = 5000.0     # Maximum payout multiplier (x bet amount), hard cap both modes
 
 
 class GameConfig(Config):
     """
-    Complete static configuration for Future Spinner.
+    Complete static configuration for Future Spinner (Overdrive Free Spins).
 
     Grid topology
-    ─────────────
-    5 reels × 4 rows = 20 symbol positions
-    Ways-to-win: 4^5 = 1,024 (any symbol in any row on consecutive reels,
-    left-to-right, multiplied across all matching rows per reel)
+    -------------
+    5 reels x 4 rows = 20 symbol positions. Ways-to-win: 4^5 = 1,024.
 
     Symbol tiers (10 symbols total)
-    ────────────────────────────────
+    -------------------------------
     Ultra-Premium : H1  Spinning Rim
     Premium       : H2  Turbocharger
     Mid-High      : M1  Car Grille  |  M2  Exhaust Pipe
     Mid           : M3  Steering Wheel  |  L1  Lug Nut
     Low           : L2  Spark Plug  |  L3  Piston
-    Special       : W   Wild (substitutes, no independent pay)
-                    S   Scatter (instant multiplier, stateless)
+    Special       : W  Wild (substitutes, no independent pay)
+                    S  Scatter (instant pay + free-spin trigger)
 
     Design targets
-    ──────────────
-    RTP       : 96.35%
-    Volatility: Medium-High
-    Max win   : 5,000× bet
-    Min bet   : 0.10
-    Max bet   : 100.00
+    --------------
+    RTP        : 96.3500% (both modes)
+    Volatility : Medium-High
+    Max win    : 5,000x bet
+    Min bet    : 0.10
+    Max bet    : 100.00
     """
 
     _instance = None  # Singleton holder
 
     def __new__(cls):
-        """Enforce singleton — only one GameConfig instance exists per process."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
@@ -103,205 +89,100 @@ class GameConfig(Config):
     def __init__(self):
         super().__init__()
 
-        # ── Identity ──────────────────────────────────────────────────────────
-        # game_id determines all output directory paths via construct_paths().
-        # Must be a filesystem-safe string with no spaces.
-        self.game_id        = "future_spinner"
-        self.provider_name  = "We Roll Spinners"     # Required by make_fe_config()
-        self.game_name      = "Future Spinner"        # Required by make_fe_config()
-        self.working_name   = "Future Spinner"        # Human label in config.json
-        self.provider_number = 0                      # Integer provider ID for RGS
+        # -- Identity ----------------------------------------------------------
+        self.game_id = "future_spinner"
+        self.provider_name = "We Roll Spinners"
+        self.game_name = "Future Spinner"
+        self.working_name = "Future Spinner"
+        self.provider_number = 0
 
-        # ── Core Math Parameters ──────────────────────────────────────────────
-        self.rtp     = _BASE_RTP   # 0.9635 — used by BetMode and optimizer assertions
-        self.wincap  = _WINCAP     # 5,000× — payout ceiling enforced at runtime
-        self.win_type = "ways"     # Informational; actual calc uses evaluate_ways_board()
+        # -- Core math parameters ----------------------------------------------
+        self.rtp = _BASE_RTP
+        self.wincap = _WINCAP
+        self.win_type = "ways"
 
-        # ── Denomination ──────────────────────────────────────────────────────
-        # min_denomination drives betDenomination and minDenomination in config.json:
-        #   betDenomination  = int(0.10 × 100 × 100) = 1000 (internal currency units)
-        #   minDenomination  = int(0.10 × 100)        =   10
+        # -- Denomination ------------------------------------------------------
         self.min_denomination = 0.10
-
-        # Bet level ladder (frontend reference — not used directly by SDK math).
-        # 10 levels from 0.10 to 100.00, reflecting typical operator requirement.
         self.bet_levels = [0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00, 100.00]
 
-        # ── Paths ─────────────────────────────────────────────────────────────
-        # Must be called immediately after game_id is set. Creates:
-        #   self.reels_path   → games/future_spinner/reels/
-        #   self.library_path → games/future_spinner/library/
-        #   self.publish_path → games/future_spinner/library/publish_files/
         self.construct_paths()
 
-        # ── Grid Dimensions ───────────────────────────────────────────────────
-        # 5 reels, each showing 4 rows → 4^5 = 1,024 ways.
-        # num_rows is a per-reel list, enabling variable-row grids if needed later.
+        # -- Grid dimensions ---------------------------------------------------
         self.num_reels = 5
-        self.num_rows  = [4] * self.num_reels   # [4, 4, 4, 4, 4]
+        self.num_rows = [4] * self.num_reels
 
-        # ── Paytable ──────────────────────────────────────────────────────────
-        # Format: {(match_count: int, symbol_id: str): payout_per_way: float}
-        #
-        # Values are the multiplier of the bet PER MATCHING WAY. The final payout
-        # for a winning spin is: paytable_value × ways_count × bet_amount.
-        #
-        # Example: H1 five-of-a-kind with 2 H1s per reel on all 5 reels:
-        #   ways = 2×2×2×2×2 = 32; payout = 400 × 32 = 12,800× bet.
-        #   Capped at wincap = 5,000× bet.
-        #
-        # Wild (W) is NOT in the paytable — it is a pure substitute symbol.
-        # Scatter (S) is NOT in the paytable — it pays via scatter_multiplier_table.
-        #
-        # Symbol tier ordering (high → low) mirrors designer intent:
-        #   higher paytable values for symbols with lower reel frequency.
-        #
-        # Frequency weights for reference (used when designing reel strips):
-        #   H1=2, H2=3, M1=5, M2=6, M3=8, L1=10, L2=12, L3=14, W=3, S=2
-        #   Total weight per reel position ≈ 65
-
+        # -- Paytable (UNCHANGED from the validated base package) --------------
+        # Format: {(match_count, symbol_id): payout_per_way}. Final ways win =
+        # paytable_value x ways_count x bet, then x the Overdrive multiplier
+        # during free spins. Wild (W) is a pure substitute (no paytable entry);
+        # Scatter (S) pays via scatter_multiplier_table.
         self.paytable = {
-            # ── Tier 1: Ultra-Premium ─────────────────────────────────────────
-            # H1 Spinning Rim — rarity weight 2/65 ≈ 3.1%; rarest pay symbol.
-            # H1_5 = 22× per way: on BRWCAP strip (H1+W ~77% density per reel),
-            # expected ways ≈ 277, producing wins well above the 5000× wincap.
-            # On BR0 strip, H1+W ≈ 5/65 density → typical single-way H1 win = 22×.
-            # Values are ~18× lower than the original design; raw pool RTP is now
-            # calibrated to ~200-300% of target (needed for PigFarm optimizer
-            # convergence). Original values were 18× too large, causing the
-            # basegame-fence avg_win (2.5×) to be unreachable by the pool.
-            (5, "H1"): 22.0,
-            (4, "H1"):  6.0,
-            (3, "H1"):  1.5,
-
-            # ── Tier 2: Premium ───────────────────────────────────────────────
-            (5, "H2"): 10.0,
-            (4, "H2"):  3.0,
-            (3, "H2"):  0.8,
-
-            # ── Tier 3: Mid-High ─────────────────────────────────────────────
-            (5, "M1"):  5.0,
-            (4, "M1"):  1.5,
-            (3, "M1"):  0.45,
-
-            (5, "M2"):  4.0,
-            (4, "M2"):  1.0,
-            (3, "M2"):  0.3,
-
-            # ── Tier 4: Mid ───────────────────────────────────────────────────
-            (5, "M3"):  2.0,
-            (4, "M3"):  0.6,
-            (3, "M3"):  0.2,
-
-            (5, "L1"):  1.5,
-            (4, "L1"):  0.45,
-            (3, "L1"):  0.15,
-
-            # ── Tier 5: Low ───────────────────────────────────────────────────
-            (5, "L2"):  0.8,
-            (4, "L2"):  0.25,
-            (3, "L2"):  0.10,
-
-            (5, "L3"):  0.65,
-            (4, "L3"):  0.20,
-            (3, "L3"):  0.08,
+            (5, "H1"): 22.0, (4, "H1"): 6.0, (3, "H1"): 1.5,
+            (5, "H2"): 10.0, (4, "H2"): 3.0, (3, "H2"): 0.8,
+            (5, "M1"): 5.0,  (4, "M1"): 1.5, (3, "M1"): 0.45,
+            (5, "M2"): 4.0,  (4, "M2"): 1.0, (3, "M2"): 0.3,
+            (5, "M3"): 2.0,  (4, "M3"): 0.6, (3, "M3"): 0.2,
+            (5, "L1"): 1.5,  (4, "L1"): 0.45, (3, "L1"): 0.15,
+            (5, "L2"): 0.8,  (4, "L2"): 0.25, (3, "L2"): 0.10,
+            (5, "L3"): 0.65, (4, "L3"): 0.20, (3, "L3"): 0.08,
         }
 
-        # ── Special Symbols ───────────────────────────────────────────────────
-        # The SDK tracks each key as a category of special symbol. The Board class
-        # builds self.special_syms_on_board with one list per key.
-        #
-        # "wild"      : W substitutes for all paying symbols (H1/H2/M1-M3/L1-L3).
-        #               Wild participation in ways is handled automatically by
-        #               Ways.get_ways_data() — no paytable entry needed.
-        #
-        # "scatter"   : S triggers instant multiplier. Tracked separately so
-        #               count_special_symbols("scatter") can be called in gamestate.
-        #               NOT passed through ways calculation (pure scatter logic).
-        #
-        # "multiplier": Empty list — Future Spinner Wilds carry no multiplier
-        #               attribute. Leaving this key present (with empty list)
-        #               avoids potential KeyError in any SDK code that checks for it.
+        # -- Special symbols ---------------------------------------------------
+        # No symbol-multiplier wilds: the Overdrive multiplier is a game-level
+        # (global) multiplier applied via the "global" ways strategy.
         self.special_symbols = {
-            "wild":       ["W"],
-            "scatter":    ["S"],
-            "multiplier": [],       # No multiplier wilds in Future Spinner
+            "wild": ["W"],
+            "scatter": ["S"],
+            "multiplier": [],
         }
 
-        # ── Scatter Multiplier Table ──────────────────────────────────────────
-        # Custom config field consumed by GameState.evaluate_scatter_multiplier().
-        # The scatter is STATELESS: the multiplier is applied immediately on the
-        # spin where scatters land. No free-spin round is triggered.
-        #
-        # Awards are expressed as multiples of the TOTAL BET (not per-way).
-        # They stack additively with any ways-to-win wins on the same spin.
-        #
-        # Design rationale:
-        #   3 scatters: 5× total bet   — mild award, expected ~once per 2,000 spins
-        #   4 scatters: 15× total bet  — solid award, expected ~once per 15,000 spins
-        #   5 scatters: 50× total bet  — jackpot feature, expected ~once per 100,000 spins
-        #
-        # These frequencies are estimates based on SCATTER weight 2/65 per reel.
-        # Probability of 3 scatters on 5 reels: C(5,3)×(2/65)^3×(63/65)^2 ≈ 0.00046
+        # -- Scatter multiplier table (instant pays, UNCHANGED) ----------------
+        # Awards are multiples of TOTAL BET, paid on the spin the scatters land.
+        # During free spins these are multiplied by the current Overdrive meter.
         self.scatter_multiplier_table = {
-            3:  1.0,   # 3 scatters anywhere on the 5×4 grid → 1× total bet
-            4:  3.0,   # 4 scatters anywhere                 → 3× total bet
-            5: 10.0,   # 5 scatters anywhere (one per reel)  → 10× total bet
-            # Reduced from 5/15/50 so that some 3-scatter spins (1× award +
-            # zero ways-to-win) produce a total win below the scatter fence
-            # avg_win = 4.0 (= hr 20 × rtp 0.20).  The PigFarm optimizer
-            # requires wins both above AND below avg_win to form positive and
-            # negative pigs; original values ensured every scatter spin paid
-            # ≥ 5× — always above the 4.0 target — causing an infinite loop.
+            3: 1.0,   # 3 scatters -> 1x total bet
+            4: 3.0,   # 4 scatters -> 3x total bet
+            5: 10.0,  # 5 scatters -> 10x total bet
         }
 
-        # ── Freespin Trigger Thresholds ───────────────────────────────────────
-        # Future Spinner has NO free-spin round. These thresholds are set to 99
-        # (impossible on a 5-reel grid where max scatter count = 5) to prevent
-        # the SDK's draw_board() from ever retrying boards due to scatter counts.
-        #
-        # The SDK draw_board() has this guard when force_freegame=False:
-        #   while count_special_symbols("scatter") >= min(freespin_triggers[gametype]):
-        #       create_board_reelstrips()
-        # With min = 99, this while-loop condition is never true → free draw.
-        #
-        # Both gametype keys are required to avoid KeyError if the freegame_type
-        # is ever referenced during initialization (reset_fs_spin() in __init__).
+        # -- Free-spin triggers ------------------------------------------------
+        # basegame: 3/4/5 scatters award 8/12/16 free spins. The base trigger is
+        # forced to exactly 3/4/5 distinct-reel scatters, but free-spin draws are
+        # natural and scatters can stack, giving 6+ on a 5x4 grid, so every count
+        # from 3 up to the 20-cell maximum is mapped (6+ awards the 5-scatter
+        # amount). freegame retrigger is a flat +5 for any 3+ scatters.
+        # The minimum key (3) is also the resample threshold used by draw_board()
+        # for non-forced base criteria, preventing accidental triggers there.
+        _MAX_SCATTERS = self.num_reels * max(self.num_rows)  # 5 x 4 = 20
+        _base_award = {3: 8, 4: 12, 5: 16}
         self.freespin_triggers = {
-            self.basegame_type: {99: 1},   # Unreachable threshold — free draw
-            self.freegame_type: {99: 1},   # Defensive — Future Spinner has no freegame
+            self.basegame_type: {
+                n: _base_award.get(n, 16) for n in range(3, _MAX_SCATTERS + 1)
+            },
+            self.freegame_type: {n: 5 for n in range(3, _MAX_SCATTERS + 1)},
         }
 
-        # anticipation_triggers: threshold for reel-delay animation.
-        # Set to 99 for same reason — scatter anticipation is not applicable
-        # since scatters don't trigger a freegame in this title.
+        # anticipation on the final reel when a trigger is one scatter away.
         self.anticipation_triggers = {
-            self.basegame_type: 99,
-            self.freegame_type: 99,
+            self.basegame_type: 3,
+            self.freegame_type: 3,
         }
 
-        # ── Padding ───────────────────────────────────────────────────────────
-        # When True, each reel in the board reveal event includes one symbol
-        # above (top) and below (bottom) the visible rows. The FE uses these
-        # for reel-stop animations. Row indices in win events are offset +1.
+        # -- Padding -----------------------------------------------------------
         self.include_padding = True
 
-        # ── Reel Strips ───────────────────────────────────────────────────────
-        # CSV files in games/future_spinner/reels/. Each file has 5 columns
-        # (one per reel) and N rows (symbols top-to-bottom of the strip).
-        #
-        # Frequency design target (per reel position):
-        #   H1:2, H2:3, M1:5, M2:6, M3:8, L1:10, L2:12, L3:14, W:3, S:2
-        #   Total weight ≈ 65; strip length should be ≈ 65 or a multiple.
-        #
-        # BR0 — Base game reel strip (used for all base distributions)
-        # (FR0 reserved for a freegame strip if a feature is added in future)
-        #
-        # If CSV files don't exist yet, self.reels[key] is simply not populated.
-        # The simulation cannot run until at least BR0.csv exists.
+        # -- Reel strips -------------------------------------------------------
+        # BR0    : base-game strip.
+        # FR0    : free-game strip (currently identical to BR0; kept separate so
+        #          the free game can be tuned independently later).
+        # BRWCAP : H1/Wild heavy wincap strip (base trigger draw).
+        # FRWCAP : H1/Wild heavy wincap strip used inside free spins so a forced
+        #          wincap round can reach exactly 5,000x with the Overdrive meter.
         _reel_files = {
-            "BR0":   "BR0.csv",     # Base-game strip — required before running
-            "BRWCAP": "BRWCAP.csv", # Wincap strip — H1/Wild heavy, forces 5000x outcomes
+            "BR0": "BR0.csv",
+            "FR0": "FR0.csv",
+            "BRWCAP": "BRWCAP.csv",
+            "FRWCAP": "FRWCAP.csv",
         }
         self.reels = {}
         for reel_id, filename in _reel_files.items():
@@ -309,294 +190,132 @@ class GameConfig(Config):
             if os.path.exists(reel_path):
                 self.reels[reel_id] = self.read_reels_csv(reel_path)
 
-        # ── Padding Reels ─────────────────────────────────────────────────────
-        # Required by make_fe_config() — maps gametype → reel strip for the
-        # frontend padding symbol configuration. Must be populated after
-        # self.reels is built. Uses the base-game strip for both types since
-        # Future Spinner has no dedicated freegame strip.
+        # -- Padding reels (required by make_fe_config) ------------------------
         self.padding_reels = {}
         if "BR0" in self.reels:
             self.padding_reels[self.basegame_type] = self.reels["BR0"]
-            self.padding_reels[self.freegame_type] = self.reels["BR0"]
+            self.padding_reels[self.freegame_type] = self.reels.get("FR0", self.reels["BR0"])
 
-        # ── Bet Mode Conditions ───────────────────────────────────────────────
-        # Each condition dict is passed to a Distribution object and consumed
-        # by draw_board() and check_repeat() during simulation.
-        #
-        # Required key: "reel_weights" — maps gametype → {reel_strip_id: weight}
-        # Optional keys the SDK checks: "force_freegame", "force_wincap",
-        #   "scatter_triggers", "mult_values"
-        #
-        # reel_weights includes BOTH gametypes defensively — even though Future
-        # Spinner never enters freegame, reset_fs_spin() during __init__ sets
-        # gametype=freegame_type, and a stray draw_board() call before the first
-        # run_spin() would otherwise KeyError on the missing gametype key.
-
-        _base_reels_both = {
+        # -- Reel weight helpers ----------------------------------------------
+        # Every condition supplies reel weights for BOTH gametypes: the base
+        # reveal uses basegame_type, the free spins use freegame_type.
+        _reels_std = {
             self.basegame_type: {"BR0": 1},
-            self.freegame_type: {"BR0": 1},   # Fallback — no dedicated freegame strip
+            self.freegame_type: {"FR0": 1},
+        }
+        # Wincap: force the trigger on BR0, then rack up 5,000x inside free spins
+        # on the H1/Wild heavy FRWCAP strip.
+        _wincap_strip_fg = "FRWCAP" if "FRWCAP" in self.reels else "FR0"
+        _reels_wincap = {
+            self.basegame_type: {"BR0": 1},
+            self.freegame_type: {_wincap_strip_fg: 1},
         }
 
-        # ── Wincap reel weights ───────────────────────────────────────────────
-        # BRWCAP is a high-density H1/Wild strip (76.9% coverage per position).
-        # Using it for the wincap criteria ensures check_repeat() can satisfy
-        # win_criteria=5000.0 within a very small number of retries.
-        # BRWCAP is only used when the game config has loaded the file; falls
-        # back to BR0 if BRWCAP.csv is absent.
-        _wincap_strip = "BRWCAP" if "BRWCAP" in self.reels else "BR0"
-        _wincap_reels = {
-            self.basegame_type: {_wincap_strip: 1},
-            self.freegame_type: {_wincap_strip: 1},
-        }
-
-        # ── Condition: wincap ─────────────────────────────────────────────────
-        # Applied to 0.1% of base spins.
-        # These are the extreme-win tail outcomes (≥ 5,000× bet).
-        # win_criteria=5000.0 forces check_repeat() to reject any sim whose
-        # final_win ≠ exactly 5,000× bet (the wincap).
-        # BRWCAP strip makes 5000× achievable in ≤ 3 retries on average.
+        # -- Base-mode conditions ---------------------------------------------
+        # wincap: forces a trigger and drives free spins to the 5,000x cap.
         wincap_condition = {
-            "reel_weights":   _wincap_reels,
-            "force_wincap":   True,    # Advisory flag for game_override logic
-            "force_freegame": False,   # No scatter-forcing
+            "reel_weights": _reels_wincap,
+            "force_wincap": True,
+            "force_freegame": True,
+            "scatter_triggers": {3: 60, 4: 30, 5: 10},
         }
-
-        # ── Condition: scatter ────────────────────────────────────────────────
-        # Applied to 5% of base spins.
-        # force_freegame=True instructs draw_board() to use force_special_board(),
-        # which guarantees the requested number of scatter symbols appear.
-        # scatter_triggers weights: {count: weight} → RNG selects scatter count.
-        #
-        # CRITICAL: gamestate.py must set self.triggered_freegame = True after
-        # processing the scatter multiplier, otherwise check_repeat() will reject
-        # every spin in this criteria (see module-level architecture note).
-        #
-        # Base game scatter distribution (5% of spins):
-        #   70% chance of 3 scatters (5× award) → expected contribution ≈ 0.70×5×0.05 = 0.175×
-        #   20% chance of 4 scatters (15× award) → 0.20×15×0.05 = 0.15×
-        #   10% chance of 5 scatters (50× award) → 0.10×50×0.05 = 0.25×
-        #   Plus expected ways wins on same spin.
-        scatter_base_condition = {
-            "reel_weights":    _base_reels_both,
-            "force_wincap":    False,
-            "force_freegame":  True,   # Activates scatter-count forcing in draw_board()
-            "scatter_triggers": {
-                3: 70,   # 70% weight → 3 scatters → 5× total bet
-                4: 20,   # 20% weight → 4 scatters → 15× total bet
-                5: 10,   # 10% weight → 5 scatters → 50× total bet
-            },
+        # freegame: the standard free-spin trigger. scatter_triggers weight the
+        # 3/4/5 entry distribution (8/12/16 spins). Instant pay + free spins.
+        freegame_base_condition = {
+            "reel_weights": _reels_std,
+            "force_wincap": False,
+            "force_freegame": True,
+            "scatter_triggers": {3: 75, 4: 20, 5: 5},
         }
-
-        # ── Condition: 0 (zero-win) ───────────────────────────────────────────
-        # Applied to 40.0% of base spins. Forces simulations that contribute
-        # nothing to RTP — essential for calibrating overall hit rate.
-        # win_criteria=0.0 tells check_repeat() to reject any spin with a win.
-        # 40% zero-win quota is appropriate for medium-high volatility.
+        # 0: zero-win base spins. force_freegame=False -> draw_board resamples any
+        # board with 3+ scatters, so no accidental trigger.
         zerowin_condition = {
-            "reel_weights":   _base_reels_both,
-            "force_wincap":   False,
+            "reel_weights": _reels_std,
+            "force_wincap": False,
             "force_freegame": False,
         }
-
-        # ── Condition: basegame ───────────────────────────────────────────────
-        # Applied to 54.9% of base spins. No forcing — free draw from BR0.
-        # Captures the full range of naturally-occurring ways-to-win outcomes.
-        # Scatters may land naturally on these spins (see scatter handling in
-        # gamestate.py); they will still award the multiplier when they do.
-        # The optimizer shapes the win distribution within this criteria.
+        # basegame: ordinary ways outcomes, no forced trigger.
         basegame_condition = {
-            "reel_weights":   _base_reels_both,
-            "force_wincap":   False,
+            "reel_weights": _reels_std,
+            "force_wincap": False,
             "force_freegame": False,
         }
 
-        # ── Maximum Wins per Mode ─────────────────────────────────────────────
-        # Kept as a dict for readability when constructing BetMode objects below.
-        _mode_maxwins = {
-            "base":  int(_WINCAP),   # 5000
+        # -- Bonus-mode conditions --------------------------------------------
+        # Guaranteed trigger, weighted toward higher scatter counts to justify
+        # the 100x buy price. wincap variant drives the cap in-bonus.
+        freegame_bonus_condition = {
+            "reel_weights": _reels_std,
+            "force_wincap": False,
+            "force_freegame": True,
+            "scatter_triggers": {3: 55, 4: 30, 5: 15},
+        }
+        wincap_bonus_condition = {
+            "reel_weights": _reels_wincap,
+            "force_wincap": True,
+            "force_freegame": True,
+            "scatter_triggers": {3: 50, 4: 30, 5: 20},
         }
 
-        # ── Bet Modes ─────────────────────────────────────────────────────────
-        self.bet_modes = [
+        _maxwin = int(_WINCAP)
 
-            # ── BASE MODE ─────────────────────────────────────────────────────
-            # Standard single-spin play at 1× bet cost.
-            # is_feature=True: this is the "main" mode (standard RGS behaviour).
-            # is_buybonus=False: not a purchase mode.
-            #
-            # Distribution quota breakdown (must sum to 1.0):
-            #   wincap    0.001  →   100 sims per 100,000 (extreme wins)
-            #   scatter   0.050  → 5,000 sims per 100,000 (scatter feature spins)
-            #   0         0.400  →40,000 sims per 100,000 (zero-win spins)
-            #   basegame  0.549  →54,900 sims per 100,000 (regular winning spins)
-            #   TOTAL     1.000
+        # -- Bet modes ---------------------------------------------------------
+        self.bet_modes = [
+            # BASE MODE (cost 1.0x) -------------------------------------------
             BetMode(
                 name="base",
                 cost=1.0,
-                rtp=self.rtp,                    # 0.9635
-                max_win=_mode_maxwins["base"],   # 5000
-                auto_close_disabled=False,       # RGS auto-closes zero-win rounds
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
                 is_feature=True,
                 is_buybonus=False,
                 distributions=[
                     Distribution(
                         criteria="wincap",
-                        quota=0.001,
-                        win_criteria=float(_mode_maxwins["base"]),  # Must hit exactly 5000×
+                        quota=0.002,
+                        win_criteria=float(_maxwin),
                         conditions=wincap_condition,
                     ),
                     Distribution(
-                        criteria="scatter",
-                        quota=0.050,
-                        # No win_criteria — scatter award varies by count (5/15/50×)
-                        conditions=scatter_base_condition,
+                        criteria="freegame",
+                        quota=0.15,
+                        conditions=freegame_base_condition,
                     ),
                     Distribution(
                         criteria="0",
-                        quota=0.400,
-                        win_criteria=0.0,           # Must produce zero payout
+                        quota=0.36,
+                        win_criteria=0.0,
                         conditions=zerowin_condition,
                     ),
                     Distribution(
                         criteria="basegame",
-                        quota=0.549,
-                        # No win_criteria — accepts any non-zero, non-wincap outcome
+                        quota=0.488,
                         conditions=basegame_condition,
                     ),
                 ],
             ),
+            # BONUS MODE / BUY (cost 100.0x) ----------------------------------
+            BetMode(
+                name="bonus",
+                cost=100.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=False,
+                is_buybonus=True,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.004,
+                        win_criteria=float(_maxwin),
+                        conditions=wincap_bonus_condition,
+                    ),
+                    Distribution(
+                        criteria="freegame",
+                        quota=0.996,
+                        conditions=freegame_bonus_condition,
+                    ),
+                ],
+            ),
         ]
-
-        # ── Optimizer Parameters (opt_params) ─────────────────────────────────
-        # Consumed by generate_configs() → make_temp_math_config() to produce
-        # math_config.json, which the Rust optimization engine reads.
-        #
-        # Structure per mode:
-        #   conditions       : one entry per distribution criteria; RTPs must
-        #                      sum to betmode RTP (enforced by verify_optimization_input)
-        #   scaling          : win-range scaling factors for distribution shaping
-        #   parameters       : optimization run hyperparameters
-        #   distribution_bias: optional bias toward specific win ranges
-        #
-        # Condition dict format (matches ConstructConditions.return_dict()):
-        #   search_range : (min_win, max_win) for optimizer win-range search;
-        #                  (-1, -1) means "use force_search key instead"
-        #   force_search : {field_name: value} to find book entries by event tag
-        #   rtp          : RTP contribution from this criteria (float)
-        #   av_win       : average payout for outcomes in this criteria (optional)
-        #   hr           : hit rate — avg spins between outcomes in criteria (optional)
-        #
-        # RTP CONSTRAINT: all condition RTPs per mode MUST sum to mode RTP.
-        #   Base:  0.0500 + 0.2000 + 0.0000 + 0.7135 = 0.9635 ✓
-        #
-        # NOTE: If OptimizationSetup(config) is called in run.py, it WILL
-        # overwrite self.opt_params with its own values. These values here are
-        # used when optimization is disabled (run_optimization=False) and when
-        # generate_configs() is called without a prior OptimizationSetup call.
-        # Create game_optimization.py to define refined opt_params for the Rust
-        # optimizer once reel strips are finalised.
-
-        _wincaps = {bm.get_name(): bm.get_wincap() for bm in self.bet_modes}
-
-        self.opt_params = {
-
-            # ── Base Mode Optimizer Config ─────────────────────────────────────
-            "base": {
-                "conditions": {
-
-                    # wincap: target the maximum-win tail.
-                    # av_win = 5000 (exact wincap value); rtp=0.05 implies
-                    # ~1-in-100,000 actual hit rate contributing 5% of total RTP.
-                    "wincap": {
-                        "search_range": (_wincaps["base"], _wincaps["base"]),
-                        "force_search": {},            # Locate by exact win amount
-                        "rtp":    0.0500,
-                        "av_win": float(_wincaps["base"]),   # 5000.0
-                    },
-
-                    # scatter: locate outcomes containing scatter-triggered events.
-                    # hr=20 → optimizer expects ~1 in 20 simulations in this
-                    # criteria to have scatter wins (within the forced 5% quota).
-                    # av_win = rtp/hr per spin roughly; actual value set by optimizer.
-                    "scatter": {
-                        "search_range": (-1, -1),
-                        "force_search": {"symbol": "scatter"},   # Match force-file key
-                        "rtp":  0.2000,
-                        "hr":   20.0,
-                    },
-
-                    # 0 (zero-win): no contribution to RTP; optimizer skips these
-                    # when targeting payout distribution shaping.
-                    "0": {
-                        "search_range": (0.0, 0.0),
-                        "force_search": {},
-                        "rtp":    0.0000,
-                        "av_win": 0.0,
-                    },
-
-                    # basegame: the bulk of the ways-to-win outcomes.
-                    # hr=3.5 → roughly 1 in 3.5 basegame spins has a win.
-                    # With quota 0.549, basegame forms the backbone of the RTP.
-                    "basegame": {
-                        "search_range": (-1, -1),
-                        "force_search": {},
-                        "rtp":  0.7135,
-                        "hr":   3.5,
-                    },
-                },
-
-                # Scaling: biases the optimizer toward specific win ranges.
-                # scale_factor > 1.0 → try to show MORE outcomes in this range.
-                # scale_factor < 1.0 → try to show FEWER outcomes in this range.
-                "scaling": [
-                    # Boost small basegame wins (1–5×) — increases hit frequency,
-                    # supports medium-high volatility profile.
-                    {"criteria": "basegame", "scale_factor": 1.2,
-                     "win_range": (1.0, 5.0),    "probability": 1.0},
-                    # Boost medium basegame wins (10–30×) — gives satisfying
-                    # mid-range wins and visible excitement moments.
-                    {"criteria": "basegame", "scale_factor": 1.5,
-                     "win_range": (10.0, 30.0),  "probability": 1.0},
-                    # Slightly over-represent small scatter wins (5–15×) so the
-                    # 3-scatter outcome appears regularly in the book.
-                    {"criteria": "scatter",  "scale_factor": 1.3,
-                     "win_range": (5.0, 15.0),   "probability": 1.0},
-                    # Under-represent very large scatter wins (50–200×) to
-                    # control variance within the medium-high target band.
-                    {"criteria": "scatter",  "scale_factor": 0.8,
-                     "win_range": (50.0, 200.0), "probability": 1.0},
-                ],
-
-                # Optimizer hyperparameters.
-                # num_show_pigs     : selected outcomes per fence (≤ pool size)
-                # num_pigs_per_fence: candidate pool per fence
-                # min/max_mean_to_median: acceptable range for win distribution shape
-                # pmb_rtp           : probability mass balance RTP weight
-                # simulation_trials : Monte Carlo trials per optimization step
-                # test_spins        : session lengths used to score distributions
-                # test_spins_weights: relative importance of each session length
-                # score_type        : "rtp" — optimize toward exact RTP target
-                # max_trial_dist    : maximum distribution candidates per iteration
-                #
-                # These values are calibrated for 10k–100k sim pools and complete
-                # in 2–5 minutes on a 4-core machine with 20 Rust threads.
-                "parameters": {
-                    "num_show_pigs":       1000,
-                    "num_pigs_per_fence":  2000,
-                    "min_mean_to_median":     4,
-                    "max_mean_to_median":     8,
-                    "pmb_rtp":              1.0,
-                    "simulation_trials":    500,
-                    "test_spins":        [50, 100, 200],
-                    "test_spins_weights": [0.3, 0.4, 0.3],
-                    "score_type":         "rtp",
-                    "max_trial_dist":        10,
-                },
-
-                # Distribution bias: nudge the optimizer to over-represent
-                # basegame wins in the 2–5× range (small but satisfying hits).
-                "distribution_bias": [
-                    {"criteria": "basegame", "range": (2.0, 5.0), "prob": 0.4},
-                ],
-            },
-        }

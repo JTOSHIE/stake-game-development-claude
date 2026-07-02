@@ -26,18 +26,26 @@ const winMicros   = Math.floor((wagerMicros * csvPayout) / 100) // csvPayout is 
 const winDollars  = winMicros / CURRENCY_SCALE                  // display only
 ```
 
-## True game facts (canonical, base-only package)
+## True game facts (Overdrive Free Spins, two-mode package)
 
-- Base game only. Exactly one bet mode: `base`, cost 1.0x. No bonus buy, no free spins,
-  no jackpot, no gamble, no continuation mechanic. Stateless.
-- Scatter is an instant multiplier of total bet: 3 = 1x, 4 = 3x, 5 = 10x. Applied on the
-  same spin, stacks additively with any ways win. This is the true value everywhere
-  (maths, PAR, frontend paytable, blurbs). It is not 5x/15x/50x.
-- RTP: 96.3500% (at four decimal places; exact integer arithmetic lands at
-  96.34999996...%, the same as the committed baseline, which rounds identically).
-- Hit rate: 33.5724%. Max win: 5,000x. Volatility (weighted SD): 16.23x.
-- Scatter trigger rate: 6.37%. Scatter average win: 97.6x.
-- Grid 5x4, 1,024 ways. Simulation basis 100,000 spins.
+The owner decided Option C: the game ships WITH a real bonus feature (Overdrive Free
+Spins). Two bet modes: `base` (cost 1.0x) and `bonus` buy (cost 100.0x). Stateless: the
+whole feature resolves inside one book round. No jackpot, gamble, or continuation.
+
+- **Feature (Overdrive Free Spins):** 3/4/5 scatters award 8/12/16 free spins AND pay an
+  instant 1x/3x/10x total bet. During free spins an Overdrive meter starts at 1x and rises
+  +1x after every winning spin, applied to all subsequent free-spin wins (ways and scatter
+  pays), never resetting, not retroactive. 3+ scatters in free spins retrigger +5 spins and
+  pay their instant award x the current meter. The bonus buy guarantees a 3+ trigger.
+- **Scatter values are 1x/3x/10x everywhere** (maths, PAR, and frontend once Stage 2 wires
+  the feature). Not 5x/15x/50x.
+- **RTP: 96.3500% at 4dp in BOTH modes** (base 10dp 96.3499998727%, bonus 96.3499999962%).
+- Max win 5,000x (hard cap both modes). Grid 5x4, 1,024 ways. 100,000 rounds per mode.
+- **Base mode:** hit rate 29.11%, volatility (weighted SD) 17.28x, free-spin trigger rate
+  1 in 184.7 (0.5415%), average triggered-round win 79.4x, wincap 1 in 100,000.
+- **Bonus mode:** average bought outcome 96.35x (RTP 96.35% at 100x), volatility 206.63x,
+  wincap 1 in 1,000.
+- Paytable unchanged (H1 22/6/1.5 down to L3 0.65/0.20/0.08 per way).
 
 ## Assets
 

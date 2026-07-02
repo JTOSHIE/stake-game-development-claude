@@ -1,5 +1,32 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-03 | Canonical base-only math package complete
+## Last updated: 2026-07-03 | Overdrive Free Spins two-mode maths package built
+
+## OVERDRIVE FREE SPINS — TWO-MODE MATHS PACKAGE — 2026-07-03
+Owner decided Option C: ship a real bonus feature. Built on branch
+`claude/overdrive-feature` (sanctioned exception to the maths lock via
+FS_FeatureMath_Prompt.md). This supersedes the base-only single-mode package.
+
+- Feature: 3/4/5 scatters award 8/12/16 free spins plus an instant 1x/3x/10x pay; an
+  Overdrive meter rises +1x after every winning free spin and applies to all subsequent
+  free-spin wins (never resets, not retroactive); 3+ scatters retrigger +5; a 100x bonus
+  buy guarantees a trigger. Stateless (resolves in one book round), 5,000x hard cap.
+- Two bet modes: base (cost 1.0x) and bonus (cost 100.0x). Both RTP 96.3500% at 4dp
+  (base 10dp 96.3499998727%, bonus 96.3499999962%).
+- Base metrics: hit 29.11%, volatility SD 17.28x, trigger 1 in 184.7 (0.5415%), avg
+  triggered-round win 79.4x, wincap 1 in 100,000. RTP split basegame 53.35% / free-spin
+  rounds (incl instant) 38.00% / wincap 5.00%.
+- Bonus metrics: average bought outcome 96.35x (fair at 100x cost), volatility SD 206.63x,
+  wincap 1 in 1,000. RTP split free-spin rounds 91.35% / wincap 5.00%.
+- Verified: RTP 4dp both modes; books match LUTs positionally and as multisets; max exactly
+  5,000.00x with zero over cap; determinism (fixed seeds reproduce identical payouts);
+  round-shape audit 250 rounds/mode with 0 failures (trigger counts, retriggers, Overdrive
+  progression, instant pays, payout reconciliation). index.json + game_metadata list both
+  modes.
+- PAR sheet rewritten for the two-mode feature (two-mode declaration, no em/en dashes).
+- Stage 2 (feature frontend) pending: free-spin loop and Overdrive meter UI, buy-bonus
+  entry, `disabledBuyFeature` hiding the buy, bonus-buy replay showing the 100x spend, and
+  frontend paytable/blurb update to the feature.
+- rgsService.ts and gameStore.ts: not touched (hard lock respected).
 
 ## ANIMATED SYMBOL SYSTEM — 2026-04-05
 - ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
@@ -124,10 +151,10 @@ Production build passing, 0 TypeScript errors.
 - ✅  TSC: 0 errors | Build: pass
 
 ## COMPLIANCE STATUS (Stake Engine)
-- ✅ Stateless design — no continuation mechanics
-- ✅ No Buy Bonus / no free spins / no jackpots
-- ✅ Win cap: 5,000×
-- ✅ RTP: 96.3500%
+- ✅ Stateless design — no continuation mechanics (Overdrive feature resolves in one round)
+- ✅ Overdrive Free Spins feature + 100x bonus buy (both permitted); no jackpot/gamble/continuation
+- ✅ Win cap: 5,000× (both modes)
+- ✅ RTP: 96.3500% (both modes, 4dp)
 - ✅ 16 languages
 - ✅ No Stake branding
 - ✅ No underage appeal
@@ -143,7 +170,7 @@ Production build passing, 0 TypeScript errors.
 ## COMPONENT STATUS
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Math SDK | ✅ LOCKED | 96.35% RTP, 100k sim, single base mode (canonical, 2026-07-03) |
+| Math SDK | ✅ LOCKED | 96.35% RTP both modes, 100k sim/mode, Overdrive Free Spins base+bonus (2026-07-03) |
 | rgsService.ts | ✅ LOCKED | Mock mode |
 | gameStore.ts | ✅ LOCKED | |
 | GameGrid.svelte | ✅ Complete | All symbols, WILD dark mask, blur tumble |
@@ -177,6 +204,7 @@ Submission is pending the design elevation pass plus these manual steps:
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Overdrive Free Spins (two-mode) | 2026-07-03 | Option C: built the free-spins feature with progressive Overdrive multiplier + 100x bonus buy; rewrote game_config/gamestate/game_calculation/run + game_optimization + FR0/FRWCAP reels; both modes converge to 96.3500%; all verification gates passed; two-mode PAR sheet; bundle + manifest rebuilt |
 | Canonical base-only package | 2026-07-03 | Removed unshipped bonus BetMode from game_config.py/run.py; ran canonical publish pipeline; all verification gates passed (payout identity, exact RTP, books match); PAR sheet regenerated with recomputed weight-dependent figures + single mode declaration; PROMO_BLURB.md/SUBMISSION_CHECKLIST.md corrected; Desktop submission bundle rebuilt with SHA-256 manifest |
 | Bet Replay | 2026-04-12 | replayService.ts + replayStore.ts + ReplayMode.svelte; App.svelte branches on ?replay=true; CLAUDE.md + REPLAY_TEST_EVENTS.md |
 | Compliance + frame + audio | 2026-04-11 | Frame inset symmetric, playWin epic→50×+echo, small win softer, status updated |

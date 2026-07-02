@@ -6,17 +6,23 @@ Australian English, no em dashes or en dashes.
 
 ## Current posture (build verified against current requirements)
 
-- **Stateless:** verified. Single base mode, cost 1.0x. No jackpot, gamble, continuation
-  or early cashout. Matches the approval-guidelines Key Restrictions.
-- **No prohibited features:** verified. No bonus buy, no free spins, no held state.
+- **Stateless:** verified. Two bet modes (base 1.0x, bonus buy 100.0x); the Overdrive Free
+  Spins feature resolves inside one book round. No jackpot, gamble, continuation or early
+  cashout. Matches the approval-guidelines Key Restrictions (free spins and feature buys are
+  permitted; jackpots/gamble/continuation are not).
+- **Feature:** Overdrive Free Spins with a progressive multiplier, plus a 100x bonus buy.
+  Both modes stateless and capped at 5,000x, both at 96.3500% RTP.
 - **Original IP:** verified. Original designs, produced in-house from vector masters.
   No pre-purchased or third-party licensed content.
 - **No Stake branding:** verified. No Stake trademark or themes in any shipped asset or text.
 - **No underage appeal:** verified. No child or child-like characters.
 - **Social/jurisdiction:** social mode present; prohibited-term overrides applied for
   stake.us (`social=true`). See `docs/stake-engine-live/jurisdiction-requirements.md`.
+  Feature-buy disclosure: the `disabledBuyFeature` jurisdiction flag must hide the bonus buy
+  (Stage 2 frontend scope).
 - **Bet Replay:** implemented and mandatory-compliant; player session not required. Event
-  IDs from staging still pending to hand to the reviewer.
+  IDs from staging still pending. Stage 2: bonus-buy replays must display the amount spent
+  including the 100x cost multiplier.
 
 ## Process reminders
 
@@ -53,3 +59,18 @@ Source snapshots saved under `docs/stake-engine-live/` (rendered via headless Ch
 - **changelog:** no dedicated docs page found. `/docs/changelog` and `/docs/updates` both
   error, and there is no changelog entry in the docs navigation. Recorded as not-found;
   re-check on the next refresh in case a changelog page is added.
+
+### 2026-07-03: single-mode star-rating question RESOLVED (Option C)
+The owner decided to ship a real bonus feature (OVERDRIVE FREE SPINS). The maths is now a
+two-mode package (base + 100x bonus buy), directly answering the quality-rankings concern
+that additional mechanics are expected in competitive submissions. Both modes are stateless,
+capped at 5,000x, and return 96.3500% RTP. This closes the base-only decision point above.
+
+Two Stage 2 (feature frontend) compliance items opened by the feature:
+- **Buy-feature disclosure:** the jurisdiction flag `disabledBuyFeature` must hide the bonus
+  buy where feature buys are not permitted.
+- **Bonus-buy replay:** bonus-buy replays must display the amount spent including the 100x
+  cost multiplier (per the game-replay-requirements page).
+
+A compliance re-validation against the live docs for the two-mode feature game is scheduled
+in the pass sequence before submission.

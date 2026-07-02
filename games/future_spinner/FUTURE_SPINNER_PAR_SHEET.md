@@ -3,31 +3,53 @@
 **Game:** Future Spinner
 **Provider:** We Roll Spinners
 **Report Date:** 2026-07-03
-**Simulation Basis:** 100,000 base-game spins (Stake Engine SDK v1)
-**Optimiser:** PigFarm Rust, converged to 96.3500% RTP (0.0000% deviation)
+**Feature:** OVERDRIVE FREE SPINS (two bet modes: base + bonus buy)
+**Simulation Basis:** 100,000 rounds per mode (Stake Engine SDK v1)
+**Optimiser:** PigFarm Rust, both modes converged to 96.3500% RTP
 
 ---
 
 ## 1. GAME OVERVIEW
 
-| Parameter              | Value                                   |
-|------------------------|-----------------------------------------|
-| Grid                   | 5 reels × 4 rows (20 symbol positions)  |
-| Win mechanic           | Ways-to-win (up to 4^5 = 1,024 ways)   |
-| Target RTP             | 96.35%                                  |
-| Achieved RTP           | 96.3500%                                |
-| Wincap                 | 5,000× bet                              |
-| Volatility             | Medium-High                             |
-| Min bet                | $0.10                                   |
-| Max bet                | $100.00                                 |
-| Special feature        | Instant Scatter Multiplier (stateless)  |
-| Bonus buy              | No: base game only, single mode         |
+| Parameter              | Value                                     |
+|------------------------|-------------------------------------------|
+| Grid                   | 5 reels x 4 rows (20 symbol positions)    |
+| Win mechanic           | Ways-to-win (up to 4^5 = 1,024 ways)     |
+| Bet modes              | Two: base (cost 1.0x) and bonus buy (cost 100.0x) |
+| Target RTP             | 96.35% (both modes)                       |
+| Achieved RTP (base)    | 96.3500% (10dp 96.3499998727%)            |
+| Achieved RTP (bonus)   | 96.3500% (10dp 96.3499999962%)            |
+| Wincap                 | 5,000x bet (hard, both modes)             |
+| Volatility (base)      | Medium-High, weighted SD 17.28x           |
+| Min bet                | $0.10                                     |
+| Max bet                | $100.00                                   |
+| Feature                | Overdrive Free Spins with progressive multiplier |
 
 ---
 
-## 2. PAYTABLE (per-way multipliers × bet)
+## 2. THE OVERDRIVE FREE SPINS FEATURE
 
-*Final payout = paytable value × ways count × bet amount. Capped at 5,000× bet.*
+- **Trigger:** 3, 4 or 5 scatters in the base game award 8, 12 or 16 free spins
+  AND pay the instant scatter award of 1x, 3x or 10x total bet.
+- **Overdrive meter:** the free-spin round starts at multiplier 1x. After every
+  WINNING free spin the meter increases by +1x and applies to all subsequent
+  free-spin wins (ways wins and scatter pays alike). It never resets during the
+  round and is not retroactive. There is no cap on the meter beyond the round
+  win cap.
+- **Retrigger:** 3 or more scatters during free spins award +5 free spins and
+  pay their instant scatter award multiplied by the current Overdrive meter.
+- **Bonus buy:** the second bet mode "bonus" (cost 100.0x) guarantees a 3+
+  scatter trigger spin.
+- **Win cap:** 5,000x total per round, hard, both modes.
+- **Stateless:** the entire feature resolves inside a single book round; no
+  state is carried between rounds.
+
+---
+
+## 3. PAYTABLE (per-way multipliers x bet)
+
+*Final ways payout = paytable value x ways count x bet, then x the Overdrive
+meter during free spins. Capped at 5,000x bet per round.*
 
 | Match | H1 (Spinning Rim) | H2 (Turbocharger) | M1 (Car Grille) | M2 (Exhaust Pipe) | M3 (Steering Wheel) | L1 (Lug Nut) | L2 (Spark Plug) | L3 (Piston) |
 |-------|------------------:|------------------:|----------------:|------------------:|--------------------:|-------------:|----------------:|------------:|
@@ -36,211 +58,216 @@
 | 3-of  |              1.50 |              0.80 |            0.45 |              0.30 |                0.20 |         0.15 |            0.10 |        0.08 |
 
 **Wild (W):** Substitutes for all pay symbols. No independent pay.
-**Scatter (S):** Instant multiplier, pays below. Does not participate in ways calculation.
+**Scatter (S):** Instant pay and free-spin trigger (see below). Does not
+participate in the ways calculation.
 
-### Scatter Multiplier Table
+### Scatter table (instant pays and free-spin awards)
 
-| Scatters on board | Award (× total bet) |
-|------------------:|--------------------:|
-| 3 (any position)  |                1.0× |
-| 4 (any position)  |                3.0× |
-| 5 (one per reel)  |               10.0× |
+| Scatters | Instant pay (x total bet) | Free spins awarded (base trigger) |
+|---------:|--------------------------:|----------------------------------:|
+| 3        |                      1.0x |                                 8 |
+| 4        |                      3.0x |                                12 |
+| 5        |                     10.0x |                                16 |
+| 3+ (retrigger, in free spins) | award x current meter | +5 |
 
-*Scatter award stacks additively with any ways-to-win win on the same spin.*
-
----
-
-## 3. REEL STRIP FREQUENCIES
-
-*BR0 reel strip, 65 positions per reel, uniform across all 5 reels.*
-
-| Symbol | Name            | Count / Reel | Density | P(≥1 visible / spin) | Avg visible / spin |
-|--------|-----------------|:------------:|--------:|---------------------:|-------------------:|
-| H1     | Spinning Rim    |      2       |   3.1%  |               46.0%  |               0.62 |
-| H2     | Turbocharger    |      3       |   4.6%  |               59.8%  |               0.92 |
-| M1     | Car Grille      |      5       |   7.7%  |               78.5%  |               1.54 |
-| M2     | Exhaust Pipe    |      6       |   9.2%  |               84.7%  |               1.85 |
-| M3     | Steering Wheel  |      8       |  12.3%  |               91.9%  |               2.46 |
-| L1     | Lug Nut         |     10       |  15.4%  |               96.5%  |               3.08 |
-| L2     | Spark Plug      |     12       |  18.5%  |               98.6%  |               3.69 |
-| L3     | Piston          |     14       |  21.5%  |               99.5%  |               4.31 |
-| W      | Wild            |      3       |   4.6%  |               59.8%  |               0.92 |
-| S      | Scatter         |      2       |   3.1%  |               46.0%  |               0.62 |
-
-*P(≥1 visible / spin) = 1 − (1 − density)^(4 rows) per reel, product across 5 reels.*
-*Avg visible = 5 reels × 4 rows × density per position.*
+*During free spins the instant scatter pay is multiplied by the current
+Overdrive meter. 6+ scatters can appear on a free-spin board (scatters stack);
+they pay the 5-scatter award and retrigger +5 spins.*
 
 ---
 
-## 4. SYMBOL COMBINATION HIT FREQUENCIES
+## 4. REEL STRIP FREQUENCIES
 
-*From 100,000 simulated base-game spins with optimised weights (canonical base-only publish run).*
+*BR0 base strip and FR0 free-game strip, 65 positions per reel, uniform across
+all 5 reels. FR0 is currently identical to BR0. BRWCAP and FRWCAP are H1/Wild
+heavy strips used to force wincap rounds.*
 
-| Combination | Hit Rate (1-in-N) | Frequency (%) | Avg Win (× bet) | Sim Count |
-|-------------|------------------:|:-------------:|----------------:|----------:|
-| H1 × 5      |           859.5   |    0.116%     |         192.1×  |       141 |
-| H1 × 4      |           360.4   |    0.277%     |          72.8×  |       297 |
-| H1 × 3      |           305.2   |    0.328%     |         180.8×  |       289 |
-| H2 × 5      |           528.2   |    0.189%     |          77.1×  |       234 |
-| H2 × 4      |           209.8   |    0.477%     |         102.5×  |       539 |
-| H2 × 3      |           139.5   |    0.717%     |          89.7×  |       708 |
-| M1 × 5      |           112.9   |    0.885%     |          92.9×  |       885 |
-| M1 × 4      |            88.4   |    1.131%     |          84.8×  |     1,137 |
-| M1 × 3      |           108.9   |    0.918%     |         112.0×  |       786 |
-| M2 × 5      |            92.3   |    1.084%     |          77.5×  |     1,196 |
-| M2 × 4      |            62.0   |    1.612%     |          88.0×  |     1,682 |
-| M2 × 3      |            82.4   |    1.213%     |         104.4×  |     1,253 |
-| M3 × 5      |            54.1   |    1.849%     |         103.0×  |     1,884 |
-| M3 × 4      |            41.2   |    2.425%     |          74.4×  |     2,087 |
-| M3 × 3      |            67.1   |    1.490%     |          76.5×  |     1,414 |
-| L1 × 5      |            19.7   |    5.079%     |          89.8×  |     4,573 |
-| L1 × 4      |            22.3   |    4.491%     |          93.0×  |     4,324 |
-| L1 × 3      |            23.5   |    4.247%     |          95.0×  |     4,405 |
-| L2 × 5      |            25.4   |    3.938%     |          85.2×  |     3,562 |
-| L2 × 4      |            35.9   |    2.788%     |         104.7×  |     2,401 |
-| L2 × 3      |            73.3   |    1.364%     |         126.1×  |     1,403 |
-| L3 × 5      |            19.0   |    5.254%     |          83.6×  |     4,965 |
-| L3 × 4      |            27.2   |    3.682%     |         104.7×  |     3,483 |
-| L3 × 3      |            65.6   |    1.525%     |          96.8×  |     1,629 |
-
-> **Note on Avg Win column:** Higher-order matches (×3/×4) can show elevated average wins because
-> the ways multiplier dominates when multiple rows of the same symbol land simultaneously.
-> The win per way is always lower for ×3 and ×4 than ×5 (see paytable above).
->
-> Sim Count is the raw number of simulated rounds landing each combination, identical to the
-> prior canonical run (the underlying per-round payouts are byte-identical). Hit Rate and Avg Win
-> are weighted figures and shift slightly between optimiser runs at fixed RTP (see Section 9).
+| Symbol | Name            | Count / Reel | Density |
+|--------|-----------------|:------------:|--------:|
+| H1     | Spinning Rim    |      2       |   3.1%  |
+| H2     | Turbocharger    |      3       |   4.6%  |
+| M1     | Car Grille      |      5       |   7.7%  |
+| M2     | Exhaust Pipe    |      6       |   9.2%  |
+| M3     | Steering Wheel  |      8       |  12.3%  |
+| L1     | Lug Nut         |     10       |  15.4%  |
+| L2     | Spark Plug      |     12       |  18.5%  |
+| L3     | Piston          |     14       |  21.5%  |
+| W      | Wild            |      3       |   4.6%  |
+| S      | Scatter         |      2       |   3.1%  |
 
 ---
 
-## 5. SCATTER FEATURE STATISTICS
+## 5. BASE MODE STATISTICS (cost 1.0x)
 
-| Metric                           | Value              |
-|-----------------------------------|--------------------|
-| Scatter hit rate (all spins)     | 1-in-15.7  (6.37%) |
-| Scatter spin count (100k sample) | 6,478 spins        |
-| Average scatter win              | 97.6× bet          |
-| Forced scatter quota (base)      | 5.0% of spins      |
-| Scatter 3-count weight           | 70% → 1.0× award  |
-| Scatter 4-count weight           | 20% → 3.0× award  |
-| Scatter 5-count weight           | 10% → 10.0× award |
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| RTP                                 | 96.3500% (10dp 96.3499998727%) |
+| Hit rate (win > 0)                  | 29.11%                   |
+| Zero-win rate                       | 70.89%                   |
+| Volatility (weighted SD)            | 17.28x                   |
+| Maximum win                         | 5,000x bet               |
+| Free-spin trigger rate              | 1 in 184.7 (0.5415%)     |
+| Average triggered-round win         | 79.40x bet               |
+| Wincap frequency                    | 1 in 100,000 (0.001%)    |
 
-*6.37% observed scatter rate vs 5.0% forced quota: the excess reflects scatters landing
-naturally on basegame and wincap spins.*
+### Trigger distribution (share of triggers)
 
----
+| Free spins awarded | Scatters | Share of triggers |
+|-------------------:|---------:|------------------:|
+| 8                  | 3        |            86.37% |
+| 12                 | 4        |            12.78% |
+| 16                 | 5        |             0.85% |
 
-## 6. WIN FREQUENCY TABLE
+### RTP budget split (base mode, weighted)
 
-| Metric                              | Value                  |
-|-------------------------------------|------------------------|
-| Total spins simulated               | 100,000                |
-| Spins with any win (win > 0)        | 33,572 (33.57%)        |
-| Spins with zero payout              | 66,428 (66.43%)        |
-| Overall hit rate                    | 1-in-3.0 spins         |
-| Average win per spin (all spins)    | 0.9635× bet            |
-| Average win per winning spin        | 2.87× bet              |
-| Maximum win recorded                | 5,000× bet (wincap)    |
-
----
-
-## 7. RTP BREAKDOWN
-
-| Component              | Fence       | Hit Rate     | RTP Contribution | % of Total RTP |
-|------------------------|-------------|:------------:|:----------------:|:--------------:|
-| Ways-to-win line wins  | basegame    | 1-in-3.5     |      71.35%      |     74.07%     |
-| Scatter multiplier     | scatter     | 1-in-20      |      20.00%      |     20.76%     |
-| Wincap events (5,000×) | wincap      | 1-in-100,000 |       5.00%      |      5.19%     |
-| Zero-win spins         | 0           | -            |       0.00%      |      0.00%     |
-| **TOTAL**              |             |              |   **96.35%**     |   **100.00%**  |
-
-*RTP verified by optimiser: 96.3500% (0.0000% deviation from target).*
+| Component                                   | RTP contribution |
+|---------------------------------------------|-----------------:|
+| Base ways (non-feature rounds)              |          53.3500% |
+| Overdrive free-spin rounds (instant scatter pays plus free-spin winnings) | 38.0000% |
+| Wincap rounds (5,000x)                       |           5.0000% |
+| **Total**                                    |     **96.3500%** |
 
 ---
 
-## 8. WIN DISTRIBUTION
+## 6. BONUS BUY MODE STATISTICS (cost 100.0x)
 
-*Based on 100,000 optimised base-game spins (weighted LUT, canonical base-only publish run).*
+The bonus buy guarantees a 3+ scatter trigger, weighted toward higher scatter
+counts than the base game to justify the 100x price. The average bought outcome
+returns 96.35x, i.e. an RTP of 96.35% at the 100x cost.
 
-| Win Tier      | % of Spins | Cumulative % |
-|---------------|:----------:|:------------:|
-| 0× (no win)   |   66.43%   |    66.43%    |
-| 0×-1×         |   16.80%   |    83.22%    |
-| 1×-5×         |   12.75%   |    95.98%    |
-| 5×-20×        |    3.09%   |    99.07%    |
-| 20×-100×      |    0.93%   |    99.99%    |
-| 100×+         |    0.01%   |   100.00%    |
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| RTP                                 | 96.3500% (10dp 96.3499999962%) |
+| Cost                                | 100.0x bet               |
+| Trigger rate                        | 100% (guaranteed)        |
+| Average bought outcome              | 96.35x bet               |
+| Volatility (weighted SD)            | 206.63x                  |
+| Maximum win                         | 5,000x bet               |
+| Wincap frequency                    | 1 in 1,000 (0.100%)      |
 
-**Maximum win:** 5,000× bet (wincap)
-**Wincap frequency:** 1-in-100,000 spins (0.001%)
+### Bonus entry distribution (share of triggers)
 
-### Payout Percentiles
+| Free spins awarded | Scatters | Share of triggers |
+|-------------------:|---------:|------------------:|
+| 8                  | 3        |            76.56% |
+| 12                 | 4        |            16.37% |
+| 16                 | 5        |             7.07% |
 
-| Percentile | Payout  |
-|:----------:|--------:|
-| P10        |  0.00×  |
-| P25        |  0.00×  |
-| P50        |  0.00×  |
-| P75        |  0.60×  |
-| P90        |  1.21×  |
-| P95        |  3.15×  |
-| P99        | 19.40×  |
+### RTP budget split (bonus mode, weighted)
 
----
-
-## 9. VOLATILITY METRICS
-
-| Metric                       | Value               |
-|------------------------------|---------------------|
-| Mean payout per spin         | 0.9635×             |
-| Median payout per spin       | 0.00× (>50% zero)   |
-| Standard deviation           | 16.23×              |
-| Mean / Median ratio          | N/A (median = 0)    |
-| Hit rate (win > 0)           | 33.57% (1-in-3.0)   |
-| Zero-win spin quota          | 40.0% forced + natural |
-| Volatility classification    | **Medium-High**     |
-
-*Volatility rationale: 66% zero-win rate creates significant dry spells, while the
-5,000× wincap and scatter multipliers provide strong positive-skew tail events.
-Standard deviation of 16.23× against a mean of 0.96× confirms medium-high variance.*
+| Component                                   | RTP contribution |
+|---------------------------------------------|-----------------:|
+| Overdrive free-spin rounds (incl instant pays) |         91.3500% |
+| Wincap rounds (5,000x)                       |           5.0000% |
+| **Total**                                    |     **96.3500%** |
 
 ---
 
-## 10. DISTRIBUTION DESIGN PARAMETERS
+## 7. SYMBOL COMBINATION FREQUENCIES
 
-| Parameter                    | Value           |
-|------------------------------|-----------------|
-| Simulation pool size (base)  | 100,000 spins   |
-| LUT entries                  | 100,000         |
-| Total LUT weight             | 1,125,899,906,781,129 |
-| Zero-win quota (forced)      | 40.0%           |
-| Scatter quota (forced)       | 5.0%            |
-| Wincap quota (forced)        | 0.1%            |
-| Basegame quota (free draw)   | 54.9%           |
-| Optimiser threads            | 20 (Rust)       |
-| Simulation threads           | 10 (Python)     |
+*Raw simulation frequencies across all simulated base-mode spins (base game and
+free spins combined), 100,000 rounds. Averages are per winning combination and
+include the Overdrive multiplier applied during free spins, which is why higher
+tiers can show elevated averages.*
+
+| Combination | Hit Rate (1-in-N) | Avg Win (x bet) | Sim Count |
+|-------------|------------------:|----------------:|----------:|
+| H1 x 5      |             244.7 |           71.9x |       391 |
+| H1 x 4      |             133.4 |           94.2x |       787 |
+| H1 x 3      |             147.8 |          117.6x |       750 |
+| H2 x 5      |             172.8 |          107.7x |       653 |
+| H2 x 4      |              67.1 |           96.4x |     1,468 |
+| H2 x 3      |              54.5 |          110.9x |     1,846 |
+| M1 x 5      |              46.8 |          104.1x |     2,279 |
+| M1 x 4      |              31.4 |           82.3x |     2,993 |
+| M1 x 3      |              46.9 |           84.1x |     2,056 |
+| M2 x 5      |              32.2 |           92.2x |     3,202 |
+| M2 x 4      |              24.4 |           84.4x |     4,336 |
+| M2 x 3      |              30.9 |           81.9x |     3,318 |
+| M3 x 5      |              19.2 |           90.1x |     5,032 |
+| M3 x 4      |              18.8 |           95.2x |     5,389 |
+| M3 x 3      |              27.9 |           87.1x |     3,609 |
+| L1 x 5      |               9.1 |           89.5x |    11,549 |
+| L1 x 4      |              10.1 |          101.0x |    10,664 |
+| L1 x 3      |              10.6 |           98.1x |     9,926 |
+| L2 x 5      |              11.1 |           91.8x |     9,363 |
+| L2 x 4      |              17.1 |           94.7x |     5,823 |
+| L2 x 3      |              29.5 |           80.8x |     3,554 |
+| L3 x 5      |               7.7 |           91.2x |    12,843 |
+| L3 x 4      |              12.1 |          104.0x |     8,643 |
+| L3 x 3      |              25.2 |          110.6x |     4,175 |
 
 ---
 
-## 11. SINGLE MODE DECLARATION
+## 8. VOLATILITY
 
-Future Spinner ships exactly one bet mode: base, cost 1.0× bet. It is stateless with an
-instant scatter multiplier resolved entirely within the spin that triggers it. There is no
-free spin round, no bonus game, no feature buy, no gamble feature and no continuation
-mechanic of any kind. The published bundle (`index.json`, `game_metadata.json`,
-`lookUpTable_base_0.csv`, `books_base.jsonl.zst`) contains base-mode artefacts only.
+| Metric                       | Base mode           | Bonus mode          |
+|------------------------------|---------------------|---------------------|
+| Weighted standard deviation  | 17.28x              | 206.63x             |
+| Hit rate                     | 29.11%              | 100% (guaranteed)   |
+| Maximum win                  | 5,000x              | 5,000x              |
+| Classification               | Medium-High         | High (feature buy)  |
 
----
-
-## 12. REGULATORY COMPLIANCE NOTES
-
-- **RTP achieved:** 96.3500%, matching the 96.35% declared target.
-- **Wincap enforced:** All payouts are capped at 5,000× bet at the engine level. No simulated outcome exceeds this value.
-- **Zero-win policy:** The `auto_close_disabled` flag is `False`, so zero-win rounds are automatically closed by the RGS without player interaction required.
-- **Scatter mechanic:** The scatter multiplier is resolved entirely within the same spin it is triggered (stateless). No free-spin rounds or deferred awards exist in this title.
-- **No progressive jackpot:** This title has no progressive contribution or jackpot mechanic.
-- **Single mode:** This title ships exactly one bet mode. See Section 11.
+*Base-mode volatility of 17.28x against a mean of 0.9635x reflects the rare but
+large Overdrive free-spin rounds and the 5,000x cap. The bonus buy is far more
+volatile because every purchase enters the feature and outcomes range widely up
+to the cap.*
 
 ---
 
-*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.0*
+## 9. PROVABLE ARTEFACTS AND VERIFICATION
+
+Both lookup tables were independently recomputed with exact integer arithmetic
+(fractions.Fraction) and both equal 96.3500% at four decimal places. The books
+match the lookup tables positionally by id and as sorted multisets in both
+modes; the maximum win is exactly 5,000.00x with zero rounds above the cap in
+either mode; the simulation is deterministic (fixed seeds reproduce identical
+payouts). A round-shape audit of freegame-containing books confirmed correct
+trigger counts, retriggers, Overdrive multiplier progression (+1 only after
+winning spins, applied to subsequent wins), instant scatter pays, and that the
+total payout equals the recorded payout multiplier in every sampled round.
+
+| File | SHA-256 |
+|------|---------|
+| index.json | 63c64048508a35940aa5fc5124489ceb9d1c774737411b3bd726779babb85107 |
+| game_metadata.json | 771fe87b78256626d9eb626bbdaee7ba9683dc5fd5e9b891063b00eb461164b3 |
+| lookUpTable_base_0.csv | 7aa435857dcac59756f96b21dd128c58a9e3ed538b647c9056cebeee25e71990 |
+| lookUpTable_bonus_0.csv | a77241f1a2e6606bebe94b5e6bb86bc6dda957732316d4962cffc199731d50cd |
+| books_base.jsonl.zst | b86c8bb484523a53b8a42db6dbaef0bc26c51843077b5f06d01f492c40d39331 |
+| books_bonus.jsonl.zst | a38d2b8f5da04ac4f401f33bcdfbbcde56f6b661bcc0f7ad50e518763dd9bbb9 |
+
+---
+
+## 10. TWO-MODE DECLARATION
+
+Future Spinner ships exactly two bet modes:
+
+- **base** (cost 1.0x): standard play. The Overdrive Free Spins feature triggers
+  on 3+ scatters at a rate of about 1 in 185 base spins.
+- **bonus** (cost 100.0x): a buy that guarantees entry to the Overdrive Free
+  Spins feature.
+
+Both modes are stateless (each round resolves independently inside one book
+round), share the 1,024-way base game and paytable, enforce the same 5,000x win
+cap, and return 96.3500% RTP. There is no jackpot, gamble, or continuation
+mechanic. The scatter awards are 1x/3x/10x instant plus 8/12/16 free spins on
+3/4/5 scatters, with a progressive Overdrive multiplier during the feature.
+
+---
+
+## 11. REGULATORY COMPLIANCE NOTES
+
+- **RTP:** 96.3500% in both modes (four decimal places), satisfying the 0.5%
+  tolerance rule.
+- **Wincap:** hard 5,000x cap enforced at the engine level; no simulated round
+  in either mode exceeds it.
+- **Stateless:** the whole Overdrive feature resolves within a single book
+  round; no state carries between rounds.
+- **No progressive jackpot, gamble, or continuation mechanic.**
+- **Bonus buy:** the 100x buy returns 96.35% RTP (average outcome 96.35x),
+  matching the base-mode RTP. Jurisdictions that disable feature buys hide the
+  bonus mode (frontend scope).
+
+---
+
+*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.1 (Overdrive Free Spins)*
