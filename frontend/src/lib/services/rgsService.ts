@@ -13,8 +13,16 @@
  * NEVER use floats for monetary values sent to the API.
  */
 
+import { get } from 'svelte/store'
 import { errorMessage, isLoading, balance, currencyCode } from '../stores/gameStore'
 import { rgsBetLevels } from '../stores/rgsBetLevels'
+// Sanctioned additive passthroughs (FS_FeatureFrontend, Overdrive Stage 2):
+//  - selectedBetMode : buy UI writes the mode; play() includes it in the request
+//  - jurisdictionFlags: initRGS publishes the authenticate jurisdiction flags
+//  - lastRoundEvents : spin() publishes the full raw round events before flattening
+import { selectedBetMode } from '../stores/betMode'
+import { jurisdictionFlags } from '../stores/jurisdiction'
+import { lastRoundEvents } from '../stores/roundEvents'
 
 // ── Currency ──────────────────────────────────────────────────────────────────
 /** 1 dollar = 1,000,000 micros. Use ONLY integer arithmetic for money. */
@@ -47,6 +55,7 @@ interface RawAuthResponse {
   betLevels:  number[]     // micros[]
   currency?:  string
   round?:     ActiveRound  // present when a round is in progress
+  jurisdiction?: Record<string, unknown>  // jurisdiction flags, e.g. disabledBuyFeature
 }
 
 interface ActiveRound {
@@ -62,6 +71,7 @@ export interface AuthResponse {
   betLevels: number[]     // dollars[]
   currency?: string
   round?:    ActiveRound
+  jurisdiction?: Record<string, unknown>  // surfaced jurisdiction flags (e.g. disabledBuyFeature)
 }
 
 // -- Play ---------------------------------------------------------------------
@@ -313,6 +323,7 @@ export async function authenticate(params: SessionParams): Promise<AuthResponse>
     betLevels: raw.betLevels.map(microsToDisplay),
     currency:  raw.currency,
     round:     raw.round,
+    jurisdiction: raw.jurisdiction,   // surfaced for the non-locked jurisdiction store
   }
 
   _devLog('authenticate ← OK', auth)
@@ -339,6 +350,9 @@ export async function play(
     _post<RawPlayResponse>(`${params.rgs_url}/wallet/play`, {
       sessionID: params.sessionID,
       amount:    amountMicros,
+      // Sanctioned additive: include the selected bet mode ('base' default, or
+      // 'bonus' when the buy UI set it). Base spins are unaffected.
+      mode:      get(selectedBetMode),
     })
   )
 
@@ -403,6 +417,8 @@ export async function initRGS(_gameId: string, _legacyToken: string): Promise<vo
     balance.set(auth.balance)
     if (auth.currency) currencyCode.set(auth.currency)
     rgsBetLevels.set(auth.betLevels)
+    // Sanctioned additive passthrough: publish jurisdiction flags for the buy UI.
+    jurisdictionFlags.set((auth.jurisdiction ?? {}) as Record<string, unknown>)
 
     _rgsMode = true
     _devLog('RGS connected — auth OK', { balance: auth.balance, betLevels: auth.betLevels })
@@ -443,6 +459,11 @@ async function _rgsSpinReal(req: SpinRequest): Promise<SpinResult> {
 
   try {
     const playResp = await play(params, req.betAmount)
+
+    // Sanctioned additive: publish the complete raw round event sequence BEFORE
+    // flattening, so the Overdrive presentation can play back the full round.
+    // SpinResult and every existing consumer are untouched.
+    lastRoundEvents.set(playResp.events as unknown as import('./roundInterpreter').RawEvent[])
 
     // authBalance starts as the post-play value (bet already deducted by RGS)
     let authBalance = playResp.balance

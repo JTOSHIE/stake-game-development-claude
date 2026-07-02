@@ -11,9 +11,30 @@ These are also machine-enforced by the `deny` rules in `.claude/settings.json`:
 - `frontend/src/lib/stores/gameStore.ts`: authoritative game state
 - `games/future_spinner/**`: the maths package (config, gamestate, run, publish files, PAR)
 
-Owner-sanctioned exceptions are granted only via `.claude/settings.local.json` for that
-single session, and only for the specific files named in the sanctioning brief. When the
-session ends the full lock re-applies. Never edit `.claude/settings.json` to widen access.
+**Canonical locked state of `rgsService.ts`.** The file now includes these owner-sanctioned
+additive passthroughs on top of the base client; this is its canonical locked surface going
+forward (no further edits without a new sanction):
+- the bet-levels passthrough (writes `rgsBetLevels` from the authenticate response);
+- `play()` includes the selected bet mode from the `selectedBetMode` store in the request;
+- `authenticate()`/`initRGS()` surface jurisdiction flags and publish them to `jurisdictionFlags`;
+- `_rgsSpinReal()` publishes the full raw round events to `lastRoundEvents` before flattening.
+`SpinResult` and all existing consumers are unchanged; base-mode behaviour is identical.
+
+### Lock-exception mechanism (the real one)
+
+A `deny` in `.claude/settings.json` takes precedence over any `allow` in
+`.claude/settings.local.json`, so adding a path to the local allow list does NOT lift a
+deny. An owner-sanctioned exception therefore works only like this:
+
+- The sanctioning brief must explicitly name the deny line(s) to lift.
+- The lift is a temporary, NEVER-committed working-tree edit of `.claude/settings.json`
+  removing exactly those deny line(s) for the session, restored before any commit so that
+  `git diff .claude/settings.json` is verified empty.
+- Writing to locked paths via Bash (for example `cp`, `python`, `sed`) to route around a
+  deny is FORBIDDEN and never counts as a sanctioned exception.
+
+When the session ends the full lock re-applies (the deny is back in place, uncommitted diff
+empty).
 
 ## Integer micros rule (mandatory, zero float tolerance)
 
@@ -90,3 +111,11 @@ the end of a session that changes it.
 guidelines, jurisdiction requirements, quality rankings, changelog, bet replay) via the
 headless browser into `docs/stake-engine-live/`, and update `COMPLIANCE_WATCH.md` with any
 differences found.
+
+**(e) Lock exceptions.** Follow the lock-exception mechanism above (temporary, never-committed
+`settings.json` deny removal named by the brief, restored with a verified-empty diff before
+commit; Bash-routing around a deny is forbidden).
+
+**(f) Briefs saved verbatim.** Briefs arrive as pasted messages. The session saves each one
+verbatim as its named prompt file in the repo root and commits it with that session's work
+(this reinforces (b)).

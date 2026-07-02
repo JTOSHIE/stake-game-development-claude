@@ -2,6 +2,7 @@
   import { showPaytable } from '../stores/gameStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
+  import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
 
   function close(): void {
@@ -108,7 +109,7 @@
                 <span class="sym-name">{sym.name}</span>
               </td>
               {#if sym.name === 'SCAT'}
-                <td colspan="3" class="scatter-note">3× = 1× · 4× = 3× · 5× = 10× multiplier</td>
+                <td colspan="3" class="scatter-note">3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins</td>
               {:else if sym.name === 'WILD'}
                 <td colspan="3" class="scatter-note">Substitutes for all symbols except SCATTER</td>
               {:else}
@@ -128,6 +129,20 @@
           {#each rulesList as rule}
             <li>{rule}</li>
           {/each}
+        </ul>
+      </div>
+
+      <!-- ── Overdrive Free Spins feature ─────────────────────────── -->
+      <div class="rules-section">
+        <h3 class="rules-heading">{$tr('rulesOverdriveTitle')}</h3>
+        <ul class="rules-list">
+          <li>{$tr('rulesOverdriveTrigger')}</li>
+          <li>{$tr('rulesOverdriveMeter')}</li>
+          <li>{$tr('rulesOverdriveRetrigger')}</li>
+          {#if !$buyFeatureDisabled}
+            <li>{$tr('rulesOverdriveBuy')}</li>
+          {/if}
+          <li>{$tr('rulesOverdriveModes')}</li>
         </ul>
       </div>
 
