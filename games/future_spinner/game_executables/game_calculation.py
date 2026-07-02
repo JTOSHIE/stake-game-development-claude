@@ -238,7 +238,7 @@ def check_scatter(
 
     Multiplier table
     ----------------
-    The values match the scatter bonus described in README.md and the
+    The values match the scatter multiplier described in README.md and the
     ``scatter_multiplier_table`` stored in ``GameConfig``.
 
     Examples
@@ -561,8 +561,8 @@ class GameCalculation(Executables):
     --------
     Ways-to-win: 5 reels × 4 rows = 4⁵ = 1,024 ways.
 
-    Bonus
-    -----
+    Scatter multiplier
+    ------------------
     Instant scatter multiplier — stateless, no free-spin state:
         3 S → 5×  total bet
         4 S → 15× total bet

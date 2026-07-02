@@ -15,9 +15,9 @@ from src.config.betmode import BetMode
 #
 # Target RTP: 96.35% (0.9635)
 #
-# The RTP is split across four simulation criteria in the BASE mode and two
-# in the BONUS (buy-bonus) mode. These fractions are initial design estimates
-# used to seed the optimizer — they will be refined once reel strips are tuned.
+# The RTP is split across four simulation criteria in the BASE mode. These
+# fractions are initial design estimates used to seed the optimizer — they
+# will be refined once reel strips are tuned.
 #
 # BASE MODE (cost = 1× bet):
 #   ┌────────────────┬────────┬──────────────────────────────────────────────┐
@@ -27,15 +27,6 @@ from src.config.betmode import BetMode
 #   │ scatter        │ 0.2000 │ Spins with 3–5 scatter symbols (instant mult)│
 #   │ 0              │ 0.0000 │ Zero-win spins (no payout to player)         │
 #   │ basegame       │ 0.7135 │ All other winning outcomes (ways-to-win)     │
-#   │ TOTAL          │ 0.9635 │                                              │
-#   └────────────────┴────────┴──────────────────────────────────────────────┘
-#
-# BONUS MODE (cost = 100× bet, buy-bonus):
-#   ┌────────────────┬────────┬──────────────────────────────────────────────┐
-#   │ Criteria       │  RTP   │ Description                                  │
-#   ├────────────────┼────────┼──────────────────────────────────────────────┤
-#   │ wincap         │ 0.0500 │ Maximum-win outcomes                         │
-#   │ scatter        │ 0.9135 │ Guaranteed scatter-multiplier spins          │
 #   │ TOTAL          │ 0.9635 │                                              │
 #   └────────────────┴────────┴──────────────────────────────────────────────┘
 #
@@ -303,7 +294,7 @@ class GameConfig(Config):
         #   H1:2, H2:3, M1:5, M2:6, M3:8, L1:10, L2:12, L3:14, W:3, S:2
         #   Total weight ≈ 65; strip length should be ≈ 65 or a multiple.
         #
-        # BR0 — Base game reel strip (used for all base+bonus distributions)
+        # BR0 — Base game reel strip (used for all base distributions)
         # (FR0 reserved for a freegame strip if a feature is added in future)
         #
         # If CSV files don't exist yet, self.reels[key] is simply not populated.
@@ -359,7 +350,7 @@ class GameConfig(Config):
         }
 
         # ── Condition: wincap ─────────────────────────────────────────────────
-        # Applied to 0.1% of base spins and 0.1% of bonus spins.
+        # Applied to 0.1% of base spins.
         # These are the extreme-win tail outcomes (≥ 5,000× bet).
         # win_criteria=5000.0 forces check_repeat() to reject any sim whose
         # final_win ≠ exactly 5,000× bet (the wincap).
@@ -371,7 +362,7 @@ class GameConfig(Config):
         }
 
         # ── Condition: scatter ────────────────────────────────────────────────
-        # Applied to 5% of base spins and 99.9% of bonus spins.
+        # Applied to 5% of base spins.
         # force_freegame=True instructs draw_board() to use force_special_board(),
         # which guarantees the requested number of scatter symbols appear.
         # scatter_triggers weights: {count: weight} → RNG selects scatter count.
@@ -393,20 +384,6 @@ class GameConfig(Config):
                 3: 70,   # 70% weight → 3 scatters → 5× total bet
                 4: 20,   # 20% weight → 4 scatters → 15× total bet
                 5: 10,   # 10% weight → 5 scatters → 50× total bet
-            },
-        }
-
-        # Bonus buy scatter distribution (99.9% of bonus spins):
-        # Bonus players pay 100× for guaranteed scatter access. Shift weight
-        # toward higher scatter counts to justify the buy cost vs. base game.
-        scatter_bonus_condition = {
-            "reel_weights":    _base_reels_both,
-            "force_wincap":    False,
-            "force_freegame":  True,
-            "scatter_triggers": {
-                3: 60,   # 60% → 3 scatters (5× bet)
-                4: 25,   # 25% → 4 scatters (15× bet)   ← higher than base
-                5: 15,   # 15% → 5 scatters (50× bet)   ← higher than base
             },
         }
 
@@ -434,11 +411,9 @@ class GameConfig(Config):
         }
 
         # ── Maximum Wins per Mode ─────────────────────────────────────────────
-        # Both modes share the same wincap. Kept as a dict for readability
-        # when constructing BetMode objects below.
+        # Kept as a dict for readability when constructing BetMode objects below.
         _mode_maxwins = {
             "base":  int(_WINCAP),   # 5000
-            "bonus": int(_WINCAP),   # 5000
         }
 
         # ── Bet Modes ─────────────────────────────────────────────────────────
@@ -490,40 +465,6 @@ class GameConfig(Config):
                     ),
                 ],
             ),
-
-            # ── BONUS MODE (Buy-Bonus) ────────────────────────────────────────
-            # Player pays 100× bet to enter guaranteed scatter-multiplier spin.
-            # Cost ratio 100× reflects: base scatter hit rate ~1/2000 spins ×
-            # ~3× expected award relative to bet × some buy-bonus premium.
-            # is_feature=False: this mode is not the "main" game loop.
-            # is_buybonus=True: RGS displays this as a purchase option.
-            #
-            # Distribution quota breakdown:
-            #   wincap   0.001  → wincap hits within bonus context
-            #   scatter  0.999  → nearly all bonus spins are scatter events
-            #   TOTAL    1.000
-            BetMode(
-                name="bonus",
-                cost=100.0,
-                rtp=self.rtp,                     # 0.9635 — same RTP as base
-                max_win=_mode_maxwins["bonus"],   # 5000
-                auto_close_disabled=False,
-                is_feature=False,
-                is_buybonus=True,
-                distributions=[
-                    Distribution(
-                        criteria="wincap",
-                        quota=0.001,
-                        win_criteria=float(_mode_maxwins["bonus"]),
-                        conditions=wincap_condition,
-                    ),
-                    Distribution(
-                        criteria="scatter",
-                        quota=0.999,
-                        conditions=scatter_bonus_condition,
-                    ),
-                ],
-            ),
         ]
 
         # ── Optimizer Parameters (opt_params) ─────────────────────────────────
@@ -547,7 +488,6 @@ class GameConfig(Config):
         #
         # RTP CONSTRAINT: all condition RTPs per mode MUST sum to mode RTP.
         #   Base:  0.0500 + 0.2000 + 0.0000 + 0.7135 = 0.9635 ✓
-        #   Bonus: 0.0500 + 0.9135               = 0.9635 ✓
         #
         # NOTE: If OptimizationSetup(config) is called in run.py, it WILL
         # overwrite self.opt_params with its own values. These values here are
@@ -657,65 +597,6 @@ class GameConfig(Config):
                 # basegame wins in the 2–5× range (small but satisfying hits).
                 "distribution_bias": [
                     {"criteria": "basegame", "range": (2.0, 5.0), "prob": 0.4},
-                ],
-            },
-
-            # ── Bonus Mode Optimizer Config ────────────────────────────────────
-            "bonus": {
-                "conditions": {
-
-                    # wincap: same as base — extreme tail within bonus context.
-                    "wincap": {
-                        "search_range": (_wincaps["bonus"], _wincaps["bonus"]),
-                        "force_search": {},
-                        "rtp":    0.0500,
-                        "av_win": float(_wincaps["bonus"]),
-                    },
-
-                    # scatter: nearly all bonus spins hit scatter (quota=0.999).
-                    # hr=5.0 → very high hit frequency (forced scatter every ~5 spins
-                    # within bonus pool); av_win ≈ rtp×hr per event.
-                    "scatter": {
-                        "search_range": (-1, -1),
-                        "force_search": {"symbol": "scatter"},
-                        "rtp":  0.9135,
-                        "hr":   5.0,
-                    },
-                },
-
-                "scaling": [
-                    # For bonus mode, focus on shaping the scatter win distribution.
-                    # Slightly boost lower-range scatter awards (5–15×) for frequency.
-                    {"criteria": "scatter", "scale_factor": 1.2,
-                     "win_range": (5.0, 15.0),    "probability": 1.0},
-                    # Reduce over-representation of mid-scatter awards (50–200×).
-                    {"criteria": "scatter", "scale_factor": 0.8,
-                     "win_range": (50.0, 200.0),  "probability": 1.0},
-                    # Preserve high-scatter wins (200–500×) at natural frequency —
-                    # these are the headline wins bonus players are buying for.
-                    {"criteria": "scatter", "scale_factor": 1.5,
-                     "win_range": (200.0, 500.0), "probability": 1.0},
-                ],
-
-                "parameters": {
-                    "num_show_pigs":       1000,
-                    "num_pigs_per_fence":  2000,
-                    "min_mean_to_median":     4,
-                    "max_mean_to_median":     8,
-                    "pmb_rtp":              1.0,
-                    "simulation_trials":    500,
-                    # Bonus sessions are shorter (player buys individual spins),
-                    # so weight short session counts more heavily.
-                    "test_spins":        [10, 20, 50],
-                    "test_spins_weights": [0.6, 0.2, 0.2],
-                    "score_type":         "rtp",
-                    "max_trial_dist":        10,
-                },
-
-                # Bonus bias: push scatter wins toward the 10–50× range —
-                # the "sweet spot" that justifies the buy-bonus cost to players.
-                "distribution_bias": [
-                    {"criteria": "scatter", "range": (10.0, 50.0), "prob": 0.3},
                 ],
             },
         }

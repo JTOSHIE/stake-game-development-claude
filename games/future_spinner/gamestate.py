@@ -85,10 +85,6 @@ class GameState(GameCalculation):
         0        -- win_criteria=0.0; spin must resolve with zero win
         basegame -- no win_criteria; any non-zero win accepted
 
-    betmode "bonus" (buy-bonus):
-        wincap   -- same as base wincap
-        scatter  -- force_freegame=True; higher scatter quota (quota=0.999)
-
     Symbol roster
     -------------
     H1 Spinning Rim | H2 Turbocharger | M1 Car Grille | M2 Exhaust Pipe
@@ -188,7 +184,7 @@ class GameState(GameCalculation):
         No-op stub — Future Spinner has no free-spin round.
 
         Required by ``GeneralGameState``'s ``@abstractmethod`` contract.  The
-        scatter bonus is a stateless single-spin multiplier resolved entirely
+        scatter multiplier is a stateless single-spin award resolved entirely
         inside ``run_spin``; ``run_freespin`` is never called during normal
         simulation.
         """

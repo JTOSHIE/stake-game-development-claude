@@ -11,7 +11,7 @@
 | 7 | **Error codes handled** — RGS error responses surface to player | ✅ PASS | `errorMessage` store; `error-banner` rendered in `App.svelte`; session expiry + maintenance keys in translations |
 | 8 | **High-res assets** — 512 px+ symbol PNGs, UI art | ⏳ PENDING | Placeholder PNG set integrated; final production renders from art team required before submission |
 | 9 | **PAR sheet** — Full probability and RTP breakdown document | ✅ PASS | `games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md`: hit rate 33.57%, win distribution, symbol pay table |
-| 10 | **Promo blurb** — 100–200 word storefront description | ✅ PASS | `PROMO_BLURB.md`: 160 words, cyberpunk theme, 5×4 grid, 1,024 ways, Scatter Multiplier (up to 50×) |
+| 10 | **Promo blurb** — 100–200 word storefront description | ✅ PASS | `PROMO_BLURB.md`: cyberpunk theme, 5×4 grid, 1,024 ways, Scatter Multiplier (up to 10×), single base mode, no buy-bonus |
 
 ---
 

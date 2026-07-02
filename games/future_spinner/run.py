@@ -48,7 +48,6 @@ if __name__ == "__main__":
         compression   = True        # Write .jsonl.zst (zstandard)
         num_sim_args  = {
             "base":  100_000,       # Full production — 100 k base-game simulations
-            "bonus": 100_000,       # Required for generate_configs()
         }
         run_conditions = {
             "run_sims":         True,
@@ -62,7 +61,6 @@ if __name__ == "__main__":
         compression   = False       # Plain .jsonl for easy inspection
         num_sim_args  = {
             "base":  100,           # 100 sims — quick smoke-test
-            "bonus": 100,           # 100 sims — needed for generate_configs()
         }
         run_conditions = {
             "run_sims":         True,
