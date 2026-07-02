@@ -1,5 +1,37 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-03 | Overdrive Free Spins two-mode maths package built
+## Last updated: 2026-07-03 | Overdrive Stage 2 feature frontend built
+
+## OVERDRIVE STAGE 2 — FEATURE FRONTEND — 2026-07-03
+Branch `claude/feature-frontend` (FS_FeatureFrontend_Prompt.md). Makes the frontend present
+the true two-mode Overdrive game: free-spins presentation, Overdrive meter, Bonus Buy,
+replay of feature rounds, rules/paytable, full 16-locale localisation with social overrides.
+
+- Round interpreter (`roundInterpreter.ts`): pure, typed, converts a book round into a
+  presentation script. Exact-total gate PASSES 44/44 sample rounds (sum of presented wins,
+  capped, equals payoutMultiplier exactly). 44 curated real rounds in `mock/sample_rounds.json`.
+- Presentation: `FreeSpinsPresentation.svelte` + `OverdriveMeter.svelte` (temporary CSS,
+  theme colours) play the entry, per-spin boards, meter increments (only after winning
+  spins), retriggers, and end count-up. Turbo-aware. Autoplay treats the bonus as one round.
+- Bonus Buy: `BuyBonus.svelte` (button + confirm modal, 100× price in live currency,
+  affordability guard). Hidden entirely when the jurisdiction disables feature buys.
+- Compliance: all new strings in 16 locales + social overrides (fixed the pre-existing
+  non-compliant 'BUY FEATURE' social label to 'GET FEATURE'). Headless first-paint scan:
+  social buy label is 'GET FEATURE' (no 'buy'), zero console errors.
+- Replay: `ReplayMode.svelte` plays a full free-spins round via the interpreter; bonus-buy
+  replays show the amount spent including the 100× cost multiplier; graceful on bad input.
+- Rules/paytable: PaytableModal gains the Overdrive section (trigger table, meter rules,
+  retrigger, buy + price, both modes 96.35% RTP, 5,000x cap); seven-point disclaimer intact.
+- Sanctioned locked change: three additive passthroughs to `rgsService.ts` (bet mode in
+  play request; jurisdiction flags to store; raw round events to store before flattening),
+  applied via the temporary two-line deny lift, restored with an empty diff before commit.
+  Base-mode behaviour identical (mock spin path byte-unchanged). New non-locked stores:
+  `betMode.ts`, `jurisdiction.ts`, `roundEvents.ts`, `mock/roundProvider.ts`.
+- Verification: tsc clean; build clean with NO warnings (sample data tree-shaken from the
+  production bundle, main chunk ~109 kB); exact-total gate 44/44; headless buy flow reaches
+  the free-spins overlay with zero console errors; replay graceful.
+- gameStore.ts untouched (fully locked). CLAUDE.md conventions updated: real lock-exception
+  mechanism, convention (f) briefs saved verbatim, and rgsService.ts canonical locked surface.
+
 
 ## OVERDRIVE FREE SPINS — TWO-MODE MATHS PACKAGE — 2026-07-03
 Owner decided Option C: ship a real bonus feature. Built on branch

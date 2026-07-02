@@ -49,6 +49,15 @@
   import type { SpinResult } from './lib/services/rgsService'
   import { playBGM, playWin } from './lib/services/soundService'
   import { isSocial } from './lib/stores/socialMode'
+  // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
+  import { get } from 'svelte/store'
+  import BuyBonus from './lib/components/BuyBonus.svelte'
+  import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
+  import { selectedBetMode } from './lib/stores/betMode'
+  import { lastRoundEvents } from './lib/stores/roundEvents'
+  import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
+  // Mock round provider is imported lazily and only in dev, so the sample data
+  // is tree-shaken out of the production build (live RGS supplies real events).
 
   // RGS error strings (set in the locked rgsService) are real-money framed
   // ("bet", "balance"). In social mode, remap those nouns so no gambling term
@@ -63,6 +72,76 @@
 
   let gridRef: GameGrid
   let showThemeSelector = false
+
+  // ── Overdrive free-spins presentation state ───────────────────────────────
+  let featureActive = false
+  let featureScript: PresentationScript | null = null
+  let featureResolve: (() => void) | null = null
+
+  /** Build a presentation script from a raw event list (live) or a served round. */
+  function scriptFromEvents(events: RawEvent[]): PresentationScript {
+    const finalWin = [...events].reverse().find((e) => e.type === 'finalWin')
+    const payout = Number((finalWin?.amount as number) ?? 0)
+    return interpretRound({ id: 0, payoutMultiplier: payout, events })
+  }
+
+  /** Play the free-spins overlay to completion. Resolves when the player has
+   *  seen the whole round. Autoplay treats the entire bonus as one round. */
+  function presentFeature(script: PresentationScript): Promise<void> {
+    return new Promise((resolve) => {
+      featureScript = script
+      featureActive = true
+      featureResolve = resolve
+    })
+  }
+
+  function onFeatureComplete(): void {
+    featureActive = false
+    featureScript = null
+    const r = featureResolve
+    featureResolve = null
+    if (r) r()
+  }
+
+  // ── Bonus Buy: place a bonus-mode spin and present the guaranteed feature ──
+  async function handleBuy(): Promise<void> {
+    if ($isSpinning || featureActive) return
+    isSpinning.set(true)
+    resetWin()
+    const bet = $betAmount
+    const cost = bet * 100
+    try {
+      selectedBetMode.set('bonus')
+      const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
+
+      // Live rgsService publishes the round events; in mock, serve a sample.
+      let servedTotalWin: number | null = null
+      if (import.meta.env.DEV && !get(lastRoundEvents)) {
+        const { serveMockRound } = await import('./lib/mock/roundProvider')
+        const round = await serveMockRound('bonus')
+        if (round) servedTotalWin = (round.payoutMultiplier / 100) * bet
+      }
+      const events = get(lastRoundEvents)
+      const script = events ? scriptFromEvents(events) : null
+
+      if (result.newBalance !== undefined) {
+        // Live: RGS balance is authoritative (already reflects the 100x cost).
+        recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
+      } else {
+        // Mock: deduct the full 100x cost and add the served round total.
+        const win = servedTotalWin ?? result.totalWin
+        recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
+      }
+
+      if (script?.triggered) await presentFeature(script)
+      playWin(bet > 0 ? $winMultiplier : 0)
+    } catch (err) {
+      console.error('[Buy error]', err)
+    } finally {
+      selectedBetMode.set('base')
+      isSpinning.set(false)
+    }
+  }
 
   let bgVideo1: HTMLVideoElement
   let bgVideo2: HTMLVideoElement
@@ -139,9 +218,11 @@
   }
 
   async function handleSpin() {
-    if ($isSpinning) return
+    if ($isSpinning || featureActive) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
+    selectedBetMode.set('base')
+    lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
     const bet  = $betAmount
 
@@ -155,6 +236,15 @@
       scatterCount.set(result.scatterEvent?.count ?? 0)
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
       playWin(bet > 0 ? result.totalWin / bet : 0)
+
+      // Live base rounds that trigger Overdrive publish their full events; play
+      // the free-spins overlay before autoplay continues. (Mock base spins do
+      // not populate this, so normal mock base play is unchanged.)
+      const roundEvents = get(lastRoundEvents)
+      if (roundEvents) {
+        const script = scriptFromEvents(roundEvents)
+        if (script.triggered) await presentFeature(script)
+      }
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
@@ -204,7 +294,7 @@
 
     // Let space behave normally (for example scrolling the modal) while a
     // modal or overlay is open.
-    if ($showPaytable || showThemeSelector || $isWincap) return
+    if ($showPaytable || showThemeSelector || $isWincap || featureActive) return
 
     // From here we own the spacebar: stop the page from scrolling.
     e.preventDefault()
@@ -340,6 +430,12 @@
       {/if}
       <WinBanner />
       <WinPod />
+      <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
+      <FreeSpinsPresentation
+        script={featureScript}
+        active={featureActive}
+        on:complete={onFeatureComplete}
+      />
     </div>
   </section>
 
@@ -349,6 +445,12 @@
   </footer>
 
   <ControlBar on:spin={handleSpin} />
+
+  <!-- Bonus Buy — hidden entirely where the jurisdiction disables feature buys.
+       Temporary CSS treatment; final art in AssetForge v2. -->
+  <div class="buy-bonus-row">
+    <BuyBonus on:buy={handleBuy} />
+  </div>
 
   <!-- Theme selector — dev-only. Hidden in the production submission build so
        only the validated Future Spinner experience ships (see the scope note

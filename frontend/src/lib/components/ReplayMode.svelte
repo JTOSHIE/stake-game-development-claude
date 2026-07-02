@@ -16,6 +16,8 @@
   import GameGrid from './GameGrid.svelte'
   import WinDisplay from './WinDisplay.svelte'
   import WinPod from './WinPod.svelte'
+  import FreeSpinsPresentation from './FreeSpinsPresentation.svelte'
+  import { interpretEvents, type PresentationScript, type RawEvent } from '../services/roundInterpreter'
 
   // Drive the animation pipeline by setting gameStore writables via their
   // public .set() API — gameStore.ts itself is NOT modified.
@@ -25,6 +27,7 @@
     scatterCount,
     winAmount,
     betAmount,
+    currencyCode,
     isWincap,
     isSpinning,
     WINCAP,
@@ -46,6 +49,17 @@
   let phase: 'loading' | 'ready' | 'playing' | 'complete' | 'error' = 'loading'
   let error: string | null = null
   let gridRef: GameGrid
+
+  // Overdrive free-spins playback (feature rounds).
+  let featureScript: PresentationScript | null = null
+  let featureActive = false
+  let featureResolve: (() => void) | null = null
+  function onFeatureComplete(): void {
+    featureActive = false
+    const r = featureResolve
+    featureResolve = null
+    if (r) r()
+  }
 
   onMount(async () => {
     try {
@@ -82,6 +96,29 @@
       const events: any[] = Array.isArray(response.state?.events)
         ? response.state.events
         : []
+
+      // Set bet + currency so amounts format correctly during playback.
+      betAmount.set(microsToDisplay(params.amount))
+      currencyCode.set(params.currency)
+
+      // --- Overdrive free-spins round -------------------------------------
+      // If the replayed round triggered the feature, play the full free-spins
+      // sequence via the shared interpreter and presentation overlay. The
+      // disclaimer stays visible in every phase (rendered at the top).
+      const isFeatureRound = events.some((ev: any) => ev.type === 'freeSpinTrigger')
+      if (isFeatureRound) {
+        const script = interpretEvents(events as RawEvent[])
+        if (script.triggered) {
+          featureScript = script
+          featureActive = true
+          await new Promise<void>((resolve) => { featureResolve = resolve })
+          winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
+          isWincap.set(response.payoutMultiplier >= WINCAP)
+          phase = 'complete'
+          replayPhase.set('complete')
+          return
+        }
+      }
 
       // --- Board ----------------------------------------------------------
       const boardEvent = events.find((ev: any) => ev.type === 'board')
@@ -172,6 +209,11 @@
     <!-- Game grid is always shown once data is ready -->
     <div class="grid-area">
       <GameGrid bind:this={gridRef} />
+      <FreeSpinsPresentation
+        script={featureScript}
+        active={featureActive}
+        on:complete={onFeatureComplete}
+      />
     </div>
 
     <!-- Win amount display once replay has played out -->
