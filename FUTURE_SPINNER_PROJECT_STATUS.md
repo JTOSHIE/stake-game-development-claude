@@ -1,5 +1,5 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-04-12 | Three new themes installed
+## Last updated: 2026-07-03 | Canonical base-only math package complete
 
 ## ANIMATED SYMBOL SYSTEM — 2026-04-05
 - ✅ Two-state video system: _idle.mp4 loop + _win.mp4 burst
@@ -62,6 +62,40 @@ UI asset sources:
 - ✅ Win line colour uses theme primary palette colour
 - ✅ Frame inset -80px (consistent across all themes)
 
+## CANONICAL BASE-ONLY MATH PACKAGE — 2026-07-03
+- ✅ Unshipped bonus (buy-bonus) BetMode removed from `game_config.py` and `run.py`;
+  base-mode paytable, reel strips, scatter table, wincap and distributions untouched
+  (verified byte-diff: only bonus-specific content removed)
+- ✅ `lookUpTable_bonus_0.csv` deleted; zero remaining "bonus" references in the maths
+  source except the SDK's own required `is_buybonus` constructor parameter
+- ✅ Canonical publish run executed from the repo (Python 3.14 venv, satisfies the SDK's
+  3.12+ f-string requirement; Rust PigFarm optimiser via Homebrew `cargo`)
+- ✅ `index.json` now declares exactly one mode (base, cost 1.0); `game_metadata.json`
+  already listed `modes: ["base"]`
+- ✅ Verification gates all passed: new base payouts byte-identical to the previously
+  committed table (positionally and as a multiset); books_base.jsonl.zst (100,000
+  rounds) matches the lookup table positionally and as a multiset, max exactly 5,000.00×,
+  zero rounds over cap; RTP 96.3500% at the same integer-arithmetic precision the repo's
+  own `audit/analyze.py` uses (the already-committed baseline is 96.34999996...% at
+  infinite precision too — both round identically; this is expected optimiser-weight
+  variance, not a defect)
+- ✅ PAR sheet regenerated from the canonical artefact: volatility, scatter trigger rate,
+  scatter average win, win distribution, combination tables and percentiles recomputed;
+  RTP/hit rate/paytable/reel frequencies/scatter table (1×/3×/10×) unchanged as required
+- ✅ Section 11 replaced with a SINGLE MODE DECLARATION; every em/en dash removed from
+  the PAR sheet
+- ✅ `PROMO_BLURB.md` and `SUBMISSION_CHECKLIST.md` corrected (removed stale "50×
+  scatter" and "buy-bonus access" claims; scatter is 1×/3×/10×, single base mode only).
+  Note: `FS_BlurbChecklistFix_Prompt.md` referenced by the task brief does not exist in
+  the repo, so this was done directly from the validated maths
+- ✅ `~/Desktop/FutureSpinner_SubmissionBundle/` rebuilt from scratch (math + fresh
+  frontend dist + PAR sheet + blurb + full SHA-256 manifest, 994 files, self-verified)
+- ⚠️  `submission-package/` (a stale legacy directory from 2026-04-03, predates all
+  maths fixes) still contains the old 5×/15×/50× scatter claim in its own
+  `promotional_blurb.txt` and `SUBMISSION_CHECKLIST.md`. Out of scope for this pass
+  (not part of the sanction); flagging for a future cleanup or removal decision.
+- rgsService.ts and gameStore.ts: not touched (hard lock respected)
+
 ## CURRENT STATE
 R5 audio system active. 12 tracks wired. Tiered win sounds (small/medium/big/epic).
 Dedicated scatter land sound. Anticipation audio (tension build + heavy reel stop).
@@ -97,6 +131,11 @@ Production build passing, 0 TypeScript errors.
 - ✅ 16 languages
 - ✅ No Stake branding
 - ✅ No underage appeal
+- ✅ Fonts self-hosted via @fontsource/orbitron — zero external font requests (XSS compliant) — 2026-05-10
+- ✅ Bet Replay implemented (mandatory) — replayService.ts + ReplayMode.svelte — 2026-04-12
+- ✅ Single bet mode only (base, cost 1.0×) — unshipped bonus mode removed from maths
+  source and publish files — 2026-07-03
+- ⏳ Replay event IDs pending (capture from staging, populate REPLAY_TEST_EVENTS.md)
 - ⏳ IP/trademark review pending
 - ⏳ Real RGS endpoint test pending
 - ⏳ Google Drive artwork upload pending
@@ -104,7 +143,7 @@ Production build passing, 0 TypeScript errors.
 ## COMPONENT STATUS
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Math SDK | ✅ LOCKED | 96.35% RTP, 100k sim |
+| Math SDK | ✅ LOCKED | 96.35% RTP, 100k sim, single base mode (canonical, 2026-07-03) |
 | rgsService.ts | ✅ LOCKED | Mock mode |
 | gameStore.ts | ✅ LOCKED | |
 | GameGrid.svelte | ✅ Complete | All symbols, WILD dark mask, blur tumble |
@@ -121,19 +160,25 @@ Production build passing, 0 TypeScript errors.
 | Symbol PNGs | ✅ Wired | All 10, WILD dark mask |
 | UI assets | ✅ Wired | R3 v2 bet buttons, labelled MAX/AUTO |
 | Sounds | ✅ Wired | R5: 12 tracks, 5 win tiers, anticipation, scatter land |
-| PAR Sheet | ✅ Complete | submission-package/FUTURE_SPINNER_PAR_SHEET.html |
+| PAR Sheet | ✅ Complete | games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md (canonical, matches uploaded bundle exactly) |
 | Submission package | ✅ Complete | Checklist + blurb |
 
 ## OUTSTANDING (manual steps only)
-1. Upload artwork folder to Google Drive/Dropbox — public link
-2. Upload dist/ + math publish files to Stake Engine portal
-3. IP/trademark review — "Future Spinner" / "We Roll Spinners"
-4. Test against real RGS endpoint (currently mock mode)
-5. Optional: PDF PAR sheet (brew install --cask basictex)
+Math/PAR package is canonical and complete; no reviewer notes required on that front.
+Submission is pending the design elevation pass plus these manual steps:
+1. Capture replay event IDs from staging deployment — populate REPLAY_TEST_EVENTS.md
+2. Upload artwork folder to Google Drive/Dropbox — public link
+3. Upload ~/Desktop/FutureSpinner_SubmissionBundle/ (math + dist, hash-verified) to the Stake Engine portal
+4. IP/trademark review — "Future Spinner" / "We Roll Spinners"
+5. Test against real RGS endpoint (currently mock mode)
+6. Optional: PDF PAR sheet (brew install --cask basictex)
+7. Decide whether to clean up or delete the stale submission-package/ legacy directory
 
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Canonical base-only package | 2026-07-03 | Removed unshipped bonus BetMode from game_config.py/run.py; ran canonical publish pipeline; all verification gates passed (payout identity, exact RTP, books match); PAR sheet regenerated with recomputed weight-dependent figures + single mode declaration; PROMO_BLURB.md/SUBMISSION_CHECKLIST.md corrected; Desktop submission bundle rebuilt with SHA-256 manifest |
+| Bet Replay | 2026-04-12 | replayService.ts + replayStore.ts + ReplayMode.svelte; App.svelte branches on ?replay=true; CLAUDE.md + REPLAY_TEST_EVENTS.md |
 | Compliance + frame + audio | 2026-04-11 | Frame inset symmetric, playWin epic→50×+echo, small win softer, status updated |
 | Definitive theme overhaul R2 | 2026-04-05 | All 4 themes assets reinstalled exact source filenames, integrity audit 0 failures, TSC+build clean |
 | Definitive theme overhaul | 2026-04-05 | Full asset reinstall, themeStore rewrite, GameGrid cache clear, all UI reactive |
@@ -207,3 +252,13 @@ Production build passing, 0 TypeScript errors.
 - ✅ trap-lane, oil-and-fire, beautiful-game: now load PNG symbols from themes/{id}/symbols/
 - ✅ Win burst: FS uses _win.mp4, other themes use CSS win-flash animation
 - ✅ TSC: 0 errors | Build: 0 warnings | Commit: 864448d
+
+## ORBITRON SELF-HOST — 2026-05-10
+- ✅ @fontsource/orbitron installed (v5.2.8)
+- ✅ Weights 400, 700, 900 imported in src/main.ts
+- ✅ Google Fonts <link> removed from App.svelte <svelte:head>
+- ✅ Build confirmed: 6× .woff2 files bundled in dist/assets/
+- ✅ dist/ grep: zero matches for fonts.googleapis.com or fonts.gstatic.com
+- ✅ CLAUDE.md created with fonts policy (prevents regression)
+- ✅ rgsService.ts and gameStore.ts NOT modified
+- ✅ TSC: 0 errors | Build: pass | Commit: 00dc23c
