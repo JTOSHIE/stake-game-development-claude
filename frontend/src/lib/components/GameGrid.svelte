@@ -1,13 +1,15 @@
 <script lang="ts">
   /**
-   * GameGrid.svelte — two-state animated symbol system
+   * GameGrid.svelte — themed vector symbol grid
    *
-   * Symbol display: HTML5 <video> elements in a CSS flex grid.
-   *   - Idle state : _idle.mp4 loops continuously
-   *   - Win state  : _win.mp4 plays once (4.0 s), then reverts to idle
+   * Symbol display: <img> PNG elements in a CSS flex grid, resolved from the
+   *   active theme (AssetForge v2 vector exports). The legacy per-symbol MP4
+   *   pipeline is retired; engine-driven win animation lands in Motion Polish v2.
+   *   - Idle state : the symbol PNG at full opacity
+   *   - Win state  : CSS win-flash pulse on winners, non-winners dim
    *
    * Win overlay  : PixiJS canvas (transparent) draws gold cell borders
-   *                and connecting lines on top of the video layer.
+   *                and connecting lines on top of the symbol layer.
    *
    * Spin animation: CSS blur on column wrappers + sequential reel timing.
    * Public API  : animateSpin(board) called by App.svelte — unchanged contract.
@@ -38,19 +40,13 @@
   const CANVAS_H = ROWS  * CELL_H + (ROWS  - 1) * GAP   // 412
 
   // ── Symbol asset paths — reactive to active theme ─────────────────────────
-  // future-spinner: MP4 video symbols  |  all other themes: PNG symbols
-  let _isFS      = false
-  let _assetBase = ''
-  let IDLE_BASE  = ''
-  let WIN_BASE   = ''
-  let PNG_IDLE   = ''
-  $: _isFS      = $themeAssets.id === 'future-spinner'
-  $: _assetBase = $themeAssets.assetBase
-  $: IDLE_BASE  = _isFS ? 'assets/symbols/idle'     : `${_assetBase}/symbols`
-  $: WIN_BASE   = _isFS ? 'assets/symbols/win'      : `${_assetBase}/symbols`
-  $: PNG_IDLE   = _isFS ? 'assets/symbols/idle-png' : `${_assetBase}/symbols`
-
-  const videoSupported = typeof HTMLVideoElement !== 'undefined'
+  // AssetForge v2: every theme (including future-spinner) renders its vector
+  // symbol PNGs from the themeStore-resolved path. The legacy MP4 roots under
+  // assets/symbols/{idle,win,idle-png} are no longer referenced.
+  let _assetBase  = ''
+  let SYMBOL_BASE = ''
+  $: _assetBase  = $themeAssets.assetBase
+  $: SYMBOL_BASE = `${_assetBase}/symbols`
 
   // ── State ─────────────────────────────────────────────────────────────────
   let pixiContainer: HTMLDivElement
@@ -58,11 +54,7 @@
   let winHighlightLayer: Graphics
   let assetsReady = false
 
-  // Video cell refs: videoRefs[col][row] — used by future-spinner only
-  let videoRefs: (HTMLVideoElement | null)[][] =
-    Array.from({ length: REELS }, () => Array.from({ length: ROWS }, (): HTMLVideoElement | null => null))
-
-  // Image cell refs: imgRefs[col][row] — used by non-FS themes (PNG symbols)
+  // Image cell refs: imgRefs[col][row] — PNG symbols for every theme
   let imgRefs: (HTMLImageElement | null)[][] =
     Array.from({ length: REELS }, () => Array.from({ length: ROWS }, (): HTMLImageElement | null => null))
 
@@ -98,23 +90,8 @@
     // Always signal loading complete — must not stay stuck at 0%
     assetLoadProgress.set(100)
 
-    // Initialize all cells to idle L3 (FS video only — non-FS uses reactive template src)
-    if (_isFS) {
-      for (let col = 0; col < REELS; col++) {
-        for (let row = 0; row < ROWS; row++) {
-          const vid = videoRefs[col][row]
-          if (vid) {
-            vid.setAttribute('data-symbol', 'L3')
-            vid.src = getIdleSrc('L3')
-            vid.loop = true
-            vid.play().catch(() => {})
-          }
-        }
-      }
-    }
-
     const unsubBoard = boardSymbols.subscribe(board => {
-      if (assetsReady && board && board.length === REELS) _updateSymbolVideos(board)
+      if (assetsReady && board && board.length === REELS) _updateSymbols(board)
     })
 
     const unsubWins = activeWins.subscribe(() => {
@@ -137,40 +114,20 @@
     'W':  'wild', 'S': 'scatter'
   }
 
-  function getIdleSrc(symbol: string): string {
-    if (_isFS) return `${IDLE_BASE}/${symbol.toUpperCase()}_idle.mp4`
+  function symbolSrc(symbol: string): string {
     const fname = _symNameMap[symbol.toUpperCase()] ?? symbol.toLowerCase()
-    return `${IDLE_BASE}/${fname}.png`
-  }
-
-  function getWinSrc(symbol: string): string {
-    if (_isFS) return `${WIN_BASE}/${symbol.toUpperCase()}_win.mp4`
-    const fname = _symNameMap[symbol.toUpperCase()] ?? symbol.toLowerCase()
-    return `${WIN_BASE}/${fname}.png`
+    return `${SYMBOL_BASE}/${fname}.png`
   }
 
   // ── Update all symbol cells to idle state for given board ─────────────────
-  function _updateSymbolVideos(board: string[][]): void {
+  function _updateSymbols(board: string[][]): void {
     for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
         const symbol = (board[col]?.[row] ?? 'L3').toUpperCase()
-        if (_isFS) {
-          const vid = videoRefs[col][row]
-          if (!vid) continue
-          if (vid.getAttribute('data-symbol') !== symbol) {
-            vid.setAttribute('data-symbol', symbol)
-            vid.src = getIdleSrc(symbol)
-            vid.loop = true
-            vid.load()
-            vid.play().catch(() => {})
-          }
-          vid.style.opacity = '1'
-        } else {
-          const img = imgRefs[col]?.[row]
-          if (!img) continue
-          img.src = getIdleSrc(symbol)
-          img.style.opacity = '1'
-        }
+        const img = imgRefs[col]?.[row]
+        if (!img) continue
+        img.src = symbolSrc(symbol)
+        img.style.opacity = '1'
       }
     }
   }
@@ -203,52 +160,23 @@
         if (!symbol) continue
         const key = `${col},${row}`
 
-        if (_isFS) {
-          const vid = videoRefs[col][row]
-          if (!vid) continue
-          if (winningCells.has(key)) {
-            // Swap to win burst video — plays once
-            vid.style.opacity = '1'
-            vid.loop = false
-            vid.src = getWinSrc(symbol.toUpperCase())
-            vid.load()
-            vid.currentTime = 0
-            vid.play().catch(() => {})
-          } else {
-            // Non-winning: pause idle and dim to 40%
-            vid.pause()
-            vid.style.opacity = '0.4'
-          }
+        const img = imgRefs[col]?.[row]
+        if (!img) continue
+        if (winningCells.has(key)) {
+          img.style.opacity = '1'
+          img.classList.add('win-flash')
         } else {
-          const img = imgRefs[col]?.[row]
-          if (!img) continue
-          if (winningCells.has(key)) {
-            img.style.opacity = '1'
-            img.classList.add('win-flash')
-          } else {
-            img.style.opacity = '0.35'
-          }
+          img.style.opacity = '0.35'
         }
       }
     }
 
     // After 4.0 s: restore all to idle
     winBurstTimer = setTimeout(() => {
-      const currentBoard = get(boardSymbols)
-      if (_isFS) {
-        if (currentBoard.length) _updateSymbolVideos(currentBoard)
-        for (let col = 0; col < REELS; col++) {
-          for (let row = 0; row < ROWS; row++) {
-            const vid = videoRefs[col][row]
-            if (vid) { vid.loop = true; vid.style.opacity = '1' }
-          }
-        }
-      } else {
-        for (let col = 0; col < REELS; col++) {
-          for (let row = 0; row < ROWS; row++) {
-            const img = imgRefs[col]?.[row]
-            if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
-          }
+      for (let col = 0; col < REELS; col++) {
+        for (let row = 0; row < ROWS; row++) {
+          const img = imgRefs[col]?.[row]
+          if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
         }
       }
     }, 4000)
@@ -259,13 +187,8 @@
     if (winBurstTimer) { clearTimeout(winBurstTimer); winBurstTimer = null }
     for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
-        if (_isFS) {
-          const vid = videoRefs[col][row]
-          if (vid) { vid.loop = true; vid.style.opacity = '1' }
-        } else {
-          const img = imgRefs[col]?.[row]
-          if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
-        }
+        const img = imgRefs[col]?.[row]
+        if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
       }
     }
   }
@@ -431,22 +354,10 @@
     const reel = finalBoard[r] ?? []
     for (let row = 0; row < ROWS; row++) {
       const sym = (reel[row] ?? 'L3').toUpperCase()
-      if (_isFS) {
-        const vid = videoRefs[r][row]
-        if (vid) {
-          vid.setAttribute('data-symbol', sym)
-          vid.src = getIdleSrc(sym)
-          vid.loop = true
-          vid.load()
-          vid.play().catch(() => {})
-          vid.style.opacity = '1'
-        }
-      } else {
-        const img = imgRefs[r]?.[row]
-        if (img) {
-          img.src = getIdleSrc(sym)
-          img.style.opacity = '1'
-        }
+      const img = imgRefs[r]?.[row]
+      if (img) {
+        img.src = symbolSrc(sym)
+        img.style.opacity = '1'
       }
     }
 
@@ -508,37 +419,14 @@
       <div class="symbol-col" bind:this={colRefs[col]} data-col={col}>
         {#each Array(ROWS) as _, row}
           <div class="symbol-cell" data-col={col} data-row={row}>
-            {#if _isFS}
-              {#if videoSupported}
-                <video
-                  bind:this={videoRefs[col][row]}
-                  class="symbol-video"
-                  autoplay
-                  loop
-                  muted
-                  playsinline
-                  data-col={col}
-                  data-row={row}
-                ></video>
-              {:else}
-                <!-- PNG fallback for FS on no-video devices -->
-                <img
-                  class="symbol-img"
-                  src="{PNG_IDLE}/{($boardSymbols?.[col]?.[row] ?? 'L3').toUpperCase()}.png"
-                  alt=""
-                  draggable="false"
-                />
-              {/if}
-            {:else}
-              <!-- Non-FS themes: PNG symbols from active theme folder -->
-              <img
-                bind:this={imgRefs[col][row]}
-                class="symbol-img"
-                src={getIdleSrc($boardSymbols?.[col]?.[row] ?? 'L3')}
-                alt={$boardSymbols?.[col]?.[row] ?? 'L3'}
-                draggable="false"
-              />
-            {/if}
+            <!-- PNG symbols from the active theme (AssetForge v2 vector exports) -->
+            <img
+              bind:this={imgRefs[col][row]}
+              class="symbol-img"
+              src={symbolSrc($boardSymbols?.[col]?.[row] ?? 'L3')}
+              alt={$boardSymbols?.[col]?.[row] ?? 'L3'}
+              draggable="false"
+            />
           </div>
         {/each}
         <!-- Spin overlay — covers entire column during spin, fades out on land -->
@@ -621,13 +509,6 @@
     background: rgba(9, 9, 20, 0.85);
     border-radius: 8px;
     overflow: hidden;
-  }
-
-  .symbol-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: opacity 0.15s ease;
   }
 
   .symbol-img {
