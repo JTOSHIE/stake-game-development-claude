@@ -1,0 +1,37 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd700" stop-opacity="0.16"/>
+      <stop offset="60%" stop-color="#ffd700" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffd700" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldBody" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff3b0"/>
+      <stop offset="35%" stop-color="#e8b422"/>
+      <stop offset="60%" stop-color="#8a6508"/>
+      <stop offset="100%" stop-color="#d9a81e"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8fa2b8"/>
+      <stop offset="40%" stop-color="#39465c"/>
+      <stop offset="65%" stop-color="#161d2c"/>
+      <stop offset="100%" stop-color="#4a5a72"/>
+    </linearGradient>
+    <radialGradient id="bore" cx="42%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#232c40"/>
+      <stop offset="60%" stop-color="#0c111d"/>
+      <stop offset="100%" stop-color="#05070d"/>
+    </radialGradient>
+  </defs>
+  <circle cx="512" cy="512" r="486" fill="url(#bgGlow)"/>
+  <polygon points="512,142 832,327 832,697 512,882 192,697 192,327" fill="url(#goldBody)" stroke="#0a0e16" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="512,209 774,360 774,664 512,815 250,664 250,360" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="5" stroke-linejoin="round"/>
+  <polygon points="512,142 832,327 774,360 512,209" fill="#ffffff" opacity="0.28"/>
+  <polygon points="192,327 512,142 512,209 250,360" fill="#ffffff" opacity="0.14"/>
+  <circle cx="512" cy="512" r="150" fill="url(#bore)" stroke="#0a0e16" stroke-width="6"/>
+  <path d="M 420 470 A 120 120 0 0 1 560 420" fill="none" stroke="#5a6b80" stroke-width="7" opacity="0.7"/>
+  <path d="M 412 540 A 128 128 0 0 1 470 428" fill="none" stroke="#5a6b80" stroke-width="5" opacity="0.5"/>
+  <circle cx="512" cy="512" r="150" fill="none" stroke="#ffd700" stroke-width="22" opacity="0.18"/>
+  <circle cx="512" cy="512" r="150" fill="none" stroke="#ffe66b" stroke-width="7" opacity="0.95"/>
+  <ellipse cx="380" cy="300" rx="150" ry="60" fill="#ffffff" opacity="0.07" transform="rotate(-32 380 300)"/>
+</svg>

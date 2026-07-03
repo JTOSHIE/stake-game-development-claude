@@ -1,0 +1,56 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="58%" r="50%">
+      <stop offset="0%" stop-color="#9adcff" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#9adcff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#9adcff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#c8daea"/>
+      <stop offset="45%" stop-color="#6d8098"/>
+      <stop offset="58%" stop-color="#2e3a4c"/>
+      <stop offset="80%" stop-color="#a9bed4"/>
+      <stop offset="100%" stop-color="#e9f5ff"/>
+    </linearGradient>
+    <linearGradient id="ceramic" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#e8eef6"/>
+      <stop offset="100%" stop-color="#b9c6d6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="560" r="470" fill="url(#bgGlow)"/>
+  <rect x="484" y="118" width="56" height="70" rx="16" fill="url(#gold)" stroke="#0a0e16" stroke-width="4"/>
+  <circle cx="512" cy="112" r="34" fill="url(#gold)" stroke="#0a0e16" stroke-width="4"/>
+  <rect x="452" y="186" width="120" height="256" rx="42" fill="url(#ceramic)" stroke="#0a0e16" stroke-width="5"/>
+  <g stroke="#8a99ab" stroke-width="5" fill="none" opacity="0.8">
+    <path d="M 456 250 Q 512 268 568 250"/>
+    <path d="M 456 316 Q 512 334 568 316"/>
+    <path d="M 456 382 Q 512 400 568 382"/>
+  </g>
+  <rect x="418" y="440" width="188" height="164" rx="18" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <line x1="462" y1="446" x2="462" y2="598" stroke="#0a0e16" stroke-width="3" opacity="0.5"/>
+  <line x1="562" y1="446" x2="562" y2="598" stroke="#0a0e16" stroke-width="3" opacity="0.5"/>
+  <path d="M 430 452 L 430 592" stroke="#ffffff" stroke-width="8" opacity="0.5"/>
+  <rect x="452" y="602" width="120" height="128" rx="10" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <g stroke="#1a2334" stroke-width="6">
+    <line x1="454" y1="626" x2="570" y2="618"/>
+    <line x1="454" y1="654" x2="570" y2="646"/>
+    <line x1="454" y1="682" x2="570" y2="674"/>
+    <line x1="454" y1="710" x2="570" y2="702"/>
+  </g>
+  <rect x="496" y="730" width="32" height="64" rx="8" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="4"/>
+  <path d="M 588 716 L 588 828 L 528 828" fill="none" stroke="url(#chromeU)" stroke-width="24" stroke-linecap="round"/>
+  <path d="M 588 716 L 588 828 L 528 828" fill="none" stroke="#0a0e16" stroke-width="30" opacity="0.25"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M 512 798 L 500 812 L 522 818 L 512 826" stroke="#9adcff" stroke-width="18" opacity="0.25"/>
+    <path d="M 512 798 L 500 812 L 522 818 L 512 826" stroke="#cfeeff" stroke-width="8" opacity="0.8"/>
+    <path d="M 512 798 L 500 812 L 522 818 L 512 826" stroke="#ffffff" stroke-width="3"/>
+  </g>
+  <circle cx="512" cy="814" r="52" fill="#9adcff" opacity="0.18"/>
+</svg>

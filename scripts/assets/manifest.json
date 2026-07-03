@@ -1,0 +1,70 @@
+{
+  "_doc": "AssetForge v2 export manifest. Deterministic: `npm run assets` renders every entry here from design-system/masters/ to exact pixel sizes. Reproducible (byte-identical on re-run).",
+  "masters_root": "design-system/masters",
+  "output_root": "frontend/public/assets/themes/future-spinner",
+  "symbols": [
+    {"id": "h1",      "src": "H1_master_v2.svg"},
+    {"id": "h2",      "src": "H2_master_v31.svg"},
+    {"id": "m1",      "src": "M1_master_v3.svg"},
+    {"id": "m2",      "src": "M2_master_v2.svg"},
+    {"id": "m3",      "src": "M3_master_v3.svg"},
+    {"id": "l1",      "src": "L1_master.svg"},
+    {"id": "l2",      "src": "L2_master.svg"},
+    {"id": "l3",      "src": "L3_master.svg"},
+    {"id": "wild",    "src": "W_master.svg"},
+    {"id": "scatter", "src": "S_master.svg"}
+  ],
+  "symbol_sizes": [
+    {"suffix": "",    "w": 240, "h": 240},
+    {"suffix": "_1x", "w": 120, "h": 120}
+  ],
+  "exports": [
+    {"src": "brand_mark.svg",          "out": "ui/brand_mark.png",         "w": 512,  "h": 512},
+    {"src": "brand_mark.svg",          "out": "ui/brand_mark_glyph.png",   "w": 192,  "h": 192},
+    {"src": "M2_master_v2.svg",        "out": "ui/feature_button.png",     "w": 224,  "h": 224},
+    {"src": "H2_master_v31.svg",       "out": "ui/gauge_face.png",         "w": 464,  "h": 464},
+    {"src": "scene_character_car.svg", "out": "ui/scene_character_car.png", "w": 1200, "h": 656},
+    {"src": "plate_instrument.svg",    "out": "ui/instrument_plate.png",   "w": 524,  "h": 119},
+    {"src": "plate_instrument.svg",    "out": "ui/instrument_plate_1x.png","w": 262,  "h": 59}
+  ],
+  "layered": [
+    {
+      "_doc": "H1 rim: rotating group alone (spin sprite) + full master with the rotating group removed (static base). Engine rotates h1_spin over h1_base.",
+      "src": "H1_master_v2.svg",
+      "group_ids": ["spokes", "spokeShadows", "hubBolts"],
+      "out_only": "symbols/h1_spin.png",
+      "out_base": "symbols/h1_base.png",
+      "w": 240, "h": 240
+    },
+    {
+      "_doc": "H2 gauge: needle group alone + face with the needle removed. Engine rotates gauge_needle over gauge_base by meter value.",
+      "src": "H2_master_v31.svg",
+      "match_transform": "rotate(62 512 512)",
+      "out_only": "ui/gauge_needle.png",
+      "out_base": "ui/gauge_base.png",
+      "w": 464, "h": 464
+    }
+  ],
+  "tile_plate": {
+    "out": "symbols/tile_plate.png",
+    "w": 244, "h": 204, "fill": "#0b0f1c", "radius": 28,
+    "grid_alpha": 0.06, "grid_step": 34
+  },
+  "plates_json": {
+    "out": "plates.json",
+    "plate_sprite": "symbols/tile_plate.png",
+    "note": "Symbol id to signature colour for engine edge tinting of the tile plate. H1 and wild are cyan/magenta duos (primary listed); scatter is spectrum (gold anchor).",
+    "colours": {
+      "h1": "#00ffff",
+      "h2": "#ff2d3d",
+      "m1": "#ff9a2e",
+      "m2": "#8a5cff",
+      "m3": "#5dff3c",
+      "l1": "#ffd700",
+      "l2": "#9adcff",
+      "l3": "#ff7a2e",
+      "wild": "#ff00ff",
+      "scatter": "#ffd700"
+    }
+  }
+}

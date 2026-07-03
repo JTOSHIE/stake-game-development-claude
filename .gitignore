@@ -27,3 +27,7 @@ __pycache__
 
 **/site/*
 
+
+# AssetForge build venv (never committed)
+scripts/assets/.venv/
+scripts/assets/__pycache__/

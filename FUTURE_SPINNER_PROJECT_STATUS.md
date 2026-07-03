@@ -1,5 +1,43 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-03 | Overdrive Stage 2 feature frontend built
+## Last updated: 2026-07-03 | AssetForge v2: masters, layout law, pipeline, backgrounds
+
+## ASSETFORGE v2: MASTERS, LAYOUT LAW, PIPELINE, BACKGROUNDS (2026-07-03)
+Branch `claude/assetforge-v2` (FS_AssetForge_v2_Prompt.md). Ships the in-house vector design
+capital, a deterministic asset pipeline, the layout law, and static graded backgrounds. The
+full HUD rebuild to LAYOUT_SPEC v3.1 is scoped but is NOT in this pass (see the last bullet).
+
+- Ten masters in design-system/masters/ (six from part one: M1_v3, M2_v2, M3_v3, L1, L2, L3;
+  four from part two: H2_v31, brand_mark, plate_instrument, scene_character_car). All real
+  SVG; manifest check passed (10 of 10, zero placeholders); all render on-brand (contact
+  sheet at ~/Desktop/FS_AssetForge_Screens/).
+- DESIGN_SYSTEM.md updated: lineup (M2 Holographic Grille, M3 Plasma Booster, H2 v3.1 THE
+  ANCHOR, M1 v3, L1/L2/L3 in masters), signature colour identity law, silhouette-first,
+  tile-plate law, generic control overlay, retirements (win pod; themed spin/buy buttons),
+  and the non-symbol masters (scene, brand, instrument plate).
+- LAYOUT_SPEC.md committed (design-system/LAYOUT_SPEC.md): HANDOVER.md section 4 verbatim.
+- Deterministic pipeline: scripts/assets/manifest.json + build.py, wired as `npm run assets`.
+  33 exports (ten symbols at 240 and 120, tile plate + plates.json colour table, brand mark
+  512/192, Grille feature button 224, gauge face 464, scene 1200 wide, instrument plate
+  524/262, layered H1 spin+base and H2 needle+face). Reproducibility gate PASSED (two runs
+  byte-identical).
+- Static backgrounds (scripts/assets/backgrounds.py): bg_base.jpg (t=22s) and bg_overdrive.jpg
+  (t=7s) graded per HANDOVER section 3, quality 88. App.svelte swapped from the dual-video
+  crossfade to static stills with an Overdrive crossfade; the animated loop mp4 is excluded
+  from dist by a vite plugin (source kept in repo). Build verified: mp4 absent from dist,
+  both jpgs present.
+- CLAUDE.md convention (g) cross-reference corrected from (d) to (e).
+- Gates: exact-total interpreter test PASSES 44/44; `npm run build` clean; my source changes
+  add zero type errors (23 pre-existing svelte-check errors remain in untouched bonus
+  components and the tsx test file, unrelated to this pass).
+- NOT in this pass (Task 5, the large remainder): full HUD and scene rebuild to LAYOUT_SPEC
+  (1280x720 surface re-architecture, symbol-on-tinted-plate grid, persistent bonus instrument
+  column, character scene placement, occlusion gate across ten viewports). The live app is a
+  720x760 surface; that re-architecture is a substantial separately-verifiable pass and was
+  deliberately not big-banged unverified. Every export, plate and background it needs is now
+  produced and ready. Task 6 recon (valkyriestudio.gg, reachable HTTP 200) is reference-only
+  and left as a reachability note (nothing committed).
+- rgsService.ts, gameStore.ts and games/future_spinner/**: not touched (hard locks respected).
+
 
 ## OVERDRIVE STAGE 2 — FEATURE FRONTEND — 2026-07-03
 Branch `claude/feature-frontend` (FS_FeatureFrontend_Prompt.md). Makes the frontend present

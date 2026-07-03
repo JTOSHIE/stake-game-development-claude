@@ -1,0 +1,73 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8a5cff" stop-opacity="0.2"/>
+      <stop offset="60%" stop-color="#8a5cff" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#8a5cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#c8daea"/>
+      <stop offset="40%" stop-color="#6d8098"/>
+      <stop offset="52%" stop-color="#2e3a4c"/>
+      <stop offset="66%" stop-color="#7d92aa"/>
+      <stop offset="85%" stop-color="#e9f5ff"/>
+      <stop offset="100%" stop-color="#8ea3ba"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8fa2b8"/>
+      <stop offset="40%" stop-color="#39465c"/>
+      <stop offset="65%" stop-color="#161d2c"/>
+      <stop offset="100%" stop-color="#4a5a72"/>
+    </linearGradient>
+    <linearGradient id="violetGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b490ff"/>
+      <stop offset="50%" stop-color="#8a5cff"/>
+      <stop offset="100%" stop-color="#4b1fae"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="486" fill="url(#bgGlow)"/>
+  <rect x="92" y="232" width="840" height="560" rx="72" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="6"/>
+  <path d="M 150 262 L 560 250" stroke="#ffffff" stroke-width="16" opacity="0.5" stroke-linecap="round"/>
+  <rect x="134" y="274" width="756" height="476" rx="52" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="5"/>
+  <g fill="url(#gold)" stroke="#0a0e16" stroke-width="3">
+    <circle cx="158" cy="298" r="12"/><circle cx="866" cy="298" r="12"/>
+    <circle cx="158" cy="726" r="12"/><circle cx="866" cy="726" r="12"/>
+  </g>
+  <rect x="176" y="316" width="672" height="24" rx="12" fill="#00e5ff" opacity="0.25"/>
+  <rect x="176" y="316" width="672" height="24" rx="12" fill="none" stroke="#5cffff" stroke-width="5" opacity="0.9"/>
+  <rect x="196" y="322" width="632" height="12" rx="6" fill="#eaffff" opacity="0.9"/>
+  <rect x="176" y="372" width="672" height="316" rx="26" fill="url(#violetGlow)" opacity="0.85"/>
+  <rect x="176" y="372" width="672" height="316" rx="26" fill="none" stroke="#0a0e16" stroke-width="4"/>
+  <g fill="url(#chromeU)" stroke="#0a0e16" stroke-width="4">
+    <rect x="204" y="372" width="52" height="316"/>
+    <rect x="290" y="372" width="52" height="316"/>
+    <rect x="376" y="372" width="52" height="316"/>
+    <rect x="596" y="372" width="52" height="316"/>
+    <rect x="682" y="372" width="52" height="316"/>
+    <rect x="768" y="372" width="52" height="316"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="4" opacity="0.4">
+    <line x1="212" y1="380" x2="212" y2="680"/>
+    <line x1="298" y1="380" x2="298" y2="680"/>
+    <line x1="384" y1="380" x2="384" y2="680"/>
+    <line x1="604" y1="380" x2="604" y2="680"/>
+    <line x1="690" y1="380" x2="690" y2="680"/>
+    <line x1="776" y1="380" x2="776" y2="680"/>
+  </g>
+  <polygon points="512,412 588,530 512,648 436,530" fill="url(#gold)" stroke="#0a0e16" stroke-width="5"/>
+  <polygon points="512,448 560,530 512,612 464,530" fill="url(#gunmetal)" stroke="#7d5a06" stroke-width="4"/>
+  <circle cx="512" cy="530" r="88" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.8"/>
+  <circle cx="512" cy="530" r="88" fill="none" stroke="#00e5ff" stroke-width="12" opacity="0.2"/>
+  <g fill="#0b111e" stroke="#0a0e16" stroke-width="3">
+    <rect x="286" y="712" width="130" height="22" rx="11"/>
+    <rect x="447" y="712" width="130" height="22" rx="11"/>
+    <rect x="608" y="712" width="130" height="22" rx="11"/>
+  </g>
+  <ellipse cx="330" cy="310" rx="180" ry="60" fill="#ffffff" opacity="0.06" transform="rotate(-18 330 310)"/>
+</svg>

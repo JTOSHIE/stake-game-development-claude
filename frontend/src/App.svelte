@@ -143,10 +143,7 @@
     }
   }
 
-  let bgVideo1: HTMLVideoElement
-  let bgVideo2: HTMLVideoElement
-  let bgVideo1Active = true
-  let crossfadeInterval: ReturnType<typeof setInterval> | null = null
+  // Background is static graded stills (AssetForge v2); no video refs needed.
   // Pending autoplay continuation, so it can be cancelled when autoplay stops.
   let autoSpinTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -176,29 +173,11 @@
     // isLoading is cleared inside initRGS's finally block
     playBGM()
 
-    // Crossfade logic — offset video2 by half duration to eliminate loop jump
-    if (bgVideo1 && bgVideo2) {
-      bgVideo1.addEventListener('loadedmetadata', () => {
-        const half = bgVideo1.duration / 2
-        bgVideo2.currentTime = half
-
-        crossfadeInterval = setInterval(() => {
-          const v1 = bgVideo1
-          const v2 = bgVideo2
-          if (!v1 || !v2) return
-
-          if (bgVideo1Active && v1.duration > 0 && v1.currentTime > v1.duration - 1.5) {
-            bgVideo1Active = false
-          } else if (!bgVideo1Active && v2.duration > 0 && v2.currentTime > v2.duration - 1.5) {
-            bgVideo1Active = true
-          }
-        }, 100)
-      }, { once: true })
-    }
+    // Background is now static graded stills (video retired); the Overdrive
+    // variant crossfades via the .bg-still.overdrive.active CSS class.
   })
 
   onDestroy(() => {
-    if (crossfadeInterval) clearInterval(crossfadeInterval)
     if (autoSpinTimer) clearTimeout(autoSpinTimer)
   })
 
@@ -316,32 +295,23 @@
 <!-- ── Background layer ─────────────────────────────────────────────────── -->
 <div class="bg-layer">
   {#if $activeTheme.id === 'future-spinner'}
-    <!-- Dual video crossfade — eliminates the visible loop restart jump -->
-    <div class="bg-video-container">
-      <video
-        bind:this={bgVideo1}
-        class="bg-video"
-        class:active={bgVideo1Active}
-        autoplay
-        loop
-        muted
-        playsinline
+    <!-- Static graded backgrounds (AssetForge v2). The animated loop video is
+         retired from the served build. The Overdrive variant crossfades in
+         while the feature plays. -->
+    <div class="bg-still-container">
+      <img
+        class="bg-still"
+        src="assets/themes/future-spinner/backgrounds/bg_base.jpg"
+        alt=""
         aria-hidden="true"
-      >
-        <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
-      </video>
-      <video
-        bind:this={bgVideo2}
-        class="bg-video"
-        class:active={!bgVideo1Active}
-        autoplay
-        loop
-        muted
-        playsinline
+      />
+      <img
+        class="bg-still overdrive"
+        class:active={featureActive}
+        src="assets/themes/future-spinner/backgrounds/bg_overdrive.jpg"
+        alt=""
         aria-hidden="true"
-      >
-        <source src="assets/videos/bg_animated_loop.mp4" type="video/mp4" />
-      </video>
+      />
     </div>
   {:else}
     <!-- Static image background — all other themes; video is NOT in DOM -->
@@ -605,8 +575,8 @@
     opacity: 0.92;
   }
 
-  /* Dual-video crossfade container (future-spinner) */
-  .bg-video-container {
+  /* Static graded stills (future-spinner); Overdrive variant crossfades over base */
+  .bg-still-container {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -614,20 +584,25 @@
     overflow: hidden;
   }
 
-  .bg-video {
+  .bg-still {
     position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     object-fit: cover;
-    opacity: 0;
-    transition: opacity 1.5s ease;
     pointer-events: none;
+    display: block;
+    opacity: 0.92;
   }
 
-  .bg-video.active {
-    opacity: 0.85;
+  .bg-still.overdrive {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .bg-still.overdrive.active {
+    opacity: 0.92;
   }
 
   /* ── Theme toggle button ──────────────────────────────────────────────── */
