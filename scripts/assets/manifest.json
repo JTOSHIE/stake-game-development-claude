@@ -43,6 +43,23 @@
       "out_only": "ui/gauge_needle.png",
       "out_base": "ui/gauge_base.png",
       "w": 464, "h": 464
+    },
+    {
+      "_doc": "H2 reel symbol at cell scale (Motion Polish v2): same needle-isolation as the gauge above, rendered at symbol size so the H2 reel symbol idles with its own flickering needle and slams to the redline on wins.",
+      "src": "H2_master_v31.svg",
+      "match_transform": "rotate(62 512 512)",
+      "out_only": "symbols/h2_needle.png",
+      "out_base": "symbols/h2_base.png",
+      "w": 240, "h": 240
+    },
+    {
+      "_doc": "Brand mark inner disc (Motion Polish v2): the five-fold bpair blade cluster (one real <g id=bpair> plus four <use> clones at 72/144/216/288deg) alone on transparency (spin sprite) + the static rim/hub base with those blades removed. Engine rotates brand_mark_spin continuously over brand_mark_base as the loading-screen loader, per DESIGN_SYSTEM's brand-mark law.",
+      "src": "brand_mark.svg",
+      "group_ids": ["bpair"],
+      "href_ids": ["bpair"],
+      "out_only": "ui/brand_mark_spin.png",
+      "out_base": "ui/brand_mark_base.png",
+      "w": 512, "h": 512
     }
   ],
   "tile_plate": {

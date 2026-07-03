@@ -1,23 +1,30 @@
 <script lang="ts">
+  // LoadingScreen.svelte — Motion Polish v2 brand screens: the WRS standard
+  // loading screen. The brand mark (a neon chrome rim) renders large with its
+  // inner five-fold blade layer spinning continuously as the loader itself;
+  // WE ROLL SPINNERS wordmark above in CSS Orbitron, the active theme's game
+  // logo below. DESIGN_SYSTEM: "the rim spinning as the loader, the WE ROLL
+  // SPINNERS wordmark above, the game logo slot beneath" — every WRS title.
   import { assetLoadProgress } from '../stores/loadingStore'
+  import { themeAssets } from '../stores/themeStore'
 </script>
 
 <div class="loading-screen">
 
-  <!-- Game logo -->
-  <div class="logo-block">
-    <img
-      src="assets/ui/logo_future_spinner_loading.png"
-      class="loading-logo"
-      alt="FUTURE SPINNER"
-      draggable="false"
-    />
+  <div class="wordmark">WE ROLL SPINNERS</div>
+
+  <div class="brand-mark" aria-hidden="true">
+    <img class="brand-base" src="{$themeAssets.assetBase}/ui/brand_mark_base.png" alt="" draggable="false" />
+    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/brand_mark_spin.png" alt="" draggable="false" />
   </div>
 
-  <!-- Animated spinner ring -->
-  <div class="spinner-ring">
-    <div class="ring"></div>
-    <div class="ring ring-2"></div>
+  <div class="logo-block">
+    <img
+      src="{$themeAssets.logo}"
+      class="loading-logo"
+      alt=""
+      draggable="false"
+    />
   </div>
 
   <!-- Progress bar -->
@@ -37,47 +44,52 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1.1rem;
     z-index: 1000;
   }
 
-  /* ── Logo ── */
-  .logo-block {
-    text-align: center;
+  .wordmark {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-weight: 900;
+    font-size: clamp(1rem, 3.2vw, 1.6rem);
+    letter-spacing: 0.32em;
+    color: #fff;
+    text-shadow: 0 0 14px rgba(0, 255, 255, 0.6), 0 0 30px rgba(255, 0, 255, 0.35);
     animation: fade-in 0.8s ease both;
   }
 
-  .loading-logo {
-    height: clamp(80px, 15vw, 140px);
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 20px rgba(0,255,255,0.7))
-            drop-shadow(0 0 40px rgba(255,215,0,0.3));
-    animation: title-glow 2s ease-in-out infinite alternate;
-  }
-
-  /* ── Spinner ring ── */
-  .spinner-ring {
+  /* ── Brand mark — the rim spinning as the loader ─────────────────────── */
+  .brand-mark {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: clamp(140px, 24vw, 220px);
+    height: clamp(140px, 24vw, 220px);
+    filter: drop-shadow(0 0 24px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
   }
-
-  .ring {
+  .brand-base, .brand-spin {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: #00ffff;
-    border-right-color: rgba(0, 255, 255, 0.3);
-    animation: spin 1.2s linear infinite;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .brand-spin {
+    animation: brand-spin 2.6s linear infinite;
+    transform-origin: 50% 50%;
+  }
+  @keyframes brand-spin {
+    to { transform: rotate(360deg); }
   }
 
-  .ring-2 {
-    inset: 10px;
-    border-top-color: #ff00ff;
-    border-right-color: rgba(255, 0, 255, 0.3);
-    animation: spin 0.8s linear infinite reverse;
+  /* ── Game logo slot ───────────────────────────────────────────────────── */
+  .logo-block {
+    text-align: center;
+    animation: fade-in 0.8s 0.15s ease both;
+  }
+  .loading-logo {
+    height: clamp(56px, 10vw, 96px);
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 0.6));
   }
 
   /* ── Progress bar ── */
@@ -87,6 +99,7 @@
     background: rgba(255, 255, 255, 0.08);
     border-radius: 2px;
     overflow: hidden;
+    margin-top: 0.4rem;
   }
 
   .progress-fill {
@@ -102,11 +115,7 @@
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: rgba(0, 255, 255, 0.5);
-  }
-
-  /* ── Keyframes ── */
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+    font-variant-numeric: tabular-nums;
   }
 
   @keyframes fade-in {
@@ -114,8 +123,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes title-glow {
-    from { text-shadow: 0 0 20px rgba(0,255,255,0.9), 0 0 60px rgba(0,255,255,0.4); }
-    to   { text-shadow: 0 0 30px rgba(0,255,255,1),   0 0 80px rgba(0,255,255,0.6); }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-spin { animation-duration: 8s; }
   }
 </style>

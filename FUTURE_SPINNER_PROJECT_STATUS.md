@@ -1,5 +1,45 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-04 | UX polish: HUD v3.2 fixed fields, full-page paytable, wincap flow, mock pool
+## Last updated: 2026-07-04 | Motion Polish v2: reel feel, symbol life, celebrations, Overdrive transition, brand screens
+
+## MOTION POLISH V2: REEL FEEL, SYMBOL LIFE, CELEBRATIONS, OVERDRIVE TRANSITION, BRAND SCREENS (2026-07-04)
+Branch `claude/motion-polish-v2` (FS_MotionPolish_v2_Prompt.md). The game comes alive:
+engine-driven motion replaces every remaining static/CSS-only placeholder, matching or
+beating the retired video set's energy without video.
+
+- Two new deterministic asset-pipeline exports (byte-identical rebuild of everything else):
+  H2 reel-symbol-scale needle layering (`h2_base`/`h2_needle`) and the brand mark's
+  five-fold inner blade disc (`brand_mark_base`/`brand_mark_spin`, via a small `href_ids`
+  extension to `build.py`'s group isolation so `<use>` clones of a group are caught too).
+- GameGrid.svelte rewritten for reel feel (owner priority one): ticker-driven (PixiJS
+  `app.ticker`, 60fps) column motion, velocity-scaled vertical stretch (no CSS `blur()`
+  filter anywhere), scatter-count-driven anticipation glow that extends the final reel,
+  a cancellable mid-spin slam-stop (SPIN stays clickable while spinning), and three speed
+  tiers scaling every duration (autoplay's inter-spin pause now honours the tier too).
+- Symbol life: H1's spoke sprite rotates continuously and spins up on wins; H2 gained its
+  own symbol-scale needle that idles low and slams to its baked redline on wins; every
+  other symbol has its lineup-table idle micro-motion (grille sweep, booster flicker,
+  piston shimmer, plug blink, breathing); every win blooms the tile-plate edge, punches the
+  symbol scale, and fires a pooled (no per-frame allocation) Pixi particle burst in the
+  symbol's signature colour.
+- New WinBreakdown.svelte cycles the ways breakdown group by group after a win settles;
+  WinBanner.svelte gained explicit BIG/MEGA/EPIC tiers (10x/30x/100x) with staged count-up
+  and escalating particle counts; screen shake on feature trigger and 50x+ wins; every new
+  animation respects prefers-reduced-motion.
+- Overdrive transition: FreeSpinsPresentation's entry phase is now a 5-stage sequence
+  (scatter flare, screen dip, gauge slam-to-centre with the needle ripping to redline, a
+  spin-count text burst, settle), with the bg-crossfade/frame-hue-shift reversing behind
+  the total-win summary via a new `overdriveVisualActive` binding (not the raw feature flag).
+- Brand screens rebuilt to the WRS standard: LoadingScreen now spins the brand mark's inner
+  disc as the loader with the wordmark above and the game logo below; new IntroSplash shows
+  the Overdrive rules once per session, localised (16 locales, +1 new `introContinue` key).
+- Proof: 20-spin headless fps run averaged 59.9fps (gate: ≥55, PASS); one single frame over
+  100ms was found and investigated (root-caused to a one-time browser cold-start cost at the
+  very first Overdrive entry mount, not a recurring reel defect — see session report for the
+  two preload fixes tried). Three proof GIFs (spin stagger, win bloom, Overdrive transition)
+  committed under 1.1MB each. Occlusion re-run at 1280x720: 0 failures. Exact-total test
+  58/58. tsc/build clean.
+- rgsService.ts, gameStore.ts and games/future_spinner/**: not touched (hard locks
+  respected; no lock exception needed or taken).
 
 ## UX POLISH: HUD v3.2, FULL-PAGE PAYTABLE, WINCAP FLOW, MOCK POOL (2026-07-04)
 Branch `claude/ux-polish` (FS_UXPolish_Prompt.md). Follows straight on from the layout

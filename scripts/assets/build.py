@@ -55,28 +55,37 @@ def render_bytes(svg_bytes: bytes, out_rel: str, w: int, h: int):
     print(f"  {out_rel:42s} {w}x{h}  (layered)")
 
 
-def top_level_matches(child, group_ids, match_transform):
+def top_level_matches(child, group_ids, match_transform, href_ids):
     cid = child.get("id")
     ctf = child.get("transform")
     if group_ids and cid in group_ids:
         return True
     if match_transform and ctf == match_transform:
         return True
+    if href_ids:
+        href = child.get("href") or child.get("{http://www.w3.org/1999/xlink}href")
+        if href and href.lstrip("#") in href_ids:
+            return True
     return False
 
 
 def layered(src_path: Path, spec):
     """Produce two sprites: the named groups alone on transparency (out_only),
-    and the master with those groups removed (out_base)."""
+    and the master with those groups removed (out_base). group_ids matches a
+    top-level element's own id; href_ids also matches <use> elements whose
+    href references one of those ids (for repeated-instance groups, e.g. the
+    brand mark's five-fold blade cluster: one real <g id="bpair"> plus four
+    <use href="#bpair"> clones at different rotations)."""
     group_ids = set(spec.get("group_ids", []))
     match_transform = spec.get("match_transform")
+    href_ids = set(spec.get("href_ids", []))
     w, h = spec["w"], spec["h"]
 
     # base: remove the matching top-level groups
     tree = ET.parse(src_path)
     root = tree.getroot()
     for child in list(root):
-        if top_level_matches(child, group_ids, match_transform):
+        if top_level_matches(child, group_ids, match_transform, href_ids):
             root.remove(child)
     render_bytes(ET.tostring(root, encoding="utf-8"), spec["out_base"], w, h)
 
@@ -87,7 +96,7 @@ def layered(src_path: Path, spec):
         tag = child.tag.split("}")[-1]
         if tag == "defs":
             continue
-        if not top_level_matches(child, group_ids, match_transform):
+        if not top_level_matches(child, group_ids, match_transform, href_ids):
             root.remove(child)
     render_bytes(ET.tostring(root, encoding="utf-8"), spec["out_only"], w, h)
 

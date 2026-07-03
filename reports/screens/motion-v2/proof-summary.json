@@ -1,0 +1,29 @@
+{
+  "fps": {
+    "sampleCount": 7394,
+    "avgFrameMs": 16.68688125507168,
+    "avgFps": 59.92731563880865,
+    "longFrameCount": 1,
+    "longFrames": [
+      150
+    ]
+  },
+  "occlusion": {
+    "boxCount": 11,
+    "failures": []
+  },
+  "gifs": {
+    "spinStagger": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/spin-stagger.gif",
+      "sizeMb": 1.025404930114746
+    },
+    "winBloom": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/win-bloom.gif",
+      "sizeMb": 1.0481367111206055
+    },
+    "overdriveTransition": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/overdrive-transition.gif",
+      "sizeMb": 0.6729602813720703
+    }
+  }
+}

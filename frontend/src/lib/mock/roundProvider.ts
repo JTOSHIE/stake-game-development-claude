@@ -62,6 +62,15 @@ export async function serveMockRound(
   return entry.round
 }
 
+/** Warm the sample-pool cache ahead of time (App.svelte calls this once on
+ *  mount, DEV-only). The curated pool is a multi-MB JSON file (58 rounds'
+ *  worth of full board/event data); parsing it cold on the first bonus buy
+ *  was a measurable main-thread hitch mid-animation (Motion Polish v2 fps
+ *  gate). Loading it during startup idle time instead has no such cost. */
+export async function preloadSamples(): Promise<void> {
+  await loadSamples()
+}
+
 /** Serve a specific sample category (used by dev/headless verification). */
 export async function serveCategory(
   mode: 'base' | 'bonus',

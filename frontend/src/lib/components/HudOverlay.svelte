@@ -17,7 +17,7 @@
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
 
-  const dispatch = createEventDispatcher<{ spin: void }>()
+  const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
   // Dev-only test hook: exposes the store objects so headless verification
   // (frontend/scripts/layout_v1_audit.mjs) can inject stress values (e.g.
@@ -54,8 +54,15 @@
     activeLevels[curIndex + 1] <= $balance
   $: canDecrease = curIndex > 0
 
+  // Pressing SPIN mid-spin slam-stops all reels instantly (Motion Polish v2,
+  // reel feel item 1); the outcome is already determined, this only fast
+  // forwards the presentation. Otherwise behaves as a normal spin request.
   function handleSpin() {
-    if ($canSpin) dispatch('spin')
+    if ($isSpinning) {
+      dispatch('slam')
+    } else if ($canSpin) {
+      dispatch('spin')
+    }
   }
 
   function increaseBet() {
@@ -170,11 +177,12 @@
   <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
 </div>
 
-<!-- SPIN — v3.2: centre (1004,604), 84 diameter -->
+<!-- SPIN — v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
+     (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
 <button
   class="spin-btn"
   class:spinning={$isSpinning}
-  disabled={!$canSpin}
+  disabled={$isSpinning ? false : !$canSpin}
   on:click={handleSpin}
   aria-label={$tr('spin')}
   data-testid="spin-button"
