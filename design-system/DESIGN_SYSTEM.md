@@ -61,11 +61,13 @@ calibration of speeds is pending against the preview GIFs.
    filters), win choreography, tiered celebrations (2x, 10x, 50x thresholds,
    BIG to MEGA to EPIC staged count), scatter punch, anticipation staging,
    ambient life, all turbo aware, Overdrive presentation reskinned from
-   temporary CSS to system art.
+   temporary CSS to system art, plus the reel feel requirements and Overdrive
+   transition in the addendum.
 4. Build Diet v2 (Claude Code): reference scan, postbuild prune of dev only
-   themes and retired videos, background re encode to under 16 MB, audio
-   normalisation, dist gate under 40 MB.
-5. Compliance re validation (Claude Code): full checklist against the final
+   themes and retired videos, background video removed from the build (static
+   backgrounds ship instead), dist gate under 25 MB, audio normalisation.
+5. Compliance re validation (Claude Code): QA soak harness per the addendum,
+   then full checklist against the final
    build; install stakecli (pinned release or source build; session cookie in
    keychain only) for the portal upload; generate REVIEW_EVENTS.md (event ids
    per mode: wincap round, 3/4/5 scatter triggers, retrigger, win tiers) from
@@ -74,3 +76,62 @@ calibration of speeds is pending against the preview GIFs.
    docs/approval/game-tile, docs/math pages); liability metrics already
    verified: P(payout over 5000x) is zero in both modes by the hard cap.
 Then the dossier section 5 protocol, then submit.
+
+## ADDENDUM (July 2026): OWNER-RATIFIED LAWS AND SCOPES
+
+### Visual hierarchy by pay tier
+Premium symbols carry the most elaborate rendering and the richest animation.
+Low tier symbols keep the identical palette and materials with simpler forms.
+Order of elaboration: Gauge and Wild and Scatter above all, then H, then M,
+then L. The player's eye must learn the value ladder without the paytable.
+
+### The Boost Gauge is the design anchor
+The Overdrive meter in the bonus IS the gauge, large and central. The H2 reel
+symbol is its miniature. Win presentation borrows its language: needles,
+redlines, flares. Everything else flows outward from it with less intensity.
+
+### Static environment backgrounds
+Backgrounds are premium static images, one base scene and one feature-state
+variant per skin, with only whisper-level engine ambience (slow brightness
+breathing). No background video ships. Future Spinner's pair derives from the
+retired video: base hero graded to palette with a seating vignette, Overdrive
+variant pushed magenta and darkened. Rationale: focus stays on the reels,
+loops cannot betray us, and reskins need one image not one video.
+
+### Brand layer (enriched)
+We Roll Spinners plays on "we ride spinners" (spinning rim culture; the Soul
+Plane nod). The brand mark is a neon chrome rim whose inner spins
+independently, derived from the H1 master's layers. The standard loading
+screen for EVERY WRS game: the rim spinning as the loader, the WE ROLL
+SPINNERS wordmark above, the game logo slot beneath. Brand voice is playful;
+generic "Studios/Gaming/Labs" tonality is forbidden.
+
+### Intro splash (new standard screen)
+After load, before the game: a feature explainer card in system style
+(Overdrive rules in one glance: 3/4/5 scatters award 8/12/16 free spins, every
+winning spin adds +1x to a meter that never resets, retrigger +5, feature
+available for 100x where permitted) with a Continue control. Localised across
+all 16 locales with social overrides. Counts toward the review clarity
+criterion.
+
+### Overdrive transition (concept of record)
+Trigger: scatters flare, screen dips, the gauge slams into centre frame with
+the needle ripping into the redline, a speed-line burst, background swaps to
+the Overdrive variant, frame neon shifts hue, BGM shifts layer. Exit: reverse
+behind the total win presentation.
+
+### Reel feel requirements (Motion Polish v2 scope)
+Ticker-driven transforms only, 60 fps, motion blur during spin, per-reel
+staggered stops with overshoot slam and impact audio, the final reel extends
+and holds under anticipation when two scatters are live, screen shake on
+feature trigger and on 50x and above wins, reduced-motion aware. Jitter is a
+defect class, not a style.
+
+### QA programme
+A repo soak harness (headless) plays 1,000+ mock spins across the locale,
+social and turbo matrix asserting: integer micros balance arithmetic exact,
+presented totals equal book payouts exactly, zero console errors, memory flat,
+frame rate above floor. Runs as its own pass before compliance re-validation
+and is inherited by every future skin. The community stake dev tool is
+evaluated as a local RGS emulator. Post-deploy testing follows
+SUBMISSION_DOSSIER.md section 5.
