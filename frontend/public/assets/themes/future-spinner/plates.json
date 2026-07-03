@@ -1,0 +1,16 @@
+{
+  "colours": {
+    "h1": "#00ffff",
+    "h2": "#ff2d3d",
+    "l1": "#ffd700",
+    "l2": "#9adcff",
+    "l3": "#ff7a2e",
+    "m1": "#ff9a2e",
+    "m2": "#8a5cff",
+    "m3": "#5dff3c",
+    "scatter": "#ffd700",
+    "wild": "#ff00ff"
+  },
+  "note": "Symbol id to signature colour for engine edge tinting of the tile plate. H1 and wild are cyan/magenta duos (primary listed); scatter is spectrum (gold anchor).",
+  "plate_sprite": "symbols/tile_plate.png"
+}

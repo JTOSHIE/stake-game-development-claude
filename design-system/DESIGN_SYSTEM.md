@@ -19,18 +19,32 @@ regenerate every pending brief.
   AssetForge v2). Layered export planned: symbol part groups (spokes, needle,
   neon rings) export separately so the engine animates parts independently.
 - Every symbol must read at 120x100 px, one reel cell.
+- Signature colour identity per symbol: H1 cyan and magenta duo, H2 crimson
+  #ff2d3d, M1 neon orange #ff9a2e, M2 neon violet #8a5cff, M3 acid green
+  #5dff3c, L1 gold #ffd700, L2 electric blue #9adcff, L3 heat orange #ff7a2e,
+  W magenta and cyan, S spectrum. Each symbol carries exactly one signature
+  colour so the value ladder reads by hue.
+- Silhouette-first differentiation: every symbol must be identifiable by
+  outline alone before colour or detail resolve.
+- Signature-colour tile plates behind every symbol: a dark tech plate #0b0f1c
+  with the symbol's signature colour on its engine-tinted edge; the edge blooms
+  on win.
+- Standardised generic control overlay, reskin-free (identical structure across
+  every WRS title), with exactly two themed accents: TURBO uses the existing
+  turbocharger art with flames on engage, and FEATURE uses the Grille art
+  carrying the button with no plate box.
 
 ## APPROVED SYMBOL LINEUP (art is skin level; maths IDs never change)
 | ID | Object | Win animation | Master status |
 |----|--------|---------------|---------------|
 | H1 | Spinning Rim | spin up, neon flare | v2 approved (in masters/) |
-| H2 | Boost Gauge (face of Overdrive) | needle slams to redline | v2 concept approved; v3 fixes: remove stray cyan arc, aim needle into redline, heavier needle |
-| M1 | Steering Wheel | quick spin with glow | to design |
-| M2 | Gear | fast rotation, sparks | to design |
-| M3 | Headlight | full beam flare | to design |
-| L1 | Lug Nut | torque spin punch | to design |
-| L2 | Spark Plug | lightning burst | to design |
-| L3 | Piston | rapid pump, exhaust flash | to design |
+| H2 | Boost Gauge (face of Overdrive) | needle slams to redline | v3.1 in masters/ (THE ANCHOR) |
+| M1 | Steering Wheel | quick spin with glow | v3 in masters/ |
+| M2 | Holographic Grille (EV fascia, neon violet #8a5cff) | LED bar surge, energy panel flare | in masters/ (M2_master_v2.svg) |
+| M3 | Plasma Booster (acid green #5dff3c, flame with cyan shock diamonds) | plasma flame burst, cyan shock diamonds | in masters/ (M3_master_v3.svg) |
+| L1 | Lug Nut | torque spin punch | in masters/ |
+| L2 | Spark Plug | lightning burst | in masters/ |
+| L3 | Piston | rapid pump, exhaust flash | in masters/ |
 | W | Wild hub with machined W | core flare | approved (in masters/) |
 | S | Energy Burst Scatter | rupture burst | approved v2 (in masters/), may iterate in game |
 Idle animations: subtle mechanical motion per object (rotation, needle flicker,
@@ -38,6 +52,20 @@ pulse), breathing scale 1.000 to 1.015, periodic light sweep. Reference motion:
 the H1 idle loops seamlessly over 72 degrees (five fold symmetry); the H2 win is
 an ease out back slam with overshoot and a magenta redline flare. Owner taste
 calibration of speeds is pending against the preview GIFs.
+
+## SCENE, BRAND AND INSTRUMENT MASTERS (non-symbol)
+- Scene group (scene_character_car.svg): the racer plus hover car, the game's
+  identity character. The car is required (this is a car game). Placed left of
+  the frame; idle breathing only until Motion Polish.
+- Brand mark (brand_mark.svg): the WRS provider logo, a neon chrome rim whose
+  inner layer spins independently.
+- Instrument plate master (plate_instrument.svg): notched-corner cyberpunk tech
+  frame used for the MULTIPLIER and TOTAL WIN plates and any future readouts.
+
+## RETIREMENTS
+- Win pod RETIRED.
+- Themed spin and buy buttons RETIRED (replaced by the standardised generic
+  control overlay with two themed accents above).
 
 ## BRAND LAYER (Phase B scope)
 - WRS provider logo: square, transparent background, legible at small tile

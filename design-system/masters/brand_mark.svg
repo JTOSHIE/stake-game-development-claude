@@ -1,0 +1,50 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chromeB" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#c8daea"/>
+      <stop offset="50%" stop-color="#5a6b80"/>
+      <stop offset="62%" stop-color="#2e3a4c"/>
+      <stop offset="85%" stop-color="#e9f5ff"/>
+      <stop offset="100%" stop-color="#9fb2c8"/>
+    </linearGradient>
+    <radialGradient id="tyreB" cx="42%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#2a3346"/>
+      <stop offset="60%" stop-color="#141a28"/>
+      <stop offset="100%" stop-color="#070a12"/>
+    </radialGradient>
+    <radialGradient id="barrelB" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#232c40"/>
+      <stop offset="55%" stop-color="#121828"/>
+      <stop offset="100%" stop-color="#080c16"/>
+    </radialGradient>
+    <linearGradient id="goldB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="470" fill="url(#tyreB)"/>
+  <circle cx="512" cy="512" r="470" fill="none" stroke="#000208" stroke-width="8"/>
+  <circle cx="512" cy="512" r="386" fill="url(#chromeB)"/>
+  <circle cx="512" cy="512" r="386" fill="none" stroke="#0a0e16" stroke-width="7"/>
+  <path d="M 196 322 A 366 366 0 0 1 502 146" fill="none" stroke="#ffffff" stroke-width="30" opacity="0.55" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="322" fill="url(#barrelB)" stroke="#0a0e16" stroke-width="8"/>
+  <circle cx="512" cy="512" r="272" fill="none" stroke="#ff00ff" stroke-width="30" opacity="0.2"/>
+  <circle cx="512" cy="512" r="272" fill="none" stroke="#ff2bd6" stroke-width="11" opacity="0.95"/>
+  <circle cx="512" cy="512" r="196" fill="none" stroke="#00ffff" stroke-width="26" opacity="0.22"/>
+  <circle cx="512" cy="512" r="196" fill="none" stroke="#5cffff" stroke-width="10" opacity="0.95"/>
+  <g id="bpair">
+    <g>
+      <path d="M 488 200 L 536 200 L 528 470 L 496 470 Z" fill="url(#chromeB)" stroke="#0a0e16" stroke-width="7" transform="rotate(-8 512 512)"/>
+      <path d="M 488 200 L 536 200 L 528 470 L 496 470 Z" fill="url(#chromeB)" stroke="#0a0e16" stroke-width="7" transform="rotate(8 512 512)"/>
+    </g>
+  </g>
+  <use href="#bpair" transform="rotate(72 512 512)"/>
+  <use href="#bpair" transform="rotate(144 512 512)"/>
+  <use href="#bpair" transform="rotate(216 512 512)"/>
+  <use href="#bpair" transform="rotate(288 512 512)"/>
+  <circle cx="512" cy="512" r="120" fill="url(#chromeB)" stroke="#0a0e16" stroke-width="7"/>
+  <circle cx="512" cy="512" r="76" fill="url(#goldB)" stroke="#0a0e16" stroke-width="6"/>
+  <circle cx="498" cy="496" r="16" fill="#ffffff" opacity="0.85"/>
+</svg>

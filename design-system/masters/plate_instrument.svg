@@ -1,0 +1,28 @@
+<svg width="1024" height="232" viewBox="0 0 1024 232" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="plateBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a2236"/>
+      <stop offset="45%" stop-color="#0d1322"/>
+      <stop offset="100%" stop-color="#080c16"/>
+    </linearGradient>
+    <linearGradient id="goldP" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="50%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <path id="pshape" d="M 44 10 L 940 10 L 1014 84 L 1014 222 L 84 222 L 10 148 L 10 10 Z" fill="url(#plateBody)"/>
+  <path d="M 44 10 L 940 10 L 1014 84 L 1014 222 L 84 222 L 10 148 L 10 10 Z" fill="none" stroke="#ff00ff" stroke-width="26" opacity="0.14"/>
+  <path d="M 44 10 L 940 10 L 1014 84 L 1014 222 L 84 222 L 10 148 L 10 10 Z" fill="none" stroke="#ff2bd6" stroke-width="9" opacity="0.95"/>
+  <path d="M 54 24 L 934 24 L 1000 90 L 1000 208 L 90 208 L 24 142 L 24 24 Z" fill="none" stroke="url(#goldP)" stroke-width="3.5" opacity="0.9"/>
+  <rect x="40" y="52" width="14" height="128" rx="6" fill="#ff2bd6"/>
+  <rect x="40" y="52" width="14" height="128" rx="6" fill="none" stroke="#ff00ff" stroke-width="10" opacity="0.25"/>
+  <g stroke="#ffffff" opacity="0.05" stroke-width="4">
+    <line x1="80" y1="76" x2="990" y2="76"/>
+    <line x1="80" y1="124" x2="990" y2="124"/>
+    <line x1="80" y1="172" x2="990" y2="172"/>
+  </g>
+  <circle cx="962" cy="196" r="10" fill="url(#goldP)" stroke="#05070d" stroke-width="3"/>
+  <circle cx="118" cy="40" r="10" fill="url(#goldP)" stroke="#05070d" stroke-width="3"/>
+  <path d="M 940 10 L 1014 84" stroke="#ffd2f4" stroke-width="3" opacity="0.6"/>
+</svg>

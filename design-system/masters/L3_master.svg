@@ -1,0 +1,51 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#ff7a2e" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#ff7a2e" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ff7a2e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gunmetal" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8fa2b8"/>
+      <stop offset="40%" stop-color="#39465c"/>
+      <stop offset="65%" stop-color="#161d2c"/>
+      <stop offset="100%" stop-color="#4a5a72"/>
+    </linearGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#c8daea"/>
+      <stop offset="50%" stop-color="#6d8098"/>
+      <stop offset="62%" stop-color="#2e3a4c"/>
+      <stop offset="85%" stop-color="#dcebfa"/>
+      <stop offset="100%" stop-color="#9fb2c8"/>
+    </linearGradient>
+    <linearGradient id="heat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd9a0"/>
+      <stop offset="45%" stop-color="#ff7a2e"/>
+      <stop offset="100%" stop-color="#ff7a2e" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="440" r="480" fill="url(#bgGlow)"/>
+  <g stroke="#ff9a4d" stroke-width="6" fill="none" opacity="0.5" stroke-linecap="round">
+    <path d="M 420 196 Q 432 172 420 148"/>
+    <path d="M 512 184 Q 524 158 512 132"/>
+    <path d="M 604 196 Q 616 172 604 148"/>
+  </g>
+  <rect x="332" y="238" width="360" height="152" rx="26" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="6"/>
+  <rect x="332" y="238" width="360" height="36" rx="18" fill="url(#heat)" opacity="0.9"/>
+  <path d="M 348 246 L 676 246" stroke="#ffe9c4" stroke-width="7" opacity="0.9" stroke-linecap="round"/>
+  <g stroke="#0a0e16" stroke-width="6">
+    <line x1="338" y1="308" x2="686" y2="308"/>
+    <line x1="338" y1="342" x2="686" y2="342"/>
+  </g>
+  <path d="M 338 316 L 686 316" stroke="#ff7a2e" stroke-width="4" opacity="0.55"/>
+  <rect x="368" y="390" width="288" height="86" rx="18" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="5"/>
+  <circle cx="512" cy="470" r="42" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <path d="M 482 500 L 542 500 L 566 742 L 458 742 Z" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <path d="M 492 512 L 500 730" stroke="#ffffff" stroke-width="6" opacity="0.55" fill="none"/>
+  <circle cx="512" cy="790" r="96" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="6"/>
+  <circle cx="512" cy="790" r="52" fill="#12060b"/>
+  <circle cx="512" cy="790" r="52" fill="none" stroke="#ff7a2e" stroke-width="6" opacity="0.9"/>
+  <circle cx="512" cy="790" r="52" fill="none" stroke="#ff7a2e" stroke-width="16" opacity="0.2"/>
+  <ellipse cx="420" cy="280" rx="120" ry="30" fill="#ffffff" opacity="0.08" transform="rotate(-8 420 280)"/>
+</svg>
