@@ -71,6 +71,7 @@ export interface Translations {
   rulesOverdriveRetrigger?: string
   rulesOverdriveBuy?:      string
   rulesOverdriveModes?:    string
+  introContinue?:          string
 }
 
 // Feature strings live in a dedicated per-locale layer so the 16 base locale
@@ -79,7 +80,7 @@ export type FeatureKey =
   | 'overdrive' | 'overdriveFreeSpins' | 'freeSpins' | 'totalWin' | 'featureComplete'
   | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
-  | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes'
+  | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
 export type FeatureStrings = Record<FeatureKey, string>
 
 // ── English ───────────────────────────────────────────────────────────────────
@@ -674,6 +675,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 or more Scatters during free spins award +5 free spins.',
     rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
     rulesOverdriveModes: 'Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.',
+    introContinue: 'Continue',
   },
   ar: {
     overdrive: 'أوفردرايف', overdriveFreeSpins: 'لفات أوفردرايف المجانية', freeSpins: 'لفات مجانية',
@@ -687,6 +689,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 رموز سكاتر أو أكثر خلال اللفات المجانية تمنح 5 لفات إضافية.',
     rulesOverdriveBuy: 'شراء البونص: ادفع 100× رهانك لبدء الميزة فوراً.',
     rulesOverdriveModes: 'اللعبة الأساسية وشراء البونص يمنحان نسبة عائد 96.35٪. أقصى فوز 5000× الرهان.',
+    introContinue: 'متابعة',
   },
   de: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREISPIELE', freeSpins: 'FREISPIELE',
@@ -700,6 +703,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 oder mehr Scatter während der Freispiele vergeben 5 zusätzliche Freispiele.',
     rulesOverdriveBuy: 'Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten.',
     rulesOverdriveModes: 'Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.',
+    introContinue: 'Weiter',
   },
   es: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRATIS OVERDRIVE', freeSpins: 'GIROS GRATIS',
@@ -713,6 +717,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 o más Scatters durante los giros gratis otorgan 5 giros gratis adicionales.',
     rulesOverdriveBuy: 'Compra de bono: paga 100× tu apuesta para iniciar la función de inmediato.',
     rulesOverdriveModes: 'El juego base y la Compra de bono devuelven 96,35 % de RTP. Ganancia máxima 5.000× la apuesta.',
+    introContinue: 'Continuar',
   },
   fi: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE-ILMAISKIERROKSET', freeSpins: 'ILMAISKIERROKSET',
@@ -726,6 +731,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 tai useampi Scatter ilmaiskierrosten aikana antaa 5 lisäkierrosta.',
     rulesOverdriveBuy: 'Bonusosto: maksa 100× panoksesi aloittaaksesi ominaisuuden heti.',
     rulesOverdriveModes: 'Peruspeli ja Bonusosto palauttavat molemmat 96,35 % RTP. Enimmäisvoitto 5 000× panos.',
+    introContinue: 'Jatka',
   },
   fr: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'TOURS GRATUITS OVERDRIVE', freeSpins: 'TOURS GRATUITS',
@@ -739,6 +745,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 Scatters ou plus pendant les tours gratuits accordent 5 tours gratuits supplémentaires.',
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
     rulesOverdriveModes: 'Le jeu de base et l’Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
+    introContinue: 'Continuer',
   },
   hi: {
     overdrive: 'ओवरड्राइव', overdriveFreeSpins: 'ओवरड्राइव फ्री स्पिन', freeSpins: 'फ्री स्पिन',
@@ -752,6 +759,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'फ्री स्पिन के दौरान 3 या अधिक स्कैटर 5 अतिरिक्त फ्री स्पिन देते हैं।',
     rulesOverdriveBuy: 'बोनस खरीद: फ़ीचर तुरंत शुरू करने के लिए अपने दांव का 100× भुगतान करें।',
     rulesOverdriveModes: 'बेस गेम और बोनस खरीद दोनों 96.35% RTP देते हैं। अधिकतम जीत दांव का 5,000×।',
+    introContinue: 'जारी रखें',
   },
   id: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'FREE SPIN OVERDRIVE', freeSpins: 'FREE SPIN',
@@ -765,6 +773,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 atau lebih Scatter selama free spin memberikan 5 free spin tambahan.',
     rulesOverdriveBuy: 'Beli Bonus: bayar 100× taruhan Anda untuk memulai fitur segera.',
     rulesOverdriveModes: 'Game dasar dan Beli Bonus keduanya memberikan RTP 96,35%. Kemenangan maksimum 5.000× taruhan.',
+    introContinue: 'Lanjutkan',
   },
   ja: {
     overdrive: 'オーバードライブ', overdriveFreeSpins: 'オーバードライブ フリースピン', freeSpins: 'フリースピン',
@@ -778,6 +787,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'フリースピン中にスキャッター3個以上でフリースピンを5回追加します。',
     rulesOverdriveBuy: 'ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。',
     rulesOverdriveModes: 'ベースゲームとボーナス購入はどちらもRTP96.35%です。最大配当はベットの5,000倍。',
+    introContinue: '続ける',
   },
   ko: {
     overdrive: '오버드라이브', overdriveFreeSpins: '오버드라이브 프리 스핀', freeSpins: '프리 스핀',
@@ -791,6 +801,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '프리 스핀 중 스캐터 3개 이상이면 프리 스핀 5회를 추가로 지급합니다.',
     rulesOverdriveBuy: '보너스 구매: 베팅액의 100배를 지불하면 기능이 즉시 시작됩니다.',
     rulesOverdriveModes: '기본 게임과 보너스 구매 모두 RTP 96.35%입니다. 최대 당첨은 베팅액의 5,000배입니다.',
+    introContinue: '계속',
   },
   pl: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'DARMOWE SPINY OVERDRIVE', freeSpins: 'DARMOWE SPINY',
@@ -804,6 +815,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 lub więcej symboli Scatter podczas darmowych spinów przyznaje 5 dodatkowych spinów.',
     rulesOverdriveBuy: 'Zakup bonusu: zapłać 100× swojego zakładu, aby natychmiast uruchomić funkcję.',
     rulesOverdriveModes: 'Gra podstawowa i Zakup bonusu zwracają 96,35% RTP. Maksymalna wygrana 5000× zakładu.',
+    introContinue: 'Kontynuuj',
   },
   pt: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRÁTIS OVERDRIVE', freeSpins: 'GIROS GRÁTIS',
@@ -817,6 +829,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 ou mais Scatters durante os giros grátis concedem 5 giros grátis adicionais.',
     rulesOverdriveBuy: 'Compra de bônus: pague 100× a sua aposta para iniciar o recurso imediatamente.',
     rulesOverdriveModes: 'O jogo base e a Compra de bônus retornam ambos 96,35% de RTP. Ganho máximo de 5.000× a aposta.',
+    introContinue: 'Continuar',
   },
   ru: {
     overdrive: 'ОВЕРДРАЙВ', overdriveFreeSpins: 'ФРИСПИНЫ ОВЕРДРАЙВ', freeSpins: 'ФРИСПИНЫ',
@@ -830,6 +843,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 или более скаттеров во время фриспинов дают 5 дополнительных фриспинов.',
     rulesOverdriveBuy: 'Покупка бонуса: заплатите 100× вашей ставки, чтобы запустить функцию сразу.',
     rulesOverdriveModes: 'Базовая игра и Покупка бонуса возвращают 96,35% RTP. Максимальный выигрыш 5000× ставки.',
+    introContinue: 'Продолжить',
   },
   tr: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE BEDAVA DÖNÜŞLER', freeSpins: 'BEDAVA DÖNÜŞLER',
@@ -843,6 +857,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'Bedava dönüşler sırasında 3 veya daha fazla Scatter 5 ek bedava dönüş verir.',
     rulesOverdriveBuy: 'Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin.',
     rulesOverdriveModes: 'Temel oyun ve Bonus Satın Alma her ikisi de %96,35 RTP döndürür. Maksimum kazanç bahsin 5.000 katı.',
+    introContinue: 'Devam Et',
   },
   vi: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE', freeSpins: 'VÒNG QUAY MIỄN PHÍ',
@@ -856,6 +871,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 biểu tượng Scatter trở lên trong vòng quay miễn phí trao thêm 5 vòng quay miễn phí.',
     rulesOverdriveBuy: 'Mua Thưởng: trả 100× tiền cược của bạn để bắt đầu tính năng ngay lập tức.',
     rulesOverdriveModes: 'Trò chơi cơ bản và Mua Thưởng đều trả về RTP 96,35%. Thắng tối đa 5.000× tiền cược.',
+    introContinue: 'Tiếp tục',
   },
   zh: {
     overdrive: '超载', overdriveFreeSpins: '超载免费旋转', freeSpins: '免费旋转',
@@ -869,6 +885,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '免费旋转期间出现 3 个或以上分散符号可额外获得 5 次免费旋转。',
     rulesOverdriveBuy: '购买奖励：支付 100 倍投注即可立即启动功能。',
     rulesOverdriveModes: '基础游戏和购买奖励的 RTP 均为 96.35%。最高赢额为投注的 5,000 倍。',
+    introContinue: '继续',
   },
 }
 

@@ -1,0 +1,9 @@
+{
+  "sampleCount": 7394,
+  "avgFrameMs": 16.68688125507168,
+  "avgFps": 59.92731563880865,
+  "longFrameCount": 1,
+  "longFrames": [
+    150
+  ]
+}

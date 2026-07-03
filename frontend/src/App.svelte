@@ -6,7 +6,9 @@
   import SceneGroup      from './lib/components/SceneGroup.svelte'
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
+  import IntroSplash      from './lib/components/IntroSplash.svelte'
   import WinCelebration      from './lib/components/WinCelebration.svelte'
+  import WinBreakdown        from './lib/components/WinBreakdown.svelte'
   import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
   import PaytableModal       from './lib/components/PaytableModal.svelte'
   import WinBanner           from './lib/components/WinBanner.svelte'
@@ -43,7 +45,7 @@
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     recordSpinResult, resetWin, errorMessage,
-    winMultiplier, showPaytable, isWincap, canSpin,
+    winMultiplier, winAmount, showPaytable, isWincap, canSpin,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -51,6 +53,7 @@
   import { isSocial } from './lib/stores/socialMode'
   // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
   import { get } from 'svelte/store'
+  import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode } from './lib/stores/betMode'
@@ -72,6 +75,24 @@
 
   let gridRef: GameGrid
   let buyBonusRef: BuyBonus
+
+  // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────
+  // Shown once per session, right after loading finishes.
+  const INTRO_SESSION_KEY = 'wrs_intro_seen'
+  let showIntroSplash = false
+  let introHandledForLoad = false
+  $: if (!$isLoading && !introHandledForLoad) {
+    introHandledForLoad = true
+    try {
+      if (!sessionStorage.getItem(INTRO_SESSION_KEY)) showIntroSplash = true
+    } catch {
+      // sessionStorage unavailable — skip the splash rather than block play
+    }
+  }
+  function handleIntroContinue(): void {
+    showIntroSplash = false
+    try { sessionStorage.setItem(INTRO_SESSION_KEY, '1') } catch {}
+  }
   let showThemeSelector = false
 
   // ── Overdrive free-spins presentation state ───────────────────────────────
@@ -103,6 +124,10 @@
   let liveMeter = 1
   let liveSpinsRemaining = 0
   let liveRunningTotalCentibets = 0
+  // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
+  // Motion Polish v2) — false again once the 'end' phase starts, so the
+  // reverse shift plays out behind the total win summary, not after it.
+  let overdriveVisualActive = false
 
   /** Build a presentation script from a raw event list (live) or a served round. */
   function scriptFromEvents(events: RawEvent[]): PresentationScript {
@@ -117,8 +142,21 @@
     return new Promise((resolve) => {
       featureScript = script
       featureActive = true
+      if (script.triggered) triggerShake() // screen shake on feature trigger
       featureResolve = resolve
     })
+  }
+
+  // ── Screen shake — feature trigger and 50x+ wins (Motion Polish v2) ───────
+  let shakeActive = false
+  let lastShakeWin = 0
+  function triggerShake(durationMs = 420): void {
+    shakeActive = true
+    setTimeout(() => { shakeActive = false }, durationMs)
+  }
+  $: if ($winAmount > 0 && $winAmount !== lastShakeWin && $winMultiplier >= 50) {
+    lastShakeWin = $winAmount
+    triggerShake()
   }
 
   function onFeatureComplete(): void {
@@ -216,6 +254,21 @@
 
     // Background is now static graded stills (video retired); the Overdrive
     // variant crossfades via the .bg-still.overdrive.active CSS class.
+
+    // Preload the Overdrive gauge images so they're already decoded before
+    // the transition fires — mounting them cold (large PNGs, decoded on
+    // first paint) was the source of an occasional dropped frame right at
+    // feature trigger (Motion Polish v2 fps gate).
+    for (const rel of ['ui/gauge_face.png', 'ui/gauge_needle.png']) {
+      const img = new Image()
+      img.src = `${$themeAssets.assetBase}/${rel}`
+    }
+
+    // Dev-only mock harness: warm the curated sample pool during startup
+    // idle time (see roundProvider.preloadSamples), not on the first buy.
+    if (import.meta.env.DEV) {
+      import('./lib/mock/roundProvider').then((m) => m.preloadSamples()).catch(() => {})
+    }
   })
 
   onDestroy(() => {
@@ -230,11 +283,15 @@
   }
 
   // Schedule the next autoplay spin. The id is tracked so it can be cancelled.
+  // Autoplay honours the active speed tier (Motion Polish v2): the inter-spin
+  // pause scales down the same way reel timing does.
   function scheduleAutoSpin(delayMs: number): void {
+    const tier = get(speedTier)
+    const factor = tier === 'super' ? 0.16 : tier === 'turbo' ? 0.5 : 1
     autoSpinTimer = setTimeout(() => {
       autoSpinTimer = null
       handleSpin()
-    }, delayMs)
+    }, delayMs * factor)
   }
 
   async function handleSpin() {
@@ -320,7 +377,7 @@
 
     // Let space behave normally (for example scrolling the modal) while a
     // modal or overlay is open.
-    if ($showPaytable || showThemeSelector || $isWincap || featureActive) return
+    if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash) return
 
     // From here we own the spacebar: stop the page from scrolling.
     e.preventDefault()
@@ -354,7 +411,7 @@
       />
       <img
         class="bg-still overdrive"
-        class:active={featureActive}
+        class:active={overdriveVisualActive}
         src="assets/themes/future-spinner/backgrounds/bg_overdrive.jpg"
         alt=""
         aria-hidden="true"
@@ -382,6 +439,7 @@
 <div class="game-stage">
 <main
   class="game-wrapper"
+  class:shake={shakeActive}
   style="
     --theme-primary: {$activeTheme.palette.primary};
     --theme-secondary: {$activeTheme.palette.secondary};
@@ -397,6 +455,10 @@
 
   {#if $isLoading}
     <LoadingScreen />
+  {/if}
+
+  {#if showIntroSplash}
+    <IntroSplash on:continue={handleIntroContinue} />
   {/if}
 
   <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
@@ -432,11 +494,13 @@
     <SceneGroup />
   {/if}
 
-  <!-- FRAME — 640x468 at (320,84), z10 -->
+  <!-- FRAME — 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
+       (Motion Polish v2), reversed once overdriveVisualActive clears. -->
   {#if $themeAssets.frame}
     <img
       src="{$themeAssets.frame}"
       class="game-frame"
+      class:overdrive-active={overdriveVisualActive}
       alt=""
       aria-hidden="true"
       on:error={(e) => {
@@ -451,6 +515,8 @@
       <GameGrid bind:this={gridRef} />
       <!-- Suppress standard celebration while the max-win overlay is active -->
       <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
+      <!-- Ways breakdown — cycles group by group after the win burst settles -->
+      <WinBreakdown />
       <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
       <FreeSpinsPresentation
         script={featureScript}
@@ -458,6 +524,7 @@
         bind:displayMeter={liveMeter}
         bind:spinsRemaining={liveSpinsRemaining}
         bind:runningTotalCentibets={liveRunningTotalCentibets}
+        bind:overdriveVisualActive
         on:complete={onFeatureComplete}
       />
     </div>
@@ -481,7 +548,7 @@
   {/if}
 
   <!-- HUD OVERLAY — generic panel + SPIN + AUTOPLAY, z60 -->
-  <HudOverlay on:spin={handleSpin} />
+  <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
 
   <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
        replaced by FeatureButton above (showTrigger=false). Hidden entirely
@@ -559,6 +626,23 @@
       rgba(6,6,15,0.65) 100%
     );
     transition: background 0.6s ease;
+  }
+
+  /* Screen shake — feature trigger and 50x+ wins (Motion Polish v2). The
+     keyframe re-applies scale(S) at every step so the stage stays correctly
+     sized while shaking (the base rule's transform is fully replaced while
+     the animation runs). */
+  @keyframes screen-shake {
+    0%, 100% { transform: scale(var(--S, 1)) translate(0, 0); }
+    20%      { transform: scale(var(--S, 1)) translate(-7px, 5px); }
+    40%      { transform: scale(var(--S, 1)) translate(7px, -5px); }
+    60%      { transform: scale(var(--S, 1)) translate(-5px, 4px); }
+    80%      { transform: scale(var(--S, 1)) translate(5px, -3px); }
+  }
+  .game-wrapper.shake { animation: screen-shake 0.42s ease-in-out; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-wrapper.shake { animation: none; }
   }
 
   /* ── Logo — top centre, 380 wide, y 18, z70 ─────────────────────────────── */
@@ -719,6 +803,23 @@
   @keyframes frame-pulse {
     0%, 100% { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent)); }
     50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 90%, transparent)); }
+  }
+
+  /* Overdrive transition — frame neon shifts hue while active (Motion Polish
+     v2), reversing automatically when the class clears (overdriveVisualActive
+     goes false behind the total win summary, not after it). A distinct
+     animation name (not a transition) avoids fighting frame-pulse for the
+     filter property. */
+  .game-frame.overdrive-active {
+    animation: frame-pulse-overdrive 3s ease-in-out infinite;
+  }
+  @keyframes frame-pulse-overdrive {
+    0%, 100% { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
+    50%       { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 24px color-mix(in srgb, var(--theme-secondary, #ff00ff) 95%, transparent)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-frame, .game-frame.overdrive-active { animation: none; }
   }
 
   /* ── Grid — 522x349, centred inside the frame, z20 ──────────────────────── */

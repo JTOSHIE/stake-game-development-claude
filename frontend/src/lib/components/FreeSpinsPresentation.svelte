@@ -11,6 +11,7 @@
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
+  import { themeAssets } from '../stores/themeStore'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
 
   export let script: PresentationScript | null = null
@@ -19,6 +20,11 @@
   const dispatch = createEventDispatcher<{ complete: { totalWin: number } }>()
 
   let phase: 'idle' | 'entry' | 'spin' | 'end' = 'idle'
+  // Overdrive transition sub-stages within 'entry' (Motion Polish v2): scatter
+  // flare, screen dip, gauge slam-to-centre with the needle ripping to the
+  // redline, spin-count text burst, then settle (fades, revealing the real
+  // BonusInstrumentColumn already sitting in its column position underneath).
+  let entryStage: 'flare' | 'dip' | 'gauge' | 'burst' | 'settle' = 'flare'
   let spinIndex = -1
   let currentSpin: PresentedSpin | null = null
   // Exported (bindable) so BonusInstrumentColumn (LAYOUT_SPEC HUD) can drive
@@ -26,6 +32,10 @@
   export let displayMeter = 1
   export let spinsRemaining = 0
   export let runningTotalCentibets = 0
+  // Bindable so App.svelte can drive the background crossfade and frame neon
+  // hue-shift; false again once the 'end' phase starts, so the reverse shift
+  // plays out behind the total-win summary rather than after it.
+  export let overdriveVisualActive = false
   let showRetrigger = false
   let endTotalDisplay = 0
   let timer: ReturnType<typeof setTimeout> | null = null
@@ -71,7 +81,28 @@
     runningTotalCentibets = script.baseSpin.runningTotalCentibets
     spinsRemaining = script.initialFreeSpins
     showRetrigger = false
-    timer = setTimeout(nextSpin, dur(1100))
+    overdriveVisualActive = true
+    runEntrySequence()
+  }
+
+  /** Overdrive transition (DESIGN_SYSTEM concept of record): scatter flare,
+   *  screen dip, gauge slam to centre with the needle ripping to the redline,
+   *  spin-count text burst, then settle. Every step is turbo-aware via dur(). */
+  function runEntrySequence(): void {
+    entryStage = 'flare'
+    timer = setTimeout(() => {
+      entryStage = 'dip'
+      timer = setTimeout(() => {
+        entryStage = 'gauge'
+        timer = setTimeout(() => {
+          entryStage = 'burst'
+          timer = setTimeout(() => {
+            entryStage = 'settle'
+            timer = setTimeout(nextSpin, dur(450))
+          }, dur(700))
+        }, dur(450))
+      }, dur(200))
+    }, dur(250))
   }
 
   function nextSpin() {
@@ -97,6 +128,9 @@
   function toEnd() {
     phase = 'end'
     currentSpin = null
+    // Reverse the bg-crossfade/frame-hue shift behind the total win summary,
+    // not after it.
+    overdriveVisualActive = false
     // count-up the total
     const target = centibetsToMicros(script!.totalWinCentibets)
     const steps = 24
@@ -133,12 +167,18 @@
   onDestroy(clear)
 </script>
 
-{#if active && script && script.triggered}
+{#if active && script}
   <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label="Overdrive Free Spins">
     {#if phase === 'entry'}
-      <div class="fs-entry">
-        <div class="fs-title">{t(lang, 'overdriveFreeSpins', mode)}</div>
-        <div class="fs-sub">{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
+      <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry">
+        <div class="entry-scatter-flare" aria-hidden="true"></div>
+        <div class="entry-dip" aria-hidden="true"></div>
+        <div class="entry-gauge-wrap" aria-hidden="true">
+          <img class="entry-gauge-face" src="{$themeAssets.assetBase}/ui/gauge_face.png" alt="" />
+          <img class="entry-gauge-needle" src="{$themeAssets.assetBase}/ui/gauge_needle.png" alt="" />
+        </div>
+        <div class="entry-title">{t(lang, 'overdriveFreeSpins', mode)}</div>
+        <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
       </div>
     {:else if phase === 'spin' && currentSpin}
       <div class="fs-stage">
@@ -189,6 +229,63 @@
   .fs-entry, .fs-end { display: flex; flex-direction: column; gap: 10px; }
   .fs-title { font-size: 2rem; font-weight: 900; color: var(--theme-primary, #16f2e0); letter-spacing: 3px; text-shadow: 0 0 18px var(--theme-primary, #16f2e0); }
   .fs-sub { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
+
+  /* ── Overdrive transition (Motion Polish v2) — staged entry sequence ───── */
+  .fs-entry-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+  .entry-scatter-flare {
+    position: absolute; inset: -20%; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.55) 0%, rgba(255, 215, 0, 0.15) 40%, transparent 70%);
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  .stage-flare .entry-scatter-flare, .stage-dip .entry-scatter-flare { opacity: 1; }
+
+  .entry-dip {
+    position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .stage-dip .entry-dip { opacity: 0.55; }
+
+  .entry-gauge-wrap {
+    position: relative; width: 240px; height: 240px; opacity: 0; transform: scale(0.4);
+    transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stage-gauge .entry-gauge-wrap, .stage-burst .entry-gauge-wrap { opacity: 1; transform: scale(1); }
+  .stage-settle .entry-gauge-wrap { opacity: 0; transform: scale(1.18); transition: opacity 0.5s ease, transform 0.5s ease; }
+
+  .entry-gauge-face, .entry-gauge-needle {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+  }
+  .entry-gauge-needle {
+    transform-origin: 50% 50%; transform: rotate(-75deg);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stage-gauge .entry-gauge-needle, .stage-burst .entry-gauge-needle { transform: rotate(0deg); }
+
+  .entry-title {
+    position: absolute; top: 12%; left: 0; right: 0;
+    font-size: 1.5rem; font-weight: 900; letter-spacing: 0.15em;
+    color: var(--theme-primary, #16f2e0); text-shadow: 0 0 18px var(--theme-primary, #16f2e0);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .stage-flare .entry-title, .stage-dip .entry-title, .stage-gauge .entry-title, .stage-burst .entry-title { opacity: 1; }
+  .stage-settle .entry-title { opacity: 0; }
+
+  .entry-burst-text {
+    position: absolute; bottom: 10%; left: 0; right: 0;
+    font-size: 2.1rem; font-weight: 900; color: #ffd700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+    opacity: 0; transform: scale(0.5);
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stage-burst .entry-burst-text { opacity: 1; transform: scale(1); }
+  .stage-settle .entry-burst-text { opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
+      transition: none;
+    }
+  }
   .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
   .fs-meter-slot { position: absolute; top: 12px; right: 12px; }
   .fs-board { display: flex; gap: 6px; }
