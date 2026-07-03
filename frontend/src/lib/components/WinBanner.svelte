@@ -1,9 +1,11 @@
 <script lang="ts">
   /**
-   * WinBanner.svelte — Compact Big Win banner
-   * Sits at top of grid-wrapper above reel frame. Reels remain 100% visible.
-   * Appears on big/mega/epic wins. Auto-dismisses after 4 seconds.
-   * Uses big_win_banner.png (800x200) as background.
+   * WinBanner.svelte — LAYOUT_SPEC banner: compact 380x96, centred over the
+   * grid at stage (450,262), translucent with a gold rim, z100. CSS-only
+   * (no big_win_banner.png dependency). Appears on big/mega/epic wins.
+   * Auto-dismisses after 4 seconds. Mounted as a stage-level sibling in
+   * App.svelte, so its position here is in stage coordinates, not relative
+   * to the grid.
    */
   import { onDestroy } from 'svelte'
   import { winMultiplier, winAmount, isSpinning } from '../stores/gameStore'
@@ -68,13 +70,7 @@
 </script>
 
 {#if visible}
-  <div class="big-win-banner" class:active={visible}>
-    <img
-      class="banner-bg"
-      src="assets/ui/big_win_banner.png"
-      alt="Big Win"
-      draggable="false"
-    />
+  <div class="big-win-banner" class:active={visible} data-testid="win-banner">
     <div class="win-amount">
       USD {displayAmount.toFixed(2)}
     </div>
@@ -82,33 +78,27 @@
 {/if}
 
 <style>
+  /* Compact 380x96, centred over the grid at stage (450,262), z100 */
   .big-win-banner {
     position: absolute;
-    top: -120px;          /* above the reel frame */
-    left: 50%;
-    transform: translateX(-50%);
-    /* Fluid: caps at the 800px design width but shrinks to fit small popouts
-       (for example Popout S at 400x225). Aspect ratio keeps the 800x200 art
-       undistorted as it scales. */
-    width: min(800px, 90vw);
-    aspect-ratio: 4 / 1;
-    height: auto;
+    left: 450px;
+    top: 262px;
+    width: 380px;
+    height: 96px;
     z-index: 100;
     pointer-events: none;
-  }
-
-  .banner-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(10, 8, 0, 0.55) 0%, rgba(25, 20, 0, 0.45) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.75);
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.35), inset 0 0 20px rgba(255, 215, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease-in;
   }
 
-  .big-win-banner.active .banner-bg {
+  .big-win-banner.active {
     opacity: 1;
     animation: bannerPulse 2s ease-in-out infinite;
   }
@@ -118,12 +108,7 @@
     50% { transform: scale(1.03); }
   }
 
-  /* Win amount in the LED readout zone at banner bottom */
   .win-amount {
-    position: absolute;
-    bottom: 18%;
-    left: 50%;
-    transform: translateX(-50%);
     font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 2rem;
     font-weight: 900;

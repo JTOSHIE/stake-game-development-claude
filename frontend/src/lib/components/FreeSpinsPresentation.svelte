@@ -10,7 +10,7 @@
   import { betAmount, currencyCode, isTurbo, locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
-  import { t } from '../i18n/translations'
+  import { t, type GameMode } from '../i18n/translations'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
 
   export let script: PresentationScript | null = null
@@ -21,14 +21,16 @@
   let phase: 'idle' | 'entry' | 'spin' | 'end' = 'idle'
   let spinIndex = -1
   let currentSpin: PresentedSpin | null = null
-  let displayMeter = 1
-  let spinsRemaining = 0
-  let runningTotalCentibets = 0
+  // Exported (bindable) so BonusInstrumentColumn (LAYOUT_SPEC HUD) can drive
+  // its gauge/odometer/plates from the same live values this overlay shows.
+  export let displayMeter = 1
+  export let spinsRemaining = 0
+  export let runningTotalCentibets = 0
   let showRetrigger = false
   let endTotalDisplay = 0
   let timer: ReturnType<typeof setTimeout> | null = null
 
-  $: mode = $isSocial ? 'social' : 'real'
+  $: mode = ($isSocial ? 'social' : 'real') as GameMode
   $: lang = $locale
 
   function dur(ms: number): number {
