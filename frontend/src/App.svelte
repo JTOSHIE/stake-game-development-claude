@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
   import GameGrid       from './lib/components/GameGrid.svelte'
-  import ControlBar     from './lib/components/ControlBar.svelte'
-  import BalanceDisplay from './lib/components/BalanceDisplay.svelte'
-  import WinDisplay     from './lib/components/WinDisplay.svelte'
+  import HudOverlay      from './lib/components/HudOverlay.svelte'
+  import FeatureButton   from './lib/components/FeatureButton.svelte'
+  import SceneGroup      from './lib/components/SceneGroup.svelte'
+  import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
   import WinCelebration      from './lib/components/WinCelebration.svelte'
   import MaxWinCelebration   from './lib/components/MaxWinCelebration.svelte'
   import PaytableModal       from './lib/components/PaytableModal.svelte'
   import WinBanner           from './lib/components/WinBanner.svelte'
-  import WinPod              from './lib/components/WinPod.svelte'
   import ThemeSelector       from './lib/components/ThemeSelector.svelte'
   import ReplayMode          from './lib/components/ReplayMode.svelte'
   import { parseReplayParams } from './lib/services/replayService'
@@ -71,12 +71,20 @@
     : $errorMessage
 
   let gridRef: GameGrid
+  let buyBonusRef: BuyBonus
   let showThemeSelector = false
 
   // ── Overdrive free-spins presentation state ───────────────────────────────
   let featureActive = false
   let featureScript: PresentationScript | null = null
   let featureResolve: (() => void) | null = null
+
+  // Live bonus-instrument values — FreeSpinsPresentation drives these via
+  // two-way binding below; BonusInstrumentColumn reads the same numbers it
+  // shows in its own overlay (LAYOUT_SPEC bonus instrument column).
+  let liveMeter = 1
+  let liveSpinsRemaining = 0
+  let liveRunningTotalCentibets = 0
 
   /** Build a presentation script from a raw event list (live) or a served round. */
   function scriptFromEvents(events: RawEvent[]): PresentationScript {
@@ -147,19 +155,20 @@
   // Pending autoplay continuation, so it can be cancelled when autoplay stops.
   let autoSpinTimer: ReturnType<typeof setTimeout> | null = null
 
-  // ── Scale-to-fit ───────────────────────────────────────────────────────────
-  // The game is laid out at a fixed design size and scaled to fit the viewport,
-  // so the whole UI (grid, logo, HUD, controls) shrinks together and never
-  // overflows or clips at small popout sizes (for example Popout S, 400x225).
-  const DESIGN_W = 720
-  const DESIGN_H = 760
-  function fitFor(): number {
+  // ── Scale-to-fit (LAYOUT_SPEC v3.1) ────────────────────────────────────────
+  // The whole stage is laid out at the fixed 1280x720 design surface LAYOUT_SPEC
+  // specifies and scaled together by the single stage factor S = min(vw/1280,
+  // vh/720), so every element (frame, grid, HUD, instrument column, scene
+  // group) shrinks or grows in lockstep and never overflows or clips at small
+  // popout sizes (for example Popout S, 400x225).
+  const STAGE_W = 1280
+  const STAGE_H = 720
+  function computeS(): number {
     if (typeof window === 'undefined') return 1
-    // Never upscale beyond the design size (keeps the canvas crisp on large screens).
-    return Math.min(1, window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H)
+    return Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H)
   }
-  let fitScale = fitFor()
-  function handleResize(): void { fitScale = fitFor() }
+  let S = computeS()
+  function handleResize(): void { S = computeS() }
 
   onMount(async () => {
     // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
@@ -330,8 +339,8 @@
   <!-- Replay mode — no betting controls, balance, autoplay, or theme selector -->
   <ReplayMode />
 {:else}
-<!-- Stage clips the viewport and centres the fixed-size game, which is scaled
-     to fit so it never overflows at small popout sizes. -->
+<!-- Stage clips the viewport and centres the fixed 1280x720 design surface,
+     scaled by S so it never overflows or clips at small popout sizes. -->
 <div class="game-stage">
 <main
   class="game-wrapper"
@@ -339,7 +348,7 @@
     --theme-primary: {$activeTheme.palette.primary};
     --theme-secondary: {$activeTheme.palette.secondary};
     --theme-bg: {$activeTheme.palette.background};
-    --fit-scale: {fitScale};
+    --S: {S};
   "
 >
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
@@ -352,75 +361,94 @@
     <LoadingScreen />
   {/if}
 
-  <header class="game-header">
-    <div class="game-title-area">
-      <img
-        class="game-logo-img"
-        src="{$themeAssets.logo}"
-        alt="{$activeTheme.name}"
-        draggable="false"
-        id="theme-logo-img"
-        on:error={() => {
-          const img = document.getElementById('theme-logo-img') as HTMLImageElement
-          if (img) img.style.display = 'none'
-          const txt = document.getElementById('theme-logo-txt')
-          if (txt) (txt as HTMLElement).style.display = 'block'
-        }}
-      />
-      <div
-        class="logo-text"
-        id="theme-logo-txt"
-        style="display: none;"
-      >
-        {$activeTheme.name}
-      </div>
+  <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
+  <div class="logo-box">
+    <img
+      class="game-logo-img"
+      src="{$themeAssets.logo}"
+      alt="{$activeTheme.name}"
+      draggable="false"
+      id="theme-logo-img"
+      on:error={() => {
+        const img = document.getElementById('theme-logo-img') as HTMLImageElement
+        if (img) img.style.display = 'none'
+        const txt = document.getElementById('theme-logo-txt')
+        if (txt) (txt as HTMLElement).style.display = 'block'
+      }}
+    />
+    <div
+      class="logo-text"
+      id="theme-logo-txt"
+      style="display: none;"
+    >
+      {$activeTheme.name}
     </div>
-  </header>
+  </div>
 
   {#if $errorMessage}
     <div class="error-banner">{errorDisplay}</div>
   {/if}
 
-  <section class="grid-section">
-    <!-- Suppress standard celebration while the max-win overlay is active -->
-    <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
-    <!-- Cyberpunk frame overlay — sits above canvas, below controls -->
-    <div class="grid-wrapper">
+  <!-- SCENE GROUP — left, set further back (z8), future-spinner only -->
+  {#if $activeTheme.id === 'future-spinner'}
+    <SceneGroup />
+  {/if}
+
+  <!-- FRAME — 640x468 at (320,84), z10 -->
+  {#if $themeAssets.frame}
+    <img
+      src="{$themeAssets.frame}"
+      class="game-frame"
+      alt=""
+      aria-hidden="true"
+      on:error={(e) => {
+        (e.currentTarget as HTMLImageElement).style.display = 'none'
+      }}
+    />
+  {/if}
+
+  <!-- GRID — 522x349, centred inside the frame, z20 -->
+  <div class="grid-slot">
+    <div class="grid-scale">
       <GameGrid bind:this={gridRef} />
-      {#if $themeAssets.frame}
-        <img
-          src="{$themeAssets.frame}"
-          class="game-frame"
-          alt=""
-          aria-hidden="true"
-          on:error={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = 'none'
-          }}
-        />
-      {/if}
-      <WinBanner />
-      <WinPod />
+      <!-- Suppress standard celebration while the max-win overlay is active -->
+      <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
       <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
       <FreeSpinsPresentation
         script={featureScript}
         active={featureActive}
+        bind:displayMeter={liveMeter}
+        bind:spinsRemaining={liveSpinsRemaining}
+        bind:runningTotalCentibets={liveRunningTotalCentibets}
         on:complete={onFeatureComplete}
       />
     </div>
-  </section>
-
-  <footer class="hud">
-    <BalanceDisplay />
-    <WinDisplay />
-  </footer>
-
-  <ControlBar on:spin={handleSpin} />
-
-  <!-- Bonus Buy — hidden entirely where the jurisdiction disables feature buys.
-       Temporary CSS treatment; final art in AssetForge v2. -->
-  <div class="buy-bonus-row">
-    <BuyBonus on:buy={handleBuy} />
   </div>
+
+  <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
+  <WinBanner />
+
+  <!-- FEATURE — Grille button, beside the frame upper left, future-spinner only -->
+  {#if $activeTheme.id === 'future-spinner'}
+    <FeatureButton on:open={() => buyBonusRef?.openConfirm()} />
+  {/if}
+
+  <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->
+  {#if featureActive && $activeTheme.id === 'future-spinner'}
+    <BonusInstrumentColumn
+      multiplier={liveMeter}
+      spinsRemaining={liveSpinsRemaining}
+      runningTotalCentibets={liveRunningTotalCentibets}
+    />
+  {/if}
+
+  <!-- HUD OVERLAY — generic panel + SPIN + AUTOPLAY, z60 -->
+  <HudOverlay on:spin={handleSpin} />
+
+  <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
+       replaced by FeatureButton above (showTrigger=false). Hidden entirely
+       where the jurisdiction disables feature buys (handled inside). -->
+  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={handleBuy} />
 
   <!-- Theme selector — dev-only. Hidden in the production submission build so
        only the validated Future Spinner experience ships (see the scope note
@@ -462,8 +490,9 @@
     height: 100dvh;
   }
 
-  /* Viewport-locked stage: clips overflow and centres the scaled game so the
-     document never grows past the viewport (no scrollbars at any size). */
+  /* Viewport-locked stage: clips overflow and centres the scaled 1280x720
+     design surface so the document never grows past the viewport (no
+     scrollbars at any size). */
   .game-stage {
     position: fixed;
     inset: 0;
@@ -474,18 +503,16 @@
     overflow: hidden;
   }
 
+  /* LAYOUT_SPEC v3.1 stage: fixed 1280x720 design surface, every child
+     absolutely positioned per spec, the whole thing scaled by S (set in the
+     script and updated on resize) so it shrinks or grows together. */
   .game-wrapper {
-    display: flex;
-    flex-direction: column;
-    /* Fixed design size, scaled to fit the viewport via --fit-scale (set in the
-       script and updated on resize). transform-origin centre keeps it centred
-       within the stage; the background layer fills any letterbox margin. */
-    width: 720px;
-    height: 760px;
-    flex: 0 0 auto;
-    transform: scale(var(--fit-scale, 1));
-    transform-origin: center center;
     position: relative;
+    width: 1280px;
+    height: 720px;
+    flex: 0 0 auto;
+    transform: scale(var(--S, 1));
+    transform-origin: center center;
     /* Subtle dark overlay so grid and UI stay readable over the background */
     background: linear-gradient(
       to bottom,
@@ -496,26 +523,24 @@
     transition: background 0.6s ease;
   }
 
-  .game-header {
-    text-align: center;
-    padding: 0.75rem 1rem 0.25rem;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 70;  /* Z-INDEX STACK: logo / title */
-  }
-
-  .game-title-area {
+  /* ── Logo — top centre, 380 wide, y 18, z70 ─────────────────────────────── */
+  .logo-box {
+    position: absolute;
+    left: 450px;
+    top: 18px;
+    width: 380px;
+    height: 60px;
+    z-index: 70;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 60px;
     pointer-events: none;
   }
 
   /* Text hidden by default — only shown by JS when img fails to load */
   .logo-text {
     font-family: 'Courier New', monospace;
-    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    font-size: 1.6rem;
     font-weight: 900;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -528,30 +553,30 @@
   }
 
   .game-logo-img {
-    max-height: 72px;
-    max-width: 440px;
+    max-height: 60px;
+    max-width: 380px;
     object-fit: contain;
     display: block;
     filter: drop-shadow(0 2px 12px rgba(0,0,0,0.9));
   }
 
+  /* Between the grid (bottom 492.5) and the HUD panel (top 560) */
   .error-banner {
+    position: absolute;
+    left: 340px;
+    top: 498px;
+    width: 600px;
+    height: 54px;
+    z-index: 90;
     background: rgba(255, 50, 50, 0.15);
     border: 1px solid rgba(255, 50, 50, 0.4);
     color: #ff8080;
     text-align: center;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-  }
-
-  .grid-section {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
-    min-height: 0;
+    padding: 0 1rem;
+    font-size: 0.85rem;
   }
 
   /* ── Background video layer ───────────────────────────────────────────── */
@@ -640,20 +665,13 @@
     .bg-media { animation: none; filter: none; }
   }
 
-  /* ── Cyberpunk frame overlay ──────────────────────────────────────────── */
-  .grid-wrapper {
-    position: relative;
-    display: inline-block;
-    overflow: visible;
-    z-index: 10;  /* Z-INDEX STACK: reel frame + symbols */
-    /* Frame PNG provides the border — no CSS border here */
-  }
-
+  /* ── Frame — 640x468 at (320,84), z10 ───────────────────────────────────── */
   .game-frame {
     position: absolute;
-    inset: -70px;
-    width: calc(100% + 140px);
-    height: calc(100% + 140px);
+    left: 320px;
+    top: 84px;
+    width: 640px;
+    height: 468px;
     object-fit: fill;
     pointer-events: none;
     z-index: 10;
@@ -665,25 +683,31 @@
     50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 90%, transparent)); }
   }
 
-  /* ── Mobile responsive ─────────────────────────────────────────────────── */
-  /* The whole game is scaled to fit the viewport via --fit-scale (see the
-     game-stage and game-wrapper rules plus handleResize in the script), so no
-     per-breakpoint grid scaling is needed. The touch-target minimum below
-     applies before scaling. */
+  /* ── Grid — 522x349, centred inside the frame, z20 ──────────────────────── */
+  .grid-slot {
+    position: absolute;
+    left: 379px;
+    top: 143.5px;
+    width: 522px;
+    height: 349px;
+    z-index: 20;
+    overflow: visible;
+  }
+
+  /* GameGrid's native canvas is 616x412 — scale it down uniformly to the
+     522x349 spec box rather than resizing its internals. */
+  .grid-scale {
+    position: relative;
+    width: 616px;
+    height: 412px;
+    transform: scale(0.8474025974);
+    transform-origin: top left;
+  }
+
   @media (max-width: 768px) {
     button {
       min-height: 44px;
       min-width: 44px;
     }
-  }
-
-  .hud {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 0.4rem 1.5rem;
-    background: rgba(0,0,0,0.25);
-    border-top: 1px solid rgba(255,255,255,0.06);
-    flex-shrink: 0;
   }
 </style>

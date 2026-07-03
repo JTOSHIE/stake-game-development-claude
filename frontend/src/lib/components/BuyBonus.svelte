@@ -7,12 +7,17 @@
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { isSocial } from '../stores/socialMode'
-  import { t } from '../i18n/translations'
+  import { t, type GameMode } from '../i18n/translations'
 
   const dispatch = createEventDispatcher<{ buy: void }>()
   let showConfirm = false
 
-  $: mode = $isSocial ? 'social' : 'real'
+  // FeatureButton (LAYOUT_SPEC HUD) opens this same confirm flow instead of a
+  // second on-screen trigger; App.svelte mounts this with showTrigger={false}
+  // and calls openConfirm() via bind:this so there is exactly one buy button.
+  export let showTrigger = true
+
+  $: mode = ($isSocial ? 'social' : 'real') as GameMode
   $: priceMicros = Math.round($betAmount * 100 * CURRENCY_SCALE)
   $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD')
 
@@ -22,19 +27,23 @@
     showConfirm = false
     dispatch('buy')
   }
+
+  export function openConfirm(): void { open() }
 </script>
 
 {#if !$buyFeatureDisabled}
-  <button
-    class="buy-btn"
-    on:click={open}
-    disabled={$isSpinning}
-    aria-label={t($locale, 'buyFeature', mode)}
-    data-testid="buy-bonus-button"
-  >
-    <span class="buy-btn-label">{t($locale, 'buyFeature', mode)}</span>
-    <span class="buy-btn-price">{priceLabel}</span>
-  </button>
+  {#if showTrigger}
+    <button
+      class="buy-btn"
+      on:click={open}
+      disabled={$isSpinning}
+      aria-label={t($locale, 'buyFeature', mode)}
+      data-testid="buy-bonus-button"
+    >
+      <span class="buy-btn-label">{t($locale, 'buyFeature', mode)}</span>
+      <span class="buy-btn-price">{priceLabel}</span>
+    </button>
+  {/if}
 
   {#if showConfirm}
     <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={t($locale, 'buyConfirmTitle', mode)}>

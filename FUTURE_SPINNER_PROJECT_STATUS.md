@@ -1,5 +1,46 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-03 | AssetForge v2: masters, layout law, pipeline, backgrounds
+## Last updated: 2026-07-04 | Layout install: LAYOUT_SPEC v3.1 rendered, old HUD retired
+
+## LAYOUT INSTALL: LAYOUT_SPEC v3.1 RENDERED, OLD HUD RETIRED (2026-07-04)
+Branch `claude/layout-install` (FS_LayoutInstall_Prompt.md). Builds and mounts the HUD/scene
+rebuild that AssetForge v2 scoped but deliberately did not big-bang (Task 5). The stage is
+now the 1280x720 LAYOUT_SPEC surface, scaled together by a single factor S; every element
+AssetForge v2 produced art for is now actually on screen.
+
+- App.svelte re-architected from the old 720x760 flex column to an absolutely-positioned
+  1280x720 stage (`STAGE_W`/`STAGE_H`, factor `S = min(vw/1280, vh/720)`, CSS var `--S`).
+  Frame, grid, logo, HUD panel, feature button, scene group and bonus instrument column are
+  each positioned per spec and scale together; verified no clipping/scrolling at all six
+  compliance viewports plus 1280x720.
+- New components: `HudOverlay.svelte` (generic reskin-free panel: TURBO the only themed
+  accent, hamburger menu with paytable+mute, BALANCE/WIN/BET boxes, stacked cyan bet arrows,
+  SPIN, AUTOPLAY), `FeatureButton.svelte` (Grille export, opens the existing BuyBonus confirm
+  flow), `SceneGroup.svelte` (scene_character_car, idle breathing), `BonusInstrumentColumn.svelte`
+  (gauge_face + rotating gauge_needle sprite, odometer spins window, MULTIPLIER/TOTAL WIN
+  plates, live-bound to FreeSpinsPresentation's meter/spins/total via new exported bindables).
+- New non-locked store `speedMode.ts`: three-tier speed cycle (Normal/Turbo/Super Turbo) layered
+  on top of the locked `gameStore.isTurbo` boolean (kept in sync); GameGrid reads the tier
+  directly for the extra Super Turbo quarter-speed reduction.
+- GameGrid.svelte: tile plate (plates.json signature colour) now wired behind every symbol
+  cell as a box-shadow edge tint, fetched at runtime per theme.
+- WinBanner.svelte restyled to the spec's compact 380x96 CSS panel (translucent, gold rim,
+  no image dependency); frame switched future-spinner from frame-1 to frame-2 (one-line
+  `themeStore.ts` change, notes the revert if the owner's eye prefers frame-1).
+- RETIRED from the mounted live-game tree (files not deleted): ControlBar.svelte, WinPod.svelte,
+  BalanceDisplay.svelte, WinDisplay.svelte (footer `.hud`), the old buy-bonus row. Scope note:
+  ReplayMode.svelte legitimately continues to import WinDisplay/WinPod for its own
+  compliance-mandated replay presentation — untouched, out of scope for this pass.
+- Proof gates: `reports/screens/layout-v1/` — base.png, bonus.png (mock Overdrive round via
+  the guaranteed bonus buy), plus the six compliance viewports. DOM occlusion audit (script
+  `frontend/scripts/layout_v1_audit.mjs`) — zero bounding-box intersections across all 8
+  captured states. Position audit at 1280x720 (S=1): HUD panel, spin button centre, logo
+  box, and instrument column bounds all match LAYOUT_SPEC to the pixel (0px deviation).
+- Gates: tsc/svelte-check clean on every edited/new file (WinDisplay.svelte's one pre-existing
+  error and the pre-existing tsx-test errors are untouched baseline noise); `npm run build`
+  clean; exact-total interpreter test PASS 44/44.
+- CLAUDE.md gains convention (h): visual-proof screenshots for any rendering pass.
+- rgsService.ts, gameStore.ts and games/future_spinner/**: not touched (hard locks respected;
+  no lock exception needed or taken).
 
 ## ASSETFORGE v2: MASTERS, LAYOUT LAW, PIPELINE, BACKGROUNDS (2026-07-03)
 Branch `claude/assetforge-v2` (FS_AssetForge_v2_Prompt.md). Ships the in-house vector design

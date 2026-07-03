@@ -18,6 +18,7 @@
   import { get } from 'svelte/store'
   import { Application, Graphics } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
+  import { speedTier } from '../stores/speedMode'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
   import { activeTheme, themeAssets } from '../stores/themeStore'
@@ -47,6 +48,30 @@
   let SYMBOL_BASE = ''
   $: _assetBase  = $themeAssets.assetBase
   $: SYMBOL_BASE = `${_assetBase}/symbols`
+
+  // ── Tile plate edge tinting — plates.json maps symbol id to its signature
+  // colour for the engine-tinted plate behind every symbol (LAYOUT_SPEC law).
+  let tilePlateSrc = ''
+  let plateColours: Record<string, string> = {}
+  let _platesLoadedFor = ''
+  $: tilePlateSrc = _assetBase ? `${_assetBase}/symbols/tile_plate.png` : ''
+  $: if (_assetBase && _assetBase !== _platesLoadedFor) loadPlates(_assetBase)
+
+  async function loadPlates(base: string): Promise<void> {
+    _platesLoadedFor = base
+    try {
+      const res = await fetch(`${base}/plates.json`)
+      const data = await res.json()
+      plateColours = data.colours ?? {}
+    } catch {
+      plateColours = {}
+    }
+  }
+
+  function plateTint(symbol: string): string {
+    const key = _symNameMap[symbol.toUpperCase()] ?? symbol.toLowerCase()
+    return plateColours[key] ?? '#00ffff'
+  }
 
   // ── State ─────────────────────────────────────────────────────────────────
   let pixiContainer: HTMLDivElement
@@ -377,6 +402,11 @@
     playSpinStart()
 
     const isT = get(isTurbo)
+    // Speed tiers (LAYOUT_SPEC): Normal 1x, Turbo 0.5x, Super Turbo 0.25x.
+    // isTurbo (locked gameStore) still gates the plain turbo halving above it;
+    // speedTier layers the Super Turbo quarter-speed on top, non-locked.
+    const tier = get(speedTier)
+    const speedFactor = tier === 'super' ? 0.25 : isT ? 0.5 : 1
 
     // START all reels simultaneously — overlay + blur on all columns
     for (let r = 0; r < REELS; r++) {
@@ -384,11 +414,11 @@
     }
 
     // STOP reels sequentially left to right — staggered delays
-    // Normal: 600 / 900 / 1200 / 1500 ms   Turbo: half these
+    // Normal: 600 / 900 / 1200 / 1500 ms   Turbo: half   Super Turbo: quarter
     const BASE_STOPS = [600, 900, 1200, 1500]
 
     for (let r = 0; r < 4; r++) {
-      const dur = isT ? BASE_STOPS[r] / 2 : BASE_STOPS[r]
+      const dur = BASE_STOPS[r] * speedFactor
       await new Promise<void>(resolve => setTimeout(resolve, dur))
       await _landReel(r, finalBoard)
 
@@ -418,7 +448,16 @@
     {#each Array(REELS) as _, col}
       <div class="symbol-col" bind:this={colRefs[col]} data-col={col}>
         {#each Array(ROWS) as _, row}
-          <div class="symbol-cell" data-col={col} data-row={row}>
+          <div
+            class="symbol-cell"
+            data-col={col}
+            data-row={row}
+            style="--plate-tint: {plateTint($boardSymbols?.[col]?.[row] ?? 'L3')};"
+          >
+            <!-- Tile plate — signature-colour edge tint per plates.json -->
+            {#if tilePlateSrc}
+              <img class="tile-plate" src={tilePlateSrc} alt="" draggable="false" aria-hidden="true" />
+            {/if}
             <!-- PNG symbols from the active theme (AssetForge v2 vector exports) -->
             <img
               bind:this={imgRefs[col][row]}
@@ -500,6 +539,7 @@
 
   /* Each cell: 120 × 100 px — matches CELL_W / CELL_H */
   .symbol-cell {
+    position: relative;
     width: 120px;
     height: 100px;
     flex-shrink: 0;
@@ -509,11 +549,24 @@
     background: rgba(9, 9, 20, 0.85);
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: inset 0 0 10px 1px color-mix(in srgb, var(--plate-tint, #00ffff) 55%, transparent);
+  }
+
+  /* Neutral dark plate sprite (tile_plate.png) behind every symbol; the
+     signature colour comes from the cell's edge box-shadow above (plates.json). */
+  .tile-plate {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
   }
 
   .symbol-img {
-    width: 100%;
-    height: 100%;
+    position: relative;
+    width: 82%;
+    height: 82%;
     object-fit: contain;
     transition: opacity 0.15s ease;
   }

@@ -124,3 +124,7 @@ verbatim as its named prompt file in the repo root and commits it with that sess
 writes for every session; never pause to request approval for anything the settings permit;
 the deny rules are the only boundary and remain machine-enforced; owner-sanctioned lock
 exceptions continue to follow convention (e).
+
+**(h) Visual proof.** Any pass that changes what renders commits before and after proof
+screenshots to `reports/screens/<pass>/` so the independent verifier can review rendering
+from the repository.

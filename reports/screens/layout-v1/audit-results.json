@@ -1,0 +1,105 @@
+{
+  "viewports": {
+    "1280x720-base": {
+      "width": 1280,
+      "height": 720,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "mobile-s": {
+      "width": 320,
+      "height": 568,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "mobile-m": {
+      "width": 375,
+      "height": 667,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "mobile-l": {
+      "width": 425,
+      "height": 812,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "popout-s": {
+      "width": 400,
+      "height": 225,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "popout-l": {
+      "width": 800,
+      "height": 450,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "desktop": {
+      "width": 1200,
+      "height": 675,
+      "boxCount": 10,
+      "occlusionFailures": []
+    },
+    "1280x720-bonus": {
+      "width": 1280,
+      "height": 720,
+      "boxCount": 13,
+      "occlusionFailures": []
+    }
+  },
+  "position": {
+    "hudPanel": {
+      "expected": {
+        "x": 320,
+        "y": 560,
+        "width": 640,
+        "height": 88
+      },
+      "measured": {
+        "x": 320,
+        "y": 560,
+        "width": 640,
+        "height": 88
+      }
+    },
+    "spinCentre": {
+      "expected": {
+        "x": 970,
+        "y": 604
+      },
+      "measured": {
+        "x": 970,
+        "y": 604
+      }
+    },
+    "logoBox": {
+      "expected": {
+        "x": 450,
+        "y": 18,
+        "width": 380,
+        "height": 60
+      },
+      "measured": {
+        "x": 450,
+        "y": 18,
+        "width": 380,
+        "height": 60
+      }
+    },
+    "instrumentColumn": {
+      "expected": {
+        "x": 1000,
+        "y": 96,
+        "width": 262
+      },
+      "measured": {
+        "x": 1000,
+        "y": 96,
+        "width": 262,
+        "height": 366
+      }
+    }
+  }
+}
