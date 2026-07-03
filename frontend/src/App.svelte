@@ -79,6 +79,24 @@
   let featureScript: PresentationScript | null = null
   let featureResolve: (() => void) | null = null
 
+  // ── Wincap flow ────────────────────────────────────────────────────────────
+  // MaxWinCelebration shows immediately (reactive to $isWincap, unchanged). On
+  // COLLECT, present the complete round sequence through the interpreter (the
+  // "how it happened"), finishing on the total win summary, before autoplay
+  // or the next spin can proceed.
+  let wincapCollectResolve: (() => void) | null = null
+
+  function waitForWincapCollect(): Promise<void> {
+    return new Promise((resolve) => { wincapCollectResolve = resolve })
+  }
+
+  function handleWincapCollect(): void {
+    isWincap.set(false)
+    const r = wincapCollectResolve
+    wincapCollectResolve = null
+    if (r) r()
+  }
+
   // Live bonus-instrument values — FreeSpinsPresentation drives these via
   // two-way binding below; BonusInstrumentColumn reads the same numbers it
   // shows in its own overlay (LAYOUT_SPEC bonus instrument column).
@@ -123,10 +141,15 @@
       const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
 
       // Live rgsService publishes the round events; in mock, serve a sample.
+      // A dev-only ?mockCategory= override lets headless verification force a
+      // specific curated round (e.g. the wincap sample) deterministically.
       let servedTotalWin: number | null = null
       if (import.meta.env.DEV && !get(lastRoundEvents)) {
-        const { serveMockRound } = await import('./lib/mock/roundProvider')
-        const round = await serveMockRound('bonus')
+        const { serveMockRound, serveCategory } = await import('./lib/mock/roundProvider')
+        const forcedCategory = new URLSearchParams(window.location.search).get('mockCategory')
+        const round = forcedCategory
+          ? await serveCategory('bonus', forcedCategory)
+          : await serveMockRound('bonus')
         if (round) servedTotalWin = (round.payoutMultiplier / 100) * bet
       }
       const events = get(lastRoundEvents)
@@ -141,7 +164,16 @@
         recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
       }
 
-      if (script?.triggered) await presentFeature(script)
+      // Wincap flow: MaxWinCelebration is already showing (reactive to
+      // $isWincap). Wait for COLLECT, then present the complete round
+      // sequence, finishing on the total win summary. Otherwise, the normal
+      // (non-capped) feature presentation plays immediately as before.
+      if ($isWincap) {
+        await waitForWincapCollect()
+        if (script) await presentFeature(script)
+      } else if (script?.triggered) {
+        await presentFeature(script)
+      }
       playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
       console.error('[Buy error]', err)
@@ -227,11 +259,17 @@
 
       // Live base rounds that trigger Overdrive publish their full events; play
       // the free-spins overlay before autoplay continues. (Mock base spins do
-      // not populate this, so normal mock base play is unchanged.)
+      // not populate this, so normal mock base play is unchanged.) Wincap flow:
+      // MaxWinCelebration is already showing (reactive to $isWincap) — wait for
+      // COLLECT, then present the complete round sequence through the
+      // interpreter, finishing on the total win summary.
       const roundEvents = get(lastRoundEvents)
-      if (roundEvents) {
-        const script = scriptFromEvents(roundEvents)
-        if (script.triggered) await presentFeature(script)
+      const script = roundEvents ? scriptFromEvents(roundEvents) : null
+      if ($isWincap) {
+        await waitForWincapCollect()
+        if (script) await presentFeature(script)
+      } else if (script?.triggered) {
+        await presentFeature(script)
       }
 
       if ($isAutoPlay) {
@@ -354,7 +392,7 @@
   <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
   <MaxWinCelebration
     show={$isWincap}
-    on:collect={() => isWincap.set(false)}
+    on:collect={handleWincapCollect}
   />
 
   {#if $isLoading}

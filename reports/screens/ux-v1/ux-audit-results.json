@@ -1,0 +1,142 @@
+{
+  "viewports": {
+    "1280x720": {
+      "width": 1280,
+      "height": 720,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "mobile-s": {
+      "width": 320,
+      "height": 568,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "mobile-m": {
+      "width": 375,
+      "height": 667,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "mobile-l": {
+      "width": 425,
+      "height": 812,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "popout-s": {
+      "width": 400,
+      "height": 225,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "popout-l": {
+      "width": 800,
+      "height": 450,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    },
+    "desktop": {
+      "width": 1200,
+      "height": 675,
+      "boxCount": 11,
+      "occlusionFailures": [],
+      "arrowsClickable": true
+    }
+  },
+  "position": {
+    "hudPanel": {
+      "expected": {
+        "x": 296,
+        "y": 560,
+        "width": 688,
+        "height": 88
+      },
+      "measured": {
+        "x": 296,
+        "y": 560,
+        "width": 688,
+        "height": 88
+      }
+    },
+    "spinCentre": {
+      "expected": {
+        "x": 1004,
+        "y": 604
+      },
+      "measured": {
+        "x": 1004,
+        "y": 604
+      }
+    },
+    "turboCentre": {
+      "expected": {
+        "x": 268,
+        "y": 604
+      },
+      "measured": {
+        "x": 268,
+        "y": 604
+      }
+    },
+    "autoplayCentre": {
+      "expected": {
+        "x": 936,
+        "y": 672
+      },
+      "measured": {
+        "x": 936,
+        "y": 672
+      }
+    },
+    "balanceBox": {
+      "expected": {
+        "x": 400,
+        "width": 200
+      },
+      "measured": {
+        "x": 400,
+        "width": 200
+      }
+    },
+    "winBox": {
+      "expected": {
+        "x": 616,
+        "width": 150
+      },
+      "measured": {
+        "x": 616,
+        "width": 150
+      }
+    },
+    "betBox": {
+      "expected": {
+        "x": 782,
+        "width": 120
+      },
+      "measured": {
+        "x": 782,
+        "width": 120
+      }
+    },
+    "betArrows": {
+      "expected": {
+        "x": 916
+      },
+      "measured": {
+        "x": 916
+      }
+    }
+  },
+  "wincapFlow": {
+    "splashVisible": true,
+    "presentationVisible": true,
+    "summaryVisible": true
+  }
+}

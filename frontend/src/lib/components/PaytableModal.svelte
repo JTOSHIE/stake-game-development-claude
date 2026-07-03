@@ -1,10 +1,17 @@
 <script lang="ts">
-  import { showPaytable } from '../stores/gameStore'
+  // PaytableModal.svelte — full-page paytable (LAYOUT_SPEC UX polish v1).
+  // Fills ~92% of the 1280x720 stage (scales with S via the transformed
+  // ancestor, which also re-anchors this modal's `position: fixed`). Large
+  // symbol cells (240 exports), an Overdrive trigger table, a WAYS TO WIN
+  // adjacency diagram, RTP for both modes, and the existing seven-point
+  // disclaimer, all scrollable.
+  import { showPaytable, betAmount, currencyCode } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 
   function close(): void {
     playClick()
@@ -46,8 +53,8 @@
   // games/future_spinner/game_config.py exactly. Final payout = paytable value
   // x ways count x bet. pays array is [_, _, 3-of, 4-of, 5-of]. WILD substitutes
   // for all symbols and has no independent pay; SCAT pays via the scatter table.
-  // Icons resolve to the active theme's AssetForge vector exports (the small
-  // _1x variant is appropriate for these table icons). See $themeAssets.assetBase.
+  // Icons resolve to the active theme's AssetForge vector exports — the full
+  // 240 export is used here (large paytable cells); see $themeAssets.assetBase.
   const SYMBOLS = [
     { name: 'WILD', file: 'wild',    pays: [null, null, null, null, null] },
     { name: 'SCAT', file: 'scatter', pays: [null, null, null, null, null] },
@@ -60,6 +67,16 @@
     { name: 'L2',   file: 'l2',      pays: [null, null, 0.10, 0.25, 0.8]  },
     { name: 'L3',   file: 'l3',      pays: [null, null, 0.08, 0.20, 0.65] },
   ] as const
+
+  // Overdrive trigger table (matches CLAUDE.md true game facts exactly).
+  const TRIGGER_TABLE = [
+    { scatters: 3, spins: 8,  award: '1×' },
+    { scatters: 4, spins: 12, award: '3×' },
+    { scatters: 5, spins: 16, award: '10×' },
+  ]
+
+  // Buy price — 100x current bet, only meaningful where the buy is not disabled.
+  $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -71,6 +88,7 @@
   role="dialog"
   aria-modal="true"
   aria-label={$tr('paytable')}
+  tabindex="-1"
   on:click|self={close}
 >
   <div class="modal-panel">
@@ -94,36 +112,51 @@
         </div>
       </div>
 
-      <!-- Symbol pay table -->
-      <table class="pay-table" aria-label="Symbol payouts">
-        <thead>
-          <tr>
-            <th class="col-sym">Symbol</th>
-            <th class="col-match">3×</th>
-            <th class="col-match">4×</th>
-            <th class="col-match">5×</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each SYMBOLS as sym}
-            <tr class="sym-row">
-              <td class="sym-cell">
-                <img src="{$themeAssets.assetBase}/symbols/{sym.file}_1x.png" alt={sym.name} class="sym-icon" />
-                <span class="sym-name">{sym.name}</span>
-              </td>
-              {#if sym.name === 'SCAT'}
-                <td colspan="3" class="scatter-note">3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins</td>
-              {:else if sym.name === 'WILD'}
-                <td colspan="3" class="scatter-note">Substitutes for all symbols except SCATTER</td>
-              {:else}
-                <td class="pay-cell">{sym.pays[2] ?? '—'}</td>
-                <td class="pay-cell">{sym.pays[3] ?? '—'}</td>
-                <td class="pay-cell">{sym.pays[4] ?? '—'}</td>
+      <!-- WAYS TO WIN — adjacent-reels diagram, reads left to right from reel 1 -->
+      <div class="ways-diagram-section">
+        <h3 class="rules-heading">{waysLabel}</h3>
+        <div class="ways-diagram" role="img" aria-label="A matching way reads left to right across adjacent reels, starting from reel 1">
+          {#each [1, 2, 3, 4, 5] as reelNum, i}
+            <div class="way-step">
+              <div class="way-cell" class:matched={i < 3}>
+                <span class="way-reel-num">{reelNum}</span>
+              </div>
+              {#if i < 4}
+                <span class="way-arrow" class:matched={i < 2}>→</span>
               {/if}
-            </tr>
+            </div>
           {/each}
-        </tbody>
-      </table>
+        </div>
+        <p class="ways-caption">Reels 1, 2 and 3 hold the same symbol (highlighted) — a match, read left to right starting from reel 1. Reels 4 and 5 are not required.</p>
+      </div>
+
+      <!-- Symbol pay table — large cells (240 exports) -->
+      <div class="symbol-grid-section">
+        <h3 class="rules-heading">Symbol Payouts</h3>
+        <div class="symbol-grid">
+          {#each SYMBOLS as sym}
+            <div class="symbol-card">
+              <img src="{$themeAssets.assetBase}/symbols/{sym.file}.png" alt={sym.name} class="sym-icon-lg" />
+              <span class="sym-name-lg">{sym.name}</span>
+              {#if sym.name === 'SCAT'}
+                <span class="scatter-note-lg">3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins</span>
+              {:else if sym.name === 'WILD'}
+                <span class="scatter-note-lg">Substitutes for all symbols except SCATTER</span>
+              {:else}
+                <div class="pay-row-lg">
+                  <span class="pay-count">3×</span><span class="pay-value">{sym.pays[2] ?? '—'}</span>
+                </div>
+                <div class="pay-row-lg">
+                  <span class="pay-count">4×</span><span class="pay-value">{sym.pays[3] ?? '—'}</span>
+                </div>
+                <div class="pay-row-lg">
+                  <span class="pay-count">5×</span><span class="pay-value">{sym.pays[4] ?? '—'}</span>
+                </div>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      </div>
 
       <!-- ── Rules ───────────────────────────────────────────────── -->
       <div class="rules-section">
@@ -138,8 +171,27 @@
       <!-- ── Overdrive Free Spins feature ─────────────────────────── -->
       <div class="rules-section">
         <h3 class="rules-heading">{$tr('rulesOverdriveTitle')}</h3>
+
+        <table class="trigger-table" aria-label="Overdrive trigger table">
+          <thead>
+            <tr>
+              <th>Scatters</th>
+              <th>Free Spins</th>
+              <th>Instant Award</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each TRIGGER_TABLE as row}
+              <tr>
+                <td>{row.scatters}</td>
+                <td>{row.spins}</td>
+                <td>{row.award}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+
         <ul class="rules-list">
-          <li>{$tr('rulesOverdriveTrigger')}</li>
           <li>{$tr('rulesOverdriveMeter')}</li>
           <li>{$tr('rulesOverdriveRetrigger')}</li>
           {#if !$buyFeatureDisabled}
@@ -147,12 +199,29 @@
           {/if}
           <li>{$tr('rulesOverdriveModes')}</li>
         </ul>
+
+        {#if !$buyFeatureDisabled}
+          <div class="buy-price-callout">
+            <span class="buy-price-label">{$tr('buyFeature')}</span>
+            <span class="buy-price-value">{buyPriceLabel}</span>
+          </div>
+        {/if}
       </div>
 
-      <!-- ── RTP ─────────────────────────────────────────────────── -->
-      <div class="rtp-row">
-        <span class="rtp-label">THEORETICAL RTP</span>
-        <span class="rtp-value">96.35%</span>
+      <!-- ── RTP — both modes ────────────────────────────────────── -->
+      <div class="rtp-grid">
+        <div class="rtp-row">
+          <span class="rtp-label">BASE MODE RTP</span>
+          <span class="rtp-value">96.35%</span>
+        </div>
+        <div class="rtp-row">
+          <span class="rtp-label">BONUS BUY RTP</span>
+          <span class="rtp-value">96.35%</span>
+        </div>
+        <div class="rtp-row">
+          <span class="rtp-label">MAX WIN</span>
+          <span class="rtp-value">5,000×</span>
+        </div>
       </div>
 
       <!-- ── Disclaimer (Stake Engine seven-point requirement) ────── -->
@@ -167,26 +236,30 @@
 
 <style>
   /* ── Backdrop ─────────────────────────────────────────────────────── */
+  /* Sized against the 1280x720 stage design units — App.svelte's .game-wrapper
+     has `transform: scale(S)`, which re-anchors `position: fixed` descendants
+     to its own (pre-transform) box, so this backdrop covers exactly the
+     1280x720 stage and everything below scales with it automatically. */
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: 200;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(3px);
-    padding: 1rem;
   }
 
-  /* ── Panel ────────────────────────────────────────────────────────── */
+  /* ── Panel — fills ~92% of the stage ──────────────────────────────── */
   .modal-panel {
     background: linear-gradient(160deg, #0c0c22 0%, #08081a 100%);
     border: 1px solid rgba(255, 200, 50, 0.25);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 480px;
-    max-height: 86dvh;
+    border-radius: 16px;
+    width: 92%;
+    max-width: 1178px;
+    height: 92%;
+    max-height: 662px;
     display: flex;
     flex-direction: column;
     box-shadow:
@@ -200,13 +273,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.9rem 1.2rem;
+    padding: 1.1rem 1.6rem;
     border-bottom: 1px solid rgba(255, 200, 50, 0.12);
     flex-shrink: 0;
   }
 
   .modal-title {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 900;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -221,10 +294,10 @@
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: rgba(255, 255, 255, 0.7);
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,10 +313,10 @@
   /* ── Body ─────────────────────────────────────────────────────────── */
   .modal-body {
     overflow-y: auto;
-    padding: 1rem 1.2rem 1.4rem;
+    padding: 1.2rem 1.8rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1.5rem;
   }
 
   /* ── How-to-win banner ────────────────────────────────────────────── */
@@ -251,14 +324,14 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    padding: 0.7rem 0.9rem;
+    padding: 0.9rem 1.1rem;
     background: rgba(0, 200, 255, 0.05);
     border: 1px solid rgba(0, 200, 255, 0.18);
     border-radius: 8px;
   }
 
   .htw-headline {
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #ffffff;
     line-height: 1.4;
@@ -266,7 +339,7 @@
   }
 
   .htw-sub {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     color: rgba(160, 228, 255, 0.75);
     line-height: 1.35;
     margin: 0;
@@ -277,7 +350,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.5rem 0.6rem;
+    padding: 0.6rem 0.8rem;
     margin-top: 0.3rem;
     background: rgba(255, 200, 50, 0.06);
     border: 1px solid rgba(255, 200, 50, 0.2);
@@ -285,7 +358,7 @@
   }
 
   .ways-number {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 900;
     color: #ffd700;
     line-height: 1;
@@ -294,74 +367,143 @@
   }
 
   .ways-label {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: rgba(255, 200, 50, 0.65);
     margin-top: 2px;
   }
 
-  /* ── Pay table ────────────────────────────────────────────────────── */
-  .pay-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
+  /* ── WAYS TO WIN adjacency diagram ────────────────────────────────── */
+  .ways-diagram-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
   }
 
-  .pay-table th {
-    text-align: left;
-    color: rgba(255, 200, 50, 0.6);
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0 0 0.4rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .col-sym   { width: 46%; }
-  .col-match { width: 18%; text-align: center; }
-
-  .sym-row {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    transition: background 0.1s;
-  }
-
-  .sym-row:hover { background: rgba(255, 255, 255, 0.03); }
-
-  .sym-cell {
+  .ways-diagram {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0;
+    justify-content: center;
+    gap: 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
   }
 
-  .sym-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    flex-shrink: 0;
+  .way-step {
+    display: flex;
+    align-items: center;
   }
 
-  .sym-name {
+  .way-cell {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.3);
+    transition: all 0.2s;
+  }
+
+  .way-cell.matched {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 14px rgba(0, 255, 255, 0.45);
+  }
+
+  .way-reel-num { line-height: 1; }
+
+  .way-arrow {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.2);
+    padding: 0 0.4rem;
+  }
+
+  .way-arrow.matched {
+    color: #00ffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+  }
+
+  .ways-caption {
     font-size: 0.72rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.75);
-    letter-spacing: 0.05em;
-  }
-
-  .pay-cell {
+    color: rgba(255, 255, 255, 0.55);
     text-align: center;
-    color: #4eff91;
-    font-family: 'Courier New', monospace;
-    font-weight: 700;
-    padding: 0.35rem 0;
+    line-height: 1.4;
+    margin: 0;
   }
 
-  .scatter-note {
+  /* ── Symbol grid — large 240px cells ──────────────────────────────── */
+  .symbol-grid-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.7rem;
+  }
+
+  .symbol-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.8rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    transition: background 0.15s;
+  }
+
+  .symbol-card:hover { background: rgba(255, 255, 255, 0.06); }
+
+  .sym-icon-lg {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+  }
+
+  .sym-name-lg {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.06em;
+  }
+
+  .pay-row-lg {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-family: 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pay-count {
+    font-size: 0.62rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .pay-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #4eff91;
+  }
+
+  .scatter-note-lg {
     text-align: center;
     color: #a0e4ff;
     font-style: italic;
-    font-size: 0.72rem;
-    padding: 0.35rem 0;
+    font-size: 0.68rem;
+    line-height: 1.35;
   }
 
   /* ── Rules ────────────────────────────────────────────────────────── */
@@ -372,7 +514,7 @@
   }
 
   .rules-heading {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(255, 200, 50, 0.7);
@@ -383,16 +525,16 @@
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.35rem;
     padding: 0;
   }
 
   .rules-list li {
-    font-size: 0.76rem;
+    font-size: 0.82rem;
     color: rgba(255, 255, 255, 0.6);
     padding-left: 0.9rem;
     position: relative;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .rules-list li::before {
@@ -402,30 +544,92 @@
     color: rgba(255, 200, 50, 0.5);
   }
 
-  /* ── RTP row ──────────────────────────────────────────────────────── */
+  /* ── Overdrive trigger table ──────────────────────────────────────── */
+  .trigger-table {
+    width: 100%;
+    max-width: 420px;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trigger-table th {
+    text-align: center;
+    color: rgba(255, 200, 50, 0.6);
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 0 0.4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .trigger-table td {
+    text-align: center;
+    padding: 0.4rem 0;
+    color: #a0e4ff;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  /* ── Buy price callout ────────────────────────────────────────────── */
+  .buy-price-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.9rem;
+    background: rgba(255, 46, 196, 0.06);
+    border: 1px solid rgba(255, 46, 196, 0.25);
+    border-radius: 6px;
+  }
+
+  .buy-price-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 213, 74, 0.85);
+    font-weight: 700;
+  }
+
+  .buy-price-value {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #ff2ec4;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 8px rgba(255, 46, 196, 0.5);
+  }
+
+  /* ── RTP grid ─────────────────────────────────────────────────────── */
+  .rtp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+  }
+
   .rtp-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0.8rem;
+    padding: 0.6rem 0.9rem;
     border: 1px solid rgba(255, 200, 50, 0.15);
     border-radius: 6px;
     background: rgba(255, 200, 50, 0.04);
   }
 
   .rtp-label {
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
     color: rgba(255, 200, 50, 0.55);
     text-transform: uppercase;
     font-weight: 700;
   }
 
   .rtp-value {
-    font-size: 1rem;
+    font-size: 1.05rem;
     font-weight: 900;
     color: #ffd700;
     font-family: 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
   }
 
@@ -437,10 +641,17 @@
   }
 
   .disclaimer-text {
-    font-size: 0.68rem;
-    line-height: 1.5;
+    font-size: 0.72rem;
+    line-height: 1.55;
     color: rgba(255, 255, 255, 0.55);
     margin: 0;
     text-align: left;
+  }
+
+  /* ── Small viewports — tighter padding, single-column symbol grid ──── */
+  @media (max-width: 500px) {
+    .modal-body { padding: 0.9rem 1rem 1.4rem; gap: 1rem; }
+    .symbol-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .sym-icon-lg { width: 64px; height: 64px; }
   }
 </style>
