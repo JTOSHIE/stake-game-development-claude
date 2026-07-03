@@ -1,5 +1,6 @@
 <script lang="ts">
   import { showPaytable } from '../stores/gameStore'
+  import { themeAssets } from '../stores/themeStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
@@ -45,17 +46,19 @@
   // games/future_spinner/game_config.py exactly. Final payout = paytable value
   // x ways count x bet. pays array is [_, _, 3-of, 4-of, 5-of]. WILD substitutes
   // for all symbols and has no independent pay; SCAT pays via the scatter table.
+  // Icons resolve to the active theme's AssetForge vector exports (the small
+  // _1x variant is appropriate for these table icons). See $themeAssets.assetBase.
   const SYMBOLS = [
-    { name: 'WILD', src: '/assets/symbols/wild_cyberpunk_logo_variant_04.png',                  pays: [null, null, null, null, null] },
-    { name: 'SCAT', src: '/assets/symbols/scatter_energy_burst_variant_01.png',                 pays: [null, null, null, null, null] },
-    { name: 'H1',   src: '/assets/symbols/h1_futuristic_rim_variant_02.png',                    pays: [null, null, 1.5,  6,    22]   },
-    { name: 'H2',   src: '/assets/symbols/h2_neon_turbocharger_variant_01.png',                 pays: [null, null, 0.8,  3,    10]   },
-    { name: 'M1',   src: '/assets/symbols/m1_holographic_grille_variant_09_original.png',       pays: [null, null, 0.45, 1.5,  5]    },
-    { name: 'M2',   src: '/assets/symbols/m2_glowing_exhaust_variant_01.png',                   pays: [null, null, 0.3,  1,    4]    },
-    { name: 'M3',   src: '/assets/symbols/m3_holographic_steering_wheel_variant_03.png',        pays: [null, null, 0.2,  0.6,  2]    },
-    { name: 'L1',   src: '/assets/symbols/l1_chrome_lug_nut_variant_05.png',                    pays: [null, null, 0.15, 0.45, 1.5]  },
-    { name: 'L2',   src: '/assets/symbols/l2_chrome_spark_plug_variant_05.png',                 pays: [null, null, 0.10, 0.25, 0.8]  },
-    { name: 'L3',   src: '/assets/symbols/l3_neon_piston_variant_08.png',                       pays: [null, null, 0.08, 0.20, 0.65] },
+    { name: 'WILD', file: 'wild',    pays: [null, null, null, null, null] },
+    { name: 'SCAT', file: 'scatter', pays: [null, null, null, null, null] },
+    { name: 'H1',   file: 'h1',      pays: [null, null, 1.5,  6,    22]   },
+    { name: 'H2',   file: 'h2',      pays: [null, null, 0.8,  3,    10]   },
+    { name: 'M1',   file: 'm1',      pays: [null, null, 0.45, 1.5,  5]    },
+    { name: 'M2',   file: 'm2',      pays: [null, null, 0.3,  1,    4]    },
+    { name: 'M3',   file: 'm3',      pays: [null, null, 0.2,  0.6,  2]    },
+    { name: 'L1',   file: 'l1',      pays: [null, null, 0.15, 0.45, 1.5]  },
+    { name: 'L2',   file: 'l2',      pays: [null, null, 0.10, 0.25, 0.8]  },
+    { name: 'L3',   file: 'l3',      pays: [null, null, 0.08, 0.20, 0.65] },
   ] as const
 </script>
 
@@ -105,7 +108,7 @@
           {#each SYMBOLS as sym}
             <tr class="sym-row">
               <td class="sym-cell">
-                <img src={sym.src} alt={sym.name} class="sym-icon" />
+                <img src="{$themeAssets.assetBase}/symbols/{sym.file}_1x.png" alt={sym.name} class="sym-icon" />
                 <span class="sym-name">{sym.name}</span>
               </td>
               {#if sym.name === 'SCAT'}
