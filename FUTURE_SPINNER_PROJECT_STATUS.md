@@ -1,5 +1,34 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-04 | Layout install: LAYOUT_SPEC v3.1 rendered, old HUD retired
+## Last updated: 2026-07-04 | UX polish: HUD v3.2 fixed fields, full-page paytable, wincap flow, mock pool
+
+## UX POLISH: HUD v3.2, FULL-PAGE PAYTABLE, WINCAP FLOW, MOCK POOL (2026-07-04)
+Branch `claude/ux-polish` (FS_UXPolish_Prompt.md). Follows straight on from the layout
+install: fixes HUD occlusion risk under stress values, rebuilds the paytable full-page,
+reorders the wincap experience per the owner's decision, and grows the bonus mock pool.
+
+- LAYOUT_SPEC gains AMENDMENT v3.2: the HUD panel widens (296-984), TURBO and SPIN both move
+  fully outside the panel (centres 268,604 and 1004,604), and BALANCE/WIN/BET/bet-arrows
+  become independently fixed stage-positioned boxes that never move or resize as values
+  grow (tabular-nums everywhere). Verified with $10,000.00 balance / $5,000.00 bet / $5,000.00
+  win stress values (a dev-only test hook seeds a higher bet ladder so the $5,000 bet isn't
+  snapped back by the normal ladder guard): 0 occlusion failures and 0px position deviation
+  across 1280x720 and all six compliance viewports.
+- PaytableModal.svelte rebuilt full-page (92% of the stage, scrollable): large 240px symbol
+  cards, a new WAYS TO WIN adjacent-reels diagram, an Overdrive trigger table + live buy
+  price callout, RTP split into Base/Bonus Buy rows (both 96.35%), the same seven-point
+  disclaimer. All existing 16-locale/social plumbing untouched. z-index corrected to the
+  documented "modals 200" law (was 100).
+- Wincap flow re-sequenced per owner decision: splash shows immediately (unchanged), then on
+  COLLECT the complete round sequence plays through the interpreter (FreeSpinsPresentation,
+  extended to also walk a non-triggered base round), finishing on the total win summary —
+  applies in normal play, bonus buy, and replay (ReplayMode gained its first MaxWinCelebration
+  mount). Headless-verified against the curated wincap sample round via a new dev-only
+  `?mockCategory=` override.
+- Bonus mock pool grown from 22 to 31 rounds (base pool untouched at 27), sourced read-only
+  from the real 100,000-round bonus book: exactly one wincap round kept, plus three new
+  small/mid/large size categories (5 rounds each). Exact-total interpreter gate PASS 58/58.
+- Gates: svelte-check/tsc clean on every edited/new file, `npm run build` clean. No lock
+  exception needed or taken.
 
 ## LAYOUT INSTALL: LAYOUT_SPEC v3.1 RENDERED, OLD HUD RETIRED (2026-07-04)
 Branch `claude/layout-install` (FS_LayoutInstall_Prompt.md). Builds and mounts the HUD/scene

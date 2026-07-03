@@ -51,7 +51,20 @@
 
   export function start() {
     clear()
-    if (!script || !script.triggered) { finish(); return }
+    if (!script) { finish(); return }
+    if (!script.triggered) {
+      // Wincap walkthrough for a round that never entered the feature (a
+      // plain base-game win reaching the cap): "how it happened" is just the
+      // base spin's board, so show that, then the same total-win summary.
+      phase = 'spin'
+      currentSpin = script.baseSpin
+      displayMeter = 1
+      spinsRemaining = 0
+      runningTotalCentibets = script.baseSpin.runningTotalCentibets
+      showRetrigger = false
+      timer = setTimeout(toEnd, dur(1800))
+      return
+    }
     phase = 'entry'
     spinIndex = -1
     displayMeter = 1

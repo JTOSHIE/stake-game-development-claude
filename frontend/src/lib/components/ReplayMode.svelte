@@ -17,6 +17,7 @@
   import WinDisplay from './WinDisplay.svelte'
   import WinPod from './WinPod.svelte'
   import FreeSpinsPresentation from './FreeSpinsPresentation.svelte'
+  import MaxWinCelebration from './MaxWinCelebration.svelte'
   import { interpretEvents, type PresentationScript, type RawEvent } from '../services/roundInterpreter'
 
   // Drive the animation pipeline by setting gameStore writables via their
@@ -58,6 +59,17 @@
     featureActive = false
     const r = featureResolve
     featureResolve = null
+    if (r) r()
+  }
+
+  // Wincap flow (applies to replay too): show the MAX WIN splash immediately,
+  // wait for COLLECT, then present the complete round sequence, finishing on
+  // the total win summary — same order as live play.
+  let wincapCollectResolve: (() => void) | null = null
+  function handleWincapCollect(): void {
+    isWincap.set(false)
+    const r = wincapCollectResolve
+    wincapCollectResolve = null
     if (r) r()
   }
 
@@ -109,11 +121,18 @@
       if (isFeatureRound) {
         const script = interpretEvents(events as RawEvent[])
         if (script.triggered) {
+          const wincapNow = response.payoutMultiplier >= WINCAP
+          if (wincapNow) {
+            // Wincap flow applies in replay too: splash first, then on COLLECT
+            // present the complete round sequence, finishing on the summary.
+            isWincap.set(true)
+            await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
+          }
           featureScript = script
           featureActive = true
           await new Promise<void>((resolve) => { featureResolve = resolve })
           winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
-          isWincap.set(response.payoutMultiplier >= WINCAP)
+          isWincap.set(wincapNow)
           phase = 'complete'
           replayPhase.set('complete')
           return
@@ -141,6 +160,16 @@
       // Set bet so winMultiplier derived store resolves correctly
       betAmount.set(microsToDisplay(params.amount))
 
+      // Wincap flow (non-feature base round reaching the cap — see the
+      // feature-round branch above for the more common triggered case):
+      // splash first, wait for COLLECT, then the reel reveal below plays as
+      // the "how it happened" presentation, finishing on the summary.
+      const wincapNow = response.payoutMultiplier >= WINCAP
+      if (wincapNow) {
+        isWincap.set(true)
+        await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
+      }
+
       // Drive the reel spin animation (identical pipeline to live game)
       isSpinning.set(true)
       if (gridRef && board.length > 0) {
@@ -154,7 +183,7 @@
       scatterCount.set(scatterEvt?.data?.count ?? 0)
       // winAmount drives the derived winMultiplier (winAmount / betAmount)
       winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
-      isWincap.set(response.payoutMultiplier >= WINCAP)
+      isWincap.set(wincapNow)
 
       // Let win-line and celebration animations complete
       await new Promise((r) => setTimeout(r, 2000))
@@ -197,6 +226,10 @@
   <!-- Replay disclaimer — always visible, Stake Engine compliance. Makes clear
        this is a non-interactive replay of a past round with no real wager. -->
   <div class="replay-disclaimer" role="note">{disclaimer}</div>
+
+  <!-- Wincap flow applies in replay too: splash first, then COLLECT reveals
+       the full round sequence (see startReplay). -->
+  <MaxWinCelebration show={$isWincap} on:collect={handleWincapCollect} />
 
   {#if phase === 'loading'}
     <div class="replay-status loading">Loading replay…</div>

@@ -1,10 +1,11 @@
 <script lang="ts">
-  // HudOverlay.svelte — LAYOUT_SPEC v3.1 generic HUD panel.
-  // Reskin-free per DESIGN_SYSTEM (the only themed accent inside it is TURBO,
-  // which reuses the existing turbo treatment with an engage glow). Replaces
-  // the retired ControlBar: bet ladder, spin, autoplay, turbo/speed, and the
-  // hamburger menu (paytable + mute) all live here now.
-  import { createEventDispatcher } from 'svelte'
+  // HudOverlay.svelte — LAYOUT_SPEC v3.2 AMENDMENT: fixed-field HUD.
+  // Reskin-free per DESIGN_SYSTEM (the only themed accent is TURBO, which
+  // reuses the existing turbo treatment with an engage glow). Every field
+  // inside the panel is a fixed box that never moves or resizes as its value
+  // grows (stress-tested against $10,000.00 balance / $5,000.00 win /
+  // $5,000.00 bet); every numeric value uses tabular numerals.
+  import { createEventDispatcher, onMount } from 'svelte'
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
@@ -17,6 +18,16 @@
   import { playClick } from '../services/soundService'
 
   const dispatch = createEventDispatcher<{ spin: void }>()
+
+  // Dev-only test hook: exposes the store objects so headless verification
+  // (frontend/scripts/layout_v1_audit.mjs) can inject stress values (e.g.
+  // $10,000.00 balance) without any production code path. Never present in
+  // a production build (import.meta.env.DEV is false there).
+  onMount(() => {
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __testStores?: unknown }).__testStores = { balance, betAmount, winAmount, rgsBetLevels }
+    }
+  })
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
   let showAutoMenu = false
@@ -104,55 +115,62 @@
   $: winLabel     = formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
-<!-- HUD panel — spec x 320..960, y 560..648, radius 18, z 60 -->
-<div class="hud-panel" data-testid="hud-panel">
-  <button
-    class="turbo-btn"
-    class:engaged={$speedTier !== 'normal'}
-    on:click={toggleTurbo}
-    disabled={$isSpinning}
-    aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
-    title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
-  >
-    <span class="turbo-glyph">⚡</span>
-    <span class="turbo-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
+<!-- HUD panel — v3.2 x 296..984 (688 wide), y 560..648, radius 18, z 60 -->
+<div class="hud-panel" data-testid="hud-panel"></div>
+
+<!-- TURBO — v3.2: OUTSIDE the panel, centre (268,604) -->
+<button
+  class="turbo-btn"
+  class:engaged={$speedTier !== 'normal'}
+  on:click={toggleTurbo}
+  disabled={$isSpinning}
+  aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+  title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+>
+  <span class="turbo-glyph">⚡</span>
+  <span class="turbo-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
+</button>
+
+<!-- Hamburger + menu — fixed at x 344 -->
+<div class="menu-wrapper">
+  <button class="hamburger-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
   </button>
-
-  <div class="menu-wrapper">
-    <button class="hamburger-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
-      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-    </button>
-    {#if showMenu}
-      <div class="hud-menu" role="menu">
-        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-        <button class="hud-menu-item" role="menuitem" on:click={toggleMute}>
-          {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
-        </button>
-      </div>
-    {/if}
-  </div>
-
-  <div class="hud-box balance-box">
-    <span class="hud-label">{$tr('balance')}</span>
-    <span class="hud-value cyan">{balanceLabel}</span>
-  </div>
-
-  <div class="hud-box win-box">
-    <span class="hud-label">{$tr('win')}</span>
-    <span class="hud-value magenta">{winLabel}</span>
-  </div>
-
-  <div class="hud-box bet-box">
-    <span class="hud-label">{$tr('bet')}</span>
-    <span class="hud-value gold">{betLabel}</span>
-    <div class="bet-arrows">
-      <button class="bet-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">▲</button>
-      <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
+  {#if showMenu}
+    <div class="hud-menu" role="menu">
+      <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+      <button class="hud-menu-item" role="menuitem" on:click={toggleMute}>
+        {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+      </button>
     </div>
-  </div>
+  {/if}
 </div>
 
-<!-- SPIN — spec centre (970,604), 84 diameter, clear of the bet arrows -->
+<!-- BALANCE — fixed box x 400, width 200 -->
+<div class="hud-box balance-box" data-testid="hud-balance">
+  <span class="hud-label">{$tr('balance')}</span>
+  <span class="hud-value cyan">{balanceLabel}</span>
+</div>
+
+<!-- WIN — fixed box x 616, width 150 -->
+<div class="hud-box win-box" data-testid="hud-win">
+  <span class="hud-label">{$tr('win')}</span>
+  <span class="hud-value magenta">{winLabel}</span>
+</div>
+
+<!-- BET — fixed box x 782, width 120, value right-aligned -->
+<div class="hud-box bet-box" data-testid="hud-bet">
+  <span class="hud-label">{$tr('bet')}</span>
+  <span class="hud-value gold">{betLabel}</span>
+</div>
+
+<!-- Stacked cyan bet arrows — own FIXED column x 916, independent of the BET box -->
+<div class="bet-arrows" data-testid="bet-arrows">
+  <button class="bet-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">▲</button>
+  <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
+</div>
+
+<!-- SPIN — v3.2: centre (1004,604), 84 diameter -->
 <button
   class="spin-btn"
   class:spinning={$isSpinning}
@@ -165,7 +183,7 @@
   <span class="spin-text">{$tr('spin')}</span>
 </button>
 
-<!-- AUTOPLAY — spec centre (902,672), 48, below the bar -->
+<!-- AUTOPLAY — v3.2: centre (936,672), 48 -->
 <div class="autoplay-wrapper">
   <button
     class="autoplay-btn"
@@ -190,28 +208,33 @@
 </div>
 
 <style>
+  /* Numeric HUD values never reflow as digits grow. */
+  .hud-value {
+    font-variant-numeric: tabular-nums;
+  }
+
   .hud-panel {
     position: absolute;
-    left: 320px;
+    left: 296px;
     top: 560px;
-    width: 640px;
+    width: 688px;
     height: 88px;
     z-index: 60;
     border-radius: 18px;
     background: linear-gradient(135deg, rgba(4, 6, 18, 0.82) 0%, rgba(8, 12, 30, 0.72) 100%);
     border: 1px solid color-mix(in srgb, var(--theme-primary, #00ffff) 30%, transparent);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
+    pointer-events: none;
   }
 
-  /* ── TURBO — the one themed accent inside the generic panel ────────────── */
+  /* ── TURBO — v3.2: OUTSIDE the panel, centre (268,604) ──────────────────── */
   .turbo-btn {
-    flex-shrink: 0;
+    position: absolute;
+    left: 232px;
+    top: 568px;
     width: 72px;
     height: 72px;
+    z-index: 60;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.45);
     border: 2px solid rgba(255, 154, 46, 0.4);
@@ -225,7 +248,7 @@
     transition: border-color 0.15s, filter 0.15s;
   }
   .turbo-btn .turbo-glyph { font-size: 1.4rem; line-height: 1; }
-  .turbo-btn .turbo-tier { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em; }
+  .turbo-btn .turbo-tier { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
   .turbo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .turbo-btn.engaged {
     border-color: #ff9a2e;
@@ -238,8 +261,15 @@
     to   { filter: brightness(1.35); }
   }
 
-  /* ── Hamburger + menu ───────────────────────────────────────────────────── */
-  .menu-wrapper { position: relative; flex-shrink: 0; }
+  /* ── Hamburger + menu — fixed at x 344 ──────────────────────────────────── */
+  .menu-wrapper {
+    position: absolute;
+    left: 344px;
+    top: 584px;
+    width: 40px;
+    height: 40px;
+    z-index: 60;
+  }
   .hamburger-btn {
     width: 40px;
     height: 40px;
@@ -284,10 +314,12 @@
   }
   .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
 
-  /* ── BALANCE / WIN / BET boxes ──────────────────────────────────────────── */
+  /* ── BALANCE / WIN / BET — fixed boxes, never move or resize ────────────── */
   .hud-box {
-    flex-shrink: 0;
+    position: absolute;
+    top: 574px;
     height: 60px;
+    z-index: 60;
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.35);
     display: flex;
@@ -296,10 +328,11 @@
     justify-content: center;
     gap: 2px;
     padding: 0 6px;
+    overflow: hidden;
   }
-  .balance-box { width: 170px; }
-  .win-box     { width: 140px; }
-  .bet-box     { width: 136px; flex-direction: row; gap: 6px; justify-content: space-between; padding: 0 8px 0 10px; }
+  .balance-box { left: 400px; width: 200px; }
+  .win-box     { left: 616px; width: 150px; }
+  .bet-box     { left: 782px; width: 120px; align-items: flex-end; padding-right: 10px; }
 
   .hud-label {
     font-family: 'Orbitron', 'Courier New', monospace;
@@ -321,28 +354,33 @@
   .hud-value.magenta { color: #ff2ec4; text-shadow: 0 0 8px rgba(255, 46, 196, 0.6); }
   .hud-value.gold    { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
 
+  /* BET value right-aligned within its fixed 120 width, per AMENDMENT v3.2 */
   .bet-box .hud-label,
   .bet-box .hud-value {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    text-align: right;
+    width: 100%;
   }
-  .bet-box .hud-value { font-size: 0.85rem; }
 
-  /* Stacked cyan bet arrows — fully visible, given the freed panel width */
+  /* Stacked cyan bet arrows — own FIXED column x 916, independent of BET box */
   .bet-arrows {
+    position: absolute;
+    left: 916px;
+    top: 578px;
+    width: 44px;
+    height: 52px;
+    z-index: 60;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
   .bet-arrow {
-    width: 22px;
-    height: 17px;
+    width: 44px;
+    height: 24px;
     background: rgba(0, 255, 255, 0.08);
     border: 1px solid rgba(0, 255, 255, 0.4);
-    border-radius: 3px;
+    border-radius: 4px;
     color: #00ffff;
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     line-height: 1;
     cursor: pointer;
     display: flex;
@@ -353,10 +391,10 @@
   .bet-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
   .bet-arrow:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); }
 
-  /* ── SPIN — clean generic treatment, breaks past the panel's right edge ── */
+  /* ── SPIN — v3.2: centre (1004,604) ──────────────────────────────────────── */
   .spin-btn {
     position: absolute;
-    left: 928px;
+    left: 962px;
     top: 562px;
     width: 84px;
     height: 84px;
@@ -381,10 +419,10 @@
   .spin-btn.spinning .spin-glyph { animation: spin-rotate 0.7s linear infinite; }
   @keyframes spin-rotate { to { transform: rotate(360deg); } }
 
-  /* ── AUTOPLAY — spec centre (902,672), 48, below the bar ────────────────── */
+  /* ── AUTOPLAY — v3.2: centre (936,672), 48 ───────────────────────────────── */
   .autoplay-wrapper {
     position: absolute;
-    left: 878px;
+    left: 912px;
     top: 648px;
     width: 48px;
     height: 48px;
@@ -410,7 +448,7 @@
     box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
   }
   .autoplay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .autoplay-count { font-size: 0.95rem; }
+  .autoplay-count { font-size: 0.95rem; font-variant-numeric: tabular-nums; }
   .autoplay-glyph { font-size: 1.1rem; }
 
   .auto-menu {
