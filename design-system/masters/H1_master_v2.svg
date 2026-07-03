@@ -1,0 +1,118 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4de3ff" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#b400ff" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#b400ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#c8daea"/>
+      <stop offset="40%" stop-color="#6d8098"/>
+      <stop offset="52%" stop-color="#2e3a4c"/>
+      <stop offset="66%" stop-color="#7d92aa"/>
+      <stop offset="85%" stop-color="#e9f5ff"/>
+      <stop offset="100%" stop-color="#8ea3ba"/>
+    </linearGradient>
+    <linearGradient id="chromeDark" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"  stop-color="#93a7bd"/>
+      <stop offset="35%" stop-color="#42506a"/>
+      <stop offset="60%" stop-color="#1b2334"/>
+      <stop offset="100%" stop-color="#55677f"/>
+    </linearGradient>
+    <radialGradient id="barrel" cx="40%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#232c40"/>
+      <stop offset="55%" stop-color="#121828"/>
+      <stop offset="100%" stop-color="#080c16"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+    <radialGradient id="tyre" cx="42%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#2a3346"/>
+      <stop offset="60%" stop-color="#141a28"/>
+      <stop offset="100%" stop-color="#070a12"/>
+    </radialGradient>
+  </defs>
+  <circle cx="512" cy="512" r="492" fill="url(#bgGlow)"/>
+  <circle cx="512" cy="512" r="452" fill="url(#tyre)"/>
+  <circle cx="512" cy="512" r="452" fill="none" stroke="#000208" stroke-width="6" opacity="0.8"/>
+  <circle cx="512" cy="512" r="424" fill="none" stroke="#39445c" stroke-width="4" opacity="0.5" stroke-dasharray="18 26"/>
+  <circle cx="512" cy="512" r="386" fill="url(#chromeU)"/>
+  <circle cx="512" cy="512" r="386" fill="none" stroke="#0a0e16" stroke-width="4" opacity="0.75"/>
+  <path d="M 206 330 A 358 358 0 0 1 500 154" fill="none" stroke="#ffffff" stroke-width="22" opacity="0.5" stroke-linecap="round"/>
+  <path d="M 760 796 A 358 358 0 0 0 866 560" fill="none" stroke="#ffffff" stroke-width="14" opacity="0.3" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="336" fill="none" stroke="#0a0e16" stroke-width="6" opacity="0.8"/>
+  <g id="lipRivets">
+    <circle id="rv" cx="512" cy="152" r="9" fill="url(#chromeDark)" stroke="#0a0e16" stroke-width="1.5"/>
+    <use href="#rv" transform="rotate(36 512 512)"/>
+    <use href="#rv" transform="rotate(72 512 512)"/>
+    <use href="#rv" transform="rotate(108 512 512)"/>
+    <use href="#rv" transform="rotate(144 512 512)"/>
+    <use href="#rv" transform="rotate(180 512 512)"/>
+    <use href="#rv" transform="rotate(216 512 512)"/>
+    <use href="#rv" transform="rotate(252 512 512)"/>
+    <use href="#rv" transform="rotate(288 512 512)"/>
+    <use href="#rv" transform="rotate(324 512 512)"/>
+  </g>
+  <circle cx="512" cy="512" r="330" fill="url(#barrel)"/>
+  <g fill="none">
+    <circle cx="512" cy="512" r="276" stroke="#ff00ff" stroke-width="34" opacity="0.14"/>
+    <circle cx="512" cy="512" r="276" stroke="#ff00ff" stroke-width="16" opacity="0.35"/>
+    <circle cx="512" cy="512" r="276" stroke="#ff2bd6" stroke-width="7" opacity="0.9"/>
+    <circle cx="512" cy="512" r="276" stroke="#ffd2f4" stroke-width="2.5"/>
+    <circle cx="512" cy="512" r="196" stroke="#00ffff" stroke-width="30" opacity="0.15"/>
+    <circle cx="512" cy="512" r="196" stroke="#00ffff" stroke-width="14" opacity="0.38"/>
+    <circle cx="512" cy="512" r="196" stroke="#5cffff" stroke-width="6" opacity="0.9"/>
+    <circle cx="512" cy="512" r="196" stroke="#eaffff" stroke-width="2"/>
+    <circle cx="512" cy="512" r="236" stroke="#00ffff" stroke-width="2" opacity="0.35" stroke-dasharray="3 12"/>
+  </g>
+  <g id="spokeShadows" opacity="0.45">
+    <g id="pairS" transform="translate(7 9)">
+      <path d="M 496 216 L 508 216 L 520 470 L 490 470 Z" fill="#04060c" transform="rotate(-8 512 512)"/>
+      <path d="M 516 216 L 528 216 L 534 470 L 504 470 Z" fill="#04060c" transform="rotate(8 512 512)"/>
+    </g>
+    <use href="#pairS" transform="rotate(72 512 512)"/>
+    <use href="#pairS" transform="rotate(144 512 512)"/>
+    <use href="#pairS" transform="rotate(216 512 512)"/>
+    <use href="#pairS" transform="rotate(288 512 512)"/>
+  </g>
+  <g id="spokes">
+    <g id="pair">
+      <g transform="rotate(-8 512 512)">
+        <path d="M 494 214 L 530 214 L 524 476 L 486 476 Z" fill="url(#chromeDark)" stroke="#0a0e16" stroke-width="3.5"/>
+        <path d="M 501 220 L 519 220 L 515 468 L 495 468 Z" fill="url(#chromeU)"/>
+        <path d="M 503 224 L 505 464" stroke="#ffffff" stroke-width="4" opacity="0.6" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="rotate(8 512 512)">
+        <path d="M 494 214 L 530 214 L 524 476 L 486 476 Z" fill="url(#chromeDark)" stroke="#0a0e16" stroke-width="3.5"/>
+        <path d="M 501 220 L 519 220 L 515 468 L 495 468 Z" fill="url(#chromeU)"/>
+        <path d="M 503 224 L 505 464" stroke="#ffffff" stroke-width="4" opacity="0.6" fill="none" stroke-linecap="round"/>
+      </g>
+    </g>
+    <use href="#pair" transform="rotate(72 512 512)"/>
+    <use href="#pair" transform="rotate(144 512 512)"/>
+    <use href="#pair" transform="rotate(216 512 512)"/>
+    <use href="#pair" transform="rotate(288 512 512)"/>
+  </g>
+  <circle cx="512" cy="512" r="132" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="4"/>
+  <circle cx="512" cy="512" r="98" fill="url(#barrel)"/>
+  <circle cx="512" cy="512" r="98" fill="none" stroke="url(#gold)" stroke-width="7"/>
+  <g id="hubBolts">
+    <g id="hbolt">
+      <circle cx="512" cy="402" r="12" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="2"/>
+      <circle cx="508" cy="398" r="4" fill="#ffffff" opacity="0.9"/>
+    </g>
+    <use href="#hbolt" transform="rotate(72 512 512)"/>
+    <use href="#hbolt" transform="rotate(144 512 512)"/>
+    <use href="#hbolt" transform="rotate(216 512 512)"/>
+    <use href="#hbolt" transform="rotate(288 512 512)"/>
+  </g>
+  <circle cx="512" cy="512" r="48" fill="none" stroke="#00ffff" stroke-width="10" opacity="0.25"/>
+  <circle cx="512" cy="512" r="48" fill="none" stroke="#5cffff" stroke-width="4" opacity="0.9"/>
+  <circle cx="512" cy="512" r="32" fill="url(#gold)" stroke="#0a0e16" stroke-width="3"/>
+  <circle cx="506" cy="504" r="9" fill="#ffffff" opacity="0.75"/>
+  <ellipse cx="392" cy="330" rx="210" ry="86" fill="#ffffff" opacity="0.06" transform="rotate(-33 392 330)"/>
+</svg>

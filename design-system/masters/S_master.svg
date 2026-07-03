@@ -1,0 +1,90 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="haze" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff00ff" stop-opacity="0.4"/>
+      <stop offset="55%" stop-color="#8a2be2" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#8a2be2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#ccfdff"/>
+      <stop offset="48%" stop-color="#00e5ff" stop-opacity="0.95"/>
+      <stop offset="75%" stop-color="#c400ff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff00ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rayGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff2bd6" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ff2bd6" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+    <linearGradient id="chromeSeg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#8fa2b8"/>
+      <stop offset="100%" stop-color="#2e3a4c"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="500" fill="url(#haze)"/>
+  <g id="rays" opacity="0.9">
+    <g id="ray">
+      <polygon points="512,60 552,330 472,330" fill="url(#rayGrad)" opacity="0.35"/>
+      <polygon points="512,80 540,330 484,330" fill="url(#rayGrad)" opacity="0.6"/>
+      <polygon points="512,100 528,330 496,330" fill="#ff9bea" opacity="0.75"/>
+    </g>
+    <use href="#ray" transform="rotate(36 512 512)"/>
+    <use href="#ray" transform="rotate(80 512 512)"/>
+    <use href="#ray" transform="rotate(118 512 512)"/>
+    <use href="#ray" transform="rotate(155 512 512)"/>
+    <use href="#ray" transform="rotate(198 512 512)"/>
+    <use href="#ray" transform="rotate(238 512 512)"/>
+    <use href="#ray" transform="rotate(283 512 512)"/>
+    <use href="#ray" transform="rotate(322 512 512)"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g id="boltSet">
+      <path id="b1" d="M 512 512 L 462 372 L 516 318 L 464 196"/>
+      <use href="#b1" transform="rotate(95 512 512)"/>
+      <use href="#b1" transform="rotate(170 512 512)"/>
+      <use href="#b1" transform="rotate(255 512 512)"/>
+      <path id="b2" d="M 512 512 L 606 420 L 676 396 L 726 282"/>
+      <use href="#b2" transform="rotate(120 512 512)"/>
+      <use href="#b2" transform="rotate(230 512 512)"/>
+    </g>
+  </g>
+  <use href="#boltSet" stroke="#00e5ff" stroke-width="30" opacity="0.15" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <use href="#boltSet" stroke="#00e5ff" stroke-width="16" opacity="0.35" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <use href="#boltSet" stroke="#9df4ff" stroke-width="8" opacity="0.85" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <use href="#boltSet" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="none">
+    <g stroke="#00ffff" stroke-width="64" opacity="0.16">
+      <path d="M 512 244 A 268 268 0 0 1 744 380" transform="rotate(7 512 512)"/>
+      <path d="M 768 552 A 268 268 0 0 1 642 748" transform="rotate(9 512 512)"/>
+      <path d="M 512 780 A 268 268 0 0 1 290 664" transform="rotate(6 512 512)"/>
+      <path d="M 252 468 A 268 268 0 0 1 376 288" transform="rotate(-8 512 512)"/>
+    </g>
+    <g stroke-width="42">
+      <path d="M 512 244 A 268 268 0 0 1 744 380" stroke="url(#gold)" transform="rotate(7 512 512)"/>
+      <path d="M 768 552 A 268 268 0 0 1 642 748" stroke="url(#chromeSeg)" transform="rotate(9 512 512)"/>
+      <path d="M 512 780 A 268 268 0 0 1 290 664" stroke="url(#gold)" transform="rotate(6 512 512)"/>
+      <path d="M 252 468 A 268 268 0 0 1 376 288" stroke="url(#chromeSeg)" transform="rotate(-8 512 512)"/>
+    </g>
+    <g stroke="#ffffff" stroke-width="10" opacity="0.55">
+      <path d="M 512 258 A 254 254 0 0 1 732 386" transform="rotate(7 512 512)"/>
+      <path d="M 512 766 A 254 254 0 0 1 302 656" transform="rotate(6 512 512)"/>
+    </g>
+  </g>
+  <rect x="806" y="430" width="44" height="26" rx="6" fill="url(#gold)" transform="rotate(24 828 443)"/>
+  <rect x="176" y="560" width="38" height="22" rx="6" fill="url(#chromeSeg)" transform="rotate(-18 195 571)"/>
+  <circle cx="512" cy="512" r="215" fill="url(#core)"/>
+  <circle cx="512" cy="512" r="132" fill="#dffdff" opacity="0.9"/>
+  <circle cx="512" cy="512" r="82" fill="#ffffff"/>
+  <g stroke="#ffffff" stroke-linecap="round" opacity="0.9">
+    <line x1="512" y1="356" x2="512" y2="668" stroke-width="7" opacity="0.5"/>
+    <line x1="356" y1="512" x2="668" y2="512" stroke-width="7" opacity="0.5"/>
+    <line x1="512" y1="396" x2="512" y2="628" stroke-width="3"/>
+    <line x1="396" y1="512" x2="628" y2="512" stroke-width="3"/>
+  </g>
+</svg>
