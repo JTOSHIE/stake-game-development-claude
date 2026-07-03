@@ -119,3 +119,8 @@ commit; Bash-routing around a deny is forbidden).
 **(f) Briefs saved verbatim.** Briefs arrive as pasted messages. The session saves each one
 verbatim as its named prompt file in the repo root and commits it with that session's work
 (this reinforces (b)).
+
+**(g) Autonomy posture.** The owner pre-authorises all commands, network access and Desktop
+writes for every session; never pause to request approval for anything the settings permit;
+the deny rules are the only boundary and remain machine-enforced; owner-sanctioned lock
+exceptions continue to follow convention (d).
