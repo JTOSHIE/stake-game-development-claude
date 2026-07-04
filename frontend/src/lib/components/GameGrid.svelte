@@ -669,20 +669,34 @@
         const cell    = visCell(col, row)
         if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
         overlay?.classList.remove('win-spin-fast')
-        cell?.classList.remove('plate-bloom', 'pre-charge')
+        cell?.classList.remove('plate-bloom', 'pre-charge', 'scatter-charge')
       }
     }
   }
 
-  // ── Scatter anticipation — charge glow on the still-travelling reels ──────
+  // ── Scatter anticipation (Set B) — charge glow on the still-travelling reels,
+  // plus a landed-scatter charge loop (glow bloom + scanline + orbiting spark)
+  // on every scatter already on the board while the final reel decides.
   function _scatterAnticipation(fromReel: number): void {
     for (let r = fromReel; r < REELS; r++) {
       const strip = stripRefs[r]
       if (strip && reels[r].state !== 'rest') { strip.classList.add('anticipate'); reels[r].charged = true }
     }
+    _chargeLandedScatters()
+  }
+  function _chargeLandedScatters(): void {
+    for (let c = 0; c < REELS; c++) {
+      if (reels[c].state !== 'rest') continue
+      for (let row = 0; row < ROWS; row++) {
+        if (slotSym[c][visIdx(row)] === 'S') visCell(c, row)?.classList.add('scatter-charge')
+      }
+    }
   }
   function _clearAnticipation(): void {
-    for (let r = 0; r < REELS; r++) stripRefs[r]?.classList.remove('anticipate')
+    for (let r = 0; r < REELS; r++) {
+      stripRefs[r]?.classList.remove('anticipate')
+      for (let i = 0; i < STRIP; i++) slotCell[r]?.[i]?.classList.remove('scatter-charge')
+    }
   }
 
   function _checkAnticipation(board: string[][]): boolean {
@@ -1132,6 +1146,27 @@
   }
   .symbol-img:global(.win-flash) { animation: win-flash-pulse 0.6s ease-in-out infinite; }
 
+  /* ── Scatter charge (Set B) — landed scatters charge during anticipation ── */
+  @keyframes scatter-charge-bloom {
+    0%, 100% { box-shadow: inset 0 0 12px 2px rgba(255, 215, 0, 0.5), 0 0 10px 2px rgba(255, 215, 0, 0.4); }
+    50%      { box-shadow: inset 0 0 26px 6px rgba(255, 215, 0, 0.95), 0 0 22px 6px rgba(255, 215, 0, 0.8); }
+  }
+  .symbol-cell.scatter-charge { animation: scatter-charge-bloom 0.5s ease-in-out infinite; z-index: 6; }
+  /* scanline sweep */
+  .symbol-cell.scatter-charge::before {
+    content: ''; position: absolute; inset: 0; border-radius: 8px; pointer-events: none;
+    background: linear-gradient(to bottom, transparent 42%, rgba(255, 240, 170, 0.55) 50%, transparent 58%);
+    animation: scatter-scanline 0.7s linear infinite; z-index: 7;
+  }
+  @keyframes scatter-scanline { 0% { background-position: 0 -100%; } 100% { background-position: 0 100%; } }
+  /* orbiting spark */
+  .symbol-cell.scatter-charge::after {
+    content: ''; position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px;
+    border-radius: 50%; background: #fff8c0; box-shadow: 0 0 8px 3px rgba(255, 224, 120, 0.9);
+    pointer-events: none; transform-origin: -34px 0; animation: scatter-orbit 0.9s linear infinite; z-index: 8;
+  }
+  @keyframes scatter-orbit { to { transform: rotate(360deg); } }
+
   .pixi-overlay {
     position: absolute;
     inset: 0;
@@ -1142,8 +1177,10 @@
 
   @media (prefers-reduced-motion: reduce) {
     .symbol-img, .symbol-overlay, .symbol-fx,
-    .symbol-img:global(.win-flash), .symbol-cell.plate-bloom, .symbol-cell.pre-charge {
+    .symbol-img:global(.win-flash), .symbol-cell.plate-bloom, .symbol-cell.pre-charge,
+    .symbol-cell.scatter-charge, .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after {
       animation: none !important;
     }
+    .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after { display: none; }
   }
 </style>
