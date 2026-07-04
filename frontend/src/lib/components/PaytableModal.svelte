@@ -128,6 +128,23 @@
           {/each}
         </div>
         <p class="ways-caption">Reels 1, 2 and 3 hold the same symbol (highlighted) — a match, read left to right starting from reel 1. Reels 4 and 5 are not required.</p>
+
+        <!-- Where 1,024 comes from + a worked multi-way example -->
+        <div class="ways-math">
+          <p class="ways-math-line">
+            Every reel shows 4 symbols, so
+            <span class="ways-math-eq">4 × 4 × 4 × 4 × 4 = 1,024</span>
+            ways are active on every spin. There are no paylines and nothing to switch on — your stake always plays all 1,024 ways.
+          </p>
+          <p class="ways-math-line">
+            <span class="ways-math-tag">Example</span>
+            the same symbol lands on 2 positions of reel 1, 1 of reel 2 and 3 of reel 3.
+            That is <span class="ways-math-eq">2 × 1 × 3 = 6</span> winning ways, each paying that symbol's per-way value.
+          </p>
+          <p class="ways-math-line ways-math-note">
+            The payouts below are shown per way. Your total win adds up every winning way on the spin.
+          </p>
+        </div>
       </div>
 
       <!-- Symbol pay table — large cells (240 exports) -->
@@ -437,6 +454,51 @@
     text-align: center;
     line-height: 1.4;
     margin: 0;
+  }
+
+  .ways-math {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    background: rgba(0, 255, 255, 0.04);
+    border: 1px solid rgba(0, 255, 255, 0.18);
+    border-radius: 8px;
+  }
+
+  .ways-math-line {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .ways-math-eq {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-weight: 900;
+    color: #00ffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+    white-space: nowrap;
+  }
+
+  .ways-math-tag {
+    display: inline-block;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-weight: 900;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0b0f1c;
+    background: #00ffff;
+    border-radius: 4px;
+    padding: 0.05rem 0.4rem;
+    margin-right: 0.35rem;
+    vertical-align: 0.05em;
+  }
+
+  .ways-math-note {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.55);
   }
 
   /* ── Symbol grid — large 240px cells ──────────────────────────────── */
