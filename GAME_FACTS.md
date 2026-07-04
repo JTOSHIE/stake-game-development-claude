@@ -3,8 +3,9 @@
 Authoritative facts sheet compiled for external audit. Every figure below is quoted from a
 committed repo document (cited inline); none is invented or estimated for this sheet. Where
 the maths PAR sheet and later art passes disagree only on a symbol's cosmetic name (the
-maths ID itself never changes — see `design-system/DESIGN_SYSTEM.md`), the current shipped
-name is used and the PAR sheet's original name is noted alongside it.
+maths ID itself never changes, see `design-system/DESIGN_SYSTEM.md`), the current shipped
+name is used and the PAR sheet's original name is noted alongside it. The full maths ID to
+display-name reconciliation and integrity statement is in `docs/PAR_NAMING_ADDENDUM.md`.
 
 ## 1. Game identity
 

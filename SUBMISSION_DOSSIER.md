@@ -25,7 +25,7 @@ checklist in the docs must be satisfied.
 | 1 | Frontend build (dist, static only) | Pipeline | Regenerates each pass | Build Diet v2 |
 | 2 | Maths files: index.json, both lookup tables, both books, game_metadata.json | Overdrive pass | MERGED to main | Done (v1.1.0) |
 | 3 | PAR sheet v2 (two modes, Overdrive documented) | Overdrive pass | MERGED to main | Done |
-| 4 | Submission blurb v2 (Overdrive) | Section 3 below | Drafted, awaiting owner approval | Owner |
+| 4 | Submission blurb v2 (Overdrive) | Section 3 below | OWNER APPROVED (soundtrack line amended, pending re-approval) | Owner |
 | 5 | Game tile background image | Design system Phase B | To design | AssetForge v2 |
 | 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | To design | AssetForge v2 |
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
@@ -36,7 +36,7 @@ checklist in the docs must be satisfied.
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
 
-## 3. SUBMISSION BLURB v2 (Overdrive), awaiting owner approval
+## 3. SUBMISSION BLURB v2 (Overdrive), OWNER APPROVED (soundtrack line amended, pending re-approval)
 
     Plug in. Power up. Future Spinner drops you into a neon soaked cyberpunk
     megacity where chrome rims and holographic gauges blaze across a 5x4 grid
@@ -49,9 +49,8 @@ checklist in the docs must be satisfied.
     5 more spins. Prefer the fast lane? The Bonus Buy takes you straight to the
     feature for 100x.
 
-    With a 96.35% RTP, wins up to 5,000x your bet, turbo mode and a soundtrack
-    straight from the neon underground, Future Spinner is built for players who
-    live on the edge of the grid.
+    With a 96.35% RTP, wins up to 5,000x your bet and turbo mode, Future Spinner
+    is built for players who live on the edge of the grid.
 
 ## 4. COMPLIANCE EVIDENCE MAP
 Verified and holding (evidence in audit/ and PR #1): stateless per platform

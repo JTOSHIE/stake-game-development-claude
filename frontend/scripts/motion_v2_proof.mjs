@@ -86,8 +86,12 @@ async function runFpsGate(browser) {
   const avgMs = gaps.reduce((a, b) => a + b, 0) / gaps.length
   const avgFps = 1000 / avgMs
   const longFrames = gaps.filter((g) => g > 100)
+  const sorted = [...gaps].sort((a, b) => a - b)
+  const pct = (p) => sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))]
+  const p95FrameMs = pct(95)
+  const p99FrameMs = pct(99)
 
-  return { sampleCount: gaps.length, avgFrameMs: avgMs, avgFps, longFrameCount: longFrames.length, longFrames }
+  return { sampleCount: gaps.length, avgFrameMs: avgMs, avgFps, p95FrameMs, p99FrameMs, longFrameCount: longFrames.length, longFrames }
 }
 
 // ── Gate: occlusion re-check at 1280x720 ─────────────────────────────────────
@@ -174,7 +178,26 @@ async function run() {
 
   console.log('[1/4] FPS gate (20 spins incl. one bonus entry)...')
   results.fps = await runFpsGate(browser)
-  console.log(`  avg fps: ${results.fps.avgFps.toFixed(1)}, long frames (>100ms): ${results.fps.longFrameCount}`)
+  console.log(`  avg fps: ${results.fps.avgFps.toFixed(1)}, p95: ${results.fps.p95FrameMs.toFixed(1)}ms, p99: ${results.fps.p99FrameMs.toFixed(1)}ms, long frames (>100ms): ${results.fps.longFrameCount}`)
+
+  // ── Anticipation floor (audit remediation, Task 2) ──────────────────────────
+  // Effective final-reel anticipation hold per tier, mirroring GameGrid's
+  // Math.max(300, base * speedFactor). Base 900ms (scatter) / 600ms (near-miss),
+  // factors Normal 1 / Turbo 0.5 / Super Turbo 0.16. Gate: every hold >= 300ms.
+  results.anticipationFloor = (() => {
+    const factors = { normal: 1, turbo: 0.5, super: 0.16 }
+    const rows = {}
+    let pass = true
+    for (const [tier, f] of Object.entries(factors)) {
+      const scatterHoldMs = Math.max(300, 900 * f)
+      const nearMissHoldMs = Math.max(300, 600 * f)
+      rows[tier] = { scatterHoldMs, nearMissHoldMs }
+      if (scatterHoldMs < 300 || nearMissHoldMs < 300) pass = false
+    }
+    return { rows, pass }
+  })()
+  console.log('  anticipation holds ms:', JSON.stringify(results.anticipationFloor.rows),
+    results.anticipationFloor.pass ? 'PASS (>=300 all tiers)' : 'FAIL')
 
   console.log('[2/4] Occlusion gate (1280x720)...')
   results.occlusion = await runOcclusionGate(browser)
@@ -222,6 +245,7 @@ async function run() {
   let fail = false
   if (results.fps.avgFps < 55) { console.error(`FAIL: avg fps ${results.fps.avgFps.toFixed(1)} < 55`); fail = true }
   if (results.fps.longFrameCount > 0) { console.error(`FAIL: ${results.fps.longFrameCount} frame(s) over 100ms`); fail = true }
+  if (!results.anticipationFloor.pass) { console.error('FAIL: anticipation floor < 300ms at some tier'); fail = true }
   if (results.occlusion.failures.length > 0) { console.error('FAIL: occlusion failures detected'); fail = true }
   for (const [k, v] of Object.entries(gifResults)) {
     if (v.sizeMb >= 3) { console.error(`FAIL: ${k}.gif is ${v.sizeMb.toFixed(2)} MB (>= 3MB)`); fail = true }

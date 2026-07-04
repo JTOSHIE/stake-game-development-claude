@@ -30,7 +30,7 @@
 
 <div class="jets" class:active class:reduced aria-hidden="true">
   {#each JETS as j}
-    <div class="jet" style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale(0.55);">
+    <div class="jet" style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale(0.34);">
       <div
         class="flame"
         style="background-image: url({base}/ui/{reduced ? 'jet_flame_static' : 'jet_flame_sheet'}.png)"

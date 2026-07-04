@@ -79,3 +79,19 @@ steps(5) sprite loop plus a scale-breathe, and extinguish when the end phase sta
 allocation). prefers-reduced-motion shows the static-glow frame with no animation. Z-order:
 the jet layer is z15 (above the frame at z10, outside the grid so it never overlaps symbols),
 below the HUD (z60) and banner (z100).
+
+# AMENDMENT v3.5 (audit remediation): MAX touch target, jet scale
+
+(a) MAX chip touch target. The visible MAX chip keeps its v3.3 geometry (x936, width 24, y591,
+height 26). Its clickable button is an enlarged hit rectangle of 26 x 44 CSS px centred on the
+chip (x935 to 961, y582 to 626). A 44 x 44 square cannot fit: the SPIN hit circle (centre
+(1004,604), radius 42) and the bet-arrow column (right edge x932) cap the width at 26, so the
+width is the recorded lever and the height is the full 44. Verified: the MAX, SPIN and
+bet-arrow hit rectangles are pairwise non-intersecting at 1280x720 and at Mobile S 320x568.
+
+(b) Flame jet scale. The v3.4 scale 0.55 clipped the two top jets (mouths at (480,84) and
+(800,84), flame pointing up) above the stage top: a flame of 240 sprite px at scale s reaches
+84 minus 240s, so s must be at most 84/240 = 0.35. The scale is reduced to 0.34; the v3.4 mount
+points and outward directions are unchanged. Verified: all eight flame bounding boxes are fully
+inside the visible stage at all six viewports (320x568, 375x667, 425x812, 400x225, 800x450,
+1200x675).
