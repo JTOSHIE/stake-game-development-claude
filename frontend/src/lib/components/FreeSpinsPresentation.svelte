@@ -26,6 +26,9 @@
   // BonusInstrumentColumn already sitting in its column position underneath).
   let entryStage: 'flare' | 'dip' | 'gauge' | 'burst' | 'settle' = 'flare'
   let spinIndex = -1
+  // Free spins awarded SO FAR (initial award, growing on each retrigger). Used
+  // for the odometer so it never shows the post-retrigger total before it lands.
+  let awardedTotal = 0
   let currentSpin: PresentedSpin | null = null
   // Exported (bindable) so BonusInstrumentColumn (LAYOUT_SPEC HUD) can drive
   // its gauge/odometer/plates from the same live values this overlay shows.
@@ -80,6 +83,7 @@
     displayMeter = 1
     runningTotalCentibets = script.baseSpin.runningTotalCentibets
     spinsRemaining = script.initialFreeSpins
+    awardedTotal = script.initialFreeSpins
     showRetrigger = false
     overdriveVisualActive = true
     runEntrySequence()
@@ -112,7 +116,11 @@
     phase = 'spin'
     currentSpin = script.freeSpins[spinIndex]
     displayMeter = currentSpin.meterBefore
-    spinsRemaining = Math.max(0, script.totalFreeSpinsAwarded - spinIndex - 1)
+    // Grow the awarded total when this spin retriggered, then show spins
+    // remaining (this spin included) against the total awarded so far, so the
+    // odometer matches what the player has actually been given at this point.
+    if (currentSpin.retrigger) awardedTotal = currentSpin.retrigger.newTotal
+    spinsRemaining = Math.max(0, awardedTotal - spinIndex)
     runningTotalCentibets = currentSpin.runningTotalCentibets
     showRetrigger = !!currentSpin.retrigger
 
@@ -156,6 +164,14 @@
   // Start automatically when activated with a script.
   $: if (active && script && phase === 'idle') start()
 
+  // Free-spin board cells show the real symbol art (same exports the main reel
+  // uses), not the id text. W/S map to the wild/scatter filenames.
+  const SYM_FILE: Record<string, string> = { W: 'wild', S: 'scatter' }
+  function symImg(sym: string): string {
+    const f = SYM_FILE[sym] ?? sym.toLowerCase()
+    return `${$themeAssets.assetBase}/symbols/${f}.png`
+  }
+
   function visibleRows(board: PresentedSpin['board']): string[][] {
     // Board reels include padding rows; show the middle 4 where present.
     return board.map((reel) => {
@@ -194,7 +210,9 @@
           {#each visibleRows(currentSpin.board) as reel}
             <div class="fs-reel">
               {#each reel as sym}
-                <div class="fs-cell" class:scatter={sym === 'S'} class:wild={sym === 'W'}>{sym}</div>
+                <div class="fs-cell" class:scatter={sym === 'S'} class:wild={sym === 'W'}>
+                  <img src={symImg(sym)} alt={sym} draggable="false" />
+                </div>
               {/each}
             </div>
           {/each}
@@ -295,8 +313,9 @@
     border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
     font-size: 0.8rem; font-weight: 700; color: #cfe;
   }
-  .fs-cell.scatter { border-color: var(--theme-secondary, #ff2ec4); color: var(--theme-secondary, #ff2ec4); box-shadow: 0 0 10px var(--theme-secondary, #ff2ec4); }
-  .fs-cell.wild { border-color: var(--theme-primary, #16f2e0); color: var(--theme-primary, #16f2e0); }
+  .fs-cell img { width: 92%; height: 92%; object-fit: contain; display: block; }
+  .fs-cell.scatter { border-color: var(--theme-secondary, #ff2ec4); box-shadow: 0 0 10px var(--theme-secondary, #ff2ec4); }
+  .fs-cell.wild { border-color: var(--theme-primary, #16f2e0); }
   .fs-winline { min-height: 2rem; display: flex; gap: 8px; align-items: center; justify-content: center; }
   .fs-win { font-size: 1.6rem; font-weight: 900; color: #ffd54a; }
   .fs-mult { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }

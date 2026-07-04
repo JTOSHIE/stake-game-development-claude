@@ -264,9 +264,9 @@
           <div class="btn-line-1">START REPLAY</div>
           <div class="btn-line-2">Mode: <strong>{params.mode}</strong></div>
           <div class="btn-line-3">
-            Bet: <strong>{currencySymbol(params.currency)}{baseBet.toFixed(2)}</strong>
+            {mode === 'social' ? 'Play' : 'Bet'}: <strong>{currencySymbol(params.currency)}{baseBet.toFixed(2)}</strong>
             {#if showCostMultiplier}
-              × {response.costMultiplier} cost =
+              × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
               <strong>{currencySymbol(params.currency)}{totalSpent.toFixed(2)}</strong>
             {/if}
           </div>
