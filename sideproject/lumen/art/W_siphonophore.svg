@@ -1,0 +1,82 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wchain" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="40%" stop-color="#23f0c7"/>
+      <stop offset="70%" stop-color="#7a8bff"/>
+      <stop offset="100%" stop-color="#ff3df0"/>
+    </linearGradient>
+    <radialGradient id="wnode" cx="42%" cy="34%" r="70%">
+      <stop offset="0%" stop-color="#eaffff"/>
+      <stop offset="45%" stop-color="#8ff4ff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0a1122" stop-opacity="0.9"/>
+    </radialGradient>
+    <radialGradient id="wglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d6fbff"/>
+      <stop offset="45%" stop-color="#57e8ff"/>
+      <stop offset="100%" stop-color="#57e8ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wglowm" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd6fb"/>
+      <stop offset="45%" stop-color="#ff3df0"/>
+      <stop offset="100%" stop-color="#ff3df0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="wsoft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="wbig" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <!-- ornate spectrum halo down the chain -->
+  <path d="M120 26 C 150 66 90 106 120 146 C 150 186 96 208 120 216"
+        fill="none" stroke="url(#wchain)" stroke-width="40" stroke-linecap="round"
+        opacity="0.28" filter="url(#wbig)"/>
+
+  <!-- spine -->
+  <path d="M120 26 C 150 66 90 106 120 146 C 150 186 96 208 120 216"
+        fill="none" stroke="url(#wchain)" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+  <path d="M120 26 C 150 66 90 106 120 146 C 150 186 96 208 120 216"
+        fill="none" stroke="#eaffff" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- lateral trailing tentacle filaments -->
+  <g id="filaments" fill="none" stroke-linecap="round" opacity="0.7">
+    <path d="M132 60 C 158 74 168 96 166 120" stroke="#23f0c7" stroke-width="1.6"/>
+    <path d="M104 96 C 78 106 66 128 66 150" stroke="#00e5ff" stroke-width="1.6"/>
+    <path d="M134 132 C 162 146 172 168 168 190" stroke="#7a8bff" stroke-width="1.6"/>
+    <path d="M104 170 C 80 182 72 198 74 214" stroke="#ff3df0" stroke-width="1.6"/>
+  </g>
+
+  <!-- glowing nectophore bells stacked down the chain -->
+  <g id="bells">
+    <!-- bell macro: halo + body + rim + inner light -->
+    <g id="b1" transform="translate(120 48)">
+      <circle r="20" fill="url(#wglow)" filter="url(#wsoft)"/>
+      <path d="M-18 4 C -18 -14 -8 -22 0 -22 C 8 -22 18 -14 18 4 C 8 12 -8 12 -18 4 Z"
+            fill="url(#wnode)" stroke="#57e8ff" stroke-width="1.6"/>
+      <circle cx="0" cy="-4" r="4" fill="#eaffff"/>
+    </g>
+    <g id="b2" transform="translate(108 92) scale(1.15)">
+      <circle r="20" fill="url(#wglow)" filter="url(#wsoft)"/>
+      <path d="M-18 4 C -18 -14 -8 -22 0 -22 C 8 -22 18 -14 18 4 C 8 12 -8 12 -18 4 Z"
+            fill="url(#wnode)" stroke="#23f0c7" stroke-width="1.6"/>
+      <circle cx="0" cy="-4" r="4" fill="#eaffff"/>
+    </g>
+    <g id="b3" transform="translate(132 138) scale(1.15)">
+      <circle r="20" fill="url(#wglow)" filter="url(#wsoft)"/>
+      <path d="M-18 4 C -18 -14 -8 -22 0 -22 C 8 -22 18 -14 18 4 C 8 12 -8 12 -18 4 Z"
+            fill="url(#wnode)" stroke="#7a8bff" stroke-width="1.6"/>
+      <circle cx="0" cy="-4" r="4" fill="#eaffff"/>
+    </g>
+    <g id="b4" transform="translate(106 184)">
+      <circle r="20" fill="url(#wglowm)" filter="url(#wsoft)"/>
+      <path d="M-18 4 C -18 -14 -8 -22 0 -22 C 8 -22 18 -14 18 4 C 8 12 -8 12 -18 4 Z"
+            fill="url(#wnode)" stroke="#ff6ef4" stroke-width="1.6"/>
+      <circle cx="0" cy="-4" r="4" fill="#ffe6fb"/>
+    </g>
+  </g>
+
+  <!-- crown float at the top (pneumatophore) -->
+  <g id="crown">
+    <circle cx="120" cy="30" r="12" fill="url(#wglow)" filter="url(#wsoft)"/>
+    <circle cx="120" cy="30" r="7" fill="url(#wnode)" stroke="#eaffff" stroke-width="1.2"/>
+    <circle cx="120" cy="30" r="2.6" fill="#ffffff"/>
+  </g>
+</svg>

@@ -1,0 +1,61 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="m3body" cx="42%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#122036"/>
+      <stop offset="55%" stop-color="#0a1122"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <radialGradient id="m3cyan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#eaffff"/>
+      <stop offset="45%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="m3soft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="m3big" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+
+  <!-- glow along the photophore flank -->
+  <path d="M52 148 C 96 168 150 168 190 140" fill="none" stroke="url(#m3cyan)"
+        stroke-width="26" stroke-linecap="round" opacity="0.35" filter="url(#m3big)"/>
+
+  <!-- fish body (facing left, three-quarter) -->
+  <g id="body">
+    <path d="M44 128 C 44 96 90 78 128 82 C 158 85 186 96 200 110
+             C 206 116 206 122 200 128 C 184 146 156 160 124 160
+             C 86 162 44 152 44 128 Z"
+          fill="url(#m3body)" stroke="#0a1526" stroke-width="2"/>
+    <!-- dorsal + tail fins -->
+    <path d="M196 110 C 214 96 226 96 232 92 C 226 108 224 118 224 126
+             C 216 118 206 114 200 112 Z" fill="url(#m3body)" stroke="#0a1526" stroke-width="1.6"/>
+    <path d="M120 84 C 118 68 122 58 128 50 C 136 62 146 72 156 80 Z"
+          fill="url(#m3body)" stroke="#0a1526" stroke-width="1.6"/>
+    <!-- top rim light -->
+    <path d="M52 120 C 80 96 120 84 128 82 C 158 85 184 96 198 108"
+          fill="none" stroke="#00e5ff" stroke-width="2.6" stroke-linecap="round" opacity="0.7" filter="url(#m3soft)"/>
+    <path d="M52 120 C 80 96 120 84 128 82 C 158 85 184 96 198 108"
+          fill="none" stroke="#baf6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.85"/>
+  </g>
+
+  <!-- big glowing eye -->
+  <g id="eye">
+    <circle cx="72" cy="120" r="15" fill="url(#m3cyan)"/>
+    <circle cx="72" cy="120" r="6" fill="#eaffff"/>
+    <circle cx="69" cy="117" r="2.4" fill="#ffffff"/>
+  </g>
+
+  <!-- photophore spots (rows of light organs) -->
+  <g id="photophores">
+    <g fill="url(#m3cyan)">
+      <circle cx="96" cy="150" r="6"/><circle cx="112" cy="154" r="6"/><circle cx="128" cy="155" r="6"/>
+      <circle cx="144" cy="153" r="6"/><circle cx="160" cy="148" r="6"/><circle cx="174" cy="141" r="6"/>
+    </g>
+    <g fill="#eaffff">
+      <circle cx="96" cy="150" r="2.4"/><circle cx="112" cy="154" r="2.4"/><circle cx="128" cy="155" r="2.4"/>
+      <circle cx="144" cy="153" r="2.4"/><circle cx="160" cy="148" r="2.4"/><circle cx="174" cy="141" r="2.4"/>
+    </g>
+    <!-- second upper row, dimmer -->
+    <g fill="#23f0c7" opacity="0.85">
+      <circle cx="106" cy="132" r="3.4"/><circle cx="126" cy="132" r="3.4"/><circle cx="146" cy="128" r="3.4"/>
+    </g>
+  </g>
+</svg>

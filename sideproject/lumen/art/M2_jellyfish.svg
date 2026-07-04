@@ -1,0 +1,67 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="m2bell" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#123a33"/>
+      <stop offset="45%" stop-color="#0b1c22"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <radialGradient id="m2teal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d8fff5"/>
+      <stop offset="40%" stop-color="#23f0c7"/>
+      <stop offset="100%" stop-color="#23f0c7" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="m2tent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#23f0c7" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#23f0c7" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="m2soft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="m2big" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="12"/></filter>
+  </defs>
+
+  <!-- soft bell halo -->
+  <ellipse cx="120" cy="92" rx="82" ry="66" fill="url(#m2teal)" opacity="0.3" filter="url(#m2big)"/>
+
+  <!-- trailing tentacles -->
+  <g id="tentacles" fill="none" stroke-linecap="round">
+    <path d="M84 118 C 78 150 86 178 74 210" stroke="url(#m2tent)" stroke-width="3"/>
+    <path d="M100 124 C 96 156 104 182 96 214" stroke="url(#m2tent)" stroke-width="3"/>
+    <path d="M120 126 C 120 158 120 186 120 216" stroke="url(#m2tent)" stroke-width="3.4"/>
+    <path d="M140 124 C 144 156 136 182 144 214" stroke="url(#m2tent)" stroke-width="3"/>
+    <path d="M156 118 C 162 150 154 178 166 210" stroke="url(#m2tent)" stroke-width="3"/>
+  </g>
+  <!-- short frilly oral arms -->
+  <g id="arms" fill="none" stroke="#d8fff5" stroke-width="1.6" opacity="0.8" stroke-linecap="round">
+    <path d="M110 124 C 106 142 112 156 106 170"/>
+    <path d="M120 126 C 120 144 120 158 120 172"/>
+    <path d="M130 124 C 134 142 128 156 134 170"/>
+  </g>
+
+  <!-- bell -->
+  <g id="bell">
+    <path d="M46 108 C 46 58 84 30 120 30 C 156 30 194 58 194 108
+             C 194 118 186 124 176 122 C 168 130 150 132 138 124
+             C 126 132 114 132 102 124 C 90 132 72 130 64 122
+             C 54 124 46 118 46 108 Z"
+          fill="url(#m2bell)" stroke="#0a1c22" stroke-width="2"/>
+    <!-- rim light -->
+    <path d="M46 108 C 46 58 84 30 120 30 C 156 30 194 58 194 108"
+          fill="none" stroke="#23f0c7" stroke-width="3" stroke-linecap="round" opacity="0.8" filter="url(#m2soft)"/>
+    <path d="M46 108 C 46 58 84 30 120 30 C 156 30 194 58 194 108"
+          fill="none" stroke="#d8fff5" stroke-width="1.4" stroke-linecap="round" opacity="0.9"/>
+    <!-- scalloped glowing rim -->
+    <path d="M64 122 C 72 130 90 132 102 124 C 114 132 126 132 138 124 C 150 132 168 130 176 122"
+          fill="none" stroke="#23f0c7" stroke-width="2.4" opacity="0.85"/>
+    <!-- radial canals + the four moon-jelly gonad rings -->
+    <g stroke="#23f0c7" stroke-width="1.4" opacity="0.55" fill="none">
+      <path d="M120 40 L120 118"/>
+      <path d="M84 46 C 96 80 100 100 100 118"/>
+      <path d="M156 46 C 144 80 140 100 140 118"/>
+    </g>
+    <g fill="none" stroke="#7bfff0" stroke-width="2.2" opacity="0.9">
+      <circle cx="102" cy="86" r="12"/>
+      <circle cx="138" cy="86" r="12"/>
+      <circle cx="120" cy="70" r="12"/>
+      <circle cx="120" cy="104" r="12"/>
+    </g>
+  </g>
+</svg>

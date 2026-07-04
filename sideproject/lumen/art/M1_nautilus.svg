@@ -1,0 +1,64 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="m1body" cx="44%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#122036"/>
+      <stop offset="55%" stop-color="#0a1122"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <radialGradient id="m1cyan" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d6fbff"/>
+      <stop offset="40%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="m1soft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="m1big" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+
+  <!-- outer glow halo -->
+  <circle cx="112" cy="112" r="86" fill="url(#m1cyan)" opacity="0.28" filter="url(#m1big)"/>
+
+  <!-- shell body -->
+  <g id="shell">
+    <path d="M112 26 C 170 26 214 70 214 128 C 214 178 176 214 132 214
+             C 96 214 70 190 70 158 C 70 132 88 114 112 114
+             C 130 114 142 126 142 142 C 142 154 134 162 124 162
+             C 118 162 114 158 114 152"
+          fill="none" stroke="url(#m1body)" stroke-width="22" stroke-linecap="round"/>
+    <!-- cyan rim light tracing the spiral -->
+    <path d="M112 26 C 170 26 214 70 214 128 C 214 178 176 214 132 214
+             C 96 214 70 190 70 158 C 70 132 88 114 112 114
+             C 130 114 142 126 142 142 C 142 154 134 162 124 162
+             C 118 162 114 158 114 152"
+          fill="none" stroke="#00e5ff" stroke-width="4.5" stroke-linecap="round" opacity="0.55" filter="url(#m1soft)"/>
+    <path d="M112 26 C 170 26 214 70 214 128 C 214 178 176 214 132 214
+             C 96 214 70 190 70 158 C 70 132 88 114 112 114
+             C 130 114 142 126 142 142 C 142 154 134 162 124 162
+             C 118 162 114 158 114 152"
+          fill="none" stroke="#d6fbff" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- chamber septa (glowing ribs across the shell) -->
+  <g id="septa" stroke="#23f0c7" stroke-width="1.6" opacity="0.75" stroke-linecap="round">
+    <path d="M112 30 L112 12"/>
+    <path d="M170 44 L182 30"/>
+    <path d="M204 92 L222 84"/>
+    <path d="M210 150 L228 156"/>
+    <path d="M176 200 L186 216"/>
+  </g>
+  <g id="septaInner" stroke="#00e5ff" stroke-width="2.4" opacity="0.5">
+    <path d="M113 48 A 66 66 0 0 1 178 96"/>
+    <path d="M113 74 A 42 42 0 0 1 152 118"/>
+  </g>
+
+  <!-- tentacle cluster + hood at the aperture -->
+  <g id="tentacles">
+    <path d="M118 150 C 96 150 78 168 66 186" fill="none" stroke="url(#m1body)" stroke-width="9" stroke-linecap="round"/>
+    <g stroke="#23f0c7" stroke-width="2" stroke-linecap="round" opacity="0.85">
+      <path d="M114 156 C 96 160 82 176 74 194"/>
+      <path d="M120 158 C 104 168 96 186 92 206"/>
+      <path d="M126 156 C 118 174 116 192 116 208"/>
+    </g>
+    <circle cx="118" cy="150" r="9" fill="url(#m1cyan)"/>
+    <circle cx="118" cy="150" r="3.4" fill="#eaffff"/>
+  </g>
+</svg>

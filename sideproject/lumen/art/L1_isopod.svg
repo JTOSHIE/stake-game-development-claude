@@ -1,0 +1,72 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="l1body" cx="46%" cy="32%" r="76%">
+      <stop offset="0%" stop-color="#0f1c24"/>
+      <stop offset="55%" stop-color="#0a1218"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <radialGradient id="l1teal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bff7ea"/>
+      <stop offset="45%" stop-color="#23f0c7"/>
+      <stop offset="100%" stop-color="#23f0c7" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="l1soft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="l1big" x="-90%" y="-90%" width="280%" height="280%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+
+  <!-- dim outline halo (this low symbol glows least) -->
+  <ellipse cx="120" cy="122" rx="72" ry="88" fill="url(#l1teal)" opacity="0.16" filter="url(#l1big)"/>
+
+  <!-- legs -->
+  <g id="legs" stroke="#0e1a20" stroke-width="6" stroke-linecap="round">
+    <path d="M64 96 L36 82"/><path d="M62 120 L32 116"/><path d="M64 146 L34 150"/><path d="M70 170 L44 184"/>
+    <path d="M176 96 L204 82"/><path d="M178 120 L208 116"/><path d="M176 146 L206 150"/><path d="M170 170 L196 184"/>
+  </g>
+  <g id="legTips" stroke="#23f0c7" stroke-width="1.4" stroke-linecap="round" opacity="0.5">
+    <path d="M64 96 L40 85"/><path d="M62 120 L36 117"/><path d="M64 146 L38 149"/>
+    <path d="M176 96 L200 85"/><path d="M178 120 L204 117"/><path d="M176 146 L202 149"/>
+  </g>
+
+  <!-- segmented carapace -->
+  <g id="carapace">
+    <path d="M120 40 C 158 40 178 68 178 108 C 178 156 152 200 120 200
+             C 88 200 62 156 62 108 C 62 68 82 40 120 40 Z"
+          fill="url(#l1body)" stroke="#0a1218" stroke-width="2"/>
+    <!-- head shield -->
+    <path d="M120 40 C 100 40 88 52 86 66 C 100 58 140 58 154 66 C 152 52 140 40 120 40 Z"
+          fill="url(#l1body)" stroke="#0a1218" stroke-width="1.6"/>
+    <!-- segment ridges with teal edge light -->
+    <g fill="none" stroke="#0a1218" stroke-width="3">
+      <path d="M84 74 C 108 66 132 66 156 74"/>
+      <path d="M78 96 C 106 88 134 88 162 96"/>
+      <path d="M74 120 C 104 112 136 112 166 120"/>
+      <path d="M76 146 C 104 140 136 140 164 146"/>
+      <path d="M82 172 C 106 166 134 166 158 172"/>
+    </g>
+    <g fill="none" stroke="#23f0c7" stroke-width="1.5" opacity="0.55">
+      <path d="M84 72 C 108 64 132 64 156 72"/>
+      <path d="M78 94 C 106 86 134 86 162 94"/>
+      <path d="M74 118 C 104 110 136 110 166 118"/>
+      <path d="M76 144 C 104 138 136 138 164 144"/>
+      <path d="M82 170 C 106 164 134 164 158 170"/>
+    </g>
+    <!-- outer rim light left edge -->
+    <path d="M64 104 C 66 70 84 44 118 42" fill="none" stroke="#bff7ea" stroke-width="1.4"
+          stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <!-- eyes + antennae -->
+  <g id="head">
+    <circle cx="104" cy="58" r="4.5" fill="url(#l1teal)"/>
+    <circle cx="136" cy="58" r="4.5" fill="url(#l1teal)"/>
+    <circle cx="104" cy="58" r="1.8" fill="#eafff9"/>
+    <circle cx="136" cy="58" r="1.8" fill="#eafff9"/>
+    <path d="M108 46 C 100 34 92 28 84 24" fill="none" stroke="#23f0c7" stroke-width="1.6"
+          stroke-linecap="round" opacity="0.6"/>
+    <path d="M132 46 C 140 34 148 28 156 24" fill="none" stroke="#23f0c7" stroke-width="1.6"
+          stroke-linecap="round" opacity="0.6"/>
+  </g>
+  <!-- tail fan -->
+  <path d="M96 194 C 108 210 132 210 144 194 C 132 202 108 202 96 194 Z"
+        fill="url(#l1body)" stroke="#23f0c7" stroke-width="1.4" opacity="0.85"/>
+</svg>

@@ -1,0 +1,67 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="l3halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#eaffff"/>
+      <stop offset="22%" stop-color="#8ff2ff"/>
+      <stop offset="48%" stop-color="#00e5ff" stop-opacity="0.85"/>
+      <stop offset="75%" stop-color="#00b7d6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#00b7d6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="l3core" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#eafeff"/>
+      <stop offset="100%" stop-color="#8ff2ff" stop-opacity="0.9"/>
+    </radialGradient>
+    <linearGradient id="l3ray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d6fbff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#d6fbff" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="l3soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="l3big" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <!-- broad soft halo (brightest symbol in the set) -->
+  <circle cx="120" cy="120" r="96" fill="url(#l3halo)" opacity="0.55" filter="url(#l3big)"/>
+  <circle cx="120" cy="120" r="66" fill="url(#l3halo)" opacity="0.75" filter="url(#l3soft)"/>
+
+  <!-- radiant star rays -->
+  <g id="rays" fill="url(#l3ray)" opacity="0.85">
+    <polygon points="120,24 128,120 112,120"/>
+    <polygon points="120,216 128,120 112,120"/>
+    <polygon points="24,120 120,112 120,128"/>
+    <polygon points="216,120 120,112 120,128"/>
+  </g>
+  <g id="raysDiag" fill="url(#l3ray)" opacity="0.5">
+    <polygon points="58,58 124,116 116,124" transform="rotate(0 120 120)"/>
+    <polygon points="182,58 124,116 116,124"/>
+    <polygon points="58,182 124,116 116,124"/>
+    <polygon points="182,182 124,116 116,124"/>
+  </g>
+
+  <!-- diatom lattice ring around the core -->
+  <g id="diatom" fill="none" stroke="#d6fbff" opacity="0.7">
+    <circle cx="120" cy="120" r="44" stroke-width="2"/>
+    <circle cx="120" cy="120" r="44" stroke-width="6" opacity="0.25"/>
+    <g stroke="#8ff2ff" stroke-width="1.2" opacity="0.7">
+      <circle cx="120" cy="76" r="4"/><circle cx="151" cy="89" r="4"/><circle cx="164" cy="120" r="4"/>
+      <circle cx="151" cy="151" r="4"/><circle cx="120" cy="164" r="4"/><circle cx="89" cy="151" r="4"/>
+      <circle cx="76" cy="120" r="4"/><circle cx="89" cy="89" r="4"/>
+    </g>
+    <g stroke="#8ff2ff" stroke-width="0.9" opacity="0.45">
+      <path d="M120 76 L164 120 L120 164 L76 120 Z"/>
+      <path d="M89 89 L151 89 L151 151 L89 151 Z"/>
+    </g>
+  </g>
+
+  <!-- bright core -->
+  <circle cx="120" cy="120" r="26" fill="url(#l3core)"/>
+  <circle cx="120" cy="120" r="12" fill="#ffffff"/>
+
+  <!-- drifting sparkle motes -->
+  <g id="motes" fill="#eaffff">
+    <circle cx="182" cy="70" r="3" opacity="0.9"/>
+    <circle cx="66" cy="176" r="2.4" opacity="0.8"/>
+    <circle cx="188" cy="150" r="2" opacity="0.7"/>
+    <circle cx="58" cy="92" r="2" opacity="0.7"/>
+  </g>
+</svg>

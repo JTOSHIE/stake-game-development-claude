@@ -1,0 +1,87 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="abyss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#080e1e"/>
+      <stop offset="42%" stop-color="#060a16"/>
+      <stop offset="100%" stop-color="#03040a"/>
+    </linearGradient>
+    <radialGradient id="topLight" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#0f2440" stop-opacity="0.8"/>
+      <stop offset="45%" stop-color="#0a1428" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0a1428" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="trenchGlow" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#0090b0" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#005a80" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#005a80" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mote" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bff4ff"/>
+      <stop offset="45%" stop-color="#00e5ff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moteM" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd6fb"/>
+      <stop offset="45%" stop-color="#ff3df0" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff3df0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shaft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a6da0" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#2a6da0" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="bgMote" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="bgHaze" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="40"/></filter>
+  </defs>
+
+  <!-- base abyss gradient -->
+  <rect width="1600" height="900" fill="url(#abyss)"/>
+  <rect width="1600" height="900" fill="url(#topLight)"/>
+
+  <!-- faint downward light shafts from the surface far above -->
+  <g opacity="0.6">
+    <polygon points="360,0 470,0 610,900 300,900" fill="url(#shaft)"/>
+    <polygon points="900,0 980,0 1120,900 840,900" fill="url(#shaft)"/>
+    <polygon points="1240,0 1300,0 1360,900 1150,900" fill="url(#shaft)"/>
+  </g>
+
+  <!-- suggestion of a distant trench: two dark ridge walls meeting low-centre with a faint glow between -->
+  <ellipse cx="800" cy="900" rx="620" ry="300" fill="url(#trenchGlow)"/>
+  <g id="trench">
+    <path d="M0 900 L0 640 C 260 700 520 792 800 812 C 1080 792 1340 700 1600 640 L1600 900 Z"
+          fill="#04060e"/>
+    <path d="M0 640 C 260 700 520 792 800 812 C 1080 792 1340 700 1600 640"
+          fill="none" stroke="#0a2036" stroke-width="3" opacity="0.6"/>
+    <path d="M0 640 C 260 700 520 792 800 812 C 1080 792 1340 700 1600 640"
+          fill="none" stroke="#00b7d6" stroke-width="1.4" opacity="0.22" filter="url(#bgHaze)"/>
+    <!-- inner ridge silhouette -->
+    <path d="M0 900 L0 770 C 300 810 560 858 800 866 C 1040 858 1300 810 1600 770 L1600 900 Z"
+          fill="#030509"/>
+  </g>
+
+  <!-- faint far ridge peaks left and right -->
+  <g fill="#05080f" opacity="0.9">
+    <path d="M0 900 L0 560 L120 640 L240 540 L360 660 L400 900 Z"/>
+    <path d="M1600 900 L1600 560 L1470 640 L1340 540 L1220 660 L1200 900 Z"/>
+  </g>
+
+  <!-- drifting bioluminescent motes (marine snow lit up) -->
+  <g id="motes">
+    <circle cx="180" cy="160" r="10" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="420" cy="300" r="6" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="660" cy="120" r="7" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="980" cy="220" r="5" fill="url(#moteM)" filter="url(#bgMote)"/>
+    <circle cx="1240" cy="160" r="9" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="1420" cy="320" r="6" fill="url(#moteM)" filter="url(#bgMote)"/>
+    <circle cx="300" cy="480" r="8" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="1120" cy="440" r="7" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="740" cy="520" r="5" fill="url(#moteM)" filter="url(#bgMote)"/>
+    <circle cx="1500" cy="560" r="6" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="90" cy="360" r="5" fill="url(#mote)" filter="url(#bgMote)"/>
+    <circle cx="560" cy="400" r="4" fill="url(#mote)" filter="url(#bgMote)"/>
+  </g>
+  <!-- tiny sharp sparkle cores -->
+  <g fill="#eaffff">
+    <circle cx="180" cy="160" r="2"/><circle cx="660" cy="120" r="1.6"/><circle cx="1240" cy="160" r="1.8"/>
+    <circle cx="300" cy="480" r="1.6"/><circle cx="1120" cy="440" r="1.5"/>
+  </g>
+</svg>

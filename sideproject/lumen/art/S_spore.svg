@@ -1,0 +1,76 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="ssac" cx="44%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#14241f"/>
+      <stop offset="55%" stop-color="#0c1418"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <radialGradient id="segg" cx="42%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#fff4cf"/>
+      <stop offset="40%" stop-color="#ffd36b"/>
+      <stop offset="72%" stop-color="#23f0c7" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#23f0c7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sgold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff4cf"/>
+      <stop offset="40%" stop-color="#ffd36b"/>
+      <stop offset="100%" stop-color="#ffab2e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="steal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d8fff5"/>
+      <stop offset="45%" stop-color="#23f0c7"/>
+      <stop offset="100%" stop-color="#23f0c7" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ssoft" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="sbig" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="16"/></filter>
+  </defs>
+
+  <!-- warm gold-teal halo (special scatter) -->
+  <circle cx="120" cy="122" r="86" fill="url(#sgold)" opacity="0.34" filter="url(#sbig)"/>
+
+  <!-- outer egg-sac membrane -->
+  <g id="sac">
+    <path d="M120 34 C 172 34 200 78 200 124 C 200 174 166 208 120 208
+             C 74 208 40 174 40 124 C 40 78 68 34 120 34 Z"
+          fill="url(#ssac)" stroke="#0c1418" stroke-width="2"/>
+    <!-- membrane rim light, gold top / teal bottom -->
+    <path d="M120 34 C 172 34 200 78 200 124" fill="none" stroke="#ffd36b" stroke-width="2.6"
+          stroke-linecap="round" opacity="0.85" filter="url(#ssoft)"/>
+    <path d="M120 34 C 172 34 200 78 200 124" fill="none" stroke="#fff4cf" stroke-width="1.2"
+          stroke-linecap="round" opacity="0.9"/>
+    <path d="M40 124 C 40 174 74 208 120 208 C 166 208 200 174 200 124" fill="none"
+          stroke="#23f0c7" stroke-width="2.2" stroke-linecap="round" opacity="0.7" filter="url(#ssoft)"/>
+  </g>
+
+  <!-- cluster of glowing eggs/spores inside -->
+  <g id="eggs">
+    <g fill="url(#segg)">
+      <circle cx="120" cy="96" r="20"/>
+      <circle cx="92" cy="122" r="18"/>
+      <circle cx="148" cy="122" r="18"/>
+      <circle cx="106" cy="152" r="16"/>
+      <circle cx="140" cy="152" r="16"/>
+      <circle cx="120" cy="128" r="16"/>
+    </g>
+    <!-- bright egg cores -->
+    <g fill="#fff4cf">
+      <circle cx="120" cy="96" r="6"/><circle cx="92" cy="122" r="5.2"/><circle cx="148" cy="122" r="5.2"/>
+      <circle cx="106" cy="152" r="4.6"/><circle cx="140" cy="152" r="4.6"/><circle cx="120" cy="128" r="4.6"/>
+    </g>
+    <!-- teal specular pips top-left of each -->
+    <g fill="#eafff9" opacity="0.85">
+      <circle cx="114" cy="90" r="2.2"/><circle cx="87" cy="117" r="2"/><circle cx="143" cy="117" r="2"/>
+    </g>
+  </g>
+
+  <!-- membrane specular sheen -->
+  <ellipse cx="92" cy="72" rx="30" ry="16" fill="#ffffff" opacity="0.1" transform="rotate(-28 92 72)"/>
+
+  <!-- little escaping spores drifting off -->
+  <g id="drift" fill="url(#steal)">
+    <circle cx="192" cy="70" r="6"/><circle cx="52" cy="180" r="5"/><circle cx="196" cy="164" r="4"/>
+  </g>
+  <g fill="#eafff9">
+    <circle cx="192" cy="70" r="2"/><circle cx="52" cy="180" r="1.7"/>
+  </g>
+</svg>
