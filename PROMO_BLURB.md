@@ -1,9 +1,13 @@
 # Future Spinner — Storefront Description
 
-Plug in. Power up. **Future Spinner** drops you into a neon-soaked cyberpunk world where chrome rims burn across a massive 5×4 grid and **1,024 Ways to Win** light up at every turn. High-voltage symbols race down the reels — from holographic turbochargers to glowing exhaust manifolds — each one crackling with electric potential.
+Plug in. Power up. **Future Spinner** drops you into a neon soaked cyberpunk megacity where chrome rims and holographic gauges blaze across a 5x4 grid with **1,024 Ways to Win**.
 
-The real thrill comes when the **Scatter Multiplier** kicks in. Land three or more Energy Burst Scatters and the multiplier chain ignites, awarding **up to 10×** your total bet instantly and turning ordinary spins into neon-blazing payouts. Wild symbols surge across the board substituting for every symbol on the grid, amplifying every winning combination they touch.
+Land three, four or five Energy Burst Scatters to bank an instant award of up to **10x** total bet and ignite **OVERDRIVE FREE SPINS**: 8, 12 or 16 spins where every winning spin pushes the Overdrive meter one gear higher, adding +1x to a multiplier that never resets. Three or more scatters during the bonus add 5 more spins. Prefer the fast lane? The **Bonus Buy** takes you straight to the feature for 100x.
 
-With a theoretical RTP of **96.35%**, a single stateless base game, and a dazzling celebration sequence for big multiplier hits, Future Spinner is built for players who live on the edge of the grid. Available across all devices — desktop, tablet, and mobile — the cyberpunk city never sleeps.
+With a **96.35% RTP**, wins up to **5,000x** your bet and turbo mode, Future Spinner is built for players who live on the edge of the grid. Available across desktop, tablet and mobile.
 
-*We Roll Spinners · Future Spinner · v1.0.0*
+*We Roll Spinners · Future Spinner · v1.1.0*
+
+<!-- Canonical two-mode blurb (Overdrive Free Spins + 100x bonus buy), aligned with
+     SUBMISSION_DOSSIER.md section 3 (owner-approved v2). Supersedes the earlier
+     single-mode / scatter-only text. No em or en dashes per CLAUDE.md. -->
