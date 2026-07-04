@@ -59,6 +59,7 @@
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode } from './lib/stores/betMode'
+  import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
   // Mock round provider is imported lazily and only in dev, so the sample data
@@ -115,15 +116,17 @@
   }
   let showThemeSelector = false
 
-  // ── Warm hidden mount (audit remediation, Task 1) ──────────────────────────
+  // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
   // the entry-overlay + BonusInstrumentColumn subtree (a single >100ms frame).
-  // Mount that subtree once, hidden, during loading; the subtree auto-starts its
-  // entry (FreeSpinsPresentation is reactive on active+script) so one entry tick
-  // runs; then unmount. The first real entry then pays nothing. It is never
-  // visible (fixed, opacity 0, behind everything, visibility hidden after the
-  // first paint), never audible (the subtree imports no audio), never
-  // layout-affecting (out of flow), and unmounts well under 250ms.
+  // Mount that subtree once during loading, let it warm-paint every entry stage
+  // at opacity 0, then KEEP IT MOUNTED for the whole session (visibility hidden
+  // after the warm paint). Unlike the earlier warm-then-unmount, it is never
+  // torn down, so the first real entry reuses the live, compiled, decoded
+  // subtree and pays nothing (the 182.8ms first-entry frame is gone). It is
+  // never visible (fixed, opacity 0, behind everything, visibility hidden after
+  // the first paint), never audible (the subtree imports no audio), never
+  // layout-affecting (out of flow), and never focusable (aria-hidden).
   const WARM_SCRIPT = {
     roundId: 0, triggered: true,
     baseSpin: {
@@ -141,13 +144,12 @@
   onMount(() => {
     if (!warmMount) return
     // Let the entry sequence render every stage (flare -> gauge slam -> burst) at
-    // opacity 0 so each stage's style/layout/paint/decode is warmed, then hide
-    // and unmount. This runs concurrently with loading (mock RGS + asset load,
+    // opacity 0 so each stage's style/layout/paint/decode is warmed, then switch
+    // it to visibility hidden (stops repaint) but LEAVE IT MOUNTED for the
+    // session. This runs concurrently with loading (mock RGS + asset load,
     // longer than this window), so it adds no loading delay; the first real
-    // Overdrive entry then reuses the warmed styles. The subtree stays opacity 0
-    // (still painted, so it warms) until we hide it just before unmount.
+    // Overdrive entry reuses the live compiled/decoded subtree.
     setTimeout(() => { warmPainted = true }, 520)
-    setTimeout(() => { warmMount = false }, 600)
   })
 
   // ── Overdrive free-spins presentation state ───────────────────────────────
@@ -529,8 +531,9 @@
     <LoadingScreen />
   {/if}
 
-  <!-- Warm hidden mount (Task 1): pre-compile the Overdrive entry subtree once,
-       hidden, during loading, so the first real entry pays no >100ms frame. -->
+  <!-- Persistent hidden mount (Task 5): the Overdrive entry subtree is mounted
+       once, warm-painted, then kept mounted (visibility hidden) for the session
+       so the first real entry pays no >100ms frame. -->
   {#if warmMount && $activeTheme.id === 'future-spinner'}
     <div class="warm-mount" class:painted={warmPainted} aria-hidden="true">
       <BonusInstrumentColumn multiplier={1} spinsRemaining={8} runningTotalCentibets={0} />
@@ -652,6 +655,14 @@
       aria-label="Change theme"
       title="Change theme"
     >🎨</button>
+    <!-- Reel choreography toggle — dev-only eye test (strip default / drop). -->
+    <button
+      class="util-btn reel-mode-btn"
+      on:click={cycleReelMode}
+      aria-label="Toggle reel mode"
+      title="Reel mode: {$reelMode} (click to toggle strip/drop)"
+      data-testid="reel-mode-toggle"
+    >{$reelMode === 'drop' ? '⬇' : '⇅'}<span class="reel-mode-label">{$reelMode}</span></button>
   {/if}
 
   {#if $showPaytable}
@@ -872,6 +883,38 @@
   .util-btn.theme-btn:hover {
     background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
     border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
+  }
+
+  /* ── Reel-mode toggle (dev-only) — pill just left of the theme button ────── */
+  .util-btn.reel-mode-btn {
+    position: fixed;
+    bottom: 1rem;
+    right: 3.6rem;
+    z-index: 50;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px;
+    height: 28px;
+    padding: 0 0.55rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #fff;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .util-btn.reel-mode-btn:hover {
+    background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
+    border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
+  }
+  .reel-mode-label {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.85;
   }
 
   .bg-overlay {
