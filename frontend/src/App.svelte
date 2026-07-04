@@ -5,6 +5,7 @@
   import FeatureButton   from './lib/components/FeatureButton.svelte'
   import SceneGroup      from './lib/components/SceneGroup.svelte'
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
+  import FlameJets      from './lib/components/FlameJets.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
   import IntroSplash      from './lib/components/IntroSplash.svelte'
   import WinCelebration      from './lib/components/WinCelebration.svelte'
@@ -507,6 +508,11 @@
         (e.currentTarget as HTMLImageElement).style.display = 'none'
       }}
     />
+  {/if}
+
+  <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
+  {#if $activeTheme.id === 'future-spinner'}
+    <FlameJets active={overdriveVisualActive} />
   {/if}
 
   <!-- GRID — 522x349, centred inside the frame, z20 -->
