@@ -231,6 +231,7 @@
     const cost = bet * 100
     try {
       selectedBetMode.set('bonus')
+      lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh bonus round
       const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
 
       // Live rgsService publishes the round events; in mock, serve a sample.
