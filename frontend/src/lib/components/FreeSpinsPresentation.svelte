@@ -124,9 +124,12 @@
     runningTotalCentibets = currentSpin.runningTotalCentibets
     showRetrigger = !!currentSpin.retrigger
 
-    // After a winning spin, animate the meter increment.
+    // After a winning spin, animate the meter increment. Bigger wins dwell
+    // longer so the connection (and, in a wincap round, the spin that reaches
+    // the cap) is actually seen; small wins still move fast.
     const willInc = currentSpin.meterAfter > currentSpin.meterBefore
-    const holdWin = currentSpin.spinWinCentibets > 0 ? 900 : 500
+    const winMult = currentSpin.spinWinCentibets / 100
+    const holdWin = winMult > 0 ? Math.min(3200, 700 + winMult * 24) : 500
     timer = setTimeout(() => {
       if (willInc) displayMeter = currentSpin!.meterAfter
       timer = setTimeout(nextSpin, dur(willInc ? 450 : 150))
@@ -180,6 +183,27 @@
     })
   }
 
+  // ── Win-connection story: which cells make up the spin's wins ─────────────
+  // A ways win with symbol S over `kind` reels lights every cell holding S (or a
+  // wild) on reels 0..kind-1 — so the player sees the connection across reels.
+  function winningCells(rows: string[][], wins: PresentedSpin['wins']): Set<string> {
+    const cells = new Set<string>()
+    for (const win of wins) {
+      const reels = Math.min(win.kind, rows.length)
+      for (let r = 0; r < reels; r++) {
+        for (let row = 0; row < rows[r].length; row++) {
+          const sym = rows[r][row]
+          if (sym === win.symbol || sym === 'W' || win.symbol === 'W') cells.add(`${r},${row}`)
+        }
+      }
+    }
+    return cells
+  }
+  // Recompute per shown spin so the highlight lands with the board.
+  $: vrows = currentSpin ? visibleRows(currentSpin.board) : []
+  $: winCells = currentSpin ? winningCells(vrows, currentSpin.wins) : new Set<string>()
+  $: hasWin = !!currentSpin && currentSpin.wins.length > 0 && currentSpin.spinWinCentibets > 0
+
   onDestroy(clear)
 </script>
 
@@ -206,21 +230,34 @@
             spinsLabel={t(lang, 'freeSpins', mode)}
           />
         </div>
-        <div class="fs-board">
-          {#each visibleRows(currentSpin.board) as reel}
+        <div class="fs-board" class:has-win={hasWin}>
+          {#each vrows as reel, reelIdx}
             <div class="fs-reel">
-              {#each reel as sym}
-                <div class="fs-cell" class:scatter={sym === 'S'} class:wild={sym === 'W'}>
+              {#each reel as sym, rowIdx}
+                <div
+                  class="fs-cell"
+                  class:scatter={sym === 'S'}
+                  class:wild={sym === 'W'}
+                  class:win={winCells.has(reelIdx + ',' + rowIdx)}
+                  class:dim={hasWin && !winCells.has(reelIdx + ',' + rowIdx)}
+                >
                   <img src={symImg(sym)} alt={sym} draggable="false" />
                 </div>
               {/each}
             </div>
           {/each}
+          <!-- Win value pops over the highlighted connection (what you just won
+               this spin); the running TOTAL WIN stays in the right column. -->
+          {#if hasWin}
+            {#key spinIndex}
+              <div class="fs-spin-win">
+                {fmt(currentSpin.spinWinCentibets)}{#if currentSpin.meterBefore > 1}<span class="fs-spin-mult"> ×{currentSpin.meterBefore}</span>{/if}
+              </div>
+            {/key}
+          {/if}
         </div>
-        <!-- Per-spin win, running total and multiplier are NOT repeated here:
-             TOTAL WIN and MULTIPLIER already live in the instrument column under
-             the gauge on the right. Only the retrigger notice shows below the
-             board. -->
+        <!-- Running total and multiplier live in the instrument column under the
+             gauge on the right; only the retrigger notice shows below the board. -->
         {#if showRetrigger}
           <div class="fs-retrigger">+5 {t(lang, 'freeSpins', mode)}</div>
         {/if}
@@ -300,19 +337,51 @@
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
       transition: none;
     }
+    .fs-cell.win { animation: none; }
+    .fs-spin-win { animation: none; }
   }
   .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
   .fs-meter-slot { position: absolute; top: 12px; right: 12px; }
-  .fs-board { display: flex; gap: 10px; }
+  /* Shifted left of centre so the top-right Overdrive meter box clears the
+     board's top-right tile (off-centre is fine per owner). */
+  .fs-board { position: relative; display: flex; gap: 10px; transform: translateX(-52px); }
   .fs-reel { display: flex; flex-direction: column; gap: 10px; }
   .fs-cell {
+    position: relative;
     width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
     border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
     font-size: 1.1rem; font-weight: 700; color: #cfe;
+    transition: opacity 0.2s ease;
   }
   .fs-cell img { width: 92%; height: 92%; object-fit: contain; display: block; }
   .fs-cell.scatter { border-color: var(--theme-secondary, #ff2ec4); box-shadow: 0 0 10px var(--theme-secondary, #ff2ec4); }
   .fs-cell.wild { border-color: var(--theme-primary, #16f2e0); }
+  /* Win-connection story: winners light up + pulse, non-winners dim back so the
+     connecting symbols across the reels read clearly. */
+  .fs-cell.dim { opacity: 0.26; }
+  .fs-cell.win {
+    border-color: #ffd54a; z-index: 2;
+    box-shadow: 0 0 16px 2px rgba(255, 213, 74, 0.8), inset 0 0 12px rgba(255, 213, 74, 0.4);
+    animation: fs-win-pulse 0.7s ease-in-out infinite;
+  }
+  .fs-cell.win img { filter: brightness(1.15) drop-shadow(0 0 7px rgba(255, 213, 74, 0.85)); }
+  @keyframes fs-win-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+  /* Win value callout on the connection (what you won this spin). */
+  .fs-spin-win {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    z-index: 5; pointer-events: none;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 2.1rem; font-weight: 900; color: #ffd54a;
+    text-shadow: 0 0 14px rgba(255, 180, 0, 0.95), 0 2px 5px rgba(0, 0, 0, 0.9);
+    padding: 0.15em 0.5em; border-radius: 10px;
+    background: radial-gradient(ellipse at center, rgba(8, 6, 18, 0.7) 0%, rgba(8, 6, 18, 0) 72%);
+    animation: fs-winpop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .fs-spin-mult { color: var(--theme-secondary, #ff2ec4); font-size: 1.4rem; }
+  @keyframes fs-winpop {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
   .fs-retrigger { font-size: 1.3rem; font-weight: 900; color: var(--theme-secondary, #ff2ec4); animation: rtpop 0.5s ease; }
   .fs-endtotal { font-size: 2.4rem; font-weight: 900; color: #ffd54a; text-shadow: 0 0 20px #ffb300; }
   @keyframes rtpop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.25); opacity: 1; } 100% { transform: scale(1); } }
