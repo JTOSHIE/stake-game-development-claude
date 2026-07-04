@@ -108,3 +108,36 @@ visible chip keeps its v3.3 geometry (24 x 26, centred). It clears TURBO and the
 MAX, TURBO and hamburger hit rectangles are pairwise non-intersecting, and MAX no longer
 intersects the SPIN circle, at 1280x720 (and the fixed surface scales uniformly to all
 viewports).
+
+# AMENDMENT v3.7 (owner-directed polish): framed HUD, instrument plates, bonus board, feature story
+
+Records the feature-presentation + bonus/HUD polish passes. Supersedes only the elements named;
+the frame, grid, scene group and other fixed fields are unchanged.
+
+(a) HUD value boxes (BALANCE/WIN/BET) are now CSS-drawn angular neon frames, not flat panels:
+a 2px magenta-to-cyan gradient bezel with cut corners (11px notch), a deep navy gradient fill
+and a soft pink glow. Height 60 to 62 (top nudged 573); fixed positions and the cyan/magenta/gold
+value colours are unchanged. Same design language as the instrument plates and the CSS odometer.
+
+(b) MULTIPLIER / TOTAL WIN instrument plates are redrawn in CSS (262x64): the same gradient
+bezel with 15px cut corners, deep gradient fill, a left neon accent rail and a glow. This
+replaces the flat `instrument_plate` PNG export, which is retired (removed from the asset manifest
+and deleted). Values/labels unchanged.
+
+(c) Free-spins board: cells enlarged 46 to 72px (gap 10) so the board fills the frame, and the
+board is shifted translateX -52px (left of centre, off-centre by design) so the top-right
+Overdrive meter box clears the board's top-right tile with space. The under-board win/total text
+is removed (TOTAL WIN and MULTIPLIER live in the instrument column on the right).
+
+(d) Free-spins win-connection story: each spin's winning ways light up and pulse gold across the
+connecting reels while non-winners dim, and the spin win value pops on the connection; big wins
+dwell longer (hold scales with win size, capped ~3.2s).
+
+(e) Max-win dwell: on a base-game wincap the winning board burst is held for 2.6s (not
+turbo-shortened) before the celebration, whose backdrop now eases in rather than snapping over
+the board.
+
+(f) Scene life: the cyber-driver hover car gains a hover bob, travelling pink neon on the body
+line, an antenna-light blink, and rotating cyan turbine swirls in the two hover pads (the
+hover-car "wheels"); a wheel-split of the master was tried and reverted (the car has no wheel
+arches and the road wheel sits off-screen). All scene effects respect prefers-reduced-motion.

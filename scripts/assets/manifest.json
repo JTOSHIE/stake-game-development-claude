@@ -23,9 +23,7 @@
     {"src": "brand_mark.svg",          "out": "ui/brand_mark_glyph.png",   "w": 192,  "h": 192},
     {"src": "M2_master_v2.svg",        "out": "ui/feature_button.png",     "w": 224,  "h": 224},
     {"src": "H2_master_v31.svg",       "out": "ui/gauge_face.png",         "w": 464,  "h": 464},
-    {"src": "scene_character_car.svg", "out": "ui/scene_character_car.png", "w": 1200, "h": 656},
-    {"src": "plate_instrument.svg",    "out": "ui/instrument_plate.png",   "w": 524,  "h": 119},
-    {"src": "plate_instrument.svg",    "out": "ui/instrument_plate_1x.png","w": 262,  "h": 59}
+    {"src": "scene_character_car.svg", "out": "ui/scene_character_car.png", "w": 1200, "h": 656}
   ],
   "layered": [
     {
