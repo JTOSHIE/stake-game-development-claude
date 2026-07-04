@@ -1,0 +1,38 @@
+# Independent math validation gate.
+#
+# Recomputes RTP / hit-rate / StdDev / max-win / wincap-odds from the SHIPPED
+# lookup tables and enforces Stake Engine's compliance rubric (RTP 90-98%,
+# cross-mode <=0.5%, base hit-rate 5-33%, min 100k rows, max-win reachable).
+# Fails the build on any hard compliance breach, so a drifted or non-compliant
+# math table cannot reach a submission (StakeCLI's --yes only warns). Stdlib only.
+name: Validate math
+
+on:
+  push:
+    paths:
+      - games/future_spinner/library/publish_files/index.json
+      - games/future_spinner/library/publish_files/lookUpTable_*.csv
+      - scripts/validate_math.py
+      - .github/workflows/validate-math.yml
+  pull_request:
+    paths:
+      - games/future_spinner/library/publish_files/index.json
+      - games/future_spinner/library/publish_files/lookUpTable_*.csv
+      - scripts/validate_math.py
+      - .github/workflows/validate-math.yml
+  workflow_dispatch:
+
+jobs:
+  validate-math:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate lookup tables against the compliance rubric
+        run: python3 scripts/validate_math.py

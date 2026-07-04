@@ -6,7 +6,9 @@ the PAR, gated against Stake Engine's compliance rubric. This is the pre-submiss
 the published tables actually deliver the stated maths. Australian English, no em dashes.
 
 Re-run any time: `python3 scripts/validate_math.py` (stdlib only; exits non-zero on a hard
-compliance fail, so it is CI-ready). Last run 2026-07-04 - **ALL CHECKS PASS**.
+compliance fail). It also runs automatically in CI via `.github/workflows/validate-math.yml`
+whenever the lookup tables, `index.json`, or the script change, so a non-compliant table
+fails the build. Last run 2026-07-04 - **ALL CHECKS PASS**.
 
 ## Verified results (recomputed from the tables)
 
