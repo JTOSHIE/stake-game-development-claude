@@ -1,3 +1,5 @@
+> ARCHIVED 2026-07-03. Superseded by reports/SESSION_REPORT.md and the 2026-07-04 archives (motion-polish-v2, opus-elevate, opus-elevate-2, audit-remediation). Historical reference only.
+
 # FUTURE SPINNER: HANDOVER AND STATE CAPTURE
 Date: 2026-07-03 (post Stage 2, pre AssetForge). Supersedes prior handovers.
 A fresh session with the pinned project instructions plus this repository can

@@ -47,6 +47,7 @@
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     recordSpinResult, resetWin, errorMessage,
     winMultiplier, winAmount, showPaytable, isWincap, canSpin,
+    balance, locale,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
@@ -63,38 +64,91 @@
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
 
-  // RGS error strings (set in the locked rgsService) are real-money framed
-  // ("bet", "balance"). In social mode, remap those nouns so no gambling term
-  // reaches the player. This is a display-only transform; the locked service
-  // is untouched.
+  // RGS error strings (set in the locked rgsService) are real-money framed. In
+  // social mode, scrub every gambling term so none reaches the stake.us player.
+  // The locked RGS error code is not surfaced to this layer (gameStore exposes
+  // only the message string), so this display-only transform is the available
+  // mechanism. Of the eight RGS messages only ERR_VAL ("bet") carries a
+  // prohibited term today; the buy/purchase/cost scrubs are defensive so a
+  // future server string cannot bleed. Audit remediation, Task 6.
+  const scrubCase = (match: string, upper: string, lower: string): string =>
+    match[0] === match[0].toUpperCase() ? upper : lower
   $: errorDisplay = $errorMessage && $isSocial
     ? $errorMessage
         .replace(/\bInsufficient balance\b/gi, 'Insufficient coins')
         .replace(/\bbalance\b/gi, 'coins')
-        .replace(/\bbets?\b/gi, (m) => (m[0] === m[0].toUpperCase() ? 'Play' : 'play'))
+        .replace(/\bbets?\b/gi, (m) => scrubCase(m, 'Play', 'play'))
+        .replace(/\bpurchases?\b/gi, (m) => scrubCase(m, 'Request', 'request'))
+        .replace(/\bbuy\b/gi, (m) => scrubCase(m, 'Get', 'get'))
+        .replace(/\bcosts?\b/gi, (m) => scrubCase(m, 'Amount', 'amount'))
     : $errorMessage
 
   let gridRef: GameGrid
   let buyBonusRef: BuyBonus
 
   // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────
-  // Shown once per session, right after loading finishes.
-  const INTRO_SESSION_KEY = 'wrs_intro_seen'
+  // Shown once, right after loading finishes. Persistence (audit remediation):
+  // localStorage so it does not re-show on every load in incognito/memory-
+  // cleared contexts, falling back silently to sessionStorage then in-memory if
+  // a store is unavailable or blocked (each guarded, so no console errors).
+  const INTRO_KEY = 'fs_intro_seen_v1'
+  let introSeenMemory = false
+  function introSeen(): boolean {
+    try { if (localStorage.getItem(INTRO_KEY)) return true } catch {}
+    try { if (sessionStorage.getItem(INTRO_KEY)) return true } catch {}
+    return introSeenMemory
+  }
+  function markIntroSeen(): void {
+    introSeenMemory = true
+    try { localStorage.setItem(INTRO_KEY, '1'); return } catch {}
+    try { sessionStorage.setItem(INTRO_KEY, '1') } catch {}
+  }
   let showIntroSplash = false
   let introHandledForLoad = false
   $: if (!$isLoading && !introHandledForLoad) {
     introHandledForLoad = true
-    try {
-      if (!sessionStorage.getItem(INTRO_SESSION_KEY)) showIntroSplash = true
-    } catch {
-      // sessionStorage unavailable — skip the splash rather than block play
-    }
+    if (!introSeen()) showIntroSplash = true
   }
   function handleIntroContinue(): void {
     showIntroSplash = false
-    try { sessionStorage.setItem(INTRO_SESSION_KEY, '1') } catch {}
+    markIntroSeen()
   }
   let showThemeSelector = false
+
+  // ── Warm hidden mount (audit remediation, Task 1) ──────────────────────────
+  // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
+  // the entry-overlay + BonusInstrumentColumn subtree (a single >100ms frame).
+  // Mount that subtree once, hidden, during loading; the subtree auto-starts its
+  // entry (FreeSpinsPresentation is reactive on active+script) so one entry tick
+  // runs; then unmount. The first real entry then pays nothing. It is never
+  // visible (fixed, opacity 0, behind everything, visibility hidden after the
+  // first paint), never audible (the subtree imports no audio), never
+  // layout-affecting (out of flow), and unmounts well under 250ms.
+  const WARM_SCRIPT = {
+    roundId: 0, triggered: true,
+    baseSpin: {
+      phase: 'base', fsIndex: null,
+      board: Array.from({ length: 5 }, () => Array.from({ length: 4 }, () => 'L3')),
+      wins: [], scatterCount: 3, meterBefore: 1, meterAfter: 1, retrigger: null,
+      spinWinCentibets: 0, runningTotalCentibets: 0,
+    },
+    initialFreeSpins: 8, freeSpins: [], totalFreeSpinsAwarded: 8, finalMeter: 1,
+    instantScatterCentibets: 0, baseGameWinCentibets: 0, freeGameWinCentibets: 0,
+    totalWinCentibets: 0, isWincap: false,
+  } as unknown as PresentationScript
+  let warmMount = !isReplay
+  let warmPainted = false
+  onMount(() => {
+    if (!warmMount) return
+    // Let the entry sequence render every stage (flare -> gauge slam -> burst) at
+    // opacity 0 so each stage's style/layout/paint/decode is warmed, then hide
+    // and unmount. This runs concurrently with loading (mock RGS + asset load,
+    // longer than this window), so it adds no loading delay; the first real
+    // Overdrive entry then reuses the warmed styles. The subtree stays opacity 0
+    // (still painted, so it warms) until we hide it just before unmount.
+    setTimeout(() => { warmPainted = true }, 520)
+    setTimeout(() => { warmMount = false }, 600)
+  })
 
   // ── Overdrive free-spins presentation state ───────────────────────────────
   let featureActive = false
@@ -315,6 +369,22 @@
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
       playWin(bet > 0 ? result.totalWin / bet : 0)
 
+      // QA soak harness telemetry (dev-only): the raw mock "book" data for
+      // this round, plus the balance the store actually landed on, so the
+      // harness can independently recompute totals and running balance in
+      // integer micros and assert zero drift against what's presented.
+      if (import.meta.env.DEV) {
+        const w = window as unknown as { __qaLog?: unknown[] }
+        w.__qaLog = w.__qaLog ?? []
+        w.__qaLog.push({
+          bet,
+          totalWin:     result.totalWin,
+          winEvents:    result.winEvents,
+          scatterEvent: result.scatterEvent,
+          balanceAfter: get(balance),
+        })
+      }
+
       // Live base rounds that trigger Overdrive publish their full events; play
       // the free-spins overlay before autoplay continues. (Mock base spins do
       // not populate this, so normal mock base play is unchanged.) Wincap flow:
@@ -456,6 +526,15 @@
 
   {#if $isLoading}
     <LoadingScreen />
+  {/if}
+
+  <!-- Warm hidden mount (Task 1): pre-compile the Overdrive entry subtree once,
+       hidden, during loading, so the first real entry pays no >100ms frame. -->
+  {#if warmMount && $activeTheme.id === 'future-spinner'}
+    <div class="warm-mount" class:painted={warmPainted} aria-hidden="true">
+      <BonusInstrumentColumn multiplier={1} spinsRemaining={8} runningTotalCentibets={0} />
+      <FreeSpinsPresentation script={WARM_SCRIPT} active={true} />
+    </div>
   {/if}
 
   {#if showIntroSplash}
@@ -605,6 +684,17 @@
   /* Viewport-locked stage: clips overflow and centres the scaled 1280x720
      design surface so the document never grows past the viewport (no
      scrollbars at any size). */
+  /* Warm hidden mount (Task 1): renders once to warm styles/decode, then hides.
+     opacity 0 (still painted, so it warms), out of flow, behind everything. */
+  .warm-mount {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .warm-mount.painted { visibility: hidden; }
+
   .game-stage {
     position: fixed;
     inset: 0;

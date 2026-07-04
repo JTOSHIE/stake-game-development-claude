@@ -21,8 +21,9 @@ Australian English, no em dashes or en dashes.
   Feature-buy disclosure: the `disabledBuyFeature` jurisdiction flag must hide the bonus buy
   (Stage 2 frontend scope).
 - **Bet Replay:** implemented and mandatory-compliant; player session not required. Event
-  IDs from staging still pending. Stage 2: bonus-buy replays must display the amount spent
-  including the 100x cost multiplier.
+  IDs are captured on the deployed staging build per `docs/REVIEW_EVENTS_PLAN.md` during the
+  SUBMISSION_DOSSIER.md section 5 protocol. Stage 2: bonus-buy replays must display the amount
+  spent including the 100x cost multiplier.
 
 ## Process reminders
 

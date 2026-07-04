@@ -632,7 +632,11 @@
     if (scatterAnticipate || nearMissAnticipate) {
       if (!anticipationGlowApplied) _scatterAnticipation(3)
       playAnticipation()
-      const holdMs = (scatterAnticipate ? 900 : 600) * speedFactor
+      // Anticipation floor (audit remediation): clamp the scaled hold to a
+      // 300ms perceptual minimum at every speed tier, so Super Turbo (0.16x)
+      // does not drop the hold below reaction time and bypass anticipation.
+      // Normal (900/600) and Turbo (450/300) are numerically unchanged.
+      const holdMs = Math.max(300, (scatterAnticipate ? 900 : 600) * speedFactor)
       await wait(holdMs)
     }
     await _landReel(4, finalBoard)

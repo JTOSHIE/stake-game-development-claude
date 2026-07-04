@@ -1,0 +1,48 @@
+{
+  "fps": {
+    "sampleCount": 6331,
+    "avgFrameMs": 16.695545727373243,
+    "avgFps": 59.896215213884645,
+    "p95FrameMs": 17.69999999999709,
+    "p99FrameMs": 18.599999999998545,
+    "longFrameCount": 1,
+    "longFrames": [
+      182.79999999999927
+    ]
+  },
+  "anticipationFloor": {
+    "rows": {
+      "normal": {
+        "scatterHoldMs": 900,
+        "nearMissHoldMs": 600
+      },
+      "turbo": {
+        "scatterHoldMs": 450,
+        "nearMissHoldMs": 300
+      },
+      "super": {
+        "scatterHoldMs": 300,
+        "nearMissHoldMs": 300
+      }
+    },
+    "pass": true
+  },
+  "occlusion": {
+    "boxCount": 11,
+    "failures": []
+  },
+  "gifs": {
+    "spinStagger": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/spin-stagger.gif",
+      "sizeMb": 0.9897947311401367
+    },
+    "winBloom": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/win-bloom.gif",
+      "sizeMb": 1.2156963348388672
+    },
+    "overdriveTransition": {
+      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/overdrive-transition.gif",
+      "sizeMb": 0.7537641525268555
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "hitAreas": {
+    "1280x720": {
+      "max": {
+        "x": 935,
+        "y": 582,
+        "w": 26,
+        "h": 44
+      },
+      "spin": {
+        "x": 962,
+        "w": 84
+      },
+      "arrows": {
+        "x": 906,
+        "w": 26
+      },
+      "intersecting": {
+        "max-spin": false,
+        "max-arrows": false,
+        "spin-arrows": false
+      },
+      "pass": true
+    },
+    "320x568": {
+      "max": {
+        "x": 234,
+        "y": 340,
+        "w": 7,
+        "h": 11
+      },
+      "spin": {
+        "x": 241,
+        "w": 21
+      },
+      "arrows": {
+        "x": 227,
+        "w": 7
+      },
+      "intersecting": {
+        "max-spin": false,
+        "max-arrows": false,
+        "spin-arrows": false
+      },
+      "pass": true
+    }
+  },
+  "jetClip": {
+    "320x568": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    },
+    "375x667": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    },
+    "425x812": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    },
+    "400x225": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    },
+    "800x450": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    },
+    "1200x675": {
+      "jetCount": 8,
+      "clipped": [],
+      "pass": true
+    }
+  },
+  "pass": true
+}

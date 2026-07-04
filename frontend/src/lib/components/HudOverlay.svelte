@@ -9,7 +9,7 @@
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
-    isMuted, showPaytable, winAmount, BET_LEVELS,
+    isMuted, showPaytable, winAmount, BET_LEVELS, locale,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
@@ -20,12 +20,14 @@
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
   // Dev-only test hook: exposes the store objects so headless verification
-  // (frontend/scripts/layout_v1_audit.mjs) can inject stress values (e.g.
-  // $10,000.00 balance) without any production code path. Never present in
-  // a production build (import.meta.env.DEV is false there).
+  // (frontend/scripts/layout_v1_audit.mjs, qa_soak.mjs) can inject stress
+  // values / drive the locale-social-speed matrix without any production
+  // code path. Never present in a production build (import.meta.env.DEV is
+  // false there).
   onMount(() => {
     if (import.meta.env.DEV) {
-      ;(window as unknown as { __testStores?: unknown }).__testStores = { balance, betAmount, winAmount, rgsBetLevels }
+      ;(window as unknown as { __testStores?: unknown }).__testStores =
+        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier }
     }
   })
 
@@ -198,7 +200,7 @@
   disabled={$isSpinning || !canSetMax}
   aria-label="Max bet"
   data-testid="max-chip"
->MAX</button>
+><span class="max-chip-face">MAX</span></button>
 
 <!-- SPIN — v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
      (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
@@ -423,13 +425,32 @@
   .bet-arrow:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); }
 
   /* MAX chip (v3.3) — fixed beside the arrows, never repositioned by content */
+  /* v3.5 audit: the button is the enlarged touch target (26x44, centred on the
+     visual chip); the visible chip keeps its v3.3 geometry (x936 w24, y591 h26).
+     Width is capped at 26 by the SPIN hit circle (centre 1004, r42) and the
+     bet-arrow column (right edge 932); 44 tall fits inside the panel. */
   .max-chip {
     position: absolute;
-    left: 936px;
-    top: 591px;
+    left: 935px;
+    top: 582px;
+    width: 26px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .max-chip:disabled { cursor: not-allowed; }
+  .max-chip-face {
     width: 24px;
     height: 26px;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid rgba(0, 255, 255, 0.5);
     border-radius: 6px;
     background: rgba(0, 40, 60, 0.55);
@@ -439,12 +460,10 @@
     font-weight: 700;
     letter-spacing: 0;
     font-variant-numeric: tabular-nums;
-    cursor: pointer;
-    z-index: 60;
     transition: background 0.15s, filter 0.15s;
   }
-  .max-chip:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); filter: brightness(1.15); }
-  .max-chip:disabled { opacity: 0.35; cursor: not-allowed; }
+  .max-chip:hover:not(:disabled) .max-chip-face { background: rgba(0, 255, 255, 0.18); filter: brightness(1.15); }
+  .max-chip:disabled .max-chip-face { opacity: 0.35; }
 
   /* ── SPIN — v3.2: centre (1004,604) ──────────────────────────────────────── */
   .spin-btn {
