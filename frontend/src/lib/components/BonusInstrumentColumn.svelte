@@ -39,12 +39,12 @@
     </div>
   </div>
 
-  <div class="plate" style="background-image: url('{$themeAssets.assetBase}/ui/instrument_plate_1x.png');">
+  <div class="plate">
     <span class="plate-label">MULTIPLIER</span>
     <span class="plate-value">{multiplier}×</span>
   </div>
 
-  <div class="plate" style="background-image: url('{$themeAssets.assetBase}/ui/instrument_plate_1x.png');">
+  <div class="plate">
     <span class="plate-label">TOTAL WIN</span>
     <span class="plate-value">{totalWinLabel}</span>
   </div>
@@ -114,23 +114,52 @@
     color: rgba(255, 215, 0, 0.8);
   }
 
-  /* MULTIPLIER / TOTAL WIN — instrument plate export, label 12 / value 30 */
+  /* MULTIPLIER / TOTAL WIN — CSS-drawn angular instrument frame (cyberpunk):
+     a 2px magenta->cyan gradient bezel with cut corners, a deep gradient fill,
+     a left accent rail and a neon glow. Replaces the thin flat plate export. */
   .plate {
+    position: relative;
     width: 262px;
-    height: 59px;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    height: 64px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2px;
+    /* the bezel: gradient shows through as a 2px frame around ::before */
+    background: linear-gradient(135deg, #ff2ec4 0%, #16f2e0 55%, #ff2ec4 100%);
+    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+    filter: drop-shadow(0 0 7px rgba(255, 46, 196, 0.55));
   }
+  /* interior fill, inset by the bezel width */
+  .plate::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    background:
+      linear-gradient(160deg, rgba(255, 46, 196, 0.14), transparent 42%),
+      linear-gradient(180deg, rgba(26, 15, 46, 0.97) 0%, rgba(10, 7, 20, 0.98) 100%);
+  }
+  /* left accent rail + faint scan sheen */
+  .plate::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #16f2e0, #ff2ec4);
+    box-shadow: 0 0 6px rgba(22, 242, 224, 0.7);
+  }
+  .plate-label,
+  .plate-value { position: relative; z-index: 1; }
   .plate-label {
     font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 12px;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.16em;
+    color: rgba(180, 240, 255, 0.72);
     text-transform: uppercase;
   }
   .plate-value {
