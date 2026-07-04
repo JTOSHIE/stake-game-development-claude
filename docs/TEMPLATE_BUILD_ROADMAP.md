@@ -52,7 +52,15 @@ game later.
   swappable (no vendor lock).
 - **Later:** wire a production sink (owner picks the analytics vendor); add funnel/retention events.
 
-## 4. Responsible-gambling / compliance module (CODE-fe, MED) - SPEC
+## 4. Responsible-gambling / compliance module (CODE-fe, MED) - BUILT (branch claude/compliance-rg)
+
+DONE: autoplay stop-conditions (stop on win / single-win limit / feature / loss limit) on the
+live HudOverlay + App loop; minimum spin interval (rgSpinDelay); autoplay ban where flagged;
+session tracking + SessionPanel (time/spins/net); reality-check modal; all jurisdiction-flag
+driven and off by default. Tested 12/12 (`responsibleGambling.test.ts`); proof in
+`reports/screens/compliance/`. Documented in `docs/RG_COMPLIANCE.md`. Original spec below.
+
+
 
 Jurisdiction-flag-driven, not per-game. Needed the moment we target a regulated market.
 
