@@ -1,0 +1,649 @@
+<script lang="ts">
+  import {
+    betAmount, balance, canSpin,
+    isSpinning, isAutoPlay, autoPlayCount,
+    isTurbo, isMuted, showPaytable,
+    currencyCode, BET_LEVELS,
+  } from '../stores/gameStore'
+  import { rgsBetLevels } from '../stores/rgsBetLevels'
+  import { tr } from '../i18n/tr'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { playClick } from '../services/soundService'
+  import { themeAssets } from '../stores/themeStore'
+  import { createEventDispatcher } from 'svelte'
+  import { autoplayLimits, rgJurisdiction } from '../stores/responsibleGambling'
+
+  const dispatch = createEventDispatcher<{ spin: void }>()
+
+  const AUTO_OPTIONS = [10, 25, 50, 100]
+  let showAutoMenu = false
+  // Autoplay stop-conditions the player can set before starting (RG standard).
+  let stopOnWin = false
+  let stopOnFeature = true
+  let lossLimitOn = false
+
+  // ── Bet ladder ────────────────────────────────────────────────────────────
+  // Prefer the RGS-provided levels when present, otherwise the built-in
+  // defaults. Both are number[] in display currency units, so no mapping is
+  // needed. Navigation runs against this list via the public betAmount.set API
+  // (gameStore is not modified).
+  $: activeLevels = $rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS
+
+  /** Return the level in `levels` closest to `value`. */
+  function nearestLevel(levels: number[], value: number): number {
+    return levels.reduce(
+      (best, lvl) => (Math.abs(lvl - value) < Math.abs(best - value) ? lvl : best),
+      levels[0],
+    )
+  }
+
+  // Keep the selected bet valid against the active ladder. When the RGS levels
+  // arrive (or change) and the current bet is not on the ladder, snap to the
+  // nearest valid level so the UI never holds an unselectable value.
+  $: if (activeLevels.length > 0 && !activeLevels.includes($betAmount)) {
+    betAmount.set(nearestLevel(activeLevels, $betAmount))
+  }
+
+  // Affordability-aware guards, mirroring the gameStore behaviour against the
+  // active ladder.
+  $: curIndex = activeLevels.indexOf($betAmount)
+  $: canIncrease =
+    curIndex > -1 &&
+    curIndex < activeLevels.length - 1 &&
+    activeLevels[curIndex + 1] <= $balance
+  $: maxAffordable = activeLevels.filter((l) => l <= $balance)
+  $: canSetMax =
+    maxAffordable.length > 0 && maxAffordable[maxAffordable.length - 1] !== $betAmount
+
+  function handleSpin() {
+    if ($canSpin) dispatch('spin')
+  }
+
+  function startAuto(count: number) {
+    playClick()
+    // Apply the chosen stop-conditions. Loss limit = the total staked over `count`
+    // spins at the current bet (a simple, meaningful default the player can trust).
+    autoplayLimits.set({
+      count,
+      stopOnAnyWin: stopOnWin,
+      singleWinLimitMult: 0,
+      stopOnFeature,
+      lossLimitMicros: lossLimitOn ? Math.round($betAmount * count * CURRENCY_SCALE) : 0,
+    })
+    autoPlayCount.set(count)
+    isAutoPlay.set(true)
+    showAutoMenu = false
+    dispatch('spin')
+  }
+
+  function stopAuto() {
+    playClick()
+    isAutoPlay.set(false)
+    autoPlayCount.set(0)
+  }
+
+  function handleIncreaseBet() {
+    playClick()
+    const idx = activeLevels.indexOf($betAmount)
+    if (idx > -1 && idx < activeLevels.length - 1 && activeLevels[idx + 1] <= $balance) {
+      betAmount.set(activeLevels[idx + 1])
+    }
+  }
+
+  function handleDecreaseBet() {
+    playClick()
+    const idx = activeLevels.indexOf($betAmount)
+    if (idx > 0) betAmount.set(activeLevels[idx - 1])
+  }
+
+  function handleMaxBet() {
+    playClick()
+    const affordable = activeLevels.filter((l) => l <= $balance)
+    if (affordable.length) betAmount.set(affordable[affordable.length - 1])
+  }
+
+  function toggleTurbo() {
+    playClick()
+    isTurbo.update(v => !v)
+  }
+
+  function toggleMute() {
+    isMuted.update(v => !v)
+  }
+
+  function openPaytable() {
+    playClick()
+    showPaytable.set(true)
+  }
+</script>
+
+<div class="control-bar">
+
+  <!-- ── Single controls row ─────────────────────────────────────────────── -->
+  <div class="main-row">
+
+  <!-- ── Left cluster: Max Bet + Bet selector ────────────────────────────── -->
+  <div class="bet-cluster">
+
+    <!-- Max Bet button — left of bet selector -->
+    <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !canSetMax} aria-label={$tr('maxBet')}>
+      <img src="assets/themes/future-spinner/ui/btn_max.png" alt="MAX" draggable="false"
+        on:error={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = 'none';
+          const btn = (e.currentTarget as HTMLImageElement).parentElement
+          if (btn) btn.classList.add('maxbet-fallback')
+        }}
+      />
+    </button>
+
+    <!-- Bet selector panel (CSS-only — no baked-in image) -->
+    <div class="bet-selector-panel">
+      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnMinus}')" on:click={handleDecreaseBet} disabled={$isSpinning} aria-label="Decrease bet">−</button>
+
+      <div class="bet-value-wrap">
+        <div class="bet-text-pill">
+          <span class="bet-label">{$tr('bet')}</span>
+          <span class="bet-value led-gold">{formatBalance(Math.round($betAmount * CURRENCY_SCALE), $currencyCode || 'USD')}</span>
+        </div>
+      </div>
+
+      <button class="nudge-btn" style="background-image: url('{$themeAssets.btnPlus}')" on:click={handleIncreaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">+</button>
+    </div>
+  </div>
+
+  <!-- ── Centre: Spin button (image) ─────────────────────────────────────── -->
+  <div class="spin-wrap">
+    <button
+      class="img-btn spin-btn"
+      class:spinning={$isSpinning}
+      disabled={!$canSpin}
+      on:click={handleSpin}
+      aria-label={$tr('spin')}
+    >
+      <img
+        src="{$themeAssets.spinButton}"
+        alt={$tr('spin')}
+        draggable="false"
+        on:error={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0' }}
+      />
+      {#if $isSpinning}
+        <span class="spin-overlay">⟳</span>
+      {/if}
+    </button>
+  </div>
+
+  <!-- ── Right cluster: Auto + Turbo / Mute / Info ──────────────────���────── -->
+  <div class="aux-cluster">
+
+    <!-- Autoplay button — hidden entirely where the jurisdiction bans autoplay
+         (e.g. UK real-money, UKGC enforced May 2026). -->
+    {#if !$rgJurisdiction.autoplayDisabled}
+    <div class="auto-wrapper">
+      {#if $isAutoPlay}
+        <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
+          <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
+          <span class="auto-label">AUTO</span>
+          <span class="auto-count">{$autoPlayCount}</span>
+        </button>
+      {:else}
+        <button
+          class="img-btn auto-btn"
+          on:click={() => showAutoMenu = !showAutoMenu}
+          disabled={$isSpinning}
+          aria-label={$tr('autoPlay')}
+        >
+          <img src="{$themeAssets.btnAutoplay}" alt="Autoplay" draggable="false" />
+          <span class="auto-label">AUTO</span>
+        </button>
+        {#if showAutoMenu}
+          <div class="auto-menu">
+            <label class="menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on any win</label>
+            <label class="menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
+            <label class="menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+            <div class="menu-sep">Number of spins</div>
+            {#each AUTO_OPTIONS as n}
+              <button class="menu-item" on:click={() => startAuto(n)}>{n}</button>
+            {/each}
+          </div>
+        {/if}
+      {/if}
+    </div>
+    {/if}
+
+    <!-- Utility buttons: Turbo / Mute / Info -->
+    <div class="util-group">
+      <button
+        class="util-btn"
+        class:util-active={$isTurbo}
+        on:click={toggleTurbo}
+        disabled={$isSpinning}
+        aria-label="Toggle turbo mode"
+        title="Turbo"
+      >⚡</button>
+
+      <button
+        class="util-btn"
+        class:util-active={!$isMuted}
+        on:click={toggleMute}
+        aria-label={$isMuted ? 'Unmute' : 'Mute'}
+        title={$isMuted ? 'Unmute' : 'Mute'}
+      >{$isMuted ? '🔇' : '🔊'}</button>
+
+      <!-- Info/rules stays enabled during a spin so the disclaimer is
+           reachable at all times (Stake Engine requirement). -->
+      <button
+        class="util-btn"
+        on:click={openPaytable}
+        aria-label={$tr('paytable')}
+        title={$tr('paytable')}
+      >ℹ</button>
+    </div>
+
+  </div>
+
+  </div><!-- /main-row -->
+</div>
+
+<style>
+  /* ── Bar container ──────────────────────────────────────────────────────── */
+  .control-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 0.6rem 1rem 0.8rem;
+    background: transparent;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 60;  /* Z-INDEX STACK: bottom controls */
+  }
+
+  /* ── Utility group (inside aux-cluster) ────────────────────────────────── */
+  .util-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .util-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 1.1rem;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, filter 0.15s, color 0.15s;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .util-btn:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
+    color: #fff;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent));
+  }
+
+  .util-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+
+  .util-btn.util-active {
+    background: rgba(255, 200, 50, 0.12);
+    border-color: rgba(255, 200, 50, 0.35);
+    color: #ffc832;
+  }
+
+  /* Single controls row — three zones spread across full width */
+  .main-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 8px;
+    gap: 0;
+  }
+
+  /* ── Generic image-button reset ─────────────────────────────────────────── */
+  .img-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, filter 0.15s;
+  }
+
+  .img-btn img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Prevent browser drag ghost */
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .img-btn:hover:not(:disabled) {
+    filter: brightness(1.15) drop-shadow(0 0 8px rgba(255,200,50,0.5));
+  }
+
+  .img-btn:active:not(:disabled) {
+    transform: scale(0.93);
+  }
+
+  .img-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+
+  /* ── Spin button ─────────────────────────────────────────────────────────── */
+  .spin-btn {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow:
+      0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 40%, transparent),
+      0 0 40px color-mix(in srgb, var(--theme-primary, #00ffff) 20%, transparent);
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .spin-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow:
+      0 0 30px rgba(255, 0, 255, 0.6),
+      0 0 60px rgba(255, 0, 255, 0.3);
+    filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 0, 255, 0.8));
+  }
+
+  .spin-btn:active:not(:disabled) {
+    transform: scale(0.96);
+    transition-duration: 0.05s;
+  }
+
+  .spin-btn:disabled {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+    box-shadow: none;
+  }
+
+  .spin-btn.spinning img {
+    animation: spin-img 0.7s linear infinite;
+  }
+
+  @keyframes spin-img {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Rotating glyph overlay shown during spin */
+  .spin-overlay {
+    position: absolute;
+    font-size: 2rem;
+    color: rgba(255,255,255,0.9);
+    animation: spin-img 0.5s linear infinite;
+    pointer-events: none;
+  }
+
+  /* ── Left zone — bet cluster (horizontal: MAX | − BET +) ───────────────── */
+  .bet-cluster {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+  }
+
+  /* Bet selector: CSS-only gold glass panel — no bet_display.png */
+  .bet-selector-panel {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
+    background: linear-gradient(135deg,
+      rgba(10, 8, 0, 0.92) 0%,
+      rgba(25, 20, 0, 0.88) 50%,
+      rgba(10, 8, 0, 0.92) 100%
+    );
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 6px;
+    box-shadow:
+      0 0 10px rgba(255, 215, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+    width: 148px;
+    height: 48px;
+    padding: 0 2px;
+  }
+
+  .nudge-btn {
+    background-color: transparent;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    color: transparent;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 52px;
+    min-height: 52px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: opacity 0.1s, transform 0.1s, filter 0.1s;
+    flex-shrink: 0;
+  }
+
+  .nudge-btn:hover:not(:disabled) {
+    transform: scale(1.08);
+    filter: brightness(1.2) drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 50%, transparent));
+  }
+
+  .nudge-btn:active:not(:disabled) {
+    transform: scale(0.95);
+    transition-duration: 0.05s;
+  }
+
+  .nudge-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
+
+  .bet-value-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Dark pill — same treatment as BalanceDisplay for consistent contrast */
+  .bet-text-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.60);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  .bet-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 200, 50, 0.90);
+    text-transform: uppercase;
+    line-height: 1;
+    display: block;
+  }
+
+  .bet-value {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    line-height: 1.2;
+    display: block;
+  }
+
+  /* Orbitron LED gold — bet display */
+  .led-gold {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-shadow: 0 0 8px #FFD700;
+    letter-spacing: 2px;
+    display: block;
+    line-height: 1.2;
+  }
+
+  /* Max Bet button — image-based */
+  .maxbet-btn {
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+
+  /* Fallback text if btn_max.png fails to load — class added dynamically via JS */
+  .maxbet-btn:global(.maxbet-fallback) {
+    background: transparent;
+    border: 2px solid var(--theme-primary, #00ffff);
+    border-radius: 6px;
+    color: var(--theme-primary, #00ffff);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    font-family: 'Courier New', monospace;
+  }
+
+  .maxbet-btn:global(.maxbet-fallback)::after {
+    content: 'MAX';
+  }
+
+  /* ── Centre zone — spin button ─────────────────────────────────────────── */
+  .spin-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ── Right zone — aux cluster (AUTO + util group) ──────────────────────── */
+  .aux-cluster {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  /* Autoplay button */
+  .auto-wrapper { position: relative; }
+
+  .auto-btn {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .auto-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: color-mix(in srgb, var(--theme-primary, #00ffff) 70%, transparent);
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+  }
+
+  .auto-btn.active .auto-label {
+    color: var(--theme-primary, #00ffff);
+    text-shadow: 0 0 6px color-mix(in srgb, var(--theme-primary, #00ffff) 80%, transparent);
+  }
+
+  /* Active auto-play: theme glow */
+  .auto-btn.active img {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--theme-primary, #00ffff) 80%, transparent));
+    animation: pulse-glow 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    to { filter: drop-shadow(0 0 4px color-mix(in srgb, var(--theme-primary, #00ffff) 30%, transparent)); }
+  }
+
+  /* Remaining spin count badge */
+  .auto-count {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: var(--theme-primary, #00ffff);
+    color: #000020;
+    font-size: 0.65rem;
+    font-weight: 800;
+    border-radius: 10px;
+    padding: 0 4px;
+    pointer-events: none;
+  }
+
+  /* Auto-play count dropdown */
+  .auto-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 10, 30, 0.95);
+    border: 1px solid rgba(255, 200, 50, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 20;
+    min-width: 70px;
+  }
+
+  .menu-item {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 1rem;
+    background: none;
+    border: none;
+    color: #ffc832;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-align: center;
+    transition: background 0.1s;
+  }
+
+  .menu-item:hover { background: rgba(255, 200, 50, 0.15); }
+
+  .menu-toggle {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0.3rem 0.7rem; font-size: 0.68rem; color: #cde; cursor: pointer;
+    white-space: nowrap;
+  }
+  .menu-toggle input { accent-color: #00ffff; }
+  .menu-sep {
+    padding: 0.3rem 0.7rem 0.15rem; font-size: 0.56rem; letter-spacing: 0.06em;
+    color: rgba(205, 222, 238, 0.55); border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2px;
+  }
+
+</style>
