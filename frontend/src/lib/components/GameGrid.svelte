@@ -267,11 +267,12 @@
     queue: string[]      // injection order for landing
     onSettle: (() => void) | null
     charged: boolean     // scatter-anticipation glow applied
+    lastM: number        // last applied motion factor (throttles var writes)
   }
   const reels: Reel[] = Array.from({ length: REELS }, () => ({
     state: 'rest', velocity: 0, offset: 0, t: 0, cruiseV: 0,
     decelDur: 0, decelDist: 0, decelOffset0: 0, injects: 0, queue: [],
-    onSettle: null, charged: false,
+    onSettle: null, charged: false, lastM: 0,
   }))
   let rafId: number | null = null
   let lastFrame = 0
@@ -298,21 +299,20 @@
     _positionStrip(col)
   }
 
+  // Position + stretch every frame with minimal hot-loop allocation: the
+  // per-reel velocity stretch/alpha are pushed to CSS variables on the strip
+  // (inherited by every tile-inner) and only rewritten when the motion factor
+  // changes, so cruise frames allocate just the one translateY string.
   function _positionStrip(col: number): void {
     const r = reels[col]
     const strip = stripRefs[col]
     if (!strip) return
-    strip.style.transform = `translateY(${(REST_Y + r.offset).toFixed(2)}px)`
-    // Velocity-scaled vertical stretch (<=1.18) + subtle alpha trail.
+    strip.style.transform = `translateY(${(REST_Y + r.offset).toFixed(1)}px)`
     const m = Math.min(1, r.velocity / VMAX)
-    const scaleY = 1 + 0.18 * m
-    const alpha = 1 - 0.34 * m
-    for (let i = 0; i < STRIP; i++) {
-      const inner = slotInner[col][i]
-      if (inner) {
-        inner.style.transform = m > 0.01 ? `scaleY(${scaleY.toFixed(3)})` : ''
-        inner.style.opacity = m > 0.01 ? alpha.toFixed(3) : '1'
-      }
+    if (Math.abs(m - r.lastM) > 0.02 || (m === 0 && r.lastM !== 0)) {
+      r.lastM = m
+      strip.style.setProperty('--ts', (1 + 0.18 * m).toFixed(3))
+      strip.style.setProperty('--ta', (1 - 0.34 * m).toFixed(3))
     }
   }
 
@@ -364,7 +364,7 @@
   function _startReel(col: number, cruiseV: number): void {
     const r = reels[col]
     r.state = 'accel'; r.t = 0; r.velocity = 0; r.cruiseV = cruiseV
-    r.injects = 0; r.decelDone = 0; r.queue = []; r.charged = false
+    r.injects = 0; r.lastM = 0; r.queue = []; r.charged = false
     const strip = stripRefs[col]
     if (strip) strip.classList.add('spinning')
     _ensureRaf()
@@ -514,6 +514,10 @@
       const src = symbolBaseSrc(sym)
       if (img.getAttribute('src') !== src) img.setAttribute('src', src)
     }
+    // Fast path while travelling: only the symbol image reads through the blur,
+    // so skip plate tint / overlay / idle / fx work (imperceptible or gated off
+    // by .spinning) and repaint them once on settle.
+    if (moving) return
     const cell = slotCell[col]?.[i]
     if (cell) cell.style.setProperty('--plate-tint', plateTint(sym))
     const overlay = slotOverlay[col]?.[i]
@@ -540,6 +544,19 @@
     }
   }
 
+  // Decode every symbol texture + fx sheet during load so the first spin's
+  // full-res cruise paint never pays a first-use decode cost mid-frame.
+  function _prewarmArt(): void {
+    if (!SYMBOL_BASE) return
+    const files = ['h1_base', 'h1_spin', 'h2', 'm1', 'm2', 'm3', 'l1', 'l2', 'l3',
+                   'wild', 'scatter', 'tile_plate', 'm3_flame_sheet', 'l2_fuse_sheet']
+    for (const f of files) {
+      const img = new Image()
+      img.src = `${SYMBOL_BASE}/${f}.png`
+      img.decode?.().catch(() => {})
+    }
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMount(() => {
     try {
@@ -562,6 +579,7 @@
     }
 
     assetLoadProgress.set(100)
+    _prewarmArt()
 
     const unsubBoard = boardSymbols.subscribe(board => {
       if (assetsReady && board && board.length === REELS) _updateSymbols(board)
@@ -763,6 +781,7 @@
   export function slamStop(): void {
     if (!get(isSpinning) || slamRequested) return
     slamRequested = true
+    if (_pendingWaitAbort) _pendingWaitAbort()
   }
 
   // ── Public API — called by App.svelte ─────────────────────────────────────
@@ -775,11 +794,13 @@
     isSpinning.set(true)
     playSpinStart()
 
-    const rows = (col: number): string[] =>
-      Array.from({ length: ROWS }, (_, row) => (finalBoard[col]?.[row] ?? 'L3').toUpperCase())
+    // Precompute the result rows once (avoids per-reference array allocation in
+    // the hot spin loop, which feeds GC and risks a >100ms pause).
+    const boardRows: string[][] = Array.from({ length: REELS }, (_, c) =>
+      Array.from({ length: ROWS }, (_, row) => (finalBoard[c]?.[row] ?? 'L3').toUpperCase()))
 
     if (get(reelMode) === 'drop') {
-      await _dropAll(finalBoard, rows)
+      await _dropAll(boardRows)
       isSpinning.set(false)
       return
     }
@@ -814,13 +835,13 @@
         }
       }
 
-      const p = _landReel(r, rows(r), slamRequested).then(() => {
+      const p = _landReel(r, boardRows[r], slamRequested).then(() => {
         _clearAnticipationFor(r)
       })
       settles.push(p)
 
       // Count scatters that have now committed (their queue is set on landing).
-      scattersLanded += rows(r).filter((s) => s === 'S').length
+      scattersLanded += boardRows[r].filter((s) => s === 'S').length
       if (scattersLanded >= 2 && !slamRequested && r < REELS - 1) {
         _scatterAnticipation(r + 1)
       }
@@ -832,9 +853,9 @@
     if (import.meta.env.DEV) {
       for (let c = 0; c < REELS; c++) {
         for (let row = 0; row < ROWS; row++) {
-          if (slotSym[c][visIdx(row)] !== rows(c)[row]) {
+          if (slotSym[c][visIdx(row)] !== boardRows[c][row]) {
             console.error(`[GameGrid] landing mismatch reel ${c} row ${row}: ` +
-              `got ${slotSym[c][visIdx(row)]} want ${rows(c)[row]}`)
+              `got ${slotSym[c][visIdx(row)]} want ${boardRows[c][row]}`)
           }
         }
       }
@@ -847,22 +868,21 @@
     stripRefs[col]?.classList.remove('anticipate')
   }
 
-  async function _dropAll(finalBoard: string[][], rows: (c: number) => string[]): Promise<void> {
+  async function _dropAll(boardRows: string[][]): Promise<void> {
     const stagger = get(isTurbo) ? 60 : 95
-    const drops = Array.from({ length: REELS }, (_, c) => _dropReel(c, rows(c), c * stagger))
+    const drops = Array.from({ length: REELS }, (_, c) => _dropReel(c, boardRows[c], c * stagger))
     await Promise.all(drops)
   }
 
   // ── Cancellable stagger wait (resolves instantly on slam) ────────────────
+  // setTimeout-based (not rAF-polled) so a long cruise wait allocates one timer,
+  // not a closure every frame — needless GC pressure otherwise.
+  let _pendingWaitAbort: (() => void) | null = null
   function _sleepOrSlam(ms: number): Promise<void> {
     if (slamRequested) return Promise.resolve()
     return new Promise<void>((resolve) => {
-      const started = performance.now()
-      const check = () => {
-        if (slamRequested || performance.now() - started >= ms) { resolve(); return }
-        requestAnimationFrame(check)
-      }
-      requestAnimationFrame(check)
+      const t = setTimeout(() => { _pendingWaitAbort = null; resolve() }, ms)
+      _pendingWaitAbort = () => { clearTimeout(t); _pendingWaitAbort = null; resolve() }
     })
   }
 </script>
@@ -978,6 +998,9 @@
     inset: 0;
     transform-origin: 50% 50%;
     will-change: transform, opacity;
+    /* velocity stretch/alpha come from per-reel CSS vars set on the strip */
+    transform: scaleY(var(--ts, 1));
+    opacity: var(--ta, 1);
   }
 
   .tile-plate {
