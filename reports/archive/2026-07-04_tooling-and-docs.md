@@ -62,3 +62,23 @@ Full write-up with exact commands, contract shapes and use-vs-rebuild calls:
   (100k rows each) + `books_{base,bonus}.jsonl.zst` (bonus book ~151 MB).
 
 No frontend code changed; no build required. Locked files untouched.
+
+## Follow-on: math verified + RGS contract captured
+
+Acting on the review's recommendations (owner agreed; nothing live):
+
+- **`scripts/validate_math.py`** (new, stdlib only, CI-ready) - independently recomputes the
+  maths from the shipped lookup tables and gates on Stake's rubric. **Ran it: ALL CHECKS PASS
+  and every stated fact is confirmed to the decimal:** RTP 96.350000% both modes (cross-mode
+  variation 0.0000%), base hit rate 29.11%, base SD 17.28x, bonus SD 206.63x, max win 5000x,
+  wincap odds exactly 1 in 100,000 (base) / 1 in 1,000 (bonus), 100k rows each. Bonus buy has
+  no zero-payout outcome (100% hit, min 1.4x). Captured in **`MATH_VALIDATION.md`**.
+- **`docs/RGS_CONTRACT_REFERENCE.md`** (new) - the Stake Engine RGS wire contract extracted
+  from stake-dev-tool (endpoints, micro-unit money, payoutMultiplier bp/100, payout-at-end-round
+  timing, the `library[sim+1]=Book(sim)` mapping), cross-checked against our locked
+  `rgsService.ts` / `replayService.ts` / mock. **No misalignments found** - same endpoints,
+  micros, and play -> end-round settle order. Only operational item: the sim_id vs event-id +1
+  offset to verify on staging.
+
+Net: our maths is independently proven correct and compliant, and our RGS integration is
+proven to match the platform contract - both now documented on file for the submission.
