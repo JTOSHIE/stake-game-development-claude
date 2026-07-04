@@ -192,8 +192,10 @@
   <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
 </div>
 
-<!-- MAX chip — v3.3: FIXED position beside the arrows, tabular numerals, never
-     repositioned by content; wired to the max-bet ladder logic. -->
+<!-- MAX chip — v3.6: relocated to the FAR LEFT of the HUD (between TURBO and the
+     menu), clear of the SPIN button; was jammed against the SPIN hit circle in
+     v3.3 to v3.5 (a mis-tap hazard). Tabular numerals, never repositioned by
+     content; wired to the max-bet ladder logic. -->
 <button
   class="max-chip"
   on:click={setMaxBet}
@@ -424,14 +426,15 @@
   .bet-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
   .bet-arrow:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); }
 
-  /* MAX chip (v3.3) — fixed beside the arrows, never repositioned by content */
-  /* v3.5 audit: the button is the enlarged touch target (26x44, centred on the
-     visual chip); the visible chip keeps its v3.3 geometry (x936 w24, y591 h26).
-     Width is capped at 26 by the SPIN hit circle (centre 1004, r42) and the
-     bet-arrow column (right edge 932); 44 tall fits inside the panel. */
+  /* MAX chip (v3.6) — relocated to the FAR LEFT, in the 40px gap between the
+     TURBO button (right edge x304) and the hamburger menu (left edge x344). The
+     26x44 button is centred in that gap (x311 to 337), clearing TURBO and the
+     menu by ~7px each and sitting nowhere near the SPIN circle (centre 1004,
+     r42). The visible chip keeps its v3.3 geometry (24x26, centred). Baseline
+     y604 unchanged. This removes the v3.3 to v3.5 SPIN-adjacency mis-tap hazard. */
   .max-chip {
     position: absolute;
-    left: 935px;
+    left: 311px;
     top: 582px;
     width: 26px;
     height: 44px;
