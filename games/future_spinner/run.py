@@ -37,19 +37,15 @@ if __name__ == "__main__":
     # mode band). NOTE: the shipped ante package was generated on its own to keep
     # the already-verified base/bonus books + replay event IDs byte-identical; a
     # full from-scratch run of all three here reproduces a consistent bundle.
-    target_modes = ["base", "cruise", "ante", "bonus"]
+    target_modes = ["base", "cruise", "ante", "bonus", "volatile",
+                    "antelite", "superante", "minibuy", "superbuy", "megabuy", "hyperbuy"]
 
     if PRODUCTION:
         num_threads = 10
         rust_threads = 20
         batching_size = 5000
         compression = True
-        num_sim_args = {
-            "base":  100_000,
-            "cruise": 100_000,
-            "ante":  100_000,
-            "bonus": 100_000,
-        }
+        num_sim_args = {m: 100_000 for m in target_modes}
         run_conditions = {
             "run_sims": True,
             "run_optimization": True,
@@ -60,12 +56,7 @@ if __name__ == "__main__":
         rust_threads = 4
         batching_size = 100
         compression = False
-        num_sim_args = {
-            "base":  100,
-            "cruise": 100,
-            "ante":  100,
-            "bonus": 100,
-        }
+        num_sim_args = {m: 100 for m in target_modes}
         run_conditions = {
             "run_sims": True,
             "run_optimization": False,

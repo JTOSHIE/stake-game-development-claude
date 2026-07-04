@@ -23,6 +23,48 @@
             "cost": 100.0,
             "events": "books_bonus.jsonl.zst",
             "weights": "lookUpTable_bonus_0.csv"
+        },
+        {
+            "name": "volatile",
+            "cost": 1.0,
+            "events": "books_volatile.jsonl.zst",
+            "weights": "lookUpTable_volatile_0.csv"
+        },
+        {
+            "name": "antelite",
+            "cost": 1.25,
+            "events": "books_antelite.jsonl.zst",
+            "weights": "lookUpTable_antelite_0.csv"
+        },
+        {
+            "name": "superante",
+            "cost": 2.0,
+            "events": "books_superante.jsonl.zst",
+            "weights": "lookUpTable_superante_0.csv"
+        },
+        {
+            "name": "minibuy",
+            "cost": 80.0,
+            "events": "books_minibuy.jsonl.zst",
+            "weights": "lookUpTable_minibuy_0.csv"
+        },
+        {
+            "name": "superbuy",
+            "cost": 300.0,
+            "events": "books_superbuy.jsonl.zst",
+            "weights": "lookUpTable_superbuy_0.csv"
+        },
+        {
+            "name": "megabuy",
+            "cost": 500.0,
+            "events": "books_megabuy.jsonl.zst",
+            "weights": "lookUpTable_megabuy_0.csv"
+        },
+        {
+            "name": "hyperbuy",
+            "cost": 1000.0,
+            "events": "books_hyperbuy.jsonl.zst",
+            "weights": "lookUpTable_hyperbuy_0.csv"
         }
     ]
 }

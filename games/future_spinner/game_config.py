@@ -276,6 +276,25 @@ class GameConfig(Config):
             "scatter_triggers": {3: 50, 4: 30, 5: 20},
         }
 
+        # -- Mini-buy conditions (cheapest guaranteed entry, 3-scatter weighted) --
+        freegame_mini_condition = {
+            "reel_weights": _reels_std, "force_wincap": False, "force_freegame": True,
+            "scatter_triggers": {3: 90, 4: 8, 5: 2},
+        }
+        wincap_mini_condition = {
+            "reel_weights": _reels_wincap, "force_wincap": True, "force_freegame": True,
+            "scatter_triggers": {3: 80, 4: 15, 5: 5},
+        }
+        # -- Super-buy conditions (richest guaranteed entry, 4/5-scatter weighted) --
+        freegame_super_condition = {
+            "reel_weights": _reels_std, "force_wincap": False, "force_freegame": True,
+            "scatter_triggers": {3: 5, 4: 25, 5: 70},
+        }
+        wincap_super_condition = {
+            "reel_weights": _reels_wincap, "force_wincap": True, "force_freegame": True,
+            "scatter_triggers": {3: 5, 4: 25, 5: 70},
+        }
+
         _maxwin = int(_WINCAP)
 
         # -- Bet modes ---------------------------------------------------------
@@ -409,6 +428,115 @@ class GameConfig(Config):
                         quota=0.996,
                         conditions=freegame_bonus_condition,
                     ),
+                ],
+            ),
+            # VOLATILE / HIGH-VOLATILITY MODE (cost 1.0x) ---------------------
+            # Same price and RTP as base, tuned HIGH volatility: more of the return
+            # sits in the rare feature and the 5,000x tail (wincap 0.10 vs base
+            # 0.05), fewer/smaller base wins. The swingy counterpart to Cruise.
+            BetMode(
+                name="volatile",
+                cost=1.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.004,
+                                 win_criteria=float(_maxwin), conditions=wincap_condition),
+                    Distribution(criteria="freegame", quota=0.20,
+                                 conditions=freegame_base_condition),
+                    Distribution(criteria="0", quota=0.35,
+                                 win_criteria=0.0, conditions=zerowin_condition),
+                    Distribution(criteria="basegame", quota=0.446,
+                                 conditions=basegame_condition),
+                ],
+            ),
+            # ANTE-LITE / DOUBLE-CHANCE (cost 1.25x) --------------------------
+            # Market-centre ante: +25% cost for ~1.6x the trigger rate.
+            BetMode(
+                name="antelite",
+                cost=1.25,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.0025,
+                                 win_criteria=float(_maxwin), conditions=wincap_ante_condition),
+                    Distribution(criteria="freegame", quota=0.24,
+                                 conditions=freegame_ante_condition),
+                    Distribution(criteria="0", quota=0.30,
+                                 win_criteria=0.0, conditions=zerowin_condition),
+                    Distribution(criteria="basegame", quota=0.4575,
+                                 conditions=basegame_condition),
+                ],
+            ),
+            # SUPER-ANTE / HEAVY DOUBLE-CHANCE (cost 2.0x) --------------------
+            # Heavy ante: 2x cost for ~3x the trigger rate (each feature a touch
+            # smaller, but far more frequent). Pragmatic Super Scatter style.
+            BetMode(
+                name="superante",
+                cost=2.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.004,
+                                 win_criteria=float(_maxwin), conditions=wincap_ante_condition),
+                    Distribution(criteria="freegame", quota=0.42,
+                                 conditions=freegame_ante_condition),
+                    Distribution(criteria="0", quota=0.20,
+                                 win_criteria=0.0, conditions=zerowin_condition),
+                    Distribution(criteria="basegame", quota=0.376,
+                                 conditions=basegame_condition),
+                ],
+            ),
+            # MINI BUY (80x, guaranteed 3-scatter entry) ---------------------
+            BetMode(
+                name="minibuy", cost=80.0, rtp=self.rtp, max_win=_maxwin,
+                auto_close_disabled=False, is_feature=False, is_buybonus=True,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.002,
+                                 win_criteria=float(_maxwin), conditions=wincap_mini_condition),
+                    Distribution(criteria="freegame", quota=0.998,
+                                 conditions=freegame_mini_condition),
+                ],
+            ),
+            # SUPER BUY (richest entry, 300x) --------------------------------
+            BetMode(
+                name="superbuy", cost=300.0, rtp=self.rtp, max_win=_maxwin,
+                auto_close_disabled=False, is_feature=False, is_buybonus=True,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.02,
+                                 win_criteria=float(_maxwin), conditions=wincap_super_condition),
+                    Distribution(criteria="freegame", quota=0.98,
+                                 conditions=freegame_super_condition),
+                ],
+            ),
+            # MEGA BUY (500x) + HYPER BUY (1000x) - map the buy-ladder ceiling -
+            BetMode(
+                name="megabuy", cost=500.0, rtp=self.rtp, max_win=_maxwin,
+                auto_close_disabled=False, is_feature=False, is_buybonus=True,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.03,
+                                 win_criteria=float(_maxwin), conditions=wincap_super_condition),
+                    Distribution(criteria="freegame", quota=0.97,
+                                 conditions=freegame_super_condition),
+                ],
+            ),
+            BetMode(
+                name="hyperbuy", cost=1000.0, rtp=self.rtp, max_win=_maxwin,
+                auto_close_disabled=False, is_feature=False, is_buybonus=True,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.05,
+                                 win_criteria=float(_maxwin), conditions=wincap_super_condition),
+                    Distribution(criteria="freegame", quota=0.95,
+                                 conditions=freegame_super_condition),
                 ],
             ),
         ]

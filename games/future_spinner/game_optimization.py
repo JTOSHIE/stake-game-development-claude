@@ -195,6 +195,160 @@ class OptimizationSetup:
                     score_type="rtp",
                 ).return_dict(),
             },
+            "volatile": {
+                # High volatility (cost 1.0x, same 96.35% RTP): more return in the
+                # rare feature + a fatter 5,000x tail (wincap 0.10), fewer base wins.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.10, av_win=wincaps["volatile"], search_conditions=wincaps["volatile"]
+                    ).return_dict(),
+                    "0": ConstructConditions(rtp=0.0, av_win=0, search_conditions=0).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.55, hr=185, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.3135, hr=3.5).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 0.8,
+                         "win_range": (0.5, 3), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 1.3,
+                         "win_range": (500, 4000), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=6, max_m2m=14,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3], score_type="rtp",
+                ).return_dict(),
+            },
+            "antelite": {
+                # Market-centre ante (cost 1.25x, ~1.6x trigger, hr 115).
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["antelite"], search_conditions=wincaps["antelite"]
+                    ).return_dict(),
+                    "0": ConstructConditions(rtp=0.0, av_win=0, search_conditions=0).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.608, hr=115, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.3055, hr=3.5).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 1.2,
+                         "win_range": (1, 5), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 1.2,
+                         "win_range": (20, 80), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=8,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3], score_type="rtp",
+                ).return_dict(),
+            },
+            "superante": {
+                # Heavy ante (cost 2.0x, ~3x trigger, hr 62): feature more frequent
+                # and a touch smaller, funded by a lighter base game.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["superante"], search_conditions=wincaps["superante"]
+                    ).return_dict(),
+                    "0": ConstructConditions(rtp=0.0, av_win=0, search_conditions=0).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.80, hr=62, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.1135, hr=3.5).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "freegame", "scale_factor": 1.2,
+                         "win_range": (10, 60), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=8,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[30, 60, 120],
+                    test_weights=[0.4, 0.4, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
+            "minibuy": {
+                # Cheapest guaranteed feature (3-scatter weighted), honest floor 80x.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["minibuy"], search_conditions=wincaps["minibuy"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.9135, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "freegame", "scale_factor": 1.1,
+                         "win_range": (10, 60), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 0.8,
+                         "win_range": (1000, 4000), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=8,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
+            "superbuy": {
+                # Richest guaranteed feature (4/5-scatter weighted), 300x.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["superbuy"], search_conditions=wincaps["superbuy"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.9135, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [{"criteria": "freegame", "scale_factor": 1.1,
+                      "win_range": (100, 500), "probability": 1.0}]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=10,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
+            "megabuy": {
+                # 500x buy - maps the ceiling (tail gate loosens: cost>=500 scale 0.5).
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["megabuy"], search_conditions=wincaps["megabuy"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.9135, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [{"criteria": "freegame", "scale_factor": 1.1,
+                      "win_range": (200, 1000), "probability": 1.0}]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=12,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
+            "hyperbuy": {
+                # 1000x buy - the top of the cost-multiplier range (tier-1 ceiling).
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["hyperbuy"], search_conditions=wincaps["hyperbuy"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.9135, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [{"criteria": "freegame", "scale_factor": 1.1,
+                      "win_range": (400, 2000), "probability": 1.0}]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=14,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
         }
 
         verify_optimization_input(self.game_config, self.game_config.opt_params)

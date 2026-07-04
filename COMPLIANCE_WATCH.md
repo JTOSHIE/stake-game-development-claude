@@ -35,6 +35,22 @@ Australian English, no em dashes or en dashes.
 
 ## Watch log
 
+### 2026-07-05: built the full template mode library (11 modes)
+Owner directed an exhaustive autonomous build of every compliant bet mode, since this first
+game is a reusable template. Built and independently validated (`scripts/validate_math.py`,
+ALL PASS) eleven modes, every one at 96.3500% RTP (cross-mode variation 0.0000%, within the
+0.5% rule), stateless, sharing the 5,000x cap:
+- **Standing modes:** cruise 1.0x (SD 11.10x), base 1.0x (17.28x), antelite 1.25x (20.31x),
+  ante 1.5x (23.26x), volatile 1.0x (24.28x), superante 2.0x (26.41x).
+- **Buy ladder:** minibuy 80x (SD 178x), bonus 100x (207x), superbuy 300x (407x),
+  megabuy 500x (633x), hyperbuy 1000x (969x). All pass the cost-scaled tail-risk gate.
+- **Finding:** the 5,000x cap does NOT limit the buy ladder (buys feasible to 1000x, the
+  platform cost-multiplier ceiling). Documented in `docs/MASTER_TEMPLATE.md` + `MATH_DESIGN_SPACE.md`.
+- All 1.0x-cost modes sit inside the operator-risk SD band (0.6-60). Each mode generated on
+  its own so the others stay byte-identical; base/cruise/ante/bonus unchanged.
+- Lock exception followed (deny lifted for the build, restored with verified-empty diff).
+- Frontend selector for the library is a separate iterable pass; the shipped skin selects a subset.
+
 ### 2026-07-05: added a third bet mode (ante / Double-Chance)
 Acted on the gap analysis "now-or-never" finding (bet modes lock at approval). Added a
 third stateless mode, **ante / Double-Chance** (cost 1.5x, ~2x the free-spin trigger rate:

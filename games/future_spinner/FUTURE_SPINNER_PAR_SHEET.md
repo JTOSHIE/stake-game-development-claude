@@ -3,9 +3,9 @@
 **Game:** Future Spinner
 **Provider:** We Roll Spinners
 **Report Date:** 2026-07-05
-**Feature:** OVERDRIVE FREE SPINS (four bet modes: base + cruise / low-vol + ante / Double-Chance + bonus buy)
+**Feature:** OVERDRIVE FREE SPINS (template library of 11 bet modes, see section 1A)
 **Simulation Basis:** 100,000 rounds per mode (Stake Engine SDK v1)
-**Optimiser:** PigFarm Rust, all four modes converged to 96.3500% RTP
+**Optimiser:** PigFarm Rust, all eleven modes converged to 96.3500% RTP
 
 ---
 
@@ -15,19 +15,40 @@
 |------------------------|-------------------------------------------|
 | Grid                   | 5 reels x 4 rows (20 symbol positions)    |
 | Win mechanic           | Ways-to-win (up to 4^5 = 1,024 ways)     |
-| Bet modes              | Four: base (1.0x), cruise / low-vol (1.0x), ante / Double-Chance (1.5x), bonus buy (100.0x) |
-| Target RTP             | 96.35% (all modes)                        |
-| Achieved RTP (base)    | 96.3500% (10dp 96.3499998727%)            |
-| Achieved RTP (cruise)  | 96.3500% (96.34999985%)                   |
-| Achieved RTP (ante)    | 96.3500% (96.34999985%)                   |
-| Achieved RTP (bonus)   | 96.3500% (10dp 96.3499999962%)            |
+| Bet modes              | Template library of 11 (see section 1A); a shipped skin selects a subset |
+| Target RTP             | 96.35% (every mode, cross-mode variation 0.0000%) |
 | Wincap                 | 5,000x bet (hard, all modes)              |
-| Volatility (cruise)    | Low, weighted SD 11.10x                   |
-| Volatility (base)      | Medium-High, weighted SD 17.28x           |
-| Volatility (ante)      | High, weighted SD 23.26x                  |
+| Volatility range       | SD 11.10x (cruise) to 969x (hyperbuy)     |
 | Min bet                | $0.10                                     |
 | Max bet                | $100.00                                   |
 | Feature                | Overdrive Free Spins with progressive multiplier |
+
+---
+
+## 1A. MODE LIBRARY (template; every mode 96.3500% RTP, 5,000x cap)
+
+This game is a reusable template. All eleven modes below are generated and independently
+validated (`scripts/validate_math.py`) at the same 96.3500% RTP (cross-mode variation 0.0000%,
+within the 0.5% rule) and share the 5,000x cap. A shipped skin selects a subset; the remaining
+modes stay available in the library.
+
+| Mode | Type | Cost | Volatility SD | Character |
+|---|---|---|---|---|
+| cruise    | standing | 1.0x   | 11.10x | low-vol, frequent small wins (hit 43.9%) |
+| base      | standing | 1.0x   | 17.28x | standard game (hit 29.1%) |
+| antelite  | standing | 1.25x  | 20.31x | +25% for ~1.6x trigger rate |
+| ante      | standing | 1.5x   | 23.26x | +50% for ~2x trigger rate (Double Chance) |
+| volatile  | standing | 1.0x   | 24.28x | high-vol: more feature + tail, fewer base wins |
+| superante | standing | 2.0x   | 26.41x | 2x for ~3x trigger rate (heavy ante) |
+| minibuy   | buy      | 80x    | 178x   | cheapest guaranteed entry (3-scatter weighted) |
+| bonus     | buy      | 100x   | 206.63x| standard guaranteed entry |
+| superbuy  | buy      | 300x   | 407x   | rich guaranteed entry (4/5-scatter) |
+| megabuy   | buy      | 500x   | 633x   | richest entry |
+| hyperbuy  | buy      | 1000x  | 969x   | richest entry, top of the cost range |
+
+Sections 5, 5A, 5B below give the detailed per-mode statistics and RTP fence budgets for the
+core modes (base, cruise, ante, bonus); the remaining modes follow the same construction (same
+reels, feature and cap; only the fence RTP split, hit-rate and cost differ).
 
 ---
 
@@ -309,20 +330,14 @@ total payout equals the recorded payout multiplier in every sampled round.
 
 ---
 
-## 10. FOUR-MODE DECLARATION
+## 10. MODE DECLARATION (template library)
 
-Future Spinner ships exactly four bet modes:
+Future Spinner is a template carrying a library of eleven validated bet modes (section 1A):
+six standing modes (cruise, base, antelite, ante, volatile, superante) and a five-tier buy
+ladder (minibuy 80x, bonus 100x, superbuy 300x, megabuy 500x, hyperbuy 1000x). A shipped skin
+declares the subset it ships.
 
-- **base** (cost 1.0x): standard play. The Overdrive Free Spins feature triggers
-  on 3+ scatters at a rate of about 1 in 185 base spins.
-- **cruise / low-vol** (cost 1.0x): same price and RTP as base, tuned for lower
-  volatility (SD 11.1x vs 17.3x): more frequent smaller wins, a rarer feature.
-- **ante / Double-Chance** (cost 1.5x): standard play at roughly double the
-  free-spin trigger rate (about 1 in 92). Not a buy; the reels spin normally.
-- **bonus** (cost 100.0x): a buy that guarantees entry to the Overdrive Free
-  Spins feature.
-
-All four modes are stateless (each round resolves independently inside one book
+All modes are stateless (each round resolves independently inside one book
 round), share the 1,024-way base game and paytable, enforce the same 5,000x win
 cap, and return 96.3500% RTP (cross-mode variation 0.0000%, within the 0.5% rule).
 There is no jackpot, gamble, or continuation mechanic. The scatter awards are
@@ -349,4 +364,4 @@ Overdrive multiplier during the feature.
 
 ---
 
-*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.3 (Overdrive Free Spins, four modes)*
+*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.4 (Overdrive Free Spins, 11-mode template library)*
