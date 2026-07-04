@@ -1,0 +1,82 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8a5cff" stop-opacity="0.2"/>
+      <stop offset="60%" stop-color="#8a5cff" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#8a5cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#c8daea"/>
+      <stop offset="45%" stop-color="#6d8098"/>
+      <stop offset="58%" stop-color="#2e3a4c"/>
+      <stop offset="80%" stop-color="#a9bed4"/>
+      <stop offset="100%" stop-color="#e9f5ff"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8fa2b8"/>
+      <stop offset="40%" stop-color="#39465c"/>
+      <stop offset="65%" stop-color="#161d2c"/>
+      <stop offset="100%" stop-color="#4a5a72"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="486" fill="url(#bgGlow)"/>
+  <rect x="400" y="128" width="224" height="56" rx="16" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="5"/>
+  <polygon points="512,138 542,155 542,173 512,190 482,173 482,155" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="4"/>
+  <rect x="492" y="184" width="40" height="190" rx="12" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <rect x="440" y="356" width="144" height="392" rx="30" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="6"/>
+  <g stroke="#0a0e16" stroke-width="4" opacity="0.7">
+    <line x1="446" y1="560" x2="578" y2="560"/>
+    <line x1="446" y1="590" x2="578" y2="590"/>
+    <line x1="446" y1="620" x2="578" y2="620"/>
+    <line x1="446" y1="650" x2="578" y2="650"/>
+    <line x1="446" y1="680" x2="578" y2="680"/>
+  </g>
+  <rect x="426" y="366" width="172" height="48" rx="14" fill="url(#gold)" stroke="#0a0e16" stroke-width="5"/>
+  <g fill="none">
+    <g stroke="#8a5cff" stroke-width="46" opacity="0.16">
+      <ellipse cx="512" cy="246" rx="152" ry="36"/>
+      <ellipse cx="512" cy="322" rx="152" ry="36"/>
+      <ellipse cx="512" cy="398" rx="152" ry="36"/>
+      <ellipse cx="512" cy="474" rx="152" ry="36"/>
+      <ellipse cx="512" cy="550" rx="152" ry="36"/>
+      <ellipse cx="512" cy="626" rx="152" ry="36"/>
+      <ellipse cx="512" cy="702" rx="152" ry="36"/>
+    </g>
+    <g stroke="#a37dff" stroke-width="24">
+      <ellipse cx="512" cy="246" rx="152" ry="36"/>
+      <ellipse cx="512" cy="322" rx="152" ry="36"/>
+      <ellipse cx="512" cy="398" rx="152" ry="36"/>
+      <ellipse cx="512" cy="474" rx="152" ry="36"/>
+      <ellipse cx="512" cy="550" rx="152" ry="36"/>
+      <ellipse cx="512" cy="626" rx="152" ry="36"/>
+      <ellipse cx="512" cy="702" rx="152" ry="36"/>
+    </g>
+    <g stroke="#0a0e16" stroke-width="3" opacity="0.8">
+      <ellipse cx="512" cy="246" rx="152" ry="36"/>
+      <ellipse cx="512" cy="322" rx="152" ry="36"/>
+      <ellipse cx="512" cy="398" rx="152" ry="36"/>
+      <ellipse cx="512" cy="474" rx="152" ry="36"/>
+      <ellipse cx="512" cy="550" rx="152" ry="36"/>
+      <ellipse cx="512" cy="626" rx="152" ry="36"/>
+      <ellipse cx="512" cy="702" rx="152" ry="36"/>
+    </g>
+    <g stroke="#e6d9ff" stroke-width="7" opacity="0.85" stroke-linecap="round">
+      <path d="M 400 236 A 152 36 0 0 1 624 236"/>
+      <path d="M 400 312 A 152 36 0 0 1 624 312"/>
+      <path d="M 400 388 A 152 36 0 0 1 624 388"/>
+      <path d="M 400 464 A 152 36 0 0 1 624 464"/>
+      <path d="M 400 540 A 152 36 0 0 1 624 540"/>
+      <path d="M 400 616 A 152 36 0 0 1 624 616"/>
+      <path d="M 400 692 A 152 36 0 0 1 624 692"/>
+    </g>
+  </g>
+  <circle cx="512" cy="812" r="56" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="6"/>
+  <circle cx="512" cy="812" r="24" fill="#0c111d" stroke="#0a0e16" stroke-width="4"/>
+  <ellipse cx="470" cy="300" rx="60" ry="140" fill="#ffffff" opacity="0.08" transform="rotate(-10 470 300)"/>
+</svg>

@@ -128,3 +128,8 @@ exceptions continue to follow convention (e).
 **(h) Visual proof.** Any pass that changes what renders commits before and after proof
 screenshots to `reports/screens/<pass>/` so the independent verifier can review rendering
 from the repository.
+
+**(i) Handover block.** Every session report ends with a FOR THE NEXT SESSION section stating
+the model and effort used, the approach taken, alternatives tried and rejected, files touched,
+and open threads; and every brief opens with a READ FIRST list of the repo documents that
+carry its context.

@@ -82,6 +82,7 @@
   // (L2); every other symbol gets the generic gentle breathing pulse. H1/H2
   // get their own overlay-sprite motion (below) in addition to breathing.
   const IDLE_CLASS: Record<string, string> = {
+    H2: 'idle-charge',
     M2: 'idle-sweep',
     M3: 'idle-flicker',
     L3: 'idle-shimmer',
@@ -91,16 +92,17 @@
     return IDLE_CLASS[(symbol ?? '').toUpperCase()] ?? 'idle-breathe'
   }
 
-  // ── Layered sprites — H1 rotating spoke sprite, H2 needle sprite ─────────
+  // ── Layered sprites — H1 rotating spoke sprite ───────────────────────────
+  // (H2 was a gauge with an isolated needle; the H2 reel symbol is now the
+  // Nitro Canister with no separable part, so it renders with no overlay and
+  // gets its idle micro-motion on the base layer like the other symbols.)
   const LAYERED_OVERLAY: Record<string, { base: string; overlay: string }> = {
     H1: { base: 'h1_base', overlay: 'h1_spin' },
-    H2: { base: 'h2_base', overlay: 'h2_needle' },
   }
 
   function overlayClass(symbol: string | undefined): string {
     const key = (symbol ?? '').toUpperCase()
     if (key === 'H1') return 'h1-overlay'
-    if (key === 'H2') return 'h2-overlay'
     return 'overlay-hidden'
   }
 
@@ -352,7 +354,6 @@
           cell?.classList.add('plate-bloom')
           const upperSym = symbol.toUpperCase()
           if (upperSym === 'H1') overlay?.classList.add('win-spin-fast')
-          if (upperSym === 'H2') overlay?.classList.add('win-slam')
           spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol))
         } else {
           img.style.opacity = '0.35'
@@ -368,7 +369,7 @@
           const overlay = overlayRefs[col]?.[row]
           const cell    = cellRefs[col]?.[row]
           if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
-          overlay?.classList.remove('win-spin-fast', 'win-slam')
+          overlay?.classList.remove('win-spin-fast')
           cell?.classList.remove('plate-bloom')
         }
       }
@@ -384,7 +385,7 @@
         const overlay = overlayRefs[col]?.[row]
         const cell    = cellRefs[col]?.[row]
         if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
-        overlay?.classList.remove('win-spin-fast', 'win-slam')
+        overlay?.classList.remove('win-spin-fast')
         cell?.classList.remove('plate-bloom')
       }
     }
@@ -823,27 +824,20 @@
   .idle-flicker { animation: idle-flicker 0.9s steps(2, jump-none) infinite; }
   .idle-shimmer { animation: idle-shimmer 2.2s ease-in-out infinite; }
   .idle-blink   { animation: idle-blink 3s linear infinite; }
+  /* H2 Nitro Canister — crimson charge-glow pulse (Opus elevate, Task 2 idle
+     life): the premium reel symbol reads as "charged" rather than inert. */
+  @keyframes idle-charge {
+    0%, 100% { filter: brightness(1) drop-shadow(0 0 2px rgba(255, 45, 61, 0.35)); }
+    50%      { filter: brightness(1.12) drop-shadow(0 0 9px rgba(255, 45, 61, 0.85)); }
+  }
+  .idle-charge  { animation: idle-charge 2.6s ease-in-out infinite; }
 
   /* H1 — continuous idle rotation (5-fold symmetry loops seamlessly every
-     72deg), spins up fast on wins. H2 — idle needle flicker low, slams to
-     the (baked) redline orientation on wins. */
+     72deg), spins up fast on wins. */
   @keyframes h1-idle-spin { to { transform: rotate(72deg); } }
   @keyframes h1-win-spin  { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
   .symbol-overlay.h1-overlay { animation: h1-idle-spin 4s linear infinite; }
   .symbol-overlay.h1-overlay.win-spin-fast { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
-
-  @keyframes h2-idle-flicker {
-    0%, 100% { transform: rotate(-78deg); }
-    50%      { transform: rotate(-72deg); }
-  }
-  @keyframes h2-win-slam {
-    0%   { transform: rotate(-75deg); }
-    65%  { transform: rotate(12deg); }
-    85%  { transform: rotate(-8deg); }
-    100% { transform: rotate(0deg); }
-  }
-  .symbol-overlay.h2-overlay { transform: rotate(-75deg); animation: h2-idle-flicker 2.4s ease-in-out infinite; }
-  .symbol-overlay.h2-overlay.win-slam { animation: h2-win-slam 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 1 forwards; }
 
   /* ── Win state — brighten, plate bloom, punch scale ──────────────────── */
   @keyframes plate-bloom-pulse {
@@ -878,8 +872,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .idle-breathe, .idle-sweep, .idle-flicker, .idle-shimmer, .idle-blink,
-    .symbol-overlay.h1-overlay, .symbol-overlay.h2-overlay,
+    .idle-breathe, .idle-sweep, .idle-flicker, .idle-shimmer, .idle-blink, .idle-charge,
+    .symbol-overlay.h1-overlay,
     .symbol-img:global(.win-flash), .symbol-cell.plate-bloom {
       animation: none !important;
     }

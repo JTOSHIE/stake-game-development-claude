@@ -4,12 +4,12 @@
   "output_root": "frontend/public/assets/themes/future-spinner",
   "symbols": [
     {"id": "h1",      "src": "H1_master_v2.svg"},
-    {"id": "h2",      "src": "H2_master_v31.svg"},
+    {"id": "h2",      "src": "H2_reel_nitro.svg"},
     {"id": "m1",      "src": "M1_master_v3.svg"},
-    {"id": "m2",      "src": "M2_master_v2.svg"},
+    {"id": "m2",      "src": "M2_reel_coilover.svg"},
     {"id": "m3",      "src": "M3_master_v3.svg"},
     {"id": "l1",      "src": "L1_master.svg"},
-    {"id": "l2",      "src": "L2_master.svg"},
+    {"id": "l2",      "src": "L2_reel_fuse.svg"},
     {"id": "l3",      "src": "L3_master.svg"},
     {"id": "wild",    "src": "W_master.svg"},
     {"id": "scatter", "src": "S_master.svg"}
@@ -43,14 +43,6 @@
       "out_only": "ui/gauge_needle.png",
       "out_base": "ui/gauge_base.png",
       "w": 464, "h": 464
-    },
-    {
-      "_doc": "H2 reel symbol at cell scale (Motion Polish v2): same needle-isolation as the gauge above, rendered at symbol size so the H2 reel symbol idles with its own flickering needle and slams to the redline on wins.",
-      "src": "H2_master_v31.svg",
-      "match_transform": "rotate(62 512 512)",
-      "out_only": "symbols/h2_needle.png",
-      "out_base": "symbols/h2_base.png",
-      "w": 240, "h": 240
     },
     {
       "_doc": "Brand mark inner disc (Motion Polish v2): the five-fold bpair blade cluster (one real <g id=bpair> plus four <use> clones at 72/144/216/288deg) alone on transparency (spin sprite) + the static rim/hub base with those blades removed. Engine rotates brand_mark_spin continuously over brand_mark_base as the loading-screen loader, per DESIGN_SYSTEM's brand-mark law.",

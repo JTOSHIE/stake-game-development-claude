@@ -38,20 +38,20 @@ regenerate every pending brief.
 | ID | Object | Win animation | Master status |
 |----|--------|---------------|---------------|
 | H1 | Spinning Rim | spin up, neon flare | v2 approved (in masters/) |
-| H2 | Boost Gauge (face of Overdrive) | needle slams to redline | v3.1 in masters/ (THE ANCHOR) |
+| H2 | Nitro Canister (crimson #ff2d3d) | charge flash, redline surge | reel: H2_reel_nitro.svg in masters/ |
 | M1 | Steering Wheel | quick spin with glow | v3 in masters/ |
-| M2 | Holographic Grille (EV fascia, neon violet #8a5cff) | LED bar surge, energy panel flare | in masters/ (M2_master_v2.svg) |
+| M2 | Coilover (neon violet #8a5cff) | spring compress and rebound | reel: M2_reel_coilover.svg in masters/ |
 | M3 | Plasma Booster (acid green #5dff3c, flame with cyan shock diamonds) | plasma flame burst, cyan shock diamonds | in masters/ (M3_master_v3.svg) |
 | L1 | Lug Nut | torque spin punch | in masters/ |
-| L2 | Spark Plug | lightning burst | in masters/ |
+| L2 | Blade Fuse (electric blue #9adcff) | filament arc blink | reel: L2_reel_fuse.svg in masters/ |
 | L3 | Piston | rapid pump, exhaust flash | in masters/ |
 | W | Wild hub with machined W | core flare | approved (in masters/) |
 | S | Energy Burst Scatter | rupture burst | approved v2 (in masters/), may iterate in game |
 Idle animations: subtle mechanical motion per object (rotation, needle flicker,
 pulse), breathing scale 1.000 to 1.015, periodic light sweep. Reference motion:
-the H1 idle loops seamlessly over 72 degrees (five fold symmetry); the H2 win is
-an ease out back slam with overshoot and a magenta redline flare. Owner taste
-calibration of speeds is pending against the preview GIFs.
+the H1 idle loops seamlessly over 72 degrees (five fold symmetry); the bonus
+gauge needle (UI) is an ease out back slam with overshoot and a redline flare.
+Owner taste calibration of speeds is pending against the preview GIFs.
 
 ## SCENE, BRAND AND INSTRUMENT MASTERS (non-symbol)
 - Scene group (scene_character_car.svg): the racer plus hover car, the game's
@@ -61,6 +61,12 @@ calibration of speeds is pending against the preview GIFs.
   inner layer spins independently.
 - Instrument plate master (plate_instrument.svg): notched-corner cyberpunk tech
   frame used for the MULTIPLIER and TOTAL WIN plates and any future readouts.
+- Bonus gauge (H2_master_v31.svg): UI-EXCLUSIVE. The Overdrive meter gauge and
+  its isolated needle (HUD bonus instrument column only). No longer a reel
+  symbol; the H2 reel is the Nitro Canister.
+- Feature grille (M2_master_v2.svg): UI-EXCLUSIVE. The Holographic Grille art
+  carrying the FEATURE button (HUD only). No longer a reel symbol; the M2 reel
+  is the Coilover.
 
 ## RETIREMENTS
 - Win pod RETIRED.

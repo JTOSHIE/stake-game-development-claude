@@ -1,0 +1,40 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#9adcff" stop-opacity="0.2"/>
+      <stop offset="60%" stop-color="#9adcff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#9adcff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#c8daea"/>
+      <stop offset="45%" stop-color="#6d8098"/>
+      <stop offset="58%" stop-color="#2e3a4c"/>
+      <stop offset="80%" stop-color="#a9bed4"/>
+      <stop offset="100%" stop-color="#e9f5ff"/>
+    </linearGradient>
+    <linearGradient id="fuseBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#b9e9ff"/>
+      <stop offset="45%" stop-color="#5da8d6"/>
+      <stop offset="100%" stop-color="#2c6a96"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="486" fill="url(#bgGlow)"/>
+  <rect x="446" y="690" width="36" height="180" rx="10" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <rect x="542" y="690" width="36" height="180" rx="10" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <rect x="372" y="252" width="280" height="70" rx="26" fill="#2c6a96" stroke="#0a0e16" stroke-width="6"/>
+  <g stroke="#0a0e16" stroke-width="4" opacity="0.6">
+    <line x1="452" y1="262" x2="452" y2="312"/>
+    <line x1="512" y1="262" x2="512" y2="312"/>
+    <line x1="572" y1="262" x2="572" y2="312"/>
+  </g>
+  <rect x="372" y="316" width="280" height="400" rx="42" fill="url(#fuseBody)" opacity="0.92" stroke="#0a0e16" stroke-width="6"/>
+  <rect x="372" y="316" width="280" height="400" rx="42" fill="none" stroke="#9adcff" stroke-width="18" opacity="0.2"/>
+  <rect x="390" y="332" width="26" height="368" rx="13" fill="#ffffff" opacity="0.5"/>
+  <rect x="416" y="352" width="192" height="322" rx="24" fill="#0c1622" stroke="#0a0e16" stroke-width="5"/>
+  <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="url(#chromeU)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <circle cx="512" cy="500" r="46" fill="#9adcff" opacity="0.22"/>
+  <circle cx="512" cy="500" r="20" fill="#e8f8ff" opacity="0.8"/>
+  <ellipse cx="440" cy="380" rx="34" ry="90" fill="#ffffff" opacity="0.14" transform="rotate(-6 440 380)"/>
+</svg>

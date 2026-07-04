@@ -79,6 +79,19 @@
     if (idx > 0) betAmount.set(activeLevels[idx - 1])
   }
 
+  // MAX bet (v3.3) — highest affordable ladder level, consistent with the
+  // affordability guard the increase arrow already uses.
+  $: maxLevel = (() => {
+    const affordable = activeLevels.filter((l) => l <= $balance)
+    return affordable.length ? affordable[affordable.length - 1] : activeLevels[0]
+  })()
+  $: canSetMax = curIndex > -1 && $betAmount !== maxLevel
+
+  function setMaxBet() {
+    playClick()
+    if ($betAmount !== maxLevel) betAmount.set(maxLevel)
+  }
+
   function startAuto(count: number) {
     playClick()
     autoPlayCount.set(count)
@@ -171,11 +184,21 @@
   <span class="hud-value gold">{betLabel}</span>
 </div>
 
-<!-- Stacked cyan bet arrows — own FIXED column x 916, independent of the BET box -->
+<!-- Stacked cyan bet arrows — own FIXED column x 906 (v3.3), independent of the BET box -->
 <div class="bet-arrows" data-testid="bet-arrows">
   <button class="bet-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">▲</button>
   <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
 </div>
+
+<!-- MAX chip — v3.3: FIXED position beside the arrows, tabular numerals, never
+     repositioned by content; wired to the max-bet ladder logic. -->
+<button
+  class="max-chip"
+  on:click={setMaxBet}
+  disabled={$isSpinning || !canSetMax}
+  aria-label="Max bet"
+  data-testid="max-chip"
+>MAX</button>
 
 <!-- SPIN — v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
      (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
@@ -369,12 +392,12 @@
     width: 100%;
   }
 
-  /* Stacked cyan bet arrows — own FIXED column x 916, independent of BET box */
+  /* Stacked cyan bet arrows — own FIXED column x 906 (v3.3), independent of BET box */
   .bet-arrows {
     position: absolute;
-    left: 916px;
+    left: 906px;
     top: 578px;
-    width: 44px;
+    width: 26px;
     height: 52px;
     z-index: 60;
     display: flex;
@@ -398,6 +421,30 @@
   }
   .bet-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
   .bet-arrow:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); }
+
+  /* MAX chip (v3.3) — fixed beside the arrows, never repositioned by content */
+  .max-chip {
+    position: absolute;
+    left: 936px;
+    top: 591px;
+    width: 24px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 6px;
+    background: rgba(0, 40, 60, 0.55);
+    color: #9fefff;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.46rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    z-index: 60;
+    transition: background 0.15s, filter 0.15s;
+  }
+  .max-chip:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); filter: brightness(1.15); }
+  .max-chip:disabled { opacity: 0.35; cursor: not-allowed; }
 
   /* ── SPIN — v3.2: centre (1004,604) ──────────────────────────────────────── */
   .spin-btn {

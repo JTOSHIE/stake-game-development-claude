@@ -1,0 +1,52 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff2d3d" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#ff2d3d" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ff2d3d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="chromeU" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="22%" stop-color="#c8daea"/>
+      <stop offset="45%" stop-color="#6d8098"/>
+      <stop offset="58%" stop-color="#2e3a4c"/>
+      <stop offset="80%" stop-color="#a9bed4"/>
+      <stop offset="100%" stop-color="#e9f5ff"/>
+    </linearGradient>
+    <linearGradient id="gunmetal" x1="150" y1="150" x2="880" y2="880" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8fa2b8"/>
+      <stop offset="40%" stop-color="#39465c"/>
+      <stop offset="65%" stop-color="#161d2c"/>
+      <stop offset="100%" stop-color="#4a5a72"/>
+    </linearGradient>
+    <linearGradient id="nitroBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff8089"/>
+      <stop offset="30%" stop-color="#e01f2f"/>
+      <stop offset="70%" stop-color="#a4121f"/>
+      <stop offset="100%" stop-color="#6e0a13"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="45%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="486" fill="url(#bgGlow)"/>
+  <ellipse cx="512" cy="530" rx="220" ry="330" fill="#ff2d3d" opacity="0.10"/>
+  <rect x="496" y="112" width="32" height="64" rx="9" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="4"/>
+  <rect x="458" y="124" width="108" height="24" rx="12" fill="url(#gold)" stroke="#0a0e16" stroke-width="4"/>
+  <g stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.8">
+    <line x1="576" y1="122" x2="604" y2="108"/>
+    <line x1="582" y1="140" x2="614" y2="136"/>
+  </g>
+  <rect x="428" y="170" width="168" height="88" rx="34" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <rect x="392" y="240" width="240" height="564" rx="62" fill="url(#nitroBody)" stroke="#0a0e16" stroke-width="6"/>
+  <path d="M 412 262 L 412 780" stroke="#ffb9be" stroke-width="14" opacity="0.55" stroke-linecap="round"/>
+  <rect x="430" y="262" width="24" height="520" rx="12" fill="#ffffff" opacity="0.8"/>
+  <rect x="332" y="468" width="360" height="92" rx="22" fill="url(#gunmetal)" stroke="#0a0e16" stroke-width="5"/>
+  <circle cx="362" cy="514" r="13" fill="url(#gold)" stroke="#0a0e16" stroke-width="3"/>
+  <circle cx="662" cy="514" r="13" fill="url(#gold)" stroke="#0a0e16" stroke-width="3"/>
+  <polygon points="548,300 470,470 522,470 486,640 588,438 530,438" fill="#ffffff" stroke="#7a0d16" stroke-width="5"/>
+  <rect x="398" y="792" width="228" height="46" rx="20" fill="url(#chromeU)" stroke="#0a0e16" stroke-width="5"/>
+  <ellipse cx="452" cy="330" rx="40" ry="90" fill="#ffffff" opacity="0.12" transform="rotate(-8 452 330)"/>
+</svg>
