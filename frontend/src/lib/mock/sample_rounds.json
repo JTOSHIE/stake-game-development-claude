@@ -129096,5 +129096,183 @@
       "baseGameWins": 13.25,
       "freeGameWins": 834.42
     }
+  },
+  {
+    "mode": "base",
+    "category": "multiwild_demo",
+    "round": {
+      "id": 9001,
+      "payoutMultiplier": 150000,
+      "criteria": "multiwild_demo",
+      "baseGameWins": 1500,
+      "freeGameWins": 0,
+      "events": [
+        {
+          "index": 0,
+          "type": "reveal",
+          "board": [
+            [
+              {
+                "name": "L3"
+              },
+              {
+                "name": "H1"
+              },
+              {
+                "name": "L1"
+              },
+              {
+                "name": "L2"
+              },
+              {
+                "name": "L3"
+              },
+              {
+                "name": "L3"
+              }
+            ],
+            [
+              {
+                "name": "L3"
+              },
+              {
+                "name": "W",
+                "wild": true,
+                "multiplier": 5
+              },
+              {
+                "name": "M1"
+              },
+              {
+                "name": "M2"
+              },
+              {
+                "name": "M3"
+              },
+              {
+                "name": "L3"
+              }
+            ],
+            [
+              {
+                "name": "L3"
+              },
+              {
+                "name": "H1"
+              },
+              {
+                "name": "L1"
+              },
+              {
+                "name": "L2"
+              },
+              {
+                "name": "L3"
+              },
+              {
+                "name": "L3"
+              }
+            ],
+            [
+              {
+                "name": "L3"
+              },
+              {
+                "name": "W",
+                "wild": true,
+                "multiplier": 3
+              },
+              {
+                "name": "M1"
+              },
+              {
+                "name": "M2"
+              },
+              {
+                "name": "M3"
+              },
+              {
+                "name": "L3"
+              }
+            ],
+            [
+              {
+                "name": "L3"
+              },
+              {
+                "name": "L3"
+              },
+              {
+                "name": "H2"
+              },
+              {
+                "name": "M1"
+              },
+              {
+                "name": "L1"
+              },
+              {
+                "name": "L3"
+              }
+            ]
+          ],
+          "gameType": "basegame"
+        },
+        {
+          "index": 1,
+          "type": "winInfo",
+          "totalWin": 150000,
+          "wins": [
+            {
+              "symbol": "H1",
+              "kind": 4,
+              "win": 150000,
+              "positions": [
+                {
+                  "reel": 0,
+                  "row": 1
+                },
+                {
+                  "reel": 1,
+                  "row": 1,
+                  "multiplier": 5
+                },
+                {
+                  "reel": 2,
+                  "row": 1
+                },
+                {
+                  "reel": 3,
+                  "row": 1,
+                  "multiplier": 3
+                }
+              ],
+              "meta": {
+                "ways": 15,
+                "globalMult": 1,
+                "winWithoutMult": 150000,
+                "symbolMult": 8
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "type": "setWin",
+          "amount": 150000,
+          "winLevel": "big"
+        },
+        {
+          "index": 3,
+          "type": "setTotalWin",
+          "amount": 150000
+        },
+        {
+          "index": 4,
+          "type": "finalWin",
+          "amount": 150000
+        }
+      ]
+    }
   }
 ]

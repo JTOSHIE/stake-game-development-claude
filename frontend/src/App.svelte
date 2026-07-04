@@ -69,7 +69,8 @@
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
-  import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
+  import { interpretRound, cellMultipliersFromEvents, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
+  import { cellMultipliers } from './lib/stores/cellMultipliers'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
 
@@ -358,6 +359,32 @@
     // idle time (see roundProvider.preloadSamples), not on the first buy.
     if (import.meta.env.DEV) {
       import('./lib/mock/roundProvider').then((m) => m.preloadSamples()).catch(() => {})
+
+      // Dev-only demo hook: drive the multiplier-wilds presentation from a curated
+      // mock round without the RGS. Seats the round's visible board, its win, and
+      // its per-cell wild multipliers so the CellModifier badges (e.g. "x5")
+      // render on the winning wild cells. Used by headless verification.
+      ;(window as unknown as { __demoMultiWild?: () => Promise<void> }).__demoMultiWild = async () => {
+        const { serveCategory } = await import('./lib/mock/roundProvider')
+        const round = await serveCategory('base', 'multiwild_demo')
+        if (!round) return
+        const events = round.events as RawEvent[]
+        const reveal = events.find((e) => e.type === 'reveal') as { board?: Array<Array<{ name: string }>> } | undefined
+        const board = reveal?.board
+        if (board && board[0]) {
+          const pad = Math.max(0, Math.floor((board[0].length - 4) / 2))
+          boardSymbols.set(board.map((col) => col.slice(pad, pad + 4).map((c) => c.name)))
+        }
+        const wi = events.find((e) => e.type === 'winInfo') as { wins?: Array<Record<string, unknown>> } | undefined
+        const bet = get(betAmount)
+        activeWins.set((wi?.wins ?? []).map((w) => ({
+          symbol: String(w.symbol ?? ''),
+          kind: Number(w.kind ?? 0),
+          ways: Number((w.meta as Record<string, unknown> | undefined)?.ways ?? 0),
+          payout: (Number(w.win ?? 0) / 100) * bet,
+        })))
+        cellMultipliers.set(cellMultipliersFromEvents(events))
+      }
     }
   })
 
@@ -412,6 +439,14 @@
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
+      // Multiplier wilds: if the round published raw events (live RGS, or a mock
+      // multiwild round), surface the per-cell wild multipliers as overlay
+      // badges on the winning cells. Rounds without wild multipliers yield an
+      // empty list, so base play is visually unchanged.
+      {
+        const rawEvents = get(lastRoundEvents)
+        cellMultipliers.set(rawEvents ? cellMultipliersFromEvents(rawEvents) : [])
+      }
       if (result.isWincap) {
         // Dwell on the winning hit: the board's win burst is already playing
         // from activeWins, so hold on it (a max win is the one moment to linger)

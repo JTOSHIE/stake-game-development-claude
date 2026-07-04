@@ -263,3 +263,97 @@ export function sumPresentedWins(script: PresentationScript): number {
   for (const s of script.freeSpins) for (const w of s.wins) sum += w.winCentibets
   return sum
 }
+
+// ── Per-cell multiplier wilds (mechanic-agnostic overlay data) ───────────────
+// The multiplier-wilds maths (games/future_spinner_multiwild) evaluates ways with
+// multiplier_strategy="symbol": each Wild cell can carry an assigned multiplier,
+// the winning way's meta.symbolMult is the accumulation of those wild multipliers,
+// and every winning way's `positions` list includes the wild positions. When a
+// wild cell carries a multiplier the SDK serialises it two ways, either of which
+// we accept here:
+//   - on the reveal board cell:  { name: 'W', wild: true, multiplier: N }
+//   - on a winInfo win position:  { reel, row, multiplier: N }
+// (mirrors src/calculations/ways.py, which writes the multiplier onto the wild
+// position dict, and src/events/events.py json_ready_sym, which writes it onto
+// the board cell.)
+//
+// collectCellMultipliers derives, for one round, the list of cells that carry a
+// wild multiplier as VISIBLE-grid coordinates (reel 0..4, row 0..3) so the
+// presentation can drop a per-cell badge straight onto GameGrid. Reveal boards
+// may include padding rows; the top-padding offset is inferred from the board
+// height and stripped so the returned rows are always 0-based visible rows.
+
+export interface CellMultiplier {
+  reel: number
+  row: number
+  value: number // the wild multiplier on that cell (only values > 1 are surfaced)
+}
+
+const VISIBLE_ROWS = 4
+
+/** Top padding rows on a reveal board given its total row count (visible = 4). */
+function topPadding(rowCount: number): number {
+  return Math.max(0, Math.floor((rowCount - VISIBLE_ROWS) / 2))
+}
+
+/**
+ * Collect the per-cell wild multipliers for a round, in visible-grid coordinates.
+ * Deduplicates by cell (a cell that appears in several winning ways is emitted
+ * once, keeping the largest multiplier seen). Only multipliers > 1 are surfaced,
+ * since a plain wild (multiplier 1) carries no badge-worthy value.
+ */
+export function collectCellMultipliers(round: BookRound): CellMultiplier[] {
+  const events = round.events ?? []
+
+  // Infer the top-padding offset from the first reveal board so win positions
+  // (which use the padded row index) map back to visible rows 0..3.
+  let pad = 0
+  for (const ev of events) {
+    if (ev.type === 'reveal') {
+      const board = ev.board as Array<unknown[]> | undefined
+      if (board && Array.isArray(board[0])) pad = topPadding(board[0].length)
+      break
+    }
+  }
+
+  const byCell = new Map<string, number>()
+  const add = (reelRaw: unknown, rowRaw: unknown, multRaw: unknown, padded: boolean): void => {
+    const value = Number(multRaw)
+    if (!Number.isFinite(value) || value <= 1) return
+    const reel = Number(reelRaw)
+    const row = Number(rowRaw) - (padded ? pad : 0)
+    if (!Number.isInteger(reel) || !Number.isInteger(row)) return
+    if (row < 0 || row >= VISIBLE_ROWS) return
+    const key = `${reel},${row}`
+    byCell.set(key, Math.max(byCell.get(key) ?? 0, value))
+  }
+
+  for (const ev of events) {
+    if (ev.type === 'winInfo') {
+      const wins = (ev.wins as Array<Record<string, unknown>>) ?? []
+      for (const w of wins) {
+        const positions = (w.positions as Array<Record<string, unknown>>) ?? []
+        for (const p of positions) add(p.reel, p.row, p.multiplier, true)
+      }
+    } else if (ev.type === 'reveal') {
+      const board = (ev.board as Array<Array<Record<string, unknown>>>) ?? []
+      for (let reel = 0; reel < board.length; reel++) {
+        const col = board[reel] ?? []
+        for (let row = 0; row < col.length; row++) {
+          const cell = col[row]
+          if (cell && (cell.wild || cell.name === 'W')) add(reel, row, cell.multiplier, true)
+        }
+      }
+    }
+  }
+
+  return [...byCell.entries()].map(([key, value]) => {
+    const [reel, row] = key.split(',').map(Number)
+    return { reel, row, value }
+  })
+}
+
+/** collectCellMultipliers over a bare event list (live spin / replay path). */
+export function cellMultipliersFromEvents(events: RawEvent[]): CellMultiplier[] {
+  return collectCellMultipliers({ id: 0, payoutMultiplier: 0, events })
+}

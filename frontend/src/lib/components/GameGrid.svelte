@@ -29,6 +29,8 @@
   import { get } from 'svelte/store'
   import { Application, Graphics } from 'pixi.js'
   import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
+  import CellModifier from './CellModifier.svelte'
+  import { cellMultipliers } from '../stores/cellMultipliers'
   import { speedTier } from '../stores/speedMode'
   import { reelMode } from '../stores/reelMode'
   import { assetLoadProgress } from '../stores/loadingStore'
@@ -790,6 +792,7 @@
     winHighlightLayer?.clear()
     _resetToIdle()
     _clearAnticipation()
+    cellMultipliers.set([]) // clear last round's per-cell wild badges on a new spin
     slamRequested = false
     isSpinning.set(true)
     playSpinStart()
@@ -932,6 +935,19 @@
 
   <!-- PixiJS canvas — transparent overlay for win lines, particles and borders -->
   <div bind:this={pixiContainer} class="pixi-overlay"></div>
+
+  <!-- Per-cell modifier overlay — mechanic-agnostic badges (multiplier wilds,
+       prizes, upgrades). Publishes the board's cell geometry as CSS variables so
+       each CellModifier positions itself by (reel, row); populated from the
+       cellMultipliers store during the win step and cleared on the next spin. -->
+  <div
+    class="cell-mod-overlay"
+    style="--cell-w:{CELL_W}px; --cell-h:{CELL_H}px; --grid-gap:{GAP}px;"
+  >
+    {#each $cellMultipliers as cm (cm.reel + ',' + cm.row)}
+      <CellModifier kind="mult" value={cm.value} reel={cm.reel} row={cm.row} />
+    {/each}
+  </div>
 </div>
 
 <style>
@@ -1197,6 +1213,16 @@
     z-index: 2;
   }
   .pixi-overlay :global(canvas) { display: block; }
+
+  /* Per-cell modifier overlay — sits above the tiles and the pixi win lines, its
+     origin aligned to the symbol grid (reel 0, row 0) so CellModifier's
+     cell-index positioning lands on the matching cell. */
+  .cell-mod-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .symbol-img, .symbol-overlay, .symbol-fx,
