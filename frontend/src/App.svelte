@@ -58,8 +58,10 @@
   import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import AnteToggle from './lib/components/AnteToggle.svelte'
+  import ModeLibrary from './lib/components/ModeLibrary.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
-  import { selectedBetMode, anteEnabled, ANTE_COST } from './lib/stores/betMode'
+  import { selectedBetMode, standingMode, MODE_COST } from './lib/stores/betMode'
+  import type { BuyMode } from './lib/stores/betMode'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
@@ -225,15 +227,17 @@
     if (r) r()
   }
 
-  // ── Bonus Buy: place a bonus-mode spin and present the guaranteed feature ──
-  async function handleBuy(): Promise<void> {
+  // ── Bonus Buy: place a buy-mode spin and present the guaranteed feature ──
+  // buyMode selects the tier (minibuy/bonus/superbuy/megabuy/hyperbuy); the server
+  // applies its cost. Mock/dev serves the standard 'bonus' sample rounds for any tier.
+  async function handleBuy(buyMode: BuyMode = 'bonus'): Promise<void> {
     if ($isSpinning || featureActive) return
     isSpinning.set(true)
     resetWin()
     const bet = $betAmount
-    const cost = bet * 100
+    const cost = bet * MODE_COST[buyMode]
     try {
-      selectedBetMode.set('bonus')
+      selectedBetMode.set(buyMode)
       lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh bonus round
       const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
 
@@ -275,8 +279,8 @@
     } catch (err) {
       console.error('[Buy error]', err)
     } finally {
-      // Restore the standing mode (ante if the toggle is on, else base).
-      selectedBetMode.set(get(anteEnabled) ? 'ante' : 'base')
+      // Restore the standing mode for subsequent normal spins.
+      selectedBetMode.set(get(standingMode))
       isSpinning.set(false)
     }
   }
@@ -357,20 +361,20 @@
   async function handleSpin() {
     if ($isSpinning || featureActive) return
     const bet  = $betAmount
-    // Ante / Double-Chance: standing mode for normal spins. Costs 1.5x (server
-    // applies the mode cost); guard affordability of the 1.5x debit here since
-    // the locked canSpin guard only checks the 1x base bet.
-    const ante = get(anteEnabled)
-    const cost = ante ? bet * ANTE_COST : bet
-    if (ante && get(balance) < cost) return
+    // Standing mode for normal spins (base/cruise/antelite/ante/volatile/superante).
+    // The server applies the mode cost; guard affordability of any >1x debit here
+    // since the locked canSpin guard only checks the 1x base bet.
+    const mode = get(standingMode)
+    const cost = bet * MODE_COST[mode]
+    if (cost > bet && get(balance) < cost) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
-    selectedBetMode.set(ante ? 'ante' : 'base')
+    selectedBetMode.set(mode)
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
     try {
-      // SpinRequest.mode stays 'base' (locked type); the server reads the ante
-      // mode from selectedBetMode set above. Base/bonus behaviour unchanged.
+      // SpinRequest.mode stays 'base' (locked type); the server reads the actual
+      // mode from selectedBetMode set above. Base behaviour unchanged.
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
 
       if (gridRef) await gridRef.animateSpin(result.board)
@@ -660,7 +664,7 @@
   <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
        replaced by FeatureButton above (showTrigger=false). Hidden entirely
        where the jurisdiction disables feature buys (handled inside). -->
-  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={handleBuy} />
+  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={() => handleBuy('bonus')} />
 
   <!-- Ante / Double-Chance toggle — standing bet-mode switch for normal spins.
        Hidden during the feature (no bet changes mid-feature). -->
@@ -668,6 +672,11 @@
     <div class="ante-mount">
       <AnteToggle />
     </div>
+  {/if}
+
+  <!-- Mode Library — DEV-only panel to play/test every template mode. -->
+  {#if import.meta.env.DEV && !featureActive}
+    <ModeLibrary on:buy={(e) => handleBuy(e.detail)} />
   {/if}
 
   <!-- Theme selector — dev-only. Hidden in the production submission build so

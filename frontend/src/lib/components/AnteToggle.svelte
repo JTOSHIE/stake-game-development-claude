@@ -4,7 +4,7 @@
   // rate (server applies the mode cost). Not a buy: the reels still spin
   // normally. Cyan treatment distinguishes it from the magenta Bonus Buy.
   // Temporary CSS treatment (final art in AssetForge v2). Strings localised.
-  import { anteEnabled, ANTE_COST } from '../stores/betMode'
+  import { anteEnabled, ANTE_COST, toggleAnte } from '../stores/betMode'
   import { betAmount, currencyCode, isSpinning, locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
@@ -16,7 +16,7 @@
 
   function toggle() {
     if ($isSpinning) return
-    anteEnabled.update((v) => !v)
+    toggleAnte()
   }
 </script>
 
