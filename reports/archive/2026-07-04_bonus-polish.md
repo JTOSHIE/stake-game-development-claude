@@ -43,6 +43,18 @@ copies are removed; only the retrigger notice remains there. TOTAL WIN and
 MULTIPLIER stay in the instrument column where they already lived, and the board
 now sits centred with no text pushing it up. Nothing was moved.
 
+## 5. Reels enlarged again + scene comes alive
+
+With the duplicate text gone, the free-spins cells go 58px to 72px (gap 8->10) so
+the board fills the frame far better (the black area to the bottom/left is taken
+up), still short of the base reels and clear of the Overdrive box.
+
+SceneGroup (the cyber driver + hover car, a single baked PNG - the master has no
+separable parts) gains more life via layered CSS effects: a slow HOVER BOB on the
+whole rig, a stronger counter-phase cyan underglow at the hover pads, a magenta
+pulse travelling the car's neon side lines, and an orange antenna-light blink;
+the booster flicker and visor glint are kept. All respect prefers-reduced-motion.
+
 ## Verification
 
 - `npm run build` clean; `svelte-check` 0 errors in the three files.

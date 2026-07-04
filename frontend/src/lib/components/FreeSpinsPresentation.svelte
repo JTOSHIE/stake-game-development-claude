@@ -303,12 +303,12 @@
   }
   .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
   .fs-meter-slot { position: absolute; top: 12px; right: 12px; }
-  .fs-board { display: flex; gap: 8px; }
-  .fs-reel { display: flex; flex-direction: column; gap: 8px; }
+  .fs-board { display: flex; gap: 10px; }
+  .fs-reel { display: flex; flex-direction: column; gap: 10px; }
   .fs-cell {
-    width: 58px; height: 58px; display: flex; align-items: center; justify-content: center;
-    border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
-    font-size: 1rem; font-weight: 700; color: #cfe;
+    width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+    font-size: 1.1rem; font-weight: 700; color: #cfe;
   }
   .fs-cell img { width: 92%; height: 92%; object-fit: contain; display: block; }
   .fs-cell.scatter { border-color: var(--theme-secondary, #ff2ec4); box-shadow: 0 0 10px var(--theme-secondary, #ff2ec4); }
