@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # mode band). NOTE: the shipped ante package was generated on its own to keep
     # the already-verified base/bonus books + replay event IDs byte-identical; a
     # full from-scratch run of all three here reproduces a consistent bundle.
-    target_modes = ["base", "ante", "bonus"]
+    target_modes = ["base", "cruise", "ante", "bonus"]
 
     if PRODUCTION:
         num_threads = 10
@@ -46,6 +46,7 @@ if __name__ == "__main__":
         compression = True
         num_sim_args = {
             "base":  100_000,
+            "cruise": 100_000,
             "ante":  100_000,
             "bonus": 100_000,
         }
@@ -61,6 +62,7 @@ if __name__ == "__main__":
         compression = False
         num_sim_args = {
             "base":  100,
+            "cruise": 100,
             "ante":  100,
             "bonus": 100,
         }

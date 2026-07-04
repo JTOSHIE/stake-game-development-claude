@@ -27,6 +27,7 @@ STATED = {
     "rtp": 0.963500,           # all modes, 4dp
     "base_hit_rate": 0.2911,
     "base_std": 17.28,         # weighted SD in bet-multiples
+    "cruise_std": 11.10,       # cruise / low-vol (cost 1.0x) weighted SD
     "ante_std": 23.26,         # ante (cost 1.5x) weighted SD
     "bonus_std": 206.63,
     "max_win": 5000.0,
@@ -169,6 +170,8 @@ def main() -> int:
     print("\n--- cross-check vs stated facts (warn on mismatch) ---")
     checks = [
         ("base RTP == 96.35%", near(br["rtp"], STATED["rtp"], 1e-4)),
+        ("cruise RTP == 96.35%", near(results["cruise"]["rtp"], STATED["rtp"], 1e-4)),
+        ("cruise SD == 11.10x (low-vol < base)", near(results["cruise"]["std"], STATED["cruise_std"], 0.05) and results["cruise"]["std"] < br["std"]),
         ("ante RTP == 96.35%", near(results["ante"]["rtp"], STATED["rtp"], 1e-4)),
         ("bonus RTP == 96.35%", near(results["bonus"]["rtp"], STATED["rtp"], 1e-4)),
         ("ante SD == 23.26x", near(results["ante"]["std"], STATED["ante_std"], 0.03)),

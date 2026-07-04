@@ -79,6 +79,51 @@ class OptimizationSetup:
                     bias_weights=[0.4],
                 ).return_dict(),
             },
+            "cruise": {
+                # Low-volatility (cost 1.0x, same 96.35% RTP as base): most of the
+                # return sits in a frequent base-ways fence (hr 2.3 ~ 43% hit rate),
+                # the feature is rarer (hr 260) and the 5,000x tail is thinner
+                # (wincap rtp 0.02 vs base 0.05). Small-win dresses + a low
+                # mean-to-median band tighten the distribution. Fences sum to 0.9635.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.02, av_win=wincaps["cruise"], search_conditions=wincaps["cruise"]
+                    ).return_dict(),
+                    "0": ConstructConditions(
+                        rtp=0.0, av_win=0, search_conditions=0
+                    ).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.18, hr=260, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.7635, hr=2.3).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 1.4,
+                         "win_range": (0.5, 3), "probability": 1.0},
+                        {"criteria": "basegame", "scale_factor": 1.2,
+                         "win_range": (3, 8), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 0.7,
+                         "win_range": (200, 4000), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000,
+                    num_per_fence=10000,
+                    min_m2m=2,
+                    max_m2m=4,
+                    pmb_rtp=1.0,
+                    sim_trials=5000,
+                    test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3],
+                    score_type="rtp",
+                ).return_dict(),
+                "distribution_bias": ConstructFenceBias(
+                    applied_criteria=["basegame"],
+                    bias_ranges=[(0.5, 3.0)],
+                    bias_weights=[0.5],
+                ).return_dict(),
+            },
             "ante": {
                 # Double-Chance (cost 1.5x): identical free-spin outcome to base
                 # (av_win = 0.76 x 92.5 = 70.3, same as base 0.38 x 185) but at

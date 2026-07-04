@@ -7,6 +7,12 @@
             "weights": "lookUpTable_base_0.csv"
         },
         {
+            "name": "cruise",
+            "cost": 1.0,
+            "events": "books_cruise.jsonl.zst",
+            "weights": "lookUpTable_cruise_0.csv"
+        },
+        {
             "name": "ante",
             "cost": 1.5,
             "events": "books_ante.jsonl.zst",

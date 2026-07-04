@@ -314,6 +314,44 @@ class GameConfig(Config):
                     ),
                 ],
             ),
+            # CRUISE / LOW-VOLATILITY MODE (cost 1.0x) ------------------------
+            # Same price and RTP as base, but a smoother ride: more frequent base
+            # ways wins, a rarer feature and a thinner 5,000x tail. Same reels and
+            # feature; only the quota mix + optimiser fences differ (low mean-to-
+            # median, small-win dresses). A "casual" play style at 96.35% RTP.
+            BetMode(
+                name="cruise",
+                cost=1.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.001,
+                        win_criteria=float(_maxwin),
+                        conditions=wincap_condition,
+                    ),
+                    Distribution(
+                        criteria="freegame",
+                        quota=0.06,
+                        conditions=freegame_base_condition,
+                    ),
+                    Distribution(
+                        criteria="0",
+                        quota=0.30,
+                        win_criteria=0.0,
+                        conditions=zerowin_condition,
+                    ),
+                    Distribution(
+                        criteria="basegame",
+                        quota=0.639,
+                        conditions=basegame_condition,
+                    ),
+                ],
+            ),
             # ANTE / DOUBLE-CHANCE MODE (cost 1.5x) ---------------------------
             # Same reels and feature as base; ~2x the trigger rate. Not a buy:
             # the reels still spin normally, the feature is just twice as likely.

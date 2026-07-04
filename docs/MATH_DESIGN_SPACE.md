@@ -80,10 +80,20 @@ RTP by 1 to 2 points) which would breach our 0.5% rule.
 |---|---|---|---|---|---|
 | **base** | 1.0x | Med-High (SD 17.3x) | Standard play; feature ~1 in 185 | BUILT | universal |
 | **ante / Double-Chance** | 1.5x | High (SD 23.3x) | ~2x trigger (1 in 92); reels spin normally | BUILT | Pragmatic ante +25%, NLC xBet +25%, Push Bet; +50% matches Pragmatic Super Scatter mid ante |
-| **low-vol / "Cruise"** | 1.0x | Low (target SD ~8-10x) | Same RTP, more frequent smaller wins, rarer feature | OPTION | white space: rare in-market (Evoplay difficulty modes); a genuine differentiator |
-| **mini / hunt buy** | ~20-40x | High | Cheap guaranteed feature entry (hunters), weighted to minimum trigger | OPTION | Hacksaw BonusHunt 3x, ELK Bonus Hunt 3x, The Count 3x |
+| **low-vol / "Cruise"** | 1.0x | Low (SD 11.1x, hit 43.9%) | Same RTP, more frequent smaller wins, rarer feature | BUILT | white space: rare in-market (Evoplay difficulty modes); a genuine differentiator |
+| **mini / hunt buy** | see finding | High | Cheap guaranteed feature entry | NOT A CLEAN FIT (see below) | Hacksaw BonusHunt 3x, ELK Bonus Hunt 3x |
 | **standard buy** | 100x | High (SD 206x) | Guaranteed feature entry | BUILT (bonus) | the single most common buy price; real Stake titles (Madame Mystique, Cursed Seas T1) |
 | **super buy** | ~300-500x | Very High | Enhanced entry (guaranteed 4-5 scatters or higher starting Overdrive meter) | OPTION | ELK Super Bonus 500x, Pragmatic Super FS 500x, Hacksaw Epic/Super Core |
+
+**Mini-buy finding (measured 2026-07-05):** our Overdrive feature is rich. Even the minimum
+3-scatter (8 free spins) entry has a natural median of ~80x and a mean well above 100x (the tail
+runs to the 5,000x cap). The 100x standard buy is therefore ALREADY at the cheap end for this
+feature (the optimiser already suppresses the natural richness to hit 96.35% at 100x). A cheaper
+"mini/hunt buy" (25x, or even 60x) would hit 96.35% RTP only by systematically nerfing the
+feature below a natural trigger, which is a poor product. For this feature the room is UPWARD
+(a super buy at a richer entry), not downward. A genuine cheap hunt buy would require a separate
+WEAKER mini-feature (fewer free spins) = game code, not config. Conclusion: the mini buy was not
+shipped; the buy ladder should grow up (super buy) rather than down.
 
 Key design facts from the market scan:
 - **Ante and buys do NOT stack** (mechanically meaningless; unseen in market). They are
