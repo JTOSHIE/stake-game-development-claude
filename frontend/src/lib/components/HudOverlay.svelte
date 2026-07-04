@@ -16,6 +16,7 @@
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
+  import { autoplayLimits, rgJurisdiction } from '../stores/responsibleGambling'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
@@ -33,6 +34,10 @@
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
   let showAutoMenu = false
+  // Responsible-gambling autoplay stop-conditions (see stores/responsibleGambling).
+  let stopOnWin = false
+  let stopOnFeature = true
+  let lossLimitOn = false
   let showMenu = false
 
   // ── Bet ladder — ported from the retired ControlBar unchanged ────────────
@@ -96,6 +101,13 @@
 
   function startAuto(count: number) {
     playClick()
+    autoplayLimits.set({
+      count,
+      stopOnAnyWin: stopOnWin,
+      singleWinLimitMult: 0,
+      stopOnFeature,
+      lossLimitMicros: lossLimitOn ? Math.round($betAmount * count * CURRENCY_SCALE) : 0,
+    })
     autoPlayCount.set(count)
     isAutoPlay.set(true)
     showAutoMenu = false
@@ -218,7 +230,9 @@
   <span class="spin-text">{$tr('spin')}</span>
 </button>
 
-<!-- AUTOPLAY — v3.2: centre (936,672), 48 -->
+<!-- AUTOPLAY — v3.2: centre (936,672), 48. Hidden where the jurisdiction bans
+     autoplay (UKGC, enforced May 2026). -->
+{#if !$rgJurisdiction.autoplayDisabled}
 <div class="autoplay-wrapper">
   <button
     class="autoplay-btn"
@@ -235,12 +249,17 @@
   </button>
   {#if showAutoMenu}
     <div class="auto-menu" role="menu">
+      <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+      <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
+      <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+      <div class="auto-menu-sep">Spins</div>
       {#each AUTO_OPTIONS as n}
         <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
       {/each}
     </div>
   {/if}
 </div>
+{/if}
 
 <style>
   /* Numeric HUD values never reflow as digits grow. */
@@ -568,4 +587,13 @@
     text-align: center;
   }
   .auto-menu-item:hover { background: rgba(255, 200, 50, 0.15); }
+  .auto-menu-toggle {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0.28rem 0.7rem; font-size: 0.64rem; color: #cde; cursor: pointer; white-space: nowrap;
+  }
+  .auto-menu-toggle input { accent-color: #00ffff; }
+  .auto-menu-sep {
+    padding: 0.28rem 0.7rem 0.1rem; font-size: 0.54rem; letter-spacing: 0.06em;
+    color: rgba(205,222,238,0.55); border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2px;
+  }
 </style>

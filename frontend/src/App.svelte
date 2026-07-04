@@ -59,6 +59,7 @@
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import ModeSelector from './lib/components/ModeSelector.svelte'
   import ModeLibrary from './lib/components/ModeLibrary.svelte'
+  import SessionPanel from './lib/components/SessionPanel.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, MODE_COST } from './lib/stores/betMode'
   import type { BuyMode } from './lib/stores/betMode'
@@ -720,6 +721,10 @@
   {#if import.meta.env.DEV && !featureActive}
     <ModeLibrary on:buy={(e) => handleBuy(e.detail)} />
   {/if}
+
+  <!-- Responsible-gambling session panel — shown where the jurisdiction enables
+       RG (plus dev, for testing). Not rendered in replay mode. -->
+  <SessionPanel devForce={import.meta.env.DEV} />
 
   <!-- Theme selector — dev-only. Hidden in the production submission build so
        only the validated Future Spinner experience ships (see the scope note
