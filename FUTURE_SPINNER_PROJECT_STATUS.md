@@ -1,4 +1,40 @@
 # FUTURE SPINNER — PROJECT STATUS
+## Last updated: 2026-07-04 | Docs reconciled to current two-mode reality
+
+## CURRENT STATE (authoritative, reconciled 2026-07-04)
+
+This block is the single source of truth. Where older sections below disagree (notably
+the "CANONICAL BASE-ONLY MATH PACKAGE" section, now SUPERSEDED), this block wins.
+
+- **Bet modes: TWO.** base (cost 1.0x) and bonus buy (cost 100.0x). The game ships WITH a
+  real feature (Overdrive Free Spins, progressive multiplier) per the owner's Option C.
+  Both `lookUpTable_base_0.csv` and `lookUpTable_bonus_0.csv` exist in the shipped bundle.
+  (Any earlier "single mode / bonus removed" note is obsolete.)
+- **Maths: independently VERIFIED correct + compliant (2026-07-04).** Recomputed from the
+  shipped lookup tables by `scripts/validate_math.py` (gated in CI via
+  `.github/workflows/validate-math.yml`): RTP 96.350000% both modes (cross-mode variation
+  0.0000%), base hit rate 29.11%, SD 17.28x base / 206.63x bonus, max win 5,000x, wincap
+  odds 1 in 100,000 (base) / 1 in 1,000 (bonus), 100,000 sims/mode; bonus buy has no
+  zero-payout outcome. All Stake compliance checks pass. See `MATH_VALIDATION.md`.
+- **Frontend: feature-complete and polished.** Reel Feel v3 (travelling tile-strip engine,
+  drop mode, symbol life, charge states), bonus + HUD redesign (framed neon plates/boxes),
+  free-spins win-connection story, max-win dwell, scene animations (hover-pad turbines).
+  Build + svelte-check clean.
+- **RGS integration: verified aligned** with the platform wire contract
+  (`docs/RGS_CONTRACT_REFERENCE.md`) - same endpoints, integer micro-units, payout credited
+  at end-round. Currently mock mode; real-endpoint test pending a staging deploy.
+- **Bet Replay: implemented and mandatory-compliant.** Real representative event IDs derived
+  per mode in `REPLAY_TEST_EVENTS.md` (verify the +1 sim-id/event-id offset on staging).
+- **Compliance:** stateless, original in-house IP, no Stake branding, no underage appeal,
+  fonts self-hosted, social/jurisdiction handled. Live docs mirrored + watched
+  (`docs/stake-engine-live/`, `COMPLIANCE_WATCH.md`; last refresh 2026-07-04, no changes).
+- **Outstanding** (pre-deploy work done; these need a deploy or the owner): verify replay
+  event IDs + real-RGS test on staging, upload bundle to the portal, IP/trademark clearance,
+  public high-res asset link, submission-blurb v2 re-approval, fill STAKE_TEAM/game-slug in
+  `.github/workflows/publish-stake-engine.yml`.
+
+---
+
 ## Last updated: 2026-07-04 | Motion Polish v2: reel feel, symbol life, celebrations, Overdrive transition, brand screens
 
 ## MOTION POLISH V2: REEL FEEL, SYMBOL LIFE, CELEBRATIONS, OVERDRIVE TRANSITION, BRAND SCREENS (2026-07-04)
@@ -269,7 +305,13 @@ UI asset sources:
 - ✅ Win line colour uses theme primary palette colour
 - ✅ Frame inset -80px (consistent across all themes)
 
-## CANONICAL BASE-ONLY MATH PACKAGE — 2026-07-03
+## CANONICAL BASE-ONLY MATH PACKAGE — 2026-07-03  [SUPERSEDED]
+
+> SUPERSEDED by the two-mode Option C decision. This section describes an intermediate
+> base-only state that is NOT what ships: the game ships TWO modes (base + bonus buy) and
+> `lookUpTable_bonus_0.csv` exists in the current bundle (validated 2026-07-04). Kept for
+> history only; see the CURRENT STATE block at the top.
+
 - ✅ Unshipped bonus (buy-bonus) BetMode removed from `game_config.py` and `run.py`;
   base-mode paytable, reel strips, scatter table, wincap and distributions untouched
   (verified byte-diff: only bonus-specific content removed)
@@ -340,17 +382,20 @@ Production build passing, 0 TypeScript errors.
 - ✅ No underage appeal
 - ✅ Fonts self-hosted via @fontsource/orbitron — zero external font requests (XSS compliant) — 2026-05-10
 - ✅ Bet Replay implemented (mandatory) — replayService.ts + ReplayMode.svelte — 2026-04-12
-- ✅ Single bet mode only (base, cost 1.0×) — unshipped bonus mode removed from maths
-  source and publish files — 2026-07-03
-- ⏳ Replay event IDs pending (capture from staging, populate REPLAY_TEST_EVENTS.md)
-- ⏳ IP/trademark review pending
-- ⏳ Real RGS endpoint test pending
-- ⏳ Google Drive artwork upload pending
+- ✅ TWO bet modes: base (cost 1.0×) + bonus buy (cost 100.0×), Overdrive Free Spins feature
+  (Option C). Both modes 96.3500% RTP. (Corrects an earlier obsolete "single mode only" note.)
+- ✅ Maths independently verified correct + compliant — `scripts/validate_math.py`, gated in
+  CI; all Stake checks pass; every stated figure confirmed to the dp — 2026-07-04
+- ✅ Replay event IDs derived per mode from the shipped lookup tables (REPLAY_TEST_EVENTS.md);
+  verify the +1 offset on staging — 2026-07-04
+- ⏳ IP/trademark review pending (owner)
+- ⏳ Real RGS endpoint test pending (needs staging deploy; currently mock mode)
+- ⏳ Public high-res asset link pending (owner: Google Drive/Dropbox)
 
 ## COMPONENT STATUS
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Math SDK | ✅ LOCKED | 96.35% RTP both modes, 100k sim/mode, Overdrive Free Spins base+bonus (2026-07-03) |
+| Math SDK | ✅ LOCKED + VERIFIED | 96.35% RTP both modes, 100k sim/mode, Overdrive Free Spins base+bonus; independently re-validated + CI-gated (scripts/validate_math.py) 2026-07-04 |
 | rgsService.ts | ✅ LOCKED | Mock mode |
 | gameStore.ts | ✅ LOCKED | |
 | GameGrid.svelte | ✅ Complete | All symbols, WILD dark mask, blur tumble |
@@ -370,22 +415,34 @@ Production build passing, 0 TypeScript errors.
 | PAR Sheet | ✅ Complete | games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md (canonical, matches uploaded bundle exactly) |
 | Submission package | ✅ Complete | Checklist + blurb |
 
-## OUTSTANDING (manual steps only)
-Math/PAR package is canonical and complete; no reviewer notes required on that front.
-Submission is pending the design elevation pass plus these manual steps:
-1. Capture replay event IDs from staging deployment — populate REPLAY_TEST_EVENTS.md
-2. Upload artwork folder to Google Drive/Dropbox — public link
-3. Upload ~/Desktop/FutureSpinner_SubmissionBundle/ (math + dist, hash-verified) to the Stake Engine portal
-4. IP/trademark review — "Future Spinner" / "We Roll Spinners"
-5. Test against real RGS endpoint (currently mock mode)
-6. Optional: PDF PAR sheet (brew install --cask basictex)
-7. Decide whether to clean up or delete the stale submission-package/ legacy directory
+## OUTSTANDING
+Math/PAR package is canonical, two-mode, and independently verified (see CURRENT STATE); the
+frontend is feature-complete and polished. Remaining items, split by what they need:
+
+**Needs a staging deploy / live access (the "not there yet" bucket):**
+1. Verify the derived replay event IDs on staging (the +1 sim-id/event-id offset), then upload
+   the bundle to the Stake Engine portal.
+2. Test against the real RGS endpoint (currently mock mode).
+
+**Owner actions:**
+3. IP/trademark review — "Future Spinner" / "We Roll Spinners".
+4. Public high-res asset link (Google Drive/Dropbox).
+5. Re-approve submission blurb v2; fill STAKE_TEAM + game-slug in the publish workflow.
+
+**Can do now (pre-deploy, no live access):**
+6. Retire the now-unused `instrument_plate_1x.png` from the asset manifest.
+7. Decide whether to clean up or delete the stale `submission-package/` legacy directory
+   (still carries old 5x/15x/50x scatter claims).
+8. Optional: PDF PAR sheet; a LAYOUT_SPEC amendment for the latest visual changes.
 
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
+| Docs reconcile | 2026-07-04 | Reconciled this status doc + SUBMISSION_DOSSIER to the current TWO-MODE reality (the "base-only" section is stale and now marked SUPERSEDED; PAR + game_metadata were already correctly two-mode). Fixed the self-contradicting compliance block. |
+| Tooling + math validation | 2026-07-04 | Reviewed community tools (StakeCLI, stake-dev-tool, LUT analyzer); independently VERIFIED the maths from the shipped lookup tables (all Stake checks pass, every figure to the dp) via scripts/validate_math.py + CI gate; captured the RGS wire contract (docs/RGS_CONTRACT_REFERENCE.md, our impl aligned); derived real replay event IDs; safe publish workflow; refreshed live docs (no change) |
+| Feature presentation + bonus/HUD polish | 2026-07-04 | Reel Feel v3, symbol life, charge states; framed neon HUD/instrument plates; bigger bonus reels; free-spins win-connection story; max-win dwell; scene hover-pad turbines |
 | Overdrive Free Spins (two-mode) | 2026-07-03 | Option C: built the free-spins feature with progressive Overdrive multiplier + 100x bonus buy; rewrote game_config/gamestate/game_calculation/run + game_optimization + FR0/FRWCAP reels; both modes converge to 96.3500%; all verification gates passed; two-mode PAR sheet; bundle + manifest rebuilt |
-| Canonical base-only package | 2026-07-03 | Removed unshipped bonus BetMode from game_config.py/run.py; ran canonical publish pipeline; all verification gates passed (payout identity, exact RTP, books match); PAR sheet regenerated with recomputed weight-dependent figures + single mode declaration; PROMO_BLURB.md/SUBMISSION_CHECKLIST.md corrected; Desktop submission bundle rebuilt with SHA-256 manifest |
+| Canonical base-only package [SUPERSEDED by two-mode] | 2026-07-03 | Removed unshipped bonus BetMode from game_config.py/run.py; ran canonical publish pipeline; all verification gates passed (payout identity, exact RTP, books match); PAR sheet regenerated with recomputed weight-dependent figures + single mode declaration; PROMO_BLURB.md/SUBMISSION_CHECKLIST.md corrected; Desktop submission bundle rebuilt with SHA-256 manifest. NOTE: this base-only state does NOT ship - the game ships two modes (see CURRENT STATE at top). |
 | Bet Replay | 2026-04-12 | replayService.ts + replayStore.ts + ReplayMode.svelte; App.svelte branches on ?replay=true; CLAUDE.md + REPLAY_TEST_EVENTS.md |
 | Compliance + frame + audio | 2026-04-11 | Frame inset symmetric, playWin epic→50×+echo, small win softer, status updated |
 | Definitive theme overhaul R2 | 2026-04-05 | All 4 themes assets reinstalled exact source filenames, integrity audit 0 failures, TSC+build clean |
