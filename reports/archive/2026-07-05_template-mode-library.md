@@ -51,6 +51,27 @@ Commits: `b26dc7f` (cruise + mini-buy finding), `b560e43` (volatile/antelite/sup
 base/cruise/ante/bonus tables byte-identical across the incremental builds. Lock discipline
 followed throughout (deny lifted per build, restored with verified-empty diff before each commit).
 
+## 5. "Go for all" phase: ship config, production UI, cap + mechanic variants
+
+- **Ship decisions + production UI** (`docs/SHIP_CONFIG.md`, commit `bacc0a9`): this skin ships
+  5 of 11 modes (cruise/base/ante 1.5x/bonus/superbuy); ante ships at 1.5x. Production
+  `ModeSelector` (Cruise/Normal/Double + Buy/Super) replaces the ante toggle; dev Mode Library
+  still exposes all 11.
+- **Higher-cap variant** (`games/future_spinner_bigwin`, commit `22ab035`): forked package at
+  25,000x cap. base/bonus/superbuy all validate at 96.3500%; SD roughly doubles (base 17->36x),
+  max win 25,000x. Finding: cap is a marketing choice, not a functional need.
+- **Multiplier-wilds mechanic variant** (`games/future_spinner_multiwild`, commit `abdc659`):
+  forked package, Wilds carry random multipliers in free spins (ways "symbol" strategy). base +
+  bonus validate at 96.3500%. Proves the mechanic-fork approach end to end.
+- **Mechanic recipes** (`docs/MECHANIC_VARIANTS.md`): precise, proven recipes for multiplier
+  wilds (built), tumble/cascade, cluster pays, paylines, scatter-pays - each anchored to a
+  working SDK sample game (0_0_cluster / 0_0_expwilds / 0_0_lines / 0_0_scatter / 0_0_ways +
+  the built-in tumble engine). Tumble + cluster documented (not forked; each needs its own
+  retune, best as a focused build).
+
+Forks are siblings of the locked future_spinner (no lock exception); the main 5,000x package is
+untouched and still validates ALL PASS.
+
 ## Still open / next passes (owner to steer)
 - **Frontend selector** for the library (standing-mode selector Normal/Cruise/Ante/... + buy-tier
   UI). Cruise + the new modes are not yet UI-selectable; only the ante toggle exists. Iterable,
