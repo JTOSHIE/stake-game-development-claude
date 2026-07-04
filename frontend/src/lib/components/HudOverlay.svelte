@@ -349,36 +349,52 @@
   }
   .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
 
-  /* ── BALANCE / WIN / BET — fixed boxes, never move or resize ────────────── */
+  /* ── BALANCE / WIN / BET — CSS-drawn angular neon boxes (cyberpunk) ───────
+     A 2px magenta->cyan gradient bezel with cut corners, a deep gradient fill
+     and a soft pink glow; framed and thicker than the old flat panels, sharing
+     the instrument-plate design language. Fixed geometry, never reflow. */
   .hud-box {
     position: absolute;
-    top: 574px;
-    height: 60px;
+    top: 573px;
+    height: 62px;
     z-index: 60;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.35);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 0 6px;
-    overflow: hidden;
+    gap: 3px;
+    padding: 0 8px;
+    background: linear-gradient(135deg, #ff2ec4 0%, #16f2e0 58%, #ff2ec4 100%);
+    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
+    filter: drop-shadow(0 0 6px rgba(255, 46, 196, 0.5));
+  }
+  .hud-box::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    background:
+      linear-gradient(160deg, rgba(255, 46, 196, 0.12), transparent 45%),
+      linear-gradient(180deg, rgba(20, 11, 36, 0.95) 0%, rgba(8, 6, 16, 0.97) 100%);
   }
   .balance-box { left: 400px; width: 200px; }
   .win-box     { left: 616px; width: 150px; }
-  .bet-box     { left: 782px; width: 120px; align-items: flex-end; padding-right: 10px; }
+  .bet-box     { left: 782px; width: 120px; align-items: flex-end; padding-right: 12px; }
 
   .hud-label {
+    position: relative;
+    z-index: 1;
     font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.5rem;
+    font-size: 0.52rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.16em;
+    color: rgba(190, 240, 255, 0.6);
     text-transform: uppercase;
   }
 
   .hud-value {
+    position: relative;
+    z-index: 1;
     font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 1rem;
     font-weight: 700;
