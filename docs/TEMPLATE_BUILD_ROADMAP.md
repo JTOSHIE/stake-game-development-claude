@@ -18,16 +18,15 @@ Legend: BUILT / IN PROGRESS / SPEC. Cost: CONFIG / CODE(fe|game) / ART / OWNER.
 - **Acceptance:** test passes; running it twice yields byte-identical scripts.
 - **Later:** reserve a per-round id field to carry a seed/nonce when Stake exposes a PF API.
 
-## 2. Frontend presentation for non-ways mechanics (CODE-fe, MED) - STARTED
+## 2. Frontend presentation for non-ways mechanics (CODE-fe, MED) - BUILT (core)
 
-DONE (foundation): `CellModifier.svelte` - a mechanic-agnostic per-cell overlay (mult/prize/
-upgrade badge) positioned by cell index via CSS variables. New mechanics add DATA, not a new
-pipeline. REMAINING (fresh focused pass, touches the core reel engine): (a) `roundInterpreter.ts`
-expose per-cell modifiers from `winInfo` meta (`symbolMult`/wild `multiplier`); (b) `GameGrid.svelte`
-publish its cell geometry as `--cell-w/--cell-h/--grid-gap` and mount `CellModifier` for each
-modified cell during the win step; (c) point a build at the `future_spinner_multiwild` book (mock
-samples) so the wild multipliers actually flow through. Then tumble/cluster reuse the same overlay
-+ their own event kinds. Original spec below.
+DONE: `CellModifier.svelte` overlay + `roundInterpreter.ts` per-cell extractors
+(`collectCellMultipliers`) + `cellMultipliers` store + `GameGrid.svelte` overlay layer (publishes
+cell geometry, mounts a badge per modified cell, clears on new spin) + a demo round. Verified:
+exact-total 59/59, PF determinism PASS, build clean; screenshot proof
+`reports/screens/mechanics/multiwild_badge.png` (x5/x3 badges on winning wilds). tumble/cluster
+reuse the same overlay. FOLLOW-UP: the in-feature (FreeSpinsPresentation) badge + a collect-pot
+meter display. Original spec below.
 
 
 
@@ -87,7 +86,12 @@ Jurisdiction-flag-driven, not per-game. Needed the moment we target a regulated 
   minimum spin + disables turbo where required.
 - **Dependency:** jurisdiction flags (partly present via `disabledBuyFeature`).
 
-## 5. Stateless feature-primitives library (CODE-game + ART, MED) - SPEC
+## 5. Stateless feature-primitives library (CODE-game + ART, MED) - STARTED (collection meter BUILT)
+
+DONE: `games/future_spinner_collect` - a collection-meter primitive (in-round coin pot paid at
+bonus end, resets each round). Independently verified 96.3500% RTP both modes, statelessness proven
+from the books (one payout/round, payout == sum of coins). REMAINING primitives: symbol-upgrade
+ladder, nudge-wild (same fork pattern + retune). Original spec below.
 
 Reusable, config-parameterised feature modules that resolve inside ONE round (like the Overdrive
 meter). The current signature mechanics.
