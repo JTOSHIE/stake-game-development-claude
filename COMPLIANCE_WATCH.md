@@ -34,6 +34,17 @@ Australian English, no em dashes or en dashes.
 
 ## Watch log
 
+### 2026-07-04: docs refresh, no changes
+Re-rendered all five pages via headless Chrome into `docs/stake-engine-live/`.
+**No content changes** vs the 2026-07-03 snapshot: approval-guidelines (2250 chars),
+jurisdiction-requirements (1375), game-quality-rankings (3245) and
+game-replay-requirements (5037) all match byte-for-byte (identical content SHA-256).
+The `/docs/updates` changelog page still renders only 88 chars (`looks_real:false`) via
+this method, same as before; treat as a known gap and re-check it manually. No compliance
+action required. Bet-replay implementation remains aligned with the (unchanged) spec, and
+the star-rating "missing bonus feature" concern is already addressed (the Overdrive Free
+Spins feature and 100x bonus buy ship, per the Option C decision below).
+
 ### 2026-07-03: first live docs refresh
 Source snapshots saved under `docs/stake-engine-live/` (rendered via headless Chrome).
 

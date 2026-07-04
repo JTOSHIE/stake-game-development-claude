@@ -1,0 +1,116 @@
+# Publish Future Spinner to Stake Engine via StakeCLI (mnemoo/cli).
+#
+# SAFE BY DEFAULT. Manual dispatch only. With do_upload=false (the default) it
+# builds the frontend, validates the math + front bundles exist, and PRINTS the
+# exact stakecli commands - it uploads nothing and needs no credentials. Set
+# do_upload=true AND provide the STAKE_SID repo secret to actually upload/publish.
+#
+# StakeCLI is a community tool (github.com/mnemoo/cli), not official Stake Engine
+# software. Pin the release tag below and review it before trusting it with a real
+# session credential. STAKE_SID is a full browser session cookie for stake-engine.com
+# - treat it like a password; never echo it, never enable `set -x` in the run steps.
+name: Publish to Stake Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: What to publish
+        type: choice
+        options: [both, math, front]
+        default: both
+      do_upload:
+        description: Actually upload + publish (needs STAKE_SID secret). Leave false for a dry run.
+        type: boolean
+        default: false
+      publish:
+        description: Publish after upload (adds --publish). If false, uploads to scratch only.
+        type: boolean
+        default: false
+
+concurrency:
+  group: publish-stake-engine
+  cancel-in-progress: false
+
+env:
+  # The platform team/game slugs (verify with `stakecli` TUI or GET /api/teams).
+  # --game is the platform slug, not necessarily the local dir name.
+  STAKE_TEAM: REPLACE_WITH_TEAM_SLUG
+  STAKE_GAME: future_spinner
+  STAKECLI_TAG: v1.1.0            # pin a reviewed release; do not use latest
+  MATH_PATH: games/future_spinner/library/publish_files
+  FRONT_PATH: frontend/dist
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend bundle
+        if: ${{ inputs.target != 'math' }}
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          test -f dist/index.html || { echo "::error::frontend/dist/index.html missing after build"; exit 1; }
+
+      - name: Validate bundles exist
+        run: |
+          if [ "${{ inputs.target }}" != "front" ]; then
+            test -f "$MATH_PATH/index.json" || { echo "::error::$MATH_PATH/index.json missing"; exit 1; }
+            echo "math bundle OK: $MATH_PATH"; ls -1 "$MATH_PATH" | head
+          fi
+          if [ "${{ inputs.target }}" != "math" ]; then
+            test -d "$FRONT_PATH" || { echo "::error::$FRONT_PATH missing"; exit 1; }
+            echo "front bundle OK: $FRONT_PATH"
+          fi
+
+      - name: Install stakecli
+        if: ${{ inputs.do_upload }}
+        uses: jaxxstorm/action-install-gh-release@v2
+        with:
+          repo: mnemoo/cli
+          tag: ${{ env.STAKECLI_TAG }}
+
+      - name: Dry run (print commands, upload nothing)
+        if: ${{ !inputs.do_upload }}
+        run: |
+          PUB=$([ "${{ inputs.publish }}" = "true" ] && echo "--yes --publish" || echo "--yes")
+          echo "DRY RUN - would run (do_upload=false). Set do_upload=true + STAKE_SID secret to execute:"
+          if [ "${{ inputs.target }}" != "front" ]; then
+            echo "  stakecli upload --team \"$STAKE_TEAM\" --game \"$STAKE_GAME\" --type math  --path \"$MATH_PATH\"  $PUB"
+          fi
+          if [ "${{ inputs.target }}" != "math" ]; then
+            echo "  stakecli upload --team \"$STAKE_TEAM\" --game \"$STAKE_GAME\" --type front --path \"$FRONT_PATH\" $PUB"
+          fi
+          echo "Note: without --publish the bundle only lands in scratch. RTP/volatility checks on math"
+          echo "are advisory with --yes (they warn but still upload); drop --yes for a hard gate."
+
+      - name: Upload + publish math
+        if: ${{ inputs.do_upload && inputs.target != 'front' }}
+        env:
+          STAKE_SID: ${{ secrets.STAKE_SID }}
+        run: |
+          [ -n "$STAKE_SID" ] || { echo "::error::STAKE_SID secret not set"; exit 1; }
+          stakecli upload --team "$STAKE_TEAM" --game "$STAKE_GAME" \
+            --type math --path "$MATH_PATH" --yes ${{ inputs.publish && '--publish' || '' }}
+
+      - name: Upload + publish front
+        if: ${{ inputs.do_upload && inputs.target != 'math' }}
+        env:
+          STAKE_SID: ${{ secrets.STAKE_SID }}
+        run: |
+          [ -n "$STAKE_SID" ] || { echo "::error::STAKE_SID secret not set"; exit 1; }
+          stakecli upload --team "$STAKE_TEAM" --game "$STAKE_GAME" \
+            --type front --path "$FRONT_PATH" --yes ${{ inputs.publish && '--publish' || '' }}
