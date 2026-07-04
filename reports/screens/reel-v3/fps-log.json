@@ -1,0 +1,12 @@
+{
+  "sampleCount": 2481,
+  "avgFrameMs": 16.747158403869406,
+  "avgFps": 59.71162246658821,
+  "p95FrameMs": 17.200000000000728,
+  "p99FrameMs": 18.599999999998545,
+  "maxFrameMs": 150,
+  "longFrameCount": 1,
+  "longFrames": [
+    150
+  ]
+}
