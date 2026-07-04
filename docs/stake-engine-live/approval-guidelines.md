@@ -2,13 +2,13 @@
 - topic: approval-guidelines
 - requested_url: https://stake-engine.com/docs/approval-guidelines
 - resolved_url: https://stake-engine.com/docs/approval-guidelines
-- fetched: 2026-07-03
+- fetched: 2026-07-04
 - rendered_via: headless Chrome (Playwright)
 - content_sha256: 9e2713a17e0752804a2fc4f9db68904c95a1b2eab0fc4d662bdb5e4f7e400555
 - content_chars: 2250
 - looks_real: true
 
-# Approval Guidelines - API Documentation
+# approval-guidelines
 
 General Requirements
 

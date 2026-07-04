@@ -2,7 +2,7 @@
 - topic: game-replay-requirements
 - requested_url: https://stake-engine.com/docs/approval-guidelines/game-replay-requirements
 - resolved_url: https://stake-engine.com/docs/approval-guidelines/game-replay-requirements
-- fetched: 2026-07-03
+- fetched: 2026-07-04
 - rendered_via: headless Chrome (Playwright)
 - content_sha256: 789dcfd5ff7bc592582440aae2e098156026bb88f40b2ec75224ad1cb3afa536
 - content_chars: 5037

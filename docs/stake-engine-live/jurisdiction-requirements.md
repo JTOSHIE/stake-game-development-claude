@@ -2,13 +2,13 @@
 - topic: jurisdiction-requirements
 - requested_url: https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements
 - resolved_url: https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements
-- fetched: 2026-07-03
+- fetched: 2026-07-04
 - rendered_via: headless Chrome (Playwright)
 - content_sha256: b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c
 - content_chars: 1375
 - looks_real: true
 
-# Approval Guidelines Jurisdiction Requirements - API Documentation
+# jurisdiction-requirements
 
 Jurisdiction Requirements
 

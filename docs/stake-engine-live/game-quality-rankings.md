@@ -2,13 +2,13 @@
 - topic: game-quality-rankings
 - requested_url: https://stake-engine.com/docs/approval-guidelines/game-quality-rankings
 - resolved_url: https://stake-engine.com/docs/approval-guidelines/game-quality-rankings
-- fetched: 2026-07-03
+- fetched: 2026-07-04
 - rendered_via: headless Chrome (Playwright)
 - content_sha256: 0454dcc257c08a49717e1cc27a856f5c696aaee02e5009848c60239dba265dcf
 - content_chars: 3245
 - looks_real: true
 
-# Approval Guidelines Game Quality Rankings - API Documentation
+# game-quality-rankings
 
 Game Quality Rankings
 
