@@ -58,3 +58,24 @@ recorded here with the final measured value.
 (c) The theme selector button is removed from the production UI and gated behind a dev-only
 flag (import.meta.env.DEV); in production it is never rendered and the default theme is forced
 (already the case in App.svelte, re-verified this pass).
+
+# AMENDMENT v3.4 (owner concept) — Overdrive flame jets
+
+Eight flame jets ring the frame (640x468 at (320,84)), two per side, flame pointing OUTWARD
+from each edge, sprites derived from M3_master_v3.svg (nozzle + a 5-frame flame sheet). Fixed
+positions in stage coordinates, at the jet-mouth origin, with an outward rotation:
+
+| Jet | Mouth (x,y) | Flame direction |
+|-----|-------------|-----------------|
+| top-left / top-right | (480,84) / (800,84) | up (rot -90) |
+| bottom-left / bottom-right | (480,552) / (800,552) | down (rot 90) |
+| left-upper / left-lower | (320,224) / (320,412) | left (rot 180) |
+| right-upper / right-lower | (960,224) / (960,412) | right (rot 0) |
+
+Each jet renders at scale 0.55. They IGNITE on the Overdrive entry (driven by
+`overdriveVisualActive`, in sync with the gauge slam), burn for the whole bonus with a CSS
+steps(5) sprite loop plus a scale-breathe, and extinguish when the end phase starts. Pooled
+(the eight elements exist once, toggled by class; the flame is CSS-driven, zero per-frame
+allocation). prefers-reduced-motion shows the static-glow frame with no animation. Z-order:
+the jet layer is z15 (above the frame at z10, outside the grid so it never overlaps symbols),
+below the HUD (z60) and banner (z100).
