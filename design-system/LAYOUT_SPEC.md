@@ -95,3 +95,16 @@ bet-arrow hit rectangles are pairwise non-intersecting at 1280x720 and at Mobile
 points and outward directions are unchanged. Verified: all eight flame bounding boxes are fully
 inside the visible stage at all six viewports (320x568, 375x667, 425x812, 400x225, 800x450,
 1200x675).
+
+# AMENDMENT v3.6 (owner directive): MAX chip relocated away from SPIN
+
+The MAX chip is moved off the SPIN button. Under v3.3 to v3.5 it sat at x935 to 961, right edge
+touching the SPIN hit circle (leftmost point x962); a control that jumps the bet to maximum one
+mis-tap from SPIN is a hazard the owner flagged. It now lives on the FAR LEFT of the HUD, in the
+40px gap between the TURBO button (right edge x304) and the hamburger menu (left edge x344): a
+26 x 44 button centred at x324 (spanning x311 to 337, y582 to 626), baseline y604 unchanged. The
+visible chip keeps its v3.3 geometry (24 x 26, centred). It clears TURBO and the menu by about
+7px each and is nowhere near SPIN. The bet arrows, BET box and SPIN are unchanged. Verified: the
+MAX, TURBO and hamburger hit rectangles are pairwise non-intersecting, and MAX no longer
+intersects the SPIN circle, at 1280x720 (and the fixed surface scales uniformly to all
+viewports).
