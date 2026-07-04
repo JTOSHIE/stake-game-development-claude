@@ -65,6 +65,7 @@
   import { currencyCode } from './lib/stores/gameStore'
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier } from './lib/services/telemetry'
+  import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
@@ -282,6 +283,12 @@
         const win = servedTotalWin ?? result.totalWin
         recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
       }
+      const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
+      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(buyWin * CURRENCY_SCALE))
+      if (buyWin > 0) {
+        const bm = bet > 0 ? buyWin / bet : 0
+        track({ type: 'win', winMicros: Math.round(buyWin * CURRENCY_SCALE), multiple: bm, tier: winTier(bm) })
+      }
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
       // $isWincap). Wait for COLLECT, then present the complete round
@@ -370,10 +377,13 @@
   function scheduleAutoSpin(delayMs: number): void {
     const tier = get(speedTier)
     const factor = tier === 'super' ? 0.16 : tier === 'turbo' ? 0.5 : 1
+    // Responsible gambling: never go below the jurisdiction minimum spin interval
+    // (UKGC 2.5s), even under turbo. rgSpinDelay is a no-op where unset.
+    const delay = rgSpinDelay(delayMs * factor)
     autoSpinTimer = setTimeout(() => {
       autoSpinTimer = null
       handleSpin()
-    }, delayMs * factor)
+    }, delay)
   }
 
   async function handleSpin() {
@@ -416,6 +426,7 @@
         track({ type: 'win', winMicros: Math.round(result.totalWin * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
       }
       if (result.isWincap) track({ type: 'wincap', multiple: bet > 0 ? result.totalWin / bet : 0 })
+      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
       // this round, plus the balance the store actually landed on, so the
@@ -450,8 +461,15 @@
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
+        // Responsible-gambling stop conditions (stop on win / single-win limit /
+        // feature / loss limit), in addition to count and the wincap stop.
+        const rg = autoplayShouldStop({
+          winMicros: Math.round(result.totalWin * CURRENCY_SCALE),
+          betMicros: Math.round(bet * CURRENCY_SCALE),
+          triggered: !!script?.triggered,
+        })
         // Stop auto-play immediately on wincap — player must manually collect
-        if ($autoPlayCount <= 0 || $isWincap) {
+        if ($autoPlayCount <= 0 || $isWincap || rg.stop) {
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {

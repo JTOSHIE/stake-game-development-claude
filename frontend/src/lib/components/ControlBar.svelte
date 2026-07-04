@@ -11,11 +11,16 @@
   import { playClick } from '../services/soundService'
   import { themeAssets } from '../stores/themeStore'
   import { createEventDispatcher } from 'svelte'
+  import { autoplayLimits, rgJurisdiction } from '../stores/responsibleGambling'
 
   const dispatch = createEventDispatcher<{ spin: void }>()
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
   let showAutoMenu = false
+  // Autoplay stop-conditions the player can set before starting (RG standard).
+  let stopOnWin = false
+  let stopOnFeature = true
+  let lossLimitOn = false
 
   // ── Bet ladder ────────────────────────────────────────────────────────────
   // Prefer the RGS-provided levels when present, otherwise the built-in
@@ -56,6 +61,15 @@
 
   function startAuto(count: number) {
     playClick()
+    // Apply the chosen stop-conditions. Loss limit = the total staked over `count`
+    // spins at the current bet (a simple, meaningful default the player can trust).
+    autoplayLimits.set({
+      count,
+      stopOnAnyWin: stopOnWin,
+      singleWinLimitMult: 0,
+      stopOnFeature,
+      lossLimitMicros: lossLimitOn ? Math.round($betAmount * count * CURRENCY_SCALE) : 0,
+    })
     autoPlayCount.set(count)
     isAutoPlay.set(true)
     showAutoMenu = false
@@ -161,7 +175,9 @@
   <!-- ── Right cluster: Auto + Turbo / Mute / Info ──────────────────���────── -->
   <div class="aux-cluster">
 
-    <!-- Autoplay button -->
+    <!-- Autoplay button — hidden entirely where the jurisdiction bans autoplay
+         (e.g. UK real-money, UKGC enforced May 2026). -->
+    {#if !$rgJurisdiction.autoplayDisabled}
     <div class="auto-wrapper">
       {#if $isAutoPlay}
         <button class="img-btn auto-btn active" on:click={stopAuto} aria-label="Stop autoplay">
@@ -181,6 +197,10 @@
         </button>
         {#if showAutoMenu}
           <div class="auto-menu">
+            <label class="menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on any win</label>
+            <label class="menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
+            <label class="menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+            <div class="menu-sep">Number of spins</div>
             {#each AUTO_OPTIONS as n}
               <button class="menu-item" on:click={() => startAuto(n)}>{n}</button>
             {/each}
@@ -188,6 +208,7 @@
         {/if}
       {/if}
     </div>
+    {/if}
 
     <!-- Utility buttons: Turbo / Mute / Info -->
     <div class="util-group">
@@ -613,5 +634,16 @@
   }
 
   .menu-item:hover { background: rgba(255, 200, 50, 0.15); }
+
+  .menu-toggle {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0.3rem 0.7rem; font-size: 0.68rem; color: #cde; cursor: pointer;
+    white-space: nowrap;
+  }
+  .menu-toggle input { accent-color: #00ffff; }
+  .menu-sep {
+    padding: 0.3rem 0.7rem 0.15rem; font-size: 0.56rem; letter-spacing: 0.06em;
+    color: rgba(205, 222, 238, 0.55); border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2px;
+  }
 
 </style>
