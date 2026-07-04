@@ -18,7 +18,18 @@ Legend: BUILT / IN PROGRESS / SPEC. Cost: CONFIG / CODE(fe|game) / ART / OWNER.
 - **Acceptance:** test passes; running it twice yields byte-identical scripts.
 - **Later:** reserve a per-round id field to carry a seed/nonce when Stake exposes a PF API.
 
-## 2. Frontend presentation for non-ways mechanics (CODE-fe, MED) - SPEC
+## 2. Frontend presentation for non-ways mechanics (CODE-fe, MED) - STARTED
+
+DONE (foundation): `CellModifier.svelte` - a mechanic-agnostic per-cell overlay (mult/prize/
+upgrade badge) positioned by cell index via CSS variables. New mechanics add DATA, not a new
+pipeline. REMAINING (fresh focused pass, touches the core reel engine): (a) `roundInterpreter.ts`
+expose per-cell modifiers from `winInfo` meta (`symbolMult`/wild `multiplier`); (b) `GameGrid.svelte`
+publish its cell geometry as `--cell-w/--cell-h/--grid-gap` and mount `CellModifier` for each
+modified cell during the win step; (c) point a build at the `future_spinner_multiwild` book (mock
+samples) so the wild multipliers actually flow through. Then tumble/cluster reuse the same overlay
++ their own event kinds. Original spec below.
+
+
 
 The multiplier-wilds maths (`future_spinner_multiwild`) has no wild-multiplier display; same for
 future tumble/cluster forks. Turning proven maths into shippable games depends on this.
