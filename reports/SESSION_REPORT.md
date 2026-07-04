@@ -35,6 +35,34 @@ more artistic"). Fixed geometry is unchanged (top nudged 1px, height 60px to 62p
 to seat the frame); the cyan/magenta/gold value colours are preserved and now read
 above the dark fill. Tabular numerals and non-reflow behaviour unchanged.
 
+## 4. Removed duplicate win/total under the free-spins reels
+
+The per-spin win, the running TOTAL WIN and the multiplier were shown both under
+the board and on the right instrument column (under the gauge). The under-board
+copies are removed; only the retrigger notice remains there. TOTAL WIN and
+MULTIPLIER stay in the instrument column where they already lived, and the board
+now sits centred with no text pushing it up. Nothing was moved.
+
+## 5. Reels enlarged again + scene comes alive
+
+With the duplicate text gone, the free-spins cells go 58px to 72px (gap 8->10) so
+the board fills the frame far better (the black area to the bottom/left is taken
+up), still short of the base reels and clear of the Overdrive box.
+
+SceneGroup (the cyber driver + hover car) gains life via layered CSS effects: a
+slow HOVER BOB on the whole rig, spinning cyan turbine swirls in the hover pads
+(the hover-car's "wheels"; owner-chosen after we found the car has no visible
+road wheels - see note), a counter-phase cyan pad underglow, a magenta pulse
+travelling the car's neon side lines, and an orange antenna-light blink; the
+booster flicker and visor glint are kept. All respect prefers-reduced-motion.
+
+Wheel-spin investigation (recorded): the master was split (base + spinning wheel
+sprite via the layered pipeline) and it worked technically, but the car is a
+hover car with no wheel arches and its one token wheel sits off-screen at the
+far-left front (the scene is offset to seat the character beside the frame), so a
+visible spinning road wheel was not achievable without redesigning the car. The
+split was reverted cleanly; the owner chose to spin the hover pads instead.
+
 ## Verification
 
 - `npm run build` clean; `svelte-check` 0 errors in the three files.

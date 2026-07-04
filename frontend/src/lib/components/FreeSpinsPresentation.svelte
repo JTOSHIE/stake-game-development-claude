@@ -217,16 +217,13 @@
             </div>
           {/each}
         </div>
-        <div class="fs-winline">
-          {#if currentSpin.spinWinCentibets > 0}
-            <span class="fs-win">{fmt(currentSpin.spinWinCentibets)}</span>
-            {#if currentSpin.meterBefore > 1}<span class="fs-mult">×{currentSpin.meterBefore}</span>{/if}
-          {/if}
-        </div>
+        <!-- Per-spin win, running total and multiplier are NOT repeated here:
+             TOTAL WIN and MULTIPLIER already live in the instrument column under
+             the gauge on the right. Only the retrigger notice shows below the
+             board. -->
         {#if showRetrigger}
           <div class="fs-retrigger">+5 {t(lang, 'freeSpins', mode)}</div>
         {/if}
-        <div class="fs-running">{t(lang, 'totalWin', mode)}: {fmt(runningTotalCentibets)}</div>
       </div>
     {:else if phase === 'end'}
       <div class="fs-end">
@@ -306,21 +303,17 @@
   }
   .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
   .fs-meter-slot { position: absolute; top: 12px; right: 12px; }
-  .fs-board { display: flex; gap: 8px; }
-  .fs-reel { display: flex; flex-direction: column; gap: 8px; }
+  .fs-board { display: flex; gap: 10px; }
+  .fs-reel { display: flex; flex-direction: column; gap: 10px; }
   .fs-cell {
-    width: 58px; height: 58px; display: flex; align-items: center; justify-content: center;
-    border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
-    font-size: 1rem; font-weight: 700; color: #cfe;
+    width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+    font-size: 1.1rem; font-weight: 700; color: #cfe;
   }
   .fs-cell img { width: 92%; height: 92%; object-fit: contain; display: block; }
   .fs-cell.scatter { border-color: var(--theme-secondary, #ff2ec4); box-shadow: 0 0 10px var(--theme-secondary, #ff2ec4); }
   .fs-cell.wild { border-color: var(--theme-primary, #16f2e0); }
-  .fs-winline { min-height: 2rem; display: flex; gap: 8px; align-items: center; justify-content: center; }
-  .fs-win { font-size: 1.6rem; font-weight: 900; color: #ffd54a; }
-  .fs-mult { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
   .fs-retrigger { font-size: 1.3rem; font-weight: 900; color: var(--theme-secondary, #ff2ec4); animation: rtpop 0.5s ease; }
-  .fs-running { font-size: 0.9rem; opacity: 0.85; }
   .fs-endtotal { font-size: 2.4rem; font-weight: 900; color: #ffd54a; text-shadow: 0 0 20px #ffb300; }
   @keyframes rtpop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.25); opacity: 1; } 100% { transform: scale(1); } }
 </style>
