@@ -81,3 +81,25 @@ split was reverted cleanly; the owner chose to spin the hover pads instead.
   meter); (2) optional: retire the now-unused `instrument_plate_1x.png` from the
   asset manifest; (3) a LAYOUT_SPEC amendment recording the framed HUD boxes and
   enlarged bonus board.
+
+## 6. Overdrive layout, win-connection story, and max-win dwell
+
+Three owner-reported feature-presentation fixes:
+
+- **Overdrive box overlap:** with the 72px reels the top-right OverdriveMeter box
+  covered the board's top-right tile. The free-spins board is shifted left of
+  centre (translateX -52px) so the meter clears it with space; off-centre by
+  design, clear of the frame and character.
+- **Win-connection story (free spins):** the free-spins board had no win
+  visualization. Now each spin's winning ways light up (gold pulse + glow across
+  the connecting reels), non-winners dim back, and the spin's win value pops on
+  the connection - so the player sees what connected and what it paid. The base
+  game already draws win borders/lines/burst. Big free-spin wins also dwell
+  longer (hold scales with win size, up to ~3.2s) so the connection is seen.
+- **Max-win dwell:** on a base-game wincap the celebration used to snap over the
+  board the instant the reels landed. Now the winning board burst is held on for
+  2.6s first (deliberately not turbo-shortened - a max win should linger), then
+  the celebration eases in (backdrop fade) rather than jumping. For a bonus/
+  free-spins wincap the celebration collect is followed by the free-spins replay,
+  which now shows the win connections and dwells on the big spins.
+
