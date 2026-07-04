@@ -15,6 +15,7 @@ modes / cap / mechanic to ship. This index says what exists, where it lives, and
 | `games/future_spinner` | the shipping game + the full bet-mode LIBRARY | 11 (see below) | 5,000x | LOCKED, validated |
 | `games/future_spinner_bigwin` | higher max-win-cap template axis | base/bonus/superbuy | 25,000x | proof, validated |
 | `games/future_spinner_multiwild` | multiplier-wilds MECHANIC swap | base/bonus | 5,000x | proof, validated |
+| `games/future_spinner_rtp94` | RTP-preset axis (94.00%) | base/bonus | 5,000x | proof, validated |
 
 `future_spinner` is the locked, verified core. The forks are siblings (no lock exception) proving
 two template axes (cap, mechanic). SDK sample games `games/0_0_{ways,cluster,lines,scatter,expwilds}`
