@@ -49,11 +49,19 @@ With the duplicate text gone, the free-spins cells go 58px to 72px (gap 8->10) s
 the board fills the frame far better (the black area to the bottom/left is taken
 up), still short of the base reels and clear of the Overdrive box.
 
-SceneGroup (the cyber driver + hover car, a single baked PNG - the master has no
-separable parts) gains more life via layered CSS effects: a slow HOVER BOB on the
-whole rig, a stronger counter-phase cyan underglow at the hover pads, a magenta
-pulse travelling the car's neon side lines, and an orange antenna-light blink;
-the booster flicker and visor glint are kept. All respect prefers-reduced-motion.
+SceneGroup (the cyber driver + hover car) gains life via layered CSS effects: a
+slow HOVER BOB on the whole rig, spinning cyan turbine swirls in the hover pads
+(the hover-car's "wheels"; owner-chosen after we found the car has no visible
+road wheels - see note), a counter-phase cyan pad underglow, a magenta pulse
+travelling the car's neon side lines, and an orange antenna-light blink; the
+booster flicker and visor glint are kept. All respect prefers-reduced-motion.
+
+Wheel-spin investigation (recorded): the master was split (base + spinning wheel
+sprite via the layered pipeline) and it worked technically, but the car is a
+hover car with no wheel arches and its one token wheel sits off-screen at the
+far-left front (the scene is offset to seat the character beside the frame), so a
+visible spinning road wheel was not achievable without redesigning the car. The
+split was reverted cleanly; the owner chose to spin the hover pads instead.
 
 ## Verification
 

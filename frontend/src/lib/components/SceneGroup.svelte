@@ -13,6 +13,9 @@
   <div class="scene-hover">
     <img class="scene-img" src="{$themeAssets.assetBase}/ui/scene_character_car.png" alt="" draggable="false" />
     <div class="underglow" aria-hidden="true"></div>
+    <!-- Hover-pad turbines — the car's ground contacts spin (its 'wheels'). -->
+    <div class="hover-swirl front" aria-hidden="true"></div>
+    <div class="hover-swirl rear" aria-hidden="true"></div>
     <div class="car-neon" aria-hidden="true"></div>
     <div class="booster-flicker" aria-hidden="true"></div>
     <div class="antenna-light" aria-hidden="true"></div>
@@ -68,6 +71,30 @@
     0%, 100% { opacity: 0.5; transform: scaleY(0.9); }
     50%      { opacity: 1; transform: scaleY(1.1); }
   }
+
+  /* Hover-pad turbines — a rotating cyan energy swirl in each hover pad, so the
+     car's ground contacts read as spinning (the hover-car 'wheels'). Elliptical
+     to match the pads' perspective; screen-blended over the pad glow. */
+  .hover-swirl {
+    position: absolute;
+    height: 5.5%;
+    width: 11%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+      rgba(0, 225, 255, 0.75) 0deg, rgba(0, 225, 255, 0.05) 40deg,
+      rgba(0, 225, 255, 0.6) 90deg, rgba(0, 225, 255, 0.05) 150deg,
+      rgba(0, 225, 255, 0.75) 180deg, rgba(0, 225, 255, 0.05) 220deg,
+      rgba(0, 225, 255, 0.6) 270deg, rgba(0, 225, 255, 0.05) 330deg,
+      rgba(0, 225, 255, 0.75) 360deg);
+    mix-blend-mode: screen;
+    filter: blur(1.5px);
+    animation: swirl-spin 1.3s linear infinite;
+  }
+  /* Positioned within the on-screen portion of the hover glow (the pad rects
+     themselves fall off the left edge / behind the frame). */
+  .hover-swirl.front { left: 24%; bottom: 13%; }
+  .hover-swirl.rear  { left: 39%; bottom: 13%; }
+  @keyframes swirl-spin { to { transform: rotate(360deg); } }
 
   /* Car neon side lines — a magenta glow that travels along the body lines. */
   .car-neon {
@@ -146,7 +173,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .scene-hover, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
+    .scene-hover, .underglow, .hover-swirl, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
       animation: none;
     }
     .underglow { opacity: 0.6; }
