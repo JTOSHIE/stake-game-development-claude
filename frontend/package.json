@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "assets": "../scripts/assets/.venv/bin/python ../scripts/assets/build.py && ../scripts/assets/.venv/bin/python ../scripts/assets/flame_jets.py"
+    "assets": "../scripts/assets/.venv/bin/python ../scripts/assets/build.py && ../scripts/assets/.venv/bin/python ../scripts/assets/flame_jets.py && ../scripts/assets/.venv/bin/python ../scripts/assets/symbol_fx.py",
+    "qa:soak": "node scripts/qa_soak.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.1",

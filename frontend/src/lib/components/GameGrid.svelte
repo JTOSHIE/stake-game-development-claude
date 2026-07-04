@@ -133,14 +133,28 @@
   function idleClass(symbol: string | undefined): string {
     return IDLE_CLASS[(symbol ?? '').toUpperCase()] ?? 'idle-breathe'
   }
-  // Symbols whose idle is driven by a sprite-sheet flipbook fx overlay.
+  // Full class lists so _paintSlot can swap idle/fx classes via classList without
+  // ever wiping the Svelte scope hash class (which className= would drop, killing
+  // the scoped sizing rules).
+  const IDLE_ALL = ['idle-breathe','idle-charge','idle-rev','idle-coil','idle-flame',
+                    'idle-glint','idle-arc','idle-pump','idle-rings','idle-rays']
+  const FX_ALL = ['fx-none','fx-flame','fx-arc']
+  // Symbols whose idle is driven by a sprite-sheet flipbook fx overlay
+  // (deterministic sheets from symbol_fx.py, played via CSS steps()).
   const FX_CLASS: Record<string, string> = {
     M3: 'fx-flame',
     L2: 'fx-arc',
-    M1: 'fx-led',
+  }
+  const FX_SHEET: Record<string, string> = {
+    M3: 'm3_flame_sheet',
+    L2: 'l2_fuse_sheet',
   }
   function fxClass(symbol: string | undefined): string {
     return FX_CLASS[(symbol ?? '').toUpperCase()] ?? 'fx-none'
+  }
+  function fxSheet(symbol: string): string | null {
+    const s = FX_SHEET[symbol.toUpperCase()]
+    return s ? `${SYMBOL_BASE}/${s}.png` : null
   }
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -514,11 +528,16 @@
       }
     }
     // Idle micro-motion class — only meaningful on settled tiles; the .spinning
-    // class on the column gates the animations off while travelling.
-    const base = slotImg[col]?.[i]
-    if (base) base.className = `symbol-img ${idleClass(sym)}`
+    // class on the column gates the animations off while travelling. Use
+    // classList (not className=) so the Svelte scope hash class survives.
+    if (img) { img.classList.remove(...IDLE_ALL); img.classList.add(idleClass(sym)) }
     const fx = slotFx[col]?.[i]
-    if (fx) fx.className = `symbol-fx ${moving ? 'fx-none' : fxClass(sym)}`
+    if (fx) {
+      const fxc = moving ? 'fx-none' : fxClass(sym)
+      fx.classList.remove(...FX_ALL); fx.classList.add(fxc)
+      const sheet = moving ? null : fxSheet(sym)
+      fx.style.backgroundImage = sheet ? `url(${sheet})` : ''
+    }
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -978,19 +997,33 @@
     transform-origin: 50% 50%;
   }
 
-  /* Flipbook / fx overlay layer (Symbol Life v2) */
+  /* Flipbook / fx overlay layer (Symbol Life v2) — a centred 82x82 square
+     aligned to the symbol's contained render, screen-blended over the base. */
   .symbol-fx {
     position: absolute;
-    top: 9%;
-    left: 9%;
-    width: 82%;
-    height: 82%;
+    top: 9px;
+    left: 19px;
+    width: 82px;
+    height: 82px;
     pointer-events: none;
     background-repeat: no-repeat;
-    background-position: center;
+    background-position-y: center;
     mix-blend-mode: screen;
+    opacity: 0.9;
   }
   .symbol-fx.fx-none { display: none; }
+  /* M3 booster flame — 6-frame flipbook at ~9fps */
+  .symbol-fx.fx-flame {
+    background-size: 492px 82px;
+    animation: fx-flame-cycle 0.66s steps(6) infinite;
+  }
+  @keyframes fx-flame-cycle { from { background-position-x: 0; } to { background-position-x: -492px; } }
+  /* L2 fuse arc — 4-frame flicker at an irregular cadence */
+  .symbol-fx.fx-arc {
+    background-size: 328px 82px;
+    animation: fx-arc-cycle 0.34s steps(4) infinite;
+  }
+  @keyframes fx-arc-cycle { from { background-position-x: 0; } to { background-position-x: -328px; } }
 
   /* Idles pause on travelling reels. */
   .reel-strip.spinning .symbol-img,
