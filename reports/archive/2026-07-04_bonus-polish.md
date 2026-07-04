@@ -35,6 +35,14 @@ more artistic"). Fixed geometry is unchanged (top nudged 1px, height 60px to 62p
 to seat the frame); the cyan/magenta/gold value colours are preserved and now read
 above the dark fill. Tabular numerals and non-reflow behaviour unchanged.
 
+## 4. Removed duplicate win/total under the free-spins reels
+
+The per-spin win, the running TOTAL WIN and the multiplier were shown both under
+the board and on the right instrument column (under the gauge). The under-board
+copies are removed; only the retrigger notice remains there. TOTAL WIN and
+MULTIPLIER stay in the instrument column where they already lived, and the board
+now sits centred with no text pushing it up. Nothing was moved.
+
 ## Verification
 
 - `npm run build` clean; `svelte-check` 0 errors in the three files.
