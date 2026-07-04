@@ -535,7 +535,7 @@
        once, warm-painted, then kept mounted (visibility hidden) for the session
        so the first real entry pays no >100ms frame. -->
   {#if warmMount && $activeTheme.id === 'future-spinner'}
-    <div class="warm-mount" class:painted={warmPainted} aria-hidden="true">
+    <div class="warm-mount" class:painted={warmPainted} aria-hidden="true" inert>
       <BonusInstrumentColumn multiplier={1} spinsRemaining={8} runningTotalCentibets={0} />
       <FreeSpinsPresentation script={WARM_SCRIPT} active={true} />
     </div>
@@ -705,6 +705,10 @@
     pointer-events: none;
     z-index: -1;
   }
+  /* Force the whole warm subtree non-interactive so its dialog backdrop never
+     intercepts pointer events during the 0-520ms paint window (a child would
+     otherwise re-enable pointer-events over the container's none). */
+  .warm-mount :global(*) { pointer-events: none !important; }
   .warm-mount.painted { visibility: hidden; }
 
   .game-stage {

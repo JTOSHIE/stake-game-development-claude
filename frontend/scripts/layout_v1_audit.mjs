@@ -24,6 +24,20 @@ mkdirSync(OUT_DIR, { recursive: true })
 
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
+// Fresh Playwright contexts have empty storage, so the once-per-session intro
+// splash (a full-screen modal) shows on every page and intercepts clicks unless
+// dismissed. (Pre-existing: this audit predates the intro splash.)
+async function dismissIntroIfPresent(page) {
+  const btn = page.locator('[data-testid="intro-continue"]')
+  try {
+    if (await btn.count() > 0 && await btn.isVisible()) {
+      await btn.click()
+      await page.waitForTimeout(120)
+    }
+  } catch {}
+}
+
+
 const COMPLIANCE_VIEWPORTS = [
   { name: 'mobile-s', width: 320, height: 568 },
   { name: 'mobile-m', width: 375, height: 667 },
@@ -97,6 +111,7 @@ async function run() {
     const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } })
     await page.goto(BASE_URL, { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="hud-panel"]', { timeout: 15000 })
+    await dismissIntroIfPresent(page)
     await page.waitForTimeout(600) // settle animations/fonts
 
     const boxes = await collectBoxes(page)
@@ -133,6 +148,7 @@ async function run() {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
     await page.goto(BASE_URL, { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="hud-panel"]', { timeout: 15000 })
+    await dismissIntroIfPresent(page)
     await page.waitForTimeout(600)
 
     await page.locator('[data-testid="feature-button"] button').click()
@@ -140,8 +156,9 @@ async function run() {
     await page.locator('[data-testid="buy-confirm"]').click()
 
     // Wait for the free-spins overlay to reach its 'spin' phase (entry ~1.1s)
-    await page.waitForSelector('[data-testid="freespins-overlay"]', { timeout: 10000 })
-    await page.waitForSelector('[data-testid="bonus-instrument-column"]', { timeout: 10000 })
+    // :visible: skip the persistent hidden warm mount's duplicate testids.
+    await page.waitForSelector('[data-testid="freespins-overlay"]:visible', { timeout: 10000 })
+    await page.waitForSelector('[data-testid="bonus-instrument-column"]:visible', { timeout: 10000 })
     await page.waitForTimeout(1400)
 
     const boxes = await collectBoxes(page)
@@ -154,7 +171,7 @@ async function run() {
     }
     if (failures.length) anyFail = true
 
-    const column = await page.locator('[data-testid="bonus-instrument-column"]').boundingBox()
+    const column = await page.locator('[data-testid="bonus-instrument-column"]:visible').boundingBox()
     results.position.instrumentColumn = {
       expected: { x: 1000, y: 96, width: 262 },
       measured: column,
