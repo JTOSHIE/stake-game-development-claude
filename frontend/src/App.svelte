@@ -57,7 +57,7 @@
   import { get } from 'svelte/store'
   import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
-  import AnteToggle from './lib/components/AnteToggle.svelte'
+  import ModeSelector from './lib/components/ModeSelector.svelte'
   import ModeLibrary from './lib/components/ModeLibrary.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, MODE_COST } from './lib/stores/betMode'
@@ -670,7 +670,7 @@
        Hidden during the feature (no bet changes mid-feature). -->
   {#if !featureActive}
     <div class="ante-mount">
-      <AnteToggle />
+      <ModeSelector on:buy={(e) => handleBuy(e.detail)} />
     </div>
   {/if}
 
