@@ -123,7 +123,11 @@
       rgba(20, 8, 50, 0.97) 0%,
       rgba(6, 4, 20, 0.99) 100%
     );
+    /* Ease the backdrop in (the winning hit was already dwelt on beneath) so the
+       celebration does not snap over the board. */
+    animation: overlay-fadein 0.55s ease both;
   }
+  @keyframes overlay-fadein { from { opacity: 0; } to { opacity: 1; } }
 
   /* ── Rotating halo ring ─────────────────────────────────────────────────── */
   .halo-ring {

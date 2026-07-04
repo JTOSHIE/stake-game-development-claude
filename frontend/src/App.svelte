@@ -369,8 +369,16 @@
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
+      if (result.isWincap) {
+        // Dwell on the winning hit: the board's win burst is already playing
+        // from activeWins, so hold on it (a max win is the one moment to linger)
+        // before recordSpinResult flips isWincap and the celebration covers the
+        // screen. Deliberately NOT turbo-shortened.
+        playWin(bet > 0 ? result.totalWin / bet : 0)
+        await new Promise((r) => setTimeout(r, 2600))
+      }
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
-      playWin(bet > 0 ? result.totalWin / bet : 0)
+      if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
       // this round, plus the balance the store actually landed on, so the
