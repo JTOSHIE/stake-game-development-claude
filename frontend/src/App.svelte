@@ -533,9 +533,10 @@
   <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
   <WinBanner />
 
-  <!-- FEATURE — Grille button, beside the frame upper left, future-spinner only -->
+  <!-- FEATURE — Grille button, right of the frame (v3.3), future-spinner only;
+       hidden during Overdrive so the bonus instrument column owns that zone. -->
   {#if $activeTheme.id === 'future-spinner'}
-    <FeatureButton on:open={() => buyBonusRef?.openConfirm()} />
+    <FeatureButton overdriveActive={featureActive} on:open={() => buyBonusRef?.openConfirm()} />
   {/if}
 
   <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->

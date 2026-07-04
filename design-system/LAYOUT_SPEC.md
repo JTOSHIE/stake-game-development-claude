@@ -37,3 +37,24 @@ x 782 with the value right-aligned in a fixed 120 width; the stacked cyan bet ar
 their own FIXED column at x 916, independent of the BET value box. Every numeric HUD value
 renders with tabular numerals (font-variant-numeric: tabular-nums) so digit width never
 shifts. Z-order law is unchanged from v3.1.
+
+# AMENDMENT v3.3 (owner approved) — feature button right, MAX chip returns, theme selector dev-only
+
+Supersedes only the elements it names; the frame, grid, logo, banner, scene group, bonus
+instrument column and the other v3.2 fixed-field HUD boxes are unchanged.
+
+(a) FEATURE button relocates to the RIGHT side of the frame, about 160 wide, vertically
+centred on the frame (the frame is 640x468 at (320,84), so its vertical centre is y 318).
+During Overdrive the FEATURE button is hidden and the bonus instrument column owns that right
+zone.
+
+(b) MAX BET returns as a MAX chip at a FIXED position beside the bet arrows. The stacked cyan
+bet arrows shift from x 916 (v3.2) to x 906; the MAX chip sits at x 938, width 40, on the HUD
+baseline (cy 604), wired to the existing max-bet ladder logic, rendered with tabular numerals,
+and never repositioned by its content. The chip clears the SPIN button; if a stress audit
+finds the fixed 40 width intersecting the SPIN circle, the chip width is the free lever and is
+recorded here with the final measured value.
+
+(c) The theme selector button is removed from the production UI and gated behind a dev-only
+flag (import.meta.env.DEV); in production it is never rendered and the default theme is forced
+(already the case in App.svelte, re-verified this pass).

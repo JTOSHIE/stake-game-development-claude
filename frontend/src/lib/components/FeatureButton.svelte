@@ -12,6 +12,9 @@
 
   const dispatch = createEventDispatcher<{ open: void }>()
 
+  // v3.3: hidden during Overdrive (the bonus instrument column owns that zone).
+  export let overdriveActive = false
+
   $: mode = ($isSocial ? 'social' : 'real') as GameMode
   $: label = t($locale, 'buyFeature', mode)
 
@@ -20,7 +23,7 @@
   }
 </script>
 
-{#if !$buyFeatureDisabled}
+{#if !$buyFeatureDisabled && !overdriveActive}
   <div class="feature-group" data-testid="feature-button">
     <button
       class="feature-btn"
@@ -35,12 +38,13 @@
 {/if}
 
 <style>
-  /* Beside the frame upper left, just above and right of the character */
+  /* v3.3: right of the frame (right edge x960), vertically centred on the
+     frame (frame centre y318 -> the 160 button spans y238-398). */
   .feature-group {
     position: absolute;
-    left: 170px;
-    top: 30px;
-    width: 128px;
+    left: 966px;
+    top: 238px;
+    width: 160px;
     z-index: 60;
     display: flex;
     flex-direction: column;
@@ -49,8 +53,8 @@
   }
 
   .feature-btn {
-    width: 128px;
-    height: 128px;
+    width: 160px;
+    height: 160px;
     background: none;
     border: none;
     padding: 0;
