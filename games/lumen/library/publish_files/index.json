@@ -1,0 +1,28 @@
+{
+    "modes": [
+        {
+            "name": "surface",
+            "cost": 1.0,
+            "events": "books_surface.jsonl.zst",
+            "weights": "lookUpTable_surface_0.csv"
+        },
+        {
+            "name": "deepdive",
+            "cost": 1.5,
+            "events": "books_deepdive.jsonl.zst",
+            "weights": "lookUpTable_deepdive_0.csv"
+        },
+        {
+            "name": "bloom",
+            "cost": 100.0,
+            "events": "books_bloom.jsonl.zst",
+            "weights": "lookUpTable_bloom_0.csv"
+        },
+        {
+            "name": "abyssalbloom",
+            "cost": 300.0,
+            "events": "books_abyssalbloom.jsonl.zst",
+            "weights": "lookUpTable_abyssalbloom_0.csv"
+        }
+    ]
+}
