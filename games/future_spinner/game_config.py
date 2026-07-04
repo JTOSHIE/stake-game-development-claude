@@ -241,6 +241,25 @@ class GameConfig(Config):
             "force_freegame": False,
         }
 
+        # -- Ante-mode conditions ---------------------------------------------
+        # Double-Chance: cost 1.5x for ~2x the free-spin trigger rate. Same reels,
+        # same feature, same 5,000x cap as base. The ante funds a heavier free-game
+        # fence, so ordinary base ways wins are lighter (authentic ante profile).
+        # Conditions are identical to base's; only the quota mix (more freegame
+        # books) and the optimiser fence split differ (see game_optimization.py).
+        freegame_ante_condition = {
+            "reel_weights": _reels_std,
+            "force_wincap": False,
+            "force_freegame": True,
+            "scatter_triggers": {3: 75, 4: 20, 5: 5},
+        }
+        wincap_ante_condition = {
+            "reel_weights": _reels_wincap,
+            "force_wincap": True,
+            "force_freegame": True,
+            "scatter_triggers": {3: 60, 4: 30, 5: 10},
+        }
+
         # -- Bonus-mode conditions --------------------------------------------
         # Guaranteed trigger, weighted toward higher scatter counts to justify
         # the 100x buy price. wincap variant drives the cap in-bonus.
@@ -291,6 +310,42 @@ class GameConfig(Config):
                     Distribution(
                         criteria="basegame",
                         quota=0.488,
+                        conditions=basegame_condition,
+                    ),
+                ],
+            ),
+            # ANTE / DOUBLE-CHANCE MODE (cost 1.5x) ---------------------------
+            # Same reels and feature as base; ~2x the trigger rate. Not a buy:
+            # the reels still spin normally, the feature is just twice as likely.
+            BetMode(
+                name="ante",
+                cost=1.5,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.003,
+                        win_criteria=float(_maxwin),
+                        conditions=wincap_ante_condition,
+                    ),
+                    Distribution(
+                        criteria="freegame",
+                        quota=0.30,
+                        conditions=freegame_ante_condition,
+                    ),
+                    Distribution(
+                        criteria="0",
+                        quota=0.25,
+                        win_criteria=0.0,
+                        conditions=zerowin_condition,
+                    ),
+                    Distribution(
+                        criteria="basegame",
+                        quota=0.447,
                         conditions=basegame_condition,
                     ),
                 ],

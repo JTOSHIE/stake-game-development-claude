@@ -57,8 +57,9 @@
   import { get } from 'svelte/store'
   import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
+  import AnteToggle from './lib/components/AnteToggle.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
-  import { selectedBetMode } from './lib/stores/betMode'
+  import { selectedBetMode, anteEnabled, ANTE_COST } from './lib/stores/betMode'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
@@ -274,7 +275,8 @@
     } catch (err) {
       console.error('[Buy error]', err)
     } finally {
-      selectedBetMode.set('base')
+      // Restore the standing mode (ante if the toggle is on, else base).
+      selectedBetMode.set(get(anteEnabled) ? 'ante' : 'base')
       isSpinning.set(false)
     }
   }
@@ -354,14 +356,21 @@
 
   async function handleSpin() {
     if ($isSpinning || featureActive) return
+    const bet  = $betAmount
+    // Ante / Double-Chance: standing mode for normal spins. Costs 1.5x (server
+    // applies the mode cost); guard affordability of the 1.5x debit here since
+    // the locked canSpin guard only checks the 1x base bet.
+    const ante = get(anteEnabled)
+    const cost = ante ? bet * ANTE_COST : bet
+    if (ante && get(balance) < cost) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
-    selectedBetMode.set('base')
+    selectedBetMode.set(ante ? 'ante' : 'base')
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
-    const bet  = $betAmount
-
     try {
+      // SpinRequest.mode stays 'base' (locked type); the server reads the ante
+      // mode from selectedBetMode set above. Base/bonus behaviour unchanged.
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
 
       if (gridRef) await gridRef.animateSpin(result.board)
@@ -377,7 +386,7 @@
         playWin(bet > 0 ? result.totalWin / bet : 0)
         await new Promise((r) => setTimeout(r, 2600))
       }
-      recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
+      recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
       if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
@@ -653,6 +662,14 @@
        where the jurisdiction disables feature buys (handled inside). -->
   <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={handleBuy} />
 
+  <!-- Ante / Double-Chance toggle — standing bet-mode switch for normal spins.
+       Hidden during the feature (no bet changes mid-feature). -->
+  {#if !featureActive}
+    <div class="ante-mount">
+      <AnteToggle />
+    </div>
+  {/if}
+
   <!-- Theme selector — dev-only. Hidden in the production submission build so
        only the validated Future Spinner experience ships (see the scope note
        in the script). Reversible: remove these import.meta.env.DEV guards. -->
@@ -895,6 +912,15 @@
   .util-btn.theme-btn:hover {
     background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
     border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
+  }
+
+  /* ── Ante / Double-Chance toggle — bottom-left, clear of the centre controls
+        and the bottom-right dev toggles. Temporary placement (AssetForge v2). ── */
+  .ante-mount {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 55;
   }
 
   /* ── Reel-mode toggle (dev-only) — pill just left of the theme button ────── */

@@ -24,12 +24,14 @@ PUB = ROOT / "games/future_spinner/library/publish_files"
 
 # Our stated facts (CLAUDE.md / GAME_FACTS) to cross-check against.
 STATED = {
-    "rtp": 0.963500,           # both modes, 4dp
+    "rtp": 0.963500,           # all modes, 4dp
     "base_hit_rate": 0.2911,
     "base_std": 17.28,         # weighted SD in bet-multiples
+    "ante_std": 23.26,         # ante (cost 1.5x) weighted SD
     "bonus_std": 206.63,
     "max_win": 5000.0,
     "base_wincap_one_in": 100_000,
+    "ante_wincap_one_in": 66_667,
     "bonus_wincap_one_in": 1_000,
 }
 # Stake compliance rubric - from the OFFICIAL math-verification doc
@@ -167,7 +169,10 @@ def main() -> int:
     print("\n--- cross-check vs stated facts (warn on mismatch) ---")
     checks = [
         ("base RTP == 96.35%", near(br["rtp"], STATED["rtp"], 1e-4)),
+        ("ante RTP == 96.35%", near(results["ante"]["rtp"], STATED["rtp"], 1e-4)),
         ("bonus RTP == 96.35%", near(results["bonus"]["rtp"], STATED["rtp"], 1e-4)),
+        ("ante SD == 23.26x", near(results["ante"]["std"], STATED["ante_std"], 0.03)),
+        ("ante wincap ~ 1 in 66.7k", near(results["ante"]["wincap_one_in"], STATED["ante_wincap_one_in"], 0.20)),
         ("base hit rate == 29.11%", near(br["hit_rate"], STATED["base_hit_rate"], 0.02)),
         ("base SD == 17.28x", near(br["std"], STATED["base_std"], 0.03)),
         ("bonus SD == 206.63x", near(results["bonus"]["std"], STATED["bonus_std"], 0.03)),

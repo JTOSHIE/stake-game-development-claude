@@ -2,10 +2,10 @@
 
 **Game:** Future Spinner
 **Provider:** We Roll Spinners
-**Report Date:** 2026-07-03
-**Feature:** OVERDRIVE FREE SPINS (two bet modes: base + bonus buy)
+**Report Date:** 2026-07-05
+**Feature:** OVERDRIVE FREE SPINS (three bet modes: base + ante / Double-Chance + bonus buy)
 **Simulation Basis:** 100,000 rounds per mode (Stake Engine SDK v1)
-**Optimiser:** PigFarm Rust, both modes converged to 96.3500% RTP
+**Optimiser:** PigFarm Rust, all three modes converged to 96.3500% RTP
 
 ---
 
@@ -15,12 +15,14 @@
 |------------------------|-------------------------------------------|
 | Grid                   | 5 reels x 4 rows (20 symbol positions)    |
 | Win mechanic           | Ways-to-win (up to 4^5 = 1,024 ways)     |
-| Bet modes              | Two: base (cost 1.0x) and bonus buy (cost 100.0x) |
-| Target RTP             | 96.35% (both modes)                       |
+| Bet modes              | Three: base (1.0x), ante / Double-Chance (1.5x) and bonus buy (100.0x) |
+| Target RTP             | 96.35% (all modes)                        |
 | Achieved RTP (base)    | 96.3500% (10dp 96.3499998727%)            |
+| Achieved RTP (ante)    | 96.3500% (96.34999985%)                   |
 | Achieved RTP (bonus)   | 96.3500% (10dp 96.3499999962%)            |
-| Wincap                 | 5,000x bet (hard, both modes)             |
+| Wincap                 | 5,000x bet (hard, all modes)              |
 | Volatility (base)      | Medium-High, weighted SD 17.28x           |
+| Volatility (ante)      | High, weighted SD 23.26x                  |
 | Min bet                | $0.10                                     |
 | Max bet                | $100.00                                   |
 | Feature                | Overdrive Free Spins with progressive multiplier |
@@ -126,6 +128,40 @@ heavy strips used to force wincap rounds.*
 | Overdrive free-spin rounds (instant scatter pays plus free-spin winnings) | 38.0000% |
 | Wincap rounds (5,000x)                       |           5.0000% |
 | **Total**                                    |     **96.3500%** |
+
+---
+
+## 5B. ANTE / DOUBLE-CHANCE MODE STATISTICS (cost 1.5x)
+
+Ante is a stateless standing bet mode: the reels spin normally (it is not a buy),
+but at 1.5x the base cost the free-spin trigger rate is roughly doubled. The feature
+itself is identical to base (same reels, same Overdrive meter, same 5,000x cap); the
+heavier free-game fence is funded by a lighter base-ways fence.
+
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| Cost                                | 1.5x base bet            |
+| RTP                                 | 96.3500% (96.34999985%)  |
+| Hit rate (win > 0)                  | 29.65%                   |
+| Free-spin trigger rate              | 1 in 92.4 (2.0x the base 1 in 184.7) |
+| Volatility (weighted SD)            | 23.26x                   |
+| Max win                             | 5,000x bet               |
+| Wincap frequency                    | 1 in 66,667              |
+| P(win >= 5,000x)                     | 1.5e-05                  |
+| Simulations                         | 100,000                  |
+
+### RTP budget split (ante mode, weighted, as fractions of the 1.5x cost)
+
+| Component                                   | RTP contribution |
+|---------------------------------------------|-----------------:|
+| Base ways (non-feature rounds)              |          15.3500% |
+| Overdrive free-spin rounds (instant scatter pays plus free-spin winnings) | 76.0000% |
+| Wincap rounds (5,000x)                       |           5.0000% |
+| **Total**                                    |     **96.3500%** |
+
+Independently recomputed from the shipped `lookUpTable_ante_0.csv` by
+`scripts/validate_math.py`: RTP 96.350000%, cross-mode variation 0.0000% vs base
+and bonus, all Stake star-tier risk gates pass.
 
 ---
 
@@ -238,36 +274,42 @@ total payout equals the recorded payout multiplier in every sampled round.
 
 ---
 
-## 10. TWO-MODE DECLARATION
+## 10. THREE-MODE DECLARATION
 
-Future Spinner ships exactly two bet modes:
+Future Spinner ships exactly three bet modes:
 
 - **base** (cost 1.0x): standard play. The Overdrive Free Spins feature triggers
   on 3+ scatters at a rate of about 1 in 185 base spins.
+- **ante / Double-Chance** (cost 1.5x): standard play at roughly double the
+  free-spin trigger rate (about 1 in 92). Not a buy; the reels spin normally.
 - **bonus** (cost 100.0x): a buy that guarantees entry to the Overdrive Free
   Spins feature.
 
-Both modes are stateless (each round resolves independently inside one book
+All three modes are stateless (each round resolves independently inside one book
 round), share the 1,024-way base game and paytable, enforce the same 5,000x win
-cap, and return 96.3500% RTP. There is no jackpot, gamble, or continuation
-mechanic. The scatter awards are 1x/3x/10x instant plus 8/12/16 free spins on
-3/4/5 scatters, with a progressive Overdrive multiplier during the feature.
+cap, and return 96.3500% RTP (cross-mode variation 0.0000%, within the 0.5% rule).
+There is no jackpot, gamble, or continuation mechanic. The scatter awards are
+1x/3x/10x instant plus 8/12/16 free spins on 3/4/5 scatters, with a progressive
+Overdrive multiplier during the feature.
 
 ---
 
 ## 11. REGULATORY COMPLIANCE NOTES
 
-- **RTP:** 96.3500% in both modes (four decimal places), satisfying the 0.5%
+- **RTP:** 96.3500% in all three modes (four decimal places), satisfying the 0.5%
   tolerance rule.
 - **Wincap:** hard 5,000x cap enforced at the engine level; no simulated round
-  in either mode exceeds it.
+  in any mode exceeds it.
 - **Stateless:** the whole Overdrive feature resolves within a single book
   round; no state carries between rounds.
 - **No progressive jackpot, gamble, or continuation mechanic.**
+- **Ante / Double-Chance:** the 1.5x mode returns 96.35% RTP with roughly double
+  the trigger rate. It is not a buy (reels spin normally). Jurisdictions that
+  restrict ante-style bets can gate it in the frontend.
 - **Bonus buy:** the 100x buy returns 96.35% RTP (average outcome 96.35x),
   matching the base-mode RTP. Jurisdictions that disable feature buys hide the
   bonus mode (frontend scope).
 
 ---
 
-*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.1 (Overdrive Free Spins)*
+*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.2 (Overdrive Free Spins, three modes)*

@@ -6,12 +6,13 @@ Australian English, no em dashes or en dashes.
 
 ## Current posture (build verified against current requirements)
 
-- **Stateless:** verified. Two bet modes (base 1.0x, bonus buy 100.0x); the Overdrive Free
-  Spins feature resolves inside one book round. No jackpot, gamble, continuation or early
-  cashout. Matches the approval-guidelines Key Restrictions (free spins and feature buys are
-  permitted; jackpots/gamble/continuation are not).
-- **Feature:** Overdrive Free Spins with a progressive multiplier, plus a 100x bonus buy.
-  Both modes stateless and capped at 5,000x, both at 96.3500% RTP.
+- **Stateless:** verified. Three bet modes (base 1.0x, ante / Double-Chance 1.5x, bonus buy
+  100.0x); the Overdrive Free Spins feature resolves inside one book round. No jackpot, gamble,
+  continuation or early cashout. Matches the approval-guidelines Key Restrictions (free spins
+  and feature buys are permitted; jackpots/gamble/continuation are not).
+- **Feature:** Overdrive Free Spins with a progressive multiplier, an ante / Double-Chance
+  mode (1.5x, ~2x trigger rate) and a 100x bonus buy. All three modes stateless and capped at
+  5,000x, all at 96.3500% RTP (cross-mode variation 0.0000%).
 - **Original IP:** verified. Original designs, produced in-house from vector masters.
   No pre-purchased or third-party licensed content.
 - **No Stake branding:** verified. No Stake trademark or themes in any shipped asset or text.
@@ -33,6 +34,26 @@ Australian English, no em dashes or en dashes.
   required for our current stateless submission; note for future roadmap only.
 
 ## Watch log
+
+### 2026-07-05: added a third bet mode (ante / Double-Chance)
+Acted on the gap analysis "now-or-never" finding (bet modes lock at approval). Added a
+third stateless mode, **ante / Double-Chance** (cost 1.5x, ~2x the free-spin trigger rate:
+1 in 92.4 vs base 1 in 184.7), same reels/feature/5,000x cap as base. Generated ante-only so
+the already-verified base/bonus books + replay event IDs stay byte-identical; base/bonus
+lookup tables unchanged (git diff empty).
+- **RTP:** 96.3500% all three modes, cross-mode variation 0.0000% (well within the 0.5% rule).
+  All Stake star-tier risk gates pass in `scripts/validate_math.py` (ante SD 23.26x in band,
+  wincap 1 in 66,667, P(>=5000x) 1.5e-05). PAR sheet updated (section 5B, three-mode
+  declaration), `game_metadata.json` version 1.2.0 modes [base, ante, bonus].
+- **Frontend:** Double Chance toggle (cyan, distinct from magenta Bonus Buy); sends 'ante'
+  via the sanctioned `selectedBetMode` passthrough so the server applies the 1.5x cost; base/
+  bonus behaviour unchanged. Paytable gains an ante rule line, social-scrubbed (no bet/pay/
+  cost terms leak in social mode). Build + typecheck clean; proof in `reports/screens/ante/`.
+- **Jurisdiction watch:** ante-style bets are restricted in some markets (like autoplay/turbo).
+  No RGS flag consumed yet; gate the toggle behind a jurisdiction flag if one is exposed. The
+  bonus-buy `disabledBuyFeature` gating is unaffected.
+- **Lock discipline:** the two `games/future_spinner/**` deny lines were lifted for the build
+  under the owner's sanction and restored before commit (git diff .claude/settings.json empty).
 
 ### 2026-07-04: captured the full approval-guidelines set + rubric findings
 Discovered (via the docs nav) that we were mirroring only 4 of the approval pages and that

@@ -71,6 +71,9 @@ export interface Translations {
   rulesOverdriveRetrigger?: string
   rulesOverdriveBuy?:      string
   rulesOverdriveModes?:    string
+  rulesOverdriveAnte?:     string
+  anteLabel?:              string
+  anteHint?:               string
   introContinue?:          string
 }
 
@@ -117,6 +120,9 @@ const en: Translations = {
   close:                'CLOSE',
   settings:             'SETTINGS',
   replayDisclaimer:     'This is a replay of a previously completed bet, shown for verification only. No funds are wagered and the outcome cannot be changed.',
+  anteLabel:            'DOUBLE CHANCE',
+  anteHint:             '2× FEATURE',
+  rulesOverdriveAnte:   'Double Chance: pay 1.5× your bet for roughly twice the free-spin trigger rate. Same feature, same 96.35% RTP, same 5,000× max win.',
 }
 
 // ── Arabic ────────────────────────────────────────────────────────────────────
@@ -943,6 +949,8 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
     'Feature Play: play 100× your total play to start the feature instantly.',
   rulesOverdriveModes:
     'Base game and Feature Play both return 96.35% RTP. Maximum prize 5,000× your play.',
+  rulesOverdriveAnte:
+    'Double Chance: play 1.5× your total play for roughly twice the free-spin trigger rate. Same feature, same 96.35% RTP, same 5,000× maximum prize.',
 }
 
 // ── t() — translate a key ─────────────────────────────────────────────────────

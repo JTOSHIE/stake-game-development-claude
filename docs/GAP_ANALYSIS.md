@@ -151,11 +151,13 @@ This is a small, high-value frontend change and it directly answers the concern.
 ### A. Now-or-never maths decisions (owner, before the maths locks)
 These cannot be added after approval. They are the only items on this whole list
 with a hard deadline.
-1. **Second/third bet mode.** We ship exactly one 100x buy. Convention is 2 to 3
-   tiers, and/or an **ante / double-chance** mode (base cost plus ~25 to 50%, raises
-   trigger frequency) that the "bonus hunter" crowd prefers over a full 100x buy.
-   All modes must stay within 0.5% RTP of each other; our two at 96.35% leave room
-   for a third.
+1. **Second/third bet mode.** DONE (2026-07-05): added a third mode, **ante /
+   Double-Chance** (cost 1.5x, ~2x free-spin trigger rate: 1 in 92.4 vs base
+   1 in 184.7), stateless, RTP 96.3500% (cross-mode variation 0.0000%), max win
+   5,000x. Independently validated by `scripts/validate_math.py` (all three modes
+   pass) and wired into the frontend (Double Chance toggle). See the PAR sheet
+   section 5B and `reports/screens/ante/`. A further "super/mini" buy tier remains
+   an option if wanted this submission.
 2. **One interacting free-spins mechanic** (for example sticky wilds that feed the
    Overdrive meter, or symbol upgrades). This is the clearest way to lift the
    "limited depth / missing additional mechanics" risk from a possible 1 to 2 star

@@ -68,11 +68,15 @@ bans buy, bonus buy, purchase, bought, cost of, at the cost of on stake.us, with
 replacements such as get bonus, play, instantly triggered, can be played for);
 the RGS jurisdiction flag disabledBuyFeature must fully hide the buy; replay
 must play back a complete free spins round and, for a bonus buy round, display
-the amount spent including the cost multiplier; both modes must appear in the
+the amount spent including the cost multiplier; all three modes must appear in the
 paytable and rules, localised across all sixteen locales; the 0.5% mode RTP rule
-is satisfied by design, both modes at 96.3500%, evidenced in PAR v2.
+is satisfied by design, all three modes at 96.3500% (cross-mode variation 0.0000%),
+evidenced in PAR v2. A third mode, ante / Double-Chance (cost 1.5x, ~2x the
+free-spin trigger rate), was added 2026-07-05 while the maths could still change
+(bet modes lock at approval); it is stateless, capped at 5,000x, and wired to a
+frontend Double Chance toggle.
 Independent verification (2026-07-04): the maths is recomputed from the shipped
-lookup tables by scripts/validate_math.py (CI-gated) - both modes 96.350000%,
+lookup tables by scripts/validate_math.py (CI-gated) - all three modes 96.350000%,
 cross-mode variation 0.0000%, base hit 29.11%, SD 17.28x / 206.63x, max 5,000x,
 wincap 1-in-100k / 1-in-1k, all Stake checks pass (MATH_VALIDATION.md). The RGS
 wire contract is documented and our client verified aligned in

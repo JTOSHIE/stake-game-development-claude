@@ -79,6 +79,50 @@ class OptimizationSetup:
                     bias_weights=[0.4],
                 ).return_dict(),
             },
+            "ante": {
+                # Double-Chance (cost 1.5x): identical free-spin outcome to base
+                # (av_win = 0.76 x 92.5 = 70.3, same as base 0.38 x 185) but at
+                # ~twice the trigger rate (hr 92.5 vs 185). The heavier freegame
+                # fence is funded by a lighter basegame fence. Fences sum to 0.9635.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["ante"], search_conditions=wincaps["ante"]
+                    ).return_dict(),
+                    "0": ConstructConditions(
+                        rtp=0.0, av_win=0, search_conditions=0
+                    ).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.76, hr=92.5, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.1535, hr=3.5).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 1.2,
+                         "win_range": (1, 5), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 1.2,
+                         "win_range": (20, 80), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 0.8,
+                         "win_range": (1000, 4000), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000,
+                    num_per_fence=10000,
+                    min_m2m=4,
+                    max_m2m=8,
+                    pmb_rtp=1.0,
+                    sim_trials=5000,
+                    test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3],
+                    score_type="rtp",
+                ).return_dict(),
+                "distribution_bias": ConstructFenceBias(
+                    applied_criteria=["basegame"],
+                    bias_ranges=[(1.0, 5.0)],
+                    bias_weights=[0.4],
+                ).return_dict(),
+            },
             "bonus": {
                 "conditions": {
                     "wincap": ConstructConditions(

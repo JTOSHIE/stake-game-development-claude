@@ -32,7 +32,12 @@ from src.write_data.write_configs import generate_configs               # noqa: 
 if __name__ == "__main__":
 
     rtp_target = 96.35
-    target_modes = ["base", "bonus"]
+    # Three stateless modes: base (1.0x), ante / Double-Chance (1.5x, ~2x trigger
+    # rate) and bonus buy (100.0x). All target 96.35% RTP (within the 0.5% cross-
+    # mode band). NOTE: the shipped ante package was generated on its own to keep
+    # the already-verified base/bonus books + replay event IDs byte-identical; a
+    # full from-scratch run of all three here reproduces a consistent bundle.
+    target_modes = ["base", "ante", "bonus"]
 
     if PRODUCTION:
         num_threads = 10
@@ -41,6 +46,7 @@ if __name__ == "__main__":
         compression = True
         num_sim_args = {
             "base":  100_000,
+            "ante":  100_000,
             "bonus": 100_000,
         }
         run_conditions = {
@@ -55,6 +61,7 @@ if __name__ == "__main__":
         compression = False
         num_sim_args = {
             "base":  100,
+            "ante":  100,
             "bonus": 100,
         }
         run_conditions = {

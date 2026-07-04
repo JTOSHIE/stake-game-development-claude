@@ -211,6 +211,7 @@
         <ul class="rules-list">
           <li>{$tr('rulesOverdriveMeter')}</li>
           <li>{$tr('rulesOverdriveRetrigger')}</li>
+          <li>{$tr('rulesOverdriveAnte')}</li>
           {#if !$buyFeatureDisabled}
             <li>{$tr('rulesOverdriveBuy')}</li>
           {/if}
