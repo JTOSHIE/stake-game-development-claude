@@ -62,6 +62,9 @@
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, MODE_COST } from './lib/stores/betMode'
   import type { BuyMode } from './lib/stores/betMode'
+  import { currencyCode } from './lib/stores/gameStore'
+  import { CURRENCY_SCALE } from './lib/utils/currency'
+  import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier } from './lib/services/telemetry'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
@@ -89,6 +92,20 @@
 
   let gridRef: GameGrid
   let buyBonusRef: BuyBonus
+
+  // Telemetry: lazy session envelope + a dev buffer sink (window.__telemetry).
+  // Production registers a vendor sink instead; no-op until one is set.
+  configureTelemetry(() => ({
+    mode: get(selectedBetMode),
+    betMicros: Math.round(get(betAmount) * CURRENCY_SCALE),
+    currency: get(currencyCode) || 'USD',
+    social: get(isSocial),
+  }))
+  if (import.meta.env.DEV) {
+    const buf: import('./lib/services/telemetry').TelemetryEvent[] = []
+    ;(window as unknown as { __telemetry: unknown[] }).__telemetry = buf
+    setTelemetrySink(bufferSink(buf))
+  }
 
   // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────
   // Shown once, right after loading finishes. Persistence (audit remediation):
@@ -238,6 +255,7 @@
     const cost = bet * MODE_COST[buyMode]
     try {
       selectedBetMode.set(buyMode)
+      track({ type: 'buy', tier: buyMode, costMicros: Math.round(cost * CURRENCY_SCALE) })
       lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh bonus round
       const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
 
@@ -370,6 +388,7 @@
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
     selectedBetMode.set(mode)
+    track({ type: 'spin', costMicros: Math.round(cost * CURRENCY_SCALE) })
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
     try {
@@ -392,6 +411,11 @@
       }
       recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
       if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
+      if (result.totalWin > 0) {
+        const mult = bet > 0 ? result.totalWin / bet : 0
+        track({ type: 'win', winMicros: Math.round(result.totalWin * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
+      }
+      if (result.isWincap) track({ type: 'wincap', multiple: bet > 0 ? result.totalWin / bet : 0 })
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
       // this round, plus the balance the store actually landed on, so the
