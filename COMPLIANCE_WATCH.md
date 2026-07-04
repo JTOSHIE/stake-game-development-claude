@@ -34,6 +34,30 @@ Australian English, no em dashes or en dashes.
 
 ## Watch log
 
+### 2026-07-04: captured the full approval-guidelines set + rubric findings
+Discovered (via the docs nav) that we were mirroring only 4 of the approval pages and that
+the dossier's `/docs/approval/checklist` + `/docs/approval/game-tile` URLs were wrong (they
+error). Captured the real set under `/docs/approval-guidelines/`: **submission-checklist,
+game-tile-requirements, rgs-communication, front-end-communication, math-verification,
+general-disclaimer** (now 11 pages mirrored; manifest rebuilt).
+
+Key findings (all reconciled against our build):
+- **RTP band is 90.0%-96.70%, NOT up to 98%** (math-verification). We are compliant at
+  **96.35%** with 0.35% headroom. `scripts/validate_math.py` was tightened to this real cap
+  (and re-run: still ALL PASS).
+- **Operator-risk star-tier ceilings** (math-verification) all pass for us: max payout mult
+  5,000x (<= 100,000x), cost mult 100x (<= 1,500x), base SD 17.28 (in 0.6-60), P(>=5000x)
+  cost-scaled 1e-5 base / 1e-3 bonus (<= 1e-2), max win reachable 1-in-100k / 1-in-1k
+  (< 1-in-10M). Added these as gates to `validate_math.py`.
+- **rgs-communication / front-end-communication** are the OFFICIAL RGS + frontend contract
+  docs and align with `docs/RGS_CONTRACT_REFERENCE.md` (authenticate returns bet levels +
+  min/max/minStep the frontend must respect; we do).
+- **game-tile-requirements:** BG (PNG/JPG env background) + FG (transparent PNG) combined
+  <= 3MB, plus a transparent Provider Logo legible at small size, with `GameTitle-BG/FG` /
+  `ProviderName-Logo` naming. Feeds the tile asset task (owner/design).
+- **submission-checklist:** the full criteria list is **login-gated** (portal auth) - capture
+  the authenticated version on the owner's next portal login.
+
 ### 2026-07-04: docs refresh, no changes
 Re-rendered all five pages via headless Chrome into `docs/stake-engine-live/`.
 **No content changes** vs the 2026-07-03 snapshot: approval-guidelines (2250 chars),

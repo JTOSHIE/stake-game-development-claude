@@ -6,40 +6,77 @@
       "resolved_url": "https://stake-engine.com/docs/approval-guidelines",
       "sha256": "9e2713a17e0752804a2fc4f9db68904c95a1b2eab0fc4d662bdb5e4f7e400555",
       "chars": 2250,
-      "looks_real": true,
-      "error": null
-    },
-    {
-      "slug": "jurisdiction-requirements",
-      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements",
-      "sha256": "b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c",
-      "chars": 1375,
-      "looks_real": true,
-      "error": null
-    },
-    {
-      "slug": "game-quality-rankings",
-      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-quality-rankings",
-      "sha256": "0454dcc257c08a49717e1cc27a856f5c696aaee02e5009848c60239dba265dcf",
-      "chars": 3245,
-      "looks_real": true,
-      "error": null
-    },
-    {
-      "slug": "game-replay-requirements",
-      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-replay-requirements",
-      "sha256": "789dcfd5ff7bc592582440aae2e098156026bb88f40b2ec75224ad1cb3afa536",
-      "chars": 5037,
-      "looks_real": true,
-      "error": null
+      "looks_real": true
     },
     {
       "slug": "changelog",
       "resolved_url": "https://stake-engine.com/docs/updates",
       "sha256": "312569dd18e2263f87e9467888e6d3180e8a4ea43dca437771d0abd248d1f69c",
       "chars": 88,
-      "looks_real": false,
-      "error": null
+      "looks_real": false
+    },
+    {
+      "slug": "front-end-communication",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/front-end-communication",
+      "sha256": "362166b9146acf498bf19725e6c69a88157c61e3dc7de2a496054849fee40c82",
+      "chars": 2854,
+      "looks_real": true
+    },
+    {
+      "slug": "game-quality-rankings",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-quality-rankings",
+      "sha256": "0454dcc257c08a49717e1cc27a856f5c696aaee02e5009848c60239dba265dcf",
+      "chars": 3245,
+      "looks_real": true
+    },
+    {
+      "slug": "game-replay-requirements",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-replay-requirements",
+      "sha256": "789dcfd5ff7bc592582440aae2e098156026bb88f40b2ec75224ad1cb3afa536",
+      "chars": 5037,
+      "looks_real": true
+    },
+    {
+      "slug": "game-tile-requirements",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/game-tile-requirements",
+      "sha256": "08f7a9e0b3e2be9210f24fa79b913c9a40e52308b0dea25c321441286624cad4",
+      "chars": 1341,
+      "looks_real": true
+    },
+    {
+      "slug": "general-disclaimer",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/general-disclaimer",
+      "sha256": "d83624a4ad8cb4845cb0b4ca9bd3ca252b332bd9fa77b9a3327412a20463c904",
+      "chars": 872,
+      "looks_real": true
+    },
+    {
+      "slug": "jurisdiction-requirements",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements",
+      "sha256": "b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c",
+      "chars": 1375,
+      "looks_real": true
+    },
+    {
+      "slug": "math-verification",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/math-verification",
+      "sha256": "32e479e43c54153133754b167c60357a75c164776c06ce01e5a52c98c2734a6c",
+      "chars": 4307,
+      "looks_real": true
+    },
+    {
+      "slug": "rgs-communication",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/rgs-communication",
+      "sha256": "73d60917731d4b4ea1b606d2a66875f6320a2d6687b8eb13c227357dc7c865f3",
+      "chars": 2725,
+      "looks_real": true
+    },
+    {
+      "slug": "submission-checklist",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/submission-checklist",
+      "sha256": "f3de133a7efc780a0410e196818f708353916b0b8c4eee4a44879561910ed0cf",
+      "chars": 1376,
+      "looks_real": true
     }
   ]
 }
