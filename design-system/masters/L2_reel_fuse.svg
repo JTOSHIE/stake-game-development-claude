@@ -32,9 +32,11 @@
   <rect x="372" y="316" width="280" height="400" rx="42" fill="none" stroke="#9adcff" stroke-width="18" opacity="0.2"/>
   <rect x="390" y="332" width="26" height="368" rx="13" fill="#ffffff" opacity="0.5"/>
   <rect x="416" y="352" width="192" height="322" rx="24" fill="#0c1622" stroke="#0a0e16" stroke-width="5"/>
-  <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="url(#chromeU)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
-  <circle cx="512" cy="500" r="46" fill="#9adcff" opacity="0.22"/>
-  <circle cx="512" cy="500" r="20" fill="#e8f8ff" opacity="0.8"/>
+  <g id="fuseArc">
+    <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="url(#chromeU)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 512 368 L 512 430 L 466 470 L 558 532 L 512 572 L 512 656" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="512" cy="500" r="46" fill="#9adcff" opacity="0.22"/>
+    <circle cx="512" cy="500" r="20" fill="#e8f8ff" opacity="0.8"/>
+  </g>
   <ellipse cx="440" cy="380" rx="34" ry="90" fill="#ffffff" opacity="0.14" transform="rotate(-6 440 380)"/>
 </svg>

@@ -1,33 +1,34 @@
-// motion_v2_proof.mjs — Motion Polish v2 proof gates.
+// reel_v3_proof.mjs — Reel Feel v3 motion proof gates.
 //
 // Requires a running dev server (npm run dev, default http://localhost:5173).
-// Run (from frontend/): npx tsx scripts/motion_v2_proof.mjs
+// Run (from frontend/): npx tsx scripts/reel_v3_proof.mjs
 //
-// Produces reports/screens/motion-v2/:
-//  - fps-log.json (per-spin fps + long-frame log across 20 spins incl. one bonus entry)
+// Produces reports/screens/reel-v3/:
+//  - fps-log.json (per-frame fps + long-frame log across 20 spins incl. one bonus entry)
 //  - occlusion-1280x720.json (re-run of the HUD occlusion audit)
-//  - spin-stagger.gif, win-bloom.gif, overdrive-transition.gif (video capture -> gif via ffmpeg)
+//  - strip-cycle.gif, drop-cycle.gif, idle-charge.gif (video capture -> gif via ffmpeg)
 //
-// Exits non-zero if the fps gate, the long-frame gate, or the occlusion gate fails.
+// Gates (exit non-zero on any): avg fps >= 55, ZERO frames over 100ms (hard),
+// occlusion clean, every gif < 3MB. p95/p99 reported.
+//
+// Note: the persistent hidden Overdrive warm mount means [data-testid=...] for
+// the entry/overlay always exist in the DOM, so all bonus detection here uses
+// :visible to target the real (visible) instance only.
 
 import { chromium } from 'playwright'
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, writeFileSync, statSync, renameSync } from 'node:fs'
+import { mkdirSync, writeFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'motion-v2')
+const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'reel-v3')
 mkdirSync(OUT_DIR, { recursive: true })
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
 async function waitSpinDone(page, timeout = 15000) {
   await page.waitForFunction(() => !document.querySelector('.spin-btn.spinning'), { timeout })
 }
-
-/** Every fresh browser context has its own sessionStorage, so the once-per-
- *  session intro splash shows on every new page — dismiss it before driving
- *  spins/buys so it doesn't block the SPIN button. */
 async function dismissIntroIfPresent(page) {
   const btn = page.locator('[data-testid="intro-continue"]')
   if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
@@ -54,20 +55,15 @@ async function runFpsGate(browser) {
     window.__rafHandle = requestAnimationFrame(tick)
   })
 
-  // 19 base spins + 1 bonus entry (the 10th, mid-run, so both idle and
-  // in-feature frames are sampled).
   for (let i = 0; i < 20; i++) {
     if (i === 9) {
       await page.locator('[data-testid="feature-button"] button').click()
       await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
       await page.locator('[data-testid="buy-confirm"]').click()
-      // :visible targets the real entry, not the persistent hidden warm mount
-      // (Reel Feel v3, Task 5), whose testids are always present in the DOM.
-      await page.waitForSelector('[data-testid="overdrive-entry"]:visible', { timeout: 8000 })
-      // Let the entry sequence + at least one free spin play out.
+      // :visible targets the real entry, not the persistent warm mount.
+      await page.locator('[data-testid="overdrive-entry"]:visible').waitFor({ timeout: 8000 })
       await page.waitForTimeout(2500)
-      // Slam through the rest of the feature quickly if still active.
-      for (let j = 0; j < 20; j++) {
+      for (let j = 0; j < 25; j++) {
         const active = await page.locator('[data-testid="freespins-overlay"]:visible').count()
         if (!active) break
         await page.waitForTimeout(300)
@@ -84,16 +80,18 @@ async function runFpsGate(browser) {
   })
   await page.close()
 
-  const gaps = frameTimes.slice(5) // drop the first few (page-settle noise)
+  const gaps = frameTimes.slice(5)
   const avgMs = gaps.reduce((a, b) => a + b, 0) / gaps.length
   const avgFps = 1000 / avgMs
   const longFrames = gaps.filter((g) => g > 100)
   const sorted = [...gaps].sort((a, b) => a - b)
   const pct = (p) => sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))]
-  const p95FrameMs = pct(95)
-  const p99FrameMs = pct(99)
-
-  return { sampleCount: gaps.length, avgFrameMs: avgMs, avgFps, p95FrameMs, p99FrameMs, longFrameCount: longFrames.length, longFrames }
+  return {
+    sampleCount: gaps.length, avgFrameMs: avgMs, avgFps,
+    p95FrameMs: pct(95), p99FrameMs: pct(99),
+    maxFrameMs: sorted[sorted.length - 1],
+    longFrameCount: longFrames.length, longFrames,
+  }
 }
 
 // ── Gate: occlusion re-check at 1280x720 ─────────────────────────────────────
@@ -138,10 +136,7 @@ async function runOcclusionGate(browser) {
 }
 
 // ── GIF captures ──────────────────────────────────────────────────────────
-// Each proof clip must land well under the 3MB gate: modest fps/width/colors,
-// and (for the win-bloom clip, whose search phase varies in length) trimmed
-// to just the tail of the recording so only the actual winning spin appears.
-async function captureGif(browser, name, widthPx, action, { tailSeconds } = {}) {
+async function captureGif(browser, name, widthPx, url, action, { tailSeconds } = {}) {
   const dir = join(OUT_DIR, `_video_${name}`)
   mkdirSync(dir, { recursive: true })
   const context = await browser.newContext({
@@ -149,7 +144,7 @@ async function captureGif(browser, name, widthPx, action, { tailSeconds } = {}) 
     recordVideo: { dir, size: { width: widthPx, height: Math.round(widthPx * 720 / 1280) } },
   })
   const page = await context.newPage()
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' })
+  await page.goto(url, { waitUntil: 'networkidle' })
   await page.waitForSelector('.spin-btn', { timeout: 15000 })
   await dismissIntroIfPresent(page)
   await action(page)
@@ -170,8 +165,7 @@ async function captureGif(browser, name, widthPx, action, { tailSeconds } = {}) 
   const MAX_COLORS = 96
   execFileSync('ffmpeg', ['-y', '-i', videoPath, '-vf', `fps=${FPS},scale=${widthPx}:-1:flags=lanczos,palettegen=max_colors=${MAX_COLORS}`, palettePath])
   execFileSync('ffmpeg', ['-y', '-i', videoPath, '-i', palettePath, '-filter_complex', `fps=${FPS},scale=${widthPx}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer`, gifPath])
-  const sizeMb = statSync(gifPath).size / (1024 * 1024)
-  return { gifPath, sizeMb }
+  return { gifPath, sizeMb: statSync(gifPath).size / (1024 * 1024) }
 }
 
 async function run() {
@@ -180,64 +174,44 @@ async function run() {
 
   console.log('[1/4] FPS gate (20 spins incl. one bonus entry)...')
   results.fps = await runFpsGate(browser)
-  console.log(`  avg fps: ${results.fps.avgFps.toFixed(1)}, p95: ${results.fps.p95FrameMs.toFixed(1)}ms, p99: ${results.fps.p99FrameMs.toFixed(1)}ms, long frames (>100ms): ${results.fps.longFrameCount}`)
-
-  // ── Anticipation floor (audit remediation, Task 2) ──────────────────────────
-  // Effective final-reel anticipation hold per tier, mirroring GameGrid's
-  // Math.max(300, base * speedFactor). Base 900ms (scatter) / 600ms (near-miss),
-  // factors Normal 1 / Turbo 0.5 / Super Turbo 0.16. Gate: every hold >= 300ms.
-  results.anticipationFloor = (() => {
-    const factors = { normal: 1, turbo: 0.5, super: 0.16 }
-    const rows = {}
-    let pass = true
-    for (const [tier, f] of Object.entries(factors)) {
-      const scatterHoldMs = Math.max(300, 900 * f)
-      const nearMissHoldMs = Math.max(300, 600 * f)
-      rows[tier] = { scatterHoldMs, nearMissHoldMs }
-      if (scatterHoldMs < 300 || nearMissHoldMs < 300) pass = false
-    }
-    return { rows, pass }
-  })()
-  console.log('  anticipation holds ms:', JSON.stringify(results.anticipationFloor.rows),
-    results.anticipationFloor.pass ? 'PASS (>=300 all tiers)' : 'FAIL')
+  console.log(`  avg fps: ${results.fps.avgFps.toFixed(1)}, p95: ${results.fps.p95FrameMs.toFixed(1)}ms, p99: ${results.fps.p99FrameMs.toFixed(1)}ms, max: ${results.fps.maxFrameMs.toFixed(1)}ms, long frames (>100ms): ${results.fps.longFrameCount}`)
 
   console.log('[2/4] Occlusion gate (1280x720)...')
   results.occlusion = await runOcclusionGate(browser)
   writeFileSync(join(OUT_DIR, 'occlusion-1280x720.json'), JSON.stringify(results.occlusion, null, 2))
   console.log(`  boxes: ${results.occlusion.boxCount}, failures: ${results.occlusion.failures.length}`)
 
-  console.log('[3/4] GIF captures...')
+  console.log('[3/4] GIF captures (strip / drop / idle+charge)...')
   const gifResults = {}
 
-  gifResults.spinStagger = await captureGif(browser, 'spin-stagger', 360, async (page) => {
+  gifResults.stripCycle = await captureGif(browser, 'strip-cycle', 360, `${BASE_URL}/?fs_reel_mode=strip`, async (page) => {
     await page.locator('.spin-btn').click()
     await waitSpinDone(page)
-    await page.waitForTimeout(300)
+    await page.waitForTimeout(400)
   })
 
-  gifResults.winBloom = await captureGif(browser, 'win-bloom', 360, async (page) => {
+  gifResults.dropCycle = await captureGif(browser, 'drop-cycle', 360, `${BASE_URL}/?fs_reel_mode=drop`, async (page) => {
+    await page.locator('.spin-btn').click()
+    await waitSpinDone(page)
+    await page.waitForTimeout(400)
+  })
+
+  // idle + charge: spin until a win blooms, then linger so the win charge/bloom
+  // and the settled-tile idle animations are captured.
+  gifResults.idleCharge = await captureGif(browser, 'idle-charge', 360, `${BASE_URL}/?fs_reel_mode=strip`, async (page) => {
     let saw = false
-    for (let i = 0; i < 10 && !saw; i++) {
+    for (let i = 0; i < 12 && !saw; i++) {
       await page.locator('.spin-btn').click()
       await waitSpinDone(page)
       saw = (await page.locator('.symbol-cell.plate-bloom').count()) > 0
     }
-    await page.waitForTimeout(1500)
-  }, { tailSeconds: 4 }) // search phase length varies — keep just the winning spin
-
-  gifResults.overdriveTransition = await captureGif(browser, 'overdrive-transition', 360, async (page) => {
-    await page.locator('[data-testid="feature-button"] button').click()
-    await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
-    await page.locator('[data-testid="buy-confirm"]').click()
-    await page.waitForSelector('[data-testid="overdrive-entry"]', { timeout: 8000 })
-    await page.waitForTimeout(2600)
-  })
+    await page.waitForTimeout(2200)
+  }, { tailSeconds: 4 })
 
   for (const [k, v] of Object.entries(gifResults)) {
     console.log(`  ${k}: ${v.gifPath} (${v.sizeMb.toFixed(2)} MB)`)
   }
   results.gifs = gifResults
-
   await browser.close()
 
   console.log('[4/4] Writing fps-log.json...')
@@ -247,17 +221,13 @@ async function run() {
   let fail = false
   if (results.fps.avgFps < 55) { console.error(`FAIL: avg fps ${results.fps.avgFps.toFixed(1)} < 55`); fail = true }
   if (results.fps.longFrameCount > 0) { console.error(`FAIL: ${results.fps.longFrameCount} frame(s) over 100ms`); fail = true }
-  if (!results.anticipationFloor.pass) { console.error('FAIL: anticipation floor < 300ms at some tier'); fail = true }
   if (results.occlusion.failures.length > 0) { console.error('FAIL: occlusion failures detected'); fail = true }
   for (const [k, v] of Object.entries(gifResults)) {
     if (v.sizeMb >= 3) { console.error(`FAIL: ${k}.gif is ${v.sizeMb.toFixed(2)} MB (>= 3MB)`); fail = true }
   }
 
-  if (fail) { console.error('MOTION V2 PROOF: FAILURES DETECTED'); process.exit(1) }
-  console.log('MOTION V2 PROOF: ALL GATES PASS')
+  if (fail) { console.error('REEL V3 PROOF: FAILURES DETECTED'); process.exit(1) }
+  console.log('REEL V3 PROOF: ALL GATES PASS')
 }
 
-run().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+run().catch((err) => { console.error(err); process.exit(1) })
