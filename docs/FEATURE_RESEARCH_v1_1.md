@@ -7,6 +7,13 @@
 > was effectively lost. This file recovers it verbatim under its intended deliverable name
 > `docs/FEATURE_RESEARCH_v1_1.md`. Content below is unchanged from the recovered source.
 
+> **Related reference (added 2026-07-05).** A captured market comparison of a live
+> multi-bonus competitor (Valkyrie Studio, "Waylander's Forge") lives at
+> `docs/reference/competitor-demos/waylanders-forge/` - four scatter-selected bonuses, a
+> cheap-enhancer-plus-buy-ladder menu, a stated 98.0% RTP, and an 80,085x max win. It
+> speaks directly to decisions D3 (buy ladder), D4 (a second mechanic), D5 (max-win cap)
+> and the section 0 RTP-ceiling assumption. See that folder's README for the full breakdown.
+
 ---
 
 # FUTURE SPINNER: MATH DESIGN SPACE

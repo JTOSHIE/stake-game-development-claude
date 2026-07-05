@@ -1,0 +1,5 @@
+# Raw screen-recording captures are large (~122 MB total) and un-diffable.
+# They are kept locally for reference but NOT committed to git history (no git-lfs here).
+# Everything referenceable is captured in README.md + frames/*.png.
+# To version the raw videos, install git-lfs and `git lfs track "*.mp4"`, then remove this rule.
+*.mp4
