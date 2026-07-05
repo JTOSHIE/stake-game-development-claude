@@ -55,6 +55,13 @@ volatility, the signature mechanic, and a TIGHT bet-mode ladder (base + an ante/
 buy tiers; not a sprawling menu). Write a GDD. Compliance envelope: stateless (no jackpot/gamble/
 continuation/cross-round state), all modes within 0.5% RTP, original IP, no Stake branding.
 
+**Less is more for the opener.** The first game ships a CLEAN, lean base, not a sprawl of half-baked
+features. Complex mechanics are the end game; the opener needs the ARCHITECTURE and the placeholder
+hooks, not a full feature zoo. The base template is the container future games start from (this skill
+starts from it), so getting the presentation and the mode-menu architecture right - with slots for
+buys/add-ons you tweak in and out later - matters more than shipping many features. Do not overdo it
+and risk a weak first submission.
+
 ## D1 - Validated maths (the must-reach). FAST PATH:
 
 1. **Fork the proven base**: `cp -r games/future_spinner games/<name>; rm -rf games/<name>/library;
@@ -123,6 +130,35 @@ Render to PNG with `scripts/assets/.venv/bin/python` + cairosvg into `public/ass
   the full D2 kit there should be almost none.
 - One Svelte gotcha seen: a reactive inline `style` (e.g. a rotating needle) will WIPE an `on:error`
   `display:none` every value change, so a broken img reappears - remove the element, do not just hide it.
+
+### D3a - Unified FEATURES menu + BET MODES info (the base-template mode architecture)
+
+The proven presentation for the bet-mode ladder, grounded in the competitor field (every buy and
+add-on sits under ONE entry, not scattered buttons). Build it data-driven so future skins tweak modes
+in and out without touching components:
+
+- **One source of truth**: a single config array `src/lib/config/<name>Modes.ts` -
+  `{ id, label, kind: 'standing'|'enhancer'|'buy', cost, volatility, blurb }` per mode, ids VERBATIM
+  from `games/<name>/game_config.py`. The FEATURES menu, the BET MODES info page, AND the betMode
+  store all derive from this one array. Adding/removing a mode = a one-array edit (+ widen the id
+  union + add the maths mode); document that recipe in a header comment. This is the placeholder
+  architecture: slots for buys/add-ons the owner tweaks later.
+- **One entry, one modal** (`FeatureMenu.svelte`): replace the inherited scattered mounts
+  (`FeatureButton`, `BuyBonus`, `ModeSelector`, dev `ModeLibrary`) with ONE glowing FEATURES icon
+  that opens a modal: a shared bet selector on top, then a scrollable card list. Card behaviour keys
+  off `kind`: `standing` shows ACTIVE, `enhancer` is an ON/OFF toggle (`role="switch"`) bound to the
+  standing mode, `buy` shows cost + ACTIVATE which dispatches a `buy` event to `handleBuy(id)`.
+- **Align the betMode store** to the new maths ids (default = the standing mode); keep the store's
+  PUBLIC shape identical (`selectedBetMode`/`standingMode` writables) so the locked `rgsService`
+  (which reads `selectedBetMode`) is untouched. DELETE the inherited `ModeSelector.svelte` +
+  `ModeLibrary.svelte` (their old ids fail type-check).
+- **BET MODES info page** (section in `PaytableModal.svelte`): render EVERY mode uniformly from the
+  same array (label, blurb, cost x bet, RTP) plus the shared "all modes same RTP / max win Nx"
+  footer - the competitor's info architecture. Correct any inherited cap number to YOUR cap.
+- Keep it lean (the opener philosophy): one entry, the four-ish real modes as cards, clean palette.
+  Screenshot proof: base (single FEATURES entry, no scattered buttons), menu open (the cards), the
+  BET MODES info page, and a working buy that triggers the feature. (LUMEN reference commit: the
+  unified menu + `lumenModes.ts` on `claude/lumen-sideproject`.)
 VERIFY: `npm run build` + `svelte-check` (ignore the ~6 pre-existing node_modules .d.ts errors) +
 Playwright screenshots of BOTH the base game (frame/logo/panels/buttons render, no old scene) and the
 feature (buy to trigger; the meter + feature art show). Recompute nothing here - this is visual; the
@@ -177,6 +213,9 @@ biggest genuine cost is the UI-art kit and (for true multi-skin) decoupling the 
 - [ ] Full art kit (symbols + UI chrome + placeholder audio) authored, rendered, and present.
 - [ ] Frontend reskinned: theme repointed, all assets render, old chrome (scene/flame) stripped,
       all feature/buy text relabelled to the new game, no broken/hidden art.
+- [ ] Bet modes presented under ONE unified FEATURES menu driven by a single `<name>Modes.ts`
+      config array (scattered mode/buy buttons removed); BET MODES info page renders all modes
+      uniformly; adding a placeholder mode is a one-array edit.
 - [ ] `npm run build` + `svelte-check` clean (only the ~6 pre-existing node_modules errors);
       screenshots of base + feature captured and eyeballed.
 - [ ] Runs via `cd sideproject/<name>/frontend && npm run dev`.
