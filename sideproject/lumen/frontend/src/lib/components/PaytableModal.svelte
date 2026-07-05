@@ -12,6 +12,7 @@
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { LUMEN_MODES, LUMEN_RTP_LABEL, LUMEN_MAX_WIN_LABEL } from '../config/lumenModes'
 
   function close(): void {
     playClick()
@@ -32,16 +33,16 @@
         'Prizes pay left to right on adjacent reels starting from reel 1.',
         'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
         'WILD substitutes for all symbols except SCATTER.',
-        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
-        'Maximum prize per play is capped at 5,000× your total play.',
+        '3, 4, or 5 Spore SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
+        'Maximum prize per play is capped at 10,000× your total play.',
         'Malfunctions void all pays and plays.',
       ]
     : [
         'Wins pay left to right on adjacent reels starting from reel 1.',
         'Symbol values shown are per matching way; the total is that value times the number of ways times your bet.',
         'WILD substitutes for all symbols except SCATTER.',
-        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.',
-        'Maximum win per spin is capped at 5,000× your total bet.',
+        '3, 4, or 5 Spore SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.',
+        'Maximum win per spin is capped at 10,000× your total bet.',
         'Malfunctions void all pays and plays.',
       ]
 
@@ -77,6 +78,19 @@
 
   // Buy price — 100x current bet, only meaningful where the buy is not disabled.
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
+
+  // BET MODES info page — rendered uniformly from the single source-of-truth
+  // config (src/lib/config/lumenModes.ts). Buy modes are omitted where the
+  // jurisdiction disables feature buys. All modes share the same 96.35% RTP.
+  $: betModeCur = $currencyCode || 'USD'
+  $: betModeRows = LUMEN_MODES
+    .filter((m) => m.kind !== 'buy' || !$buyFeatureDisabled)
+    .map((m) => ({
+      label: m.label,
+      blurb: m.blurb,
+      costLabel: `${m.cost}× · ${formatBalance(Math.round($betAmount * m.cost * CURRENCY_SCALE), betModeCur)}`,
+      rtp: LUMEN_RTP_LABEL,
+    }))
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -226,19 +240,38 @@
         {/if}
       </div>
 
-      <!-- ── RTP — both modes ────────────────────────────────────── -->
+      <!-- ── BET MODES — every mode listed uniformly (from the config) ─── -->
+      <div class="rules-section" data-testid="bet-modes-section">
+        <h3 class="rules-heading">Bet Modes</h3>
+        <p class="bet-modes-intro">
+          Every mode plays the same 1,024-ways game and The Bloom feature, and
+          returns the same {LUMEN_RTP_LABEL} RTP. Pick a mode from the FEATURES menu.
+        </p>
+        <div class="bet-modes-list">
+          {#each betModeRows as m}
+            <div class="bet-mode-row">
+              <div class="bet-mode-main">
+                <span class="bet-mode-name">{m.label}</span>
+                <span class="bet-mode-blurb">{m.blurb}</span>
+              </div>
+              <div class="bet-mode-meta">
+                <span class="bet-mode-cost">{m.costLabel}</span>
+                <span class="bet-mode-rtp">RTP {m.rtp}</span>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <!-- ── RTP + max win — all modes ───────────────────────────── -->
       <div class="rtp-grid">
         <div class="rtp-row">
-          <span class="rtp-label">BASE MODE RTP</span>
-          <span class="rtp-value">96.35%</span>
-        </div>
-        <div class="rtp-row">
-          <span class="rtp-label">BONUS BUY RTP</span>
-          <span class="rtp-value">96.35%</span>
+          <span class="rtp-label">ALL MODES RTP</span>
+          <span class="rtp-value">{LUMEN_RTP_LABEL}</span>
         </div>
         <div class="rtp-row">
           <span class="rtp-label">MAX WIN</span>
-          <span class="rtp-value">5,000×</span>
+          <span class="rtp-value">{LUMEN_MAX_WIN_LABEL}</span>
         </div>
       </div>
 
@@ -660,6 +693,74 @@
     color: #ff2ec4;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 8px rgba(255, 46, 196, 0.5);
+  }
+
+  /* ── Bet modes list ───────────────────────────────────────────────── */
+  .bet-modes-intro {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    margin: 0 0 0.3rem;
+  }
+
+  .bet-modes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bet-mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 0.9rem;
+    background: rgba(0, 240, 255, 0.04);
+    border: 1px solid rgba(0, 240, 255, 0.16);
+    border-radius: 8px;
+  }
+
+  .bet-mode-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .bet-mode-name {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: #eafcff;
+    letter-spacing: 0.03em;
+  }
+
+  .bet-mode-blurb {
+    font-size: 0.72rem;
+    color: rgba(200, 230, 245, 0.65);
+    line-height: 1.4;
+  }
+
+  .bet-mode-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .bet-mode-cost {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffd54a;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .bet-mode-rtp {
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    color: rgba(155, 236, 255, 0.7);
+    white-space: nowrap;
   }
 
   /* ── RTP grid ─────────────────────────────────────────────────────── */

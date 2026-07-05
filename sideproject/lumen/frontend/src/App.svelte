@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from 'svelte'
   import GameGrid       from './lib/components/GameGrid.svelte'
   import HudOverlay      from './lib/components/HudOverlay.svelte'
-  import FeatureButton   from './lib/components/FeatureButton.svelte'
   import SceneGroup      from './lib/components/SceneGroup.svelte'
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import FlameJets      from './lib/components/FlameJets.svelte'
@@ -56,9 +55,7 @@
   // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
   import { get } from 'svelte/store'
   import { speedTier } from './lib/stores/speedMode'
-  import BuyBonus from './lib/components/BuyBonus.svelte'
-  import ModeSelector from './lib/components/ModeSelector.svelte'
-  import ModeLibrary from './lib/components/ModeLibrary.svelte'
+  import FeatureMenu from './lib/components/FeatureMenu.svelte'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, MODE_COST } from './lib/stores/betMode'
@@ -94,7 +91,6 @@
     : $errorMessage
 
   let gridRef: GameGrid
-  let buyBonusRef: BuyBonus
 
   // Telemetry: lazy session envelope + a dev buffer sink (window.__telemetry).
   // Production registers a vendor sink instead; no-op until one is set.
@@ -248,9 +244,10 @@
   }
 
   // ── Bonus Buy: place a buy-mode spin and present the guaranteed feature ──
-  // buyMode selects the tier (minibuy/bonus/superbuy/megabuy/hyperbuy); the server
-  // applies its cost. Mock/dev serves the standard 'bonus' sample rounds for any tier.
-  async function handleBuy(buyMode: BuyMode = 'bonus'): Promise<void> {
+  // buyMode selects the LUMEN buy tier (bloom 100x / abyssalbloom 300x); the
+  // server applies its cost via selectedBetMode. Mock/dev serves the standard
+  // 'bonus' sample rounds for any tier.
+  async function handleBuy(buyMode: BuyMode = 'bloom'): Promise<void> {
     if ($isSpinning || featureActive) return
     isSpinning.set(true)
     resetWin()
@@ -714,10 +711,11 @@
   <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
   <WinBanner />
 
-  <!-- FEATURE — Grille button, right of the frame (v3.3), future-spinner only;
-       hidden during Overdrive so the bonus instrument column owns that zone. -->
-  {#if $activeTheme.id === 'future-spinner'}
-    <FeatureButton overdriveActive={featureActive} on:open={() => buyBonusRef?.openConfirm()} />
+  <!-- FEATURES — the SINGLE entry for every bet mode (enhancer + buys), right of
+       the frame; opens the data-driven mode menu. Hidden during the Bloom so the
+       bonus instrument column owns that zone. -->
+  {#if $activeTheme.id === 'future-spinner' && !featureActive}
+    <FeatureMenu on:buy={(e) => handleBuy(e.detail)} />
   {/if}
 
   <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->
@@ -732,23 +730,8 @@
   <!-- HUD OVERLAY — generic panel + SPIN + AUTOPLAY, z60 -->
   <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
 
-  <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
-       replaced by FeatureButton above (showTrigger=false). Hidden entirely
-       where the jurisdiction disables feature buys (handled inside). -->
-  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={() => handleBuy('bonus')} />
-
-  <!-- Ante / Double-Chance toggle — standing bet-mode switch for normal spins.
-       Hidden during the feature (no bet changes mid-feature). -->
-  {#if !featureActive}
-    <div class="ante-mount">
-      <ModeSelector on:buy={(e) => handleBuy(e.detail)} />
-    </div>
-  {/if}
-
-  <!-- Mode Library — DEV-only panel to play/test every template mode. -->
-  {#if import.meta.env.DEV && !featureActive}
-    <ModeLibrary on:buy={(e) => handleBuy(e.detail)} />
-  {/if}
+  <!-- All bet modes (Deep Dive enhancer + Bloom / Abyssal Bloom buys) now live
+       inside the single FeatureMenu above — no scattered mode/buy controls. -->
 
   <!-- Responsible-gambling session panel — shown where the jurisdiction enables
        RG (plus dev, for testing). Not rendered in replay mode. -->
@@ -996,15 +979,6 @@
   .util-btn.theme-btn:hover {
     background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
     border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
-  }
-
-  /* ── Ante / Double-Chance toggle — bottom-left, clear of the centre controls
-        and the bottom-right dev toggles. Temporary placement (AssetForge v2). ── */
-  .ante-mount {
-    position: fixed;
-    left: 1rem;
-    bottom: 1rem;
-    z-index: 55;
   }
 
   /* ── Reel-mode toggle (dev-only) — pill just left of the theme button ────── */
