@@ -65,6 +65,23 @@ art, and a playable loop - produced autonomously.
 4. **Trivial scale** - more modes, a higher cap, or an ante variant are all proven-cheap additions.
 5. **Wire the real RGS + bet replay + submission** for a live LUMEN.
 
+## Second run - visual completion (and the one-run lesson)
+
+Run 2 finished the "little visual things" run 1 flagged: a full UI-chrome art kit (reel frame, LUMEN
+wordmark, spin/bet/autoplay/menu buttons, balance/win panels, BUY BLOOM feature button, tile plate,
+loading brand-mark) authored + rendered + wired; the future_spinner car/flame scene stripped; placeholder
+audio reused; and all feature text LUMEN-ised (THE BLOOM / GLOW / BUY BLOOM), with the rules now
+describing the real dual-fed meter + 10,000x cap. Result: a fully complete, polished, playable game -
+frame, logo, panels, buttons all render, no broken art, no car in the abyss, and the GLOW feature reads
+cleanly at 16x. Verified by build + screenshots (`frontend/screens/lumen_complete_*.png`).
+
+**The two runs consolidate into ONE.** The split existed only because run 1's art brief covered symbols
+but not the UI-chrome kit, and the first frontend pass did not strip the old scene. The
+`build-original-slot` skill is updated so both are front-loaded into D2/D3 - so the next original game is
+a single complete run. Remaining true polish (optional): themed audio, glow-orb per-cell badges in the
+feature (needs a small interpreter tweak + LUMEN sample rounds), and the theme-id -> capability-flag
+decoupling for multi-skin.
+
 ## Verdict
 
 The autonomous flow went the full distance - a complete, verified, original game - and the real

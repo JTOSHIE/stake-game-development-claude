@@ -74,25 +74,51 @@ continuation/cross-round state), all modes within 0.5% RTP, original IP, no Stak
    `./env/bin/python <runner> mode1,mode2,...`. Then INDEPENDENTLY recompute RTP per mode. Fix fences
    only if a mode misses; the base splits usually converge first try.
 
-## D2 - Art (in-house vector; no external image gen)
+## D2 - Art (in-house vector; no external image gen). AUTHOR THE FULL KIT IN ONE PASS.
 
-Author one self-contained SVG per symbol (240x240 viewBox, front-facing, NO baked-in text, layered
-`<g>` groups) matching `design-system/masters/*.svg`. A DARK theme is art-efficient: glowing shapes
-on near-black read well and pop cheaply (feGaussianBlur halo + radial hot core). Keep one shared
-glow/lighting system for cohesion. Render to PNG with `scripts/assets/.venv/bin/python` + cairosvg
-(240px symbols, large bg) into the frontend's `public/assets/<name>/`. Also make: reel frame, logo/
-brand mark, feature-button, tile-plate, meter gauge (the UI kit - the first run's biggest art gap).
+The single biggest lesson from run 1: brief the WHOLE art kit up front, not just symbols, or you
+pay for a second run. In ONE art pass author + render all of:
+- **Symbols** (10): one self-contained SVG each, 240x240 viewBox, front-facing, NO baked-in text,
+  layered `<g>` groups, matching `design-system/masters/*.svg`.
+- **UI chrome kit** (the gap that forced run 2): reel frame (`frames/frame-2.png`, transparent
+  centre), logo/wordmark (`ui/logo.png` - the only piece with text, drawn as vector paths),
+  spin button, bet +/- buttons, autoplay + menu buttons, balance + win panels, feature button,
+  meter gauge, tile plate (`symbols/tile_plate.png`), loading brand mark. SIZE each to match the
+  equivalent future_spinner asset (read the dimensions off `frontend/public/assets/themes/
+  future-spinner/` with PIL) so they are drop-in.
+A DARK theme is art-efficient: glowing shapes on near-black pop cheaply (feGaussianBlur halo +
+radial hot core); keep ONE shared glow/lighting system for cohesion across symbols AND chrome.
+Render to PNG with `scripts/assets/.venv/bin/python` + cairosvg into `public/assets/<name>/`.
+- **Audio**: reuse the existing project sound set as placeholder (`cp
+  frontend/public/assets/themes/future-spinner/sounds/*.mp3` to the new `.../sounds/`); themed
+  audio is a later pass. (No audio-authoring tool exists, so do not try to synthesise it.)
 
 ## D3 - Playable frontend (reskin the copy)
 
 `rsync -a --exclude node_modules --exclude dist frontend/ sideproject/<name>/frontend/`; trim the old
-`public/assets`; `npm install`. **REPOINT the existing default theme** (`config/themes.ts`: name,
-palette, `assetBase`) at the new assets - do NOT add a new theme id, because the feature/meter/scene/
-buttons are gated on the literal `'future-spinner'` id string (the #1 frontend trap; the real fix for
-true multi-skin is to convert those gates to capability flags on the theme config). Relabel the meter
-(i18n `overdrive` key) and swap the gauge art. Add `on:error` hides for any UI art you have not made
-yet. `npm run build` + `svelte-check` (ignore the ~6 pre-existing node_modules .d.ts errors) + a
-Playwright screenshot (dismiss the intro, buy to trigger the feature) to prove it plays.
+`public/assets`; `npm install`. Then, with the FULL art kit from D2 present, do all of this in one pass
+(run 1 split it across two - do not):
+- **REPOINT the existing default theme** (`config/themes.ts`: name, palette, `assetBase`) at the new
+  assets - do NOT add a new theme id, because the feature/meter/scene/buttons/background-stills are
+  gated on the literal `'future-spinner'` id string (the #1 frontend trap; the real multi-skin fix is
+  to convert those gates to capability flags on the theme config).
+- **Repoint every asset path** (symbols, background, frame, logo, panels, buttons, tile plate, gauge,
+  brand mark) to the theme `assetBase`. Fix hardcoded `assets/themes/future-spinner/...` paths in
+  components (e.g. background stills in App.svelte, btn_max in ControlBar) to `$themeAssets`.
+- **Strip the old theme's decorative chrome** that does not fit: gate off the SceneGroup and FlameJets
+  mounts in App.svelte (they render on the `future-spinner` id, which is now your theme). Do NOT leave
+  a car/flames in a non-racing theme.
+- **Relabel all feature/buy text** via i18n from the start: the meter (`overdrive`/`overdriveFreeSpins`
+  keys), `buyConfirmTitle/Body/buyFeature`, and the `rules*` strings - and make the rules describe YOUR
+  real mechanic + cap, not the inherited one. Swap the gauge art.
+- Only add `on:error` graceful-hides for art you genuinely did not make (e.g. a MAX-bet button); with
+  the full D2 kit there should be almost none.
+- One Svelte gotcha seen: a reactive inline `style` (e.g. a rotating needle) will WIPE an `on:error`
+  `display:none` every value change, so a broken img reappears - remove the element, do not just hide it.
+VERIFY: `npm run build` + `svelte-check` (ignore the ~6 pre-existing node_modules .d.ts errors) +
+Playwright screenshots of BOTH the base game (frame/logo/panels/buttons render, no old scene) and the
+feature (buy to trigger; the meter + feature art show). Recompute nothing here - this is visual; the
+maths was verified in D1.
 
 ## D4 - PAR sheet + review
 
@@ -117,9 +143,18 @@ bottlenecks hit and the opportunities - this is what compounds across builds.
 - Higher cap - `games/future_spinner_bigwin/` (25,000x). RTP preset - `games/future_spinner_rtp94/`.
 - Recipes for tumble/cluster/lines/scatter (SDK samples `games/0_0_*`) - `docs/MECHANIC_VARIANTS.md`.
 
-## Time budget reality (from the first run)
+## One run, not two (validated across the two LUMEN runs)
 
-A full original game (theme -> validated 4-mode maths -> 12 art masters -> playable reskin) is
-reachable in one focused autonomous run IF you fork the proven base, reuse the fence splits, delegate
-+ verify, and know the traps above. The maths is the cheap part now; the frontend UI-art kit and the
-theme-id decoupling are the real remaining costs.
+Run 1 reached "operational with visual gaps"; run 2 filled them. The ONLY reasons it split were: the
+art brief covered symbols but not the UI-chrome kit, and the frontend pass did not strip the old
+theme's scene. Both are now folded into D2/D3 above, so this is a SINGLE run: theme -> validated
+maths -> full art kit (symbols + chrome + placeholder audio) -> complete reskin (wired + old chrome
+stripped + text relabelled) -> review. Do NOT plan a second "polish" run; brief the full kit up front.
+
+## Time budget reality
+
+A complete original game in one focused autonomous run IF you: fork the proven base, reuse the fence
+splits, brief the FULL art kit (symbols + chrome + audio) up front, delegate each intricate piece to
+a fresh-context agent + independently verify (recompute RTP, view screenshots), strip the old chrome
+and relabel text from the start, and know the traps above. The maths is the cheap part now; the
+biggest genuine cost is the UI-art kit and (for true multi-skin) decoupling the theme-id gates.
