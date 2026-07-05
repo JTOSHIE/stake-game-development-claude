@@ -31,7 +31,7 @@
       disabled={$isSpinning}
       aria-label={label}
     >
-      <img src="{$themeAssets.assetBase}/ui/feature_button.png" alt="" draggable="false" on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+      <img src="{$themeAssets.assetBase}/ui/feature_button.png" alt="" draggable="false" />
     </button>
     <div class="feature-label">{label}</div>
   </div>

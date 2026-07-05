@@ -1,0 +1,54 @@
+<svg width="600" height="120" viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lumGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d6fbff"/>
+      <stop offset="35%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#23f0c7"/>
+    </linearGradient>
+    <radialGradient id="lumOrb" cx="42%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#eaffff"/>
+      <stop offset="45%" stop-color="#57e8ff"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="lumSoft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="lumBig" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+
+  <!-- broad cyan bloom behind the wordmark -->
+  <g opacity="0.5" filter="url(#lumBig)" fill="none" stroke="#00e5ff" stroke-width="10"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 34 L120 90 L162 90"/>
+    <path d="M192 34 L192 74 Q192 90 218 90 Q244 90 244 74 L244 34"/>
+    <path d="M274 90 L274 34 L305 66 L336 34 L336 90"/>
+    <path d="M366 34 L366 90 M366 34 L410 34 M366 62 L402 62 M366 90 L410 90"/>
+    <path d="M440 90 L440 34 L492 90 L492 34"/>
+  </g>
+
+  <!-- main neon-tube letters: L U M E N -->
+  <g fill="none" stroke="url(#lumGrad)" stroke-width="10"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 34 L120 90 L162 90"/>
+    <path d="M192 34 L192 74 Q192 90 218 90 Q244 90 244 74 L244 34"/>
+    <path d="M274 90 L274 34 L305 66 L336 34 L336 90"/>
+    <path d="M366 34 L366 90 M366 34 L410 34 M366 62 L402 62 M366 90 L410 90"/>
+    <path d="M440 90 L440 34 L492 90 L492 34"/>
+  </g>
+
+  <!-- inner hot highlight -->
+  <g fill="none" stroke="#eaffff" stroke-width="2.4"
+     stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <path d="M120 34 L120 90 L162 90"/>
+    <path d="M192 34 L192 74 Q192 90 218 90 Q244 90 244 74 L244 34"/>
+    <path d="M274 90 L274 34 L305 66 L336 34 L336 90"/>
+    <path d="M366 34 L366 90 M366 34 L410 34 M366 62 L402 62 M366 90 L410 90"/>
+    <path d="M440 90 L440 34 L492 90 L492 34"/>
+  </g>
+
+  <!-- small glowing lure-orb accent -->
+  <g transform="translate(528 44)">
+    <circle r="18" fill="url(#lumOrb)" filter="url(#lumSoft)"/>
+    <circle r="7" fill="#eaffff"/>
+    <circle r="7" fill="none" stroke="#00e5ff" stroke-width="1.6" opacity="0.7"/>
+    <circle cx="-2" cy="-2" r="2" fill="#ffffff"/>
+  </g>
+</svg>

@@ -652,12 +652,6 @@
       alt="{$activeTheme.name}"
       draggable="false"
       id="theme-logo-img"
-      on:error={() => {
-        const img = document.getElementById('theme-logo-img') as HTMLImageElement
-        if (img) img.style.display = 'none'
-        const txt = document.getElementById('theme-logo-txt')
-        if (txt) (txt as HTMLElement).style.display = 'block'
-      }}
     />
     <div
       class="logo-text"
@@ -672,8 +666,9 @@
     <div class="error-banner">{errorDisplay}</div>
   {/if}
 
-  <!-- SCENE GROUP — left, set further back (z8), future-spinner only -->
-  {#if $activeTheme.id === 'future-spinner'}
+  <!-- SCENE GROUP (cyber-driver + hover car) removed for LUMEN: a car has no
+       place in the deep-sea abyss. Kept in tree for other themes but disabled. -->
+  {#if false}
     <SceneGroup />
   {/if}
 
@@ -686,14 +681,12 @@
       class:overdrive-active={overdriveVisualActive}
       alt=""
       aria-hidden="true"
-      on:error={(e) => {
-        (e.currentTarget as HTMLImageElement).style.display = 'none'
-      }}
     />
   {/if}
 
-  <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
-  {#if $activeTheme.id === 'future-spinner'}
+  <!-- OVERDRIVE FLAME JETS removed for LUMEN: no fire in the deep-sea abyss.
+       Kept in tree for other themes but disabled. -->
+  {#if false}
     <FlameJets active={overdriveVisualActive} />
   {/if}
 

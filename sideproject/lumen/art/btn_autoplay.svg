@@ -1,0 +1,21 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="apDisc" cx="42%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#101c34"/>
+      <stop offset="55%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <filter id="apSoft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5"/></filter>
+    <filter id="apBig" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#00e5ff" stroke-width="9" opacity="0.24" filter="url(#apBig)"/>
+  <circle cx="100" cy="100" r="80" fill="url(#apDisc)" stroke="#16233f" stroke-width="2"/>
+  <ellipse cx="88" cy="64" rx="36" ry="16" fill="#ffffff" opacity="0.06"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.4" filter="url(#apSoft)"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#57e8ff" stroke-width="2" opacity="0.85"/>
+  <!-- infinity / loop glyph -->
+  <path d="M100 100 C 90 80 64 80 64 100 C 64 120 90 120 100 100 C 110 80 136 80 136 100 C 136 120 110 120 100 100 Z"
+        fill="none" stroke="#00e5ff" stroke-width="11" stroke-linecap="round" opacity="0.55" filter="url(#apSoft)"/>
+  <path d="M100 100 C 90 80 64 80 64 100 C 64 120 90 120 100 100 C 110 80 136 80 136 100 C 136 120 110 120 100 100 Z"
+        fill="none" stroke="#eaffff" stroke-width="6.5" stroke-linecap="round"/>
+</svg>

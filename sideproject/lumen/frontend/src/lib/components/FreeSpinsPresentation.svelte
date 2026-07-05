@@ -214,8 +214,9 @@
         <div class="entry-scatter-flare" aria-hidden="true"></div>
         <div class="entry-dip" aria-hidden="true"></div>
         <div class="entry-gauge-wrap" aria-hidden="true">
-          <img class="entry-gauge-face" src="{$themeAssets.assetBase}/ui/glow_meter.png" alt="" on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-          <img class="entry-gauge-needle" src="{$themeAssets.assetBase}/ui/gauge_needle.png" alt="" on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+          <!-- LUMEN uses the glow_meter as the entry gauge face. There is no
+               separate needle sprite in the abyss skin, so it is not rendered. -->
+          <img class="entry-gauge-face" src="{$themeAssets.assetBase}/ui/glow_meter.png" alt="" />
         </div>
         <div class="entry-title">{t(lang, 'overdriveFreeSpins', mode)}</div>
         <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
@@ -305,14 +306,9 @@
   .stage-gauge .entry-gauge-wrap, .stage-burst .entry-gauge-wrap { opacity: 1; transform: scale(1); }
   .stage-settle .entry-gauge-wrap { opacity: 0; transform: scale(1.18); transition: opacity 0.5s ease, transform 0.5s ease; }
 
-  .entry-gauge-face, .entry-gauge-needle {
+  .entry-gauge-face {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
   }
-  .entry-gauge-needle {
-    transform-origin: 50% 50%; transform: rotate(-75deg);
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .stage-gauge .entry-gauge-needle, .stage-burst .entry-gauge-needle { transform: rotate(0deg); }
 
   .entry-title {
     position: absolute; top: 12%; left: 0; right: 0;
@@ -334,7 +330,7 @@
   .stage-settle .entry-burst-text { opacity: 0; }
 
   @media (prefers-reduced-motion: reduce) {
-    .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
+    .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-title, .entry-burst-text {
       transition: none;
     }
     .fs-cell.win { animation: none; }

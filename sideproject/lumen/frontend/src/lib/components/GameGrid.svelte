@@ -913,7 +913,6 @@
                     alt=""
                     draggable="false"
                     aria-hidden="true"
-                    on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                   />
                 {/if}
                 <img

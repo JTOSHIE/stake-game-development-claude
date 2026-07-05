@@ -1,0 +1,65 @@
+<svg width="224" height="224" viewBox="0 0 224 224" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbPlate" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#160f26"/>
+      <stop offset="55%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </linearGradient>
+    <radialGradient id="fbBloom" cx="48%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#ffd6fb"/>
+      <stop offset="45%" stop-color="#ff3df0" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#ff3df0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fbEgg" cx="42%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#fff4cf"/>
+      <stop offset="40%" stop-color="#ffd36b"/>
+      <stop offset="78%" stop-color="#ff3df0" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff3df0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="fbSoft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="fbBig" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <!-- magenta plate bloom -->
+  <rect x="16" y="16" width="192" height="192" rx="30" fill="none" stroke="#ff3df0" stroke-width="10" opacity="0.2" filter="url(#fbBig)"/>
+  <!-- premium dark plate -->
+  <rect x="16" y="16" width="192" height="192" rx="28" fill="url(#fbPlate)" stroke="#2a1636" stroke-width="2"/>
+  <!-- magenta rim + gold corner accents -->
+  <rect x="16" y="16" width="192" height="192" rx="28" fill="none" stroke="#ff3df0" stroke-width="3" opacity="0.4" filter="url(#fbSoft)"/>
+  <rect x="16" y="16" width="192" height="192" rx="28" fill="none" stroke="#ff6ef4" stroke-width="1.6" opacity="0.85"/>
+  <g fill="#ffd36b" opacity="0.9">
+    <circle cx="34" cy="34" r="3" filter="url(#fbSoft)"/><circle cx="190" cy="34" r="3" filter="url(#fbSoft)"/>
+    <circle cx="34" cy="190" r="3" filter="url(#fbSoft)"/><circle cx="190" cy="190" r="3" filter="url(#fbSoft)"/>
+  </g>
+
+  <!-- central spore / egg-sac bloom (the premium buy motif) -->
+  <circle cx="112" cy="106" r="80" fill="url(#fbBloom)" opacity="0.55" filter="url(#fbBig)"/>
+  <g id="sac">
+    <path d="M112 52 C 150 52 172 82 172 112 C 172 150 146 174 112 174
+             C 78 174 52 150 52 112 C 52 82 74 52 112 52 Z"
+          fill="#0c0f1c" stroke="#ff6ef4" stroke-width="2" opacity="0.9"/>
+    <path d="M112 52 C 150 52 172 82 172 112" fill="none" stroke="#ffd36b" stroke-width="2.4"
+          stroke-linecap="round" opacity="0.85" filter="url(#fbSoft)"/>
+    <path d="M52 112 C 52 150 78 174 112 174 C 146 174 172 150 172 112" fill="none"
+          stroke="#ff3df0" stroke-width="2.2" stroke-linecap="round" opacity="0.75" filter="url(#fbSoft)"/>
+  </g>
+  <!-- glowing egg cluster -->
+  <g fill="url(#fbEgg)">
+    <circle cx="112" cy="86" r="20"/>
+    <circle cx="86" cy="112" r="18"/>
+    <circle cx="138" cy="112" r="18"/>
+    <circle cx="98" cy="140" r="16"/>
+    <circle cx="128" cy="140" r="16"/>
+    <circle cx="112" cy="116" r="16"/>
+  </g>
+  <g fill="#fff4cf">
+    <circle cx="112" cy="86" r="6"/><circle cx="86" cy="112" r="5"/><circle cx="138" cy="112" r="5"/>
+    <circle cx="98" cy="140" r="4.4"/><circle cx="128" cy="140" r="4.4"/><circle cx="112" cy="116" r="4.4"/>
+  </g>
+  <g fill="#ffe6fb" opacity="0.85">
+    <circle cx="106" cy="80" r="2.2"/><circle cx="81" cy="107" r="2"/><circle cx="133" cy="107" r="2"/>
+  </g>
+  <!-- escaping spores -->
+  <g fill="url(#fbEgg)"><circle cx="186" cy="66" r="6"/><circle cx="42" cy="158" r="5"/></g>
+  <g fill="#fff4cf"><circle cx="186" cy="66" r="2"/><circle cx="42" cy="158" r="1.7"/></g>
+</svg>

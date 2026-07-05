@@ -1,0 +1,27 @@
+<svg width="244" height="204" viewBox="0 0 244 204" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tpFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1020"/>
+      <stop offset="55%" stop-color="#070b16"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </linearGradient>
+    <radialGradient id="tpInner" cx="50%" cy="34%" r="70%">
+      <stop offset="0%" stop-color="#0f2440" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0f2440" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- very dark cell plate -->
+  <rect x="6" y="6" width="232" height="192" rx="22" fill="url(#tpFill)"/>
+  <!-- faint inner top glow so symbols sit in light -->
+  <rect x="6" y="6" width="232" height="192" rx="22" fill="url(#tpInner)"/>
+  <!-- faint cyan grid (subtle, symbols must pop) -->
+  <g stroke="#00e5ff" stroke-width="1" opacity="0.08">
+    <line x1="87" y1="18" x2="87" y2="186"/>
+    <line x1="157" y1="18" x2="157" y2="186"/>
+    <line x1="20" y1="70" x2="224" y2="70"/>
+    <line x1="20" y1="134" x2="224" y2="134"/>
+  </g>
+  <!-- faint rounded inner border -->
+  <rect x="6" y="6" width="232" height="192" rx="22" fill="none" stroke="#00e5ff" stroke-width="1.4" opacity="0.22"/>
+  <rect x="10" y="10" width="224" height="184" rx="18" fill="none" stroke="#0a1120" stroke-width="1.5"/>
+</svg>

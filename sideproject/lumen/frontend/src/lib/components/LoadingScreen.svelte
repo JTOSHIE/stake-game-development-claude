@@ -14,8 +14,9 @@
   <div class="wordmark">WE ROLL SPINNERS</div>
 
   <div class="brand-mark" aria-hidden="true">
-    <img class="brand-base" src="{$themeAssets.assetBase}/ui/brand_mark_base.png" alt="" draggable="false" on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/brand_mark_spin.png" alt="" draggable="false" on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+    <!-- LUMEN ships a single brand mark (ui/brand_mark.png); it spins as the
+         loader. No separate base/spin layers in the abyss skin. -->
+    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/brand_mark.png" alt="" draggable="false" />
   </div>
 
   <div class="logo-block">
@@ -24,7 +25,6 @@
       class="loading-logo"
       alt=""
       draggable="false"
-      on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
     />
   </div>
 
@@ -66,7 +66,7 @@
     height: clamp(140px, 24vw, 220px);
     filter: drop-shadow(0 0 24px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
   }
-  .brand-base, .brand-spin {
+  .brand-spin {
     position: absolute;
     inset: 0;
     width: 100%;

@@ -670,17 +670,17 @@ const zh: Translations = {
 // ── Overdrive feature strings, all 16 locales ─────────────────────────────────
 export const featureI18n: Record<Locale, FeatureStrings> = {
   en: {
-    overdrive: 'GLOW', overdriveFreeSpins: 'GLOW FREE SPINS', freeSpins: 'FREE SPINS',
-    totalWin: 'TOTAL WIN', featureComplete: 'FEATURE COMPLETE',
-    buyFeature: 'BUY FEATURE', buyConfirmTitle: 'BUY OVERDRIVE FREE SPINS',
-    buyConfirmBody: 'Start Overdrive Free Spins now at 100× your bet?', buyPrice: 'PRICE',
-    buyConfirm: 'BUY', buyCancel: 'CANCEL',
-    rulesOverdriveTitle: 'OVERDRIVE FREE SPINS',
-    rulesOverdriveTrigger: '3, 4 or 5 Scatters award 8, 12 or 16 free spins and pay an instant 1×, 3× or 10× total bet.',
-    rulesOverdriveMeter: 'The Overdrive meter starts at 1× and rises +1× after every winning free spin, multiplying all later wins. It never resets during the feature.',
-    rulesOverdriveRetrigger: '3 or more Scatters during free spins award +5 free spins.',
-    rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
-    rulesOverdriveModes: 'Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.',
+    overdrive: 'GLOW', overdriveFreeSpins: 'THE BLOOM', freeSpins: 'FREE SPINS',
+    totalWin: 'TOTAL WIN', featureComplete: 'BLOOM COMPLETE',
+    buyFeature: 'BUY BLOOM', buyConfirmTitle: 'ENTER THE BLOOM',
+    buyConfirmBody: 'Descend into THE BLOOM now at 100× your bet?', buyPrice: 'PRICE',
+    buyConfirm: 'DIVE', buyCancel: 'CANCEL',
+    rulesOverdriveTitle: 'THE BLOOM (GLOW FREE SPINS)',
+    rulesOverdriveTrigger: '3, 4 or 5 Spore Scatters award 8, 12 or 16 free spins and pay an instant 1×, 3× or 10× total bet.',
+    rulesOverdriveMeter: 'The GLOW meter starts at 1× and rises +1× after every winning spin AND +1× for every glow orb gathered, multiplying all later wins. It never resets during the Bloom.',
+    rulesOverdriveRetrigger: '3 or more Spore Scatters during the Bloom award +5 free spins.',
+    rulesOverdriveBuy: 'Buy the Bloom: pay 100× your bet to descend into the feature immediately.',
+    rulesOverdriveModes: 'All bet modes return 96.35% RTP. Maximum win 10,000× bet.',
     introContinue: 'Continue',
   },
   ar: {

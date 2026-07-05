@@ -1,0 +1,19 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bmDisc" cx="42%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#101c34"/>
+      <stop offset="55%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </radialGradient>
+    <filter id="bmSoft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.5"/></filter>
+    <filter id="bmBig" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#00e5ff" stroke-width="9" opacity="0.24" filter="url(#bmBig)"/>
+  <circle cx="100" cy="100" r="80" fill="url(#bmDisc)" stroke="#16233f" stroke-width="2"/>
+  <ellipse cx="88" cy="64" rx="36" ry="16" fill="#ffffff" opacity="0.06"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#00e5ff" stroke-width="4" opacity="0.4" filter="url(#bmSoft)"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#57e8ff" stroke-width="2" opacity="0.85"/>
+  <!-- minus glyph -->
+  <line x1="68" y1="100" x2="132" y2="100" stroke="#00e5ff" stroke-width="12" stroke-linecap="round" opacity="0.6" filter="url(#bmSoft)"/>
+  <line x1="68" y1="100" x2="132" y2="100" stroke="#eaffff" stroke-width="7" stroke-linecap="round"/>
+</svg>

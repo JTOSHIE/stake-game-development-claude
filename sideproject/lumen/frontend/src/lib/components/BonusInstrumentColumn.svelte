@@ -29,7 +29,6 @@
       src="{$themeAssets.assetBase}/ui/glow_meter.png"
       alt=""
       draggable="false"
-      on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
     />
     <div class="odometer" data-testid="odometer">
       <span class="odometer-value">{spinsRemaining}</span>

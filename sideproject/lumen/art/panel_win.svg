@@ -1,0 +1,25 @@
+<svg width="360" height="100" viewBox="0 0 360 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pwPlate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#180f28"/>
+      <stop offset="55%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#05070f"/>
+    </linearGradient>
+    <filter id="pwSoft" x="-40%" y="-60%" width="180%" height="220%"><feGaussianBlur stdDeviation="3.5"/></filter>
+    <filter id="pwBig" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <!-- magenta rim bloom -->
+  <rect x="12" y="12" width="336" height="76" rx="24" fill="none" stroke="#ff3df0" stroke-width="6" opacity="0.22" filter="url(#pwBig)"/>
+  <!-- dark plate (win amount prints over this) -->
+  <rect x="12" y="12" width="336" height="76" rx="24" fill="url(#pwPlate)" stroke="#2a1636" stroke-width="1.5"/>
+  <!-- magenta rim -->
+  <rect x="12" y="12" width="336" height="76" rx="24" fill="none" stroke="#ff3df0" stroke-width="3" opacity="0.45" filter="url(#pwSoft)"/>
+  <rect x="12" y="12" width="336" height="76" rx="24" fill="none" stroke="#ff6ef4" stroke-width="1.4" opacity="0.85"/>
+  <!-- top sheen -->
+  <path d="M30 18 H330" stroke="#ffe6fb" stroke-width="1.2" opacity="0.14"/>
+  <!-- corner glow pips -->
+  <g fill="#ff9df6" opacity="0.85">
+    <circle cx="32" cy="50" r="2.6" filter="url(#pwSoft)"/>
+    <circle cx="328" cy="50" r="2.6" filter="url(#pwSoft)"/>
+  </g>
+</svg>

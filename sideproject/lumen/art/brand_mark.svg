@@ -1,0 +1,67 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bkCore" cx="46%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#eaffff"/>
+      <stop offset="60%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bkBloom" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d6fbff" stop-opacity="0.7"/>
+      <stop offset="45%" stop-color="#00e5ff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bkSoft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="bkBig" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <!-- broad bioluminescent bloom -->
+  <circle cx="256" cy="256" r="200" fill="url(#bkBloom)" filter="url(#bkBig)"/>
+
+  <!-- outer segmented ring (reads as rotation when spun as a loader) -->
+  <g fill="none" stroke-linecap="round">
+    <circle cx="256" cy="256" r="196" stroke="#00e5ff" stroke-width="12" opacity="0.4"
+            stroke-dasharray="46 40" filter="url(#bkSoft)"/>
+    <circle cx="256" cy="256" r="196" stroke="#8ff4ff" stroke-width="5" opacity="0.9"
+            stroke-dasharray="46 40"/>
+  </g>
+
+  <!-- mid teal ring -->
+  <circle cx="256" cy="256" r="158" fill="none" stroke="#23f0c7" stroke-width="3" opacity="0.55"/>
+  <circle cx="256" cy="256" r="158" fill="none" stroke="#23f0c7" stroke-width="8" opacity="0.2" filter="url(#bkSoft)"/>
+
+  <!-- radiating spokes/ticks -->
+  <g stroke="#57e8ff" stroke-width="4" stroke-linecap="round" opacity="0.7">
+    <path d="M256 112 v26"/><path d="M256 374 v26"/>
+    <path d="M112 256 h26"/><path d="M374 256 h26"/>
+    <path d="M154 154 l18 18"/><path d="M358 154 l-18 18"/>
+    <path d="M154 358 l18 -18"/><path d="M358 358 l-18 -18"/>
+  </g>
+  <!-- magenta accent nodes on the ring -->
+  <g fill="#ff3df0">
+    <circle cx="256" cy="60" r="7" filter="url(#bkSoft)"/>
+    <circle cx="452" cy="256" r="6" filter="url(#bkSoft)"/>
+    <circle cx="256" cy="452" r="6" filter="url(#bkSoft)"/>
+    <circle cx="60" cy="256" r="6" filter="url(#bkSoft)"/>
+  </g>
+
+  <!-- diatom lattice inner ring -->
+  <g fill="none" stroke="#8ff4ff" stroke-width="2.4" opacity="0.5">
+    <circle cx="256" cy="256" r="112"/>
+  </g>
+  <g stroke="#00e5ff" stroke-width="1.6" opacity="0.35">
+    <path d="M256 144 L352 256 L256 368 L160 256 Z"/>
+    <path d="M186 186 L326 326 M326 186 L186 326"/>
+  </g>
+
+  <!-- luminous orb core -->
+  <circle cx="256" cy="256" r="96" fill="url(#bkCore)" filter="url(#bkSoft)"/>
+  <!-- star rays -->
+  <g stroke="#eaffff" stroke-linecap="round" opacity="0.85">
+    <path d="M256 176 v-30" stroke-width="4"/><path d="M256 336 v30" stroke-width="4"/>
+    <path d="M176 256 h-30" stroke-width="4"/><path d="M336 256 h30" stroke-width="4"/>
+  </g>
+  <circle cx="256" cy="256" r="34" fill="#eaffff"/>
+  <circle cx="256" cy="256" r="34" fill="none" stroke="#00e5ff" stroke-width="2.5" opacity="0.7"/>
+  <circle cx="246" cy="246" r="9" fill="#ffffff"/>
+</svg>

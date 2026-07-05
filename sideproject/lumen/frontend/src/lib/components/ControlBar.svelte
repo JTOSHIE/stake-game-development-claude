@@ -127,7 +127,7 @@
 
     <!-- Max Bet button — left of bet selector -->
     <button class="img-btn maxbet-btn" on:click={handleMaxBet} disabled={$isSpinning || !canSetMax} aria-label={$tr('maxBet')}>
-      <img src="assets/themes/future-spinner/ui/btn_max.png" alt="MAX" draggable="false"
+      <img src="{$themeAssets.assetBase}/ui/btn_max.png" alt="MAX" draggable="false"
         on:error={(e) => {
           (e.currentTarget as HTMLImageElement).style.display = 'none';
           const btn = (e.currentTarget as HTMLImageElement).parentElement
@@ -164,7 +164,6 @@
         src="{$themeAssets.spinButton}"
         alt={$tr('spin')}
         draggable="false"
-        on:error={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0' }}
       />
       {#if $isSpinning}
         <span class="spin-overlay">⟳</span>
