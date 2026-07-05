@@ -3,9 +3,35 @@
 
 import { get } from 'svelte/store'
 import { isMuted as isMutedStore } from '../stores/gameStore'
+import { musicVolume, sfxVolume } from '../stores/audioSettings'
 import { themeAssets } from '../stores/themeStore'
 
 const FS_BASE = 'assets/themes/future-spinner/sounds'
+
+// ── Base volumes ──────────────────────────────────────────────────────────────
+// The per-sound design volumes, kept in one place. The two player sliders act as
+// master scalars on top of these: BGM loudness is driven directly by
+// musicVolume; every SFX effective volume is its base x sfxVolume. Nothing else
+// hardcodes a volume number.
+const BASE = {
+  bgm:                  0.30, // retained for reference; BGM loudness is driven directly by musicVolume
+  spin:                 0.70,
+  reelStop:             0.85,
+  reelStopAnticipation: 0.90,
+  winSmall:             0.65,
+  winMedium:            0.75,
+  winBig:               0.85,
+  winEpic:              0.95,
+  scatterLand:          0.80,
+  anticipationBuild:    0.60,
+  uiClick:              0.60,
+} as const
+
+// BGM ducking factors, expressed relative to musicVolume so the slider always
+// sets the ceiling. These mirror the original 0.30 / 0.12 / 0.08 ratios:
+// spin duck 0.12/0.30 = 0.4, anticipation duck 0.08/0.30 ~= 0.27.
+const BGM_DUCK_SPIN         = 0.4
+const BGM_DUCK_ANTICIPATION = 0.27
 
 function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
   const el = new Audio(url)
@@ -34,18 +60,9 @@ function buildSounds() {
     anticipationBuild:    makeAudio(p.anticipationBuild,    'anticipation_build'),
     uiClick:              makeAudio(p.uiClick,              'ui_click'),
   }
-  s.bgm.loop    = true
-  s.bgm.volume  = 0.30
-  s.spin.volume                 = 0.70
-  s.reelStop.volume             = 0.85
-  s.reelStopAnticipation.volume = 0.90
-  s.winSmall.volume             = 0.65
-  s.winMedium.volume            = 0.75
-  s.winBig.volume               = 0.85
-  s.winEpic.volume              = 0.95
-  s.scatterLand.volume          = 0.80
-  s.anticipationBuild.volume    = 0.60
-  s.uiClick.volume              = 0.60
+  s.bgm.loop = true
+  // Volumes are set by applyVolumes() from the two player sliders (see below),
+  // not hardcoded here.
   return s
 }
 
@@ -54,6 +71,40 @@ let sounds = buildSounds()
 let bgmStarted = false
 let muted = false
 let anticipationActive = false
+
+// Current slider values, mirrored from the stores so applyVolumes() and the
+// duck helpers can read them synchronously.
+let musicVol = get(musicVolume)
+let sfxVol   = get(sfxVolume)
+
+// Current BGM duck factor: 1 = normal, BGM_DUCK_SPIN during a spin,
+// BGM_DUCK_ANTICIPATION during anticipation. Effective BGM = musicVol * bgmDuck.
+let bgmDuck = 1
+
+/**
+ * Recompute and assign every current volume from the two slider values. BGM is
+ * musicVol scaled by the active duck factor; each SFX is its base x sfxVol.
+ * Muting is handled separately via the .muted flag, so this is safe to call at
+ * any time (including on unmute to restore the slider-derived volumes).
+ */
+function applyVolumes(): void {
+  sounds.bgm.volume                  = musicVol * bgmDuck
+  sounds.spin.volume                 = BASE.spin                 * sfxVol
+  sounds.reelStop.volume             = BASE.reelStop             * sfxVol
+  sounds.reelStopAnticipation.volume = BASE.reelStopAnticipation * sfxVol
+  sounds.winSmall.volume             = BASE.winSmall             * sfxVol
+  sounds.winMedium.volume            = BASE.winMedium            * sfxVol
+  sounds.winBig.volume               = BASE.winBig               * sfxVol
+  sounds.winEpic.volume              = BASE.winEpic              * sfxVol
+  sounds.scatterLand.volume          = BASE.scatterLand          * sfxVol
+  sounds.anticipationBuild.volume    = BASE.anticipationBuild    * sfxVol
+  sounds.uiClick.volume              = BASE.uiClick              * sfxVol
+}
+
+// Live-apply whenever either slider changes (subscribe fires immediately on
+// subscription, which also performs the initial volume assignment).
+musicVolume.subscribe((v) => { musicVol = v; applyVolumes() })
+sfxVolume.subscribe((v)   => { sfxVol   = v; applyVolumes() })
 
 // One-shot cloned sounds currently playing (reel stops, scatters, small wins,
 // the epic-win echo). Tracked so muting can stop them immediately, not just
@@ -67,7 +118,9 @@ const activeClones = new Set<HTMLAudioElement>()
 function playClone(base: HTMLAudioElement, volume?: number): void {
   if (muted) return
   const clone = base.cloneNode() as HTMLAudioElement
-  clone.volume = volume ?? base.volume
+  // An explicit one-shot volume is a raw base value, so scale it by sfxVol here.
+  // When none is passed, base.volume is already the slider-scaled SFX volume.
+  clone.volume = volume !== undefined ? volume * sfxVol : base.volume
   activeClones.add(clone)
   const cleanup = () => activeClones.delete(clone)
   clone.addEventListener('ended', cleanup, { once: true })
@@ -85,6 +138,9 @@ export function setMuted(val: boolean): void {
     // everything at once, not only future sounds.
     activeClones.forEach(c => { c.pause(); c.currentTime = 0 })
     activeClones.clear()
+  } else {
+    // On unmute, restore every volume to the current slider-derived values.
+    applyVolumes()
   }
 }
 
@@ -117,10 +173,12 @@ export function playSpinStart(): void {
   if (muted) return
   sounds.spin.currentTime = 0
   sounds.spin.play().catch(() => {})
-  // Duck BGM during spin
-  sounds.bgm.volume = 0.12
+  // Duck BGM during spin, relative to the music slider.
+  bgmDuck = BGM_DUCK_SPIN
+  sounds.bgm.volume = musicVol * bgmDuck
   setTimeout(() => {
-    if (!muted) sounds.bgm.volume = 0.30
+    bgmDuck = 1
+    if (!muted) sounds.bgm.volume = musicVol * bgmDuck
   }, 1800)
 }
 
@@ -151,8 +209,9 @@ export function playReelStop(reelIndex: number = 0): void {
 export function playAnticipation(): void {
   if (muted) return
   anticipationActive = true
-  // Duck normal BGM
-  sounds.bgm.volume = 0.08
+  // Duck BGM further during anticipation, relative to the music slider.
+  bgmDuck = BGM_DUCK_ANTICIPATION
+  sounds.bgm.volume = musicVol * bgmDuck
   // Play tension build
   sounds.anticipationBuild.currentTime = 0
   sounds.anticipationBuild.play().catch(() => {})
@@ -162,8 +221,9 @@ export function stopAnticipation(): void {
   anticipationActive = false
   sounds.anticipationBuild.pause()
   sounds.anticipationBuild.currentTime = 0
-  // Restore BGM
-  if (!muted) sounds.bgm.volume = 0.30
+  // Restore BGM to the full music slider level.
+  bgmDuck = 1
+  if (!muted) sounds.bgm.volume = musicVol * bgmDuck
 }
 
 // ── SCATTER ─────────────────────────────────────────────────────────────────
