@@ -25,11 +25,16 @@ what make a second run hours faster than the first.
    and confirm the meter/pot starts fresh each round (one payout/round; meter=1 at round start).
 4. **Isolate a side project completely.** New game -> a NEW sibling package `games/<name>/` (never
    edit `games/future_spinner/**`, `rgsService.ts`, `gameStore.ts` - deny-locked). Copy/adapt freely;
-   do not modify the locked originals. Work on a dedicated branch.
+   do not modify the locked originals. Branch the side project off `main` (a CLEAN base), NOT off
+   whatever you happen to be on - otherwise the branch silently carries unrelated work. One dedicated
+   branch, off main. Beware same-dir Remote Control spawns: a concurrent session shares the working
+   tree and can switch branches under you - run one at a time, or use `--spawn=worktree`.
 5. **Delegate intricate builds to fresh-context subagents** with detailed specs (see templates
    below), then independently verify. This is how quality holds across a long run without your
    context degrading. Give each agent: the exact files to study, the constraint (no locked files),
-   the acceptance test, and "recompute the number, do not trust it".
+   the acceptance test, and "recompute the number, do not trust it". PARALLELISE independent pieces:
+   the maths (`games/<name>/`) and the art (`sideproject/<name>/art/`) touch different directories,
+   so dispatch both at once and verify each as it lands - it roughly halves wall-clock.
 6. **Plan destination points up front** (D0-D4 below) so the autonomous run has a spine and a
    must-reach fallback.
 
@@ -85,7 +90,10 @@ pay for a second run. In ONE art pass author + render all of:
   spin button, bet +/- buttons, autoplay + menu buttons, balance + win panels, feature button,
   meter gauge, tile plate (`symbols/tile_plate.png`), loading brand mark. SIZE each to match the
   equivalent future_spinner asset (read the dimensions off `frontend/public/assets/themes/
-  future-spinner/` with PIL) so they are drop-in.
+  future-spinner/` with PIL) so they are drop-in. Known-good sizes from LUMEN: symbols 240x240,
+  frame 800x640 (transparent centre), tile_plate 244x204, logo 600x120, round buttons (spin/bet
+  +-/autoplay/menu) 200x200, panel_balance 340x90, panel_win 360x100, feature_button 224x224,
+  brand_mark 512x512, glow/meter gauge ~180x480, background 1600x900.
 A DARK theme is art-efficient: glowing shapes on near-black pop cheaply (feGaussianBlur halo +
 radial hot core); keep ONE shared glow/lighting system for cohesion across symbols AND chrome.
 Render to PNG with `scripts/assets/.venv/bin/python` + cairosvg into `public/assets/<name>/`.
@@ -118,7 +126,8 @@ Render to PNG with `scripts/assets/.venv/bin/python` + cairosvg into `public/ass
 VERIFY: `npm run build` + `svelte-check` (ignore the ~6 pre-existing node_modules .d.ts errors) +
 Playwright screenshots of BOTH the base game (frame/logo/panels/buttons render, no old scene) and the
 feature (buy to trigger; the meter + feature art show). Recompute nothing here - this is visual; the
-maths was verified in D1.
+maths was verified in D1. The deliverable is RUNNABLE for the owner:
+`cd sideproject/<name>/frontend && npm run dev` -> the dev server boots into the new theme.
 
 ## D4 - PAR sheet + review
 
@@ -158,3 +167,21 @@ splits, brief the FULL art kit (symbols + chrome + audio) up front, delegate eac
 a fresh-context agent + independently verify (recompute RTP, view screenshots), strip the old chrome
 and relabel text from the start, and know the traps above. The maths is the cheap part now; the
 biggest genuine cost is the UI-art kit and (for true multi-skin) decoupling the theme-id gates.
+
+## Definition of done (the lock-in checklist)
+
+- [ ] GDD written (theme choice + mechanic + modes + cap + RTP).
+- [ ] Every bet mode INDEPENDENTLY recomputes to the target RTP from the shipped lookUpTable;
+      cross-mode spread <=0.5pp; max win = the cap; each mode 100k rows.
+- [ ] Any new mechanic proven STATELESS from the books (meter/pot resets each round).
+- [ ] Full art kit (symbols + UI chrome + placeholder audio) authored, rendered, and present.
+- [ ] Frontend reskinned: theme repointed, all assets render, old chrome (scene/flame) stripped,
+      all feature/buy text relabelled to the new game, no broken/hidden art.
+- [ ] `npm run build` + `svelte-check` clean (only the ~6 pre-existing node_modules errors);
+      screenshots of base + feature captured and eyeballed.
+- [ ] Runs via `cd sideproject/<name>/frontend && npm run dev`.
+- [ ] PAR sheet + REVIEW (bottlenecks + opportunities) written.
+- [ ] `future_spinner`, `rgsService.ts`, `gameStore.ts` verified UNTOUCHED; work isolated on one
+      branch off main.
+
+If every box is ticked, it is one complete run - do NOT schedule a second polish pass.
