@@ -1,51 +1,68 @@
-# Session Report: outstanding pre-deploy list (docs, tile/RTP findings, cleanup)
+# Session Report: recover + commit the ante / multi-buy feature research
 
-- **Date:** 2026-07-04
-- **Model / effort:** Claude Opus 4.8 (1M context), High.
-- **Branch:** `claude/outstanding-prep` (from `main`, after PR #26 merged).
-- **Source:** owner: "move forward with the outstanding list" (the pre-deploy items).
+- **Date:** 2026-07-05
+- **Model / effort:** Claude Opus 4.8, High.
+- **Branch:** `claude/feature-research` (from `main` at a295630, after PR #27).
+- **Source:** owner: the ante and multi-buy research from a recent session was never
+  committed; locate it (working tree, ~/Desktop, or regenerate), commit it as
+  `docs/FEATURE_RESEARCH_v1_1.md` on `claude/feature-research`, open a PR into `main`
+  with a one-paragraph summary, and include a session report per convention.
 
-Worked the can-do-now outstanding items. One turned up a real correction to our compliance gate.
+## 1. What was located
 
-## 1. Captured the full approval-guidelines doc set (+ a rubric correction)
+The research was **found, not lost**. It is the full bet-mode + mechanic design space
+document covering the ante variants (1.25x vs 1.5x vs two ante rungs) and the multi-buy
+ladder (mini / standard / super buy tiers), plus the measured "mini-buy finding", volatility
+recipes, the max-win ceiling decision and a phased roadmap.
 
-The dossier's `/docs/approval/checklist` and `/docs/approval/game-tile` URLs were wrong (they
-error). Via the docs nav I found the real set under `/docs/approval-guidelines/` and captured the
-**six pages we were missing**: submission-checklist, game-tile-requirements, rgs-communication,
-front-end-communication, math-verification, general-disclaimer (now 11 pages mirrored; manifest
-rebuilt). Key findings (logged in `COMPLIANCE_WATCH.md`):
+- **Where it lived:** committed as `docs/MATH_DESIGN_SPACE.md` on the feature branches
+  `claude/gap-analysis`, `claude/compliance-rg` and `claude/lumen-sideproject`
+  (commits 0762444 "math design space" and b26dc7f "low-vol Cruise mode + mini-buy finding").
+- **Why it looked lost:** it was **never merged to `main`**. From `main`'s perspective the
+  file does not exist (`git cat-file -e main:docs/MATH_DESIGN_SPACE.md` fails), so the
+  research had no presence on the trunk. Not on `~/Desktop`; no stash held it; no
+  `FEATURE_RESEARCH*` file existed anywhere on disk.
 
-- **RTP band is 90.0%-96.70%, not up to 98%** (math-verification). We are compliant at **96.35%**
-  (0.35% headroom). `scripts/validate_math.py` was **tightened to the real 96.70% cap** plus the
-  documented star-tier operator-risk gates (max payout 100,000x, max cost mult 1,500x, base SD
-  band 0.6-60, P(>=5000x) cost-scaled <= 1e-2, max win reachable < 1-in-10M). Re-ran: still ALL
-  PASS - base P(>=5000) 1e-5, bonus 1e-3, base SD 17.28.
-- **rgs-communication / front-end-communication** (the official contract docs) align with our
-  `docs/RGS_CONTRACT_REFERENCE.md`.
-- **game-tile-requirements:** BG + FG combined <= 3MB, transparent-PNG FG + Provider Logo, naming
-  conventions - feeds the tile asset task.
-- **submission-checklist** full criteria are **login-gated** - capture on the owner's next portal login.
+## 2. What changed
 
-## 2. LAYOUT_SPEC v3.7 amendment
+- **`docs/FEATURE_RESEARCH_v1_1.md`** (new): the recovered research, committed verbatim
+  under its intended deliverable name. A short provenance note was prepended (clearly marked
+  as added-on-recovery) explaining where it came from and why it was effectively lost; the
+  body below the note is unchanged from the recovered source (240-line original preserved).
+- **`reports/SESSION_REPORT.md`** + archive copy (this file).
 
-Recorded the recent visual work: framed neon HUD value boxes; CSS-drawn instrument plates (flat
-`instrument_plate` PNG retired); free-spins board enlarged (72px) and shifted left so the Overdrive
-meter clears the top-right tile; the win-connection story + big-win dwell; the max-win dwell; and
-the scene hover-pad turbines (with the reverted wheel-split noted).
+No code, no maths, no locked files touched. Docs-only change.
 
-## 3. Cleanup
+## 3. Verification
 
-- Retired the now-unused `instrument_plate.png` + `instrument_plate_1x.png` (removed both exports
-  from `scripts/assets/manifest.json`, deleted the PNGs; pipeline 35 -> 33 outputs, build clean).
-- The stale `submission-package/` legacy dir is **already gone** (not tracked) - item resolved.
+- Confirmed the source content is byte-faithful (copied from the tracked file via the
+  git-tracked working tree, not regenerated).
+- Branched cleanly from `main`; the three unrelated working-tree modifications carried in
+  from the prior branch (`frontend/.claude/settings.local.json`, `frontend/dist/index.html`,
+  `optimization_program/src/setup.toml`) were **deliberately left unstaged** so the PR is
+  docs-only.
+- `git diff .claude/settings.json` verified empty (no lock exception needed this session).
 
-## Verification
+## 4. Lock discipline
 
-`validate_math.py` PASSES against the tightened real rubric; `npm run assets` + `npm run build`
-clean; JSON valid. No frontend code changed; locks untouched.
+No locked paths were modified. No lock exception was required or taken. The
+`games/future_spinner/**` and `rgsService.ts`/`gameStore.ts` deny rules remain in place and
+`.claude/settings.json` is unchanged.
 
-## Still outstanding (needs deploy / owner)
+## FOR THE NEXT SESSION
 
-Verify replay event IDs + real-RGS test on staging, upload bundle to portal; owner: IP/trademark,
-public high-res asset link, blurb re-approval, STAKE_TEAM/game-slug, and the authenticated
-submission-checklist capture. Tile assets (BG/FG/logo) per the now-captured game-tile spec.
+- **Model / effort:** Claude Opus 4.8, High.
+- **Approach:** located the research rather than regenerating it, recovered it verbatim under
+  the requested filename with a transparent provenance header, and opened a docs-only PR to
+  `main`.
+- **Alternatives considered and rejected:** (a) regenerating the research from session
+  context — rejected, the original was found intact so recovery is faithful; (b) merging
+  `docs/MATH_DESIGN_SPACE.md` under its old name — rejected, the owner asked specifically for
+  `docs/FEATURE_RESEARCH_v1_1.md`; (c) sweeping the unrelated working-tree changes into this
+  PR — rejected, kept the PR docs-only.
+- **Files touched:** `docs/FEATURE_RESEARCH_v1_1.md` (new), `reports/SESSION_REPORT.md` +
+  archive copy.
+- **Open threads:** `docs/MATH_DESIGN_SPACE.md` still exists only on feature branches under
+  its old name; decide whether to retire it in favour of this canonical copy. The design
+  decisions D1-D6 (ante price, low-vol Cruise, buy ladder depth, second mechanic, max-win
+  cap, RTP parity) remain open and lock at Stake approval.

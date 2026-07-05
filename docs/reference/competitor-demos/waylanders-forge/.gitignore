@@ -1,0 +1,7 @@
+# Raw screen-recording captures are large and un-diffable, so most are kept locally only
+# (there is no git-lfs in this repo, and raw video would bloat history permanently).
+# We commit ONE representative video - the info-pages walkthrough - so reviewers can open it
+# and validate the facts listed in README.md against the source. Everything else is captured
+# in README.md + frames/*.png; the remaining raw videos stay local, git-ignored.
+*.mp4
+!03_paytable-and-info-pages.mp4
