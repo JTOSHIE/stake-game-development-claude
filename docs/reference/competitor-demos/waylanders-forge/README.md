@@ -12,23 +12,34 @@ feature design, buy-menu UX, presentation). Australian English, no em/en dashes.
 
 ## Files
 
-> The raw `.mp4` captures (~122 MB total) are kept locally in this folder but are **git-ignored**
-> (see `.gitignore`) - there is no git-lfs in this repo and raw video would bloat history
-> permanently. The committed reference is `README.md` + `frames/*.png`, which capture
-> everything. To version the videos, install git-lfs and remove the `.gitignore` rule.
+**What is committed to git, and why:**
+- `README.md` - this breakdown (the facts, transcribed from the videos).
+- `frames/*.png` - 20 full-resolution stills pulled from the videos; the numbered info-page
+  stills (08-17) are the primary evidence for the facts below.
+- `03_paytable-and-info-pages.mp4` - **one representative video is committed** (14 MB, the
+  in-game info walkthrough) so a reviewer can open it and **validate the pay table, features,
+  special symbols, bet modes and RTP/max-win listed here against the source** - and flag
+  anything that reads differently.
 
-Videos (all Stake mobile web wrapper, portrait 720x1584, TRX play-money):
+**What is not committed:** the other seven raw captures (~108 MB) are **git-ignored** (see
+`.gitignore`) - there is no git-lfs in this repo and raw video would bloat history
+permanently. They are kept locally in this folder for anyone working on the machine; the
+committed frames + README already capture their content. To version them too, install
+git-lfs and relax the `.gitignore` rule.
 
-| File | Duration | What it shows |
-|---|---|---|
-| `01_base-and-buy-menu.mp4` | 19.5s | Studio splash, intro card, base spins, opening the buy menu |
-| `02_buy-menu-and-freespins.mp4` | 20.4s | Buy-menu tiers, Wayfinder's Blessing rules card, free-spins play |
-| `03_paytable-and-info-pages.mp4` | 17.0s | **The full in-game info: pay table, all features, special symbols, bet modes, RTP/max-win, legal notice** (richest source) |
-| `04_base-play-and-bet-menu.mp4` | 14.6s | Base play, MAX/multiplier symbols landing, the bet-level menu |
-| `05_bonus-enhancer-activate.mp4` | 15.1s | Activating the Bonus Enhancer (3x cost) and the resulting spin |
-| `06_trickster-spin-buy.mp4` | 15.2s | Trickster Spin buy, confirm dialog, multiplier-grid spin |
-| `07_trickster-multiplier-grid-bigwin.mp4` | 10.6s | Multiplier-grid cascade building to a Big Win |
-| `08_special-symbols-megawin.mp4` | 19.9s | Wild Star / Wild Bomb in action, Nice/Big/Mega Win tiers |
+All eight source videos (Stake mobile web wrapper, portrait 720x1584, TRX play-money;
+**bold = committed**):
+
+| File | Duration | Committed | What it shows |
+|---|---|---|---|
+| `01_base-and-buy-menu.mp4` | 19.5s | local only | Studio splash, intro card, base spins, opening the buy menu |
+| `02_buy-menu-and-freespins.mp4` | 20.4s | local only | Buy-menu tiers, Wayfinder's Blessing rules card, free-spins play |
+| **`03_paytable-and-info-pages.mp4`** | 17.0s | **yes** | **The full in-game info: pay table, all features, special symbols, bet modes, RTP/max-win, legal notice** (richest source; the one committed for validation) |
+| `04_base-play-and-bet-menu.mp4` | 14.6s | local only | Base play, MAX/multiplier symbols landing, the bet-level menu |
+| `05_bonus-enhancer-activate.mp4` | 15.1s | local only | Activating the Bonus Enhancer (3x cost) and the resulting spin |
+| `06_trickster-spin-buy.mp4` | 15.2s | local only | Trickster Spin buy, confirm dialog, multiplier-grid spin |
+| `07_trickster-multiplier-grid-bigwin.mp4` | 10.6s | local only | Multiplier-grid cascade building to a Big Win |
+| `08_special-symbols-megawin.mp4` | 19.9s | local only | Wild Star / Wild Bomb in action, Nice/Big/Mega Win tiers |
 
 `frames/*.png` are full-resolution stills pulled from the videos (numbered; the info-page
 stills 08-17 are the most useful reference). Re-pull any moment with
