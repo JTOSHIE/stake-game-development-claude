@@ -1,5 +1,5 @@
 <script lang="ts">
-  // WinBreakdown.svelte — Motion Polish v2, win presentation item 3: after the
+  // WinBreakdown.svelte - Motion Polish v2, win presentation item 3: after the
   // win burst settles, cycle group by group through the interpreter's win
   // events (symbol, count, ways, pay), matching what actually paid.
   import { onDestroy } from 'svelte'
@@ -56,41 +56,65 @@
 </script>
 
 {#if visible && current}
-  <div class="win-breakdown" data-testid="win-breakdown">
-    <span class="wb-symbol">{SYMBOL_LABELS[current.symbol.toUpperCase()] ?? current.symbol}</span>
-    <span class="wb-count">×{current.kind}</span>
-    <span class="wb-ways">{current.ways} ways</span>
-    <span class="wb-pay">{payLabel}</span>
+  <div class="c1-win win-breakdown fs-plate" data-testid="win-breakdown">
+    <span class="fs-rail"></span>
+    <div class="fs-face">
+      <span class="wb-symbol">{SYMBOL_LABELS[current.symbol.toUpperCase()] ?? current.symbol}</span>
+      <span class="wb-count">x{current.kind}</span>
+      <span class="wb-ways">{current.ways} ways</span>
+      <span class="wb-pay fs-num">{payLabel}</span>
+    </div>
   </div>
 {/if}
 
 <style>
+  /* ── 5 signature tokens (canonical, from CHROME_PRIMITIVES.md) ─────────── */
+  .c1-win {
+    --sig-cyan: var(--theme-primary, #00FFFF);
+    --sig-magenta: var(--theme-secondary, #FF00FF);
+    --sig-pink: #FF2EC4;
+    --sig-gold: #FFD700;
+    --sig-orange: #FF9A2E;
+    --sig-green: #4EFF91;
+    --acc: var(--sig-cyan);
+    --acc2: var(--sig-pink);
+  }
+
+  /* ── Thin chrome chip: fs-plate primitive (verbatim canonical) ────────── */
   .win-breakdown {
     position: absolute;
     left: 50%;
     bottom: 6px;
     transform: translateX(-50%);
     z-index: 45;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 6px 14px;
-    background: rgba(4, 6, 18, 0.82);
-    border: 1px solid rgba(0, 255, 255, 0.35);
-    border-radius: 8px;
-    font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-    animation: wb-fade-in 0.25s ease both;
     pointer-events: none;
+    animation: wb-fade-in 0.25s ease both;
   }
-  .wb-symbol { color: #00ffff; letter-spacing: 0.05em; }
+  .fs-plate {
+    position: relative; --sig: var(--sig-cyan); padding: 2px;
+    clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
+    background: linear-gradient(150deg, #eef5fa, #b3c6d2 15%, #63737f 37%, #2b363f 52%, #8499a8 72%, #dceaf2);
+    box-shadow: 0 3px 10px rgba(0,0,0,.6), 0 0 9px color-mix(in srgb, var(--sig) 20%, transparent), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .fs-plate > .fs-face {
+    position: relative; display: flex; flex-direction: row; align-items: center; justify-content: center;
+    gap: 10px; padding: 6px 16px 6px 18px; white-space: nowrap;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    background: linear-gradient(160deg, color-mix(in srgb, var(--sig) 12%, transparent), transparent 44%), linear-gradient(180deg, #111a2b, #070b16);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07), inset 0 -8px 18px rgba(0,0,0,.6);
+    font-family: 'Orbitron', system-ui, sans-serif;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+  }
+  .fs-rail {
+    position: absolute; left: 2px; top: 9px; bottom: 9px; width: 3px; border-radius: 2px; z-index: 2;
+    background: var(--sig); box-shadow: 0 0 8px var(--sig);
+  }
+  .fs-num { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+
+  .wb-symbol { color: var(--acc); letter-spacing: 0.05em; }
   .wb-count  { color: rgba(255, 255, 255, 0.7); }
-  .wb-ways   { color: rgba(160, 228, 255, 0.75); font-size: 0.62rem; }
-  .wb-pay    { color: #ffd700; }
+  .wb-ways   { color: color-mix(in srgb, var(--sig-cyan) 75%, #ffffff); font-size: 0.62rem; }
+  .wb-pay    { color: var(--sig-gold); }
 
   @keyframes wb-fade-in {
     from { opacity: 0; transform: translate(-50%, 4px); }
