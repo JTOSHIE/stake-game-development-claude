@@ -18,6 +18,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
+  import { FS_MODES, FS_RTP_LABEL } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -91,6 +92,12 @@
 
   // Buy price — 100x current bet, only meaningful where the buy is not disabled.
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
+
+  // Bet Modes section — every mode priced against the current bet, straight from
+  // the single source of truth (config/fsModes.ts). Placeholder modes (maths not
+  // yet shipped) are tagged "coming soon"; RTP is the same across all modes.
+  $: modePrice = (cost: number) =>
+    formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -220,6 +227,34 @@
               </div>
             </div>
           {/if}
+        </div>
+
+        <!-- Bet Modes — every mode from the single source of truth (fsModes.ts).
+             Two are live (Normal, Buy Overdrive); the rest are tagged "coming
+             soon" until their maths ships. All share the same 96.35% RTP. -->
+        <div>
+          <h3 class="fs-heading" style="margin-bottom:10px;">Bet Modes</h3>
+          <div class="fs-modes">
+            {#each FS_MODES as m (m.id)}
+              <div class="fs-mode-row fs-plate tone-{m.kind}" class:soon={!m.available}>
+                <div class="fs-face">
+                  <div class="fs-mode-main">
+                    <div class="fs-mode-name-row">
+                      <span class="fs-mode-name">{m.label}</span>
+                      {#if !m.available}
+                        <span class="fs-mode-soon">coming soon</span>
+                      {/if}
+                    </div>
+                    <p class="fs-mode-blurb">{m.blurb}</p>
+                  </div>
+                  <div class="fs-mode-meta">
+                    <span class="fs-mode-cost fs-num">{m.cost}× · {modePrice(m.cost)}</span>
+                    <span class="fs-mode-rtp">RTP {FS_RTP_LABEL}</span>
+                  </div>
+                </div>
+              </div>
+            {/each}
+          </div>
         </div>
 
         <!-- RTP — both modes + max win -->
@@ -463,6 +498,27 @@
   .fs-buy > .fs-face { flex-direction: row; align-items: center; justify-content: space-between; padding: 12px 20px; }
   .fs-buy-lbl { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--sig-gold) 82%, #fff); }
   .fs-buy-val { font-size: 1.1rem; font-weight: 900; color: #ffd6f2; text-shadow: 0 0 3px var(--sig-pink); }
+
+  /* Bet Modes */
+  .fs-modes { display: flex; flex-direction: column; gap: 10px; }
+  .fs-mode-row { --sig: var(--sig-cyan); }
+  .fs-mode-row.tone-standing { --sig: var(--sig-cyan); }
+  .fs-mode-row.tone-enhancer { --sig: var(--sig-orange); }
+  .fs-mode-row.tone-buy { --sig: var(--sig-pink); }
+  .fs-mode-row > .fs-face { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; }
+  .fs-mode-row.soon { filter: grayscale(0.5) brightness(0.74); opacity: 0.72; }
+  .fs-mode-main { flex: 1; min-width: 0; text-align: left; }
+  .fs-mode-name-row { display: flex; align-items: center; gap: 0.5rem; }
+  .fs-mode-name { font-size: 0.9rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
+  .fs-mode-soon {
+    font-size: 0.5rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #d8e2ea; background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 0.12rem 0.5rem; white-space: nowrap;
+  }
+  .fs-mode-blurb { font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); line-height: 1.4; margin: 0.24rem 0 0; }
+  .fs-mode-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .fs-mode-cost { font-size: 0.78rem; font-weight: 700; color: #ffd66a; white-space: nowrap; }
+  .fs-mode-rtp { font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--sig-gold) 55%, #fff); white-space: nowrap; }
 
   /* RTP */
   .fs-rtp { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
