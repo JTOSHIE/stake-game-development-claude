@@ -209,27 +209,37 @@
     life: number; maxLife: number
     color: number; size: number
   }
-  const PARTICLE_POOL_SIZE = 90
+  // Bigger pool so several winners can each fire a fuller burst without starving.
+  const PARTICLE_POOL_SIZE = 140
   const particles: Particle[] = Array.from({ length: PARTICLE_POOL_SIZE }, () => ({
     active: false, x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 0, color: 0xffffff, size: 0,
   }))
 
-  function spawnBurst(x: number, y: number, colorHex: string, count = 16): void {
+  // Reduced-motion: particle bursts (Pixi-drawn, not CSS) must fall back to
+  // static, so gate the whole burst behind this flag.
+  const _reduceMotion = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false
+
+  // Amplified burst: ~1.75x the particle count, bigger and a touch faster, still
+  // tinted per symbol and drawn from the fixed pool (no per-frame allocation).
+  function spawnBurst(x: number, y: number, colorHex: string, count = 28): void {
+    if (_reduceMotion) return
     const color = hexToPixi(colorHex)
     let spawned = 0
     for (const p of particles) {
       if (spawned >= count) break
       if (p.active) continue
       const angle = Math.random() * Math.PI * 2
-      const speed = 70 + Math.random() * 110
+      const speed = 90 + Math.random() * 150
       p.active  = true
       p.x = x; p.y = y
       p.vx = Math.cos(angle) * speed
       p.vy = Math.sin(angle) * speed
       p.life = 0
-      p.maxLife = 450 + Math.random() * 350
+      p.maxLife = 500 + Math.random() * 400
       p.color = color
-      p.size = 2 + Math.random() * 3
+      p.size = 3 + Math.random() * 4
       spawned++
     }
   }
@@ -424,9 +434,10 @@
     return new Promise((resolve) => {
       const strip = stripRefs[col]
       if (!strip) { resolve(); return }
-      const OVER = r.decelDur <= 160 ? 6 : 22
-      const D1 = r.decelDur <= 160 ? 40 : 90
-      const D2 = r.decelDur <= 160 ? 24 : 70
+      // Punchier landing: a bigger overshoot with a snappier settle.
+      const OVER = r.decelDur <= 160 ? 8 : 30
+      const D1 = r.decelDur <= 160 ? 36 : 78
+      const D2 = r.decelDur <= 160 ? 22 : 58
       const base = REST_Y
       const start = performance.now()
       const down = () => {
@@ -486,11 +497,11 @@
   function _squash(col: number): Promise<void> {
     return new Promise((resolve) => {
       const start = performance.now()
-      const D = 150
+      const D = 135
       const step = () => {
         const t = Math.min((performance.now() - start) / D, 1)
-        // 0.82 -> 1 spring
-        const s = 0.82 + 0.18 * easeOutCubic(t) + 0.06 * Math.sin(t * Math.PI)
+        // 0.74 -> 1 spring - a deeper squash with a snappier settle.
+        const s = 0.74 + 0.26 * easeOutCubic(t) + 0.09 * Math.sin(t * Math.PI)
         for (let row = 0; row < ROWS; row++) {
           const inner = slotInner[col][visIdx(row)]
           if (inner) inner.style.transform = `scaleY(${s.toFixed(3)})`
@@ -648,18 +659,22 @@
         const cell    = visCell(col, row)
         if (!img) continue
         if (winningCells.has(`${col},${row}`)) {
-          // 250ms charge pre-burst, then the plate bloom + particle burst fires.
+          // 250ms charge pre-burst, then a per-reel left-to-right stagger
+          // (~70ms per reel) so the win reads as a sweep, not all-at-once.
           cell?.classList.add('pre-charge')
           setTimeout(() => {
             cell?.classList.remove('pre-charge')
+            img.classList.remove('loser-dim')
             img.style.opacity = '1'
             img.classList.add('win-flash')
             cell?.classList.add('plate-bloom')
             if (symbol.toUpperCase() === 'H1') overlay?.classList.add('win-spin-fast')
             spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol))
-          }, 250)
+          }, 250 + col * 70)
         } else {
-          img.style.opacity = '0.35'
+          // Dim losers harder (and desaturate) so winners clearly spotlight.
+          img.style.opacity = ''
+          img.classList.add('loser-dim')
         }
       }
     }
@@ -670,7 +685,7 @@
           const img     = visImg(col, row)
           const overlay = visOverlay(col, row)
           const cell    = visCell(col, row)
-          if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
+          if (img) { img.style.opacity = '1'; img.classList.remove('win-flash', 'loser-dim') }
           overlay?.classList.remove('win-spin-fast')
           cell?.classList.remove('plate-bloom', 'pre-charge')
         }
@@ -685,7 +700,7 @@
         const img     = visImg(col, row)
         const overlay = visOverlay(col, row)
         const cell    = visCell(col, row)
-        if (img) { img.style.opacity = '1'; img.classList.remove('win-flash') }
+        if (img) { img.style.opacity = '1'; img.classList.remove('win-flash', 'loser-dim') }
         overlay?.classList.remove('win-spin-fast')
         cell?.classList.remove('plate-bloom', 'pre-charge', 'scatter-charge')
       }
@@ -1069,13 +1084,22 @@
   .reel-strip.spinning .symbol-overlay,
   .reel-strip.spinning .symbol-fx { display: none !important; }
 
-  /* Scatter-anticipation charge glow on still-travelling reels. */
+  /* Scatter-anticipation charge glow on still-travelling reels - stronger glow
+     plus a faint tremble on every tile of the anticipating reel. The tremble
+     lives on the cell (which has no JS-driven transform), so it survives the
+     .spinning gate and never fights the strip's travel transform. */
   .reel-strip.anticipate .tile-inner {
-    filter: brightness(1.35) saturate(1.5) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+    filter: brightness(1.5) saturate(1.75) drop-shadow(0 0 16px rgba(0, 255, 255, 0.85));
   }
+  @keyframes reel-tremble {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-1.5px); }
+    75%      { transform: translateX(1.5px); }
+  }
+  .reel-strip.anticipate .symbol-cell { animation: reel-tremble 0.09s linear infinite; }
 
   /* ── Symbol Life v2 idles (Set A) — tuned to read at 120px ─────────────── */
-  @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+  @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
   .idle-breathe { animation: idle-breathe 3.4s ease-in-out infinite; }
 
   /* H2 nitro crimson charge halo (2.4s) + valve-hiss opacity flicker */
@@ -1116,10 +1140,10 @@
   @keyframes idle-arc { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.06); } }
   .idle-arc { animation: idle-arc 2s ease-in-out infinite; }
 
-  /* L3 piston — crown pump 6px over 2.2s */
+  /* L3 piston - crown pump 7px over 2.2s */
   @keyframes idle-pump {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-6px); }
+    50%      { transform: translateY(-7px); }
   }
   .idle-pump { animation: idle-pump 2.2s ease-in-out infinite; }
 
@@ -1145,15 +1169,29 @@
   .symbol-overlay.win-spin-fast { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
 
   /* ── Win state — brighten, plate bloom, punch scale ──────────────────────── */
+  /* Stronger, larger edge bloom in the symbol's tint (bigger spread + a wider
+     outer halo) so winners glow hard against the dimmed losers. */
   @keyframes plate-bloom-pulse {
-    0%, 100% { box-shadow: inset 0 0 10px 1px color-mix(in srgb, var(--plate-tint, #00ffff) 55%, transparent); }
+    0%, 100% {
+      box-shadow:
+        inset 0 0 16px 2px color-mix(in srgb, var(--plate-tint, #00ffff) 75%, transparent),
+        0 0 14px 2px color-mix(in srgb, var(--plate-tint, #00ffff) 50%, transparent);
+    }
     50%      {
       box-shadow:
-        inset 0 0 22px 4px color-mix(in srgb, var(--plate-tint, #00ffff) 95%, transparent),
-        0 0 16px 3px color-mix(in srgb, var(--plate-tint, #00ffff) 70%, transparent);
+        inset 0 0 30px 6px color-mix(in srgb, var(--plate-tint, #00ffff) 100%, transparent),
+        0 0 28px 8px color-mix(in srgb, var(--plate-tint, #00ffff) 85%, transparent);
     }
   }
-  .symbol-cell.plate-bloom { animation: plate-bloom-pulse 0.7s ease-in-out infinite; z-index: 5; }
+  .symbol-cell.plate-bloom { animation: plate-bloom-pulse 0.6s ease-in-out infinite; z-index: 5; }
+
+  /* Dimmed, desaturated losers - spotlight the winners (harder than before). */
+  .symbol-img:global(.loser-dim) {
+    opacity: 0.2 !important;
+    filter: grayscale(0.6) brightness(0.62) !important;
+    animation: none !important;
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
 
   /* 250ms charge pre-burst on winning tiles (Set B). */
   @keyframes pre-charge-pulse {
@@ -1162,12 +1200,33 @@
   }
   .symbol-cell.pre-charge { animation: pre-charge-pulse 0.25s ease-in forwards; z-index: 5; }
 
-  @keyframes win-flash-pulse {
-    0%, 100% { filter: brightness(1) drop-shadow(0 0 8px rgba(0, 255, 255, 0.8)); transform: scale(1); }
-    30%      { transform: scale(1.16); }
-    50%      { filter: brightness(1.35) drop-shadow(0 0 16px rgba(0, 255, 255, 1)); transform: scale(1.05); }
+  /* Winner pop (biggest lift): a squash-and-stretch overshoot to 1.22 that
+     spring-settles to 1.0, then a gentle 1.0<->1.06 pulse for the win duration.
+     Flash and pop/pulse animate DIFFERENT properties (filter vs transform) so
+     they run concurrently in one animation list; win-pulse is listed after
+     win-pop (with a 0.5s delay) so it owns the transform once the pop settles. */
+  @keyframes win-pop {
+    0%   { transform: scale(0.86); }
+    40%  { transform: scale(1.22); }
+    64%  { transform: scale(0.97); }
+    82%  { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
-  .symbol-img:global(.win-flash) { animation: win-flash-pulse 0.6s ease-in-out infinite; }
+  @keyframes win-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.06); }
+  }
+  /* Brighter, higher-contrast white flash. */
+  @keyframes win-flash-pulse {
+    0%, 100% { filter: brightness(1.15) contrast(1.05) drop-shadow(0 0 10px rgba(255, 255, 255, 0.85)); }
+    50%      { filter: brightness(1.65) contrast(1.22) drop-shadow(0 0 22px rgba(255, 255, 255, 1)); }
+  }
+  .symbol-img:global(.win-flash) {
+    animation:
+      win-pop 0.5s ease-out 1 both,
+      win-pulse 0.9s ease-in-out 0.5s infinite,
+      win-flash-pulse 0.55s ease-in-out infinite;
+  }
 
   /* ── Scatter charge (Set B) — landed scatters charge during anticipation ── */
   @keyframes scatter-charge-bloom {
@@ -1201,9 +1260,13 @@
   @media (prefers-reduced-motion: reduce) {
     .symbol-img, .symbol-overlay, .symbol-fx,
     .symbol-img:global(.win-flash), .symbol-cell.plate-bloom, .symbol-cell.pre-charge,
+    .reel-strip.anticipate .symbol-cell,
     .symbol-cell.scatter-charge, .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after {
       animation: none !important;
     }
     .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after { display: none; }
+    /* Winners still spotlight, but statically (no pop / pulse / flash motion);
+       losers still dim. Particle bursts are gated in JS (_reduceMotion). */
+    .symbol-img:global(.loser-dim) { transition: none; }
   }
 </style>
