@@ -61,6 +61,7 @@
   import { selectedBetMode } from './lib/stores/betMode'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
+  import { overdriveVisual } from './lib/stores/overdriveVisual'
   import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -185,6 +186,9 @@
   // Motion Polish v2) — false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.
   let overdriveVisualActive = false
+  // Mirror the local Overdrive visual flag into the shared store so the HUD and
+  // paytable flip their accents from one source of truth.
+  $: overdriveVisual.set(overdriveVisualActive)
 
   /** Build a presentation script from a raw event list (live) or a served round. */
   function scriptFromEvents(events: RawEvent[]): PresentationScript {

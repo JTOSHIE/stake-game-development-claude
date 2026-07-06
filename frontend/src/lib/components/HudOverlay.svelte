@@ -1,5 +1,5 @@
 <script lang="ts">
-  // HudOverlay.svelte — LAYOUT_SPEC v3.2 AMENDMENT: fixed-field HUD.
+  // HudOverlay.svelte - LAYOUT_SPEC v3.2 AMENDMENT: fixed-field HUD.
   // Reskin-free per DESIGN_SYSTEM (the only themed accent is TURBO, which
   // reuses the existing turbo treatment with an engage glow). Every field
   // inside the panel is a fixed box that never moves or resizes as its value
@@ -12,6 +12,7 @@
     isMuted, showPaytable, winAmount, BET_LEVELS, locale,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
+  import { overdriveVisual } from '../stores/overdriveVisual'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
@@ -35,7 +36,7 @@
   let showAutoMenu = false
   let showMenu = false
 
-  // ── Bet ladder — ported from the retired ControlBar unchanged ────────────
+  // ── Bet ladder - ported from the retired ControlBar unchanged ────────────
   $: activeLevels = $rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS
 
   function nearestLevel(levels: number[], value: number): number {
@@ -81,7 +82,7 @@
     if (idx > 0) betAmount.set(activeLevels[idx - 1])
   }
 
-  // MAX bet (v3.3) — highest affordable ladder level, consistent with the
+  // MAX bet (v3.3) - highest affordable ladder level, consistent with the
   // affordability guard the increase arrow already uses.
   $: maxLevel = (() => {
     const affordable = activeLevels.filter((l) => l <= $balance)
@@ -137,166 +138,395 @@
   $: winLabel     = formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
-<!-- HUD panel — v3.2 x 296..984 (688 wide), y 560..648, radius 18, z 60 -->
-<div class="hud-panel" data-testid="hud-panel"></div>
+<!-- HUD - B1 reskin. .fs-hud is a display:contents token-scope wrapper only;
+     every control keeps its own position:absolute against the same stage
+     ancestor, so nothing shifts. Overdrive flips accents from the shared flag. -->
+<div class="fs-hud" class:fs-hud--overdrive={$overdriveVisual}>
 
-<!-- TURBO — v3.2: OUTSIDE the panel, centre (268,604) -->
-<button
-  class="turbo-btn"
-  class:engaged={$speedTier !== 'normal'}
-  on:click={toggleTurbo}
-  disabled={$isSpinning}
-  aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
-  title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
->
-  <span class="turbo-glyph">⚡</span>
-  <span class="turbo-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
-</button>
+  <!-- HUD panel - v3.2 x 296..984 (688 wide), y 560..648, radius 18 -->
+  <div class="fs-panel" data-testid="hud-panel"></div>
 
-<!-- Hamburger + menu — fixed at x 344 -->
-<div class="menu-wrapper">
-  <button class="hamburger-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
-    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-  </button>
-  {#if showMenu}
-    <div class="hud-menu" role="menu">
-      <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-      <button class="hud-menu-item" role="menuitem" on:click={toggleMute}>
-        {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
-      </button>
-    </div>
-  {/if}
-</div>
-
-<!-- BALANCE — fixed box x 400, width 200 -->
-<div class="hud-box balance-box" data-testid="hud-balance">
-  <span class="hud-label">{$tr('balance')}</span>
-  <span class="hud-value cyan">{balanceLabel}</span>
-</div>
-
-<!-- WIN — fixed box x 616, width 150 -->
-<div class="hud-box win-box" data-testid="hud-win">
-  <span class="hud-label">{$tr('win')}</span>
-  <span class="hud-value magenta">{winLabel}</span>
-</div>
-
-<!-- BET — fixed box x 782, width 120, value right-aligned -->
-<div class="hud-box bet-box" data-testid="hud-bet">
-  <span class="hud-label">{$tr('bet')}</span>
-  <span class="hud-value gold">{betLabel}</span>
-</div>
-
-<!-- Stacked cyan bet arrows — own FIXED column x 906 (v3.3), independent of the BET box -->
-<div class="bet-arrows" data-testid="bet-arrows">
-  <button class="bet-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">▲</button>
-  <button class="bet-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">▼</button>
-</div>
-
-<!-- MAX chip — v3.6: relocated to the FAR LEFT of the HUD (between TURBO and the
-     menu), clear of the SPIN button; was jammed against the SPIN hit circle in
-     v3.3 to v3.5 (a mis-tap hazard). Tabular numerals, never repositioned by
-     content; wired to the max-bet ladder logic. -->
-<button
-  class="max-chip"
-  on:click={setMaxBet}
-  disabled={$isSpinning || !canSetMax}
-  aria-label="Max bet"
-  data-testid="max-chip"
-><span class="max-chip-face">MAX</span></button>
-
-<!-- SPIN — v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
-     (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
-<button
-  class="spin-btn"
-  class:spinning={$isSpinning}
-  disabled={$isSpinning ? false : !$canSpin}
-  on:click={handleSpin}
-  aria-label={$tr('spin')}
-  data-testid="spin-button"
->
-  <span class="spin-glyph">{$isSpinning ? '⟳' : '▶'}</span>
-  <span class="spin-text">{$tr('spin')}</span>
-</button>
-
-<!-- AUTOPLAY — v3.2: centre (936,672), 48 -->
-<div class="autoplay-wrapper">
+  <!-- TURBO - v3.2: OUTSIDE the panel, centre (268,604) -->
   <button
-    class="autoplay-btn"
-    class:active={$isAutoPlay}
-    on:click={toggleAutoMenu}
-    disabled={$isSpinning && !$isAutoPlay}
-    aria-label={$tr('autoPlay')}
+    class="fs-turbo fs-knob"
+    class:engaged={$speedTier !== 'normal'}
+    on:click={toggleTurbo}
+    disabled={$isSpinning}
+    aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+    title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
-    {#if $isAutoPlay}
-      <span class="autoplay-count">{$autoPlayCount}</span>
-    {:else}
-      <span class="autoplay-glyph">∞</span>
-    {/if}
+    <span class="fs-face">
+      <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+      <span class="tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
+    </span>
   </button>
-  {#if showAutoMenu}
-    <div class="auto-menu" role="menu">
-      {#each AUTO_OPTIONS as n}
-        <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
-      {/each}
-    </div>
-  {/if}
-</div>
+
+  <!-- MAX chip - v3.6: far-left gap between TURBO and the menu, clear of SPIN. -->
+  <button
+    class="fs-max"
+    on:click={setMaxBet}
+    disabled={$isSpinning || !canSetMax}
+    aria-label="Max bet"
+    data-testid="max-chip"
+  ><span class="cap">MAX</span></button>
+
+  <!-- Hamburger + menu - fixed at x 344 -->
+  <div class="menu-wrapper">
+    <button class="fs-menu" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+      <span class="inset"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
+    </button>
+    {#if showMenu}
+      <div class="hud-menu" role="menu">
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={toggleMute}>
+          {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+        </button>
+      </div>
+    {/if}
+  </div>
+
+  <!-- BALANCE - fixed box x 400, width 200 -->
+  <div class="fs-box fs-balance fs-plate" data-testid="hud-balance">
+    <span class="fs-rail"></span>
+    <span class="fs-face">
+      <span class="fs-label">{$tr('balance')}</span>
+      <span class="fs-value cyan">{balanceLabel}</span>
+    </span>
+  </div>
+
+  <!-- WIN - fixed box x 616, width 150 -->
+  <div class="fs-box fs-win fs-plate" class:lit={$winAmount > 0} data-testid="hud-win">
+    <span class="fs-rail"></span>
+    <span class="fs-face">
+      <span class="fs-label">{$tr('win')}</span>
+      <span class="fs-value magenta">{winLabel}</span>
+    </span>
+  </div>
+
+  <!-- BET - fixed box x 782, width 120, value right-aligned -->
+  <div class="fs-box fs-bet fs-plate" data-testid="hud-bet">
+    <span class="fs-rail"></span>
+    <span class="fs-face">
+      <span class="fs-label">{$tr('bet')}</span>
+      <span class="fs-value gold">{betLabel}</span>
+    </span>
+  </div>
+
+  <!-- Stacked cyan bet arrows - own FIXED column x 906 (v3.3), independent of BET box -->
+  <div class="fs-arrows" data-testid="bet-arrows">
+    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet"><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
+    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet"><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
+  </div>
+
+  <!-- SPIN - v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
+       (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
+  <button
+    class="fs-spin"
+    class:spinning={$isSpinning}
+    disabled={$isSpinning ? false : !$canSpin}
+    on:click={handleSpin}
+    aria-label={$tr('spin')}
+    data-testid="spin-button"
+  >
+    <span class="ring"></span>
+    <span class="dome">
+      <svg class="glyph play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="glyph arrows" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M18 3v5h-5"/></svg>
+    </span>
+    <span class="txt">{$tr('spin')}</span>
+  </button>
+
+  <!-- AUTOPLAY - v3.2: centre (936,672), 48 -->
+  <div class="autoplay-wrapper">
+    <button
+      class="fs-auto fs-knob"
+      class:active={$isAutoPlay}
+      on:click={toggleAutoMenu}
+      disabled={$isSpinning && !$isAutoPlay}
+      aria-label={$tr('autoPlay')}
+    >
+      <span class="fs-face">
+        {#if $isAutoPlay}
+          <span class="count">{$autoPlayCount}</span>
+        {:else}
+          <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
+        {/if}
+      </span>
+    </button>
+    {#if showAutoMenu}
+      <div class="auto-menu" role="menu">
+        {#each AUTO_OPTIONS as n}
+          <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+        {/each}
+      </div>
+    {/if}
+  </div>
+
+</div><!-- /fs-hud -->
 
 <style>
-  /* Numeric HUD values never reflow as digits grow. */
-  .hud-value {
-    font-variant-numeric: tabular-nums;
+  /* ============================================================================
+     FUTURE SPINNER - B1 HUD & CONTROL-BAR RESKIN  (production CSS)
+     Fixed 1280x720 design surface (LAYOUT_SPEC v3.2/v3.6). Every coordinate
+     below is the real spec coordinate already used by HudOverlay.svelte.
+     Material language: brushed chrome + gunmetal + gold (DESIGN_SYSTEM Record
+     of Truth), matched to the Overdrive gauge bezel. One signature colour per
+     field. Base + Overdrive two-state locked via the .fs-hud--overdrive class.
+     ========================================================================== */
+
+  /* ---- token bridge: reads the app's existing --theme-* vars, falls back to
+     themes.ts future-spinner palette. display:contents keeps .fs-hud a pure
+     token-scope wrapper so children stay absolute against the stage ancestor. */
+  .fs-hud{
+    display:contents;
+    --sig-cyan:    var(--theme-primary,   #00FFFF);
+    --sig-magenta: var(--theme-secondary, #FF00FF);
+    --sig-pink:    #FF2EC4;   /* HUD magenta used in v3.7 boxes */
+    --sig-gold:    #FFD700;
+    --sig-orange:  #FF9A2E;
+    --navy:        #060610;
+    /* live accents - flipped by the Overdrive skin below */
+    --acc:  var(--sig-cyan);
+    --acc2: var(--sig-pink);
   }
 
-  .hud-panel {
-    position: absolute;
-    left: 296px;
-    top: 560px;
-    width: 688px;
-    height: 88px;
-    z-index: 60;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(4, 6, 18, 0.82) 0%, rgba(8, 12, 30, 0.72) 100%);
-    border: 1px solid color-mix(in srgb, var(--theme-primary, #00ffff) 30%, transparent);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    pointer-events: none;
+  /* ===== REUSABLE CHROME PRIMITIVES ==========================================
+     .fs-plate  notched instrument plate (bezel + face + optional rail)
+     .fs-knob   round chrome bezel (buttons)
+     .fs-rail   left neon accent rail
+     ========================================================================== */
+  .fs-plate{
+    position:absolute;
+    --sig:var(--sig-cyan);
+    padding:2px;                                   /* rim thickness */
+    clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px));
+    background:linear-gradient(150deg,#eef5fa 0%,#b3c6d2 15%,#63737f 37%,#2b363f 52%,#8499a8 72%,#dceaf2 100%);
+    box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .fs-plate > .fs-face{
+    position:absolute;inset:2px;
+    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+    background:
+      linear-gradient(160deg,color-mix(in srgb,var(--sig) 15%,transparent),transparent 44%),
+      linear-gradient(180deg,#111a2b 0%,#070b16 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -8px 18px rgba(0,0,0,.6);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  }
+  .fs-rail{
+    position:absolute;left:2px;top:9px;bottom:9px;width:3px;border-radius:2px;
+    background:var(--sig);box-shadow:0 0 8px var(--sig),0 0 14px color-mix(in srgb,var(--sig) 60%,transparent);
+    z-index:2;
+  }
+  .fs-knob{
+    border-radius:50%;padding:3px;
+    background:conic-gradient(from 216deg,#e7f1f7,#93a7b5,#39454f,#728593,#eef5fa,#4f5f6b,#a9bcc8,#e7f1f7);
+    box-shadow:0 3px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.55);
+  }
+  .fs-knob > .fs-face{
+    position:absolute;inset:3px;border-radius:50%;
+    background:radial-gradient(circle at 36% 28%,#1a3640,#06131c 72%);
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.14),inset 0 -6px 12px rgba(0,0,0,.7);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   }
 
-  /* ── TURBO — v3.2: OUTSIDE the panel, centre (268,604) ──────────────────── */
-  .turbo-btn {
-    position: absolute;
-    left: 232px;
-    top: 568px;
-    width: 72px;
-    height: 72px;
-    z-index: 60;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.45);
-    border: 2px solid rgba(255, 154, 46, 0.4);
-    color: rgba(255, 200, 120, 0.75);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    cursor: pointer;
-    transition: border-color 0.15s, filter 0.15s;
-  }
-  .turbo-btn .turbo-glyph { font-size: 1.4rem; line-height: 1; }
-  .turbo-btn .turbo-tier { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
-  .turbo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .turbo-btn.engaged {
-    border-color: #ff9a2e;
-    color: #ffc87a;
-    box-shadow: 0 0 16px rgba(255, 154, 46, 0.7), 0 0 32px rgba(255, 100, 20, 0.4);
-    animation: turbo-flame 0.8s ease-in-out infinite alternate;
-  }
-  @keyframes turbo-flame {
-    from { filter: brightness(1); }
-    to   { filter: brightness(1.35); }
+  /* ===== PANEL ================================================================
+     v3.2: x296..984 (688 wide), y560..648, radius18. Slim chrome sub-frame. */
+  .fs-panel{
+    position:absolute;left:296px;top:560px;width:688px;height:88px;z-index:59;
+    border-radius:18px;pointer-events:none;
+    background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
+    border:1px solid transparent;
+    background-image:
+      linear-gradient(135deg,rgba(6,9,20,.86),rgba(10,15,34,.74)),
+      linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#c9d7e0),color-mix(in srgb,var(--acc) 12%,#2b363f));
+    background-origin:border-box;background-clip:padding-box,border-box;
+    box-shadow:
+      0 6px 22px rgba(0,0,0,.5),
+      inset 0 1px 0 rgba(255,255,255,.06),
+      0 0 22px color-mix(in srgb,var(--acc) 22%,transparent);
   }
 
-  /* ── Hamburger + menu — fixed at x 344 ──────────────────────────────────── */
+  /* ===== BALANCE / WIN / BET =================================================
+     Fixed geometry (never reflow). Signature colour per field. ------------- */
+  .fs-box{position:absolute;top:573px;height:62px;z-index:60;}
+  .fs-box .fs-face{padding:0 10px;}
+  .fs-balance{left:400px;width:200px;--sig:var(--sig-cyan);}
+  .fs-win    {left:616px;width:150px;--sig:var(--sig-pink);}
+  .fs-bet    {left:782px;width:120px;--sig:var(--sig-gold);}
+  .fs-bet .fs-face{align-items:flex-end;padding-right:14px;}
+
+  .fs-label{
+    font-family:'Orbitron',system-ui,monospace;font-size:.52rem;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:rgba(190,232,255,.62);
+    position:relative;z-index:1;
+  }
+  .fs-value{
+    font-family:'Orbitron',system-ui,monospace;font-size:1.02rem;font-weight:700;
+    letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
+    position:relative;z-index:1;
+    -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+  }
+  /* Crisp glyphs: near-white fill, one tight 3px halo (no wide blur = no fuzz). */
+  .fs-value.cyan   {color:color-mix(in srgb,var(--sig-cyan) 18%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-cyan) 60%,transparent);}
+  .fs-value.magenta{color:color-mix(in srgb,var(--sig-pink) 20%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-pink) 60%,transparent);}
+  .fs-value.gold   {color:color-mix(in srgb,var(--sig-gold) 28%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-gold) 55%,transparent);}
+  .fs-bet .fs-label,.fs-bet .fs-value{text-align:right;width:100%;}
+
+  /* WIN plate lit - win present. Rail + face bloom, value count-pulse. */
+  .fs-win.lit{--sig:var(--sig-pink);}
+  .fs-win.lit{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--sig-pink) 70%,transparent));}
+  .fs-win.lit .fs-rail{animation:fs-rail-bloom 1.1s ease-in-out infinite;}
+  .fs-win.lit .fs-value{animation:fs-win-pop 1.1s ease-in-out infinite;}
+  @keyframes fs-rail-bloom{0%,100%{box-shadow:0 0 8px var(--sig-pink);}50%{box-shadow:0 0 16px var(--sig-pink),0 0 28px var(--sig-pink);}}
+  @keyframes fs-win-pop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+
+  /* ===== BET ARROWS - chrome nubs, cyan chevrons ============================
+     own fixed column x906 top578 (v3.3). ----------------------------------- */
+  .fs-arrows{position:absolute;left:906px;top:578px;width:44px;height:52px;z-index:60;
+    display:flex;flex-direction:column;gap:4px;}
+  .fs-arrow{
+    width:44px;height:24px;padding:0;border:none;cursor:pointer;position:relative;
+    border-radius:5px;background:transparent;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .fs-arrow::before{                              /* chrome cap */
+    content:'';position:absolute;inset:0;border-radius:5px;
+    background:linear-gradient(180deg,#c8d8e2,#5c6c78 55%,#26313a);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.6);
+  }
+  .fs-arrow svg{position:relative;z-index:1;width:15px;height:9px;
+    filter:drop-shadow(0 0 4px color-mix(in srgb,var(--acc) 80%,transparent));}
+  .fs-arrow svg path{fill:var(--acc);}
+  .fs-arrow:hover:not(:disabled)::before{filter:brightness(1.18);}
+  .fs-arrow:active:not(:disabled){transform:translateY(1px);}
+  .fs-arrow:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4);}
+
+  /* ===== MAX chip - far-left gap (v3.6), gold ============================== */
+  .fs-max{position:absolute;left:311px;top:582px;width:26px;height:44px;padding:0;
+    border:none;background:none;cursor:pointer;z-index:60;
+    display:flex;align-items:center;justify-content:center;}
+  .fs-max .cap{
+    width:24px;height:26px;display:flex;align-items:center;justify-content:center;
+    border-radius:6px;position:relative;
+    background:linear-gradient(180deg,#2a2410,#0d0b04);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sig-gold) 55%,transparent),
+               0 0 8px color-mix(in srgb,var(--sig-gold) 35%,transparent);
+    font-family:'Orbitron',monospace;font-size:.46rem;font-weight:800;letter-spacing:.02em;
+    color:#ffe58a;text-shadow:0 0 6px var(--sig-gold);
+  }
+  .fs-max:hover:not(:disabled) .cap{filter:brightness(1.2);}
+  .fs-max:active:not(:disabled){transform:translateY(1px);}
+  .fs-max:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* ===== HAMBURGER menu - chrome square (x344) ============================= */
+  .fs-menu{position:absolute;left:344px;top:584px;width:40px;height:40px;z-index:60;
+    padding:0;border:none;cursor:pointer;border-radius:9px;
+    background:linear-gradient(160deg,#c6d6e0,#55656f 52%,#222c34);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.55);
+    display:flex;align-items:center;justify-content:center;}
+  .fs-menu .inset{width:32px;height:32px;border-radius:6px;
+    background:radial-gradient(circle at 38% 30%,#15222b,#070d14 72%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    box-shadow:inset 0 0 8px rgba(0,0,0,.7);}
+  .fs-menu .bar{width:16px;height:2px;border-radius:1px;background:var(--acc);
+    box-shadow:0 0 5px color-mix(in srgb,var(--acc) 80%,transparent);}
+  .fs-menu:hover .bar{filter:brightness(1.3);}
+  .fs-menu:active{transform:translateY(1px);}
+
+  /* ===== TURBO - chrome knob, orange flame accent (x232 top568, 72) ======= */
+  .fs-turbo{position:absolute;left:232px;top:568px;width:72px;height:72px;z-index:60;
+    padding:0;border:none;cursor:pointer;}
+  .fs-turbo .fs-face{background:radial-gradient(circle at 36% 28%,#33210c,#0c0803 72%);}
+  .fs-turbo svg{width:26px;height:26px;}
+  .fs-turbo svg path{fill:rgba(255,190,120,.7);}
+  .fs-turbo .tier{font-family:'Orbitron',monospace;font-size:.5rem;font-weight:800;
+    letter-spacing:.06em;color:rgba(255,200,140,.75);font-variant-numeric:tabular-nums;}
+  .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
+  .fs-turbo.engaged svg path{fill:#ffc46a;}
+  .fs-turbo.engaged .tier{color:#ffce7a;}
+  .fs-turbo.engaged{filter:drop-shadow(0 0 14px rgba(255,120,30,.7));
+    animation:fs-flame .8s ease-in-out infinite alternate;}
+  @keyframes fs-flame{from{filter:drop-shadow(0 0 10px rgba(255,120,30,.55)) brightness(1);}
+    to{filter:drop-shadow(0 0 20px rgba(255,140,40,.9)) brightness(1.28);}}
+
+  /* ===== AUTOPLAY - chrome knob (x912 top648, 48) ========================= */
+  .fs-auto{position:absolute;left:912px;top:648px;width:48px;height:48px;z-index:60;
+    padding:0;border:none;cursor:pointer;}
+  .fs-auto .fs-face{gap:0;}
+  .fs-auto svg{width:20px;height:20px;}
+  .fs-auto svg path{fill:none;stroke:rgba(200,236,255,.7);stroke-width:5;}
+  .fs-auto .count{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:800;
+    color:var(--acc);font-variant-numeric:tabular-nums;text-shadow:0 0 8px var(--acc);}
+  .fs-auto:disabled{opacity:.4;cursor:not-allowed;}
+  .fs-auto.active{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--acc) 75%,transparent));
+    animation:fs-auto-pulse 1s ease-in-out infinite alternate;}
+  .fs-auto.active svg path{stroke:var(--acc);}
+  @keyframes fs-auto-pulse{from{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--acc) 40%,transparent));}
+    to{filter:drop-shadow(0 0 16px color-mix(in srgb,var(--acc) 90%,transparent));}}
+
+  /* ===== SPIN - crafted chrome, cyan redline ring (x962 top562, 84) =======
+     Replaces spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
+  .fs-spin{position:absolute;left:962px;top:562px;width:84px;height:84px;z-index:61;
+    padding:0;border:none;cursor:pointer;border-radius:50%;
+    background:conic-gradient(from 216deg,#e7f1f7,#8fa3b1,#333f49,#6d8090,#eef5fa,#47565f,#a4b7c3,#e7f1f7);
+    box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),
+               0 0 20px color-mix(in srgb,var(--acc) 55%,transparent);
+    transition:transform .12s ease,box-shadow .15s ease;}
+  .fs-spin .ring{position:absolute;inset:5px;border-radius:50%;
+    border:2px solid var(--acc);box-shadow:0 0 12px var(--acc),inset 0 0 10px color-mix(in srgb,var(--acc) 50%,transparent);}
+  .fs-spin .dome{position:absolute;inset:9px;border-radius:50%;
+    background:radial-gradient(circle at 36% 28%,#1a3a44,#05131b 70%);
+    box-shadow:inset 0 3px 5px rgba(255,255,255,.16),inset 0 -8px 16px rgba(0,0,0,.75);
+    display:flex;align-items:center;justify-content:center;}
+  .fs-spin .glyph{width:30px;height:30px;}
+  .fs-spin .glyph.play path{fill:var(--acc);filter:drop-shadow(0 0 6px var(--acc));}
+  .fs-spin .glyph.arrows{display:none;}
+  .fs-spin .glyph.arrows path{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;
+    filter:drop-shadow(0 0 6px var(--acc));}
+  .fs-spin .txt{position:absolute;bottom:14px;left:0;right:0;text-align:center;
+    font-family:'Orbitron',monospace;font-size:.46rem;font-weight:800;letter-spacing:.14em;
+    color:var(--acc);text-shadow:0 0 6px var(--acc);}
+  .fs-spin:hover:not(:disabled){transform:scale(1.05);
+    box-shadow:0 4px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),0 0 30px var(--acc);}
+  .fs-spin:active:not(:disabled){transform:scale(.96);}
+  .fs-spin:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4);box-shadow:none;}
+  .fs-spin.spinning .glyph.play{display:none;}
+  .fs-spin.spinning .glyph.arrows{display:block;animation:fs-spin-rot .7s linear infinite;}
+  .fs-spin.spinning .txt{opacity:.5;}
+  @keyframes fs-spin-rot{to{transform:rotate(360deg);}}
+
+  /* ===== SWAPPABLE COLOUR SCHEMES (slot-template layer) =====================
+     The HUD is skin-free: every colour comes from 5 signature tokens. Drop a
+     scheme class on the .fs-hud root and the whole bar re-tints. */
+  .fs-hud.scheme-trap { --sig-cyan:#39FF14; --sig-pink:#FF7A1A; --sig-gold:#EBFF5A; --sig-orange:#FF6600; } /* Trap Lane   */
+  .fs-hud.scheme-oil  { --sig-cyan:#FF8A3D; --sig-pink:#D9A86A; --sig-gold:#F5D061; --sig-orange:#FF5A1F; } /* Oil & Fire  */
+  .fs-hud.scheme-pitch{ --sig-cyan:#2FD24F; --sig-pink:#FFD700; --sig-gold:#EDE7C8; --sig-orange:#4CE06B; } /* Beautiful Game */
+
+  /* ===== OVERDRIVE TWO-STATE ================================================
+     App sets .fs-hud--overdrive (mirror overdriveVisual). Accents flip
+     cyan->magenta, spin ring goes redline, panel edge warms. */
+  .fs-hud--overdrive{--acc:var(--sig-pink);--acc2:var(--sig-orange);}
+  .fs-hud--overdrive .fs-spin .dome{background:radial-gradient(circle at 36% 28%,#4a1030,#1a0510 70%);}
+  .fs-hud--overdrive .fs-spin .ring{border-color:var(--sig-pink);
+    box-shadow:0 0 14px var(--sig-pink),0 0 26px color-mix(in srgb,var(--sig-orange) 45%,transparent);}
+  .fs-hud--overdrive .fs-panel{animation:fs-od-edge 3s ease-in-out infinite;}
+  @keyframes fs-od-edge{0%,100%{box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 20px color-mix(in srgb,var(--sig-pink) 30%,transparent);}
+    50%{box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 34px color-mix(in srgb,var(--sig-pink) 65%,transparent);}}
+  .fs-hud--overdrive .fs-arrows,
+  .fs-hud--overdrive .fs-menu,
+  .fs-hud--overdrive .fs-auto{filter:hue-rotate(-6deg) saturate(1.08);}
+
+  @media (prefers-reduced-motion:reduce){
+    .fs-win.lit .fs-rail,.fs-win.lit .fs-value,.fs-turbo.engaged,.fs-auto.active,
+    .fs-spin.spinning .glyph.arrows,.fs-hud--overdrive .fs-panel{animation:none;}
+  }
+
+  /* ============================================================================
+     DROPDOWN MENUS - NOT part of the design pass (kept from the live component).
+     The menu / autoplay wrappers position the new chrome buttons and anchor
+     their dropdowns; the buttons themselves render static inside the wrapper so
+     their spec coordinates are unchanged.
+     ========================================================================== */
   .menu-wrapper {
     position: absolute;
     left: 344px;
@@ -305,26 +535,8 @@
     height: 40px;
     z-index: 60;
   }
-  .hamburger-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    cursor: pointer;
-  }
-  .hamburger-btn .bar {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 1px;
-  }
+  .menu-wrapper .fs-menu { position: static; left: auto; top: auto; }
+
   .hud-menu {
     position: absolute;
     bottom: calc(100% + 8px);
@@ -349,170 +561,6 @@
   }
   .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
 
-  /* ── BALANCE / WIN / BET — CSS-drawn angular neon boxes (cyberpunk) ───────
-     A 2px magenta->cyan gradient bezel with cut corners, a deep gradient fill
-     and a soft pink glow; framed and thicker than the old flat panels, sharing
-     the instrument-plate design language. Fixed geometry, never reflow. */
-  .hud-box {
-    position: absolute;
-    top: 573px;
-    height: 62px;
-    z-index: 60;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 0 8px;
-    background: linear-gradient(135deg, #ff2ec4 0%, #16f2e0 58%, #ff2ec4 100%);
-    clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
-    filter: drop-shadow(0 0 6px rgba(255, 46, 196, 0.5));
-  }
-  .hud-box::before {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-    background:
-      linear-gradient(160deg, rgba(255, 46, 196, 0.12), transparent 45%),
-      linear-gradient(180deg, rgba(20, 11, 36, 0.95) 0%, rgba(8, 6, 16, 0.97) 100%);
-  }
-  .balance-box { left: 400px; width: 200px; }
-  .win-box     { left: 616px; width: 150px; }
-  .bet-box     { left: 782px; width: 120px; align-items: flex-end; padding-right: 12px; }
-
-  .hud-label {
-    position: relative;
-    z-index: 1;
-    font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.52rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    color: rgba(190, 240, 255, 0.6);
-    text-transform: uppercase;
-  }
-
-  .hud-value {
-    position: relative;
-    z-index: 1;
-    font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-  .hud-value.cyan    { color: #00ffff; text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); }
-  .hud-value.magenta { color: #ff2ec4; text-shadow: 0 0 8px rgba(255, 46, 196, 0.6); }
-  .hud-value.gold    { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
-
-  /* BET value right-aligned within its fixed 120 width, per AMENDMENT v3.2 */
-  .bet-box .hud-label,
-  .bet-box .hud-value {
-    text-align: right;
-    width: 100%;
-  }
-
-  /* Stacked cyan bet arrows — own FIXED column x 906 (v3.3), independent of BET box */
-  .bet-arrows {
-    position: absolute;
-    left: 906px;
-    top: 578px;
-    width: 26px;
-    height: 52px;
-    z-index: 60;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .bet-arrow {
-    width: 44px;
-    height: 24px;
-    background: rgba(0, 255, 255, 0.08);
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    border-radius: 4px;
-    color: #00ffff;
-    font-size: 0.65rem;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-  .bet-arrow:disabled { opacity: 0.35; cursor: not-allowed; }
-  .bet-arrow:hover:not(:disabled) { background: rgba(0, 255, 255, 0.18); }
-
-  /* MAX chip (v3.6) — relocated to the FAR LEFT, in the 40px gap between the
-     TURBO button (right edge x304) and the hamburger menu (left edge x344). The
-     26x44 button is centred in that gap (x311 to 337), clearing TURBO and the
-     menu by ~7px each and sitting nowhere near the SPIN circle (centre 1004,
-     r42). The visible chip keeps its v3.3 geometry (24x26, centred). Baseline
-     y604 unchanged. This removes the v3.3 to v3.5 SPIN-adjacency mis-tap hazard. */
-  .max-chip {
-    position: absolute;
-    left: 311px;
-    top: 582px;
-    width: 26px;
-    height: 44px;
-    padding: 0;
-    border: none;
-    background: none;
-    cursor: pointer;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .max-chip:disabled { cursor: not-allowed; }
-  .max-chip-face {
-    width: 24px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(0, 255, 255, 0.5);
-    border-radius: 6px;
-    background: rgba(0, 40, 60, 0.55);
-    color: #9fefff;
-    font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.46rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    font-variant-numeric: tabular-nums;
-    transition: background 0.15s, filter 0.15s;
-  }
-  .max-chip:hover:not(:disabled) .max-chip-face { background: rgba(0, 255, 255, 0.18); filter: brightness(1.15); }
-  .max-chip:disabled .max-chip-face { opacity: 0.35; }
-
-  /* ── SPIN — v3.2: centre (1004,604) ──────────────────────────────────────── */
-  .spin-btn {
-    position: absolute;
-    left: 962px;
-    top: 562px;
-    width: 84px;
-    height: 84px;
-    z-index: 60;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #1c3a3a, #041014 70%);
-    border: 3px solid var(--theme-primary, #00ffff);
-    color: var(--theme-primary, #00ffff);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    cursor: pointer;
-    box-shadow: 0 0 18px color-mix(in srgb, var(--theme-primary, #00ffff) 55%, transparent);
-    transition: transform 0.12s ease, box-shadow 0.15s ease;
-  }
-  .spin-btn .spin-glyph { font-size: 1.5rem; line-height: 1; }
-  .spin-btn .spin-text { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.1em; }
-  .spin-btn:hover:not(:disabled) { transform: scale(1.05); }
-  .spin-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
-  .spin-btn.spinning .spin-glyph { animation: spin-rotate 0.7s linear infinite; }
-  @keyframes spin-rotate { to { transform: rotate(360deg); } }
-
-  /* ── AUTOPLAY — v3.2: centre (936,672), 48 ───────────────────────────────── */
   .autoplay-wrapper {
     position: absolute;
     left: 912px;
@@ -521,28 +569,7 @@
     height: 48px;
     z-index: 60;
   }
-  .autoplay-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.45);
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.75);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Orbitron', 'Courier New', monospace;
-    font-weight: 700;
-  }
-  .autoplay-btn.active {
-    border-color: var(--theme-primary, #00ffff);
-    color: var(--theme-primary, #00ffff);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--theme-primary, #00ffff) 60%, transparent);
-  }
-  .autoplay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .autoplay-count { font-size: 0.95rem; font-variant-numeric: tabular-nums; }
-  .autoplay-glyph { font-size: 1.1rem; }
+  .autoplay-wrapper .fs-auto { position: static; left: auto; top: auto; }
 
   .auto-menu {
     position: absolute;

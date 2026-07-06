@@ -17,6 +17,7 @@
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { overdriveVisual } from '../stores/overdriveVisual'
 
   function close(): void {
     playClick()
@@ -98,6 +99,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="fs-pt"
+  class:fs-pt--overdrive={$overdriveVisual}
   role="dialog"
   aria-modal="true"
   aria-label={$tr('paytable')}
