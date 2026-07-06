@@ -337,6 +337,43 @@
     if (autoSpinTimer) clearTimeout(autoSpinTimer)
   })
 
+  // ── DEV-ONLY forced-win demo (Symbol Life capture harness) ────────────────
+  // Drives a scripted winning board through the public GameGrid API so the real
+  // win burst fires (dev has no RGS), looping every 5s so it is easy to film.
+  // NEVER affects production: gated by BOTH import.meta.env.DEV AND a
+  // ?windemo=<symbol> URL param, so a normal build (DEV false) or a normal URL
+  // (no param) skips it entirely and the block tree-shakes out of the bundle.
+  let winDemoInterval: ReturnType<typeof setInterval> | null = null
+  onMount(() => {
+    if (!import.meta.env.DEV) return
+    const demoParam = new URLSearchParams(window.location.search).get('windemo')
+    if (!demoParam) return
+    const sym = demoParam.toUpperCase()
+    // A board with the demo symbol on reels 0, 1, 2 (row 1) so a 3-of-a-kind
+    // ways win lights those three reels; the rest is quiet filler.
+    const demoBoard = [
+      ['L1', sym, 'L2', 'L3'],
+      ['M1', sym, 'L2', 'L3'],
+      ['M2', sym, 'L1', 'L3'],
+      ['L1', 'M3', 'L2', 'L3'],
+      ['L2', 'M1', 'L3', 'H2'],
+    ]
+    const fire = async () => {
+      if (!gridRef) return
+      resetWin()
+      activeWins.set([])
+      await gridRef.animateSpin(demoBoard)
+      boardSymbols.set(demoBoard)
+      activeWins.set([{ symbol: sym, kind: 3, ways: 6, payout: 9 }])
+    }
+    // Start after loading/assets settle, then loop for easy capture.
+    const startTimer = setTimeout(() => {
+      fire()
+      winDemoInterval = setInterval(fire, 5000)
+    }, 1600)
+    return () => { clearTimeout(startTimer); if (winDemoInterval) clearInterval(winDemoInterval) }
+  })
+
   // Q1 fix: cancel a pending autoplay continuation the moment autoplay stops,
   // so pressing STOP during the inter-spin delay never fires one more bet.
   $: if (!$isAutoPlay && autoSpinTimer !== null) {
