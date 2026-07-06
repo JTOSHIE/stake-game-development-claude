@@ -1,0 +1,55 @@
+<svg width="1420" height="500" viewBox="40 300 1420 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="carBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9fb2c8"/>
+      <stop offset="28%" stop-color="#4a5a72"/>
+      <stop offset="62%" stop-color="#1b2334"/>
+      <stop offset="100%" stop-color="#0d1220"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7de8ff" stop-opacity="0.9"/>
+      <stop offset="45%" stop-color="#1b4b5e" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0a1a26"/>
+    </linearGradient>
+    <linearGradient id="suit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d4a63"/>
+      <stop offset="55%" stop-color="#1c2437"/>
+      <stop offset="100%" stop-color="#2a3550"/>
+    </linearGradient>
+    <linearGradient id="visor" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9df4ff"/>
+      <stop offset="45%" stop-color="#1e6c8f"/>
+      <stop offset="75%" stop-color="#7a1f8f"/>
+      <stop offset="100%" stop-color="#ff2bd6"/>
+    </linearGradient>
+    <linearGradient id="goldS" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff0a0"/>
+      <stop offset="50%" stop-color="#e0ac1c"/>
+      <stop offset="100%" stop-color="#7d5a06"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="740" cy="762" rx="640" ry="34" fill="#000000" opacity="0.5"/>
+  <ellipse cx="420" cy="742" rx="150" ry="20" fill="#00e5ff" opacity="0.35"/>
+  <ellipse cx="1080" cy="742" rx="150" ry="20" fill="#00e5ff" opacity="0.35"/>
+  <circle cx="132" cy="520" r="52" fill="url(#carBody)" stroke="#05070d" stroke-width="6"/>
+  <circle cx="132" cy="520" r="30" fill="#0a1408"/>
+  <circle cx="132" cy="520" r="30" fill="none" stroke="#5dff3c" stroke-width="7" opacity="0.9"/>
+  <path d="M 96 520 Q 40 520 18 508 Q 44 534 96 536 Z" fill="#5dff3c" opacity="0.5"/>
+  <path d="M 128 566 C 96 500 130 448 260 428 L 430 404 C 540 336 800 326 930 368 L 1210 424 C 1352 452 1420 506 1396 566 L 1352 616 L 210 620 Z"
+        fill="url(#carBody)" stroke="#05070d" stroke-width="7"/>
+  <path d="M 260 432 L 430 408 C 540 342 796 332 926 372" fill="none" stroke="#e9f5ff" stroke-width="8" opacity="0.55" stroke-linecap="round"/>
+  <path d="M 448 402 C 540 344 786 336 900 372 L 866 416 L 492 428 Z" fill="url(#glass)" stroke="#05070d" stroke-width="6"/>
+  <path d="M 486 396 C 560 356 700 350 780 362" fill="none" stroke="#ffffff" stroke-width="9" opacity="0.55" stroke-linecap="round"/>
+  <line x1="672" y1="344" x2="660" y2="424" stroke="#05070d" stroke-width="5" opacity="0.8"/>
+  <path d="M 186 520 L 1330 502" stroke="#ff2bd6" stroke-width="20" opacity="0.16" fill="none"/>
+  <path d="M 186 520 L 1330 502" stroke="#ff2bd6" stroke-width="7" opacity="0.95" fill="none"/>
+  <path d="M 250 452 L 1240 448" stroke="url(#goldS)" stroke-width="4" opacity="0.9" fill="none"/>
+  <path d="M 1352 470 L 1396 478 L 1394 494 L 1350 488 Z" fill="#7de8ff" stroke="#05070d" stroke-width="3"/>
+  <line x1="560" y1="436" x2="548" y2="606" stroke="#05070d" stroke-width="4" opacity="0.6"/>
+  <line x1="960" y1="430" x2="964" y2="606" stroke="#05070d" stroke-width="4" opacity="0.6"/>
+  <path d="M 210 620 L 1352 616 L 1332 648 L 236 652 Z" fill="#0a0e1a" stroke="#05070d" stroke-width="5"/>
+  <rect x="300" y="652" width="180" height="52" rx="22" fill="url(#carBody)" stroke="#05070d" stroke-width="5"/>
+  <rect x="960" y="650" width="180" height="52" rx="22" fill="url(#carBody)" stroke="#05070d" stroke-width="5"/>
+  <path d="M 310 700 Q 390 726 470 700" stroke="#00e5ff" stroke-width="8" fill="none" opacity="0.9"/>
+  <path d="M 970 698 Q 1050 724 1130 698" stroke="#00e5ff" stroke-width="8" fill="none" opacity="0.9"/>
+</svg>
