@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import GameGrid       from './lib/components/GameGrid.svelte'
   import HudOverlay      from './lib/components/HudOverlay.svelte'
-  import FeatureButton   from './lib/components/FeatureButton.svelte'
+  import FeatureMenu     from './lib/components/FeatureMenu.svelte'
   import SceneGroup      from './lib/components/SceneGroup.svelte'
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import FlameJets      from './lib/components/FlameJets.svelte'
@@ -634,10 +634,13 @@
   <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
   <WinBanner />
 
-  <!-- FEATURE — Grille button, right of the frame (v3.3), future-spinner only;
-       hidden during Overdrive so the bonus instrument column owns that zone. -->
-  {#if $activeTheme.id === 'future-spinner'}
-    <FeatureButton overdriveActive={featureActive} on:open={() => buyBonusRef?.openConfirm()} />
+  <!-- FEATURES — unified bet-modes menu, right of the frame (replaces the old
+       single FeatureButton); future-spinner only, hidden during Overdrive so
+       the bonus instrument column owns that zone. A live buy ACTIVATE opens the
+       existing BuyBonus confirm modal (same confirm-protected flow the old
+       FeatureButton used), which then dispatches 'buy' -> handleBuy. -->
+  {#if $activeTheme.id === 'future-spinner' && !featureActive}
+    <FeatureMenu on:buy={() => buyBonusRef?.openConfirm()} />
   {/if}
 
   <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->
