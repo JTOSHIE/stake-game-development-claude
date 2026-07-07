@@ -134,7 +134,10 @@ function checkRound(entry) {
 }
 
 async function waitSpinDone(page, timeout = 20000) {
-  await page.waitForFunction(() => !document.querySelector('.spin-btn.spinning'), { timeout })
+  await page.waitForFunction(
+    () => !document.querySelector('[data-testid="spin-button"].spinning'),
+    { timeout },
+  )
 }
 
 async function dismissIntro(page) {
@@ -143,6 +146,83 @@ async function dismissIntro(page) {
     await btn.click()
     await page.waitForTimeout(100)
   }
+}
+
+// ── Cost-integrity gate (Wiring Integrity Audit, item b) ────────────────────
+// FS_MODES' single source of truth (frontend/src/lib/config/fsModes.ts),
+// duplicated here as a plain literal rather than imported: this script runs
+// against a built/rsync'd snapshot server, not through the app's own module
+// graph, so it has no static import path into frontend/src. Kept in sync by
+// the fsModes/index.json drift test (scripts/check_mode_cost_drift.mjs),
+// which both sources.
+const MODE_COST_CHECK = [
+  { menuId: 'normal',    serverMode: 'base',     cost: 1.0,   kind: 'standing' },
+  { menuId: 'cruise',    serverMode: 'cruise',   cost: 1.0,   kind: 'standing' },
+  { menuId: 'overboost', serverMode: 'antelite', cost: 1.25,  kind: 'enhancer' },
+  { menuId: 'bonus',     serverMode: 'bonus',    cost: 100.0, kind: 'buy' },
+  { menuId: 'super',     serverMode: 'super',    cost: 400.0, kind: 'buy' },
+]
+const COST_CHECK_BET = 1.00
+
+/**
+ * For each of the five modes, at a fixed bet: drive the FEATURES menu the way
+ * a real player would (SELECT / toggle ON / ACTIVATE+CONFIRM), then assert
+ * the round actually recorded (a) the correct server mode and (b) the correct
+ * integer-micros debit (bet x MODE_COST[mode], never the wallet's 1,000,000
+ * scale confused with the book's 100 (centibet) scale). This is the permanent
+ * regression gate for the buy-tier billing bug class (PR #44): a control that
+ * looks right but silently charges/serves the wrong tier.
+ */
+async function runCostIntegrityCheck(page) {
+  await waitForTestStores(page)
+  await page.evaluate((b) => { window.__testStores.betAmount.set(b) }, COST_CHECK_BET)
+  // A high balance so the 400x super-buy check never fails on affordability
+  // alone after four prior mode charges have run down the default $100 start.
+  await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
+  await dismissIntro(page)
+
+  const results = []
+  for (const m of MODE_COST_CHECK) {
+    await clearQaLog(page)
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(120)
+
+    if (m.kind === 'standing') {
+      // 'normal' (base) is the active standing mode from session start, so it
+      // shows an ACTIVE tag rather than a SELECT button - nothing to click.
+      const selectBtn = page.locator(`[data-testid="standing-select-${m.menuId}"]`)
+      if (await selectBtn.count() > 0) await selectBtn.click()
+      await page.locator('[data-testid="feature-menu-close"]').click()
+      await page.locator('[data-testid="spin-button"]').click()
+    } else if (m.kind === 'enhancer') {
+      await page.locator(`[data-testid="enhancer-toggle-${m.menuId}"]`).click()
+      await page.locator('[data-testid="feature-menu-close"]').click()
+      await page.locator('[data-testid="spin-button"]').click()
+    } else {
+      // buy tier: ACTIVATE opens BuyBonus's confirm modal; CONFIRM fires the spin.
+      await page.locator(`[data-testid="activate-${m.menuId}"]`).click()
+      await page.locator('[data-testid="buy-confirm"]').click()
+    }
+    await waitSpinDone(page)
+
+    const entries = await readQaLog(page)
+    const entry = entries[entries.length - 1]
+    const expectedMicros = Math.round(COST_CHECK_BET * m.cost * CURRENCY_SCALE)
+    // Standing/enhancer spins (handleSpin) log `bet` only, no separate `cost`
+    // field, since that call site charges a flat 1x bet regardless of mode
+    // today - which is exactly what this gate is checking for. Buy spins
+    // (handleBuy) log the computed `cost` directly.
+    const actualMicros = entry?.cost !== undefined ? toMicros(entry.cost) : toMicros(entry?.bet ?? NaN)
+    const modeOk = entry?.mode === m.serverMode
+    const costOk = actualMicros === expectedMicros
+    results.push({
+      menuId: m.menuId, serverMode: m.serverMode,
+      expectedMode: m.serverMode, actualMode: entry?.mode,
+      expectedMicros, actualMicros,
+      ok: modeOk && costOk,
+    })
+  }
+  return results
 }
 
 // A concurrent session actively editing the same dev server can trigger HMR
@@ -230,7 +310,7 @@ async function runSession(browser, { social, cellSpins, globalCounter, heapSampl
 
   const url = social ? `${BASE_URL}/?social=true` : BASE_URL
   await page.goto(url, { waitUntil: 'networkidle' })
-  await page.waitForSelector('.spin-btn', { timeout: 15000 })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
   await page.waitForFunction(() => window.__testStores !== undefined, { timeout: 10000 })
   await dismissIntro(page)
   await startFpsSampling(page)
@@ -250,7 +330,7 @@ async function runSession(browser, { social, cellSpins, globalCounter, heapSampl
         // once-per-session intro splash while a dev server is live-edited
         // concurrently) must never silently stall the whole soak.
         await dismissIntro(page)
-        await page.locator('.spin-btn').click()
+        await page.locator('[data-testid="spin-button"]').click()
         await waitSpinDone(page)
         globalCounter.n += 1
 
@@ -362,6 +442,25 @@ async function run() {
     writeFileSync(join(OUT_DIR, 'session-b-result.json'), JSON.stringify(sessionB, null, 2))
     log(`Session B complete: ${sessionB.totalSpins} spins, avg fps ${sessionB.avgFps?.toFixed(1)}`)
 
+    log('')
+    log('=== COST-INTEGRITY GATE (all five modes, fixed bet) ===')
+    const costPage = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+    let costResults
+    try {
+      await costPage.goto(BASE_URL, { waitUntil: 'networkidle' })
+      await costPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      costResults = await runCostIntegrityCheck(costPage)
+    } finally {
+      await costPage.close()
+    }
+    for (const r of costResults) {
+      const status = r.ok ? 'PASS' : 'FAIL'
+      log(`  [${status}] ${r.menuId} -> expected mode=${r.expectedMode} micros=${r.expectedMicros}` +
+          `, actual mode=${r.actualMode} micros=${r.actualMicros}`)
+    }
+    const costFailures = costResults.filter((r) => !r.ok)
+    writeFileSync(join(OUT_DIR, 'cost-integrity-result.json'), JSON.stringify(costResults, null, 2))
+
     const totalSpins = sessionA.totalSpins + sessionB.totalSpins
     const totalChecked = sessionA.roundResults.checked + sessionB.roundResults.checked
     const totalMismatches = [...sessionA.roundResults.totalMismatches, ...sessionB.roundResults.totalMismatches]
@@ -390,6 +489,7 @@ async function run() {
       avgFpsSessionA: sessionA.avgFps,
       avgFpsSessionB: sessionB.avgFps,
       avgFpsOverall: avgFps,
+      costIntegrityFailures: costFailures.length,
     }
 
     log('')
@@ -398,6 +498,7 @@ async function run() {
     if (totalMismatches.length) log('MISMATCHES:\n' + JSON.stringify(totalMismatches, null, 2))
     if (totalDrifts.length) log('BALANCE DRIFTS:\n' + JSON.stringify(totalDrifts, null, 2))
     if (totalConsoleErrors.length) log('CONSOLE ERRORS:\n' + JSON.stringify(totalConsoleErrors, null, 2))
+    if (costFailures.length) log('COST-INTEGRITY FAILURES:\n' + JSON.stringify(costFailures, null, 2))
 
     writeFileSync(join(OUT_DIR, 'soak-1-summary.json'), JSON.stringify(summary, null, 2))
 
@@ -408,6 +509,7 @@ async function run() {
     if (totalConsoleErrors.length > 0) { log(`FAIL: ${totalConsoleErrors.length} console error(s)`); fail = true }
     if (heapGrowthPct != null && Math.abs(heapGrowthPct) > 15) { log(`FAIL: heap growth ${heapGrowthPct.toFixed(1)}% (> 15%)`); fail = true }
     if (avgFps != null && avgFps < 55) { log(`FAIL: avg fps ${avgFps.toFixed(1)} (< 55)`); fail = true }
+    if (costFailures.length > 0) { log(`FAIL: ${costFailures.length} cost-integrity mismatch(es) (see COST-INTEGRITY FAILURES above)`); fail = true }
 
     if (fail) {
       log('QA SOAK: FAILURES DETECTED')

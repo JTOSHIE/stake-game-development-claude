@@ -47,11 +47,14 @@ const winMicros   = Math.floor((wagerMicros * csvPayout) / 100) // csvPayout is 
 const winDollars  = winMicros / CURRENCY_SCALE                  // display only
 ```
 
-## True game facts (Overdrive Free Spins, two-mode package)
+## True game facts (Overdrive Free Spins, five-mode package)
 
 The owner decided Option C: the game ships WITH a real bonus feature (Overdrive Free
-Spins). Two bet modes: `base` (cost 1.0x) and `bonus` buy (cost 100.0x). Stateless: the
-whole feature resolves inside one book round. No jackpot, gamble, or continuation.
+Spins). FeatureMath v2 (2026-07-07) shipped the full five-mode package into the locked
+package: `base` (Normal, 1.0x), `cruise` (Cruise, 1.0x, low-vol), `antelite` (OVERBOOST,
+1.25x), `bonus` (Buy Overdrive, 100.0x) and `super` (NITRO OVERDRIVE, 400.0x, Overdrive
+meter pre-revved to 5x). Stateless: the whole feature resolves inside one book round. No
+jackpot, gamble, or continuation.
 
 - **Feature (Overdrive Free Spins):** 3/4/5 scatters award 8/12/16 free spins AND pay an
   instant 1x/3x/10x total bet. During free spins an Overdrive meter starts at 1x and rises
@@ -60,8 +63,10 @@ whole feature resolves inside one book round. No jackpot, gamble, or continuatio
   pay their instant award x the current meter. The bonus buy guarantees a 3+ trigger.
 - **Scatter values are 1x/3x/10x everywhere** (maths, PAR, and frontend once Stage 2 wires
   the feature). Not 5x/15x/50x.
-- **RTP: 96.3500% at 4dp in BOTH modes** (base 10dp 96.3499998727%, bonus 96.3499999962%).
-- Max win 5,000x (hard cap both modes). Grid 5x4, 1,024 ways. 100,000 rounds per mode.
+- **RTP: 96.3500% at 4dp in ALL FIVE modes** (base 10dp 96.3499998727%, bonus
+  96.3499999962%; cruise/antelite/super independently re-verified 2026-07-07 at
+  96.350000% - see `HANDOVER_2026-07-07_Fable.md` for the full per-mode table).
+- Max win 5,000x (hard cap every mode). Grid 5x4, 1,024 ways. 100,000 rounds per mode.
 - **Base mode:** hit rate 29.11%, volatility (weighted SD) 17.28x, free-spin trigger rate
   1 in 184.7 (0.5415%), average triggered-round win 79.4x, wincap 1 in 100,000.
 - **Bonus mode:** average bought outcome 96.35x (RTP 96.35% at 100x), volatility 206.63x,
