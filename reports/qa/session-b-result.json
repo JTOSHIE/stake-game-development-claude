@@ -1,0 +1,10 @@
+{
+  "roundResults": {
+    "checked": 300,
+    "totalMismatches": [],
+    "balanceDrifts": []
+  },
+  "consoleErrors": [],
+  "avgFps": 59.9596292267967,
+  "totalSpins": 300
+}

@@ -1,0 +1,14 @@
+8:19:06 pm [vite] (client) Forced re-optimization of dependencies
+
+  VITE v7.3.1  ready in 772 ms
+
+  ➜  Local:   http://localhost:52996/
+  ➜  Network: use --host to expose
+8:19:06 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:177:12 `<tr>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase
+8:19:06 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:185:14 `<tr>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase
+[build-diet] total pruned: 0 paths, 0.00 MB
+[build-diet] total pruned: 0 paths, 0.00 MB
+
+[qa_soak] child exited at Sat Jul 04 2026 21:04:55 GMT+1000 (Australian Eastern Standard Time) code=143 signal=null

@@ -1,0 +1,13 @@
+{
+  "totalSpins": 1300,
+  "totalRoundsChecked": 1300,
+  "exactTotalMismatches": 0,
+  "balanceDrifts": 0,
+  "consoleErrors": 0,
+  "heap100Bytes": 17100000,
+  "heap1000Bytes": 19300000,
+  "heapGrowthPct": 12.865497076023392,
+  "avgFpsSessionA": 59.865539389546576,
+  "avgFpsSessionB": 59.9596292267967,
+  "avgFpsOverall": 59.91258430817164
+}
