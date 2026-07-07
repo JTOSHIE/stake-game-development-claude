@@ -3,10 +3,11 @@
 // Both choreographies share one tile-unit engine (GameGrid): 'strip' scrolls a
 // wrapped vertical strip, 'drop' releases the same tiles from above the frame
 // with gravity easing. The toggle switches choreography only; result rows are
-// identical. Dev-only per the brief: default 'strip', overridable via a
-// ?fs_reel_mode= URL param or a persisted localStorage key (guarded, falling
-// back to sessionStorage then in-memory like the intro-splash flag), and
-// surfaced through a DEV-gated control in App.svelte.
+// identical. Shipping default is 'drop' (owner eye-call closed 2026-07-07,
+// relayed via Fable) - overridable via a ?fs_reel_mode= URL param or a
+// persisted localStorage key (guarded, falling back to sessionStorage then
+// in-memory like the intro-splash flag), and surfaced through a DEV-gated
+// control in App.svelte (never rendered in the production submission build).
 
 import { writable } from 'svelte/store'
 
@@ -35,7 +36,7 @@ function initialMode(): ReelMode {
     const s = sessionStorage.getItem(KEY)
     if (isMode(s)) return s
   } catch {}
-  return 'strip'
+  return 'drop'
 }
 
 export const reelMode = writable<ReelMode>(initialMode())

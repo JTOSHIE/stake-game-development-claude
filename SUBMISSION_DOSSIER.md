@@ -24,14 +24,14 @@ checklist in the docs must be satisfied.
 |---|----------|-------------|--------|----------|
 | 1 | Frontend build (dist, static only) | Pipeline | Regenerates each pass | Build Diet v2 |
 | 2 | Maths files: index.json, both lookup tables, both books, game_metadata.json | Overdrive pass | MERGED to main | Done (v1.1.0) |
-| 3 | PAR sheet v2 (two modes, Overdrive documented) | Overdrive pass | MERGED to main | Done |
+| 3 | PAR sheet (five modes, FeatureMath v2 documented) | Overdrive pass + FeatureMath v2 | MERGED to main | Done |
 | 4 | Submission blurb v2 (Overdrive) | Section 3 below | OWNER APPROVED (soundtrack line amended, pending re-approval) | Owner |
 | 5 | Game tile background image | Design system Phase B | To design | AssetForge v2 |
 | 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | To design | AssetForge v2 |
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
-| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Two-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived (REPLAY_TEST_EVENTS.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy (2026-07-04) |
+| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for base/bonus (REPLAY_TEST_EVENTS.md), cruise/antelite/super still owed (see section 6); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy (2026-07-04), five-mode replay IDs pending |
 | 11 | High resolution asset link (Drive or Dropbox, public) | Owner | Pending | Pre-submission |
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
@@ -62,21 +62,56 @@ consecutive bets; working sound disable; incremental win count-up; sixteen
 locales; social mode clean including first paint; static build, no external
 origins, no Stake branding, original IP; Bet Replay implemented for base rounds;
 responsive verified at all six required viewports.
-New obligations created by Overdrive (owned by Stage 2 unless noted): bonus buy
+New obligations created by Overdrive (owned by Stage 2 unless noted): buy-tier
 UI must carry social overrides for every string (the live prohibited terms table
 bans buy, bonus buy, purchase, bought, cost of, at the cost of on stake.us, with
 replacements such as get bonus, play, instantly triggered, can be played for);
-the RGS jurisdiction flag disabledBuyFeature must fully hide the buy; replay
-must play back a complete free spins round and, for a bonus buy round, display
-the amount spent including the cost multiplier; both modes must appear in the
-paytable and rules, localised across all sixteen locales; the 0.5% mode RTP rule
-is satisfied by design, both modes at 96.3500%, evidenced in PAR v2.
-Independent verification (2026-07-04): the maths is recomputed from the shipped
-lookup tables by scripts/validate_math.py (CI-gated) - both modes 96.350000%,
-cross-mode variation 0.0000%, base hit 29.11%, SD 17.28x / 206.63x, max 5,000x,
-wincap 1-in-100k / 1-in-1k, all Stake checks pass (MATH_VALIDATION.md). The RGS
-wire contract is documented and our client verified aligned in
-docs/RGS_CONTRACT_REFERENCE.md. Community tooling assessed in docs/TOOLING_REVIEW.md.
+the RGS jurisdiction flag disabledBuyFeature must fully hide both buy tiers;
+replay must play back a complete free spins round and, for a buy-tier round,
+display the amount spent including the cost multiplier; all five modes must
+appear in the paytable and rules, localised across all sixteen locales; the
+0.5% mode RTP rule is satisfied by design, all five modes at 96.3500%,
+evidenced in the PAR sheet's five-mode declaration (section 10) and
+independently re-verified 2026-07-07 (see the mode table below).
+
+**FIVE-MODE TABLE** (FeatureMath v2, shipped 2026-07-07, all independently
+re-verified from the shipped lookup tables via `scripts/validate_math.py`):
+
+| Mode | Cost | RTP | Notes |
+|---|---|---|---|
+| Normal | 1.0x | 96.35% | Standard play. |
+| Cruise | 1.0x | 96.35% | Low-volatility standing mode, same cost and RTP as Normal. |
+| OVERBOOST | 1.25x | 96.35% | Ante-style toggle - **debits 1.25x every spin while ON**, not a one-shot buy. About 1.6x the feature trigger rate. |
+| Buy Overdrive | 100x | 96.35% | One-shot buy, guaranteed Overdrive Free Spins entry. |
+| NITRO OVERDRIVE | 400x | 96.35% | One-shot buy, guaranteed entry with the Overdrive meter **pre-revved to 5x** at the feature's first free spin. |
+
+All five: 5,000x hard win cap, stateless (resolves inside one book round), 4^5
+= 1,024 ways, 5x4 grid. Cross-mode RTP spread 0.0000pp (satisfies the 0.5%
+rule with large margin).
+
+Independent verification (2026-07-07, re-run fresh for this dossier update):
+the maths is recomputed from the shipped lookup tables by
+`scripts/validate_math.py` (CI-gated) - all five modes 96.350000%, cross-mode
+variation 0.0000%, base hit 29.11% (SD 17.28x), cruise SD 11.29x, antelite
+(OVERBOOST) SD 20.32x, bonus SD 206.63x, super (NITRO OVERDRIVE) SD 539.16x,
+max 5,000x every mode, wincap base 1-in-100k / cruise 1-in-250k / antelite
+1-in-80k / bonus 1-in-1k / super 1-in-250, all Stake checks pass
+(MATH_VALIDATION.md). The RGS wire contract is documented and our client
+verified aligned in docs/RGS_CONTRACT_REFERENCE.md. Community tooling assessed
+in docs/TOOLING_REVIEW.md.
+
+**Responsible play** (frontend, non-locked): autoplay can stop automatically
+on any win, on Overdrive triggering, or once a player-set loss limit is
+reached, and can always be stopped manually; a session summary (time, spins,
+net) is available from the menu. Implemented in
+`frontend/src/lib/stores/responsibleGambling.ts`, jurisdiction-flag-driven and
+off by default; player-facing copy lives in the in-game paytable's
+"Responsible Play" section.
+
+**No soundtrack claim**: the submission blurb (section 3) and all in-game copy
+remain free of any soundtrack/music claim until audio actually ships (audio
+delivery is still the one open creative item, tracked in
+`docs/CHAT_CLOSEOUT_2026-07-06.md` section 3).
 
 ## 5. POST-UPLOAD VERIFICATION PROTOCOL (before requesting review)
 1. Dashboard Developer Testing Tool: matrix of currencies, languages including
@@ -97,10 +132,20 @@ owner's next portal login: confirm team profile and payment details, and
 screenshot the submission form fields so this dossier can record any field not
 yet covered.
 
+**REVIEW_EVENTS pass (ratified by Fable, still owed, queued next after this
+copy update):** commit the statelessness artefact (a scan script plus its
+output summary, under `reports/qa/`) proving cruise/antelite/super are
+stateless from the actual shipped books, and the per-mode Bet Replay event IDs
+for cruise/antelite/super (base/bonus already have theirs in
+`REPLAY_TEST_EVENTS.md`).
+
 ## 7. WHERE EACH ARTEFACT FINALISES
-Overdrive merge: maths files, PAR v2, facts sheet (done). Stage 2 frontend: buy
-UI with social overrides, jurisdiction flag, bonus replay, rules and paytable
-for both modes. AssetForge v2: all art including tile background, tile hero and
-provider logo. Motion Polish v2: final presentation. Build Diet v2: final dist
+Overdrive merge: maths files, PAR v2, facts sheet (done). FeatureMath v2: three
+more modes shipped into the locked package (done, 2026-07-07). Stage 2
+frontend: buy-tier UI with social overrides, jurisdiction flag, buy-tier
+replay, rules and paytable for all five modes (rules/paytable done; per-mode
+replay IDs for cruise/antelite/super still owed, see section 6).
+AssetForge v2: all art including tile background, tile hero and provider
+logo. Motion Polish v2: final presentation. Build Diet v2: final dist
 and bundle. Compliance re-validation: evidence pack refreshed against the final
 build. Then section 5, then submit.

@@ -15,11 +15,18 @@ display-name reconciliation and integrity statement is in `docs/PAR_NAMING_ADDEN
 | Studio / brand | We Roll Spinners | `FUTURE_SPINNER_PAR_SHEET.md`; `design-system/DESIGN_SYSTEM.md` |
 | Grid | 5 reels x 4 rows (20 symbol positions) | `FUTURE_SPINNER_PAR_SHEET.md` §1 |
 | Win mechanic | Ways-to-win, up to 4^5 = 1,024 ways | `FUTURE_SPINNER_PAR_SHEET.md` §1 |
-| Bet modes | Two: `base` (cost 1.0x), `bonus` buy (cost 100.0x) | `FUTURE_SPINNER_PAR_SHEET.md` §1, §10 |
+| Bet modes | Five (FeatureMath v2, 2026-07-07): `base` 1.0x, `cruise` 1.0x, `antelite`/OVERBOOST 1.25x, `bonus`/Buy Overdrive 100.0x, `super`/NITRO OVERDRIVE 400.0x | `FUTURE_SPINNER_PAR_SHEET.md` §1, §10, §11 |
 | Min / max bet | $0.10 / $100.00 | `FUTURE_SPINNER_PAR_SHEET.md` §1 |
 | Simulation basis | 100,000 rounds per mode, Stake Engine SDK v1 | `FUTURE_SPINNER_PAR_SHEET.md` (header) |
-| Optimiser | PigFarm (Rust); both modes converged to 96.3500% RTP | `FUTURE_SPINNER_PAR_SHEET.md` (header) |
-| Version | v1.1 (Overdrive Free Spins) | `FUTURE_SPINNER_PAR_SHEET.md` §12 footer |
+| Optimiser | PigFarm (Rust); all five modes converged to 96.3500% RTP | `FUTURE_SPINNER_PAR_SHEET.md` (header) |
+| Version | v1.2.0 (FeatureMath v2, five modes) | `FUTURE_SPINNER_PAR_SHEET.md` §12 footer |
+
+Note (2026-07-07): the "Verified mathematics" section below (§2) was compiled before
+FeatureMath v2 and documents `base`/`bonus` only. Cruise/antelite/super's independently
+re-verified figures (all 96.350000% RTP; SD 11.29x/20.32x/539.16x; wincap 1-in-250k/
+1-in-80k/1-in-250) are in `HANDOVER_2026-07-07_Fable.md`'s per-mode table and
+`FUTURE_SPINNER_PAR_SHEET.md` §§10-11; a full three-mode audit-sheet expansion mirroring
+the Base/Bonus sections below remains a follow-up, not done in this pass.
 
 ## 2. Verified mathematics
 

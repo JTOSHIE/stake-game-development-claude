@@ -44,6 +44,12 @@
   // An enhancer is on when its serverMode is the selected standing mode.
   const isEnhancerOn = (m: FsMode, sel: BetMode) => sel === m.serverMode
 
+  // FEATURES entry chip reflects the active standing/enhancer mode (cost
+  // visibility, Fable 2026-07-07 item 0): OVERBOOST needs a persistent,
+  // clearly-labelled state since it changes the real per-spin debit; Cruise
+  // only needs a subtle label since its cost is unchanged at 1.0x.
+  $: entryActiveLabel = $standingMode === 'antelite' ? 'OVERBOOST' : $standingMode === 'cruise' ? 'CRUISE' : ''
+
   function openMenu(): void { if (!$isSpinning) { playClick(); open = true } }
   function close(): void { playClick(); open = false }
 
@@ -85,6 +91,7 @@
 <div class="fm-entry" data-testid="feature-menu-entry">
   <button
     class="fm-entry-knob fs-knob"
+    class:mode-enhancer={$standingMode === 'antelite'}
     on:click={openMenu}
     disabled={$isSpinning}
     aria-label="Features and bet modes"
@@ -97,6 +104,13 @@
     </span>
   </button>
   <div class="fm-entry-label">FEATURES</div>
+  {#if entryActiveLabel}
+    <div
+      class="fm-entry-active"
+      class:enhancer={$standingMode === 'antelite'}
+      data-testid="feature-menu-active-mode"
+    >{entryActiveLabel}</div>
+  {/if}
 </div>
 
 <!-- ── Modal ───────────────────────────────────────────────────────────────── -->
@@ -318,12 +332,38 @@
     0%, 100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--sig-cyan) 40%, transparent)); }
     50%      { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--sig-pink) 60%, transparent)); }
   }
+  /* OVERBOOST engaged: the entry knob glows orange (matching the enhancer
+     card's tone) instead of the default cyan/pink pulse, so the FEATURES
+     chip itself reflects the toggle state at a glance (cost-visibility item). */
+  .fm-entry-knob.mode-enhancer {
+    animation: none;
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--sig-orange) 55%, transparent));
+  }
+  .fm-entry-knob.mode-enhancer svg { stroke: var(--sig-orange); filter: drop-shadow(0 0 5px var(--sig-orange)); }
   .fm-entry-label {
     font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 0.62rem; font-weight: 800; letter-spacing: 0.14em;
     text-transform: uppercase; color: color-mix(in srgb, var(--sig-cyan) 30%, #fff);
     text-shadow: 0 0 8px color-mix(in srgb, var(--sig-cyan) 60%, transparent);
     white-space: nowrap;
+  }
+  /* Active standing/enhancer mode label under the FEATURES chip - subtle for
+     Cruise (cost unchanged), a clearly-labelled persistent pill for OVERBOOST
+     (real per-spin cost change while ON). */
+  .fm-entry-active {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.56rem; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; white-space: nowrap;
+    padding: 2px 8px; border-radius: 999px;
+    color: color-mix(in srgb, var(--sig-cyan) 35%, #fff);
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid color-mix(in srgb, var(--sig-cyan) 40%, transparent);
+  }
+  .fm-entry-active.enhancer {
+    color: #1a0d02;
+    background: var(--sig-orange);
+    border-color: var(--sig-orange);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--sig-orange) 55%, transparent);
   }
 
   /* ---- modal shell ---- */

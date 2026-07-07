@@ -76,7 +76,7 @@ export const FS_MODES: FsMode[] = [
     kind: 'enhancer',
     cost: 1.25,
     volatility: 'High',
-    blurb: 'Double-chance: about 1.6x the feature trigger rate.',
+    blurb: 'Double-chance: about 1.6x the feature trigger rate. Debits 1.25x every spin while ON.',
     available: true,
     serverMode: 'antelite',
   },
