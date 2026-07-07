@@ -71,6 +71,8 @@
   import { currencyCode } from './lib/stores/gameStore'
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
+  import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
+  import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
 
@@ -297,10 +299,12 @@
       if (result.newBalance !== undefined) {
         // Live: RGS balance is authoritative (already reflects the mode's cost).
         recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
+        rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
       } else {
         // Mock: deduct the mode's real cost and add the served round total.
         const win = servedTotalWin ?? result.totalWin
         recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
+        rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
       }
       const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
       if (buyWin > 0) {
@@ -431,10 +435,13 @@
   function scheduleAutoSpin(delayMs: number): void {
     const tier = get(speedTier)
     const factor = tier === 'super' ? 0.16 : tier === 'turbo' ? 0.5 : 1
+    // Responsible gambling: never go below the jurisdiction minimum spin interval
+    // (UKGC 2.5s), even under turbo/super. rgSpinDelay is a no-op where unset.
+    const delay = rgSpinDelay(delayMs * factor)
     autoSpinTimer = setTimeout(() => {
       autoSpinTimer = null
       handleSpin()
-    }, delayMs * factor)
+    }, delay)
   }
 
   async function handleSpin() {
@@ -472,6 +479,7 @@
         await new Promise((r) => setTimeout(r, 2600))
       }
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
+      rgRecordSpin(Math.round(bet * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
       if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
       if (result.totalWin > 0) {
         const mult = bet > 0 ? result.totalWin / bet : 0
@@ -512,8 +520,16 @@
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
+        // Responsible-gambling stop conditions (stop on win / single-win limit /
+        // feature / loss limit), in addition to count, wincap and the win-tier
+        // pause escalation below.
+        const rg = autoplayShouldStop({
+          winMicros: Math.round(result.totalWin * CURRENCY_SCALE),
+          betMicros: Math.round(bet * CURRENCY_SCALE),
+          triggered: !!script?.triggered,
+        })
         // Stop auto-play immediately on wincap — player must manually collect
-        if ($autoPlayCount <= 0 || $isWincap) {
+        if ($autoPlayCount <= 0 || $isWincap || rg.stop) {
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {
@@ -782,6 +798,11 @@
   {#if $showPaytable}
     <PaytableModal />
   {/if}
+
+  <!-- Responsible-gambling session panel — shown where the jurisdiction enables
+       RG (plus dev, for testing). Inside the non-replay branch so it is never
+       rendered in replay mode, matching BalanceDisplay/ControlBar/ThemeSelector. -->
+  <SessionPanel devForce={import.meta.env.DEV} />
 
   {#if import.meta.env.DEV && showThemeSelector}
     <ThemeSelector on:close={() => showThemeSelector = false} />
