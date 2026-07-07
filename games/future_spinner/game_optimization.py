@@ -106,6 +106,102 @@ class OptimizationSetup:
                     score_type="rtp",
                 ).return_dict(),
             },
+            "cruise": {
+                # Low-volatility (cost 1.0x, same 96.35% RTP as base): most of the
+                # return sits in a frequent base-ways fence (hr 2.3 ~ 43% hit rate),
+                # the feature is rarer (hr 260) and the 5,000x tail is thinner
+                # (wincap rtp 0.02 vs base 0.05). Small-win dresses + a low
+                # mean-to-median band tighten the distribution. Fences sum to
+                # 0.9635. Ported verbatim from claude/gap-analysis (FeatureMath v2).
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.02, av_win=wincaps["cruise"], search_conditions=wincaps["cruise"]
+                    ).return_dict(),
+                    "0": ConstructConditions(
+                        rtp=0.0, av_win=0, search_conditions=0
+                    ).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.18, hr=260, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.7635, hr=2.3).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 1.4,
+                         "win_range": (0.5, 3), "probability": 1.0},
+                        {"criteria": "basegame", "scale_factor": 1.2,
+                         "win_range": (3, 8), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 0.7,
+                         "win_range": (200, 4000), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000,
+                    num_per_fence=10000,
+                    min_m2m=2,
+                    max_m2m=4,
+                    pmb_rtp=1.0,
+                    sim_trials=5000,
+                    test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3],
+                    score_type="rtp",
+                ).return_dict(),
+                "distribution_bias": ConstructFenceBias(
+                    applied_criteria=["basegame"],
+                    bias_ranges=[(0.5, 3.0)],
+                    bias_weights=[0.5],
+                ).return_dict(),
+            },
+            "antelite": {
+                # OVERBOOST (cost 1.25x, ~1.6x trigger, hr 115). Ported verbatim
+                # from claude/gap-analysis (FeatureMath v2).
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["antelite"], search_conditions=wincaps["antelite"]
+                    ).return_dict(),
+                    "0": ConstructConditions(rtp=0.0, av_win=0, search_conditions=0).return_dict(),
+                    "freegame": ConstructConditions(
+                        rtp=0.608, hr=115, search_conditions={"symbol": "scatter"}
+                    ).return_dict(),
+                    "basegame": ConstructConditions(rtp=0.3055, hr=3.5).return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [
+                        {"criteria": "basegame", "scale_factor": 1.2,
+                         "win_range": (1, 5), "probability": 1.0},
+                        {"criteria": "freegame", "scale_factor": 1.2,
+                         "win_range": (20, 80), "probability": 1.0},
+                    ]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=8,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[50, 100, 200],
+                    test_weights=[0.3, 0.4, 0.3], score_type="rtp",
+                ).return_dict(),
+            },
+            "super": {
+                # NITRO OVERDRIVE: 400x buy with the Overdrive meter pre-revved
+                # to 5x (gamestate). Same buy fence shape as bonus (wincap 0.05 +
+                # always-on freegame 0.9135 = 0.9635); the cost scales the mean to
+                # 0.9635 x 400 = 385.4x. Dress centred on the pre-revved feature
+                # body. Validated in the games/future_spinner_super prototype;
+                # converged first try, no re-tuning expected.
+                "conditions": {
+                    "wincap": ConstructConditions(
+                        rtp=0.05, av_win=wincaps["super"], search_conditions=wincaps["super"]
+                    ).return_dict(),
+                    "freegame": ConstructConditions(rtp=0.9135, hr="x").return_dict(),
+                },
+                "scaling": ConstructScaling(
+                    [{"criteria": "freegame", "scale_factor": 1.1,
+                      "win_range": (150, 800), "probability": 1.0}]
+                ).return_dict(),
+                "parameters": ConstructParameters(
+                    num_show=5000, num_per_fence=10000, min_m2m=4, max_m2m=12,
+                    pmb_rtp=1.0, sim_trials=5000, test_spins=[10, 20, 50],
+                    test_weights=[0.6, 0.2, 0.2], score_type="rtp",
+                ).return_dict(),
+            },
         }
 
         verify_optimization_input(self.game_config, self.game_config.opt_params)

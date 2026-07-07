@@ -36,6 +36,17 @@ class GameState(GameCalculation):
         no multiplier property and this map is intentionally empty."""
         self.special_symbol_functions = {}
 
+    def _overdrive_start_meter(self) -> int:
+        """Starting Overdrive meter for the current bet mode. NITRO OVERDRIVE
+        (the 400x super buy) pre-revs to 5x; every other mode starts at 1x.
+        Stateless: applied at the feature start each round, reset to 1 by
+        reset_book every round."""
+        try:
+            name = self.get_current_betmode().get_name()
+        except Exception:
+            return 1
+        return 5 if name == "super" else 1
+
     def run_spin(self, sim, simulation_seed=None) -> None:
         """Execute one full base round, entering free spins on a 3+ scatter trigger."""
         self.reset_seed(sim, simulation_seed)
@@ -74,6 +85,13 @@ class GameState(GameCalculation):
         # reset_book and is deliberately NOT reset here, so it starts at 1x and
         # persists across the round.
         self.reset_fs_spin()
+
+        # NITRO OVERDRIVE pre-revs the Overdrive meter to its starting value so
+        # every free spin is multiplied from the first (stateless; reset_book
+        # returns it to 1 each round). Every other mode starts at 1x.
+        _start_meter = self._overdrive_start_meter()
+        if _start_meter > 1:
+            self.global_multiplier = _start_meter
 
         while self.fs < self.tot_fs:
             self.update_freespin()          # advance spin counter, reset spin win
