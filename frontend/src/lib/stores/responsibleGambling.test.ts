@@ -6,7 +6,7 @@
 
 import {
   autoplayLimits, defaultAutoplayLimits, autoplayShouldStop,
-  rgSpinDelay, rgRecordSpin, rgResetSession, rgNetMicros,
+  rgSpinDelay, rgRecordSpin, rgResetSession, rgNetMicros, rgJurisdiction,
 } from './responsibleGambling.ts'
 import { jurisdictionFlags } from './jurisdiction.ts'
 import { get } from 'svelte/store'
@@ -54,6 +54,17 @@ check('minSpin: raises a short delay to 2500', rgSpinDelay(800) === 2500)
 check('minSpin: leaves a longer delay alone', rgSpinDelay(6000) === 6000)
 jurisdictionFlags.set({}) // no min -> passthrough
 check('minSpin: no floor when unset', rgSpinDelay(800) === 800)
+
+// --- Wiring Integrity Audit, item 3(i): the platform manual has no general
+// minimum spin interval (only UKGC-specific jurisdictions do), so Stake
+// sessions with no jurisdiction data must see a literal 0ms floor - not just
+// "whatever delay was requested happens to pass through unchanged" (the check
+// above), but the resolved floor value itself must be exactly 0. ---
+jurisdictionFlags.set({}) // default, permissive state (no authenticate jurisdiction data)
+check('minSpin: resolves to a literal 0ms floor with no jurisdiction data (native game feel, no platform-wide floor)', get(rgJurisdiction).minSpinMs === 0)
+jurisdictionFlags.set({ minSpinMs: 2500 })
+check('minSpin: floor only ever raises above 0 when a jurisdiction flag explicitly sets it (UKGC-style)', get(rgJurisdiction).minSpinMs === 2500)
+jurisdictionFlags.set({})
 
 console.log('='.repeat(64))
 console.log('RESPONSIBLE GAMBLING: autoplay stop-conditions + limits')

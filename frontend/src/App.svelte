@@ -58,7 +58,7 @@
   import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
-  import { selectedBetMode, type BetMode } from './lib/stores/betMode'
+  import { selectedBetMode, standingMode, type BetMode } from './lib/stores/betMode'
   import { MODE_COST } from './lib/config/fsModes'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
@@ -263,7 +263,11 @@
     isSpinning.set(true)
     resetWin()
     const bet = $betAmount
-    const cost = bet * (MODE_COST[mode] ?? 100)
+    // Route through integer micros before this reaches any balance/telemetry
+    // math (CLAUDE.md's zero-float-tolerance rule) - a raw `bet * cost` float
+    // multiplication (e.g. 0.1 * 400) can land a hair off a clean value, and
+    // recordSpinResult's mock-mode balance update does plain float subtraction.
+    const cost = Math.round(bet * (MODE_COST[mode] ?? 100) * CURRENCY_SCALE) / CURRENCY_SCALE
     try {
       selectedBetMode.set(mode)
       track({ type: 'buy', tier: mode, costMicros: Math.round(cost * CURRENCY_SCALE) })
@@ -310,6 +314,22 @@
       if (buyWin > 0) {
         const bm = bet > 0 ? buyWin / bet : 0
         track({ type: 'win', winMicros: Math.round(buyWin * CURRENCY_SCALE), multiple: bm, tier: winTier(bm) })
+      }
+
+      // Dev-only QA instrumentation, mirroring handleSpin's __qaLog block below:
+      // the wiring-integrity audit's cost-integrity gate (qa_soak.mjs) needs a
+      // buy-tier entry with the mode actually charged, since this call site is
+      // the one place the FEATURES-menu tier selection turns into a real debit.
+      if (import.meta.env.DEV) {
+        const w = window as unknown as { __qaLog?: unknown[] }
+        w.__qaLog = w.__qaLog ?? []
+        w.__qaLog.push({
+          mode,
+          bet,
+          cost,
+          totalWin:     buyWin,
+          balanceAfter: get(balance),
+        })
       }
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
@@ -446,13 +466,22 @@
 
   async function handleSpin() {
     if ($isSpinning || featureActive) return
+    // Standing mode for normal spins (Normal/Cruise) plus the OVERBOOST
+    // enhancer toggle - both live in the one standingMode store (FeatureMenu's
+    // selectStanding()/toggleEnhancer() write it; see betMode.ts). The locked
+    // canSpin guard only ever checks affordability of the 1x base bet, so any
+    // >1x mode (OVERBOOST, 1.25x) needs its own affordability guard here,
+    // before the spin lock engages - mirrors handleBuy's per-tier cost.
+    const mode = $standingMode
+    const bet  = $betAmount
+    const cost = Math.round(bet * (MODE_COST[mode] ?? 1) * CURRENCY_SCALE) / CURRENCY_SCALE
+    if (cost > bet && $balance < cost) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
-    selectedBetMode.set('base')
+    selectedBetMode.set(mode)
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
-    const bet  = $betAmount
-    track({ type: 'spin', costMicros: Math.round(bet * CURRENCY_SCALE) })
+    track({ type: 'spin', costMicros: Math.round(cost * CURRENCY_SCALE) })
 
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
@@ -478,8 +507,8 @@
         playWin(bet > 0 ? result.totalWin / bet : 0)
         await new Promise((r) => setTimeout(r, 2600))
       }
-      recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
-      rgRecordSpin(Math.round(bet * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
+      recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
+      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
       if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
       if (result.totalWin > 0) {
         const mult = bet > 0 ? result.totalWin / bet : 0
@@ -495,7 +524,9 @@
         const w = window as unknown as { __qaLog?: unknown[] }
         w.__qaLog = w.__qaLog ?? []
         w.__qaLog.push({
+          mode:         get(selectedBetMode),
           bet,
+          cost,
           totalWin:     result.totalWin,
           winEvents:    result.winEvents,
           scatterEvent: result.scatterEvent,
