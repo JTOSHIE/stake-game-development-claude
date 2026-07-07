@@ -12,6 +12,7 @@
     isMuted, showPaytable, winAmount, BET_LEVELS, locale,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
+  import { musicVolume, sfxVolume } from '../stores/audioSettings'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
@@ -145,6 +146,18 @@
     isMuted.update((v) => !v)
   }
 
+  // Audio sliders run on a 0..100 scale; the stores hold 0..1. These convert
+  // between the two so the range inputs drive musicVolume / sfxVolume live.
+  $: musicPct = Math.round($musicVolume * 100)
+  $: sfxPct   = Math.round($sfxVolume * 100)
+
+  function setMusicVol(e: Event) {
+    musicVolume.set((+(e.currentTarget as HTMLInputElement).value) / 100)
+  }
+  function setSfxVol(e: Event) {
+    sfxVolume.set((+(e.currentTarget as HTMLInputElement).value) / 100)
+  }
+
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round($betAmount * CURRENCY_SCALE), $currencyCode || 'USD')
   $: winLabel     = formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
@@ -190,9 +203,33 @@
     {#if showMenu}
       <div class="hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-        <button class="hud-menu-item" role="menuitem" on:click={toggleMute}>
-          {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
-        </button>
+        <div class="audio-panel" class:muted={$isMuted}>
+          <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
+            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+          </button>
+          <div class="audio-row">
+            <span class="audio-label">MUSIC</span>
+            <input
+              class="audio-slider"
+              type="range" min="0" max="100"
+              value={musicPct}
+              on:input={setMusicVol}
+              aria-label="Music volume"
+            />
+            <span class="audio-pct">{musicPct}%</span>
+          </div>
+          <div class="audio-row">
+            <span class="audio-label">SOUND</span>
+            <input
+              class="audio-slider"
+              type="range" min="0" max="100"
+              value={sfxPct}
+              on:input={setSfxVol}
+              aria-label="Sound effects volume"
+            />
+            <span class="audio-pct">{sfxPct}%</span>
+          </div>
+        </div>
       </div>
     {/if}
   </div>
@@ -560,7 +597,7 @@
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
-    min-width: 140px;
+    min-width: 200px;
     background: rgba(6, 6, 18, 0.96);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
@@ -579,6 +616,75 @@
     cursor: pointer;
   }
   .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
+
+  /* ── Audio panel - Mute toggle + MUSIC / SOUND volume sliders ─────────────── */
+  .audio-panel {
+    border-top: 1px solid rgba(0, 255, 255, 0.14);
+    padding-bottom: 0.4rem;
+    transition: opacity 0.15s;
+  }
+  /* When muted, dim the sliders (they stay adjustable). */
+  .audio-panel.muted .audio-row { opacity: 0.45; }
+  .audio-mute { padding-top: 0.55rem; }
+  .audio-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.3rem 0.9rem;
+  }
+  .audio-label {
+    flex: 0 0 42px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(159, 239, 255, 0.75);
+  }
+  .audio-pct {
+    flex: 0 0 30px;
+    text-align: right;
+    font-size: 0.58rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--sig-cyan, #00ffff);
+  }
+
+  /* Range slider styled on the HUD's cyan accent (track + thumb). */
+  .audio-slider {
+    flex: 1 1 auto;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(0, 255, 255, 0.55), rgba(0, 255, 255, 0.15));
+    outline: none;
+    cursor: pointer;
+    margin: 0;
+  }
+  .audio-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--sig-cyan, #00ffff);
+    border: 1px solid rgba(4, 6, 18, 0.9);
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    cursor: pointer;
+  }
+  .audio-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--sig-cyan, #00ffff);
+    border: 1px solid rgba(4, 6, 18, 0.9);
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    cursor: pointer;
+  }
+  .audio-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(0, 255, 255, 0.25);
+  }
 
   .autoplay-wrapper {
     position: absolute;
