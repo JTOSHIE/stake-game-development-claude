@@ -11,21 +11,17 @@ import { writable } from 'svelte/store'
 // shipped all five modes' maths and the FEATURES menu exposes all five as
 // live, selectable controls (none are "coming soon" placeholders any more).
 // The locked rgsService reads selectedBetMode; its default stays 'base',
-// unchanged. `selectedBetMode` IS correctly threaded through for buy tiers
-// (handleBuy sets it before every buy spin) - see the Wiring Integrity Audit
-// (reports/qa/wiring_integrity_audit_2026-07-07.md) for the standingMode gap
-// below, which is NOT yet wired the same way.
+// unchanged. `selectedBetMode` is correctly threaded through for both buy
+// tiers (handleBuy) and standing/enhancer modes (handleSpin, fixed 2026-07-07
+// per the Wiring Integrity Audit - see reports/qa/wiring_integrity_audit_2026-07-07.md).
 export type BetMode = 'base' | 'bonus' | 'cruise' | 'antelite' | 'super'
 
 export const selectedBetMode = writable<BetMode>('base')
 
-// Selected standing (base) mode. WARNING (Wiring Integrity Audit finding,
-// 2026-07-07): FeatureMenu.svelte's selectStanding()/toggleEnhancer() write
-// this store, and the UI shows an ACTIVE/ON badge reflecting it, but
-// App.svelte's handleSpin() does NOT read it - every normal spin hardcodes
-// mode 'base' regardless of this store's value. Selecting Cruise or toggling
-// OVERBOOST currently changes the FEATURES menu's own display state only; it
-// has zero effect on the actual spin request/cost. See the audit report
-// (reports/qa/wiring_integrity_audit_2026-07-07.md) before assuming this is
-// wired - it is flagged there, not fixed, pending an explicit go-ahead.
+// Selected standing (base) mode. FeatureMenu.svelte's selectStanding()/
+// toggleEnhancer() write this; App.svelte's handleSpin() reads it (fixed
+// 2026-07-07 - previously a dead-end store, see the Wiring Integrity Audit
+// report for the original finding) and computes the real per-mode cost from
+// MODE_COST[$standingMode], so OVERBOOST's 1.25x is a genuine per-spin debit
+// while the toggle is ON, not just a display figure.
 export const standingMode = writable<BetMode>('base')

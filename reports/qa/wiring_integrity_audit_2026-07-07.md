@@ -9,32 +9,67 @@ fsModes/index.json drift test; (e) two autoplay asserts folded in from item 3.
 
 ## Headline finding (not part of the original ask - found while tracing item a)
 
-**`standingMode` is a dead-end store. Selecting Cruise or toggling OVERBOOST in
-the FEATURES menu currently has ZERO effect on the actual spin request.**
+**UPDATE (same day, follow-up commit): FIXED, per explicit owner direction -
+"wire standingMode through, OVERBOOST 1.25x per spin while toggled on." See
+"Resolution" at the end of this section.**
+
+**`standingMode` was a dead-end store. Selecting Cruise or toggling OVERBOOST in
+the FEATURES menu had ZERO effect on the actual spin request.**
 
 `FeatureMenu.svelte`'s `selectStanding()`/`toggleEnhancer()` write the
 `standingMode` store (`betMode.ts`), and the UI shows a correct ACTIVE/ON badge
-reflecting it. But `App.svelte`'s `handleSpin()` hardcodes
+reflecting it. But `App.svelte`'s `handleSpin()` hardcoded
 `selectedBetMode.set('base')` and `spin({ betAmount: bet, mode: 'base' })`
-unconditionally - `$standingMode` is never read there. Concretely:
-- Selecting **Cruise** shows "ACTIVE" but every subsequent spin still plays
+unconditionally - `$standingMode` was never read there. Concretely:
+- Selecting **Cruise** showed "ACTIVE" but every subsequent spin still played
   `base` maths at 1.0x cost (the wrong RTP/volatility curve, though the cost
-  happens to be right by coincidence - both are 1.0x).
-- Toggling **OVERBOOST** ON shows "ON" but every subsequent spin still plays
-  `base` at 1.0x cost - **never** the 1.25x cost the toggle implies is active.
+  happened to be right by coincidence - both are 1.0x).
+- Toggling **OVERBOOST** ON showed "ON" but every subsequent spin still played
+  `base` at 1.0x cost - **never** the 1.25x cost the toggle implied was active.
 
-This is the same class of bug as the buy-tier billing fix (a live, selectable
+This was the same class of bug as the buy-tier billing fix (a live, selectable
 control that silently does nothing / charges the wrong thing), just on the
-standing-mode side rather than the buy side. **Per this audit's scope
-("flagging", not fixing), this has NOT been fixed in this pass** - it is a
-product-relevant behaviour change (which maths curve actually plays, and
-whether OVERBOOST's 1.25x cost should apply on top of every subsequent base
-spin), not a mechanical wiring correction, so it needs an explicit go-ahead
-before touching it. See "Recommendation" at the end of this report.
+standing-mode side rather than the buy side. Initially left flagged rather
+than fixed in this pass, per the audit's original scope ("flagging", not
+fixing) - it changes real gameplay/cost behaviour, not a mechanical wiring
+correction, so it needed an explicit go-ahead before touching it.
 
-Reproducible, concrete proof is in the cost-integrity gate results below (item
-b): running the new gate against the current codebase, `cruise` and
-`overboost` both FAIL; `normal`, `bonus` and `super` PASS.
+Reproducible, concrete proof (captured before the fix): running the new
+cost-integrity gate against the codebase at that point, `cruise` and
+`overboost` both FAILed; `normal`, `bonus` and `super` PASSed.
+
+### Resolution
+
+The owner confirmed: wire `standingMode` through, and OVERBOOST's 1.25x should
+apply per spin while toggled ON (consistent with its "enhancer" framing in
+`fsModes.ts` - a persistent multiplier on ordinary play, not a one-shot buy).
+
+`handleSpin()` now reads `$standingMode`, computes
+`cost = bet * MODE_COST[mode]` (routed through integer micros, matching
+`handleBuy`'s pattern), sets `selectedBetMode` to the real mode, and passes
+`cost` (not the base `bet`) to `recordSpinResult`/`rgRecordSpin`. The locked
+`canSpin` guard only ever checks 1x-bet affordability, so an explicit
+`if (cost > bet && $balance < cost) return` guard was added before the spin
+lock engages, for any mode costing more than the base bet. Win-multiple
+display/telemetry (`result.totalWin / bet`) intentionally still uses the base
+bet, not `cost`, matching the existing convention for buy tiers (a win is
+always expressed as a multiple of the base bet everywhere in the UI,
+regardless of which tier/mode was played).
+
+Re-running the cost-integrity gate after the fix: **all five modes now PASS.**
+```
+[PASS] normal    -> expected mode=base     micros=1000000,   actual mode=base     micros=1000000
+[PASS] cruise    -> expected mode=cruise   micros=1000000,   actual mode=cruise   micros=1000000
+[PASS] overboost -> expected mode=antelite micros=1250000,   actual mode=antelite micros=1250000
+[PASS] bonus     -> expected mode=bonus    micros=100000000, actual mode=bonus    micros=100000000
+[PASS] super     -> expected mode=super    micros=400000000, actual mode=super    micros=400000000
+```
+Also verified visually and via a live balance check: toggling OVERBOOST ON,
+then spinning at a $1.00 bet, correctly debited $1.25 (balance $100.00 ->
+$98.75, matching `100 - 1.25 + 0` for a dead spin exactly) - screenshots in
+`reports/screens/standingmode-fix/`. The RG SessionPanel's NET figure also
+picked up the real cost correctly (`-$1.25`), confirming `rgRecordSpin`'s fix
+flows through to the compliance-facing session display too.
 
 ## (a) Static trace of dispatch/handler pairings
 
@@ -42,7 +77,8 @@ Full trace covered every `createEventDispatcher` call site in
 `frontend/src/lib/components/*.svelte`, `App.svelte`'s `handleSpin`/`handleBuy`/
 autoplay loop, and the autoplay start path. Findings, most to least severe:
 
-1. **`standingMode` dead-end store** (above) - critical, not fixed this pass.
+1. **`standingMode` dead-end store** (above) - critical, fixed same-day per
+   explicit owner direction (see "Resolution" above).
 2. **`canBuyBonus` (`gameStore.ts:94-97`, locked) hardcodes `$bet * 100`**, not
    the buy tier's real `MODE_COST`. Currently unreachable via the live UI
    (`FeatureMenu`'s own `activateBuy()` gate is correct and blocks first), but
@@ -204,18 +240,11 @@ non-blocking note.
 - **The other 5 verification scripts with the same stale `.spin-btn`
   selector** were not fixed (out of scope for a `qa_soak.mjs`-specific work
   order) - flagged in finding (a)3 above.
-- **`standingMode`'s dead-end wiring was not fixed** - flagged as the headline
-  finding, pending an explicit decision (see below).
 - **`canBuyBonus`'s hardcoded 100x** (finding a2) was not fixed - it lives in
   the locked `gameStore.ts` and would need a sanctioned lock exception.
 
 ## Recommendation
 
-The `standingMode` finding needs an explicit decision before any fix: wiring
-`$standingMode` into `handleSpin` means Cruise/OVERBOOST selections start
-actually changing which maths mode plays and, for OVERBOOST, actually charging
-1.25x on every subsequent spin (not just the one buy action) - a real
-money-behaviour change, not a mechanical correction like the buy-tier fix was.
-Recommend treating this as its own sanctioned work item once the owner/Fable
-confirm the intended behaviour (does OVERBOOST's 1.25x apply per spin while
-toggled ON, consistent with its "enhancer" framing in `fsModes.ts`?).
+Resolved same-day: the `standingMode` finding was fixed per explicit owner
+direction ("wire standingMode through, OVERBOOST 1.25x per spin while toggled
+on") - see "Resolution" above. Nothing further recommended on this finding.

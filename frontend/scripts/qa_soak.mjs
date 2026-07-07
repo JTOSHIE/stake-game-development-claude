@@ -208,10 +208,10 @@ async function runCostIntegrityCheck(page) {
     const entries = await readQaLog(page)
     const entry = entries[entries.length - 1]
     const expectedMicros = Math.round(COST_CHECK_BET * m.cost * CURRENCY_SCALE)
-    // Standing/enhancer spins (handleSpin) log `bet` only, no separate `cost`
-    // field, since that call site charges a flat 1x bet regardless of mode
-    // today - which is exactly what this gate is checking for. Buy spins
-    // (handleBuy) log the computed `cost` directly.
+    // Both handleSpin (standing/enhancer modes) and handleBuy (buy tiers) log
+    // the actual computed `cost` now that standingMode is wired through
+    // handleSpin - fall back to `bet` only for defensiveness against an
+    // older/mismatched build.
     const actualMicros = entry?.cost !== undefined ? toMicros(entry.cost) : toMicros(entry?.bet ?? NaN)
     const modeOk = entry?.mode === m.serverMode
     const costOk = actualMicros === expectedMicros
@@ -347,7 +347,12 @@ async function runSession(browser, { social, cellSpins, globalCounter, heapSampl
         if (!ok) {
           roundResults.totalMismatches.push({ locale, tier, recomputedMicros, presentedMicros })
         }
-        const betMicros = toMicros(entry.bet)
+        // Use the entry's real per-mode cost when present (standingMode is now
+        // wired through handleSpin, so a spin under an active >1x enhancer like
+        // OVERBOOST costs more than the base bet) - this matrix only ever
+        // exercises base/normal mode, so cost === bet here today, but the check
+        // must not assume that forever.
+        const betMicros = toMicros(entry.cost ?? entry.bet)
         const winMicros = toMicros(entry.totalWin)
         runningBalanceMicros = runningBalanceMicros - betMicros + winMicros
         const actualMicros = toMicros(entry.balanceAfter)
