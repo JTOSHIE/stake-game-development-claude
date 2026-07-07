@@ -13,9 +13,16 @@
 
 import { lastRoundEvents } from '../stores/roundEvents'
 import type { BookRound, RawEvent } from '../services/roundInterpreter'
+import type { BetMode } from '../stores/betMode'
+import { BUY_MODES } from '../config/fsModes'
+
+// Every buy-tier server mode (bonus, super, and any future addition) - single
+// source of truth via fsModes.ts, so a new buy tier is guaranteed-trigger here
+// for free the moment it is added to FS_MODES.
+const BUY_MODE_IDS = new Set<string>(BUY_MODES.map((m) => m.serverMode))
 
 export interface SampleEntry {
-  mode: 'base' | 'bonus'
+  mode: BetMode
   category: string
   round: BookRound
 }
@@ -28,11 +35,11 @@ async function loadSamples(): Promise<SampleEntry[]> {
   return _cache
 }
 
-async function samplesFor(mode: 'base' | 'bonus'): Promise<SampleEntry[]> {
+async function samplesFor(mode: BetMode): Promise<SampleEntry[]> {
   return (await loadSamples()).filter((s) => s.mode === mode)
 }
 
-async function triggeredSamples(mode: 'base' | 'bonus'): Promise<SampleEntry[]> {
+async function triggeredSamples(mode: BetMode): Promise<SampleEntry[]> {
   return (await samplesFor(mode)).filter((s) =>
     s.round.events.some((e) => e.type === 'freeSpinTrigger'),
   )
@@ -45,15 +52,19 @@ function randomOf<T>(arr: T[]): T | null {
 /**
  * Publish a mock round's raw events to lastRoundEvents so the presentation can
  * play it back. Returns the chosen round (or null if none match).
- *  - mode 'bonus'  -> always a triggered round (guaranteed feature)
- *  - mode 'base'   -> a triggered round when forceTrigger, else any base round
+ *  - a buy-tier mode (bonus, super, ...) -> always a triggered round (guaranteed feature)
+ *  - a standing mode (base, cruise, antelite) -> a triggered round when forceTrigger, else any
+ * NOTE: sample_rounds.json currently curates only 'base'/'bonus' samples; a
+ * buy tier with no curated pool yet (e.g. 'super') returns null here and the
+ * caller falls back to the raw _mockSpin board - correctly priced/labelled,
+ * just not a curated feature demo, until samples are authored for it.
  */
 export async function serveMockRound(
-  mode: 'base' | 'bonus',
+  mode: BetMode,
   opts: { forceTrigger?: boolean } = {},
 ): Promise<BookRound | null> {
   const pool =
-    mode === 'bonus' || opts.forceTrigger
+    BUY_MODE_IDS.has(mode) || opts.forceTrigger
       ? await triggeredSamples(mode)
       : await samplesFor(mode)
   const entry = randomOf(pool)
@@ -73,7 +84,7 @@ export async function preloadSamples(): Promise<void> {
 
 /** Serve a specific sample category (used by dev/headless verification). */
 export async function serveCategory(
-  mode: 'base' | 'bonus',
+  mode: BetMode,
   category: string,
 ): Promise<BookRound | null> {
   const entry = (await samplesFor(mode)).find((s) => s.category === category) ?? null

@@ -111,6 +111,13 @@ export const ENHANCER_MODES = FS_MODES.filter((m) => m.kind === 'enhancer')
 /** Buy tiers (guaranteed Overdrive entry). */
 export const BUY_MODES = FS_MODES.filter((m) => m.kind === 'buy')
 
+/** Cost multiplier per server mode id (the server applies the real debit; this
+ * is for the UI to show/compute the correct price BEFORE the spin request). */
+export const MODE_COST = FS_MODES.reduce(
+  (acc, m) => ((acc[m.serverMode] = m.cost), acc),
+  {} as Record<FsServerMode, number>,
+)
+
 /** Shared RTP + max win, identical across all modes (see game_config.py). */
 export const FS_RTP_LABEL = '96.35%'
 export const FS_MAX_WIN_LABEL = '5,000×'

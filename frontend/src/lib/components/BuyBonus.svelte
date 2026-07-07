@@ -9,55 +9,68 @@
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
+  import { MODE_COST } from '../config/fsModes'
+  import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
   // it leads; then the premium reel symbols the feature pays on).
   const PREVIEW = ['scatter', 'h1', 'h2', 'm3', 'wild']
   $: base = $themeAssets.assetBase
 
-  const dispatch = createEventDispatcher<{ buy: void }>()
+  const dispatch = createEventDispatcher<{ buy: BetMode }>()
   let showConfirm = false
 
   // FeatureButton (LAYOUT_SPEC HUD) opens this same confirm flow instead of a
   // second on-screen trigger; App.svelte mounts this with showTrigger={false}
-  // and calls openConfirm() via bind:this so there is exactly one buy button.
+  // and calls openConfirm(mode) via bind:this so there is exactly one buy
+  // button/modal shared by every buy tier in the FEATURES menu.
   export let showTrigger = true
 
-  $: mode = ($isSocial ? 'social' : 'real') as GameMode
-  $: priceMicros = Math.round($betAmount * 100 * CURRENCY_SCALE)
+  // Which buy tier this confirm is currently for (set by openConfirm before
+  // showConfirm flips true). Defaults to 'bonus' so the standalone trigger
+  // button (showTrigger=true, unused in the current 5-mode menu but kept for
+  // API compatibility) still shows a sane price.
+  let buyMode: BetMode = 'bonus'
+
+  $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
+  $: priceMicros = Math.round($betAmount * (MODE_COST[buyMode] ?? 100) * CURRENCY_SCALE)
   $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD')
 
-  function open() { if (!$isSpinning) showConfirm = true }
+  function open(mode: BetMode = 'bonus') {
+    if ($isSpinning) return
+    buyMode = mode
+    showConfirm = true
+  }
   function cancel() { showConfirm = false }
   function confirm() {
     showConfirm = false
-    dispatch('buy')
+    dispatch('buy', buyMode)
   }
 
-  export function openConfirm(): void { open() }
+  export function openConfirm(mode: BetMode = 'bonus'): void { open(mode) }
 </script>
 
 {#if !$buyFeatureDisabled}
   {#if showTrigger}
     <button
       class="buy-btn"
-      on:click={open}
+      on:click={() => open()}
       disabled={$isSpinning}
-      aria-label={t($locale, 'buyFeature', mode)}
+      aria-label={t($locale, 'buyFeature', localeMode)}
       data-testid="buy-bonus-button"
     >
-      <span class="buy-btn-label">{t($locale, 'buyFeature', mode)}</span>
+      <span class="buy-btn-label">{t($locale, 'buyFeature', localeMode)}</span>
       <span class="buy-btn-price">{priceLabel}</span>
     </button>
   {/if}
 
   {#if showConfirm}
-    <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={t($locale, 'buyConfirmTitle', mode)}>
+    <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={t($locale, 'buyConfirmTitle', localeMode)}>
       <div class="buy-modal">
         <!-- Grille art carries the header (LAYOUT_SPEC feature accent) -->
         <img class="buy-header-art" src="{base}/ui/feature_button.png" alt="" draggable="false" />
-        <h2 class="buy-title">{t($locale, 'buyConfirmTitle', mode)}</h2>
-        <p class="buy-desc">{t($locale, 'buyConfirmBody', mode)}</p>
+        <h2 class="buy-title">{t($locale, 'buyConfirmTitle', localeMode)}</h2>
+        <p class="buy-desc">{t($locale, 'buyConfirmBody', localeMode)}</p>
 
         <!-- Real symbol preview grid (scatter leads) -->
         <div class="buy-preview" aria-hidden="true">
@@ -70,16 +83,16 @@
 
         <!-- Price on an instrument-plate styled element -->
         <div class="buy-price-plate">
-          <span class="buy-price-label">{t($locale, 'buyPrice', mode)}</span>
+          <span class="buy-price-label">{t($locale, 'buyPrice', localeMode)}</span>
           <span class="buy-price-val">{priceLabel}</span>
         </div>
         {#if !$canBuyBonus}
-          <p class="buy-warn">{t($locale, 'insufficientBalance', mode)}</p>
+          <p class="buy-warn">{t($locale, 'insufficientBalance', localeMode)}</p>
         {/if}
         <div class="buy-actions">
-          <button class="buy-cancel" on:click={cancel}>{t($locale, 'buyCancel', mode)}</button>
+          <button class="buy-cancel" on:click={cancel}>{t($locale, 'buyCancel', localeMode)}</button>
           <button class="buy-confirm" on:click={confirm} disabled={!$canBuyBonus} data-testid="buy-confirm">
-            {t($locale, 'buyConfirm', mode)}
+            {t($locale, 'buyConfirm', localeMode)}
           </button>
         </div>
       </div>
