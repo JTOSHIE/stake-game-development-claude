@@ -90,6 +90,20 @@
     { scatters: 5, spins: 16, award: '10×' },
   ]
 
+  // Interface Guide — each game control with its rendered UI art and a
+  // one-line description. `kind: 'img'` rows use the theme's UI PNGs; `kind:
+  // 'pill'` rows have no dedicated art and render a styled text token instead.
+  const INTERFACE_GUIDE = [
+    { kind: 'img',  file: 'spin_button.png',   name: 'Spin',         desc: 'Start a spin at the current bet.' },
+    { kind: 'img',  file: 'btn_bet_plus.png',  name: 'Increase Bet', desc: 'Raise your bet to the next level.' },
+    { kind: 'img',  file: 'btn_bet_minus.png', name: 'Decrease Bet', desc: 'Lower your bet to the previous level.' },
+    { kind: 'img',  file: 'feature_button.png',name: 'Features',     desc: 'Open the FEATURES menu to pick a bet mode or buy the feature.' },
+    { kind: 'img',  file: 'btn_autoplay.png',  name: 'Autoplay',     desc: 'Spin automatically with optional loss and win limits.' },
+    { kind: 'img',  file: 'btn_menu.png',      name: 'Menu',         desc: 'Open the menu for the paytable and sound settings.' },
+    { kind: 'pill', label: 'TURBO',            name: 'Turbo',        desc: 'Speed up spins.' },
+    { kind: 'pill', label: 'MAX',              name: 'Max Bet',      desc: 'Bet the maximum.' },
+  ] as const
+
   // Buy price — 100x current bet, only meaningful where the buy is not disabled.
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
 
@@ -251,6 +265,28 @@
                     <span class="fs-mode-cost fs-num">{m.cost}× · {modePrice(m.cost)}</span>
                     <span class="fs-mode-rtp">RTP {FS_RTP_LABEL}</span>
                   </div>
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <!-- ── Interface Guide — every game control explained ────────────── -->
+        <div data-testid="interface-guide">
+          <h3 class="fs-heading" style="margin-bottom:10px;">Interface Guide</h3>
+          <div class="fs-guide-list">
+            {#each INTERFACE_GUIDE as g}
+              <div class="fs-guide-row">
+                <div class="fs-guide-icon">
+                  {#if g.kind === 'img'}
+                    <img src="{$themeAssets.assetBase}/ui/{g.file}" alt={g.name} class="fs-guide-img" />
+                  {:else}
+                    <span class="fs-guide-pill">{g.label}</span>
+                  {/if}
+                </div>
+                <div class="fs-guide-text">
+                  <span class="fs-guide-name">{g.name}</span>
+                  <span class="fs-guide-desc">{g.desc}</span>
                 </div>
               </div>
             {/each}
@@ -519,6 +555,47 @@
   .fs-mode-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
   .fs-mode-cost { font-size: 0.78rem; font-weight: 700; color: #ffd66a; white-space: nowrap; }
   .fs-mode-rtp { font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--sig-gold) 55%, #fff); white-space: nowrap; }
+
+  /* ── Interface Guide ──────────────────────────────────────────────── */
+  .fs-guide-list { display: flex; flex-direction: column; gap: 10px; }
+  .fs-guide-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: color-mix(in srgb, var(--sig-cyan) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--sig-cyan) 16%, transparent);
+    border-radius: 10px;
+  }
+  .fs-guide-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+  }
+  .fs-guide-img { width: 44px; height: 44px; object-fit: contain; }
+  .fs-guide-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0.6rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: #05070f;
+    background: linear-gradient(135deg, var(--sig-cyan), color-mix(in srgb, var(--sig-cyan) 60%, #0090aa));
+    border-radius: 999px;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--sig-cyan) 45%, transparent);
+  }
+  .fs-guide-text { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; text-align: left; }
+  .fs-guide-name { font-size: 0.86rem; font-weight: 800; color: #fff; letter-spacing: 0.02em; }
+  .fs-guide-desc { font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); line-height: 1.4; }
 
   /* RTP */
   .fs-rtp { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
