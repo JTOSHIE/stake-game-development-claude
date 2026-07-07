@@ -218,3 +218,67 @@ Stake Engine submission-sequence risk.
 
 The owner will collect your feedback and relay it back in a single input, same as last time.
 Thank you.
+
+---
+
+## 8. Update — your verdicts actioned (2026-07-07, same day, PR #48)
+
+Your verdicts arrived (relayed by the owner, saved verbatim as
+`FS_FableVerdicts_2026-07-07_Prompt.md`). Item 1's sanctioned work order - the Wiring
+Integrity Audit, "read-only plus tests, no locked files, no sanction needed" - is done and
+merged (PR #48). Full detail in `reports/qa/wiring_integrity_audit_2026-07-07.md`.
+
+**Delivered exactly as specified:**
+- (a) Full static trace of every dispatch/handler pairing across buy, mode-select,
+  bet-change and autoplay.
+- (b) A permanent cost-integrity gate in `qa_soak.mjs` - drives all five modes at a fixed
+  bet, asserts the correct mode and integer-micros debit.
+- (c) `scan_wallet_floats.mjs` - a wallet-path float scan, locked files explicitly out of
+  scope (can't remediate a finding there without a sanction).
+- (d) `fsModes.drift.test.ts` - cross-checks `fsModes.ts` against the shipped
+  `index.json`, 5/5 matched.
+- (e) Two autoplay asserts: an explicit test for the literal `minSpinMs=0` default, and a
+  static gate proving autoplay only ever starts from exactly one real, explicit click
+  (correctly separated a dead-code duplicate in the retired `ControlBar.svelte` from the
+  live path in `HudOverlay.svelte` rather than failing on it).
+
+**Headline finding, surfaced by the trace itself (not part of your original ask):**
+`standingMode` was a dead-end store - selecting Cruise or toggling OVERBOOST in the
+FEATURES menu had zero effect on the actual spin request, since `handleSpin()` hardcoded
+`mode: 'base'` unconditionally. Same bug class as the buy-tier billing fix, on the
+standing-mode side. The new cost-integrity gate (item b) reproduced it exactly:
+`cruise`/`overboost` failed, `normal`/`bonus`/`super` passed.
+
+Per the audit's own scope ("flagging", not fixing) this was left unfixed and reported to
+the owner as a finding requiring an explicit decision, since it's a real gameplay/cost
+behaviour change (which maths curve plays; whether OVERBOOST's 1.25x should apply per
+spin), not a mechanical correction. **The owner confirmed same day: wire it through,
+OVERBOOST 1.25x per spin while toggled on.** Fixed and merged in the same PR:
+`handleSpin()` now reads `$standingMode`, computes the real per-mode cost (integer-micros
+rounded, mirroring `handleBuy`'s pattern), and threads it through to the wallet request
+and RG session tracking. Re-ran the cost-integrity gate after the fix - all five modes now
+pass. Verified live: OVERBOOST ON + a $1.00 spin debited exactly $1.25 (balance
+$100.00 -> $98.75), and the RG SessionPanel's NET figure picked up the real cost too
+(`-$1.25`). Screenshots in `reports/screens/standingmode-fix/`.
+
+Also fixed along the way (all non-locked, no sanction needed): a stale `.spin-btn`
+selector in `qa_soak.mjs` that would have timed out the whole harness (the live spin
+button has carried `data-testid="spin-button"` since the B1 HUD reskin); `handleBuy`'s
+`cost` was reaching the balance store as an unrounded float (a real "zero float
+tolerance" violation, now routed through integer micros); `CLAUDE.md` and `betMode.ts`
+both still claimed only two bet modes exist, corrected to the current five-mode reality.
+
+**Not yet actioned from your verdicts (queued, per your own sequencing - "wiring
+integrity audit now, then dossier and copy update, then hygiene pass"):**
+- Item 2's standing directive: the REVIEW_EVENTS pass committing the statelessness
+  artefact and per-mode replay IDs for cruise/antelite/super.
+- Item 4: relocating `games/future_spinner_collect` to a reference branch
+  (`claude/collect-prototype`) with a doc pointer - part of the hygiene pass, which per
+  your sequencing comes after the dossier/copy update, not yet started.
+- Item 5's list: the two owner eye-calls (strip vs drop reel mode; flame-jet scale/
+  orientation) remain with the owner, unchanged; the hygiene pass scope; the dossier and
+  paytable five-mode copy update; QA re-soak (gated on audio).
+
+**Next up, per your sequencing:** the dossier and paytable copy update, unless you'd
+rather reorder given the standingMode fix landed same-day as the audit itself. Let us know.
+
