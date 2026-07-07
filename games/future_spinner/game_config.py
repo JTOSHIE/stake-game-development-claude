@@ -241,6 +241,24 @@ class GameConfig(Config):
             "force_freegame": False,
         }
 
+        # -- OVERBOOST (antelite) conditions -----------------------------------
+        # Market-centre double-chance: cost 1.25x for ~1.6x the free-spin trigger
+        # rate. Same reels, same feature, same 5,000x cap as base; only the
+        # quota mix + optimiser fence split differ (see game_optimization.py).
+        # Ported verbatim from the validated claude/gap-analysis library.
+        freegame_ante_condition = {
+            "reel_weights": _reels_std,
+            "force_wincap": False,
+            "force_freegame": True,
+            "scatter_triggers": {3: 75, 4: 20, 5: 5},
+        }
+        wincap_ante_condition = {
+            "reel_weights": _reels_wincap,
+            "force_wincap": True,
+            "force_freegame": True,
+            "scatter_triggers": {3: 60, 4: 30, 5: 10},
+        }
+
         # -- Bonus-mode conditions --------------------------------------------
         # Guaranteed trigger, weighted toward higher scatter counts to justify
         # the 100x buy price. wincap variant drives the cap in-bonus.
@@ -314,6 +332,98 @@ class GameConfig(Config):
                     Distribution(
                         criteria="freegame",
                         quota=0.996,
+                        conditions=freegame_bonus_condition,
+                    ),
+                ],
+            ),
+            # CRUISE / LOW-VOLATILITY MODE (cost 1.0x) ------------------------
+            # Same price and RTP as base, but a smoother ride: more frequent base
+            # ways wins, a rarer feature and a thinner 5,000x tail. Same reels and
+            # feature; only the quota mix + optimiser fences differ (low mean-to-
+            # median, small-win dresses). Ported verbatim from the validated
+            # claude/gap-analysis library (FeatureMath v2).
+            BetMode(
+                name="cruise",
+                cost=1.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.001,
+                        win_criteria=float(_maxwin),
+                        conditions=wincap_condition,
+                    ),
+                    Distribution(
+                        criteria="freegame",
+                        quota=0.06,
+                        conditions=freegame_base_condition,
+                    ),
+                    Distribution(
+                        criteria="0",
+                        quota=0.30,
+                        win_criteria=0.0,
+                        conditions=zerowin_condition,
+                    ),
+                    Distribution(
+                        criteria="basegame",
+                        quota=0.639,
+                        conditions=basegame_condition,
+                    ),
+                ],
+            ),
+            # OVERBOOST (mode id "antelite", cost 1.25x) -----------------------
+            # Market-centre double-chance: +25% cost for ~1.6x the trigger rate.
+            # Display name OVERBOOST; the mode id stays "antelite" (matches the
+            # frontend fsModes.ts serverMode mapping). Ported verbatim from the
+            # validated claude/gap-analysis library (FeatureMath v2).
+            BetMode(
+                name="antelite",
+                cost=1.25,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=True,
+                is_buybonus=False,
+                distributions=[
+                    Distribution(criteria="wincap", quota=0.0025,
+                                 win_criteria=float(_maxwin), conditions=wincap_ante_condition),
+                    Distribution(criteria="freegame", quota=0.24,
+                                 conditions=freegame_ante_condition),
+                    Distribution(criteria="0", quota=0.30,
+                                 win_criteria=0.0, conditions=zerowin_condition),
+                    Distribution(criteria="basegame", quota=0.4575,
+                                 conditions=basegame_condition),
+                ],
+            ),
+            # NITRO OVERDRIVE (mode id "super", cost 400.0x) -------------------
+            # Guaranteed 3+ trigger (standard bonus conditions); the richness
+            # comes from the Overdrive meter pre-revved to 5x at the feature
+            # start (gamestate._overdrive_start_meter), not from extra scatters.
+            # Validated in the games/future_spinner_super prototype: 96.350000%
+            # at 400x, SD ~500x, max win 5,000x, tail 3.2e-3 cost-scaled,
+            # stateless from the books. FeatureMath v2 drop-in, unchanged recipe.
+            BetMode(
+                name="super",
+                cost=400.0,
+                rtp=self.rtp,
+                max_win=_maxwin,
+                auto_close_disabled=False,
+                is_feature=False,
+                is_buybonus=True,
+                distributions=[
+                    Distribution(
+                        criteria="wincap",
+                        quota=0.03,
+                        win_criteria=float(_maxwin),
+                        conditions=wincap_bonus_condition,
+                    ),
+                    Distribution(
+                        criteria="freegame",
+                        quota=0.97,
                         conditions=freegame_bonus_condition,
                     ),
                 ],

@@ -5,20 +5,15 @@
 // adding, removing or renaming a mode is a one-line edit here - nothing else in
 // the UI needs to change.
 //
-// `available: false` marks a mode whose maths is not shipped yet. Cruise,
-// Overboost and Super all await FeatureMath v2; they render as dimmed "coming
-// soon" placeholders and are never interactive. Flip `available: true` for a
-// mode ONLY once the RGS actually serves its serverMode. Today only Normal
-// (base) and Buy Overdrive (bonus) are runtime-live.
-//
-// NOTE: "Super Buy" is a PLACEHOLDER name pending the owner's final choice.
+// FeatureMath v2 shipped (2026-07-07): all five modes are now runtime-live.
+// Cruise, OVERBOOST and NITRO OVERDRIVE are served by games/future_spinner
+// (see FUTURE_SPINNER_PAR_SHEET.md); `available: true` reflects that.
 //
 // ---------------------------------------------------------------------------
-// HOW TO PROMOTE A PLACEHOLDER TO LIVE
+// HOW TO PROMOTE A PLACEHOLDER TO LIVE (kept for the next mode added)
 //   1. Ship the matching BetMode in games/future_spinner so the server prices
 //      and serves the mode's serverMode id.
-//   2. Widen BetMode in stores/betMode.ts if the serverMode is new (already
-//      done: base | bonus | cruise | antelite | super).
+//   2. Widen BetMode in stores/betMode.ts if the serverMode is new.
 //   3. Flip `available: true` on the entry below.
 //   The menu and the info page pick it up for free.
 // ---------------------------------------------------------------------------
@@ -72,17 +67,17 @@ export const FS_MODES: FsMode[] = [
     cost: 1.0,
     volatility: 'Low',
     blurb: 'A smoother ride: more frequent smaller wins, same 96.35% RTP.',
-    available: false,
+    available: true,
     serverMode: 'cruise',
   },
   {
     id: 'overboost',
-    label: 'Overboost',
+    label: 'OVERBOOST',
     kind: 'enhancer',
     cost: 1.25,
     volatility: 'High',
     blurb: 'Double-chance: about 1.6x the feature trigger rate.',
-    available: false,
+    available: true,
     serverMode: 'antelite',
   },
   {
@@ -97,12 +92,12 @@ export const FS_MODES: FsMode[] = [
   },
   {
     id: 'super',
-    label: 'Super Buy',
+    label: 'NITRO OVERDRIVE',
     kind: 'buy',
     cost: 400,
     volatility: 'Extreme',
     blurb: 'Buy a rich entry with the Overdrive meter pre-revved to 5x.',
-    available: false,
+    available: true,
     serverMode: 'super',
   },
 ]

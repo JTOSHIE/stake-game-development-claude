@@ -2,10 +2,16 @@
 
 **Game:** Future Spinner
 **Provider:** We Roll Spinners
-**Report Date:** 2026-07-03
-**Feature:** OVERDRIVE FREE SPINS (two bet modes: base + bonus buy)
+**Report Date:** 2026-07-03 (FeatureMath v2 update: 2026-07-07)
+**Feature:** OVERDRIVE FREE SPINS (five bet modes: Normal, Cruise, OVERBOOST,
+Buy Overdrive, NITRO OVERDRIVE)
 **Simulation Basis:** 100,000 rounds per mode (Stake Engine SDK v1)
-**Optimiser:** PigFarm Rust, both modes converged to 96.3500% RTP
+**Optimiser:** PigFarm Rust, all five modes converged to 96.3500% RTP
+
+**FeatureMath v2 note:** base and bonus are the original 2026-07-03 release,
+byte-identical (lookUpTable_base_0.csv / lookUpTable_bonus_0.csv hashes
+unchanged - see section 9). cruise, antelite (OVERBOOST) and super (NITRO
+OVERDRIVE) are new in this update.
 
 ---
 
@@ -15,11 +21,10 @@
 |------------------------|-------------------------------------------|
 | Grid                   | 5 reels x 4 rows (20 symbol positions)    |
 | Win mechanic           | Ways-to-win (up to 4^5 = 1,024 ways)     |
-| Bet modes              | Two: base (cost 1.0x) and bonus buy (cost 100.0x) |
-| Target RTP             | 96.35% (both modes)                       |
-| Achieved RTP (base)    | 96.3500% (10dp 96.3499998727%)            |
-| Achieved RTP (bonus)   | 96.3500% (10dp 96.3499999962%)            |
-| Wincap                 | 5,000x bet (hard, both modes)             |
+| Bet modes              | Five: Normal (base, 1.0x), Cruise (cruise, 1.0x), OVERBOOST (antelite, 1.25x), Buy Overdrive (bonus, 100.0x), NITRO OVERDRIVE (super, 400.0x) |
+| Target RTP             | 96.35% (every mode)                       |
+| Achieved RTP            | 96.350000% independently recomputed, every mode (see section 9) |
+| Wincap                 | 5,000x bet (hard, every mode)             |
 | Volatility (base)      | Medium-High, weighted SD 17.28x           |
 | Min bet                | $0.10                                     |
 | Max bet                | $100.00                                   |
@@ -38,11 +43,20 @@
   win cap.
 - **Retrigger:** 3 or more scatters during free spins award +5 free spins and
   pay their instant scatter award multiplied by the current Overdrive meter.
-- **Bonus buy:** the second bet mode "bonus" (cost 100.0x) guarantees a 3+
-  scatter trigger spin.
-- **Win cap:** 5,000x total per round, hard, both modes.
+- **Bonus buy:** the bet mode "bonus" (Buy Overdrive, cost 100.0x) guarantees a
+  3+ scatter trigger spin.
+- **NITRO OVERDRIVE (FeatureMath v2):** the bet mode "super" (cost 400.0x)
+  guarantees a 3+ scatter trigger AND pre-revs the Overdrive meter to **5x**
+  at the feature's first free spin (every other mode starts at 1x). The meter
+  then climbs +1x per winning free spin exactly as in every other mode. This
+  is a per-mode meter initialisation applied at the feature start each round
+  and reset to 1 by reset_book every round, so it remains fully stateless -
+  independently confirmed from the shipped books: every one of 100,000 super
+  rounds shows the free-spin globalMult sequence starting at exactly 5, with
+  no value carrying across rounds.
+- **Win cap:** 5,000x total per round, hard, every mode.
 - **Stateless:** the entire feature resolves inside a single book round; no
-  state is carried between rounds.
+  state is carried between rounds, including the NITRO OVERDRIVE pre-rev.
 
 ---
 
@@ -163,6 +177,65 @@ returns 96.35x, i.e. an RTP of 96.35% at the 100x cost.
 
 ---
 
+## 6a. CRUISE MODE STATISTICS (cost 1.0x) - FeatureMath v2
+
+Low-volatility standing mode: same price and RTP as Normal, but a smoother
+ride - more frequent, smaller base wins and a rarer, thinner-tailed feature.
+Ported verbatim from the validated `claude/gap-analysis` library (same fence
+recipe, freshly generated into the shipping package).
+
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| RTP (independently recomputed)      | 96.350000%               |
+| Hit rate (win > 0)                  | 43.86%                   |
+| Volatility (weighted SD)            | 11.29x (vs 17.28x Normal)|
+| Maximum win                         | 5,000x bet               |
+| Wincap frequency                    | 1 in 250,000             |
+| Unique payouts                      | 5,837                    |
+
+---
+
+## 6b. OVERBOOST MODE STATISTICS (mode id "antelite", cost 1.25x) - FeatureMath v2
+
+Double-chance: +25% cost for roughly 1.6x the free-spin trigger rate. Same
+reels, same feature, same 5,000x cap as Normal. Ported verbatim from the
+validated `claude/gap-analysis` library.
+
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| RTP (independently recomputed)      | 96.350000%               |
+| Cost                                | 1.25x bet                |
+| Hit rate (win > 0)                  | 29.44%                   |
+| Volatility (weighted SD)            | 20.32x                   |
+| Maximum win                         | 5,000x bet               |
+| Wincap frequency                    | 1 in 80,000              |
+| Unique payouts                      | 14,814                   |
+
+---
+
+## 6c. NITRO OVERDRIVE MODE STATISTICS (mode id "super", cost 400.0x) - FeatureMath v2
+
+Guaranteed 3+ scatter trigger (the same standard bonus conditions as Buy
+Overdrive); the richness comes from the Overdrive meter pre-revving to **5x**
+at the feature's first free spin, not from extra scatters. Validated in the
+`games/future_spinner_super` sibling prototype before this drop-in; converged
+first try in the shipping package, no fence re-tuning needed.
+
+| Metric                              | Value                    |
+|-------------------------------------|--------------------------|
+| RTP (independently recomputed)      | 96.350000%               |
+| Cost                                | 400.0x bet               |
+| Trigger rate                        | 100% (guaranteed)        |
+| Average bought outcome              | 385.40x bet              |
+| Volatility (weighted SD)            | 539.16x                  |
+| Maximum win                         | 5,000x bet               |
+| Wincap frequency                    | 1 in 250                 |
+| P(>=5,000x), cost-scaled            | 3.20e-3 (limit 1e-2)      |
+| Unique payouts                      | 46,049                   |
+| Statelessness proof                 | all 100,000 books show the free-spin meter starting at exactly 5, no cross-round carry |
+
+---
+
 ## 7. SYMBOL COMBINATION FREQUENCIES
 
 *Raw simulation frequencies across all simulated base-mode spins (base game and
@@ -227,47 +300,78 @@ trigger counts, retriggers, Overdrive multiplier progression (+1 only after
 winning spins, applied to subsequent wins), instant scatter pays, and that the
 total payout equals the recorded payout multiplier in every sampled round.
 
+**FeatureMath v2 (2026-07-07):** base and bonus rows below are UNCHANGED from
+the original 2026-07-03 generation - re-verified byte-identical before and
+after this update. index.json and game_metadata.json were hand-updated to add
+the three new modes (their hashes below reflect the five-mode file) and are
+re-derived, not independently meaningful for byte-identity.
+
 | File | SHA-256 |
 |------|---------|
-| index.json | 63c64048508a35940aa5fc5124489ceb9d1c774737411b3bd726779babb85107 |
-| game_metadata.json | 771fe87b78256626d9eb626bbdaee7ba9683dc5fd5e9b891063b00eb461164b3 |
-| lookUpTable_base_0.csv | 7aa435857dcac59756f96b21dd128c58a9e3ed538b647c9056cebeee25e71990 |
-| lookUpTable_bonus_0.csv | a77241f1a2e6606bebe94b5e6bb86bc6dda957732316d4962cffc199731d50cd |
+| index.json (five-mode) | 8857dbc027c5e2ceb0b2e39ec0a7dd05bc63272938dc8db515cdf7422d6f1aac |
+| game_metadata.json (five-mode) | 51e7dceeacd41fd292e769b75383ac8c77f726e8f275b1808ad898d99d9abc38 |
+| lookUpTable_base_0.csv (unchanged) | 7aa435857dcac59756f96b21dd128c58a9e3ed538b647c9056cebeee25e71990 |
+| lookUpTable_bonus_0.csv (unchanged) | a77241f1a2e6606bebe94b5e6bb86bc6dda957732316d4962cffc199731d50cd |
+| lookUpTable_cruise_0.csv (new, v2) | da3e45c577866d7357f6b1e83b9a2d14e406d2daf24b662e1a55003e2ed5de01 |
+| lookUpTable_antelite_0.csv (new, v2) | 150a6d243dcca205a7b9aff1c25c6ce5e3b31c634ac58f7b7e72274e4a054b15 |
+| lookUpTable_super_0.csv (new, v2) | 2e94fe04ad0c44a69789f871b1c969e2c36021ce4db1c25bb328c8ee3dd4330e |
 | books_base.jsonl.zst | b86c8bb484523a53b8a42db6dbaef0bc26c51843077b5f06d01f492c40d39331 |
 | books_bonus.jsonl.zst | a38d2b8f5da04ac4f401f33bcdfbbcde56f6b661bcc0f7ad50e518763dd9bbb9 |
+| books_cruise.jsonl.zst (new, v2) | 7b5a1ddcfcdfde76a2f286a36992df5f9e8632cf9cfdc442fcc71dfd3fcc5b24 |
+| books_antelite.jsonl.zst (new, v2) | 9e5e8a0ad24f00383a6497f7debdf1ecaf46145d7f23f7d5d345e86ffd381377 |
+| books_super.jsonl.zst (new, v2) | c079226d718cab54825b91d5fdab631d7d2f8dd542f432e9b7b6ec7d57347445 |
+
+*As with the original base/bonus books, the new books_*.jsonl.zst files are
+regenerable build artifacts (`games/future_spinner/run.py`), gitignored per
+`**/library/**`, not committed to source control; only the lookUpTable CSVs
+and the two JSON config files are force-tracked, matching existing precedent.*
 
 ---
 
-## 10. TWO-MODE DECLARATION
+## 10. FIVE-MODE DECLARATION (FeatureMath v2)
 
-Future Spinner ships exactly two bet modes:
+Future Spinner ships exactly five bet modes:
 
-- **base** (cost 1.0x): standard play. The Overdrive Free Spins feature triggers
-  on 3+ scatters at a rate of about 1 in 185 base spins.
-- **bonus** (cost 100.0x): a buy that guarantees entry to the Overdrive Free
-  Spins feature.
+- **Normal** (mode id `base`, cost 1.0x): standard play. The Overdrive Free
+  Spins feature triggers on 3+ scatters at a rate of about 1 in 185 base spins.
+- **Cruise** (mode id `cruise`, cost 1.0x): a lower-volatility standing mode,
+  same RTP, more frequent smaller wins.
+- **OVERBOOST** (mode id `antelite`, cost 1.25x): double-chance, roughly 1.6x
+  the free-spin trigger rate.
+- **Buy Overdrive** (mode id `bonus`, cost 100.0x): a buy that guarantees entry
+  to the Overdrive Free Spins feature.
+- **NITRO OVERDRIVE** (mode id `super`, cost 400.0x): a buy that guarantees
+  entry AND pre-revs the Overdrive meter to 5x at the feature's first free
+  spin (see section 2 and 6c).
 
-Both modes are stateless (each round resolves independently inside one book
-round), share the 1,024-way base game and paytable, enforce the same 5,000x win
-cap, and return 96.3500% RTP. There is no jackpot, gamble, or continuation
-mechanic. The scatter awards are 1x/3x/10x instant plus 8/12/16 free spins on
-3/4/5 scatters, with a progressive Overdrive multiplier during the feature.
+All five modes are stateless (each round resolves independently inside one
+book round, including the NITRO OVERDRIVE pre-rev), share the 1,024-way base
+game and paytable, enforce the same 5,000x win cap, and independently
+recompute to 96.3500% RTP with 0.0000pp cross-mode spread. There is no
+jackpot, gamble, or continuation mechanic. The scatter awards are 1x/3x/10x
+instant plus 8/12/16 free spins on 3/4/5 scatters, with a progressive
+Overdrive multiplier during the feature.
 
 ---
 
 ## 11. REGULATORY COMPLIANCE NOTES
 
-- **RTP:** 96.3500% in both modes (four decimal places), satisfying the 0.5%
-  tolerance rule.
+- **RTP:** 96.3500% in every mode (four decimal places), satisfying the 0.5%
+  cross-mode tolerance rule (measured spread 0.0000pp across all five).
 - **Wincap:** hard 5,000x cap enforced at the engine level; no simulated round
-  in either mode exceeds it.
-- **Stateless:** the whole Overdrive feature resolves within a single book
-  round; no state carries between rounds.
+  in any mode exceeds it (independently confirmed by scanning every book).
+- **Stateless:** the whole Overdrive feature, including the NITRO OVERDRIVE
+  pre-rev, resolves within a single book round; no state carries between
+  rounds (independently confirmed: every NITRO OVERDRIVE round's free-spin
+  meter starts at exactly 5, with no cross-round carry).
 - **No progressive jackpot, gamble, or continuation mechanic.**
-- **Bonus buy:** the 100x buy returns 96.35% RTP (average outcome 96.35x),
-  matching the base-mode RTP. Jurisdictions that disable feature buys hide the
-  bonus mode (frontend scope).
+- **Buy Overdrive:** the 100x buy returns 96.35% RTP (average outcome
+  96.35x), matching every other mode's RTP.
+- **NITRO OVERDRIVE:** the 400x buy returns 96.35% RTP (average outcome
+  385.40x); tail risk P(>=5,000x) is 3.20e-3 cost-scaled, under the 1e-2 gate.
+- Jurisdictions that disable feature buys hide the Buy Overdrive and NITRO
+  OVERDRIVE modes (frontend scope).
 
 ---
 
-*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.1 (Overdrive Free Spins)*
+*Generated by Stake Engine Math SDK | We Roll Spinners | Future Spinner v1.2 (Overdrive Free Spins, FeatureMath v2)*

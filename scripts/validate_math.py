@@ -6,6 +6,11 @@ PAR), the way the community LUT analyzer (mnemoo/tools) and StakeCLI's complianc
 check do, and gates on Stake Engine's published rubric. Run before submission so a
 drifted or non-compliant table cannot slip through (StakeCLI's --yes only warns).
 
+FeatureMath v2: extended from the original two-mode (base/bonus) gate to the
+shipped five (base, cruise, antelite/OVERBOOST, bonus, super/NITRO OVERDRIVE).
+The main analysis loop is fully generic (reads every mode from index.json), so
+only the STATED facts and the cross-check section below were extended.
+
 Reads games/future_spinner/library/publish_files/{index.json, lookUpTable_<mode>_0.csv}.
 CSV rows are `sim_id,weight,payout` where payout is the multiplier x100 (390 = 3.90x)
 and weight is a uint64. Integer arithmetic on the weight sums avoids float drift.
@@ -24,13 +29,22 @@ PUB = ROOT / "games/future_spinner/library/publish_files"
 
 # Our stated facts (CLAUDE.md / GAME_FACTS) to cross-check against.
 STATED = {
-    "rtp": 0.963500,           # both modes, 4dp
+    "rtp": 0.963500,           # every shipped mode, 4dp
     "base_hit_rate": 0.2911,
     "base_std": 17.28,         # weighted SD in bet-multiples
     "bonus_std": 206.63,
     "max_win": 5000.0,
     "base_wincap_one_in": 100_000,
     "bonus_wincap_one_in": 1_000,
+    # FeatureMath v2 additions - prototype-validated targets (see
+    # games/future_spinner_super/SUPER_PROTOTYPE_FINDINGS.md for super; cruise
+    # and antelite ported verbatim from the validated claude/gap-analysis
+    # library, same targets as that library's independent validation).
+    "cruise_std": 11.10,       # low-vol (cost 1.0x) weighted SD
+    "antelite_std": 20.31,     # OVERBOOST (cost 1.25x) weighted SD
+    "super_std": 500.0,        # NITRO OVERDRIVE (cost 400x) weighted SD (approx)
+    "super_wincap_one_in": 250,
+    "super_p_bigwin_cost_scaled": 3.2e-3,
 }
 # Stake compliance rubric - from the OFFICIAL math-verification doc
 # (docs/stake-engine-live/math-verification.md, mirrored 2026-07-04).
@@ -175,6 +189,22 @@ def main() -> int:
         ("base wincap ~ 1 in 100k", near(br["wincap_one_in"], STATED["base_wincap_one_in"], 0.15)),
         ("bonus wincap ~ 1 in 1k", near(results["bonus"]["wincap_one_in"], STATED["bonus_wincap_one_in"], 0.20)),
     ]
+    # FeatureMath v2 additions - only run if the mode is present (post-v2 index.json).
+    if "cruise" in results:
+        checks.append(("cruise RTP == 96.35%", near(results["cruise"]["rtp"], STATED["rtp"], 1e-4)))
+        checks.append(("cruise SD == 11.10x (low-vol < base)",
+                        near(results["cruise"]["std"], STATED["cruise_std"], 0.05)
+                        and results["cruise"]["std"] < br["std"]))
+    if "antelite" in results:
+        checks.append(("antelite (OVERBOOST) RTP == 96.35%", near(results["antelite"]["rtp"], STATED["rtp"], 1e-4)))
+        checks.append(("antelite (OVERBOOST) SD == 20.31x", near(results["antelite"]["std"], STATED["antelite_std"], 0.05)))
+    if "super" in results:
+        sr = results["super"]
+        checks.append(("super (NITRO OVERDRIVE) RTP == 96.35%", near(sr["rtp"], STATED["rtp"], 1e-4)))
+        checks.append(("super max win == 5000x", near(sr["max_win"], STATED["max_win"])))
+        checks.append(("super wincap ~ 1 in 250", near(sr["wincap_one_in"], STATED["super_wincap_one_in"], 0.30)))
+        scaled = sr["p_bigwin"] * cost_scale(sr["cost"])
+        checks.append(("super tail cost-scaled <= 1e-2 gate", scaled <= P_BIGWIN_MAX))
     for label, ok in checks:
         print(f"  {'OK ' if ok else 'DIFF'} {label}")
         if not ok:

@@ -7,10 +7,28 @@
             "weights": "lookUpTable_base_0.csv"
         },
         {
+            "name": "cruise",
+            "cost": 1.0,
+            "events": "books_cruise.jsonl.zst",
+            "weights": "lookUpTable_cruise_0.csv"
+        },
+        {
+            "name": "antelite",
+            "cost": 1.25,
+            "events": "books_antelite.jsonl.zst",
+            "weights": "lookUpTable_antelite_0.csv"
+        },
+        {
             "name": "bonus",
             "cost": 100.0,
             "events": "books_bonus.jsonl.zst",
             "weights": "lookUpTable_bonus_0.csv"
+        },
+        {
+            "name": "super",
+            "cost": 400.0,
+            "events": "books_super.jsonl.zst",
+            "weights": "lookUpTable_super_0.csv"
         }
     ]
 }

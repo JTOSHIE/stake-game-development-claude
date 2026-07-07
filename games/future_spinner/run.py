@@ -1,8 +1,19 @@
 # File: run.py
 # Game: Future Spinner by We Roll Spinners
-# Purpose: Simulation runner for the two-mode OVERDRIVE FREE SPINS package.
+# Purpose: Simulation runner for the OVERDRIVE FREE SPINS package.
 #          Wires GameConfig + GameState + OptimizationSetup, runs the full
-#          pipeline (books, configs, optimiser, analytics) for both bet modes.
+#          pipeline (books, configs, optimiser, analytics).
+#
+# FeatureMath v2: game_config.py now defines all five shipped modes (base,
+# cruise, antelite/OVERBOOST, bonus, super/NITRO OVERDRIVE), but base and bonus
+# already have PUBLISHED, committed lookUpTable_*_0.csv files that must stay
+# byte-identical. This run generates ONLY the three new modes (per-mode
+# generation, the same incremental technique used historically to add ante on
+# its own): config.bet_modes is narrowed to just the new modes below BEFORE the
+# SDK pipeline runs, so create_books/generate_configs/the optimiser never touch
+# base or bonus at all. The newly generated cruise/antelite/super lookup tables
+# are then merged into publish_files/index.json + game_metadata.json by hand
+# (see FS_FeatureMath_v2_Prompt.md), alongside the untouched base/bonus entries.
 #
 # Toggle PRODUCTION below to switch between development and production settings.
 
@@ -32,7 +43,7 @@ from src.write_data.write_configs import generate_configs               # noqa: 
 if __name__ == "__main__":
 
     rtp_target = 96.35
-    target_modes = ["base", "bonus"]
+    target_modes = ["cruise", "antelite", "super"]
 
     if PRODUCTION:
         num_threads = 10
@@ -40,8 +51,9 @@ if __name__ == "__main__":
         batching_size = 5000
         compression = True
         num_sim_args = {
-            "base":  100_000,
-            "bonus": 100_000,
+            "cruise":   100_000,
+            "antelite": 100_000,
+            "super":    100_000,
         }
         run_conditions = {
             "run_sims": True,
@@ -54,8 +66,9 @@ if __name__ == "__main__":
         batching_size = 100
         compression = False
         num_sim_args = {
-            "base":  100,
-            "bonus": 100,
+            "cruise":   100,
+            "antelite": 100,
+            "super":    100,
         }
         run_conditions = {
             "run_sims": True,
@@ -68,16 +81,25 @@ if __name__ == "__main__":
     print("=" * 60)
     print("FUTURE SPINNER - We Roll Spinners - Overdrive Free Spins")
     print(f"Mode: {'PRODUCTION' if PRODUCTION else 'DEVELOPMENT'}")
-    print(f"RTP Target: {rtp_target}%  Modes: {target_modes}")
+    print(f"FeatureMath v2: {rtp_target}%  New modes this run: {target_modes}")
     print("=" * 60)
 
     config = GameConfig()
-    gamestate = GameState(config)
 
-    # Optimiser parameters must be set before generate_configs writes the math
-    # config, and before the optimiser runs.
+    # OptimizationSetup builds a wincaps lookup keyed by EVERY bet mode's name
+    # (base included), so it must run against the FULL 5-mode config, before
+    # narrowing bet_modes below - otherwise the base/bonus fence blocks in
+    # game_optimization.py would KeyError on a missing wincap entry.
     if run_conditions["run_optimization"] or run_conditions["run_analysis"]:
         OptimizationSetup(config)
+
+    # NOW narrow to the three new modes for this incremental generation run -
+    # base and bonus are already published and must stay byte-identical, so
+    # they are excluded from create_books/generate_configs/the optimiser
+    # entirely. generate_configs only ever processes bet_modes actually present
+    # here, so the leftover base/bonus entries in opt_params are harmless.
+    config.bet_modes = [bm for bm in config.bet_modes if bm.get_name() in target_modes]
+    gamestate = GameState(config)
 
     # 1. Simulate both modes -> books_*.jsonl.zst, lookUpTable_*.csv, force files
     if run_conditions["run_sims"]:
