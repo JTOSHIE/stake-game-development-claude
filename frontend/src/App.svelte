@@ -63,8 +63,14 @@
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { overdriveVisual } from './lib/stores/overdriveVisual'
-  import { interpretRound, type PresentationScript, type RawEvent } from './lib/services/roundInterpreter'
+  import {
+    interpretRound, cellMultipliersFromEvents,
+    type PresentationScript, type RawEvent,
+  } from './lib/services/roundInterpreter'
+  import { cellMultipliers } from './lib/stores/cellMultipliers'
+  import { currencyCode } from './lib/stores/gameStore'
   import { CURRENCY_SCALE } from './lib/utils/currency'
+  import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
@@ -91,6 +97,21 @@
 
   let gridRef: GameGrid
   let buyBonusRef: BuyBonus
+
+  // Telemetry: lazy session envelope + a dev buffer sink (window.__telemetry).
+  // Production registers a vendor sink instead; no-op until one is set. Never
+  // touches the outcome path (see docs/TELEMETRY_TAXONOMY.md) - it only observes.
+  configureTelemetry(() => ({
+    mode: get(selectedBetMode),
+    betMicros: Math.round(get(betAmount) * CURRENCY_SCALE),
+    currency: get(currencyCode) || 'USD',
+    social: get(isSocial),
+  }))
+  if (import.meta.env.DEV) {
+    const buf: TelemetryEvent[] = []
+    ;(window as unknown as { __telemetry: unknown[] }).__telemetry = buf
+    setTelemetrySink(bufferSink(buf))
+  }
 
   // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────
   // Shown once, right after loading finishes. Persistence (audit remediation):
@@ -245,6 +266,7 @@
     const cost = bet * (MODE_COST[mode] ?? 100)
     try {
       selectedBetMode.set(mode)
+      track({ type: 'buy', tier: mode, costMicros: Math.round(cost * CURRENCY_SCALE) })
       lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh round
       // NOTE: the locked rgsService.SpinRequest.mode type is 'base'|'bonus' only
       // - it is NOT what reaches the real RGS. play() reads get(selectedBetMode)
@@ -283,6 +305,11 @@
         const win = servedTotalWin ?? result.totalWin
         recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
         rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
+      }
+      const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
+      if (buyWin > 0) {
+        const bm = bet > 0 ? buyWin / bet : 0
+        track({ type: 'win', winMicros: Math.round(buyWin * CURRENCY_SCALE), multiple: bm, tier: winTier(bm) })
       }
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
@@ -425,6 +452,7 @@
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
     const bet  = $betAmount
+    track({ type: 'spin', costMicros: Math.round(bet * CURRENCY_SCALE) })
 
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
@@ -434,6 +462,14 @@
       boardSymbols.set(result.board)
       activeWins.set(result.winEvents)
       scatterCount.set(result.scatterEvent?.count ?? 0)
+      // Multiplier wilds: if the round published raw events (live RGS, or a mock
+      // multiwild round), surface the per-cell wild multipliers as overlay
+      // badges on the winning cells. Rounds without wild multipliers yield an
+      // empty list, so base play is visually unchanged.
+      {
+        const rawEvents = get(lastRoundEvents)
+        cellMultipliers.set(rawEvents ? cellMultipliersFromEvents(rawEvents) : [])
+      }
       if (result.isWincap) {
         // Dwell on the winning hit: the board's win burst is already playing
         // from activeWins, so hold on it (a max win is the one moment to linger)
@@ -445,6 +481,11 @@
       recordSpinResult(result.totalWin, bet, result.newBalance, result.isWincap)
       rgRecordSpin(Math.round(bet * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
       if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
+      if (result.totalWin > 0) {
+        const mult = bet > 0 ? result.totalWin / bet : 0
+        track({ type: 'win', winMicros: Math.round(result.totalWin * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
+      }
+      if (result.isWincap) track({ type: 'wincap', multiple: bet > 0 ? result.totalWin / bet : 0 })
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
       // this round, plus the balance the store actually landed on, so the
