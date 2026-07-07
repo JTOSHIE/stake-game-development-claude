@@ -18,13 +18,17 @@ an exploration. Do NOT change any already-verified mode's numbers.
   statelessness from the books).
 - `docs/MASTER_TEMPLATE.md` — the 11-mode library and the ship-config.
 
-## PRECONDITIONS (both required before running — do NOT start without them)
-1. **Lock sanction.** Explicit owner authorisation to temporarily lift exactly
-   these two deny lines in `.claude/settings.json`:
+## PRECONDITIONS
+**STATUS 2026-07-06: BOTH SATISFIED - this brief is CLEARED TO RUN.** The owner
+issued the lock sanction (relayed via Fable) naming exactly the two deny lines
+below, and decided the Super Buy ship name: **NITRO OVERDRIVE** (the nitro
+canister is the H2 symbol and a pre-revved meter is literally what nitro does).
+1. **Lock sanction (in hand).** Temporarily lift exactly these two deny lines in
+   `.claude/settings.json`:
    - `Edit(games/future_spinner/**)`
    - `Write(games/future_spinner/**)`
-2. **Super Buy ship name.** `__________` (placeholder: "Super Buy"). Used in
-   `game_metadata.json` and the frontend `fsModes.ts` label.
+2. **Super Buy ship name: NITRO OVERDRIVE.** Used in `game_metadata.json` and the
+   frontend `fsModes.ts` label.
 
 ## LOCK DISCIPLINE (mandatory — convention (e))
 - Temporarily remove ONLY those two deny lines from the working-tree
@@ -35,13 +39,21 @@ an exploration. Do NOT change any already-verified mode's numbers.
   around the deny is FORBIDDEN and does not count as the sanctioned exception.
 - Work off a branch off `main`, in a worktree, same flow as #29/#31/#32/#34.
 
-## SCOPE — one new mode; everything else byte-identical
-Shipped five-mode menu = `base` (Normal, 1.0x), `cruise` (Cruise, 1.0x),
-`antelite` (OVERBOOST, 1.25x), `bonus` (Buy Overdrive, 100x), `super`
-(Super Buy, 400x). base/cruise/antelite/bonus already exist and recompute to
-96.3500%. **The only new maths is `super`.** The other six library modes
-(volatile, ante 1.5x, superante, minibuy, superbuy, megabuy, hyperbuy) stay in
-the package but are not part of the shipped five.
+## SCOPE — the shipping package on main is base + bonus; ADD THREE modes
+CORRECTED (verified against origin/main, 2026-07-06): the shipping package
+`games/future_spinner` currently carries ONLY `base` + `bonus`. The 11-mode
+library lives on `claude/gap-analysis` as REFERENCE and MUST NOT be pulled into
+the shipping package (Fable's guard). So FeatureMath v2 ADDS exactly three modes
+to reach the shipped five, keeping `base` + `bonus` byte-identical:
+- **`cruise`** (Cruise, 1.0x, low-vol) - port its BetMode + optimiser fences
+  verbatim from the validated `claude/gap-analysis` (`game_config.py` /
+  `game_optimization.py`).
+- **`antelite`** (1.25x) rebadged **OVERBOOST** (display name only; the mode id
+  stays `antelite`, which the frontend `fsModes.ts` already maps as its
+  serverMode) - port its fences from `claude/gap-analysis`.
+- **`super`** (400x) named **NITRO OVERDRIVE** - the 5x pre-rev recipe below.
+Add ONLY these three. Do NOT bring in volatile / ante 1.5x / superante / minibuy
+/ superbuy / megabuy / hyperbuy - they stay on the library branch as reference.
 
 ## THE RECIPE (apply verbatim to `games/future_spinner/`)
 
@@ -164,3 +176,36 @@ This is the one-line-per-mode change the placeholder architecture was built for
 
 If every box is ticked, FeatureMath v2 is complete and the shipped five-mode menu
 is backed by validated maths.
+
+---
+
+## FABLE RATIFICATION + ADDITIONS (2026-07-06)
+
+The overseer (Fable) reviewed and ratified this approach. Bake these in:
+- **Sanction in hand; name decided.** Run end to end. NITRO OVERDRIVE (400x super),
+  OVERBOOST (antelite 1.25x rebadge).
+- **Guard: shipping package stays lean.** Add ONLY cruise, antelite(OVERBOOST) and
+  super(NITRO OVERDRIVE). The 11-mode library stays reference on `claude/gap-analysis`,
+  never merged into the shipping package.
+- **Independent recomputation is on the v2 OUTPUT** in the locked package (Fable does
+  this at a check-in), not on the prototype. So the validation gates in this brief are
+  mandatory and must pass on the shipped tables.
+
+### Submission-risk items to CLOSE as part of v2 (Fable):
+- **Placeholders must never ship.** Once all five modes are live server-side, flip the
+  frontend `fsModes.ts` placeholders (`cruise`, `overboost`, `super`) to
+  `available: true` and set the super label to "Nitro Overdrive" (separate UNLOCKED
+  frontend commit). A submitted build advertising dead COMING SOON modes is a rejection
+  risk.
+- **REVIEW_EVENTS / bet-replay per-mode IDs** for the three new modes (cruise, antelite,
+  super) - add them so replay covers every shipped mode.
+- **PAR sheet + dossier + paytable copy: five-mode update**, including an explicit
+  disclosure of the Super Buy's 5x pre-revved starting meter (the NITRO OVERDRIVE
+  mechanic) so the maths is transparent to the reviewer.
+- **QA re-soak must cover all five live modes**; the external audit pack is now stale
+  against the overhauled game and needs one refresh re-run AFTER audio lands.
+
+### After v2 (owner / next sessions):
+- Audio delivery into `~/Desktop/fs_audio/` (top creative blocker, owner-gated).
+- QA re-soak (5 modes) + external audit refresh + compliance re-validation.
+- Portal one-timers + dossier section 5, then submit. Target: 3 stars.
