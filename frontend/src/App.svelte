@@ -58,7 +58,8 @@
   import { speedTier } from './lib/stores/speedMode'
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
-  import { selectedBetMode } from './lib/stores/betMode'
+  import { selectedBetMode, type BetMode } from './lib/stores/betMode'
+  import { MODE_COST } from './lib/config/fsModes'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { overdriveVisual } from './lib/stores/overdriveVisual'
@@ -231,39 +232,54 @@
     if (r) r()
   }
 
-  // ── Bonus Buy: place a bonus-mode spin and present the guaranteed feature ──
-  async function handleBuy(): Promise<void> {
+  // ── Buy: place a buy-tier spin and present the guaranteed feature ──────────
+  // Generic over every buy tier in FS_MODES (today: bonus 100x, super 400x).
+  // `mode` comes from whichever card the player ACTIVATEd in the FEATURES menu
+  // (threaded through BuyBonus's confirm dispatch - see the on:buy wiring
+  // below); it must never be assumed to be 'bonus'.
+  async function handleBuy(mode: BetMode = 'bonus'): Promise<void> {
     if ($isSpinning || featureActive) return
     isSpinning.set(true)
     resetWin()
     const bet = $betAmount
-    const cost = bet * 100
+    const cost = bet * (MODE_COST[mode] ?? 100)
     try {
-      selectedBetMode.set('bonus')
-      lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh bonus round
+      selectedBetMode.set(mode)
+      lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh round
+      // NOTE: the locked rgsService.SpinRequest.mode type is 'base'|'bonus' only
+      // - it is NOT what reaches the real RGS. play() reads get(selectedBetMode)
+      // (set just above) for the actual wallet request, so every buy tier is
+      // correctly communicated to the live RGS regardless of this literal. The
+      // 'bonus' passed here only selects the mock branch (see rgsService's
+      // _mockSpin, which does not itself branch on it either).
       const result: SpinResult = await spin({ betAmount: bet, mode: 'bonus' })
 
       // Live rgsService publishes the round events; in mock, serve a sample.
       // A dev-only ?mockCategory= override lets headless verification force a
       // specific curated round (e.g. the wincap sample) deterministically.
+      // NOTE: sample_rounds.json currently only curates 'base'/'bonus' category
+      // samples; cruise/antelite/super fall back to serveMockRound's generic
+      // random board (still correctly priced/labelled, just not a curated
+      // feature demo) until matching samples are authored - flagged as a
+      // follow-up, not a regression (the real RGS path is unaffected).
       let servedTotalWin: number | null = null
       if (import.meta.env.DEV && !get(lastRoundEvents)) {
         const { serveMockRound, serveCategory } = await import('./lib/mock/roundProvider')
         const forcedCategory = new URLSearchParams(window.location.search).get('mockCategory')
         const round = forcedCategory
-          ? await serveCategory('bonus', forcedCategory)
-          : await serveMockRound('bonus')
+          ? await serveCategory(mode, forcedCategory)
+          : await serveMockRound(mode)
         if (round) servedTotalWin = (round.payoutMultiplier / 100) * bet
       }
       const events = get(lastRoundEvents)
       const script = events ? scriptFromEvents(events) : null
 
       if (result.newBalance !== undefined) {
-        // Live: RGS balance is authoritative (already reflects the 100x cost).
+        // Live: RGS balance is authoritative (already reflects the mode's cost).
         recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
         rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
       } else {
-        // Mock: deduct the full 100x cost and add the served round total.
+        // Mock: deduct the mode's real cost and add the served round total.
         const win = servedTotalWin ?? result.totalWin
         recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
         rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
@@ -692,9 +708,12 @@
        single FeatureButton); future-spinner only, hidden during Overdrive so
        the bonus instrument column owns that zone. A live buy ACTIVATE opens the
        existing BuyBonus confirm modal (same confirm-protected flow the old
-       FeatureButton used), which then dispatches 'buy' -> handleBuy. -->
+       FeatureButton used), passing THROUGH which buy tier was clicked (bug fix:
+       every tier used to fall through to the hardcoded 100x bonus buy) so the
+       modal shows the correct price and, on confirm, dispatches THAT mode to
+       handleBuy. -->
   {#if $activeTheme.id === 'future-spinner' && !featureActive}
-    <FeatureMenu on:buy={() => buyBonusRef?.openConfirm()} />
+    <FeatureMenu on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
   {/if}
 
   <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->
@@ -711,8 +730,9 @@
 
   <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
        replaced by FeatureButton above (showTrigger=false). Hidden entirely
-       where the jurisdiction disables feature buys (handled inside). -->
-  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={handleBuy} />
+       where the jurisdiction disables feature buys (handled inside). Dispatches
+       the CONFIRMED buy tier (e.detail), not always 'bonus'. -->
+  <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={(e) => handleBuy(e.detail)} />
 
   <!-- Theme selector — dev-only. Hidden in the production submission build so
        only the validated Future Spinner experience ships (see the scope note
