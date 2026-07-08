@@ -7,13 +7,15 @@
    * container holding the tinted plate and its symbol (plus idle/charge layers)
    * that move together. Two choreographies share the one tile system, chosen by
    * the fs_reel_mode dev store:
-   *   - strip (default): the strip scrolls vertically — accelerate (cubic-in)
-   *     to a per-tier cruise, cruise with velocity-scaled vertical stretch and a
+   *   - drop (shipping default): the same tile units fall from above the frame
+   *     with gravity easing, per-column stagger and a squash-and-settle
+   *     landing; result rows identical to strip.
+   *   - strip: the strip scrolls vertically — accelerate (cubic-in) to a
+   *     per-tier cruise, cruise with velocity-scaled vertical stretch and a
    *     subtle alpha trail while weighted-random tiles pass, then decelerate
    *     (cubic-out) into an index-aligned stop that lands the book's result row
    *     exactly, with a 22px overshoot and spring settle. Per-reel stagger.
-   *   - drop: the same tile units fall from above the frame with gravity easing,
-   *     per-column stagger and a squash-and-settle landing; result rows identical.
+   *     Kept as the dev-toggle alternative, no longer the shipping default.
    * Slam-stop collapses every reel to a fast deceleration (never a teleport).
    * Scatter anticipation extends the final reel's travel under the glow, floored
    * at 300ms per tier.

@@ -244,8 +244,10 @@
         </div>
 
         <!-- Bet Modes — every mode from the single source of truth (fsModes.ts).
-             Two are live (Normal, Buy Overdrive); the rest are tagged "coming
-             soon" until their maths ships. All share the same 96.35% RTP. -->
+             All five are live since FeatureMath v2 (2026-07-07): Normal, Cruise,
+             OVERBOOST, Buy Overdrive, NITRO OVERDRIVE. All share the same
+             96.35% RTP; the `soon` tag/branch remains for any future mode
+             added ahead of its maths shipping. -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">Bet Modes</h3>
           <div class="fs-modes">
@@ -293,11 +295,24 @@
           </div>
         </div>
 
-        <!-- RTP — both modes + max win -->
+        <!-- RTP — identical across all five modes (0.5% cross-mode rule) + max win -->
         <div class="fs-rtp">
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Base Mode RTP</span><span class="fs-rtp-val fs-num">96.35%</span></div></div>
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Bonus Buy RTP</span><span class="fs-rtp-val fs-num">96.35%</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">RTP (All 5 Modes)</span><span class="fs-rtp-val fs-num">96.35%</span></div></div>
           <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Max Win</span><span class="fs-rtp-val fs-num">5,000×</span></div></div>
+        </div>
+
+        <!-- Responsible play — the autoplay stop-conditions actually available
+             in the HUD's auto-menu (HudOverlay.svelte's startAuto()). Kept
+             factual and scoped to what the player can actually set here. -->
+        <div>
+          <h3 class="fs-heading" style="margin-bottom:6px;">Responsible Play</h3>
+          <p class="fs-disc">
+            Autoplay can be set to stop automatically on any win, when the
+            Overdrive feature triggers, or once a loss limit you choose is
+            reached, and can always be stopped manually at any time. A session
+            summary (time played, spins, net result) is available from the
+            menu.
+          </p>
         </div>
 
         <!-- Disclaimer (Stake Engine seven-point requirement) -->

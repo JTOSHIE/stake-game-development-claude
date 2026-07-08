@@ -110,3 +110,17 @@ Two Stage 2 (feature frontend) compliance items opened by the feature:
 
 A compliance re-validation against the live docs for the two-mode feature game is scheduled
 in the pass sequence before submission.
+
+### 2026-07-07: SUPERSEDED by FeatureMath v2 - five-mode package
+The two entries above (the base-only decision at 2026-07-03's game-quality-rankings note,
+and this section's "now a two-mode package" framing) are both superseded. FeatureMath v2
+shipped three more modes into the locked package the same day: Cruise (1.0x, low-vol),
+OVERBOOST (1.25x ante toggle, debits every spin while ON), and NITRO OVERDRIVE (400x,
+Overdrive meter pre-revved to 5x). The package is now five modes, all stateless, all
+capped at 5,000x, all 96.3500% RTP (see `HANDOVER_2026-07-07_Fable.md` for the full
+per-mode table and independent re-verification). This closes the star-rating concern the
+2026-07-03 entry flagged more fully than the original two-mode answer did - a five-mode
+package with a genuine ante mechanic and two buy tiers is a stronger answer to "additional
+mechanics are expected in competitive submissions" than base-plus-one-buy was.
+Buy-feature disclosure and buy replay's cost-multiplier display now apply to **both** buy
+tiers (Buy Overdrive 100x and NITRO OVERDRIVE 400x), not just the original bonus buy.

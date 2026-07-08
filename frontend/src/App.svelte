@@ -816,7 +816,9 @@
       aria-label="Change theme"
       title="Change theme"
     >🎨</button>
-    <!-- Reel choreography toggle — dev-only eye test (strip default / drop). -->
+    <!-- Reel choreography toggle — dev-only eye test (drop is the shipping
+         default; strip is the dev-toggle alternative). Never rendered in the
+         production submission build (import.meta.env.DEV gate above). -->
     <button
       class="util-btn reel-mode-btn"
       on:click={cycleReelMode}

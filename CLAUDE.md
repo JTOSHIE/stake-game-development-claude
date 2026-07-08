@@ -36,6 +36,20 @@ deny. An owner-sanctioned exception therefore works only like this:
 When the session ends the full lock re-applies (the deny is back in place, uncommitted diff
 empty).
 
+### LOCKED_FILE_DEBTS (known issues inside locked files, no sanction to fix yet)
+
+Findings inside a locked file that are compensated/unreachable today, recorded here so they
+ride along with the next sanctioned locked pass rather than being rediscovered cold:
+
+- **`gameStore.ts`'s `canBuyBonus` derived store hardcodes `$bet * 100`**, not the real
+  per-tier `MODE_COST` (`config/fsModes.ts`). Wrong for `super` (400x). Currently
+  compensated and unreachable via the live UI: `FeatureMenu.svelte`'s own `activateBuy()`
+  gate (`$balance < $betAmount * m.cost`) checks the correct per-mode cost and blocks
+  first, so `canBuyBonus`'s wrong threshold never actually gates a real purchase. Ratified
+  by Fable (2026-07-07, Wiring Integrity Audit follow-up): no lock lift for this alone;
+  fix opportunistically the next time `gameStore.ts` is under a sanctioned edit for
+  something else.
+
 ## Integer micros rule (mandatory, zero float tolerance)
 
 All currency maths uses integer micros. Never multiply dollars by a multiplier directly.
@@ -138,3 +152,12 @@ from the repository.
 the model and effort used, the approach taken, alternatives tried and rejected, files touched,
 and open threads; and every brief opens with a READ FIRST list of the repo documents that
 carry its context.
+
+**(j) Living handover (Fable-facing, ratified 2026-07-07 as standing).** The Fable handover
+document is a single living file per arc (`HANDOVER_<date>_Fable.md`, the date of the arc's
+first commit), extended with dated appended sections as the conversation continues, not a
+fresh document per update. Start a new document only when a genuinely new arc begins (a
+different major initiative, not just the next round of feedback on the current one). Each
+appended section states what was actioned since the prior verdict, quotes the driving
+instruction where load-bearing, and re-verifies every claim fresh rather than carrying
+forward a prior pass's numbers.

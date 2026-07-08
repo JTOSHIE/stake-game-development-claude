@@ -19,6 +19,8 @@
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { autoplayLimits, rgJurisdiction } from '../stores/responsibleGambling'
+  import { standingMode } from '../stores/betMode'
+  import { MODE_COST } from '../config/fsModes'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
@@ -158,8 +160,18 @@
     sfxVolume.set((+(e.currentTarget as HTMLInputElement).value) / 100)
   }
 
+  // Cost visibility (Fable 2026-07-07 item 0): while OVERBOOST is toggled ON,
+  // every spin is actually debited at 1.25x, not the nominal bet-level amount
+  // - the BET display must show that effective figure (the standard ante-bet
+  // pattern), not the base bet, or the HUD silently disagrees with the real
+  // wallet cost. Mirrors handleSpin's own cost computation exactly (App.svelte)
+  // so the displayed figure can never drift from what is actually charged.
+  $: effectiveCost = Math.round($betAmount * (MODE_COST[$standingMode] ?? 1) * CURRENCY_SCALE) / CURRENCY_SCALE
+  $: isOverboost = $standingMode === 'antelite'
+  $: isCruise    = $standingMode === 'cruise'
+
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: betLabel     = formatBalance(Math.round($betAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
   $: winLabel     = formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
@@ -252,7 +264,9 @@
     </span>
   </div>
 
-  <!-- BET - fixed box x 782, width 120, value right-aligned -->
+  <!-- BET - fixed box x 782, width 120, value right-aligned. Shows the
+       EFFECTIVE debit (bet x MODE_COST[standingMode]), not the nominal bet
+       level, whenever a standing/enhancer mode changes the real cost. -->
   <div class="fs-box fs-bet fs-plate" data-testid="hud-bet">
     <span class="fs-rail"></span>
     <span class="fs-face">
@@ -260,6 +274,19 @@
       <span class="fs-value gold">{betLabel}</span>
     </span>
   </div>
+
+  <!-- Mode badge anchor - a plain (unclipped) sibling matching the BET box's
+       own geometry exactly. .fs-plate's clip-path would otherwise clip any
+       child poking above the box, so this sits outside it, not inside. -->
+  {#if isOverboost || isCruise}
+    <div class="fs-bet-badge-anchor">
+      {#if isOverboost}
+        <span class="fs-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+      {:else}
+        <span class="fs-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+      {/if}
+    </div>
+  {/if}
 
   <!-- Stacked cyan bet arrows - own FIXED column x 906 (v3.3), independent of BET box -->
   <div class="fs-arrows" data-testid="bet-arrows">
@@ -427,6 +454,29 @@
   .fs-value.magenta{color:color-mix(in srgb,var(--sig-pink) 20%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-pink) 60%,transparent);}
   .fs-value.gold   {color:color-mix(in srgb,var(--sig-gold) 28%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-gold) 55%,transparent);}
   .fs-bet .fs-label,.fs-bet .fs-value{text-align:right;width:100%;}
+
+  /* Cost-visibility mode badge (Fable 2026-07-07 item 0): a plain (unclipped)
+     anchor matching the BET box's own fixed geometry exactly, sitting just
+     above it - kept OUTSIDE .fs-bet/.fs-plate deliberately, since .fs-plate's
+     clip-path would otherwise clip a child poking above its own bounds. */
+  .fs-bet-badge-anchor{
+    position:absolute; left:782px; top:557px; width:120px; height:16px;
+    z-index:61; display:flex; justify-content:flex-end; pointer-events:none;
+  }
+  .fs-mode-badge{
+    font-family:'Orbitron',system-ui,monospace; font-size:.5rem; font-weight:800;
+    letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+    padding:2px 7px; border-radius:999px;
+  }
+  .fs-mode-badge.overboost{
+    color:#1a0d02; background:var(--sig-orange);
+    box-shadow:0 0 8px color-mix(in srgb,var(--sig-orange) 55%,transparent);
+  }
+  .fs-mode-badge.cruise{
+    color:color-mix(in srgb,var(--sig-cyan) 30%,#fff);
+    background:rgba(0,240,255,.08);
+    border:1px solid color-mix(in srgb,var(--sig-cyan) 40%,transparent);
+  }
 
   /* WIN plate lit - win present. Rail + face bloom, value count-pulse. */
   .fs-win.lit{--sig:var(--sig-pink);}

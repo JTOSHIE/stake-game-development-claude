@@ -225,6 +225,86 @@ async function runCostIntegrityCheck(page) {
   return results
 }
 
+/**
+ * Cost-visibility gate (Fable 2026-07-07 item 2): whenever a standing/enhancer
+ * mode changes the real per-spin cost (OVERBOOST) or merely changes which
+ * maths curve plays (Cruise), the HUD BET box must show it - the correct
+ * mode badge, and for OVERBOOST the correct EFFECTIVE bet figure (bet x
+ * MODE_COST[mode]), never the nominal bet-level amount. 'normal' is checked
+ * too, asserting NEITHER badge shows (a regression there would be just as
+ * misleading as one missing when it should show).
+ */
+async function runCostVisibilityCheck(page) {
+  await waitForTestStores(page)
+  await page.evaluate((b) => { window.__testStores.betAmount.set(b) }, COST_CHECK_BET)
+  await dismissIntro(page)
+
+  const results = []
+  for (const m of MODE_COST_CHECK.filter((x) => x.kind !== 'buy')) {
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(120)
+    if (m.kind === 'standing') {
+      const selectBtn = page.locator(`[data-testid="standing-select-${m.menuId}"]`)
+      if (await selectBtn.count() > 0) await selectBtn.click()
+    } else if (m.kind === 'enhancer') {
+      await page.locator(`[data-testid="enhancer-toggle-${m.menuId}"]`).click()
+    }
+    await page.locator('[data-testid="feature-menu-close"]').click()
+    await page.waitForTimeout(150)
+
+    const overboostBadge = await page.locator('[data-testid="hud-overboost-badge"]').count() > 0
+    const cruiseBadge = await page.locator('[data-testid="hud-cruise-label"]').count() > 0
+    const expectBadge = m.menuId === 'overboost' ? 'overboost' : m.menuId === 'cruise' ? 'cruise' : 'none'
+    const badgeOk = expectBadge === 'overboost'
+      ? (overboostBadge && !cruiseBadge)
+      : expectBadge === 'cruise'
+        ? (cruiseBadge && !overboostBadge)
+        : (!overboostBadge && !cruiseBadge)
+
+    const betText = (await page.locator('[data-testid="hud-bet"] .fs-value').textContent()) ?? ''
+    const numeric = parseFloat(betText.replace(/[^0-9.]/g, ''))
+    const expectedMicros = Math.round(COST_CHECK_BET * m.cost * CURRENCY_SCALE)
+    const actualMicros = toMicros(numeric)
+    const figureOk = actualMicros === expectedMicros
+
+    results.push({ menuId: m.menuId, expectBadge, badgeOk, expectedMicros, actualMicros, figureOk, ok: badgeOk && figureOk })
+  }
+  // Reset to normal so this check never leaves standingMode engaged for a
+  // caller running further checks against the same page afterward.
+  await page.locator('[data-testid="feature-menu-button"]').click()
+  await page.waitForTimeout(120)
+  const normalSelect = page.locator('[data-testid="standing-select-normal"]')
+  if (await normalSelect.count() > 0) await normalSelect.click()
+  await page.locator('[data-testid="feature-menu-close"]').click()
+  return results
+}
+
+/**
+ * Buy-affordability boundary assert (Fable 2026-07-07 ruling on trace finding
+ * 2): a balance above the 100x Buy Overdrive cost but below the 400x NITRO
+ * OVERDRIVE cost must disable the super ACTIVATE button while leaving bonus
+ * enabled. This is what actually protects an unaffordable super buy from
+ * being reachable - FeatureMenu's own activateBuy() gate checks the real
+ * per-mode cost, not the locked gameStore.canBuyBonus (hardcoded to 100x,
+ * known-wrong for super - see CLAUDE.md's LOCKED_FILE_DEBTS - but compensated
+ * since it never gates the real click path).
+ */
+async function runBuyAffordabilityBoundaryCheck(page) {
+  await waitForTestStores(page)
+  await page.evaluate((b) => { window.__testStores.betAmount.set(b) }, COST_CHECK_BET)
+  // 150x the bet: affords the 100x bonus buy, not the 400x super buy.
+  await page.evaluate((v) => { window.__testStores.balance.set(v) }, COST_CHECK_BET * 150)
+  await dismissIntro(page)
+
+  await page.locator('[data-testid="feature-menu-button"]').click()
+  await page.waitForTimeout(150)
+  const bonusDisabled = await page.locator('[data-testid="activate-bonus"]').isDisabled()
+  const superDisabled = await page.locator('[data-testid="activate-super"]').isDisabled()
+  await page.locator('[data-testid="feature-menu-close"]').click()
+
+  return { balanceMultiple: 150, bonusDisabled, superDisabled, ok: !bonusDisabled && superDisabled }
+}
+
 // A concurrent session actively editing the same dev server can trigger HMR
 // component remounts mid-run; window.__testStores is briefly undefined while
 // the new instance's onMount re-populates it. Every access below waits for
@@ -466,6 +546,39 @@ async function run() {
     const costFailures = costResults.filter((r) => !r.ok)
     writeFileSync(join(OUT_DIR, 'cost-integrity-result.json'), JSON.stringify(costResults, null, 2))
 
+    log('')
+    log('=== COST-VISIBILITY GATE (HUD badge + effective bet figure) ===')
+    const visPage = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+    let visResults
+    try {
+      await visPage.goto(BASE_URL, { waitUntil: 'networkidle' })
+      await visPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      visResults = await runCostVisibilityCheck(visPage)
+    } finally {
+      await visPage.close()
+    }
+    for (const r of visResults) {
+      log(`  [${r.ok ? 'PASS' : 'FAIL'}] ${r.menuId} -> expect badge=${r.expectBadge} (${r.badgeOk ? 'ok' : 'WRONG'})` +
+          `, bet figure expected=${r.expectedMicros} actual=${r.actualMicros} (${r.figureOk ? 'ok' : 'WRONG'})`)
+    }
+    const visFailures = visResults.filter((r) => !r.ok)
+    writeFileSync(join(OUT_DIR, 'cost-visibility-result.json'), JSON.stringify(visResults, null, 2))
+
+    log('')
+    log('=== BUY-AFFORDABILITY BOUNDARY GATE (150x bet: affords bonus, not super) ===')
+    const boundaryPage = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+    let boundaryResult
+    try {
+      await boundaryPage.goto(BASE_URL, { waitUntil: 'networkidle' })
+      await boundaryPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      boundaryResult = await runBuyAffordabilityBoundaryCheck(boundaryPage)
+    } finally {
+      await boundaryPage.close()
+    }
+    log(`  [${boundaryResult.ok ? 'PASS' : 'FAIL'}] bonus disabled=${boundaryResult.bonusDisabled} (expect false),` +
+        ` super disabled=${boundaryResult.superDisabled} (expect true)`)
+    writeFileSync(join(OUT_DIR, 'buy-affordability-boundary-result.json'), JSON.stringify(boundaryResult, null, 2))
+
     const totalSpins = sessionA.totalSpins + sessionB.totalSpins
     const totalChecked = sessionA.roundResults.checked + sessionB.roundResults.checked
     const totalMismatches = [...sessionA.roundResults.totalMismatches, ...sessionB.roundResults.totalMismatches]
@@ -495,6 +608,8 @@ async function run() {
       avgFpsSessionB: sessionB.avgFps,
       avgFpsOverall: avgFps,
       costIntegrityFailures: costFailures.length,
+      costVisibilityFailures: visFailures.length,
+      buyAffordabilityBoundaryOk: boundaryResult.ok,
     }
 
     log('')
@@ -504,6 +619,8 @@ async function run() {
     if (totalDrifts.length) log('BALANCE DRIFTS:\n' + JSON.stringify(totalDrifts, null, 2))
     if (totalConsoleErrors.length) log('CONSOLE ERRORS:\n' + JSON.stringify(totalConsoleErrors, null, 2))
     if (costFailures.length) log('COST-INTEGRITY FAILURES:\n' + JSON.stringify(costFailures, null, 2))
+    if (visFailures.length) log('COST-VISIBILITY FAILURES:\n' + JSON.stringify(visFailures, null, 2))
+    if (!boundaryResult.ok) log('BUY-AFFORDABILITY BOUNDARY FAILURE:\n' + JSON.stringify(boundaryResult, null, 2))
 
     writeFileSync(join(OUT_DIR, 'soak-1-summary.json'), JSON.stringify(summary, null, 2))
 
@@ -515,6 +632,8 @@ async function run() {
     if (heapGrowthPct != null && Math.abs(heapGrowthPct) > 15) { log(`FAIL: heap growth ${heapGrowthPct.toFixed(1)}% (> 15%)`); fail = true }
     if (avgFps != null && avgFps < 55) { log(`FAIL: avg fps ${avgFps.toFixed(1)} (< 55)`); fail = true }
     if (costFailures.length > 0) { log(`FAIL: ${costFailures.length} cost-integrity mismatch(es) (see COST-INTEGRITY FAILURES above)`); fail = true }
+    if (visFailures.length > 0) { log(`FAIL: ${visFailures.length} cost-visibility mismatch(es) (see COST-VISIBILITY FAILURES above)`); fail = true }
+    if (!boundaryResult.ok) { log('FAIL: buy-affordability boundary gate (see BUY-AFFORDABILITY BOUNDARY FAILURE above)'); fail = true }
 
     if (fail) {
       log('QA SOAK: FAILURES DETECTED')
