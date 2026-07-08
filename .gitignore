@@ -31,3 +31,6 @@ __pycache__
 # AssetForge build venv (never committed)
 scripts/assets/.venv/
 scripts/assets/__pycache__/
+
+# gif_creator scratch (raw webm + palette, intermediate to the committed .gif)
+reports/screens/**/_video_*/

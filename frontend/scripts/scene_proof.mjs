@@ -63,8 +63,8 @@ async function run() {
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
     await page.goto(BASE_URL, { waitUntil: 'load' })
-    // The intro splash overlays the ControlBar, so dismiss it before the
-    // controls (and thus the spin button) render.
+    // The intro splash overlays the HUD, so dismiss it before the controls
+    // (and thus the spin button) render.
     await page.waitForSelector('[data-testid="intro-continue"]', { timeout: 20000 })
     await dismissIntroIfPresent(page)
     await page.waitForSelector('.game-frame', { timeout: 20000 })

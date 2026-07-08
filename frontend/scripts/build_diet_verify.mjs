@@ -12,6 +12,7 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { createServer } from 'node:net'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -28,16 +29,33 @@ const PRUNED_PREFIXES = [
 // assets/ui/ is prune-except-two; individual matches checked separately.
 const KEEP_UI = new Set(['win_pod_v3_active.png', 'win_pod_v3_idle.png'])
 
-function startPreview() {
+// A fixed port is a real collision risk on a host that runs other concurrent
+// sessions (same fix already applied in qa_soak.mjs) - ask the OS for a free
+// one immediately before spawning instead.
+async function getFreePort() {
+  return new Promise((resolvePromise, reject) => {
+    const srv = createServer()
+    srv.on('error', reject)
+    srv.listen(0, '127.0.0.1', () => {
+      const { port } = srv.address()
+      srv.close(() => resolvePromise(port))
+    })
+  })
+}
+
+function startPreview(port) {
   return new Promise((resolvePreview, reject) => {
-    const proc = spawn('npx', ['vite', 'preview', '--port', '4321', '--strictPort'], {
+    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
       cwd: join(__dirname, '..'),
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     let resolved = false
     const onData = (d) => {
       const s = d.toString()
-      if (!resolved && /Local:/.test(s)) {
+      // `vite preview`'s banner puts an ANSI reset code between "Local" and
+      // ":" (unlike `vite dev`'s), so /Local:/ never matches - just check
+      // for the word, or the printed URL, either is a reliable enough signal.
+      if (!resolved && (/Local/.test(s) || /localhost:\d+/.test(s))) {
         resolved = true
         resolvePreview(proc)
       }
@@ -50,8 +68,9 @@ function startPreview() {
 }
 
 async function run() {
-  const preview = await startPreview()
-  const baseUrl = 'http://localhost:4321'
+  const port = await getFreePort()
+  const preview = await startPreview(port)
+  const baseUrl = `http://localhost:${port}`
   const requests = []
   const failures = []
   const consoleErrors = []
@@ -89,7 +108,7 @@ async function run() {
     })
 
     await page.goto(baseUrl, { waitUntil: 'networkidle' })
-    await page.waitForSelector('.spin-btn', { timeout: 15000 })
+    await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
     const intro = page.locator('[data-testid="intro-continue"]')
     if (await intro.count() > 0 && await intro.isVisible().catch(() => false)) {
       await intro.click()
@@ -100,20 +119,27 @@ async function run() {
     // preview has no live RGS / curated mock-round data (see reports/qa
     // notes), so this exercises the buy request/response path and whatever
     // DOES render, not necessarily the full Overdrive walkthrough; that full
-    // chain's own assets are checked statically below.
-    const featureBtn = page.locator('[data-testid="feature-button"] button')
-    if (await featureBtn.count() > 0) {
-      await featureBtn.click()
-      await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
-      await page.locator('[data-testid="buy-confirm"]').click({ force: true })
-      await page.waitForTimeout(1500)
+    // chain's own assets are checked statically below. FeatureMenu replaced
+    // the old single-tier FeatureButton (2026-07-07): open the menu, then
+    // ACTIVATE the Buy Overdrive card, which opens the same confirm modal.
+    const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
+    if (await featureMenuBtn.count() > 0) {
+      await featureMenuBtn.click()
+      await page.waitForTimeout(150)
+      const activateBonus = page.locator('[data-testid="activate-bonus"]')
+      if (await activateBonus.count() > 0) {
+        await activateBonus.click()
+        await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
+        await page.locator('[data-testid="buy-confirm"]').click({ force: true })
+        await page.waitForTimeout(1500)
+      }
     }
 
     // Base spins
     for (let i = 0; i < 6; i++) {
-      if (!(await page.locator('.spin-btn').isEnabled().catch(() => false))) break
-      await page.locator('.spin-btn').click()
-      await page.waitForFunction(() => !document.querySelector('.spin-btn.spinning'), { timeout: 15000 })
+      if (!(await page.locator('[data-testid="spin-button"]').isEnabled().catch(() => false))) break
+      await page.locator('[data-testid="spin-button"]').click()
+      await page.waitForFunction(() => !document.querySelector('[data-testid="spin-button"].spinning'), { timeout: 15000 })
       await page.waitForTimeout(150)
     }
 

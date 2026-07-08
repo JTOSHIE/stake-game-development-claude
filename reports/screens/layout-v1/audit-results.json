@@ -3,49 +3,49 @@
     "1280x720-base": {
       "width": 1280,
       "height": 720,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "mobile-s": {
       "width": 320,
       "height": 568,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "mobile-m": {
       "width": 375,
       "height": 667,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "mobile-l": {
       "width": 425,
       "height": 812,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "popout-s": {
       "width": 400,
       "height": 225,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "popout-l": {
       "width": 800,
       "height": 450,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "desktop": {
       "width": 1200,
       "height": 675,
-      "boxCount": 5,
+      "boxCount": 10,
       "occlusionFailures": []
     },
     "1280x720-bonus": {
       "width": 1280,
       "height": 720,
-      "boxCount": 7,
+      "boxCount": 12,
       "occlusionFailures": []
     }
   },
@@ -95,10 +95,10 @@
         "width": 262
       },
       "measured": {
-        "x": 1000,
+        "x": 996,
         "y": 96,
         "width": 262,
-        "height": 366
+        "height": 376
       }
     }
   }
