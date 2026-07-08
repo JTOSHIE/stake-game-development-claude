@@ -31,7 +31,7 @@ checklist in the docs must be satisfied.
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
-| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for base/bonus (REPLAY_TEST_EVENTS.md), cruise/antelite/super still owed (see section 6); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy (2026-07-04), five-mode replay IDs pending |
+| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy |
 | 11 | High resolution asset link (Drive or Dropbox, public) | Owner | Pending | Pre-submission |
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
@@ -132,19 +132,20 @@ owner's next portal login: confirm team profile and payment details, and
 screenshot the submission form fields so this dossier can record any field not
 yet covered.
 
-**REVIEW_EVENTS pass (ratified by Fable, still owed, queued next after this
-copy update):** commit the statelessness artefact (a scan script plus its
-output summary, under `reports/qa/`) proving cruise/antelite/super are
-stateless from the actual shipped books, and the per-mode Bet Replay event IDs
-for cruise/antelite/super (base/bonus already have theirs in
-`REPLAY_TEST_EVENTS.md`).
+**REVIEW_EVENTS pass: DONE (2026-07-08).** Statelessness artefact committed
+(`scripts/review_events_stateless_scan.py` + `reports/qa/review_events_statelessness_2026-07-08.md`)
+proving cruise, antelite and super all independently stateless from the actual shipped
+books (regenerated under a temporary, owner-sanctioned lock exception and confirmed
+byte-identical, SHA-256, to the originally shipped FeatureMath v2 books - a pure
+reproduction, not a re-derivation). `REPLAY_TEST_EVENTS.md` now has real per-mode event
+IDs for all five modes (previously only base/bonus).
 
 ## 7. WHERE EACH ARTEFACT FINALISES
 Overdrive merge: maths files, PAR v2, facts sheet (done). FeatureMath v2: three
 more modes shipped into the locked package (done, 2026-07-07). Stage 2
 frontend: buy-tier UI with social overrides, jurisdiction flag, buy-tier
-replay, rules and paytable for all five modes (rules/paytable done; per-mode
-replay IDs for cruise/antelite/super still owed, see section 6).
+replay, rules and paytable for all five modes (done; per-mode replay IDs for
+cruise/antelite/super landed 2026-07-08, see section 6).
 AssetForge v2: all art including tile background, tile hero and provider
 logo. Motion Polish v2: final presentation. Build Diet v2: final dist
 and bundle. Compliance re-validation: evidence pack refreshed against the final
