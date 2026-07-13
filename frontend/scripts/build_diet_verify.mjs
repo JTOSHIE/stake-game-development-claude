@@ -3,13 +3,15 @@
 // Serves the ACTUAL pruned dist/ (via `vite preview`, not the dev server —
 // the dev server serves public/ unpruned) and drives a headless session
 // (base spins plus a bonus buy) capturing every network request, asserting
-// zero 404s and zero requests into any pruned legacy path.
+// zero 404s and zero requests into any pruned legacy path. Also asserts the
+// built dist/ directory's total size stays under the 25MB budget (JOB 4,
+// 2026-07-13 - the audio-bearing bundle's first re-verification).
 //
 // Run (from frontend/, after `npm run build`): npx tsx scripts/build_diet_verify.mjs
 
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
+import { mkdirSync, writeFileSync, existsSync, statSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
@@ -17,6 +19,18 @@ import { createServer } from 'node:net'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
 mkdirSync(OUT_DIR, { recursive: true })
+
+const DIST_DIR = join(__dirname, '..', 'dist')
+const DIST_BUDGET_BYTES = 25 * 1024 * 1024
+
+function getDirSizeBytes(dir) {
+  let total = 0
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name)
+    total += entry.isDirectory() ? getDirSizeBytes(full) : statSync(full).size
+  }
+  return total
+}
 
 // Paths pruned from dist by vite.config.ts's pruneLegacyAssets — a request
 // whose path starts with any of these is a hard failure.
@@ -149,6 +163,8 @@ async function run() {
     preview.kill()
   }
 
+  const distSizeBytes = getDirSizeBytes(DIST_DIR)
+
   const summary = {
     totalRequests: requests.length,
     notFound: requests.filter((r) => r.status === 404).length,
@@ -157,16 +173,24 @@ async function run() {
     consoleErrors: consoleErrors.length,
     failures,
     consoleErrorMessages: consoleErrors,
+    distSizeBytes,
+    distSizeMB: Math.round((distSizeBytes / (1024 * 1024)) * 100) / 100,
+    distBudgetMB: DIST_BUDGET_BYTES / (1024 * 1024),
+    distUnderBudget: distSizeBytes < DIST_BUDGET_BYTES,
   }
 
   writeFileSync(join(OUT_DIR, 'build-diet-network-log.json'), JSON.stringify({ requests, summary }, null, 2))
   console.log(JSON.stringify(summary, null, 2))
 
-  if (summary.notFound > 0 || summary.failed > 0 || summary.prunedPathHits > 0 || summary.consoleErrors > 0) {
+  if (
+    summary.notFound > 0 || summary.failed > 0 || summary.prunedPathHits > 0 || summary.consoleErrors > 0 ||
+    !summary.distUnderBudget
+  ) {
     console.error('BUILD DIET VERIFY: FAILURES DETECTED')
     process.exit(1)
   }
-  console.log('BUILD DIET VERIFY: ALL CHECKS PASS (zero 404s, zero pruned-path requests, zero console errors)')
+  console.log(`BUILD DIET VERIFY: ALL CHECKS PASS (zero 404s, zero pruned-path requests, zero console errors, ` +
+    `dist ${summary.distSizeMB}MB < ${summary.distBudgetMB}MB budget)`)
 }
 
 run().catch((err) => {
