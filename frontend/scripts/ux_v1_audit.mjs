@@ -22,6 +22,21 @@ mkdirSync(OUT_DIR, { recursive: true })
 
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
+// Fresh Playwright contexts have empty storage, so the once-per-session intro
+// splash (a full-screen modal) shows on every page and intercepts clicks
+// unless dismissed. (2026-07-08 hygiene pass: this script predates the intro
+// splash and never accounted for it, unlike layout_v1_audit.mjs's own copy of
+// this same helper.)
+async function dismissIntroIfPresent(page) {
+  const btn = page.locator('[data-testid="intro-continue"]')
+  try {
+    if (await btn.count() > 0 && await btn.isVisible()) {
+      await btn.click()
+      await page.waitForTimeout(120)
+    }
+  } catch {}
+}
+
 const COMPLIANCE_VIEWPORTS = [
   { name: 'mobile-s', width: 320, height: 568 },
   { name: 'mobile-m', width: 375, height: 667 },
@@ -34,18 +49,21 @@ const COMPLIANCE_VIEWPORTS = [
 // Text-bearing HUD selectors checked for pairwise occlusion, plus the frame.
 // AMENDMENT v3.2: TURBO/SPIN/AUTOPLAY/BALANCE/WIN/BET/arrows are all direct
 // stage-level siblings now (no longer nested inside .hud-panel).
+// 2026-07-08 hygiene pass: class names updated to the current B1 HUD reskin
+// (.fs-turbo/.fs-menu/etc, testid-based where no stable class exists) and the
+// FeatureButton testid replaced with FeatureMenu's entry.
 const TEXT_SELECTORS = [
   '.logo-box',
   '.error-banner',
-  '.turbo-btn',
-  '.hamburger-btn',
-  '.balance-box',
-  '.win-box',
-  '.bet-box',
-  '.bet-arrows',
-  '.spin-btn',
+  '.fs-turbo',
+  '.fs-menu',
+  '[data-testid="hud-balance"]',
+  '[data-testid="hud-win"]',
+  '[data-testid="hud-bet"]',
+  '[data-testid="bet-arrows"]',
+  '[data-testid="spin-button"]',
   '.autoplay-wrapper',
-  '[data-testid="feature-button"] .feature-label',
+  '[data-testid="feature-menu-entry"] .fm-entry-label',
   '[data-testid="win-banner"]',
   '[data-testid="bonus-instrument-column"] .plate',
   '[data-testid="odometer"]',
@@ -116,7 +134,8 @@ async function run() {
   for (const vp of [{ name: '1280x720', width: 1280, height: 720 }, ...COMPLIANCE_VIEWPORTS]) {
     const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } })
     await page.goto(BASE_URL, { waitUntil: 'networkidle' })
-    await page.waitForSelector('.spin-btn', { timeout: 15000 })
+    await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+    await dismissIntroIfPresent(page)
     await loadStressValues(page)
 
     const boxes = await collectBoxes(page)
@@ -125,7 +144,7 @@ async function run() {
     if (failures.length) anyFail = true
 
     // Verify the bet arrows are visible AND clickable (not just present).
-    const arrows = page.locator('.bet-arrows .bet-arrow')
+    const arrows = page.locator('[data-testid="bet-arrows"] .fs-arrow')
     const arrowCount = await arrows.count()
     let arrowsClickable = arrowCount === 2
     for (let i = 0; i < arrowCount; i++) {
@@ -137,14 +156,14 @@ async function run() {
     await page.screenshot({ path: join(OUT_DIR, `hud-stress-${vp.name}.png`) })
 
     if (vp.name === '1280x720') {
-      const panel = await page.locator('.hud-panel').boundingBox()
-      const spin = await page.locator('.spin-btn').boundingBox()
-      const turbo = await page.locator('.turbo-btn').boundingBox()
+      const panel = await page.locator('[data-testid="hud-panel"]').boundingBox()
+      const spin = await page.locator('[data-testid="spin-button"]').boundingBox()
+      const turbo = await page.locator('.fs-turbo').boundingBox()
       const autoplay = await page.locator('.autoplay-wrapper').boundingBox()
-      const balanceBox = await page.locator('.balance-box').boundingBox()
-      const winBox = await page.locator('.win-box').boundingBox()
-      const betBox = await page.locator('.bet-box').boundingBox()
-      const betArrows = await page.locator('.bet-arrows').boundingBox()
+      const balanceBox = await page.locator('[data-testid="hud-balance"]').boundingBox()
+      const winBox = await page.locator('[data-testid="hud-win"]').boundingBox()
+      const betBox = await page.locator('[data-testid="hud-bet"]').boundingBox()
+      const betArrows = await page.locator('[data-testid="bet-arrows"]').boundingBox()
       const centre = (b) => ({ x: b.x + b.width / 2, y: b.y + b.height / 2 })
       results.position = {
         hudPanel:   { expected: { x: 296, y: 560, width: 688, height: 88 }, measured: panel },
@@ -165,14 +184,15 @@ async function run() {
   {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
     await page.goto(BASE_URL, { waitUntil: 'networkidle' })
-    await page.waitForSelector('.spin-btn', { timeout: 15000 })
-    await page.locator('.hamburger-btn').click()
+    await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+    await dismissIntroIfPresent(page)
+    await page.locator('.fs-menu').click()
     await page.getByRole('menuitem', { name: /paytable/i }).click()
-    await page.waitForSelector('.modal-panel', { timeout: 5000 })
+    await page.waitForSelector('.fs-pt-panel', { timeout: 5000 })
     await page.waitForTimeout(300)
     await page.screenshot({ path: join(OUT_DIR, 'paytable-top.png') })
 
-    await page.locator('.modal-body').evaluate((el) => { el.scrollTop = el.scrollHeight })
+    await page.locator('.fs-pt-body').evaluate((el) => { el.scrollTop = el.scrollHeight })
     await page.waitForTimeout(200)
     await page.screenshot({ path: join(OUT_DIR, 'paytable-scrolled.png') })
     await page.close()
@@ -182,9 +202,13 @@ async function run() {
   {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
     await page.goto(`${BASE_URL}/?mockCategory=wincap`, { waitUntil: 'networkidle' })
-    await page.waitForSelector('[data-testid="feature-button"] button', { timeout: 15000 })
+    await page.waitForSelector('[data-testid="feature-menu-button"]', { timeout: 15000 })
+    await dismissIntroIfPresent(page)
 
-    await page.locator('[data-testid="feature-button"] button').click()
+    // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07).
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(150)
+    await page.locator('[data-testid="activate-bonus"]').click()
     await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
     await page.locator('[data-testid="buy-confirm"]').click()
 
@@ -194,18 +218,22 @@ async function run() {
     await page.screenshot({ path: join(OUT_DIR, 'wincap-splash.png') })
     const splashVisible = await page.locator('.max-win-overlay').isVisible()
 
-    // Collect — the full round presentation should now play.
+    // Collect — the full round presentation should now play. :visible skips
+    // the persistent hidden warm mount's duplicate testid (same pattern
+    // layout_v1_audit.mjs already uses for this exact element).
     await page.locator('.collect-btn').click()
-    await page.waitForSelector('[data-testid="freespins-overlay"]', { timeout: 10000 })
+    await page.waitForSelector('[data-testid="freespins-overlay"]:visible', { timeout: 10000 })
     await page.waitForTimeout(1200)
     await page.screenshot({ path: join(OUT_DIR, 'wincap-presentation.png') })
-    const presentationVisible = await page.locator('[data-testid="freespins-overlay"]').isVisible()
+    const presentationVisible = await page.locator('[data-testid="freespins-overlay"]:visible').isVisible()
 
-    // Wait for it to reach the end/summary phase, then screenshot.
-    await page.waitForSelector('.fs-end', { timeout: 20000 })
+    // Wait for it to reach the end/summary phase, then screenshot. :visible
+    // skips the persistent hidden warm mount's duplicate (same pattern as
+    // freespins-overlay above).
+    await page.waitForSelector('.fs-end:visible', { timeout: 20000 })
     await page.waitForTimeout(300)
     await page.screenshot({ path: join(OUT_DIR, 'wincap-summary.png') })
-    const summaryVisible = await page.locator('.fs-end').isVisible()
+    const summaryVisible = await page.locator('.fs-end:visible').isVisible()
 
     results.wincapFlow = { splashVisible, presentationVisible, summaryVisible }
     if (!splashVisible || !presentationVisible || !summaryVisible) anyFail = true

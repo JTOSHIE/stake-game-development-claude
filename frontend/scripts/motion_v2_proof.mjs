@@ -22,7 +22,7 @@ mkdirSync(OUT_DIR, { recursive: true })
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
 async function waitSpinDone(page, timeout = 15000) {
-  await page.waitForFunction(() => !document.querySelector('.spin-btn.spinning'), { timeout })
+  await page.waitForFunction(() => !document.querySelector('[data-testid="spin-button"].spinning'), { timeout })
 }
 
 /** Every fresh browser context has its own sessionStorage, so the once-per-
@@ -40,8 +40,12 @@ async function dismissIntroIfPresent(page) {
 async function runFpsGate(browser) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
   await page.goto(BASE_URL, { waitUntil: 'networkidle' })
-  await page.waitForSelector('.spin-btn', { timeout: 15000 })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
   await dismissIntroIfPresent(page)
+  // Ensure the 100x bonus buy at spin #10 stays affordable regardless of how
+  // the preceding 9 base spins land.
+  await page.waitForFunction(() => window.__testStores?.balance, { timeout: 8000 })
+  await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
 
   await page.evaluate(() => {
     window.__frameTimes = []
@@ -58,7 +62,10 @@ async function runFpsGate(browser) {
   // in-feature frames are sampled).
   for (let i = 0; i < 20; i++) {
     if (i === 9) {
-      await page.locator('[data-testid="feature-button"] button').click()
+      // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07).
+      await page.locator('[data-testid="feature-menu-button"]').click()
+      await page.waitForTimeout(150)
+      await page.locator('[data-testid="activate-bonus"]').click()
       await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
       await page.locator('[data-testid="buy-confirm"]').click()
       // :visible targets the real entry, not the persistent hidden warm mount
@@ -73,7 +80,7 @@ async function runFpsGate(browser) {
         await page.waitForTimeout(300)
       }
     } else {
-      await page.locator('.spin-btn').click()
+      await page.locator('[data-testid="spin-button"]').click()
       await waitSpinDone(page)
     }
   }
@@ -97,10 +104,13 @@ async function runFpsGate(browser) {
 }
 
 // ── Gate: occlusion re-check at 1280x720 ─────────────────────────────────────
+// 2026-07-08 hygiene pass: class names updated to the current B1 HUD reskin
+// and the FeatureButton testid replaced with FeatureMenu's entry.
 const TEXT_SELECTORS = [
-  '.logo-box', '.error-banner', '.turbo-btn', '.hamburger-btn',
-  '.balance-box', '.win-box', '.bet-box', '.bet-arrows', '.spin-btn', '.autoplay-wrapper',
-  '[data-testid="feature-button"] .feature-label', '[data-testid="win-banner"]',
+  '.logo-box', '.error-banner', '.fs-turbo', '.fs-menu',
+  '[data-testid="hud-balance"]', '[data-testid="hud-win"]', '[data-testid="hud-bet"]',
+  '[data-testid="bet-arrows"]', '[data-testid="spin-button"]', '.autoplay-wrapper',
+  '[data-testid="feature-menu-entry"] .fm-entry-label', '[data-testid="win-banner"]',
   '[data-testid="bonus-instrument-column"] .plate', '[data-testid="odometer"]',
 ]
 const FRAME_SELECTOR = '.game-frame'
@@ -110,7 +120,7 @@ function intersects(a, b) {
 async function runOcclusionGate(browser) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
   await page.goto(BASE_URL, { waitUntil: 'networkidle' })
-  await page.waitForSelector('.spin-btn', { timeout: 15000 })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
   await dismissIntroIfPresent(page)
   await page.waitForTimeout(500)
   const boxes = []
@@ -150,7 +160,7 @@ async function captureGif(browser, name, widthPx, action, { tailSeconds } = {}) 
   })
   const page = await context.newPage()
   await page.goto(BASE_URL, { waitUntil: 'networkidle' })
-  await page.waitForSelector('.spin-btn', { timeout: 15000 })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
   await dismissIntroIfPresent(page)
   await action(page)
   const video = page.video()
@@ -210,7 +220,7 @@ async function run() {
   const gifResults = {}
 
   gifResults.spinStagger = await captureGif(browser, 'spin-stagger', 360, async (page) => {
-    await page.locator('.spin-btn').click()
+    await page.locator('[data-testid="spin-button"]').click()
     await waitSpinDone(page)
     await page.waitForTimeout(300)
   })
@@ -218,7 +228,7 @@ async function run() {
   gifResults.winBloom = await captureGif(browser, 'win-bloom', 360, async (page) => {
     let saw = false
     for (let i = 0; i < 10 && !saw; i++) {
-      await page.locator('.spin-btn').click()
+      await page.locator('[data-testid="spin-button"]').click()
       await waitSpinDone(page)
       saw = (await page.locator('.symbol-cell.plate-bloom').count()) > 0
     }
@@ -226,7 +236,10 @@ async function run() {
   }, { tailSeconds: 4 }) // search phase length varies — keep just the winning spin
 
   gifResults.overdriveTransition = await captureGif(browser, 'overdrive-transition', 360, async (page) => {
-    await page.locator('[data-testid="feature-button"] button').click()
+    // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07).
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(150)
+    await page.locator('[data-testid="activate-bonus"]').click()
     await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
     await page.locator('[data-testid="buy-confirm"]').click()
     await page.waitForSelector('[data-testid="overdrive-entry"]', { timeout: 8000 })

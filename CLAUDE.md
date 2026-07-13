@@ -50,6 +50,17 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   fix opportunistically the next time `gameStore.ts` is under a sanctioned edit for
   something else.
 
+### Reference / prototype branches (not on main)
+
+Not-for-release maths prototypes and forks live on their own branch, never on `main` -
+a second maths package sitting beside the shipping one is exactly the stale-artefact
+misread that has previously cost a star at external audit. Current pointers:
+
+- **Collection Meter** (stateless coin-collect bonus prototype) - `claude/collect-prototype`.
+  Relocated off `main` 2026-07-08 (hygiene pass, ratified by Fable); independently
+  RTP/SD/hit-rate-verified findings in that branch's `games/future_spinner_collect/COLLECT_PROTOTYPE_FINDINGS.md`.
+  Reads as a LUMEN mechanic or a Future Spinner v1.1 post-launch mode, not a pre-submission item.
+
 ## Integer micros rule (mandatory, zero float tolerance)
 
 All currency maths uses integer micros. Never multiply dollars by a multiplier directly.
@@ -161,3 +172,9 @@ different major initiative, not just the next round of feedback on the current o
 appended section states what was actioned since the prior verdict, quotes the driving
 instruction where load-bearing, and re-verifies every claim fresh rather than carrying
 forward a prior pass's numbers.
+
+**(k) Explicit-paths commits.** Every commit stages explicit file paths, never `git add -A`
+or `git add .` - review `git status` after any broad staging step and stage each intended
+path by name. This has been followed as informal discipline throughout; recorded here as a
+standing convention (2026-07-08 hygiene pass) so it does not need re-establishing per
+session.

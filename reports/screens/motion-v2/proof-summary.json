@@ -1,12 +1,31 @@
 {
   "fps": {
-    "sampleCount": 7394,
-    "avgFrameMs": 16.68688125507168,
-    "avgFps": 59.92731563880865,
+    "sampleCount": 1936,
+    "avgFrameMs": 16.804338842975206,
+    "avgFps": 59.50844060836315,
+    "p95FrameMs": 17.600000000000364,
+    "p99FrameMs": 18.5,
     "longFrameCount": 1,
     "longFrames": [
       150
     ]
+  },
+  "anticipationFloor": {
+    "rows": {
+      "normal": {
+        "scatterHoldMs": 900,
+        "nearMissHoldMs": 600
+      },
+      "turbo": {
+        "scatterHoldMs": 450,
+        "nearMissHoldMs": 300
+      },
+      "super": {
+        "scatterHoldMs": 300,
+        "nearMissHoldMs": 300
+      }
+    },
+    "pass": true
   },
   "occlusion": {
     "boxCount": 11,
@@ -14,16 +33,16 @@
   },
   "gifs": {
     "spinStagger": {
-      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/spin-stagger.gif",
-      "sizeMb": 1.025404930114746
+      "gifPath": "/Users/jt/math-sdk-hygiene/reports/screens/motion-v2/spin-stagger.gif",
+      "sizeMb": 0.45406246185302734
     },
     "winBloom": {
-      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/win-bloom.gif",
-      "sizeMb": 1.0481367111206055
+      "gifPath": "/Users/jt/math-sdk-hygiene/reports/screens/motion-v2/win-bloom.gif",
+      "sizeMb": 0.8170785903930664
     },
     "overdriveTransition": {
-      "gifPath": "/Users/jt/math-sdk/reports/screens/motion-v2/overdrive-transition.gif",
-      "sizeMb": 0.6729602813720703
+      "gifPath": "/Users/jt/math-sdk-hygiene/reports/screens/motion-v2/overdrive-transition.gif",
+      "sizeMb": 1.0718021392822266
     }
   }
 }

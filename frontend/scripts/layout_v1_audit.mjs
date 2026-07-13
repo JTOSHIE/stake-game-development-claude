@@ -48,17 +48,21 @@ const COMPLIANCE_VIEWPORTS = [
 ]
 
 // Text-bearing HUD selectors checked for pairwise occlusion, plus the frame.
+// (2026-07-08 hygiene pass: the old .hud-panel/.turbo-btn/etc class names and
+// the FeatureButton testid are stale since the B1 HUD reskin - fs-turbo/
+// fs-menu/etc are siblings of .fs-panel, not descendants, so these are now
+// standalone selectors rather than `.hud-panel .x` descendant selectors.)
 const TEXT_SELECTORS = [
   '.logo-box',
   '.error-banner',
-  '.hud-panel .turbo-btn',
-  '.hud-panel .hamburger-btn',
-  '.hud-panel .balance-box',
-  '.hud-panel .win-box',
-  '.hud-panel .bet-box',
-  '.spin-btn',
+  '.fs-turbo',
+  '.fs-menu',
+  '[data-testid="hud-balance"]',
+  '[data-testid="hud-win"]',
+  '[data-testid="hud-bet"]',
+  '[data-testid="spin-button"]',
   '.autoplay-wrapper',
-  '[data-testid="feature-button"] .feature-label',
+  '[data-testid="feature-menu-entry"] .fm-entry-label',
   '[data-testid="win-banner"]',
   '[data-testid="bonus-instrument-column"] .plate',
   '[data-testid="odometer"]',
@@ -129,8 +133,8 @@ async function run() {
 
     // Position audit — only meaningful at the 1280x720 reference (S=1)
     if (vp.name === '1280x720-base') {
-      const panel = await page.locator('.hud-panel').boundingBox()
-      const spin = await page.locator('.spin-btn').boundingBox()
+      const panel = await page.locator('[data-testid="hud-panel"]').boundingBox()
+      const spin = await page.locator('[data-testid="spin-button"]').boundingBox()
       const logo = await page.locator('.logo-box').boundingBox()
       const spinCentre = { x: spin.x + spin.width / 2, y: spin.y + spin.height / 2 }
       results.position = {
@@ -151,7 +155,11 @@ async function run() {
     await dismissIntroIfPresent(page)
     await page.waitForTimeout(600)
 
-    await page.locator('[data-testid="feature-button"] button').click()
+    // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07):
+    // open the menu, then ACTIVATE the Buy Overdrive card.
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(150)
+    await page.locator('[data-testid="activate-bonus"]').click()
     await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
     await page.locator('[data-testid="buy-confirm"]').click()
 
