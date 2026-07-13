@@ -34,3 +34,7 @@ scripts/assets/__pycache__/
 
 # gif_creator scratch (raw webm + palette, intermediate to the committed .gif)
 reports/screens/**/_video_*/
+
+# AudioForge build venv (never committed)
+tools/audio_forge/.venv/
+tools/audio_forge/__pycache__/

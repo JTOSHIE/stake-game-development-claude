@@ -282,3 +282,112 @@ integrity audit now, then dossier and copy update, then hygiene pass"):**
 **Next up, per your sequencing:** the dossier and paytable copy update, unless you'd
 rather reorder given the standingMode fix landed same-day as the audit itself. Let us know.
 
+---
+
+## 9. Update — dossier/copy update, REVIEW_EVENTS pass, hygiene pass (2026-07-08, PRs #50/#51/#52)
+
+Everything from your 2026-07-07 verdicts (`FS_FableVerdicts_2026-07-07_Prompt.md` and
+`FS_FableVerdicts2_2026-07-07_Prompt.md`, both saved verbatim) is now done, in your own
+stated sequencing order. Two of the three PRs below are merged; the third is open, still
+awaiting the owner's merge.
+
+### 9a. Dossier and paytable five-mode copy update — PR #50, merged 2026-07-08
+
+`SUBMISSION_DOSSIER.md` and the in-game paytable copy updated to describe all five modes
+(base/cruise/antelite/bonus/super) instead of the old two-mode description, plus OVERBOOST
+HUD visibility (the standingMode fix from section 8 needed a visible on-screen indicator
+so a player can see OVERBOOST is active, not just feel the cost) and reel mode defaulted
+to `drop` (the owner's eye-call from section 6, now actioned). No maths changes; no locked
+files touched.
+
+### 9b. REVIEW_EVENTS pass — PR #51, merged 2026-07-08
+
+Your verdict item 2's standing directive, closed:
+
+- **Statelessness proof extended to cruise and antelite.** Previously only `super` had
+  been independently proven stateless from its actual shipped books (the manual analysis
+  during FeatureMath v2); cruise/antelite had only been ported verbatim from an
+  already-validated library, not re-checked this specific way. Generalised that one-off
+  analysis into a committed, reusable script
+  (`scripts/review_events_stateless_scan.py`): every round's Overdrive meter is set once
+  at free-spin start and only ever increments afterward, so the first winning free spin's
+  `meta.globalMult` in every round equals that round's starting meter - the distinct set
+  of these values across 100,000 rounds collapsing to a single constant proves both
+  statelessness (no drift) and correctness (constant matches `gamestate.py`'s coded
+  expectation). Result: cruise `{1}` (6,100/100,000 sampled), antelite `{1}`
+  (24,249/100,000), super `{5}` (99,998/100,000) - all three **STATELESS**, matching
+  expectation exactly. Full report: `reports/qa/review_events_statelessness_2026-07-08.md`.
+- **Books regenerated under a properly-scoped lock exception** (you named the deny lines,
+  we lifted them for the session only, restored before commit, verified-empty diff) via
+  `run.py`'s `run_sims` path only - never the stochastic optimiser - so the shipped
+  `lookUpTable_*_0.csv` files could not drift. Confirmed byte-for-byte unchanged before and
+  after, and the three regenerated `books_*.jsonl.zst` SHA-256 hashes matched the
+  already-committed PAR-sheet-recorded hashes exactly. This is a pure read/analysis pass
+  over already-shipped maths, not new maths.
+- **Per-mode Bet Replay event IDs** added to `REPLAY_TEST_EVENTS.md` for all five modes
+  (previously only base/bonus had recorded IDs).
+
+### 9c. Hygiene pass — PR #52, open, awaiting merge
+
+Your verdict's full expanded scope (Collection Meter relocation, dead component removal,
+the five stale-selector scripts, HANDOVER supersession, prompt archive, explicit-paths
+convention, QA log archive) - all seven items done:
+
+- **Collection Meter relocated off `main`** to `claude/collect-prototype` (branch created
+  from the exact pre-removal commit, verified via `git ls-tree` to carry the full
+  directory before removal here) - closing the stale-second-maths-package risk you flagged
+  by name. `CLAUDE.md` now carries a permanent "Reference / prototype branches" pointer.
+- **`FeatureButton.svelte` and `ControlBar.svelte` deleted** - confirmed zero live imports
+  (only historical comments), clean build afterward. `ControlBar.svelte`'s duplicate
+  `isAutoPlay.set(true)` call site (the one your Wiring Integrity Audit trace had to
+  explicitly separate from the live path rather than fail on) is now gone entirely rather
+  than merely flagged.
+- **Five QA/proof scripts de-rotted and re-verified live**, not just statically edited -
+  each actually run to completion against a live dev server after fixing:
+  `build_diet_verify.mjs`, `layout_v1_audit.mjs`, `ux_v1_audit.mjs`, `reel_v3_proof.mjs`,
+  `motion_v2_proof.mjs`. All had the same underlying stale-selector rot (`.spin-btn` ->
+  `[data-testid="spin-button"]`, the old FeatureButton click flow -> the current
+  FeatureMenu menu-then-ACTIVATE flow) from two historical UI changes (the B1 HUD reskin
+  and the FeatureButton->FeatureMenu migration) that had gone unnoticed since neither had
+  been run since.
+- **Two new findings surfaced by actually running the scripts, not silently absorbed:**
+  - A `vite preview` startup-detection bug in `build_diet_verify.mjs` - its regex
+    (`/Local:/`) never matched because (unlike `vite dev`'s banner) `vite preview`
+    inserts an ANSI reset code between "Local" and ":". Fixed; also hardened to request a
+    free port dynamically rather than a hardcoded one.
+  - `reel_v3_proof.mjs` and `motion_v2_proof.mjs` **each show exactly one frame over the
+    100ms hard gate** (149ms and 150ms respectively, out of ~2,000-2,300 samples), landing
+    at almost the same magnitude in both - consistent with one shared, likely-transient
+    hitch at the bonus-buy transaction moment rather than two independent regressions.
+    Average fps passes comfortably in both (~59.5), so this is not a functional failure,
+    but it is new information this pass surfaced that did not exist before (the scripts
+    could not previously run at all) - flagged for your attention, not chased further here
+    (would need profiling, out of scope for a selector-fix pass).
+  - Also flagged, not fixed: `layout_v1_audit.mjs`'s recorded "expected" position values
+    are stale (pre-B1-reskin); only occlusion is gated so this is not a functional
+    failure, but the reference numbers would mislead a human comparing them directly.
+- **HANDOVER supersession, prompt archive, QA log archive, explicit-paths convention** -
+  all repo-hygiene housekeeping per your scope, each with an explanatory README where a
+  human might otherwise wonder why files moved. Detail:
+  `reports/archive/2026-07-08_hygiene-pass.md`.
+
+Full verification (build, svelte-check, all four test suites, wallet-float scan,
+autoplay-confirm gate, font-CDN compliance grep, `validate_math.py`, locked-file diff) run
+fresh for this pass and all clean - detail in the same report.
+
+## 10. What we would like from you
+
+1. **The two long-frame findings** (section 9c) - worth a profiling pass now, or fine to
+   let ride until audio ships and a full QA re-soak happens anyway?
+2. **`layout_v1_audit.mjs`'s stale position-expectation values** (section 9c) - worth a
+   dedicated refresh pass, or low enough priority to leave as a known-flagged gap?
+3. **PR #52 itself** - any objection before the owner merges the hygiene pass as-is?
+4. Confirming our read of your sequencing: with the dossier/copy update, REVIEW_EVENTS
+   pass and hygiene pass all now done, is there anything still open from your 2026-07-07
+   verdicts that we have not covered, or does this close out that round entirely?
+5. Anything new since - the owner will collect your feedback and relay it back in a single
+   input, same as every round so far.
+
+The owner will collect your feedback and relay it back in a single input, same as last
+time. Thank you.
+

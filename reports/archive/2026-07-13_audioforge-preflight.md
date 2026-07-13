@@ -166,10 +166,3 @@ best-effort placeholder.
   exist, including whether `apg_scale=0.0` vs the default `1.0` is audible; PR #54 still
   needs the owner's merge decision (both the original build and this amendment are on the
   same branch/PR).
-
-**Note (2026-07-13, PR #52 conflict resolution):** the hygiene pass (PR #52, originally
-2026-07-08) was merged into `main` after resolving a two-file conflict (`.gitignore` -
-union of both sides' ignore lines; this file - `main`'s version taken wholesale, since
-the hygiene pass's own session report is preserved at
-`reports/archive/2026-07-08_hygiene-pass.md` and nothing is lost). See that PR/branch for
-the hygiene pass's own full report.

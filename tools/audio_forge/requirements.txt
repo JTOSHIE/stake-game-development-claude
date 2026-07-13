@@ -1,0 +1,105 @@
+# AudioForge v1 - pinned to a verified-working install (2026-07-13, AUDIOFORGE pre-flight
+# amendment), confirmed end-to-end by real generation on stabilityai/stable-audio-3-medium.
+#
+# Requires Python 3.10 specifically. The PyPI release (stable-audio-tools 0.0.19) predates
+# Stable Audio 3's architecture and fails at model-load time with `TypeError:
+# TransformerBlock.__init__() got an unexpected keyword argument 'local_add_cond_dim'`.
+# stable-audio-tools' GitHub main branch has the fix but pins
+# `requires-python = ">=3.10,<3.11"` in its pyproject.toml. 3.11/3.12/3.14 were all tried
+# and rejected - see tools/audio_forge/README.md's "Why Python 3.10" section for the full
+# story, including an earlier, now-obsolete Python-3.11 + PyPI-0.0.19 + pandas/setuptools
+# saga this install no longer needs at all (GitHub main's base install has no pandas
+# dependency - it's train-extras-only there).
+#
+# Build the venv with:
+#   brew install python@3.10
+#   /opt/homebrew/opt/python@3.10/libexec/bin/python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# stable-audio-tools is pinned to the exact commit this was verified against (below) via
+# pip's `name @ git+url@commit` syntax - installing from GitHub main directly, not PyPI,
+# since PyPI has not published a Stable-Audio-3-compatible release as of this pass.
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.1
+aiosignal==1.4.0
+alias-free-torch==0.0.6
+annotated-doc==0.0.4
+anyio==4.14.2
+async-timeout==5.0.1
+attrs==26.1.0
+certifi==2026.6.17
+cffi==2.1.0
+charset-normalizer==3.4.9
+click==8.4.2
+dill==0.4.1
+einops==0.8.2
+einops-exts==0.0.4
+einx==0.4.3
+exceptiongroup==1.3.1
+filelock==3.29.7
+frozendict==2.4.7
+frozenlist==1.8.0
+fsspec==2026.6.0
+ftfy==6.3.1
+h11==0.16.0
+hf-xet==1.5.1
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==1.23.0
+idna==3.18
+importlib-resources==5.12.0
+Jinja2==3.1.6
+lightning-utilities==0.15.3
+markdown-it-py==4.2.0
+MarkupSafe==3.0.3
+mdurl==0.1.2
+mpmath==1.3.0
+multidict==6.7.1
+networkx==3.4.2
+nnaudio==0.3.4
+numpy==2.2.6
+packaging==26.2
+pillow==12.3.0
+propcache==0.5.2
+pycparser==3.0
+Pygments==2.20.0
+# pytorch_lightning and PyWavelets are both overrides of what stable-audio-tools' own
+# pyproject.toml would otherwise resolve for a base (non-[train]) install:
+# - pytorch_lightning isn't a base dependency at all, but models/lora/callbacks.py
+#   imports it unconditionally (`import pytorch_lightning as pl`) even for pure inference,
+#   so it must be installed anyway or stable_audio_tools.inference.generation fails to import.
+# - PyWavelets==1.4.1 (the version stable-audio-tools' pyproject.toml pins, presumably
+#   tested under numpy<2) is ABI-incompatible with numpy>=2 ("numpy.dtype size changed") -
+#   upgraded here to a version actually built against numpy 2.x.
+pytorch-lightning==2.5.5
+PyWavelets==1.8.0
+PyYAML==6.0.3
+regex==2026.7.10
+requests==2.34.2
+rich==15.0.0
+safetensors==0.8.0
+scipy==1.15.3
+sentencepiece==0.1.99
+shellingham==1.5.4
+soundfile==0.14.0
+soxr==1.1.0
+stable-audio-tools @ git+https://github.com/Stability-AI/stable-audio-tools.git@3241adba4fc2a85cf5b29d9eb68d42f40a28e820
+sympy==1.14.0
+tokenizers==0.22.2
+torch==2.7.1
+torchaudio==2.7.1
+torchmetrics==1.9.0
+torchsde==0.2.6
+torchvision==0.22.1
+tqdm==4.68.4
+trampoline==0.1.2
+transformers==5.13.1
+typer==0.26.8
+typing_extensions==4.16.0
+urllib3==2.7.0
+v-diffusion-pytorch==0.0.2
+vector-quantize-pytorch==1.14.41
+wcwidth==0.8.2
+yarl==1.24.2
