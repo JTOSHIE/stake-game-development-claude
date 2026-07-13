@@ -1,0 +1,17 @@
+{
+  "totalSpins": 1300,
+  "totalRoundsChecked": 1300,
+  "exactTotalMismatches": 0,
+  "balanceDrifts": 0,
+  "consoleErrors": 0,
+  "heap100Bytes": 19300000,
+  "heap1000Bytes": 19300000,
+  "heapGrowthPct": 0,
+  "avgFpsSessionA": 58.79371832508983,
+  "avgFpsSessionB": 58.14941860660446,
+  "avgFpsOverall": 58.47156846584714,
+  "costIntegrityFailures": 0,
+  "costVisibilityFailures": 0,
+  "buyAffordabilityBoundaryOk": true,
+  "framesOver100ms": 5
+}
