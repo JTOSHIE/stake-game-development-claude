@@ -73,5 +73,32 @@
       "wild": "#ff00ff",
       "scatter": "#ffd700"
     }
+  },
+  "storefront_tile": {
+    "_doc": "JOB 7 scaffold (2026-07-14, output slots only, no art). Per docs/stake-engine-live/game-tile-requirements.md, the published spec gives format/naming/file-size rules but NO pixel dimensions or text-safe-area guidance - the w/h values below are Claude's own provisional defaults, not a Stake-published number; confirm against the dashboard Tile Editor before Fable finalises art. NOT read by build.py's main() (which only loops symbols/exports/layered/tile_plate/plates_json by name) - inert until a future pass wires it in and the src masters exist.",
+    "tile_background": {
+      "src": "tile_background.svg",
+      "out": "storefront/tile_background.png",
+      "w": 2048, "h": 1152,
+      "format": "PNG or JPG, high resolution",
+      "naming_on_upload": "FutureSpinner-BG.png",
+      "note": "NEW ART REQUIRED - environmental background showing the world of the game. No existing master fits (the in-game background is a video asset, not tile-appropriate). Combined with tile_foreground_hero must not exceed 3MB total per the published requirement."
+    },
+    "tile_foreground_hero": {
+      "src": "tile_foreground_hero.svg",
+      "out": "storefront/tile_foreground_hero.png",
+      "w": 1536, "h": 1536,
+      "format": "PNG, transparent background, high resolution",
+      "naming_on_upload": "FutureSpinner-FG.png",
+      "note": "NEW ART REQUIRED, but scene_character_car.svg (the existing in-game identity-character master, racer + hover car, currently exported 1200x656 for in-scene HUD placement) is a strong reference/starting point for Fable rather than a from-scratch design - the tile hero likely needs an isolated re-crop/re-composition on transparency."
+    },
+    "provider_logo": {
+      "src": "brand_mark.svg",
+      "out": "storefront/provider_logo.png",
+      "w": 512, "h": 512,
+      "format": "PNG, transparent background, high resolution, legible at small sizes",
+      "naming_on_upload": "WeRollSpinners-Logo.png",
+      "note": "NO NEW ART NEEDED - brand_mark.svg is already the WRS provider logo (design-system/DESIGN_SYSTEM.md) and already exports at 512x512 (ui/brand_mark.png) and 192x192 (ui/brand_mark_glyph.png), both transparent. This slot re-points the existing master at a dedicated storefront output path; confirm with Fable/owner before treating as final."
+    }
   }
 }
