@@ -83,12 +83,20 @@ async function startIsolatedDevServer(instanceLabel = 'a') {
 
   await new Promise((resolvePromise, reject) => {
     let resolved = false
-    const onData = (d) => { if (!resolved && /Local:/.test(d.toString())) { resolved = true; resolvePromise() } }
+    // The real bug (JOB 2, 2026-07-13, found by inspecting the raw stdout
+    // bytes): vite 7.3.1's dev-mode banner bolds "Local" and resets *before*
+    // the colon - the literal bytes are `\x1b[1mLocal\x1b[22m:`, so `/Local:/`
+    // never matches at all, on any timeout length. This had been silently
+    // broken (every run fell through to the timeout, however generous) since
+    // whichever vite upgrade introduced that styling change. Match the word
+    // alone, the same fix already applied to build_diet_verify.mjs for
+    // `vite preview`'s banner (a different command, same class of bug).
+    const onData = (d) => { if (!resolved && /Local/.test(d.toString())) { resolved = true; resolvePromise() } }
     proc.stdout.on('data', onData)
     proc.stderr.on('data', onData)
     proc.on('error', reject)
     proc.on('exit', (code) => { if (!resolved) reject(new Error(`isolated vite server exited early (code ${code})`)) })
-    setTimeout(() => { if (!resolved) reject(new Error('isolated vite server did not start in time')) }, 15000)
+    setTimeout(() => { if (!resolved) reject(new Error('isolated vite server did not start in time')) }, 60000)
   })
   return { proc, isoDir, url: `http://localhost:${port}`, serverLogPath }
 }
@@ -201,6 +209,7 @@ async function runCostIntegrityCheck(page) {
     } else {
       // buy tier: ACTIVATE opens BuyBonus's confirm modal; CONFIRM fires the spin.
       await page.locator(`[data-testid="activate-${m.menuId}"]`).click()
+      await logAction(page, `buy-confirm-${m.menuId}`)
       await page.locator('[data-testid="buy-confirm"]').click()
     }
     await waitSpinDone(page)
@@ -359,10 +368,11 @@ async function readQaLog(page) {
 
 async function startFpsSampling(page) {
   await page.evaluate(() => {
-    window.__fpsSamples = []
+    window.__fpsSamples = [] // {t, gap} - t is absolute performance.now(), for event attribution
+    window.__actionLog = window.__actionLog ?? [] // {event, t} markers pushed by logAction()
     let last = performance.now()
     function tick(t) {
-      window.__fpsSamples.push(t - last)
+      window.__fpsSamples.push({ t, gap: t - last })
       last = t
       window.__fpsHandle = requestAnimationFrame(tick)
     }
@@ -373,6 +383,43 @@ async function stopFpsSampling(page) {
   return page.evaluate(() => {
     cancelAnimationFrame(window.__fpsHandle)
     return window.__fpsSamples ?? []
+  })
+}
+
+/** Marks a named game event (spin click, buy click, ...) at its real page-context
+ * timestamp, so any long frame nearby can be attributed to what was happening
+ * rather than reported as an unexplained hitch. */
+async function logAction(page, event) {
+  await page.evaluate((e) => {
+    window.__actionLog = window.__actionLog ?? []
+    window.__actionLog.push({ event: e, t: performance.now() })
+  }, event)
+}
+
+/** Frame gate with attribution (JOB 2): every sampled frame gap over 100ms gets
+ * matched to its nearest logged game-event marker by absolute timestamp, so a
+ * known hitch (e.g. the ~150ms buy-moment hitch reel_v3_proof.mjs/
+ * motion_v2_proof.mjs found) is either explained by what the frame was doing or
+ * shown to no longer reproduce - a diagnostic report, not an additional
+ * pass/fail gate on top of the existing avg-fps-vs-55 floor. */
+function attributeLongFrames(frameSamples, actionLog, thresholdMs = 100) {
+  const longFrames = frameSamples.filter((f) => f.gap > thresholdMs)
+  return longFrames.map((f) => {
+    let nearest = null
+    let nearestDelta = Infinity
+    for (const a of actionLog) {
+      const delta = Math.abs(a.t - f.t)
+      if (delta < nearestDelta) {
+        nearestDelta = delta
+        nearest = a
+      }
+    }
+    return {
+      tMs: Math.round(f.t),
+      gapMs: Math.round(f.gap * 10) / 10,
+      nearestEvent: nearest?.event ?? null,
+      deltaToEventMs: nearest ? Math.round(nearestDelta) : null,
+    }
   })
 }
 
@@ -410,6 +457,7 @@ async function runSession(browser, { social, cellSpins, globalCounter, heapSampl
         // once-per-session intro splash while a dev server is live-edited
         // concurrently) must never silently stall the whole soak.
         await dismissIntro(page)
+        await logAction(page, 'spin-click')
         await page.locator('[data-testid="spin-button"]').click()
         await waitSpinDone(page)
         globalCounter.n += 1
@@ -449,12 +497,14 @@ async function runSession(browser, { social, cellSpins, globalCounter, heapSampl
     }
   }
 
-  const frameTimes = await stopFpsSampling(page)
-  const gaps = frameTimes.slice(5)
+  const frameSamples = await stopFpsSampling(page)
+  const gaps = frameSamples.slice(5).map((f) => f.gap)
   const avgFps = gaps.length ? 1000 / (gaps.reduce((a, b) => a + b, 0) / gaps.length) : null
+  const actionLog = await page.evaluate(() => window.__actionLog ?? [])
+  const longFrames = attributeLongFrames(frameSamples.slice(5), actionLog)
 
   await page.close()
-  return { roundResults, consoleErrors, avgFps, totalSpins: globalCounter.n }
+  return { roundResults, consoleErrors, avgFps, totalSpins: globalCounter.n, longFrames }
 }
 
 async function run() {
@@ -529,12 +579,20 @@ async function run() {
 
     log('')
     log('=== COST-INTEGRITY GATE (all five modes, fixed bet) ===')
+    // This is the one place a real buy-confirm click happens against a fresh
+    // page under fps sampling - the known ~150ms buy-moment hitch (found by
+    // reel_v3_proof.mjs/motion_v2_proof.mjs) would show up here with a
+    // 'buy-confirm-<mode>' nearestEvent if it still reproduces.
     const costPage = await browser.newPage({ viewport: { width: 1280, height: 720 } })
-    let costResults
+    let costResults, costLongFrames
     try {
       await costPage.goto(BASE_URL, { waitUntil: 'networkidle' })
       await costPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      await startFpsSampling(costPage)
       costResults = await runCostIntegrityCheck(costPage)
+      const costFrameSamples = await stopFpsSampling(costPage)
+      const costActionLog = await costPage.evaluate(() => window.__actionLog ?? [])
+      costLongFrames = attributeLongFrames(costFrameSamples.slice(5), costActionLog)
     } finally {
       await costPage.close()
     }
@@ -595,6 +653,13 @@ async function run() {
     const avgFpsOverall = [sessionA.avgFps, sessionB.avgFps].filter((x) => x != null)
     const avgFps = avgFpsOverall.length ? avgFpsOverall.reduce((a, b) => a + b, 0) / avgFpsOverall.length : null
 
+    const allLongFrames = [
+      ...(sessionA.longFrames ?? []).map((f) => ({ ...f, source: 'session-a' })),
+      ...(sessionB.longFrames ?? []).map((f) => ({ ...f, source: 'session-b' })),
+      ...costLongFrames.map((f) => ({ ...f, source: 'cost-integrity' })),
+    ]
+    writeFileSync(join(OUT_DIR, 'frame-gate-attribution-2026-07-13.json'), JSON.stringify(allLongFrames, null, 2))
+
     const summary = {
       totalSpins,
       totalRoundsChecked: totalChecked,
@@ -610,6 +675,7 @@ async function run() {
       costIntegrityFailures: costFailures.length,
       costVisibilityFailures: visFailures.length,
       buyAffordabilityBoundaryOk: boundaryResult.ok,
+      framesOver100ms: allLongFrames.length,
     }
 
     log('')
@@ -621,6 +687,8 @@ async function run() {
     if (costFailures.length) log('COST-INTEGRITY FAILURES:\n' + JSON.stringify(costFailures, null, 2))
     if (visFailures.length) log('COST-VISIBILITY FAILURES:\n' + JSON.stringify(visFailures, null, 2))
     if (!boundaryResult.ok) log('BUY-AFFORDABILITY BOUNDARY FAILURE:\n' + JSON.stringify(boundaryResult, null, 2))
+    if (allLongFrames.length) log('FRAMES OVER 100ms (attributed):\n' + JSON.stringify(allLongFrames, null, 2))
+    else log('FRAME GATE: no frames over 100ms sampled this run (the known ~150ms buy-moment hitch did not reproduce)')
 
     writeFileSync(join(OUT_DIR, 'soak-1-summary.json'), JSON.stringify(summary, null, 2))
 

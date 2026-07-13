@@ -1,0 +1,47 @@
+[
+  {
+    "menuId": "normal",
+    "serverMode": "base",
+    "expectedMode": "base",
+    "actualMode": "base",
+    "expectedMicros": 1000000,
+    "actualMicros": 1000000,
+    "ok": true
+  },
+  {
+    "menuId": "cruise",
+    "serverMode": "cruise",
+    "expectedMode": "cruise",
+    "actualMode": "cruise",
+    "expectedMicros": 1000000,
+    "actualMicros": 1000000,
+    "ok": true
+  },
+  {
+    "menuId": "overboost",
+    "serverMode": "antelite",
+    "expectedMode": "antelite",
+    "actualMode": "antelite",
+    "expectedMicros": 1250000,
+    "actualMicros": 1250000,
+    "ok": true
+  },
+  {
+    "menuId": "bonus",
+    "serverMode": "bonus",
+    "expectedMode": "bonus",
+    "actualMode": "bonus",
+    "expectedMicros": 100000000,
+    "actualMicros": 100000000,
+    "ok": true
+  },
+  {
+    "menuId": "super",
+    "serverMode": "super",
+    "expectedMode": "super",
+    "actualMode": "super",
+    "expectedMicros": 400000000,
+    "actualMicros": 400000000,
+    "ok": true
+  }
+]
