@@ -352,14 +352,48 @@ def probe_and_select_models(device: str):
     )
 
 
-def run_manifest(models: dict, device: str, only, fresh_seeds: bool):
+def write_log_header(models: dict, switched: bool, switch_reason) -> None:
+    """Writes the run header + table header immediately, before any generation starts,
+    then append_log_row() appends one line per candidate as it completes. This makes
+    GENERATION_LOG.md durable against an interrupted run (e.g. an unattended multi-hour
+    caffeinate session that gets killed) - every candidate actually written to disk is
+    logged the moment it's written, not batched until the whole run finishes."""
+    DESKTOP_OUT.mkdir(parents=True, exist_ok=True)
+    date = datetime.date.today().isoformat()
+
+    model_ids = sorted({model_id for _, _, model_id in models.values()})
+    lines = [f"## Run {date}", f"- Model(s): {', '.join(f'`{m}`' for m in model_ids)}",
+             f"- Licence: {LICENCE_NAME}"]
+    if switched:
+        lines.append(
+            f"- **Switched from {MODEL_MEDIUM} to {MODEL_SMALL_SFX} (SFX) / "
+            f"{MODEL_SMALL_MUSIC} (BGM)**: {switch_reason}"
+        )
+    lines.append("")
+    lines.append("| name | seed | duration (s) | model | prompt |")
+    lines.append("|---|---|---|---|---|")
+
+    with open(LOG_PATH, "a") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def append_log_row(entry: dict) -> None:
+    with open(LOG_PATH, "a") as f:
+        f.write(
+            f"| {entry['name']} | {entry['seed']} | {entry['seconds']} | "
+            f"{entry['model_id']} | {entry['prompt']} |\n"
+        )
+        f.flush()
+
+
+def run_manifest(models: dict, device: str, only, fresh_seeds: bool) -> int:
     rows = MANIFEST if only is None else [r for r in MANIFEST if r[0] == only]
     if not rows:
         print(f"No manifest row named '{only}'.", file=sys.stderr)
         sys.exit(1)
 
     rng = random.SystemRandom()
-    log_entries = []
+    generated_count = 0
 
     for name, seconds, prompt, is_bgm in rows:
         model, model_config, model_id = models[is_bgm]
@@ -384,47 +418,16 @@ def run_manifest(models: dict, device: str, only, fresh_seeds: bool):
             postprocess_and_write(audio, sample_rate, seconds, out_path)
             print(f"    -> {out_path} ({elapsed:.1f}s)")
 
-            log_entries.append({
+            append_log_row({
                 "name": name,
                 "seed": seed,
                 "seconds": seconds,
                 "prompt": prompt,
                 "model_id": model_id,
             })
+            generated_count += 1
 
-    return log_entries
-
-
-def write_log(models: dict, switched: bool, switch_reason, log_entries) -> None:
-    DESKTOP_OUT.mkdir(parents=True, exist_ok=True)
-    date = datetime.date.today().isoformat()
-
-    model_ids = sorted({model_id for _, _, model_id in models.values()})
-    lines = [f"## Run {date}", f"- Model(s): {', '.join(f'`{m}`' for m in model_ids)}",
-             f"- Licence: {LICENCE_NAME}"]
-    if switched:
-        lines.append(
-            f"- **Switched from {MODEL_MEDIUM} to {MODEL_SMALL_SFX} (SFX) / "
-            f"{MODEL_SMALL_MUSIC} (BGM)**: {switch_reason}"
-        )
-    lines.append("")
-
-    if log_entries:
-        lines.append("| name | seed | duration (s) | model | prompt |")
-        lines.append("|---|---|---|---|---|")
-        for entry in log_entries:
-            lines.append(
-                f"| {entry['name']} | {entry['seed']} | {entry['seconds']} | "
-                f"{entry['model_id']} | {entry['prompt']} |"
-            )
-    else:
-        lines.append("(no new candidates generated - all requested files already existed)")
-    lines.append("")
-
-    with open(LOG_PATH, "a") as f:
-        f.write("\n".join(lines) + "\n")
-
-    print(f"Log updated: {LOG_PATH}")
+    return generated_count
 
 
 def main() -> None:
@@ -453,9 +456,9 @@ def main() -> None:
     used = ", ".join(sorted({m[2] for m in models.values()}))
     print(f"Using model(s): {used}" + (f" (switched: {switch_reason})" if switched else ""))
 
-    log_entries = run_manifest(models, device, args.only, args.fresh_seeds)
-    write_log(models, switched, switch_reason, log_entries)
-    print("Done.")
+    write_log_header(models, switched, switch_reason)
+    generated_count = run_manifest(models, device, args.only, args.fresh_seeds)
+    print(f"Done. {generated_count} candidate(s) generated. Log: {LOG_PATH}")
 
 
 if __name__ == "__main__":
