@@ -6,13 +6,14 @@ Powered by Stability AI
 
 The LICENSE.md in this directory is the Stability AI Community License Agreement (Last
 Updated: July 5, 2024), the licence family Stability AI applies across its open-weight
-Stable Audio releases. stable-audio-3-medium and stable-audio-3-small are gated on
-Hugging Face and were not reachable without authentication at the time this tool was
-built, so this copy was sourced from the same, publicly-readable licence text on the
-sibling stabilityai/stable-audio-open-1.0 model card instead - Stability publishes this
-as one fixed, reusable agreement referenced by name across the whole model family, not a
-bespoke per-model document. generate.py automatically re-fetches and overwrites this
-LICENSE.md from the actual selected model's own repo (stable-audio-3-medium or
-stable-audio-3-small, whichever loads) immediately after the first successful
-authenticated model load, so this copy self-corrects to the exact repo-specific text the
-first time the pipeline is run for real.
+Stable Audio releases.
+
+It was first drafted from the publicly-readable licence text on the sibling
+stabilityai/stable-audio-open-1.0 model card, since stable-audio-3-medium/-small-sfx/
+-small-music are gated on Hugging Face and were not reachable without authentication at
+the time this tool was built. generate.py automatically re-fetches and overwrites this
+LICENSE.md from the actual selected model's own repo immediately after the first
+successful authenticated model load - this has since happened for real (2026-07-13, AUDIOFORGE
+pre-flight run, `stabilityai/stable-audio-3-medium`): the file now on disk is the genuine
+repo-specific LICENSE.md, confirmed identical in substance to the earlier best-effort
+draft (only raw-text formatting differs - smart quotes, no markdown headers).

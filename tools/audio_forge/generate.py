@@ -23,7 +23,8 @@ CANDIDATES_DIR = DESKTOP_OUT / "candidates"
 LOG_PATH = DESKTOP_OUT / "GENERATION_LOG.md"
 
 MODEL_MEDIUM = "stabilityai/stable-audio-3-medium"
-MODEL_SMALL = "stabilityai/stable-audio-3-small"
+MODEL_SMALL_SFX = "stabilityai/stable-audio-3-small-sfx"
+MODEL_SMALL_MUSIC = "stabilityai/stable-audio-3-small-music"
 LICENCE_NAME = "Stability AI Community License Agreement"
 
 SFX_PREFIX = (
@@ -92,17 +93,58 @@ OWNER_STEPS = """\
 Hugging Face authentication is required before AudioForge can run.
 
 1. Create a Hugging Face account: https://huggingface.co/join
-2. Accept the licence on both model pages:
+2. Accept the licence on all three model pages:
    - https://huggingface.co/stabilityai/stable-audio-3-medium
-   - https://huggingface.co/stabilityai/stable-audio-3-small
+   - https://huggingface.co/stabilityai/stable-audio-3-small-sfx
+   - https://huggingface.co/stabilityai/stable-audio-3-small-music
 3. Create a read token: https://huggingface.co/settings/tokens
 4. Run: huggingface-cli login
    (the huggingface_hub version installed in this venv has replaced that CLI with `hf` -
    if `huggingface-cli login` prints a deprecation notice instead of prompting for a
    token, run `hf auth login` instead; it is the same login.)
 
+If step 4 succeeds but a real run still gets 401/403 on a repo: open
+https://huggingface.co/settings/tokens, edit the token, and under User permissions ->
+Repositories tick "Read access to contents of all public gated repos you can access",
+then save and retry (the token value does not change, no re-login needed).
+
 Then re-run this script.
 """
+
+GATE_CHECK_FILENAME = "model_config.json"
+TOKEN_PERMISSION_MESSAGE = (
+    'Open https://huggingface.co/settings/tokens, edit the FutureS token, and under '
+    'User permissions > Repositories tick "Read access to contents of all public gated '
+    'repos you can access", then save and retry. The token value does not change, so no '
+    're-login is needed.'
+)
+
+
+def check_gated_access() -> bool:
+    """AUDIOFORGE pre-flight: confirm gated access to all three model repos by
+    downloading only their small model_config.json file. Reports PASS/FAIL per repo;
+    stops with the token-permission message on any 401/403."""
+    from huggingface_hub import hf_hub_download
+    from huggingface_hub.utils import HfHubHTTPError
+
+    all_pass = True
+    for repo in (MODEL_MEDIUM, MODEL_SMALL_SFX, MODEL_SMALL_MUSIC):
+        try:
+            hf_hub_download(repo, filename=GATE_CHECK_FILENAME, repo_type="model")
+        except HfHubHTTPError as exc:
+            status = getattr(exc.response, "status_code", None)
+            print(f"FAIL\t{repo}\tHTTP {status}: {exc}")
+            all_pass = False
+            if status in (401, 403):
+                print(f"\n{TOKEN_PERMISSION_MESSAGE}\n")
+                return False
+        except Exception as exc:  # noqa: BLE001
+            print(f"FAIL\t{repo}\t{type(exc).__name__}: {exc}")
+            all_pass = False
+        else:
+            print(f"PASS\t{repo}")
+
+    return all_pass
 
 
 def full_prompt_for(name: str, prompt: str, is_bgm: bool) -> str:
@@ -162,8 +204,15 @@ def try_copy_licence(model_id: str) -> None:
 
 def generate_one(model, model_config, device: str, prompt: str, negative_prompt: str,
                   seconds: float, seed: int):
+    """Uses generate_diffusion_cond_inpaint, not the plain generate_diffusion_cond: all
+    three Stable Audio 3 variants (medium/small-sfx/small-music) declare
+    local_add_cond_ids = ["inpaint_mask", "inpaint_masked_input"] in their model_config.json
+    - a unified text-to-audio + inpainting architecture that populates those conditioning
+    tensors unconditionally. Only *_inpaint builds them (as an all-zero "generate
+    everything from scratch" mask when no inpaint_audio/mask is given); the plain function
+    never does, and fails with `KeyError: 'inpaint_mask'` on this model family."""
     import torch
-    from stable_audio_tools.inference.generation import generate_diffusion_cond
+    from stable_audio_tools.inference.generation import generate_diffusion_cond_inpaint
 
     sample_rate = model_config["sample_rate"]
     sample_size = model_config["sample_size"]
@@ -175,21 +224,32 @@ def generate_one(model, model_config, device: str, prompt: str, negative_prompt:
 
     def run(active_device):
         with torch.no_grad():
-            return generate_diffusion_cond(
+            return generate_diffusion_cond_inpaint(
                 model,
                 steps=100,
                 cfg_scale=7.0,
+                # apg_scale=0.0 uses vanilla CFG instead of Adaptive Projected Guidance.
+                # APG's apg_project() (models/dit.py) unconditionally calls .double() on
+                # its intermediate tensors, and MPS has no float64 support at all (not a
+                # transient/retryable failure - torch raises TypeError, not RuntimeError,
+                # and it recurs on every single diffusion step). Disabling APG keeps
+                # generation on native MPS instead of forcing every call through the CPU
+                # fallback path, which would defeat the point of MPS acceleration.
+                apg_scale=0.0,
                 conditioning=conditioning,
                 negative_conditioning=negative_conditioning,
                 sample_size=sample_size,
-                sample_rate=sample_rate,
                 seed=seed,
                 device=active_device,
             )
 
     try:
         audio = run(device)
-    except RuntimeError as exc:
+    except (RuntimeError, TypeError, NotImplementedError) as exc:
+        # MPS backend gaps surface as different exception types depending on where
+        # PyTorch trips the "unsupported on MPS" check (e.g. an unimplemented op is
+        # RuntimeError, but an explicit unsupported-dtype conversion like float64 is
+        # TypeError - confirmed via generate_diffusion_cond_inpaint's APG path).
         if device != "mps":
             raise
         print(f"    MPS generation failed ({exc}); retrying on CPU", file=sys.stderr)
@@ -234,60 +294,65 @@ def postprocess_and_write(audio, sample_rate: int, seconds: float, out_path: Pat
     sf.write(str(out_path), audio.to(torch.float32).cpu().numpy().T, sample_rate, subtype="PCM_16")
 
 
-def probe_and_select_model(device: str):
-    """Load stable-audio-3-medium and time a short row. Falls back to stable-audio-3-small
-    if the load fails or the probe generation exceeds GEN_TIME_LIMIT_S. The probe generation
-    itself is discarded (timing/capability test only) - the real manifest loop regenerates
-    every row from scratch with whichever model was selected."""
+def probe_and_select_models(device: str):
+    """Load stable-audio-3-medium and time a short row. Falls back to the two specialised
+    small models - stable-audio-3-small-sfx for SFX rows, stable-audio-3-small-music for
+    the two BGM rows - if medium fails to load or the probe generation exceeds
+    GEN_TIME_LIMIT_S. The probe generation itself is discarded (timing/capability test
+    only) - the real manifest loop regenerates every row from scratch with whichever
+    model(s) were selected.
+
+    Returns (models, switched, switch_reason) where models is a dict keyed by is_bgm:
+    {False: (model, config, model_id), True: (model, config, model_id)}."""
     probe_row = min((r for r in MANIFEST if not r[3]), key=lambda r: r[1])
     name, seconds, prompt, is_bgm = probe_row
     prompt = full_prompt_for(name, prompt, is_bgm)
 
     switched = False
     switch_reason = None
+    model = None
 
     print(f"Probing {MODEL_MEDIUM} (row '{name}', {seconds}s)...")
     try:
         model, model_config = load_model(MODEL_MEDIUM, device)
-    except Exception as exc:  # noqa: BLE001
-        switch_reason = f"{MODEL_MEDIUM} failed to load: {exc}"
-        print(f"  {switch_reason}")
-        switched = True
-        model, model_config = load_model(MODEL_SMALL, device)
-        try_copy_licence(MODEL_SMALL)
-        return model, model_config, MODEL_SMALL, switched, switch_reason
-
-    start = time.monotonic()
-    try:
+        start = time.monotonic()
         generate_one(model, model_config, device, prompt, NEGATIVE_PROMPT, seconds, BASE_SEED)
         elapsed = time.monotonic() - start
+        print(f"  Probe completed in {elapsed:.1f}s (limit {GEN_TIME_LIMIT_S}s).")
+        if elapsed > GEN_TIME_LIMIT_S:
+            switch_reason = (
+                f"{MODEL_MEDIUM} probe row '{name}' took {elapsed:.1f}s, over the "
+                f"{GEN_TIME_LIMIT_S}s limit on this hardware"
+            )
+            switched = True
     except Exception as exc:  # noqa: BLE001
-        switch_reason = f"{MODEL_MEDIUM} probe generation failed: {exc}"
-        print(f"  {switch_reason}")
+        switch_reason = f"{MODEL_MEDIUM} failed to load or generate: {exc}"
         switched = True
-        del model
-        model, model_config = load_model(MODEL_SMALL, device)
-        try_copy_licence(MODEL_SMALL)
-        return model, model_config, MODEL_SMALL, switched, switch_reason
 
-    print(f"  Probe completed in {elapsed:.1f}s (limit {GEN_TIME_LIMIT_S}s).")
-    if elapsed > GEN_TIME_LIMIT_S:
-        switch_reason = (
-            f"{MODEL_MEDIUM} probe row '{name}' took {elapsed:.1f}s, over the "
-            f"{GEN_TIME_LIMIT_S}s limit on this hardware"
+    if not switched:
+        try_copy_licence(MODEL_MEDIUM)
+        return (
+            {False: (model, model_config, MODEL_MEDIUM), True: (model, model_config, MODEL_MEDIUM)},
+            switched,
+            switch_reason,
         )
-        print(f"  {switch_reason}")
-        switched = True
-        del model
-        model, model_config = load_model(MODEL_SMALL, device)
-        try_copy_licence(MODEL_SMALL)
-        return model, model_config, MODEL_SMALL, switched, switch_reason
 
-    try_copy_licence(MODEL_MEDIUM)
-    return model, model_config, MODEL_MEDIUM, switched, switch_reason
+    print(f"  {switch_reason}")
+    print(f"  Falling back to {MODEL_SMALL_SFX} (SFX rows) and {MODEL_SMALL_MUSIC} (BGM rows).")
+    del model
+
+    sfx_model, sfx_config = load_model(MODEL_SMALL_SFX, device)
+    music_model, music_config = load_model(MODEL_SMALL_MUSIC, device)
+    try_copy_licence(MODEL_SMALL_SFX)
+
+    return (
+        {False: (sfx_model, sfx_config, MODEL_SMALL_SFX), True: (music_model, music_config, MODEL_SMALL_MUSIC)},
+        switched,
+        switch_reason,
+    )
 
 
-def run_manifest(model, model_config, device: str, only, fresh_seeds: bool):
+def run_manifest(models: dict, device: str, only, fresh_seeds: bool):
     rows = MANIFEST if only is None else [r for r in MANIFEST if r[0] == only]
     if not rows:
         print(f"No manifest row named '{only}'.", file=sys.stderr)
@@ -297,6 +362,7 @@ def run_manifest(model, model_config, device: str, only, fresh_seeds: bool):
     log_entries = []
 
     for name, seconds, prompt, is_bgm in rows:
+        model, model_config, model_id = models[is_bgm]
         prompt = full_prompt_for(name, prompt, is_bgm)
         if fresh_seeds:
             seeds = [rng.randint(0, 2**31 - 1) for _ in SEED_OFFSETS]
@@ -309,7 +375,7 @@ def run_manifest(model, model_config, device: str, only, fresh_seeds: bool):
                 print(f"  [skip] {out_path.relative_to(DESKTOP_OUT)} already exists")
                 continue
 
-            print(f"  generating {name} seed={seed} ({seconds}s)...")
+            print(f"  generating {name} seed={seed} ({seconds}s) via {model_id}...")
             t0 = time.monotonic()
             audio, sample_rate = generate_one(
                 model, model_config, device, prompt, NEGATIVE_PROMPT, seconds, seed
@@ -323,26 +389,33 @@ def run_manifest(model, model_config, device: str, only, fresh_seeds: bool):
                 "seed": seed,
                 "seconds": seconds,
                 "prompt": prompt,
+                "model_id": model_id,
             })
 
     return log_entries
 
 
-def write_log(model_id: str, switched: bool, switch_reason, log_entries) -> None:
+def write_log(models: dict, switched: bool, switch_reason, log_entries) -> None:
     DESKTOP_OUT.mkdir(parents=True, exist_ok=True)
     date = datetime.date.today().isoformat()
 
-    lines = [f"## Run {date}", f"- Model: `{model_id}`", f"- Licence: {LICENCE_NAME}"]
+    model_ids = sorted({model_id for _, _, model_id in models.values()})
+    lines = [f"## Run {date}", f"- Model(s): {', '.join(f'`{m}`' for m in model_ids)}",
+             f"- Licence: {LICENCE_NAME}"]
     if switched:
-        lines.append(f"- **Switched from {MODEL_MEDIUM} to {MODEL_SMALL}**: {switch_reason}")
+        lines.append(
+            f"- **Switched from {MODEL_MEDIUM} to {MODEL_SMALL_SFX} (SFX) / "
+            f"{MODEL_SMALL_MUSIC} (BGM)**: {switch_reason}"
+        )
     lines.append("")
 
     if log_entries:
-        lines.append("| name | seed | duration (s) | prompt |")
-        lines.append("|---|---|---|---|")
+        lines.append("| name | seed | duration (s) | model | prompt |")
+        lines.append("|---|---|---|---|---|")
         for entry in log_entries:
             lines.append(
-                f"| {entry['name']} | {entry['seed']} | {entry['seconds']} | {entry['prompt']} |"
+                f"| {entry['name']} | {entry['seed']} | {entry['seconds']} | "
+                f"{entry['model_id']} | {entry['prompt']} |"
             )
     else:
         lines.append("(no new candidates generated - all requested files already existed)")
@@ -368,14 +441,20 @@ def main() -> None:
         print(OWNER_STEPS)
         sys.exit(1)
 
+    print("Checking gated access to all three model repos...")
+    if not check_gated_access():
+        print("\nGated access check failed for at least one repo - see FAIL lines above.", file=sys.stderr)
+        sys.exit(1)
+
     device = pick_device("mps")
     print(f"Using device: {device}")
 
-    model, model_config, model_id, switched, switch_reason = probe_and_select_model(device)
-    print(f"Using model: {model_id}" + (f" (switched: {switch_reason})" if switched else ""))
+    models, switched, switch_reason = probe_and_select_models(device)
+    used = ", ".join(sorted({m[2] for m in models.values()}))
+    print(f"Using model(s): {used}" + (f" (switched: {switch_reason})" if switched else ""))
 
-    log_entries = run_manifest(model, model_config, device, args.only, args.fresh_seeds)
-    write_log(model_id, switched, switch_reason, log_entries)
+    log_entries = run_manifest(models, device, args.only, args.fresh_seeds)
+    write_log(models, switched, switch_reason, log_entries)
     print("Done.")
 
 
