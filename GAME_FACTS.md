@@ -157,6 +157,18 @@ Reel frequencies, which are maths-locked, are unaffected by the cosmetic rename.
   stage (frame, grid, HUD, instrument column) shrinks/grows together
   (`design-system/LAYOUT_SPEC.md` v3.1 onward, amended through v3.4 for the fixed-field HUD
   and Overdrive flame jets).
+- **Audio: shipped** (2026-07-13, previously the one open creative item per
+  `docs/CHAT_CLOSEOUT_2026-07-06.md`). Twelve mastered sound files - two music beds
+  (`bgm_loop` 100 BPM, `bgm_tension` 140 BPM, both crossfading on Overdrive entry/exit)
+  and ten SFX/stingers - generated via Stable Audio 3 open weights
+  (`tools/audio_forge/generate.py`, model `stabilityai/stable-audio-3-medium`), mastered
+  deterministically (`tools/audio_forge/master.py`: silence trim, bar-aligned loop points,
+  loudness normalisation with a verified win-tier escalation check) and wired into
+  `soundService.ts`. Provenance: `reports/audio/GENERATION_LOG_2026-07-13.md` (per-file
+  model/seed/prompt), `frontend/public/assets/themes/future-spinner/sounds/README.md`,
+  licensed under the Stability AI Community License
+  (`tools/audio_forge/LICENSE.md`/`NOTICE`). Verified via
+  `frontend/scripts/audio_verify.mjs` - ALL CHECKS PASS.
 
 ## 5. Compliance summary
 
@@ -192,4 +204,5 @@ Reel frequencies, which are maths-locked, are unaffected by the cosmetic rename.
 `COMPLIANCE_WATCH.md` · `CLAUDE.md` · `design-system/DESIGN_SYSTEM.md` ·
 `design-system/LAYOUT_SPEC.md` · `reports/archive/2026-07-04_layout-install.md` ·
 `reports/archive/2026-07-04_ux-polish.md` · `reports/archive/2026-07-04_motion-polish-v2.md` ·
-`reports/archive/2026-07-04_opus-elevate.md` · `reports/archive/2026-07-04_opus-elevate-2.md`
+`reports/archive/2026-07-04_opus-elevate.md` · `reports/archive/2026-07-04_opus-elevate-2.md` ·
+`reports/audio/GENERATION_LOG_2026-07-13.md` · `reports/archive/2026-07-13_job1-audio-integration.md`
