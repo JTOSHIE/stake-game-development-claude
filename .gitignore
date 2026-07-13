@@ -31,3 +31,7 @@ __pycache__
 # AssetForge build venv (never committed)
 scripts/assets/.venv/
 scripts/assets/__pycache__/
+
+# AudioForge build venv (never committed)
+tools/audio_forge/.venv/
+tools/audio_forge/__pycache__/
