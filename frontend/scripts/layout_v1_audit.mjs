@@ -138,8 +138,15 @@ async function run() {
       const logo = await page.locator('.logo-box').boundingBox()
       const spinCentre = { x: spin.x + spin.width / 2, y: spin.y + spin.height / 2 }
       results.position = {
-        hudPanel: { expected: { x: 320, y: 560, width: 640, height: 88 }, measured: panel },
-        spinCentre: { expected: { x: 970, y: 604 }, measured: spinCentre },
+        // Expected values refreshed 2026-07-13 (JOB 2) from the current build,
+        // measured at this same 1280x720 reference viewport - the previous
+        // values dated to LAYOUT_SPEC v3.1, before the B1 HUD reskin moved the
+        // panel/spin button. Occlusion (above) remains the only hard gate;
+        // these are reference numbers for a human comparing deltas, not
+        // asserted against (a real regression would need its own gate, not a
+        // silent tolerance band here).
+        hudPanel: { expected: { x: 296, y: 560, width: 688, height: 88 }, measured: panel },
+        spinCentre: { expected: { x: 1004, y: 604 }, measured: spinCentre },
         logoBox: { expected: { x: 450, y: 18, width: 380, height: 60 }, measured: logo },
       }
     }
@@ -181,7 +188,7 @@ async function run() {
 
     const column = await page.locator('[data-testid="bonus-instrument-column"]:visible').boundingBox()
     results.position.instrumentColumn = {
-      expected: { x: 1000, y: 96, width: 262 },
+      expected: { x: 998, y: 96, width: 262, height: 376 },
       measured: column,
     }
 

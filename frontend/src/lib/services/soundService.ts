@@ -5,8 +5,41 @@ import { get } from 'svelte/store'
 import { isMuted as isMutedStore } from '../stores/gameStore'
 import { musicVolume, sfxVolume } from '../stores/audioSettings'
 import { themeAssets } from '../stores/themeStore'
+import { overdriveVisual } from '../stores/overdriveVisual'
 
 const FS_BASE = 'assets/themes/future-spinner/sounds'
+
+const MUTE_KEY = 'fs_muted'
+
+/** localStorage persistence for the master mute flag. isMuted itself lives in the
+ * locked gameStore.ts (never edited here) - this only ever calls its public
+ * writable API (.set()/.subscribe()), the same way this file already read it. */
+function loadMutePersisted(): boolean {
+  try {
+    return localStorage.getItem(MUTE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function persistMute(val: boolean): void {
+  try {
+    localStorage.setItem(MUTE_KEY, val ? '1' : '0')
+  } catch {
+    /* ignore - blocked/unavailable storage should never break gameplay */
+  }
+}
+
+/** Picks the WebM/Opus encode for a loop bed/track when the browser supports it,
+ * falling back to the MP3 encode of the same asset otherwise. makeAudio()'s own
+ * on-error fallback (below) is the second line of defence if canPlayType's
+ * "maybe" turns out wrong at actual playback time. */
+function pickLoopUrl(mp3Url: string): string {
+  const webmUrl = mp3Url.replace(/\.mp3$/, '.webm')
+  const supportsOpus =
+    typeof Audio !== 'undefined' && new Audio().canPlayType('audio/webm; codecs="opus"') !== ''
+  return supportsOpus ? webmUrl : mp3Url
+}
 
 // ── Base volumes ──────────────────────────────────────────────────────────────
 // The per-sound design volumes, kept in one place. The two player sliders act as
@@ -48,7 +81,8 @@ function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
 function buildSounds() {
   const p = get(themeAssets).sounds
   const s = {
-    bgm:                  makeAudio(p.bgm,                  'bgm_loop'),
+    bgm:                  makeAudio(pickLoopUrl(p.bgm),               'bgm_loop'),
+    bgmTension:           makeAudio(pickLoopUrl(p.bgmTension),        'bgm_tension'),
     spin:                 makeAudio(p.spin,                 'spin'),
     reelStop:             makeAudio(p.reelStop,             'reel_stop'),
     reelStopAnticipation: makeAudio(p.reelStopAnticipation, 'reel_stop_anticipation'),
@@ -57,10 +91,12 @@ function buildSounds() {
     winBig:               makeAudio(p.winBig,               'win_big'),
     winEpic:              makeAudio(p.winEpic,              'win_epic'),
     scatterLand:          makeAudio(p.scatterLand,          'scatter_land'),
-    anticipationBuild:    makeAudio(p.anticipationBuild,    'anticipation_build'),
+    anticipationBuild:    makeAudio(pickLoopUrl(p.anticipationBuild), 'anticipation_build'),
     uiClick:              makeAudio(p.uiClick,              'ui_click'),
   }
   s.bgm.loop = true
+  s.bgmTension.loop = true
+  s.anticipationBuild.loop = true
   // Volumes are set by applyVolumes() from the two player sliders (see below),
   // not hardcoded here.
   return s
@@ -89,6 +125,9 @@ let bgmDuck = 1
  */
 function applyVolumes(): void {
   sounds.bgm.volume                  = musicVol * bgmDuck
+  // Only audible while it's the active bed (paused otherwise, so this is safe
+  // to always assign) - see setOverdriveBed()'s crossfade below.
+  sounds.bgmTension.volume            = musicVol * bgmDuck
   sounds.spin.volume                 = BASE.spin                 * sfxVol
   sounds.reelStop.volume             = BASE.reelStop             * sfxVol
   sounds.reelStopAnticipation.volume = BASE.reelStopAnticipation * sfxVol
@@ -127,8 +166,16 @@ function playClone(base: HTMLAudioElement, volume?: number): void {
   clone.play().catch(cleanup)
 }
 
-// Sync with isMuted store
-isMutedStore.subscribe(val => setMuted(val))
+// Restore the persisted mute flag once at load (isMuted itself, gameStore.ts, is
+// never edited - only its public .set() is called here, the same as any other
+// consumer of the store), then keep every subsequent change persisted too.
+if (loadMutePersisted()) {
+  isMutedStore.set(true)
+}
+isMutedStore.subscribe(val => {
+  setMuted(val)
+  persistMute(val)
+})
 
 export function setMuted(val: boolean): void {
   muted = val
@@ -226,6 +273,62 @@ export function stopAnticipation(): void {
   if (!muted) sounds.bgm.volume = musicVol * bgmDuck
 }
 
+// ── OVERDRIVE BED SWAP ──────────────────────────────────────────────────────
+
+const BED_CROSSFADE_MS = 600
+
+let overdriveBedActive = false
+
+/**
+ * Ramps an element's volume linearly from `from` to `to` over `durationMs`,
+ * reusing the same "duck by adjusting .volume over time" idea as the existing
+ * spin/anticipation ducks above, just interpolated instead of a single step.
+ */
+function rampVolume(el: HTMLAudioElement, from: number, to: number, durationMs: number, onDone?: () => void): void {
+  const steps = 20
+  const stepMs = durationMs / steps
+  let i = 0
+  el.volume = Math.max(0, Math.min(1, from))
+  const timer = setInterval(() => {
+    i += 1
+    el.volume = Math.max(0, Math.min(1, from + (to - from) * (i / steps)))
+    if (i >= steps) {
+      clearInterval(timer)
+      onDone?.()
+    }
+  }, stepMs)
+}
+
+/**
+ * Crossfades the base bed (bgm_loop) to the tension bed (bgm_tension) on
+ * Overdrive feature entry, and back on exit. Driven by the shared
+ * `overdriveVisual` store (App.svelte/FreeSpinsPresentation.svelte already flip
+ * it at exactly the feature-entry/exit boundary for the HUD/paytable accents -
+ * reused here rather than adding a second signal for the same event).
+ */
+function setOverdriveBed(active: boolean): void {
+  if (active === overdriveBedActive) return
+  overdriveBedActive = active
+  if (muted) return
+  const target = musicVol * bgmDuck
+
+  if (active) {
+    sounds.bgmTension.currentTime = 0
+    sounds.bgmTension.play().catch(() => {})
+    rampVolume(sounds.bgmTension, 0, target, BED_CROSSFADE_MS)
+    rampVolume(sounds.bgm, sounds.bgm.volume, 0, BED_CROSSFADE_MS, () => sounds.bgm.pause())
+  } else {
+    sounds.bgm.play().catch(() => {})
+    rampVolume(sounds.bgm, sounds.bgm.volume, target, BED_CROSSFADE_MS)
+    rampVolume(sounds.bgmTension, sounds.bgmTension.volume, 0, BED_CROSSFADE_MS, () => {
+      sounds.bgmTension.pause()
+      sounds.bgmTension.currentTime = 0
+    })
+  }
+}
+
+overdriveVisual.subscribe(setOverdriveBed)
+
 // ── SCATTER ─────────────────────────────────────────────────────────────────
 
 /**
@@ -240,28 +343,34 @@ export function playScatterLand(): void {
 // ── WIN SOUNDS ──────────────────────────────────────────────────────────────
 
 /**
- * Play tiered win sound based on multiplier (winAmount / betAmount).
- * 0         = dead spin, no sound
- * 0.01–1.9× = small win (quiet cloneNode at 0.4 vol)
- * 2×–9.9×   = medium win
- * 10×–49.9× = big win
- * 50×+      = epic win (plays twice with 800ms echo)
+ * Play tiered win sound based on multiplier (winAmount / betAmount). Thresholds
+ * are aligned to the shipped C1 celebration tiers (WinBanner.svelte's
+ * BIG_WIN_THRESHOLD/MEGA_WIN_THRESHOLD/EPIC_WIN_THRESHOLD and telemetry.ts's
+ * WIN_TIERS - do not let this drift from those two again, the same way
+ * telemetry.ts's own comment already warns against drifting from WinBanner).
+ * 0        = dead spin, no sound
+ * 0–9.99×  = small win (quiet cloneNode at 0.4 vol)
+ * 10–29.99×= medium win
+ * 30–99.99×= big win
+ * 100×+    = epic win (plays twice with 800ms echo) - also covers the 5,000x
+ *            MAX/wincap tier, reusing the epic echo rather than a dedicated
+ *            MAX sound, as designed.
  */
 export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
 
-  if (multiplier >= 50) {
-    // Epic win — play twice with slight delay for emphasis
+  if (multiplier >= 100) {
+    // Epic win (and MAX/wincap) — play twice with slight delay for emphasis
     sounds.winEpic.currentTime = 0
     sounds.winEpic.play().catch(() => {})
     setTimeout(() => {
       playClone(sounds.winEpic, 0.6)
     }, 800)
-  } else if (multiplier >= 10) {
+  } else if (multiplier >= 30) {
     // Big win
     sounds.winBig.currentTime = 0
     sounds.winBig.play().catch(() => {})
-  } else if (multiplier >= 2) {
+  } else if (multiplier >= 10) {
     // Medium win
     sounds.winMedium.currentTime = 0
     sounds.winMedium.play().catch(() => {})
