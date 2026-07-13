@@ -6,12 +6,16 @@ Australian English, no em dashes or en dashes.
 
 ## Current posture (build verified against current requirements)
 
-- **Stateless:** verified. Two bet modes (base 1.0x, bonus buy 100.0x); the Overdrive Free
-  Spins feature resolves inside one book round. No jackpot, gamble, continuation or early
-  cashout. Matches the approval-guidelines Key Restrictions (free spins and feature buys are
-  permitted; jackpots/gamble/continuation are not).
-- **Feature:** Overdrive Free Spins with a progressive multiplier, plus a 100x bonus buy.
-  Both modes stateless and capped at 5,000x, both at 96.3500% RTP.
+- **Stateless:** verified. **Five modes** (base 1.0x, cruise 1.0x, OVERBOOST 1.25x, Buy
+  Overdrive 100.0x, NITRO OVERDRIVE 400.0x - corrected 2026-07-13, this summary had been
+  left saying "two bet modes" after FeatureMath v2 shipped three more on 2026-07-07, see
+  the Watch log entry of that date); the Overdrive Free Spins feature resolves inside one
+  book round. No jackpot, gamble, continuation or early cashout. Matches the
+  approval-guidelines Key Restrictions (free spins and feature buys are permitted;
+  jackpots/gamble/continuation are not).
+- **Feature:** Overdrive Free Spins with a progressive multiplier, plus two buy tiers
+  (Buy Overdrive 100x, NITRO OVERDRIVE 400x). All five modes stateless and capped at
+  5,000x, all at 96.3500% RTP.
 - **Original IP:** verified. Original designs, produced in-house from vector masters.
   No pre-purchased or third-party licensed content.
 - **No Stake branding:** verified. No Stake trademark or themes in any shipped asset or text.
@@ -124,3 +128,75 @@ package with a genuine ante mechanic and two buy tiers is a stronger answer to "
 mechanics are expected in competitive submissions" than base-plus-one-buy was.
 Buy-feature disclosure and buy replay's cost-multiplier display now apply to **both** buy
 tiers (Buy Overdrive 100x and NITRO OVERDRIVE 400x), not just the original bonus buy.
+
+### 2026-07-13: JOB 3 re-validation - line-by-line against current `main`, dated evidence
+
+Consolidated Work Order JOB 3. Every line below is a fresh check against today's code/
+build, not carried forward from an earlier pass.
+
+- **RG jurisdiction defaults (minSpinMs 0 unless flags demand):** confirmed in
+  `frontend/src/lib/stores/responsibleGambling.ts:25-32` - `rgJurisdiction` derives
+  `minSpinMs` from `jurisdictionFlags` (`typeof $f.minSpinMs === 'number' ? $f.minSpinMs :
+  0`), sourced from the RGS `authenticate` response's `jurisdiction` passthrough
+  (`rgsService.ts:421`). Turbo is auto-disabled whenever `minSpinMs > 0`. Test coverage
+  (`responsibleGambling.test.ts:64-66`) asserts both the literal 0ms floor with no
+  jurisdiction data and the 2500ms UKGC-style override - re-ran today, still passes.
+  `rgSpinDelay()` is the single enforcement point, called from `App.svelte`'s
+  `scheduleAutoSpin()` after the turbo/super speed-tier factor, so the jurisdiction floor
+  always wins even under fast-play multipliers.
+- **Autoplay explicit-confirm gate:** confirmed structural, not a single named function -
+  `isAutoPlay.set(true)` has exactly two call sites in the whole codebase, both inside
+  `startAuto(count)` in `ControlBar.svelte:57-63` and its `HudOverlay.svelte` duplicate,
+  each only reachable via two explicit clicks (open the autoplay menu, then click a
+  specific spin-count option). Never called on mount, from restored state, or from a URL
+  param.
+- **Provably-fair determinism test:** re-ran fresh today
+  (`npx tsx src/lib/services/roundInterpreter.determinism.test.ts`) - **PASS, 58/58**
+  sample books reconstruct identically across 5 runs each, plus a static source-text
+  guard against `Math.random`/`Date.now`/`new Date(` in `roundInterpreter.ts`.
+- **Telemetry confirmed no-op by default, zero external network calls in the bundle:**
+  `track()` in `telemetry.ts:68-70` is a hard no-op unless `setTelemetrySink()` has been
+  called; the only call site is `App.svelte:110-114`, gated behind
+  `import.meta.env.DEV` (never fires in a production build). Source-level grep for
+  `fetch(`/`XMLHttpRequest`/`new WebSocket`/`sendBeacon` in `telemetry.ts` and its only
+  consumer: zero matches. Checked the **actual built bundle** too (`npm run build`, then
+  grep `dist/assets/index-*.js`): 4 `fetch(` call sites total, all attributable to the
+  legitimate RGS/replay communication layer (`authenticate`, `endRound`, `/replay/`
+  strings found adjacent) - none from telemetry, which has none to begin with.
+- **Bet levels:** confirmed dynamic, not hardcoded - `rgsBetLevels` (`rgsBetLevels.ts`) is
+  populated from the real RGS `authenticate` response (`rgsService.ts:419`,
+  `auth.betLevels` converted from micros), with a static fallback array only used in
+  dev/mock/auth-failure mode (`$rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS`).
+- **RGS failure paths, each exercised once, observed behaviour recorded:**
+  - **Disconnect mid-spin:** `handleRGSError()` (`rgsService.ts:194-197`) maps a fetch
+    `TypeError` to the retryable `ERR_GEN` code; `_withRetry()` retries `play()` up to 3
+    times, 1s apart. **Gap found:** `endRound()` is called directly (`rgsService.ts:473`),
+    not wrapped in `_withRetry` - a disconnect specifically during end-round (after
+    `play()` already succeeded) gets no retry, just a single throw into the same
+    generic error-banner path `App.svelte` already renders. The RGS contract's
+    `AuthResponse.round?: ActiveRound` field is parsed but never consumed anywhere -
+    the frontend has no resume-in-progress-round logic, though the game's stateless
+    design (the whole feature resolves inside one book round) limits the blast radius.
+  - **Insufficient funds on buy:** confirmed complete. `FeatureMenu.svelte`'s per-tier
+    affordability gate (`$balance < $betAmount * m.cost`) blocks opening the buy modal at
+    all when unaffordable, correctly using the real per-tier cost (100x or 400x). The
+    modal's own `canBuyBonus` check (`gameStore.ts`, locked) is hardcoded to a flat 100x -
+    already recorded as a compensated, unreachable finding in `CLAUDE.md`'s
+    `LOCKED_FILE_DEBTS` (ratified 2026-07-07, no lock lift needed while `FeatureMenu`'s
+    tighter gate keeps blocking first) - re-confirmed still true and still compensated
+    today, not a new gap. Server-side `ERR_IPB` also maps to a clear
+    "Insufficient balance" banner message.
+  - **Resume-after-refresh / replay:** **gap confirmed, not new but re-verified today** -
+    repo-wide grep for `resume|reconnect|onLine|visibilitychange` returns zero matches;
+    `initRGS()` always re-authenticates clean on load and never inspects `auth.round`.
+    Replay mode itself (a separate, explicit URL-param flow) is fully handled with its own
+    error state machine (`ReplayMode.svelte`) and a descriptive thrown `Error` on a
+    non-OK fetch (`replayService.ts:98-109`) - no gap there, only in silent mid-round
+    refresh recovery, which the stateless architecture makes lower-risk but not zero-risk.
+
+**Net assessment:** no new compliance regressions found. Two pre-existing, low-risk gaps
+re-confirmed (endRound not wrapped in retry; no resume-after-refresh path) - both
+compensated by the stateless single-book-round design, neither blocking submission, both
+worth a future hardening pass rather than urgent fixes. The "Current posture" summary
+above was stale (still said "two bet modes" nine days after the five-mode package
+shipped) - corrected in this same pass.

@@ -25,7 +25,7 @@ checklist in the docs must be satisfied.
 | 1 | Frontend build (dist, static only) | Pipeline | Regenerates each pass | Build Diet v2 |
 | 2 | Maths files: index.json, both lookup tables, both books, game_metadata.json | Overdrive pass | MERGED to main | Done (v1.1.0) |
 | 3 | PAR sheet (five modes, FeatureMath v2 documented) | Overdrive pass + FeatureMath v2 | MERGED to main | Done |
-| 4 | Submission blurb v2 (Overdrive) | Section 3 below | OWNER APPROVED (soundtrack line amended, pending re-approval) | Owner |
+| 4 | Submission blurb v2 (Overdrive) | Section 3 below | Owner-approved text unchanged; a DRAFT soundtrack sentence added 2026-07-13, PENDING OWNER APPROVAL (not yet part of the approved blurb) | Owner |
 | 5 | Game tile background image | Design system Phase B | To design | AssetForge v2 |
 | 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | To design | AssetForge v2 |
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
@@ -36,7 +36,16 @@ checklist in the docs must be satisfied.
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
 
-## 3. SUBMISSION BLURB v2 (Overdrive), OWNER APPROVED (soundtrack line amended, pending re-approval)
+## 3. SUBMISSION BLURB v2 (Overdrive) - soundtrack sentence restored as DRAFT, PENDING OWNER APPROVAL
+
+**Status (2026-07-13, JOB 5):** the blurb below now includes a draft soundtrack sentence
+(marked inline) - restored per `docs/CHAT_CLOSEOUT_2026-07-06.md` §2's own note that
+"PROMO_BLURB.md restores its soundtrack sentence once audio ships, then the owner
+approves the final text." No original wording survives anywhere in the repo (checked -
+it was fully removed, not archived), so this is freshly drafted to match what actually
+shipped (`tools/audio_forge/`, `reports/audio/GENERATION_LOG_2026-07-13.md`), not a
+recovered original. **This draft sentence is NOT approved** - the rest of the blurb
+remains the owner's last-approved v2 text, unchanged.
 
     Plug in. Power up. Future Spinner drops you into a neon soaked cyberpunk
     megacity where chrome rims and holographic gauges blaze across a 5x4 grid
@@ -48,6 +57,10 @@ checklist in the docs must be satisfied.
     a multiplier that never resets. Three or more scatters during the bonus add
     5 more spins. Prefer the fast lane? The Bonus Buy takes you straight to the
     feature for 100x.
+
+    [DRAFT - PENDING OWNER APPROVAL, not yet part of the approved blurb] A driving
+    synthwave soundtrack and layered turbo SFX push the neon city to life,
+    shifting up a gear the instant Overdrive ignites.
 
     With a 96.35% RTP, wins up to 5,000x your bet and turbo mode, Future Spinner
     is built for players who live on the edge of the grid.
@@ -108,12 +121,119 @@ net) is available from the menu. Implemented in
 off by default; player-facing copy lives in the in-game paytable's
 "Responsible Play" section.
 
-**No soundtrack claim**: the submission blurb (section 3) and all in-game copy
-remain free of any soundtrack/music claim until audio actually ships (audio
-delivery is still the one open creative item, tracked in
-`docs/CHAT_CLOSEOUT_2026-07-06.md` section 3).
+**Soundtrack claim status (updated 2026-07-13):** audio has shipped (twelve mastered
+sound files - two music beds, ten SFX/stingers - via `tools/audio_forge/`, provenance in
+`reports/audio/GENERATION_LOG_2026-07-13.md`; wired into `soundService.ts` with a bed
+crossfade on Overdrive entry/exit, verified via `frontend/scripts/audio_verify.mjs`,
+ALL CHECKS PASS). Per `docs/CHAT_CLOSEOUT_2026-07-06.md` §2's own note, the blurb's
+soundtrack sentence is now restored as a draft (section 3) - **but remains
+PENDING OWNER APPROVAL**, not yet an approved claim. Do not treat the draft sentence as
+approved copy until the owner explicitly signs off on it.
 
-## 5. POST-UPLOAD VERIFICATION PROTOCOL (before requesting review)
+## 5. STAGING PROTOCOL (JOB 5, rewritten 2026-07-13 - was "POST-UPLOAD VERIFICATION
+PROTOCOL"; that content is preserved below as 5e, now framed inside the fuller staging
+sequence a real upload actually requires)
+
+### 5a. Frontend build artefact - what it is, how it's produced
+
+The uploaded frontend artefact is `frontend/dist/` after `npm run build` - a static,
+self-contained bundle (HTML/CSS/JS + the theme's asset tree), no server-side component.
+Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'s
+`pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
+(confirmed empty of pruned-path requests and under the 25MB budget by
+`frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
+Current measured size: **13.59MB** (JOB 4, 2026-07-13), including the twelve mastered
+audio files shipped in JOB 1. Regenerate immediately before staging with a clean
+`npm run build` from `frontend/` - never upload a stale or hand-edited `dist/`.
+
+### 5b. Exact portal upload steps
+
+1. Log in to the Stake Engine developer dashboard (team profile, branding and payment
+   details must already be confirmed one-time - see 5d below).
+2. Upload the frontend bundle: the full contents of `frontend/dist/` as produced in 5a,
+   for this exact commit.
+3. Upload the maths/publish bundle: the eleven files in 5c below, from
+   `games/future_spinner/library/publish_files/` - `index.json` first (declares the five
+   modes and their file references), then each mode's `books_*.jsonl.zst` and
+   `lookUpTable_*_0.csv`, then `game_metadata.json`.
+4. Compose the game tile in the dashboard Tile Editor from the background image,
+   foreground hero and provider logo (see JOB 7 - these are still design-pending, not
+   part of this pass).
+5. Enter the submission blurb (section 3) - **only once the draft soundtrack sentence has
+   been explicitly owner-approved**, otherwise upload the blurb without it.
+6. Do not request review yet - proceed to 5e (post-upload verification) first.
+
+### 5c. `publish_files` inventory with fresh SHA-256 hashes (2026-07-13)
+
+The eleven files `index.json` actually declares (five modes: `base`, `cruise`,
+`antelite`, `bonus`, `super`):
+
+| File | SHA-256 |
+|---|---|
+| `index.json` | `8857dbc027c5e2ceb0b2e39ec0a7dd05bc63272938dc8db515cdf7422d6f1aac` |
+| `game_metadata.json` | `51e7dceeacd41fd292e769b75383ac8c77f726e8f275b1808ad898d99d9abc38` |
+| `books_base.jsonl.zst` | `b86c8bb484523a53b8a42db6dbaef0bc26c51843077b5f06d01f492c40d39331` |
+| `books_cruise.jsonl.zst` | `7b5a1ddcfcdfde76a2f286a36992df5f9e8632cf9cfdc442fcc71dfd3fcc5b24` |
+| `books_antelite.jsonl.zst` | `9e5e8a0ad24f00383a6497f7debdf1ecaf46145d7f23f7d5d345e86ffd381377` |
+| `books_bonus.jsonl.zst` | `a38d2b8f5da04ac4f401f33bcdfbbcde56f6b661bcc0f7ad50e518763dd9bbb9` |
+| `books_super.jsonl.zst` | **absent from this checkout - see gap below** |
+| `lookUpTable_base_0.csv` | `7aa435857dcac59756f96b21dd128c58a9e3ed538b647c9056cebeee25e71990` |
+| `lookUpTable_cruise_0.csv` | `da3e45c577866d7357f6b1e83b9a2d14e406d2daf24b662e1a55003e2ed5de01` |
+| `lookUpTable_antelite_0.csv` | `150a6d243dcca205a7b9aff1c25c6ce5e3b31c634ac58f7b7e72274e4a054b15` |
+| `lookUpTable_bonus_0.csv` | `a77241f1a2e6606bebe94b5e6bb86bc6dda957732316d4962cffc199731d50cd` |
+| `lookUpTable_super_0.csv` | `2e94fe04ad0c44a69789f871b1c969e2c36021ce4db1c25bb328c8ee3dd4330e` |
+
+`books_cruise.jsonl.zst` and `books_antelite.jsonl.zst`'s hashes above match the
+REVIEW_EVENTS pass's independently-verified values exactly (`reports/qa/review_events_statelessness_2026-07-08.md`).
+`books_base.jsonl.zst`/`books_bonus.jsonl.zst` were not independently cross-checked
+against an earlier recorded hash in this pass (no baseline was located to compare
+against) - worth confirming against the PAR sheet's own §9 table before staging.
+
+**Gap found, not silently skipped: `books_super.jsonl.zst` is absent from this checkout's
+local `publish_files/` directory right now.** It is gitignored (`**/library/**`) like
+every file in this table, so its absence here doesn't necessarily mean anything is wrong
+upstream - it simply hasn't been (re)generated into this particular local filesystem
+state. The PAR sheet (`FUTURE_SPINNER_PAR_SHEET.md` §9) last recorded its hash as
+`c079226d718cab54825b91d5fdab631d7d2f8dd542f432e9b7b6ec7d57347445` (from the FeatureMath
+v2 pass). **Before staging, regenerate it (`games/future_spinner/run.py`, `run_sims`
+only, under a properly-scoped owner-sanctioned lock exception per `CLAUDE.md`'s
+lock-exception mechanism - this pass did not touch `games/future_spinner/**` at all, per
+the work order's explicit restriction) and confirm the fresh hash still matches this
+recorded value.** Do not stage the maths bundle without it - `index.json` declares
+`super` as a required mode.
+
+**Also flagged: seven orphaned, unreferenced `books_*.jsonl.zst` files sit in the same
+`publish_files/` directory** - `books_volatile.jsonl.zst`, `books_ante.jsonl.zst`,
+`books_hyperbuy.jsonl.zst`, `books_minibuy.jsonl.zst`, `books_superbuy.jsonl.zst`,
+`books_megabuy.jsonl.zst`, `books_superante.jsonl.zst` (35MB-203MB each, all dated
+2026-07-05, none referenced by `index.json`). These look like leftover artefacts from an
+earlier mode-naming iteration, before the current `base`/`cruise`/`antelite`/`bonus`/
+`super` names were finalised. **Not part of the declared publish set** and not staged in
+5b above - but exactly the class of stale-second-maths-package risk `CLAUDE.md`'s
+"Reference / prototype branches" note already warns cost a star at a prior external
+audit. Not deleted in this pass (locked path, out of this work order's scope) -
+recommend a future sanctioned `games/future_spinner/**` pass clean these up so a human
+skimming the directory never mistakes one for a live mode.
+
+### 5d. Owner checklist - one-time portal actions vs per-update actions
+
+**One-time (do once, ever, for this studio/game):**
+- [ ] Team profile and branding configured in Team Settings (provider logo applies to all
+  tiles automatically once set here - do not re-upload per game).
+- [ ] Payment details confirmed in the portal.
+- [ ] Knockout trademark search cleared (already done, dossier inventory item 12).
+
+**Per-update (repeat every time a new build/maths version is submitted):**
+- [ ] Regenerate `frontend/dist/` fresh (5a) - never reuse a prior build.
+- [ ] Re-verify `books_super.jsonl.zst`'s hash if the maths package changed at all (5c).
+- [ ] Re-upload both bundles (frontend + publish_files) for the exact new commit.
+- [ ] Re-run the post-upload verification protocol (5e) against the newly deployed build,
+  not a cached prior result.
+- [ ] Confirm the submission blurb text matches what's actually approved at the time
+  (the soundtrack sentence must not go in until explicitly approved - see 5b step 5).
+- [ ] Only then request review.
+
+### 5e. Post-upload verification protocol (preserved from the prior section 5, unchanged)
 1. Dashboard Developer Testing Tool: matrix of currencies, languages including
    social mode, and device modes against the deployed build.
 2. Browser network verification of authenticate, play and end-round on the

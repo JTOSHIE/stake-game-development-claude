@@ -1,0 +1,29 @@
+[
+  {
+    "menuId": "normal",
+    "expectBadge": "none",
+    "badgeOk": true,
+    "expectedMicros": 1000000,
+    "actualMicros": 1000000,
+    "figureOk": true,
+    "ok": true
+  },
+  {
+    "menuId": "cruise",
+    "expectBadge": "cruise",
+    "badgeOk": true,
+    "expectedMicros": 1000000,
+    "actualMicros": 1000000,
+    "figureOk": true,
+    "ok": true
+  },
+  {
+    "menuId": "overboost",
+    "expectBadge": "overboost",
+    "badgeOk": true,
+    "expectedMicros": 1250000,
+    "actualMicros": 1250000,
+    "figureOk": true,
+    "ok": true
+  }
+]

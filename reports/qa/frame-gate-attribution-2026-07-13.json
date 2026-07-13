@@ -1,0 +1,37 @@
+[
+  {
+    "tMs": 2929,
+    "gapMs": 283.2,
+    "nearestEvent": "spin-click",
+    "deltaToEventMs": 294,
+    "source": "session-a"
+  },
+  {
+    "tMs": 119644,
+    "gapMs": 166.4,
+    "nearestEvent": "spin-click",
+    "deltaToEventMs": 226,
+    "source": "session-a"
+  },
+  {
+    "tMs": 2177,
+    "gapMs": 233.3,
+    "nearestEvent": "spin-click",
+    "deltaToEventMs": 242,
+    "source": "session-b"
+  },
+  {
+    "tMs": 198157,
+    "gapMs": 149,
+    "nearestEvent": "spin-click",
+    "deltaToEventMs": 227,
+    "source": "session-b"
+  },
+  {
+    "tMs": 2512,
+    "gapMs": 233.4,
+    "nearestEvent": "buy-confirm-bonus",
+    "deltaToEventMs": 3421,
+    "source": "cost-integrity"
+  }
+]
