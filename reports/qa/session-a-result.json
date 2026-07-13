@@ -1,0 +1,28 @@
+{
+  "roundResults": {
+    "checked": 1000,
+    "totalMismatches": [],
+    "balanceDrifts": []
+  },
+  "consoleErrors": [],
+  "avgFps": 58.79371832508983,
+  "totalSpins": 1000,
+  "longFrames": [
+    {
+      "tMs": 2929,
+      "gapMs": 283.2,
+      "nearestEvent": "spin-click",
+      "deltaToEventMs": 294
+    },
+    {
+      "tMs": 119644,
+      "gapMs": 166.4,
+      "nearestEvent": "spin-click",
+      "deltaToEventMs": 226
+    }
+  ],
+  "heapSamples": {
+    "100": 19300000,
+    "1000": 19300000
+  }
+}

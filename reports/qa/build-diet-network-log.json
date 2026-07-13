@@ -1,199 +1,199 @@
 {
   "requests": [
     {
-      "url": "http://localhost:50107/",
+      "url": "http://localhost:50573/",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/index-PF7VQ8ty.css",
+      "url": "http://localhost:50573/assets/index-PF7VQ8ty.css",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/svelte-sRPQ3dN3.js",
+      "url": "http://localhost:50573/assets/svelte-sRPQ3dN3.js",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/index-DHSZ1rmK.js",
+      "url": "http://localhost:50573/assets/index-DHSZ1rmK.js",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/pixi-CNN18upR.js",
+      "url": "http://localhost:50573/assets/pixi-CNN18upR.js",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "url": "http://localhost:50573/assets/themes/future-spinner/backgrounds/bg_base.jpg",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
+      "url": "http://localhost:50573/assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/brand_mark_base.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/brand_mark_base.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/brand_mark_spin.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/brand_mark_spin.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/logo.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/logo.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/gauge_face.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/gauge_face.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/orbitron-latin-900-normal-DrIi7unX.woff2",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/gauge_needle.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/orbitron-latin-400-normal-U6xZUhur.woff2",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/scene_car.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/gauge_needle.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/scene_character.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/scene_car.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/frames/frame-2.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/orbitron-latin-700-normal-4jsRXGGJ.woff2",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/jet_nozzle.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/scene_character.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/tile_plate.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/frames/frame-2.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/l3.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/jet_nozzle.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/h1_base.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/tile_plate.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/h1_spin.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/l3.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/h2.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/h1_base.png",
+      "url": "http://localhost:50573/assets/orbitron-latin-400-normal-U6xZUhur.woff2",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/h1_spin.png",
+      "url": "http://localhost:50573/assets/orbitron-latin-700-normal-4jsRXGGJ.woff2",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/h2.png",
+      "url": "http://localhost:50573/assets/orbitron-latin-900-normal-DrIi7unX.woff2",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/m1.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/m2.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/m2.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/m1.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/m3.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/m3.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/l1.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/l1.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/l2.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/l2.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/wild.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/wild.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/scatter.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/m3_flame_sheet.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/m3_flame_sheet.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/scatter.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/jet_flame_sheet.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/l2_fuse_sheet.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/l2_fuse_sheet.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/jet_flame_sheet.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/plates.json",
+      "url": "http://localhost:50573/assets/themes/future-spinner/plates.json",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/bgm_loop.webm",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/bgm_tension.webm",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/bgm_tension.webm",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/spin.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/spin.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/reel_stop.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/reel_stop_anticipation.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/reel_stop_anticipation.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/win_small.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/win_small.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/win_medium.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/win_medium.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/win_big.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/win_epic.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/win_epic.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/scatter_land.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/scatter_land.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/win_big.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/anticipation_build.webm",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/anticipation_build.webm",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "url": "http://localhost:50573/assets/themes/future-spinner/sounds/ui_click.mp3",
       "status": 206
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/ui/feature_button.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/ui/feature_button.png",
       "status": 200
     },
     {
-      "url": "http://localhost:50107/assets/themes/future-spinner/symbols/h1.png",
+      "url": "http://localhost:50573/assets/themes/future-spinner/symbols/h1.png",
       "status": 200
     }
   ],
@@ -208,6 +208,12 @@
     "distSizeBytes": 14254924,
     "distSizeMB": 13.59,
     "distBudgetMB": 25,
-    "distUnderBudget": true
+    "distUnderBudget": true,
+    "reelModeToggleAbsentFromProdBundle": true,
+    "reducedMotion": {
+      "cssRulePresent": true,
+      "spinCompletedWithNoErrors": true,
+      "errors": []
+    }
   }
 }
