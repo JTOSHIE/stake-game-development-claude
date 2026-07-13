@@ -1,3 +1,9 @@
+> ARCHIVED ARC (2026-07-06). Superseded as the living document by
+> `HANDOVER_2026-07-07_Fable.md` (a genuinely new arc, per convention (j)), which itself
+> names this file "still the primary reference for full historical context" - so this
+> stays as background reading, not duplicated or deleted. Do not append further dated
+> sections here; new updates go in the 2026-07-07 file (or its successor arc).
+
 # Handover to Fable — Future Spinner + LUMEN status (2026-07-06)
 
 **From:** the working session (Claude Opus 4.8, 1M context), operating semi-independently

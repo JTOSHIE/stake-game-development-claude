@@ -48,17 +48,21 @@ const COMPLIANCE_VIEWPORTS = [
 ]
 
 // Text-bearing HUD selectors checked for pairwise occlusion, plus the frame.
+// (2026-07-08 hygiene pass: the old .hud-panel/.turbo-btn/etc class names and
+// the FeatureButton testid are stale since the B1 HUD reskin - fs-turbo/
+// fs-menu/etc are siblings of .fs-panel, not descendants, so these are now
+// standalone selectors rather than `.hud-panel .x` descendant selectors.)
 const TEXT_SELECTORS = [
   '.logo-box',
   '.error-banner',
-  '.hud-panel .turbo-btn',
-  '.hud-panel .hamburger-btn',
-  '.hud-panel .balance-box',
-  '.hud-panel .win-box',
-  '.hud-panel .bet-box',
-  '.spin-btn',
+  '.fs-turbo',
+  '.fs-menu',
+  '[data-testid="hud-balance"]',
+  '[data-testid="hud-win"]',
+  '[data-testid="hud-bet"]',
+  '[data-testid="spin-button"]',
   '.autoplay-wrapper',
-  '[data-testid="feature-button"] .feature-label',
+  '[data-testid="feature-menu-entry"] .fm-entry-label',
   '[data-testid="win-banner"]',
   '[data-testid="bonus-instrument-column"] .plate',
   '[data-testid="odometer"]',
@@ -129,13 +133,20 @@ async function run() {
 
     // Position audit — only meaningful at the 1280x720 reference (S=1)
     if (vp.name === '1280x720-base') {
-      const panel = await page.locator('.hud-panel').boundingBox()
-      const spin = await page.locator('.spin-btn').boundingBox()
+      const panel = await page.locator('[data-testid="hud-panel"]').boundingBox()
+      const spin = await page.locator('[data-testid="spin-button"]').boundingBox()
       const logo = await page.locator('.logo-box').boundingBox()
       const spinCentre = { x: spin.x + spin.width / 2, y: spin.y + spin.height / 2 }
       results.position = {
-        hudPanel: { expected: { x: 320, y: 560, width: 640, height: 88 }, measured: panel },
-        spinCentre: { expected: { x: 970, y: 604 }, measured: spinCentre },
+        // Expected values refreshed 2026-07-13 (JOB 2) from the current build,
+        // measured at this same 1280x720 reference viewport - the previous
+        // values dated to LAYOUT_SPEC v3.1, before the B1 HUD reskin moved the
+        // panel/spin button. Occlusion (above) remains the only hard gate;
+        // these are reference numbers for a human comparing deltas, not
+        // asserted against (a real regression would need its own gate, not a
+        // silent tolerance band here).
+        hudPanel: { expected: { x: 296, y: 560, width: 688, height: 88 }, measured: panel },
+        spinCentre: { expected: { x: 1004, y: 604 }, measured: spinCentre },
         logoBox: { expected: { x: 450, y: 18, width: 380, height: 60 }, measured: logo },
       }
     }
@@ -151,7 +162,11 @@ async function run() {
     await dismissIntroIfPresent(page)
     await page.waitForTimeout(600)
 
-    await page.locator('[data-testid="feature-button"] button').click()
+    // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07):
+    // open the menu, then ACTIVATE the Buy Overdrive card.
+    await page.locator('[data-testid="feature-menu-button"]').click()
+    await page.waitForTimeout(150)
+    await page.locator('[data-testid="activate-bonus"]').click()
     await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
     await page.locator('[data-testid="buy-confirm"]').click()
 
@@ -173,7 +188,7 @@ async function run() {
 
     const column = await page.locator('[data-testid="bonus-instrument-column"]:visible').boundingBox()
     results.position.instrumentColumn = {
-      expected: { x: 1000, y: 96, width: 262 },
+      expected: { x: 998, y: 96, width: 262, height: 376 },
       measured: column,
     }
 

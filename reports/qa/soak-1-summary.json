@@ -4,10 +4,14 @@
   "exactTotalMismatches": 0,
   "balanceDrifts": 0,
   "consoleErrors": 0,
-  "heap100Bytes": 17100000,
+  "heap100Bytes": 19300000,
   "heap1000Bytes": 19300000,
-  "heapGrowthPct": 12.865497076023392,
-  "avgFpsSessionA": 59.865539389546576,
-  "avgFpsSessionB": 59.9596292267967,
-  "avgFpsOverall": 59.91258430817164
+  "heapGrowthPct": 0,
+  "avgFpsSessionA": 58.79371832508983,
+  "avgFpsSessionB": 58.14941860660446,
+  "avgFpsOverall": 58.47156846584714,
+  "costIntegrityFailures": 0,
+  "costVisibilityFailures": 0,
+  "buyAffordabilityBoundaryOk": true,
+  "framesOver100ms": 5
 }

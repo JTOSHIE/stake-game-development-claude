@@ -1,0 +1,14 @@
+{
+  "roundResults": {
+    "checked": 1000,
+    "totalMismatches": [],
+    "balanceDrifts": []
+  },
+  "consoleErrors": [],
+  "avgFps": 59.865539389546576,
+  "totalSpins": 1000,
+  "heapSamples": {
+    "100": 17100000,
+    "1000": 19300000
+  }
+}

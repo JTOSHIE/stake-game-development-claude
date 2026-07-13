@@ -1,14 +1,84 @@
-8:19:06 pm [vite] (client) Forced re-optimization of dependencies
+[2m11:21:02 pm[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Forced re-optimization of dependencies
 
-  VITE v7.3.1  ready in 772 ms
+  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m998[22m[2m[0m ms[22m
 
-  ➜  Local:   http://localhost:52996/
-  ➜  Network: use --host to expose
-8:19:06 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:177:12 `<tr>` will be treated as an HTML element unless it begins with a capital letter
-https://svelte.dev/e/component_name_lowercase
-8:19:06 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:185:14 `<tr>` will be treated as an HTML element unless it begins with a capital letter
-https://svelte.dev/e/component_name_lowercase
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m49702[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1086:2 Unused CSS selector ".symbol-fx.fx-flame"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1092:2 Unused CSS selector ".symbol-fx.fx-arc"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1099:2 Unused CSS selector ".reel-strip.spinning .symbol-img"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1100:2 Unused CSS selector ".reel-strip.spinning .symbol-overlay"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1101:2 Unused CSS selector ".reel-strip.spinning .symbol-fx"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1102:2 Unused CSS selector ".reel-strip.spinning .symbol-overlay"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1103:2 Unused CSS selector ".reel-strip.spinning .symbol-fx"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1109:2 Unused CSS selector ".reel-strip.anticipate .tile-inner"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1117:2 Unused CSS selector ".reel-strip.anticipate .symbol-cell"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1129:2 Unused CSS selector ".idle-charge"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1136:2 Unused CSS selector ".idle-rev"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1143:2 Unused CSS selector ".idle-coil"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1147:2 Unused CSS selector ".idle-flame"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1155:2 Unused CSS selector ".idle-glint"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1159:2 Unused CSS selector ".idle-arc"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1166:2 Unused CSS selector ".idle-pump"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1173:2 Unused CSS selector ".idle-rings"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1181:2 Unused CSS selector ".idle-rays"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1187:2 Unused CSS selector ".symbol-overlay.win-spin-fast"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1204:2 Unused CSS selector ".symbol-cell.plate-bloom"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1219:2 Unused CSS selector ".symbol-cell.pre-charge"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1254:2 Unused CSS selector ".symbol-cell.scatter-charge"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1256:2 Unused CSS selector ".symbol-cell.scatter-charge::before"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1263:2 Unused CSS selector ".symbol-cell.scatter-charge::after"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1290:36 Unused CSS selector ".symbol-cell.plate-bloom"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1290:62 Unused CSS selector ".symbol-cell.pre-charge"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1291:4 Unused CSS selector ".reel-strip.anticipate .symbol-cell"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1292:4 Unused CSS selector ".symbol-cell.scatter-charge"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1292:33 Unused CSS selector ".symbol-cell.scatter-charge::before"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1292:70 Unused CSS selector ".symbol-cell.scatter-charge::after"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1295:4 Unused CSS selector ".symbol-cell.scatter-charge::before"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/GameGrid.svelte:1295:41 Unused CSS selector ".symbol-cell.scatter-charge::after"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/HudOverlay.svelte:607:2 Unused CSS selector ".fs-hud.scheme-trap"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/HudOverlay.svelte:608:2 Unused CSS selector ".fs-hud.scheme-oil"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:02 pm [vite-plugin-svelte] src/lib/components/HudOverlay.svelte:609:2 Unused CSS selector ".fs-hud.scheme-pitch"
+https://svelte.dev/e/css_unused_selector[39m
+[36m11:21:03 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:218:14 `<tr>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase[39m
+[36m11:21:03 pm [vite-plugin-svelte] src/lib/components/PaytableModal.svelte:222:16 `<tr>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase[39m
 [build-diet] total pruned: 0 paths, 0.00 MB
 [build-diet] total pruned: 0 paths, 0.00 MB
 
-[qa_soak] child exited at Sat Jul 04 2026 21:04:55 GMT+1000 (Australian Eastern Standard Time) code=143 signal=null
+[qa_soak] child exited at Mon Jul 13 2026 23:43:06 GMT+1000 (Australian Eastern Standard Time) code=143 signal=null
