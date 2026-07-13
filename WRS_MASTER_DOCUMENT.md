@@ -29,36 +29,39 @@ Living register of everything We Roll Spinners must hold, maintain and carry for
 |---|---|---|
 | Rules and paytable UI (all rules, per-mode cost, per-mode RTP, per-mode max win, all symbol pays, special values, feature access) | frontend PaytableModal + rules UI | IN PROGRESS (JOB 5b) |
 | UI button guide | frontend (new) | OPEN (JOB 5b) |
-| Submission blurb | SUBMISSION_BLURB.md / dossier s3 | GATE (owner approval of amended wording; soundtrack line restores after audio ships) |
+| Submission blurb | SUBMISSION_BLURB.md / dossier s3 | GATE - SUBMISSION_BLURB.md is STALE (pre-Overdrive, single-mode text, contradicts the shipped five-mode game - flagged in JOB 6's AUDIT_PACK_INDEX.md, not yet corrected or deleted). PROMO_BLURB.md and SUBMISSION_DOSSIER.md s3 carry the current text; owner approval of the amended wording still open, soundtrack line restores after audio ships. |
 ### 3b. Reviewer-facing evidence
 | Artefact | Path | Status |
 |---|---|---|
 | PAR sheet (5 modes, pre-rev disclosure) | games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md | DONE |
-| Math self-audit vs approval criteria | reports/qa/math_selfaudit_*.md | OPEN (JOB 3b) |
-| Compliance watch (dated re-validation) | COMPLIANCE_WATCH.md | IN PROGRESS (JOB 3) |
+| Math self-audit vs approval criteria | reports/qa/math_selfaudit_*.md | OPEN (JOB 3b, addendum - not the same as the JOB 3 re-validation below, still not started) |
+| Compliance watch (dated re-validation) | COMPLIANCE_WATCH.md | DONE (JOB 3 re-validation merged to main 2026-07-14; RG gates, PF determinism 58/58, telemetry no-op confirmed at built-bundle level, three RGS failure paths traced) |
 | Wiring integrity audit | reports/qa/wiring_integrity_audit_2026-07-07.md | DONE |
 | Statelessness proof (script + result) | scripts/review_events_stateless_scan.py; reports/qa/review_events_statelessness_* | DONE |
 | Replay event IDs (5 modes) | REPLAY_TEST_EVENTS.md | DONE |
-| Determinism / provably-fair | roundInterpreter.determinism.test.ts; PF_READINESS.md | DONE (re-verify in JOB 3) |
-| QA re-soak (current, 5 modes, audio, conformance) | reports/qa/ (new dated logs) | OPEN (JOB 2 + extensions) |
-| Build diet + budget | frontend/scripts/build_diet_verify.mjs; report | IN PROGRESS (JOB 4 re-run with audio) |
-| Audio provenance | reports/audio/GENERATION_LOG_2026-07-13.md; sounds/README.md | OPEN (JOB 1e) |
-| Math validation record | MATH_VALIDATION.md; scripts/validate_math.py | DONE |
+| Determinism / provably-fair | roundInterpreter.determinism.test.ts; PF_READINESS.md | DONE (re-verified fresh in JOB 3, 58/58 pass) |
+| QA re-soak (current, 5 modes, audio, conformance) | reports/qa/ (dated logs) | DONE for the core gates merged in JOB 2 (cost integrity, frame-gate attribution, reduced-motion, reel-mode-toggle absence, real vite-banner bug fixed). OPEN for the addendum's platform-conformance extensions (a-g): same-origin resource sweep, spacebar-triggers-bet assert, mini-player popout screenshots, bet-level conformance incl. high-min currency, language fuzz, incremental win count-up assert, fastplay legibility - none of these are built yet. |
+| Build diet + budget | frontend/scripts/build_diet_verify.mjs; reports/qa/build-diet-network-log.json | DONE - JOB 2's and JOB 4's versions of this script were reconciled during the 2026-07-14 merge sweep (both gate sets combined); re-run fresh against the merged main: 13.59MB dist, all gates pass (zero 404s/pruned-hits/console errors, dist under 25MB, reel-toggle absent, reduced-motion CSS present). |
+| Audio provenance | reports/audio/GENERATION_LOG_2026-07-13.md; sounds/README.md | DONE (JOB 1 merged to main 2026-07-14) |
+| Math validation record | MATH_VALIDATION.md; scripts/validate_math.py | DONE (re-run fresh against the final merged main during the 2026-07-14 sweep, all-pass) |
 | RGS contract reference | docs/RGS_CONTRACT_REFERENCE.md | DONE |
-| Telemetry taxonomy (no-op default) | docs/TELEMETRY_TAXONOMY.md | DONE (confirm no-op in JOB 3) |
+| Telemetry taxonomy (no-op default) | docs/TELEMETRY_TAXONOMY.md | DONE (no-op confirmed at built-bundle level in JOB 3) |
 ### 3c. Portal artefacts
 | Artefact | Status |
 |---|---|
-| Tile background layer (hi-res scene) | OPEN (Fable art master next check-in; AssetForge slot via JOB 7) |
-| Tile foreground layer (pilot+car transparent PNG) | OPEN (same) |
-| Provider logo (square, transparent) | OPEN (same) |
-| Dossier section 5: ACP staging protocol with doc-URL citations | OPEN (JOB 5) |
+| Tile background layer (hi-res scene) | OPEN, now scaffolded - AssetForge output slot added in JOB 7 (`scripts/assets/manifest.json`'s `storefront_tile.tile_background`, inert until Fable delivers the master SVG). No existing master fits; genuinely new art needed. Note: the published Stake tile spec has no pixel dimensions or text-safe-area guidance at all - the scaffold's w/h values are provisional defaults, not an official number; confirm against the dashboard Tile Editor. |
+| Tile foreground layer (pilot+car transparent PNG) | OPEN, now scaffolded (same manifest, `tile_foreground_hero`). `scene_character_car.svg` (the existing in-game identity-character master) is a strong reference/starting point for Fable rather than a from-scratch design, but still needs isolated re-crop/re-composition work - not a straight reuse. |
+| Provider logo (square, transparent) | IN PROGRESS (sign-off only, no art needed) - JOB 7 found `brand_mark.svg` is already documented as the WRS provider logo (`design-system/DESIGN_SYSTEM.md`) and already exports at 512x512 (`ui/brand_mark.png`) and 192x192 (`ui/brand_mark_glyph.png`), both transparent PNG. No new art needed; only needs Fable/owner confirmation to use the existing export for the Team Settings upload. |
+| Dossier section 5: ACP staging protocol with doc-URL citations | DONE (JOB 5 merged to main 2026-07-14: full 5a-5e staging protocol, publish_files SHA-256 inventory) |
 ### 3d. Process record
 | Artefact | Path | Status |
 |---|---|---|
-| Living arc handover | HANDOVER_2026-07-07_Fable.md | DONE (PR #53 merge pending) |
-| Hygiene pass (prompt archive, supersessions) | PR #52 | APPROVED, merge pending |
+| Living arc handover | HANDOVER_2026-07-07_Fable.md | DONE, merged |
+| Hygiene pass (prompt archive, supersessions) | merged to main (was PR #52) | DONE |
 | Known locked-file debts | CLAUDE.md LOCKED_FILE_DEBTS note (canBuyBonus 1x/100x hardcodes, compensated) | DONE |
+| External audit pack refresh (pointer + supersession list) | AUDIT_PACK_INDEX.md | DONE (JOB 6, merged 2026-07-14). The audit itself has not run - this is prep only, per the work order. |
+| PR merge sweep (all ten open PRs resolved) | reports/archive/2026-07-14_pr-merge-sweep.md | DONE 2026-07-14. Zero open PRs remain. Two genuinely stale branches (JOB 1's carrier branch, and the oldest pre-work-order incremental-logging fix) needed real reconciliation; the other eight were already correctly merged against the post-hygiene-pass main by the sessions that created them. Locked files, frontend build and math validation all re-verified clean on the final merged main. |
+| Round-two audio slots (bonus_trigger, buy_confirm, wild_land, coin_count, win_max, ambience_rain) | reports/archive/2026-07-14_job8-audio-round2-placeholder.md | OPEN, deliberately deferred (JOB 8) - gated on the owner playing the JOB 1 build and Fable ruling on the mix. Not started, by design. |
 
 ## 4. TESTING GATES BEFORE SUBMISSION (evidence lands in reports/qa/)
 1. Five-mode QA re-soak: cost integrity (integer micros), buy boundary, OVERBOOST cost visibility, drop default, reduced motion. (JOB 2)
@@ -90,3 +93,4 @@ Reuse in order: maths package + validate_math + PAR -> wiring integrity audit pa
 
 ## 9. CHANGE LOG
 - 2026-07-13: Document created (Fable). Statuses reflect main at PR #54 with PRs #52/#53 approved and awaiting merge.
+- 2026-07-14: Jobs 1-8 of the 2026-07-13 consolidated work order, and CLAUDE_PROJECT_INSTRUCTIONS_v6.md, all merged to main via a full PR sweep (`reports/archive/2026-07-14_pr-merge-sweep.md`). Ten open PRs resolved to zero; locked files, frontend build and math validation all re-verified clean on the final merged main. Sections 3b/3c/3d above updated to reflect landed work. Two real findings surfaced during the sweep and JOB 6/7 prep, both still open: `SUBMISSION_BLURB.md` (repo root) is stale pre-Overdrive text contradicting the shipped game (3a); the provider logo requirement turns out to already be satisfied by the existing `brand_mark.svg` master, pending only a confirmation, not new art (3c). Remaining before submission: JOB 3b (math self-audit), JOB 5b (in-game rules conformance UI), JOB 9b (social-mode string audit), and the JOB 2 addendum's platform-conformance extensions (a-g) - none of these have started. 24 stale merged remote/local branches cleaned up in the same pass, preserving the two deliberately-named reference branches (`claude/collect-prototype`, `claude/gap-analysis`).

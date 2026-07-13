@@ -93,6 +93,36 @@ main in and resolved things properly) - only **2 were genuinely stale**:
 - No new session-specific proofs were generated (this was a merge/reconciliation pass,
   not a build/feature pass) beyond the build_diet_verify re-run above.
 
+## Addendum: branch cleanup + WRS_MASTER_DOCUMENT.md refresh
+
+After the merge sweep, owner confirmed via prompt: delete all merged branches (not
+just today's). Cross-checked with `git branch --merged origin/main` (ancestry-based,
+not PR-status-based) rather than trusting the PR list alone. One deliberate exception
+found and preserved: `claude/collect-prototype` showed as "merged" (its commits are
+ancestors of main from when the Collection Meter prototype briefly lived on main,
+before the 2026-07-08 hygiene pass relocated it), but CLAUDE.md names this branch by
+name as the durable, deliberate home for that work for possible future LUMEN reuse -
+excluded it from deletion. Verified its content is separately permanent in main's own
+history either way (`git log main -- games/future_spinner_collect/` shows the add and
+remove commits), so the branch name itself was the only thing at stake, and it was
+worth preserving given it's explicitly documented. `claude/gap-analysis` (also named
+in CLAUDE.md as a deliberate reference) was never at risk - it isn't merged.
+
+Deleted 24 remote branches and their local copies (11 from today's sweep, 13 older
+already-merged branches from past sessions). Remaining: `main`, the two deliberate
+references (`collect-prototype`, `gap-analysis`), the active `lumen-sideproject`, and
+two unmerged/untouched branches (`compliance-rg`, `fs-super-prototype`) outside this
+sweep's scope.
+
+Also refreshed `WRS_MASTER_DOCUMENT.md` (created only yesterday, already stale after
+today's merges): updated sections 3b/3c/3d status rows to DONE where Jobs 1-8 actually
+landed, distinguished the JOB 3/JOB 5 work that's done from the JOB 3b/5b/9b/JOB-2-
+addendum work that is NOT (these are separate, not-yet-started items despite similar
+names), and appended a dated section 9 entry. Carried forward, not silently dropped:
+the `SUBMISSION_BLURB.md` staleness finding (JOB 6) and the provider-logo-already-
+exists finding (JOB 7), both now visible in the master document's own tables rather
+than only in individual job archives.
+
 ## FOR THE NEXT SESSION
 
 - **Model/effort:** Claude Sonnet 5, default effort. **Approach:** surveyed every PR's
@@ -114,8 +144,7 @@ main in and resolved things properly) - only **2 were genuinely stale**:
   (conflict reconciliation only, no new logic), this report + its dated archive copy.
   Everything else landed via the ten PR merges themselves, each already reviewed and
   reported by its own originating session.
-- **Open threads:** optionally clean up the 28 stale remote branches (ask first);
-  `WRS_MASTER_DOCUMENT.md`'s section 9 change log and section 3 status table still
-  only reflect its 2026-07-13 creation snapshot and should get a dated entry now that
-  Jobs 1-8 are actually on `main`; the Fable update for next steps is drafted
+- **Open threads:** branch cleanup done (see addendum above) and
+  `WRS_MASTER_DOCUMENT.md` refreshed (see addendum above), both resolved within this
+  same session after the owner's follow-up; the Fable update for next steps is drafted
   separately for the owner to paste into the next Fable session.
