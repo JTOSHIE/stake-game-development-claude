@@ -166,3 +166,50 @@ best-effort placeholder.
   exist, including whether `apg_scale=0.0` vs the default `1.0` is audible; PR #54 still
   needs the owner's merge decision (both the original build and this amendment are on the
   same branch/PR).
+
+## Addendum (2026-07-13, same day) - full 48-candidate manifest run, provenance
+
+PR #54 merged; the owner then asked for the full manifest run (all 12 rows x 4 seeds),
+unattended under `caffeinate` so the Mac wouldn't sleep mid-run. Recorded here for the
+dossier since the run's provenance isn't a clean single pass - two real incidents
+happened and both are relevant to trusting the resulting candidates and log.
+
+**Incident 1 - the first attempt was killed by a tool timeout, not the job itself.**
+Launched via a backgrounded Bash call with an explicit `timeout: 600000` (10 minutes) -
+that cap turned out to apply even in background mode, so the process was killed
+~10 minutes in, mid-way through `bgm_loop` (a 90-second-audio row, ~730-790s per
+candidate at this hardware's pace - nothing close to finishing in 10 minutes). Three
+`bgm_loop` candidates (seeds 20260707/08/09) had already completed and written valid,
+complete WAV files to disk before the kill, but `write_log()` at the time only ran once,
+after the *entire* manifest finished - so those three real, valid candidates were never
+recorded in `GENERATION_LOG.md` at all.
+
+**Fix, applied before relaunching:** refactored `generate.py` so the log is written
+incrementally - `write_log_header()` writes the run's header once, then
+`append_log_row()` appends one line immediately after each candidate is written to disk,
+flushing every write. An interrupted run now only ever loses the *in-flight* candidate at
+the moment of interruption, never previously-completed ones. This is committed as its own
+change (see below).
+
+**Manual reconciliation:** since the three `bgm_loop` files predate this fix, they were
+individually appended to `GENERATION_LOG.md` by hand in a clearly-marked
+"## Run 2026-07-13 (reconciliation)" block, stating why (the timeout, not a failed
+generation) and that the files themselves were verified complete and valid on disk before
+being logged. No files were regenerated or altered - this is a paperwork fix, not a
+maths/audio fix.
+
+**Relaunch:** the full run was restarted fully detached
+(`nohup caffeinate -i -s python generate.py > /tmp/audioforge_full_run.log 2>&1 &`,
+disowned) specifically so it could not be killed by any tool-level timeout again -
+`nohup`'d output isn't tracked by the Bash tool's own process lifecycle at all. It
+skipped the 7 already-complete candidates (4 `ui_click` from the earlier smoke test, 3
+`bgm_loop` from the killed attempt) and ran the remaining 41 to completion.
+
+**Result:** all 48 candidates present and valid, zero fallback switches (medium handled
+every row), full per-row timing table already relayed to the owner in chat. Nothing under
+`~/Desktop` is part of this or any commit - `GENERATION_LOG.md`, all candidates, and the
+promoted-file convention all stay outside the repo per the original brief.
+
+- **Files touched (this addendum):** `tools/audio_forge/generate.py` (incremental
+  `write_log_header()`/`append_log_row()` in place of the old batched `write_log()`),
+  this report + its dated archive copy. No maths/frontend/locked files touched.
