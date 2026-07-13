@@ -74,6 +74,9 @@ async function run() {
   const requests = []
   const failures = []
   const consoleErrors = []
+  let reelModeToggleCount = null
+  let reducedMotionErrors = []
+  let reducedMotionCssPresent = false
 
   try {
     const browser = await chromium.launch()
@@ -143,7 +146,42 @@ async function run() {
       await page.waitForTimeout(150)
     }
 
+    // JOB 2 (QA re-soak): confirm the dev-only reel-mode toggle is absent from
+    // the production bundle - it's gated behind the same import.meta.env.DEV
+    // block as the theme selector (App.svelte), so a normal `npm run build` +
+    // `vite preview` (this script) is exactly what a real production check needs.
+    reelModeToggleCount = await page.locator('[data-testid="reel-mode-toggle"]').count()
+
     await page.close()
+
+    // JOB 2's reduced-motion pass: emulate the OS preference, reload, and
+    // confirm (a) the shipped CSS still contains the prefers-reduced-motion
+    // media query (not stripped by the build) and (b) a full spin completes
+    // with zero console errors under that preference - GameGrid.svelte's
+    // particle bursts are Pixi-drawn (not CSS), so they can't be asserted via
+    // a DOM selector; this checks the app functions correctly with the
+    // preference active rather than asserting a canvas-internal detail.
+    const rmPage = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+    rmPage.on('console', (msg) => { if (msg.type() === 'error') reducedMotionErrors.push(msg.text()) })
+    rmPage.on('pageerror', (err) => reducedMotionErrors.push('pageerror: ' + err.message))
+    await rmPage.emulateMedia({ reducedMotion: 'reduce' })
+    await rmPage.goto(baseUrl, { waitUntil: 'networkidle' })
+    await rmPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+    const rmIntro = rmPage.locator('[data-testid="intro-continue"]')
+    if (await rmIntro.count() > 0 && await rmIntro.isVisible().catch(() => false)) {
+      await rmIntro.click()
+      await rmPage.waitForTimeout(150)
+    }
+    await rmPage.locator('[data-testid="spin-button"]').click()
+    await rmPage.waitForFunction(() => !document.querySelector('[data-testid="spin-button"].spinning'), { timeout: 15000 })
+    await rmPage.waitForTimeout(150)
+    const shippedCss = requests.map((r) => r.url).find((u) => u.endsWith('.css'))
+    if (shippedCss) {
+      const cssRes = await rmPage.request.get(shippedCss)
+      const cssText = await cssRes.text()
+      reducedMotionCssPresent = /prefers-reduced-motion/.test(cssText)
+    }
+    await rmPage.close()
     await browser.close()
   } finally {
     preview.kill()
@@ -157,16 +195,27 @@ async function run() {
     consoleErrors: consoleErrors.length,
     failures,
     consoleErrorMessages: consoleErrors,
+    reelModeToggleAbsentFromProdBundle: reelModeToggleCount === 0,
+    reducedMotion: {
+      cssRulePresent: reducedMotionCssPresent,
+      spinCompletedWithNoErrors: reducedMotionErrors.length === 0,
+      errors: reducedMotionErrors,
+    },
   }
 
   writeFileSync(join(OUT_DIR, 'build-diet-network-log.json'), JSON.stringify({ requests, summary }, null, 2))
   console.log(JSON.stringify(summary, null, 2))
 
-  if (summary.notFound > 0 || summary.failed > 0 || summary.prunedPathHits > 0 || summary.consoleErrors > 0) {
+  if (
+    summary.notFound > 0 || summary.failed > 0 || summary.prunedPathHits > 0 || summary.consoleErrors > 0 ||
+    !summary.reelModeToggleAbsentFromProdBundle ||
+    !summary.reducedMotion.cssRulePresent || !summary.reducedMotion.spinCompletedWithNoErrors
+  ) {
     console.error('BUILD DIET VERIFY: FAILURES DETECTED')
     process.exit(1)
   }
-  console.log('BUILD DIET VERIFY: ALL CHECKS PASS (zero 404s, zero pruned-path requests, zero console errors)')
+  console.log('BUILD DIET VERIFY: ALL CHECKS PASS (zero 404s, zero pruned-path requests, zero console errors, ' +
+    'reel-mode toggle absent, reduced-motion CSS present + spin clean)')
 }
 
 run().catch((err) => {
