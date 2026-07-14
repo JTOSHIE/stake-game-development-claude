@@ -29,7 +29,7 @@ Living register of everything We Roll Spinners must hold, maintain and carry for
 |---|---|---|
 | Rules and paytable UI (all rules, per-mode cost, per-mode RTP, per-mode max win, all symbol pays, special values, feature access) | frontend PaytableModal + rules UI | IN PROGRESS (JOB 5b) |
 | UI button guide | frontend (new) | OPEN (JOB 5b) |
-| Submission blurb | SUBMISSION_BLURB.md / dossier s3 | GATE - SUBMISSION_BLURB.md is STALE (pre-Overdrive, single-mode text, contradicts the shipped five-mode game - flagged in JOB 6's AUDIT_PACK_INDEX.md, not yet corrected or deleted). PROMO_BLURB.md and SUBMISSION_DOSSIER.md s3 carry the current text; owner approval of the amended wording still open, soundtrack line restores after audio ships. |
+| Submission blurb | PROMO_BLURB.md / dossier s3 | GATE (owner approval of amended wording; soundtrack line restores after audio ships). The stale pre-Overdrive `SUBMISSION_BLURB.md` (flagged in JOB 6's AUDIT_PACK_INDEX.md) was moved to `reports/archive/SUBMISSION_BLURB_superseded.md` with a SUPERSEDED header in the 2026-07-14 work order's ITEM 0 - resolved. |
 ### 3b. Reviewer-facing evidence
 | Artefact | Path | Status |
 |---|---|---|
