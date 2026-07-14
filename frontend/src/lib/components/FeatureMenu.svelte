@@ -16,9 +16,10 @@
   // Because everything renders from FS_MODES, flipping a mode live later is a
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
-  import { FS_MODES, FS_RTP_LABEL } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
+  import { isSocial } from '../stores/socialMode'
   import {
     betAmount, currencyCode, isSpinning, balance,
     increaseBet, decreaseBet, canIncreaseBet, showPaytable,
@@ -160,14 +161,14 @@
               <div class="fs-face">
                 <div class="fm-card-main">
                   <div class="fm-name-row">
-                    <span class="fm-name">{m.label}</span>
+                    <span class="fm-name">{modeLabel(m, $isSocial)}</span>
                     {#if !m.available}
                       <span class="fm-soon">COMING SOON</span>
                     {:else}
                       <span class="fm-vol">{m.volatility}</span>
                     {/if}
                   </div>
-                  <p class="fm-blurb">{m.blurb}</p>
+                  <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
                 </div>
 
                 <div class="fm-action">

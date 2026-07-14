@@ -1,0 +1,52 @@
+{
+  "results": {
+    "real-money": {
+      "featureMenuText": "Normal\nHIGH\n\nStandard play. Overdrive Free Spins trigger on 3+ scatters.\n\n1× bet\nACTIVE\nCruise\nLOW\n\nA smoother ride: more frequent smaller wins, same 96.35% RTP.\n\n1× bet\nSELECT\nOVERBOOST\nHIGH\n\nDouble-chance: about 1.6x the feature trigger rate. Debits 1.25x every spin while ON.\n\n1.25× bet\nOFF\nBuy Overdrive\nVERY HIGH\n\nBuy a guaranteed Overdrive Free Spins entry.\n\n100× · $100.00\nACTIVATE\nNITRO OVERDRIVE\nEXTREME\n\nBuy a rich entry with the Overdrive meter pre-revved to 5x.\n\n400× · $400.00\nACTIVATE",
+      "paytableText": "Normal\n\nStandard play. Overdrive Free Spins trigger on 3+ scatters.\n\n1× · $1.00\nRTP 96.35% · MAX WIN 5,000×\nCruise\n\nA smoother ride: more frequent smaller wins, same 96.35% RTP.\n\n1× · $1.00\nRTP 96.35% · MAX WIN 5,000×\nOVERBOOST\n\nDouble-chance: about 1.6x the feature trigger rate. Debits 1.25x every spin while ON.\n\n1.25× · $1.25\nRTP 96.35% · MAX WIN 5,000×\nBuy Overdrive\n\nBuy a guaranteed Overdrive Free Spins entry.\n\n100× · $100.00\nRTP 96.35% · MAX WIN 5,000×\nNITRO OVERDRIVE\n\nBuy a rich entry with the Overdrive meter pre-revved to 5x.\n\n400× · $400.00\nRTP 96.35% · MAX WIN 5,000×",
+      "consoleErrorCount": 0
+    },
+    "social": {
+      "featureMenuText": "Normal\nHIGH\n\nStandard play. Overdrive Free Spins trigger on 3+ scatters.\n\n1× bet\nACTIVE\nCruise\nLOW\n\nA smoother ride: more frequent smaller prizes, same 96.35% RTP.\n\n1× bet\nSELECT\nOVERBOOST\nHIGH\n\nDouble-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.\n\n1.25× bet\nOFF\nGet Overdrive\nVERY HIGH\n\nGet a guaranteed Overdrive Free Spins entry.\n\n100× · $100.00\nACTIVATE\nNITRO OVERDRIVE\nEXTREME\n\nGet a rich entry with the Overdrive meter pre-revved to 5x.\n\n400× · $400.00\nACTIVATE",
+      "paytableText": "Normal\n\nStandard play. Overdrive Free Spins trigger on 3+ scatters.\n\n1× · $1.00\nRTP 96.35% · MAX WIN 5,000×\nCruise\n\nA smoother ride: more frequent smaller prizes, same 96.35% RTP.\n\n1× · $1.00\nRTP 96.35% · MAX WIN 5,000×\nOVERBOOST\n\nDouble-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.\n\n1.25× · $1.25\nRTP 96.35% · MAX WIN 5,000×\nGet Overdrive\n\nGet a guaranteed Overdrive Free Spins entry.\n\n100× · $100.00\nRTP 96.35% · MAX WIN 5,000×\nNITRO OVERDRIVE\n\nGet a rich entry with the Overdrive meter pre-revved to 5x.\n\n400× · $400.00\nRTP 96.35% · MAX WIN 5,000×",
+      "consoleErrorCount": 0
+    }
+  },
+  "checks": {
+    "bonus.socialLabel": {
+      "expected": "Get Overdrive",
+      "pass": true
+    },
+    "bonus.socialBlurb": {
+      "expected": "Get a guaranteed Overdrive Free Spins entry.",
+      "pass": true
+    },
+    "super.socialBlurb": {
+      "expected": "Get a rich entry with the Overdrive meter pre-revved to 5x.",
+      "pass": true
+    },
+    "overboost.socialBlurb": {
+      "expected": "Double-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.",
+      "pass": true
+    },
+    "cruise.socialBlurb": {
+      "expected": "A smoother ride: more frequent smaller prizes, same 96.35% RTP.",
+      "pass": true
+    },
+    "realMoney.bonusLabelUnchanged": {
+      "pass": true
+    },
+    "realMoney.overboostBlurbUnchanged": {
+      "pass": true
+    },
+    "social.no_Buy": {
+      "pass": true
+    },
+    "social.no_Debits": {
+      "pass": true
+    },
+    "zeroConsoleErrors": {
+      "pass": true
+    }
+  },
+  "allPass": true
+}
