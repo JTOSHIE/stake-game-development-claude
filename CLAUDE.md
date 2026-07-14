@@ -36,6 +36,14 @@ deny. An owner-sanctioned exception therefore works only like this:
 When the session ends the full lock re-applies (the deny is back in place, uncommitted diff
 empty).
 
+**The optimiser stage is not bit-reproducible.** Confirmed 2026-07-14: the raw simulation
+stage (`create_books`) is perfectly deterministic (seeded, reproduces byte-identical
+books across runs), but the separate weight-fitting optimiser is not - re-running it
+produces a statistically-equivalent but byte-different `lookUpTable_*.csv`. Published
+lookup tables are frozen truth: they are never regenerated outside an owner-sanctioned
+pass, and even then only to fill a genuinely missing file, never to "refresh" one that
+already exists and is already correct.
+
 ### LOCKED_FILE_DEBTS (known issues inside locked files, no sanction to fix yet)
 
 Findings inside a locked file that are compensated/unreachable today, recorded here so they
