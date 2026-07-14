@@ -132,31 +132,62 @@ on a handful of values. **PASS.**
 
 ### "Inspect hit-rates for win-ranges to avoid gaps"
 
-Bucketed every mode's payouts on a log-ish scale (in "times cost" units) and
-looked for empty bands:
+**Correction (2026-07-14b)**: the first pass of this section bucketed every
+mode's payouts uniformly in "times cost" units and reported bonus/super as
+showing a "genuinely wide empty band" between their typical feature payout
+and the 5,000x cap. That reading was wrong, and the error was in the
+bucketing, not the maths. For a high-cost buy-tier mode, the mode's own
+maximum achievable ratio is cap/cost - 5,000/100 = 50x cost for bonus,
+5,000/400 = 12.5x cost for super. Every "times cost" bucket edge ABOVE that
+ratio is empty **by construction**: the payout distribution can never reach
+a "times cost" value the cap itself doesn't allow, regardless of how well
+the intermediate range is actually covered. Presenting that as a coverage
+gap was measuring an arithmetically impossible range and calling the result
+a finding.
 
-| Mode | Empty buckets found |
-|---|---|
-| base | `[2500-5000)x` only |
-| cruise | `[2500-5000)x` only |
-| antelite | `[5000-5001)x` only (an exact-boundary artefact, not a real gap) |
-| bonus | `[100-250)x`, `[250-500)x`, `[500-1000)x`, `[1000-2500)x`, `[2500-5000)x`, `[5000-5001)x` |
-| super | `[20-50)x` through `[5000-5001)x` (eight consecutive buckets) |
+The correct check for "do intermediate wins exist between small payouts and
+the maximum" is **bet-multiple bucketing** (the raw payout column, never
+divided by cost) - the actual 0-5,000x range every mode shares regardless of
+its own cost, since the cap itself is expressed in bet-multiple terms. Base,
+cruise and antelite are 1.0x/1.0x/1.25x cost, close enough to 1 that
+bet-multiple and times-cost bucketing are nearly identical there (harmless);
+bonus and super, at 100x/400x cost, are exactly where the two diverge and
+where the original bucketing broke down.
 
-**Read plainly, not glossed over**: base/cruise/antelite's single empty
-bucket is exactly what you'd expect either side of a discrete wincap outcome
-(5,000x is a special, separately-modelled result, not part of a continuous
-tail) - not a real gap. **bonus and super show a genuinely wide empty band**
-between their typical feature payout range and the 5,000x cap. This reflects
-the buy-tier reward structure being naturally lumpy at the high end (a
-guaranteed-feature buy's payout comes from the Overdrive meter/ways-win
-combination, not a smooth continuum extending to the cap) rather than a
-coding defect - but it is exactly the kind of gap the approval page's own
-wording flags for reviewer attention ("intermediate wins should exist between
-small payouts and the maximum payout amount"). **Flagging this for Fable/the
-owner's judgement, not silently calling it compliant** - the shipped maths is
-locked and already through prior review passes, so this is a disclosure, not
-a proposal to change anything.
+Re-bucketed bonus and super in bet-multiple units
+(`scripts/math_selfaudit_risk_metrics.py`, corrected this pass):
+
+| Bucket (x bet) | bonus weight | super weight |
+|---|---|---|
+| [0-0.5) | 0 | 0 |
+| [0.5-1) | 0 | 0 |
+| [1-2) | 1,030,562,982,609 | 0 |
+| [2-5) | 14,465,639,638,970 | 299,801,797,768 |
+| [5-10) | 48,049,466,593,349 | 1,970,223,406,818 |
+| [10-20) | 138,969,853,096,246 | 10,652,427,274,041 |
+| [20-50) | 598,385,570,027,311 | 80,235,852,326,464 |
+| [50-100) | 60,648,751,357,168 | 234,262,730,215,566 |
+| [100-250) | 138,183,258,237,895 | 473,406,672,952,377 |
+| [250-500) | 98,457,641,377,957 | 13,836,547,594,159 |
+| [500-1000) | 25,260,099,176,173 | 181,425,808,720,351 |
+| [1000-2500) | 1,316,930,993,725 | 122,396,553,547,738 |
+| [2500-5000) | 6,233,404,531 | 2,909,689,331,730 |
+| [5000-5001) (wincap) | 1,125,899,906,800 | 4,503,599,625,484 |
+
+**Continuous coverage from ~1x/2x bet all the way to the 5,000x cap for both
+modes** - every intermediate band carries real weight, nothing between the
+achievable floor and the wincap is unobtainable. The only empty bands are
+`[0-0.5)` and `[0.5-1)` for bonus (its documented minimum non-zero win is
+1.4x per `validate_math.py`) and `[0-0.5)` through `[1-2)` for super (minimum
+non-zero win 2.3x) - both are the mode's designed floor, not a gap, exactly
+analogous to base/cruise/antelite's single empty bucket immediately below
+the wincap being a discrete-outcome artefact rather than a real one.
+
+**Criterion reframed: PASS for all five modes.** The approval page's actual
+concern - "intermediate wins should exist between small payouts and the
+maximum payout amount" - is satisfied; the original "gap" finding was a
+measurement artefact of dividing by cost before bucketing high-cost modes,
+now corrected.
 
 ## Risk-limit criteria (3-star column)
 
@@ -194,9 +225,6 @@ explicitly rather than silently omitted.
 ## Not computed / marginal items, disclosed
 
 - The 100,000-simulation floor is met exactly, not exceeded - see above.
-- The bonus/super win-range gaps above are real and worth a second pair of
-  eyes, even though they read as an artefact of the reward structure rather
-  than a defect.
 - CVaR/ETL had no prior committed implementation in this repo before this
   pass (`validate_math.py` does not compute them) - `scripts/
   math_selfaudit_risk_metrics.py` is new, and its formulas (worst-0.1%-tail
