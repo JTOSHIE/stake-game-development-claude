@@ -24,15 +24,23 @@
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
+  // Portrait layout mode (2026-07-14 portrait pass): when true, renders a
+  // native-DOM-scale stacked composition (stats row + controls row) instead
+  // of the fixed-coordinate LAYOUT_SPEC v3.2 absolute layout below - see the
+  // template's top-level {#if portrait} branch. Every binding/handler is
+  // shared between both branches; only the markup/CSS differs.
+  export let portrait = false
+
   // Dev-only test hook: exposes the store objects so headless verification
-  // (frontend/scripts/layout_v1_audit.mjs, qa_soak.mjs) can inject stress
-  // values / drive the locale-social-speed matrix without any production
-  // code path. Never present in a production build (import.meta.env.DEV is
-  // false there).
+  // (frontend/scripts/layout_v1_audit.mjs, qa_soak.mjs, the portrait-layout
+  // conformance suite) can inject stress values / drive the
+  // locale-social-speed matrix / force a standing mode (OVERBOOST, Cruise)
+  // without any production code path. Never present in a production build
+  // (import.meta.env.DEV is false there).
   onMount(() => {
     if (import.meta.env.DEV) {
       ;(window as unknown as { __testStores?: unknown }).__testStores =
-        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier }
+        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier, standingMode }
     }
   })
 
@@ -228,6 +236,136 @@
   $: winLabel = formatBalance(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
+{#if portrait}
+<!-- PORTRAIT HUD (2026-07-14 portrait pass): native-DOM-scale stacked
+     composition - a compact stats row (balance/win/bet+steppers), then a
+     controls row (menu, turbo/badge zone, a large central SPIN, MAX,
+     autoplay). Rendered as a normal-flow sibling OUTSIDE the scaled
+     1280x720 stage (see App.svelte), so nothing here is affected by --S -
+     every size below is a real, native CSS px value. -->
+<div class="p-hud" class:p-hud--overdrive={$overdriveVisual}>
+  <div class="p-stats-row">
+    <div class="p-stat" data-testid="hud-balance">
+      <span class="p-stat-label">{$tr('balance')}</span>
+      <span class="p-stat-value cyan">{balanceLabel}</span>
+    </div>
+    <div class="p-stat" class:lit={$winAmount > 0} data-testid="hud-win">
+      <span class="p-stat-label">{$tr('win')}</span>
+      <span class="p-stat-value magenta">{winLabel}</span>
+    </div>
+  </div>
+  <!-- BET gets its own full-width row: a 3-column stats row left no room
+       for two 44px steppers plus a stress-value bet figure without either
+       clipping the currency text or shrinking the steppers below the
+       touch-target floor (caught by the committed portrait screenshots
+       showing "$1,000,000.00" overflowing its card - see session report). -->
+  <div class="p-bet-stat" data-testid="hud-bet">
+    <span class="p-stat-label">{$tr('bet')}</span>
+    <div class="p-bet-row" data-testid="bet-arrows">
+      <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
+        <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+      </button>
+      <span class="p-stat-value gold">{betLabel}</span>
+      <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
+        <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+      </button>
+    </div>
+    {#if isOverboost}
+      <span class="p-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+    {:else if isCruise}
+      <span class="p-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+    {/if}
+  </div>
+
+  <div class="p-controls-row">
+    <div class="p-controls-side">
+      <div class="p-menu-wrapper">
+        <button class="p-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+          <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
+        </button>
+        {#if showMenu}
+          <div class="hud-menu p-hud-menu" role="menu">
+            <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+            <div class="audio-panel" class:muted={$isMuted}>
+              <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
+                {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+              </button>
+              <div class="audio-row">
+                <span class="audio-label">MUSIC</span>
+                <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
+                <span class="audio-pct">{musicPct}%</span>
+              </div>
+              <div class="audio-row">
+                <span class="audio-label">SOUND</span>
+                <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
+                <span class="audio-pct">{sfxPct}%</span>
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+      <button
+        class="p-round-btn"
+        class:engaged={$speedTier !== 'normal'}
+        on:click={toggleTurbo}
+        disabled={$isSpinning}
+        aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+        title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+      >
+        <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+        <span class="p-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
+      </button>
+    </div>
+
+    <button
+      class="p-spin"
+      class:spinning={$isSpinning}
+      disabled={$isSpinning ? false : !$canSpin}
+      on:click={handleSpin}
+      aria-label={$tr('spin')}
+      data-testid="spin-button"
+    >
+      <svg class="glyph play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="glyph arrows" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M18 3v5h-5"/></svg>
+      <span class="p-spin-txt">{$tr('spin')}</span>
+    </button>
+
+    <div class="p-controls-side">
+      <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
+        <span class="p-max-cap">MAX</span>
+      </button>
+      {#if !$rgJurisdiction.autoplayDisabled}
+        <div class="p-autoplay-wrapper">
+          <button
+            class="p-round-btn"
+            class:active={$isAutoPlay}
+            on:click={toggleAutoMenu}
+            disabled={$isSpinning && !$isAutoPlay}
+            aria-label={$tr('autoPlay')}
+          >
+            {#if $isAutoPlay}
+              <span class="p-tier">{$autoPlayCount}</span>
+            {:else}
+              <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
+            {/if}
+          </button>
+          {#if showAutoMenu}
+            <div class="auto-menu p-auto-menu" role="menu">
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+              <div class="auto-menu-sep">Spins</div>
+              {#each AUTO_OPTIONS as n}
+                <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+  </div>
+</div><!-- /p-hud -->
+{:else}
 <!-- HUD - B1 reskin. .fs-hud is a display:contents token-scope wrapper only;
      every control keeps its own position:absolute against the same stage
      ancestor, so nothing shifts. Overdrive flips accents from the shared flag. -->
@@ -399,6 +537,7 @@
   {/if}
 
 </div><!-- /fs-hud -->
+{/if}
 
 <style>
   /* ============================================================================
@@ -592,8 +731,14 @@
   .fs-menu:hover .bar{filter:brightness(1.3);}
   .fs-menu:active{transform:translateY(1px);}
 
-  /* ===== TURBO - chrome knob, orange flame accent (x232 top568, 72) ======= */
-  .fs-turbo{position:absolute;left:232px;top:568px;width:72px;height:72px;z-index:60;
+  /* ===== TURBO - chrome knob, orange flame accent (x227 top563, 82) =======
+     2026-07-14 portrait pass, landscape touch-target audit: at the typical
+     landscape-phone scale factor (~0.54, e.g. iPhone 14 landscape 844x390),
+     the previous 72x72 box read as ~39x39 effective - under the 44px floor.
+     Bumped to 82x82 (recentred on the old 72x72 box) so it clears 44px
+     effective at 0.54 scale with margin (82*0.54=~44.3px); the 40px gap to
+     .fs-menu absorbs the size increase without collision. */
+  .fs-turbo{position:absolute;left:227px;top:563px;width:82px;height:82px;z-index:60;
     padding:0;border:none;cursor:pointer;}
   .fs-turbo .fs-face{background:radial-gradient(circle at 36% 28%,#33210c,#0c0803 72%);}
   .fs-turbo svg{width:26px;height:26px;}
@@ -845,4 +990,231 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     margin-top: 2px;
   }
+
+  /* ============================================================================
+     PORTRAIT HUD (2026-07-14 portrait pass) - fully self-contained, native
+     CSS px throughout (never affected by the stage's --S scale, since this
+     renders as a normal-flow sibling outside the scaled 1280x720 stage - see
+     App.svelte). Every font-size here is >=11px (legibility floor); every
+     interactive control is >=44px effective (touch-target floor). Uses its
+     own p- prefixed classes throughout rather than reusing the landscape
+     fs-* classes, since those carry hardcoded LAYOUT_SPEC absolute
+     coordinates that would need overriding anyway - a fresh, isolated set of
+     rules is less risk than fighting the absolute-position cascade.
+     ========================================================================== */
+  .p-hud {
+    --p-cyan: var(--theme-primary, #00ffff);
+    --p-pink: var(--theme-secondary, #ff00ff);
+    --p-gold: #ffd700;
+    --p-orange: #ff9a2e;
+    --p-acc: var(--p-cyan);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    font-family: 'Orbitron', system-ui, sans-serif;
+    background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
+  }
+  .p-hud--overdrive { --p-acc: var(--p-pink); }
+
+  .p-stats-row { display: flex; flex-direction: row; gap: 8px; }
+  .p-stat {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 6px;
+    min-height: 52px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), transparent 60%), #0c1220;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+  }
+  .p-stat.lit { border-color: color-mix(in srgb, var(--p-pink) 55%, transparent); }
+  .p-stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(190, 232, 255, 0.65);
+    white-space: nowrap;
+  }
+  .p-stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* BET's own full-width row (2026-07-14 portrait pass correction): the
+     original single 3-column .p-stats-row left no room for two 44px
+     steppers plus a stress-value bet figure ($1,000,000.00-scale balances
+     are a real, tested case per this file's landscape doc comment above) -
+     confirmed overflowing in the committed portrait-v1 screenshots. */
+  .p-bet-stat {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    min-height: 52px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, rgba(255, 215, 0, 0.08), transparent 60%), #0c1220;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .p-stat-value.cyan { color: color-mix(in srgb, var(--p-cyan) 20%, #fff); }
+  .p-stat-value.magenta { color: color-mix(in srgb, var(--p-pink) 22%, #fff); }
+  .p-stat-value.gold { color: color-mix(in srgb, var(--p-gold) 30%, #fff); }
+
+  .p-bet-row { display: flex; align-items: center; gap: 2px; }
+  .p-bet-step {
+    /* 2026-07-14 portrait pass, touch-target audit (portrait_layout_
+       conformance.mjs): the original 30x30 box measured below the 44px
+       floor - bumped to a real 44x44 hit target, confirmed by re-running
+       the audit rather than assumed. */
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .p-bet-step svg { width: 12px; height: 8px; }
+  .p-bet-step svg path { fill: var(--p-acc); }
+  .p-bet-step:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .p-mode-badge {
+    position: absolute;
+    top: -8px;
+    right: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .p-mode-badge.overboost { color: #1a0d02; background: var(--p-orange); }
+  .p-mode-badge.cruise {
+    color: color-mix(in srgb, var(--p-cyan) 30%, #fff);
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid color-mix(in srgb, var(--p-cyan) 40%, transparent);
+  }
+
+  .p-controls-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .p-controls-side {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 0;
+  }
+  .p-controls-side:last-child { justify-content: flex-end; }
+
+  /* Every round control button: 48x48 real box (>=44px touch-target floor
+     with headroom), circular chrome-on-navy, one accent colour via --p-acc. */
+  .p-round-btn {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 28%, #1a2636, #060b16 72%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    cursor: pointer;
+  }
+  .p-round-btn svg { width: 20px; height: 20px; }
+  .p-round-btn svg path { fill: none; stroke: var(--p-acc); stroke-width: 1.8; }
+  .p-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .p-round-btn.engaged { box-shadow: 0 0 12px color-mix(in srgb, var(--p-orange) 70%, transparent); }
+  .p-round-btn.engaged svg path { stroke: var(--p-orange); }
+  .p-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--p-acc) 70%, transparent); }
+  .p-tier {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: rgba(230, 245, 255, 0.85);
+  }
+
+  .p-hamburger { display: flex; flex-direction: column; gap: 4px; }
+  .p-hamburger-bar { width: 18px; height: 2px; border-radius: 1px; background: var(--p-acc); }
+
+  .p-max-cap { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--p-gold); }
+
+  /* SPIN - the single largest, most important control: 72px real diameter
+     (well over the 64px floor the brief asks for), centred between the two
+     control clusters. */
+  .p-spin {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: conic-gradient(from 200deg, var(--p-acc), color-mix(in srgb, var(--p-acc) 40%, #0c1220), var(--p-acc));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 18px color-mix(in srgb, var(--p-acc) 45%, transparent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+  }
+  .p-spin .glyph { width: 22px; height: 22px; }
+  .p-spin .glyph path { fill: #04070f; }
+  .p-spin .glyph.arrows { display: none; fill: none; stroke: #04070f; stroke-width: 2; }
+  .p-spin.spinning .glyph.play { display: none; }
+  .p-spin.spinning .glyph.arrows { display: block; }
+  .p-spin:disabled { opacity: 0.5; cursor: not-allowed; }
+  .p-spin-txt {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #04070f;
+  }
+
+  .p-menu-wrapper, .p-autoplay-wrapper { position: relative; }
+
+  /* Dropdowns reuse the existing .hud-menu/.auto-menu visual styling
+     verbatim (dark panel, border, item padding - not spec-coordinate-tied,
+     just anchored to whichever positioned ancestor wraps them), which now
+     anchors correctly against .p-menu-wrapper/.p-autoplay-wrapper above
+     instead of the landscape stage's absolute wrapper. */
+  .p-hud-menu, .p-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; }
+  .p-hud-menu { left: 0; }
+  .p-auto-menu { right: 0; }
 </style>

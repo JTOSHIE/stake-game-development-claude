@@ -367,8 +367,32 @@
     if (typeof window === 'undefined') return 1
     return Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H)
   }
+  // Portrait layout pass (2026-07-14): a native-feeling composition needs the
+  // HUD/FEATURES trigger decoupled from the stage scale, which means
+  // .game-wrapper itself must stop being a transformed ancestor in portrait
+  // (a `transform` on an ancestor re-anchors `position:fixed` descendants to
+  // its own bounding box, not the true viewport - every modal here relies on
+  // .game-wrapper being untransformed to correctly cover the real screen).
+  // So in portrait, .game-wrapper becomes an unscaled, full-viewport
+  // container; only the nested .canvas-inner (the 1280x720 design surface
+  // still used for the scene/frame/grid) gets its own scale transform, sized
+  // to roughly 96% of viewport width per the brief.
+  function computePortrait(): boolean {
+    if (typeof window === 'undefined') return false
+    return window.innerHeight > window.innerWidth
+  }
+  function computePortraitCanvasScale(): number {
+    if (typeof window === 'undefined') return 1
+    return (0.96 * window.innerWidth) / STAGE_W
+  }
   let S = computeS()
-  function handleResize(): void { S = computeS() }
+  let portrait = computePortrait()
+  let portraitCanvasScale = computePortraitCanvasScale()
+  function handleResize(): void {
+    S = computeS()
+    portrait = computePortrait()
+    portraitCanvasScale = computePortraitCanvasScale()
+  }
 
   onMount(async () => {
     // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
@@ -681,6 +705,7 @@
 <div class="game-stage">
 <main
   class="game-wrapper"
+  class:portrait
   class:shake={shakeActive}
   style="
     --theme-primary: {$activeTheme.palette.primary};
@@ -713,106 +738,136 @@
     <IntroSplash on:continue={handleIntroContinue} />
   {/if}
 
-  <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
-  <div class="logo-box">
-    <img
-      class="game-logo-img"
-      src="{$themeAssets.logo}"
-      alt="{$activeTheme.name}"
-      draggable="false"
-      id="theme-logo-img"
-      on:error={() => {
-        const img = document.getElementById('theme-logo-img') as HTMLImageElement
-        if (img) img.style.display = 'none'
-        const txt = document.getElementById('theme-logo-txt')
-        if (txt) (txt as HTMLElement).style.display = 'block'
-      }}
-    />
+  <!-- CANVAS SLOT — the fixed 1280x720 design surface (scene/frame/grid/logo).
+       In landscape this is a no-op wrapper (canvas-inner is unscaled, static;
+       .game-wrapper itself carries the scale(S) transform as before). In
+       portrait, .game-wrapper is unscaled/full-viewport instead, and this
+       inner div carries its own scale (portraitCanvasScale, ~96% of viewport
+       width) so the canvas sits at the top with the HUD native-stacked below
+       (2026-07-14 portrait pass). -->
+  <div class="canvas-slot" class:portrait style={portrait ? `height:${STAGE_H * portraitCanvasScale}px` : ''}>
     <div
-      class="logo-text"
-      id="theme-logo-txt"
-      style="display: none;"
+      class="canvas-inner"
+      class:portrait
+      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : ''}
     >
-      {$activeTheme.name}
+      <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
+      <div class="logo-box">
+        <img
+          class="game-logo-img"
+          src="{$themeAssets.logo}"
+          alt="{$activeTheme.name}"
+          draggable="false"
+          id="theme-logo-img"
+          on:error={() => {
+            const img = document.getElementById('theme-logo-img') as HTMLImageElement
+            if (img) img.style.display = 'none'
+            const txt = document.getElementById('theme-logo-txt')
+            if (txt) (txt as HTMLElement).style.display = 'block'
+          }}
+        />
+        <div
+          class="logo-text"
+          id="theme-logo-txt"
+          style="display: none;"
+        >
+          {$activeTheme.name}
+        </div>
+      </div>
+
+      {#if $errorMessage}
+        <div class="error-banner">{errorDisplay}</div>
+      {/if}
+
+      <!-- SCENE GROUP — left, set further back (z8), future-spinner only -->
+      {#if $activeTheme.id === 'future-spinner'}
+        <SceneGroup />
+      {/if}
+
+      <!-- FRAME — 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
+           (Motion Polish v2), reversed once overdriveVisualActive clears. -->
+      {#if $themeAssets.frame}
+        <img
+          src="{$themeAssets.frame}"
+          class="game-frame"
+          class:overdrive-active={overdriveVisualActive}
+          alt=""
+          aria-hidden="true"
+          on:error={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = 'none'
+          }}
+        />
+      {/if}
+
+      <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
+      {#if $activeTheme.id === 'future-spinner'}
+        <FlameJets active={overdriveVisualActive} />
+      {/if}
+
+      <!-- GRID — 522x349, centred inside the frame, z20 -->
+      <div class="grid-slot">
+        <div class="grid-scale">
+          <GameGrid bind:this={gridRef} />
+          <!-- Suppress standard celebration while the max-win overlay is active -->
+          <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
+          <!-- Ways breakdown — cycles group by group after the win burst settles -->
+          <WinBreakdown />
+          <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
+          <FreeSpinsPresentation
+            script={featureScript}
+            active={featureActive}
+            bind:displayMeter={liveMeter}
+            bind:spinsRemaining={liveSpinsRemaining}
+            bind:runningTotalCentibets={liveRunningTotalCentibets}
+            bind:overdriveVisualActive
+            on:complete={onFeatureComplete}
+          />
+        </div>
+      </div>
+
+      <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
+      <WinBanner />
+
+      <!-- BONUS INSTRUMENT COLUMN — Overdrive only. Not given a dedicated
+           native-scale portrait treatment this pass (not named in the portrait
+           brief); it stays part of the scaled canvas in both modes, disclosed
+           in the session report as a known gap for a future pass. -->
+      {#if featureActive && $activeTheme.id === 'future-spinner'}
+        <BonusInstrumentColumn
+          multiplier={liveMeter}
+          spinsRemaining={liveSpinsRemaining}
+          runningTotalCentibets={liveRunningTotalCentibets}
+        />
+      {/if}
+
+      <!-- FEATURES trigger — landscape only here (stays pinned beside the
+           frame in the 1280x720 coordinate space); portrait renders its own
+           native-scale trigger in .portrait-hud-slot below. -->
+      {#if !portrait && $activeTheme.id === 'future-spinner' && !featureActive}
+        <FeatureMenu on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+      {/if}
+
+      <!-- HUD OVERLAY — landscape only here; portrait renders its own
+           native-DOM instance in .portrait-hud-slot below. -->
+      {#if !portrait}
+        <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
+      {/if}
     </div>
   </div>
 
-  {#if $errorMessage}
-    <div class="error-banner">{errorDisplay}</div>
-  {/if}
-
-  <!-- SCENE GROUP — left, set further back (z8), future-spinner only -->
-  {#if $activeTheme.id === 'future-spinner'}
-    <SceneGroup />
-  {/if}
-
-  <!-- FRAME — 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
-       (Motion Polish v2), reversed once overdriveVisualActive clears. -->
-  {#if $themeAssets.frame}
-    <img
-      src="{$themeAssets.frame}"
-      class="game-frame"
-      class:overdrive-active={overdriveVisualActive}
-      alt=""
-      aria-hidden="true"
-      on:error={(e) => {
-        (e.currentTarget as HTMLImageElement).style.display = 'none'
-      }}
-    />
-  {/if}
-
-  <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
-  {#if $activeTheme.id === 'future-spinner'}
-    <FlameJets active={overdriveVisualActive} />
-  {/if}
-
-  <!-- GRID — 522x349, centred inside the frame, z20 -->
-  <div class="grid-slot">
-    <div class="grid-scale">
-      <GameGrid bind:this={gridRef} />
-      <!-- Suppress standard celebration while the max-win overlay is active -->
-      <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
-      <!-- Ways breakdown — cycles group by group after the win burst settles -->
-      <WinBreakdown />
-      <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
-      <FreeSpinsPresentation
-        script={featureScript}
-        active={featureActive}
-        bind:displayMeter={liveMeter}
-        bind:spinsRemaining={liveSpinsRemaining}
-        bind:runningTotalCentibets={liveRunningTotalCentibets}
-        bind:overdriveVisualActive
-        on:complete={onFeatureComplete}
-      />
+  {#if portrait}
+    <!-- PORTRAIT HUD SLOT — native DOM scale, never stage-scaled (2026-07-14
+         portrait pass). Sits below the canvas slot in normal flow; both
+         FeatureMenu and HudOverlay get portrait=true so their own CSS renders
+         the compact/native-scale composition instead of the LAYOUT_SPEC
+         absolute positions. -->
+    <div class="portrait-hud-slot">
+      {#if $activeTheme.id === 'future-spinner' && !featureActive}
+        <FeatureMenu portrait on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+      {/if}
+      <HudOverlay portrait on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
     </div>
-  </div>
-
-  <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
-  <WinBanner />
-
-  <!-- FEATURES — unified bet-modes menu, right of the frame (replaces the old
-       single FeatureButton); future-spinner only, hidden during Overdrive so
-       the bonus instrument column owns that zone. A live buy ACTIVATE opens the
-       existing BuyBonus confirm modal (same confirm-protected flow the old
-       FeatureButton used), passing THROUGH which buy tier was clicked (bug fix:
-       every tier used to fall through to the hardcoded 100x bonus buy) so the
-       modal shows the correct price and, on confirm, dispatches THAT mode to
-       handleBuy. -->
-  {#if $activeTheme.id === 'future-spinner' && !featureActive}
-    <FeatureMenu on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
   {/if}
-
-  <!-- BONUS INSTRUMENT COLUMN — Overdrive only -->
-  {#if featureActive && $activeTheme.id === 'future-spinner'}
-    <BonusInstrumentColumn
-      multiplier={liveMeter}
-      spinsRemaining={liveSpinsRemaining}
-      runningTotalCentibets={liveRunningTotalCentibets}
-    />
-  {/if}
-
-  <!-- HUD OVERLAY — generic panel + SPIN + AUTOPLAY, z60 -->
-  <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
 
   <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
        replaced by FeatureButton above (showTrigger=false). Hidden entirely
@@ -936,11 +991,90 @@
   }
   .game-wrapper.shake { animation: screen-shake 0.42s ease-in-out; }
 
+  /* Portrait shake variant - no scale() term since .game-wrapper.portrait
+     carries no scale transform of its own (only .canvas-inner does). */
+  @keyframes screen-shake-portrait {
+    0%, 100% { transform: translate(0, 0); }
+    20%      { transform: translate(-7px, 5px); }
+    40%      { transform: translate(7px, -5px); }
+    60%      { transform: translate(-5px, 4px); }
+    80%      { transform: translate(5px, -3px); }
+  }
+  .game-wrapper.portrait.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
+
   @media (prefers-reduced-motion: reduce) {
     .game-wrapper.shake { animation: none; }
   }
 
-  /* ── Logo — top centre, 380 wide, y 18, z70 ─────────────────────────────── */
+  /* Portrait layout mode (2026-07-14 portrait pass). .game-wrapper.portrait
+     drops the scale(S) transform entirely so it is no longer a transformed
+     ancestor: every position:fixed modal inside it (PaytableModal, BuyBonus,
+     SessionPanel, MaxWinCelebration, ThemeSelector, LoadingScreen,
+     IntroSplash) then correctly covers the true viewport again, since a
+     transform on an ancestor otherwise re-anchors position:fixed descendants
+     to its own bounding box. Only .canvas-inner (nested) carries a scale
+     transform, sized to roughly 96% of viewport width per the brief, keeping
+     the existing 1280x720 coordinate space for the scene/frame/grid
+     unchanged. */
+  .game-wrapper.portrait {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  .canvas-slot {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .canvas-slot.portrait {
+    flex: 0 0 auto;
+    /* height set inline per-frame (STAGE_H * portraitCanvasScale) */
+  }
+  .canvas-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .canvas-inner.portrait {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1280px;
+    height: 720px;
+    transform-origin: top center;
+    /* transform (translateX(-50%) scale(portraitCanvasScale)) set inline */
+  }
+
+  /* Native-DOM HUD region, immediately below the canvas (no dead gap),
+     never stage-scaled. Fonts and touch targets inside render at their own
+     CSS px, independent of S. flex:0 0 auto sizes this to its own content
+     height rather than stretch-filling remaining viewport space - an
+     earlier draft used flex:1 1 auto + justify-content:flex-end, which
+     pushed the FEATURES/HUD controls to the very bottom of the screen with
+     a large blank backdrop-only gap above them (caught via the committed
+     portrait-v1 screenshots, see the session report). Any true leftover
+     space on unusually tall phones now collects at the bottom, after the
+     HUD, which reads as normal safe-area padding rather than a broken
+     composition. */
+  .portrait-hud-slot {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 60;
+  }
+
+  /* -- Logo - top centre, 380 wide, y 18, z70 -- */
   .logo-box {
     position: absolute;
     left: 450px;

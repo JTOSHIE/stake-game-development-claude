@@ -30,6 +30,14 @@
 
   const dispatch = createEventDispatcher<{ buy: BetMode }>()
 
+  // Portrait layout mode (2026-07-14 portrait pass): renders a compact,
+  // native-DOM-scale trigger (reachable above the HUD controls row) instead
+  // of the LAYOUT_SPEC absolute-positioned .fm-entry knob below. The modal
+  // itself (.fm) is unchanged either way - it correctly covers the true
+  // viewport once the caller (App.svelte) stops giving .game-wrapper a scale
+  // transform in portrait mode.
+  export let portrait = false
+
   let open = false
 
   $: cur = $currencyCode || 'USD'
@@ -88,6 +96,30 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
+{#if portrait}
+  <!-- Portrait native-scale trigger - reachable above the HUD controls row,
+       native CSS px throughout (never stage-scaled). -->
+  <button
+    class="p-fm-entry"
+    class:mode-enhancer={$standingMode === 'antelite'}
+    on:click={openMenu}
+    disabled={$isSpinning}
+    aria-label="Features and bet modes"
+    aria-haspopup="dialog"
+    aria-expanded={open}
+    data-testid="feature-menu-button"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span class="p-fm-entry-label">FEATURES</span>
+    {#if entryActiveLabel}
+      <span
+        class="p-fm-entry-active"
+        class:enhancer={$standingMode === 'antelite'}
+        data-testid="feature-menu-active-mode"
+      >{entryActiveLabel}</span>
+    {/if}
+  </button>
+{:else}
 <!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot) ───── -->
 <div class="fm-entry" data-testid="feature-menu-entry">
   <button
@@ -113,6 +145,7 @@
     >{entryActiveLabel}</div>
   {/if}
 </div>
+{/if}
 
 <!-- ── Modal ───────────────────────────────────────────────────────────────── -->
 {#if open}
@@ -238,6 +271,7 @@
 
   /* token scope */
   .fm-entry,
+  .p-fm-entry,
   .fm {
     --sig-cyan: var(--theme-primary, #00ffff);
     --sig-pink: #ff2ec4;
@@ -525,5 +559,44 @@
 
   @media (prefers-reduced-motion: reduce) {
     .fm, .fm-panel, .fm-entry-knob { animation: none; }
+  }
+
+  /* Portrait native-scale trigger (2026-07-14 portrait pass) - fully
+     self-contained, native CSS px throughout, no LAYOUT_SPEC coordinates. */
+  .p-fm-entry {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 14px;
+    margin: 0 12px 8px;
+    width: calc(100% - 24px);
+    border: 1px solid color-mix(in srgb, var(--sig-cyan, #00ffff) 40%, transparent);
+    border-radius: 10px;
+    background: linear-gradient(160deg, rgba(0, 255, 255, 0.1), rgba(6, 9, 20, 0.9));
+    color: color-mix(in srgb, var(--sig-cyan, #00ffff) 30%, #fff);
+    cursor: pointer;
+    font-family: 'Orbitron', system-ui, sans-serif;
+  }
+  .p-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
+  .p-fm-entry svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+  .p-fm-entry-label {
+    font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .p-fm-entry-active {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 999px;
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid color-mix(in srgb, var(--sig-cyan, #00ffff) 40%, transparent);
+  }
+  .p-fm-entry-active.enhancer {
+    color: #1a0d02;
+    background: var(--sig-orange, #ff9a2e);
+    border-color: var(--sig-orange, #ff9a2e);
+  }
+  .p-fm-entry.mode-enhancer {
+    border-color: color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);
   }
 </style>

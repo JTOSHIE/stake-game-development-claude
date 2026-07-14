@@ -1,0 +1,290 @@
+{
+  "iphone14-portrait": {
+    "device": "iPhone 14",
+    "viewport": {
+      "width": 390,
+      "height": 664
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "touchTargetAudit": {
+      "totalChecked": 10,
+      "failing": [],
+      "pass": true
+    },
+    "fontLegibilityAudit": {
+      "totalChecked": 10,
+      "failing": [],
+      "pass": true
+    },
+    "frameGate": {
+      "sampleCount": 329,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  },
+  "iphone14-landscape": {
+    "device": "iPhone 14 landscape",
+    "viewport": {
+      "width": 750,
+      "height": 340
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "touchTargetAudit": {
+      "totalChecked": 10,
+      "failing": [
+        {
+          "testid": null,
+          "label": "Cycle speed (Normal / Turbo / Super Turbo)",
+          "tag": "button",
+          "w": 38.7,
+          "h": 38.7,
+          "pass": false
+        },
+        {
+          "testid": "max-chip",
+          "label": "Max bet",
+          "tag": "button",
+          "w": 12.3,
+          "h": 20.8,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Menu",
+          "tag": "button",
+          "w": 18.9,
+          "h": 18.9,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Increase bet",
+          "tag": "button",
+          "w": 20.8,
+          "h": 11.3,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Decrease bet",
+          "tag": "button",
+          "w": 20.8,
+          "h": 11.3,
+          "pass": false
+        },
+        {
+          "testid": "spin-button",
+          "label": "SPIN",
+          "tag": "button",
+          "w": 39.7,
+          "h": 39.7,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "AUTO",
+          "tag": "button",
+          "w": 22.7,
+          "h": 22.7,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Change theme",
+          "tag": "button",
+          "w": 20.9,
+          "h": 20.8,
+          "pass": false
+        },
+        {
+          "testid": "reel-mode-toggle",
+          "label": "Toggle reel mode",
+          "tag": "button",
+          "w": 31,
+          "h": 20.8,
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    "landscapeSmallTextDiagnostic": [
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      },
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      },
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      }
+    ],
+    "frameGate": {
+      "sampleCount": 330,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  },
+  "pixel7-portrait": {
+    "device": "Pixel 7",
+    "viewport": {
+      "width": 412,
+      "height": 839
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "touchTargetAudit": {
+      "totalChecked": 10,
+      "failing": [],
+      "pass": true
+    },
+    "fontLegibilityAudit": {
+      "totalChecked": 10,
+      "failing": [],
+      "pass": true
+    },
+    "frameGate": {
+      "sampleCount": 331,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  },
+  "pixel7-landscape": {
+    "device": "Pixel 7 landscape",
+    "viewport": {
+      "width": 863,
+      "height": 360
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "touchTargetAudit": {
+      "totalChecked": 10,
+      "failing": [
+        {
+          "testid": null,
+          "label": "Cycle speed (Normal / Turbo / Super Turbo)",
+          "tag": "button",
+          "w": 41,
+          "h": 41,
+          "pass": false
+        },
+        {
+          "testid": "max-chip",
+          "label": "Max bet",
+          "tag": "button",
+          "w": 13,
+          "h": 22,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Menu",
+          "tag": "button",
+          "w": 20,
+          "h": 20,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Increase bet",
+          "tag": "button",
+          "w": 22,
+          "h": 12,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Decrease bet",
+          "tag": "button",
+          "w": 22,
+          "h": 12,
+          "pass": false
+        },
+        {
+          "testid": "spin-button",
+          "label": "SPIN",
+          "tag": "button",
+          "w": 42,
+          "h": 42,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "AUTO",
+          "tag": "button",
+          "w": 24,
+          "h": 24,
+          "pass": false
+        },
+        {
+          "testid": null,
+          "label": "Change theme",
+          "tag": "button",
+          "w": 22.1,
+          "h": 20,
+          "pass": false
+        },
+        {
+          "testid": "reel-mode-toggle",
+          "label": "Toggle reel mode",
+          "tag": "button",
+          "w": 32.9,
+          "h": 14,
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    "landscapeSmallTextDiagnostic": [
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      },
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      },
+      {
+        "selector": ".fs-label",
+        "fontSizePx": 8.32
+      }
+    ],
+    "frameGate": {
+      "sampleCount": 330,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  }
+}

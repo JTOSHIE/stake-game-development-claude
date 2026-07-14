@@ -631,5 +631,13 @@
     .fs-pt-body { padding: 14px 16px 20px; gap: 16px; }
     .fs-sym-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
     .fs-sym-card img { width: 64px; height: 64px; }
+    /* 2026-07-14 portrait pass: the 5-cell ways-to-win adjacency diagram
+       (5x56px cells + 4 arrows, ~464px total) overflowed at 390-430px
+       viewports, cropping the outer cells - caught via the committed
+       portrait-v1 paytable screenshot. Shrunk to fit within the panel's
+       ~92%-width content box on real phones. */
+    .fs-way-cell { width: 40px; height: 40px; font-size: 0.95rem; }
+    .fs-way-arrow { font-size: 1.05rem; padding: 0 4px; }
+    .fs-ways-diagram > .fs-face { padding: 12px 8px; }
   }
 </style>

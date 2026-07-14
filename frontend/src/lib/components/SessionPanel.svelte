@@ -54,7 +54,10 @@
 
 <style>
   .sp {
-    position: fixed; top: 1rem; right: 1rem; z-index: 56;
+    position: fixed;
+    top: calc(1rem + env(safe-area-inset-top, 0px));
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+    z-index: 56;
     display: flex; flex-direction: column; gap: 3px; min-width: 128px;
     padding: 8px 12px; border-radius: 9px; font-family: 'Orbitron', monospace;
     background: rgba(6, 12, 22, 0.9); border: 1px solid rgba(0, 255, 255, 0.25); color: #cde;
