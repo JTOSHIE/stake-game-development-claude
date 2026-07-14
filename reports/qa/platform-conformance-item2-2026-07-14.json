@@ -1,0 +1,129 @@
+{
+  "sameOriginSweep": {
+    "totalRequests": 139,
+    "thirdPartyRequests": [],
+    "pass": true
+  },
+  "spacebarTriggersSpin": {
+    "spunViaSpacebar": true,
+    "balanceBefore": 1000000,
+    "balanceAfter": 1000004.45,
+    "pass": true
+  },
+  "popoutProofs": {
+    "popout-s": {
+      "width": 400,
+      "height": 225,
+      "hasHorizontalOverflow": false,
+      "spinVisible": true,
+      "balanceVisible": true,
+      "pass": true
+    },
+    "popout-l": {
+      "width": 800,
+      "height": 450,
+      "hasHorizontalOverflow": false,
+      "spinVisible": true,
+      "balanceVisible": true,
+      "pass": true
+    }
+  },
+  "betLevelConformance": {
+    "injectedLevels": [
+      100,
+      200,
+      500,
+      1000,
+      2000,
+      5000,
+      10000,
+      50000
+    ],
+    "levelsReachedViaIncrease": [
+      100,
+      200,
+      500,
+      1000,
+      2000,
+      5000,
+      10000,
+      50000
+    ],
+    "allLevelsReached": true,
+    "spinSucceededAtMax": true,
+    "spinSucceededAtMin": true,
+    "pass": true
+  },
+  "languageFuzz": {
+    "en": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    },
+    "de-DE": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    },
+    "zh-Hant": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    },
+    "xx-XX": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    },
+    "🎰": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    },
+    "(empty)": {
+      "corrupted": false,
+      "consoleErrorCount": 0,
+      "pass": true
+    }
+  },
+  "winCountUp": {
+    "hudSamples": [
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50",
+      "$42.50"
+    ],
+    "hudDistinctValues": 1,
+    "hudCountsUp": false,
+    "bannerSelectorNote": "the main script's guessed selector (.fs-win-amount / .win-banner-amount / [class*=win-amount]) matched nothing - the real class is .c1-amount (WinBanner.svelte). Re-verified in an isolated follow-up check with the corrected selector (not re-run via this script) rather than left as a false negative.",
+    "bannerCountsUpVerifiedSeparately": {
+      "distinctValueCount": 52,
+      "firstSample": "$0.62",
+      "lastSample": "$171.35",
+      "countsUp": true
+    }
+  },
+  "fastplayLegibility": {
+    "speedTierUsed": "superTurbo",
+    "screenshotsCaptured": [
+      "fastplay-superturbo-midspin.png",
+      "fastplay-superturbo-settled.png"
+    ]
+  }
+}
