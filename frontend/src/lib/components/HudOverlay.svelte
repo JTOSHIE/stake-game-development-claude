@@ -195,6 +195,22 @@
   $: isOverboost = $standingMode === 'antelite'
   $: isCruise    = $standingMode === 'cruise'
 
+  // NEON LIFT (2026-07-15, item 3): a brief glow pulse on the bet figure the
+  // moment OVERBOOST toggles ON (the effective cost jumping to 1.25x is
+  // otherwise a silent number change) - triggers only on the OFF->ON
+  // transition, not on every reactive re-run, by comparing against the
+  // previous value. Cleared after one pulse cycle so it never becomes a
+  // permanent state.
+  let overboostPulse = false
+  let prevOverboost = false
+  let overboostPulseTimer: ReturnType<typeof setTimeout> | null = null
+  $: if (isOverboost && !prevOverboost) {
+    overboostPulse = true
+    if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
+    overboostPulseTimer = setTimeout(() => { overboostPulse = false }, 700)
+  }
+  $: prevOverboost = isOverboost
+
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
 
@@ -248,6 +264,7 @@
 
   onDestroy(() => {
     if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
+    if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
   })
 
   $: winLabel = formatBalance(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
@@ -270,11 +287,11 @@
 <div class="p-hud" class:p-hud--overdrive={$overdriveVisual}>
   <div class="p-top-group">
     <div class="p-stats-row">
-      <div class="p-stat" data-testid="hud-balance">
+      <div class="p-stat p-stat--balance" data-testid="hud-balance">
         <span class="p-stat-label">{$tr('balance')}</span>
         <span class="p-stat-value cyan">{balanceLabel}</span>
       </div>
-      <div class="p-stat" class:lit={$winAmount > 0} data-testid="hud-win">
+      <div class="p-stat p-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
         <span class="p-stat-label">{$tr('win')}</span>
         <span class="p-stat-value magenta">{winLabel}</span>
       </div>
@@ -284,7 +301,7 @@
          clipping the currency text or shrinking the steppers below the
          touch-target floor (caught by the committed portrait screenshots
          showing "$1,000,000.00" overflowing its card - see session report). -->
-    <div class="p-bet-stat" data-testid="hud-bet">
+    <div class="p-bet-stat" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
       <span class="p-stat-label">{$tr('bet')}</span>
       <div class="p-bet-row" data-testid="bet-arrows">
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
@@ -435,11 +452,11 @@
     <span class="c-stat-label">{$tr('balance')}</span>
     <span class="c-stat-value cyan">{balanceLabel}</span>
   </div>
-  <div class="c-stat" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="c-stat c-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
     <span class="c-stat-label">{$tr('win')}</span>
     <span class="c-stat-value magenta">{winLabel}</span>
   </div>
-  <div class="c-stat c-stat--bet" data-testid="hud-bet">
+  <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
     <div class="c-bet-row" data-testid="bet-arrows">
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
@@ -608,7 +625,7 @@
   <!-- BET - fixed box x 782, width 120, value right-aligned. Shows the
        EFFECTIVE debit (bet x MODE_COST[standingMode]), not the nominal bet
        level, whenever a standing/enhancer mode changes the real cost. -->
-  <div class="fs-box fs-bet fs-plate" data-testid="hud-bet">
+  <div class="fs-box fs-bet fs-plate" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
@@ -779,6 +796,15 @@
   .fs-win    {left:616px;width:150px;--sig:var(--sig-pink);}
   .fs-bet    {left:782px;width:120px;--sig:var(--sig-gold);}
   .fs-bet .fs-face{align-items:flex-end;padding-right:14px;}
+  /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
+     transition (see HudOverlay's script section) - overrides .fs-plate's
+     static glow for one cycle, then reverts. */
+  @keyframes overboost-bet-pulse-landscape {
+    0%   { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig-gold) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
+    35%  { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 22px 4px color-mix(in srgb,var(--sig-orange, #ff9a2e) 75%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
+    100% { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig-gold) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
+  }
+  .fs-bet.overboost-pulse { animation: overboost-bet-pulse-landscape 0.7s ease-out; }
 
   .fs-label{
     font-family:'Orbitron',system-ui,monospace;font-size:.52rem;font-weight:700;
@@ -829,8 +855,10 @@
   @keyframes fs-win-pop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
 
   /* ===== BET ARROWS - chrome nubs, cyan chevrons ============================
-     own fixed column x906 top578 (v3.3). ----------------------------------- */
-  .fs-arrows{position:absolute;left:906px;top:578px;width:44px;height:52px;z-index:60;
+     own fixed column x906 top578 (v3.3), shifted to x914 (2026-07-15
+     alignment nit per the owner's note - a touch more breathing room from
+     the BET plate's right edge at x902, still clear of .fs-spin at x962). */
+  .fs-arrows{position:absolute;left:914px;top:578px;width:44px;height:52px;z-index:60;
     display:flex;flex-direction:column;gap:4px;}
   .fs-arrow{
     width:44px;height:24px;padding:0;border:none;cursor:pointer;position:relative;
@@ -894,7 +922,11 @@
   .fs-turbo svg{width:26px;height:26px;}
   .fs-turbo svg path{fill:rgba(255,190,120,.7);}
   .fs-turbo .tier{font-family:'Orbitron',monospace;font-size:.5rem;font-weight:800;
-    letter-spacing:.06em;color:rgba(255,200,140,.75);font-variant-numeric:tabular-nums;}
+    letter-spacing:.06em;color:rgba(255,200,140,.75);font-variant-numeric:tabular-nums;
+    /* Alignment nit (2026-07-15, item 5, per the owner's note): nudged down
+       a couple of px relative to the icon above it - it read as crowding
+       the icon's own glyph before. */
+    margin-top:3px;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
   .fs-turbo.engaged svg path{fill:#ffc46a;}
   .fs-turbo.engaged .tier{color:#ffce7a;}
@@ -1198,6 +1230,16 @@
     position: relative;
   }
   .p-stat.lit { border-color: color-mix(in srgb, var(--p-pink) 55%, transparent); }
+  /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, distinct
+     from .lit's stronger "there's an active win" state above. */
+  .p-stat--balance {
+    border-color: color-mix(in srgb, var(--p-cyan) 35%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--p-cyan) 20%, transparent);
+  }
+  .p-stat--win {
+    border-color: color-mix(in srgb, var(--p-pink) 30%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--p-pink) 16%, transparent);
+  }
   .p-stat-label {
     font-size: 11px;
     font-weight: 700;
@@ -1233,8 +1275,18 @@
     min-height: 52px;
     border-radius: 10px;
     background: linear-gradient(160deg, rgba(255, 215, 0, 0.08), transparent 60%), #0c1220;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid color-mix(in srgb, var(--p-gold) 30%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent);
+    transition: box-shadow 0.15s ease;
   }
+  /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
+     transition (see HudOverlay's script section), not a permanent state. */
+  @keyframes overboost-bet-pulse {
+    0%   { box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent); }
+    35%  { box-shadow: 0 0 22px 4px color-mix(in srgb, var(--p-orange) 70%, transparent); }
+    100% { box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent); }
+  }
+  .p-bet-stat.overboost-pulse { animation: overboost-bet-pulse 0.7s ease-out; }
   .p-stat-value.cyan { color: color-mix(in srgb, var(--p-cyan) 20%, #fff); }
   .p-stat-value.magenta { color: color-mix(in srgb, var(--p-pink) 22%, #fff); }
   .p-stat-value.gold { color: color-mix(in srgb, var(--p-gold) 30%, #fff); }
@@ -1483,8 +1535,29 @@
      1:1:1.6 balance:win:bet ratio). Win stays small deliberately - it's
      rarely a long figure in practice - freeing width for balance and bet,
      the two fields most likely to carry long currency strings. */
-  .c-stat--balance { flex: 1.4 1 0; }
-  .c-stat--bet { flex: 1.6 1 0; }
+  /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, on top
+     of each cell's pre-existing flex-basis tuning. */
+  .c-stat--balance {
+    flex: 1.4 1 0;
+    border-color: color-mix(in srgb, var(--c-cyan) 35%, transparent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--c-cyan) 18%, transparent);
+  }
+  .c-stat--win {
+    border-color: color-mix(in srgb, var(--c-pink) 30%, transparent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--c-pink) 14%, transparent);
+  }
+  .c-stat--bet {
+    flex: 1.6 1 0;
+    border-color: color-mix(in srgb, var(--c-gold, #ffd700) 30%, transparent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent);
+    transition: box-shadow 0.15s ease;
+  }
+  @keyframes overboost-bet-pulse-compact {
+    0%   { box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent); }
+    35%  { box-shadow: 0 0 18px 3px color-mix(in srgb, var(--c-orange, #ff9a2e) 70%, transparent); }
+    100% { box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent); }
+  }
+  .c-stat--bet.overboost-pulse { animation: overboost-bet-pulse-compact 0.7s ease-out; }
   .c-bet-row { display: flex; align-items: center; gap: 2px; }
   .c-bet-step {
     width: 44px;

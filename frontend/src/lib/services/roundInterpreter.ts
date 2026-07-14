@@ -114,7 +114,42 @@ function newSpin(phase: 'base' | 'free', fsIndex: number | null, board: Board, m
 export function interpretRound(round: BookRound): PresentationScript {
   const events = round.events ?? []
 
+  // Seed the meter from the book's own data rather than hardcoding 1
+  // (2026-07-15, NITRO DEV FUEL / neon polish pass). The meter only ever
+  // changes on a WINNING free spin (never on a loss, never retroactively -
+  // per the Overdrive spec), so whatever the first free-spin win's
+  // meta.globalMult shows is the true meter value for every spin up to and
+  // including that one - there is no separate "starting meter" event, only
+  // each win's own globalMult. This matters for modes whose entry doesn't
+  // start at 1x (NITRO OVERDRIVE's meter is pre-revved to 5x): without this
+  // pre-scan, every spin up to the first WIN would incorrectly display 1x
+  // regardless of mode, since the increment via updateGlobalMult only fires
+  // after a win resolves. For base/bonus (meter genuinely starts at 1x),
+  // this pre-scan correctly derives 1 from the same data, so there is no
+  // behaviour change there - it's a strict generalisation, not a special
+  // case. Falls back to 1 if the free-spin sequence has no win at all (the
+  // meter's value is then never visibly applied to anything, so the exact
+  // fallback doesn't matter).
   let meter = 1
+  {
+    let scanPhase: 'base' | 'free' = 'base'
+    for (const ev of events) {
+      if (ev.type === 'reveal') {
+        scanPhase = (ev.gameType as string) === 'freegame' ? 'free' : 'base'
+        continue
+      }
+      if (ev.type !== 'winInfo' || scanPhase !== 'free') continue
+      const wins = (ev.wins as Array<Record<string, unknown>>) ?? []
+      const withMult = wins.find((w) => {
+        const m = (w.meta as Record<string, unknown> | undefined) ?? {}
+        return typeof m.globalMult === 'number'
+      })
+      if (withMult) {
+        meter = Number((withMult.meta as Record<string, unknown>).globalMult)
+        break
+      }
+    }
+  }
   let phase: 'base' | 'free' = 'base'
   let pendingFsIndex: number | null = null
 

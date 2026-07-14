@@ -1,9 +1,9 @@
-QA SOAK — start Mon Jul 13 2026 23:20:58 GMT+1000 (Australian Eastern Standard Time)
+QA SOAK — start Wed Jul 15 2026 04:01:45 GMT+1000 (Australian Eastern Standard Time)
 Matrix: locales=en,es,ja,ar social=[off,on] speedTiers=normal,turbo,super
 Session A (social off) per-cell spins: {"normal":15,"turbo":25,"super":210}
 Session B (social on)  per-cell spins: {"normal":5,"turbo":10,"super":60}
 Spawning isolated dev server (rsync snapshot, immune to concurrent src edits)...
-Isolated dev server ready at http://localhost:49702 (snapshot: /var/folders/fz/fbtq0yb92qgfz_dw82k6gbt80000gn/T/fs-qa-soak-ZJgMqx)
+Isolated dev server ready at http://localhost:56365 (snapshot: /var/folders/fz/fbtq0yb92qgfz_dw82k6gbt80000gn/T/fs-qa-soak-XPuG1A)
   [social-off] locale=en tier=normal spins=15 (global=15)
   [social-off] locale=en tier=turbo spins=25 (global=40)
   [social-off] locale=en tier=super spins=210 (global=250)
@@ -12,95 +12,8 @@ Isolated dev server ready at http://localhost:49702 (snapshot: /var/folders/fz/f
   [social-off] locale=es tier=super spins=210 (global=500)
   [social-off] locale=ja tier=normal spins=15 (global=515)
   [social-off] locale=ja tier=turbo spins=25 (global=540)
-  [social-off] locale=ja tier=super spins=210 (global=750)
-  [social-off] locale=ar tier=normal spins=15 (global=765)
-  [social-off] locale=ar tier=turbo spins=25 (global=790)
-  [social-off] locale=ar tier=super spins=210 (global=1000)
-Session A complete: 1000 spins, avg fps 58.8
-  [social-on ] locale=en tier=normal spins=5 (global=5)
-  [social-on ] locale=en tier=turbo spins=10 (global=15)
-  [social-on ] locale=en tier=super spins=60 (global=75)
-  [social-on ] locale=es tier=normal spins=5 (global=80)
-  [social-on ] locale=es tier=turbo spins=10 (global=90)
-  [social-on ] locale=es tier=super spins=60 (global=150)
-  [social-on ] locale=ja tier=normal spins=5 (global=155)
-  [social-on ] locale=ja tier=turbo spins=10 (global=165)
-  [social-on ] locale=ja tier=super spins=60 (global=225)
-  [social-on ] locale=ar tier=normal spins=5 (global=230)
-  [social-on ] locale=ar tier=turbo spins=10 (global=240)
-  [social-on ] locale=ar tier=super spins=60 (global=300)
-Session B complete: 300 spins, avg fps 58.1
-
-=== COST-INTEGRITY GATE (all five modes, fixed bet) ===
-  [PASS] normal -> expected mode=base micros=1000000, actual mode=base micros=1000000
-  [PASS] cruise -> expected mode=cruise micros=1000000, actual mode=cruise micros=1000000
-  [PASS] overboost -> expected mode=antelite micros=1250000, actual mode=antelite micros=1250000
-  [PASS] bonus -> expected mode=bonus micros=100000000, actual mode=bonus micros=100000000
-  [PASS] super -> expected mode=super micros=400000000, actual mode=super micros=400000000
-
-=== COST-VISIBILITY GATE (HUD badge + effective bet figure) ===
-  [PASS] normal -> expect badge=none (ok), bet figure expected=1000000 actual=1000000 (ok)
-  [PASS] cruise -> expect badge=cruise (ok), bet figure expected=1000000 actual=1000000 (ok)
-  [PASS] overboost -> expect badge=overboost (ok), bet figure expected=1250000 actual=1250000 (ok)
-
-=== BUY-AFFORDABILITY BOUNDARY GATE (150x bet: affords bonus, not super) ===
-  [PASS] bonus disabled=false (expect false), super disabled=true (expect true)
-
-=== SUMMARY ===
-{
-  "totalSpins": 1300,
-  "totalRoundsChecked": 1300,
-  "exactTotalMismatches": 0,
-  "balanceDrifts": 0,
-  "consoleErrors": 0,
-  "heap100Bytes": 19300000,
-  "heap1000Bytes": 19300000,
-  "heapGrowthPct": 0,
-  "avgFpsSessionA": 58.79371832508983,
-  "avgFpsSessionB": 58.14941860660446,
-  "avgFpsOverall": 58.47156846584714,
-  "costIntegrityFailures": 0,
-  "costVisibilityFailures": 0,
-  "buyAffordabilityBoundaryOk": true,
-  "framesOver100ms": 5
-}
-FRAMES OVER 100ms (attributed):
-[
-  {
-    "tMs": 2929,
-    "gapMs": 283.2,
-    "nearestEvent": "spin-click",
-    "deltaToEventMs": 294,
-    "source": "session-a"
-  },
-  {
-    "tMs": 119644,
-    "gapMs": 166.4,
-    "nearestEvent": "spin-click",
-    "deltaToEventMs": 226,
-    "source": "session-a"
-  },
-  {
-    "tMs": 2177,
-    "gapMs": 233.3,
-    "nearestEvent": "spin-click",
-    "deltaToEventMs": 242,
-    "source": "session-b"
-  },
-  {
-    "tMs": 198157,
-    "gapMs": 149,
-    "nearestEvent": "spin-click",
-    "deltaToEventMs": 227,
-    "source": "session-b"
-  },
-  {
-    "tMs": 2512,
-    "gapMs": 233.4,
-    "nearestEvent": "buy-confirm-bonus",
-    "deltaToEventMs": 3421,
-    "source": "cost-integrity"
-  }
-]
-QA SOAK: ALL GATES PASS
-Isolated dev server (final) stopped, snapshot /var/folders/fz/fbtq0yb92qgfz_dw82k6gbt80000gn/T/fs-qa-soak-ZJgMqx removed.
+Isolated dev server (final) stopped, snapshot /var/folders/fz/fbtq0yb92qgfz_dw82k6gbt80000gn/T/fs-qa-soak-XPuG1A removed.
+FATAL: page.waitForFunction: Target page, context or browser has been closed
+    at waitSpinDone (/Users/jt/math-sdk/frontend/scripts/qa_soak.mjs:145:14)
+    at runSession (/Users/jt/math-sdk/frontend/scripts/qa_soak.mjs:503:15)
+    at async run (/Users/jt/math-sdk/frontend/scripts/qa_soak.mjs:587:18)

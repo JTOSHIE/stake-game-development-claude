@@ -933,11 +933,15 @@
       <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
       <WinBanner />
 
-      <!-- BONUS INSTRUMENT COLUMN — Overdrive only. Not given a dedicated
-           native-scale portrait treatment this pass (not named in the portrait
-           brief); it stays part of the scaled canvas in both modes, disclosed
-           in the session report as a known gap for a future pass. -->
-      {#if featureActive && $activeTheme.id === 'future-spinner'}
+      <!-- BONUS INSTRUMENT COLUMN — Overdrive only. Landscape/desktop
+           unchanged (2026-07-15 neon polish pass, item 2); portrait renders
+           its own native-scale compact strip in .native-hud-slot below
+           instead - the gap the portrait v2 session report disclosed
+           (this gauge column fell fully outside the visible viewport
+           window on at least one tested profile during Overdrive) is
+           closed by the same decoupling pattern used for FeatureMenu/
+           HudOverlay, not by cropping the canvas differently. -->
+      {#if featureActive && $activeTheme.id === 'future-spinner' && !portrait}
         <BonusInstrumentColumn
           multiplier={liveMeter}
           spinsRemaining={liveSpinsRemaining}
@@ -970,6 +974,22 @@
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
     <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape}>
+      <!-- Portrait Overdrive meter (2026-07-15, item 2): docked between the
+           grid (canvas-slot above) and the FEATURES bar - occupies the same
+           slot FeatureMenu's trigger would, since that's hidden during the
+           feature anyway (both here and in the landscape/desktop branch).
+           Only in portrait - compact-landscape isn't named in this brief and
+           keeps its prior behaviour (BonusInstrumentColumn not shown there
+           either way, since compactLandscape's own strip has no room for it -
+           unchanged, not a new gap this pass introduces). -->
+      {#if portrait && featureActive && $activeTheme.id === 'future-spinner'}
+        <BonusInstrumentColumn
+          compact
+          multiplier={liveMeter}
+          spinsRemaining={liveSpinsRemaining}
+          runningTotalCentibets={liveRunningTotalCentibets}
+        />
+      {/if}
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
         <FeatureMenu {portrait} {compactLandscape} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}

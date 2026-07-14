@@ -70,4 +70,31 @@ if (trig) {
   console.log(`meter progression well-formed: ${meterOk}`)
   if (!meterOk) process.exit(1)
 }
+
+// NITRO DEV FUEL (2026-07-15): every curated `super` sample must present its
+// meter starting at 5x (pre-revved per FeatureMath v2), not the interpreter's
+// naive 1x default - this is the exact gap the meter-seeding fix (pre-scan
+// for the first free-spin win's meta.globalMult) closes. Checks meterBefore
+// on the FIRST free spin specifically, since that's the one v1 of the
+// interpreter always got wrong regardless of mode.
+const superSamples = samples.filter((s) => s.mode === 'super')
+if (superSamples.length === 0) {
+  console.error('FAIL: no curated super samples found (expected NITRO DEV FUEL pool)')
+  process.exit(1)
+}
+let superMeterOk = true
+for (const s of superSamples) {
+  const script = interpretRound(s.round)
+  const firstFs = script.freeSpins[0]
+  if (!firstFs || firstFs.meterBefore < 5) {
+    superMeterOk = false
+    console.error(
+      `FAIL: super/${s.category} (round ${s.round.id}) meterBefore on first free spin = ` +
+        `${firstFs?.meterBefore ?? 'undefined'}, expected >= 5`,
+    )
+  }
+}
+console.log(`super samples: ${superSamples.length}, all start >=5x meter: ${superMeterOk}`)
+if (!superMeterOk) process.exit(1)
+
 console.log('ALL INTERPRETER GATES PASS')

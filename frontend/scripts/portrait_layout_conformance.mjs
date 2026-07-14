@@ -240,6 +240,120 @@ async function auditSessionPanel(page) {
   }
 }
 
+/** Overdrive meter geometry (2026-07-15, item 2): confirms a real bonus buy,
+ *  waits past the title-card transition, and asserts BonusInstrumentColumn
+ *  (compact .pm-strip in portrait, the LAYOUT_SPEC .instrument-column
+ *  otherwise) is fully within the true viewport bounds - not just present in
+ *  the DOM, since the portrait v2 pass found the gauge column could be
+ *  wholly off-screen while still "rendered". Skips gracefully (marks n/a)
+ *  if the buy control isn't reachable at all. */
+// Non-gating diagnostic (2026-07-15, NEON LIFT item 3): reports the luminance
+// gap between a symbol tile's plate background and its symbol art so the
+// "8-12% lighter plate" target can be tracked over time. Never fails the
+// suite (pass is always true) - it's a trend readout, not a conformance gate.
+async function auditSymbolLuminanceDiagnostic(page) {
+  return page.evaluate(async () => {
+    const cell = document.querySelector('.symbol-cell')
+    if (!cell) return { skipped: true, reason: 'no symbol-cell found', pass: true }
+    const plateBg = getComputedStyle(cell).backgroundColor
+    const parsed = plateBg.match(/rgba?\(([^)]+)\)/)
+    let plateLuminance = null
+    if (parsed) {
+      const [r, g, b] = parsed[1].split(',').map((v) => parseFloat(v))
+      plateLuminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+    }
+    const img = cell.querySelector('.symbol-img')
+    if (!img || !img.src) return { skipped: true, reason: 'no symbol-img found', plateLuminance, pass: true }
+    const loadedImg = await new Promise((resolve) => {
+      const el = new Image()
+      el.onload = () => resolve(el)
+      el.onerror = () => resolve(null)
+      el.src = img.src
+    })
+    if (!loadedImg) return { skipped: true, reason: 'symbol image failed to load', plateLuminance, pass: true }
+    const canvas = document.createElement('canvas')
+    canvas.width = loadedImg.naturalWidth
+    canvas.height = loadedImg.naturalHeight
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(loadedImg, 0, 0)
+    let data
+    try {
+      data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+    } catch {
+      return { skipped: true, reason: 'canvas read blocked', plateLuminance, pass: true }
+    }
+    let total = 0
+    let count = 0
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 16) continue
+      total += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255
+      count++
+    }
+    const artLuminance = count > 0 ? total / count : null
+    const luminanceDeltaPct = plateLuminance != null && artLuminance != null ? (artLuminance - plateLuminance) * 100 : null
+    return { plateLuminance, artLuminance, luminanceDeltaPct, pass: true }
+  })
+}
+
+async function auditOverdriveMeterOnScreen(page, screensDir) {
+  const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
+  if ((await featureMenuBtn.count()) === 0) {
+    return { skipped: true, reason: 'no feature-menu-button', pass: true }
+  }
+  await featureMenuBtn.click()
+  await page.waitForTimeout(150)
+  const activateBonus = page.locator('[data-testid="activate-bonus"]')
+  if ((await activateBonus.count()) === 0) {
+    return { skipped: true, reason: 'no activate-bonus (jurisdiction disabled?)', pass: true }
+  }
+  await activateBonus.click()
+  await page.waitForTimeout(150)
+  const confirmBtn = page.locator('[data-testid="buy-confirm"]')
+  if ((await confirmBtn.count()) === 0) {
+    return { skipped: true, reason: 'no buy-confirm', pass: true }
+  }
+  await confirmBtn.click()
+  // Past the ~1.8s title-card transition (FreeSpinsPresentation's own
+  // dur(1800) timer) so displayMeter has actually applied, not still
+  // showing its pre-reset placeholder.
+  await page.waitForTimeout(2200)
+
+  const geometry = await page.evaluate(() => {
+    // Two instances can share this testid: the always-mounted, normally
+    // invisible warm-up copy (App.svelte's .warm-mount, visibility:hidden
+    // after its one-time paint) and the real, currently-shown one. Filter
+    // for genuine visibility/size rather than class name, since both the
+    // warm-mount and a real landscape/desktop instance render as
+    // .instrument-column (only portrait's real instance is .pm-strip).
+    const candidates = Array.from(document.querySelectorAll('[data-testid="bonus-instrument-column"]'))
+    const el = candidates.find((e) => {
+      const r = e.getBoundingClientRect()
+      const style = getComputedStyle(e)
+      const warmMount = e.closest('.warm-mount')
+      return r.width > 0 && r.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && !warmMount
+    })
+    if (!el) return null
+    const r = el.getBoundingClientRect()
+    return {
+      className: el.className,
+      top: r.top, left: r.left, bottom: r.bottom, right: r.right,
+      onScreen: r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth,
+    }
+  })
+
+  await page.screenshot({ path: join(screensDir, 'overdrive-meter.png') }).catch(() => {})
+
+  // Let the round finish so later steps (frame gate) start clean.
+  await page.waitForFunction(
+    () => !document.querySelector('[data-testid="spin-button"].spinning'),
+    { timeout: 20000 },
+  ).catch(() => {})
+  await page.waitForTimeout(200)
+
+  if (!geometry) return { found: false, pass: false }
+  return { found: true, ...geometry, pass: geometry.onScreen }
+}
+
 async function runFrameGate(page) {
   await page.evaluate(() => {
     window.__frameTimes = []
@@ -293,6 +407,7 @@ async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName
   // idle
   await page.screenshot({ path: join(screensDir, 'idle.png') })
   entry.screenshots.idle = 'idle.png'
+  entry.symbolLuminanceDiagnostic = await auditSymbolLuminanceDiagnostic(page)
 
   // spin (mid-flight)
   await page.locator('[data-testid="spin-button"]').click()
@@ -329,6 +444,15 @@ async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName
     }
   }
   await page.waitForTimeout(100)
+
+  // Overdrive meter geometry (2026-07-15, item 2): a REAL confirmed buy this
+  // time (the prior step only screenshots the confirm modal then cancels),
+  // waiting past the ~1.8s title-card transition so BonusInstrumentColumn's
+  // own displayMeter has actually applied - then asserting the meter is
+  // geometrically within the viewport on all four profiles, closing the gap
+  // the portrait v2 session report disclosed (the gauge column previously
+  // fell fully outside the visible window on at least one tested profile).
+  entry.overdriveMeterAudit = await auditOverdriveMeterOnScreen(page, screensDir)
 
   // paytable
   await page.evaluate(() => { window.__testStores.showPaytable?.set?.(true) }).catch(() => {})

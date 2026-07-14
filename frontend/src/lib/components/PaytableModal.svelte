@@ -247,26 +247,43 @@
              All five are live since FeatureMath v2 (2026-07-07): Normal, Cruise,
              OVERBOOST, Buy Overdrive, NITRO OVERDRIVE. All share the same
              96.35% RTP; the `soon` tag/branch remains for any future mode
-             added ahead of its maths shipping. -->
+             added ahead of its maths shipping.
+             2026-07-15 neon polish pass, item 6: reformatted from a
+             left-justified row list into centred mode cards (name, cost,
+             RTP, max win) - rest of the paytable is unchanged. -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">Bet Modes</h3>
-          <div class="fs-modes">
+          <div class="fs-mode-cards">
             {#each FS_MODES as m (m.id)}
-              <div class="fs-mode-row fs-plate tone-{m.kind}" class:soon={!m.available}>
+              <div class="fs-mode-card fs-plate tone-{m.kind}" class:soon={!m.available}>
                 <div class="fs-face">
-                  <div class="fs-mode-main">
-                    <div class="fs-mode-name-row">
-                      <span class="fs-mode-name">{modeLabel(m, $isSocial)}</span>
-                      {#if !m.available}
-                        <span class="fs-mode-soon">coming soon</span>
-                      {/if}
+                  <div class="fs-mode-card-name-row">
+                    <span class="fs-mode-name">{modeLabel(m, $isSocial)}</span>
+                    {#if !m.available}
+                      <span class="fs-mode-soon">coming soon</span>
+                    {/if}
+                  </div>
+                  <div class="fs-mode-card-stats">
+                    <div class="fs-mode-stat">
+                      <span class="fs-mode-stat-label">Cost</span>
+                      <!-- Stacked, not "1.25x · $1.25" on one line - the
+                         100x/400x buy tiers' dollar figures truncated with
+                         an ellipsis in the 3-column card grid's narrow cost
+                         column (caught via a committed screenshot, not
+                         assumed from the CSS). -->
+                      <span class="fs-mode-stat-value fs-num">{m.cost}×</span>
+                      <span class="fs-mode-stat-subvalue fs-num">{modePrice(m.cost)}</span>
                     </div>
-                    <p class="fs-mode-blurb">{modeBlurb(m, $isSocial)}</p>
+                    <div class="fs-mode-stat">
+                      <span class="fs-mode-stat-label">RTP</span>
+                      <span class="fs-mode-stat-value fs-num">{FS_RTP_LABEL}</span>
+                    </div>
+                    <div class="fs-mode-stat">
+                      <span class="fs-mode-stat-label">Max Win</span>
+                      <span class="fs-mode-stat-value fs-num">{FS_MAX_WIN_LABEL}</span>
+                    </div>
                   </div>
-                  <div class="fs-mode-meta">
-                    <span class="fs-mode-cost fs-num">{m.cost}× · {modePrice(m.cost)}</span>
-                    <span class="fs-mode-rtp">RTP {FS_RTP_LABEL} · Max Win {FS_MAX_WIN_LABEL}</span>
-                  </div>
+                  <p class="fs-mode-blurb">{modeBlurb(m, $isSocial)}</p>
                 </div>
               </div>
             {/each}
@@ -550,26 +567,42 @@
   .fs-buy-lbl { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--sig-gold) 82%, #fff); }
   .fs-buy-val { font-size: 1.1rem; font-weight: 900; color: #ffd6f2; text-shadow: 0 0 3px var(--sig-pink); }
 
-  /* Bet Modes */
-  .fs-modes { display: flex; flex-direction: column; gap: 10px; }
-  .fs-mode-row { --sig: var(--sig-cyan); }
-  .fs-mode-row.tone-standing { --sig: var(--sig-cyan); }
-  .fs-mode-row.tone-enhancer { --sig: var(--sig-orange); }
-  .fs-mode-row.tone-buy { --sig: var(--sig-pink); }
-  .fs-mode-row > .fs-face { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 18px; }
-  .fs-mode-row.soon { filter: grayscale(0.5) brightness(0.74); opacity: 0.72; }
-  .fs-mode-main { flex: 1; min-width: 0; text-align: left; }
-  .fs-mode-name-row { display: flex; align-items: center; gap: 0.5rem; }
+  /* Bet Modes (2026-07-15 neon polish pass, item 6): centred mode cards in
+     a responsive grid, replacing the old left-justified row list. */
+  .fs-mode-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .fs-mode-card { --sig: var(--sig-cyan); }
+  .fs-mode-card.tone-standing { --sig: var(--sig-cyan); }
+  .fs-mode-card.tone-enhancer { --sig: var(--sig-orange); }
+  .fs-mode-card.tone-buy { --sig: var(--sig-pink); }
+  .fs-mode-card > .fs-face {
+    flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 16px 14px;
+  }
+  .fs-mode-card.soon { filter: grayscale(0.5) brightness(0.74); opacity: 0.72; }
+  .fs-mode-card-name-row { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; }
   .fs-mode-name { font-size: 0.9rem; font-weight: 800; letter-spacing: 0.04em; color: #fff; }
   .fs-mode-soon {
     font-size: 0.5rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
     color: #d8e2ea; background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 0.12rem 0.5rem; white-space: nowrap;
   }
-  .fs-mode-blurb { font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); line-height: 1.4; margin: 0.24rem 0 0; }
-  .fs-mode-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-  .fs-mode-cost { font-size: 0.78rem; font-weight: 700; color: #ffd66a; white-space: nowrap; }
-  .fs-mode-rtp { font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--sig-gold) 55%, #fff); white-space: nowrap; }
+  .fs-mode-blurb { font-size: 0.74rem; color: rgba(255, 255, 255, 0.6); line-height: 1.4; margin: 0; }
+  .fs-mode-card-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%;
+    padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--sig) 25%, transparent);
+  }
+  .fs-mode-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+  .fs-mode-stat-label {
+    font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(200, 220, 235, 0.6); white-space: nowrap;
+  }
+  .fs-mode-stat-value {
+    font-size: 0.72rem; font-weight: 700; color: color-mix(in srgb, var(--sig) 55%, #fff);
+    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
+  .fs-mode-stat-subvalue {
+    font-size: 0.6rem; font-weight: 600; color: rgba(230, 240, 250, 0.65);
+    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
 
   /* ── Interface Guide ──────────────────────────────────────────────── */
   .fs-guide-list { display: flex; flex-direction: column; gap: 10px; }
