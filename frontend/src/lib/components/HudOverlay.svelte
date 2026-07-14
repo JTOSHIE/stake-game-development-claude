@@ -30,6 +30,12 @@
   // template's top-level {#if portrait} branch. Every binding/handler is
   // shared between both branches; only the markup/CSS differs.
   export let portrait = false
+  // Landscape compact HUD pass (2026-07-14b): when true (a landscape phone
+  // with innerHeight below 500px, see App.svelte's computeCompactLandscape),
+  // renders a native-DOM-scale single-row strip instead of either the
+  // fixed-coordinate LAYOUT_SPEC absolute layout or portrait's stacked rows.
+  // Every binding/handler is shared across all three branches.
+  export let compactLandscape = false
 
   // Dev-only test hook: exposes the store objects so headless verification
   // (frontend/scripts/layout_v1_audit.mjs, qa_soak.mjs, the portrait-layout
@@ -365,6 +371,127 @@
     </div>
   </div>
 </div><!-- /p-hud -->
+{:else if compactLandscape}
+<!-- LANDSCAPE COMPACT HUD (2026-07-14b): a single native-scale row - menu,
+     stats cluster (balance/win/bet+steppers), turbo, AUTO, MAX, SPIN
+     (>=56px, rightmost) - for a landscape phone with innerHeight below
+     500px. Rendered as the second flex item in .native-hud-slot, which
+     App.svelte switches to flex-direction:row for this mode so this and
+     FeatureMenu's compact trigger share one row (see App.svelte's
+     `.native-hud-slot.compact-landscape` rule). Every size below is a real
+     native CSS px value, same discipline as the portrait branch above - all
+     seven touch targets (menu, turbo, AUTO, MAX, both bet steppers, SPIN)
+     are >=44px effective, closing the PR #78 landscape debt table. -->
+<div class="c-hud" class:c-hud--overdrive={$overdriveVisual}>
+  <div class="c-menu-wrapper">
+    <button class="c-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+      <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
+    </button>
+    {#if showMenu}
+      <div class="hud-menu c-hud-menu" role="menu">
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <div class="audio-panel" class:muted={$isMuted}>
+          <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
+            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+          </button>
+          <div class="audio-row">
+            <span class="audio-label">MUSIC</span>
+            <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
+            <span class="audio-pct">{musicPct}%</span>
+          </div>
+          <div class="audio-row">
+            <span class="audio-label">SOUND</span>
+            <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
+            <span class="audio-pct">{sfxPct}%</span>
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
+
+  <div class="c-stat c-stat--balance" data-testid="hud-balance">
+    <span class="c-stat-label">{$tr('balance')}</span>
+    <span class="c-stat-value cyan">{balanceLabel}</span>
+  </div>
+  <div class="c-stat" class:lit={$winAmount > 0} data-testid="hud-win">
+    <span class="c-stat-label">{$tr('win')}</span>
+    <span class="c-stat-value magenta">{winLabel}</span>
+  </div>
+  <div class="c-stat c-stat--bet" data-testid="hud-bet">
+    <span class="c-stat-label">{$tr('bet')}</span>
+    <div class="c-bet-row" data-testid="bet-arrows">
+      <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
+        <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+      </button>
+      <span class="c-stat-value gold">{betLabel}</span>
+      <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
+        <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+      </button>
+    </div>
+    {#if isOverboost}
+      <span class="c-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+    {:else if isCruise}
+      <span class="c-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+    {/if}
+  </div>
+
+  <button
+    class="c-round-btn"
+    class:engaged={$speedTier !== 'normal'}
+    on:click={toggleTurbo}
+    disabled={$isSpinning}
+    aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+    title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+  >
+    <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+    <span class="c-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
+  </button>
+
+  {#if !$rgJurisdiction.autoplayDisabled}
+    <div class="c-autoplay-wrapper">
+      <button
+        class="c-round-btn"
+        class:active={$isAutoPlay}
+        on:click={toggleAutoMenu}
+        disabled={$isSpinning && !$isAutoPlay}
+        aria-label={$tr('autoPlay')}
+      >
+        {#if $isAutoPlay}
+          <span class="c-tier">{$autoPlayCount}</span>
+        {:else}
+          <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
+        {/if}
+      </button>
+      {#if showAutoMenu}
+        <div class="auto-menu c-auto-menu" role="menu">
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+          <div class="auto-menu-sep">Spins</div>
+          {#each AUTO_OPTIONS as n}
+            <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
+
+  <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
+    <span class="c-max-cap">MAX</span>
+  </button>
+
+  <button
+    class="c-spin"
+    class:spinning={$isSpinning}
+    disabled={$isSpinning ? false : !$canSpin}
+    on:click={handleSpin}
+    aria-label={$tr('spin')}
+    data-testid="spin-button"
+  >
+    <svg class="glyph play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="glyph arrows" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M18 3v5h-5"/></svg>
+  </button>
+</div><!-- /c-hud -->
 {:else}
 <!-- HUD - B1 reskin. .fs-hud is a display:contents token-scope wrapper only;
      every control keeps its own position:absolute against the same stage
@@ -1217,4 +1344,168 @@
   .p-hud-menu, .p-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; }
   .p-hud-menu { left: 0; }
   .p-auto-menu { right: 0; }
+
+  /* LANDSCAPE COMPACT HUD (2026-07-14b) - fully self-contained, native CSS
+     px throughout, same discipline as the portrait .p-* block above: no
+     reuse of the LAYOUT_SPEC .fs-* absolute-position classes. Fills
+     App.svelte's .native-hud-slot.compact-landscape row (fixed 76px tall,
+     set there) as the second flex item, alongside FeatureMenu's own
+     compact trigger. */
+  .c-hud {
+    --c-cyan: var(--theme-primary, #00ffff);
+    --c-pink: var(--theme-secondary, #ff00ff);
+    --c-gold: #ffd700;
+    --c-orange: #ff9a2e;
+    --c-acc: var(--c-cyan);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px 8px 8px;
+    font-family: 'Orbitron', system-ui, sans-serif;
+    background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
+  }
+  .c-hud--overdrive { --c-acc: var(--c-pink); }
+
+  .c-round-btn {
+    position: relative;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 28%, #1a2636, #060b16 72%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    cursor: pointer;
+  }
+  .c-round-btn svg { width: 18px; height: 18px; }
+  .c-round-btn svg path { fill: none; stroke: var(--c-acc); stroke-width: 1.8; }
+  .c-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .c-round-btn.engaged { box-shadow: 0 0 12px color-mix(in srgb, var(--c-orange) 70%, transparent); }
+  .c-round-btn.engaged svg path { stroke: var(--c-orange); }
+  .c-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--c-acc) 70%, transparent); }
+
+  .c-tier { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(230, 245, 255, 0.85); }
+  .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--c-gold); }
+
+  .c-menu-wrapper, .c-autoplay-wrapper { position: relative; flex: 0 0 auto; }
+  .c-hud-menu, .c-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; }
+  .c-hud-menu { left: 0; }
+  .c-auto-menu { right: 0; }
+
+  .c-stat {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    /* 4px horizontal (not 8px): caught via a $1,000,000.00 stress-value
+       screenshot truncating by ~5px at the iPhone 14 landscape width
+       (2026-07-14b) - narrow margin, not a font/flex-ratio problem. */
+    padding: 2px 4px;
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), transparent 60%), #0c1220;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+  }
+  .c-stat.lit { border-color: color-mix(in srgb, var(--c-pink) 55%, transparent); }
+  .c-stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(190, 232, 255, 0.65);
+    white-space: nowrap;
+  }
+  .c-stat-value {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .c-stat-value.cyan { color: color-mix(in srgb, var(--c-cyan) 20%, #fff); }
+  .c-stat-value.magenta { color: color-mix(in srgb, var(--c-pink) 22%, #fff); }
+  .c-stat-value.gold { color: color-mix(in srgb, var(--c-gold) 30%, #fff); }
+
+  /* Balance gets extra flex-basis (2026-07-14b, caught via stress-value
+     screenshot: "$1,000,000.00" was truncating with ellipsis at the default
+     1:1:1.6 balance:win:bet ratio). Win stays small deliberately - it's
+     rarely a long figure in practice - freeing width for balance and bet,
+     the two fields most likely to carry long currency strings. */
+  .c-stat--balance { flex: 1.4 1 0; }
+  .c-stat--bet { flex: 1.6 1 0; }
+  .c-bet-row { display: flex; align-items: center; gap: 2px; }
+  .c-bet-step {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .c-bet-step svg { width: 12px; height: 8px; }
+  .c-bet-step svg path { fill: var(--c-acc); }
+  .c-bet-step:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .c-mode-badge {
+    position: absolute;
+    top: -8px;
+    right: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .c-mode-badge.overboost { color: #1a0d02; background: var(--c-orange); }
+  .c-mode-badge.cruise {
+    color: color-mix(in srgb, var(--c-cyan) 30%, #fff);
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid color-mix(in srgb, var(--c-cyan) 40%, transparent);
+  }
+
+  .c-spin {
+    position: relative;
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: conic-gradient(from 200deg, var(--c-acc), color-mix(in srgb, var(--c-acc) 40%, #0c1220), var(--c-acc));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 18px color-mix(in srgb, var(--c-acc) 45%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .c-spin .glyph { width: 22px; height: 22px; }
+  .c-spin .glyph path { fill: #04070f; }
+  .c-spin .glyph.arrows { display: none; fill: none; stroke: #04070f; stroke-width: 2; }
+  .c-spin.spinning .glyph.play { display: none; }
+  .c-spin.spinning .glyph.arrows { display: block; }
+  .c-spin:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

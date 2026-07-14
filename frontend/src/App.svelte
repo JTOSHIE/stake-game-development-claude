@@ -385,13 +385,37 @@
     if (typeof window === 'undefined') return 1
     return (0.96 * window.innerWidth) / STAGE_W
   }
+  // Landscape compact HUD pass (2026-07-14b): gate by HEIGHT, not aspect
+  // ratio - a landscape phone (innerWidth >= innerHeight) with innerHeight
+  // below COMPACT_HEIGHT_BREAKPOINT gets the same decoupling treatment the
+  // portrait pass proved (.game-wrapper drops its scale(S) transform so
+  // position:fixed modals correctly cover the true viewport again), but with
+  // a horizontal single-row native-scale strip instead of portrait's
+  // vertical stack. Desktop landscape (>=500px tall) is completely
+  // unchanged - still the single scale(S) transform, still every control
+  // inside the LAYOUT_SPEC v3.x panel.
+  const COMPACT_HEIGHT_BREAKPOINT = 500
+  const COMPACT_STRIP_H = 76
+  function computeCompactLandscape(): boolean {
+    if (typeof window === 'undefined') return false
+    return window.innerHeight < window.innerWidth && window.innerHeight < COMPACT_HEIGHT_BREAKPOINT
+  }
+  function computeCompactCanvasScale(): number {
+    if (typeof window === 'undefined') return 1
+    const availH = Math.max(window.innerHeight - COMPACT_STRIP_H, 1)
+    return Math.min(window.innerWidth / STAGE_W, availH / STAGE_H)
+  }
   let S = computeS()
   let portrait = computePortrait()
   let portraitCanvasScale = computePortraitCanvasScale()
+  let compactLandscape = computeCompactLandscape()
+  let compactCanvasScale = computeCompactCanvasScale()
   function handleResize(): void {
     S = computeS()
     portrait = computePortrait()
     portraitCanvasScale = computePortraitCanvasScale()
+    compactLandscape = computeCompactLandscape()
+    compactCanvasScale = computeCompactCanvasScale()
   }
 
   onMount(async () => {
@@ -706,6 +730,7 @@
 <main
   class="game-wrapper"
   class:portrait
+  class:compact-landscape={compactLandscape}
   class:shake={shakeActive}
   style="
     --theme-primary: {$activeTheme.palette.primary};
@@ -739,17 +764,25 @@
   {/if}
 
   <!-- CANVAS SLOT — the fixed 1280x720 design surface (scene/frame/grid/logo).
-       In landscape this is a no-op wrapper (canvas-inner is unscaled, static;
-       .game-wrapper itself carries the scale(S) transform as before). In
-       portrait, .game-wrapper is unscaled/full-viewport instead, and this
-       inner div carries its own scale (portraitCanvasScale, ~96% of viewport
-       width) so the canvas sits at the top with the HUD native-stacked below
-       (2026-07-14 portrait pass). -->
-  <div class="canvas-slot" class:portrait style={portrait ? `height:${STAGE_H * portraitCanvasScale}px` : ''}>
+       In desktop landscape this is a no-op wrapper (canvas-inner is
+       unscaled, static; .game-wrapper itself carries the scale(S) transform
+       as before). In portrait AND compact-landscape (2026-07-14b: a
+       landscape phone with innerHeight below 500px), .game-wrapper is
+       unscaled/full-viewport instead, and this inner div carries its own
+       scale so the canvas sits above the HUD, which native-stacks below
+       (2026-07-14 portrait pass; 2026-07-14b extends the same mechanism to
+       short landscape viewports, height-driven instead of width-driven). -->
+  <div
+    class="canvas-slot"
+    class:portrait
+    class:compact-landscape={compactLandscape}
+    style={portrait ? `height:${STAGE_H * portraitCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
+  >
     <div
       class="canvas-inner"
       class:portrait
-      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : ''}
+      class:compact-landscape={compactLandscape}
+      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
     >
       <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
       <div class="logo-box">
@@ -840,32 +873,35 @@
         />
       {/if}
 
-      <!-- FEATURES trigger — landscape only here (stays pinned beside the
-           frame in the 1280x720 coordinate space); portrait renders its own
-           native-scale trigger in .portrait-hud-slot below. -->
-      {#if !portrait && $activeTheme.id === 'future-spinner' && !featureActive}
+      <!-- FEATURES trigger — desktop landscape only here (stays pinned
+           beside the frame in the 1280x720 coordinate space); portrait and
+           compact-landscape each render their own native-scale trigger in
+           .native-hud-slot below. -->
+      {#if !portrait && !compactLandscape && $activeTheme.id === 'future-spinner' && !featureActive}
         <FeatureMenu on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
 
-      <!-- HUD OVERLAY — landscape only here; portrait renders its own
-           native-DOM instance in .portrait-hud-slot below. -->
-      {#if !portrait}
+      <!-- HUD OVERLAY — desktop landscape only here; portrait and
+           compact-landscape each render their own native-DOM instance in
+           .native-hud-slot below. -->
+      {#if !portrait && !compactLandscape}
         <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
       {/if}
     </div>
   </div>
 
-  {#if portrait}
-    <!-- PORTRAIT HUD SLOT — native DOM scale, never stage-scaled (2026-07-14
-         portrait pass). Sits below the canvas slot in normal flow; both
-         FeatureMenu and HudOverlay get portrait=true so their own CSS renders
-         the compact/native-scale composition instead of the LAYOUT_SPEC
-         absolute positions. -->
-    <div class="portrait-hud-slot">
+  {#if portrait || compactLandscape}
+    <!-- NATIVE HUD SLOT — native DOM scale, never stage-scaled (2026-07-14
+         portrait pass; 2026-07-14b extends it to compact-landscape). Sits
+         below the canvas slot in normal flow; FeatureMenu/HudOverlay each
+         get a `portrait` or `compactLandscape` prop so their own CSS
+         renders the matching native-scale composition instead of the
+         LAYOUT_SPEC absolute positions. -->
+    <div class="native-hud-slot" class:compact-landscape={compactLandscape}>
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
-        <FeatureMenu portrait on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+        <FeatureMenu {portrait} {compactLandscape} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
-      <HudOverlay portrait on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
+      <HudOverlay {portrait} {compactLandscape} on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
     </div>
   {/if}
 
@@ -884,16 +920,22 @@
       on:click={() => showThemeSelector = true}
       aria-label="Change theme"
       title="Change theme"
+      data-dev="true"
     >🎨</button>
     <!-- Reel choreography toggle — dev-only eye test (drop is the shipping
          default; strip is the dev-toggle alternative). Never rendered in the
-         production submission build (import.meta.env.DEV gate above). -->
+         production submission build (import.meta.env.DEV gate above).
+         data-dev (2026-07-14b): lets the conformance suite's touch-target
+         audit cheaply exclude dev-only elements from the production gate
+         rather than special-casing them by selector - see item 4 of the
+         landscape compact HUD brief. -->
     <button
       class="util-btn reel-mode-btn"
       on:click={cycleReelMode}
       aria-label="Toggle reel mode"
       title="Reel mode: {$reelMode} (click to toggle strip/drop)"
       data-testid="reel-mode-toggle"
+      data-dev="true"
     >{$reelMode === 'drop' ? '⬇' : '⇅'}<span class="reel-mode-label">{$reelMode}</span></button>
   {/if}
 
@@ -991,8 +1033,9 @@
   }
   .game-wrapper.shake { animation: screen-shake 0.42s ease-in-out; }
 
-  /* Portrait shake variant - no scale() term since .game-wrapper.portrait
-     carries no scale transform of its own (only .canvas-inner does). */
+  /* Portrait/compact-landscape shake variant - no scale() term since
+     .game-wrapper carries no scale transform of its own in either native-hud
+     mode (only .canvas-inner does). */
   @keyframes screen-shake-portrait {
     0%, 100% { transform: translate(0, 0); }
     20%      { transform: translate(-7px, 5px); }
@@ -1000,23 +1043,28 @@
     60%      { transform: translate(-5px, 4px); }
     80%      { transform: translate(5px, -3px); }
   }
-  .game-wrapper.portrait.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
+  .game-wrapper.portrait.shake,
+  .game-wrapper.compact-landscape.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
 
   @media (prefers-reduced-motion: reduce) {
     .game-wrapper.shake { animation: none; }
   }
 
-  /* Portrait layout mode (2026-07-14 portrait pass). .game-wrapper.portrait
-     drops the scale(S) transform entirely so it is no longer a transformed
-     ancestor: every position:fixed modal inside it (PaytableModal, BuyBonus,
-     SessionPanel, MaxWinCelebration, ThemeSelector, LoadingScreen,
-     IntroSplash) then correctly covers the true viewport again, since a
-     transform on an ancestor otherwise re-anchors position:fixed descendants
-     to its own bounding box. Only .canvas-inner (nested) carries a scale
-     transform, sized to roughly 96% of viewport width per the brief, keeping
-     the existing 1280x720 coordinate space for the scene/frame/grid
-     unchanged. */
-  .game-wrapper.portrait {
+  /* Native-HUD layout modes: portrait (2026-07-14 pass) and compact-landscape
+     (2026-07-14b - a landscape phone with innerHeight below 500px). Both
+     drop the scale(S) transform entirely on .game-wrapper so it is no
+     longer a transformed ancestor: every position:fixed modal inside it
+     (PaytableModal, BuyBonus, SessionPanel, MaxWinCelebration, ThemeSelector,
+     LoadingScreen, IntroSplash) then correctly covers the true viewport
+     again, since a transform on an ancestor otherwise re-anchors
+     position:fixed descendants to its own bounding box. Only .canvas-inner
+     (nested) carries a scale transform - width-driven in portrait (~96% of
+     viewport width), height-driven in compact-landscape (fits the space
+     remaining above the native HUD strip) - keeping the existing 1280x720
+     coordinate space for the scene/frame/grid unchanged in both. Desktop
+     landscape (neither class) is completely untouched. */
+  .game-wrapper.portrait,
+  .game-wrapper.compact-landscape {
     width: 100%;
     height: 100%;
     flex: 1 1 auto;
@@ -1035,43 +1083,61 @@
     width: 100%;
     height: 100%;
   }
-  .canvas-slot.portrait {
+  .canvas-slot.portrait,
+  .canvas-slot.compact-landscape {
     flex: 0 0 auto;
-    /* height set inline per-frame (STAGE_H * portraitCanvasScale) */
+    /* height set inline per-frame (STAGE_H * portraitCanvasScale, or
+       STAGE_H * compactCanvasScale in compact-landscape) */
   }
   .canvas-inner {
     position: relative;
     width: 100%;
     height: 100%;
   }
-  .canvas-inner.portrait {
+  .canvas-inner.portrait,
+  .canvas-inner.compact-landscape {
     position: absolute;
     top: 0;
     left: 50%;
     width: 1280px;
     height: 720px;
     transform-origin: top center;
-    /* transform (translateX(-50%) scale(portraitCanvasScale)) set inline */
+    /* transform (translateX(-50%) scale(...CanvasScale)) set inline */
   }
 
   /* Native-DOM HUD region, immediately below the canvas (no dead gap),
      never stage-scaled. Fonts and touch targets inside render at their own
      CSS px, independent of S. flex:0 0 auto sizes this to its own content
      height rather than stretch-filling remaining viewport space - an
-     earlier draft used flex:1 1 auto + justify-content:flex-end, which
-     pushed the FEATURES/HUD controls to the very bottom of the screen with
-     a large blank backdrop-only gap above them (caught via the committed
-     portrait-v1 screenshots, see the session report). Any true leftover
-     space on unusually tall phones now collects at the bottom, after the
-     HUD, which reads as normal safe-area padding rather than a broken
-     composition. */
-  .portrait-hud-slot {
+     earlier draft (portrait pass) used flex:1 1 auto + justify-content:
+     flex-end, which pushed the FEATURES/HUD controls to the very bottom of
+     the screen with a large blank backdrop-only gap above them (caught via
+     the committed portrait-v1 screenshots, see that pass's session report).
+     Any true leftover space on an unusually tall/short viewport now collects
+     at the bottom, after the HUD, which reads as normal safe-area padding
+     rather than a broken composition. Shared by both portrait (vertical
+     stack, see HudOverlay's `portrait` template) and compact-landscape
+     (single horizontal row, see HudOverlay's `compactLandscape` template) -
+     only the CHILD composition differs, not this slot's own layout. */
+  .native-hud-slot {
     position: relative;
     flex: 0 0 auto;
     width: 100%;
     display: flex;
     flex-direction: column;
     z-index: 60;
+  }
+  /* Compact-landscape (2026-07-14b): a single native-scale row - FeatureMenu's
+     compact trigger and HudOverlay's compact strip are the two flex items,
+     side by side, instead of portrait's vertical stack. Fixed height matches
+     COMPACT_STRIP_H in the script exactly, since the canvas's own height
+     budget is computed against that same constant. */
+  .native-hud-slot.compact-landscape {
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: stretch;
+    height: 76px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* -- Logo - top centre, 380 wide, y 18, z70 -- */

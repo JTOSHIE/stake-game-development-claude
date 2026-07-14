@@ -37,6 +37,11 @@
   // viewport once the caller (App.svelte) stops giving .game-wrapper a scale
   // transform in portrait mode.
   export let portrait = false
+  // Landscape compact HUD pass (2026-07-14b): renders an icon-only 48px
+  // round trigger as a flex item alongside HudOverlay's compact strip in
+  // App.svelte's .native-hud-slot.compact-landscape row. Same modal, same
+  // reasoning as portrait above - only the trigger's own markup/CSS differs.
+  export let compactLandscape = false
 
   let open = false
 
@@ -118,6 +123,27 @@
         data-testid="feature-menu-active-mode"
       >{entryActiveLabel}</span>
     {/if}
+  </button>
+{:else if compactLandscape}
+  <!-- Compact-landscape native-scale trigger (2026-07-14b) - a flex item
+       alongside HudOverlay's .c-hud strip, icon-only (no room for the
+       "FEATURES" text label at this width budget), still >=44px effective.
+       No active-mode badge here (unlike the portrait/landscape triggers) -
+       HudOverlay's own .c-mode-badge on the bet stat cell already shows
+       OVERBOOST/CRUISE in the same visible row, so a second indicator here
+       would be redundant and, at this button's size, would either sit below
+       the 11px legibility floor or overflow the 76px strip height. -->
+  <button
+    class="c-fm-entry"
+    class:mode-enhancer={$standingMode === 'antelite'}
+    on:click={openMenu}
+    disabled={$isSpinning}
+    aria-label="Features and bet modes"
+    aria-haspopup="dialog"
+    aria-expanded={open}
+    data-testid="feature-menu-button"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
   </button>
 {:else}
 <!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot) ───── -->
@@ -272,6 +298,7 @@
   /* token scope */
   .fm-entry,
   .p-fm-entry,
+  .c-fm-entry,
   .fm {
     --sig-cyan: var(--theme-primary, #00ffff);
     --sig-pink: #ff2ec4;
@@ -599,4 +626,30 @@
   .p-fm-entry.mode-enhancer {
     border-color: color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);
   }
+
+  /* Compact-landscape native-scale trigger (2026-07-14b) - icon-only round
+     button, sized to match HudOverlay's .c-round-btn family (44px) but a
+     touch larger (48px) since it's the entry point to every bet mode. */
+  .c-fm-entry {
+    position: relative;
+    flex: 0 0 auto;
+    align-self: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 28%, #10303a, #05121b 72%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .c-fm-entry svg { width: 20px; height: 20px; fill: none; stroke: var(--sig-cyan, #00ffff); stroke-width: 2.2; stroke-linecap: round; }
+  .c-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
+  .c-fm-entry.mode-enhancer {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);
+  }
+  .c-fm-entry.mode-enhancer svg { stroke: var(--sig-orange, #ff9a2e); }
 </style>
