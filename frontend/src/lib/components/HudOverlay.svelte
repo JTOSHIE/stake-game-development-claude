@@ -5,11 +5,11 @@
   // inside the panel is a fixed box that never moves or resizes as its value
   // grows (stress-tested against $10,000.00 balance / $5,000.00 win /
   // $5,000.00 bet); every numeric value uses tabular numerals.
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte'
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
-    isMuted, showPaytable, winAmount, BET_LEVELS, locale,
+    isMuted, showPaytable, winAmount, winMultiplier, BET_LEVELS, locale,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import { musicVolume, sfxVolume } from '../stores/audioSettings'
@@ -172,7 +172,60 @@
 
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: winLabel     = formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+
+  // HUD win count-up (2026-07-14b, ITEM B): every win ticks the HUD figure up
+  // incrementally rather than jumping straight to the final value, the same
+  // rAF/cubic-ease approach WinBanner.svelte already uses for its own (>=10x
+  // only) celebration overlay - this is the same behaviour applied to the
+  // HUD figure that's visible for every win, not just the big ones. Duration
+  // scales with win size: a 400ms floor for small wins up to an 800ms
+  // ceiling, saturating at 50x bet so huge wins don't drag the HUD out.
+  // Resets (new spin zeroing winAmount) snap instantly - only increases tween.
+  const WIN_COUNTUP_MIN_MS = 400
+  const WIN_COUNTUP_MAX_MS = 800
+  let displayedWinAmount = 0
+  let winCountUpFrame: number | null = null
+  let lastWinAmountSeen = 0
+
+  function startWinCountUp(target: number, multiplier: number): void {
+    if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
+    const start = displayedWinAmount
+    const startTime = performance.now()
+    const duration = Math.min(
+      WIN_COUNTUP_MAX_MS,
+      WIN_COUNTUP_MIN_MS + Math.min(WIN_COUNTUP_MAX_MS - WIN_COUNTUP_MIN_MS, multiplier * 8),
+    )
+    function tick(now: number): void {
+      const progress = Math.min((now - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      displayedWinAmount = start + (target - start) * eased
+      if (progress < 1) {
+        winCountUpFrame = requestAnimationFrame(tick)
+      } else {
+        displayedWinAmount = target
+        winCountUpFrame = null
+      }
+    }
+    winCountUpFrame = requestAnimationFrame(tick)
+  }
+
+  $: if ($winAmount !== lastWinAmountSeen) {
+    const previous = lastWinAmountSeen
+    lastWinAmountSeen = $winAmount
+    if ($winAmount > previous) {
+      startWinCountUp($winAmount, $winMultiplier)
+    } else {
+      if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
+      winCountUpFrame = null
+      displayedWinAmount = $winAmount
+    }
+  }
+
+  onDestroy(() => {
+    if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
+  })
+
+  $: winLabel = formatBalance(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
 <!-- HUD - B1 reskin. .fs-hud is a display:contents token-scope wrapper only;
