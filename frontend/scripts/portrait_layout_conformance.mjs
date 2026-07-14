@@ -1,23 +1,29 @@
 // portrait_layout_conformance.mjs — PORTRAIT LAYOUT PASS, 2026-07-14;
-// extended by the LANDSCAPE COMPACT HUD PASS, 2026-07-14b.
+// extended by the LANDSCAPE COMPACT HUD PASS, 2026-07-14b;
+// extended by PORTRAIT LAYOUT V2, GRID-FIRST RECOMPOSITION, 2026-07-14c.
 //
 // Permanent mobile conformance suite: Playwright device descriptors
 // (isMobile true), iPhone 14 + Pixel 7, portrait AND landscape each.
 //   - committed screenshots: idle, spin, win, buy modal, paytable,
-//     OVERBOOST-active -> reports/screens/portrait-v1/<device>-portrait/
-//     (unchanged by this pass) and reports/screens/landscape-compact-v1/
-//     <device>-landscape/ (2026-07-14b: landscape phones under 500px height
-//     now render App.svelte's compact single-row HUD instead of the old
-//     LAYOUT_SPEC absolute layout, so their proofs get their own directory
-//     rather than overwriting portrait-v1's original landscape screenshots).
+//     OVERBOOST-active -> reports/screens/portrait-v2/<device>-portrait/
+//     (2026-07-14c: portrait's composition changed fundamentally - grid-first
+//     recomposition, no scene/logo, controls pinned to the bottom safe-area -
+//     so proofs moved from portrait-v1/ to a new v2 directory rather than
+//     silently overwriting the old composition's screenshots) and
+//     reports/screens/landscape-compact-v1/<device>-landscape/ (2026-07-14b:
+//     landscape phones under 500px height render App.svelte's compact
+//     single-row HUD instead of the old LAYOUT_SPEC absolute layout;
+//     directory name unchanged this pass since the compact-strip composition
+//     itself is untouched by 2026-07-14c, only cross-cutting SessionPanel/
+//     dev-chip changes affect its content).
 //   - touch-target audit: every visible interactive element (button,
 //     [role=button], input, a[href], [tabindex]) asserts effective
 //     (post-scale) bounding box >= 44px on both dimensions. Elements marked
-//     data-dev (theme selector / reel-mode toggle - dev-only, confirmed
-//     absent from the real production build via `vite preview`, see the
-//     2026-07-14b session report) are excluded, since they only appear
-//     because this suite drives the dev server (needed for the
-//     window.__testStores hook), not a production build.
+//     data-dev (the collapsed DEV chip and its popover contents - dev-only,
+//     confirmed absent from the real production build via `vite preview`)
+//     are excluded, since they only appear because this suite drives the dev
+//     server (needed for the window.__testStores hook), not a production
+//     build.
 //   - font-legibility assert: computed font-size >= 11px rendered, on the
 //     portrait HUD's own text elements AND (2026-07-14b) the compact-
 //     landscape strip's own text elements - closing the PR #78 disclosed
@@ -26,6 +32,9 @@
 //     (>=500px tall) still isn't covered by any Playwright device profile
 //     here, so its .fs-label/.audio-label text remains an unsampled,
 //     out-of-scope surface - not claimed as fixed.
+//   - session-panel audit (2026-07-14c, item 3): the persistent TIME/SPINS/
+//     NET overlay must be absent by default and reachable via the HUD menu's
+//     "Session" item as an on-demand sheet, in every layout mode.
 //   - frame-gate: re-run of the long-frame (>100ms) check across several
 //     spins on the mobile (touch, device-scale-factor) profile.
 //
@@ -40,7 +49,11 @@ import { spawn } from 'node:child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-const PORTRAIT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'portrait-v1')
+// 2026-07-14c: portrait's composition changed fundamentally (grid-first
+// recomposition - no scene/logo, much larger grid, controls pinned to the
+// true bottom safe-area), so its proofs move to a new v2 directory rather
+// than overwriting v1's screenshots of the old composition in place.
+const PORTRAIT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'portrait-v2')
 const LANDSCAPE_COMPACT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'landscape-compact-v1')
 mkdirSync(OUT_DIR, { recursive: true })
 mkdirSync(PORTRAIT_SCREENS_ROOT, { recursive: true })
@@ -195,6 +208,38 @@ async function sampleLandscapeSmallText(page) {
   })
 }
 
+/** SessionPanel conformance assert (2026-07-14c, item 3): the persistent
+ *  TIME/SPINS/NET overlay must be absent by default, and the same
+ *  information must be reachable via the HUD menu's "Session" item as an
+ *  on-demand sheet. Assumes the HUD menu is currently closed (true after
+ *  the paytable step, which calls openPaytable() -> showMenu = false). */
+async function auditSessionPanel(page) {
+  const pinnedByDefault = await page.evaluate(
+    () => document.querySelectorAll('[data-testid="session-panel-pinned"]').length > 0,
+  )
+  const menu = page.locator('[aria-label="Menu"]')
+  await menu.first().click()
+  await page.waitForTimeout(150)
+  const sessionItem = page.locator('[data-testid="open-session-panel"]')
+  const menuItemFound = (await sessionItem.count()) > 0
+  if (menuItemFound) await sessionItem.click()
+  await page.waitForTimeout(150)
+  const sheetReachable = await page.evaluate(
+    () => document.querySelectorAll('[data-testid="session-panel-sheet"]').length > 0,
+  )
+  // Close the sheet again so later steps (overboost screenshot, frame gate)
+  // start from a clean state.
+  if (sheetReachable) {
+    await page.locator('.sp-sheet-close').click().catch(() => {})
+    await page.waitForTimeout(100)
+  }
+  return {
+    absentByDefault: !pinnedByDefault,
+    reachableViaMenu: menuItemFound && sheetReachable,
+    pass: !pinnedByDefault && menuItemFound && sheetReachable,
+  }
+}
+
 async function runFrameGate(page) {
   await page.evaluate(() => {
     window.__frameTimes = []
@@ -304,6 +349,10 @@ async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName
   entry.screenshots.paytable = 'paytable.png'
   await page.keyboard.press('Escape').catch(() => {})
   await page.waitForTimeout(100)
+
+  // SessionPanel: absent by default, reachable via the HUD menu (item 3,
+  // 2026-07-14c).
+  entry.sessionPanelAudit = await auditSessionPanel(page)
 
   // OVERBOOST active
   await page.evaluate(() => { window.__testStores.standingMode.set('antelite') })

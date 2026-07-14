@@ -13,6 +13,11 @@
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
+    },
     "touchTargetAudit": {
       "totalChecked": 8,
       "failing": [],
@@ -24,7 +29,7 @@
       "pass": true
     },
     "frameGate": {
-      "sampleCount": 329,
+      "sampleCount": 328,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
@@ -43,6 +48,11 @@
       "buyModal": "buy-modal.png",
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
+    },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
     },
     "touchTargetAudit": {
       "totalChecked": 8,
@@ -76,6 +86,11 @@
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
+    },
     "touchTargetAudit": {
       "totalChecked": 8,
       "failing": [],
@@ -87,10 +102,12 @@
       "pass": true
     },
     "frameGate": {
-      "sampleCount": 329,
-      "longFrameCount": 0,
-      "longFrames": [],
-      "pass": true
+      "sampleCount": 325,
+      "longFrameCount": 1,
+      "longFrames": [
+        250
+      ],
+      "pass": false
     }
   },
   "pixel7-landscape": {
@@ -106,6 +123,11 @@
       "buyModal": "buy-modal.png",
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
+    },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
     },
     "touchTargetAudit": {
       "totalChecked": 8,
