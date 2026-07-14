@@ -82,7 +82,8 @@ MANIFEST = [
     ), False),
     ("anticipation_build", 4.0, (
         "tense building synth drone, pulsing low heartbeat, rising electric tension, even "
-        "energy for seamless looping, no climax hit"
+        "energy for seamless looping, no climax hit, constant seething level, no decay, "
+        "no climax, uniform energy start to end"
     ), False),
     ("ui_click", 1.0, (
         "single crisp minimal digital tap, soft synth click, near subliminal"
@@ -155,11 +156,22 @@ def check_hf_auth() -> bool:
     """Verify Hugging Face auth via `huggingface-cli whoami`. Recent huggingface_hub
     releases replaced that CLI with `hf` (`huggingface-cli` is now a no-op deprecation
     stub that always exits 1) - if the `huggingface-cli` result looks like that stub,
-    fall back to `hf auth whoami`, which is the same check under the current tool name."""
-    for command in (["huggingface-cli", "whoami"], ["hf", "auth", "whoami"]):
+    fall back to `hf auth whoami`, which is the same check under the current tool name.
+
+    Real bug fixed 2026-07-14: this used to invoke bare `huggingface-cli`/`hf`, resolved
+    via PATH - but this project's CLI tools live only in this venv's own bin/ (this venv
+    is never added to PATH), so both calls hit FileNotFoundError and the function always
+    returned False regardless of actual login state (`.venv/bin/hf auth whoami` worked
+    fine the whole time). Fixed to resolve both binaries relative to sys.executable (the
+    interpreter running THIS script), which is always this same venv's bin/ directory."""
+    venv_bin = Path(sys.executable).parent
+    for exe_name, args in (("huggingface-cli", ["whoami"]), ("hf", ["auth", "whoami"])):
+        exe_path = venv_bin / exe_name
+        if not exe_path.exists():
+            continue
         try:
             result = subprocess.run(
-                command, capture_output=True, text=True, timeout=30,
+                [str(exe_path), *args], capture_output=True, text=True, timeout=30,
             )
         except FileNotFoundError:
             continue

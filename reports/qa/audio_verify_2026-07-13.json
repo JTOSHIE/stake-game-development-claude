@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-14T03:12:16.428Z",
-  "baseUrl": "http://localhost:56264",
+  "timestamp": "2026-07-14T04:45:56.724Z",
+  "baseUrl": "http://localhost:59909",
   "soundRequestCount": 18,
   "soundFailures": [],
   "consoleErrors": [],
@@ -12,7 +12,7 @@
     "bedRevertedAfterFeature": true,
     "zeroSoundRequestFailures": true,
     "zeroConsoleErrors": true,
-    "loopSeamsWithinTolerance": false
+    "loopSeamsWithinTolerance": true
   },
   "seamResults": {
     "bgm_loop": {
@@ -41,60 +41,55 @@
     },
     "anticipation_build": {
       "webm": {
-        "startDb": -12.403421612070147,
-        "endDb": -19.095258238920163,
-        "deltaDb": 6.691836626850016
+        "startDb": -28.008273349557765,
+        "endDb": -27.313321804621093,
+        "deltaDb": 0.6949515449366714
       },
       "mp3": {
-        "startDb": -12.62995128914173,
-        "endDb": -19.353563762540812,
-        "deltaDb": 6.723612473399083
+        "startDb": -28.11250423052868,
+        "endDb": -27.61755104957933,
+        "deltaDb": 0.4949531809493486
       }
     }
   },
-  "seamFailures": [
-    "anticipation_build.webm: seam delta 6.69dB exceeds 2dB tolerance",
-    "anticipation_build.mp3: seam delta 6.72dB exceeds 2dB tolerance"
-  ],
+  "seamFailures": [],
   "playedSoundsLog": {
     "afterSpin": [
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_loop.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_loop.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_tension.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/spin.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop_anticipation.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_small.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_medium.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_big.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_epic.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/scatter_land.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/anticipation_build.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_loop.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/spin.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/scatter_land.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/reel_stop.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_small.mp3"
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_tension.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/spin.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop_anticipation.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_small.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_medium.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_big.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_epic.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/scatter_land.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/anticipation_build.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/spin.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/reel_stop.mp3"
     ],
     "afterBuy": [
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_tension.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_loop.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_medium.mp3"
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_tension.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_big.mp3"
     ],
     "afterFeature": [
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/ui_click.mp3",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_tension.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/bgm_loop.webm",
-      "http://localhost:56264/assets/themes/future-spinner/sounds/win_medium.mp3"
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/ui_click.mp3",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_tension.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/bgm_loop.webm",
+      "http://localhost:59909/assets/themes/future-spinner/sounds/win_big.mp3"
     ]
   }
 }
