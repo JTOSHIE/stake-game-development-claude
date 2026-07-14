@@ -18,7 +18,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -265,7 +265,7 @@
                   </div>
                   <div class="fs-mode-meta">
                     <span class="fs-mode-cost fs-num">{m.cost}× · {modePrice(m.cost)}</span>
-                    <span class="fs-mode-rtp">RTP {FS_RTP_LABEL}</span>
+                    <span class="fs-mode-rtp">RTP {FS_RTP_LABEL} · Max Win {FS_MAX_WIN_LABEL}</span>
                   </div>
                 </div>
               </div>
@@ -297,8 +297,8 @@
 
         <!-- RTP — identical across all five modes (0.5% cross-mode rule) + max win -->
         <div class="fs-rtp">
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">RTP (All 5 Modes)</span><span class="fs-rtp-val fs-num">96.35%</span></div></div>
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Max Win</span><span class="fs-rtp-val fs-num">5,000×</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">RTP (All 5 Modes)</span><span class="fs-rtp-val fs-num">{FS_RTP_LABEL}</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Max Win</span><span class="fs-rtp-val fs-num">{FS_MAX_WIN_LABEL}</span></div></div>
         </div>
 
         <!-- Responsible play — the autoplay stop-conditions actually available

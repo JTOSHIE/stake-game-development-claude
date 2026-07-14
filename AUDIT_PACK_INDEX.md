@@ -24,11 +24,13 @@ separate, later session, run after Fable's next check-in, not part of this pass.
 
 ## 2. Superseded — an auditor must ignore these
 
-- **`SUBMISSION_BLURB.md`** (repo root). Pre-Overdrive, single-mode text ("no bonus
-  rounds or held state", scatter-only 1x/3x/10x). Directly contradicts the shipped
-  five-mode Overdrive Free Spins game. Superseded by `PROMO_BLURB.md` and
-  `SUBMISSION_DOSSIER.md` section 3. Found during this pass; not previously flagged
-  anywhere. Not deleted (out of scope for a prep-only job), flagged here instead.
+- **`reports/archive/SUBMISSION_BLURB_superseded.md`** (moved 2026-07-14 from its
+  original repo-root path `SUBMISSION_BLURB.md`, per the 2026-07-14 work order's ITEM
+  0). Pre-Overdrive, single-mode text ("no bonus rounds or held state", scatter-only
+  1x/3x/10x). Directly contradicted the shipped five-mode Overdrive Free Spins game;
+  carries its own SUPERSEDED header now. Superseded by `PROMO_BLURB.md` and
+  `SUBMISSION_DOSSIER.md` section 3. Originally found during this pass (JOB 6);
+  not previously flagged anywhere before that.
 - **`HANDOVER.md`** (repo root, undated legacy) and **`HANDOVER_2026-07-06_Fable.md`**.
   Both superseded by `HANDOVER_2026-07-07_Fable.md` per convention (j).
 - **Everything under `reports/archive/`** (43 dated `.md` files plus the `prompts/` and

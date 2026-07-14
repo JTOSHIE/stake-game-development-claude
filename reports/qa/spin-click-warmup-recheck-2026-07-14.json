@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-14T03:14:20.486Z",
+  "spinCount": 15,
+  "totalFrameSamples": 990,
+  "consoleErrors": [],
+  "longFrames": [
+    {
+      "tMs": 6342,
+      "gapMs": 333.3,
+      "nearestEvent": "spin-click-4",
+      "deltaToEventMs": 5
+    }
+  ],
+  "spinClickAttributedCount": 1,
+  "firstThreeSecondFrameCount": 0,
+  "baselineForComparison": {
+    "source": "reports/qa/frame-gate-attribution-2026-07-13.json (JOB 2, pre-warm-up)",
+    "totalLongFrames": 5,
+    "spinClickAttributedCount": 4,
+    "firstThreeSecondFrameCount": 2
+  }
+}
