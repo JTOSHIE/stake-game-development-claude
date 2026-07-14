@@ -1,0 +1,44 @@
+[
+  {
+    "mode": "cruise",
+    "expected_start_meter": 1,
+    "total_rounds": 100000,
+    "rounds_with_a_freegame_win": 6100,
+    "coverage_pct": 6.1,
+    "distinct_start_meter_values_observed": [
+      1
+    ],
+    "stateless": true,
+    "value_counts": {
+      "1": 6100
+    }
+  },
+  {
+    "mode": "antelite",
+    "expected_start_meter": 1,
+    "total_rounds": 100000,
+    "rounds_with_a_freegame_win": 24249,
+    "coverage_pct": 24.25,
+    "distinct_start_meter_values_observed": [
+      1
+    ],
+    "stateless": true,
+    "value_counts": {
+      "1": 24249
+    }
+  },
+  {
+    "mode": "super",
+    "expected_start_meter": 5,
+    "total_rounds": 100000,
+    "rounds_with_a_freegame_win": 99998,
+    "coverage_pct": 100.0,
+    "distinct_start_meter_values_observed": [
+      5
+    ],
+    "stateless": true,
+    "value_counts": {
+      "5": 99998
+    }
+  }
+]
