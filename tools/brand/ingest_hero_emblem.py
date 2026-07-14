@@ -108,9 +108,43 @@ def content_bbox(mask, labeled, main_label):
     return int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
 
 
+def measure_margins(arr, bg, threshold):
+    """Independent re-measurement of margins directly from pixel data at a
+    given threshold - used to verify recentring without going anywhere near
+    the transform's own bbox bookkeeping (2026-07-15 fix: the original
+    verify derived its "new bbox" algebraically from the pre-shift bbox and
+    the applied (dx, dy), so a sign bug in the paste itself could still
+    self-report a clean result - see FIX note below)."""
+    h, w, _ = arr.shape
+    diff = np.abs(arr.astype(np.int16) - bg).max(axis=2)
+    mask = diff > threshold
+    labeled, n = ndimage.label(mask, structure=np.ones((3, 3)))
+    sizes = ndimage.sum(mask, labeled, range(1, n + 1))
+    main_label = int(np.argmax(sizes)) + 1
+    ys, xs = np.where(labeled == main_label)
+    x0, y0, x1, y1 = int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
+    left, right = x0, w - 1 - x1
+    top, bottom = y0, h - 1 - y1
+    return {"threshold": threshold, "left": left, "right": right, "top": top, "bottom": bottom}
+
+
 def recentre(arr, bg, bbox):
     """Shifts the canvas so left/right and top/bottom margins around bbox
-    are equal, padding/cropping with bg. Returns (shifted_arr, new_bbox)."""
+    are equal, padding/cropping with bg.
+
+    FIX (2026-07-15, Fable's independent threshold sweep caught this): the
+    src/dst slice ranges below were swapped, so a positive dx (meant to
+    shift content LEFT, i.e. new_x = old_x - dx) actually shifted content
+    RIGHT instead - the emblem moved the wrong way. The old verify then
+    computed "new_bbox" algebraically as (x0 - dx, ...), which assumes the
+    shift happened as intended rather than re-measuring the real shifted
+    pixels, so it self-reported a clean 0-1px result even though the actual
+    image was off by roughly double the intended shift in the wrong
+    direction. Fixed by (a) correcting the slice ranges so old_x = new_x +
+    dx is applied consistently, and (b) verifying afterwards with
+    measure_margins() against the actual shifted array at multiple
+    thresholds, independent of this function's own bookkeeping.
+    """
     h, w, _ = arr.shape
     x0, y0, x1, y1 = bbox
     left, right = x0, w - 1 - x1
@@ -120,14 +154,14 @@ def recentre(arr, bg, bbox):
 
     canvas = np.empty_like(arr)
     canvas[:, :] = bg
-    src_x0, src_x1 = max(0, -dx), min(w, w - dx)
-    src_y0, src_y1 = max(0, -dy), min(h, h - dy)
-    dst_x0, dst_x1 = max(0, dx), min(w, w + dx)
-    dst_y0, dst_y1 = max(0, dy), min(h, h + dy)
+    # new[x_new] = old[x_new + dx]  ->  dst ranges over valid new_x, src is dst offset by dx.
+    dst_x0, dst_x1 = max(0, -dx), min(w, w - dx)
+    dst_y0, dst_y1 = max(0, -dy), min(h, h - dy)
+    src_x0, src_x1 = dst_x0 + dx, dst_x1 + dx
+    src_y0, src_y1 = dst_y0 + dy, dst_y1 + dy
     canvas[dst_y0:dst_y1, dst_x0:dst_x1] = arr[src_y0:src_y1, src_x0:src_x1]
 
-    new_bbox = (x0 - dx, y0 - dy, x1 - dx, y1 - dy)
-    return canvas, new_bbox, dx, dy
+    return canvas, dx, dy
 
 
 def main():
@@ -165,15 +199,28 @@ def main():
     # 4. Recentre on the cleaned emblem's own bbox.
     bbox = content_bbox(mask, labeled, main_label)
     print(f"measured emblem bbox: x[{bbox[0]},{bbox[2]}] y[{bbox[1]},{bbox[3]}]")
-    shifted, new_bbox, dx, dy = recentre(cleaned, bg, bbox)
-    x0, y0, x1, y1 = new_bbox
-    h, w, _ = shifted.shape
-    left, right = x0, w - 1 - x1
-    top, bottom = y0, h - 1 - y1
+    shifted, dx, dy = recentre(cleaned, bg, bbox)
     print(f"shift applied: dx={dx} dy={dy}")
-    print(f"new margins: left={left} right={right} (diff {abs(left - right)}), top={top} bottom={bottom} (diff {abs(top - bottom)})")
-    assert abs(left - right) <= MARGIN_TOLERANCE_PX, "left/right margins not equalised within tolerance"
-    assert abs(top - bottom) <= MARGIN_TOLERANCE_PX, "top/bottom margins not equalised within tolerance"
+
+    # Independent verification (2026-07-15 fix): re-measure the ACTUAL
+    # shifted pixels at a sweep of thresholds, entirely separate from
+    # recentre()'s own bookkeeping, so a transform bug cannot self-report a
+    # clean result the way the original algebraic new_bbox did.
+    print("threshold sweep (independent re-measurement of the shifted image):")
+    print(f"{'threshold':>9} | {'left':>5} {'right':>5} (diff) | {'top':>5} {'bottom':>5} (diff)")
+    sweep = {t: measure_margins(shifted, bg, t) for t in (18, 40, 80, 100, 120)}
+    for t, m in sweep.items():
+        lr_diff = abs(m["left"] - m["right"])
+        tb_diff = abs(m["top"] - m["bottom"])
+        print(f"{t:>9} | {m['left']:>5} {m['right']:>5} ({lr_diff:>3}) | {m['top']:>5} {m['bottom']:>5} ({tb_diff:>3})")
+
+    for t in (40, 100):
+        m = sweep[t]
+        lr_diff = abs(m["left"] - m["right"])
+        tb_diff = abs(m["top"] - m["bottom"])
+        assert lr_diff <= MARGIN_TOLERANCE_PX, f"left/right margins not equalised within tolerance at threshold {t} (diff {lr_diff})"
+        assert tb_diff <= MARGIN_TOLERANCE_PX, f"top/bottom margins not equalised within tolerance at threshold {t} (diff {tb_diff})"
+    print(f"margins verified within {MARGIN_TOLERANCE_PX}px at both threshold 40 and threshold 100 (threshold-invariant)")
 
     master = Image.fromarray(shifted, mode="RGB")
     master.save(OUT_DIR / "master_1024.png")
