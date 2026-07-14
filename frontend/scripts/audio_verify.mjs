@@ -77,6 +77,62 @@ async function waitSpinDone(page, timeout = 20000) {
   )
 }
 
+const SEAM_ROWS = ['bgm_loop', 'bgm_tension', 'anticipation_build']
+const SEAM_RMS_WINDOW_MS = 20
+const SEAM_RMS_TOLERANCE_DB = 2.0
+
+// Loop-conditioning seam gate (2026-07-14 seam fix): decodes the actual shipped
+// audio (both formats) in-browser via the Web Audio API and measures the RMS
+// delta between the first and last SEAM_RMS_WINDOW_MS - the same metric
+// tools/audio_forge/master.py's condition_loop_seam() targets during
+// mastering. This is a HARD gate against the real shipped bytes, not a
+// re-check of the Python pipeline's own self-report.
+async function measureSeamRmsDeltaDb(page, url) {
+  return page.evaluate(async ({ url, windowMs }) => {
+    const res = await fetch(url)
+    if (!res.ok) return { error: `fetch ${res.status}` }
+    const buf = await res.arrayBuffer()
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    let audioBuffer
+    try {
+      audioBuffer = await ctx.decodeAudioData(buf)
+    } catch (err) {
+      return { error: `decode failed: ${err.message}` }
+    }
+    const sr = audioBuffer.sampleRate
+    const n = Math.floor(sr * windowMs / 1000)
+    const total = audioBuffer.length
+    function rmsAllChannels(startIdx, len) {
+      let sumSq = 0
+      let count = 0
+      for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+        const data = audioBuffer.getChannelData(c)
+        for (let i = startIdx; i < startIdx + len; i++) {
+          sumSq += data[i] * data[i]
+          count++
+        }
+      }
+      return Math.sqrt(sumSq / count)
+    }
+    const toDb = (r) => (r > 0 ? 20 * Math.log10(r) : -999)
+    const startDb = toDb(rmsAllChannels(0, n))
+    const endDb = toDb(rmsAllChannels(total - n, n))
+    return { startDb, endDb, deltaDb: Math.abs(startDb - endDb) }
+  }, { url, windowMs: SEAM_RMS_WINDOW_MS })
+}
+
+async function runSeamChecks(page, baseUrl) {
+  const results = {}
+  for (const name of SEAM_ROWS) {
+    results[name] = {}
+    for (const ext of ['webm', 'mp3']) {
+      const url = `${baseUrl}/assets/themes/future-spinner/sounds/${name}.${ext}`
+      results[name][ext] = await measureSeamRmsDeltaDb(page, url)
+    }
+  }
+  return results
+}
+
 async function run() {
   const port = await getFreePort()
   const preview = await startDevServer(port)
@@ -164,6 +220,18 @@ async function run() {
     const playedAfterFeature = await page.evaluate(() => window.__playedSounds)
     const bedReverted = playedAfterFeature.filter((s) => /bgm_loop\.(mp3|webm)$/.test(s)).length > 0
 
+    const seamResults = await runSeamChecks(page, baseUrl)
+    const seamFailures = []
+    for (const [name, byExt] of Object.entries(seamResults)) {
+      for (const [ext, r] of Object.entries(byExt)) {
+        if (r.error) {
+          seamFailures.push(`${name}.${ext}: ${r.error}`)
+        } else if (r.deltaDb > SEAM_RMS_TOLERANCE_DB) {
+          seamFailures.push(`${name}.${ext}: seam delta ${r.deltaDb.toFixed(2)}dB exceeds ${SEAM_RMS_TOLERANCE_DB}dB tolerance`)
+        }
+      }
+    }
+
     await browser.close()
 
     const checks = {
@@ -174,6 +242,7 @@ async function run() {
       bedRevertedAfterFeature: bedReverted,
       zeroSoundRequestFailures: soundFailures.length === 0,
       zeroConsoleErrors: consoleErrors.length === 0,
+      loopSeamsWithinTolerance: seamFailures.length === 0,
     }
 
     const result = {
@@ -183,6 +252,8 @@ async function run() {
       soundFailures,
       consoleErrors,
       checks,
+      seamResults,
+      seamFailures,
       playedSoundsLog: { afterSpin: playedAfterSpin, afterBuy: playedAfterBuy, afterFeature: playedAfterFeature },
     }
     writeFileSync(OUT_PATH, JSON.stringify(result, null, 2))

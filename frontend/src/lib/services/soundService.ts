@@ -193,6 +193,36 @@ export function setMuted(val: boolean): void {
 
 // ── BGM ─────────────────────────────────────────────────────────────────────
 
+// ── FIRST-GESTURE WARM-UP ───────────────────────────────────────────────────
+
+let audioWarmedUp = false
+
+/**
+ * Primes every Audio element's decode pipeline on the very first user gesture
+ * (muted play immediately paused) so the FIRST real sound of the session -
+ * typically the first spin click - doesn't pay a first-use decode cost inline
+ * with gameplay. Idempotent and safe to call more than once; each element's
+ * mute state is restored to whatever it already was rather than assumed.
+ * GameGrid.svelte's own _prewarmArt() already decodes symbol/fx textures at
+ * component mount (before the first gesture in the normal flow), so this is
+ * audio-only - textures don't need a second, gesture-gated warm-up pass.
+ */
+export function warmUpAudio(): void {
+  if (audioWarmedUp) return
+  audioWarmedUp = true
+  Object.values(sounds).forEach((el) => {
+    const wasMuted = el.muted
+    el.muted = true
+    el.play().then(() => {
+      el.pause()
+      el.currentTime = 0
+      el.muted = wasMuted
+    }).catch(() => {
+      el.muted = wasMuted
+    })
+  })
+}
+
 export function playBGM(): void {
   if (muted || bgmStarted) return
   sounds.bgm.play().then(() => {

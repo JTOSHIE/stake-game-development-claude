@@ -1,3 +1,11 @@
+SUPERSEDED (2026-07-14): this is the pre-Overdrive, single-mode blurb - it claims
+"no bonus rounds or held state" and a scatter-only 1x/3x/10x feature, which directly
+contradicts the shipped five-mode Overdrive Free Spins game. Kept here as historical
+record only. The current, owner-approved blurb lives in `SUBMISSION_DOSSIER.md`
+section 3 (and its short-form mirror, `PROMO_BLURB.md`). First flagged as stale in
+`AUDIT_PACK_INDEX.md` (JOB 6, 2026-07-13); moved and archived under this name in the
+2026-07-14 audio seam/warm-up work order (ITEM 0).
+
 # Future Spinner, Submission Blurb
 
 **Game:** Future Spinner
