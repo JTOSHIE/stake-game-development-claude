@@ -18,7 +18,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -256,12 +256,12 @@
                 <div class="fs-face">
                   <div class="fs-mode-main">
                     <div class="fs-mode-name-row">
-                      <span class="fs-mode-name">{m.label}</span>
+                      <span class="fs-mode-name">{modeLabel(m, $isSocial)}</span>
                       {#if !m.available}
                         <span class="fs-mode-soon">coming soon</span>
                       {/if}
                     </div>
-                    <p class="fs-mode-blurb">{m.blurb}</p>
+                    <p class="fs-mode-blurb">{modeBlurb(m, $isSocial)}</p>
                   </div>
                   <div class="fs-mode-meta">
                     <span class="fs-mode-cost fs-num">{m.cost}× · {modePrice(m.cost)}</span>

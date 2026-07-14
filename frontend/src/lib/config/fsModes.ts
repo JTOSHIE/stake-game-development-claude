@@ -43,6 +43,13 @@ export interface FsMode {
   volatility: 'Low' | 'High' | 'Very High' | 'Extreme'
   /** One-line description for the card and the BET MODES info page. */
   blurb: string
+  /** Social-casino (stake.us) override for `label`, per Fable's wording
+   *  ruling (2026-07-14b, ITEM C). Omit when the real-money label has no
+   *  prohibited-term conflict - the base label is used in social mode too. */
+  socialLabel?: string
+  /** Social-casino (stake.us) override for `blurb`, per the same ruling.
+   *  Real-money `blurb` is never changed; consumers branch on `isSocial`. */
+  socialBlurb?: string
   /** false = maths not shipped yet; render dimmed + "coming soon", non-interactive. */
   available: boolean
   /** Maths mode id sent to the RGS (via the selectedBetMode store). */
@@ -67,6 +74,7 @@ export const FS_MODES: FsMode[] = [
     cost: 1.0,
     volatility: 'Low',
     blurb: 'A smoother ride: more frequent smaller wins, same 96.35% RTP.',
+    socialBlurb: 'A smoother ride: more frequent smaller prizes, same 96.35% RTP.',
     available: true,
     serverMode: 'cruise',
   },
@@ -77,6 +85,7 @@ export const FS_MODES: FsMode[] = [
     cost: 1.25,
     volatility: 'High',
     blurb: 'Double-chance: about 1.6x the feature trigger rate. Debits 1.25x every spin while ON.',
+    socialBlurb: 'Double-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.',
     available: true,
     serverMode: 'antelite',
   },
@@ -87,6 +96,8 @@ export const FS_MODES: FsMode[] = [
     cost: 100,
     volatility: 'Very High',
     blurb: 'Buy a guaranteed Overdrive Free Spins entry.',
+    socialLabel: 'Get Overdrive',
+    socialBlurb: 'Get a guaranteed Overdrive Free Spins entry.',
     available: true,
     serverMode: 'bonus',
   },
@@ -97,6 +108,7 @@ export const FS_MODES: FsMode[] = [
     cost: 400,
     volatility: 'Extreme',
     blurb: 'Buy a rich entry with the Overdrive meter pre-revved to 5x.',
+    socialBlurb: 'Get a rich entry with the Overdrive meter pre-revved to 5x.',
     available: true,
     serverMode: 'super',
   },
@@ -121,3 +133,15 @@ export const MODE_COST = FS_MODES.reduce(
 /** Shared RTP + max win, identical across all modes (see game_config.py). */
 export const FS_RTP_LABEL = '96.35%'
 export const FS_MAX_WIN_LABEL = '5,000×'
+
+/** Resolves a mode's displayed label/blurb for the current social-mode
+ * state - the single place both FeatureMenu.svelte and PaytableModal.svelte
+ * branch on `isSocial`, so the two consumers can never drift out of sync.
+ * Real-money strings (`label`/`blurb`) are always the fallback; the social
+ * override is used only when one exists AND social mode is active. */
+export function modeLabel(m: FsMode, social: boolean): string {
+  return social && m.socialLabel ? m.socialLabel : m.label
+}
+export function modeBlurb(m: FsMode, social: boolean): string {
+  return social && m.socialBlurb ? m.socialBlurb : m.blurb
+}
