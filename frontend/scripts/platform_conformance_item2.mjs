@@ -314,10 +314,15 @@ async function run() {
         }
       }
       const bannerDistinctValues = new Set(bannerSamples.filter(Boolean)).size
+      const bannerCountsUp = bannerDistinctValues > 1
       results.winCountUp = {
         hudSamples, hudDistinctValues, hudCountsUp,
-        bannerSamples, bannerDistinctValues,
-        bannerCountsUp: bannerDistinctValues > 1,
+        bannerSamples, bannerDistinctValues, bannerCountsUp,
+        // Hard assert (2026-07-14b, ITEM B): the HUD figure must tween up
+        // incrementally for every win, not just WinBanner's >=10x overlay -
+        // this is what makes item (f) a real gate rather than descriptive
+        // data collection only.
+        pass: hudCountsUp,
       }
       await page.close()
     }
@@ -351,6 +356,29 @@ async function run() {
   writeFileSync(outPath, JSON.stringify(results, null, 2))
   console.log(JSON.stringify(results, null, 2))
   console.log(`\nResults written to ${outPath}`)
+
+  // Overall pass/fail (2026-07-14b, ITEM B): collect every `pass` field
+  // anywhere in the results tree (top-level checks like winCountUp, and
+  // nested per-item checks like popoutProofs.popout-s / languageFuzz.en) and
+  // fail the whole run if any is false - this script previously only
+  // collected data with no hard gate at all.
+  const failures = []
+  function collectFailures(obj, path) {
+    if (obj === null || typeof obj !== 'object') return
+    if ('pass' in obj && obj.pass === false) failures.push(path)
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'pass') continue
+      collectFailures(value, path ? `${path}.${key}` : key)
+    }
+  }
+  collectFailures(results, '')
+
+  if (failures.length > 0) {
+    console.error(`\nPLATFORM CONFORMANCE: FAILURES DETECTED - ${failures.join(', ')}`)
+    process.exitCode = 1
+  } else {
+    console.log('\nPLATFORM CONFORMANCE: ALL CHECKS PASS')
+  }
 }
 
 run().catch((err) => {
