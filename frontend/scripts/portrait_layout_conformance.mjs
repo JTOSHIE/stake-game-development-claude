@@ -1,17 +1,31 @@
-// portrait_layout_conformance.mjs — PORTRAIT LAYOUT PASS, 2026-07-14.
+// portrait_layout_conformance.mjs — PORTRAIT LAYOUT PASS, 2026-07-14;
+// extended by the LANDSCAPE COMPACT HUD PASS, 2026-07-14b.
 //
 // Permanent mobile conformance suite: Playwright device descriptors
 // (isMobile true), iPhone 14 + Pixel 7, portrait AND landscape each.
 //   - committed screenshots: idle, spin, win, buy modal, paytable,
-//     OVERBOOST-active -> reports/screens/portrait-v1/<device>-<orientation>/
+//     OVERBOOST-active -> reports/screens/portrait-v1/<device>-portrait/
+//     (unchanged by this pass) and reports/screens/landscape-compact-v1/
+//     <device>-landscape/ (2026-07-14b: landscape phones under 500px height
+//     now render App.svelte's compact single-row HUD instead of the old
+//     LAYOUT_SPEC absolute layout, so their proofs get their own directory
+//     rather than overwriting portrait-v1's original landscape screenshots).
 //   - touch-target audit: every visible interactive element (button,
 //     [role=button], input, a[href], [tabindex]) asserts effective
-//     (post-scale) bounding box >= 44px on both dimensions.
-//   - font-legibility assert: computed font-size on the portrait HUD's own
-//     text elements >= 11px rendered (landscape's pre-existing sub-11px
-//     .fs-label/.audio-label text is sampled and reported, NOT gated - a
-//     disclosed, out-of-scope finding predating this pass, see the session
-//     report).
+//     (post-scale) bounding box >= 44px on both dimensions. Elements marked
+//     data-dev (theme selector / reel-mode toggle - dev-only, confirmed
+//     absent from the real production build via `vite preview`, see the
+//     2026-07-14b session report) are excluded, since they only appear
+//     because this suite drives the dev server (needed for the
+//     window.__testStores hook), not a production build.
+//   - font-legibility assert: computed font-size >= 11px rendered, on the
+//     portrait HUD's own text elements AND (2026-07-14b) the compact-
+//     landscape strip's own text elements - closing the PR #78 disclosed
+//     .fs-label/.audio-label sub-11px finding for both landscape profiles,
+//     since they no longer render that template at all. Desktop landscape
+//     (>=500px tall) still isn't covered by any Playwright device profile
+//     here, so its .fs-label/.audio-label text remains an unsampled,
+//     out-of-scope surface - not claimed as fixed.
 //   - frame-gate: re-run of the long-frame (>100ms) check across several
 //     spins on the mobile (touch, device-scale-factor) profile.
 //
@@ -26,9 +40,11 @@ import { spawn } from 'node:child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-const SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'portrait-v1')
+const PORTRAIT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'portrait-v1')
+const LANDSCAPE_COMPACT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'landscape-compact-v1')
 mkdirSync(OUT_DIR, { recursive: true })
-mkdirSync(SCREENS_ROOT, { recursive: true })
+mkdirSync(PORTRAIT_SCREENS_ROOT, { recursive: true })
+mkdirSync(LANDSCAPE_COMPACT_SCREENS_ROOT, { recursive: true })
 
 const DEVICE_PROFILES = [
   { label: 'iphone14', portrait: 'iPhone 14', landscape: 'iPhone 14 landscape' },
@@ -106,7 +122,14 @@ async function auditTouchTargets(page) {
         // anything else parked outside the true viewport - not a reachable
         // touch target for a real user regardless of its box size.
         const onScreen = r.bottom > 0 && r.right > 0 && r.top < window.innerHeight && r.left < window.innerWidth
-        return r.width > 0 && r.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && onScreen
+        // Excludes dev-only elements (theme selector, reel-mode toggle -
+        // 2026-07-14b: marked data-dev in App.svelte, confirmed absent from
+        // the real `vite preview` production DOM). This suite drives the dev
+        // server (needed for window.__testStores), so these render here even
+        // though a real player never sees them - auditing them against the
+        // production 44px bar would be a false failure, not a real one.
+        const isDevOnly = el.hasAttribute('data-dev')
+        return r.width > 0 && r.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && onScreen && !isDevOnly
       })
       .map((el) => {
         const r = el.getBoundingClientRect()
@@ -128,6 +151,24 @@ async function auditPortraitFontSizes(page) {
     const selectors = [
       '.p-stat-label', '.p-stat-value', '.p-spin-txt', '.p-tier',
       '.p-max-cap', '.p-fm-entry-label', '.p-fm-entry-active', '.p-mode-badge',
+    ]
+    const out = []
+    for (const sel of selectors) {
+      document.querySelectorAll(sel).forEach((el) => {
+        const size = parseFloat(getComputedStyle(el).fontSize)
+        out.push({ selector: sel, text: el.textContent?.trim()?.slice(0, 20) ?? '', fontSizePx: size, pass: size >= MIN })
+      })
+    }
+    return out
+  }, FONT_MIN)
+}
+
+/** Sample computed font-size on the compact-landscape strip's own text
+ *  elements (2026-07-14b) - the same gate as portrait's, applied to .c-*. */
+async function auditCompactLandscapeFontSizes(page) {
+  return page.evaluate((MIN) => {
+    const selectors = [
+      '.c-stat-label', '.c-stat-value', '.c-tier', '.c-max-cap', '.c-mode-badge',
     ]
     const out = []
     for (const sel of selectors) {
@@ -181,7 +222,14 @@ async function runFrameGate(page) {
 
 async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName, results) {
   const key = `${deviceLabel}-${orientation}`
-  const screensDir = join(SCREENS_ROOT, key)
+  // Portrait proofs stay in portrait-v1/ (unchanged by the 2026-07-14b pass).
+  // Landscape proofs move to landscape-compact-v1/ since these two device
+  // profiles (both under the 500px compact-mode height breakpoint) now
+  // render App.svelte's compact single-row HUD instead of the old
+  // LAYOUT_SPEC absolute layout - their screenshots document fundamentally
+  // different content, not a regression check against the old ones.
+  const screensRoot = orientation === 'portrait' ? PORTRAIT_SCREENS_ROOT : LANDSCAPE_COMPACT_SCREENS_ROOT
+  const screensDir = join(screensRoot, key)
   mkdirSync(screensDir, { recursive: true })
   const context = await browser.newContext({ ...devices[deviceName] })
   const page = await context.newPage()
@@ -273,12 +321,24 @@ async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName
     pass: failingTargets.length === 0,
   }
 
-  // font legibility (portrait only - see module doc comment)
+  // font legibility - portrait's own .p-* elements, or (2026-07-14b)
+  // compact-landscape's own .c-* elements. Both device profiles used here
+  // are under the 500px compact-mode breakpoint, so the landscape branch is
+  // always the compact strip, never the old LAYOUT_SPEC template.
   if (orientation === 'portrait') {
     const fonts = await auditPortraitFontSizes(page)
     const failingFonts = fonts.filter((f) => !f.pass)
     entry.fontLegibilityAudit = { totalChecked: fonts.length, failing: failingFonts, pass: failingFonts.length === 0 }
   } else {
+    const fonts = await auditCompactLandscapeFontSizes(page)
+    const failingFonts = fonts.filter((f) => !f.pass)
+    entry.fontLegibilityAudit = { totalChecked: fonts.length, failing: failingFonts, pass: failingFonts.length === 0 }
+    // Diagnostic-only, kept on per item 3 of the 2026-07-14b brief: samples
+    // the OLD LAYOUT_SPEC .fs-label/.audio-label selectors too. Expected to
+    // come back empty for these two profiles now (they don't render that
+    // template below the compact breakpoint) - a non-empty result here would
+    // mean the compact-mode gate itself regressed, so it stays as a live
+    // canary rather than being deleted now that its original finding closed.
     entry.landscapeSmallTextDiagnostic = await sampleLandscapeSmallText(page)
   }
 
@@ -312,7 +372,8 @@ async function run() {
   writeFileSync(outPath, JSON.stringify(results, null, 2))
   console.log(JSON.stringify(results, null, 2))
   console.log(`\nResults written to ${outPath}`)
-  console.log(`Screenshots written to ${SCREENS_ROOT}`)
+  console.log(`Portrait screenshots written to ${PORTRAIT_SCREENS_ROOT}`)
+  console.log(`Landscape screenshots written to ${LANDSCAPE_COMPACT_SCREENS_ROOT}`)
 
   const failures = []
   function collectFailures(obj, path) {
