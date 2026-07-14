@@ -33,6 +33,9 @@ BED_LUFS_TARGET = -18.0
 WIN_TIER_MARGIN_LUFS = 1.0  # minimum separation enforced between adjacent win tiers
 ZERO_CROSSING_SEARCH_MS = 15  # window to search for a clean zero crossing near a cut point
 SILENCE_TRIM_ZERO_CROSSING_MS = 5  # tighter window for the silence-trim boundary itself
+SEAM_CROSSFADE_MS = 500  # loop-conditioning crossfade length (2026-07-14 seam fix)
+SEAM_RMS_WINDOW_MS = 20  # window used to measure the end-vs-start seam level match
+SEAM_RMS_TOLERANCE_DB = 2.0  # informational target; the hard gate lives in audio_verify.mjs
 
 # (name, is_bgm, bpm) - bpm is None for non-tempo-locked rows.
 # is_loop=True rows get WebM Opus + MP3-fallback; everything else gets MP3 only.
@@ -145,6 +148,49 @@ def trim_to_seamless_cycle(data: np.ndarray, sr: int) -> np.ndarray:
     return data[start:end]
 
 
+def condition_loop_seam(data: np.ndarray, sr: int, crossfade_ms: float = SEAM_CROSSFADE_MS) -> np.ndarray:
+    """Folds the final crossfade_ms of a loop into its head via an equal-power
+    crossfade, then trims the (now-redundant) tail off - the standard technique for a
+    seamless wrap loop. The new clip's first sample is (almost) the source's natural
+    continuation of what used to be its last sample (tail_region[0] at fade weight 1.0),
+    fading across to the original head content by the end of the crossfade window, so
+    both the wrap point (old end -> new start) and the chronological continuity read
+    naturally. This shortens the clip by crossfade_ms - trim_to_whole_bars/
+    trim_to_seamless_cycle must run first so the bar/cycle alignment is computed on the
+    pre-seam-fix length, not after this shortens it."""
+    n = int(sr * crossfade_ms / 1000)
+    if n * 2 >= len(data):
+        return data  # too short to condition safely - leave as-is rather than corrupt it
+    head = data[:n]
+    tail = data[len(data) - n:]
+    middle = data[n:len(data) - n]
+    fade_in = np.sin(np.linspace(0, np.pi / 2, n)) ** 2  # 0 -> 1, toward the head
+    fade_out = np.cos(np.linspace(0, np.pi / 2, n)) ** 2  # 1 -> 0, away from the tail
+    if data.ndim > 1:
+        fade_in = fade_in[:, None]
+        fade_out = fade_out[:, None]
+    blended_head = tail * fade_out + head * fade_in
+    return np.concatenate([blended_head, middle], axis=0)
+
+
+def measure_seam_rms_delta_db(data: np.ndarray, sr: int, window_ms: float = SEAM_RMS_WINDOW_MS) -> float:
+    """Returns the absolute dB difference between the RMS of the first and last
+    window_ms of data - the same seam-level-match metric audio_verify.mjs's hard gate
+    checks against the shipped, encoded file. Informational here (logged, not
+    asserted); the pipeline can't itself guarantee an arbitrary source's tail and head
+    levels end up within tolerance after conditioning, so this is measured and
+    reported honestly rather than silently assumed."""
+    n = int(sr * window_ms / 1000)
+    n = min(n, len(data) // 2)
+    if n <= 0:
+        return 0.0
+    start_rms = np.sqrt(np.mean(data[:n].astype(np.float64) ** 2))
+    end_rms = np.sqrt(np.mean(data[-n:].astype(np.float64) ** 2))
+    start_db = linear_to_db(start_rms)
+    end_db = linear_to_db(end_rms)
+    return abs(start_db - end_db)
+
+
 def peak_normalize(data: np.ndarray, target_dbfs: float) -> np.ndarray:
     peak = np.max(np.abs(data))
     if peak <= 0:
@@ -228,6 +274,14 @@ def master_row(name: str, config: dict, out_dir: Path):
             data = trim_to_whole_bars(data, sr, config["bpm"])
         else:
             data = trim_to_seamless_cycle(data, sr)
+
+        # Seam fix (2026-07-14): fold the tail into the head and trim, so the wrap
+        # point is a genuine crossfade rather than just a click-free zero-crossing cut.
+        data = condition_loop_seam(data, sr)
+        delta_db = measure_seam_rms_delta_db(data, sr)
+        status = "OK" if delta_db <= SEAM_RMS_TOLERANCE_DB else "OUT OF TOLERANCE"
+        print(f"    [seam] end-vs-start RMS delta: {delta_db:.2f}dB "
+              f"(target <= {SEAM_RMS_TOLERANCE_DB}dB) - {status}")
 
     return data, sr
 

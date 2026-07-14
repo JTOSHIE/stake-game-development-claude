@@ -51,7 +51,7 @@
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
-  import { playBGM, playWin } from './lib/services/soundService'
+  import { playBGM, playWin, warmUpAudio } from './lib/services/soundService'
   import { isSocial } from './lib/stores/socialMode'
   // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
   import { get } from 'svelte/store'
@@ -399,6 +399,20 @@
     if (import.meta.env.DEV) {
       import('./lib/mock/roundProvider').then((m) => m.preloadSamples()).catch(() => {})
     }
+
+    // First-gesture audio warm-up (2026-07-14 seam/warm-up fix): primes every
+    // Audio element's decode pipeline on the player's first click/keypress so
+    // the first real sound of the session doesn't pay a first-use decode cost
+    // inline with gameplay. One-shot, removes both listeners once fired -
+    // separate from playBGM()'s own gesture listener (which only starts BGM
+    // playback, not every other sound element).
+    const warmUpOnce = (): void => {
+      warmUpAudio()
+      document.removeEventListener('pointerdown', warmUpOnce)
+      document.removeEventListener('keydown', warmUpOnce)
+    }
+    document.addEventListener('pointerdown', warmUpOnce)
+    document.addEventListener('keydown', warmUpOnce)
   })
 
   onDestroy(() => {
