@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""JOB 3b math self-audit: CVaR/ETL/win-range-gap analysis from the shipped
+lookUpTable CSVs (games/future_spinner/library/publish_files/, read-only -
+this script never writes to that locked directory).
+
+Computes the two risk metrics stake-engine.com/docs/approval-guidelines/
+math-verification defines but scripts/validate_math.py does not yet compute:
+  - CVaR (normalized): expected payout, in "times cost" units, in the worst
+    0.1% weighted tail of outcomes, divided by the mode's cost multiplier.
+  - ETL (normalized): the fraction of total RTP contributed by wins >= 40x
+    the cost multiplier - "what proportion of RTP comes from the heavy tail."
+Also buckets payouts on a log-ish scale to flag any multiplier band with zero
+observed outcomes (an "unobtainable win range" per the same page), and reports
+the most-likely-single-outcome's weighted share (dominance check).
+
+Run: python3 scripts/math_selfaudit_risk_metrics.py
+"""
+import csv
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+LIB = ROOT / "games/future_spinner/library/publish_files"
+
+MODES = {
+    "base": 1.0,
+    "cruise": 1.0,
+    "antelite": 1.25,
+    "bonus": 100.0,
+    "super": 400.0,
+}
+
+BUCKETS = [0, 0.5, 1, 2, 5, 10, 20, 50, 100, 250, 500, 1000, 2500, 5000, 5001]
+
+
+def analyse(mode: str, cost: float) -> dict:
+    path = LIB / f"lookUpTable_{mode}_0.csv"
+    rows = []
+    total_weight = 0
+    max_single_weight = 0
+    with open(path) as f:
+        for _, w, pay in csv.reader(f):
+            w = int(w)
+            payout = int(pay) / 100.0  # centibets -> bet multiple
+            rows.append((payout, w))
+            total_weight += w
+            max_single_weight = max(max_single_weight, w)
+
+    total_rtp_weighted = sum(p * w for p, w in rows)
+    rtp = total_rtp_weighted / total_weight / cost
+
+    # CVaR: worst 0.1% tail by payout, weighted.
+    rows_sorted = sorted(rows, key=lambda r: r[0], reverse=True)
+    tail_target = total_weight * 0.001
+    tail_weight = 0.0
+    tail_payout_weighted = 0.0
+    for payout, w in rows_sorted:
+        take = min(w, max(0, tail_target - tail_weight))
+        if take <= 0:
+            break
+        tail_payout_weighted += payout * take
+        tail_weight += take
+        if tail_weight >= tail_target:
+            break
+    cvar_abs = tail_payout_weighted / tail_weight if tail_weight > 0 else 0.0
+    cvar_norm = cvar_abs / cost
+
+    # ETL: RTP contribution from wins >= 40x cost.
+    threshold = 40 * cost
+    etl_weighted = sum(p * w for p, w in rows if p >= threshold)
+    etl_norm = etl_weighted / total_rtp_weighted if total_rtp_weighted > 0 else 0.0
+
+    # Win-range gap scan (bucketed in "times cost" units) + dominance check.
+    bucket_weights = [0] * (len(BUCKETS) - 1)
+    for payout, w in rows:
+        normalized = payout / cost
+        for i in range(len(BUCKETS) - 1):
+            if BUCKETS[i] <= normalized < BUCKETS[i + 1]:
+                bucket_weights[i] += w
+                break
+    empty_buckets = [
+        f"[{BUCKETS[i]}-{BUCKETS[i+1]})x cost"
+        for i in range(len(bucket_weights))
+        if bucket_weights[i] == 0
+    ]
+
+    zero_weight = sum(w for p, w in rows if p == 0.0)
+
+    return {
+        "mode": mode,
+        "cost": cost,
+        "rtp": rtp,
+        "cvar_abs_bet_units": cvar_abs,
+        "cvar_normalized": cvar_norm,
+        "etl_threshold_x_cost": threshold,
+        "etl_normalized": etl_norm,
+        "zero_payout_rate": zero_weight / total_weight,
+        "unique_payouts": len(set(p for p, w in rows if w > 0)),
+        "total_rows": len(rows),
+        "most_likely_single_outcome_share": max_single_weight / total_weight,
+        "empty_mid_range_buckets": empty_buckets,
+    }
+
+
+def main() -> None:
+    print("=" * 78)
+    print("Future Spinner - math self-audit risk metrics (CVaR / ETL / gap scan)")
+    print("=" * 78)
+    for mode, cost in MODES.items():
+        r = analyse(mode, cost)
+        print(f"\n[{mode}]  cost {cost}x")
+        print(f"  RTP                          {r['rtp']*100:.6f}%")
+        print(f"  CVaR (normalized, /cost)     {r['cvar_normalized']:.3f}")
+        print(f"  CVaR (absolute, bet units)   {r['cvar_abs_bet_units']:.1f}x")
+        print(f"  ETL (normalized, >= {r['etl_threshold_x_cost']:.0f}x cost)  {r['etl_normalized']:.4f}")
+        print(f"  Most-likely single outcome   {r['most_likely_single_outcome_share']*100:.3f}% of weight")
+        print(f"  Empty mid-range buckets      {r['empty_mid_range_buckets'] or 'none'}")
+
+
+if __name__ == "__main__":
+    main()
