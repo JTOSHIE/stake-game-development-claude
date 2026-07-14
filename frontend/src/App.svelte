@@ -141,6 +141,11 @@
     markIntroSeen()
   }
   let showThemeSelector = false
+  // 2026-07-14c: single collapsed toggle for the dev-only theme/reel-mode
+  // chip popover (item 4, landscape/portrait v2 briefs) - dev chrome default
+  // state is collapsed so the dev server's idle view is visually closer to
+  // production.
+  let showDevPanel = false
 
   // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
@@ -375,15 +380,59 @@
   // .game-wrapper being untransformed to correctly cover the real screen).
   // So in portrait, .game-wrapper becomes an unscaled, full-viewport
   // container; only the nested .canvas-inner (the 1280x720 design surface
-  // still used for the scene/frame/grid) gets its own scale transform, sized
-  // to roughly 96% of viewport width per the brief.
+  // still used for the frame/grid) gets its own scale transform.
+  //
+  // GRID-FIRST RECOMPOSITION (2026-07-14c, portrait v2): v1 scaled the
+  // WHOLE 1280-wide stage to ~96% of viewport width, so the frame (only
+  // 640 of those 1280 units) rendered at under half the viewport width -
+  // the grid read as small even though the brief's intent was a dominant,
+  // width-first grid. This pass calibrates the scale against GRID_SPEC_W
+  // (522px - the grid-slot's own design width, not the full 1280 stage and
+  // not the frame's own wider 640px decorative border) so the GRID itself
+  // reaches ~96% of viewport width, landing symbol cells at ~70-77px on a
+  // 390-430px phone (verified empirically against the brief's "near 70px"
+  // target - see the session report for the exact calibration reasoning).
+  // The frame's own decorative outer edge (wider than the grid by design)
+  // extends slightly past the viewport at its outer corners as a result -
+  // a deliberate, common "chrome bleed" treatment, not a bug.
   function computePortrait(): boolean {
     if (typeof window === 'undefined') return false
     return window.innerHeight > window.innerWidth
   }
+  const GRID_SPEC_W = 522
+  // Vertical crop window (portrait v2): SceneGroup and the desktop logo are
+  // not rendered in portrait at all (see the template), so canvas-slot only
+  // needs to reserve enough height to show the frame (y84-552) plus a small
+  // margin for FlameJets' edge-flare bleed (~40px) - not the full 720-tall
+  // stage, most of which would otherwise be a dead band below the frame
+  // (there is no HUD content left in that region once FeatureMenu/HudOverlay
+  // are native-DOM elements below the canvas, not part of the 1280 canvas).
+  const PORTRAIT_CROP_BOTTOM_Y = 592
+  // Width-first sizing (above) can overflow the viewport vertically on a
+  // short phone - "grid as large as width allows" still has to leave room
+  // for the wordmark and the HUD below it, or the controls row (meant to be
+  // pinned to the bottom safe-area) ends up scrolled out of view instead.
+  // These are conservative, content-derived minimums (not guesses): the
+  // wordmark's own line-height, and the portrait HUD's content-only height
+  // with zero breathing gap (FeatureMenu's 44px trigger + its 8px margin,
+  // .p-hud's 20px vertical padding, the stats+bet top-group at 114px, and a
+  // 72px controls row - see HudOverlay.svelte's .p-fm-entry/.p-hud/
+  // .p-top-group/.p-controls-row rules for the source values).
+  const PORTRAIT_WORDMARK_H = 28
+  // 290, not the 260 the component styles alone suggested: measured via
+  // getBoundingClientRect() that .native-hud-slot's real content-driven
+  // floor is ~287px (the hand-summed 260 estimate undercounted actual
+  // rendered padding/line-height), confirmed by the fact that shrinking the
+  // canvas further than that estimate implied still left the controls row
+  // scrolled a few px past the viewport bottom - caught before committing
+  // any screenshot, not assumed from the CSS alone.
+  const PORTRAIT_HUD_MIN_H = 290
   function computePortraitCanvasScale(): number {
     if (typeof window === 'undefined') return 1
-    return (0.96 * window.innerWidth) / STAGE_W
+    const widthBasedScale = (0.96 * window.innerWidth) / GRID_SPEC_W
+    const availableCanvasH = Math.max(window.innerHeight - PORTRAIT_WORDMARK_H - PORTRAIT_HUD_MIN_H, 1)
+    const heightBasedScale = availableCanvasH / PORTRAIT_CROP_BOTTOM_Y
+    return Math.min(widthBasedScale, heightBasedScale)
   }
   // Landscape compact HUD pass (2026-07-14b): gate by HEIGHT, not aspect
   // ratio - a landscape phone (innerWidth >= innerHeight) with innerHeight
@@ -763,20 +812,33 @@
     <IntroSplash on:continue={handleIntroContinue} />
   {/if}
 
-  <!-- CANVAS SLOT — the fixed 1280x720 design surface (scene/frame/grid/logo).
-       In desktop landscape this is a no-op wrapper (canvas-inner is
-       unscaled, static; .game-wrapper itself carries the scale(S) transform
-       as before). In portrait AND compact-landscape (2026-07-14b: a
-       landscape phone with innerHeight below 500px), .game-wrapper is
-       unscaled/full-viewport instead, and this inner div carries its own
-       scale so the canvas sits above the HUD, which native-stacks below
-       (2026-07-14 portrait pass; 2026-07-14b extends the same mechanism to
-       short landscape viewports, height-driven instead of width-driven). -->
+  {#if portrait}
+    <!-- PORTRAIT WORDMARK (2026-07-14c, grid-first recomposition): a small
+         native-DOM text wordmark - never the desktop title lockup image
+         (game-logo-img), which is a "desktop title lockup" the brief
+         explicitly excludes from portrait. Sits above canvas-slot in normal
+         flow, native px, never stage-scaled. -->
+    <div class="portrait-wordmark">{$activeTheme.name}</div>
+  {/if}
+
+  <!-- CANVAS SLOT — the fixed 1280x720 design surface (frame/grid, plus
+       scene/logo in desktop landscape only). In desktop landscape this is a
+       no-op wrapper (canvas-inner is unscaled, static; .game-wrapper itself
+       carries the scale(S) transform as before). In portrait AND
+       compact-landscape (2026-07-14b: a landscape phone with innerHeight
+       below 500px), .game-wrapper is unscaled/full-viewport instead, and
+       this inner div carries its own scale so the canvas sits above the
+       HUD, which native-stacks below (2026-07-14 portrait pass; 2026-07-14b
+       extends the same mechanism to short landscape viewports, height-driven
+       instead of width-driven; 2026-07-14c recalibrates portrait's scale to
+       the grid's own width, not the full 1280 stage, and crops the canvas
+       slot's height to the frame's bleed margin instead of the full 720
+       stage height - see PORTRAIT_CROP_BOTTOM_Y above). -->
   <div
     class="canvas-slot"
     class:portrait
     class:compact-landscape={compactLandscape}
-    style={portrait ? `height:${STAGE_H * portraitCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
+    style={portrait ? `height:${PORTRAIT_CROP_BOTTOM_Y * portraitCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
   >
     <div
       class="canvas-inner"
@@ -784,36 +846,46 @@
       class:compact-landscape={compactLandscape}
       style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
     >
-      <!-- LOGO — top centre, 380 wide, y 18 (z70) -->
-      <div class="logo-box">
-        <img
-          class="game-logo-img"
-          src="{$themeAssets.logo}"
-          alt="{$activeTheme.name}"
-          draggable="false"
-          id="theme-logo-img"
-          on:error={() => {
-            const img = document.getElementById('theme-logo-img') as HTMLImageElement
-            if (img) img.style.display = 'none'
-            const txt = document.getElementById('theme-logo-txt')
-            if (txt) (txt as HTMLElement).style.display = 'block'
-          }}
-        />
-        <div
-          class="logo-text"
-          id="theme-logo-txt"
-          style="display: none;"
-        >
-          {$activeTheme.name}
+      {#if !portrait}
+        <!-- LOGO — top centre, 380 wide, y 18 (z70). Desktop/landscape only:
+             portrait's brief explicitly excludes this "desktop title
+             lockup" image, using .portrait-wordmark above instead
+             (2026-07-14c). -->
+        <div class="logo-box">
+          <img
+            class="game-logo-img"
+            src="{$themeAssets.logo}"
+            alt="{$activeTheme.name}"
+            draggable="false"
+            id="theme-logo-img"
+            on:error={() => {
+              const img = document.getElementById('theme-logo-img') as HTMLImageElement
+              if (img) img.style.display = 'none'
+              const txt = document.getElementById('theme-logo-txt')
+              if (txt) (txt as HTMLElement).style.display = 'block'
+            }}
+          />
+          <div
+            class="logo-text"
+            id="theme-logo-txt"
+            style="display: none;"
+          >
+            {$activeTheme.name}
+          </div>
         </div>
-      </div>
+      {/if}
 
       {#if $errorMessage}
         <div class="error-banner">{errorDisplay}</div>
       {/if}
 
-      <!-- SCENE GROUP — left, set further back (z8), future-spinner only -->
-      {#if $activeTheme.id === 'future-spinner'}
+      <!-- SCENE GROUP — left, set further back (z8), future-spinner only.
+           Desktop/landscape only (2026-07-14c): portrait's brief explicitly
+           excludes the car/pilot/billboard scene - the grid is the whole
+           composition there, backdrop filling behind via the document-level
+           .bg-still-container (unaffected either way, since that's outside
+           .game-wrapper entirely). -->
+      {#if $activeTheme.id === 'future-spinner' && !portrait}
         <SceneGroup />
       {/if}
 
@@ -897,7 +969,7 @@
          get a `portrait` or `compactLandscape` prop so their own CSS
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
-    <div class="native-hud-slot" class:compact-landscape={compactLandscape}>
+    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape}>
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
         <FeatureMenu {portrait} {compactLandscape} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
@@ -911,42 +983,62 @@
        the CONFIRMED buy tier (e.detail), not always 'bonus'. -->
   <BuyBonus bind:this={buyBonusRef} showTrigger={false} on:buy={(e) => handleBuy(e.detail)} />
 
-  <!-- Theme selector — dev-only. Hidden in the production submission build so
-       only the validated Future Spinner experience ships (see the scope note
-       in the script). Reversible: remove these import.meta.env.DEV guards. -->
+  <!-- Dev chrome (2026-07-14c): collapsed behind one small DEV chip instead
+       of two separate labelled floating buttons, so the dev server's
+       default view reads much closer to production (nothing at all) rather
+       than visibly different chrome. Hidden in the production submission
+       build so only the validated Future Spinner experience ships (see the
+       scope note in the script); data-dev lets the conformance suite's
+       touch-target audit exclude every element in here from the production
+       gate, same mechanism as before (2026-07-14b), now covering the chip
+       and its popover contents alike. Reversible: remove these
+       import.meta.env.DEV guards. -->
   {#if import.meta.env.DEV}
-    <button
-      class="util-btn theme-btn"
-      on:click={() => showThemeSelector = true}
-      aria-label="Change theme"
-      title="Change theme"
-      data-dev="true"
-    >🎨</button>
-    <!-- Reel choreography toggle — dev-only eye test (drop is the shipping
-         default; strip is the dev-toggle alternative). Never rendered in the
-         production submission build (import.meta.env.DEV gate above).
-         data-dev (2026-07-14b): lets the conformance suite's touch-target
-         audit cheaply exclude dev-only elements from the production gate
-         rather than special-casing them by selector - see item 4 of the
-         landscape compact HUD brief. -->
-    <button
-      class="util-btn reel-mode-btn"
-      on:click={cycleReelMode}
-      aria-label="Toggle reel mode"
-      title="Reel mode: {$reelMode} (click to toggle strip/drop)"
-      data-testid="reel-mode-toggle"
-      data-dev="true"
-    >{$reelMode === 'drop' ? '⬇' : '⇅'}<span class="reel-mode-label">{$reelMode}</span></button>
+    <div class="dev-chip-wrapper">
+      <button
+        class="util-btn dev-chip"
+        on:click={() => showDevPanel = !showDevPanel}
+        aria-label="Dev tools"
+        aria-expanded={showDevPanel}
+        title="Dev tools"
+        data-dev="true"
+        data-testid="dev-chip"
+      >DEV</button>
+      {#if showDevPanel}
+        <div class="dev-panel" data-dev="true">
+          <button
+            class="util-btn theme-btn"
+            on:click={() => { showThemeSelector = true; showDevPanel = false }}
+            aria-label="Change theme"
+            title="Change theme"
+            data-dev="true"
+          >🎨</button>
+          <!-- Reel choreography toggle — dev-only eye test (drop is the
+               shipping default; strip is the dev-toggle alternative). -->
+          <button
+            class="util-btn reel-mode-btn"
+            on:click={cycleReelMode}
+            aria-label="Toggle reel mode"
+            title="Reel mode: {$reelMode} (click to toggle strip/drop)"
+            data-testid="reel-mode-toggle"
+            data-dev="true"
+          >{$reelMode === 'drop' ? '⬇' : '⇅'}<span class="reel-mode-label">{$reelMode}</span></button>
+        </div>
+      {/if}
+    </div>
   {/if}
 
   {#if $showPaytable}
     <PaytableModal />
   {/if}
 
-  <!-- Responsible-gambling session panel — shown where the jurisdiction enables
-       RG (plus dev, for testing). Inside the non-replay branch so it is never
-       rendered in replay mode, matching BalanceDisplay/ControlBar/ThemeSelector. -->
-  <SessionPanel devForce={import.meta.env.DEV} />
+  <!-- Responsible-gambling session panel (2026-07-14c: absent by default in
+       every layout - its own corner overlay only auto-pins where the
+       jurisdiction's mandatorySessionDisplay flag demands it; otherwise it's
+       reachable via the HUD menu's "Session" item, same in dev and prod).
+       Inside the non-replay branch so it is never rendered in replay mode,
+       matching BalanceDisplay/ControlBar/ThemeSelector. -->
+  <SessionPanel />
 
   {#if import.meta.env.DEV && showThemeSelector}
     <ThemeSelector on:close={() => showThemeSelector = false} />
@@ -1083,11 +1175,19 @@
     width: 100%;
     height: 100%;
   }
-  .canvas-slot.portrait,
   .canvas-slot.compact-landscape {
     flex: 0 0 auto;
-    /* height set inline per-frame (STAGE_H * portraitCanvasScale, or
-       STAGE_H * compactCanvasScale in compact-landscape) */
+    /* height set inline per-frame (STAGE_H * compactCanvasScale) */
+  }
+  .canvas-slot.portrait {
+    flex: 0 0 auto;
+    /* height set inline per-frame (PORTRAIT_CROP_BOTTOM_Y *
+       portraitCanvasScale) - deliberately shorter than canvas-inner's own
+       logical 720-tall height (2026-07-14c): SceneGroup and the desktop
+       logo aren't rendered in portrait, so everything below the frame's
+       bleed margin (y592+) is empty stage space, not real content - overflow
+       hidden crops it rather than reserving a dead band for nothing. */
+    overflow: hidden;
   }
   .canvas-inner {
     position: relative;
@@ -1127,6 +1227,18 @@
     flex-direction: column;
     z-index: 60;
   }
+  /* Portrait (2026-07-14c, grid-first recomposition): grows to fill the
+     space remaining below the canvas, so HudOverlay's own controls row can
+     be pinned to the true bottom safe-area (via justify-content:
+     space-between on .p-hud, see HudOverlay.svelte) instead of v1's
+     content-sized slot, which left the controls wherever the content
+     happened to end. FeatureMenu's bar stays at the TOP of this region,
+     immediately below the grid - no gap - since it's a separate, auto-sized
+     flex item before HudOverlay's flex:1 .p-hud fills the rest. */
+  .native-hud-slot.portrait {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
   /* Compact-landscape (2026-07-14b): a single native-scale row - FeatureMenu's
      compact trigger and HudOverlay's compact strip are the two flex items,
      side by side, instead of portrait's vertical stack. Fixed height matches
@@ -1138,6 +1250,22 @@
     align-items: stretch;
     height: 76px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Portrait wordmark (2026-07-14c) - small native-DOM text, never the
+     desktop title lockup image. Sized to comfortably fit any top safe-area
+     without pushing the canvas down meaningfully. */
+  .portrait-wordmark {
+    flex: 0 0 auto;
+    padding: 4px 0 2px;
+    text-align: center;
+    font-family: 'Orbitron', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(210, 240, 255, 0.85);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--theme-primary, #00ffff) 55%, transparent);
   }
 
   /* -- Logo - top centre, 380 wide, y 18, z70 -- */
@@ -1247,12 +1375,44 @@
     opacity: 0.92;
   }
 
-  /* ── Theme toggle button ──────────────────────────────────────────────── */
-  .util-btn.theme-btn {
+  /* ── Dev chip (2026-07-14c) — single small anchor, replaces two separate
+       floating buttons so the dev server's default view is visually closer
+       to production. ─────────────────────────────────────────────────── */
+  .dev-chip-wrapper {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
     z-index: 50;
+  }
+  .util-btn.dev-chip {
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    width: 40px;
+    height: 24px;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .util-btn.dev-chip:hover {
+    background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);
+    border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
+  }
+  .dev-panel {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .util-btn.theme-btn {
     background: rgba(0,0,0,0.55);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 50%;
@@ -1271,12 +1431,8 @@
     border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
   }
 
-  /* ── Reel-mode toggle (dev-only) — pill just left of the theme button ────── */
+  /* ── Reel-mode toggle (dev-only) ──────────────────────────────────────── */
   .util-btn.reel-mode-btn {
-    position: fixed;
-    bottom: 1rem;
-    right: 3.6rem;
-    z-index: 50;
     background: rgba(0,0,0,0.55);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 14px;
@@ -1289,6 +1445,7 @@
     gap: 0.3rem;
     color: #fff;
     transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
   }
   .util-btn.reel-mode-btn:hover {
     background: color-mix(in srgb, var(--theme-primary, #00ffff) 12%, transparent);

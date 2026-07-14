@@ -18,9 +18,10 @@
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
-  import { autoplayLimits, rgJurisdiction } from '../stores/responsibleGambling'
+  import { autoplayLimits, rgJurisdiction, showSessionPanel } from '../stores/responsibleGambling'
   import { standingMode } from '../stores/betMode'
   import { MODE_COST } from '../config/fsModes'
+  import { jurisdictionFlags } from '../stores/jurisdiction'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
 
@@ -46,7 +47,7 @@
   onMount(() => {
     if (import.meta.env.DEV) {
       ;(window as unknown as { __testStores?: unknown }).__testStores =
-        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier, standingMode }
+        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier, standingMode, jurisdictionFlags }
     }
   })
 
@@ -158,6 +159,16 @@
     showMenu = false
   }
 
+  // 2026-07-14c: opens SessionPanel's on-demand sheet (TIME/SPINS/NET) from
+  // the HUD menu, in every layout mode - always reachable regardless of
+  // jurisdiction, since the persistent corner overlay now only auto-pins
+  // where mandatorySessionDisplay demands it.
+  function openSessionPanel() {
+    playClick()
+    showSessionPanel.set(true)
+    showMenu = false
+  }
+
   function toggleMute() {
     isMuted.update((v) => !v)
   }
@@ -243,44 +254,53 @@
 </script>
 
 {#if portrait}
-<!-- PORTRAIT HUD (2026-07-14 portrait pass): native-DOM-scale stacked
-     composition - a compact stats row (balance/win/bet+steppers), then a
+<!-- PORTRAIT HUD (2026-07-14 portrait pass; 2026-07-14c grid-first
+     recomposition restructures the internal layout): native-DOM-scale
+     composition - a compact stats row (balance/win) plus a full-width bet
+     row sit at the TOP of this region (immediately below FeatureMenu's bar,
+     which is itself immediately below the grid - no gap), while the
      controls row (menu, turbo/badge zone, a large central SPIN, MAX,
-     autoplay). Rendered as a normal-flow sibling OUTSIDE the scaled
-     1280x720 stage (see App.svelte), so nothing here is affected by --S -
-     every size below is a real, native CSS px value. -->
+     autoplay) is pinned to the true bottom safe-area via .p-hud's own
+     justify-content:space-between (see the CSS) - .p-hud now fills all the
+     space App.svelte's .native-hud-slot.portrait grows to, rather than
+     being sized to its own content as v1 was. Rendered as a normal-flow
+     sibling OUTSIDE the scaled 1280x720 stage (see App.svelte), so nothing
+     here is affected by --S - every size below is a real, native CSS px
+     value. -->
 <div class="p-hud" class:p-hud--overdrive={$overdriveVisual}>
-  <div class="p-stats-row">
-    <div class="p-stat" data-testid="hud-balance">
-      <span class="p-stat-label">{$tr('balance')}</span>
-      <span class="p-stat-value cyan">{balanceLabel}</span>
+  <div class="p-top-group">
+    <div class="p-stats-row">
+      <div class="p-stat" data-testid="hud-balance">
+        <span class="p-stat-label">{$tr('balance')}</span>
+        <span class="p-stat-value cyan">{balanceLabel}</span>
+      </div>
+      <div class="p-stat" class:lit={$winAmount > 0} data-testid="hud-win">
+        <span class="p-stat-label">{$tr('win')}</span>
+        <span class="p-stat-value magenta">{winLabel}</span>
+      </div>
     </div>
-    <div class="p-stat" class:lit={$winAmount > 0} data-testid="hud-win">
-      <span class="p-stat-label">{$tr('win')}</span>
-      <span class="p-stat-value magenta">{winLabel}</span>
+    <!-- BET gets its own full-width row: a 3-column stats row left no room
+         for two 44px steppers plus a stress-value bet figure without either
+         clipping the currency text or shrinking the steppers below the
+         touch-target floor (caught by the committed portrait screenshots
+         showing "$1,000,000.00" overflowing its card - see session report). -->
+    <div class="p-bet-stat" data-testid="hud-bet">
+      <span class="p-stat-label">{$tr('bet')}</span>
+      <div class="p-bet-row" data-testid="bet-arrows">
+        <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
+          <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+        </button>
+        <span class="p-stat-value gold">{betLabel}</span>
+        <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
+          <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+        </button>
+      </div>
+      {#if isOverboost}
+        <span class="p-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+      {:else if isCruise}
+        <span class="p-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+      {/if}
     </div>
-  </div>
-  <!-- BET gets its own full-width row: a 3-column stats row left no room
-       for two 44px steppers plus a stress-value bet figure without either
-       clipping the currency text or shrinking the steppers below the
-       touch-target floor (caught by the committed portrait screenshots
-       showing "$1,000,000.00" overflowing its card - see session report). -->
-  <div class="p-bet-stat" data-testid="hud-bet">
-    <span class="p-stat-label">{$tr('bet')}</span>
-    <div class="p-bet-row" data-testid="bet-arrows">
-      <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
-        <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
-      </button>
-      <span class="p-stat-value gold">{betLabel}</span>
-      <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
-        <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
-      </button>
-    </div>
-    {#if isOverboost}
-      <span class="p-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
-    {:else if isCruise}
-      <span class="p-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
-    {/if}
   </div>
 
   <div class="p-controls-row">
@@ -292,6 +312,7 @@
         {#if showMenu}
           <div class="hud-menu p-hud-menu" role="menu">
             <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+            <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
             <div class="audio-panel" class:muted={$isMuted}>
               <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
                 {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
@@ -390,6 +411,7 @@
     {#if showMenu}
       <div class="hud-menu c-hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
             {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
@@ -533,6 +555,7 @@
     {#if showMenu}
       <div class="hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
             {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
@@ -1135,8 +1158,19 @@
     --p-gold: #ffd700;
     --p-orange: #ff9a2e;
     --p-acc: var(--p-cyan);
+    /* 2026-07-14c grid-first recomposition: fills all of App.svelte's
+       .native-hud-slot.portrait (flex:1, grows to the viewport bottom)
+       instead of v1's content-sized block, then space-between pins
+       .p-controls-row to the true bottom safe-area while .p-top-group
+       (stats+bet) stays flush against the top of this region, right below
+       FeatureMenu's bar - eliminates the v1 dead-gap bug's replacement
+       (a gap that could reappear between top-group and controls on a very
+       tall phone) by making that gap the ONE deliberate breathing space the
+       brief allows, not an accidental one. */
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: 10px;
     width: 100%;
     box-sizing: border-box;
@@ -1145,6 +1179,7 @@
     background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
   }
   .p-hud--overdrive { --p-acc: var(--p-pink); }
+  .p-top-group { display: flex; flex-direction: column; gap: 10px; flex: 0 0 auto; }
 
   .p-stats-row { display: flex; flex-direction: row; gap: 8px; }
   .p-stat {

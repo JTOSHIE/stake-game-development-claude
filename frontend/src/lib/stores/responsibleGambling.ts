@@ -20,6 +20,12 @@ export interface RgJurisdiction {
   turboDisabled: boolean // fast-play banned where min spin applies
   realityCheckMs: number // reality-check reminder interval (0 = off)
   maxAutoplaySpins: number // cap on autoplay count (Infinity = uncapped)
+  // 2026-07-14c: some markets require the session (time/spins/net) display to
+  // be PERSISTENTLY on-screen, not just reachable on demand - distinct from
+  // rgEnabled, which only gates whether RG features exist at all. Defaults
+  // off, matching every other flag here (permissive unless the platform says
+  // otherwise).
+  mandatorySessionDisplay: boolean
 }
 
 export const rgJurisdiction = derived(jurisdictionFlags, ($f): RgJurisdiction => ({
@@ -29,7 +35,15 @@ export const rgJurisdiction = derived(jurisdictionFlags, ($f): RgJurisdiction =>
   turboDisabled: $f.disabledTurbo === true || (typeof $f.minSpinMs === 'number' && $f.minSpinMs > 0),
   realityCheckMs: typeof $f.realityCheckMs === 'number' ? $f.realityCheckMs : 0,
   maxAutoplaySpins: typeof $f.maxAutoplaySpins === 'number' ? $f.maxAutoplaySpins : Infinity,
+  mandatorySessionDisplay: $f.mandatorySessionDisplay === true,
 }))
+
+// ── Session panel on-demand visibility (2026-07-14c) ─────────────────────────
+// Set by the HUD menu's "Session" item (all three layout modes), read by
+// SessionPanel.svelte to show its on-demand sheet - same shared-store pattern
+// gameStore.ts's showPaytable already uses for PaytableModal, just homed here
+// since it's RG-domain state, not core game state (gameStore.ts is locked).
+export const showSessionPanel = writable<boolean>(false)
 
 // ── Autoplay stop-condition config (set when the player starts autoplay) ─────
 export interface AutoplayLimits {
