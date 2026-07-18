@@ -1,37 +1,58 @@
 # FUTURE SPINNER — PROJECT STATUS
-## Last updated: 2026-07-04 | Docs reconciled to current two-mode reality
+## Last updated: 2026-07-18 | Five-mode FeatureMath v2, frontend layout/motion/neon passes, PR #81 reconciliation merged
 
-## CURRENT STATE (authoritative, reconciled 2026-07-04)
+## CURRENT STATE (authoritative, reconciled 2026-07-18)
 
 This block is the single source of truth. Where older sections below disagree (notably
-the "CANONICAL BASE-ONLY MATH PACKAGE" section, now SUPERSEDED), this block wins.
+the "CANONICAL BASE-ONLY MATH PACKAGE" section and the 2026-07-04 "TWO bet modes" note,
+both now SUPERSEDED by FeatureMath v2), this block wins. For day-to-day compliance/register
+tracking (company items, platform obligations, document registry, submission record), see
+`WRS_MASTER_DOCUMENT.md` - that file is now the living register; this doc stays as the
+higher-level project/build narrative, per CLAUDE.md convention (c).
 
-- **Bet modes: TWO.** base (cost 1.0x) and bonus buy (cost 100.0x). The game ships WITH a
-  real feature (Overdrive Free Spins, progressive multiplier) per the owner's Option C.
-  Both `lookUpTable_base_0.csv` and `lookUpTable_bonus_0.csv` exist in the shipped bundle.
-  (Any earlier "single mode / bonus removed" note is obsolete.)
-- **Maths: independently VERIFIED correct + compliant (2026-07-04).** Recomputed from the
-  shipped lookup tables by `scripts/validate_math.py` (gated in CI via
-  `.github/workflows/validate-math.yml`): RTP 96.350000% both modes (cross-mode variation
-  0.0000%), base hit rate 29.11%, SD 17.28x base / 206.63x bonus, max win 5,000x, wincap
-  odds 1 in 100,000 (base) / 1 in 1,000 (bonus), 100,000 sims/mode; bonus buy has no
-  zero-payout outcome. All Stake compliance checks pass. See `MATH_VALIDATION.md`.
-- **Frontend: feature-complete and polished.** Reel Feel v3 (travelling tile-strip engine,
-  drop mode, symbol life, charge states), bonus + HUD redesign (framed neon plates/boxes),
-  free-spins win-connection story, max-win dwell, scene animations (hover-pad turbines).
-  Build + svelte-check clean.
+- **Bet modes: FIVE.** FeatureMath v2 (shipped 2026-07-07) replaced the earlier two-mode
+  package: `base` (Normal, 1.0x), `cruise` (Cruise, 1.0x, low-vol), `antelite` (OVERBOOST,
+  1.25x), `bonus` (Buy Overdrive, 100.0x) and `super` (NITRO OVERDRIVE, 400.0x, Overdrive
+  meter pre-revved to 5x). All five are runtime-live and independently RTP-verified at
+  96.3500% (4dp). Scatter pays are 1x/3x/10x (not 5x/15x/50x - fully corrected across
+  maths, PAR sheet and frontend). Max win 5,000x, hard-capped every mode.
+- **Maths: independently verified correct + compliant.** `scripts/validate_math.py`
+  (CI-gated) confirms all five modes; PAR sheet (`games/future_spinner/
+  FUTURE_SPINNER_PAR_SHEET.md`) reflects the five-mode declaration with pre-rev disclosure
+  for NITRO OVERDRIVE. `MATH_VALIDATION.md` re-run fresh against merged `main` as of the
+  2026-07-14 merge sweep, all-pass.
+- **Frontend: substantially rebuilt since the 2026-07-04 baseline.** Portrait layout
+  recomposed twice (v1 then a grid-first v2), a dedicated landscape compact-HUD pass,
+  a full neon-polish visual pass (magenta/pink accent program alongside cyan, FEATURES
+  menu restructured into SPIN MODES/BUY FEATURES sections, symbol tile luminance lift,
+  paytable bet-modes reformatted into cards), and an animation uplift pass (code-
+  choreographed hero splash, retimed bonus-entry title-card/shockwave sequence, win-banner
+  v2 with coin fountain/chromatic flash, anticipation neighbour-dim/edge-sparks, a new
+  idle-attract mode, and a hardened per-effect frame gate). The two most recent passes
+  (neon-polish, PR #81, and animation-uplift, PR #84) landed on overlapping surfaces and
+  were reconciled via a dedicated merge-and-reverify pass (2026-07-16) before either
+  touched `main` - see `reports/archive/2026-07-16_pr81-reconciliation.md`. Along the way,
+  a genuine pre-existing bug was found and fixed: Svelte was silently stripping the
+  scatter-anticipation glow/tremble CSS from every build (dev and production) because the
+  classes were only ever toggled via `classList.add()`, never statically traceable - fixed
+  with `:global()`, confirmed via a real `vite build` + `vite preview`.
 - **RGS integration: verified aligned** with the platform wire contract
   (`docs/RGS_CONTRACT_REFERENCE.md`) - same endpoints, integer micro-units, payout credited
   at end-round. Currently mock mode; real-endpoint test pending a staging deploy.
-- **Bet Replay: implemented and mandatory-compliant.** Real representative event IDs derived
-  per mode in `REPLAY_TEST_EVENTS.md` (verify the +1 sim-id/event-id offset on staging).
+- **Bet Replay: implemented and mandatory-compliant**, 5-mode event IDs in
+  `REPLAY_TEST_EVENTS.md` (DONE per `WRS_MASTER_DOCUMENT.md`).
 - **Compliance:** stateless, original in-house IP, no Stake branding, no underage appeal,
-  fonts self-hosted, social/jurisdiction handled. Live docs mirrored + watched
-  (`docs/stake-engine-live/`, `COMPLIANCE_WATCH.md`; last refresh 2026-07-04, no changes).
-- **Outstanding** (pre-deploy work done; these need a deploy or the owner): verify replay
-  event IDs + real-RGS test on staging, upload bundle to the portal, IP/trademark clearance,
-  public high-res asset link, submission-blurb v2 re-approval, fill STAKE_TEAM/game-slug in
-  `.github/workflows/publish-stake-engine.yml`.
+  fonts self-hosted, social/jurisdiction handled. Trademark clearance IN PROGRESS: exact-
+  phrase searches on the official AU register cleared 2026-07-15 (0 results, both names;
+  records at `docs/records/trademark/2026-07-15/`); variant scan (classes 9/41) and USPTO
+  exact checks still pending the owner. Provider brand assets IN PROGRESS: hero emblem
+  ratified and ingested (`design-system/brand/hero_emblem/`, watermark removed, recentred,
+  full size ladder); flat vector mark evolution still pending Fable's art turn.
+- **Outstanding** (see `WRS_MASTER_DOCUMENT.md` for the full itemised register): verify
+  replay event IDs + real-RGS test on staging, upload bundle to the portal, finish
+  trademark clearance (variant scan + USPTO), public high-res asset link, submission-blurb
+  re-approval, fill STAKE_TEAM/game-slug in `.github/workflows/publish-stake-engine.yml`,
+  storefront tile art (scaffolded, no master yet).
 
 ---
 
@@ -438,7 +459,13 @@ frontend is feature-complete and polished. Remaining items, split by what they n
 ## SESSIONS LOG
 | Session | Date | What was done |
 |---------|------|--------------|
-| Docs reconcile | 2026-07-04 | Reconciled this status doc + SUBMISSION_DOSSIER to the current TWO-MODE reality (the "base-only" section is stale and now marked SUPERSEDED; PAR + game_metadata were already correctly two-mode). Fixed the self-contradicting compliance block. |
+| Docs reconcile | 2026-07-18 | This update: brought this status doc's CURRENT STATE block current (was stale since 2026-07-04, still describing the superseded two-mode package); added the consolidated entries below for everything since. Copied fresh to `~/Desktop/`. |
+| PR #81 reconciliation | 2026-07-16 | Merged `origin/main` (animation-uplift-v1, PR #84, already on main) into `claude/neon-polish-v1` (PR #81) so the two overlapping visual passes combine into one buildable whole before either reaches `main`. Conflict set matched Fable's own reproduction exactly (4 files + 24 proof PNGs). Found `roundInterpreter.ts`'s meter-seeding fix was byte-identical code on both sides (git's own merge proved it, zero conflict markers on the logic itself, only the comments differed); found and fixed a subtler trap in the frame-gate script where two functions shared an identical opening code prefix, leaving a stray orphaned declaration a naive resolution would have kept; found and fixed a related script (`nitro_flow_proof.mjs`) that merged clean but still lacked the new splash-dismiss step. Regenerated the conformance JSON and all 24 screenshots for real (two full suite runs against the reconciled build) rather than just picking a side. Re-verified every neon-polish-specific claim fresh: Overdrive meter on-screen on all 4 profiles, FEATURES menu two-section structure, NITRO buy end-to-end (now against real curated `super` mock data for the first time), paytable mode cards, and a fresh neon-lift before/after pair. Pushed, Fable reviewed, both PR #81 and #84 merged to `main`; both feature branches deleted. |
+| Animation uplift pass | 2026-07-16 | Code-choreographed hero splash (layered/filtered copies of the locked studio emblem, no new art beyond four tiny AssetForge particle textures totalling 13.3KB), a retimed bonus-entry title-card/shockwave sequence (2050ms baseline down to 1310ms, under the 1.5s budget, flame-jet/bgm_tension sync needed no new wiring), win-banner v2 (stronger overshoot, shockwave, coin fountain + chromatic flash on epic, screen-shake lowered to fire on "big and above"), anticipation uplift (neighbour dim, zoom-drift, edge sparks - and the Svelte `:global()` bug fix noted above), and a new idle-attract mode (20s timer, CSS-only glint/shimmer). Frame gate hardened into a per-effect hard gate across all six items plus a reduced-motion pass; 4 full runs, every new-effect segment 100% clean, only a pre-existing baseline segment (`plainSpins`) showed transient single-frame jitter, documented as environmental. PR #84. |
+| Trademark records | 2026-07-15 | Logged the first real trademark clearance searches: exact-phrase quick searches against the official Australian Trade Mark Search register for "we roll spinners" and "Future Spinner", both 0 results. Quoted the register's own prefix/part-word/variation caveat verbatim (fetched live, not recalled) so the record is honest about what a 0-result exact search does and doesn't prove. `WRS_MASTER_DOCUMENT.md` trademark row moved GATE to IN PROGRESS. PR #83. |
+| Brand hero emblem ingest | 2026-07-15 | Built a deterministic ingest pipeline (`tools/brand/ingest_hero_emblem.py`) for the studio's Gemini-generated hero emblem: flat-fills the generator's watermark glyph, recentres the mark by equalising margins, emits a 1024/512/192/96/48 size ladder. A recentre bug (real image content shifted the wrong direction while the verify step self-reported clean, since it checked its own transform's bookkeeping instead of the actual output) was caught by Fable's independent threshold sweep and fixed properly (independent re-measurement at multiple thresholds, not just re-deriving from the same inputs). Archived the governing Google Gemini terms in-repo (scanned for gambling/betting clauses - none found). PR #82. |
+| Portrait layout v2 + landscape compact HUD | 2026-07-14 | Portrait recomposed grid-first (the reel grid now dominates the viewport instead of the whole desktop scene scaled down); a dedicated compact single-row HUD for landscape phones under the 500px height breakpoint; SessionPanel moved behind an on-demand menu item; dev chrome (theme selector, reel-mode toggle) collapsed behind one DEV chip so the dev server visually matches production. PRs #78/#79/#80. |
+| FeatureMath v2 (five-mode package) | 2026-07-07 | Owner decided the full five-mode package (base/cruise/OVERBOOST/bonus/NITRO OVERDRIVE) rather than stopping at the two-mode Overdrive package below. All five independently RTP-verified at 96.3500% (4dp); NITRO OVERDRIVE's meter pre-revved to 5x. This superseded the "TWO bet modes" state the 2026-07-04 entries below describe - those entries are kept for history, not as current fact. |
 | Tooling + math validation | 2026-07-04 | Reviewed community tools (StakeCLI, stake-dev-tool, LUT analyzer); independently VERIFIED the maths from the shipped lookup tables (all Stake checks pass, every figure to the dp) via scripts/validate_math.py + CI gate; captured the RGS wire contract (docs/RGS_CONTRACT_REFERENCE.md, our impl aligned); derived real replay event IDs; safe publish workflow; refreshed live docs (no change) |
 | Feature presentation + bonus/HUD polish | 2026-07-04 | Reel Feel v3, symbol life, charge states; framed neon HUD/instrument plates; bigger bonus reels; free-spins win-connection story; max-win dwell; scene hover-pad turbines |
 | Overdrive Free Spins (two-mode) | 2026-07-03 | Option C: built the free-spins feature with progressive Overdrive multiplier + 100x bonus buy; rewrote game_config/gamestate/game_calculation/run + game_optimization + FR0/FRWCAP reels; both modes converge to 96.3500%; all verification gates passed; two-mode PAR sheet; bundle + manifest rebuilt |
