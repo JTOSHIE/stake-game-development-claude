@@ -7,6 +7,7 @@
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import FlameJets      from './lib/components/FlameJets.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
+  import HeroSplash       from './lib/components/HeroSplash.svelte'
   import IntroSplash      from './lib/components/IntroSplash.svelte'
   import WinCelebration      from './lib/components/WinCelebration.svelte'
   import WinBreakdown        from './lib/components/WinBreakdown.svelte'
@@ -131,9 +132,25 @@
     try { sessionStorage.setItem(INTRO_KEY, '1') } catch {}
   }
   let showIntroSplash = false
-  let introHandledForLoad = false
-  $: if (!$isLoading && !introHandledForLoad) {
-    introHandledForLoad = true
+  // HeroSplash (ANIMATION UPLIFT PASS, 2026-07-16, item 1): the animated
+  // brand intro, shown every load (unlike the once-per-session rules
+  // modal below) since it's the "sign lighting up" moment, not something a
+  // returning-this-session player needs to skip past repeatedly - it's
+  // instantly dismissible on first gesture regardless. Only rendered for
+  // the future-spinner theme, since the bundled hero emblem asset is
+  // theme-scoped and the other reference skins have no equivalent mark.
+  let showHeroSplash = false
+  let heroSplashHandledForLoad = false
+  $: if (!$isLoading && !heroSplashHandledForLoad) {
+    heroSplashHandledForLoad = true
+    if ($activeTheme.id === 'future-spinner') {
+      showHeroSplash = true
+    } else if (!introSeen()) {
+      showIntroSplash = true
+    }
+  }
+  function handleHeroSplashDismiss(): void {
+    showHeroSplash = false
     if (!introSeen()) showIntroSplash = true
   }
   function handleIntroContinue(): void {
@@ -146,6 +163,28 @@
   // state is collapsed so the dev server's idle view is visually closer to
   // production.
   let showDevPanel = false
+
+  // ── Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5) ───────────
+  // After 20s with no pointerdown/keydown, gentle symbol glints (GameGrid) and
+  // an emblem shimmer on the FEATURES bar (FeatureMenu) engage; any
+  // interaction kills it instantly. Both effects are pure CSS loops once
+  // engaged (no per-frame JS), so the steady-state idle cost is negligible -
+  // verified against the frame gate in item 6. Suppressed while any
+  // modal/overlay/spin is active so it never fights something the player is
+  // actually looking at.
+  // Dev-only fast-forward for headless verification (?fastIdle=1) - never
+  // reachable in production since import.meta.env.DEV is false there.
+  const IDLE_ATTRACT_MS = (import.meta.env.DEV && new URLSearchParams(window.location.search).get('fastIdle'))
+    ? 1200 : 20000
+  let idleAttract = false
+  let idleTimer: ReturnType<typeof setTimeout> | null = null
+  function resetIdleTimer(): void {
+    idleAttract = false
+    if (idleTimer) clearTimeout(idleTimer)
+    idleTimer = setTimeout(() => { idleAttract = true }, IDLE_ATTRACT_MS)
+  }
+  $: idleAttractActive = idleAttract && !$isSpinning && !$showPaytable && !showThemeSelector
+    && !$isWincap && !featureActive && !showIntroSplash && !showHeroSplash
 
   // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
@@ -238,14 +277,17 @@
     })
   }
 
-  // ── Screen shake — feature trigger and 50x+ wins (Motion Polish v2) ───────
+  // ── Screen shake - feature trigger and big+ wins (ANIMATION UPLIFT PASS
+  //    2026-07-16, item 3: "one subtle screen-shake pulse on big and above" -
+  //    lowered from the prior 50x threshold to 10x, the same BIG_WIN_THRESHOLD
+  //    WinBanner.svelte's own tier system uses, so the two stay aligned) ─────
   let shakeActive = false
   let lastShakeWin = 0
   function triggerShake(durationMs = 420): void {
     shakeActive = true
     setTimeout(() => { shakeActive = false }, durationMs)
   }
-  $: if ($winAmount > 0 && $winAmount !== lastShakeWin && $winMultiplier >= 50) {
+  $: if ($winAmount > 0 && $winAmount !== lastShakeWin && $winMultiplier >= 10) {
     lastShakeWin = $winAmount
     triggerShake()
   }
@@ -510,10 +552,20 @@
     }
     document.addEventListener('pointerdown', warmUpOnce)
     document.addEventListener('keydown', warmUpOnce)
+
+    // Idle attract mode (item 5): start the initial timer, reset on any
+    // interaction. Persistent (never removed) for the whole session, unlike
+    // warmUpOnce above.
+    resetIdleTimer()
+    document.addEventListener('pointerdown', resetIdleTimer)
+    document.addEventListener('keydown', resetIdleTimer)
   })
 
   onDestroy(() => {
     if (autoSpinTimer) clearTimeout(autoSpinTimer)
+    if (idleTimer) clearTimeout(idleTimer)
+    document.removeEventListener('pointerdown', resetIdleTimer)
+    document.removeEventListener('keydown', resetIdleTimer)
   })
 
   // ── DEV-ONLY forced-win demo (Symbol Life capture harness) ────────────────
@@ -716,7 +768,7 @@
 
     // Let space behave normally (for example scrolling the modal) while a
     // modal or overlay is open.
-    if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash) return
+    if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash || showHeroSplash) return
 
     // From here we own the spacebar: stop the page from scrolling.
     e.preventDefault()
@@ -806,6 +858,10 @@
       <BonusInstrumentColumn multiplier={1} spinsRemaining={8} runningTotalCentibets={0} />
       <FreeSpinsPresentation script={WARM_SCRIPT} active={true} />
     </div>
+  {/if}
+
+  {#if showHeroSplash}
+    <HeroSplash on:dismiss={handleHeroSplashDismiss} />
   {/if}
 
   {#if showIntroSplash}
@@ -912,7 +968,7 @@
       <!-- GRID — 522x349, centred inside the frame, z20 -->
       <div class="grid-slot">
         <div class="grid-scale">
-          <GameGrid bind:this={gridRef} />
+          <GameGrid bind:this={gridRef} idleAttract={idleAttractActive} />
           <!-- Suppress standard celebration while the max-win overlay is active -->
           <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
           <!-- Ways breakdown — cycles group by group after the win burst settles -->
@@ -950,7 +1006,7 @@
            compact-landscape each render their own native-scale trigger in
            .native-hud-slot below. -->
       {#if !portrait && !compactLandscape && $activeTheme.id === 'future-spinner' && !featureActive}
-        <FeatureMenu on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+        <FeatureMenu idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
 
       <!-- HUD OVERLAY — desktop landscape only here; portrait and
@@ -971,7 +1027,7 @@
          LAYOUT_SPEC absolute positions. -->
     <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape}>
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
-        <FeatureMenu {portrait} {compactLandscape} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+        <FeatureMenu {portrait} {compactLandscape} idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
       <HudOverlay {portrait} {compactLandscape} on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
     </div>
@@ -1147,7 +1203,7 @@
      drop the scale(S) transform entirely on .game-wrapper so it is no
      longer a transformed ancestor: every position:fixed modal inside it
      (PaytableModal, BuyBonus, SessionPanel, MaxWinCelebration, ThemeSelector,
-     LoadingScreen, IntroSplash) then correctly covers the true viewport
+     LoadingScreen, HeroSplash, IntroSplash) then correctly covers the true viewport
      again, since a transform on an ancestor otherwise re-anchors
      position:fixed descendants to its own bounding box. Only .canvas-inner
      (nested) carries a scale transform - width-driven in portrait (~96% of

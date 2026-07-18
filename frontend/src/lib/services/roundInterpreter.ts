@@ -114,7 +114,38 @@ function newSpin(phase: 'base' | 'free', fsIndex: number | null, board: Board, m
 export function interpretRound(round: BookRound): PresentationScript {
   const events = round.events ?? []
 
+  // Seed the meter from the book's own data rather than hardcoding 1
+  // (2026-07-16, ported from the not-yet-merged neon-polish-v1 pass, PR #81
+  // - this branch never had that fix, and the ANIMATION UPLIFT PASS's
+  // bonus-entry title card needs a correct meter to tell a NITRO OVERDRIVE
+  // entry apart from a regular one). Without this, the meter hardcodes to
+  // 1x for every mode until the first free-spin win's updateGlobalMult
+  // event fires - wrong for any mode with a non-1x starting meter, such as
+  // NITRO OVERDRIVE's pre-revved 5x. Pre-scanning the free-game-phase
+  // winInfo events for the first one carrying meta.globalMult reads the
+  // book's own ground truth directly, mode-agnostic, since the meter only
+  // ever changes on a win. Strict generalisation: base/bonus rounds' first
+  // win naturally carries globalMult 1, so this is a no-op for them.
   let meter = 1
+  {
+    let scanPhase: 'base' | 'free' = 'base'
+    for (const ev of events) {
+      if (ev.type === 'reveal') {
+        scanPhase = (ev.gameType as string) === 'freegame' ? 'free' : 'base'
+        continue
+      }
+      if (ev.type !== 'winInfo' || scanPhase !== 'free') continue
+      const wins = (ev.wins as Array<Record<string, unknown>>) ?? []
+      const withMult = wins.find((w) => {
+        const m = (w.meta as Record<string, unknown> | undefined) ?? {}
+        return typeof m.globalMult === 'number'
+      })
+      if (withMult) {
+        meter = Number((withMult.meta as Record<string, unknown>).globalMult)
+        break
+      }
+    }
+  }
   let phase: 'base' | 'free' = 'base'
   let pendingFsIndex: number | null = null
 

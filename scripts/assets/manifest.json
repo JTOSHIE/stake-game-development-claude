@@ -74,6 +74,48 @@
       "scatter": "#ffd700"
     }
   },
+  "particles": [
+    {
+      "id": "shock_ring",
+      "kind": "shock_ring",
+      "out": "ui/particles/shock_ring.png",
+      "w": 128, "h": 128,
+      "colour": "#00ffff",
+      "note": "ANIMATION UPLIFT PASS 2026-07-16. Reused across the splash's slow-rotating outer ring, the bonus-entry title card's shockwave, and win banners' expanding ring - CSS filter: hue-rotate() retints per context rather than shipping multiple colour variants."
+    },
+    {
+      "id": "spark",
+      "kind": "spark",
+      "out": "ui/particles/spark.png",
+      "w": 32, "h": 32,
+      "colour": "#00ffff",
+      "note": "ANIMATION UPLIFT PASS 2026-07-16. Win-banner particle bursts, anticipation edge sparks, idle-attract symbol glints."
+    },
+    {
+      "id": "coin",
+      "kind": "coin",
+      "out": "ui/particles/coin.png",
+      "w": 40, "h": 40,
+      "colour": "#ffd700",
+      "note": "ANIMATION UPLIFT PASS 2026-07-16. Win-banner coin fountain (epic/max tiers)."
+    },
+    {
+      "id": "smoke_puff",
+      "kind": "smoke_puff",
+      "out": "ui/particles/smoke_puff.png",
+      "w": 56, "h": 56,
+      "colour": "#93a7b5",
+      "note": "ANIMATION UPLIFT PASS 2026-07-16. Bonus-entry flame-jet ignition wisps. Grey-blue sourced from the existing fs-knob chrome gradient token (docs/design/CHROME_PRIMITIVES.md), not a new colour."
+    }
+  ],
+  "brand_exports": [
+    {
+      "src": "design-system/brand/hero_emblem/master_512.png",
+      "out": "ui/hero_emblem_512.png",
+      "palette_colors": 256,
+      "note": "ANIMATION UPLIFT PASS 2026-07-16, item 1 (splash). Palette-compressed bundle copy of the locked studio master (design-system/brand/hero_emblem/master_512.png, ratified PR #82) - ~124KB vs the 417KB master, no visible quality loss at splash scale. The design-system master itself is never modified by this step. HeroSplash.svelte matches its own backdrop colour to the master's own background (#080a16, measured during ingest) rather than chroma-keying, since alpha transparency roughly doubled file size for a soft-edge gradient without shrinking it."
+    }
+  ],
   "storefront_tile": {
     "_doc": "JOB 7 scaffold (2026-07-14, output slots only, no art). Per docs/stake-engine-live/game-tile-requirements.md, the published spec gives format/naming/file-size rules but NO pixel dimensions or text-safe-area guidance - the w/h values below are Claude's own provisional defaults, not a Stake-published number; confirm against the dashboard Tile Editor before Fable finalises art. NOT read by build.py's main() (which only loops symbols/exports/layered/tile_plate/plates_json by name) - inert until a future pass wires it in and the src masters exist.",
     "tile_background": {

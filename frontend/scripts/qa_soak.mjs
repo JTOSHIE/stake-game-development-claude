@@ -149,6 +149,13 @@ async function waitSpinDone(page, timeout = 20000) {
 }
 
 async function dismissIntro(page) {
+  // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
+  // every load, ahead of the once-per-session rules modal below.
+  const splash = page.locator('[data-testid="hero-splash"]')
+  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
+    await splash.click()
+    await page.waitForTimeout(100)
+  }
   const btn = page.locator('[data-testid="intro-continue"]')
   if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
     await btn.click()

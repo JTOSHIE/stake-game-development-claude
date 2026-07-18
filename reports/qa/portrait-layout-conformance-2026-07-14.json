@@ -29,10 +29,40 @@
       "pass": true
     },
     "frameGate": {
-      "sampleCount": 328,
-      "longFrameCount": 0,
-      "longFrames": [],
-      "pass": true
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 326,
+          "longFrameCount": 1,
+          "longFrames": [
+            150.10000000000036
+          ],
+          "pass": false
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
+          "sampleCount": 54,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 112,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 684,
+      "longFrameCount": 1,
+      "longFrames": [
+        150.10000000000036
+      ],
+      "pass": false
     }
   },
   "iphone14-landscape": {
@@ -66,7 +96,33 @@
     },
     "landscapeSmallTextDiagnostic": [],
     "frameGate": {
-      "sampleCount": 331,
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 351,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
+          "sampleCount": 55,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 112,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 710,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
@@ -102,10 +158,38 @@
       "pass": true
     },
     "frameGate": {
-      "sampleCount": 325,
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 347,
+          "longFrameCount": 1,
+          "longFrames": [
+            133.40000000000055
+          ],
+          "pass": false
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
+          "sampleCount": 55,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 112,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 706,
       "longFrameCount": 1,
       "longFrames": [
-        250
+        133.40000000000055
       ],
       "pass": false
     }
@@ -141,10 +225,84 @@
     },
     "landscapeSmallTextDiagnostic": [],
     "frameGate": {
-      "sampleCount": 330,
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 330,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
+          "sampleCount": 55,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 113,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 690,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
     }
+  },
+  "splashFrameGate": {
+    "sampleCount": 84,
+    "longFrameCount": 0,
+    "longFrames": [],
+    "pass": true
+  },
+  "idleAttractFrameGate": {
+    "sampleCount": 96,
+    "longFrameCount": 0,
+    "longFrames": [],
+    "pass": true
+  },
+  "reducedMotionFrameGate": {
+    "bySegment": {
+      "plainSpins": {
+        "sampleCount": 326,
+        "longFrameCount": 1,
+        "longFrames": [
+          133.29999999999995
+        ],
+        "pass": false
+      },
+      "winBannerEpic": {
+        "sampleCount": 192,
+        "longFrameCount": 0,
+        "longFrames": [],
+        "pass": true
+      },
+      "anticipation": {
+        "sampleCount": 54,
+        "longFrameCount": 0,
+        "longFrames": [],
+        "pass": true
+      },
+      "bonusEntryGate": {
+        "sampleCount": 175,
+        "longFrameCount": 0,
+        "longFrames": [],
+        "pass": true
+      }
+    },
+    "sampleCount": 747,
+    "longFrameCount": 1,
+    "longFrames": [
+      133.29999999999995
+    ],
+    "pass": false
   }
 }
