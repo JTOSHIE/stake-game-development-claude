@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import cairosvg
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
@@ -129,6 +129,146 @@ def build_tile_plate(spec):
     print(f"  {spec['out']:42s} {w}x{h}  (procedural plate)")
 
 
+def _hex_rgb(h):
+    h = h.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def _draw_shock_ring(w, h, colour):
+    r, g, b = _hex_rgb(colour)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cx, cy = w / 2, h / 2
+    radius = min(w, h) * 0.36
+    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse(
+        [cx - radius, cy - radius, cx + radius, cy + radius],
+        outline=(r, g, b, 255), width=max(2, int(min(w, h) * 0.09)),
+    )
+    glow = glow.filter(ImageFilter.GaussianBlur(radius=max(2, min(w, h) * 0.035)))
+    core = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    ImageDraw.Draw(core).ellipse(
+        [cx - radius, cy - radius, cx + radius, cy + radius],
+        outline=(255, 255, 255, 235), width=max(1, int(min(w, h) * 0.02)),
+    )
+    img = Image.alpha_composite(img, glow)
+    img = Image.alpha_composite(img, core)
+    return img
+
+
+def _draw_spark(w, h, colour):
+    r, g, b = _hex_rgb(colour)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cx, cy = w / 2, h / 2
+    bar_len = min(w, h) * 0.42
+    bar_thick = max(1, min(w, h) * 0.07)
+    glow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.line([(cx - bar_len, cy), (cx + bar_len, cy)], fill=(r, g, b, 255), width=int(bar_thick))
+    gd.line([(cx, cy - bar_len), (cx, cy + bar_len)], fill=(r, g, b, 255), width=int(bar_thick))
+    glow = glow.filter(ImageFilter.GaussianBlur(radius=max(1, min(w, h) * 0.06)))
+    core = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(core)
+    core_len = bar_len * 0.6
+    core_thick = max(1, bar_thick * 0.4)
+    cd.line([(cx - core_len, cy), (cx + core_len, cy)], fill=(255, 255, 255, 255), width=int(core_thick))
+    cd.line([(cx, cy - core_len), (cx, cy + core_len)], fill=(255, 255, 255, 255), width=int(core_thick))
+    img = Image.alpha_composite(img, glow)
+    img = Image.alpha_composite(img, core)
+    return img
+
+
+def _draw_coin(w, h, colour):
+    r, g, b = _hex_rgb(colour)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cx, cy = w / 2, h / 2
+    radius = min(w, h) * 0.42
+    d = ImageDraw.Draw(img)
+    d.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], fill=(r, g, b, 255))
+    rim = max(1, radius * 0.12)
+    dark = (max(0, r - 90), max(0, g - 90), max(0, b - 60), 255)
+    d.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], outline=dark, width=int(rim))
+    inner = radius * 0.62
+    d.ellipse([cx - inner, cy - inner, cx + inner, cy + inner], outline=dark, width=max(1, int(rim * 0.5)))
+    highlight = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(highlight)
+    hr = radius * 0.5
+    hcx, hcy = cx - radius * 0.32, cy - radius * 0.32
+    hd.ellipse([hcx - hr, hcy - hr, hcx + hr, hcy + hr], fill=(255, 255, 255, 130))
+    highlight = highlight.filter(ImageFilter.GaussianBlur(radius=max(1, radius * 0.18)))
+    img = Image.alpha_composite(img, highlight)
+    return img
+
+
+def _draw_smoke_puff(w, h, colour):
+    r, g, b = _hex_rgb(colour)
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cx, cy = w / 2, h / 2
+    base_r = min(w, h) * 0.22
+    # A few overlapping soft lobes offset from centre break up the perfect
+    # circle so it reads as a wisp, not a disc.
+    lobes = [(0, 0, 1.0), (0.28, -0.12, 0.72), (-0.3, 0.08, 0.68), (0.05, 0.3, 0.6), (-0.12, -0.28, 0.55)]
+    for ox, oy, scale in lobes:
+        lr = base_r * scale
+        lcx, lcy = cx + ox * min(w, h), cy + oy * min(w, h)
+        d = ImageDraw.Draw(img)
+        d.ellipse([lcx - lr, lcy - lr, lcx + lr, lcy + lr], fill=(r, g, b, 70))
+    img = img.filter(ImageFilter.GaussianBlur(radius=max(2, min(w, h) * 0.09)))
+    return img
+
+
+PARTICLE_DRAWERS = {
+    "shock_ring": _draw_shock_ring,
+    "spark": _draw_spark,
+    "coin": _draw_coin,
+    "smoke_puff": _draw_smoke_puff,
+}
+
+
+def build_particle(spec):
+    """Procedural, palette-sourced particle textures (2026-07-16, ANIMATION
+    UPLIFT PASS): small win/anticipation/splash choreography particles drawn
+    directly with PIL (no SVG master, no external tool - a simple geometric
+    shape plus a Gaussian-blurred glow layer is enough for each of these)."""
+    global count
+    kind = spec["kind"]
+    w, h = spec["w"], spec["h"]
+    drawer = PARTICLE_DRAWERS.get(kind)
+    if drawer is None:
+        raise ValueError(f"unknown particle kind: {kind}")
+    img = drawer(w, h, spec["colour"])
+    out_path = OUT / spec["out"]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path, "PNG", optimize=True)
+    count += 1
+    print(f"  {spec['out']:42s} {w}x{h}  (procedural particle: {kind})")
+
+
+def build_brand_export(spec):
+    """Copies a design-system/brand/ master into the bundle with palette
+    compression (2026-07-16, ANIMATION UPLIFT PASS item 1 - the splash
+    needs the hero emblem inside frontend/public, not just the design-system
+    source). Source is a raster PNG (not an SVG master), so this is a plain
+    PIL palette-reduce + optimize rather than an svg2png render; the
+    design-system source itself is untouched.
+
+    Kept as flat RGB (no alpha): the master's own background is already a
+    near-uniform solid colour, so the consuming component matches its own
+    backdrop to that same colour instead of paying for a chroma-keyed alpha
+    channel, which roughly doubles the file size for a soft-edge gradient
+    PNG's palette mode can't represent in a single byte-per-pixel index."""
+    global count
+    src_path = ROOT / spec["src"]
+    img = Image.open(src_path).convert("RGB")
+    colors = spec.get("palette_colors", 256)
+    out_img = img.convert("P", palette=Image.ADAPTIVE, colors=colors)
+    out_path = OUT / spec["out"]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_img.save(out_path, "PNG", optimize=True)
+    count += 1
+    size_kb = out_path.stat().st_size / 1024
+    print(f"  {spec['out']:42s} {img.size[0]}x{img.size[1]}  (brand export, {colors}-colour palette, {size_kb:.1f}KB)")
+
+
 def build_plates_json(spec):
     global count
     payload = {
@@ -164,6 +304,14 @@ def main():
     print("[tile plate + plates.json]")
     build_tile_plate(manifest["tile_plate"])
     build_plates_json(manifest["plates_json"])
+
+    print("[particles]")
+    for spec in manifest.get("particles", []):
+        build_particle(spec)
+
+    print("[brand exports]")
+    for spec in manifest.get("brand_exports", []):
+        build_brand_export(spec)
 
     print(f"done: {count} outputs")
 
