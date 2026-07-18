@@ -37,6 +37,10 @@
   // viewport once the caller (App.svelte) stops giving .game-wrapper a scale
   // transform in portrait mode.
   export let portrait = false
+  // Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5): a real
+  // Svelte prop (App.svelte owns the 20s timer), so `class:idle-shimmer`
+  // below is traced natively - no raw classList toggling here.
+  export let idleAttract = false
   // Landscape compact HUD pass (2026-07-14b): renders an icon-only 48px
   // round trigger as a flex item alongside HudOverlay's compact strip in
   // App.svelte's .native-hud-slot.compact-landscape row. Same modal, same
@@ -115,6 +119,7 @@
   <button
     class="p-fm-entry"
     class:mode-enhancer={$standingMode === 'antelite'}
+    class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
     aria-label="Features and bet modes"
@@ -144,6 +149,7 @@
   <button
     class="c-fm-entry"
     class:mode-enhancer={$standingMode === 'antelite'}
+    class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
     aria-label="Features and bet modes"
@@ -155,7 +161,7 @@
   </button>
 {:else}
 <!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot) ───── -->
-<div class="fm-entry" data-testid="feature-menu-entry">
+<div class="fm-entry" class:idle-shimmer={idleAttract} data-testid="feature-menu-entry">
   <button
     class="fm-entry-knob fs-knob"
     class:mode-enhancer={$standingMode === 'antelite'}
@@ -643,6 +649,21 @@
 
   @media (prefers-reduced-motion: reduce) {
     .fm, .fm-panel, .fm-entry-knob { animation: none; }
+  }
+
+  /* Idle attract shimmer (ANIMATION UPLIFT PASS 2026-07-16, item 5): a
+     gentle glow/brightness breathing pulse on the FEATURES entry, shared
+     across all three layout variants (.p-fm-entry/.c-fm-entry/.fm-entry)
+     via the one .idle-shimmer class rather than three separate rules. */
+  .idle-shimmer {
+    animation: idle-shimmer-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes idle-shimmer-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(0, 255, 255, 0); filter: brightness(1); }
+    50%      { box-shadow: 0 0 20px 3px color-mix(in srgb, var(--sig-cyan, #00ffff) 55%, transparent); filter: brightness(1.18); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .idle-shimmer { animation: none; }
   }
 
   /* Portrait native-scale trigger (2026-07-14 portrait pass) - fully

@@ -101,6 +101,13 @@ function startDevServer(port) {
 }
 
 async function dismissIntro(page) {
+  // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
+  // every load, ahead of the once-per-session rules modal below.
+  const splash = page.locator('[data-testid="hero-splash"]')
+  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
+    await splash.click()
+    await page.waitForTimeout(100)
+  }
   const btn = page.locator('[data-testid="intro-continue"]')
   if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
     await btn.click()
@@ -354,7 +361,7 @@ async function auditOverdriveMeterOnScreen(page, screensDir) {
   return { found: true, ...geometry, pass: geometry.onScreen }
 }
 
-async function runFrameGate(page) {
+async function startFrameSampler(page) {
   await page.evaluate(() => {
     window.__frameTimes = []
     let last = performance.now()
@@ -365,18 +372,150 @@ async function runFrameGate(page) {
     }
     window.__rafHandle = requestAnimationFrame(tick)
   })
+}
+
+async function readFrameSamples(page) {
+  const frameTimes = await page.evaluate(() => window.__frameTimes.splice(0, window.__frameTimes.length))
+  const longFrames = frameTimes.filter((t) => t > LONG_FRAME_MS)
+  return { sampleCount: frameTimes.length, longFrameCount: longFrames.length, longFrames, pass: longFrames.length === 0 }
+}
+
+/** Frame gate (ANIMATION UPLIFT PASS 2026-07-16, item 6): "the frame gate is
+ *  a hard gate throughout" - extended from the plain-spin baseline to also
+ *  sample each of the pass's 6 new effects individually, so a long frame
+ *  anywhere in the new choreography fails the same way a spin-induced one
+ *  always has. Returns a per-effect breakdown plus a single aggregate pass. */
+async function runFrameGate(page) {
+  await startFrameSampler(page)
   await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
+
+  const bySegment = {}
+
+  // 1. Plain spins (pre-existing baseline).
   for (let i = 0; i < 5; i++) {
     await page.locator('[data-testid="spin-button"]').click()
     await waitSpinDone(page)
     await page.waitForTimeout(120)
   }
-  const frameTimes = await page.evaluate(() => {
-    cancelAnimationFrame(window.__rafHandle)
-    return window.__frameTimes
+  bySegment.plainSpins = await readFrameSamples(page)
+
+  // 2. Win banner, epic tier (item 3: slam-in, shockwave, coin fountain,
+  //    particle burst, chromatic flash).
+  await page.evaluate(() => { window.__testStores.betAmount.set(1) })
+  await page.evaluate(() => { window.__testStores.winAmount.set(150) })
+  await page.waitForTimeout(3200) // full epic count-up (2800ms) + settle margin
+  bySegment.winBannerEpic = await readFrameSamples(page)
+  await page.evaluate(() => {
+    window.__testStores.winAmount.set(0)
+    window.__testStores.isSpinning.set(true)
   })
-  const longFrames = frameTimes.filter((t) => t > LONG_FRAME_MS)
-  return { sampleCount: frameTimes.length, longFrameCount: longFrames.length, longFrames, pass: longFrames.length === 0 }
+  await page.waitForTimeout(50)
+  await page.evaluate(() => { window.__testStores.isSpinning.set(false) })
+  await page.waitForTimeout(100)
+  await readFrameSamples(page) // discard the reset blip, not part of any effect
+
+  // 3. Anticipation (item 4: neighbour dim, tremble/zoom-drift, edge sparks) -
+  //    dev-only forced hook, since a genuine tease window isn't reliably
+  //    reachable through the buy flow (see GameGrid.svelte's test hook note).
+  await page.evaluate(() => { window.__testGameGrid?.forceAnticipation() })
+  await page.waitForTimeout(900)
+  bySegment.anticipation = await readFrameSamples(page)
+  await page.evaluate(() => { window.__testGameGrid?.clearAnticipationForce() })
+  await page.waitForTimeout(100)
+  await readFrameSamples(page) // discard
+
+  // 4. Bonus entry gate (item 2: title-card slam, shockwave, flame-jet sync,
+  //    smoke wisps) via a real guaranteed-trigger buy.
+  const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
+  if ((await featureMenuBtn.count()) > 0) {
+    await featureMenuBtn.click()
+    await page.waitForTimeout(150)
+    const activateBonus = page.locator('[data-testid="activate-bonus"]')
+    if ((await activateBonus.count()) > 0) {
+      await activateBonus.click()
+      await page.waitForTimeout(150)
+      const confirmBtn = page.locator('[data-testid="buy-confirm"]')
+      if ((await confirmBtn.count()) > 0) {
+        await readFrameSamples(page) // discard menu-open chrome
+        await confirmBtn.click()
+        await page.waitForSelector('[data-testid="overdrive-entry"]', { timeout: 8000 }).catch(() => {})
+        await page.waitForTimeout(1600) // full compressed entry sequence (~1.3s) + margin
+        bySegment.bonusEntryGate = await readFrameSamples(page)
+        // Let the feature resolve so later profile steps start clean.
+        await page.waitForFunction(
+          () => !document.querySelector('[data-testid="freespins-overlay"]'),
+          { timeout: 30000 },
+        ).catch(() => {})
+      }
+    }
+  }
+
+  const allLongFrames = Object.values(bySegment).flatMap((s) => s.longFrames)
+  const totalSamples = Object.values(bySegment).reduce((n, s) => n + s.sampleCount, 0)
+  return {
+    bySegment,
+    sampleCount: totalSamples,
+    longFrameCount: allLongFrames.length,
+    longFrames: allLongFrames,
+    pass: allLongFrames.length === 0,
+  }
+}
+
+/** Splash frame cost (item 1) - the flicker-in sequence is the one new
+ *  effect that can't be sampled inside runFrameGate/runProfile (it only
+ *  plays once, before dismissIntro's very first call), so it gets its own
+ *  fresh page load. Run once (iPhone 14 portrait), not per profile - a
+ *  CSS-driven effect's frame cost doesn't meaningfully vary by device
+ *  profile the way layout does, and a fresh navigation per profile would
+ *  meaningfully slow the suite for no real extra coverage. */
+async function auditSplashFrameCost(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'] })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="hero-splash"]', { timeout: 10000 }).catch(() => {})
+  await startFrameSampler(page)
+  await page.waitForTimeout(1400) // covers the full staged flicker-in (settles ~1.45s in)
+  const result = await readFrameSamples(page)
+  await context.close()
+  return result
+}
+
+/** Idle attract frame cost (item 5) - needs ?fastIdle=1 (App.svelte's
+ *  dev-only fast-forward), so it also gets its own fresh page load rather
+ *  than reusing runProfile's un-parameterised baseUrl. */
+async function auditIdleAttractFrameCost(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'] })
+  const page = await context.newPage()
+  await page.goto(`${baseUrl}?fastIdle=1`, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+  await startFrameSampler(page)
+  await page.waitForTimeout(1600) // past the 1200ms fastIdle threshold, well into the active loop
+  const result = await readFrameSamples(page)
+  await context.close()
+  return result
+}
+
+/** Reduced-motion frame gate (ANIMATION UPLIFT PASS 2026-07-16, item 6:
+ *  "re-run the full conformance suite including reduced-motion profiles") -
+ *  reuses runFrameGate() verbatim against a context with reducedMotion:
+ *  'reduce', on one representative profile (iPhone 14 portrait) rather than
+ *  all four - reduced-motion strips animations globally regardless of
+ *  device, so per-profile repetition here wouldn't add real coverage, just
+ *  suite runtime. If anything this should show FEWER long frames than the
+ *  full-motion run (every new effect's reduced-motion path is cheaper:
+ *  fewer/no keyframe animations, static states instead). */
+async function auditReducedMotionFrameGate(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'], reducedMotion: 'reduce' })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+  const result = await runFrameGate(page)
+  await context.close()
+  return result
 }
 
 async function runProfile(browser, baseUrl, deviceLabel, orientation, deviceName, results) {
@@ -536,6 +675,12 @@ async function run() {
       console.error(`[progress] ${profile.label} landscape`)
       await runProfile(browser, baseUrl, profile.label, 'landscape', profile.landscape, results)
     }
+    console.error('[progress] splash frame cost (item 1)')
+    results.splashFrameGate = await auditSplashFrameCost(browser, baseUrl)
+    console.error('[progress] idle attract frame cost (item 5)')
+    results.idleAttractFrameGate = await auditIdleAttractFrameCost(browser, baseUrl)
+    console.error('[progress] reduced-motion frame gate (item 6)')
+    results.reducedMotionFrameGate = await auditReducedMotionFrameGate(browser, baseUrl)
     await browser.close()
   } finally {
     server.kill()

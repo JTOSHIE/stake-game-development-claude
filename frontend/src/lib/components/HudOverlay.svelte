@@ -46,8 +46,13 @@
   // (import.meta.env.DEV is false there).
   onMount(() => {
     if (import.meta.env.DEV) {
+      // isSpinning added 2026-07-16 (ANIMATION UPLIFT PASS) so the
+      // conformance suite can force WinBanner's big/mega/epic tiers: set
+      // betAmount to 1 first, then winAmount directly equals winMultiplier
+      // (a derived, read-only store - not exposed here since it can't be
+      // .set() anyway).
       ;(window as unknown as { __testStores?: unknown }).__testStores =
-        { balance, betAmount, winAmount, rgsBetLevels, locale, speedTier, standingMode, jurisdictionFlags }
+        { balance, betAmount, winAmount, isSpinning, rgsBetLevels, locale, speedTier, standingMode, jurisdictionFlags }
     }
   })
 

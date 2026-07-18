@@ -39,6 +39,12 @@
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
   import { activeTheme, themeAssets } from '../stores/themeStore'
 
+  // Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5): App.svelte
+  // owns the 20s timer; this is just a boolean prop, so `class:` in the
+  // template below is enough (no raw classList toggling like .anticipate,
+  // so no :global() escape hatch needed here).
+  export let idleAttract = false
+
   // ── Theme-aware win line colour ───────────────────────────────────────────
   function hexToPixi(hex: string): number {
     return parseInt(hex.replace('#', ''), 16)
@@ -170,6 +176,13 @@
 
   // Per-column strip element (translateY) and per-slot element refs.
   let stripRefs:   (HTMLDivElement | null)[] = Array.from({ length: REELS }, () => null)
+  // Grid container ref (ANIMATION UPLIFT PASS 2026-07-16, item 4): drives the
+  // neighbour-dim class imperatively, matching this component's existing
+  // classList-driven animation style. (A CSS-only `:has()` version was tried
+  // first but didn't resolve reliably through Svelte's scoped-CSS output -
+  // JS toggling is the same approach _scatterAnticipation() already uses for
+  // .anticipate itself, so this is consistent, not a new pattern.)
+  let gridRef: HTMLDivElement | null = null
   let slotCell:    (HTMLDivElement | null)[][] =
     Array.from({ length: REELS }, () => Array.from({ length: STRIP }, (): HTMLDivElement | null => null))
   let slotInner:   (HTMLDivElement | null)[][] =
@@ -602,6 +615,32 @@
     const unsubWins = activeWins.subscribe(() => {
       if (assetsReady) _applyWinHighlights()
     })
+
+    // Dev-only test hook (ANIMATION UPLIFT PASS 2026-07-16, item 6): forces
+    // the anticipation visual (dim/tremble/edge-sparks) on demand so headless
+    // verification can frame-gate it - real gameplay only reaches this state
+    // via a genuine 2+-scatter tease mid-spin, which a buy-guaranteed round
+    // skips past (the qualifying base spin resolves before the entry
+    // sequence, never lingering in an anticipation window a script can
+    // reliably catch). Never present in a production build.
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __testGameGrid?: unknown }).__testGameGrid = {
+        // Bypasses _scatterAnticipation()'s `reels[r].state !== 'rest'` guard
+        // (real anticipation only ever applies to reels still travelling
+        // mid-spin; forcing it at idle for a screenshot/frame-gate check
+        // needs its own path rather than fighting that guard).
+        forceAnticipation: () => {
+          for (let r = REELS - 2; r < REELS; r++) {
+            const strip = stripRefs[r]
+            strip?.classList.add('anticipate')
+            strip?.parentElement?.classList.add('col-anticipate')
+          }
+          gridRef?.classList.add('grid-anticipating')
+        },
+        clearAnticipationForce: () => _clearAnticipation(),
+      }
+    }
+
     return () => { unsubBoard(); unsubWins() }
   })
 
@@ -717,8 +756,13 @@
   function _scatterAnticipation(fromReel: number): void {
     for (let r = fromReel; r < REELS; r++) {
       const strip = stripRefs[r]
-      if (strip && reels[r].state !== 'rest') { strip.classList.add('anticipate'); reels[r].charged = true }
+      if (strip && reels[r].state !== 'rest') {
+        strip.classList.add('anticipate')
+        strip.parentElement?.classList.add('col-anticipate')
+        reels[r].charged = true
+      }
     }
+    gridRef?.classList.add('grid-anticipating')
     _chargeLandedScatters()
   }
   function _chargeLandedScatters(): void {
@@ -732,8 +776,10 @@
   function _clearAnticipation(): void {
     for (let r = 0; r < REELS; r++) {
       stripRefs[r]?.classList.remove('anticipate')
+      stripRefs[r]?.parentElement?.classList.remove('col-anticipate')
       for (let i = 0; i < STRIP; i++) slotCell[r]?.[i]?.classList.remove('scatter-charge')
     }
+    gridRef?.classList.remove('grid-anticipating')
   }
 
   function _checkAnticipation(board: string[][]): boolean {
@@ -886,6 +932,10 @@
 
   function _clearAnticipationFor(col: number): void {
     stripRefs[col]?.classList.remove('anticipate')
+    stripRefs[col]?.parentElement?.classList.remove('col-anticipate')
+    if (!stripRefs.some((s) => s?.classList.contains('anticipate'))) {
+      gridRef?.classList.remove('grid-anticipating')
+    }
   }
 
   async function _dropAll(boardRows: string[][]): Promise<void> {
@@ -909,7 +959,7 @@
 
 <div class="grid-container">
   <!-- Symbol grid — 5 columns × 4 visible rows, each a wrapped travelling strip -->
-  <div class="symbol-grid">
+  <div class="symbol-grid" bind:this={gridRef}>
     {#each Array(REELS) as _, col}
       <div class="symbol-col">
         <div class="reel-strip" bind:this={stripRefs[col]} data-col={col} style="transform: translateY({REST_Y}px);">
@@ -946,9 +996,23 @@
             </div>
           {/each}
         </div>
+        <!-- Edge sparks (ANIMATION UPLIFT PASS 2026-07-16, item 4): static in
+             the DOM, activated via the .col-anticipate class toggled on this
+             element's parent (.symbol-col) by _scatterAnticipation() etc -
+             no separate reactive Svelte state, matching this component's
+             existing imperative-classList animation style. -->
+        <div class="edge-sparks" aria-hidden="true">
+          <img class="edge-spark spark-a" src="{_assetBase}/ui/particles/spark.png" alt="" draggable="false" />
+          <img class="edge-spark spark-b" src="{_assetBase}/ui/particles/spark.png" alt="" draggable="false" />
+        </div>
       </div>
     {/each}
   </div>
+
+  <!-- Idle attract glint sweep (ANIMATION UPLIFT PASS 2026-07-16, item 5):
+       a single diagonal-gradient overlay, CSS-only, cheap (one GPU-composited
+       transform loop, no per-symbol JS). -->
+  <div class="idle-glint-sweep" class:active={idleAttract} aria-hidden="true"></div>
 
   <!-- PixiJS canvas — transparent overlay for win lines, particles and borders -->
   <div bind:this={pixiContainer} class="pixi-overlay"></div>
@@ -1110,16 +1174,63 @@
   /* Scatter-anticipation charge glow on still-travelling reels - stronger glow
      plus a faint tremble on every tile of the anticipating reel. The tremble
      lives on the cell (which has no JS-driven transform), so it survives the
-     .spinning gate and never fights the strip's travel transform. */
-  .reel-strip.anticipate .tile-inner {
+     .spinning gate and never fights the strip's travel transform. Extended
+     2026-07-16 (ANIMATION UPLIFT PASS item 4) with a slight zoom-drift baked
+     into the same keyframe (scale can't be layered as a second, separate
+     transform-animation on the same element without one overwriting the
+     other), plus a spotlight dim on neighbouring (non-anticipating) reels
+     and rising edge sparks on the anticipating one. */
+  /* FIX (2026-07-16, discovered while building item 4): .anticipate is only
+     ever added via classList.add() on refs (never a literal class= in this
+     template), so Svelte's compiler cannot statically prove any of these
+     selectors match, flags them "unused", and strips them from BOTH the dev
+     and production CSS output - confirmed by fetching the compiled style
+     module directly (the `?svelte&type=style&lang.css` request), where the
+     rule appeared wrapped in an "unused" marker comment, and by
+     checking a real `vite build` + `vite preview`, where the rule still
+     never applied. This means the scatter-anticipation glow/tremble was a
+     genuine pre-existing latent bug - implemented, wired to the right DOM
+     classes, but its CSS silently never shipped, in every build, for as
+     long as this component has toggled the class imperatively. Wrapping
+     the never-statically-referenced class in :global(...) is Svelte's
+     documented escape hatch for exactly this pattern (imperative DOM class
+     toggling paired with scoped component CSS) and fixes all of these
+     rules, not just the ones added this pass. */
+  .reel-strip:global(.anticipate) .tile-inner {
     filter: brightness(1.5) saturate(1.75) drop-shadow(0 0 16px rgba(0, 255, 255, 0.85));
   }
   @keyframes reel-tremble {
-    0%, 100% { transform: translateX(0); }
-    25%      { transform: translateX(-1.5px); }
-    75%      { transform: translateX(1.5px); }
+    0%, 100% { transform: translateX(0) scale(1); }
+    25%      { transform: translateX(-1.5px) scale(1.015); }
+    75%      { transform: translateX(1.5px) scale(1.015); }
   }
-  .reel-strip.anticipate .symbol-cell { animation: reel-tremble 0.09s linear infinite; }
+  .reel-strip:global(.anticipate) .symbol-cell { animation: reel-tremble 0.09s linear infinite; }
+
+  /* Spotlight dim on neighbouring reels (item 4): .grid-anticipating (on
+     .symbol-grid) and .col-anticipate (on the specific .symbol-col) are both
+     toggled imperatively alongside .anticipate itself in
+     _scatterAnticipation()/_clearAnticipationFor()/_clearAnticipation() -
+     an initial :has()-based version didn't resolve reliably through
+     Svelte's scoped-CSS output, so this uses the same JS-toggle approach
+     the component already relies on for .anticipate. */
+  .symbol-grid:global(.grid-anticipating) .symbol-col:not(:global(.col-anticipate)) .reel-strip {
+    filter: brightness(0.62) saturate(0.75);
+    transition: filter 0.25s ease;
+  }
+
+  /* Rising edge sparks (item 4): static in the DOM (see template comment),
+     activated by the .col-anticipate class on the shared .symbol-col parent. */
+  .edge-sparks { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .edge-spark { position: absolute; bottom: -10%; width: 22px; height: 22px; opacity: 0; }
+  .spark-a { left: 4px; }
+  .spark-b { right: 4px; }
+  .symbol-col:global(.col-anticipate) .spark-a { animation: edge-spark-rise 0.85s ease-out infinite; }
+  .symbol-col:global(.col-anticipate) .spark-b { animation: edge-spark-rise 0.85s ease-out infinite 0.35s; }
+  @keyframes edge-spark-rise {
+    0%   { opacity: 0; transform: translateY(0) scale(0.7); }
+    20%  { opacity: 0.9; }
+    100% { opacity: 0; transform: translateY(-380px) scale(1.1); }
+  }
 
   /* ── Symbol Life v2 idles (Set A) — tuned to read at 120px ─────────────── */
   @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
@@ -1290,16 +1401,47 @@
     z-index: 3;
   }
 
+  /* Idle attract glint sweep (item 5): a diagonal highlight band drifting
+     across the whole grid every few seconds. Only animates while .active -
+     `idleAttract` is a real Svelte prop (not a raw classList toggle like the
+     anticipation classes), so `class:active` is traced natively by Svelte's
+     compiler and needs no :global() escape hatch. */
+  .idle-glint-sweep {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.16) 50%, transparent 60%);
+    background-size: 300% 300%;
+    background-position: -100% -100%;
+  }
+  .idle-glint-sweep.active {
+    animation: idle-glint-sweep 6s ease-in-out infinite;
+  }
+  @keyframes idle-glint-sweep {
+    0%, 74%   { opacity: 0; background-position: -120% -120%; }
+    78%       { opacity: 0.9; }
+    90%       { opacity: 0.9; background-position: 120% 120%; }
+    96%, 100% { opacity: 0; background-position: 120% 120%; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .symbol-img, .symbol-overlay, .symbol-fx,
     .symbol-img:global(.win-flash), .symbol-cell.plate-bloom, .symbol-cell.pre-charge,
-    .reel-strip.anticipate .symbol-cell,
-    .symbol-cell.scatter-charge, .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after {
+    .reel-strip:global(.anticipate) .symbol-cell,
+    .symbol-cell.scatter-charge, .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after,
+    .idle-glint-sweep.active {
       animation: none !important;
     }
+    .idle-glint-sweep { display: none; }
     .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after { display: none; }
     /* Winners still spotlight, but statically (no pop / pulse / flash motion);
        losers still dim. Particle bursts are gated in JS (_reduceMotion). */
     .symbol-img:global(.loser-dim) { transition: none; }
+    /* Item 4 additions: the neighbour dim stays (a static state, not motion)
+       but loses its transition; edge sparks are motion, so they're hidden. */
+    .symbol-grid:global(.grid-anticipating) .symbol-col:not(:global(.col-anticipate)) .reel-strip { transition: none; }
+    .edge-spark { display: none; }
   }
 </style>

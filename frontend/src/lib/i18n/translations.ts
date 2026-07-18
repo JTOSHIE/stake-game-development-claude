@@ -72,6 +72,7 @@ export interface Translations {
   rulesOverdriveBuy?:      string
   rulesOverdriveModes?:    string
   introContinue?:          string
+  splashPressAnywhere?:    string
 }
 
 // Feature strings live in a dedicated per-locale layer so the 16 base locale
@@ -81,6 +82,7 @@ export type FeatureKey =
   | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
   | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
+  | 'splashPressAnywhere'
 export type FeatureStrings = Record<FeatureKey, string>
 
 // ── English ───────────────────────────────────────────────────────────────────
@@ -676,6 +678,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
     rulesOverdriveModes: 'Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.',
     introContinue: 'Continue',
+    splashPressAnywhere: 'TAP TO CONTINUE',
   },
   ar: {
     overdrive: 'أوفردرايف', overdriveFreeSpins: 'لفات أوفردرايف المجانية', freeSpins: 'لفات مجانية',
@@ -690,6 +693,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'شراء البونص: ادفع 100× رهانك لبدء الميزة فوراً.',
     rulesOverdriveModes: 'اللعبة الأساسية وشراء البونص يمنحان نسبة عائد 96.35٪. أقصى فوز 5000× الرهان.',
     introContinue: 'متابعة',
+    splashPressAnywhere: 'اضغط للمتابعة',
   },
   de: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREISPIELE', freeSpins: 'FREISPIELE',
@@ -704,6 +708,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten.',
     rulesOverdriveModes: 'Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.',
     introContinue: 'Weiter',
+    splashPressAnywhere: 'TIPPEN ZUM FORTFAHREN',
   },
   es: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRATIS OVERDRIVE', freeSpins: 'GIROS GRATIS',
@@ -718,6 +723,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Compra de bono: paga 100× tu apuesta para iniciar la función de inmediato.',
     rulesOverdriveModes: 'El juego base y la Compra de bono devuelven 96,35 % de RTP. Ganancia máxima 5.000× la apuesta.',
     introContinue: 'Continuar',
+    splashPressAnywhere: 'TOCA PARA CONTINUAR',
   },
   fi: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE-ILMAISKIERROKSET', freeSpins: 'ILMAISKIERROKSET',
@@ -732,6 +738,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Bonusosto: maksa 100× panoksesi aloittaaksesi ominaisuuden heti.',
     rulesOverdriveModes: 'Peruspeli ja Bonusosto palauttavat molemmat 96,35 % RTP. Enimmäisvoitto 5 000× panos.',
     introContinue: 'Jatka',
+    splashPressAnywhere: 'JATKA KOSKETTAMALLA',
   },
   fr: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'TOURS GRATUITS OVERDRIVE', freeSpins: 'TOURS GRATUITS',
@@ -746,6 +753,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
     rulesOverdriveModes: 'Le jeu de base et l’Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
     introContinue: 'Continuer',
+    splashPressAnywhere: 'TOUCHEZ POUR CONTINUER',
   },
   hi: {
     overdrive: 'ओवरड्राइव', overdriveFreeSpins: 'ओवरड्राइव फ्री स्पिन', freeSpins: 'फ्री स्पिन',
@@ -760,6 +768,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'बोनस खरीद: फ़ीचर तुरंत शुरू करने के लिए अपने दांव का 100× भुगतान करें।',
     rulesOverdriveModes: 'बेस गेम और बोनस खरीद दोनों 96.35% RTP देते हैं। अधिकतम जीत दांव का 5,000×।',
     introContinue: 'जारी रखें',
+    splashPressAnywhere: 'जारी रखने के लिए टैप करें',
   },
   id: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'FREE SPIN OVERDRIVE', freeSpins: 'FREE SPIN',
@@ -774,6 +783,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Beli Bonus: bayar 100× taruhan Anda untuk memulai fitur segera.',
     rulesOverdriveModes: 'Game dasar dan Beli Bonus keduanya memberikan RTP 96,35%. Kemenangan maksimum 5.000× taruhan.',
     introContinue: 'Lanjutkan',
+    splashPressAnywhere: 'KETUK UNTUK MELANJUTKAN',
   },
   ja: {
     overdrive: 'オーバードライブ', overdriveFreeSpins: 'オーバードライブ フリースピン', freeSpins: 'フリースピン',
@@ -788,6 +798,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。',
     rulesOverdriveModes: 'ベースゲームとボーナス購入はどちらもRTP96.35%です。最大配当はベットの5,000倍。',
     introContinue: '続ける',
+    splashPressAnywhere: 'タップして続ける',
   },
   ko: {
     overdrive: '오버드라이브', overdriveFreeSpins: '오버드라이브 프리 스핀', freeSpins: '프리 스핀',
@@ -802,6 +813,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: '보너스 구매: 베팅액의 100배를 지불하면 기능이 즉시 시작됩니다.',
     rulesOverdriveModes: '기본 게임과 보너스 구매 모두 RTP 96.35%입니다. 최대 당첨은 베팅액의 5,000배입니다.',
     introContinue: '계속',
+    splashPressAnywhere: '탭하여 계속하기',
   },
   pl: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'DARMOWE SPINY OVERDRIVE', freeSpins: 'DARMOWE SPINY',
@@ -816,6 +828,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Zakup bonusu: zapłać 100× swojego zakładu, aby natychmiast uruchomić funkcję.',
     rulesOverdriveModes: 'Gra podstawowa i Zakup bonusu zwracają 96,35% RTP. Maksymalna wygrana 5000× zakładu.',
     introContinue: 'Kontynuuj',
+    splashPressAnywhere: 'DOTKNIJ, ABY KONTYNUOWAĆ',
   },
   pt: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRÁTIS OVERDRIVE', freeSpins: 'GIROS GRÁTIS',
@@ -830,6 +843,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Compra de bônus: pague 100× a sua aposta para iniciar o recurso imediatamente.',
     rulesOverdriveModes: 'O jogo base e a Compra de bônus retornam ambos 96,35% de RTP. Ganho máximo de 5.000× a aposta.',
     introContinue: 'Continuar',
+    splashPressAnywhere: 'TOQUE PARA CONTINUAR',
   },
   ru: {
     overdrive: 'ОВЕРДРАЙВ', overdriveFreeSpins: 'ФРИСПИНЫ ОВЕРДРАЙВ', freeSpins: 'ФРИСПИНЫ',
@@ -844,6 +858,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Покупка бонуса: заплатите 100× вашей ставки, чтобы запустить функцию сразу.',
     rulesOverdriveModes: 'Базовая игра и Покупка бонуса возвращают 96,35% RTP. Максимальный выигрыш 5000× ставки.',
     introContinue: 'Продолжить',
+    splashPressAnywhere: 'НАЖМИТЕ, ЧТОБЫ ПРОДОЛЖИТЬ',
   },
   tr: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE BEDAVA DÖNÜŞLER', freeSpins: 'BEDAVA DÖNÜŞLER',
@@ -858,6 +873,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin.',
     rulesOverdriveModes: 'Temel oyun ve Bonus Satın Alma her ikisi de %96,35 RTP döndürür. Maksimum kazanç bahsin 5.000 katı.',
     introContinue: 'Devam Et',
+    splashPressAnywhere: 'DEVAM ETMEK İÇİN DOKUNUN',
   },
   vi: {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE', freeSpins: 'VÒNG QUAY MIỄN PHÍ',
@@ -872,6 +888,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: 'Mua Thưởng: trả 100× tiền cược của bạn để bắt đầu tính năng ngay lập tức.',
     rulesOverdriveModes: 'Trò chơi cơ bản và Mua Thưởng đều trả về RTP 96,35%. Thắng tối đa 5.000× tiền cược.',
     introContinue: 'Tiếp tục',
+    splashPressAnywhere: 'CHẠM ĐỂ TIẾP TỤC',
   },
   zh: {
     overdrive: '超载', overdriveFreeSpins: '超载免费旋转', freeSpins: '免费旋转',
@@ -886,6 +903,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveBuy: '购买奖励：支付 100 倍投注即可立即启动功能。',
     rulesOverdriveModes: '基础游戏和购买奖励的 RTP 均为 96.35%。最高赢额为投注的 5,000 倍。',
     introContinue: '继续',
+    splashPressAnywhere: '点按继续',
   },
 }
 

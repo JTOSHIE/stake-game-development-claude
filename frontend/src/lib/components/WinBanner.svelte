@@ -7,11 +7,12 @@
    * duration and escalating CSS particle bursts per tier. Auto-dismisses.
    * Mounted as a stage-level sibling in App.svelte (stage coordinates).
    */
-  import { onDestroy } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { isSocial } from '../stores/socialMode'
   import { overdriveVisual } from '../stores/overdriveVisual'
+  import { themeAssets } from '../stores/themeStore'
 
   const BIG_WIN_THRESHOLD  = 10
   const MEGA_WIN_THRESHOLD = 30
@@ -20,6 +21,17 @@
   type Tier = 'big' | 'mega' | 'epic'
 
   interface Particle { x: number; y: number; size: number; delay: number; dur: number; color: string; angle: number }
+  // Coin-fountain particle (ANIMATION UPLIFT PASS 2026-07-16, item 3): epic
+  // tier only. Each coin gets its own upward-arc-then-fall trajectory via a
+  // per-particle --dx/--peak custom property pair consumed by the
+  // c1-coin-fountain keyframe, mirroring the existing --angle approach
+  // makeParticles() already uses for the burst layer.
+  interface Coin { x: number; dx: number; delay: number; dur: number; size: number; rot: number }
+
+  let reduced = false
+  onMount(() => {
+    reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  })
 
   const TIER_COLORS: Record<Tier, string[]> = {
     big:  ['#00ffff', '#80ffff', '#ffffff'],
@@ -33,6 +45,7 @@
   let tier: Tier = 'big'
   let displayAmount = 0
   let particles: Particle[] = []
+  let coins: Coin[] = []
   let dismissTimer: ReturnType<typeof setTimeout> | null = null
   let countUpFrame: number | null = null
   let lastShownWin = 0
@@ -51,6 +64,7 @@
     displayAmount = 0
     lastShownWin = 0
     particles = []
+    coins = []
   }
 
   function makeParticles(count: number, colors: string[]): Particle[] {
@@ -65,6 +79,21 @@
     }))
   }
 
+  // Coin fountain (ANIMATION UPLIFT PASS 2026-07-16, item 3): epic tier only
+  // ("epic and max" - a true max/wincap win is >= EPIC_WIN_THRESHOLD whenever
+  // it reaches this banner at all, so the epic tier already covers both).
+  const COIN_COUNT = 16
+  function makeCoins(): Coin[] {
+    return Array.from({ length: COIN_COUNT }, () => ({
+      x: 20 + Math.random() * 60,
+      dx: -40 + Math.random() * 80,
+      delay: Math.random() * 0.5,
+      dur: 0.9 + Math.random() * 0.5,
+      size: 16 + Math.random() * 14,
+      rot: Math.random() * 360,
+    }))
+  }
+
   function showBanner(winDollars: number, t: Tier): void {
     if (dismissTimer) clearTimeout(dismissTimer)
     if (countUpFrame) cancelAnimationFrame(countUpFrame)
@@ -73,6 +102,7 @@
     displayAmount = 0
     visible = true
     particles = makeParticles(TIER_PARTICLE_COUNT[t], TIER_COLORS[t])
+    coins = t === 'epic' && !reduced ? makeCoins() : []
 
     // Staged count-up - duration escalates with tier.
     const startTime = performance.now()
@@ -95,6 +125,7 @@
       visible = false
       displayAmount = 0
       particles = []
+      coins = []
     }, duration + 2200)
   }
 
@@ -117,7 +148,31 @@
     class:active={visible}
     data-testid="win-banner"
   >
+    {#if tier === 'epic' && !reduced}
+      <div class="c1-chromatic-flash" data-testid="win-chromatic-flash" aria-hidden="true"></div>
+    {/if}
     <div class="c1-plate-wrap">
+      {#if !reduced}
+        <img
+          class="c1-shockwave"
+          src="{$themeAssets.assetBase}/ui/particles/shock_ring.png"
+          alt=""
+          aria-hidden="true"
+          data-testid="win-shockwave"
+        />
+      {/if}
+      {#if coins.length > 0}
+        <div class="c1-coin-layer" aria-hidden="true" data-testid="win-coin-fountain">
+          {#each coins as c}
+            <img
+              class="c1-coin"
+              src="{$themeAssets.assetBase}/ui/particles/coin.png"
+              alt=""
+              style="left:{c.x}%; width:{c.size}px; height:{c.size}px; --dx:{c.dx}px; --rot:{c.rot}deg; animation-delay:{c.delay}s; animation-duration:{c.dur}s;"
+            />
+          {/each}
+        </div>
+      {/if}
       <div class="c1-particle-layer" aria-hidden="true">
         {#each particles as p}
           <div
@@ -221,11 +276,59 @@
   .tier-epic .c1-amount { font-size: 76px; }
   .c1-mult { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 800; font-size: 15px; letter-spacing: .16em; color: var(--sig-gold); margin-top: 8px; text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); }
 
-  /* ── Entry + pulse ────────────────────────────────────────────────────── */
+  /* ── Entry + pulse (ANIMATION UPLIFT PASS 2026-07-16, item 3: stronger
+       slam-in overshoot - 0.4->1.1->1 instead of 0.5->1.06->1) ───────────── */
   .c1-plate-wrap { position: relative; animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both; }
   .tier-epic .c1-plate-wrap { animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both, c1-pulse 1.1s ease-in-out .6s infinite; }
-  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.5); } 60% { opacity: 1; transform: scale(1.06); } 100% { transform: scale(1); } }
+  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
   @keyframes c1-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+
+  /* ── Expanding shock ring (ANIMATION UPLIFT PASS 2026-07-16, item 3): the
+       shared shock_ring particle, scaled a little larger per tier so it
+       feels proportionate to the plate it's bursting behind. ────────────── */
+  .c1-shockwave {
+    position: absolute; top: 50%; left: 50%; pointer-events: none; z-index: 1;
+    transform: translate(-50%, -50%) scale(0.25); opacity: 0;
+    animation: c1-shockwave-burst 0.6s ease-out both;
+  }
+  .tier-big  .c1-shockwave { width: 260px; height: 260px; }
+  .tier-mega .c1-shockwave { width: 340px; height: 340px; }
+  .tier-epic .c1-shockwave { width: 440px; height: 440px; }
+  @keyframes c1-shockwave-burst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.25); }
+    15%  { opacity: 0.85; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+  }
+
+  /* ── Coin fountain (ANIMATION UPLIFT PASS 2026-07-16, item 3): epic tier
+       only. Each coin rises on an arc (--dx horizontal drift, easing curve
+       supplies the up-then-down feel) then fades near the bottom. ───────── */
+  .c1-coin-layer { position: absolute; inset: 0; pointer-events: none; z-index: 4; overflow: visible; }
+  .c1-coin {
+    position: absolute; top: 60%; opacity: 0;
+    animation-name: c1-coin-fountain; animation-timing-function: cubic-bezier(.25,.65,.4,1); animation-fill-mode: both;
+  }
+  @keyframes c1-coin-fountain {
+    0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+    10%  { opacity: 1; }
+    55%  { transform: translate(calc(var(--dx) * 0.6), -140px) rotate(calc(var(--rot) * 0.6)); }
+    100% { opacity: 0; transform: translate(var(--dx), 40px) rotate(var(--rot)); }
+  }
+
+  /* ── Chromatic flash frame (ANIMATION UPLIFT PASS 2026-07-16, item 3): a
+       single quick RGB-channel-split flash on the epic/max tier, layered
+       full-viewport so it reads as a screen-wide flash rather than just a
+       plate effect. ──────────────────────────────────────────────────────── */
+  .c1-chromatic-flash {
+    position: fixed; inset: 0; z-index: 200; pointer-events: none;
+    animation: c1-chromatic-flash 0.28s ease-out both;
+    mix-blend-mode: screen;
+  }
+  @keyframes c1-chromatic-flash {
+    0%   { opacity: 0; box-shadow: inset 6px 0 0 rgba(255,0,80,0), inset -6px 0 0 rgba(0,255,255,0); }
+    12%  { opacity: 1; box-shadow: inset 6px 0 0 rgba(255,0,80,0.5), inset -6px 0 0 rgba(0,255,255,0.5); }
+    100% { opacity: 0; box-shadow: inset 6px 0 0 rgba(255,0,80,0), inset -6px 0 0 rgba(0,255,255,0); }
+  }
 
   /* ── Particles ────────────────────────────────────────────────────────── */
   .c1-particle-layer { position: absolute; inset: -50px; pointer-events: none; z-index: 3; }
@@ -239,5 +342,6 @@
   @media (prefers-reduced-motion: reduce) {
     .c1-plate-wrap, .tier-epic .c1-plate-wrap, .c1-particle { animation: none !important; }
     .c1-particle { opacity: 0; }
+    .c1-shockwave, .c1-coin, .c1-chromatic-flash { display: none; }
   }
 </style>

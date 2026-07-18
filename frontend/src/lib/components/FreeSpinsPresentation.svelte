@@ -45,6 +45,18 @@
 
   $: mode = ($isSocial ? 'social' : 'real') as GameMode
   $: lang = $locale
+  // NITRO OVERDRIVE detection (ANIMATION UPLIFT PASS, 2026-07-16, item 2):
+  // no explicit "which bet mode triggered this" field exists on
+  // PresentationScript, so - consistent with the meter-seeding fix earlier
+  // this project (the book's own data is the only source of truth for the
+  // Overdrive meter) - a NITRO entry is identified the same way that fix's
+  // own test assertions do: the first free spin's pre-win meter is already
+  // >= 5 (only the pre-revved NITRO OVERDRIVE buy tier starts there).
+  $: isNitroEntry = !!script && script.freeSpins.length > 0 && script.freeSpins[0].meterBefore >= 5
+  // "NITRO OVERDRIVE" is a brand-style mode name, not localised anywhere
+  // else in the UI (see fsModes.ts's FS_MODES - same convention as "Normal"/
+  // "OVERBOOST"), so it isn't run through t() here either.
+  $: entryTitleText = isNitroEntry ? 'NITRO OVERDRIVE' : t(lang, 'overdriveFreeSpins', mode)
 
   function dur(ms: number): number {
     return $isTurbo ? Math.max(120, Math.round(ms * 0.4)) : ms
@@ -89,9 +101,16 @@
     runEntrySequence()
   }
 
-  /** Overdrive transition (DESIGN_SYSTEM concept of record): scatter flare,
-   *  screen dip, gauge slam to centre with the needle ripping to the redline,
-   *  spin-count text burst, then settle. Every step is turbo-aware via dur(). */
+  /** Overdrive transition (DESIGN_SYSTEM concept of record, retimed
+   *  2026-07-16 for the ANIMATION UPLIFT PASS item 2 - "under 1.5 seconds
+   *  total, never delays the first free spin beyond it"): scatter flare
+   *  (flame jets ignite via overdriveVisualActive, already flipped in
+   *  start() before this runs), screen dip, gauge slam-to-redline + the
+   *  title card's own slam-in/shockwave (both land in the same 'gauge'
+   *  stage so they read as one threshold moment rather than two separate
+   *  beats), spin-count text burst, then settle. 180+150+380+300+300 =
+   *  1310ms baseline (non-turbo) - under budget with margin; every step
+   *  stays turbo-aware via dur(). */
   function runEntrySequence(): void {
     entryStage = 'flare'
     timer = setTimeout(() => {
@@ -102,11 +121,11 @@
           entryStage = 'burst'
           timer = setTimeout(() => {
             entryStage = 'settle'
-            timer = setTimeout(nextSpin, dur(450))
-          }, dur(700))
-        }, dur(450))
-      }, dur(200))
-    }, dur(250))
+            timer = setTimeout(nextSpin, dur(300))
+          }, dur(300))
+        }, dur(380))
+      }, dur(150))
+    }, dur(180))
   }
 
   function nextSpin() {
@@ -212,12 +231,15 @@
     {#if phase === 'entry'}
       <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry">
         <div class="entry-scatter-flare" aria-hidden="true"></div>
+        <img class="entry-smoke-wisp entry-smoke-a" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
+        <img class="entry-smoke-wisp entry-smoke-b" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
         <div class="entry-dip" aria-hidden="true"></div>
         <div class="entry-gauge-wrap" aria-hidden="true">
           <img class="entry-gauge-face" src="{$themeAssets.assetBase}/ui/gauge_face.png" alt="" />
           <img class="entry-gauge-needle" src="{$themeAssets.assetBase}/ui/gauge_needle.png" alt="" />
         </div>
-        <div class="entry-title">{t(lang, 'overdriveFreeSpins', mode)}</div>
+        <img class="entry-shockwave" src="{$themeAssets.assetBase}/ui/particles/shock_ring.png" alt="" aria-hidden="true" data-testid="entry-shockwave" />
+        <div class="entry-title" data-testid="entry-title">{entryTitleText}</div>
         <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
       </div>
     {:else if phase === 'spin' && currentSpin}
@@ -314,14 +336,51 @@
   }
   .stage-gauge .entry-gauge-needle, .stage-burst .entry-gauge-needle { transform: rotate(0deg); }
 
+  /* Smoke wisps (ANIMATION UPLIFT PASS 2026-07-16, item 2): a couple of
+     smoke_puff particles drifting up during the flare/dip stages, tying the
+     flame-jet ignition (FlameJets, synced via overdriveVisualActive) to a
+     bit of atmosphere on the title-card overlay itself. */
+  .entry-smoke-wisp {
+    position: absolute; width: 90px; height: 90px; object-fit: contain; opacity: 0; pointer-events: none;
+  }
+  .entry-smoke-a { left: 30%; bottom: 38%; }
+  .entry-smoke-b { left: 62%; bottom: 42%; animation-delay: 0.1s; }
+  .stage-flare .entry-smoke-wisp, .stage-dip .entry-smoke-wisp { animation: smoke-rise 0.9s ease-out both; }
+
+  @keyframes smoke-rise {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.7); }
+    30%  { opacity: 0.5; }
+    100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+  }
+
+  /* Title card (ANIMATION UPLIFT PASS 2026-07-16, item 2): slams in with the
+     same overshoot curve as the gauge, exactly on the 'gauge' stage
+     transition so the meter and the title read as one threshold moment. */
   .entry-title {
     position: absolute; top: 12%; left: 0; right: 0;
     font-size: 1.5rem; font-weight: 900; letter-spacing: 0.15em;
     color: var(--theme-primary, #16f2e0); text-shadow: 0 0 18px var(--theme-primary, #16f2e0);
-    opacity: 0; transition: opacity 0.3s ease;
+    opacity: 0; transform: scale(0.4);
+    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .stage-flare .entry-title, .stage-dip .entry-title, .stage-gauge .entry-title, .stage-burst .entry-title { opacity: 1; }
-  .stage-settle .entry-title { opacity: 0; }
+  .stage-gauge .entry-title, .stage-burst .entry-title { opacity: 1; transform: scale(1); }
+  .stage-settle .entry-title { opacity: 0; transform: scale(1.08); }
+
+  /* Shockwave ring (ANIMATION UPLIFT PASS 2026-07-16, item 2): the shared
+     shock_ring particle, centred on the whole stage (same centre as the
+     gauge) so it reads as one impact burst behind the title and gauge,
+     expanding and fading right as they slam in. */
+  .entry-shockwave {
+    position: absolute; top: 50%; left: 50%; width: 260px; height: 260px;
+    transform: translate(-50%, -50%) scale(0.2); opacity: 0; pointer-events: none;
+  }
+  .stage-gauge .entry-shockwave { animation: shockwave-burst 0.5s ease-out both; }
+
+  @keyframes shockwave-burst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+    15%  { opacity: 0.9; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+  }
 
   .entry-burst-text {
     position: absolute; bottom: 10%; left: 0; right: 0;
@@ -337,6 +396,7 @@
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
       transition: none;
     }
+    .entry-smoke-wisp, .entry-shockwave { display: none; }
     .fs-cell.win { animation: none; }
     .fs-spin-win { animation: none; }
   }

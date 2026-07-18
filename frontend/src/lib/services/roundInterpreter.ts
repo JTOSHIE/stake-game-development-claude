@@ -115,21 +115,17 @@ export function interpretRound(round: BookRound): PresentationScript {
   const events = round.events ?? []
 
   // Seed the meter from the book's own data rather than hardcoding 1
-  // (2026-07-15, NITRO DEV FUEL / neon polish pass). The meter only ever
-  // changes on a WINNING free spin (never on a loss, never retroactively -
-  // per the Overdrive spec), so whatever the first free-spin win's
-  // meta.globalMult shows is the true meter value for every spin up to and
-  // including that one - there is no separate "starting meter" event, only
-  // each win's own globalMult. This matters for modes whose entry doesn't
-  // start at 1x (NITRO OVERDRIVE's meter is pre-revved to 5x): without this
-  // pre-scan, every spin up to the first WIN would incorrectly display 1x
-  // regardless of mode, since the increment via updateGlobalMult only fires
-  // after a win resolves. For base/bonus (meter genuinely starts at 1x),
-  // this pre-scan correctly derives 1 from the same data, so there is no
-  // behaviour change there - it's a strict generalisation, not a special
-  // case. Falls back to 1 if the free-spin sequence has no win at all (the
-  // meter's value is then never visibly applied to anything, so the exact
-  // fallback doesn't matter).
+  // (2026-07-16, ported from the not-yet-merged neon-polish-v1 pass, PR #81
+  // - this branch never had that fix, and the ANIMATION UPLIFT PASS's
+  // bonus-entry title card needs a correct meter to tell a NITRO OVERDRIVE
+  // entry apart from a regular one). Without this, the meter hardcodes to
+  // 1x for every mode until the first free-spin win's updateGlobalMult
+  // event fires - wrong for any mode with a non-1x starting meter, such as
+  // NITRO OVERDRIVE's pre-revved 5x. Pre-scanning the free-game-phase
+  // winInfo events for the first one carrying meta.globalMult reads the
+  // book's own ground truth directly, mode-agnostic, since the meter only
+  // ever changes on a win. Strict generalisation: base/bonus rounds' first
+  // win naturally carries globalMult 1, so this is a no-op for them.
   let meter = 1
   {
     let scanPhase: 'base' | 'free' = 'base'
