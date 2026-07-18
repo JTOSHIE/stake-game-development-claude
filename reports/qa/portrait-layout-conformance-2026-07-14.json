@@ -13,6 +13,22 @@
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
+    "symbolLuminanceDiagnostic": {
+      "plateLuminance": 0.1177050980392157,
+      "artLuminance": 0.4562663300021703,
+      "luminanceDeltaPct": 33.856123196295464,
+      "pass": true
+    },
+    "overdriveMeterAudit": {
+      "found": true,
+      "className": "pm-strip s-lJxwiO_cb_fC",
+      "top": 371.5,
+      "left": 0,
+      "bottom": 429.5,
+      "right": 390,
+      "onScreen": true,
+      "pass": true
+    },
     "sessionPanelAudit": {
       "absentByDefault": true,
       "reachableViaMenu": true,
@@ -31,15 +47,13 @@
     "frameGate": {
       "bySegment": {
         "plainSpins": {
-          "sampleCount": 326,
-          "longFrameCount": 1,
-          "longFrames": [
-            150.10000000000036
-          ],
-          "pass": false
+          "sampleCount": 351,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
         },
         "winBannerEpic": {
-          "sampleCount": 192,
+          "sampleCount": 193,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
@@ -57,12 +71,10 @@
           "pass": true
         }
       },
-      "sampleCount": 684,
-      "longFrameCount": 1,
-      "longFrames": [
-        150.10000000000036
-      ],
-      "pass": false
+      "sampleCount": 710,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
     }
   },
   "iphone14-landscape": {
@@ -79,134 +91,21 @@
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
-    "sessionPanelAudit": {
-      "absentByDefault": true,
-      "reachableViaMenu": true,
+    "symbolLuminanceDiagnostic": {
+      "plateLuminance": 0.1177050980392157,
+      "artLuminance": 0.4562663300021703,
+      "luminanceDeltaPct": 33.856123196295464,
       "pass": true
     },
-    "touchTargetAudit": {
-      "totalChecked": 8,
-      "failing": [],
+    "overdriveMeterAudit": {
+      "found": true,
+      "className": "instrument-column s-lJxwiO_cb_fC",
+      "top": 35.20000076293945,
+      "left": 507,
+      "bottom": 173.06666946411133,
+      "right": 603.066650390625,
+      "onScreen": true,
       "pass": true
-    },
-    "fontLegibilityAudit": {
-      "totalChecked": 8,
-      "failing": [],
-      "pass": true
-    },
-    "landscapeSmallTextDiagnostic": [],
-    "frameGate": {
-      "bySegment": {
-        "plainSpins": {
-          "sampleCount": 351,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "winBannerEpic": {
-          "sampleCount": 192,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "anticipation": {
-          "sampleCount": 55,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 112,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        }
-      },
-      "sampleCount": 710,
-      "longFrameCount": 0,
-      "longFrames": [],
-      "pass": true
-    }
-  },
-  "pixel7-portrait": {
-    "device": "Pixel 7",
-    "viewport": {
-      "width": 412,
-      "height": 839
-    },
-    "screenshots": {
-      "idle": "idle.png",
-      "spin": "spin.png",
-      "win": "win.png",
-      "buyModal": "buy-modal.png",
-      "paytable": "paytable.png",
-      "overboostActive": "overboost-active.png"
-    },
-    "sessionPanelAudit": {
-      "absentByDefault": true,
-      "reachableViaMenu": true,
-      "pass": true
-    },
-    "touchTargetAudit": {
-      "totalChecked": 8,
-      "failing": [],
-      "pass": true
-    },
-    "fontLegibilityAudit": {
-      "totalChecked": 10,
-      "failing": [],
-      "pass": true
-    },
-    "frameGate": {
-      "bySegment": {
-        "plainSpins": {
-          "sampleCount": 347,
-          "longFrameCount": 1,
-          "longFrames": [
-            133.40000000000055
-          ],
-          "pass": false
-        },
-        "winBannerEpic": {
-          "sampleCount": 192,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "anticipation": {
-          "sampleCount": 55,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 112,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        }
-      },
-      "sampleCount": 706,
-      "longFrameCount": 1,
-      "longFrames": [
-        133.40000000000055
-      ],
-      "pass": false
-    }
-  },
-  "pixel7-landscape": {
-    "device": "Pixel 7 landscape",
-    "viewport": {
-      "width": 863,
-      "height": 360
-    },
-    "screenshots": {
-      "idle": "idle.png",
-      "spin": "spin.png",
-      "win": "win.png",
-      "buyModal": "buy-modal.png",
-      "paytable": "paytable.png",
-      "overboostActive": "overboost-active.png"
     },
     "sessionPanelAudit": {
       "absentByDefault": true,
@@ -239,7 +138,166 @@
           "pass": true
         },
         "anticipation": {
+          "sampleCount": 54,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 112,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 688,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  },
+  "pixel7-portrait": {
+    "device": "Pixel 7",
+    "viewport": {
+      "width": 412,
+      "height": 839
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "symbolLuminanceDiagnostic": {
+      "plateLuminance": 0.1177050980392157,
+      "artLuminance": 0.4562663300021703,
+      "luminanceDeltaPct": 33.856123196295464,
+      "pass": true
+    },
+    "overdriveMeterAudit": {
+      "found": true,
+      "className": "pm-strip s-lJxwiO_cb_fC",
+      "top": 474.046875,
+      "left": 0,
+      "bottom": 532.046875,
+      "right": 412,
+      "onScreen": true,
+      "pass": true
+    },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
+    },
+    "touchTargetAudit": {
+      "totalChecked": 8,
+      "failing": [],
+      "pass": true
+    },
+    "fontLegibilityAudit": {
+      "totalChecked": 10,
+      "failing": [],
+      "pass": true
+    },
+    "frameGate": {
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 330,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
           "sampleCount": 55,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "bonusEntryGate": {
+          "sampleCount": 112,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        }
+      },
+      "sampleCount": 689,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
+    }
+  },
+  "pixel7-landscape": {
+    "device": "Pixel 7 landscape",
+    "viewport": {
+      "width": 863,
+      "height": 360
+    },
+    "screenshots": {
+      "idle": "idle.png",
+      "spin": "spin.png",
+      "win": "win.png",
+      "buyModal": "buy-modal.png",
+      "paytable": "paytable.png",
+      "overboostActive": "overboost-active.png"
+    },
+    "symbolLuminanceDiagnostic": {
+      "plateLuminance": 0.1177050980392157,
+      "artLuminance": 0.4562663300021703,
+      "luminanceDeltaPct": 33.856123196295464,
+      "pass": true
+    },
+    "overdriveMeterAudit": {
+      "found": true,
+      "className": "instrument-column s-lJxwiO_cb_fC",
+      "top": 37.86666488647461,
+      "left": 573.5,
+      "bottom": 186.17777633666992,
+      "right": 676.8444213867188,
+      "onScreen": true,
+      "pass": true
+    },
+    "sessionPanelAudit": {
+      "absentByDefault": true,
+      "reachableViaMenu": true,
+      "pass": true
+    },
+    "touchTargetAudit": {
+      "totalChecked": 8,
+      "failing": [],
+      "pass": true
+    },
+    "fontLegibilityAudit": {
+      "totalChecked": 8,
+      "failing": [],
+      "pass": true
+    },
+    "landscapeSmallTextDiagnostic": [],
+    "frameGate": {
+      "bySegment": {
+        "plainSpins": {
+          "sampleCount": 325,
+          "longFrameCount": 1,
+          "longFrames": [
+            133.39999999999782
+          ],
+          "pass": false
+        },
+        "winBannerEpic": {
+          "sampleCount": 192,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
+        },
+        "anticipation": {
+          "sampleCount": 54,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
@@ -251,10 +309,12 @@
           "pass": true
         }
       },
-      "sampleCount": 690,
-      "longFrameCount": 0,
-      "longFrames": [],
-      "pass": true
+      "sampleCount": 684,
+      "longFrameCount": 1,
+      "longFrames": [
+        133.39999999999782
+      ],
+      "pass": false
     }
   },
   "splashFrameGate": {
@@ -272,10 +332,10 @@
   "reducedMotionFrameGate": {
     "bySegment": {
       "plainSpins": {
-        "sampleCount": 326,
+        "sampleCount": 346,
         "longFrameCount": 1,
         "longFrames": [
-          133.29999999999995
+          134.29999999999995
         ],
         "pass": false
       },
@@ -298,10 +358,10 @@
         "pass": true
       }
     },
-    "sampleCount": 747,
+    "sampleCount": 767,
     "longFrameCount": 1,
     "longFrames": [
-      133.29999999999995
+      134.29999999999995
     ],
     "pass": false
   }
