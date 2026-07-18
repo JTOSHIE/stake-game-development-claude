@@ -56,6 +56,14 @@
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.
   $: cards = FS_MODES.filter((m) => m.kind !== 'buy' || !$buyFeatureDisabled)
+  // FEATURES MENU RESTRUCTURE (2026-07-15, item 4): two labelled sections -
+  // SPIN MODES (standing + enhancer kinds: Normal, Cruise, OVERBOOST) and
+  // BUY FEATURES (buy kind: Buy Overdrive, NITRO OVERDRIVE) - both derived
+  // from the same `cards` array/order, so FS_MODES stays the single source
+  // of truth and adding a mode still needs no template change, just the
+  // right `kind`.
+  $: spinModeCards = cards.filter((m) => m.kind !== 'buy')
+  $: buyFeatureCards = cards.filter((m) => m.kind === 'buy')
 
   // A standing card is active when its serverMode is the selected standing mode.
   const isActiveStanding = (m: FsMode, sel: BetMode) => sel === m.serverMode
@@ -212,9 +220,14 @@
           </div>
         </div>
 
-        <!-- Scrollable card list, rendered from the config -->
+        <!-- Two labelled sections (2026-07-15 neon polish pass, item 4):
+             SPIN MODES (standing + enhancer kinds) then a visual separator
+             then BUY FEATURES (buy kind) - both rendered from the same
+             config-driven card markup via a shared snippet-like block below,
+             so adding a mode is still a one-line FS_MODES edit. -->
         <div class="fm-cards" data-testid="feature-menu-cards">
-          {#each cards as m (m.id)}
+          <div class="fm-section-label">SPIN MODES</div>
+          {#each spinModeCards as m (m.id)}
             {@const active = isActiveStanding(m, $standingMode)}
             {@const enhOn = isEnhancerOn(m, $standingMode)}
             <div
@@ -237,11 +250,7 @@
                 </div>
 
                 <div class="fm-action">
-                  {#if m.kind === 'buy'}
-                    <span class="fm-cost fs-num">{m.cost}× · {price(m.cost)}</span>
-                  {:else}
-                    <span class="fm-cost fs-num">{m.cost}× bet</span>
-                  {/if}
+                  <span class="fm-cost fs-num">{m.cost}× bet</span>
 
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">SOON</span>
@@ -256,7 +265,7 @@
                         data-testid="standing-select-{m.id}"
                       >SELECT</button>
                     {/if}
-                  {:else if m.kind === 'enhancer'}
+                  {:else}
                     <button
                       class="fm-toggle"
                       class:on={enhOn}
@@ -266,6 +275,38 @@
                       disabled={$isSpinning}
                       data-testid="enhancer-toggle-{m.id}"
                     >{enhOn ? 'ON' : 'OFF'}</button>
+                  {/if}
+                </div>
+              </div>
+            </div>
+          {/each}
+
+          <div class="fm-section-separator" role="separator" aria-hidden="true"></div>
+          <div class="fm-section-label">BUY FEATURES</div>
+          {#each buyFeatureCards as m (m.id)}
+            <div
+              class="fm-card fs-plate tone-{m.kind}"
+              class:dimmed={!m.available}
+              data-testid="feature-card-{m.id}"
+            >
+              <div class="fs-face">
+                <div class="fm-card-main">
+                  <div class="fm-name-row">
+                    <span class="fm-name">{modeLabel(m, $isSocial)}</span>
+                    {#if !m.available}
+                      <span class="fm-soon">COMING SOON</span>
+                    {:else}
+                      <span class="fm-vol">{m.volatility}</span>
+                    {/if}
+                  </div>
+                  <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                </div>
+
+                <div class="fm-action">
+                  <span class="fm-cost fs-num">{m.cost}× · {price(m.cost)}</span>
+
+                  {#if !m.available}
+                    <span class="fm-tag" aria-hidden="true">SOON</span>
                   {:else}
                     <button
                       class="fm-activate"
@@ -506,6 +547,22 @@
   .fm-cards::-webkit-scrollbar { width: 8px; }
   .fm-cards::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--acc) 40%, transparent); border-radius: 4px; }
 
+  /* Section labels + separator (2026-07-15, item 4): SPIN MODES / BUY
+     FEATURES - the first label sits flush at the top of the scroll area
+     (no extra top margin), the second is preceded by a visual rule. */
+  .fm-section-label {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--sig-gold) 45%, #fff);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 40%, transparent);
+    padding: 2px 2px 0;
+  }
+  .fm-section-separator {
+    height: 1px;
+    margin: 4px 2px 0;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sig-gold) 55%, transparent) 20%, color-mix(in srgb, var(--sig-gold) 55%, transparent) 80%, transparent);
+  }
+
   .fm-card { --sig: var(--sig-cyan); }
   .fm-card.tone-standing { --sig: var(--sig-cyan); }
   .fm-card.tone-enhancer { --sig: var(--sig-orange); }
@@ -621,10 +678,16 @@
     padding: 8px 14px;
     margin: 0 12px 8px;
     width: calc(100% - 24px);
-    border: 1px solid color-mix(in srgb, var(--sig-cyan, #00ffff) 40%, transparent);
+    /* NEON LIFT (2026-07-15): persistent bright magenta/pink border glow,
+       not just a flat 1px outline - the FEATURES bar is the entry point to
+       every bet mode and reads as a plain rectangle without it. */
+    border: 1.5px solid color-mix(in srgb, var(--sig-pink, #ff2ec4) 55%, transparent);
     border-radius: 10px;
-    background: linear-gradient(160deg, rgba(0, 255, 255, 0.1), rgba(6, 9, 20, 0.9));
-    color: color-mix(in srgb, var(--sig-cyan, #00ffff) 30%, #fff);
+    background: linear-gradient(160deg, rgba(255, 46, 196, 0.1), rgba(6, 9, 20, 0.9));
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--sig-pink, #ff2ec4) 45%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--sig-pink, #ff2ec4) 14%, transparent);
+    color: color-mix(in srgb, var(--sig-pink, #ff2ec4) 25%, #fff);
     cursor: pointer;
     font-family: 'Orbitron', system-ui, sans-serif;
   }
@@ -658,16 +721,20 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    border: none;
+    border: 1.5px solid color-mix(in srgb, var(--sig-pink, #ff2ec4) 50%, transparent);
     border-radius: 50%;
-    background: radial-gradient(circle at 36% 28%, #10303a, #05121b 72%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    background: radial-gradient(circle at 36% 28%, #2a1030, #05121b 72%);
+    /* NEON LIFT (2026-07-15): persistent pink glow, matching the portrait bar. */
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 10px color-mix(in srgb, var(--sig-pink, #ff2ec4) 40%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
-  .c-fm-entry svg { width: 20px; height: 20px; fill: none; stroke: var(--sig-cyan, #00ffff); stroke-width: 2.2; stroke-linecap: round; }
+  .c-fm-entry svg { width: 20px; height: 20px; fill: none; stroke: var(--sig-pink, #ff2ec4); stroke-width: 2.2; stroke-linecap: round; }
   .c-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
   .c-fm-entry.mode-enhancer {
     box-shadow: 0 0 12px color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);

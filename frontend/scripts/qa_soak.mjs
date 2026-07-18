@@ -321,6 +321,47 @@ async function runBuyAffordabilityBoundaryCheck(page) {
   return { balanceMultiple: 150, bonusDisabled, superDisabled, ok: !bonusDisabled && superDisabled }
 }
 
+// NITRO DEV FUEL (2026-07-15 neon polish pass): every buy-tier mode must
+// actually launch its feature against the mock, not just accept the debit.
+// Forces a deterministic curated round per tier via ?mockCategory= (see
+// frontend/src/lib/mock/roundProvider.ts's serveCategory) so this doesn't
+// depend on random luck landing a real trigger, then confirms
+// FreeSpinsPresentation's own overlay (data-testid="freespins-overlay",
+// gated on featureActive) actually renders - not just that the spin
+// completed without error.
+const BUY_TIER_MOCK_CATEGORIES = { bonus: 'bonus_win_mid', super: 'super_win_mid' }
+
+async function runBuyTierLaunchesFeatureCheck(browser) {
+  const results = []
+  for (const [mode, category] of Object.entries(BUY_TIER_MOCK_CATEGORIES)) {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+    try {
+      await page.goto(`${BASE_URL}?mockCategory=${category}`, { waitUntil: 'networkidle' })
+      await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      await waitForTestStores(page)
+      await dismissIntro(page)
+      await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
+      await page.locator('[data-testid="feature-menu-button"]').click()
+      await page.waitForTimeout(150)
+      await page.locator(`[data-testid="activate-${mode}"]`).click()
+      await page.waitForTimeout(150)
+      await page.locator('[data-testid="buy-confirm"]').click()
+      await page.waitForFunction(
+        () => !document.querySelector('[data-testid="spin-button"].spinning'),
+        { timeout: 20000 },
+      )
+      await page.waitForTimeout(300)
+      const featureLaunched = await page.evaluate(
+        () => document.querySelectorAll('[data-testid="freespins-overlay"]').length > 0,
+      )
+      results.push({ mode, category, featureLaunched, ok: featureLaunched })
+    } finally {
+      await page.close()
+    }
+  }
+  return results
+}
+
 // A concurrent session actively editing the same dev server can trigger HMR
 // component remounts mid-run; window.__testStores is briefly undefined while
 // the new instance's onMount re-populates it. Every access below waits for
@@ -644,6 +685,15 @@ async function run() {
         ` super disabled=${boundaryResult.superDisabled} (expect true)`)
     writeFileSync(join(OUT_DIR, 'buy-affordability-boundary-result.json'), JSON.stringify(boundaryResult, null, 2))
 
+    log('')
+    log('=== NITRO DEV FUEL: every buy tier launches its feature against the mock ===')
+    const buyLaunchResults = await runBuyTierLaunchesFeatureCheck(browser)
+    for (const r of buyLaunchResults) {
+      log(`  [${r.ok ? 'PASS' : 'FAIL'}] ${r.mode} (mockCategory=${r.category}) featureLaunched=${r.featureLaunched}`)
+    }
+    const buyLaunchFailures = buyLaunchResults.filter((r) => !r.ok)
+    writeFileSync(join(OUT_DIR, 'buy-tier-launches-feature-result.json'), JSON.stringify(buyLaunchResults, null, 2))
+
     const totalSpins = sessionA.totalSpins + sessionB.totalSpins
     const totalChecked = sessionA.roundResults.checked + sessionB.roundResults.checked
     const totalMismatches = [...sessionA.roundResults.totalMismatches, ...sessionB.roundResults.totalMismatches]
@@ -682,6 +732,7 @@ async function run() {
       costIntegrityFailures: costFailures.length,
       costVisibilityFailures: visFailures.length,
       buyAffordabilityBoundaryOk: boundaryResult.ok,
+      buyTierLaunchesFeatureFailures: buyLaunchFailures.length,
       framesOver100ms: allLongFrames.length,
     }
 
@@ -694,6 +745,7 @@ async function run() {
     if (costFailures.length) log('COST-INTEGRITY FAILURES:\n' + JSON.stringify(costFailures, null, 2))
     if (visFailures.length) log('COST-VISIBILITY FAILURES:\n' + JSON.stringify(visFailures, null, 2))
     if (!boundaryResult.ok) log('BUY-AFFORDABILITY BOUNDARY FAILURE:\n' + JSON.stringify(boundaryResult, null, 2))
+    if (buyLaunchFailures.length) log('BUY-TIER-LAUNCHES-FEATURE FAILURES:\n' + JSON.stringify(buyLaunchFailures, null, 2))
     if (allLongFrames.length) log('FRAMES OVER 100ms (attributed):\n' + JSON.stringify(allLongFrames, null, 2))
     else log('FRAME GATE: no frames over 100ms sampled this run (the known ~150ms buy-moment hitch did not reproduce)')
 
@@ -709,6 +761,7 @@ async function run() {
     if (costFailures.length > 0) { log(`FAIL: ${costFailures.length} cost-integrity mismatch(es) (see COST-INTEGRITY FAILURES above)`); fail = true }
     if (visFailures.length > 0) { log(`FAIL: ${visFailures.length} cost-visibility mismatch(es) (see COST-VISIBILITY FAILURES above)`); fail = true }
     if (!boundaryResult.ok) { log('FAIL: buy-affordability boundary gate (see BUY-AFFORDABILITY BOUNDARY FAILURE above)'); fail = true }
+    if (buyLaunchFailures.length > 0) { log(`FAIL: ${buyLaunchFailures.length} buy tier(s) did not launch their feature (see BUY-TIER-LAUNCHES-FEATURE FAILURES above)`); fail = true }
 
     if (fail) {
       log('QA SOAK: FAILURES DETECTED')

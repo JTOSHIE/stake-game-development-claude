@@ -241,7 +241,9 @@
   .fs-plate > .fs-face {
     position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-    background: linear-gradient(160deg, color-mix(in srgb, var(--sig) 12%, transparent), transparent 44%), linear-gradient(180deg, #111a2b, #070b16);
+    /* NEON LIFT (2026-07-15): 12% -> 18% - a richer inner glow tint, same
+       tier/theme colour tokens, no structural change to the escalation. */
+    background: linear-gradient(160deg, color-mix(in srgb, var(--sig) 18%, transparent), transparent 44%), linear-gradient(180deg, #111a2b, #070b16);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.07), inset 0 -8px 18px rgba(0,0,0,.6);
   }
   .fs-rail {
@@ -254,8 +256,13 @@
   .tier-big  .fs-face { width: 420px; padding: 34px 30px; }
   .tier-mega .fs-face { width: 500px; padding: 44px 36px; }
   .tier-epic .fs-face { width: 580px; padding: 54px 42px; }
-  .tier-mega .fs-plate { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
-  .tier-epic .fs-plate { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
+  /* NEON LIFT (2026-07-15): a secondary purple/pink accent glow layered
+     under each tier's own signature colour (unchanged from before), rather
+     than replacing the existing cyan/pink/gold escalation - "richer"
+     accents, not a different colour scheme. */
+  .tier-big  .fs-plate { box-shadow: 0 3px 10px rgba(0,0,0,.6), 0 0 9px color-mix(in srgb, var(--sig) 20%, transparent), 0 0 30px color-mix(in srgb, var(--sig-pink) 16%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
+  .tier-mega .fs-plate { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig) 40%, transparent), 0 0 55px color-mix(in srgb, #a855f7 28%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
+  .tier-epic .fs-plate { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), 0 0 130px color-mix(in srgb, var(--sig-pink) 20%, transparent), inset 0 1px 0 rgba(255,255,255,.35); }
 
   .c1-tier-label { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 900; letter-spacing: .18em; color: var(--acc); text-shadow: 0 0 12px color-mix(in srgb, var(--acc) 70%, transparent); text-transform: uppercase; }
   .tier-big  .c1-tier-label { font-size: 20px; }

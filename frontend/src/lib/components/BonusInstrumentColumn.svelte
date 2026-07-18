@@ -11,6 +11,16 @@
   export let multiplier = 1
   export let spinsRemaining = 0
   export let runningTotalCentibets = 0
+  // Portrait Overdrive meter decoupling (2026-07-15 neon polish pass, item 2):
+  // when true, renders a native-DOM-scale compact horizontal strip docked
+  // between the grid and the FEATURES bar (App.svelte's .native-hud-slot,
+  // first child when featureActive) instead of the LAYOUT_SPEC
+  // absolute-positioned gauge column below. Landscape and desktop are
+  // unchanged - same decoupling pattern as HudOverlay/FeatureMenu's
+  // `portrait` prop, applied here to close the gap the portrait v2 session
+  // report disclosed (the gauge column previously fell fully outside the
+  // visible viewport window on at least one tested profile during Overdrive).
+  export let compact = false
 
   // Needle sweeps roughly -110deg (low) to +110deg (high) through the top,
   // normalised against the same reference ceiling as the legacy OverdriveMeter
@@ -23,32 +33,54 @@
   )
 </script>
 
-<div class="instrument-column" data-testid="bonus-instrument-column">
-  <div class="gauge" style="width:232px;height:232px;">
-    <img class="gauge-face" src="{$themeAssets.assetBase}/ui/gauge_face.png" alt="" draggable="false" />
-    <img
-      class="gauge-needle"
-      src="{$themeAssets.assetBase}/ui/gauge_needle.png"
-      alt=""
-      draggable="false"
-      style="transform: rotate({needleDeg}deg);"
-    />
-    <div class="odometer" data-testid="odometer">
-      <span class="odometer-value">{spinsRemaining}</span>
-      <span class="odometer-label">SPINS</span>
+{#if compact}
+  <!-- Compact portrait strip (2026-07-15) - fully self-contained, native CSS
+       px throughout, no LAYOUT_SPEC absolute coordinates. Three cells:
+       multiplier, spins remaining, total win - geometrically guaranteed
+       on-screen since it's a normal-flow native-DOM element, not part of
+       the scaled canvas. -->
+  <div class="pm-strip" data-testid="bonus-instrument-column">
+    <div class="pm-cell">
+      <span class="pm-label">OVERDRIVE</span>
+      <span class="pm-value pink">{multiplier}×</span>
+    </div>
+    <div class="pm-cell" data-testid="odometer">
+      <span class="pm-label">SPINS</span>
+      <span class="pm-value cyan">{spinsRemaining}</span>
+    </div>
+    <div class="pm-cell">
+      <span class="pm-label">TOTAL WIN</span>
+      <span class="pm-value gold">{totalWinLabel}</span>
     </div>
   </div>
+{:else}
+  <div class="instrument-column" data-testid="bonus-instrument-column">
+    <div class="gauge" style="width:232px;height:232px;">
+      <img class="gauge-face" src="{$themeAssets.assetBase}/ui/gauge_face.png" alt="" draggable="false" />
+      <img
+        class="gauge-needle"
+        src="{$themeAssets.assetBase}/ui/gauge_needle.png"
+        alt=""
+        draggable="false"
+        style="transform: rotate({needleDeg}deg);"
+      />
+      <div class="odometer" data-testid="odometer">
+        <span class="odometer-value">{spinsRemaining}</span>
+        <span class="odometer-label">SPINS</span>
+      </div>
+    </div>
 
-  <div class="plate">
-    <span class="plate-label">MULTIPLIER</span>
-    <span class="plate-value">{multiplier}×</span>
-  </div>
+    <div class="plate">
+      <span class="plate-label">MULTIPLIER</span>
+      <span class="plate-value">{multiplier}×</span>
+    </div>
 
-  <div class="plate">
-    <span class="plate-label">TOTAL WIN</span>
-    <span class="plate-value">{totalWinLabel}</span>
+    <div class="plate">
+      <span class="plate-label">TOTAL WIN</span>
+      <span class="plate-value">{totalWinLabel}</span>
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
   /* Column overall bounds: x 1000..1262, y 96.. (gauge top) through the
@@ -176,4 +208,57 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* Compact portrait strip (2026-07-15 neon polish pass) - native px
+     throughout, docked between the grid and the FEATURES bar. */
+  .pm-strip {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    /* 3px, not 8px: on the tightest tested profile (iPhone 14 portrait,
+       height-capped), the extra strip pushed .game-wrapper's content ~5px
+       past the viewport - measured via scrollHeight/clientHeight, not
+       assumed - this trim closes that gap without shrinking the cells. */
+    padding: 3px 12px 0;
+    pointer-events: none;
+  }
+  .pm-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 4px;
+    min-height: 48px;
+    border-radius: 8px;
+    background: linear-gradient(160deg, rgba(255, 46, 196, 0.12), transparent 60%), #150c1e;
+    border: 1px solid rgba(255, 46, 196, 0.35);
+    box-shadow: 0 0 10px rgba(255, 46, 196, 0.2);
+  }
+  .pm-label {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(230, 200, 255, 0.7);
+    white-space: nowrap;
+  }
+  .pm-value {
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-size: 15px;
+    font-weight: 800;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pm-value.pink { color: #ff6fe0; text-shadow: 0 0 8px rgba(255, 46, 196, 0.6); }
+  .pm-value.cyan { color: #6ff2ff; text-shadow: 0 0 8px rgba(22, 242, 224, 0.5); }
+  .pm-value.gold { color: #ffd54a; text-shadow: 0 0 8px rgba(255, 213, 74, 0.5); }
 </style>

@@ -1083,9 +1083,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(9, 9, 20, 0.85);
+    /* NEON LIFT (2026-07-15): lightened from rgba(9,9,20,0.85) - the near-
+       black plate let symbol art (also dark-toned) disappear into it on a
+       dim phone screen. ~9 percentage points lighter (avg channel ~5% ->
+       ~14%), within the brief's 8-12% target, plus a touch more inner glow
+       spread/opacity so the lift reads as a glow, not just a flat tint. */
+    background: rgba(28, 29, 46, 0.88);
     border-radius: 8px;
-    box-shadow: inset 0 0 10px 1px color-mix(in srgb, var(--plate-tint, #00ffff) 55%, transparent);
+    box-shadow: inset 0 0 12px 2px color-mix(in srgb, var(--plate-tint, #00ffff) 60%, transparent);
   }
 
   /* Inner wrapper carries the velocity stretch / alpha so the strip geometry

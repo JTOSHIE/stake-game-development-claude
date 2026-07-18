@@ -5,20 +5,14 @@
     "balanceDrifts": []
   },
   "consoleErrors": [],
-  "avgFps": 58.14941860660446,
+  "avgFps": 55.54854185077641,
   "totalSpins": 300,
   "longFrames": [
     {
-      "tMs": 2177,
-      "gapMs": 233.3,
+      "tMs": 4230,
+      "gapMs": 300,
       "nearestEvent": "spin-click",
-      "deltaToEventMs": 242
-    },
-    {
-      "tMs": 198157,
-      "gapMs": 149,
-      "nearestEvent": "spin-click",
-      "deltaToEventMs": 227
+      "deltaToEventMs": 309
     }
   ]
 }
