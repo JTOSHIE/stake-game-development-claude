@@ -154,3 +154,60 @@ full untruncated text for every hit is in `au_variant_scan_data.json`.
 - **Next attempt:** a later session should retry after a longer cooldown,
   or the owner may prefer to run the three USPTO searches manually given
   the block.
+
+## 2026-07-23: TRADEMARK CLEARANCE CLOSURE
+
+Closes both outstanding items above. This entry records Fable's similarity
+ruling and the owner's manually-conducted USPTO searches; it does not
+introduce any new register data of its own.
+
+### Fable's AU similarity ruling: both names CLEAR
+
+Reviewing the full AU variant-scan dataset gathered 2026-07-18
+(`docs/records/trademark/2026-07-18/au/au_variant_scan_data.json`, 19 hits
+across "spinner", "spinners", "future spin", "we roll"):
+
+- **"Future Spinner":** zero results for "future spin" itself. The nearest
+  mark on the register is **SPINNER SLOTS** (number 1876622, as captured -
+  MURKA GAMES LIMITED, class 9, computer video game/social slots software).
+  It shares only the descriptive element "spinner", which is common to
+  gaming marks and routinely co-exists across unrelated proprietors;
+  distinctive elements and overall impressions differ. No barrier
+  identified.
+- **"We Roll Spinners":** the nearest marks are "That's how we roll"
+  (number 1854151, classes 25/41, sporting apparel/event services), the
+  SunCoast Spinners wheelchair-basketball marks (numbers 2034959-2034961,
+  class 41, charitable/sporting services), and the venue-limited
+  "Spinners" bar mark (number 2410242, class 41, bowling alley/centre
+  services, endorsed to a specific venue). All sit in unrelated services
+  with distinct overall impressions from a slot game. No barrier
+  identified.
+
+This is Fable's similarity judgment, not this session's - recorded here as
+the ruling that closes the AU leg.
+
+### USPTO: owner-conducted searches
+
+The owner manually ran the three searches this scan could not complete
+under automation ("We Roll Spinners", "Future Spinner", "future spin";
+live marks; classes 9 and 41; Coordinated/broadened-class matching turned
+off, per the filter guidance given after the 2026-07-18 CloudFront block)
+on `tmsearch.uspto.gov`, and attests all three come back clear.
+
+- **Search type:** owner-conducted, manual, on the live USPTO trademark
+  search system.
+- **Date:** 2026-07-23.
+- **Result:** all three searches attested clear by the owner. No register
+  data (hit counts, mark records, screenshots) is reproduced in this entry
+  beyond that attestation, since none was captured by automation this time.
+- **Supporting screenshots:** if the owner later supplies them, they will
+  be ingested under `docs/records/trademark/2026-07-23/uspto-owner/` and
+  referenced from this entry; this closure does not block on that.
+
+### Status
+
+Both outstanding items from the 2026-07-15 Pending table are now closed:
+AU variant scan gathered and Fable-reviewed (CLEAR); USPTO exact-phrase
+checks owner-conducted and attested CLEAR. See
+`WRS_MASTER_DOCUMENT.md` section 1 for the resulting trademark-clearance
+row update.
