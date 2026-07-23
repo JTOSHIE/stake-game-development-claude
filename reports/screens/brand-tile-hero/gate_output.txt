@@ -1,0 +1,6 @@
+hero cropped size: (4159, 1875) (long edge 4159)
+pilot-only cropped size: (854, 1875) (long edge 1875)
+wrote /Users/jt/math-sdk/design-system/brand/tile/tile_hero_full.png (4159, 1875)
+wrote /Users/jt/math-sdk/design-system/brand/tile/tile_hero_pilot_only.png (854, 1875)
+[PASS] fringe gate (hero): 0 offending pixels
+[PASS] fringe gate (pilot-only): 0 offending pixels

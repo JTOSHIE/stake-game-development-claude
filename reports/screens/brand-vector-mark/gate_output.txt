@@ -1,0 +1,11 @@
+
+=== wrs_mark_v2.svg ===
+[PASS] paths-only: no forbidden elements
+[PASS] margin symmetry: margins(px @ 512) = {'left': 26, 'right': 26, 'top': 26, 'bottom': 26}, spread = 0
+[PASS] min stroke @192: thickest magenta run at 192px = 20px
+
+=== wrs_mark_v2_mono_cyan.svg ===
+[PASS] paths-only: no forbidden elements
+[PASS] margin symmetry: margins(px @ 512) = {'left': 26, 'right': 26, 'top': 26, 'bottom': 26}, spread = 0
+
+ALL GATES: PASS

@@ -1,0 +1,5 @@
+native render luminance: overall=79.57 band=91.24
+native render already clears the brightness gate - no exposure lift applied
+GATE: overall>=24.0 band>=30.0 -> PASS
+wrote /Users/jt/math-sdk/design-system/brand/tile/tile_background_master.jpg (2048, 1152)
+wrote /Users/jt/math-sdk/design-system/brand/tile/tile_background_preview_1024.jpg (1024, 576)
