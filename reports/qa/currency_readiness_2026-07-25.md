@@ -199,12 +199,26 @@ Regression: `social_string_conformance.mjs` re-run, ALL CHECKS PASS.
 
 ## 7. Open items
 
-1. **SC symbol placement.** We ship leading (`SC 1,000.00`) per the brief. The
-   platform currency reference documents trailing (`1,000.00 SC`, `symbolAfter: true`).
-   One of the two is wrong for players. Flip point is the single
-   `VIRTUAL_SYMBOL_TRAILING` constant. Needs an owner or Fable ruling.
-2. **XEC.** Unverified. Do not record it as supported until a first-party source
-   exists.
+1. **SC symbol placement. Priority raised after Part 4.** We ship leading
+   (`SC 1,000.00`) per the brief. **Two independent first-party sources now say
+   trailing:**
+   - the docs repository currency reference: `XSC ... symbolAfter: true`, example
+     `10.00 SC`;
+   - the official `StakeEngine/ts-client` SDK, `src/helpers.ts`:
+     `XSC: { symbol: 'SC', decimals: 2, symbolAfter: true }`.
+
+   Two sources against the brief makes this the most likely genuine deviation in the
+   currency work. Flip point is the single `VIRTUAL_SYMBOL_TRAILING` constant, one
+   line, every surface follows. Needs an owner or Fable ruling before submission.
+
+   Related, and evidence that neither source can be trusted alone: the two disagree
+   with **each other** on XGC decimals. The SDK says `decimals: 0`, the docs page
+   says 2. We implement 2. GC is not our currency, so this is minor, but it means
+   both sources need corroborating.
+2. **XEC.** Unverified against **three** independent sources now: the live site, the
+   docs repository, and the official ts-client SDK's `Currency` union (34 fiat codes
+   plus XGC and XSC, nothing else). Do not record it as supported until a first-party
+   source exists.
 3. **Six social strings.** Need a wording ruling before stake.us or Stake EU
    distribution.
 4. **Locale plumbing.** `formatBalance` now accepts a platform locale tag and the
