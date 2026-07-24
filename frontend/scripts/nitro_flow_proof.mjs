@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro, waitSpinDone } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'neon-polish-v1', 'nitro-flow')
@@ -42,22 +43,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  // HeroSplash (ANIMATION UPLIFT PASS, 2026-07-16, merged via PR #81
-  // reconciliation) shows first, on every load, ahead of the once-per-
-  // session rules modal below.
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 async function run() {
@@ -103,10 +88,7 @@ async function run() {
     await page.screenshot({ path: join(OUT_DIR, '4-mid-feature.png') })
 
     // Let the whole sequence finish, then capture the final win summary.
-    await page.waitForFunction(
-      () => !document.querySelector('[data-testid="spin-button"].spinning'),
-      { timeout: 20000 },
-    )
+    await waitSpinDone(page, 20000)
     await page.waitForTimeout(500)
     await page.screenshot({ path: join(OUT_DIR, '5-final-summary.png') })
 

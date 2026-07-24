@@ -105,7 +105,9 @@
   /* Colourway nozzle glow (item 4) - matches the flame's own recolour. */
   .colourway-natural   .nozzle { --nozzle-glow: rgba(93, 255, 60, 0.5); }
   .colourway-overdrive .nozzle { --nozzle-glow: rgba(60, 235, 255, 0.55); }
-  .colourway-nitro     .nozzle { --nozzle-glow: rgba(255, 60, 220, 0.6); }
+  /* OWNER AUDIT ROUND 3, item 4: NITRO shifted pink-forward per the owner
+     (deep-pink glow, was magenta-purple). */
+  .colourway-nitro     .nozzle { --nozzle-glow: rgba(255, 20, 147, 0.65); }
 
   /* Flame emanates from the nozzle mouth (jet origin) to the right (local). */
   .flame {
@@ -125,7 +127,15 @@
      verified against App.svelte's matching backdrop shift for each. */
   .colourway-natural   .flame { --flame-filter: none; }
   .colourway-overdrive .flame { --flame-filter: hue-rotate(60deg) saturate(1.15); }
-  .colourway-nitro     .flame { --flame-filter: hue-rotate(180deg) saturate(1.35) brightness(1.18); }
+  /* OWNER AUDIT ROUND 3, item 4: NITRO shifted pink-forward per the owner -
+     hue-rotate(180deg) landed on magenta/purple (~300deg); 215deg lands on
+     deep pink (~335deg, matching CSS "deeppink" #FF1493) instead. The
+     sprite's own naturally-brighter tips still read white-hot on top of
+     this deep-pink core (same "white-tipped" mechanism as before), which is
+     what actually keeps this readable against the equally pink-shifted
+     backdrop below - the core alone would fail the 90-degree contrast law
+     against a same-hue backdrop, the white tips are what satisfy it. */
+  .colourway-nitro     .flame { --flame-filter: hue-rotate(215deg) saturate(1.4) brightness(1.15); }
 
   .jets.active .flame {
     opacity: 0.95;

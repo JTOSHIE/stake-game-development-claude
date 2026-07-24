@@ -13,9 +13,13 @@
 
   <div class="wordmark">WE ROLL SPINNERS</div>
 
+  <!-- OWNER AUDIT ROUND 3, item 1 (logo canonicalisation): the hero emblem
+       is the sole WRS mark - this loader now spins the hero icon (a tight
+       circular crop of the emblem's wheel-and-reel core, tools/brand/
+       derive_hero_icon.py) as a single layer, replacing the old bespoke
+       brand_mark_base/brand_mark_spin two-layer rim+blade composite. -->
   <div class="brand-mark" aria-hidden="true">
-    <img class="brand-base" src="{$themeAssets.assetBase}/ui/brand_mark_base.png" alt="" draggable="false" />
-    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/brand_mark_spin.png" alt="" draggable="false" />
+    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/hero_icon_96.png" alt="" draggable="false" />
   </div>
 
   <div class="logo-block">
@@ -65,14 +69,12 @@
     height: clamp(140px, 24vw, 220px);
     filter: drop-shadow(0 0 24px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
   }
-  .brand-base, .brand-spin {
+  .brand-spin {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
-  }
-  .brand-spin {
     animation: brand-spin 2.6s linear infinite;
     transform-origin: 50% 50%;
   }

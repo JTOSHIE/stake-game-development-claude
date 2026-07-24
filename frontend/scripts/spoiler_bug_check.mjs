@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'owner-audit-v2', 'spoiler-bug')
@@ -50,19 +51,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 function moneyToNumber(text) {

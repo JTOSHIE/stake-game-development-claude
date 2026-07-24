@@ -18,6 +18,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
+import { dismissIntro, waitSpinDone, waitFeatureDrained } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -60,21 +61,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
-}
-
-async function waitSpinDone(page, timeout = 20000) {
-  await page.waitForFunction(
-    () => !document.querySelector('[data-testid="spin-button"].spinning'),
-    { timeout },
-  )
 }
 
 const SEAM_ROWS = ['bgm_loop', 'bgm_tension', 'anticipation_build']
@@ -136,7 +122,11 @@ async function runSeamChecks(page, baseUrl) {
 async function run() {
   const port = await getFreePort()
   const preview = await startDevServer(port)
-  const baseUrl = `http://localhost:${port}`
+  // base_win_small (curated, guaranteed small win, never triggers the
+  // feature): pins this "real spin" so win-sound coverage doesn't depend on
+  // random luck landing a payline win, and so it never risks a natural
+  // trigger racing the deliberate bonus-buy step later in this script.
+  const baseUrl = `http://localhost:${port}?mockCategory=base_win_small`
 
   const soundRequests = []
   const soundFailures = []
@@ -184,6 +174,10 @@ async function run() {
     await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
     await page.locator('[data-testid="spin-button"]').click()
     await waitSpinDone(page)
+    // This real (unmocked) spin can naturally trigger a feature - the FEATURES
+    // trigger button needed below only renders once featureActive clears, which
+    // can be well after waitSpinDone() returns (see waitFeatureDrained's doc).
+    await waitFeatureDrained(page)
     await page.waitForTimeout(300) // let any win sound's setTimeout-scheduled echo fire
 
     const playedAfterSpin = await page.evaluate(() => window.__playedSounds)

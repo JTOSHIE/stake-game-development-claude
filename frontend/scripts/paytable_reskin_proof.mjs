@@ -9,6 +9,7 @@ import { spawn } from 'node:child_process'
 import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -35,16 +36,6 @@ function waitForServer(url, timeoutMs = 20000) {
     }
     tick()
   })
-}
-
-async function dismissIntro(page) {
-  for (const sel of ['[data-testid="intro-continue"]', '.intro-continue', '.intro-splash']) {
-    const b = page.locator(sel)
-    if (await b.count() > 0 && await b.isVisible().catch(() => false)) {
-      await b.click({ timeout: 1500 }).catch(() => {})
-      await page.waitForTimeout(200)
-    }
-  }
 }
 
 async function openPaytable(page) {

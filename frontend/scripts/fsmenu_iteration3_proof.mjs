@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'owner-audit-v2', 'fsmenu-iteration3')
@@ -36,13 +37,6 @@ function startDevServer(port) {
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
 }
-async function dismissIntro(page) {
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) { await splash.click(); await page.waitForTimeout(100) }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) { await btn.click(); await page.waitForTimeout(100) }
-}
-
 async function run() {
   const port = await getFreePort()
   const server = await startDevServer(port)
@@ -63,15 +57,17 @@ async function run() {
     await page.waitForTimeout(1800) // past the 1.2s fastIdle threshold
 
     await page.screenshot({ path: join(OUT_DIR, '1-landscape-idle-shimmer.png') })
-    // The idle-shimmer's box-shadow must now be confined to the circular
-    // knob button, not the rectangular wrapper - assert the wrapper itself
-    // no longer carries the animation class.
+    // The idle-shimmer's box-shadow must now be confined to the actual
+    // button (.fm-entry-pill, OWNER AUDIT ROUND 3 item 6's mobile-treatment
+    // pill - was the circular .fm-entry-knob before that retirement), not
+    // the rectangular wrapper - assert the wrapper itself no longer carries
+    // the animation class.
     const wrapperHasShimmer = await page.evaluate(() =>
       document.querySelector('[data-testid="feature-menu-entry"]')?.classList.contains('idle-shimmer') ?? null)
-    const knobHasShimmer = await page.evaluate(() =>
+    const buttonHasShimmer = await page.evaluate(() =>
       document.querySelector('[data-testid="feature-menu-button"]')?.classList.contains('idle-shimmer') ?? null)
     assert(wrapperHasShimmer === false, `outer .fm-entry wrapper no longer carries idle-shimmer (square shadow source) - was ${wrapperHasShimmer}`)
-    assert(knobHasShimmer === true, `circular .fm-entry-knob button now carries idle-shimmer instead - was ${knobHasShimmer}`)
+    assert(buttonHasShimmer === true, `.fm-entry-pill button now carries idle-shimmer instead - was ${buttonHasShimmer}`)
 
     await page.locator('[data-testid="feature-menu-button"]').click()
     await page.waitForSelector('[data-testid="feature-menu-cards"]', { timeout: 5000 })

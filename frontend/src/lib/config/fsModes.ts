@@ -134,6 +134,14 @@ export const MODE_COST = FS_MODES.reduce(
 export const FS_RTP_LABEL = '96.35%'
 export const FS_MAX_WIN_LABEL = '5,000×'
 
+/** OWNER AUDIT ROUND 3, item 2 (naming uniformity): the single source of
+ * truth for the in-feature HUD field labels, so portrait/compact-landscape/
+ * desktop templates render the exact same string instead of independently
+ * hand-typed copies that can silently drift (portrait previously said
+ * "OVERDRIVE FREE SPINS", desktop said just "FREE SPINS" - same field). */
+export const HUD_LABEL_FREE_SPINS = 'OVERDRIVE FREE SPINS'
+export const HUD_LABEL_TOTAL_WIN = 'TOTAL WIN'
+
 /** Resolves a mode's displayed label/blurb for the current social-mode
  * state - the single place both FeatureMenu.svelte and PaytableModal.svelte
  * branch on `isSocial`, so the two consumers can never drift out of sync.

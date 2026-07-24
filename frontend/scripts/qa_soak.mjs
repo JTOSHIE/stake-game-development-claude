@@ -20,6 +20,7 @@ import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { spawn, execFileSync } from 'node:child_process'
 import { createServer } from 'node:net'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 // This host runs other concurrent, unrelated automated sessions (observed:
 // a stale `vite --port 5199` from a completely different worktree squatting
@@ -161,35 +162,6 @@ async function waitSpinDone(page, timeout = 20000) {
     await page.waitForTimeout(150)
   }
   throw new Error(`waitSpinDone: spin still in progress after ${timeout}ms`)
-}
-
-async function dismissIntro(page) {
-  // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
-  // every load, ahead of the once-per-session rules modal below.
-  //
-  // Polls for up to ~2s rather than a single instantaneous check: HeroSplash
-  // has its own fade/entrance timing, and sessionStorage (its "seen" flag)
-  // is scoped per BROWSING CONTEXT - every fresh browser.newPage() (as the
-  // cost-integrity/cost-visibility/boundary gates below each use) starts
-  // with none set, so the splash always reappears there. A single-shot
-  // isVisible() check raced the splash's entrance often enough in practice
-  // to leave it covering the FEATURES/spin controls, hanging every
-  // subsequent locator wait on that fresh page.
-  const deadline = Date.now() + 2000
-  while (Date.now() < deadline) {
-    const splash = page.locator('[data-testid="hero-splash"]')
-    if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-      await splash.click()
-      await page.waitForTimeout(100)
-      break
-    }
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 // ── Cost-integrity gate (Wiring Integrity Audit, item b) ────────────────────

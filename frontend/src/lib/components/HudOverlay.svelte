@@ -832,8 +832,12 @@
 
   /* ===== PANEL ================================================================
      v3.2: x296..984 (688 wide), y560..648, radius18. Slim chrome sub-frame. */
+  /* OWNER AUDIT ROUND 3 item 7: widened/reflowed to keep underlying MAX
+     through STEPPERS (the whole re-measured banner shifted right and
+     widened slightly) - see docs/HUD_SPEC.md. TURBO and SPIN/AUTO stay
+     outside the panel, as before. */
   .fs-panel{
-    position:absolute;left:296px;top:560px;width:688px;height:88px;z-index:59;
+    position:absolute;left:309px;top:560px;width:711px;height:88px;z-index:59;
     border-radius:18px;pointer-events:none;
     background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
     border:1px solid transparent;
@@ -848,12 +852,15 @@
   }
 
   /* ===== BALANCE / WIN / BET =================================================
-     Fixed geometry (never reflow). Signature colour per field. ------------- */
+     Fixed geometry (never reflow). Signature colour per field. OWNER AUDIT
+     ROUND 3 item 7: shifted right as part of the whole-banner re-measure
+     (locked spec, docs/HUD_SPEC.md) - a consistent 16px gap now separates
+     every distinct control across the entire row, MENU through AUTO. ---- */
   .fs-box{position:absolute;top:573px;height:62px;z-index:60;}
   .fs-box .fs-face{padding:0 10px;}
-  .fs-balance{left:400px;width:200px;--sig:var(--sig-cyan);}
-  .fs-win    {left:616px;width:150px;--sig:var(--sig-pink);}
-  .fs-bet    {left:782px;width:120px;--sig:var(--sig-gold);}
+  .fs-balance{left:449px;width:200px;--sig:var(--sig-cyan);}
+  .fs-win    {left:665px;width:150px;--sig:var(--sig-pink);}
+  .fs-bet    {left:831px;width:120px;--sig:var(--sig-gold);}
   .fs-bet .fs-face{align-items:flex-end;padding-right:14px;}
   /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
      transition (see HudOverlay's script section) - overrides .fs-plate's
@@ -889,7 +896,7 @@
      above it - kept OUTSIDE .fs-bet/.fs-plate deliberately, since .fs-plate's
      clip-path would otherwise clip a child poking above its own bounds. */
   .fs-bet-badge-anchor{
-    position:absolute; left:782px; top:557px; width:120px; height:16px;
+    position:absolute; left:831px; top:557px; width:120px; height:16px;
     z-index:61; display:flex; justify-content:flex-end; pointer-events:none;
   }
   .fs-mode-badge{
@@ -916,10 +923,10 @@
   @keyframes fs-win-pop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
 
   /* ===== BET ARROWS - chrome nubs, cyan chevrons ============================
-     own fixed column x906 top578 (v3.3), shifted to x914 (2026-07-15
-     alignment nit per the owner's note - a touch more breathing room from
-     the BET plate's right edge at x902, still clear of .fs-spin at x962). */
-  .fs-arrows{position:absolute;left:914px;top:578px;width:44px;height:52px;z-index:60;
+     OWNER AUDIT ROUND 3 item 7: shifted to x967 as part of the whole-banner
+     re-measure (locked spec, docs/HUD_SPEC.md) - a consistent 16px gap from
+     the BET plate's new right edge at x951. */
+  .fs-arrows{position:absolute;left:967px;top:578px;width:44px;height:52px;z-index:60;
     display:flex;flex-direction:column;gap:4px;}
   .fs-arrow{
     width:44px;height:24px;padding:0;border:none;cursor:pointer;position:relative;
@@ -938,30 +945,35 @@
   .fs-arrow:active:not(:disabled){transform:translateY(1px);}
   .fs-arrow:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4);}
 
-  /* ===== MAX chip - far-left gap (v3.6), gold ============================== */
-  .fs-max{position:absolute;left:311px;top:582px;width:26px;height:44px;padding:0;
-    border:none;background:none;cursor:pointer;z-index:60;
+  /* ===== MAX chip - OWNER AUDIT ROUND 3 item 7: adopts the mobile
+     .p-round-btn/.p-max-cap circular treatment (was a narrow 26x44
+     rectangular "cap", the one control that didn't match the rest of the
+     banner's circular-button language) - 48px circle, same shared vertical
+     centre (y=604) as every other control in the locked spec
+     (docs/HUD_SPEC.md). ============================================== */
+  .fs-max{position:absolute;left:325px;top:580px;width:48px;height:48px;padding:0;
+    border:none;border-radius:50%;cursor:pointer;z-index:60;
+    background:radial-gradient(circle at 36% 28%,#2a2410,#0d0b04 72%);
+    box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
     display:flex;align-items:center;justify-content:center;}
   .fs-max .cap{
-    width:24px;height:26px;display:flex;align-items:center;justify-content:center;
-    border-radius:6px;position:relative;
-    background:linear-gradient(180deg,#2a2410,#0d0b04);
-    box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sig-gold) 55%,transparent),
-               0 0 8px color-mix(in srgb,var(--sig-gold) 35%,transparent);
-    font-family:'Orbitron',monospace;font-size:.46rem;font-weight:800;letter-spacing:.02em;
+    font-family:'Orbitron',monospace;font-size:.62rem;font-weight:800;letter-spacing:.02em;
     color:#ffe58a;text-shadow:0 0 6px var(--sig-gold);
   }
-  .fs-max:hover:not(:disabled) .cap{filter:brightness(1.2);}
+  .fs-max:hover:not(:disabled){filter:brightness(1.2);}
   .fs-max:active:not(:disabled){transform:translateY(1px);}
   .fs-max:disabled{opacity:.4;cursor:not-allowed;}
 
-  /* ===== HAMBURGER menu - chrome square (x344) ============================= */
-  .fs-menu{position:absolute;left:344px;top:584px;width:40px;height:40px;z-index:60;
+  /* ===== HAMBURGER menu - chrome square. OWNER AUDIT ROUND 3 item 7: bumped
+     40px -> 44px (was under the 44px touch-target floor); position now set
+     by .menu-wrapper below (locked spec, docs/HUD_SPEC.md), these left/top
+     values are inert when wrapped there but kept in sync for clarity. ==== */
+  .fs-menu{position:absolute;left:389px;top:582px;width:44px;height:44px;z-index:60;
     padding:0;border:none;cursor:pointer;border-radius:9px;
     background:linear-gradient(160deg,#c6d6e0,#55656f 52%,#222c34);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.55);
     display:flex;align-items:center;justify-content:center;}
-  .fs-menu .inset{width:32px;height:32px;border-radius:6px;
+  .fs-menu .inset{width:35px;height:35px;border-radius:6px;
     background:radial-gradient(circle at 38% 30%,#15222b,#070d14 72%);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     box-shadow:inset 0 0 8px rgba(0,0,0,.7);}
@@ -996,8 +1008,13 @@
   @keyframes fs-flame{from{filter:drop-shadow(0 0 10px rgba(255,120,30,.55)) brightness(1);}
     to{filter:drop-shadow(0 0 20px rgba(255,140,40,.9)) brightness(1.28);}}
 
-  /* ===== AUTOPLAY - chrome knob (x912 top648, 48) ========================= */
-  .fs-auto{position:absolute;left:912px;top:648px;width:48px;height:48px;z-index:60;
+  /* ===== AUTOPLAY - chrome knob. OWNER AUDIT ROUND 3 item 7: docked as a
+     circle tangent to SPIN's right edge (x1111 = SPIN's left 1027 + its own
+     width 84 - touching, never overlapping), same shared vertical centre
+     y=604 as the rest of the locked spec (docs/HUD_SPEC.md) - was sitting
+     well below-left of SPIN entirely unaligned (top:648 vs SPIN's top:562,
+     centres 68px apart). ================================================ */
+  .fs-auto{position:absolute;left:1111px;top:580px;width:48px;height:48px;z-index:60;
     padding:0;border:none;cursor:pointer;}
   .fs-auto .fs-face{gap:0;}
   .fs-auto svg{width:20px;height:20px;}
@@ -1011,9 +1028,12 @@
   @keyframes fs-auto-pulse{from{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--acc) 40%,transparent));}
     to{filter:drop-shadow(0 0 16px color-mix(in srgb,var(--acc) 90%,transparent));}}
 
-  /* ===== SPIN - crafted chrome, cyan redline ring (x962 top562, 84) =======
-     Replaces spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
-  .fs-spin{position:absolute;left:962px;top:562px;width:84px;height:84px;z-index:61;
+  /* ===== SPIN - crafted chrome, cyan redline ring (x1027 top562, 84) ======
+     OWNER AUDIT ROUND 3 item 7: shifted to x1027 (was x962) as part of the
+     whole-banner re-measure (locked spec, docs/HUD_SPEC.md) - a consistent
+     16px gap from the bet-steppers' new right edge at x1011. Replaces
+     spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
+  .fs-spin{position:absolute;left:1027px;top:562px;width:84px;height:84px;z-index:61;
     padding:0;border:none;cursor:pointer;border-radius:50%;
     background:conic-gradient(from 216deg,#e7f1f7,#8fa3b1,#333f49,#6d8090,#eef5fa,#47565f,#a4b7c3,#e7f1f7);
     box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),
@@ -1076,10 +1096,10 @@
      ========================================================================== */
   .menu-wrapper {
     position: absolute;
-    left: 344px;
-    top: 584px;
-    width: 40px;
-    height: 40px;
+    left: 389px;
+    top: 582px;
+    width: 44px;
+    height: 44px;
     z-index: 60;
   }
   .menu-wrapper .fs-menu { position: static; left: auto; top: auto; }
@@ -1177,74 +1197,101 @@
     background: rgba(0, 255, 255, 0.25);
   }
 
+  /* OWNER AUDIT ROUND 3 item 7: this wrapper (not .fs-auto itself, which it
+     forces to position:static) is the real positioning authority - docked
+     tangent to SPIN's right edge, locked spec in docs/HUD_SPEC.md. */
   .autoplay-wrapper {
     position: absolute;
-    left: 912px;
-    top: 648px;
+    left: 1111px;
+    top: 580px;
     width: 48px;
     height: 48px;
     z-index: 60;
   }
   .autoplay-wrapper .fs-auto { position: static; left: auto; top: auto; }
 
+  /* OWNER AUDIT ROUND 3, item 9: enlarged with generous spacing throughout -
+     was a cramped 64px-min-width dropdown with sub-44px checkboxes/inputs/
+     buttons (the .auto-menu-input number fields had no explicit height at
+     all, effectively ~20px tall). Every interactive row is now a real 44px+
+     target, shared by all three layouts (desktop/portrait/compact-landscape
+     all render this same markup - see the three `.auto-menu`-class mounts
+     above). */
   .auto-menu {
     position: absolute;
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(10, 10, 30, 0.96);
-    border: 1px solid rgba(255, 200, 50, 0.3);
-    border-radius: 8px;
-    overflow: hidden;
+    background: rgba(10, 10, 30, 0.97);
+    border: 1px solid rgba(255, 200, 50, 0.35);
+    border-radius: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 90px);
     z-index: 65;
-    min-width: 64px;
+    min-width: 220px;
+    padding: 6px 0;
   }
   .auto-menu-item {
     display: block;
     width: 100%;
-    padding: 0.35rem 0.8rem;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
     background: none;
     border: none;
     color: #ffc832;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 1rem;
     text-align: center;
+    box-sizing: border-box;
   }
   .auto-menu-item:hover { background: rgba(255, 200, 50, 0.15); }
 
   .auto-menu-toggle {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.62rem;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-size: 0.82rem;
     letter-spacing: 0.02em;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
     white-space: nowrap;
+    box-sizing: border-box;
   }
-  .auto-menu-toggle input { accent-color: #00ffff; cursor: pointer; }
+  .auto-menu-toggle input {
+    accent-color: #00ffff;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
   .auto-menu-amount {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 0 0.7rem 0.3rem 1.9rem;
-    font-size: 0.62rem;
-    color: rgba(255, 255, 255, 0.6);
+    gap: 8px;
+    min-height: 44px;
+    padding: 0.4rem 1rem 0.4rem 2.4rem;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.65);
+    box-sizing: border-box;
   }
   .auto-menu-input {
-    width: 3.4rem;
-    padding: 2px 5px;
-    font-size: 0.62rem;
+    width: 5.2rem;
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 0.95rem;
     font-family: 'Orbitron', sans-serif;
     color: #fff;
-    background: rgba(0, 255, 255, 0.08);
-    border: 1px solid rgba(0, 255, 255, 0.35);
-    border-radius: 4px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 6px;
+    box-sizing: border-box;
   }
   .auto-menu-sep {
-    padding: 0.3rem 0.7rem 0.15rem;
-    font-size: 0.56rem;
+    padding: 0.5rem 1rem 0.25rem;
+    font-size: 0.66rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 200, 50, 0.5);
@@ -1514,7 +1561,7 @@
      just anchored to whichever positioned ancestor wraps them), which now
      anchors correctly against .p-menu-wrapper/.p-autoplay-wrapper above
      instead of the landscape stage's absolute wrapper. */
-  .p-hud-menu, .p-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; }
+  .p-hud-menu, .p-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; left: auto; right: auto; transform: none; }
   .p-hud-menu { left: 0; }
   .p-auto-menu { right: 0; }
 
@@ -1572,7 +1619,7 @@
   .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--c-gold); }
 
   .c-menu-wrapper, .c-autoplay-wrapper { position: relative; flex: 0 0 auto; }
-  .c-hud-menu, .c-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; }
+  .c-hud-menu, .c-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; left: auto; right: auto; transform: none; }
   .c-hud-menu { left: 0; }
   .c-auto-menu { right: 0; }
 

@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'rules-conformance-item1')
@@ -66,11 +67,7 @@ async function run() {
     await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
     await page.waitForFunction(() => window.__testStores !== undefined, { timeout: 10000 })
 
-    const intro = page.locator('[data-testid="intro-continue"]')
-    if (await intro.count() > 0 && await intro.isVisible().catch(() => false)) {
-      await intro.click()
-      await page.waitForTimeout(150)
-    }
+    await dismissIntro(page)
 
     // Open the paytable: click the HUD's menu button, then its paytable item
     // (HudOverlay.svelte: button.fs-menu opens the menu, .hud-menu-item[0] is

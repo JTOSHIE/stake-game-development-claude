@@ -1572,11 +1572,12 @@
   .bg-still.overdrive.active {
     opacity: 0.92;
   }
-  /* NITRO OVERDRIVE (item 4): "intensifies the pink/magenta backdrop" - the
-     same graded bg_overdrive.jpg asset, pushed further via filter rather
-     than a second art asset. */
+  /* NITRO OVERDRIVE (OWNER AUDIT ROUND 3, item 4: shifted pink-forward per
+     the owner, was magenta-leaning) - the same graded bg_overdrive.jpg
+     asset, pushed further toward deep pink via filter rather than a second
+     art asset. */
   .bg-still.overdrive.active.nitro-active {
-    filter: saturate(1.35) brightness(1.08) hue-rotate(-8deg);
+    filter: saturate(1.4) brightness(1.1) hue-rotate(12deg);
   }
 
   /* ── Dev chip (2026-07-14c) — single small anchor, replaces two separate
@@ -1705,15 +1706,17 @@
     0%, 100% { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
     50%       { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 24px color-mix(in srgb, var(--theme-secondary, #ff00ff) 95%, transparent)); }
   }
-  /* NITRO (item 4): the same pulse, intensified - higher saturation and a
-     brighter peak glow, distinguishing the bought NITRO entry from a plain
-     Overdrive buy without a second keyframe/asset. */
+  /* NITRO (OWNER AUDIT ROUND 3, item 4: shifted pink-forward per the owner):
+     the same pulse, intensified and hue-shifted warmer than the base
+     Overdrive-buy pulse's 280deg - higher saturation and a brighter peak
+     glow, distinguishing the bought NITRO entry from a plain Overdrive buy
+     without a second keyframe/asset. */
   .game-frame.overdrive-active.nitro-active {
     animation-name: frame-pulse-nitro;
   }
   @keyframes frame-pulse-nitro {
-    0%, 100% { filter: hue-rotate(280deg) saturate(1.7) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-secondary, #ff00ff) 75%, transparent)); }
-    50%       { filter: hue-rotate(280deg) saturate(1.7) drop-shadow(0 0 34px color-mix(in srgb, var(--theme-secondary, #ff00ff) 100%, transparent)); }
+    0%, 100% { filter: hue-rotate(305deg) saturate(1.7) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-secondary, #ff00ff) 75%, transparent)); }
+    50%       { filter: hue-rotate(305deg) saturate(1.7) drop-shadow(0 0 34px color-mix(in srgb, var(--theme-secondary, #ff00ff) 100%, transparent)); }
   }
 
   @media (prefers-reduced-motion: reduce) {

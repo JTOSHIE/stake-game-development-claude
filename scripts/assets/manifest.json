@@ -114,6 +114,13 @@
       "out": "ui/hero_emblem_512.png",
       "palette_colors": 256,
       "note": "ANIMATION UPLIFT PASS 2026-07-16, item 1 (splash). Palette-compressed bundle copy of the locked studio master (design-system/brand/hero_emblem/master_512.png, ratified PR #82) - ~124KB vs the 417KB master, no visible quality loss at splash scale. The design-system master itself is never modified by this step. HeroSplash.svelte matches its own backdrop colour to the master's own background (#080a16, measured during ingest) rather than chroma-keying, since alpha transparency roughly doubled file size for a soft-edge gradient without shrinking it."
+    },
+    {
+      "src": "design-system/brand/hero_icon/hero_icon_96.png",
+      "out": "ui/hero_icon_96.png",
+      "palette_colors": 256,
+      "keep_alpha": true,
+      "note": "OWNER AUDIT ROUND 3, item 1 (logo canonicalisation). The hero icon (tools/brand/derive_hero_icon.py) is a tight circular crop of the hero emblem's wheel-and-reel core, transparent outside the circle - LoadingScreen.svelte's spinning brand-mark pod now rotates this single icon instead of the retired brand_mark_base/brand_mark_spin two-layer composite."
     }
   ],
   "storefront_tile": {

@@ -1,9 +1,10 @@
-// flame_colourway_proof.mjs — OWNER AUDIT ROUND 2, item 4 proof.
+// flame_colourway_proof.mjs — OWNER AUDIT ROUND 2 item 4, refreshed ROUND 3
+// item 4 (NITRO shifted pink-forward).
 //
 // Captures all three FlameJets colourway/backdrop entries: natural (organic
 // trigger, green flames + standard backdrop), overdrive (bought Overdrive,
-// cyan flames + magenta backdrop), nitro (bought NITRO OVERDRIVE, magenta-
-// core white-tipped flames + intensified pink/magenta backdrop).
+// cyan flames + magenta backdrop), nitro (bought NITRO OVERDRIVE, deep-pink-
+// core white-tipped flames + intensified pink backdrop).
 //
 // Run (from frontend/): node scripts/flame_colourway_proof.mjs
 
@@ -13,9 +14,10 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'owner-audit-v2', 'flame-colourways')
+const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'owner-audit-v3', 'flame-colourways')
 mkdirSync(OUT_DIR, { recursive: true })
 
 async function getFreePort() {
@@ -34,13 +36,6 @@ function startDevServer(port) {
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
 }
-async function dismissIntro(page) {
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) { await splash.click(); await page.waitForTimeout(100) }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) { await btn.click(); await page.waitForTimeout(100) }
-}
-
 async function captureNatural(browser, port) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
   await page.goto(`http://localhost:${port}?mockCategory=trigger_3`, { waitUntil: 'networkidle' })
