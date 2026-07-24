@@ -9,6 +9,8 @@
 //   - Expose a typed response for ReplayMode.svelte to consume
 //   - Helpers for currency/amount display per Stake Engine spec
 
+import { currencySymbolFor } from '../utils/currency'
+
 export interface ReplayParams {
   replay: true
   game: string         // UUID
@@ -139,21 +141,18 @@ export function microsToDisplay(micros: number): number {
 }
 
 /**
- * Resolve a currency symbol for display. Supports the most common Stake Engine
- * currencies plus the social-mode SC. Falls back to "{CODE} " for unknown codes.
+ * Resolve a currency symbol for display.
+ *
+ * Delegates to the shared formatter in utils/currency.ts. This function used to
+ * carry its own ten-entry hardcoded map, which had two defects fixed 2026-07-25:
+ * it keyed sweepstakes coins on 'SC' when the RGS actually sends 'XSC' (so a
+ * sweepstakes replay fell through to the fallback and printed the raw code
+ * "XSC" to the player, which the jurisdiction rules forbid), and it covered only
+ * ten of the platform's currencies while the shared formatter covers all of
+ * them. Kept as a named export because ReplayMode.svelte and any future replay
+ * surface import it; the implementation is now a single delegation so the two
+ * tables can never drift apart again.
  */
-export function currencySymbol(code: string): string {
-  const map: Record<string, string> = {
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    JPY: '¥',
-    CNY: '¥',
-    INR: '₹',
-    BRL: 'R$',
-    CAD: 'CA$',
-    AUD: 'A$',
-    SC: 'SC ',
-  }
-  return map[code] ?? `${code} `
+export function currencySymbol(code: string, localeTag?: string): string {
+  return currencySymbolFor(code, localeTag)
 }

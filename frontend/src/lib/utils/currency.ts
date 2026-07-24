@@ -1,15 +1,31 @@
 /**
- * currency.ts — Stake Engine currency formatters
+ * currency.ts - Stake Engine currency formatters
+ *
+ * SINGLE SOURCE OF TRUTH for every player-facing money string in the game.
+ * Nothing else may hold its own symbol table. `replayService.currencySymbol()`
+ * delegates here; a second, divergent table there previously keyed sweepstakes
+ * coins on 'SC' when the platform actually sends 'XSC', which leaked the raw
+ * code to players in replay mode (fixed 2026-07-25, see
+ * reports/qa/currency_readiness_2026-07-25.md).
  *
  * All monetary values in the Stake Engine API are integer micros
- * (1 display unit = 1,000,000 micros). This module converts micros to
- * locale-aware display strings for all 43 supported currencies.
+ * (1 display unit = 1,000,000 micros).
  *
- * Supported currencies (43):
- *   Fiat — USD CAD EUR GBP AUD NZD CHF NOK SEK DKK PLN CZK HUF RON
- *           BGN HRK RUB UAH KZT TRY ZAR NGN KES GHS EGP INR BRL MXN
- *           CLP ARS PEN COP CRC KRW CNY HKD SGD MYR THB IDR PHP VND TWD
- *   Virtual — XGC (Gold Coins → "GC")  XSC (Sweepstakes Coins → "SC")
+ * Display is DERIVED, never hardcoded:
+ *   - fiat symbols come from Intl via the currency code the platform sent, using
+ *     `currencyDisplay: 'narrowSymbol'` so USD renders "$1.00" and not
+ *     "US$1.00" (the B1 change, re-verified 2026-07-25 and confirmed correct:
+ *     it derives from the code rather than substituting a hardcoded glyph);
+ *   - virtual currency symbols come from VIRTUAL_CURRENCIES below, keyed on the
+ *     platform's own codes;
+ *   - the locale used for grouping and decimal marks is the platform-provided
+ *     language, passed in by the caller, not the browser's own locale.
+ *
+ * Supported currencies:
+ *   Fiat - USD CAD EUR GBP AUD NZD CHF NOK SEK DKK PLN CZK HUF RON
+ *          BGN HRK RUB UAH KZT TRY ZAR NGN KES GHS EGP INR BRL MXN
+ *          CLP ARS PEN COP CRC KRW CNY HKD SGD MYR THB IDR PHP VND TWD
+ *   Virtual - XGC (Gold Coins -> "GC")  XSC (Sweepstakes Coins -> "SC")
  *
  * Zero-decimal currencies: JPY IDR KRW VND CLP
  */
@@ -18,50 +34,134 @@
 export const CURRENCY_SCALE = 1_000_000
 
 /**
- * Currencies that are displayed with zero decimal places.
- * Per Stake Engine spec: JPY, IDR, KRW, VND, CLP.
+ * Currencies displayed with zero decimal places, per the Stake Engine currency
+ * reference. These are also the practical high-minimum currencies (a JPY bet
+ * level is three orders of magnitude larger than a USD one).
  */
 const ZERO_DECIMAL = new Set<string>(['JPY', 'IDR', 'KRW', 'VND', 'CLP'])
+
+/**
+ * Symbol placement for virtual currencies.
+ *
+ * OPEN QUESTION, one flip point. The Stake Engine currency reference documents
+ * XSC/XGC with `symbolAfter: true`, that is "10.00 SC". The 2026-07-25 brief
+ * specifies leading placement, "SC 1,000". They contradict each other and the
+ * question is recorded in COMPLIANCE_WATCH.md pending an owner or Fable ruling.
+ *
+ * We ship the brief's leading form. When the ruling lands, flip this ONE
+ * constant; every player-facing surface follows, because they all route here.
+ */
+export const VIRTUAL_SYMBOL_TRAILING = false
+
+interface VirtualCurrency {
+  /** Player-facing symbol. The raw code is NEVER shown to players. */
+  symbol: string
+  decimals: number
+}
+
+/**
+ * Virtual currencies, keyed on every code form that actually reaches this
+ * module. Two forms are live in the system and BOTH must resolve:
+ *
+ *   - 'XSC' / 'XGC' are what the RGS authenticate response sends
+ *     (gameStore.currencyCode).
+ *   - 'SC' / 'GC' are what the Bet Replay flow defaults to when the replay URL
+ *     carries no currency parameter, see replayService.parseReplayParams:
+ *     `params.get('currency') ?? (social ? 'SC' : 'USD')`.
+ *
+ * Keying on only one form is precisely the bug fixed on 2026-07-25: the old
+ * replay table knew 'SC' but not 'XSC', so a real sweepstakes session printed
+ * the raw code to the player. socialMode.ts already treats all four as social
+ * for the same reason.
+ */
+export const VIRTUAL_CURRENCIES: Record<string, VirtualCurrency> = {
+  XGC: { symbol: 'GC', decimals: 2 },
+  XSC: { symbol: 'SC', decimals: 2 },
+  GC:  { symbol: 'GC', decimals: 2 },
+  SC:  { symbol: 'SC', decimals: 2 },
+}
+
+/** True when the code is a platform virtual currency. */
+export function isVirtualCurrency(currencyCode: string): boolean {
+  return Object.prototype.hasOwnProperty.call(
+    VIRTUAL_CURRENCIES,
+    (currencyCode || '').toUpperCase(),
+  )
+}
+
+/**
+ * Resolve the player-facing symbol for a currency code, derived rather than
+ * hardcoded. Returns the code itself only for genuinely unknown currencies,
+ * where showing something is better than showing nothing.
+ */
+export function currencySymbolFor(currencyCode: string, localeTag?: string): string {
+  const code = (currencyCode || '').toUpperCase()
+
+  const virtual = VIRTUAL_CURRENCIES[code]
+  if (virtual) return virtual.symbol
+
+  try {
+    const parts = new Intl.NumberFormat(localeTag, {
+      style:           'currency',
+      currency:        code,
+      currencyDisplay: 'narrowSymbol',
+    }).formatToParts(0)
+    const found = parts.find((p) => p.type === 'currency')
+    if (found && found.value) return found.value
+  } catch {
+    /* fall through */
+  }
+  return code
+}
 
 /**
  * Format a micros amount as a human-readable currency string.
  *
  * @param micros       - Amount in micros (integer, from the RGS API)
- * @param currencyCode - ISO 4217 code (e.g. "USD", "JPY") or "XGC" / "XSC"
- * @returns            - Formatted string, e.g. "$1.25", "¥1,250", "GC 500"
+ * @param currencyCode - the code the platform sent, e.g. "USD", "JPY", "XSC"
+ * @param localeTag    - platform-provided language tag, e.g. "ja". Omit to use
+ *                       the runtime default.
  *
  * @example
- *   formatBalance(1_250_000, 'USD')  // → "$1.25"
- *   formatBalance(1_250_000_000, 'JPY')  // → "¥1,250"
- *   formatBalance(500_000_000, 'XGC')  // → "GC 500"
- *   formatBalance(10_000_000, 'XSC')  // → "SC 10.00"
+ *   formatBalance(1_250_000, 'USD')            // "$1.25"
+ *   formatBalance(1_250_000_000, 'JPY')        // "¥1,250"
+ *   formatBalance(1_000_000_000, 'XSC')        // "SC 1,000.00"
+ *   formatBalance(500_000_000, 'XGC')          // "GC 500.00"
  */
-export function formatBalance(micros: number, currencyCode: string): string {
+export function formatBalance(
+  micros: number,
+  currencyCode: string,
+  localeTag?: string,
+): string {
   const amount = micros / CURRENCY_SCALE
+  const code = (currencyCode || '').toUpperCase()
 
-  // ── Virtual currencies ────────────────────────────────────────────────────
-  // XGC — Gold Coins (social casino, no real-money value)
-  if (currencyCode === 'XGC') {
-    return `GC ${Math.round(amount).toLocaleString()}`
-  }
-  // XSC — Sweepstakes Coins (social casino prize currency)
-  if (currencyCode === 'XSC') {
-    return `SC ${amount.toFixed(2)}`
+  // Virtual currencies. Grouped like fiat so large sweepstakes balances stay
+  // readable ("SC 1,000.00", not "SC 1000.00"), and the code is never rendered.
+  const virtual = VIRTUAL_CURRENCIES[code]
+  if (virtual) {
+    const formatted = amount.toLocaleString(localeTag, {
+      minimumFractionDigits: virtual.decimals,
+      maximumFractionDigits: virtual.decimals,
+    })
+    return VIRTUAL_SYMBOL_TRAILING
+      ? `${formatted} ${virtual.symbol}`
+      : `${virtual.symbol} ${formatted}`
   }
 
-  // ── Fiat currencies ───────────────────────────────────────────────────────
-  const decimals = ZERO_DECIMAL.has(currencyCode) ? 0 : 2
+  // Fiat. The symbol is derived by Intl from the code, never substituted.
+  const decimals = ZERO_DECIMAL.has(code) ? 0 : 2
 
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(localeTag, {
       style:                 'currency',
-      currency:              currencyCode,
+      currency:              code,
       currencyDisplay:       'narrowSymbol',
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     }).format(amount)
   } catch {
-    // Unknown or unsupported currency code — plain fallback
-    return `${currencyCode} ${amount.toFixed(decimals)}`
+    // Unknown or unsupported currency code - plain fallback
+    return `${code} ${amount.toFixed(decimals)}`
   }
 }

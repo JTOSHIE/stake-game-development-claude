@@ -200,3 +200,114 @@ compensated by the stateless single-book-round design, neither blocking submissi
 worth a future hardening pass rather than urgent fixes. The "Current posture" summary
 above was stale (still said "two bet modes" nine days after the five-mode package
 shipped) - corrected in this same pass.
+
+### 2026-07-25: automated bet-level verification constraints, full extraction
+
+Source: `https://stake-engine.com/docs/approval-guidelines/math-verification`, rendered
+and captured 2026-07-25 to `docs/stake-engine-live/2026-07-25/math-verification.md`.
+Delta analysis against the 2026-07-04 mirror and the public GitHub repository is in
+`docs/stake-engine-live/2026-07-25/DELTA_NOTES.md`.
+
+These are **automated** limits applied to the uploaded maths, not reviewer opinion.
+They are stated per star tier. Our target tier is 3 stars, so the 3-star column is the
+operative one, with the 2-star column recorded because a rounded average can land us
+there.
+
+#### The constraint table, as published
+
+| Constraint | 2-star limit | 3-star limit |
+|---|---|---|
+| Maximum Exposure | $10,000,000 | $50,000,000 |
+| Maximum Payout Multiplier | 25,000x | 100,000x |
+| Maximum Bet Cost | $100,000 | $500,000 |
+| Maximum Cost Multiplier | 1,000x | 1,500x |
+| Minimum Base (1.0x cost) Standard Deviation | 0.6 | 0.6 |
+| Maximum Base (1.0x cost) Standard Deviation | 50.0 | 60.0 |
+| P(>=5000) | 1e-2 | 1e-2 |
+| P(>=10000) | 8e-2 | 2e-2 |
+| Risk Limits (CVaR) | 700 | 800 |
+| Liability (ETL, >40x Bet) | 0.8 | 0.9 |
+| Liability (ETL, P(>10000)) | 0.6 | 0.8 |
+
+Separately, and independent of tier: the maximum bet size accepted by the RGS is
+**$500,000 USD**. Anything above returns HTTP 400 with "invalid bet amount".
+
+#### Definitions, as published
+
+- **P(>=5000) and P(>=10000).** The maximum allowed cumulative probabilities of
+  achieving a payout at or above 5,000x and 10,000x respectively. The **worst-case,
+  meaning highest, value across all modes** is the one tested. This matters for us:
+  the gate is not the base mode, it is whichever mode is worst.
+
+- **Cost-multiplier scaling of the tail probabilities.** For high-cost modes the
+  measured probability is scaled **down** before comparison, making expensive modes
+  more lenient because their effective contribution to tail risk is smaller relative
+  to a base bet:
+
+  | Cost multiplier c | Scale applied |
+  |---|---|
+  | c >= 1000x | 0.2 |
+  | 500 <= c < 1000 | 0.5 |
+  | 200 <= c < 500 | 0.8 |
+  | c < 200 | none stated, treated as 1.0 |
+
+  Applied to us: NITRO OVERDRIVE at 400x cost falls in the 200 to 500 band and is
+  scaled by **0.8**. Buy Overdrive at 100x is below the lowest published band and
+  therefore takes **no relief**, scale 1.0. Cruise, OVERBOOST and base likewise take
+  no relief.
+
+- **CVaR, Conditional Value at Risk**, also called Expected Shortfall. Published
+  definition: "what is the expected payout to the operator when a win occurs in the
+  worst 0.1% of outcomes?" Two values are stated to be considered, the **normalised**
+  CVaR (CVaR divided by bet cost), and the **un-normalised** CVaR (the absolute
+  expected payout when such an event occurs).
+
+- **ETL, Expected Tail Liability.** The proportion of total expected return
+  concentrated in wins at or above **40x the cost multiplier** (or above 10,000x
+  where 40x is not applicable). A normalised ETL of 0.5 means half the game's RTP
+  comes from wins above the threshold. Two limits are published per tier, one against
+  the 40x-bet threshold and one against the P(>10000) threshold.
+
+#### OPEN QUESTION, CVaR definition. Recorded verbatim, resolution path attached.
+
+The published text says the worst **0.1%** of outcomes. Our independent pre-computation
+from Fable is stated as **CVaR99**, that is the worst **1%**. These are not the same
+statistic, and the published limit (700 or 800) is given without units or an explicit
+statement of which of the two published variants, normalised or un-normalised, it is
+compared against.
+
+Three unknowns, none resolvable from the published documentation:
+
+1. Is the tested quantile 0.1% (CVaR99.9) or 1% (CVaR99)?
+2. Is the limit compared against the normalised or the un-normalised value?
+3. Is the worst-case-across-modes rule applied to CVaR as it explicitly is to the tail
+   probabilities, or is CVaR assessed on the base mode only?
+
+**Resolution path, recorded as the formal mechanism rather than a guess.** The ACP
+computes and displays these figures itself. After the math upload and **before**
+requesting review, the ACP **Math Distribution and Summary** screen is read and
+screenshotted into dossier evidence, and our independently computed values are
+reconciled against the platform's own displayed values. Where they disagree, the
+platform's figures are definitive and ours are corrected to match. This is now a
+formal staging step in `SUBMISSION_DOSSIER.md` section 5, added this pass, so it
+cannot be skipped on the way to submission.
+
+Until that reconciliation happens, our CVaR position is reported at **both** quantiles
+in `reports/qa/math_bet_level_compliance_2026-07-25.md` so that whichever definition
+the platform uses, the answer is already on file.
+
+#### Other constraints recorded this pass
+
+- **File size restrictions, new since the 2026-07-04 capture.** No single events file
+  (`.jsonl.zst`) may exceed **4.2GB**, and no game mode may contain more than
+  **10,000,000 events**. These fail at publish time, not at review. Ours is 100,000
+  rounds per mode, roughly two orders of magnitude inside the cap.
+- **RTP ceiling 96.70%.** Ours is 96.3500% in all five modes, margin 0.35pp, spread
+  across modes 0.0000pp against a 0.5% allowance. The public GitHub repository still
+  advertises the old 90.0 to 98.0 range and must not be used as the source of truth.
+- **SC display format contradiction, unresolved.** The only first-party currency table
+  found (repository only, live no longer publishes one) documents `XSC` as symbol `SC`
+  with `symbolAfter: true`, example `10.00 SC`. The brief specifies an `SC 1,000`
+  leading-symbol style. Part 3 drives display from platform-provided session data
+  rather than from either assumption, so this does not block, but the final format
+  needs a ruling. `XEC` could not be verified from any source, see the delta notes.

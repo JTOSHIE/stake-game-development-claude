@@ -241,7 +241,44 @@ was within the sanctioned pass's explicit scope (the gitignored books artefacts 
 3. Replay URL tests: a base win round, a free spins round, and a bonus buy round
    (cost display check), each in normal and social mode.
 4. Tile check: the composed tile passes the thumbnail guidelines in the editor.
-5. Only then request review, with the blurb, for the exact uploaded versions.
+5. Complete 5f below. It is a hard gate, not an optional check.
+6. Only then request review, with the blurb, for the exact uploaded versions.
+
+### 5f. ACP Math Distribution and Summary evidence capture (MANDATORY, added 2026-07-25)
+
+**This step runs after the math upload and BEFORE requesting review. Review is not
+requested until it has been completed and its evidence committed.**
+
+Why it exists. The platform applies automated bet-level limits (maximum exposure,
+maximum payout multiplier, maximum bet cost, maximum cost multiplier, base standard
+deviation floor and ceiling, tail probabilities at 5,000x and 10,000x, CVaR risk limit,
+and ETL liability limits) whose published definitions are not complete enough to
+reproduce with certainty offline. Specifically, the CVaR definition is ambiguous on
+three axes at once: the tested quantile (0.1% or 1%), the normalisation (CVaR divided
+by bet cost, or the absolute value), and whether the worst-case-across-modes rule that
+is explicitly stated for the tail probabilities also applies to CVaR. Our own
+recomputation covers every reading (see `reports/qa/math_bet_level_compliance_2026-07-25.md`),
+and under the plausible readings we pass with wide margins, but the platform's own
+displayed figures are the only definitive ones.
+
+Steps:
+
+1. Complete the maths upload per 5b step 3.
+2. Open the ACP **Math Distribution and Summary** screen for the uploaded version.
+3. Screenshot the full screen, including every displayed summary statistic and every
+   automated limit result. Commit to `reports/screens/acp-math-summary/<date>/`.
+4. Transcribe the displayed values into a dated note under `reports/qa/` and reconcile
+   them line by line against our independently computed table in
+   `reports/qa/math_bet_level_compliance_2026-07-25.md`.
+5. Record the platform's operative CVaR definition once observed, and update
+   `COMPLIANCE_WATCH.md`'s 2026-07-25 open-question entry with the resolved answer.
+6. **Where our figures and the platform's disagree, the platform's are definitive.**
+   Correct ours to match and note the correction.
+7. **If any displayed value sits outside its limit, stop.** Do not request review.
+   Escalate to the owner with the screenshot and the reconciliation note.
+
+Only when steps 1 through 6 are complete and nothing is outside a limit does 5e step 6
+(request review) become available.
 
 ## 6. DOCUMENTATION GAPS TO CLOSE
 Headless capture of the interactive approval checklist items at
