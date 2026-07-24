@@ -251,3 +251,32 @@ re-runs. This session's own environment ran `qa_soak.mjs` through 8/24 cells cle
 its time budget ran out (still progressing, not stalled) and killed
 `portrait_layout_conformance.mjs` after it hit the bug (a) now fixes - neither constitutes
 a passing result for either suite, and neither should be treated as one.
+
+### FINAL MERGE close-out sweep
+
+PR #88 merged to `main` (fast-forward `7f880e8..63e2eba`), branch `claude/owner-audit-round3-v1`
+deleted, both via `gh pr merge --merge --delete-branch`.
+
+**Local branches** (7, excluding `main`): all 7 confirmed pushed, matching their remote SHA
+exactly - zero risk of local-only work. Four are explicitly dead (merged via their own PR):
+`claude/brand-hero-emblem` (#82), `claude/landscape-compact-v1` (#79),
+`claude/portrait-layout-v1` (#78), `claude/portrait-v2-grid-first` (#80). Three were never
+opened as their own PR but are pushed and safe: `claude/compliance-rg`, `claude/gap-analysis`
+(both landed via hand-picked cherry-picks into other PRs per the 2026-07-07 handover, not a
+PR of their own), `claude/lumen-sideproject` (intentionally parked, not for merge into
+`main`, per its own standing convention).
+
+**Open PRs:** zero (`gh pr list --state open` empty).
+
+**Working tree:** clean except the two known pre-existing untracked directories, both
+re-verified safe this pass - `games/future_spinner_super/` is byte-identical to its
+dedicated `origin/claude/fs-super-prototype` branch (checked via `git diff --no-index`
+against a key file); `sideproject/lumen/` contains only build artifacts (`node_modules`,
+`.vite`, `dist`, one `settings.local.json`) with zero unique source files outside those,
+the actual LUMEN source living safely on `claude/lumen-sideproject` (confirmed pushed
+above). Neither holds anything work-relevant that exists only on this machine.
+
+**Reports and briefs:** `reports/SESSION_REPORT.md`, its dated archive copy
+(`reports/archive/2026-07-25_owner-audit-round3.md`), and both briefs executed this arc
+(`FS_OwnerAudit_Round3_Prompt.md`, `FS_FinalMergeCloseout_Prompt.md`) all confirmed
+committed on `main` via `git ls-files`.

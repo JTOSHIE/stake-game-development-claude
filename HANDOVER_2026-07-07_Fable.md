@@ -391,3 +391,13 @@ fresh for this pass and all clean - detail in the same report.
 The owner will collect your feedback and relay it back in a single input, same as last
 time. Thank you.
 
+---
+
+## Superseded (2026-07-25)
+
+This document's arc closes here. A genuinely new arc - the identity canonicalisation and
+HUD lock work, rounds 1 through 3 of the owner audits, and the run-up to external audit -
+is now tracked in **`HANDOVER_2026-07-25_Fable.md`** at the repo root. That is the current
+living document going forward; this one remains as the historical record for the
+FeatureMath v2 / compliance-RG / LUMEN-parity arc it covers.
+
