@@ -136,6 +136,15 @@ Per `HANDOVER_2026-07-25_Fable.md` item 4 and the model-handover map item (4):
    and by the `.max-win-overlay` container's own presence, exported as
    `clickAnyPendingGate` (Round 3 FINAL MERGE rider (a), re-verified 2026-07-26).
 4. A star prediction.
+5. **One manual type check the tooling cannot do.** `svelte-check` fails to parse
+   `frontend/src/lib/components/RainLayer.svelte` (it reports `<script> was left open`
+   although the file is structurally sound and compiles and ships correctly), which
+   means **that component's props are not type-checked at all**. Manually verify its
+   two props, `count` and `opacity` (plus the cosmetic `variant`), against both callers,
+   `App.svelte` and `HeroSplash.svelte`: confirm the values passed are numbers in
+   sensible ranges and that no caller passes a prop the component does not declare.
+   This closes the only known unchecked-props hole in the tree (Fable ruling,
+   2026-07-26b).
 
 ## 5. Not done in this pass
 

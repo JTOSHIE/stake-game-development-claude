@@ -9,6 +9,87 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 005 - 2026-07-26 - Branch prune done; board handed to the owner
+
+**COMMS-ACK.** Receipt of FABLE RULINGS 2026-07-26b recorded. Entry 004 closed.
+Rulings noted: (1) ruling 13 closed, baseline stays at 11, type cleanup correctly
+refused; (2) audit pack refresh ratified in full; (3) dossier 5g ratified as landed;
+(4) branch prune executed, below; (5) board state formally recorded.
+
+**RainLayer blind spot: compensated, not chased.** One instruction added to
+`AUDIT_PACK_INDEX.md` section 4 as item 5: the auditor manually verifies the two props
+(`count`, `opacity`, plus the cosmetic `variant`) against both callers, `App.svelte`
+and `HeroSplash.svelte`. Closes the only known unchecked-props hole for the price of a
+sentence, as ruled.
+
+### Branch prune
+
+**15 merged remote branches deleted.** Full SHAs recorded here so every deletion stays
+recoverable by `git branch <name> <sha>`:
+
+| Branch | SHA |
+|---|---|
+| `claude/anticipation-reroll-itemA` | `5ee9869aa50f088669eb00c1725aab2002be2813` |
+| `claude/audio-seam-warmup-item0` | `ab7c96eb60e9ad18221093a6e752e89612b72a7a` |
+| `claude/books-regen-locked-pass` | `f43dd2c5a0ee9dcff5abecf50d9cde94f8d91f43` |
+| `claude/brand-hero-emblem` | `12ac14a7cd47b53e05d1310f2bea5acbd8876755` |
+| `claude/landscape-compact-v1` | `97c0441dcff6be08b9b9598c377851eada276a3a` |
+| `claude/math-audit-correction-itemD` | `c57f7eead0f53d20a5470161fa5624f560400e8f` |
+| `claude/math-selfaudit-item3` | `a1f0b4bed6fcda619694b31edea684dc7f1b0802` |
+| `claude/portrait-layout-v1` | `d987760b8fc55e34a4e871b99d2718ecbfc208ab` |
+| `claude/portrait-v2-grid-first` | `cc1521d0a4dfa6d1685af0d74253fbba82f251f8` |
+| `claude/qa-conformance-item2` | `c8202319cac26913b3838522069099a8c1a1af42` |
+| `claude/record-corrections-itemE` | `92525cb7b7ce8e8dcbf75244977f271ac6da42cd` |
+| `claude/rules-conformance-item1` | `7126f996b4b7ca51bab9a6184b1e673a051ba032` |
+| `claude/social-audit-item4` | `4b45a4060a865c6b21f24604aa9b21ba3306537e` |
+| `claude/social-strings-itemC` | `906d96cd71bc514cf2acc5132faaa3d7b09413bd` |
+| `claude/win-countup-itemB` | `a42084de4c0e4fe76d24dc92b73000ca4f9954c9` |
+
+Each was verified an ancestor of `main` before deletion, not merely assumed merged.
+Four stale local branches whose remotes were deleted were also removed with
+`git branch -d` (which refuses anything unmerged).
+
+**Four reference branches preserved exactly as directed:** `claude/collect-prototype`,
+`claude/gap-analysis`, `claude/lumen-sideproject`, `claude/fs-super-prototype`.
+
+**ONE EXCEPTION, HELD RATHER THAN DELETED, needs your ruling.**
+
+14. **`claude/compliance-rg` (`c595566`) was NOT deleted.** It is **not an ancestor of
+    `main`**, so it does not satisfy "every merged remote work branch", and it is not
+    on the four-branch preserve list either. It falls between the two clauses. The
+    2026-07-25 close-out sweep recorded that its content "landed via hand-picked
+    cherry-picks into other PRs per the 2026-07-07 handover, not a PR of their own",
+    which explains why the tip is not an ancestor even though the work is on `main`.
+    I did not delete it, because deleting an unmerged branch on an inference about
+    cherry-picks is not something to do without an explicit instruction. **Ruling
+    wanted:** delete it, or add it to the preserve list. Remote is otherwise exactly
+    the four references plus `main`.
+
+### Board state
+
+Confirmed from the repository, not asserted: **no open PRs, working tree clean** except
+the two known-safe untracked directories, `main` green, CI passing.
+
+**The builder holds nothing actionable.** Audit prep is complete. The external audit's
+sole remaining precondition is the owner's full re-test verdict and any round-4 items
+it produces. As of this entry the machine side is waiting on its owner.
+
+Open items carried, none of them blocking and none of them mine to move:
+
+- Owner re-test verdict, then any round-4 items (map item 3).
+- Ruling wanted on `claude/compliance-rg` above.
+- XEC, resolved empirically at Developer Testing Tool staging (map item 6).
+- Owner one-timers: payment details against the captured payments doc, hero-emblem
+  provider logo upload, Tile Editor composition.
+- Blurb's draft soundtrack sentence still pending owner approval.
+- Post-launch, ruled and deliberately deferred: `replayStore` removal, feature-grid
+  renderer unification, the six non-shared overlay scripts, the 11-error typecheck
+  baseline.
+
+**Lane.** GREEN: comms, records, branch housekeeping. No code, no game behaviour.
+
+---
+
 ## 004 - 2026-07-26 - PR #90 merged; audit prep complete; the 11 errors enumerated
 
 **COMMS-ACK.** Receipt of FABLE REVIEW, PR #90 (2026-07-26) including addendum ruling
