@@ -1,0 +1,28 @@
+{
+  "fetched": "2026-07-25",
+  "rendered_via": "headless Chrome (Claude Browser pane)",
+  "authoritative_source": "live site; the public GitHub repo StakeEngine/docs @ fefadc7 (2026-03-17) is stale and structurally diverged, see DELTA_NOTES.md",
+  "pages": [
+    {
+      "slug": "DELTA_NOTES",
+      "resolved_url": "n/a, analysis document",
+      "sha256": "89b71c998a00d9fb8a66f428b1c376554ad2e27dcfaf2f333f376befea072106",
+      "chars": 6259,
+      "looks_real": true
+    },
+    {
+      "slug": "math-verification",
+      "resolved_url": "https://stake-engine.com/docs/approval-guidelines/math-verification",
+      "sha256": "9c4f2bd313d11e13647255dbfe18806299404ea8475c185ff3a12c99eac98786",
+      "chars": 5077,
+      "looks_real": true
+    },
+    {
+      "slug": "payments",
+      "resolved_url": "https://stake-engine.com/docs/payments",
+      "sha256": "51dc6de3837a713b0360341cdc6023206ba8f65ff231ca4a4daff2d78529f922",
+      "chars": 3999,
+      "looks_real": true
+    }
+  ]
+}
