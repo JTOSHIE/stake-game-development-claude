@@ -9,6 +9,73 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 006 - 2026-07-26 - Owner Audit Round 4 delivered, PR #91
+
+**State delta.** All seven Round 4 items delivered, **PR #91 open, CI green (49s)**.
+Proofs `reports/screens/owner-audit-v4/`, results
+`reports/qa/owner_audit_v4_2026-07-26.json`.
+
+**Two bugs, both root-caused, and the brief's framing was wrong on both.**
+
+- **Item 3.** Overdrive was always correct. Only NITRO broke, and only inside the
+  wincap window: Overdrive derived from `$selectedBetMode`, NITRO from
+  `liveIsNitroEntry`, a binding that arrives only once `FreeSpinsPresentation` reaches
+  its entry phase, which is after MaxWinCelebration's COLLECT gate. Measured before
+  the fix: `nitro-wincap` read `colourway-natural`.
+- **Item 1 does not reproduce.** Gate visible and in-viewport on four profiles and six
+  desktop sizes across all three routes. Not "fixed": that is working code days before
+  the audit. The owner's clarification points at `introSeen()` reading **localStorage
+  first**, which is exactly why incognito shows the splash and their desktop does not.
+
+**The owner's clarification changed item 3 materially, and for the better.** They meant
+**borders and shading**, not the jets. That exposed a real gap rather than a routing
+bug: the backdrop and frame had only **two** states, so a spun-in feature and a bought
+Overdrive rendered identically magenta. Natural now grades green to match its green
+flames. All three surfaces derive from one route source, so they can no longer
+disagree; they previously each re-derived from `liveIsNitroEntry` and shared one bug.
+
+**Item 7 draft delivered; prototype deliberately NOT built.** It lives in `GameGrid`'s
+reel timing loop. Prototyping there on a seven-item PR immediately before the audit is
+the risk the section 1 bar warns against. Scoped as its own branch in section 6.
+
+**Findings needing your ruling.** Continuing the numbering.
+
+15. **Scatter anticipation, five open questions** in the proposal's section 7. The
+    load-bearing one: escalation can build toward a 4th or 5th scatter the board never
+    had, because the outcome is known before the reels move. Accept as genre-standard,
+    or soften when the board holds no further scatter? I lean accept, with a capped
+    dead-build duration.
+16. **Natural route colour is my call and should be yours.** I chose green-leaning to
+    match the green flames and to read as clearly not-a-purchase. Colour is an owner
+    eye-call; proofs are in `item3-route-*.png`.
+17. **Item 6 reverses a prior decision.** The 2026-07-14c grid-first pass explicitly
+    excluded the desktop lockup from portrait; Round 4 reinstates it. Noting the
+    reversal rather than burying it.
+18. **NITRO affordability** (owner's third observation) is real: `canBuyBonus` in
+    locked `gameStore.ts` hardcodes `bet x 100`, wrong at 400x. Already in
+    `LOCKED_FILE_DEBTS`; it is what R8 targets. Not touched here, it needs the locked
+    pass.
+
+**Sequencing decision, taken and flagged.** The FS AUDIT REMEDIATION R1-R13 brief
+arrived mid-Round-4. It is **saved verbatim and not executed**
+(`FS_AuditRemediation_2026-07-27_Prompt.md`). Round 4 lands first as its own reviewable
+unit; R1-R13 takes a fresh branch. Two things in it need your explicit acknowledgement
+before I start:
+
+19. **R10 reverses your ruling of the previous day.** You ruled "baseline stays at 11,
+    and the type-cleanup pass is correctly refused before the audit". R10 says fix all
+    11 including the RainLayer parser chase and ratchet CI to zero. I will do it, but
+    the reversal should be deliberate, not silent.
+20. **R1 pre-grants the first locked pass in this project's history** on
+    `rgsService.ts`. I will follow convention (f) exactly (named deny lines,
+    never-committed edit, verified-empty diff), and I want it as its own isolated
+    commit rather than one strand of a thirteen-item sweep.
+
+**Lane.** PR #91 REVIEW. This entry GREEN.
+
+**Map position.** Round 4 awaits your review. R1-R13 queued behind it. The owner
+re-test (map item 3) is still the audit's precondition.
+
 ## 005 - 2026-07-26 - Branch prune done; board handed to the owner
 
 **COMMS-ACK.** Receipt of FABLE RULINGS 2026-07-26b recorded. Entry 004 closed.
