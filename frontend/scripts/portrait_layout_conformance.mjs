@@ -46,6 +46,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -98,31 +99,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
-  // every load, ahead of the once-per-session rules modal below. Polls for
-  // up to ~2s rather than a single instantaneous check - sessionStorage
-  // (its "seen" flag) is scoped per browsing context, so every fresh
-  // browser.newPage()/profile here starts with none set and the splash
-  // always (re)appears; a single-shot isVisible() check can race its
-  // entrance animation and miss it, leaving it covering later controls.
-  const deadline = Date.now() + 2000
-  while (Date.now() < deadline) {
-    const splash = page.locator('[data-testid="hero-splash"]')
-    if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-      await splash.click()
-      await page.waitForTimeout(100)
-      break
-    }
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 // OWNER AUDIT ROUND 2, item 1: a triggered feature now waits at an explicit

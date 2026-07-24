@@ -1,21 +1,27 @@
 // interface_guide_icon_proof.mjs — R2-7c proof grid (owner audit round 2,
 // item c: "regenerate every interface-guide icon ... with a proof grid
-// committed").
+// committed"), extended by OWNER AUDIT ROUND 3 item 5 (Turbo + Max join as
+// real captures, plus a permanent byte-uniqueness gate across all icons).
 //
 // Boots its own vite dev server (mirrors nitro_flow_proof.mjs's boilerplate),
-// then for each of the 6 image-based INTERFACE_GUIDE entries in
-// PaytableModal.svelte (spin, bet+, bet-, features, autoplay, menu) captures:
+// then for each of the 8 image-based INTERFACE_GUIDE entries in
+// PaytableModal.svelte (spin, bet+, bet-, features, autoplay, menu, turbo,
+// max) captures:
 //   (a) the real live HUD button, in situ, exactly as a player sees it
 //   (b) the same icon as rendered inside the paytable's Interface Guide row
 // and assembles a single side-by-side comparison grid image so an owner/
-// reviewer can eyeball that the two now match, without diffing files by hand.
+// reviewer can eyeball that the two now match, without diffing files by
+// hand - then asserts no two of the underlying shipped icon FILES are
+// byte-identical (the exact bug class item 5 reported: Turbo and Max were
+// both pointed at the same live element).
 //
-// Output: reports/screens/owner-audit-v2/interface-guide-icons/proof-grid.png
+// Output: reports/screens/owner-audit-v3/interface-guide-icons/proof-grid.png
 //
 // Run (from frontend/): node scripts/interface_guide_icon_proof.mjs
 
 import { chromium } from 'playwright'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -26,18 +32,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const FRONTEND = join(__dirname, '..')
 const ROOT = join(FRONTEND, '..')
 const VENV_PY = join(ROOT, 'scripts', 'assets', '.venv', 'bin', 'python')
-const OUT_DIR = join(ROOT, 'reports', 'screens', 'owner-audit-v2', 'interface-guide-icons')
+const UI_DIR = join(FRONTEND, 'public', 'assets', 'themes', 'future-spinner', 'ui')
+const OUT_DIR = join(ROOT, 'reports', 'screens', 'owner-audit-v3', 'interface-guide-icons')
 mkdirSync(OUT_DIR, { recursive: true })
 
 // live selector = the real HUD control; guideName = its `name` field in
 // PaytableModal's INTERFACE_GUIDE array (used to find its row there).
 const ENTRIES = [
-  { live: '[data-testid="spin-button"]', guideName: 'Spin' },
-  { live: 'button[aria-label="Increase bet"]', guideName: 'Increase Bet' },
-  { live: 'button[aria-label="Decrease bet"]', guideName: 'Decrease Bet' },
-  { live: '[data-testid="feature-menu-button"]', guideName: 'Features' },
-  { live: '.fs-auto', guideName: 'Autoplay' },
-  { live: '.fs-menu', guideName: 'Menu' },
+  { live: '[data-testid="spin-button"]', guideName: 'Spin', file: 'spin_button.png' },
+  { live: 'button[aria-label="Increase bet"]', guideName: 'Increase Bet', file: 'btn_bet_plus.png' },
+  { live: 'button[aria-label="Decrease bet"]', guideName: 'Decrease Bet', file: 'btn_bet_minus.png' },
+  { live: '[data-testid="feature-menu-button"]', guideName: 'Features', file: 'feature_button.png' },
+  { live: '.fs-auto', guideName: 'Autoplay', file: 'btn_autoplay.png' },
+  { live: '.fs-menu', guideName: 'Menu', file: 'btn_menu.png' },
+  // OWNER AUDIT ROUND 3, item 5: joined the guide as real captures.
+  { live: '.fs-turbo', guideName: 'Turbo', file: 'btn_turbo.png' },
+  { live: '.fs-max', guideName: 'Max Bet', file: 'btn_max.png' },
 ]
 
 async function getFreePort() {
@@ -66,19 +76,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
@@ -152,6 +149,29 @@ async function run() {
       throw new Error(`could not locate guide rows for: ${missing.map((m) => m.guideName).join(', ')}`)
     }
 
+    // OWNER AUDIT ROUND 3, item 5: permanent uniqueness gate - no two guide
+    // icon FILES (the actual shipped PNGs INTERFACE_GUIDE references, not the
+    // cropped proof-grid thumbnails above) may be byte-identical. This is
+    // exactly the class of bug the brief reported (Turbo and Max captured
+    // identically) - a copy-paste selector mistake would silently ship two
+    // controls with the same icon, and this check fails the build on it.
+    console.log('Checking guide icon uniqueness (no two files byte-identical)...')
+    const hashes = new Map()
+    const dupes = []
+    for (const e of ENTRIES) {
+      const filePath = join(UI_DIR, e.file)
+      const hash = createHash('sha256').update(readFileSync(filePath)).digest('hex')
+      if (hashes.has(hash)) {
+        dupes.push(`${e.guideName} (${e.file}) is byte-identical to ${hashes.get(hash)}`)
+      } else {
+        hashes.set(hash, `${e.guideName} (${e.file})`)
+      }
+    }
+    if (dupes.length) {
+      throw new Error(`guide icon uniqueness FAILED:\n  ${dupes.join('\n  ')}`)
+    }
+    console.log(`  OK: all ${ENTRIES.length} guide icon files are byte-unique`)
+
     console.log('Assembling proof grid...')
     const manifestPath = join(tmpDir, 'manifest.json')
     const rowsManifest = ENTRIES.map((e) => ({
@@ -164,6 +184,7 @@ async function run() {
     const gridOut = join(OUT_DIR, 'proof-grid.png')
     const py = `
 import json, sys
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 from PIL import Image, ImageDraw, ImageFont
 
 with open(sys.argv[1]) as f:
@@ -192,7 +213,7 @@ except Exception:
     font = ImageFont.load_default()
     font_small = ImageFont.load_default()
 
-draw.text((PAD, 14), 'Interface Guide icons — regenerated vs live HUD (R2-7c)', font=font_big, fill=(230, 240, 250, 255))
+draw.text((PAD, 14), 'Interface Guide icons — regenerated vs live HUD (R2-7c / R3-5)', font=font_big, fill=(230, 240, 250, 255))
 draw.text((LABEL_W + PAD, HEADER_H - 22), 'LIVE HUD (in situ)', font=font_small, fill=(120, 220, 255, 255))
 draw.text((LABEL_W + PAD + CELL_W + PAD, HEADER_H - 22), 'GUIDE ICON (regenerated)', font=font_small, fill=(120, 220, 255, 255))
 

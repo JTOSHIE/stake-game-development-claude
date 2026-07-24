@@ -1,12 +1,14 @@
-// regen_interface_guide_icons.mjs — R2-7c (owner audit round 2, item c).
+// regen_interface_guide_icons.mjs — R2-7c (owner audit round 2, item c),
+// extended by OWNER AUDIT ROUND 3 item 5 (Turbo + Max join the guide as
+// real captured icons instead of text pills, each with its own selector).
 //
-// Regenerates the 5 legacy interface-guide icon PNGs that are NOT part of the
+// Regenerates the interface-guide icon PNGs that are NOT part of the
 // AssetForge v2 manifest-driven pipeline (scripts/assets/build.py /
 // manifest.json only wires up feature_button.png + the brand/gauge/scene
 // exports — see manifest.json's "exports" list). spin_button.png,
-// btn_bet_plus.png, btn_bet_minus.png, btn_autoplay.png and btn_menu.png were
-// legacy hand-placed PNGs that had never been regenerated from the CURRENT
-// shipped HudOverlay.svelte chrome.
+// btn_bet_plus.png, btn_bet_minus.png, btn_autoplay.png, btn_menu.png,
+// btn_turbo.png and btn_max.png are all legacy-or-newly-added hand-placed
+// PNGs regenerated from the CURRENT shipped HudOverlay.svelte chrome.
 //
 // Mechanism chosen: headless-browser screenshot-crop of the real, live
 // rendered button (Playwright), NOT a new SVG master wired into build.py.
@@ -59,6 +61,14 @@ const TARGETS = [
   { selector: 'button[aria-label="Decrease bet"]', out: 'btn_bet_minus.png', label: 'Decrease Bet' },
   { selector: '.fs-auto', out: 'btn_autoplay.png', label: 'Autoplay' },
   { selector: '.fs-menu', out: 'btn_menu.png', label: 'Menu' },
+  // OWNER AUDIT ROUND 3, item 5: Turbo and Max were captured identically
+  // (both entries pointed at the same live element) - each now has its own
+  // distinct selector (.fs-turbo / .fs-max, the actual desktop HudOverlay
+  // controls), so a byte-uniqueness check across the whole guide can catch
+  // this exact class of copy-paste mistake permanently (see
+  // interface_guide_icon_proof.mjs's uniqueness assert).
+  { selector: '.fs-turbo', out: 'btn_turbo.png', label: 'Turbo' },
+  { selector: '.fs-max', out: 'btn_max.png', label: 'Max Bet' },
 ]
 
 async function getFreePort() {
@@ -87,19 +97,6 @@ function startDevServer(port) {
     proc.on('error', reject)
     setTimeout(() => { if (!resolved) reject(new Error('vite dev server did not start in time')) }, 15000)
   })
-}
-
-async function dismissIntro(page) {
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
-    await page.waitForTimeout(100)
-  }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
 }
 
 // Prunes the DOM to exactly the root-to-target path (see header comment) and
@@ -174,6 +171,7 @@ async function captureIcon(page, tmpDir, target) {
   const outPath = join(UI_DIR, target.out)
   const py = `
 import sys
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 from PIL import Image
 im = Image.open(sys.argv[1]).convert('RGBA')
 w, h = im.size

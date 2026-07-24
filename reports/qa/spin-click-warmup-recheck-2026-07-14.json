@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-07-14T03:14:20.486Z",
+  "timestamp": "2026-07-24T16:52:45.756Z",
   "spinCount": 15,
-  "totalFrameSamples": 990,
+  "totalFrameSamples": 256,
   "consoleErrors": [],
   "longFrames": [
     {
-      "tMs": 6342,
-      "gapMs": 333.3,
-      "nearestEvent": "spin-click-4",
-      "deltaToEventMs": 5
+      "tMs": 3211,
+      "gapMs": 199.7,
+      "nearestEvent": "spin-click-1",
+      "deltaToEventMs": 178
     }
   ],
   "spinClickAttributedCount": 1,

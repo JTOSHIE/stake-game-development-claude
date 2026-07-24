@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { dismissIntro, waitSpinDone } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -67,20 +68,6 @@ function startDevServer(port) {
   })
 }
 
-async function dismissIntro(page) {
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
-}
-
-async function waitSpinDone(page, timeout = 20000) {
-  await page.waitForFunction(
-    () => !document.querySelector('[data-testid="spin-button"].spinning'),
-    { timeout },
-  )
-}
 
 async function run() {
   const port = await getFreePort()

@@ -178,10 +178,17 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
   </button>
 {:else}
-<!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot) ───── -->
+<!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot).
+     OWNER AUDIT ROUND 3, item 6: standardised on the mobile pill treatment
+     (small hamburger glyph + FEATURES text, purple/pink accent) - the large
+     circular knob variant is retired. Outer div + .fm-entry-label/
+     .fm-entry-active class names kept as-is (several other conformance
+     scripts query `[data-testid="feature-menu-entry"] .fm-entry-label`
+     directly) even though they now live inside the single pill button
+     rather than as siblings of a separate knob. ───────────────────────── -->
 <div class="fm-entry" data-testid="feature-menu-entry">
   <button
-    class="fm-entry-knob fs-knob"
+    class="fm-entry-pill"
     class:mode-enhancer={$standingMode === 'antelite'}
     class:idle-shimmer={idleAttract}
     on:click={openMenu}
@@ -191,18 +198,16 @@
     aria-expanded={open}
     data-testid="feature-menu-button"
   >
-    <span class="fs-face">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    </span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span class="fm-entry-label">FEATURES</span>
+    {#if entryActiveLabel}
+      <span
+        class="fm-entry-active"
+        class:enhancer={$standingMode === 'antelite'}
+        data-testid="feature-menu-active-mode"
+      >{entryActiveLabel}</span>
+    {/if}
   </button>
-  <div class="fm-entry-label">FEATURES</div>
-  {#if entryActiveLabel}
-    <div
-      class="fm-entry-active"
-      class:enhancer={$standingMode === 'antelite'}
-      data-testid="feature-menu-active-mode"
-    >{entryActiveLabel}</div>
-  {/if}
 </div>
 {/if}
 
@@ -487,54 +492,57 @@
     position: absolute;
     left: 966px;
     top: 238px;
-    width: 160px;
     z-index: 60;
+  }
+  /* OWNER AUDIT ROUND 3, item 6: the mobile pill treatment, standardised
+     onto desktop - same shape/colour language as .p-fm-entry (hamburger +
+     FEATURES text, purple/pink accent glow), the large circular knob
+     variant above is retired. */
+  .fm-entry-pill {
+    position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-  }
-  .fm-entry-knob {
-    width: 96px;
-    height: 96px;
-    padding: 4px;
-    border: none;
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1.5px solid color-mix(in srgb, var(--sig-pink) 55%, transparent);
+    border-radius: 10px;
+    background: linear-gradient(160deg, rgba(255, 46, 196, 0.1), rgba(6, 9, 20, 0.9));
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--sig-pink) 45%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--sig-pink) 14%, transparent);
+    color: color-mix(in srgb, var(--sig-pink) 25%, #fff);
     cursor: pointer;
-    transition: transform 0.12s ease, filter 0.15s ease;
-    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sig-cyan) 45%, transparent));
-    animation: fm-entry-glow 3s ease-in-out infinite;
+    font-family: 'Orbitron', system-ui, sans-serif;
+    white-space: nowrap;
+    transition: filter 0.15s ease;
   }
-  .fm-entry-knob > .fs-face {
-    background: radial-gradient(circle at 36% 28%, #10303a, #05121b 72%);
+  .fm-entry-pill:hover:not(:disabled) { filter: brightness(1.1); }
+  .fm-entry-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+  .fm-entry-pill svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+  /* OVERBOOST engaged: the pill glows orange (matching the enhancer card's
+     tone) instead of the default pink, so the FEATURES chip itself reflects
+     the toggle state at a glance (cost-visibility item). */
+  .fm-entry-pill.mode-enhancer {
+    border-color: color-mix(in srgb, var(--sig-orange) 55%, transparent);
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--sig-orange) 45%, transparent),
+      inset 0 0 10px color-mix(in srgb, var(--sig-orange) 14%, transparent);
+    color: color-mix(in srgb, var(--sig-orange) 25%, #fff);
   }
-  .fm-entry-knob svg { width: 34px; height: 34px; fill: none; stroke: var(--sig-cyan); stroke-width: 2.2; stroke-linecap: round; filter: drop-shadow(0 0 5px var(--sig-cyan)); }
-  .fm-entry-knob:hover:not(:disabled) { transform: scale(1.05); }
-  .fm-entry-knob:disabled { opacity: 0.5; cursor: not-allowed; }
-  @keyframes fm-entry-glow {
-    0%, 100% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--sig-cyan) 40%, transparent)); }
-    50%      { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--sig-pink) 60%, transparent)); }
-  }
-  /* OVERBOOST engaged: the entry knob glows orange (matching the enhancer
-     card's tone) instead of the default cyan/pink pulse, so the FEATURES
-     chip itself reflects the toggle state at a glance (cost-visibility item). */
-  .fm-entry-knob.mode-enhancer {
-    animation: none;
-    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--sig-orange) 55%, transparent));
-  }
-  .fm-entry-knob.mode-enhancer svg { stroke: var(--sig-orange); filter: drop-shadow(0 0 5px var(--sig-orange)); }
   .fm-entry-label {
     font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.14em;
-    text-transform: uppercase; color: color-mix(in srgb, var(--sig-cyan) 30%, #fff);
-    text-shadow: 0 0 8px color-mix(in srgb, var(--sig-cyan) 60%, transparent);
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+    text-transform: uppercase;
     white-space: nowrap;
   }
-  /* Active standing/enhancer mode label under the FEATURES chip - subtle for
-     Cruise (cost unchanged), a clearly-labelled persistent pill for OVERBOOST
-     (real per-spin cost change while ON). */
+  /* Active standing/enhancer mode label next to the FEATURES chip - subtle
+     for Cruise (cost unchanged), a clearly-labelled persistent pill for
+     OVERBOOST (real per-spin cost change while ON). */
   .fm-entry-active {
     font-family: 'Orbitron', 'Courier New', monospace;
-    font-size: 0.56rem; font-weight: 800; letter-spacing: 0.1em;
+    font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; white-space: nowrap;
     padding: 2px 8px; border-radius: 999px;
     color: color-mix(in srgb, var(--sig-cyan) 35%, #fff);

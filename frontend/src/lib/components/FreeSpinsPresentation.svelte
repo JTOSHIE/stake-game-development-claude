@@ -284,19 +284,25 @@
         </div>
         <img class="entry-shockwave" src="{$themeAssets.assetBase}/ui/particles/shock_ring.png" alt="" aria-hidden="true" data-testid="entry-shockwave" />
         <div class="entry-title" data-testid="entry-title">{entryTitleText}</div>
-        <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
-        <!-- OWNER AUDIT ROUND 2, item 1: explicit gate before the first free
-             spin - never auto-advances, not bypassed by autoplay/turbo. -->
-        {#if awaitingContinue}
-          <button
-            type="button"
-            class="entry-continue"
-            data-testid="entry-continue"
-            on:click={continueFromEntry}
-          >
-            CLICK TO CONTINUE
-          </button>
-        {/if}
+        <!-- OWNER AUDIT ROUND 3, item 3: the award text and the CLICK TO
+             CONTINUE gate now stack in one flex column anchored to the
+             card's lower border, instead of two independently-floating
+             bottom:N% elements that could overlap once the gate button's
+             own touch-target height grew (Round 2 fix) - flex guarantees a
+             real gap between them regardless of viewport, by construction. -->
+        <div class="entry-bottom-group">
+          <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
+          {#if awaitingContinue}
+            <button
+              type="button"
+              class="entry-continue"
+              data-testid="entry-continue"
+              on:click={continueFromEntry}
+            >
+              CLICK TO CONTINUE
+            </button>
+          {/if}
+        </div>
       </div>
     {:else if phase === 'spin' && currentSpin}
       <div class="fs-stage">
@@ -443,8 +449,18 @@
     100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
   }
 
+  /* Bottom group (OWNER AUDIT ROUND 3, item 3): anchored to the card's own
+     lower border (bottom:2%, close to the edge rather than floating well
+     above it), a flex column so the award text and the continue button
+     stack with a real, guaranteed gap - they can never overlap regardless
+     of the button's own height or the viewport's aspect ratio, unlike two
+     independent bottom:N% elements. */
+  .entry-bottom-group {
+    position: absolute; left: 0; right: 0; bottom: 2%;
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+
   .entry-burst-text {
-    position: absolute; bottom: 10%; left: 0; right: 0;
     font-size: 2.1rem; font-weight: 900; color: #ffd700;
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
     opacity: 0; transform: scale(0.5);
@@ -457,7 +473,6 @@
      burst text, appears the instant the gate opens (no entrance delay of
      its own beyond that), 44px+ touch target throughout. */
   .entry-continue {
-    position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
     display: flex; align-items: center; justify-content: center;
     /* This button lives inside the LAYOUT_SPEC 1280x720 stage coordinate
        system, which portrait scales down well below 1:1 (as low as ~0.58x
@@ -474,7 +489,7 @@
     animation: continue-pulse 1.1s ease-in-out infinite;
   }
   .entry-continue:hover, .entry-continue:focus-visible { filter: brightness(1.08); }
-  @keyframes continue-pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+  @keyframes continue-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
   @media (prefers-reduced-motion: reduce) {
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
@@ -486,14 +501,30 @@
     .fs-spin-win { animation: none; }
     .fs-retrigger { animation: none; }
   }
-  .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
+  /* OWNER AUDIT ROUND 3, item 8: this width cap (92vw, a REAL viewport unit)
+     was written as if this subtree renders at native browser scale, but it
+     actually sits inside .grid-scale's fixed 616x412 stage-coordinate box,
+     transformed to fit the viewport by an ancestor - 92vw could clip the
+     616px-wide board below its real size depending on viewport width
+     (exactly the residual shrink this item's hard assert catches). The
+     board now sizes to its own content (616px) with no artificial cap. */
+  .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
   /* No top-right meter overlay any more (item 3) - the board sits centred,
-     at maximum size, nothing dodging an overlay box. */
-  .fs-board { position: relative; display: flex; gap: 10px; }
-  .fs-reel { display: flex; flex-direction: column; gap: 10px; }
+     at maximum size, nothing dodging an overlay box.
+     OWNER AUDIT ROUND 3, item 8: this DOM-mocked board is a separate
+     representation from GameGrid.svelte's real PIXI canvas (not the same
+     element re-skinned) - it was never actually sized to match it, so even
+     though both sit inside the same 616x412 .grid-scale box, this board's
+     old 72x72-cell/10px-gap geometry produced a 400x318 footprint, ~65%/77%
+     of GameGrid's real 616x412 canvas (CELL_W=120, CELL_H=100, GAP=4 - see
+     GameGrid.svelte). Cell/gap here now use those EXACT same numbers, so
+     5*120 + 4*4 = 616 and 4*100 + 3*4 = 412 - byte-identical footprint,
+     verified by hud_reel_size_check.mjs. */
+  .fs-board { position: relative; display: flex; gap: 4px; }
+  .fs-reel { display: flex; flex-direction: column; gap: 4px; }
   .fs-cell {
     position: relative;
-    width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
+    width: 120px; height: 100px; display: flex; align-items: center; justify-content: center;
     border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
     font-size: 1.1rem; font-weight: 700; color: #cfe;
     transition: opacity 0.2s ease;

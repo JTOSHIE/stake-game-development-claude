@@ -251,22 +251,35 @@ def build_brand_export(spec):
     PIL palette-reduce + optimize rather than an svg2png render; the
     design-system source itself is untouched.
 
-    Kept as flat RGB (no alpha): the master's own background is already a
-    near-uniform solid colour, so the consuming component matches its own
-    backdrop to that same colour instead of paying for a chroma-keyed alpha
-    channel, which roughly doubles the file size for a soft-edge gradient
-    PNG's palette mode can't represent in a single byte-per-pixel index."""
+    Kept as flat RGB (no alpha) by default: the master's own background is
+    already a near-uniform solid colour, so the consuming component matches
+    its own backdrop to that same colour instead of paying for a
+    chroma-keyed alpha channel, which roughly doubles the file size for a
+    soft-edge gradient PNG's palette mode can't represent in a single
+    byte-per-pixel index.
+
+    OWNER AUDIT ROUND 3, item 1: the hero_icon derivatives (tools/brand/
+    derive_hero_icon.py) are a small circular cutout on real transparency
+    (outside the circle is alpha 0, not a flat colour to match a backdrop
+    against) - spec["keep_alpha"]=true preserves that channel instead of
+    forcing flat RGB, still palette-compressed via PIL's "PA" (palette +
+    alpha) mode."""
     global count
     src_path = ROOT / spec["src"]
-    img = Image.open(src_path).convert("RGB")
+    keep_alpha = spec.get("keep_alpha", False)
     colors = spec.get("palette_colors", 256)
-    out_img = img.convert("P", palette=Image.ADAPTIVE, colors=colors)
+    if keep_alpha:
+        img = Image.open(src_path).convert("RGBA")
+        out_img = img.convert("PA", palette=Image.ADAPTIVE, colors=colors).convert("RGBA")
+    else:
+        img = Image.open(src_path).convert("RGB")
+        out_img = img.convert("P", palette=Image.ADAPTIVE, colors=colors)
     out_path = OUT / spec["out"]
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_img.save(out_path, "PNG", optimize=True)
     count += 1
     size_kb = out_path.stat().st_size / 1024
-    print(f"  {spec['out']:42s} {img.size[0]}x{img.size[1]}  (brand export, {colors}-colour palette, {size_kb:.1f}KB)")
+    print(f"  {spec['out']:42s} {img.size[0]}x{img.size[1]}  (brand export, {colors}-colour palette{' + alpha' if keep_alpha else ''}, {size_kb:.1f}KB)")
 
 
 def build_plates_json(spec):

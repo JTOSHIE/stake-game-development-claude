@@ -100,8 +100,12 @@
     { kind: 'img',  file: 'feature_button.png',name: 'Features',     desc: 'Open the FEATURES menu to pick a bet mode or buy the feature.' },
     { kind: 'img',  file: 'btn_autoplay.png',  name: 'Autoplay',     desc: 'Spin automatically with optional loss and win limits.' },
     { kind: 'img',  file: 'btn_menu.png',      name: 'Menu',         desc: 'Open the menu for the paytable and sound settings.' },
-    { kind: 'pill', label: 'TURBO',            name: 'Turbo',        desc: 'Speed up spins.' },
-    { kind: 'pill', label: 'MAX',              name: 'Max Bet',      desc: 'Bet the maximum.' },
+    // OWNER AUDIT ROUND 3, item 5: Turbo and Max were text pills with no
+    // captured icon at all - now real live-component captures (each its own
+    // distinct selector, see regen_interface_guide_icons.mjs), consistent
+    // with every other control in this guide.
+    { kind: 'img',  file: 'btn_turbo.png',     name: 'Turbo',        desc: 'Speed up spins.' },
+    { kind: 'img',  file: 'btn_max.png',       name: 'Max Bet',      desc: 'Bet the maximum.' },
   ] as const
 
   // Buy price — 100x current bet, only meaningful where the buy is not disabled.

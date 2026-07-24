@@ -18,6 +18,7 @@
   import { onMount } from 'svelte'
   import { betAmount, currencyCode } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
+  import { HUD_LABEL_FREE_SPINS, HUD_LABEL_TOTAL_WIN } from '../config/fsModes'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 
   export let multiplier = 1
@@ -64,11 +65,11 @@
        canvas. -->
   <div class="pm-strip" data-testid="bonus-instrument-column">
     <div class="pm-cell" data-testid="odometer">
-      <span class="pm-label">OVERDRIVE FREE SPINS</span>
+      <span class="pm-label">{HUD_LABEL_FREE_SPINS}</span>
       <span class="pm-value cyan">{spinsRemaining}</span>
     </div>
     <div class="pm-cell" data-testid="feature-total-win">
-      <span class="pm-label">TOTAL WIN</span>
+      <span class="pm-label">{HUD_LABEL_TOTAL_WIN}</span>
       <span class="pm-value gold">{totalWinLabel}</span>
     </div>
   </div>
@@ -90,12 +91,12 @@
     </div>
 
     <div class="plate" data-testid="odometer">
-      <span class="plate-label">FREE SPINS</span>
+      <span class="plate-label">{HUD_LABEL_FREE_SPINS}</span>
       <span class="plate-value">{spinsRemaining}</span>
     </div>
 
     <div class="plate" data-testid="feature-total-win">
-      <span class="plate-label">TOTAL WIN</span>
+      <span class="plate-label">{HUD_LABEL_TOTAL_WIN}</span>
       <span class="plate-value">{totalWinLabel}</span>
     </div>
 

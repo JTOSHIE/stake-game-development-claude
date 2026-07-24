@@ -100,7 +100,7 @@
         <span class="c1-max-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
       </div>
 
-      <button class="c1-collect collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'}>
+      <button class="c1-collect collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">
         COLLECT
       </button>
 

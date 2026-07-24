@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { waitSpinDone } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -107,11 +108,22 @@ async function run() {
       window.__fpsHandle = requestAnimationFrame(tick)
     })
 
+    // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16) now shows ahead of the
+    // intro-continue modal on every load - it is the actual first real user
+    // gesture in the current flow, so it (not intro-continue) is what should
+    // fire warmUpAudio(). Falls through to intro-continue too, in case both
+    // are present.
+    const splash = page.locator('[data-testid="hero-splash"]')
+    if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
+      await page.evaluate((e) => { window.__actionLog.push({ event: e, t: performance.now() }) }, 'intro-dismiss-gesture')
+      await splash.click()
+      await page.waitForTimeout(100)
+    }
     const intro = page.locator('[data-testid="intro-continue"]')
     if (await intro.count() > 0 && await intro.isVisible().catch(() => false)) {
-      // Dismissing the intro IS the first real user gesture in the normal
-      // flow - this is what should fire warmUpAudio() before the first spin.
-      await page.evaluate((e) => { window.__actionLog.push({ event: e, t: performance.now() }) }, 'intro-dismiss-gesture')
+      if (await splash.count() === 0) {
+        await page.evaluate((e) => { window.__actionLog.push({ event: e, t: performance.now() }) }, 'intro-dismiss-gesture')
+      }
       await intro.click()
       await page.waitForTimeout(100)
     }
@@ -122,7 +134,7 @@ async function run() {
     for (let i = 0; i < SPIN_COUNT; i++) {
       await page.evaluate((e) => { window.__actionLog.push({ event: e, t: performance.now() }) }, `spin-click-${i}`)
       await page.locator('[data-testid="spin-button"]').click()
-      await page.waitForFunction(() => !document.querySelector('[data-testid="spin-button"].spinning'), { timeout: 15000 })
+      await waitSpinDone(page, 15000)
       await page.waitForTimeout(150)
     }
 
