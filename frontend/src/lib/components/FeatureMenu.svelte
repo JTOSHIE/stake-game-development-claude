@@ -16,7 +16,7 @@
   // Because everything renders from FS_MODES, flipping a mode live later is a
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
-  import { FS_MODES, FS_RTP_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, MODE_COST, modeLabel, modeBlurb } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
@@ -52,6 +52,17 @@
   $: cur = $currencyCode || 'USD'
   const price = (cost: number) =>
     formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), cur)
+  // OWNER AUDIT REMEDIATION A3: a persistent, always-visible resolved cost
+  // for whatever standing mode is currently active (base/cruise/OVERBOOST -
+  // OVERBOOST is itself a standingMode value, not a modifier layered on top,
+  // so MODE_COST[$standingMode] already carries its 1.25x correctly).
+  // $betAmount must appear directly in this statement, not just inside
+  // price()'s closure - Svelte's reactive-statement dependency tracking is
+  // a static scan of the statement's OWN text, so a store only referenced
+  // inside a called function is invisible to it and never re-triggers this
+  // line (confirmed the hard way: this exact bug shipped once already,
+  // caught by the conformance suite's live-reactivity check, not by eye).
+  $: currentSpinCost = formatBalance(Math.round($betAmount * (MODE_COST[$standingMode] ?? 1) * CURRENCY_SCALE), cur)
 
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.
@@ -227,6 +238,7 @@
              so adding a mode is still a one-line FS_MODES edit. -->
         <div class="fm-cards" data-testid="feature-menu-cards">
           <div class="fm-section-label">SPIN MODES</div>
+          <div class="fm-spin-cost" data-testid="current-spin-cost">This spin costs <span class="fs-num">{currentSpinCost}</span></div>
           {#each spinModeCards as m (m.id)}
             {@const active = isActiveStanding(m, $standingMode)}
             {@const enhOn = isEnhancerOn(m, $standingMode)}
@@ -239,6 +251,13 @@
               <div class="fs-face">
                 <div class="fm-card-main">
                   <div class="fm-name-row">
+                    {#if m.available && m.kind === 'standing'}
+                      <!-- OWNER AUDIT REMEDIATION B3: an explicit radio dot,
+                           not just the border-glow ring, so the standing-mode
+                           choice reads as an obvious single-select group at a
+                           glance, not just "the card with slightly more glow." -->
+                      <span class="fm-radio" class:checked={active} aria-hidden="true"></span>
+                    {/if}
                     <span class="fm-name">{modeLabel(m, $isSocial)}</span>
                     {#if !m.available}
                       <span class="fm-soon">COMING SOON</span>
@@ -247,6 +266,13 @@
                     {/if}
                   </div>
                   <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                  {#if m.kind === 'enhancer'}
+                    <!-- OWNER AUDIT REMEDIATION B3: OVERBOOST's own effect
+                         and live resolved cost inline, not just the bare
+                         "1.25x bet" the .fm-cost line already showed - reads
+                         as "what does turning this on actually cost me". -->
+                    <p class="fm-enh-effect">{m.cost}× per spin while ON · <span class="fs-num">{price(m.cost)}</span></p>
+                  {/if}
                 </div>
 
                 <div class="fm-action">
@@ -494,11 +520,13 @@
     width: 92%;
     max-width: 560px;
     max-height: 88%;
+    max-height: 88dvh;
     --sig: var(--sig-gold);
     animation: fm-pop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .fm-panel > .fs-face {
     max-height: 88vh;
+    max-height: 88dvh;
     overflow: hidden;
   }
   @keyframes fm-pop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
@@ -537,8 +565,15 @@
     font-size: 0.98rem; font-weight: 900; color: #fff2c2; text-shadow: 0 0 3px var(--sig-gold);
   }
 
-  /* card list */
+  /* card list - flex:1 1 auto + min-height:0 is load-bearing: without it a
+     flex column's default auto min-height means this list grows to fit ALL
+     cards and gets clipped by .fm-panel > .fs-face's overflow:hidden instead
+     of shrinking to the remaining space and scrolling internally (OWNER
+     AUDIT REMEDIATION A2 - this, not the max-height units, was the actual
+     clipping cause; the header/bet-bar above already opt out via
+     flex-shrink:0 but nothing told this list to shrink at all). */
   .fm-cards {
+    flex: 1 1 auto; min-height: 0;
     overflow-y: auto; padding: 14px 20px; margin-top: 4px;
     display: flex; flex-direction: column; gap: 10px;
     scrollbar-width: thin;
@@ -562,6 +597,11 @@
     margin: 4px 2px 0;
     background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sig-gold) 55%, transparent) 20%, color-mix(in srgb, var(--sig-gold) 55%, transparent) 80%, transparent);
   }
+  .fm-spin-cost {
+    font-size: 0.68rem; color: rgba(255, 255, 255, 0.65);
+    padding: 4px 2px 8px; letter-spacing: 0.03em;
+  }
+  .fm-spin-cost .fs-num { color: #fff2c2; font-weight: 800; text-shadow: 0 0 4px var(--sig-gold); }
 
   .fm-card { --sig: var(--sig-cyan); }
   .fm-card.tone-standing { --sig: var(--sig-cyan); }
@@ -580,6 +620,25 @@
   .fm-card-main { flex: 1; min-width: 0; text-align: left; }
   .fm-name-row { display: flex; align-items: center; gap: 0.5rem; }
   .fm-name { font-size: 0.94rem; font-weight: 800; color: #eafcff; letter-spacing: 0.03em; }
+  /* OWNER AUDIT REMEDIATION B3: radio-dot standing-mode indicator. */
+  .fm-radio {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid color-mix(in srgb, var(--sig-cyan) 45%, transparent);
+    box-sizing: border-box; position: relative;
+  }
+  .fm-radio.checked {
+    border-color: var(--sig-cyan);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--sig-cyan) 70%, transparent);
+  }
+  .fm-radio.checked::after {
+    content: ''; position: absolute; inset: 2px; border-radius: 50%;
+    background: var(--sig-cyan); box-shadow: 0 0 4px var(--sig-cyan);
+  }
+  .fm-enh-effect {
+    font-size: 0.66rem; color: color-mix(in srgb, var(--sig-orange) 55%, #fff);
+    margin: 0.3rem 0 0; font-weight: 700;
+  }
+  .fm-enh-effect .fs-num { color: #ffd66a; }
   .fm-vol {
     font-size: 0.5rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
     color: color-mix(in srgb, var(--sig) 45%, #fff);

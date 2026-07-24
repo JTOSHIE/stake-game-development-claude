@@ -302,6 +302,266 @@ async function auditSymbolLuminanceDiagnostic(page) {
   })
 }
 
+/** OWNER AUDIT REMEDIATION item A2: every FEATURES menu item must be fully
+ *  visible and tappable - either already on screen, or reachable by
+ *  scrolling .fm-cards to it. Scrolls the card list to the very bottom (the
+ *  worst case) and asserts the last card's full bounding box then sits
+ *  inside the viewport, rather than being clipped by the panel's own
+ *  overflow:hidden edge with no way to reach it (the touch-target audit
+ *  only measures size, which is why this escaped it - a clipped element can
+ *  still report a healthy width/height). */
+async function auditMenuViewportClipping(browser, baseUrl, deviceName) {
+  const context = await browser.newContext({ ...devices[deviceName] })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+
+  const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
+  if ((await featureMenuBtn.count()) === 0) {
+    await context.close()
+    return { skipped: true, reason: 'no feature-menu-button', pass: true }
+  }
+  await featureMenuBtn.click()
+  await page.waitForTimeout(150)
+
+  const result = await page.evaluate(() => {
+    const list = document.querySelector('.fm-cards')
+    if (!list) return { pass: false, reason: 'no .fm-cards element found' }
+    list.scrollTop = list.scrollHeight
+    const cards = Array.from(document.querySelectorAll('[data-testid^="feature-card-"]'))
+    if (cards.length === 0) return { pass: false, reason: 'no feature cards found' }
+    const last = cards[cards.length - 1]
+    const r = last.getBoundingClientRect()
+    const fullyVisible = r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth
+    return {
+      lastCardId: last.getAttribute('data-testid'),
+      rect: { top: Math.round(r.top), bottom: Math.round(r.bottom), viewportH: window.innerHeight },
+      pass: fullyVisible,
+    }
+  })
+  await context.close()
+  return result
+}
+
+/** OWNER AUDIT REMEDIATION item B1: stress-test the balance/win/bet plates
+ *  at $999,999.99 - the currency string must not show a "US" prefix
+ *  (currencyDisplay: 'narrowSymbol'), and the rendered value must not
+ *  overflow its own box (scrollWidth > clientWidth) nor visually truncate
+ *  (textContent must be the full, untruncated string - the CSS
+ *  text-overflow:ellipsis fallback staying purely defensive, not doing the
+ *  real work). */
+async function auditHudStressValues(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'] })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+
+  await page.evaluate(() => {
+    // rgsBetLevels must be set BEFORE betAmount: HudOverlay has a reactive
+    // snap-to-nearest-valid-ladder-level guard (by design, for the real
+    // bet-stepper UX) that silently overrides any betAmount not exactly on
+    // the ladder - confirmed the hard way (a direct betAmount.set(999999.99)
+    // got snapped straight back to BET_LEVELS' $100 max). Extending the
+    // ladder to include the stress value is how a real high-stakes RGS
+    // deployment would present it anyway, not a workaround.
+    window.__testStores.rgsBetLevels.set([0.10, 1.00, 100.00, 999999.99])
+    window.__testStores.balance.set(999999.99)
+    window.__testStores.betAmount.set(999999.99)
+    window.__testStores.winAmount.set(999999.99)
+  })
+  // 400ms alone isn't enough: displayedWinAmount count-up runs up to
+  // WIN_COUNTUP_MAX_MS (800ms) before settling on the true target value.
+  await page.waitForTimeout(1000)
+
+  const result = await page.evaluate(() => {
+    const selectors = ['.p-stat-value.cyan', '.p-stat-value.gold', '.p-stat-value.magenta']
+    const out = []
+    for (const sel of selectors) {
+      const el = document.querySelector(sel)
+      if (!el) { out.push({ selector: sel, pass: false, reason: 'element not found' }); continue }
+      const text = el.textContent ?? ''
+      const hasUsPrefix = /US\$/.test(text)
+      const overflows = el.scrollWidth > el.clientWidth + 1 // +1px rounding tolerance
+      const expectedDigits = '999,999.99'
+      const containsFullValue = text.includes(expectedDigits)
+      out.push({
+        selector: sel, text,
+        hasUsPrefix, overflows, containsFullValue,
+        pass: !hasUsPrefix && !overflows && containsFullValue,
+      })
+    }
+    return out
+  })
+
+  await context.close()
+  const pass = result.every((r) => r.pass)
+  return { result, pass }
+}
+
+/** OWNER AUDIT REMEDIATION item B5: the infinite autoplay option must show
+ *  when jurisdiction flags impose no autoplay cap, and hide when they do -
+ *  asserts both flag states against the real DOM, not just the derived
+ *  store's own value. */
+async function auditAutoInfiniteOption(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'] })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+
+  const autoBtn = page.locator('.p-autoplay-wrapper .p-round-btn')
+
+  // Uncapped: no jurisdiction flags set, maxAutoplaySpins defaults Infinity.
+  await autoBtn.click()
+  await page.waitForTimeout(150)
+  const uncappedVisible = await page.locator('[data-testid="auto-infinite"]').isVisible().catch(() => false)
+  await autoBtn.click() // close the menu
+  await page.waitForTimeout(150)
+
+  // Capped: jurisdiction flag sets a concrete autoplay cap.
+  await page.evaluate(() => { window.__testStores.jurisdictionFlags.set({ maxAutoplaySpins: 100 }) })
+  await page.waitForTimeout(150)
+  await autoBtn.click()
+  await page.waitForTimeout(150)
+  const cappedVisible = await page.locator('[data-testid="auto-infinite"]').isVisible().catch(() => false)
+
+  await context.close()
+  const pass = uncappedVisible === true && cappedVisible === false
+  return { uncappedVisible, cappedVisible, pass }
+}
+
+/** OWNER AUDIT REMEDIATION item A1: every menu card's displayed cost must
+ *  equal MODE_COST x current bet, and the buy-confirm modal's body text
+ *  multiplier must agree with its own price plate - the exact drift that
+ *  let NITRO show "100x" in the confirm body while debiting 400x. Reads the
+ *  live bet from window.__testStores.betAmount (a Svelte store) rather than
+ *  importing fsModes.ts, so this checks what's actually ON SCREEN, not
+ *  whether the source config agrees with itself. */
+async function auditCostLabelConsistency(browser, baseUrl) {
+  const context = await browser.newContext({ ...devices['iPhone 14'] })
+  const page = await context.newPage()
+  await page.goto(baseUrl, { waitUntil: 'networkidle' })
+  await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+  await waitTestStores(page)
+  await dismissIntro(page)
+  // NITRO's 400x buy tier needs a comfortably large balance to reach an
+  // enabled ACTIVATE button - the default mock balance covers bonus's 100x
+  // but not super's 400x, which otherwise silently skips this exact check.
+  await page.evaluate(() => { window.__testStores.balance.set(1_000_000) })
+
+  const results = []
+  const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
+  if ((await featureMenuBtn.count()) === 0) {
+    await context.close()
+    return { skipped: true, reason: 'no feature-menu-button', pass: true }
+  }
+  await featureMenuBtn.click()
+  await page.waitForTimeout(150)
+
+  const bet = await page.evaluate(() => {
+    let v
+    const unsub = window.__testStores.betAmount.subscribe((x) => { v = x })
+    unsub()
+    return v
+  })
+
+  // 1. Every card's own "{cost}x - $Y.YY" is internally consistent with bet.
+  // Standing-mode cards (normal/cruise/overboost) show a bare per-spin
+  // multiplier ("1x bet", "1.25x bet") with no resolved dollar figure - A3
+  // adds a persistent resolved-cost line for those; nothing to cross-check
+  // here yet, so they're skipped rather than false-failed on a format they
+  // were never meant to have.
+  const cardChecks = await page.evaluate((betVal) => {
+    const cards = Array.from(document.querySelectorAll('[data-testid^="feature-card-"]'))
+    return cards.map((card) => {
+      const id = card.getAttribute('data-testid').replace('feature-card-', '')
+      const costEl = card.querySelector('.fm-cost')
+      const text = costEl?.textContent?.trim() ?? ''
+      if (/×\s*bet\s*$/i.test(text)) return { id, text, skipped: true, reason: 'per-spin multiplier card, no resolved price to check', pass: true }
+      const multMatch = text.match(/([\d.]+)\s*[x×]/i)
+      const priceMatch = text.match(/([\d,.]+)\s*$/)
+      if (!multMatch || !priceMatch) return { id, text, pass: false, reason: 'could not parse cost label' }
+      const mult = parseFloat(multMatch[1])
+      const shownPrice = parseFloat(priceMatch[1].replace(/,/g, ''))
+      const expectedPrice = mult * betVal
+      const pass = Math.abs(shownPrice - expectedPrice) < 0.01
+      return { id, text, mult, shownPrice, expectedPrice, pass }
+    })
+  }, bet)
+  results.push(...cardChecks.map((c) => ({ scope: 'menu-card', ...c })))
+
+  // 2. Each buy-tier's confirm modal: body-text multiplier vs its own price plate.
+  const buyTierIds = cardChecks
+    .filter((c) => c.id === 'bonus' || c.id === 'super')
+    .map((c) => c.id)
+  for (const id of buyTierIds) {
+    try {
+      // activateBuy() closes the FEATURES menu itself the moment ACTIVATE is
+      // tapped (by design, so the confirm dialog takes focus) - the menu
+      // must be reopened before every iteration, not just once up front.
+      if ((await page.locator('[data-testid="feature-menu-cards"]').count()) === 0) {
+        await featureMenuBtn.click()
+        await page.waitForSelector('[data-testid="feature-menu-cards"]', { timeout: 5000 })
+      }
+      const activateBtn = page.locator(`[data-testid="activate-${id}"]`)
+      if ((await activateBtn.count()) === 0) {
+        results.push({ scope: 'buy-confirm-modal', id, pass: false, reason: 'no activate button found' })
+        continue
+      }
+      await activateBtn.click({ timeout: 5000 })
+      await page.waitForSelector('.buy-desc', { timeout: 5000 })
+      const modalCheck = await page.evaluate((betVal) => {
+        const body = document.querySelector('.buy-desc')?.textContent ?? ''
+        // .buy-price-val was renamed .buy-stat-val.gold under B4's redesign
+        // (the single price plate became a price/RTP/max-win 3-cell row).
+        const priceEl = document.querySelector('.buy-stat-val.gold')
+        const priceText = priceEl?.textContent ?? ''
+        const multMatch = body.match(/([\d.]+)\s*[x×]/i)
+        const priceMatch = priceText.match(/([\d,.]+)/)
+        if (!multMatch || !priceMatch) return { pass: false, reason: 'could not parse modal text', body, priceText }
+        const mult = parseFloat(multMatch[1])
+        const shownPrice = parseFloat(priceMatch[1].replace(/,/g, ''))
+        const expectedPrice = mult * betVal
+        const pass = Math.abs(shownPrice - expectedPrice) < 0.01
+        return { mult, shownPrice, expectedPrice, pass, body }
+      }, bet)
+      results.push({ scope: 'buy-confirm-modal', id, ...modalCheck })
+      const cancelBtn = page.locator('.buy-cancel')
+      if ((await cancelBtn.count()) > 0) await cancelBtn.click()
+      await page.waitForSelector('.buy-desc', { state: 'detached', timeout: 5000 }).catch(() => {})
+    } catch (err) {
+      results.push({ scope: 'buy-confirm-modal', id, pass: false, reason: `exception: ${err.message}` })
+    }
+  }
+
+  // 3. OWNER AUDIT REMEDIATION A3: the persistent "This spin costs" line
+  // must update live while the menu stays open, purely from a bet-store
+  // change (no re-open, no other interaction).
+  if ((await page.locator('[data-testid="feature-menu-cards"]').count()) === 0) {
+    await featureMenuBtn.click()
+    await page.waitForSelector('[data-testid="feature-menu-cards"]', { timeout: 5000 }).catch(() => {})
+  }
+  const before = await page.locator('[data-testid="current-spin-cost"]').textContent().catch(() => null)
+  await page.evaluate((newBet) => { window.__testStores.betAmount.set(newBet) }, bet * 3 + 1)
+  await page.waitForTimeout(200)
+  const after = await page.locator('[data-testid="current-spin-cost"]').textContent().catch(() => null)
+  results.push({
+    scope: 'live-reactivity',
+    id: 'current-spin-cost',
+    before, after,
+    pass: before !== null && after !== null && before !== after,
+  })
+
+  await context.close()
+  const pass = results.every((r) => r.pass)
+  return { results, pass }
+}
+
 async function auditOverdriveMeterOnScreen(page, screensDir) {
   const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
   if ((await featureMenuBtn.count()) === 0) {
@@ -681,6 +941,22 @@ async function run() {
     results.idleAttractFrameGate = await auditIdleAttractFrameCost(browser, baseUrl)
     console.error('[progress] reduced-motion frame gate (item 6)')
     results.reducedMotionFrameGate = await auditReducedMotionFrameGate(browser, baseUrl)
+    console.error('[progress] cost label consistency (OWNER AUDIT REMEDIATION A1)')
+    results.costLabelConsistency = await auditCostLabelConsistency(browser, baseUrl)
+    console.error('[progress] menu viewport clipping (OWNER AUDIT REMEDIATION A2)')
+    results.menuViewportClipping = {}
+    for (const profile of DEVICE_PROFILES) {
+      results.menuViewportClipping[`${profile.label}-portrait`] = await auditMenuViewportClipping(
+        browser, baseUrl, profile.portrait,
+      )
+      results.menuViewportClipping[`${profile.label}-landscape`] = await auditMenuViewportClipping(
+        browser, baseUrl, profile.landscape,
+      )
+    }
+    console.error('[progress] HUD stress values (OWNER AUDIT REMEDIATION B1)')
+    results.hudStressValues = await auditHudStressValues(browser, baseUrl)
+    console.error('[progress] autoplay infinite option (OWNER AUDIT REMEDIATION B5)')
+    results.autoInfiniteOption = await auditAutoInfiniteOption(browser, baseUrl)
     await browser.close()
   } finally {
     server.kill()

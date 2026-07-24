@@ -13,6 +13,7 @@
   import { isSocial } from '../stores/socialMode'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { themeAssets } from '../stores/themeStore'
+  import { autofitText } from '../actions/autofitText'
 
   const BIG_WIN_THRESHOLD  = 10
   const MEGA_WIN_THRESHOLD = 30
@@ -190,7 +191,7 @@
         <span class="fs-rail"></span>
         <div class="fs-face">
           <div class="c1-tier-label">{tierLabel}</div>
-          <div class="c1-amount fs-num">{amountLabel}</div>
+          <div class="c1-amount fs-num" use:autofitText={amountLabel}>{amountLabel}</div>
           <div class="c1-mult fs-num">{multLabel} BET</div>
         </div>
       </div>
@@ -269,11 +270,24 @@
   .tier-mega .c1-tier-label { font-size: 27px; }
   .tier-epic .c1-tier-label { font-size: 35px; }
 
-  /* B1 sharp numeral: near-white fill, tight 3px halo, no wide double glow */
-  .c1-amount { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 900; color: #f4fbff; text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; margin-top: 6px; white-space: nowrap; }
-  .tier-big  .c1-amount { font-size: 46px; }
-  .tier-mega .c1-amount { font-size: 60px; }
-  .tier-epic .c1-amount { font-size: 76px; }
+  /* B1 sharp numeral: near-white fill, tight 3px halo, no wide double glow.
+     OWNER AUDIT REMEDIATION B2: font-size scales down via the autofitText
+     action's --autofit-scale so seven-digit wins ($1,000,000+) fit the
+     fixed-width plate instead of overflowing/truncating. */
+  .c1-amount {
+    font-family: 'Orbitron', system-ui, sans-serif; font-weight: 900; color: #f4fbff;
+    text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; margin-top: 6px; white-space: nowrap;
+    /* width:100% (not just max-width) is load-bearing: .fs-face is a flex
+       column with align-items:center, so a child sizes to its own CONTENT
+       by default - without an explicit width, clientWidth would equal the
+       (unclamped) text's natural width and the autofitText action's own
+       overflow check (scrollWidth > clientWidth) could never fire. */
+    width: 100%; box-sizing: border-box; text-align: center;
+    max-width: 100%; overflow: hidden;
+  }
+  .tier-big  .c1-amount { font-size: calc(46px * var(--autofit-scale, 1)); }
+  .tier-mega .c1-amount { font-size: calc(60px * var(--autofit-scale, 1)); }
+  .tier-epic .c1-amount { font-size: calc(76px * var(--autofit-scale, 1)); }
   .c1-mult { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 800; font-size: 15px; letter-spacing: .16em; color: var(--sig-gold); margin-top: 8px; text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); }
 
   /* ── Entry + pulse (ANIMATION UPLIFT PASS 2026-07-16, item 3: stronger

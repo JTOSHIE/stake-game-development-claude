@@ -1,0 +1,23 @@
+[
+  {
+    "name": "loss limit",
+    "stoppedWithinSpins": true,
+    "spinsObserved": 1,
+    "finalAutoPlay": false,
+    "pass": true
+  },
+  {
+    "name": "single win limit",
+    "stoppedWithinSpins": true,
+    "spinsObserved": 1,
+    "finalAutoPlay": false,
+    "pass": true
+  },
+  {
+    "name": "stop on feature",
+    "stoppedWithinSpins": true,
+    "spinsObserved": 1,
+    "finalAutoPlay": false,
+    "pass": true
+  }
+]

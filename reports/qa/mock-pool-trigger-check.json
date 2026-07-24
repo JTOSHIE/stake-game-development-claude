@@ -1,0 +1,19 @@
+{
+  "staticResults": {
+    "base": {
+      "poolSize": 27,
+      "naturalTriggers": 17,
+      "pass": true
+    },
+    "cruise": {
+      "poolSize": 12,
+      "naturalTriggers": 3,
+      "pass": true
+    }
+  },
+  "liveResult": {
+    "overlayAppeared": true,
+    "overlayCleared": true,
+    "pass": true
+  }
+}
