@@ -9,7 +9,6 @@
       "idle": "idle.png",
       "spin": "spin.png",
       "win": "win.png",
-      "buyModal": "buy-modal.png",
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
@@ -20,13 +19,8 @@
       "pass": true
     },
     "overdriveMeterAudit": {
-      "found": true,
-      "className": "pm-strip s-lJxwiO_cb_fC",
-      "top": 371.5,
-      "left": 0,
-      "bottom": 429.5,
-      "right": 390,
-      "onScreen": true,
+      "skipped": true,
+      "reason": "no feature-menu-button",
       "pass": true
     },
     "sessionPanelAudit": {
@@ -35,19 +29,19 @@
       "pass": true
     },
     "touchTargetAudit": {
-      "totalChecked": 8,
+      "totalChecked": 7,
       "failing": [],
       "pass": true
     },
     "fontLegibilityAudit": {
-      "totalChecked": 10,
+      "totalChecked": 9,
       "failing": [],
       "pass": true
     },
     "frameGate": {
       "bySegment": {
         "plainSpins": {
-          "sampleCount": 351,
+          "sampleCount": 46,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
@@ -63,15 +57,9 @@
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 112,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
         }
       },
-      "sampleCount": 710,
+      "sampleCount": 293,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
@@ -126,31 +114,25 @@
     "frameGate": {
       "bySegment": {
         "plainSpins": {
-          "sampleCount": 330,
+          "sampleCount": 127,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         },
         "winBannerEpic": {
-          "sampleCount": 192,
+          "sampleCount": 193,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         },
         "anticipation": {
-          "sampleCount": 54,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 112,
+          "sampleCount": 55,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         }
       },
-      "sampleCount": 688,
+      "sampleCount": 375,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
@@ -166,7 +148,6 @@
       "idle": "idle.png",
       "spin": "spin.png",
       "win": "win.png",
-      "buyModal": "buy-modal.png",
       "paytable": "paytable.png",
       "overboostActive": "overboost-active.png"
     },
@@ -177,13 +158,8 @@
       "pass": true
     },
     "overdriveMeterAudit": {
-      "found": true,
-      "className": "pm-strip s-lJxwiO_cb_fC",
-      "top": 474.046875,
-      "left": 0,
-      "bottom": 532.046875,
-      "right": 412,
-      "onScreen": true,
+      "skipped": true,
+      "reason": "no feature-menu-button",
       "pass": true
     },
     "sessionPanelAudit": {
@@ -192,43 +168,37 @@
       "pass": true
     },
     "touchTargetAudit": {
-      "totalChecked": 8,
+      "totalChecked": 7,
       "failing": [],
       "pass": true
     },
     "fontLegibilityAudit": {
-      "totalChecked": 10,
+      "totalChecked": 9,
       "failing": [],
       "pass": true
     },
     "frameGate": {
       "bySegment": {
         "plainSpins": {
-          "sampleCount": 330,
+          "sampleCount": 46,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         },
         "winBannerEpic": {
-          "sampleCount": 192,
+          "sampleCount": 193,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         },
         "anticipation": {
-          "sampleCount": 55,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 112,
+          "sampleCount": 54,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
         }
       },
-      "sampleCount": 689,
+      "sampleCount": 293,
       "longFrameCount": 0,
       "longFrames": [],
       "pass": true
@@ -283,15 +253,13 @@
     "frameGate": {
       "bySegment": {
         "plainSpins": {
-          "sampleCount": 325,
-          "longFrameCount": 1,
-          "longFrames": [
-            133.39999999999782
-          ],
-          "pass": false
+          "sampleCount": 126,
+          "longFrameCount": 0,
+          "longFrames": [],
+          "pass": true
         },
         "winBannerEpic": {
-          "sampleCount": 192,
+          "sampleCount": 193,
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
@@ -301,24 +269,16 @@
           "longFrameCount": 0,
           "longFrames": [],
           "pass": true
-        },
-        "bonusEntryGate": {
-          "sampleCount": 113,
-          "longFrameCount": 0,
-          "longFrames": [],
-          "pass": true
         }
       },
-      "sampleCount": 684,
-      "longFrameCount": 1,
-      "longFrames": [
-        133.39999999999782
-      ],
-      "pass": false
+      "sampleCount": 373,
+      "longFrameCount": 0,
+      "longFrames": [],
+      "pass": true
     }
   },
   "splashFrameGate": {
-    "sampleCount": 84,
+    "sampleCount": 85,
     "longFrameCount": 0,
     "longFrames": [],
     "pass": true
@@ -332,10 +292,10 @@
   "reducedMotionFrameGate": {
     "bySegment": {
       "plainSpins": {
-        "sampleCount": 346,
+        "sampleCount": 333,
         "longFrameCount": 1,
         "longFrames": [
-          134.29999999999995
+          150.0999999999999
         ],
         "pass": false
       },
@@ -350,19 +310,157 @@
         "longFrameCount": 0,
         "longFrames": [],
         "pass": true
-      },
-      "bonusEntryGate": {
-        "sampleCount": 175,
-        "longFrameCount": 0,
-        "longFrames": [],
-        "pass": true
       }
     },
-    "sampleCount": 767,
+    "sampleCount": 579,
     "longFrameCount": 1,
     "longFrames": [
-      134.29999999999995
+      150.0999999999999
     ],
     "pass": false
+  },
+  "costLabelConsistency": {
+    "results": [
+      {
+        "scope": "menu-card",
+        "id": "normal",
+        "text": "1× bet",
+        "skipped": true,
+        "reason": "per-spin multiplier card, no resolved price to check",
+        "pass": true
+      },
+      {
+        "scope": "menu-card",
+        "id": "cruise",
+        "text": "1× bet",
+        "skipped": true,
+        "reason": "per-spin multiplier card, no resolved price to check",
+        "pass": true
+      },
+      {
+        "scope": "menu-card",
+        "id": "overboost",
+        "text": "1.25× bet",
+        "skipped": true,
+        "reason": "per-spin multiplier card, no resolved price to check",
+        "pass": true
+      },
+      {
+        "scope": "menu-card",
+        "id": "bonus",
+        "text": "100× · $100.00",
+        "mult": 100,
+        "shownPrice": 100,
+        "expectedPrice": 100,
+        "pass": true
+      },
+      {
+        "scope": "menu-card",
+        "id": "super",
+        "text": "400× · $400.00",
+        "mult": 400,
+        "shownPrice": 400,
+        "expectedPrice": 400,
+        "pass": true
+      },
+      {
+        "scope": "buy-confirm-modal",
+        "id": "bonus",
+        "mult": 100,
+        "shownPrice": 100,
+        "expectedPrice": 100,
+        "pass": true,
+        "body": "Start Overdrive Free Spins now at 100× your bet?"
+      },
+      {
+        "scope": "buy-confirm-modal",
+        "id": "super",
+        "mult": 400,
+        "shownPrice": 400,
+        "expectedPrice": 400,
+        "pass": true,
+        "body": "Start Overdrive Free Spins now at 400× your bet?"
+      },
+      {
+        "scope": "live-reactivity",
+        "id": "current-spin-cost",
+        "before": "This spin costs $1.00",
+        "after": "This spin costs $5.00",
+        "pass": true
+      }
+    ],
+    "pass": true
+  },
+  "menuViewportClipping": {
+    "iphone14-portrait": {
+      "lastCardId": "feature-card-super",
+      "rect": {
+        "top": 436,
+        "bottom": 562,
+        "viewportH": 664
+      },
+      "pass": true
+    },
+    "iphone14-landscape": {
+      "lastCardId": "feature-card-super",
+      "rect": {
+        "top": 169,
+        "bottom": 256,
+        "viewportH": 340
+      },
+      "pass": true
+    },
+    "pixel7-portrait": {
+      "lastCardId": "feature-card-super",
+      "rect": {
+        "top": 600,
+        "bottom": 727,
+        "viewportH": 839
+      },
+      "pass": true
+    },
+    "pixel7-landscape": {
+      "lastCardId": "feature-card-super",
+      "rect": {
+        "top": 187,
+        "bottom": 275,
+        "viewportH": 360
+      },
+      "pass": true
+    }
+  },
+  "hudStressValues": {
+    "result": [
+      {
+        "selector": ".p-stat-value.cyan",
+        "text": "$999,999.99",
+        "hasUsPrefix": false,
+        "overflows": false,
+        "containsFullValue": true,
+        "pass": true
+      },
+      {
+        "selector": ".p-stat-value.gold",
+        "text": "$999,999.99",
+        "hasUsPrefix": false,
+        "overflows": false,
+        "containsFullValue": true,
+        "pass": true
+      },
+      {
+        "selector": ".p-stat-value.magenta",
+        "text": "$999,999.99",
+        "hasUsPrefix": false,
+        "overflows": false,
+        "containsFullValue": true,
+        "pass": true
+      }
+    ],
+    "pass": true
+  },
+  "autoInfiniteOption": {
+    "uncappedVisible": true,
+    "cappedVisible": false,
+    "pass": true
   }
 }

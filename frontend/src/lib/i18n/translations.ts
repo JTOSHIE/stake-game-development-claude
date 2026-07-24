@@ -62,6 +62,7 @@ export interface Translations {
   buyFeature?:             string
   buyConfirmTitle?:        string
   buyConfirmBody?:         string
+  buyWhatYouGet?:          string
   buyPrice?:               string
   buyConfirm?:             string
   buyCancel?:              string
@@ -79,7 +80,7 @@ export interface Translations {
 // objects stay unchanged. Every locale provides all keys (required here).
 export type FeatureKey =
   | 'overdrive' | 'overdriveFreeSpins' | 'freeSpins' | 'totalWin' | 'featureComplete'
-  | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
+  | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyWhatYouGet' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
   | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
   | 'splashPressAnywhere'
@@ -669,7 +670,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREE SPINS', freeSpins: 'FREE SPINS',
     totalWin: 'TOTAL WIN', featureComplete: 'FEATURE COMPLETE',
     buyFeature: 'BUY FEATURE', buyConfirmTitle: 'BUY OVERDRIVE FREE SPINS',
-    buyConfirmBody: 'Start Overdrive Free Spins now at 100× your bet?', buyPrice: 'PRICE',
+    buyConfirmBody: 'Start Overdrive Free Spins now at {cost}× your bet?', buyWhatYouGet: 'WHAT YOU GET', buyPrice: 'PRICE',
     buyConfirm: 'BUY', buyCancel: 'CANCEL',
     rulesOverdriveTitle: 'OVERDRIVE FREE SPINS',
     rulesOverdriveTrigger: '3, 4 or 5 Scatters award 8, 12 or 16 free spins and pay an instant 1×, 3× or 10× total bet.',
@@ -684,7 +685,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'أوفردرايف', overdriveFreeSpins: 'لفات أوفردرايف المجانية', freeSpins: 'لفات مجانية',
     totalWin: 'إجمالي الفوز', featureComplete: 'انتهت الميزة',
     buyFeature: 'شراء الميزة', buyConfirmTitle: 'شراء لفات أوفردرايف المجانية',
-    buyConfirmBody: 'ابدأ لفات أوفردرايف المجانية الآن مقابل 100× رهانك؟', buyPrice: 'السعر',
+    buyConfirmBody: 'ابدأ لفات أوفردرايف المجانية الآن مقابل {cost}× رهانك؟', buyWhatYouGet: 'ماذا ستحصل عليه', buyPrice: 'السعر',
     buyConfirm: 'شراء', buyCancel: 'إلغاء',
     rulesOverdriveTitle: 'لفات أوفردرايف المجانية',
     rulesOverdriveTrigger: '3 أو 4 أو 5 رموز سكاتر تمنح 8 أو 12 أو 16 لفة مجانية وتدفع فوراً 1× أو 3× أو 10× من إجمالي الرهان.',
@@ -699,7 +700,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREISPIELE', freeSpins: 'FREISPIELE',
     totalWin: 'GESAMTGEWINN', featureComplete: 'FEATURE BEENDET',
     buyFeature: 'FEATURE KAUFEN', buyConfirmTitle: 'OVERDRIVE FREISPIELE KAUFEN',
-    buyConfirmBody: 'Overdrive Freispiele jetzt für das 100-fache deines Einsatzes starten?', buyPrice: 'PREIS',
+    buyConfirmBody: 'Overdrive Freispiele jetzt für das {cost}-fache deines Einsatzes starten?', buyWhatYouGet: 'WAS DU BEKOMMST', buyPrice: 'PREIS',
     buyConfirm: 'KAUFEN', buyCancel: 'ABBRECHEN',
     rulesOverdriveTitle: 'OVERDRIVE FREISPIELE',
     rulesOverdriveTrigger: '3, 4 oder 5 Scatter vergeben 8, 12 oder 16 Freispiele und zahlen sofort 1×, 3× oder 10× des Gesamteinsatzes.',
@@ -714,7 +715,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRATIS OVERDRIVE', freeSpins: 'GIROS GRATIS',
     totalWin: 'GANANCIA TOTAL', featureComplete: 'FUNCIÓN COMPLETA',
     buyFeature: 'COMPRAR FUNCIÓN', buyConfirmTitle: 'COMPRAR GIROS GRATIS OVERDRIVE',
-    buyConfirmBody: '¿Iniciar los Giros Gratis Overdrive ahora por 100× tu apuesta?', buyPrice: 'PRECIO',
+    buyConfirmBody: '¿Iniciar los Giros Gratis Overdrive ahora por {cost}× tu apuesta?', buyWhatYouGet: 'LO QUE OBTIENES', buyPrice: 'PRECIO',
     buyConfirm: 'COMPRAR', buyCancel: 'CANCELAR',
     rulesOverdriveTitle: 'GIROS GRATIS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 o 5 Scatters otorgan 8, 12 o 16 giros gratis y pagan al instante 1×, 3× o 10× de la apuesta total.',
@@ -729,7 +730,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE-ILMAISKIERROKSET', freeSpins: 'ILMAISKIERROKSET',
     totalWin: 'KOKONAISVOITTO', featureComplete: 'OMINAISUUS VALMIS',
     buyFeature: 'OSTA OMINAISUUS', buyConfirmTitle: 'OSTA OVERDRIVE-ILMAISKIERROKSET',
-    buyConfirmBody: 'Aloitetaanko Overdrive-ilmaiskierrokset nyt hintaan 100× panoksesi?', buyPrice: 'HINTA',
+    buyConfirmBody: 'Aloitetaanko Overdrive-ilmaiskierrokset nyt hintaan {cost}× panoksesi?', buyWhatYouGet: 'MITÄ SAAT', buyPrice: 'HINTA',
     buyConfirm: 'OSTA', buyCancel: 'PERUUTA',
     rulesOverdriveTitle: 'OVERDRIVE-ILMAISKIERROKSET',
     rulesOverdriveTrigger: '3, 4 tai 5 Scatteria antaa 8, 12 tai 16 ilmaiskierrosta ja maksaa heti 1×, 3× tai 10× kokonaispanoksesta.',
@@ -744,7 +745,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'TOURS GRATUITS OVERDRIVE', freeSpins: 'TOURS GRATUITS',
     totalWin: 'GAIN TOTAL', featureComplete: 'FONCTION TERMINÉE',
     buyFeature: 'ACHETER LA FONCTION', buyConfirmTitle: 'ACHETER LES TOURS GRATUITS OVERDRIVE',
-    buyConfirmBody: 'Lancer les Tours Gratuits Overdrive maintenant pour 100× votre mise ?', buyPrice: 'PRIX',
+    buyConfirmBody: 'Lancer les Tours Gratuits Overdrive maintenant pour {cost}× votre mise ?', buyWhatYouGet: 'CE QUE VOUS OBTENEZ', buyPrice: 'PRIX',
     buyConfirm: 'ACHETER', buyCancel: 'ANNULER',
     rulesOverdriveTitle: 'TOURS GRATUITS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 ou 5 Scatters accordent 8, 12 ou 16 tours gratuits et paient instantanément 1×, 3× ou 10× la mise totale.',
@@ -759,7 +760,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'ओवरड्राइव', overdriveFreeSpins: 'ओवरड्राइव फ्री स्पिन', freeSpins: 'फ्री स्पिन',
     totalWin: 'कुल जीत', featureComplete: 'फ़ीचर समाप्त',
     buyFeature: 'फ़ीचर खरीदें', buyConfirmTitle: 'ओवरड्राइव फ्री स्पिन खरीदें',
-    buyConfirmBody: 'अभी अपनी दांव राशि के 100× पर ओवरड्राइव फ्री स्पिन शुरू करें?', buyPrice: 'कीमत',
+    buyConfirmBody: 'अभी अपनी दांव राशि के {cost}× पर ओवरड्राइव फ्री स्पिन शुरू करें?', buyWhatYouGet: 'आपको क्या मिलेगा', buyPrice: 'कीमत',
     buyConfirm: 'खरीदें', buyCancel: 'रद्द करें',
     rulesOverdriveTitle: 'ओवरड्राइव फ्री स्पिन',
     rulesOverdriveTrigger: '3, 4 या 5 स्कैटर 8, 12 या 16 फ्री स्पिन देते हैं और तुरंत कुल दांव का 1×, 3× या 10× भुगतान करते हैं।',
@@ -774,7 +775,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'FREE SPIN OVERDRIVE', freeSpins: 'FREE SPIN',
     totalWin: 'TOTAL MENANG', featureComplete: 'FITUR SELESAI',
     buyFeature: 'BELI FITUR', buyConfirmTitle: 'BELI FREE SPIN OVERDRIVE',
-    buyConfirmBody: 'Mulai Free Spin Overdrive sekarang seharga 100× taruhan Anda?', buyPrice: 'HARGA',
+    buyConfirmBody: 'Mulai Free Spin Overdrive sekarang seharga {cost}× taruhan Anda?', buyWhatYouGet: 'YANG ANDA DAPATKAN', buyPrice: 'HARGA',
     buyConfirm: 'BELI', buyCancel: 'BATAL',
     rulesOverdriveTitle: 'FREE SPIN OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 atau 5 Scatter memberikan 8, 12 atau 16 free spin dan langsung membayar 1×, 3× atau 10× dari total taruhan.',
@@ -789,7 +790,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'オーバードライブ', overdriveFreeSpins: 'オーバードライブ フリースピン', freeSpins: 'フリースピン',
     totalWin: '合計配当', featureComplete: 'フィーチャー終了',
     buyFeature: 'フィーチャー購入', buyConfirmTitle: 'オーバードライブ フリースピン購入',
-    buyConfirmBody: 'ベット額の100倍でオーバードライブ フリースピンを今すぐ開始しますか？', buyPrice: '価格',
+    buyConfirmBody: 'ベット額の{cost}倍でオーバードライブ フリースピンを今すぐ開始しますか？', buyWhatYouGet: '獲得できる内容', buyPrice: '価格',
     buyConfirm: '購入', buyCancel: 'キャンセル',
     rulesOverdriveTitle: 'オーバードライブ フリースピン',
     rulesOverdriveTrigger: 'スキャッター3・4・5個で8・12・16回のフリースピンを獲得し、合計ベットの1倍・3倍・10倍を即時に配当します。',
@@ -804,7 +805,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: '오버드라이브', overdriveFreeSpins: '오버드라이브 프리 스핀', freeSpins: '프리 스핀',
     totalWin: '총 당첨', featureComplete: '기능 종료',
     buyFeature: '기능 구매', buyConfirmTitle: '오버드라이브 프리 스핀 구매',
-    buyConfirmBody: '베팅액의 100배로 지금 오버드라이브 프리 스핀을 시작하시겠습니까?', buyPrice: '가격',
+    buyConfirmBody: '베팅액의 {cost}배로 지금 오버드라이브 프리 스핀을 시작하시겠습니까?', buyWhatYouGet: '받는 혜택', buyPrice: '가격',
     buyConfirm: '구매', buyCancel: '취소',
     rulesOverdriveTitle: '오버드라이브 프리 스핀',
     rulesOverdriveTrigger: '스캐터 3, 4 또는 5개가 8, 12 또는 16회의 프리 스핀을 지급하고 총 베팅액의 1×, 3× 또는 10×를 즉시 지급합니다.',
@@ -819,7 +820,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'DARMOWE SPINY OVERDRIVE', freeSpins: 'DARMOWE SPINY',
     totalWin: 'WYGRANA CAŁKOWITA', featureComplete: 'FUNKCJA ZAKOŃCZONA',
     buyFeature: 'KUP FUNKCJĘ', buyConfirmTitle: 'KUP DARMOWE SPINY OVERDRIVE',
-    buyConfirmBody: 'Rozpocząć Darmowe Spiny Overdrive teraz za 100× Twojego zakładu?', buyPrice: 'CENA',
+    buyConfirmBody: 'Rozpocząć Darmowe Spiny Overdrive teraz za {cost}× Twojego zakładu?', buyWhatYouGet: 'CO OTRZYMASZ', buyPrice: 'CENA',
     buyConfirm: 'KUP', buyCancel: 'ANULUJ',
     rulesOverdriveTitle: 'DARMOWE SPINY OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 lub 5 symboli Scatter przyznaje 8, 12 lub 16 darmowych spinów i natychmiast wypłaca 1×, 3× lub 10× całkowitego zakładu.',
@@ -834,7 +835,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRÁTIS OVERDRIVE', freeSpins: 'GIROS GRÁTIS',
     totalWin: 'GANHO TOTAL', featureComplete: 'RECURSO CONCLUÍDO',
     buyFeature: 'COMPRAR RECURSO', buyConfirmTitle: 'COMPRAR GIROS GRÁTIS OVERDRIVE',
-    buyConfirmBody: 'Iniciar os Giros Grátis Overdrive agora por 100× a sua aposta?', buyPrice: 'PREÇO',
+    buyConfirmBody: 'Iniciar os Giros Grátis Overdrive agora por {cost}× a sua aposta?', buyWhatYouGet: 'O QUE VOCÊ GANHA', buyPrice: 'PREÇO',
     buyConfirm: 'COMPRAR', buyCancel: 'CANCELAR',
     rulesOverdriveTitle: 'GIROS GRÁTIS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 ou 5 Scatters concedem 8, 12 ou 16 giros grátis e pagam instantaneamente 1×, 3× ou 10× da aposta total.',
@@ -849,7 +850,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'ОВЕРДРАЙВ', overdriveFreeSpins: 'ФРИСПИНЫ ОВЕРДРАЙВ', freeSpins: 'ФРИСПИНЫ',
     totalWin: 'ОБЩИЙ ВЫИГРЫШ', featureComplete: 'ФУНКЦИЯ ЗАВЕРШЕНА',
     buyFeature: 'КУПИТЬ ФУНКЦИЮ', buyConfirmTitle: 'КУПИТЬ ФРИСПИНЫ ОВЕРДРАЙВ',
-    buyConfirmBody: 'Запустить фриспины Овердрайв сейчас за 100× вашей ставки?', buyPrice: 'ЦЕНА',
+    buyConfirmBody: 'Запустить фриспины Овердрайв сейчас за {cost}× вашей ставки?', buyWhatYouGet: 'ЧТО ВЫ ПОЛУЧАЕТЕ', buyPrice: 'ЦЕНА',
     buyConfirm: 'КУПИТЬ', buyCancel: 'ОТМЕНА',
     rulesOverdriveTitle: 'ФРИСПИНЫ ОВЕРДРАЙВ',
     rulesOverdriveTrigger: '3, 4 или 5 скаттеров дают 8, 12 или 16 фриспинов и мгновенно выплачивают 1×, 3× или 10× от общей ставки.',
@@ -864,7 +865,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE BEDAVA DÖNÜŞLER', freeSpins: 'BEDAVA DÖNÜŞLER',
     totalWin: 'TOPLAM KAZANÇ', featureComplete: 'ÖZELLİK TAMAMLANDI',
     buyFeature: 'ÖZELLİĞİ SATIN AL', buyConfirmTitle: 'OVERDRIVE BEDAVA DÖNÜŞLERİ SATIN AL',
-    buyConfirmBody: 'Overdrive Bedava Dönüşleri şimdi bahsinizin 100 katına başlatılsın mı?', buyPrice: 'FİYAT',
+    buyConfirmBody: 'Overdrive Bedava Dönüşleri şimdi bahsinizin {cost} katına başlatılsın mı?', buyWhatYouGet: 'NELER KAZANIRSIN', buyPrice: 'FİYAT',
     buyConfirm: 'SATIN AL', buyCancel: 'İPTAL',
     rulesOverdriveTitle: 'OVERDRIVE BEDAVA DÖNÜŞLER',
     rulesOverdriveTrigger: '3, 4 veya 5 Scatter 8, 12 veya 16 bedava dönüş verir ve anında toplam bahsin 1×, 3× veya 10× katını öder.',
@@ -879,7 +880,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: 'OVERDRIVE', overdriveFreeSpins: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE', freeSpins: 'VÒNG QUAY MIỄN PHÍ',
     totalWin: 'TỔNG THẮNG', featureComplete: 'TÍNH NĂNG HOÀN TẤT',
     buyFeature: 'MUA TÍNH NĂNG', buyConfirmTitle: 'MUA VÒNG QUAY MIỄN PHÍ OVERDRIVE',
-    buyConfirmBody: 'Bắt đầu Vòng Quay Miễn Phí Overdrive ngay với 100× tiền cược của bạn?', buyPrice: 'GIÁ',
+    buyConfirmBody: 'Bắt đầu Vòng Quay Miễn Phí Overdrive ngay với {cost}× tiền cược của bạn?', buyWhatYouGet: 'BẠN NHẬN ĐƯỢC', buyPrice: 'GIÁ',
     buyConfirm: 'MUA', buyCancel: 'HỦY',
     rulesOverdriveTitle: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 hoặc 5 biểu tượng Scatter trao 8, 12 hoặc 16 vòng quay miễn phí và trả ngay 1×, 3× hoặc 10× tổng tiền cược.',
@@ -894,7 +895,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     overdrive: '超载', overdriveFreeSpins: '超载免费旋转', freeSpins: '免费旋转',
     totalWin: '总赢额', featureComplete: '功能结束',
     buyFeature: '购买功能', buyConfirmTitle: '购买超载免费旋转',
-    buyConfirmBody: '立即以 100 倍投注开始超载免费旋转？', buyPrice: '价格',
+    buyConfirmBody: '立即以 {cost} 倍投注开始超载免费旋转？', buyWhatYouGet: '您将获得', buyPrice: '价格',
     buyConfirm: '购买', buyCancel: '取消',
     rulesOverdriveTitle: '超载免费旋转',
     rulesOverdriveTrigger: '3、4 或 5 个分散符号可获得 8、12 或 16 次免费旋转，并立即支付总投注的 1 倍、3 倍或 10 倍。',
@@ -951,7 +952,7 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
   totalWin:            'TOTAL PRIZE',
   buyFeature:          'GET FEATURE',
   buyConfirmTitle:     'GET OVERDRIVE FREE SPINS',
-  buyConfirmBody:      'Start Overdrive Free Spins now for 100× your play?',
+  buyConfirmBody:      'Start Overdrive Free Spins now for {cost}× your play?',
   buyConfirm:          'GET',
   rulesOverdriveTrigger:
     'Land 3, 4 or 5 Scatters to get 8, 12 or 16 free spins and an instant 1×, 3× or 10× of your total play.',
@@ -970,20 +971,26 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
  * Falls back to English if the locale or key is missing.
  * In 'social' mode, spin/win/balance are remapped to play/prize/coins.
  */
+function interpolate(str: string, params?: Record<string, string | number>): string {
+  if (!params) return str
+  return str.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match))
+}
+
 export function t(
   locale: Locale,
   key:    keyof Translations,
   mode:   GameMode = 'real',
+  params?: Record<string, string | number>,
 ): string {
   if (mode === 'social' && key in SOCIAL_OVERRIDES) {
-    return SOCIAL_OVERRIDES[key as keyof typeof SOCIAL_OVERRIDES]!
+    return interpolate(SOCIAL_OVERRIDES[key as keyof typeof SOCIAL_OVERRIDES]!, params)
   }
   // Base locale strings first.
   const base = locales[locale]?.[key]
-  if (base !== undefined) return base
+  if (base !== undefined) return interpolate(base, params)
   // Overdrive feature-string layer (all 16 locales), falling back to English.
   const fk = key as FeatureKey
   const feat = featureI18n[locale]?.[fk] ?? featureI18n.en[fk]
-  if (feat !== undefined) return feat
-  return locales.en[key] ?? ''
+  if (feat !== undefined) return interpolate(feat, params)
+  return interpolate(locales.en[key] ?? '', params)
 }

@@ -56,6 +56,7 @@ export function formatBalance(micros: number, currencyCode: string): string {
     return new Intl.NumberFormat(undefined, {
       style:                 'currency',
       currency:              currencyCode,
+      currencyDisplay:       'narrowSymbol',
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     }).format(amount)

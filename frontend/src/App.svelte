@@ -8,6 +8,7 @@
   import FlameJets      from './lib/components/FlameJets.svelte'
   import LoadingScreen    from './lib/components/LoadingScreen.svelte'
   import HeroSplash       from './lib/components/HeroSplash.svelte'
+  import RainLayer        from './lib/components/RainLayer.svelte'
   import IntroSplash      from './lib/components/IntroSplash.svelte'
   import WinCelebration      from './lib/components/WinCelebration.svelte'
   import WinBreakdown        from './lib/components/WinBreakdown.svelte'
@@ -649,6 +650,27 @@
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
 
+      // A dev-only ?mockCategory= override lets headless verification force a
+      // specific curated round for STANDING-mode spins too, mirroring the
+      // buy-flow's existing pattern below (OWNER AUDIT REMEDIATION A4: the
+      // autoplay soak needs deterministic win/loss/trigger rounds to prove
+      // the loss-limit/single-win-limit/stop-on-feature stop conditions
+      // actually engage - previously only the buy flow supported this, so
+      // standing-mode autoplay could never exercise stop-on-feature at all
+      // in mock mode, and loss/win limits could only be soaked against
+      // uncontrolled random results). Live play is unaffected either way -
+      // this whole block is import.meta.env.DEV-gated.
+      let servedTotalWin: number | null = null
+      if (import.meta.env.DEV && !get(lastRoundEvents)) {
+        const { serveMockRound, serveCategory } = await import('./lib/mock/roundProvider')
+        const forcedCategory = new URLSearchParams(window.location.search).get('mockCategory')
+        const round = forcedCategory
+          ? await serveCategory(mode, forcedCategory)
+          : await serveMockRound(mode)
+        if (round) servedTotalWin = (round.payoutMultiplier / 100) * bet
+      }
+      const win = servedTotalWin ?? result.totalWin
+
       if (gridRef) await gridRef.animateSpin(result.board)
 
       boardSymbols.set(result.board)
@@ -662,22 +684,35 @@
         const rawEvents = get(lastRoundEvents)
         cellMultipliers.set(rawEvents ? cellMultipliersFromEvents(rawEvents) : [])
       }
-      if (result.isWincap) {
+      // Live base rounds that trigger Overdrive publish their full events; play
+      // the free-spins overlay before autoplay continues. Wincap flow:
+      // MaxWinCelebration is already showing (reactive to $isWincap) — wait for
+      // COLLECT, then present the complete round sequence through the
+      // interpreter, finishing on the total win summary.
+      const roundEvents = get(lastRoundEvents)
+      const script = roundEvents ? scriptFromEvents(roundEvents) : null
+      // Named distinctly from the imported `isWincap` store ($isWincap is
+      // used below) - Svelte's compiler cannot disambiguate a same-named
+      // local const from the store when both are in scope, and errors out
+      // ("Cannot subscribe to stores that are not declared at the top
+      // level") rather than silently picking one.
+      const roundIsWincap = script?.isWincap ?? result.isWincap
+      if (roundIsWincap) {
         // Dwell on the winning hit: the board's win burst is already playing
         // from activeWins, so hold on it (a max win is the one moment to linger)
         // before recordSpinResult flips isWincap and the celebration covers the
         // screen. Deliberately NOT turbo-shortened.
-        playWin(bet > 0 ? result.totalWin / bet : 0)
+        playWin(bet > 0 ? win / bet : 0)
         await new Promise((r) => setTimeout(r, 2600))
       }
-      recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
-      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
-      if (!result.isWincap) playWin(bet > 0 ? result.totalWin / bet : 0)
-      if (result.totalWin > 0) {
-        const mult = bet > 0 ? result.totalWin / bet : 0
-        track({ type: 'win', winMicros: Math.round(result.totalWin * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
+      recordSpinResult(win, cost, result.newBalance, roundIsWincap)
+      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
+      if (!roundIsWincap) playWin(bet > 0 ? win / bet : 0)
+      if (win > 0) {
+        const mult = bet > 0 ? win / bet : 0
+        track({ type: 'win', winMicros: Math.round(win * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
       }
-      if (result.isWincap) track({ type: 'wincap', multiple: bet > 0 ? result.totalWin / bet : 0 })
+      if (roundIsWincap) track({ type: 'wincap', multiple: bet > 0 ? win / bet : 0 })
 
       // QA soak harness telemetry (dev-only): the raw mock "book" data for
       // this round, plus the balance the store actually landed on, so the
@@ -690,21 +725,13 @@
           mode:         get(selectedBetMode),
           bet,
           cost,
-          totalWin:     result.totalWin,
+          totalWin:     win,
           winEvents:    result.winEvents,
           scatterEvent: result.scatterEvent,
           balanceAfter: get(balance),
         })
       }
 
-      // Live base rounds that trigger Overdrive publish their full events; play
-      // the free-spins overlay before autoplay continues. (Mock base spins do
-      // not populate this, so normal mock base play is unchanged.) Wincap flow:
-      // MaxWinCelebration is already showing (reactive to $isWincap) — wait for
-      // COLLECT, then present the complete round sequence through the
-      // interpreter, finishing on the total win summary.
-      const roundEvents = get(lastRoundEvents)
-      const script = roundEvents ? scriptFromEvents(roundEvents) : null
       if ($isWincap) {
         await waitForWincapCollect()
         if (script) await presentFeature(script)
@@ -718,7 +745,7 @@
         // feature / loss limit), in addition to count, wincap and the win-tier
         // pause escalation below.
         const rg = autoplayShouldStop({
-          winMicros: Math.round(result.totalWin * CURRENCY_SCALE),
+          winMicros: Math.round(win * CURRENCY_SCALE),
           betMicros: Math.round(bet * CURRENCY_SCALE),
           triggered: !!script?.triggered,
         })
@@ -727,7 +754,7 @@
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {
-          const multiplier = bet > 0 ? result.totalWin / bet : 0
+          const multiplier = bet > 0 ? win / bet : 0
           if (multiplier >= 100) {
             // Epic win — stop autoplay entirely
             isAutoPlay.set(false)
@@ -808,6 +835,13 @@
         aria-hidden="true"
       />
     </div>
+    <!-- OWNER AUDIT REMEDIATION C1: the splash's rain streak layer, ported
+         into the live rain-city backdrop at a lower density/opacity than
+         the splash's own (10 streaks @ 0.55) - a background ambience touch,
+         not a foreground effect competing with gameplay. Same
+         RainLayer.svelte component the splash uses (extracted from it,
+         not duplicated), so it inherits the same reduced-motion gating. -->
+    <RainLayer count={6} opacity={0.22} variant="backdrop" />
   {:else}
     <!-- Static image background — all other themes; video is NOT in DOM -->
     <img

@@ -18,6 +18,7 @@
   import { locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { t, type GameMode } from '../i18n/translations'
+  import RainLayer from './RainLayer.svelte'
 
   const dispatch = createEventDispatcher<{ dismiss: void }>()
 
@@ -28,16 +29,6 @@
   onMount(() => {
     reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   })
-
-  interface RainStreak { id: number; left: number; delay: number; dur: number; h: number }
-  const RAIN_COUNT = 10
-  const rainStreaks: RainStreak[] = Array.from({ length: RAIN_COUNT }, (_, i) => ({
-    id: i,
-    left: Math.round((i / RAIN_COUNT) * 100 + (Math.random() * 6 - 3)),
-    delay: +(Math.random() * 2.2).toFixed(2),
-    dur: +(1.1 + Math.random() * 0.8).toFixed(2),
-    h: Math.round(60 + Math.random() * 60),
-  }))
 
   let dismissed = false
   function dismiss(): void {
@@ -63,16 +54,7 @@
   on:click={dismiss}
   on:keydown={handleKey}
 >
-  {#if !reduced}
-    <div class="rain-layer" aria-hidden="true">
-      {#each rainStreaks as s (s.id)}
-        <span
-          class="rain-streak"
-          style="left:{s.left}%; height:{s.h}px; animation-delay:{s.delay}s; animation-duration:{s.dur}s;"
-        ></span>
-      {/each}
-    </div>
-  {/if}
+  <RainLayer count={10} opacity={0.55} variant="splash" />
 
   <div class="emblem-stage">
     <img class="ring-glow" src="{base}/ui/particles/shock_ring.png" alt="" aria-hidden="true" draggable="false" />
@@ -105,25 +87,6 @@
     cursor: pointer;
   }
 
-  .rain-layer {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .rain-streak {
-    position: absolute;
-    top: -120px;
-    width: 1.5px;
-    background: linear-gradient(to bottom, transparent, rgba(150, 220, 255, 0.55), transparent);
-    animation-name: rain-fall;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-  @keyframes rain-fall {
-    from { transform: translateY(0); }
-    to   { transform: translateY(130vh); }
-  }
 
   .emblem-stage {
     position: relative;

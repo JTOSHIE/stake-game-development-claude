@@ -1,0 +1,26 @@
+[
+  {
+    "value": 1000,
+    "text": "$1,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v1/win-banner-stress/epic-win-$1000.png"
+  },
+  {
+    "value": 100000,
+    "text": "$100,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v1/win-banner-stress/epic-win-$100000.png"
+  },
+  {
+    "value": 1000000,
+    "text": "$1,000,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v1/win-banner-stress/epic-win-$1000000.png"
+  }
+]

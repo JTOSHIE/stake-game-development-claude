@@ -1,0 +1,36 @@
+{
+  "wrs_mark_v3.svg": {
+    "pathsOnly": {
+      "pass": true,
+      "found": []
+    },
+    "margins": {
+      "left": 26,
+      "right": 26,
+      "top": 26,
+      "bottom": 26
+    },
+    "spread": 0,
+    "marginPass": true,
+    "thickestRun": 22,
+    "strokePass": true,
+    "pass": true
+  },
+  "wrs_mark_v3_mono_cyan.svg": {
+    "pathsOnly": {
+      "pass": true,
+      "found": []
+    },
+    "margins": {
+      "left": 26,
+      "right": 26,
+      "top": 26,
+      "bottom": 26
+    },
+    "spread": 0,
+    "marginPass": true,
+    "thickestRun": "n/a (mono has no stroke layer)",
+    "strokePass": true,
+    "pass": true
+  }
+}

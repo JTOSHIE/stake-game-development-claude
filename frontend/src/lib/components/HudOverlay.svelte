@@ -14,6 +14,7 @@
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import { musicVolume, sfxVolume } from '../stores/audioSettings'
   import { overdriveVisual } from '../stores/overdriveVisual'
+  import { autofitText } from '../actions/autofitText'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
@@ -52,16 +53,39 @@
       // (a derived, read-only store - not exposed here since it can't be
       // .set() anyway).
       ;(window as unknown as { __testStores?: unknown }).__testStores =
-        { balance, betAmount, winAmount, isSpinning, rgsBetLevels, locale, speedTier, standingMode, jurisdictionFlags }
+        { balance, betAmount, winAmount, isSpinning, rgsBetLevels, locale, speedTier, standingMode, jurisdictionFlags,
+          isAutoPlay, autoPlayCount }
     }
   })
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
+  // OWNER AUDIT REMEDIATION B5: an infinite autoplay option, gated on the
+  // jurisdiction flag that already models an autoplay cap (defaults
+  // Infinity/uncapped - see stores/responsibleGambling's rgJurisdiction).
+  // Passing Infinity straight into the existing count/decrement machinery
+  // (autoPlayCount.update(n => n - 1), the $autoPlayCount <= 0 stop check)
+  // just works with no special-casing there - Infinity - 1 is still
+  // Infinity, and > 0 forever - only the DISPLAY needs a lying-eight symbol
+  // instead of literally rendering the string "Infinity".
+  const AUTO_INFINITE = Infinity
+  function formatAutoCount(n: number): string {
+    return n === Infinity ? '∞' : String(n)
+  }
   let showAutoMenu = false
   // Responsible-gambling autoplay stop-conditions (see stores/responsibleGambling).
   let stopOnWin = false
   let stopOnFeature = true
   let lossLimitOn = false
+  // OWNER AUDIT REMEDIATION A4: the loss limit checkbox previously had no
+  // dedicated amount - it silently reused the autoplay spin COUNT as if it
+  // were a dollar multiplier (lossLimitMicros = bet * count), which is
+  // approximately the natural all-spins-lose exhaustion point, making the
+  // "limit" nearly inert. Same story for single-win: the store's own
+  // stop-condition logic was correct and unit-tested, but singleWinLimitMult
+  // was hardcoded to 0 with no UI to set it at all.
+  let lossLimitAmount = 50
+  let singleWinLimitOn = false
+  let singleWinLimitMult = 10
   let showMenu = false
 
   // ── Bet ladder - ported from the retired ControlBar unchanged ────────────
@@ -128,9 +152,9 @@
     autoplayLimits.set({
       count,
       stopOnAnyWin: stopOnWin,
-      singleWinLimitMult: 0,
+      singleWinLimitMult: singleWinLimitOn ? singleWinLimitMult : 0,
       stopOnFeature,
-      lossLimitMicros: lossLimitOn ? Math.round($betAmount * count * CURRENCY_SCALE) : 0,
+      lossLimitMicros: lossLimitOn ? Math.round(lossLimitAmount * CURRENCY_SCALE) : 0,
     })
     autoPlayCount.set(count)
     isAutoPlay.set(true)
@@ -294,11 +318,11 @@
     <div class="p-stats-row">
       <div class="p-stat p-stat--balance" data-testid="hud-balance">
         <span class="p-stat-label">{$tr('balance')}</span>
-        <span class="p-stat-value cyan">{balanceLabel}</span>
+        <span class="p-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
       </div>
       <div class="p-stat p-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
         <span class="p-stat-label">{$tr('win')}</span>
-        <span class="p-stat-value magenta">{winLabel}</span>
+        <span class="p-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
       </div>
     </div>
     <!-- BET gets its own full-width row: a 3-column stats row left no room
@@ -312,7 +336,7 @@
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
-        <span class="p-stat-value gold">{betLabel}</span>
+        <span class="p-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
         <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
@@ -393,7 +417,7 @@
             aria-label={$tr('autoPlay')}
           >
             {#if $isAutoPlay}
-              <span class="p-tier">{$autoPlayCount}</span>
+              <span class="p-tier">{formatAutoCount($autoPlayCount)}</span>
             {:else}
               <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
             {/if}
@@ -401,12 +425,22 @@
           {#if showAutoMenu}
             <div class="auto-menu p-auto-menu" role="menu">
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+              {#if singleWinLimitOn}
+                <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
+              {/if}
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+              {#if lossLimitOn}
+                <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+              {/if}
               <div class="auto-menu-sep">Spins</div>
               {#each AUTO_OPTIONS as n}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
               {/each}
+              {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+                <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+              {/if}
             </div>
           {/if}
         </div>
@@ -455,11 +489,11 @@
 
   <div class="c-stat c-stat--balance" data-testid="hud-balance">
     <span class="c-stat-label">{$tr('balance')}</span>
-    <span class="c-stat-value cyan">{balanceLabel}</span>
+    <span class="c-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
   </div>
   <div class="c-stat c-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
     <span class="c-stat-label">{$tr('win')}</span>
-    <span class="c-stat-value magenta">{winLabel}</span>
+    <span class="c-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
   </div>
   <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
@@ -467,7 +501,7 @@
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
-      <span class="c-stat-value gold">{betLabel}</span>
+      <span class="c-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
       <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
@@ -501,7 +535,7 @@
         aria-label={$tr('autoPlay')}
       >
         {#if $isAutoPlay}
-          <span class="c-tier">{$autoPlayCount}</span>
+          <span class="c-tier">{formatAutoCount($autoPlayCount)}</span>
         {:else}
           <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
         {/if}
@@ -509,12 +543,22 @@
       {#if showAutoMenu}
         <div class="auto-menu c-auto-menu" role="menu">
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+          {#if singleWinLimitOn}
+            <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
+          {/if}
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+          {#if lossLimitOn}
+            <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+          {/if}
           <div class="auto-menu-sep">Spins</div>
           {#each AUTO_OPTIONS as n}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
           {/each}
+          {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+            <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+          {/if}
         </div>
       {/if}
     </div>
@@ -614,7 +658,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('balance')}</span>
-      <span class="fs-value cyan">{balanceLabel}</span>
+      <span class="fs-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
     </span>
   </div>
 
@@ -623,7 +667,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('win')}</span>
-      <span class="fs-value magenta">{winLabel}</span>
+      <span class="fs-value magenta" use:autofitText={winLabel}>{winLabel}</span>
     </span>
   </div>
 
@@ -634,7 +678,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
-      <span class="fs-value gold">{betLabel}</span>
+      <span class="fs-value gold" use:autofitText={betLabel}>{betLabel}</span>
     </span>
   </div>
 
@@ -688,7 +732,7 @@
     >
       <span class="fs-face">
         {#if $isAutoPlay}
-          <span class="count">{$autoPlayCount}</span>
+          <span class="count">{formatAutoCount($autoPlayCount)}</span>
         {:else}
           <svg viewBox="0 0 24 24"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
         {/if}
@@ -697,12 +741,22 @@
     {#if showAutoMenu}
       <div class="auto-menu" role="menu">
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
+        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+        {#if singleWinLimitOn}
+          <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
+        {/if}
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+        {#if lossLimitOn}
+          <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+        {/if}
         <div class="auto-menu-sep">Spins</div>
         {#each AUTO_OPTIONS as n}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
         {/each}
+        {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+          <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+        {/if}
       </div>
     {/if}
   </div>
@@ -817,7 +871,9 @@
     position:relative;z-index:1;
   }
   .fs-value{
-    font-family:'Orbitron',system-ui,monospace;font-size:1.02rem;font-weight:700;
+    font-family:'Orbitron',system-ui,monospace;
+    font-size:calc(1.02rem * var(--autofit-scale, 1));
+    font-weight:700;
     letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
     position:relative;z-index:1;
     -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
@@ -1168,6 +1224,24 @@
     white-space: nowrap;
   }
   .auto-menu-toggle input { accent-color: #00ffff; cursor: pointer; }
+  .auto-menu-amount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 0.7rem 0.3rem 1.9rem;
+    font-size: 0.62rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .auto-menu-input {
+    width: 3.4rem;
+    padding: 2px 5px;
+    font-size: 0.62rem;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    background: rgba(0, 255, 255, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    border-radius: 4px;
+  }
   .auto-menu-sep {
     padding: 0.3rem 0.7rem 0.15rem;
     font-size: 0.56rem;
@@ -1254,7 +1328,11 @@
     white-space: nowrap;
   }
   .p-stat-value {
-    font-size: 16px;
+    /* OWNER AUDIT REMEDIATION B1: font-size scales down via the
+       autofitText action's --autofit-scale custom property so values up to
+       $999,999.99 fit without truncating - text-overflow:ellipsis stays as
+       a defensive fallback only, not the primary mechanism now. */
+    font-size: calc(16px * var(--autofit-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
     white-space: nowrap;
@@ -1522,7 +1600,7 @@
     white-space: nowrap;
   }
   .c-stat-value {
-    font-size: 14px;
+    font-size: calc(14px * var(--autofit-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
     white-space: nowrap;

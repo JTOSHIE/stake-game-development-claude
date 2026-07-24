@@ -9,7 +9,7 @@
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { MODE_COST } from '../config/fsModes'
+  import { MODE_COST, FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -33,8 +33,19 @@
   let buyMode: BetMode = 'bonus'
 
   $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
-  $: priceMicros = Math.round($betAmount * (MODE_COST[buyMode] ?? 100) * CURRENCY_SCALE)
+  $: modeCost = MODE_COST[buyMode] ?? 100
+  $: priceMicros = Math.round($betAmount * modeCost * CURRENCY_SCALE)
   $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD')
+  // OWNER AUDIT REMEDIATION B4: the modal's own feature name/description
+  // now come straight from FS_MODES (the single source of truth already
+  // used by the FEATURES menu cards) instead of a single generic
+  // "OVERDRIVE FREE SPINS" title+body shared by every tier - Buy Overdrive
+  // and NITRO OVERDRIVE now read as genuinely different presentations, and
+  // NITRO's own "meter pre-revved to 5x" line comes along for free since
+  // it's already in fsModes.ts's blurb for 'super'.
+  $: buyModeEntry = FS_MODES.find((m) => m.serverMode === buyMode) ?? FS_MODES.find((m) => m.id === 'bonus')
+  $: featureName = buyModeEntry ? modeLabel(buyModeEntry, $isSocial) : t($locale, 'buyConfirmTitle', localeMode)
+  $: featureBlurb = buyModeEntry ? modeBlurb(buyModeEntry, $isSocial) : ''
 
   function open(mode: BetMode = 'bonus') {
     if ($isSpinning) return
@@ -65,12 +76,25 @@
   {/if}
 
   {#if showConfirm}
-    <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={t($locale, 'buyConfirmTitle', localeMode)}>
+    <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={featureName}>
       <div class="buy-modal">
         <!-- Grille art carries the header (LAYOUT_SPEC feature accent) -->
         <img class="buy-header-art" src="{base}/ui/feature_button.png" alt="" draggable="false" />
-        <h2 class="buy-title">{t($locale, 'buyConfirmTitle', localeMode)}</h2>
-        <p class="buy-desc">{t($locale, 'buyConfirmBody', localeMode)}</p>
+        <!-- OWNER AUDIT REMEDIATION B4: feature name (per-mode, not the one
+             generic title both tiers shared before), then "what you get" -
+             the mode's own blurb (NITRO's "pre-revved to 5x" line included
+             for free), the scatter/spins/instant-award breakdown and the
+             meter behaviour, both reused verbatim from the existing Rules
+             tab translations rather than duplicating new copy. -->
+        <h2 class="buy-title">{featureName}</h2>
+        <p class="buy-desc">{t($locale, 'buyConfirmBody', localeMode, { cost: modeCost })}</p>
+
+        <div class="buy-whatyouget">
+          <p class="buy-whatyouget-lbl">{t($locale, 'buyWhatYouGet', localeMode)}</p>
+          <p class="buy-whatyouget-line">{featureBlurb}</p>
+          <p class="buy-whatyouget-line">{t($locale, 'rulesOverdriveTrigger', localeMode)}</p>
+          <p class="buy-whatyouget-line">{t($locale, 'rulesOverdriveMeter', localeMode)}</p>
+        </div>
 
         <!-- Real symbol preview grid (scatter leads) -->
         <div class="buy-preview" aria-hidden="true">
@@ -81,10 +105,22 @@
           {/each}
         </div>
 
-        <!-- Price on an instrument-plate styled element -->
-        <div class="buy-price-plate">
-          <span class="buy-price-label">{t($locale, 'buyPrice', localeMode)}</span>
-          <span class="buy-price-val">{priceLabel}</span>
+        <!-- Price / RTP / max win stat row (B4: reinforces the per-mode
+             disclosure requirement - every buy tier states its own price
+             plus the RTP and max win that apply to it). -->
+        <div class="buy-stats-row">
+          <div class="buy-stat">
+            <span class="buy-stat-label">{t($locale, 'buyPrice', localeMode)}</span>
+            <span class="buy-stat-val gold">{priceLabel}</span>
+          </div>
+          <div class="buy-stat">
+            <span class="buy-stat-label">RTP</span>
+            <span class="buy-stat-val">{FS_RTP_LABEL}</span>
+          </div>
+          <div class="buy-stat">
+            <span class="buy-stat-label">MAX WIN</span>
+            <span class="buy-stat-val">{FS_MAX_WIN_LABEL}</span>
+          </div>
         </div>
         {#if !$canBuyBonus}
           <p class="buy-warn">{t($locale, 'insufficientBalance', localeMode)}</p>
@@ -120,10 +156,14 @@
   }
   @keyframes buy-fade { from { opacity: 0; } to { opacity: 1; } }
   .buy-modal {
-    width: min(92vw, 400px); padding: 20px 22px 22px; border-radius: 16px; text-align: center;
+    /* OWNER AUDIT REMEDIATION B4: "larger, premium presentation" - widened
+       from 400px and given a taller scrollable cap so the new what-you-get
+       and stats sections have real room instead of being squeezed in. */
+    width: min(94vw, 460px); max-height: 90dvh; overflow-y: auto;
+    padding: 22px 24px 24px; border-radius: 18px; text-align: center;
     background: linear-gradient(160deg, #0c0c22, #08081a);
     border: 1px solid var(--theme-secondary, #ff2ec4);
-    box-shadow: 0 0 30px rgba(255, 46, 196, 0.45), 0 0 60px rgba(138, 92, 255, 0.2);
+    box-shadow: 0 0 34px rgba(255, 46, 196, 0.5), 0 0 70px rgba(138, 92, 255, 0.22);
     color: #fff; font-family: 'Orbitron', sans-serif;
     animation: buy-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
@@ -136,16 +176,42 @@
   .buy-sym img { width: 46px; height: 46px; object-fit: contain; }
   .buy-sym.lead { width: 62px; height: 62px; box-shadow: inset 0 0 0 1px rgba(255, 215, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.35); }
   .buy-sym.lead img { width: 56px; height: 56px; }
-  /* Price on an instrument-plate styled element (notched corners, magenta rim) */
-  .buy-price-plate {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 18px; margin: 0 0 4px;
+  /* OWNER AUDIT REMEDIATION B4: "what you get" - mode blurb + scatter/spins
+     breakdown + meter behaviour, left-aligned body copy inside the
+     otherwise-centred modal (easier to read as a paragraph block). */
+  .buy-whatyouget {
+    text-align: left; margin: 0 0 14px; padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.03); border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .buy-whatyouget-lbl {
+    font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--theme-secondary, #ff2ec4); margin: 0 0 6px; font-weight: 700;
+  }
+  .buy-whatyouget-line {
+    font-size: 0.74rem; line-height: 1.5; color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 6px;
+  }
+  .buy-whatyouget-line:last-child { margin-bottom: 0; }
+
+  /* Price / RTP / max win, three stat cells on one instrument-plate styled
+     row (notched corners, magenta rim - same treatment the old single
+     price plate used). */
+  .buy-stats-row {
+    display: flex; align-items: stretch; justify-content: space-between;
+    padding: 10px 4px; margin: 0 0 4px;
     background: linear-gradient(180deg, #1a2236, #080c16);
-    clip-path: polygon(0 22%, 6% 0, 94% 0, 100% 22%, 100% 100%, 6% 100%, 0 78%);
+    clip-path: polygon(0 12%, 3% 0, 97% 0, 100% 12%, 100% 100%, 3% 100%, 0 88%);
     box-shadow: inset 0 0 0 1.5px rgba(255, 43, 214, 0.85), 0 0 12px rgba(255, 43, 214, 0.25);
   }
-  .buy-price-label { font-size: 0.72rem; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.7); text-transform: uppercase; }
-  .buy-price-val { color: #ffd54a; font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; text-shadow: 0 0 8px rgba(255, 213, 74, 0.5); }
+  .buy-stat {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 0 6px; border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .buy-stat:last-child { border-right: none; }
+  .buy-stat-label { font-size: 0.6rem; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; }
+  .buy-stat-val { color: #cfe9ff; font-weight: 700; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  .buy-stat-val.gold { color: #ffd54a; text-shadow: 0 0 8px rgba(255, 213, 74, 0.5); }
 
   @media (prefers-reduced-motion: reduce) {
     .buy-backdrop, .buy-modal { animation: none; }
