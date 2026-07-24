@@ -9,7 +9,14 @@
 //   - Expose a typed response for ReplayMode.svelte to consume
 //   - Helpers for currency/amount display per Stake Engine spec
 
-import { currencySymbolFor } from '../utils/currency'
+// CURRENCY_SCALE is imported, never redeclared. It previously existed here as a
+// third module-local copy alongside utils/currency.ts and the locked
+// rgsService.ts. All three agreed, but the money path holding one constant in
+// triplicate is the same drift shape that produced the 2026-07-25 currency
+// defect. utils/currency.ts is canonical (Fable ruling 8, 2026-07-26); the
+// locked rgsService.ts copy is recorded in CLAUDE.md's LOCKED_FILE_DEBTS and
+// held to the canonical value by scripts/currency_scale_drift.test.mjs.
+import { currencySymbolFor, CURRENCY_SCALE } from '../utils/currency'
 
 export interface ReplayParams {
   replay: true
@@ -31,7 +38,6 @@ export interface ReplayResponse {
   state: any                 // game-specific replay state — events / board / wins
 }
 
-const CURRENCY_SCALE = 1_000_000
 
 /**
  * Returns null if the current URL is NOT in replay mode.

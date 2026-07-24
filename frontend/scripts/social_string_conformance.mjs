@@ -70,11 +70,19 @@ async function openFeatureMenu(page) {
   await page.waitForTimeout(150)
 }
 
-async function openPaytableBetModes(page) {
+// The section heading is social-aware since Fable ruling 3 (2026-07-26): the
+// word "bet" is on the stake.us prohibited-terms table, so PaytableModal renders
+// "Play Modes" when social and "Bet Modes" otherwise. This helper is called in
+// BOTH modes, so it must not pin itself to either spelling - doing so is exactly
+// the stale-selector class that broke six scripts in Round 3.
+async function openPaytableBetModes(page, social) {
   await page.locator('button.fs-menu').click()
   await page.locator('.hud-menu-item').first().click()
   await page.waitForSelector('[data-testid="interface-guide"]', { timeout: 10000 })
-  const heading = page.locator('h3.fs-heading', { hasText: 'Bet Modes' })
+  const heading = page.locator('h3.fs-heading', {
+    hasText: social ? 'Play Modes' : 'Bet Modes',
+  })
+  await heading.waitFor({ timeout: 10000 })
   await heading.scrollIntoViewIfNeeded()
   await page.waitForTimeout(150)
 }
@@ -107,9 +115,11 @@ async function run() {
       await page.keyboard.press('Escape').catch(() => {})
 
       // PaytableModal Bet Modes section
-      await openPaytableBetModes(page)
+      await openPaytableBetModes(page, social)
       await page.screenshot({ path: join(SCREENS_DIR, `bet-modes-${label}.png`) })
-      const paytableText = await page.locator('h3.fs-heading', { hasText: 'Bet Modes' })
+      // Same social-aware heading as openPaytableBetModes - see its comment.
+      const paytableText = await page
+        .locator('h3.fs-heading', { hasText: social ? 'Play Modes' : 'Bet Modes' })
         .locator('xpath=following-sibling::div[1]').innerText()
 
       results[label] = { featureMenuText, paytableText, consoleErrorCount: consoleErrors.length }

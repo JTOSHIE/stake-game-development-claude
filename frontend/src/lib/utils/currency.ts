@@ -43,15 +43,19 @@ const ZERO_DECIMAL = new Set<string>(['JPY', 'IDR', 'KRW', 'VND', 'CLP'])
 /**
  * Symbol placement for virtual currencies.
  *
- * OPEN QUESTION, one flip point. The Stake Engine currency reference documents
- * XSC/XGC with `symbolAfter: true`, that is "10.00 SC". The 2026-07-25 brief
- * specifies leading placement, "SC 1,000". They contradict each other and the
- * question is recorded in COMPLIANCE_WATCH.md pending an owner or Fable ruling.
+ * RESOLVED 2026-07-26 by Fable ruling (2): TRAILING, "10.00 SC".
  *
- * We ship the brief's leading form. When the ruling lands, flip this ONE
- * constant; every player-facing surface follows, because they all route here.
+ * Two independent first-party sources document `symbolAfter: true`: the Stake
+ * Engine currency reference, and the official StakeEngine/ts-client SDK
+ * (`src/helpers.ts`, `XSC: { symbol: 'SC', decimals: 2, symbolAfter: true }`).
+ * The 2026-07-25 brief had specified leading placement, "SC 1,000"; Fable ruled
+ * the two first-party sources outrank it and that the brief's spec was wrong.
+ *
+ * Kept as a single named constant rather than inlined, because it remains the
+ * one flip point should the platform ever change its mind: every player-facing
+ * surface follows from here.
  */
-export const VIRTUAL_SYMBOL_TRAILING = false
+export const VIRTUAL_SYMBOL_TRAILING = true
 
 interface VirtualCurrency {
   /** Player-facing symbol. The raw code is NEVER shown to players. */
@@ -125,8 +129,8 @@ export function currencySymbolFor(currencyCode: string, localeTag?: string): str
  * @example
  *   formatBalance(1_250_000, 'USD')            // "$1.25"
  *   formatBalance(1_250_000_000, 'JPY')        // "¥1,250"
- *   formatBalance(1_000_000_000, 'XSC')        // "SC 1,000.00"
- *   formatBalance(500_000_000, 'XGC')          // "GC 500.00"
+ *   formatBalance(1_000_000_000, 'XSC')        // "1,000.00 SC"
+ *   formatBalance(500_000_000, 'XGC')          // "500.00 GC"
  */
 export function formatBalance(
   micros: number,

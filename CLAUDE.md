@@ -58,6 +58,27 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   fix opportunistically the next time `gameStore.ts` is under a sanctioned edit for
   something else.
 
+- **`rgsService.ts` declares its own `CURRENCY_SCALE = 1_000_000`** (line 29), a second
+  copy of the constant whose canonical home is `frontend/src/lib/utils/currency.ts`.
+  A third copy in `replayService.ts` was removed 2026-07-26 (it now imports the
+  canonical one); this one cannot be, because the file is locked. Both copies currently
+  agree, and per Fable ruling 8 (2026-07-26) the duplication is now **held by a gate,
+  not by a comment**: `frontend/scripts/currency_scale_drift.test.mjs` parses both
+  declarations as text (read-only, it never writes to the locked file) and fails if
+  they ever diverge or if `replayService.ts` reintroduces a local copy. Fix by deleting
+  the local declaration and importing the canonical one the next time `rgsService.ts`
+  is under a sanctioned edit.
+
+- **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
+  (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
+  read anywhere in production code, verified including `derived()` and `.subscribe()`
+  forms. Dead weight rather than defects: no behaviour depends on them and none is
+  reachable by a player. Found by the fresh-eyes review
+  (`reports/qa/fresh_eyes_review_2026-07-26.md`), recorded per Fable ruling 9
+  (2026-07-26). They are allowlisted with this reason in
+  `frontend/scripts/dead_wiring_scan.mjs`, so the gate stays green while remembering
+  them. Delete on the next sanctioned `gameStore.ts` pass; not worth a pass of its own.
+
 ### Reference / prototype branches (not on main)
 
 Not-for-release maths prototypes and forks live on their own branch, never on `main` -
@@ -128,8 +149,14 @@ lives in `App.svelte` behind `import.meta.env.DEV`; reversible by removing those
   `ReplayMode.svelte`; `App.svelte` branches on the replay URL params. Replay never calls
   rgsService or wallet endpoints, uses the public `/bet/replay/` endpoint, and drives the
   animation pipeline via the public `.set()` API of gameStore writables (never edits
-  gameStore.ts). In replay mode BalanceDisplay, ControlBar, AutoPlayModal and
-  ThemeSelector are not rendered.
+  gameStore.ts). In replay mode the balance readout, the bet controls and bet ladder,
+  the autoplay menu and its confirm gate, and the theme selector are all not rendered.
+  (Reworded 2026-07-26, Fable ruling: this line previously named BalanceDisplay,
+  ControlBar, AutoPlayModal and ThemeSelector. `ControlBar` and `AutoPlayModal` no
+  longer exist as components, and `BalanceDisplay` is dead and removed; the bet ladder
+  was ported into `HudOverlay.svelte` and the autoplay menu lives there too. The
+  behaviour was and is correct; the requirement is now stated against behaviour rather
+  than against component names, so it stays checkable as the component tree changes.)
 - No Stake branding in shipped assets or text. Original IP only.
 
 ## Session conventions

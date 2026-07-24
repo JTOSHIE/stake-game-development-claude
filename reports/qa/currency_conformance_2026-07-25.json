@@ -1,8 +1,8 @@
 {
   "unit": {
-    "sc1000": "SC 1,000.00",
-    "scAlias": "SC 1,000.00",
-    "gc500": "GC 500.00",
+    "sc1000": "1,000.00 SC",
+    "scAlias": "1,000.00 SC",
+    "gc500": "500.00 GC",
     "usd": "$1.25",
     "jpy": "¥1,250",
     "symXSC": "SC",
@@ -12,7 +12,7 @@
     "isVirtXSC": true,
     "isVirtSC": true,
     "isVirtUSD": false,
-    "trailing": false
+    "trailing": true
   },
   "dom": {
     "USD": {
@@ -26,73 +26,23 @@
       "consoleErrorCount": 0
     },
     "XSC": {
-      "balance": "COINS\nSC 100.00",
-      "bet": "PLAY\nSC 1.00",
+      "balance": "COINS\n100.00 SC",
+      "bet": "PLAY\n1.00 SC",
       "consoleErrorCount": 0
     },
     "XGC": {
-      "balance": "COINS\nGC 100.00",
-      "bet": "PLAY\nGC 1.00",
+      "balance": "COINS\n100.00 GC",
+      "bet": "PLAY\n1.00 GC",
       "consoleErrorCount": 0
     }
   },
   "social": {
-    "balance": "COINS\nSC 100.00",
+    "balance": "COINS\n100.00 SC",
     "consoleErrorCount": 0,
-    "visibleProhibitedTermHits": [
-      {
-        "text": "BET",
-        "selector": "fm-betlabel"
-      },
-      {
-        "text": "1× bet",
-        "selector": "fm-cost"
-      },
-      {
-        "text": "1× bet",
-        "selector": "fm-cost"
-      },
-      {
-        "text": "1.25× bet",
-        "selector": "fm-cost"
-      },
-      {
-        "text": "BUY FEATURES",
-        "selector": "fm-section-label"
-      },
-      {
-        "text": "BET MODES",
-        "selector": "fm-info-btn"
-      }
-    ]
+    "visibleProhibitedTermHits": []
   },
-  "socialStringFindings": [
-    {
-      "text": "BET",
-      "selector": "fm-betlabel"
-    },
-    {
-      "text": "1× bet",
-      "selector": "fm-cost"
-    },
-    {
-      "text": "1× bet",
-      "selector": "fm-cost"
-    },
-    {
-      "text": "1.25× bet",
-      "selector": "fm-cost"
-    },
-    {
-      "text": "BUY FEATURES",
-      "selector": "fm-section-label"
-    },
-    {
-      "text": "BET MODES",
-      "selector": "fm-info-btn"
-    }
-  ],
-  "socialStringsClean": false,
+  "socialStringFindings": [],
+  "socialStringsClean": true,
   "failures": [],
   "pass": true
 }

@@ -241,7 +241,7 @@
         <div class="fm-betbar fs-plate">
           <div class="fs-face">
             <span class="fm-spin-cost" data-testid="current-spin-cost">SPIN COST <span class="fs-num">{currentSpinCost}</span></span>
-            <span class="fm-betlabel">BET</span>
+            <span class="fm-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
             <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label="Decrease bet">-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
             <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
@@ -273,7 +273,7 @@
                     </div>
                     <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
                     <div class="fm-action">
-                      <span class="fm-cost fs-num">{m.cost}× bet</span>
+                      <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
                       {#if active}
                         <span class="fm-active-tag" data-testid="standing-active-{m.id}">ACTIVE</span>
                       {:else}
@@ -328,7 +328,7 @@
                 </div>
 
                 <div class="fm-action">
-                  <span class="fm-cost fs-num">{m.cost}× bet</span>
+                  <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
 
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">SOON</span>
@@ -360,7 +360,7 @@
           {/each}
 
           <div class="fm-section-separator" role="separator" aria-hidden="true"></div>
-          <div class="fm-section-label">BUY FEATURES</div>
+          <div class="fm-section-label">{$isSocial ? 'GET FEATURES' : 'BUY FEATURES'}</div>
           {#each buyFeatureCards as m (m.id)}
             <div
               class="fm-card fs-plate tone-{m.kind}"
@@ -402,7 +402,7 @@
         <!-- Footer -->
         <div class="fm-foot">
           <span class="fm-rtp">All modes · RTP {FS_RTP_LABEL}</span>
-          <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">BET MODES</button>
+          <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">{$isSocial ? 'PLAY MODES' : 'BET MODES'}</button>
         </div>
 
       </div><!-- /fs-face -->
