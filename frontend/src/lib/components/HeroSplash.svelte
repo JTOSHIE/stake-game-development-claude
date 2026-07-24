@@ -1,18 +1,24 @@
 <script lang="ts">
-  // HeroSplash.svelte — ANIMATION UPLIFT PASS, 2026-07-16, item 1.
-  // The animated brand intro built from the locked studio hero emblem
-  // (design-system/brand/hero_emblem/, ratified PR #82; bundled here as a
-  // palette-compressed 512 copy via scripts/assets/build.py's brand_exports
-  // step). Code choreography only - no video, no new tools: three stacked
-  // copies of the SAME emblem image, each carrying a different CSS filter
-  // (cyan-leaning, magenta-leaning, full colour), flicker in on a stagger so
-  // the sign reads as lighting up outer ring first, then wordmarks, then the
-  // inner reel - followed by a slow-rotating outer ring (the shared
-  // shock_ring particle, reused rather than a bespoke asset), sparse CSS
-  // rain streaks, and a soft press-anywhere pulse. First gesture dismisses
-  // instantly and, since it's a real pointerdown/keydown, incidentally
-  // satisfies App.svelte's existing first-gesture audio warm-up listener
-  // with no extra wiring needed.
+  // HeroSplash.svelte — the brand intro, built from the locked studio hero
+  // emblem (design-system/brand/hero_emblem/, ratified PR #82; bundled here as
+  // a palette-compressed 512 copy via scripts/assets/build.py's brand_exports
+  // step).
+  //
+  // OWNER AUDIT ROUND 4, item 2 (owner ruling, 2026-07-26): the neon power-on
+  // flicker sequence is REMOVED. It stacked three copies of the same emblem
+  // (cyan-leaning, magenta-leaning, full colour) and stepped their opacity in
+  // on a stagger via `flicker-in 0.5s steps(6, end)`. The stepped opacity is
+  // what made it read as flashing squares rather than a sign lighting up.
+  //
+  // The splash is now the STATIC hero emblem over the existing backdrop, with
+  // the rain layer and one gentle steady glow. One emblem image, no filters, no
+  // staging, no stepped animation anywhere.
+  //
+  // Unchanged on purpose: tap-anywhere dismissal, which is a real
+  // pointerdown/keydown and therefore still satisfies App.svelte's first-gesture
+  // audio warm-up listener with no extra wiring; and the reduced-motion
+  // behaviour, which already showed the static full-colour mark and is now
+  // simply what everyone gets.
   import { onMount, createEventDispatcher } from 'svelte'
   import { themeAssets } from '../stores/themeStore'
   import { locale } from '../stores/gameStore'
@@ -58,10 +64,6 @@
 
   <div class="emblem-stage">
     <img class="ring-glow" src="{base}/ui/particles/shock_ring.png" alt="" aria-hidden="true" draggable="false" />
-    {#if !reduced}
-      <img class="emblem-layer emblem-cyan" src="{base}/ui/hero_emblem_512.png" alt="" aria-hidden="true" draggable="false" />
-      <img class="emblem-layer emblem-magenta" src="{base}/ui/hero_emblem_512.png" alt="" aria-hidden="true" draggable="false" />
-    {/if}
     <img class="emblem-layer emblem-full" src="{base}/ui/hero_emblem_512.png" alt="We Roll Spinners" draggable="false" />
   </div>
 
@@ -99,13 +101,11 @@
     inset: -8%;
     width: 116%;
     height: 116%;
-    opacity: 0.55;
+    opacity: 0.42;
     mix-blend-mode: screen;
-    animation: ring-rotate 22s linear infinite;
-  }
-  @keyframes ring-rotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+    /* Gentle steady glow. The 22s rotation is gone with the flicker sequence:
+       the owner ruling asks for a static mark with a steady glow, and a slowly
+       rotating ring behind a static emblem reads as drift, not calm. */
   }
 
   .emblem-layer {
@@ -115,35 +115,10 @@
     height: 100%;
     object-fit: contain;
   }
-  /* Stage 1: the ring is already the brightest, most cyan part of the mark -
-     an unfiltered, high-contrast pass reads as "the ring lighting up" first. */
-  .emblem-cyan {
-    filter: contrast(1.35) saturate(1.5) brightness(1.25);
-    animation: flicker-in 0.5s steps(6, end) 0s both;
-  }
-  /* Stage 2: hue-rotated toward magenta/purple, where the wordmarks live. */
-  .emblem-magenta {
-    filter: hue-rotate(130deg) saturate(1.3) brightness(1.1);
-    animation: flicker-in 0.5s steps(6, end) 0.4s both;
-  }
-  /* Stage 3: the true full-colour mark settles in, revealing the chrome
-     inner reel last. */
+  /* The mark is static and full-colour from first paint. No filtered duplicate
+     layers, no staged reveal, no stepped opacity. */
   .emblem-full {
-    opacity: 0;
-    animation: settle-in 0.6s ease-out 0.85s both;
-  }
-
-  @keyframes flicker-in {
-    0%   { opacity: 0; }
-    15%  { opacity: 0.85; }
-    28%  { opacity: 0.15; }
-    45%  { opacity: 0.9; }
-    60%  { opacity: 0.25; }
-    100% { opacity: 0.75; }
-  }
-  @keyframes settle-in {
-    from { opacity: 0; transform: scale(0.97); }
-    to   { opacity: 1; transform: scale(1); }
+    opacity: 1;
   }
 
   .press-prompt {
@@ -160,16 +135,14 @@
     50%      { opacity: 0.95; }
   }
 
-  /* Reduced motion: show the full-colour mark immediately, static ring at
-     low opacity, no rain, no flicker staging, no press-prompt pulse. */
-  .hero-splash.reduced .ring-glow { animation: none; opacity: 0.3; }
-  .hero-splash.reduced .emblem-full { animation: none; opacity: 1; }
+  /* Reduced motion is unaffected by this ruling (it never showed the flicker
+     staging). The only remaining motion on this screen is the press-prompt
+     pulse, which reduced motion still stills. */
+  .hero-splash.reduced .ring-glow { opacity: 0.3; }
   .hero-splash.reduced .press-prompt { animation: none; opacity: 0.75; }
 
   @media (prefers-reduced-motion: reduce) {
-    .ring-glow { animation: none; opacity: 0.3; }
-    .emblem-cyan, .emblem-magenta { display: none; }
-    .emblem-full { animation: none; opacity: 1; }
+    .ring-glow { opacity: 0.3; }
     .press-prompt { animation: none; opacity: 0.75; }
   }
 </style>

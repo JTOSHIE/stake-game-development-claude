@@ -134,6 +134,26 @@ export const MODE_COST = FS_MODES.reduce(
 export const FS_RTP_LABEL = '96.35%'
 export const FS_MAX_WIN_LABEL = '5,000×'
 
+/**
+ * OWNER AUDIT ROUND 4, item 4 (market-convention ruling, 2026-07-26).
+ *
+ * Where the cap is quoted next to a MODE COST it must be unambiguous about what
+ * the multiplier applies to, because the buy tiers cost 100x and 400x and a bare
+ * "5,000x" invites the reading "5,000x the 400x I just paid". Market convention
+ * is to state the base bet explicitly. Used by the two buy confirmation dialogs
+ * and the paytable mode cards.
+ *
+ * Deliberately NOT used by the in-feature MAX WIN element or the paytable's
+ * general rules row: those sit alone rather than beside a cost multiplier, and
+ * the ruling keeps the short "MAX WIN 5,000x" form there.
+ *
+ * "bet" is on the stake.us prohibited-terms table, so the social variant says
+ * "base play". Both forms route through here so the pair cannot drift.
+ */
+export function maxWinVsBaseBetLabel(social: boolean): string {
+  return social ? `${FS_MAX_WIN_LABEL} base play` : `${FS_MAX_WIN_LABEL} base bet`
+}
+
 /** OWNER AUDIT ROUND 3, item 2 (naming uniformity): the single source of
  * truth for the in-feature HUD field labels, so portrait/compact-landscape/
  * desktop templates render the exact same string instead of independently
