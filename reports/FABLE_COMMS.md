@@ -9,6 +9,71 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 003 - 2026-07-26 - Rulings 1-11 executed; PR #89 merged; CI live
+
+**COMMS-ACK.** Receipt of the FABLE RULINGS 1-10 AND NEXT SESSION block (2026-07-26),
+including addendum ruling 11, recorded as instructed. Entries 001 and 002 closed.
+
+**PR #89: MERGED** on your approval, branch deleted. Map item (1) complete. The
+reconciliation document is noted as the standard for protocol 6 outputs.
+
+**State delta.** All rulings executed in one consolidated pass, **PR #90 open for your
+review**. Every gate green, including CI on its first real run (51s, all six).
+
+| Ruling | Result |
+|---|---|
+| 2 SC placement | Flipped to **trailing**, `1,000.00 SC` / `500.00 GC`. One constant, every surface followed. Proofs regenerated, report tables corrected so the document no longer contradicts its own update section. |
+| 3 Social wording | Applied social-branch-only, real-money untouched. **Zero prohibited terms.** stake.us and Stake EU unblocked on this axis. |
+| 4 XEC | Documents no longer chased. Resolution path recorded as empirical via Developer Testing Tool currency toggling (map item 6). Stake EU stays contingent. |
+| 5 MCP repoint | Adopted, recorded. Not yet built; queued behind the audit. |
+| 6 stake-dev-tool | Self-hosted-only recorded as the default; no trial started this pass. |
+| 7 Cleanup | Five YES items done; both refusals ratified and left undone. |
+| 8 `CURRENCY_SCALE` | Canonical + import + **new drift gate**, read-only against the locked file. |
+| 9 gameStore dead stores | In `LOCKED_FILE_DEBTS`, allowlisted with reasons in the scan. |
+| 10 `dead_wiring_scan.mjs` | Adopted into the suite and into CI. |
+| 11 CI | `.github/workflows/checks.yml`, six static gates, **verified green on PR #90**. |
+
+**Three things I want your eye on.**
+
+11. **A seventh social string existed.** `PaytableModal.svelte:259` had a hardcoded
+    `Bet Modes` heading in a surface your six did not cover. I extended your ruling on
+    that exact phrase to it (`Play Modes`) rather than inventing wording. Confirm you
+    are happy with the extension.
+12. **That rename broke a test, and it was the archaeology class repeating.**
+    `social_string_conformance.mjs` pinned two selectors to the literal `"Bet Modes"`.
+    I created a fresh instance of the stale-selector class within an hour of writing
+    the report identifying it. Both selectors are now social-aware and the suite
+    passes. Recorded because the lesson is that the class recurs under any rename, not
+    only under overlay changes, and our only defence is running the suite.
+13. **Ruling 11 forced a judgement call.** `svelte-check` had 33 pre-existing errors,
+    so a naive gate fails on day one. Root cause was the browser app's tsconfig being
+    applied to `tsx`-run `*.test.ts` scripts. Excluding them dropped the baseline
+    **33 to 11 without touching app code**. The remaining 11 are real (telemetry
+    payload typing on a no-op observer, a `RainLayer` default export, a `FlameJets`
+    union), so the gate enforces **no regression against a committed baseline** rather
+    than zero. **Ruling wanted:** clear the 11 as its own pass, or leave the baseline?
+    I lean leave: they are annotation gaps in an observer path, and the file is
+    `App.svelte`, days before the audit.
+
+**Lane table.**
+
+| Output | Lane | Status |
+|---|---|---|
+| PR #89 platform delta | REVIEW | **Merged**, branch deleted |
+| PR #90 cleanup pass (rulings 2, 3, 8, 10, 11 + five items) | **REVIEW** | Open, CI green, awaiting your block |
+| This comms entry | GREEN | Merged to `main` |
+
+**Map position.** (1) done. (2) done, pending your #90 review. Next is (3) owner full
+re-test on the current build, then (4) external audit prep. Nothing from me blocks (3)
+once #90 lands.
+
+**Pointers.** PR #90; `reports/qa/currency_readiness_2026-07-25.md` section 6a;
+`.github/workflows/checks.yml`; `frontend/scripts/dead_wiring_scan.mjs`,
+`currency_scale_drift.test.mjs`, `typecheck_baseline.mjs`;
+`frontend/src/lib/utils/currency.test.ts`.
+
+---
+
 ## 002 - 2026-07-26 - Fresh-eyes deep review delivered
 
 **State delta.** Section 3 deliverable complete: `reports/qa/fresh_eyes_review_2026-07-26.md`.
