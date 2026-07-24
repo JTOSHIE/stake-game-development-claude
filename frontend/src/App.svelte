@@ -113,6 +113,17 @@
     const buf: TelemetryEvent[] = []
     ;(window as unknown as { __telemetry: unknown[] }).__telemetry = buf
     setTelemetrySink(bufferSink(buf))
+
+    // DEV ONLY: ?mockCurrency=XSC seeds the currency the RGS would have sent in
+    // its authenticate response, so the currency conformance harness can drive
+    // every display path (fiat, zero-decimal/high-minimum, and the XSC/XGC
+    // sweepstakes codes) without a live sweepstakes session. Mirrors the
+    // existing ?mockCategory and ?social dev hooks. Guarded by import.meta.env.DEV
+    // exactly like the theme selector, so it cannot exist in a production build.
+    try {
+      const mockCurrency = new URLSearchParams(window.location.search).get('mockCurrency')
+      if (mockCurrency) currencyCode.set(mockCurrency.toUpperCase())
+    } catch { /* non-browser context, ignore */ }
   }
 
   // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────

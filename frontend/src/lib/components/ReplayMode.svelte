@@ -7,6 +7,7 @@
     totalBetSpentMicros,
     currencySymbol,
   } from '../services/replayService'
+  import { formatBalance, CURRENCY_SCALE, isVirtualCurrency } from '../utils/currency'
   import {
     replayParams,
     replayResponse,
@@ -264,10 +265,10 @@
           <div class="btn-line-1">START REPLAY</div>
           <div class="btn-line-2">Mode: <strong>{params.mode}</strong></div>
           <div class="btn-line-3">
-            {mode === 'social' ? 'Play' : 'Bet'}: <strong>{currencySymbol(params.currency)}{baseBet.toFixed(2)}</strong>
+            {mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
             {#if showCostMultiplier}
               × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
-              <strong>{currencySymbol(params.currency)}{totalSpent.toFixed(2)}</strong>
+              <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
             {/if}
           </div>
         </button>
@@ -280,9 +281,19 @@
       {/if}
     </div>
 
-    <!-- Currency display (per Stake Engine spec) -->
+    <!-- Currency display. The replay spec's UI Simplification table lists
+         "Currency display" under Keep/Show, so this stays. Two constraints
+         apply on top of it, both fixed 2026-07-25:
+           1. Virtual currencies must show the player-facing symbol, never the
+              raw platform code. Printing "XSC" at a player is exactly what the
+              jurisdiction rules prohibit.
+           2. The word "currency" is itself on the stake.us prohibited-terms
+              table (currency -> token), so the label switches in social mode. -->
     <div class="currency-display">
-      Currency: <strong>{params.currency}</strong>
+      {mode === 'social' ? 'Token' : 'Currency'}:
+      <strong>{isVirtualCurrency(params.currency)
+        ? currencySymbol(params.currency, params.lang)
+        : params.currency}</strong>
     </div>
   {/if}
 </div>
