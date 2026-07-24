@@ -46,7 +46,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
-import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { dismissIntro, clickAnyPendingGate } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -562,6 +562,12 @@ async function auditCostLabelConsistency(browser, baseUrl) {
 }
 
 async function auditOverdriveMeterOnScreen(page, screensDir) {
+  // FINAL MERGE, CLOSE-OUT AND HANDOVER, 2026-07-25, rider (a): this runs deep
+  // into a profile's audit sequence, after many prior spins - a natural
+  // 5,000x wincap hit earlier in that sequence can leave MaxWinCelebration's
+  // overlay open, blocking every click below (including feature-menu-button
+  // itself) until it's cleared.
+  await clickAnyPendingGate(page)
   const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
   if ((await featureMenuBtn.count()) === 0) {
     return { skipped: true, reason: 'no feature-menu-button', pass: true }

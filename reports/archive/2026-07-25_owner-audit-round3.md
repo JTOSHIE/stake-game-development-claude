@@ -155,6 +155,10 @@ the soak alone to the external audit's fresh environment where it remains a name
 - `scripts/assets/build.py` (`keep_alpha` manifest flag), `scripts/assets/manifest.json`
   (hero icon export entry).
 - `reports/screens/owner-audit-v3/**` - all proof screenshots for items 1-9.
+- FINAL MERGE riders (2026-07-25): `frontend/scripts/lib/dismissOverlays.mjs`
+  (`.max-win-overlay` detection, exported `clickAnyPendingGate`),
+  `frontend/scripts/portrait_layout_conformance.mjs`
+  (`auditOverdriveMeterOnScreen()` gate clear).
 
 ## Locked files
 
@@ -204,10 +208,10 @@ rather than papering over them with longer timeouts.
   follow-up dedup pass if they're ever brought back into active rotation.
 - `qa_soak.mjs`'s full 24-cell matrix and `portrait_layout_conformance.mjs`'s full run
   should be re-attempted next session or in the external audit's fresh environment (the
-  named gate this defers to). `portrait_layout_conformance.mjs` specifically needs its
+  named gate this defers to). ~~`portrait_layout_conformance.mjs` specifically needs its
   other raw-click call sites audited for the same missing-gate-check gap found in
-  `auditOverdriveMeterOnScreen()` before re-running - otherwise it will hang again the
-  first time a session naturally hits the 5,000x wincap during the audit.
+  `auditOverdriveMeterOnScreen()` before re-running~~ - **fixed same-day, see the
+  FINAL MERGE riders below.**
 - A note on this session's own pacing: item 10's conformance sweep took substantially
   longer than expected because each fix was verified by a full script re-run (spin up dev
   server + browser, minutes per cycle) before moving to the next, and the bug cascade
@@ -215,3 +219,35 @@ rather than papering over them with longer timeouts.
   sound and each is independently verified, but a next session tackling a similar sweep
   should consider capping the number of individual re-verification cycles up front and
   invoking a documented-and-deferred fallback earlier rather than later.
+
+## FINAL MERGE, CLOSE-OUT AND HANDOVER, 2026-07-25 - riders
+
+Brief saved verbatim: `FS_FinalMergeCloseout_Prompt.md`. Two riders actioned before the
+merge, both aimed at external-audit prep:
+
+**(a) `auditOverdriveMeterOnScreen()` unblocked.** Root cause matched this report's own
+open thread above exactly: `portrait_layout_conformance.mjs`'s `auditOverdriveMeterOnScreen()`
+runs deep into a profile's audit sequence, after many prior spins - a natural 5,000x wincap
+hit earlier in that same sequence leaves MaxWinCelebration's `.max-win-overlay` open,
+intercepting pointer events for every click below it (including `feature-menu-button`
+itself), and none of its clicks were routed through the shared gate-clearing helper. Fixed
+by (1) adding `.max-win-overlay` container-presence detection to
+`frontend/scripts/lib/dismissOverlays.mjs`'s `clickAnyPendingGate()` (previously it only
+checked the COLLECT button's own `isVisible()`, via its `data-testid="max-win-collect"` -
+now also treats the overlay's own presence as authoritative, matching what Playwright's
+error logs actually name as the interceptor) and exporting `clickAnyPendingGate` for direct
+use; (2) calling it at the top of `auditOverdriveMeterOnScreen()`, before its first click.
+Verified with a targeted smoke test against a real `?mockCategory=wincap` round: the
+overlay is confirmed open and blocking (`feature-menu-button` click times out), then
+`clickAnyPendingGate()` clears it (overlay visibility flips true→false) and reports it
+clicked something. Not re-run through the full `portrait_layout_conformance.mjs` suite this
+session (that full run remains deferred, per (b) below) - the fix is verified at the
+specific failure point, not re-validated end-to-end.
+
+**(b) Heavy-suite gates restated for the record.** Both `qa_soak.mjs`'s full 24-cell matrix
+and `portrait_layout_conformance.mjs`'s full run **must complete clean in the external
+audit's fresh environment before any submission** - they are named gates, not optional
+re-runs. This session's own environment ran `qa_soak.mjs` through 8/24 cells clean before
+its time budget ran out (still progressing, not stalled) and killed
+`portrait_layout_conformance.mjs` after it hit the bug (a) now fixes - neither constitutes
+a passing result for either suite, and neither should be treated as one.

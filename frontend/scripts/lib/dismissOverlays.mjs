@@ -20,12 +20,33 @@
 // every mode) - so waitSpinDone()/waitFeatureDrained() don't hang the first
 // time a session actually hits the cap.
 const PENDING_GATE_SELECTORS = ['[data-testid="entry-continue"]', '[data-testid="max-win-collect"]']
-async function clickAnyPendingGate(page) {
+
+// FINAL MERGE, CLOSE-OUT AND HANDOVER, 2026-07-25, rider (a): also detect the
+// MaxWinCelebration overlay by its own container class (`.max-win-overlay`),
+// not just its COLLECT button's testid - a long multi-spin audit sequence
+// (portrait_layout_conformance.mjs's auditOverdriveMeterOnScreen() runs deep
+// into a profile's audit, after many prior spins) can naturally hit the
+// 5,000x wincap well before its own dedicated buy-confirm click, leaving this
+// overlay open and blocking that later, unrelated interaction. Checking the
+// overlay's own presence (rather than only its button's isVisible()) is the
+// more robust signal - it's the actual pointer-event interceptor Playwright's
+// error logs name.
+const MAX_WIN_OVERLAY_SELECTOR = '.max-win-overlay'
+
+export async function clickAnyPendingGate(page) {
   let clicked = false
   for (const sel of PENDING_GATE_SELECTORS) {
     const gate = page.locator(sel)
     if (await gate.count() > 0 && await gate.isVisible().catch(() => false)) {
       await clickViaDom(gate).catch(() => {})
+      clicked = true
+    }
+  }
+  const overlay = page.locator(MAX_WIN_OVERLAY_SELECTOR)
+  if (await overlay.count() > 0 && await overlay.isVisible().catch(() => false)) {
+    const collectBtn = overlay.locator('[data-testid="max-win-collect"]')
+    if (await collectBtn.count() > 0) {
+      await clickViaDom(collectBtn).catch(() => {})
       clicked = true
     }
   }
