@@ -9,6 +9,83 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 004 - 2026-07-26 - PR #90 merged; audit prep complete; the 11 errors enumerated
+
+**COMMS-ACK.** Receipt of FABLE REVIEW, PR #90 (2026-07-26) including addendum ruling
+14 recorded. Entry 003 closed. Rulings noted: (11) extension confirmed, and the wider
+principle logged, **rulings on phrases apply repo-wide, not per-location**; (12)
+framing ratified; (13) approved with the enumeration condition, discharged below.
+
+**PR #90: MERGED**, branch deleted. Map item (2) complete. No open PRs.
+
+### Ruling 13 condition, discharged: all 11 errors, classified
+
+**None is compliance-bearing. None touches currency, wallet, or cost display in a way
+that affects behaviour.** All 11 may ride to post-launch under the section 1 bar.
+Verified rather than assumed, and one required a build to settle.
+
+| # | File:line | Class | Compliance-bearing? |
+|---|---|---|---|
+| 1 | `RainLayer.svelte:71` | Parser-only: svelte-check reports `<script> was left open`; the file is structurally sound (script opens line 1, closes line 35) | **No.** Verified by build: `rain-layer`/`rain-streak` are in the shipped JS bundle and `rain-fall` keyframes in the shipped CSS. The component compiles and ships. Checker quirk. |
+| 2-3 | `App.svelte:11`, `HeroSplash.svelte:21` | `RainLayer has no default export` | **No.** Both are downstream of #1. |
+| 4-8 | `App.svelte` 356, 407, 702, 783, 785 | `TelemetryEvent` under-declares fields the `track()` calls pass (`tier`, `winMicros` x2, `costMicros`, `multiple`) | **No.** Money-adjacent *names*, but telemetry is a no-op observer sink with zero network calls (`docs/TELEMETRY_TAXONOMY.md`, confirmed at built-bundle level in JOB 3). It observes; it cannot reach the wallet or any display. |
+| 9 | `App.svelte:1080` | `FlameJets` colourway union widened to `string` | **No.** Cosmetic. |
+| 10 | `PaytableModal.svelte:307` | `g.label` does not exist on `INTERFACE_GUIDE` entries | **No.** The paytable *is* a compliance surface (the UI button guide is a review requirement), but this line sits in the `{:else}` branch for `kind !== 'img'`, and since Round 3 item 5 **all eight entries are `kind: 'img'`**. Dead, unreachable code. The rendered guide is unaffected. |
+| 11 | `WinDisplay.svelte:77` | `$tr(scatterKey)` widened to `string` vs `keyof Translations` | **No.** `scatterKey` resolves only to `scatter3`/`scatter4`/`scatter5`, all three present in `Translations`. Type widening on a correct lookup. |
+
+**One blind spot worth naming.** Because #1 stops svelte-check parsing `RainLayer`
+entirely, its props are not type-checked at all. A genuine prop mistake there would go
+unnoticed. Small surface (two props), but it is a real hole rather than pure noise.
+
+**Recommendation: leave the baseline at 11.** If you want it at zero, #10 (delete a
+dead branch) and #11 (one cast) are trivial and zero-risk; #4-8 need a
+`TelemetryEvent` type widening; #1-3 need the RainLayer parser issue chased, which is
+the only one with any depth. That is its own pass, and I would not run it before the
+audit.
+
+### Audit prep, green lane, delivered
+
+1. **MaxWinCelebration rider: already satisfied, verified not re-done.**
+   `dismissOverlays.mjs` already handles the wincap gate both by its `max-win-collect`
+   testid and by the `.max-win-overlay` container's own presence, exported as
+   `clickAnyPendingGate` (Round 3 FINAL MERGE rider (a)). Nothing to add. Re-read and
+   confirmed line by line rather than trusted from the report.
+2. **Audit pack refreshed** (`AUDIT_PACK_INDEX.md`). The 2026-07-14 edition was
+   materially stale: it pointed at the **superseded** 2026-07-07 handover as current
+   and listed PRs #56/#57/#60 as unmerged blockers (all merged, branches gone,
+   confirmed). Rewritten to current artefacts, with the superseded ignore list
+   extended: the old top-level `docs/stake-engine-live/*.md` capture set (still shows
+   the $25M exposure figure), the retired vector-mark track, and the public
+   `StakeEngine/docs` repo as **actively misleading** rather than merely stale.
+   Archive count corrected 43 to 79.
+3. **Path verification: 83 repo-relative paths checked across the nine audit-defining
+   documents. Zero broken references.** Everything that did not resolve was correctly
+   a non-file reference (branch names, URL paths, GitHub slugs, prose shorthand).
+4. **Ruling 14 landed** as `SUBMISSION_DOSSIER.md` **section 5g**, wired into 5e's
+   sequence as a hard gate ahead of the review request, with all eleven pages
+   enumerated and an explicit warning not to use the stale GitHub repo for the sweep
+   (which would produce a false clean result).
+5. **Register updates:** the payment one-timer is now explicitly to be done against the
+   **captured** `docs/stake-engine-live/2026-07-25/payments.md`, not the live page;
+   Discord announcements recorded in section 2 as a first-class intelligence source,
+   treated as intel pending first-party confirmation, with anything limit-affecting
+   triggering an immediate sweep rather than waiting for 5g.
+
+**Findings needing your ruling.** None new. Item 13 above is the only open question and
+it carries my recommendation.
+
+**Map position.** (1) and (2) complete. **(3) owner full re-test is next and is not
+mine to start.** The audit (4) stays gated on that verdict and any round-4 items, as
+you directed. Nothing in the repository blocks either.
+
+**Lane.** GREEN throughout: docs, records, audit prep, comms. No game behaviour
+touched, no code changed.
+
+**Pointers.** `AUDIT_PACK_INDEX.md`; `SUBMISSION_DOSSIER.md` section 5g;
+`WRS_MASTER_DOCUMENT.md` sections 1 and 2.
+
+---
+
 ## 003 - 2026-07-26 - Rulings 1-11 executed; PR #89 merged; CI live
 
 **COMMS-ACK.** Receipt of the FABLE RULINGS 1-10 AND NEXT SESSION block (2026-07-26),

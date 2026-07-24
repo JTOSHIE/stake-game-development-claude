@@ -241,8 +241,10 @@ was within the sanctioned pass's explicit scope (the gitignored books artefacts 
 3. Replay URL tests: a base win round, a free spins round, and a bonus buy round
    (cost display check), each in normal and social mode.
 4. Tile check: the composed tile passes the thumbnail guidelines in the editor.
-5. Complete 5f below. It is a hard gate, not an optional check.
-6. Only then request review, with the blurb, for the exact uploaded versions.
+5. Complete 5f below (ACP Math Distribution and Summary evidence). Hard gate.
+6. Complete 5g below (final docs delta sweep, within 24 hours of the request). Hard
+   gate: if any rule changed, HALT and escalate rather than proceeding.
+7. Only then request review, with the blurb, for the exact uploaded versions.
 
 ### 5f. ACP Math Distribution and Summary evidence capture (MANDATORY, added 2026-07-25)
 
@@ -277,8 +279,50 @@ Steps:
 7. **If any displayed value sits outside its limit, stop.** Do not request review.
    Escalate to the owner with the screenshot and the reconciliation note.
 
-Only when steps 1 through 6 are complete and nothing is outside a limit does 5e step 6
-(request review) become available.
+Only when steps 1 through 6 are complete and nothing is outside a limit does 5e step 7
+(request review) become available, and 5g must also have run clean.
+
+### 5g. FINAL DOCS DELTA SWEEP (MANDATORY, added 2026-07-26, Fable ruling 14)
+
+**Within 24 hours before requesting review.** This is a named final gate, not a
+courtesy check.
+
+Why it exists. The platform changes its published rules without announcement and
+without effective dates. In a three-week window we observed the RTP ceiling already
+lowered to 96.70 (while the public GitHub repository still advertised 90.0 to 98.0),
+brand-new file-size caps appear, and the 3-star Maximum Exposure double from
+$25,000,000 to $50,000,000. Any of those landing between our last capture and our
+review request would mean submitting against rules that no longer exist.
+
+Steps:
+
+1. Re-fetch **every** approval page plus the payments page, rendered (the site is a
+   client-side app and returns an empty shell to a plain fetch):
+   - `/docs/approval-guidelines`
+   - `/docs/approval-guidelines/math-verification`
+   - `/docs/approval-guidelines/submission-checklist`
+   - `/docs/approval-guidelines/jurisdiction-requirements`
+   - `/docs/approval-guidelines/game-quality-rankings`
+   - `/docs/approval-guidelines/game-tile-requirements`
+   - `/docs/approval-guidelines/game-replay-requirements`
+   - `/docs/approval-guidelines/rgs-communication`
+   - `/docs/approval-guidelines/front-end-communication`
+   - `/docs/approval-guidelines/general-disclaimer`
+   - `/docs/payments`
+2. Write the capture to a new dated directory under `docs/stake-engine-live/`, with a
+   manifest carrying SHA-256 per page, in the same shape as the 2026-07-25 set.
+3. **Diff against the most recent dated mirror.** Compare content hashes first, then
+   read any page whose hash moved.
+4. **Log the result in `reports/FABLE_COMMS.md`**, whether or not anything changed. A
+   clean sweep is itself the evidence that the gate ran.
+5. **If ANY rule changed, HALT.** Do not request review. Escalate to Fable with the
+   diff and wait for a ruling. This applies to any change in a stated limit, threshold,
+   prohibited term, required behaviour or file-format constraint, however small.
+
+Do not use the public `StakeEngine/docs` GitHub repository as a source for this sweep.
+It is four months stale and structurally diverged from the deployed site; using it
+would produce a false clean result. See
+`docs/stake-engine-live/2026-07-25/DELTA_NOTES.md`.
 
 ## 6. DOCUMENTATION GAPS TO CLOSE
 Headless capture of the interactive approval checklist items at
