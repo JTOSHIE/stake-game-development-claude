@@ -1,0 +1,116 @@
+[
+  {
+    "orientation": "portrait",
+    "value": 1000,
+    "text": "$1,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": -179.0540771484375,
+      "y": 145.27310180664062,
+      "width": 748.108154296875,
+      "height": 122.81869506835938,
+      "top": 145.27310180664062,
+      "right": 569.0540771484375,
+      "bottom": 268.091796875,
+      "left": -179.0540771484375
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/portrait-epic-win-$1000.png"
+  },
+  {
+    "orientation": "portrait",
+    "value": 100000,
+    "text": "$100,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": -179.0540771484375,
+      "y": 145.27310180664062,
+      "width": 748.108154296875,
+      "height": 122.81869506835938,
+      "top": 145.27310180664062,
+      "right": 569.0540771484375,
+      "bottom": 268.091796875,
+      "left": -179.0540771484375
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/portrait-epic-win-$100000.png"
+  },
+  {
+    "orientation": "portrait",
+    "value": 1000000,
+    "text": "$1,000,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": -179.0540771484375,
+      "y": 145.27310180664062,
+      "width": 748.108154296875,
+      "height": 122.81869506835938,
+      "top": 145.27310180664062,
+      "right": 569.0540771484375,
+      "bottom": 268.091796875,
+      "left": -179.0540771484375
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/portrait-epic-win-$1000000.png"
+  },
+  {
+    "orientation": "landscape",
+    "value": 1000,
+    "text": "$1,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": 0,
+      "y": 224,
+      "width": 1280,
+      "height": 172,
+      "top": 224,
+      "right": 1280,
+      "bottom": 396,
+      "left": 0
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/landscape-epic-win-$1000.png"
+  },
+  {
+    "orientation": "landscape",
+    "value": 100000,
+    "text": "$100,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": 0,
+      "y": 225,
+      "width": 1280,
+      "height": 170,
+      "top": 225,
+      "right": 1280,
+      "bottom": 395,
+      "left": 0
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/landscape-epic-win-$100000.png"
+  },
+  {
+    "orientation": "landscape",
+    "value": 1000000,
+    "text": "$1,000,000.00",
+    "overflows": false,
+    "containsFullValue": true,
+    "bandBox": {
+      "x": 0,
+      "y": 225,
+      "width": 1280,
+      "height": 170,
+      "top": 225,
+      "right": 1280,
+      "bottom": 395,
+      "left": 0
+    },
+    "pass": true,
+    "screenshot": "/Users/jt/math-sdk/reports/screens/owner-audit-v2/win-banner-stress/landscape-epic-win-$1000000.png"
+  }
+]

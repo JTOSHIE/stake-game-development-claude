@@ -227,6 +227,13 @@
   let featureActive = false
   let featureScript: PresentationScript | null = null
   let featureResolve: (() => void) | null = null
+  // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix): true for the single frame
+  // in which the just-finished feature's real recordSpinResult() settlement
+  // lands (see settleRound() below) - suppresses the App-level WinBanner so
+  // it doesn't pop a SECOND celebration for a round FreeSpinsPresentation's
+  // own end-of-feature screen already celebrated. Reset false at the top of
+  // every new spin.
+  let lastRoundHadFeature = false
 
   // ── Wincap flow ────────────────────────────────────────────────────────────
   // MaxWinCelebration shows immediately (reactive to $isWincap, unchanged). On
@@ -252,6 +259,22 @@
   let liveMeter = 1
   let liveSpinsRemaining = 0
   let liveRunningTotalCentibets = 0
+  // Feature-end celebration values (WIN BANNER V3 reuse) - see the dedicated
+  // <WinBanner> mount below, and FreeSpinsPresentation's onEndBannerDismissed().
+  let liveEndBannerAmount = 0
+  let liveEndBannerMultiplier = 0
+  let liveEndBannerTrigger = 0
+  let featureRef: FreeSpinsPresentation
+  // OWNER AUDIT ROUND 2, item 4 (Fable's ruling): three distinct entry
+  // colourways - natural (organic trigger, any standing mode), overdrive
+  // (bought Overdrive - the 100x 'bonus' tier), nitro (bought NITRO
+  // OVERDRIVE - the pre-revved 'super' tier, already distinguishable via
+  // FreeSpinsPresentation's own isNitroEntry). $selectedBetMode still holds
+  // the tier that was actually bought for the whole feature (handleBuy only
+  // resets it to 'base' in its `finally`, which runs after presentFeature
+  // resolves), so it is a reliable signal here.
+  let liveIsNitroEntry = false
+  $: flameColourway = liveIsNitroEntry ? 'nitro' : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
   // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
   // Motion Polish v2) — false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.
@@ -310,6 +333,7 @@
     if ($isSpinning || featureActive) return
     isSpinning.set(true)
     resetWin()
+    lastRoundHadFeature = false
     const bet = $betAmount
     // Route through integer micros before this reaches any balance/telemetry
     // math (CLAUDE.md's zero-float-tolerance rule) - a raw `bet * cost` float
@@ -347,38 +371,51 @@
       }
       const events = get(lastRoundEvents)
       const script = events ? scriptFromEvents(events) : null
-
-      if (result.newBalance !== undefined) {
-        // Live: RGS balance is authoritative (already reflects the mode's cost).
-        recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
-        rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
-      } else {
-        // Mock: deduct the mode's real cost and add the served round total.
-        const win = servedTotalWin ?? result.totalWin
-        recordSpinResult(win, cost, undefined, script?.isWincap ?? result.isWincap)
-        rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
-      }
       const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
-      if (buyWin > 0) {
-        const bm = bet > 0 ? buyWin / bet : 0
-        track({ type: 'win', winMicros: Math.round(buyWin * CURRENCY_SCALE), multiple: bm, tier: winTier(bm) })
+      const roundIsWincap = result.newBalance !== undefined ? result.isWincap : (script?.isWincap ?? result.isWincap)
+
+      // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix, buy-flow counterpart to
+      // the same fix in handleSpin above): a buy always triggers the feature,
+      // so recordSpinResult's `win` is always the round's FULL total (base +
+      // every free spin) - settling it before presentFeature plays would
+      // spoil the whole free-spins outcome the instant the buy confirms.
+      // Defer until the feature has actually finished playing (wincap keeps
+      // its existing immediate reveal via MaxWinCelebration, unaffected).
+      const settleRound = () => {
+        if (result.newBalance !== undefined) {
+          // Live: RGS balance is authoritative (already reflects the mode's cost).
+          recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
+          rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(result.totalWin * CURRENCY_SCALE))
+        } else {
+          // Mock: deduct the mode's real cost and add the served round total.
+          recordSpinResult(buyWin, cost, undefined, roundIsWincap)
+          rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(buyWin * CURRENCY_SCALE))
+        }
+        if (buyWin > 0) {
+          const bm = bet > 0 ? buyWin / bet : 0
+          track({ type: 'win', winMicros: Math.round(buyWin * CURRENCY_SCALE), multiple: bm, tier: winTier(bm) })
+        }
+
+        // Dev-only QA instrumentation, mirroring handleSpin's __qaLog block:
+        // the wiring-integrity audit's cost-integrity gate (qa_soak.mjs) needs
+        // a buy-tier entry with the mode actually charged, since this call
+        // site is the one place the FEATURES-menu tier selection turns into a
+        // real debit.
+        if (import.meta.env.DEV) {
+          const w = window as unknown as { __qaLog?: unknown[] }
+          w.__qaLog = w.__qaLog ?? []
+          w.__qaLog.push({
+            mode,
+            bet,
+            cost,
+            totalWin:     buyWin,
+            balanceAfter: get(balance),
+          })
+        }
       }
 
-      // Dev-only QA instrumentation, mirroring handleSpin's __qaLog block below:
-      // the wiring-integrity audit's cost-integrity gate (qa_soak.mjs) needs a
-      // buy-tier entry with the mode actually charged, since this call site is
-      // the one place the FEATURES-menu tier selection turns into a real debit.
-      if (import.meta.env.DEV) {
-        const w = window as unknown as { __qaLog?: unknown[] }
-        w.__qaLog = w.__qaLog ?? []
-        w.__qaLog.push({
-          mode,
-          bet,
-          cost,
-          totalWin:     buyWin,
-          balanceAfter: get(balance),
-        })
-      }
+      const deferSettle = !roundIsWincap && !!script?.triggered
+      if (!deferSettle) settleRound()
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
       // $isWincap). Wait for COLLECT, then present the complete round
@@ -389,6 +426,11 @@
         if (script) await presentFeature(script)
       } else if (script?.triggered) {
         await presentFeature(script)
+      }
+
+      if (deferSettle) {
+        lastRoundHadFeature = true
+        settleRound()
       }
       playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
@@ -642,6 +684,7 @@
     if (cost > bet && $balance < cost) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
+    lastRoundHadFeature = false
     selectedBetMode.set(mode)
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
@@ -705,38 +748,63 @@
         playWin(bet > 0 ? win / bet : 0)
         await new Promise((r) => setTimeout(r, 2600))
       }
-      recordSpinResult(win, cost, result.newBalance, roundIsWincap)
-      rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
-      if (!roundIsWincap) playWin(bet > 0 ? win / bet : 0)
-      if (win > 0) {
-        const mult = bet > 0 ? win / bet : 0
-        track({ type: 'win', winMicros: Math.round(win * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
-      }
-      if (roundIsWincap) track({ type: 'wincap', multiple: bet > 0 ? win / bet : 0 })
 
-      // QA soak harness telemetry (dev-only): the raw mock "book" data for
-      // this round, plus the balance the store actually landed on, so the
-      // harness can independently recompute totals and running balance in
-      // integer micros and assert zero drift against what's presented.
-      if (import.meta.env.DEV) {
-        const w = window as unknown as { __qaLog?: unknown[] }
-        w.__qaLog = w.__qaLog ?? []
-        w.__qaLog.push({
-          mode:         get(selectedBetMode),
-          bet,
-          cost,
-          totalWin:     win,
-          winEvents:    result.winEvents,
-          scatterEvent: result.scatterEvent,
-          balanceAfter: get(balance),
-        })
+      // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix): recordSpinResult sets
+      // the GLOBAL $winAmount/$balance the persistent HudOverlay WIN box and
+      // WinBanner react to unconditionally, with no feature-aware guard (and
+      // cannot be given one - gameStore.ts is locked). For a normal (non-
+      // wincap) triggered round, `win` is the ROUND'S FULL total (base +
+      // every free spin combined) - settling it here, before presentFeature
+      // plays, would reveal the entire outcome before the free spins have
+      // even been shown. Defer the whole settlement (balance/session-stats/
+      // telemetry) until the feature has actually finished playing; the
+      // visible in-feature "TOTAL WIN" is a separate, safe accumulator
+      // (FreeSpinsPresentation's runningTotalCentibets, sourced only from
+      // spins already played - see roundInterpreter.ts) and is never spoiled
+      // by this deferral. Wincap already has its own dedicated immediate
+      // reveal (MaxWinCelebration) and is unaffected.
+      const settleRound = () => {
+        recordSpinResult(win, cost, result.newBalance, roundIsWincap)
+        rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
+        if (!roundIsWincap) playWin(bet > 0 ? win / bet : 0)
+        if (win > 0) {
+          const mult = bet > 0 ? win / bet : 0
+          track({ type: 'win', winMicros: Math.round(win * CURRENCY_SCALE), multiple: mult, tier: winTier(mult) })
+        }
+        if (roundIsWincap) track({ type: 'wincap', multiple: bet > 0 ? win / bet : 0 })
+
+        // QA soak harness telemetry (dev-only): the raw mock "book" data for
+        // this round, plus the balance the store actually landed on, so the
+        // harness can independently recompute totals and running balance in
+        // integer micros and assert zero drift against what's presented.
+        if (import.meta.env.DEV) {
+          const w = window as unknown as { __qaLog?: unknown[] }
+          w.__qaLog = w.__qaLog ?? []
+          w.__qaLog.push({
+            mode:         get(selectedBetMode),
+            bet,
+            cost,
+            totalWin:     win,
+            winEvents:    result.winEvents,
+            scatterEvent: result.scatterEvent,
+            balanceAfter: get(balance),
+          })
+        }
       }
+
+      const deferSettle = !roundIsWincap && !!script?.triggered
+      if (!deferSettle) settleRound()
 
       if ($isWincap) {
         await waitForWincapCollect()
         if (script) await presentFeature(script)
       } else if (script?.triggered) {
         await presentFeature(script)
+      }
+
+      if (deferSettle) {
+        lastRoundHadFeature = true
+        settleRound()
       }
 
       if ($isAutoPlay) {
@@ -830,6 +898,7 @@
       <img
         class="bg-still overdrive"
         class:active={overdriveVisualActive}
+        class:nitro-active={overdriveVisualActive && liveIsNitroEntry}
         src="assets/themes/future-spinner/backgrounds/bg_overdrive.jpg"
         alt=""
         aria-hidden="true"
@@ -890,7 +959,7 @@
   {#if warmMount && $activeTheme.id === 'future-spinner'}
     <div class="warm-mount" class:painted={warmPainted} aria-hidden="true" inert>
       <BonusInstrumentColumn multiplier={1} spinsRemaining={8} runningTotalCentibets={0} />
-      <FreeSpinsPresentation script={WARM_SCRIPT} active={true} />
+      <FreeSpinsPresentation script={WARM_SCRIPT} active={true} skipContinueGate={true} />
     </div>
   {/if}
 
@@ -986,6 +1055,7 @@
           src="{$themeAssets.frame}"
           class="game-frame"
           class:overdrive-active={overdriveVisualActive}
+          class:nitro-active={overdriveVisualActive && liveIsNitroEntry}
           alt=""
           aria-hidden="true"
           on:error={(e) => {
@@ -996,7 +1066,7 @@
 
       <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
       {#if $activeTheme.id === 'future-spinner'}
-        <FlameJets active={overdriveVisualActive} />
+        <FlameJets active={overdriveVisualActive} colourway={flameColourway} />
       {/if}
 
       <!-- GRID — 522x349, centred inside the frame, z20 -->
@@ -1009,19 +1079,37 @@
           <WinBreakdown />
           <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
           <FreeSpinsPresentation
+            bind:this={featureRef}
             script={featureScript}
             active={featureActive}
             bind:displayMeter={liveMeter}
             bind:spinsRemaining={liveSpinsRemaining}
             bind:runningTotalCentibets={liveRunningTotalCentibets}
             bind:overdriveVisualActive
+            bind:isNitroEntry={liveIsNitroEntry}
+            bind:endBannerAmount={liveEndBannerAmount}
+            bind:endBannerMultiplier={liveEndBannerMultiplier}
+            bind:endBannerTrigger={liveEndBannerTrigger}
             on:complete={onFeatureComplete}
           />
         </div>
       </div>
 
-      <!-- BANNER — compact 380x96 centred over the grid at (450,262), z100 -->
-      <WinBanner />
+      <!-- BANNER — full-width neon band, edge to edge across the stage, z100 -->
+      <WinBanner suppressed={lastRoundHadFeature} />
+
+      <!-- FEATURE-END CELEBRATION — WIN BANNER V3 reuse (OWNER AUDIT ROUND 2,
+           item 1/2): the exact same component, driven explicitly by
+           FreeSpinsPresentation's own safe (spins-already-played) total
+           rather than the global $winAmount, and mounted here (not nested
+           inside the scaled grid-slot) so it shares the full 1280x720 stage
+           coordinate space the base banner uses. -->
+      <WinBanner
+        amount={liveEndBannerAmount}
+        multiplier={liveEndBannerMultiplier}
+        trigger={liveEndBannerTrigger}
+        on:dismissed={() => featureRef?.onEndBannerDismissed()}
+      />
 
       <!-- BONUS INSTRUMENT COLUMN — Overdrive only. Landscape/desktop
            unchanged (2026-07-15 neon polish pass, item 2); portrait renders
@@ -1484,6 +1572,12 @@
   .bg-still.overdrive.active {
     opacity: 0.92;
   }
+  /* NITRO OVERDRIVE (item 4): "intensifies the pink/magenta backdrop" - the
+     same graded bg_overdrive.jpg asset, pushed further via filter rather
+     than a second art asset. */
+  .bg-still.overdrive.active.nitro-active {
+    filter: saturate(1.35) brightness(1.08) hue-rotate(-8deg);
+  }
 
   /* ── Dev chip (2026-07-14c) — single small anchor, replaces two separate
        floating buttons so the dev server's default view is visually closer
@@ -1611,9 +1705,20 @@
     0%, 100% { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
     50%       { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 24px color-mix(in srgb, var(--theme-secondary, #ff00ff) 95%, transparent)); }
   }
+  /* NITRO (item 4): the same pulse, intensified - higher saturation and a
+     brighter peak glow, distinguishing the bought NITRO entry from a plain
+     Overdrive buy without a second keyframe/asset. */
+  .game-frame.overdrive-active.nitro-active {
+    animation-name: frame-pulse-nitro;
+  }
+  @keyframes frame-pulse-nitro {
+    0%, 100% { filter: hue-rotate(280deg) saturate(1.7) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-secondary, #ff00ff) 75%, transparent)); }
+    50%       { filter: hue-rotate(280deg) saturate(1.7) drop-shadow(0 0 34px color-mix(in srgb, var(--theme-secondary, #ff00ff) 100%, transparent)); }
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    .game-frame, .game-frame.overdrive-active { animation: none; }
+    .game-frame, .game-frame.overdrive-active, .game-frame.overdrive-active.nitro-active { animation: none; }
+    .bg-still.overdrive.active.nitro-active { filter: saturate(1.2) brightness(1.05); }
   }
 
   /* ── Grid — 522x349, centred inside the frame, z20 ──────────────────────── */

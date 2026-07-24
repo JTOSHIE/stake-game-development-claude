@@ -290,6 +290,18 @@
     user-select: none;
   }
 
+  /* ── Portrait/narrow resize (OWNER AUDIT ROUND 2, item 3): the headline +
+     "5,000x" numeral were fixed desktop sizes with no narrow-viewport rule
+     at all, overflowing on phone widths - scaled down to fit, same
+     proportions, same 500px breakpoint PaytableModal already uses. ────── */
+  @media (max-width: 500px) {
+    .c1-max-headline { font-size: 42px; margin: 4px 0; }
+    .c1-max-mult { font-size: 50px; }
+    .c1-max-x { font-size: 24px; }
+    .c1-max-betlabel { font-size: 13px; }
+    .c1-collect { padding: 12px 36px; font-size: 15px; }
+  }
+
   /* ── Reduced motion guard ─────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     .c1-max, .c1-halo, .c1-max-content, .c1-particle { animation: none !important; }

@@ -102,10 +102,20 @@ function startDevServer(port) {
 
 async function dismissIntro(page) {
   // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
-  // every load, ahead of the once-per-session rules modal below.
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
+  // every load, ahead of the once-per-session rules modal below. Polls for
+  // up to ~2s rather than a single instantaneous check - sessionStorage
+  // (its "seen" flag) is scoped per browsing context, so every fresh
+  // browser.newPage()/profile here starts with none set and the splash
+  // always (re)appears; a single-shot isVisible() check can race its
+  // entrance animation and miss it, leaving it covering later controls.
+  const deadline = Date.now() + 2000
+  while (Date.now() < deadline) {
+    const splash = page.locator('[data-testid="hero-splash"]')
+    if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
+      await splash.click()
+      await page.waitForTimeout(100)
+      break
+    }
     await page.waitForTimeout(100)
   }
   const btn = page.locator('[data-testid="intro-continue"]')
@@ -115,11 +125,24 @@ async function dismissIntro(page) {
   }
 }
 
-async function waitSpinDone(page, timeout = 20000) {
-  await page.waitForFunction(
-    () => !document.querySelector('[data-testid="spin-button"].spinning'),
-    { timeout },
-  )
+// OWNER AUDIT ROUND 2, item 1: a triggered feature now waits at an explicit
+// CLICK TO CONTINUE gate before the first free spin - never auto-advances,
+// not bypassed by autoplay/turbo. A harness driving spins unattended must
+// click it too (force: true - its own continuous CSS pulse means the
+// button never "stabilises" for Playwright's default actionability check),
+// or a natural/forced trigger hangs this wait forever.
+async function waitSpinDone(page, timeout = 45000) {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const done = await page.evaluate(() => !document.querySelector('[data-testid="spin-button"].spinning'))
+    if (done) return
+    const gate = page.locator('[data-testid="entry-continue"]')
+    if (await gate.count() > 0 && await gate.isVisible().catch(() => false)) {
+      await gate.click({ force: true }).catch(() => {})
+    }
+    await page.waitForTimeout(150)
+  }
+  throw new Error(`waitSpinDone: spin still in progress after ${timeout}ms`)
 }
 
 async function waitTestStores(page) {

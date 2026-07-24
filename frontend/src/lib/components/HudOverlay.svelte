@@ -1353,8 +1353,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 8px 12px;
+    /* OWNER AUDIT ROUND 2, item 7: the row read cramped at 10px - opened up
+       for a more generous, full-width feel now that it already has the
+       whole row to itself (44px+ targets below are unaffected either way). */
+    gap: 16px;
+    padding: 8px 14px;
     min-height: 52px;
     border-radius: 10px;
     background: linear-gradient(160deg, rgba(255, 215, 0, 0.08), transparent 60%), #0c1220;
@@ -1374,7 +1377,7 @@
   .p-stat-value.magenta { color: color-mix(in srgb, var(--p-pink) 22%, #fff); }
   .p-stat-value.gold { color: color-mix(in srgb, var(--p-gold) 30%, #fff); }
 
-  .p-bet-row { display: flex; align-items: center; gap: 2px; }
+  .p-bet-row { display: flex; align-items: center; gap: 10px; }
   .p-bet-step {
     /* 2026-07-14 portrait pass, touch-target audit (portrait_layout_
        conformance.mjs): the original 30x30 box measured below the 44px

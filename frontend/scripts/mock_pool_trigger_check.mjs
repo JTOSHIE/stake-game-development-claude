@@ -1,6 +1,6 @@
 // mock_pool_trigger_check.mjs — OWNER AUDIT REMEDIATION item A5.
 //
-// 1. Static assert: the base and cruise mock pools (frontend/src/lib/mock/
+// 1. Static assert: the base, cruise and antelite mock pools (frontend/src/lib/mock/
 //    sample_rounds.json) each contain at least one natural Overdrive
 //    trigger round (a freeSpinTrigger event, not a buy-tier round).
 // 2. Live harness: forces a curated cruise trigger round via ?mockCategory=
@@ -58,7 +58,7 @@ async function dismissIntro(page) {
 function staticPoolCheck() {
   const samples = JSON.parse(readFileSync(SAMPLE_PATH, 'utf8'))
   const results = {}
-  for (const mode of ['base', 'cruise']) {
+  for (const mode of ['base', 'cruise', 'antelite']) {
     const pool = samples.filter((s) => s.mode === mode)
     const triggers = pool.filter((s) => s.round.events.some((e) => e.type === 'freeSpinTrigger'))
     results[mode] = { poolSize: pool.length, naturalTriggers: triggers.length, pass: triggers.length >= 1 }
@@ -100,10 +100,23 @@ async function liveTriggerHarness(baseUrl) {
   ).then(() => true).catch(() => false)
   let overlayCleared = false
   if (overlayAppeared) {
-    overlayCleared = await page.waitForFunction(
-      () => document.querySelectorAll('[data-testid="freespins-overlay"]').length < 2,
-      { timeout: 60000 },
-    ).then(() => true).catch(() => false)
+    // OWNER AUDIT ROUND 2, item 1: the real feature now waits at an explicit
+    // CLICK TO CONTINUE gate before the first free spin - poll for it and
+    // click through (force: true - its own continuous CSS pulse means it
+    // never "stabilises" for Playwright's default actionability check) while
+    // waiting for the overlay to clear, or a real trigger hangs here forever.
+    const deadline = Date.now() + 60000
+    while (Date.now() < deadline) {
+      const cleared = await page.evaluate(
+        () => document.querySelectorAll('[data-testid="freespins-overlay"]').length < 2,
+      )
+      if (cleared) { overlayCleared = true; break }
+      const gate = page.locator('[data-testid="entry-continue"]')
+      if (await gate.count() > 0 && await gate.isVisible().catch(() => false)) {
+        await gate.click({ force: true }).catch(() => {})
+      }
+      await page.waitForTimeout(150)
+    }
   }
   await browser.close()
   return { overlayAppeared, overlayCleared, pass: overlayAppeared && overlayCleared }
