@@ -9,6 +9,67 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 002 - 2026-07-26 - Fresh-eyes deep review delivered
+
+**State delta.** Section 3 deliverable complete: `reports/qa/fresh_eyes_review_2026-07-26.md`.
+Findings only, nothing changed. Scope: 61 source files / 15,026 lines, 35 harnesses,
+78 archives / 12,017 lines. **14 findings: 5 KEEP, 6 CLEAN, 3 RETHINK.** No bug in
+shipping behaviour found.
+
+**Headline.** The codebase is better than three weeks of rapid iteration predicts:
+**zero TODO/FIXME/HACK/@ts-ignore/eslint-disable markers in 15,026 lines.** The real
+debt is not mess, it is **duplicated concepts** kept in agreement by a comment or an
+assert rather than by construction. That single pattern is behind the PR #89 currency
+defect, the Round 3 feature-grid sizing bug, and the 22 drifted `dismissIntro` copies.
+Three live instances remain.
+
+**Corrections to standing knowledge.**
+- The stale-overlay script count is **six, not five**. `animation_uplift_proof.mjs`
+  has its own inline handling under a different function name, which is why previous
+  sweeps missed it.
+- `CLAUDE.md`'s replay-mode compliance line names `ControlBar` and `AutoPlayModal`.
+  **Neither file exists.** Behaviour is still correct; the requirement can no longer
+  be checked against the code as written.
+
+**Findings needing your ruling.** Continuing the numbering from 001.
+
+7. **Consolidated cleanup pass contents.** Eight candidates ranked in the report's
+   final table. I recommend **yes** to five and **explicitly no** to two:
+   `replayStore.ts` (write-only, 4 stores) and unifying the duplicated feature-grid
+   renderers. Both are real, both are post-launch. Under section 1's bar they are
+   elegance, in compliance-bearing or visually complex code, days before the external
+   audit. Ruling wanted on whether you agree with the two refusals.
+8. **`CURRENCY_SCALE` is defined three times**, one copy inside locked
+   `rgsService.ts`. All three agree today. It is the money path and the exact shape
+   that produced the PR #89 defect. Proposed: `utils/currency.ts` canonical,
+   `replayService.ts` imports it, the locked copy recorded in `LOCKED_FILE_DEBTS`.
+   No lock lift needed.
+9. **Four dead stores inside locked `gameStore.ts`** (`betIndex`, `buyBonusActive`,
+   `canSetMaxBet`, `sessionStats`), no production read. Propose recording in
+   `LOCKED_FILE_DEBTS` to ride the next sanctioned pass. Not worth a pass of its own.
+10. **New permanent guard, already working.** The `standingMode` dead-wiring class is
+    statically detectable. I wrote and ran the detector during the review: 9 of 53
+    stores have no production read, and it correctly clears `jurisdictionFlags`, which
+    a naive version false-flags. Run against the 2026-07-07 tree it would have caught
+    `standingMode` before the manual wiring audit did. Propose hardening it into
+    `frontend/scripts/dead_wiring_scan.mjs` and adding it to the suite. This closes
+    the one row in the armour table currently marked "no static guard".
+
+**Armour confirmed, since you asked for that too.** The buy-tier billing class is
+covered three ways (cost-integrity gate driving the real player path, the
+`fsModes`/`index.json` drift test, the wallet float scan). Notably `qa_soak.mjs`'s
+cost table is **hardcoded rather than imported**, which looks like duplication and is
+the correct independent-oracle design, i.e. the c6 recentre lesson applied properly by
+whoever wrote it.
+
+**Lane.** GREEN (findings document, no code changes), branched off `main` not off
+PR #89 so it cannot drag review-lane content into `main`.
+
+**Pointers.** `reports/qa/fresh_eyes_review_2026-07-26.md`. Map item (2) is now ready
+for your rulings; item (1) still waits on your PR #89 review.
+
+---
+
 ## 001 - 2026-07-25 - Platform delta and tool vetting; builder handover acknowledged
 
 **Handover.** Opening correspondence received and saved verbatim as
