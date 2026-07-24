@@ -9,6 +9,11 @@
       "poolSize": 12,
       "naturalTriggers": 3,
       "pass": true
+    },
+    "antelite": {
+      "poolSize": 12,
+      "naturalTriggers": 3,
+      "pass": true
     }
   },
   "liveResult": {

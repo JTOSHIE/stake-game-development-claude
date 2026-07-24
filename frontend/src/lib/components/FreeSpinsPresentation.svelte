@@ -6,7 +6,6 @@
   //
   // Emits 'complete' with the total win (dollars) when the sequence finishes.
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import OverdriveMeter from './OverdriveMeter.svelte'
   import { betAmount, currencyCode, isTurbo, locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
@@ -16,6 +15,12 @@
 
   export let script: PresentationScript | null = null
   export let active = false
+  // Reel Feel v3 warm-mount only (App.svelte's hidden always-active
+  // pre-paint instance): the real click-to-continue gate below must never
+  // auto-advance, but the invisible warm instance still needs to reach every
+  // later stage once to pay the paint/decode cost - this flag lets it
+  // synthesize the click immediately instead of waiting forever unclicked.
+  export let skipContinueGate = false
 
   const dispatch = createEventDispatcher<{ complete: { totalWin: number } }>()
 
@@ -40,8 +45,23 @@
   // plays out behind the total-win summary rather than after it.
   export let overdriveVisualActive = false
   let showRetrigger = false
-  let endTotalDisplay = 0
   let timer: ReturnType<typeof setTimeout> | null = null
+  // OWNER AUDIT ROUND 2, item 1: the entry card never auto-advances past the
+  // scatter-award reveal - it waits here for an explicit click, and nothing
+  // in runEntrySequence's own timers (all turbo-aware via dur()) can bypass
+  // it, so autoplay/turbo pause here exactly like a manual player would.
+  let awaitingContinue = false
+  // WIN BANNER V3 reuse (item 2): bound out to App.svelte, which mounts the
+  // celebration <WinBanner> (explicit-trigger mode) as a stage-level sibling
+  // of the base big-win instance - same component, same coordinate space.
+  // endBannerTrigger is bumped once per feature-end reveal so the banner
+  // shows again even if the amount happens to repeat.
+  export let endBannerAmount = 0
+  export let endBannerMultiplier = 0
+  export let endBannerTrigger = 0
+  // Bindable (OWNER AUDIT ROUND 2, item 4) so App.svelte can pick the right
+  // FlameJets colourway / backdrop treatment for the actual entry type.
+  export let isNitroEntry = false
 
   $: mode = ($isSocial ? 'social' : 'real') as GameMode
   $: lang = $locale
@@ -108,9 +128,12 @@
    *  start() before this runs), screen dip, gauge slam-to-redline + the
    *  title card's own slam-in/shockwave (both land in the same 'gauge'
    *  stage so they read as one threshold moment rather than two separate
-   *  beats), spin-count text burst, then settle. 180+150+380+300+300 =
-   *  1310ms baseline (non-turbo) - under budget with margin; every step
-   *  stays turbo-aware via dur(). */
+   *  beats), spin-count text burst, then a CLICK TO CONTINUE gate (OWNER
+   *  AUDIT ROUND 2, item 1) - every stage up to the gate is turbo-aware via
+   *  dur(), but the gate itself has no timer at all, so neither turbo nor
+   *  autoplay can skip past the scatter-award reveal without an explicit
+   *  click. 180+150+380+300 = 1010ms baseline (non-turbo) to reach the
+   *  gate. */
   function runEntrySequence(): void {
     entryStage = 'flare'
     timer = setTimeout(() => {
@@ -120,12 +143,19 @@
         timer = setTimeout(() => {
           entryStage = 'burst'
           timer = setTimeout(() => {
-            entryStage = 'settle'
-            timer = setTimeout(nextSpin, dur(300))
+            awaitingContinue = true
+            if (skipContinueGate) continueFromEntry()
           }, dur(300))
         }, dur(380))
       }, dur(150))
     }, dur(180))
+  }
+
+  function continueFromEntry(): void {
+    if (!awaitingContinue) return
+    awaitingContinue = false
+    entryStage = 'settle'
+    timer = setTimeout(nextSpin, dur(300))
   }
 
   function nextSpin() {
@@ -161,19 +191,22 @@
     // Reverse the bg-crossfade/frame-hue shift behind the total win summary,
     // not after it.
     overdriveVisualActive = false
-    // count-up the total
-    const target = centibetsToMicros(script!.totalWinCentibets)
-    const steps = 24
-    let i = 0
-    const stepMs = dur(900) / steps
-    endTotalDisplay = 0
-    const tick = () => {
-      i += 1
-      endTotalDisplay = Math.round((target * i) / steps)
-      if (i < steps) { timer = setTimeout(tick, stepMs) }
-      else { endTotalDisplay = target; timer = setTimeout(finish, dur(1400)) }
-    }
-    timer = setTimeout(tick, stepMs)
+    // WIN BANNER V3 reuse (item 2): the App-level celebration <WinBanner>
+    // owns the count-up/tier/dismiss timing entirely - bump the trigger to
+    // show it; App.svelte chains its on:dismissed to onEndBannerDismissed()
+    // below rather than a duplicated local timer.
+    endBannerAmount = script ? (script.totalWinCentibets / 100) * $betAmount : 0
+    endBannerMultiplier = script ? script.totalWinCentibets / 100 : 0
+    endBannerTrigger += 1
+  }
+
+  /** Called by App.svelte once the celebration <WinBanner> it mounts (driven
+   *  by endBannerAmount/endBannerMultiplier/endBannerTrigger above) has
+   *  auto-dismissed - completes the round exactly as the old internal timer
+   *  used to, just chained off the shared component's own timing instead of
+   *  a duplicate. */
+  export function onEndBannerDismissed(): void {
+    finish()
   }
 
   function finish() {
@@ -185,6 +218,17 @@
 
   // Start automatically when activated with a script.
   $: if (active && script && phase === 'idle') start()
+
+  // Dev-only QA hook (OWNER AUDIT ROUND 2, item 1 hard assert): publishes the
+  // live script + the spin index actually reached so a headless check can
+  // read the DOM's displayed running total after each spin and independently
+  // verify it equals the sum of spins 1..k, never the round's final total,
+  // until the round has actually finished. Mirrors App.svelte's existing
+  // dev-only __qaLog pattern.
+  $: if (import.meta.env.DEV) {
+    const w = window as unknown as { __qaFeatureScript?: unknown }
+    w.__qaFeatureScript = script ? { script, spinIndex, phase } : null
+  }
 
   // Free-spin board cells show the real symbol art (same exports the main reel
   // uses), not the id text. W/S map to the wild/scatter filenames.
@@ -241,17 +285,26 @@
         <img class="entry-shockwave" src="{$themeAssets.assetBase}/ui/particles/shock_ring.png" alt="" aria-hidden="true" data-testid="entry-shockwave" />
         <div class="entry-title" data-testid="entry-title">{entryTitleText}</div>
         <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
+        <!-- OWNER AUDIT ROUND 2, item 1: explicit gate before the first free
+             spin - never auto-advances, not bypassed by autoplay/turbo. -->
+        {#if awaitingContinue}
+          <button
+            type="button"
+            class="entry-continue"
+            data-testid="entry-continue"
+            on:click={continueFromEntry}
+          >
+            CLICK TO CONTINUE
+          </button>
+        {/if}
       </div>
     {:else if phase === 'spin' && currentSpin}
       <div class="fs-stage">
-        <div class="fs-meter-slot">
-          <OverdriveMeter
-            multiplier={displayMeter}
-            spinsRemaining={spinsRemaining}
-            label={t(lang, 'overdrive', mode)}
-            spinsLabel={t(lang, 'freeSpins', mode)}
-          />
-        </div>
+        <!-- No top-right meter overlay here (OWNER AUDIT ROUND 2, item 3:
+             "remove the top-right overlay panel from the feature entirely,
+             reels at maximum size") - the live meter/spins/total-win values
+             are bound out to BonusInstrumentColumn (App.svelte), the single
+             source of in-feature instrumentation for both layouts. -->
         <div class="fs-board" class:has-win={hasWin}>
           {#each vrows as reel, reelIdx}
             <div class="fs-reel">
@@ -269,7 +322,7 @@
             </div>
           {/each}
           <!-- Win value pops over the highlighted connection (what you just won
-               this spin); the running TOTAL WIN stays in the right column. -->
+               this spin); the running TOTAL WIN stays in the instrument column. -->
           {#if hasWin}
             {#key spinIndex}
               <div class="fs-spin-win">
@@ -277,17 +330,25 @@
               </div>
             {/key}
           {/if}
+          <!-- Retrigger notice (OWNER AUDIT ROUND 2, item 3): layered at the
+               reel edge, outside the grid, small but alive - not a big
+               centred banner. -->
+          {#if showRetrigger}
+            {#key spinIndex}
+              <div class="fs-retrigger" data-testid="retrigger-pop">+5 {t(lang, 'freeSpins', mode)}</div>
+            {/key}
+          {/if}
         </div>
-        <!-- Running total and multiplier live in the instrument column under the
-             gauge on the right; only the retrigger notice shows below the board. -->
-        {#if showRetrigger}
-          <div class="fs-retrigger">+5 {t(lang, 'freeSpins', mode)}</div>
-        {/if}
       </div>
     {:else if phase === 'end'}
+      <!-- WIN BANNER V3 reuse (item 2): the actual celebration is the exact
+           same neon-band <WinBanner> base-game big wins use, mounted as a
+           stage-level sibling in App.svelte (bound out via endBannerAmount/
+           endBannerMultiplier/endBannerTrigger below) so it shares the same
+           full-width stage coordinate space rather than this dialog's own
+           scaled grid-slot box. This dialog only shows the small title. -->
       <div class="fs-end">
         <div class="fs-title">{t(lang, 'featureComplete', mode)}</div>
-        <div class="fs-endtotal">{formatBalance(endTotalDisplay, $currencyCode || 'USD')}</div>
       </div>
     {/if}
   </div>
@@ -392,19 +453,43 @@
   .stage-burst .entry-burst-text { opacity: 1; transform: scale(1); }
   .stage-settle .entry-burst-text { opacity: 0; }
 
+  /* CLICK TO CONTINUE gate (OWNER AUDIT ROUND 2, item 1) - sits below the
+     burst text, appears the instant the gate opens (no entrance delay of
+     its own beyond that), 44px+ touch target throughout. */
+  .entry-continue {
+    position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; justify-content: center;
+    /* This button lives inside the LAYOUT_SPEC 1280x720 stage coordinate
+       system, which portrait scales down well below 1:1 (as low as ~0.58x
+       measured on iPhone 14 portrait) - a plain 48px min-height rendered on
+       screen at only ~28px, under the 44px touch-target floor
+       (portrait_layout_conformance.mjs's touchTargetAudit caught this).
+       96px pre-scale clears 44px on screen even at that smallest observed
+       scale, with margin. */
+    min-height: 96px; padding: 0 28px;
+    font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.12em;
+    color: #0a0614; background: linear-gradient(180deg, #ffe98a, #ffd700 60%, #d9a81e);
+    border: none; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.6);
+    animation: continue-pulse 1.1s ease-in-out infinite;
+  }
+  .entry-continue:hover, .entry-continue:focus-visible { filter: brightness(1.08); }
+  @keyframes continue-pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
   @media (prefers-reduced-motion: reduce) {
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
       transition: none;
     }
     .entry-smoke-wisp, .entry-shockwave { display: none; }
+    .entry-continue { animation: none; }
     .fs-cell.win { animation: none; }
     .fs-spin-win { animation: none; }
+    .fs-retrigger { animation: none; }
   }
   .fs-stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(92vw, 560px); }
-  .fs-meter-slot { position: absolute; top: 12px; right: 12px; }
-  /* Shifted left of centre so the top-right Overdrive meter box clears the
-     board's top-right tile (off-centre is fine per owner). */
-  .fs-board { position: relative; display: flex; gap: 10px; transform: translateX(-52px); }
+  /* No top-right meter overlay any more (item 3) - the board sits centred,
+     at maximum size, nothing dodging an overlay box. */
+  .fs-board { position: relative; display: flex; gap: 10px; }
   .fs-reel { display: flex; flex-direction: column; gap: 10px; }
   .fs-cell {
     position: relative;
@@ -442,7 +527,22 @@
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
     100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   }
-  .fs-retrigger { font-size: 1.3rem; font-weight: 900; color: var(--theme-secondary, #ff2ec4); animation: rtpop 0.5s ease; }
-  .fs-endtotal { font-size: 2.4rem; font-weight: 900; color: #ffd54a; text-shadow: 0 0 20px #ffb300; }
-  @keyframes rtpop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.25); opacity: 1; } 100% { transform: scale(1); } }
+  /* Retrigger notice (OWNER AUDIT ROUND 2, item 3): layered at the reel
+     edge, OUTSIDE the grid (not a big centred banner blocking play) - a
+     small pill that scale-ins with a glow over ~900ms, then holds briefly
+     before the {#key spinIndex} block tears it down on the next spin. */
+  .fs-retrigger {
+    position: absolute; top: 50%; right: -14px; transform: translate(100%, -50%);
+    z-index: 6; pointer-events: none; white-space: nowrap;
+    font-size: 0.85rem; font-weight: 900; letter-spacing: 0.06em;
+    color: #fff; padding: 6px 14px; border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255, 46, 196, 0.92), rgba(22, 242, 224, 0.85));
+    box-shadow: 0 0 10px rgba(255, 46, 196, 0.8), 0 0 22px rgba(255, 46, 196, 0.45);
+    animation: rtpop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes rtpop {
+    0%   { transform: translate(100%, -50%) scale(0.3); opacity: 0; box-shadow: 0 0 0 rgba(255, 46, 196, 0); }
+    45%  { transform: translate(100%, -50%) scale(1.15); opacity: 1; box-shadow: 0 0 16px rgba(255, 46, 196, 0.9), 0 0 30px rgba(255, 46, 196, 0.55); }
+    100% { transform: translate(100%, -50%) scale(1); opacity: 1; box-shadow: 0 0 10px rgba(255, 46, 196, 0.8), 0 0 22px rgba(255, 46, 196, 0.45); }
+  }
 </style>

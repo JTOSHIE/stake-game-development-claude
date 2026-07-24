@@ -75,6 +75,13 @@
   // right `kind`.
   $: spinModeCards = cards.filter((m) => m.kind !== 'buy')
   $: buyFeatureCards = cards.filter((m) => m.kind === 'buy')
+  // FEATURES MENU ITERATION 3 (OWNER AUDIT ROUND 2, item 6): Normal and
+  // Cruise become one paired switch instead of two separate stacked cards -
+  // condenses the list so the buy cards sit higher with less scrolling.
+  // OVERBOOST (the only enhancer) keeps its own separate card, rendered from
+  // the same generic loop as before.
+  $: pairedStandingCards = spinModeCards.filter((m) => m.id === 'normal' || m.id === 'cruise')
+  $: otherSpinModeCards = spinModeCards.filter((m) => m.id !== 'normal' && m.id !== 'cruise')
 
   // A standing card is active when its serverMode is the selected standing mode.
   const isActiveStanding = (m: FsMode, sel: BetMode) => sel === m.serverMode
@@ -172,10 +179,11 @@
   </button>
 {:else}
 <!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot) ───── -->
-<div class="fm-entry" class:idle-shimmer={idleAttract} data-testid="feature-menu-entry">
+<div class="fm-entry" data-testid="feature-menu-entry">
   <button
     class="fm-entry-knob fs-knob"
     class:mode-enhancer={$standingMode === 'antelite'}
+    class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
     aria-label="Features and bet modes"
@@ -221,9 +229,13 @@
           </button>
         </div>
 
-        <!-- Shared bet selector row -->
+        <!-- Shared bet selector row (ITERATION 3, OWNER AUDIT ROUND 2, item 6:
+             merged with the former standalone "This spin costs" line below it
+             - the cost text now sits in this SAME row, before the bet amount,
+             so the two header lines condense into one). -->
         <div class="fm-betbar fs-plate">
           <div class="fs-face">
+            <span class="fm-spin-cost" data-testid="current-spin-cost">SPIN COST <span class="fs-num">{currentSpinCost}</span></span>
             <span class="fm-betlabel">BET</span>
             <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label="Decrease bet">-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
@@ -238,8 +250,43 @@
              so adding a mode is still a one-line FS_MODES edit. -->
         <div class="fm-cards" data-testid="feature-menu-cards">
           <div class="fm-section-label">SPIN MODES</div>
-          <div class="fm-spin-cost" data-testid="current-spin-cost">This spin costs <span class="fs-num">{currentSpinCost}</span></div>
-          {#each spinModeCards as m (m.id)}
+
+          <!-- ITERATION 3, item 6: Normal + Cruise as one paired switch, not
+               two stacked cards - same per-mode markup/testids as the plain
+               loop below (standing-select-{id} only renders for the mode
+               that ISN'T active, exactly as before), just laid out side by
+               side in a single card so the list condenses. -->
+          {#if pairedStandingCards.length === 2}
+            <div class="fm-card fs-plate tone-standing fm-paired" data-testid="feature-card-normal-cruise">
+              <div class="fs-face fm-paired-face">
+                {#each pairedStandingCards as m (m.id)}
+                  {@const active = isActiveStanding(m, $standingMode)}
+                  <div class="fm-paired-opt" class:active>
+                    <div class="fm-name-row">
+                      <span class="fm-radio" class:checked={active} aria-hidden="true"></span>
+                      <span class="fm-name">{modeLabel(m, $isSocial)}</span>
+                    </div>
+                    <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                    <div class="fm-action">
+                      <span class="fm-cost fs-num">{m.cost}× bet</span>
+                      {#if active}
+                        <span class="fm-active-tag" data-testid="standing-active-{m.id}">ACTIVE</span>
+                      {:else}
+                        <button
+                          class="fm-select"
+                          on:click={() => selectStanding(m)}
+                          disabled={$isSpinning}
+                          data-testid="standing-select-{m.id}"
+                        >SELECT</button>
+                      {/if}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#each otherSpinModeCards as m (m.id)}
             {@const active = isActiveStanding(m, $standingMode)}
             {@const enhOn = isEnhancerOn(m, $standingMode)}
             <div
@@ -549,9 +596,17 @@
   .fm-close > .fs-face { color: #cfe6f2; font-size: 0.82rem; }
   .fm-close:hover > .fs-face { color: #fff; filter: brightness(1.2); }
 
-  /* bet selector row */
+  /* bet selector row - ITERATION 3 (item 6): now also carries the spin-cost
+     text (formerly its own line under the SPIN MODES label), merged into
+     this one row, before the bet amount, so the two header lines condense
+     into one. */
   .fm-betbar { margin: 14px 20px 0; --sig: var(--sig-cyan); flex-shrink: 0; }
-  .fm-betbar > .fs-face { flex-direction: row; align-items: center; gap: 0.8rem; padding: 8px 16px; }
+  .fm-betbar > .fs-face { flex-direction: row; align-items: center; gap: 0.7rem; padding: 8px 16px; flex-wrap: wrap; }
+  .fm-spin-cost {
+    font-size: 0.62rem; color: rgba(255, 255, 255, 0.65); letter-spacing: 0.1em;
+    white-space: nowrap; text-transform: uppercase;
+  }
+  .fm-spin-cost .fs-num { color: #fff2c2; font-weight: 800; text-shadow: 0 0 4px var(--sig-gold); text-transform: none; letter-spacing: normal; margin-left: 0.3em; }
   .fm-betlabel { font-size: 0.58rem; letter-spacing: 0.16em; color: color-mix(in srgb, var(--sig-cyan) 45%, #fff); }
   .fm-step {
     width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
@@ -597,11 +652,6 @@
     margin: 4px 2px 0;
     background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sig-gold) 55%, transparent) 20%, color-mix(in srgb, var(--sig-gold) 55%, transparent) 80%, transparent);
   }
-  .fm-spin-cost {
-    font-size: 0.68rem; color: rgba(255, 255, 255, 0.65);
-    padding: 4px 2px 8px; letter-spacing: 0.03em;
-  }
-  .fm-spin-cost .fs-num { color: #fff2c2; font-weight: 800; text-shadow: 0 0 4px var(--sig-gold); }
 
   .fm-card { --sig: var(--sig-cyan); }
   .fm-card.tone-standing { --sig: var(--sig-cyan); }
@@ -616,6 +666,19 @@
       0 0 14px color-mix(in srgb, var(--sig-cyan) 25%, transparent);
   }
   .fm-card.dimmed { filter: grayscale(0.55) brightness(0.72); opacity: 0.7; }
+
+  /* Normal + Cruise paired switch (ITERATION 3, item 6) - one card, two
+     options side by side, each reusing the exact same .fm-name-row/
+     .fm-radio/.fm-blurb/.fm-action/.fm-select markup the plain per-mode
+     cards use, so nothing about their behaviour or testids changes, only
+     the layout condenses from two stacked cards into one. */
+  .fm-paired-face { flex-direction: row !important; align-items: stretch !important; padding: 12px 14px !important; gap: 0 !important; }
+  .fm-paired-opt {
+    flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 0.4rem;
+    padding: 0 12px; text-align: left;
+  }
+  .fm-paired-opt:first-child { border-right: 1px solid rgba(255, 255, 255, 0.12); }
+  .fm-paired-opt .fm-action { flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; }
 
   .fm-card-main { flex: 1; min-width: 0; text-align: left; }
   .fm-name-row { display: flex; align-items: center; gap: 0.5rem; }
@@ -712,8 +775,15 @@
 
   /* Idle attract shimmer (ANIMATION UPLIFT PASS 2026-07-16, item 5): a
      gentle glow/brightness breathing pulse on the FEATURES entry, shared
-     across all three layout variants (.p-fm-entry/.c-fm-entry/.fm-entry)
-     via the one .idle-shimmer class rather than three separate rules. */
+     across all three layout variants (.p-fm-entry/.c-fm-entry/.fm-entry-knob)
+     via the one .idle-shimmer class rather than three separate rules.
+     OWNER AUDIT ROUND 2, item 7 fix: desktop/landscape had this class on
+     the OUTER .fm-entry wrapper div (rectangular, no border-radius) rather
+     than the actual circular .fm-entry-knob button - the animated
+     box-shadow followed the wrapper's square bounding box, reading as a
+     pulsing square shadow artefact behind the round button and its label.
+     Portrait/compact-landscape were never affected (idle-shimmer already
+     sat on the button itself there). Moved to .fm-entry-knob to match. */
   .idle-shimmer {
     animation: idle-shimmer-pulse 3.2s ease-in-out infinite;
   }

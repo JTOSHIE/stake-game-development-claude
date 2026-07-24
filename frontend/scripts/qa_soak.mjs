@@ -141,19 +141,48 @@ function checkRound(entry) {
   return { ok: recomputedMicros === presentedMicros, recomputedMicros, presentedMicros }
 }
 
+// OWNER AUDIT ROUND 2, item 1: a triggered feature now waits at an explicit
+// CLICK TO CONTINUE gate before the first free spin (autoplay/turbo do not
+// bypass it either) - a real player must click it, so this harness must
+// simulate that click too, or a guaranteed buy-tier trigger would hang
+// forever waiting for a spin that can never finish unattended. Polls for
+// the gate and clicks it (force: true - the gate has its own continuous
+// CSS pulse, so its bounding box never "stabilises" for Playwright's
+// default actionability check) until the spin actually completes.
 async function waitSpinDone(page, timeout = 20000) {
-  await page.waitForFunction(
-    () => !document.querySelector('[data-testid="spin-button"].spinning'),
-    { timeout },
-  )
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const done = await page.evaluate(() => !document.querySelector('[data-testid="spin-button"].spinning'))
+    if (done) return
+    const gate = page.locator('[data-testid="entry-continue"]')
+    if (await gate.count() > 0 && await gate.isVisible().catch(() => false)) {
+      await gate.click({ force: true }).catch(() => {})
+    }
+    await page.waitForTimeout(150)
+  }
+  throw new Error(`waitSpinDone: spin still in progress after ${timeout}ms`)
 }
 
 async function dismissIntro(page) {
   // HeroSplash (ANIMATION UPLIFT PASS 2026-07-16, item 1) shows first, on
   // every load, ahead of the once-per-session rules modal below.
-  const splash = page.locator('[data-testid="hero-splash"]')
-  if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
-    await splash.click()
+  //
+  // Polls for up to ~2s rather than a single instantaneous check: HeroSplash
+  // has its own fade/entrance timing, and sessionStorage (its "seen" flag)
+  // is scoped per BROWSING CONTEXT - every fresh browser.newPage() (as the
+  // cost-integrity/cost-visibility/boundary gates below each use) starts
+  // with none set, so the splash always reappears there. A single-shot
+  // isVisible() check raced the splash's entrance often enough in practice
+  // to leave it covering the FEATURES/spin controls, hanging every
+  // subsequent locator wait on that fresh page.
+  const deadline = Date.now() + 2000
+  while (Date.now() < deadline) {
+    const splash = page.locator('[data-testid="hero-splash"]')
+    if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
+      await splash.click()
+      await page.waitForTimeout(100)
+      break
+    }
     await page.waitForTimeout(100)
   }
   const btn = page.locator('[data-testid="intro-continue"]')
@@ -346,14 +375,15 @@ async function runBuyTierLaunchesFeatureCheck(browser) {
       await page.locator(`[data-testid="activate-${mode}"]`).click()
       await page.waitForTimeout(150)
       await page.locator('[data-testid="buy-confirm"]').click()
-      await page.waitForFunction(
-        () => !document.querySelector('[data-testid="spin-button"].spinning'),
-        { timeout: 20000 },
-      )
-      await page.waitForTimeout(300)
+      // Check the overlay actually launched BEFORE clicking through the entry
+      // gate (OWNER AUDIT ROUND 2, item 1) - waitSpinDone below would clear
+      // it by clicking past the whole feature, so "featureLaunched" must be
+      // read while the feature is still on its entry card.
+      await page.waitForSelector('[data-testid="freespins-overlay"]', { timeout: 10000 }).catch(() => {})
       const featureLaunched = await page.evaluate(
         () => document.querySelectorAll('[data-testid="freespins-overlay"]').length > 0,
       )
+      await waitSpinDone(page)
       results.push({ mode, category, featureLaunched, ok: featureLaunched })
     } finally {
       await page.close()
