@@ -17,5 +17,18 @@
     "checkJs": true,
     "moduleDetection": "force"
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  /**
+   * *.test.ts files are standalone scripts executed by tsx (see their own run
+   * lines), not application source: they are never imported by the app, never
+   * bundled by vite, and they legitimately use node: builtins, `process`, and
+   * .ts import extensions. Describing them with the browser app's tsconfig
+   * produced ~28 spurious errors that drowned the handful of real ones.
+   *
+   * Excluding them here does not reduce coverage of shipped code, and it does
+   * not stop them running: tsx still executes and type-strips them, and CI runs
+   * them explicitly (.github/workflows/checks.yml). Added 2026-07-26 so the
+   * svelte-check baseline reflects app-source health only.
+   */
+  "exclude": ["src/**/*.test.ts"]
 }

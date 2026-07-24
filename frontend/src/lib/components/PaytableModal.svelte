@@ -256,7 +256,7 @@
              left-justified row list into centred mode cards (name, cost,
              RTP, max win) - rest of the paytable is unchanged. -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:10px;">Bet Modes</h3>
+          <h3 class="fs-heading" style="margin-bottom:10px;">{$isSocial ? 'Play Modes' : 'Bet Modes'}</h3>
           <div class="fs-mode-cards">
             {#each FS_MODES as m (m.id)}
               <div class="fs-mode-card fs-plate tone-{m.kind}" class:soon={!m.available}>

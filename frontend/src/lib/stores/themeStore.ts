@@ -84,5 +84,4 @@ export const themeAssets = derived(activeTheme, ($t) => {
   }
 })
 
-export const themePalette = derived(activeTheme, ($t) => $t.palette)
 export { THEMES }

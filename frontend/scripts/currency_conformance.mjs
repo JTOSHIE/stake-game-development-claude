@@ -113,11 +113,15 @@ async function run() {
       })
       results.unit = unit
 
-      // Thousands separators AND leading symbol: the brief's "SC 1,000" style.
-      check('unit: XSC renders SC 1,000.00', unit.sc1000 === 'SC 1,000.00', unit.sc1000)
+      // Thousands separators AND TRAILING symbol. Fable ruling 2 (2026-07-26)
+      // flipped this from the brief's leading "SC 1,000" to "1,000.00 SC", the
+      // form documented by both first-party sources (the currency reference and
+      // the official ts-client SDK's symbolAfter: true).
+      check('unit: XSC renders 1,000.00 SC', unit.sc1000 === '1,000.00 SC', unit.sc1000)
       check('unit: SC alias matches XSC', unit.scAlias === unit.sc1000,
         `${unit.scAlias} vs ${unit.sc1000}`)
-      check('unit: XGC renders GC 500.00', unit.gc500 === 'GC 500.00', unit.gc500)
+      check('unit: XGC renders 500.00 GC', unit.gc500 === '500.00 GC', unit.gc500)
+      check('unit: symbol placement is trailing', unit.trailing === true, String(unit.trailing))
 
       // B1: narrowSymbol derives "$" from the code, no "US$" prefix.
       check('unit: USD narrow symbol, no US prefix',

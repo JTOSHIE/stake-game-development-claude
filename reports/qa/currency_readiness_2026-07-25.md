@@ -11,8 +11,11 @@ screenshots in `reports/screens/currency-readiness/`.
 ## Headline
 
 Currency conformance **PASSES** on every assertion after the fixes below. The same
-run surfaced **six genuine social-string violations** that are unrelated to currency
-and are reported for a Fable wording ruling rather than auto-corrected.
+run surfaced **six genuine social-string violations** unrelated to currency, which
+were escalated rather than auto-corrected; Fable ruled on the wording on 2026-07-26
+and they are now fixed, with social conformance reporting **zero** prohibited terms.
+Section 6a records the applied rulings; tables in sections 4 and 5 are the
+as-measured state after them.
 
 ## 1. XEC could not be verified, and this matters for scope
 
@@ -77,9 +80,9 @@ four, and the harness asserts the alias resolves identically.
 
 ### 3.3 Sweepstakes amounts had no thousands separators
 
-`formatBalance` formatted XSC with `amount.toFixed(2)`, producing `SC 1000.00`. The
-brief specifies `SC 1,000` style. Now formatted through `toLocaleString` with fixed
-fraction digits, producing `SC 1,000.00`.
+`formatBalance` formatted XSC with `amount.toFixed(2)`, producing an ungrouped
+`SC 1000.00`. Now formatted through `toLocaleString` with fixed fraction digits, and
+since Fable ruling 2 flipped placement to trailing, it renders `1,000.00 SC`.
 
 `XGC` separately used `Math.round()`, discarding cents, while the platform documents
 GC with 2 decimals. Both virtual currencies are now consistent at 2 decimals.
@@ -106,9 +109,9 @@ All assertions pass. Full output in the JSON evidence file.
 
 | Case | Output | Assertion |
 |---|---|---|
-| `formatBalance(1000 * S, 'XSC')` | `SC 1,000.00` | leading symbol, grouped |
-| `formatBalance(1000 * S, 'SC')` | `SC 1,000.00` | alias identical to XSC |
-| `formatBalance(500 * S, 'XGC')` | `GC 500.00` | GC at 2 decimals |
+| `formatBalance(1000 * S, 'XSC')` | `1,000.00 SC` | trailing symbol, grouped (ruling 2) |
+| `formatBalance(1000 * S, 'SC')` | `1,000.00 SC` | alias identical to XSC |
+| `formatBalance(500 * S, 'XGC')` | `500.00 GC` | GC at 2 decimals |
 | `formatBalance(1.25 * S, 'USD')` | `$1.25` | narrow symbol, no `US$` |
 | `formatBalance(1250 * S, 'JPY')` | `¥1,250` | zero-decimal, high-minimum |
 | `currencySymbolFor('XSC')` | `SC` | never the raw code |
@@ -121,8 +124,8 @@ All assertions pass. Full output in the JSON evidence file.
 |---|---|---|---|
 | USD | `BALANCE / $100.00` | `BET / $1.00` | 0 |
 | JPY | `BALANCE / ¥100` | `BET / ¥1` | 0 |
-| XSC | `COINS / SC 100.00` | `PLAY / SC 1.00` | 0 |
-| XGC | `COINS / GC 100.00` | `PLAY / GC 1.00` | 0 |
+| XSC | `COINS / 100.00 SC` | `PLAY / 1.00 SC` | 0 |
+| XGC | `COINS / 100.00 GC` | `PLAY / 1.00 GC` | 0 |
 
 Note the HUD labels switch to `COINS` / `PLAY` on their own for the sweepstakes
 codes. That is `socialMode.ts` inferring social presentation from the currency,
@@ -197,30 +200,50 @@ gaps and two unrelated `App.svelte` items.
 
 Regression: `social_string_conformance.mjs` re-run, ALL CHECKS PASS.
 
+## 6a. UPDATE 2026-07-26: Fable rulings applied
+
+- **Ruling 2, SC placement: FLIPPED TO TRAILING.** `VIRTUAL_SYMBOL_TRAILING` is now
+  `true`. Sweepstakes amounts render `1,000.00 SC` and `500.00 GC`, matching both
+  first-party sources. Fable ruled the two sources outrank the brief's spec, which was
+  wrong. Proofs regenerated; harness assertions updated to the trailing form.
+- **Ruling 3, social strings: FIXED, zero prohibited terms.** Fable's wording, social
+  branch only, real-money untouched. `BET MODES` to `PLAY MODES`, `BUY FEATURES` to
+  `GET FEATURES`, `1x bet` / `1.25x bet` to `1x per spin` / `1.25x per spin`, the
+  menu `BET` label to `PLAY`. A **seventh** instance not in the ruling list was found
+  during the fix, `PaytableModal.svelte:259`'s hardcoded `Bet Modes` heading, in a
+  different surface; Fable's own ruling on that exact phrase was extended to it rather
+  than new wording being invented. This unblocks stake.us and Stake EU.
+- **Ruling 8, `CURRENCY_SCALE`:** `utils/currency.ts` is canonical, `replayService.ts`
+  imports it, and the remaining locked copy in `rgsService.ts` is held by
+  `scripts/currency_scale_drift.test.mjs` rather than by a comment.
+
+Re-run after the changes: **CURRENCY CONFORMANCE PASS, SOCIAL STRINGS CLEAN**
+(`visibleProhibitedTermHits: []`).
+
 ## 7. Open items
 
-1. **SC symbol placement. Priority raised after Part 4.** We ship leading
-   (`SC 1,000.00`) per the brief. **Two independent first-party sources now say
-   trailing:**
-   - the docs repository currency reference: `XSC ... symbolAfter: true`, example
-     `10.00 SC`;
-   - the official `StakeEngine/ts-client` SDK, `src/helpers.ts`:
-     `XSC: { symbol: 'SC', decimals: 2, symbolAfter: true }`.
+1. **SC symbol placement. RESOLVED 2026-07-26, Fable ruling 2.** Flipped to trailing
+   (`1,000.00 SC`). Two first-party sources documented `symbolAfter: true` (the docs
+   currency reference and the official `ts-client` SDK's `helpers.ts`); Fable ruled
+   they outrank the brief's leading-symbol spec. One constant changed,
+   `VIRTUAL_SYMBOL_TRAILING`, and every surface followed. Proofs regenerated.
 
-   Two sources against the brief makes this the most likely genuine deviation in the
-   currency work. Flip point is the single `VIRTUAL_SYMBOL_TRAILING` constant, one
-   line, every surface follows. Needs an owner or Fable ruling before submission.
+   Still open, minor: the two first-party sources disagree with **each other** on XGC
+   decimals (SDK says 0, docs page says 2). We implement 2. GC is not our currency, so
+   this is recorded rather than chased.
 
-   Related, and evidence that neither source can be trusted alone: the two disagree
-   with **each other** on XGC decimals. The SDK says `decimals: 0`, the docs page
-   says 2. We implement 2. GC is not our currency, so this is minor, but it means
-   both sources need corroborating.
-2. **XEC.** Unverified against **three** independent sources now: the live site, the
-   docs repository, and the official ts-client SDK's `Currency` union (34 fiat codes
-   plus XGC and XSC, nothing else). Do not record it as supported until a first-party
-   source exists.
-3. **Six social strings.** Need a wording ruling before stake.us or Stake EU
-   distribution.
+2. **XEC. RESOLUTION PATH SET 2026-07-26, Fable ruling 4.** Unverified against three
+   independent sources (the live site, the docs repository, and the official ts-client
+   SDK's `Currency` union: 34 fiat codes plus XGC and XSC, nothing else). Fable ruled
+   to **stop chasing documents**: the authoritative confirmation is empirical, via
+   currency toggling in the Developer Testing Tool staging session (map item 6). Stake
+   EU stays contingent until then. If XEC proves real, it is one row in
+   `VIRTUAL_CURRENCIES`.
+3. **Six social strings. RESOLVED 2026-07-26, Fable ruling 3.** Fable supplied the
+   wording; applied social-branch-only with real-money untouched. A seventh instance
+   (`PaytableModal.svelte:259`) was found during the fix and the same ruling extended
+   to it. Social conformance now reports zero prohibited terms. stake.us and Stake EU
+   unblocked on this axis.
 4. **Locale plumbing.** `formatBalance` now accepts a platform locale tag and the
    replay path passes `params.lang`. The main HUD call sites still omit it and so
    fall back to the browser's locale. Low risk (grouping and decimal marks only, the

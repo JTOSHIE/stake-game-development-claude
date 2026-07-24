@@ -1,0 +1,104 @@
+# Static checks on every pull request. Fable ruling 11 (2026-07-26).
+#
+# SCOPE, deliberately narrow. Cheap static gates only. The Playwright suites
+# (qa_soak, portrait_layout_conformance, currency_conformance, the proof scripts)
+# stay local and in the external audit: they need a dev server and a browser,
+# they take tens of minutes, and their value is in a real environment rather than
+# in a CI container.
+#
+# SECURITY POSTURE. This repository is PUBLIC.
+#   - This workflow receives NO secrets. There is no `secrets:` usage anywhere in
+#     it, and nothing here needs credentials. Do not add any.
+#   - `permissions` is contents:read only. It cannot write to the repository,
+#     open or approve pull requests, or comment.
+#   - It runs on `pull_request`, NOT `pull_request_target`, so a fork PR executes
+#     with a read-only token and no access to repository secrets. This is the
+#     important distinction on a public repo: `pull_request_target` would run
+#     untrusted code with a privileged token.
+#   - No auto-merge, no auto-fix, no comment-writing. Those UI options are OFF by
+#     standing policy; this file must not reintroduce them by another route.
+#
+# Post-merge auto-archiving is ON as a repository setting; it is not this
+# workflow's concern.
+
+name: checks
+
+on:
+  pull_request:
+  # Also run on pushes to main so a merge that skipped review is still gated.
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: static gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        # `npm ci` is reproducible and fails if the lockfile is out of sync.
+        # Playwright browsers are NOT installed: no suite here needs one.
+        run: npm ci --ignore-scripts
+
+      # ── Gate 1: type safety, regression-only ─────────────────────────────────
+      # Fails if the error or warning count rises above the committed baseline.
+      # See scripts/typecheck_baseline.mjs for why the baseline is not zero.
+      - name: svelte-check (no new type errors)
+        working-directory: frontend
+        run: node scripts/typecheck_baseline.mjs
+
+      # ── Gate 2: dead wiring ──────────────────────────────────────────────────
+      # The standingMode class: state a control writes that nothing ever reads.
+      - name: dead wiring scan
+        working-directory: frontend
+        run: node scripts/dead_wiring_scan.mjs
+
+      # ── Gate 3: integer micros ───────────────────────────────────────────────
+      # CLAUDE.md makes integer micros mandatory with zero float tolerance.
+      - name: wallet float scan
+        working-directory: frontend
+        run: node scripts/scan_wallet_floats.mjs
+
+      # ── Gate 4: money-path constant duplication ──────────────────────────────
+      # CURRENCY_SCALE exists in the canonical util and in locked rgsService.ts.
+      # Read-only: this parses the locked file as text and never writes to it.
+      - name: currency scale drift
+        working-directory: frontend
+        run: node scripts/currency_scale_drift.test.mjs
+
+      # ── Gate 5: frontend costs vs the shipped maths package ──────────────────
+      # fsModes.ts against games/future_spinner/library/publish_files/index.json,
+      # the two sides being independently generated. Guards the buy-tier billing
+      # bug class. Read-only against the locked maths package.
+      - name: fsModes / index.json drift
+        working-directory: frontend
+        run: npx tsx src/lib/config/fsModes.drift.test.ts
+
+      # ── Gate 6: currency display contract ────────────────────────────────────
+      # Static subset of the currency conformance harness: no browser, no dev
+      # server. Asserts the raw platform code is never player-facing, trailing
+      # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.
+      - name: currency static assertions
+        working-directory: frontend
+        run: npx tsx src/lib/utils/currency.test.ts
