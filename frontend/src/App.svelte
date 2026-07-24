@@ -285,7 +285,28 @@
   // resets it to 'base' in its `finally`, which runs after presentFeature
   // resolves), so it is a reliable signal here.
   let liveIsNitroEntry = false
-  $: flameColourway = liveIsNitroEntry ? 'nitro' : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
+  // OWNER AUDIT ROUND 4, item 3. The NITRO route previously depended SOLELY on
+  // liveIsNitroEntry, which is bound out of FreeSpinsPresentation and therefore
+  // only arrives once that component has mounted and reached its entry phase.
+  // The Overdrive route never had this problem because it reads $selectedBetMode
+  // directly - which is exactly why the bug looked like "bought entries render
+  // green" while only NITRO actually did.
+  //
+  // The window that exposed it: a bought round that hits the 5,000x cap. The
+  // MaxWinCelebration COLLECT gate runs BEFORE presentFeature, so for its whole
+  // duration liveIsNitroEntry is still false and 'super' matched neither branch,
+  // falling through to 'natural' - green flames on a NITRO buy. Measured
+  // (reports/screens/owner-audit-v4/): nitro-wincap read colourway-natural
+  // before COLLECT and colourway-nitro after, while overdrive-wincap read
+  // colourway-overdrive throughout.
+  //
+  // Fix: derive NITRO from the bought tier the same way Overdrive already is, so
+  // the route is known the instant the purchase is made rather than when the
+  // presentation catches up. liveIsNitroEntry is kept as an OR because it also
+  // covers any future non-buy path into a pre-revved entry.
+  $: flameColourway = (liveIsNitroEntry || $selectedBetMode === 'super')
+    ? 'nitro'
+    : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
   // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
   // Motion Polish v2) — false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.
