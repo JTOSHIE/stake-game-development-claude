@@ -15,9 +15,9 @@ Allow about an hour. You can stop at any step and come back.
 **2. Nothing you do today is permanent.** Every upload can be replaced by uploading again.
 If you upload the wrong file, upload the right one over it.
 
-**3. "Publish" does not mean publish.** The portal has buttons called **Publish Game, Math**
-and **Publish Game, Front End**. On this platform that means *make my uploads runnable so I
-can test them*. It does not put anything in front of players.
+**3. "Publish" does not mean publish.** The portal has a green **Publish Game** button. On
+this platform that means *make my uploads runnable so I can test them*. It does not put
+anything in front of players.
 
 **4. If something looks wrong, stop and take a screenshot.** A screenshot of a confusing
 screen is more useful than a guess. Nothing breaks by pausing.
@@ -32,7 +32,10 @@ screen is more useful than a guess. Nothing breaks by pausing.
 | `02_frontend_upload/` | 108 files: the game itself | The game's **Files** page |
 | `03_branding/` | 3 images | Two different pages, see below |
 
-Each folder has a `HASHES.txt`. That is a record for later, not a task. Ignore it today.
+The two `HASHES.txt` files sit in the kit root, NOT inside the upload folders. That is
+deliberate, and it was a correction: they were originally inside, and the first upload
+carried `HASHES.txt` into the portal along with the maths files. Anything inside an upload
+folder gets uploaded. The folders now contain only files that belong on the platform.
 
 **One thing to know about the maths folder: it holds TWELVE files.** Some of our older
 documents say eleven. Eleven is a miscount that was found and corrected on 2026-07-26. If
@@ -82,7 +85,12 @@ Two of the files are large: `books_bonus.jsonl.zst` at about 145 MB and
 `books_super.jsonl.zst` at about 142 MB. **The total is about 400 MB, so this upload will
 take a while on a normal connection.** That is expected. Leave the tab open.
 
-10. When the uploads finish, confirm the page lists all twelve.
+10. When the uploads finish, the **MATH** panel at the top of the Files page should read
+    **12 files**, about 380 MB.
+
+    If it says 13, one extra file has been uploaded. Tell me which one and I will tell you
+    whether it matters. (On the first run it was `HASHES.txt`, which is harmless but does
+    not belong there.)
 
 ---
 
@@ -98,19 +106,34 @@ folder.
 
 12. There are 108 files, most of them small. This upload is much quicker than Part 3.
 
+13. When it finishes, the **FRONTEND** panel should read **108 files**.
+
+    **If it reads fewer than 108, stop and tell me the number.** It means some files did
+    not make it, and a game missing even one asset can fail in ways that are hard to
+    diagnose later. Do not publish over a short upload.
+
 ---
 
 ## Part 5: make your uploads runnable
 
-Two buttons. As above: "publish" here means *make it runnable for me*, nothing public.
+**This step is not optional, and skipping it is why a game looks blank when you launch it.**
+Until you publish, the platform has your files but no runnable version of them.
 
-13. Press **Publish Game, Math**.
-14. Wait for it to report success.
-15. Press **Publish Game, Front End**.
-16. Wait for it to report success.
+As above: "publish" here means *make it runnable for me*, nothing public.
 
-If either reports an error, screenshot it and stop. Do not re-upload files to try to fix an
+14. On the **Files** page, press **Publish Game**. It is the green button next to
+    **Import Files**.
+15. Wait for it to report success.
+16. To confirm it worked: launch the game, open the **Versions** menu in the toolbar, and
+    check that **Front** and **Math** each show a version number. If either says
+    **Vundefined** or has no number after the V, publishing has not taken effect yet.
+
+If it reports an error, screenshot it and stop. Do not re-upload files to try to fix an
 error you have not read to me first.
+
+**Note:** an earlier version of this document described two separate buttons, "Publish
+Game, Math" and "Publish Game, Front End". There is one button. Corrected 2026-07-26 from
+your own screenshots.
 
 ---
 
