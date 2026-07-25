@@ -15,7 +15,7 @@ Started 2026-07-25 during the pre-review pass.
 | Group | Status | Location | Notes |
 |---|---|---|---|
 | Layouts, landscape and portrait | **REGENERATED** | `layouts-2026-07-25/` | Six viewports: 1280x720, 1920x1080, 960x480 compact landscape, 430x932 and 390x844 portrait, and 400x225 popout. Every capture from a clean boot with **zero open dialogs**, verified in the run. `layout-v1/` and `landscape-compact-v1/` marked SUPERSEDED in the same commit. |
-| Feature presentation flow | **STALE** | `feature-fixes/`, `bonus-polish/` | Must be recaptured from a NATURAL spin, not a dialog or forced state (TR-028) |
+| Feature presentation flow | **REGENERATED** | `feature-flow-2026-07-25/` | Six stages: base idle, entry, entry gate, free spins running, meter progress, resolved. Reached by a **natural base-game trigger**, no forced category and no injected board; route recorded in `PROVENANCE.md`. `feature-fixes/` and `bonus-polish/` marked SUPERSEDED in the same commit. |
 | Win celebrations | **STALE** | `opus-elevate/`, `opus-elevate-2/` | |
 | Buy dialogs | **STALE** | `owner-audit-v4/` | Also predates the per-tier affordability fix |
 | Menu | **STALE** | `owner-audit-v3/` | |
