@@ -46,8 +46,8 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $100.00",
-          "truncated": false,
+          "text": "BAL $52,431,098.76",
+          "truncated": true,
           "disabled": false,
           "visible": true
         },
@@ -159,8 +159,8 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $100.00",
-          "truncated": false,
+          "text": "BAL $52,431,098.76",
+          "truncated": true,
           "disabled": false,
           "visible": true
         },
@@ -272,8 +272,8 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $102.90",
-          "truncated": false,
+          "text": "BAL $52,431,101.66",
+          "truncated": true,
           "disabled": false,
           "visible": true
         },
@@ -385,8 +385,8 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $101.90",
-          "truncated": false,
+          "text": "BAL $52,431,100.66",
+          "truncated": true,
           "disabled": false,
           "visible": true
         },
@@ -498,8 +498,8 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $100.00",
-          "truncated": false,
+          "text": "BAL $52,431,098.76",
+          "truncated": true,
           "disabled": false,
           "visible": true
         },
@@ -587,8 +587,8 @@
     },
     "theSpinActuallyRan": {
       "pass": true,
-      "before": "BAL $100.00",
-      "after": "BAL $102.90"
+      "before": "BAL $52,431,098.76",
+      "after": "BAL $52,431,101.66"
     },
     "theWinIsPresented": {
       "pass": true
@@ -616,8 +616,34 @@
       "findings": []
     },
     "noStatValueIsTruncated": {
-      "pass": true,
-      "findings": []
+      "pass": false,
+      "findings": [
+        {
+          "state": "idle",
+          "name": "balance",
+          "text": "BAL $52,431,098.76"
+        },
+        {
+          "state": "spinning",
+          "name": "balance",
+          "text": "BAL $52,431,098.76"
+        },
+        {
+          "state": "result",
+          "name": "balance",
+          "text": "BAL $52,431,101.66"
+        },
+        {
+          "state": "feature",
+          "name": "balance",
+          "text": "BAL $52,431,100.66"
+        },
+        {
+          "state": "modal",
+          "name": "balance",
+          "text": "BAL $52,431,098.76"
+        }
+      ]
     },
     "hudFitsItsBudget": {
       "pass": true,
@@ -640,7 +666,25 @@
     "zeroConsoleErrors": {
       "pass": true,
       "errors": []
+    },
+    "truncationGateCanActuallyFail": {
+      "pass": true,
+      "seeded": [
+        {
+          "why": "clipped by an ancestor, the form the owner photographed",
+          "caught": true
+        },
+        {
+          "why": "autofit floor reached and content still overflowing",
+          "caught": true
+        },
+        {
+          "why": "fits only by becoming illegible, effective font under 9px",
+          "caught": true
+        }
+      ],
+      "negativeControl": true
     }
   },
-  "allPass": true
+  "allPass": false
 }

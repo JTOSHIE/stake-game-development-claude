@@ -56,7 +56,17 @@ const MIN_TARGET = 44
 // recovery_banner_proof.mjs does, and then ASSERTS THE BALANCE MOVED. A capture
 // where nothing happened can no longer pass.
 const RGS_HOST = 'rgs.mini-player-proof.invalid'
-const START_MICROS = 100_000_000
+// Raised 2026-07-26, JOB 3(e). It was 100_000_000 ($100.00), a four-character
+// value, and every legibility assertion passed against it while the owner's real
+// session showed the mini strip dropping the cents off a $1,040.06 balance and
+// cutting the WIN glyph. A proof that only ever renders short numbers cannot see
+// the defect that only long numbers cause.
+//
+// $52,431,098.76 is deliberately hostile and deliberately realistic: the owner
+// ran this game at a $50,000,000 balance, and the DTT offers presets up to
+// $10,000,000,000.00. Twelve significant characters plus separators and cents is
+// the worst case a player can actually reach, so it is what the strip must hold.
+const START_MICROS = 52_431_098_760_000
 
 const cell = (n) => ({ name: n, wild: n === 'W', scatter: n === 'S' })
 const boardOf = (rows) => rows.map((reel) => reel.map(cell))
@@ -177,13 +187,60 @@ const MEASURE = `(() => {
       x: r.x, y: r.y, w: r.width, h: r.height,
       targetW: r.width + grow * 2, targetH: r.height + grow * 2,
       text: (el.innerText || '').replace(/\\s+/g, ' ').trim().slice(0, 40),
-      // LEGIBILITY, measured. A value node whose content is wider than its box
-      // is truncated on screen, whatever the row looks like as a whole. The
-      // first capture of this HUD showed the balance reading "$1..." and every
-      // geometric assertion still passed, which is why this one exists.
+      // LEGIBILITY, measured.
+      //
+      // REPAIRED 2026-07-26, JOB 3(e). The previous version of this check was
+      // 'v.scrollWidth > v.clientWidth + 1' and it was VACUOUS: every
+      // .m-stat-value carries 'use:autofitText', which iteratively shrinks the
+      // font until scrollWidth <= clientWidth. The condition it tested is the
+      // exact condition autofit exists to eliminate, so it could only ever be
+      // false. It passed while the owner's Popout S capture plainly showed the
+      // WIN readout cut mid-glyph, which is how it was found.
+      //
+      // Three real failure modes replace it, none of which autofit can mask:
+      //
+      //   clippedByAncestor  the whole stat box is cut by a parent's overflow.
+      //                      This is what the owner actually saw: the value was
+      //                      not overflowing its own box, its box was off the
+      //                      end of the strip.
+      //   autofitFloorHit    autofit gave up at MIN_SCALE (0.4) and the content
+      //                      still does not fit, so it IS truncated.
+      //   illegible          autofit "succeeded" by shrinking the rendered text
+      //                      below a readable size. Fitting by becoming
+      //                      unreadable is not fitting.
       truncated: (() => {
         const v = el.querySelector('.m-stat-value')
-        return v ? v.scrollWidth > v.clientWidth + 1 : false
+        if (!v) return false
+        if (v.scrollWidth > v.clientWidth + 1) return true
+        // Wrapping is not fitting. In a 44px strip a value that breaks
+        // onto a second line is cut vertically, and scrollWidth stays
+        // equal to clientWidth because it 'fits' horizontally. Found by
+        // the seeded case below, which this check originally missed.
+        if (v.scrollHeight > v.clientHeight + 1) return true
+
+        // Clipped by any ancestor that establishes a clipping context.
+        const vr = v.getBoundingClientRect()
+        let p = v.parentElement
+        while (p && p !== document.body) {
+          const o = getComputedStyle(p)
+          if (/(hidden|auto|scroll|clip)/.test(o.overflowX) || /(hidden|auto|scroll|clip)/.test(o.overflowY)) {
+            const pr = p.getBoundingClientRect()
+            if (vr.right - pr.right > 1 || pr.left - vr.left > 1
+              || vr.bottom - pr.bottom > 1 || pr.top - vr.top > 1) return true
+          }
+          p = p.parentElement
+        }
+        // Also clipped by the viewport itself.
+        if (vr.right - window.innerWidth > 1 || vr.left < -1) return true
+
+        const cs = getComputedStyle(v)
+        const scale = parseFloat(v.style.getPropertyValue('--autofit-scale') || '1')
+        if (scale <= 0.4 + 0.001 && v.scrollWidth > v.clientWidth) return true
+        // Effective rendered size. Below 9px a currency value on a 400x225
+        // popout is not readable, and "it fits" stops meaning anything.
+        const effective = (parseFloat(cs.fontSize) || 0)
+        if (effective > 0 && effective < 9) return true
+        return false
       })(),
       disabled: !!el.disabled,
       visible: r.width > 0 && r.height > 0,
@@ -385,6 +442,51 @@ async function run() {
       states: Object.fromEntries(featureStates.map((st) => [st, !!states[st]?.controls?.features?.visible])),
     }
     checks.zeroConsoleErrors = { pass: consoleErrors.length === 0, errors: consoleErrors.slice(0, 5) }
+
+    // ── SEEDED VIOLATION, convention (p) ────────────────────────────────────
+    //
+    // noStatValueIsTruncated passed for weeks while the WIN readout was
+    // visibly cut in the owner's Popout S capture, because it tested
+    // `scrollWidth > clientWidth`, the one condition `use:autofitText` exists
+    // to eliminate. It could only ever return false. A green result meant
+    // nothing, and nobody could tell, because it had never been seen to fail.
+    //
+    // Three violations are planted, one per real failure mode, in the form each
+    // actually occurs. The OLD check would have caught none of them.
+    await page.goto(LAUNCH(base), { waitUntil: 'domcontentloaded' })
+    await dismissIntro(page)
+    await page.waitForTimeout(400)
+    const isTruncated = async () =>
+      (await page.evaluate(MEASURE))?.controls?.win?.truncated === true
+
+    const seeded = []
+    const mutations = [
+      ['clipped by an ancestor, the form the owner photographed',
+        `document.querySelector('[data-testid="hud-win"] .m-stat-value').style.cssText += ';position:relative;left:400px'`],
+      ['autofit floor reached and content still overflowing',
+        `(() => { const v = document.querySelector('[data-testid="hud-win"] .m-stat-value'); v.textContent = '$1,234,567,890.00'; v.style.setProperty('--autofit-scale','0.4'); v.style.setProperty('width','20px','important'); v.style.setProperty('display','block','important'); v.style.setProperty('overflow','hidden','important'); v.style.setProperty('white-space','nowrap','important') })()`],
+      ['fits only by becoming illegible, effective font under 9px',
+        `document.querySelector('[data-testid="hud-win"] .m-stat-value').style.fontSize = '6px'`],
+    ]
+    for (const [why, js] of mutations) {
+      await page.evaluate(js)
+      await page.waitForTimeout(80)
+      const caught = await isTruncated()
+      seeded.push({ why, caught })
+      console.log(`  ${caught ? 'caught' : 'MISSED'}  seeded: ${why}`)
+      await page.goto(LAUNCH(base), { waitUntil: 'domcontentloaded' })
+      await dismissIntro(page)
+      await page.waitForTimeout(400)
+    }
+    // Negative control: untouched, it must be clean, or the check is just
+    // returning true for everything and is no better than the one it replaced.
+    const cleanControl = !(await isTruncated())
+    console.log(`  ${cleanControl ? 'clean ' : 'FALSE+'}  seeded: negative control, an untouched HUD must pass`)
+
+    checks.truncationGateCanActuallyFail = {
+      pass: seeded.every((s) => s.caught) && cleanControl,
+      seeded, negativeControl: cleanControl,
+    }
 
     await browser.close()
   } finally {
