@@ -152,27 +152,25 @@ Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'
 `pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
 (confirmed empty of pruned-path requests and under the 25MB budget by
 `frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
-Current measured size: **21.87MB** (re-measured from a fresh build, 2026-07-26), against
-the 25MB budget. Supersedes the 13.59MB figure recorded at JOB 4 on 2026-07-13.
+Current measured size: **14.79MB** (108 files, 15,510,083 bytes; fresh build 2026-07-26)
+against the 25MB budget. Supersedes both the 13.59MB recorded at JOB 4 on 2026-07-13 and
+the 21.87MB measured earlier on 2026-07-26.
 
-**The drift has a specific cause and it is worth acting on before staging.** 7.06MB of the
-current total is `frontend/public/assets/themes/future-spinner/branding/`, which is
-**untracked in git and referenced by no source file**. Everything under `public/` is copied
-verbatim into `dist/` by Vite, so it ships. Without it the build is 14.81MB, which is
-consistent with the 13.59MB recorded in July plus subsequent asset work.
+**That figure is reproducible, and it was verified rather than asserted.** A clean clone
+taken from origin, installed with `npm ci` and built with `npm run build`, produced
+**108 files and 15,510,083 bytes: identical file lists and an exact byte match** against
+this machine.
 
-Two consequences, and the second is the serious one:
+Getting there took two fixes, both recorded under TR-047. An untracked, unreferenced
+`branding/` directory in `frontend/public/` was shipping 7.06MB into `dist/` while being
+invisible to git, so a clone built 14.81MB where the working machine built 21.87MB; it is
+deleted and its path ignored. That narrowed the gap to four `.DS_Store` files, which macOS
+writes into any directory Finder has opened and Vite copies verbatim, and which
+`pruneLegacyAssets` now strips.
 
-- **7.06MB of dead weight** in a 25MB budget, for assets nothing loads.
-- **The bundle is not reproducible from the repository.** Anyone cloning and building gets
-  14.81MB; this machine gets 21.87MB. A committed size figure that a reviewer cannot
-  reproduce is worse than no figure.
-
-**Options, for the owner.** (a) delete the directory, since nothing references it;
-(b) commit it, if those assets are meant to ship, and then something should reference them;
-(c) exclude it in `vite.config.ts`'s `pruneLegacyAssets`, which already strips
-non-shipping paths. Recommended: **(a)**, on the evidence that no source file mentions it.
-Not done here because deleting owner-supplied art is not a builder's call.
+**See CLAUDE.md convention (o):** the staging bundle is always built from a fresh clone,
+never from a working machine, so this property is structural rather than something to
+remember to check.
 
 Regenerate immediately before staging with a clean `npm run build` from `frontend/` - never
 upload a stale or hand-edited `dist/`.
