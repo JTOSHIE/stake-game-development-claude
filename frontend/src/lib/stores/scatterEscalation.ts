@@ -35,6 +35,36 @@ import { writable, derived } from 'svelte/store'
  */
 export type EscalationLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
+/**
+ * Which build this is. The base-game trigger and a free-spins RETRIGGER are the
+ * same mechanic and deliberately not the same moment.
+ */
+export type EscalationPhase = 'base' | 'retrigger'
+
+/**
+ * TR-036 option (b), ratified, built R2R-R JOB E (2026-07-26).
+ *
+ * A retrigger runs the SAME ladder, CAPPED AT LEVEL 3. Nothing new is invented:
+ * levels 0 to 3 behave exactly as they do in the base game, and 4, 5 and 6
+ * collapse onto 3.
+ *
+ * WHY CAPPED RATHER THAN ABSENT, and why not full. The stakes genuinely differ.
+ * In the base game the gauge answers "is the bonus secured, and how good is the
+ * entry", and a fifth scatter is the best thing that can happen in the round.
+ * Inside the feature the bonus is already secured and a retrigger is +5 spins;
+ * a full eruption for it would tell the player something bigger happened than
+ * did, which is the same class of dishonesty the whole visible-state-only
+ * ruling exists to prevent. Running NOTHING was the other option and is what
+ * shipped before: reviewer 1 called it out as "a bonus retrigger presenting
+ * zero escalation after a full escalation system", and they were right that it
+ * reads as unfinished.
+ *
+ * The integrity property is untouched: the level is still a function of visibly
+ * landed scatters and whether reels are still moving, and `escalationFor` still
+ * cannot be passed a board.
+ */
+export const RETRIGGER_MAX_LEVEL: EscalationLevel = 3
+
 /** Levels that are a single celebratory beat rather than a sustained state. */
 export const PULSE_LEVELS: ReadonlySet<EscalationLevel> = new Set<EscalationLevel>([2, 4, 6])
 
@@ -53,11 +83,30 @@ export const PULSE_LEVELS: ReadonlySet<EscalationLevel> = new Set<EscalationLeve
  *
  * @returns the pulse level to fire, or null for an ordinary stop.
  */
-export function pulseLevelFor(landedBefore: number, landedAfter: number): EscalationLevel | null {
-  if (landedBefore < 5 && landedAfter >= 5) return 6
-  if (landedBefore < 4 && landedAfter >= 4) return 4
-  if (landedBefore < 3 && landedAfter >= 3) return 2
+export function pulseLevelFor(
+  landedBefore: number,
+  landedAfter: number,
+  phase: EscalationPhase = 'base',
+): EscalationLevel | null {
+  if (landedBefore < 5 && landedAfter >= 5) return capped(6, phase)
+  if (landedBefore < 4 && landedAfter >= 4) return capped(4, phase)
+  if (landedBefore < 3 && landedAfter >= 3) return capped(2, phase)
   return null
+}
+
+/**
+ * Apply the retrigger cap.
+ *
+ * A PULSE ABOVE THE CAP BECOMES NOTHING, not a repeat of the SECURED beat.
+ * Clamping 4 to 3 would turn a one-shot beat into a sustained level, and
+ * clamping it to 2 would fire SECURED a second time in one spin, which reads as
+ * a bug rather than a design. Above the cap there is simply no further beat to
+ * fire: the retrigger already announced itself at three.
+ */
+function capped(level: EscalationLevel, phase: EscalationPhase): EscalationLevel | null {
+  if (phase !== 'retrigger') return level
+  if (level > RETRIGGER_MAX_LEVEL) return PULSE_LEVELS.has(level) ? null : RETRIGGER_MAX_LEVEL
+  return level
 }
 
 /**
@@ -71,13 +120,23 @@ export function pulseLevelFor(landedBefore: number, landedAfter: number): Escala
  * @param scattersLanded  scatters visibly committed so far. Not the board's total.
  * @param reelsRemaining  reels that have not yet been told to stop.
  */
-export function escalationFor(scattersLanded: number, reelsRemaining: number): EscalationLevel {
+export function escalationFor(
+  scattersLanded: number,
+  reelsRemaining: number,
+  phase: EscalationPhase = 'base',
+): EscalationLevel {
   const moving = reelsRemaining > 0
-  if (scattersLanded >= 5) return 6
-  if (scattersLanded === 4) return moving ? 5 : 4
-  if (scattersLanded === 3) return moving ? 3 : 2
-  if (scattersLanded === 2) return moving ? 1 : 0
-  return 0
+  let level: EscalationLevel
+  if (scattersLanded >= 5) level = 6
+  else if (scattersLanded === 4) level = moving ? 5 : 4
+  else if (scattersLanded === 3) level = moving ? 3 : 2
+  else if (scattersLanded === 2) level = moving ? 1 : 0
+  else level = 0
+  // A SUSTAINED level above the cap clamps to the cap rather than vanishing:
+  // unlike a pulse, a hold has to be some value for the whole time the reels
+  // are still turning, and 3 is the honest one. "Three are down and reels are
+  // still moving" is true of a four-scatter retrigger too.
+  return phase === 'retrigger' && level > RETRIGGER_MAX_LEVEL ? RETRIGGER_MAX_LEVEL : level
 }
 
 /**

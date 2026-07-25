@@ -6,12 +6,22 @@
   //
   // Emits 'complete' with the total win (dollars) when the sequence finishes.
   import { createEventDispatcher, onDestroy } from 'svelte'
+  import { get } from 'svelte/store'
   import { betAmount, currencyCode, isTurbo, locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
   import { themeAssets } from '../stores/themeStore'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
+  // TR-036 option (b), R2R-R JOB E. The SAME gauge as the base game, capped at
+  // level 3 for a retrigger. See scatterEscalation.ts for why capped rather
+  // than absent and rather than full.
+  import {
+    escalationFor, pulseLevelFor, holdMsFor, scaledHoldMs, scaledPulseMs,
+    scatterEscalation, resetEscalation, RETRIGGER_MAX_LEVEL,
+    type EscalationLevel,
+  } from '../stores/scatterEscalation'
+  import { speedTier } from '../stores/speedMode'
 
   export let script: PresentationScript | null = null
   export let active = false
@@ -158,6 +168,69 @@
     timer = setTimeout(nextSpin, dur(300))
   }
 
+  // ── Retrigger escalation, TR-036 option (b) ────────────────────────────────
+  //
+  // WHY IT LIVES HERE AND NOT IN GameGrid. The free-spins overlay renders its
+  // OWN board; GameGrid's reel-stop loop, which owns the base-game ladder, is
+  // behind it and not running. Wiring the retrigger ladder into GameGrid would
+  // have produced a beat the player cannot see, which is the dead-wiring shape
+  // this project gates against. So the ladder runs where the reels the player
+  // is actually watching are: here.
+  //
+  // The INTEGRITY PROPERTY is preserved exactly. `escalationFor` is still fed
+  // only visibly landed scatters and reels still to come, and still cannot be
+  // passed a board. Revealing this one spin reel by reel rather than all at once
+  // is what makes "visibly landed" meaningful inside the overlay at all.
+  //
+  // Only a RETRIGGERING spin does this. Every other free spin reveals whole, as
+  // it always has, because there is nothing to build toward.
+  let revealedReels = 5          // how many reels of the current spin are shown
+  let retriggerBeat = false      // true while the capped ladder is running
+  export let onRetriggerBeat: ((active: boolean) => void) | null = null
+
+  function setBeat(on: boolean): void {
+    retriggerBeat = on
+    onRetriggerBeat?.(on)
+  }
+
+  const sleep = (ms: number) => new Promise<void>((r) => { timer = setTimeout(r, ms) })
+
+  async function runRetriggerLadder(spin: PresentedSpin): Promise<void> {
+    const rows = visibleRows(spin.board)
+    const speedFactor = get(speedTier) === 'super' ? 0.16 : get(isTurbo) ? 0.5 : 1
+    revealedReels = 0
+    resetEscalation()
+    setBeat(true)
+
+    let landed = 0
+    for (let r = 0; r < rows.length; r++) {
+      // Sustained tension BEFORE this reel commits. `rows.length - r` counts
+      // this reel as still to come, which it is.
+      const hold = escalationFor(landed, rows.length - r, 'retrigger')
+      if (holdMsFor(hold) > 0) {
+        scatterEscalation.set(hold)
+        await sleep(scaledHoldMs(hold, speedFactor))
+      }
+
+      const before = landed
+      revealedReels = r + 1
+      landed += rows[r].filter((sym) => sym === 'S').length
+
+      // Beat on the TRANSITION, so it fires when the scatter lands. Above the
+      // cap there is no further beat: the retrigger announced itself at three.
+      const pulse = pulseLevelFor(before, landed, 'retrigger')
+      if (pulse !== null) {
+        scatterEscalation.set(pulse)
+        await sleep(scaledPulseMs(pulse, speedFactor))
+      }
+
+      scatterEscalation.set(escalationFor(landed, rows.length - 1 - r, 'retrigger'))
+    }
+
+    setBeat(false)
+    resetEscalation()
+  }
+
   function nextSpin() {
     if (!script) return finish()
     spinIndex += 1
@@ -171,18 +244,33 @@
     if (currentSpin.retrigger) awardedTotal = currentSpin.retrigger.newTotal
     spinsRemaining = Math.max(0, awardedTotal - spinIndex)
     runningTotalCentibets = currentSpin.runningTotalCentibets
-    showRetrigger = !!currentSpin.retrigger
+    // The +5 pop waits for the ladder on a retriggering spin, so the build and
+    // its payoff are not on screen at the same moment.
+    showRetrigger = false
+    revealedReels = 5
 
-    // After a winning spin, animate the meter increment. Bigger wins dwell
-    // longer so the connection (and, in a wincap round, the spin that reaches
-    // the cap) is actually seen; small wins still move fast.
-    const willInc = currentSpin.meterAfter > currentSpin.meterBefore
-    const winMult = currentSpin.spinWinCentibets / 100
-    const holdWin = winMult > 0 ? Math.min(3200, 700 + winMult * 24) : 500
-    timer = setTimeout(() => {
-      if (willInc) displayMeter = currentSpin!.meterAfter
-      timer = setTimeout(nextSpin, dur(willInc ? 450 : 150))
-    }, dur(holdWin))
+    const spin = currentSpin
+    const advance = () => {
+      showRetrigger = !!spin.retrigger
+      // After a winning spin, animate the meter increment. Bigger wins dwell
+      // longer so the connection (and, in a wincap round, the spin that reaches
+      // the cap) is actually seen; small wins still move fast.
+      const willInc = spin.meterAfter > spin.meterBefore
+      const winMult = spin.spinWinCentibets / 100
+      const holdWin = winMult > 0 ? Math.min(3200, 700 + winMult * 24) : 500
+      timer = setTimeout(() => {
+        if (willInc) displayMeter = spin.meterAfter
+        timer = setTimeout(nextSpin, dur(willInc ? 450 : 150))
+      }, dur(holdWin))
+    }
+
+    if (spin.retrigger) {
+      // TR-036 option (b). Reveal this one spin reel by reel and run the capped
+      // ladder over it, then carry on exactly as before.
+      runRetriggerLadder(spin).then(advance)
+    } else {
+      advance()
+    }
   }
 
   function toEnd() {
@@ -311,9 +399,13 @@
              reels at maximum size") - the live meter/spins/total-win values
              are bound out to BonusInstrumentColumn (App.svelte), the single
              source of in-feature instrumentation for both layouts. -->
-        <div class="fs-board" class:has-win={hasWin}>
+        <div class="fs-board" class:has-win={hasWin} class:fs-beat={retriggerBeat}
+             style="--fs-esc: {$scatterEscalation}">
           {#each vrows as reel, reelIdx}
-            <div class="fs-reel">
+            <!-- During the retrigger ladder the reels arrive one at a time, so
+                 "visibly landed" means something inside this overlay. Every
+                 other spin has revealedReels at 5 and renders whole. -->
+            <div class="fs-reel" class:fs-reel-pending={reelIdx >= revealedReels}>
               {#each reel as sym, rowIdx}
                 <div
                   class="fs-cell"
@@ -368,6 +460,19 @@
     font-family: 'Orbitron', sans-serif; color: #fff; text-align: center;
   }
   .fs-entry, .fs-end { display: flex; flex-direction: column; gap: 10px; }
+
+  /* TR-036 option (b): a reel that has not landed yet during the retrigger
+     ladder. Dimmed and blurred rather than removed, so the grid keeps its
+     shape and only the outcome is withheld. */
+  .fs-reel-pending { opacity: 0.28; filter: blur(3px) saturate(0.5); }
+  .fs-reel { transition: opacity 160ms ease, filter 160ms ease; }
+  /* The board itself lifts while the capped ladder runs, so the build reads on
+     the surface the player is watching rather than only on the frame jets. */
+  .fs-board.fs-beat {
+    box-shadow: 0 0 0 2px rgba(0, 255, 255, calc(0.18 + 0.12 * var(--fs-esc, 0))),
+                0 0 34px rgba(0, 255, 255, calc(0.10 + 0.10 * var(--fs-esc, 0)));
+    transition: box-shadow 200ms ease;
+  }
   .fs-title { font-size: 2rem; font-weight: 900; color: var(--theme-primary, #16f2e0); letter-spacing: 3px; text-shadow: 0 0 18px var(--theme-primary, #16f2e0); }
   .fs-sub { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
 

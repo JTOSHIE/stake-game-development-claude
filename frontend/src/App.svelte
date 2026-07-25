@@ -449,6 +449,9 @@
   //    2026-07-16, item 3: "one subtle screen-shake pulse on big and above" -
   //    lowered from the prior 50x threshold to 10x, the same BIG_WIN_THRESHOLD
   //    WinBanner.svelte's own tier system uses, so the two stay aligned) ─────
+  // TR-036 option (b) / R2R-R JOB E. Set by FreeSpinsPresentation while the
+  // capped retrigger ladder is running; lifts the flame jets above the overlay.
+  let retriggerBeatActive = false
   let shakeActive = false
   let lastShakeWin = 0
   function triggerShake(durationMs = 420): void {
@@ -1378,7 +1381,16 @@
 
       <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
       {#if $activeTheme.id === 'future-spinner'}
-        <FlameJets active={overdriveVisualActive} colourway={flameColourway} />
+        <!-- TR-036 option (b): the free-spins overlay sits at z80 and its
+             backdrop is nearly opaque at the frame edge, where the jets live.
+             During the capped retrigger ladder the jets are lifted above it, so
+             the build the player is being shown is actually visible. Without
+             this the whole feature would be correct and invisible, which is the
+             failure mode the dead-wiring gate exists for and which a store
+             assertion alone would not have caught. -->
+        <div class="jets-holder" class:above-overlay={retriggerBeatActive}>
+          <FlameJets active={overdriveVisualActive || retriggerBeatActive} colourway={flameColourway} />
+        </div>
       {/if}
 
       <!-- GLOBAL GRADE (TR-027). A blended overlay rather than a filter, on
@@ -1420,6 +1432,7 @@
             bind:endBannerAmount={liveEndBannerAmount}
             bind:endBannerMultiplier={liveEndBannerMultiplier}
             bind:endBannerTrigger={liveEndBannerTrigger}
+            onRetriggerBeat={(on) => { retriggerBeatActive = on }}
             on:complete={onFeatureComplete}
           />
         </div>
@@ -1576,6 +1589,10 @@
 {/if}
 
 <style>
+  .jets-holder { position: absolute; inset: 0; pointer-events: none; }
+  /* Above the free-spins overlay (z80) only while the retrigger beat runs. */
+  .jets-holder.above-overlay { z-index: 90; }
+
   .live-guard-banner {
     position: fixed; left: 0; right: 0; top: 0; z-index: 9000;
     padding: 14px 18px; text-align: center;

@@ -255,6 +255,12 @@
           <ul class="fs-rules" style="margin-top:12px;">
             <li>{$tr('rulesOverdriveMeter')}</li>
             <li>{$tr('rulesOverdriveRetrigger')}</li>
+            <!-- TR-036 option (b) / R2R1 F-07. The disclosure half of the
+                 retrigger finding: a player who sees a full build on entry and
+                 a shorter one on retrigger should be told why, or the
+                 difference reads as a glitch. Routed through the JOB 6
+                 vocabulary layer like every other composed player string. -->
+            <li>{sv($tr('rulesOverdriveRetriggerBuild'), $isSocial)}</li>
             {#if !$buyFeatureDisabled}
               <li>{$tr('rulesOverdriveBuy')}</li>
             {/if}

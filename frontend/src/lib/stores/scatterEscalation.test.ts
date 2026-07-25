@@ -5,14 +5,19 @@
 // books, chosen to cover the cases the measurement showed actually occur,
 // including the 0.5% of rounds that land two scatters on one reel.
 
+import { readFileSync } from 'node:fs'
 import {
-  escalationFor, pulseLevelFor, holdMsFor, pulseMsFor, scaledHoldMs, scaledPulseMs,
+  escalationFor, RETRIGGER_MAX_LEVEL, pulseLevelFor, holdMsFor, pulseMsFor, scaledHoldMs, scaledPulseMs,
   flameIntensityFor, PULSE_LEVELS, HOLD_FLOOR_MS, PULSE_FLOOR_MS,
   type EscalationLevel,
 } from './scatterEscalation.ts'
 import fixtures from './__fixtures__/scatter_rounds.json'
 
 let failures = 0
+const checkThat = (name: string, cond: boolean) => {
+  if (cond) console.log(`  ok   ${name}`)
+  else { failures++; console.error(`  FAIL ${name}`) }
+}
 const check = (name: string, a: unknown, e: unknown) => {
   if (JSON.stringify(a) === JSON.stringify(e)) console.log(`  ok   ${name}`)
   else { failures++; console.error(`  FAIL ${name}\n    expected ${JSON.stringify(e)}\n    actual   ${JSON.stringify(a)}`) }
@@ -127,6 +132,62 @@ check('they ignite low exactly at SECURED', flameIntensityFor(2), 0.35)
   const ramp = ([2, 3, 4, 5, 6] as EscalationLevel[]).map(flameIntensityFor)
   check('and rise monotonically to full', ramp.every((v, i) => i === 0 || v > ramp[i - 1]), true)
   check('topping out at 1', ramp[ramp.length - 1], 1)
+}
+
+console.log('\nTHE RETRIGGER LADDER, TR-036 option (b)')
+// A retrigger runs the SAME ladder capped at level 3. Levels 0 to 3 must be
+// IDENTICAL to the base game, because "capped" means capped and not "different".
+{
+  const cases: Array<[number, number]> = [[0, 5], [1, 4], [2, 3], [2, 0], [3, 2], [3, 0]]
+  const same = cases.every(([l, r]) => escalationFor(l, r, 'retrigger') === escalationFor(l, r))
+  check('levels at or below the cap are identical to the base game', same, true)
+}
+check('four landed with reels moving clamps 5 to 3', escalationFor(4, 1, 'retrigger'), 3)
+check('four landed at rest clamps 4 to 3', escalationFor(4, 0, 'retrigger'), 3)
+check('five landed clamps 6 to 3', escalationFor(5, 0, 'retrigger'), 3)
+check('and the base game is untouched by any of it', [escalationFor(4, 1), escalationFor(4, 0), escalationFor(5, 0)], [5, 4, 6])
+check('nothing ever exceeds the cap on a retrigger',
+  [0, 1, 2, 3, 4, 5].flatMap((l) => [0, 1, 2, 3, 4, 5].map((r) => escalationFor(l, r, 'retrigger')))
+    .every((v) => v <= RETRIGGER_MAX_LEVEL), true)
+
+// The SECURED beat still fires: a retrigger IS three scatters landing, and that
+// is the moment worth marking. What does not fire is anything above it.
+check('the SECURED pulse still fires on a retrigger', pulseLevelFor(2, 3, 'retrigger'), 2)
+check('a jump from zero to three still fires it', pulseLevelFor(0, 3, 'retrigger'), 2)
+// A pulse above the cap becomes NOTHING, not a clamp. Clamping 4 to 3 would
+// turn a one-shot beat into a sustained level; clamping to 2 would fire SECURED
+// twice in one spin, which reads as a bug rather than a design.
+check('the fourth-scatter beat does NOT fire on a retrigger', pulseLevelFor(3, 4, 'retrigger'), null)
+check('nor the fifth', pulseLevelFor(4, 5, 'retrigger'), null)
+check('and neither is silently clamped to a lower beat',
+  [pulseLevelFor(3, 4, 'retrigger'), pulseLevelFor(4, 5, 'retrigger')], [null, null])
+check('the base game still fires all three beats',
+  [pulseLevelFor(2, 3), pulseLevelFor(3, 4), pulseLevelFor(4, 5)], [2, 4, 6])
+check('an ordinary stop is still nothing, in both phases',
+  [pulseLevelFor(1, 2), pulseLevelFor(1, 2, 'retrigger')], [null, null])
+
+// The gauge never rises above where a base-game level-3 build sits, so a
+// retrigger can never LOOK bigger than the entry that earned the feature.
+check('peak retrigger flame equals the base-game level-3 flame',
+  flameIntensityFor(RETRIGGER_MAX_LEVEL), flameIntensityFor(3))
+check('and is strictly below a full eruption',
+  flameIntensityFor(RETRIGGER_MAX_LEVEL) < flameIntensityFor(6), true)
+
+console.log('\nTHE LADDER IS WIRED, not merely available')
+// TR-036 was left unbuilt once for a good reason: the store change alone is
+// dead code. These read the shipped components.
+{
+  const fs = readFileSync('src/lib/components/FreeSpinsPresentation.svelte', 'utf8')
+  const app = readFileSync('src/App.svelte', 'utf8')
+  checkThat('the free-spins overlay runs the capped ladder', /runRetriggerLadder/.test(fs))
+  checkThat('and passes the retrigger phase, not the default', /'retrigger'\)/.test(fs))
+  checkThat('only a retriggering spin triggers it', /if \(spin\.retrigger\) \{/.test(fs))
+  checkThat('reels are revealed one at a time while it runs, so "visibly landed" means something',
+    /revealedReels/.test(fs) && /fs-reel-pending/.test(fs))
+  checkThat('and App lifts the jets above the overlay for the beat',
+    /jets-holder/.test(app) && /above-overlay/.test(app) && /retriggerBeatActive/.test(app))
+  checkThat('the beat callback is actually passed to the component',
+    /onRetriggerBeat=\{\(on\) => \{ retriggerBeatActive = on \}\}/.test(app))
 }
 
 if (failures) { console.error(`\nSCATTER ESCALATION: FAIL (${failures})`); process.exit(1) }
