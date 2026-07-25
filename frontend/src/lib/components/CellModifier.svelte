@@ -1,5 +1,5 @@
 <script lang="ts">
-  // CellModifier.svelte — mechanic-agnostic per-cell overlay. Renders a small
+  // CellModifier.svelte, mechanic-agnostic per-cell overlay. Renders a small
   // badge on a grid cell for any per-cell modifier a mechanic produces: a wild
   // multiplier (xN), a prize value, an upgrade marker, etc. Keeping this generic
   // means a new mechanic (multiplier wilds, symbol upgrades, collect symbols)

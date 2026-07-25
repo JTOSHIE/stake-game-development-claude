@@ -1,5 +1,5 @@
 /**
- * translations.ts — i18n strings for Future Spinner
+ * translations.ts, i18n strings for Future Spinner
  *
  * 16 locales: en ar de es fi fr hi id ja ko pl pt ru tr vi zh
  * Social casino mode remaps: spin→play, win→prize, balance→coins
@@ -1642,7 +1642,7 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
     'Base game and Feature Play both return 96.35% RTP. Maximum prize 5,000× your play.',
 }
 
-// ── t() — translate a key ─────────────────────────────────────────────────────
+// ── t(), translate a key ─────────────────────────────────────────────────────
 
 /**
  * Look up a translation key for the given locale and optional game mode.

@@ -1,5 +1,5 @@
 <script lang="ts">
-  // FlameJets.svelte (Opus elevate 2, Task 1) — Overdrive frame-edge jets.
+  // FlameJets.svelte (Opus elevate 2, Task 1), Overdrive frame-edge jets.
   // Eight fixed nozzles (two per frame side) with a flame sprite that IGNITES
   // on the Overdrive entry, burns for the whole bonus (a CSS steps() sprite
   // loop over jet_flame_sheet.png + a scale-breathe), and extinguishes on exit.

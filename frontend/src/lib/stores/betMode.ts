@@ -1,4 +1,4 @@
-// betMode.ts — non-locked store for the selected bet mode.
+// betMode.ts, non-locked store for the selected bet mode.
 //
 // The buy UI writes 'bonus' here immediately before placing a bonus-buy spin,
 // and resets to 'base' afterwards. The locked rgsService.play() reads this

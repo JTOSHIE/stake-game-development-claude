@@ -1,5 +1,5 @@
 <script lang="ts">
-  // IntroSplash.svelte — Motion Polish v2 brand screens: the intro splash
+  // IntroSplash.svelte, Motion Polish v2 brand screens: the intro splash
   // (DESIGN_SYSTEM "new standard screen"). After load, before play: an
   // Overdrive rules explainer card with a Continue control, localised across
   // all 16 locales with social overrides, shown once per session.

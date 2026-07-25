@@ -1,4 +1,4 @@
-// responsibleGambling.test.ts — compliance gate for the RG autoplay logic.
+// responsibleGambling.test.ts, compliance gate for the RG autoplay logic.
 // Run: npx tsx src/lib/stores/responsibleGambling.test.ts
 //
 // Verifies the autoplay STOP CONDITIONS, the minimum-round-duration enforcement,

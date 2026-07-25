@@ -1,4 +1,4 @@
-// roundEvents.ts — non-locked store carrying the complete raw event sequence of
+// roundEvents.ts, non-locked store carrying the complete raw event sequence of
 // the most recent round.
 //
 // The locked rgsService publishes the full RGS event list here (sanctioned

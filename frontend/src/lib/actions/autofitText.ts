@@ -1,4 +1,4 @@
-// autofitText.ts — OWNER AUDIT REMEDIATION B1/B2: HUD/win-banner number auto-fit.
+// autofitText.ts, OWNER AUDIT REMEDIATION B1/B2: HUD/win-banner number auto-fit.
 //
 // A Svelte action that shrinks an element's font-size (via a CSS custom
 // property, --autofit-scale, multiplied into the element's own font-size

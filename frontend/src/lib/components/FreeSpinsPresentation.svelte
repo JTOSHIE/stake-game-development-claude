@@ -1,5 +1,5 @@
 <script lang="ts">
-  // FreeSpinsPresentation.svelte — plays back an Overdrive Free Spins round from
+  // FreeSpinsPresentation.svelte, plays back an Overdrive Free Spins round from
   // a PresentationScript (produced by roundInterpreter over the round events).
   // Temporary CSS presentation; final art/animation arrive in AssetForge v2 and
   // Motion Polish v2. Drives its own timed sequence; turbo shortens every step.
@@ -336,7 +336,7 @@
 
   // ── Win-connection story: which cells make up the spin's wins ─────────────
   // A ways win with symbol S over `kind` reels lights every cell holding S (or a
-  // wild) on reels 0..kind-1 — so the player sees the connection across reels.
+  // wild) on reels 0..kind-1, so the player sees the connection across reels.
   function winningCells(rows: string[][], wins: PresentedSpin['wins']): Set<string> {
     const cells = new Set<string>()
     for (const win of wins) {
@@ -476,7 +476,7 @@
   .fs-title { font-size: 2rem; font-weight: 900; color: var(--theme-primary, #16f2e0); letter-spacing: 3px; text-shadow: 0 0 18px var(--theme-primary, #16f2e0); }
   .fs-sub { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
 
-  /* ── Overdrive transition (Motion Polish v2) — staged entry sequence ───── */
+  /* ── Overdrive transition (Motion Polish v2), staged entry sequence ───── */
   .fs-entry-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
   .entry-scatter-flare {

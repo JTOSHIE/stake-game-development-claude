@@ -64,7 +64,7 @@
     display: block;
   }
 
-  /* Zone 1 — MULTIPLIER: top:72 left:50 w:99 h:72 (from Manus QC) */
+  /* Zone 1, MULTIPLIER: top:72 left:50 w:99 h:72 (from Manus QC) */
   .zone-mult {
     position: absolute;
     top: 72px;
@@ -84,7 +84,7 @@
     z-index: 2;
   }
 
-  /* Zone 2 — WIN: top:192 left:50 w:99 h:72 (from Manus QC) */
+  /* Zone 2, WIN: top:192 left:50 w:99 h:72 (from Manus QC) */
   .zone-amt {
     position: absolute;
     top: 192px;

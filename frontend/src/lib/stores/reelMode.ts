@@ -1,4 +1,4 @@
-// reelMode.ts — non-locked dev toggle for the reel choreography (Reel Feel v3).
+// reelMode.ts, non-locked dev toggle for the reel choreography (Reel Feel v3).
 //
 // Both choreographies share one tile-unit engine (GameGrid): 'strip' scrolls a
 // wrapped vertical strip, 'drop' releases the same tiles from above the frame

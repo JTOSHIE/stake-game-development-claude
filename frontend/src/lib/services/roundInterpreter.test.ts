@@ -1,4 +1,4 @@
-// roundInterpreter.test.ts — exact-total gate over the curated sample rounds.
+// roundInterpreter.test.ts, exact-total gate over the curated sample rounds.
 // Run: npx tsx src/lib/services/roundInterpreter.test.ts
 //
 // For every sample round, the sum of all presented win events, capped at the

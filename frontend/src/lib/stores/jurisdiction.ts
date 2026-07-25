@@ -1,4 +1,4 @@
-// jurisdiction.ts — non-locked store for RGS jurisdiction flags.
+// jurisdiction.ts, non-locked store for RGS jurisdiction flags.
 //
 // The locked rgsService.initRGS() writes the flags surfaced by the authenticate
 // response here (sanctioned additive passthrough, mirroring rgsBetLevels). The

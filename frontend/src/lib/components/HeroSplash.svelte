@@ -1,5 +1,5 @@
 <script lang="ts">
-  // HeroSplash.svelte — the brand intro, built from the locked studio hero
+  // HeroSplash.svelte, the brand intro, built from the locked studio hero
   // emblem (design-system/brand/hero_emblem/, ratified PR #82; bundled here as
   // a palette-compressed 512 copy via scripts/assets/build.py's brand_exports
   // step).

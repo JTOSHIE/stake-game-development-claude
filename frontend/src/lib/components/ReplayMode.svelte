@@ -23,7 +23,7 @@
   import { socialAtBoot } from '../stores/socialMode'
 
   // Drive the animation pipeline by setting gameStore writables via their
-  // public .set() API — gameStore.ts itself is NOT modified.
+  // public .set() API, gameStore.ts itself is NOT modified.
   import {
     boardSymbols,
     activeWins,
@@ -38,7 +38,7 @@
 
   import type { ReplayParams, ReplayResponse } from '../services/replayService'
 
-  // i18n — replay supports the ?lang= param; the disclaimer must follow it.
+  // i18n, replay supports the ?lang= param; the disclaimer must follow it.
   import { t, type Locale, type GameMode } from '../i18n/translations'
 
   // Resolve the locale/mode eagerly so the disclaimer renders correctly even
@@ -71,7 +71,7 @@
 
   // Wincap flow (applies to replay too): show the MAX WIN splash immediately,
   // wait for COLLECT, then present the complete round sequence, finishing on
-  // the total win summary — same order as live play.
+  // the total win summary, same order as live play.
   let wincapCollectResolve: (() => void) | null = null
   function handleWincapCollect(): void {
     isWincap.set(false)
@@ -84,7 +84,7 @@
     try {
       const p = parseReplayParams()
       if (!p) {
-        // Should never happen — App.svelte should only render this in replay mode.
+        // Should never happen, App.svelte should only render this in replay mode.
         throw new Error('ReplayMode rendered outside of replay mode.')
       }
       params = p
@@ -192,7 +192,7 @@
         payout: (w.winCentibets / 100) * betDollars,
       }))
 
-      // Wincap flow (non-feature base round reaching the cap — see the
+      // Wincap flow (non-feature base round reaching the cap, see the
       // feature-round branch above for the more common triggered case):
       // splash first, wait for COLLECT, then the reel reveal below plays as
       // the "how it happened" presentation, finishing on the summary.
@@ -209,7 +209,7 @@
       }
       isSpinning.set(false)
 
-      // Populate result stores — exactly as App.svelte does post-spin
+      // Populate result stores, exactly as App.svelte does post-spin
       boardSymbols.set(board)
       activeWins.set(winEvents)
       // The interpreter counts scatters on the VISIBLE window, not the padded
@@ -250,14 +250,14 @@
     : 0
   $: showCostMultiplier = response ? response.costMultiplier !== 1.0 : false
 
-  // Disclaimer text — prefer parsed params once available, else the eager values.
+  // Disclaimer text, prefer parsed params once available, else the eager values.
   $: locale = (params?.lang ?? initialLang) as Locale
   $: mode = (params?.social ? 'social' : initialMode) as GameMode
   $: disclaimer = t(locale, 'replayDisclaimer', mode)
 </script>
 
 <div class="replay-container">
-  <!-- Replay disclaimer — always visible, Stake Engine compliance. Makes clear
+  <!-- Replay disclaimer, always visible, Stake Engine compliance. Makes clear
        this is a non-interactive replay of a past round with no real wager. -->
   <div class="replay-disclaimer" role="note">{disclaimer}</div>
 

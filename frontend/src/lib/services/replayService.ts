@@ -35,7 +35,7 @@ export interface ReplayParams {
 export interface ReplayResponse {
   payoutMultiplier: number   // multiplier applied to the bet amount for total payout
   costMultiplier: number     // multiplier applied to the bet for cost (1.0 for base mode)
-  state: any                 // game-specific replay state — events / board / wins
+  state: any                 // game-specific replay state, events / board / wins
 }
 
 
@@ -51,7 +51,7 @@ export interface ReplayResponse {
  *   - social: false
  *
  * Throws if replay=true is present but any of game/version/mode/event/rgs_url
- * is missing — these are mandatory.
+ * is missing, these are mandatory.
  */
 export function parseReplayParams(): ReplayParams | null {
   const params = new URLSearchParams(window.location.search)
@@ -119,7 +119,7 @@ export function parseReplayParams(): ReplayParams | null {
 
 /**
  * Fetch the replay data from the RGS replay endpoint.
- * No session is required — replay URLs are publicly shareable.
+ * No session is required, replay URLs are publicly shareable.
  */
 export async function fetchReplay(p: ReplayParams): Promise<ReplayResponse> {
   const url = `${p.rgsUrl}/bet/replay/${p.game}/${p.version}/${p.mode}/${p.event}`

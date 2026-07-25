@@ -1,5 +1,5 @@
 <script lang="ts">
-  // BuyBonus.svelte — Bonus Buy button + confirm modal. Temporary CSS treatment
+  // BuyBonus.svelte, Bonus Buy button + confirm modal. Temporary CSS treatment
   // (final art in AssetForge v2). Fully hidden where the jurisdiction disables
   // feature buys. All strings localised with social overrides.
   import { createEventDispatcher } from 'svelte'

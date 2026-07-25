@@ -1,4 +1,4 @@
-// themeStore.ts — Reactive theme state — We Roll Spinners
+// themeStore.ts, Reactive theme state, We Roll Spinners
 // All asset paths derived from active theme. Every UI element reads from here.
 
 import { writable, derived } from 'svelte/store'
@@ -33,7 +33,7 @@ export const themeAssets = derived(activeTheme, ($t) => {
   return {
     id:        $t.id,
     assetBase: b,
-    // Symbols — standard names, theme folder changes
+    // Symbols, standard names, theme folder changes
     symbols: {
       H1:     `${b}/symbols/h1.png`,
       H2:     `${b}/symbols/h2.png`,
@@ -50,7 +50,7 @@ export const themeAssets = derived(activeTheme, ($t) => {
     background:      `${b}/backgrounds/bg-1.jpg`,
     backgroundVideo: `${b}/backgrounds/bg-1.mp4`,
     isVideo:         $t.id === 'future-spinner',
-    // Frame — frame-2 for every theme (LAYOUT_INSTALL: switched future-spinner
+    // Frame, frame-2 for every theme (LAYOUT_INSTALL: switched future-spinner
     // from frame-1 to frame-2 per the owner-approved blueprint; frame-2 has a
     // larger transparent centre window, avoids clipping the canvas. One-line
     // revert: change this back to frame-1 for future-spinner if preferred.

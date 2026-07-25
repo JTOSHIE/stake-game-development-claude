@@ -1,4 +1,4 @@
-// rgsBetLevels.ts — non-locked store for RGS-provided bet levels.
+// rgsBetLevels.ts, non-locked store for RGS-provided bet levels.
 //
 // The locked rgsService.initRGS() fetches the bet levels from the wallet
 // authenticate response but does not retain them. Per the owner-sanctioned

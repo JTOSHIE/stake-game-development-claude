@@ -1,5 +1,5 @@
 <script lang="ts">
-  // RainLayer.svelte — OWNER AUDIT REMEDIATION C1.
+  // RainLayer.svelte, OWNER AUDIT REMEDIATION C1.
   // Extracted from HeroSplash.svelte's own CSS rain streaks (ANIMATION
   // UPLIFT PASS 2026-07-16) so the same effect can be ported into the
   // in-game backdrop at a different density/opacity without duplicating

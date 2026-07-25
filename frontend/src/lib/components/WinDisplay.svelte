@@ -12,7 +12,7 @@
   let animating    = false
 
   // Start a new count-up only when winAmount goes positive.
-  // Never reset mid-animation — wait until animation finishes.
+  // Never reset mid-animation, wait until animation finishes.
   $: if ($winAmount > 0 && $winAmount !== targetValue) {
     targetValue = $winAmount
     startCountUp(targetValue)
@@ -104,7 +104,7 @@
     padding: 0 1.2rem;
     border-radius: 8px;
 
-    /* CSS-only dark glass panel — no background image */
+    /* CSS-only dark glass panel, no background image */
     background: linear-gradient(135deg,
       rgba(20, 0, 30, 0.92) 0%,
       rgba(40, 0, 50, 0.88) 50%,

@@ -1,4 +1,4 @@
-// roundProvider.ts — offline mock round provider (NON-LOCKED).
+// roundProvider.ts, offline mock round provider (NON-LOCKED).
 //
 // In dev/mock mode the locked rgsService serves a single flattened SpinResult
 // and does not populate lastRoundEvents with a real free-spins sequence. This

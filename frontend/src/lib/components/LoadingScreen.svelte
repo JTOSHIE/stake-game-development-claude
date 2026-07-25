@@ -1,10 +1,10 @@
 <script lang="ts">
-  // LoadingScreen.svelte — Motion Polish v2 brand screens: the WRS standard
+  // LoadingScreen.svelte, Motion Polish v2 brand screens: the WRS standard
   // loading screen. The brand mark (a neon chrome rim) renders large with its
   // inner five-fold blade layer spinning continuously as the loader itself;
   // WE ROLL SPINNERS wordmark above in CSS Orbitron, the active theme's game
   // logo below. DESIGN_SYSTEM: "the rim spinning as the loader, the WE ROLL
-  // SPINNERS wordmark above, the game logo slot beneath" — every WRS title.
+  // SPINNERS wordmark above, the game logo slot beneath", every WRS title.
   import { assetLoadProgress } from '../stores/loadingStore'
   import { themeAssets } from '../stores/themeStore'
 </script>
@@ -62,7 +62,7 @@
     animation: fade-in 0.8s ease both;
   }
 
-  /* ── Brand mark — the rim spinning as the loader ─────────────────────── */
+  /* ── Brand mark, the rim spinning as the loader ─────────────────────── */
   .brand-mark {
     position: relative;
     width: clamp(140px, 24vw, 220px);

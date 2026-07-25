@@ -1,4 +1,4 @@
-// socialMode.ts — single source of truth for social (free-to-play) mode.
+// socialMode.ts, single source of truth for social (free-to-play) mode.
 //
 // Social mode is resolved once at boot from the ?social=true URL parameter
 // (the same flag the replay flow and the Stake Engine play-modal toggle use),

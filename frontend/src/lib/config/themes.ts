@@ -1,5 +1,5 @@
 // src/lib/config/themes.ts
-// Theme registry — We Roll Spinners multi-theme system
+// Theme registry, We Roll Spinners multi-theme system
 // Adding a new theme: add entry here + drop assets in themes/[id]/ folder
 
 export interface ThemeConfig {

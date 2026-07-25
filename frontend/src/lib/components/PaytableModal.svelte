@@ -1,5 +1,5 @@
 <script lang="ts">
-  // PaytableModal.svelte — full-page paytable, B3 reskin.
+  // PaytableModal.svelte, full-page paytable, B3 reskin.
   // Rebuilt on the B1 chrome vocabulary (.fs-plate / .fs-rail / .fs-knob /
   // .fs-face): a single brushed-steel instrument plate holding the how-to-win
   // banner, the WAYS TO WIN adjacency diagram, the symbol payouts grid, the
@@ -8,7 +8,7 @@
   // stage (scales with S via the transformed ancestor, which also re-anchors
   // this modal's `position: fixed`). All colour comes from the 5 scheme tokens,
   // so a new skin is one scheme block; base and Overdrive states are supported.
-  // Fonts are the globally self-hosted Orbitron (@fontsource, see main.ts) — no
+  // Fonts are the globally self-hosted Orbitron (@fontsource, see main.ts), no
   // external font CDN (Stake Engine compliance).
   import { showPaytable, betAmount, currencyCode } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
@@ -68,7 +68,7 @@
     ? 'Malfunction voids all prizes and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Prizes are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
     : 'Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Winnings are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
 
-  // Symbol pay table — per-way multipliers, matching the validated maths in
+  // Symbol pay table, per-way multipliers, matching the validated maths in
   // games/future_spinner/game_config.py exactly. Final payout = paytable value
   // x ways count x bet. pays array is [_, _, 3-of, 4-of, 5-of]. WILD substitutes
   // for all symbols and has no independent pay; SCAT pays via the scatter table.
@@ -102,7 +102,7 @@
     { scatters: 5, spins: 16, award: '10×' },
   ]
 
-  // Interface Guide — each game control with its rendered UI art and a
+  // Interface Guide, each game control with its rendered UI art and a
   // one-line description. `kind: 'img'` rows use the theme's UI PNGs; `kind:
   // 'pill'` rows have no dedicated art and render a styled text token instead.
   // R2R JOB 6 / TR-041. Every `name` and `desc` below was a hardcoded literal
@@ -132,10 +132,10 @@
     desc: sv(row.desc, $isSocial),
   }))
 
-  // Buy price — 100x current bet, only meaningful where the buy is not disabled.
+  // Buy price, 100x current bet, only meaningful where the buy is not disabled.
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
 
-  // Bet Modes section — every mode priced against the current bet, straight from
+  // Bet Modes section, every mode priced against the current bet, straight from
   // the single source of truth (config/fsModes.ts). Placeholder modes (maths not
   // yet shipped) are tagged "coming soon"; RTP is the same across all modes.
   $: modePrice = (cost: number) =>
@@ -184,7 +184,7 @@
           </div>
         </div>
 
-        <!-- WAYS TO WIN — adjacent-reels diagram, reads left to right from reel 1 -->
+        <!-- WAYS TO WIN, adjacent-reels diagram, reads left to right from reel 1 -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">{waysLabel}</h3>
           <div class="fs-ways-diagram fs-plate" role="img" aria-label="A matching way reads left to right across adjacent reels, starting from reel 1">
@@ -277,7 +277,7 @@
           {/if}
         </div>
 
-        <!-- Bet Modes — every mode from the single source of truth (fsModes.ts).
+        <!-- Bet Modes, every mode from the single source of truth (fsModes.ts).
              All five are live since FeatureMath v2 (2026-07-07): Normal, Cruise,
              OVERBOOST, Buy Overdrive, NITRO OVERDRIVE. All share the same
              96.35% RTP; the `soon` tag/branch remains for any future mode
@@ -332,7 +332,7 @@
           </div>
         </div>
 
-        <!-- ── Interface Guide — every game control explained ────────────── -->
+        <!-- ── Interface Guide, every game control explained ────────────── -->
         <div data-testid="interface-guide">
           <p class="fs-mode-footnote">{maxWinFootnote($isSocial)}</p>
 
@@ -359,13 +359,13 @@
           </div>
         </div>
 
-        <!-- RTP — identical across all five modes (0.5% cross-mode rule) + max win -->
+        <!-- RTP, identical across all five modes (0.5% cross-mode rule) + max win -->
         <div class="fs-rtp">
           <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">RTP (All 5 Modes)</span><span class="fs-rtp-val fs-num">{FS_RTP_LABEL}</span></div></div>
           <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Max Win</span><span class="fs-rtp-val fs-num">{FS_MAX_WIN_LABEL}</span></div></div>
         </div>
 
-        <!-- Responsible play — the autoplay stop-conditions actually available
+        <!-- Responsible play, the autoplay stop-conditions actually available
              in the HUD's auto-menu (HudOverlay.svelte's startAuto()). Kept
              factual and scoped to what the player can actually set here. -->
         <div>
@@ -430,7 +430,7 @@
     font-family: 'Orbitron', system-ui, sans-serif;
   }
 
-  /* Swappable schemes — identical token set to the HUD (template layer). */
+  /* Swappable schemes, identical token set to the HUD (template layer). */
   .fs-pt.scheme-trap  { --sig-cyan: #39ff14; --sig-pink: #ff7a1a; --sig-gold: #ebff5a; --sig-orange: #ff6600; --sig-green: #b6ff3c; }
   .fs-pt.scheme-oil   { --sig-cyan: #ff8a3d; --sig-pink: #d9a86a; --sig-gold: #f5d061; --sig-orange: #ff5a1f; --sig-green: #f0b24a; }
   .fs-pt.scheme-pitch { --sig-cyan: #2fd24f; --sig-pink: #ffd700; --sig-gold: #ede7c8; --sig-orange: #4ce06b; --sig-green: #5be07a; }

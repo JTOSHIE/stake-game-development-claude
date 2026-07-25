@@ -1,4 +1,4 @@
-// roundInterpreter.ts — pure, typed interpreter that converts one book round
+// roundInterpreter.ts, pure, typed interpreter that converts one book round
 // into an ordered presentation script for the Overdrive Free Spins feature.
 //
 // NON-LOCKED. Reads only book-round data (the shape the maths emits and the

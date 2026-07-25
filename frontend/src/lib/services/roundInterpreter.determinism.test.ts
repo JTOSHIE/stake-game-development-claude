@@ -1,4 +1,4 @@
-// roundInterpreter.determinism.test.ts — provably-fair readiness gate.
+// roundInterpreter.determinism.test.ts, provably-fair readiness gate.
 // Run: npx tsx src/lib/services/roundInterpreter.determinism.test.ts
 //
 // PF invariant 2 (docs/PF_READINESS.md): every round is reconstructable from its

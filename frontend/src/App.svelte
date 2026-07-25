@@ -33,7 +33,7 @@
     switchTheme(DEFAULT_THEME_ID)
   }
 
-  // Determine mode synchronously at boot — no async needed.
+  // Determine mode synchronously at boot, no async needed.
   // If replay=true with malformed params, treat as replay so ReplayMode shows
   // the error state rather than silently falling back to live game.
   const isReplay = (() => {
@@ -192,7 +192,7 @@
     } catch { /* non-browser context, ignore */ }
   }
 
-  // ── Intro splash — brand screens (Motion Polish v2) ───────────────────────
+  // ── Intro splash, brand screens (Motion Polish v2) ───────────────────────
   // Shown once, right after loading finishes. Persistence (audit remediation):
   // localStorage so it does not re-show on every load in incognito/memory-
   // cleared contexts, falling back silently to sessionStorage then in-memory if
@@ -371,7 +371,7 @@
     if (r) r()
   }
 
-  // Live bonus-instrument values — FreeSpinsPresentation drives these via
+  // Live bonus-instrument values, FreeSpinsPresentation drives these via
   // two-way binding below; BonusInstrumentColumn reads the same numbers it
   // shows in its own overlay (LAYOUT_SPEC bonus instrument column).
   let liveMeter = 1
@@ -420,7 +420,7 @@
     ? 'nitro'
     : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')) as 'natural' | 'overdrive' | 'nitro'
   // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
-  // Motion Polish v2) — false again once the 'end' phase starts, so the
+  // Motion Polish v2), false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.
   let overdriveVisualActive = false
   // Mirror the local Overdrive visual flag into the shared store so the HUD and
@@ -794,7 +794,7 @@
   }
 
   onMount(async () => {
-    // Skip all RGS initialisation in replay mode — ReplayMode handles its own flow
+    // Skip all RGS initialisation in replay mode, ReplayMode handles its own flow
     if (isReplay) return
 
     const params  = new URLSearchParams(window.location.search)
@@ -843,7 +843,7 @@
     // variant crossfades via the .bg-still.overdrive.active CSS class.
 
     // Preload the Overdrive gauge images so they're already decoded before
-    // the transition fires — mounting them cold (large PNGs, decoded on
+    // the transition fires, mounting them cold (large PNGs, decoded on
     // first paint) was the source of an occasional dropped frame right at
     // feature trigger (Motion Polish v2 fps gate).
     for (const rel of ['ui/gauge_face.png', 'ui/gauge_needle.png']) {
@@ -1048,7 +1048,7 @@
       }
       // Live base rounds that trigger Overdrive publish their full events; play
       // the free-spins overlay before autoplay continues. Wincap flow:
-      // MaxWinCelebration is already showing (reactive to $isWincap) — wait for
+      // MaxWinCelebration is already showing (reactive to $isWincap), wait for
       // COLLECT, then present the complete round sequence through the
       // interpreter, finishing on the total win summary.
       const roundEvents = get(lastRoundEvents)
@@ -1136,24 +1136,24 @@
           betMicros: Math.round(bet * CURRENCY_SCALE),
           triggered: !!script?.triggered,
         })
-        // Stop auto-play immediately on wincap — player must manually collect
+        // Stop auto-play immediately on wincap, player must manually collect
         if ($autoPlayCount <= 0 || $isWincap || rg.stop) {
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {
           const multiplier = bet > 0 ? win / bet : 0
           if (multiplier >= 100) {
-            // Epic win — stop autoplay entirely
+            // Epic win, stop autoplay entirely
             isAutoPlay.set(false)
             autoPlayCount.set(0)
           } else if (multiplier >= 30) {
-            scheduleAutoSpin(6000)   // Mega win — pause 6 seconds
+            scheduleAutoSpin(6000)   // Mega win, pause 6 seconds
           } else if (multiplier >= 10) {
-            scheduleAutoSpin(3500)   // Big win — pause 3.5 seconds
+            scheduleAutoSpin(3500)   // Big win, pause 3.5 seconds
           } else if (multiplier > 0) {
-            scheduleAutoSpin(1500)   // Small/medium win — pause 1.5 seconds
+            scheduleAutoSpin(1500)   // Small/medium win, pause 1.5 seconds
           } else {
-            scheduleAutoSpin(800)    // Dead spin — continue at normal pace
+            scheduleAutoSpin(800)    // Dead spin, continue at normal pace
           }
         }
       }
@@ -1170,7 +1170,7 @@
   // requirement). Reuses handleSpin and the canSpin guard so it behaves
   // identically to clicking spin.
   function handleKeydown(e: KeyboardEvent): void {
-    // Normal-play branch only — never drive a spin in replay mode.
+    // Normal-play branch only, never drive a spin in replay mode.
     if (isReplay) return
     if (e.code !== 'Space' && e.key !== ' ') return
 
@@ -1250,7 +1250,7 @@
          not duplicated), so it inherits the same reduced-motion gating. -->
     <RainLayer count={6} opacity={0.22} variant="backdrop" />
   {:else}
-    <!-- Static image background — all other themes; video is NOT in DOM -->
+    <!-- Static image background, all other themes; video is NOT in DOM -->
     <img
       class="bg-media"
       src="{$themeAssets.background}"
@@ -1263,7 +1263,7 @@
 </div>
 
 {#if isReplay}
-  <!-- Replay mode — no betting controls, balance, autoplay, or theme selector -->
+  <!-- Replay mode, no betting controls, balance, autoplay, or theme selector -->
   <ReplayMode />
 {:else}
 <!-- Stage clips the viewport and centres the fixed 1280x720 design surface,
@@ -1282,7 +1282,7 @@
     --S: {S};
   "
 >
-  <!-- Max win overlay — requires explicit COLLECT click; sits below LoadingScreen (z200) -->
+  <!-- Max win overlay, requires explicit COLLECT click; sits below LoadingScreen (z200) -->
   <MaxWinCelebration
     show={$isWincap}
     on:collect={handleWincapCollect}
@@ -1335,7 +1335,7 @@
     </div>
   {/if}
 
-  <!-- CANVAS SLOT — the fixed 1280x720 design surface (frame/grid, plus
+  <!-- CANVAS SLOT, the fixed 1280x720 design surface (frame/grid, plus
        scene/logo in desktop landscape only). In desktop landscape this is a
        no-op wrapper (canvas-inner is unscaled, static; .game-wrapper itself
        carries the scale(S) transform as before). In portrait AND
@@ -1363,7 +1363,7 @@
       style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : miniPlayer ? `transform: translateX(-50%) scale(${miniCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
     >
       {#if !portrait}
-        <!-- LOGO — top centre, 380 wide, y 18 (z70). Desktop/landscape only:
+        <!-- LOGO, top centre, 380 wide, y 18 (z70). Desktop/landscape only:
              portrait's brief explicitly excludes this "desktop title
              lockup" image, using .portrait-wordmark above instead
              (2026-07-14c). -->
@@ -1419,7 +1419,7 @@
         </div>
       {/if}
 
-      <!-- SCENE GROUP — left, set further back (z8), future-spinner only.
+      <!-- SCENE GROUP, left, set further back (z8), future-spinner only.
            Desktop/landscape only (2026-07-14c): portrait's brief explicitly
            excludes the car/pilot/billboard scene - the grid is the whole
            composition there, backdrop filling behind via the document-level
@@ -1429,7 +1429,7 @@
         <SceneGroup haze={hazeLevel} />
       {/if}
 
-      <!-- FRAME — 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
+      <!-- FRAME, 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
            (Motion Polish v2), reversed once overdriveVisualActive clears. -->
       {#if $themeAssets.frame}
         <img
@@ -1446,7 +1446,7 @@
         />
       {/if}
 
-      <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
+      <!-- OVERDRIVE FLAME JETS, 8 frame-edge jets (v3.4), ignite on Overdrive -->
       {#if $activeTheme.id === 'future-spinner'}
         <!-- TR-036 option (b): the free-spins overlay sits at z80 and its
              backdrop is nearly opaque at the frame edge, where the jets live.
@@ -1478,13 +1478,13 @@
         ></div>
       {/if}
 
-      <!-- GRID — 522x349, centred inside the frame, z20 -->
+      <!-- GRID, 522x349, centred inside the frame, z20 -->
       <div class="grid-slot">
         <div class="grid-scale">
           <GameGrid bind:this={gridRef} idleAttract={idleAttractActive} />
           <!-- Suppress standard celebration while the max-win overlay is active -->
           <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
-          <!-- Ways breakdown — cycles group by group after the win burst settles -->
+          <!-- Ways breakdown, cycles group by group after the win burst settles -->
           <WinBreakdown />
           <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
           <FreeSpinsPresentation
@@ -1505,10 +1505,10 @@
         </div>
       </div>
 
-      <!-- BANNER — full-width neon band, edge to edge across the stage, z100 -->
+      <!-- BANNER, full-width neon band, edge to edge across the stage, z100 -->
       <WinBanner suppressed={lastRoundHadFeature} />
 
-      <!-- FEATURE-END CELEBRATION — WIN BANNER V3 reuse (OWNER AUDIT ROUND 2,
+      <!-- FEATURE-END CELEBRATION, WIN BANNER V3 reuse (OWNER AUDIT ROUND 2,
            item 1/2): the exact same component, driven explicitly by
            FreeSpinsPresentation's own safe (spins-already-played) total
            rather than the global $winAmount, and mounted here (not nested
@@ -1521,7 +1521,7 @@
         on:dismissed={() => featureRef?.onEndBannerDismissed()}
       />
 
-      <!-- BONUS INSTRUMENT COLUMN — Overdrive only. Landscape/desktop
+      <!-- BONUS INSTRUMENT COLUMN, Overdrive only. Landscape/desktop
            unchanged (2026-07-15 neon polish pass, item 2); portrait renders
            its own native-scale compact strip in .native-hud-slot below
            instead - the gap the portrait v2 session report disclosed
@@ -1537,7 +1537,7 @@
         />
       {/if}
 
-      <!-- FEATURES trigger — desktop landscape only here (stays pinned
+      <!-- FEATURES trigger, desktop landscape only here (stays pinned
            beside the frame in the 1280x720 coordinate space); portrait and
            compact-landscape each render their own native-scale trigger in
            .native-hud-slot below. -->
@@ -1545,7 +1545,7 @@
         <FeatureMenu idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
 
-      <!-- HUD OVERLAY — desktop landscape only here; portrait and
+      <!-- HUD OVERLAY, desktop landscape only here; portrait and
            compact-landscape each render their own native-DOM instance in
            .native-hud-slot below. -->
       {#if !portrait && !compactLandscape && !miniPlayer}
@@ -1555,7 +1555,7 @@
   </div>
 
   {#if portrait || compactLandscape || miniPlayer}
-    <!-- NATIVE HUD SLOT — native DOM scale, never stage-scaled (2026-07-14
+    <!-- NATIVE HUD SLOT, native DOM scale, never stage-scaled (2026-07-14
          portrait pass; 2026-07-14b extends it to compact-landscape). Sits
          below the canvas slot in normal flow; FeatureMenu/HudOverlay each
          get a `portrait` or `compactLandscape` prop so their own CSS
@@ -1585,7 +1585,7 @@
     </div>
   {/if}
 
-  <!-- Bonus Buy — modal/confirm logic only; its own trigger button is
+  <!-- Bonus Buy, modal/confirm logic only; its own trigger button is
        replaced by FeatureButton above (showTrigger=false). Hidden entirely
        where the jurisdiction disables feature buys (handled inside). Dispatches
        the CONFIRMED buy tier (e.detail), not always 'bonus'. -->
@@ -1621,7 +1621,7 @@
             title="Change theme"
             data-dev="true"
           >🎨</button>
-          <!-- Reel choreography toggle — dev-only eye test (drop is the
+          <!-- Reel choreography toggle, dev-only eye test (drop is the
                shipping default; strip is the dev-toggle alternative). -->
           <button
             class="util-btn reel-mode-btn"
@@ -1765,7 +1765,7 @@
     transition: background 0.6s ease;
   }
 
-  /* Screen shake — feature trigger and 50x+ wins (Motion Polish v2). The
+  /* Screen shake, feature trigger and 50x+ wins (Motion Polish v2). The
      keyframe re-applies scale(S) at every step so the stage stays correctly
      sized while shaking (the base rule's transform is fully replaced while
      the animation runs). */
@@ -1964,7 +1964,7 @@
     pointer-events: none;
   }
 
-  /* Text hidden by default — only shown by JS when img fails to load */
+  /* Text hidden by default, only shown by JS when img fails to load */
   .logo-text {
     font-family: 'Courier New', monospace;
     font-size: 1.6rem;
@@ -2082,7 +2082,7 @@
     filter: saturate(1.4) brightness(1.1) hue-rotate(12deg);
   }
 
-  /* ── Dev chip (2026-07-14c) — single small anchor, replaces two separate
+  /* ── Dev chip (2026-07-14c), single small anchor, replaces two separate
        floating buttons so the dev server's default view is visually closer
        to production. ─────────────────────────────────────────────────── */
   .dev-chip-wrapper {
@@ -2178,7 +2178,7 @@
     .bg-media { animation: none; filter: none; }
   }
 
-  /* ── Frame — 640x468 at (320,84), z10 ───────────────────────────────────── */
+  /* ── Frame, 640x468 at (320,84), z10 ───────────────────────────────────── */
   .game-frame {
     position: absolute;
     left: 320px;
@@ -2196,7 +2196,7 @@
     50%       { filter: drop-shadow(0 0 20px color-mix(in srgb, var(--theme-primary, #00ffff) 90%, transparent)); }
   }
 
-  /* Overdrive transition — frame neon shifts hue while active (Motion Polish
+  /* Overdrive transition, frame neon shifts hue while active (Motion Polish
      v2), reversing automatically when the class clears (overdriveVisualActive
      goes false behind the total win summary, not after it). A distinct
      animation name (not a transition) avoids fighting frame-pulse for the
@@ -2239,7 +2239,7 @@
     .bg-still.overdrive.active.route-natural { filter: saturate(1.1) hue-rotate(-95deg); }
   }
 
-  /* ── Grid — 522x349, centred inside the frame, z20 ──────────────────────── */
+  /* ── Grid, 522x349, centred inside the frame, z20 ──────────────────────── */
   .grid-slot {
     position: absolute;
     left: 379px;
@@ -2250,7 +2250,7 @@
     overflow: visible;
   }
 
-  /* GameGrid's native canvas is 616x412 — scale it down uniformly to the
+  /* GameGrid's native canvas is 616x412, scale it down uniformly to the
      522x349 spec box rather than resizing its internals. */
   .grid-scale {
     position: relative;

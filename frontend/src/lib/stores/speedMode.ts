@@ -1,4 +1,4 @@
-// speedMode.ts — non-locked speed-tier store layered on top of the existing
+// speedMode.ts, non-locked speed-tier store layered on top of the existing
 // (locked) gameStore.isTurbo boolean.
 //
 // LAYOUT_SPEC's "Speed tiers Normal, Turbo, Super Turbo" needs a third state

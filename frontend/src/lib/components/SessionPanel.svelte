@@ -1,5 +1,5 @@
 <script lang="ts">
-  // SessionPanel.svelte — responsible-gambling session display + reality check.
+  // SessionPanel.svelte, responsible-gambling session display + reality check.
   // Shows time played, spins, and net win/loss; pops a reality-check reminder at
   // the jurisdiction interval. Money is integer micros.
   //

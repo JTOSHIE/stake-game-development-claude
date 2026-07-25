@@ -1,4 +1,4 @@
-// responsibleGambling.ts — jurisdiction-flag-driven responsible-gambling module.
+// responsibleGambling.ts, jurisdiction-flag-driven responsible-gambling module.
 //
 // Reusable across skins: the whole layer is off by default (so the crypto/Stake
 // model is unaffected) and switches on per-flag from the RGS authenticate response

@@ -1,8 +1,8 @@
-// audioSettings.ts — independent MUSIC and SOUND (SFX) volume controls.
+// audioSettings.ts, independent MUSIC and SOUND (SFX) volume controls.
 //
 // Two writable stores, each a number in [0, 1]:
-//   musicVolume — master scalar for the background music (BGM)
-//   sfxVolume   — master scalar for every non-BGM ("SFX") sound
+//   musicVolume, master scalar for the background music (BGM)
+//   sfxVolume, master scalar for every non-BGM ("SFX") sound
 //
 // Both persist to localStorage so a player's mix survives a reload. Loading is
 // fully guarded (SSR / blocked storage / missing key / NaN all fall back to the

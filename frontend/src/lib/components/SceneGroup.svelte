@@ -1,15 +1,15 @@
 <script lang="ts">
-  // SceneGroup.svelte — Future Spinner left-side scene, rebuilt as two layers.
+  // SceneGroup.svelte, Future Spinner left-side scene, rebuilt as two layers.
   //
   // The old single baked scene_character_car.png (character + car together,
   // pushed off-screen left) is replaced by two separately rendered sprites:
   //
-  //   scene_car.png       — lower-left SCENERY. The hover car sits in the left
+  //   scene_car.png, lower-left SCENERY. The hover car sits in the left
   //                         gutter, its tail sliding partly under the reel frame
   //                         (z below the frame). Keeps the hover bob, cyan pad
   //                         underglow, magenta neon travel and a green nose
   //                         booster flicker.
-  //   scene_character.png — the pilot as a FEATURE HERO. Pulled out of hiding,
+  //   scene_character.png, the pilot as a FEATURE HERO. Pulled out of hiding,
   //                         left-justified and fully visible in the gutter to the
   //                         left of the frame (never tucked behind it), scaled up
   //                         so he reads as a presented feature. He has his own
@@ -56,7 +56,7 @@
   style="--haze-wash:{h.wash}; --haze-blur:{h.blur}px; --haze-grade:{h.grade}; --rim:{h.rim};"
   aria-hidden="true"
 >
-  <!-- CAR — lower-left scenery, tail slides under the frame (z8, below frame z10) -->
+  <!-- CAR, lower-left scenery, tail slides under the frame (z8, below frame z10) -->
   <div class="car-layer" aria-hidden="true">
     <div class="depth-haze" aria-hidden="true"></div>
     <img class="car-img" src="{$themeAssets.assetBase}/ui/scene_car.png" alt="" draggable="false" />
@@ -65,7 +65,7 @@
     <div class="booster-flicker" aria-hidden="true"></div>
   </div>
 
-  <!-- CHARACTER — feature hero, left-justified in the gutter, fully visible (z30) -->
+  <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
   <div class="char-layer" aria-hidden="true">
     <div class="depth-haze" aria-hidden="true"></div>
     <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
@@ -147,7 +147,7 @@
     filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));
   }
 
-  /* Cyan pad underglow — pulses in counter-phase to the bob so the lift reads
+  /* Cyan pad underglow, pulses in counter-phase to the bob so the lift reads
      as hover-pad thrust. */
   .underglow {
     position: absolute;
@@ -164,7 +164,7 @@
     50%      { opacity: 1; transform: scaleY(1.1); }
   }
 
-  /* Magenta neon side line — a glow that travels along the body. */
+  /* Magenta neon side line, a glow that travels along the body. */
   .car-neon {
     position: absolute;
     left: 8%;
@@ -183,7 +183,7 @@
     100% { background-position: -60% 0; opacity: 0.35; }
   }
 
-  /* Booster — faint green flicker at the nose accent. */
+  /* Booster, faint green flicker at the nose accent. */
   .booster-flicker {
     position: absolute;
     left: 1%;
@@ -214,7 +214,7 @@
     transform-origin: 50% 92%;
     animation: char-idle 5s ease-in-out infinite;
   }
-  /* Slow bob + gentle sway + subtle breathing scale — layered so he feels alive
+  /* Slow bob + gentle sway + subtle breathing scale, layered so he feels alive
      without competing with the reels. */
   @keyframes char-idle {
     0%   { transform: translateY(0) rotate(-0.6deg) scale(1); }
@@ -230,7 +230,7 @@
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
   }
 
-  /* Antenna tip — the orange orb blinks. Positioned over the orb on the
+  /* Antenna tip, the orange orb blinks. Positioned over the orb on the
      character's upper left. */
   .antenna-light {
     position: absolute;
@@ -248,7 +248,7 @@
     60%      { opacity: 0.6; transform: scale(1); }
   }
 
-  /* Visor — occasional glint sweep over the visor. */
+  /* Visor, occasional glint sweep over the visor. */
   .visor-glint {
     position: absolute;
     left: 32%;

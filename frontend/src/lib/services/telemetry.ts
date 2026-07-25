@@ -1,4 +1,4 @@
-// telemetry.ts — vendor-agnostic analytics event emitter for the template.
+// telemetry.ts, vendor-agnostic analytics event emitter for the template.
 //
 // Designed ONCE at fine grain so every skin emits a consistent event stream (see
 // docs/TELEMETRY_TAXONOMY.md). The emitter is a thin, side-effect-free layer with a

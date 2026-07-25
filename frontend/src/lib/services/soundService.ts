@@ -1,4 +1,4 @@
-// soundService.ts — Future Spinner R5 Audio System
+// soundService.ts, Future Spinner R5 Audio System
 // Full tiered audio: 5 win tiers, anticipation, scatter events
 
 import { get } from 'svelte/store'
@@ -228,7 +228,7 @@ export function playBGM(): void {
   sounds.bgm.play().then(() => {
     bgmStarted = true
   }).catch(() => {
-    // Autoplay blocked — start BGM on the first genuine user gesture, whether
+    // Autoplay blocked, start BGM on the first genuine user gesture, whether
     // that is a click/tap or a key press (for example the spacebar to spin).
     // One-shot and idempotent: whichever fires first starts the music once and
     // removes both listeners so the music never double-starts.
@@ -268,7 +268,7 @@ export function playSpinStart(): void {
 export function playReelStop(reelIndex: number = 0): void {
   if (muted) return
   if (anticipationActive && reelIndex === 4) {
-    // Last reel during anticipation — use the heavy anticipation stop
+    // Last reel during anticipation, use the heavy anticipation stop
     sounds.reelStopAnticipation.currentTime = 0
     sounds.reelStopAnticipation.play().catch(() => {})
     stopAnticipation()
@@ -280,7 +280,7 @@ export function playReelStop(reelIndex: number = 0): void {
 // ── ANTICIPATION ────────────────────────────────────────────────────────────
 
 /**
- * Start anticipation audio — rising tension during slow reel.
+ * Start anticipation audio, rising tension during slow reel.
  * Call this when reels 1-4 have matched high-value symbols.
  */
 export function playAnticipation(): void {
@@ -407,9 +407,9 @@ export function playScatterLand(): void {
  * WIN_TIERS - do not let this drift from those two again, the same way
  * telemetry.ts's own comment already warns against drifting from WinBanner).
  * 0        = dead spin, no sound
- * 0–9.99×  = small win (quiet cloneNode at 0.4 vol)
- * 10–29.99×= medium win
- * 30–99.99×= big win
+ * 0,9.99×  = small win (quiet cloneNode at 0.4 vol)
+ * 10,29.99×= medium win
+ * 30,99.99×= big win
  * 100×+    = epic win (plays twice with 800ms echo) - also covers the 5,000x
  *            MAX/wincap tier, reusing the epic echo rather than a dedicated
  *            MAX sound, as designed.
@@ -418,7 +418,7 @@ export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
 
   if (multiplier >= 100) {
-    // Epic win (and MAX/wincap) — play twice with slight delay for emphasis
+    // Epic win (and MAX/wincap), play twice with slight delay for emphasis
     sounds.winEpic.currentTime = 0
     sounds.winEpic.play().catch(() => {})
     setTimeout(() => {
@@ -433,7 +433,7 @@ export function playWin(multiplier: number): void {
     sounds.winMedium.currentTime = 0
     sounds.winMedium.play().catch(() => {})
   } else {
-    // Small win — softer version
+    // Small win, softer version
     playClone(sounds.winSmall, 0.4)
   }
 }
@@ -450,6 +450,6 @@ export function playUIClick(): void {
 export const playClick = playUIClick
 
 export function playScatter(): void {
-  // Legacy alias — now use playScatterLand for individual scatter events
+  // Legacy alias, now use playScatterLand for individual scatter events
   playScatterLand()
 }

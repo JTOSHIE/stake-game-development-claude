@@ -1,4 +1,4 @@
-// fsModes.drift.test.ts — Wiring Integrity Audit, item (d).
+// fsModes.drift.test.ts, Wiring Integrity Audit, item (d).
 // Run: npx tsx src/lib/config/fsModes.drift.test.ts
 //
 // fsModes.ts's MODE_COST (the frontend's single source of truth for what the

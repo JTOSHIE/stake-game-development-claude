@@ -1,8 +1,8 @@
 <script lang="ts">
-  // BonusInstrumentColumn.svelte — LAYOUT_SPEC bonus instrument column
+  // BonusInstrumentColumn.svelte, LAYOUT_SPEC bonus instrument column
   // (Overdrive only). gauge_face + a separately rotating gauge_needle sprite
   // driven by the live meter, a FREE SPINS field, and TOTAL WIN on the
-  // instrument plate export — all fed by the same live values
+  // instrument plate export, all fed by the same live values
   // FreeSpinsPresentation drives (bound in App.svelte).
   //
   // OWNER AUDIT ROUND 2, item 3 relayout: the gauge no longer carries its
@@ -43,7 +43,7 @@
 
   // Needle sweeps roughly -110deg (low) to +110deg (high) through the top,
   // normalised against the same reference ceiling as the legacy OverdriveMeter
-  // fill bar (15x above the 1x floor) — purely a visual sweep, not physical.
+  // fill bar (15x above the 1x floor), purely a visual sweep, not physical.
   $: needleDeg = -110 + Math.max(0, Math.min(1, (multiplier - 1) / 15)) * 220
   // Colour-graded glow (item 3: "needle sweep on meter change, colour-graded
   // glow"): green at the floor, cyan mid-range, magenta once the meter is
@@ -152,7 +152,7 @@
     filter: drop-shadow(0 0 4px var(--needle-glow, #4eff91));
   }
 
-  /* MULTIPLIER / TOTAL WIN — CSS-drawn angular instrument frame (cyberpunk):
+  /* MULTIPLIER / TOTAL WIN, CSS-drawn angular instrument frame (cyberpunk):
      a 2px magenta->cyan gradient bezel with cut corners, a deep gradient fill,
      a left accent rail and a neon glow. Replaces the thin flat plate export. */
   .plate {

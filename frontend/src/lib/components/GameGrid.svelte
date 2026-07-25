@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * GameGrid.svelte — travelling tile-strip reel engine (Reel Feel v3)
+   * GameGrid.svelte, travelling tile-strip reel engine (Reel Feel v3)
    *
    * The mechanic is now TRUE travelling tiles, not a fixed-cell noise cycle.
    * Each reel is a wrapped vertical strip of TILE UNITS; a tile is one
@@ -10,7 +10,7 @@
    *   - drop (shipping default): the same tile units fall from above the frame
    *     with gravity easing, per-column stagger and a squash-and-settle
    *     landing; result rows identical to strip.
-   *   - strip: the strip scrolls vertically — accelerate (cubic-in) to a
+   *   - strip: the strip scrolls vertically, accelerate (cubic-in) to a
    *     per-tier cruise, cruise with velocity-scaled vertical stretch and a
    *     subtle alpha trail while weighted-random tiles pass, then decelerate
    *     (cubic-out) into an index-aligned stop that lands the book's result row
@@ -25,7 +25,7 @@
    *   particle burst fires (fixed-size array, no per-frame allocation).
    * Win overlay: a transparent PixiJS canvas draws the gold borders / connecting
    *   lines and the particle layer above the tile layer.
-   * Public API: animateSpin(board) and slamStop() — called by App.svelte.
+   * Public API: animateSpin(board) and slamStop(), called by App.svelte.
    */
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
@@ -57,7 +57,7 @@
     return hexToPixi(get(activeTheme).palette.primary)
   }
 
-  // ── Layout constants — must match PixiJS canvas dimensions ───────────────
+  // ── Layout constants, must match PixiJS canvas dimensions ───────────────
   const REELS    = 5
   const ROWS     = 4
   const CELL_W   = 120
@@ -74,13 +74,13 @@
   const STRIP      = ROWS + 3                       // 7 slots: [buf, r0..r3, buf, buf]
   const REST_Y     = -VIS_OFFSET * TILE            // -104: slot 1 sits at window top
 
-  // ── Symbol asset paths — reactive to active theme ─────────────────────────
+  // ── Symbol asset paths, reactive to active theme ─────────────────────────
   let _assetBase  = ''
   let SYMBOL_BASE = ''
   $: _assetBase  = $themeAssets.assetBase
   $: SYMBOL_BASE = `${_assetBase}/symbols`
 
-  // ── Tile plate edge tinting — plates.json maps symbol id to its signature
+  // ── Tile plate edge tinting, plates.json maps symbol id to its signature
   // colour for the engine-tinted plate behind every symbol (LAYOUT_SPEC law).
   let tilePlateSrc = ''
   let plateColours: Record<string, string> = {}
@@ -116,7 +116,7 @@
     return `${SYMBOL_BASE}/${fname}.png`
   }
 
-  // ── Layered sprites — H1 rotating spoke overlay ──────────────────────────
+  // ── Layered sprites, H1 rotating spoke overlay ──────────────────────────
   const LAYERED_OVERLAY: Record<string, { base: string; overlay: string }> = {
     H1: { base: 'h1_base', overlay: 'h1_spin' },
   }
@@ -202,7 +202,7 @@
   let slotSym: string[][] =
     Array.from({ length: REELS }, () => Array.from({ length: STRIP }, () => 'L3'))
 
-  // Visible-cell accessors — the four on-screen rows map to strip slots 1..4.
+  // Visible-cell accessors, the four on-screen rows map to strip slots 1..4.
   const visIdx = (row: number) => row + VIS_OFFSET
   const visImg     = (col: number, row: number) => slotImg[col]?.[visIdx(row)] ?? null
   const visOverlay = (col: number, row: number) => slotOverlay[col]?.[visIdx(row)] ?? null
@@ -222,7 +222,7 @@
     return CYCLE_WEIGHTED[(Math.random() * CYCLE_WEIGHTED.length) | 0]
   }
 
-  // ── Pooled Pixi particle burst — fixed-size array, no per-frame allocation
+  // ── Pooled Pixi particle burst, fixed-size array, no per-frame allocation
   interface Particle {
     active: boolean
     x: number; y: number
@@ -324,7 +324,7 @@
     for (let i = 0; i < STRIP; i++) _paintSlot(col, i, slotSym[col][i], /*moving*/ true)
   }
 
-  // accel/cruise advance — offset-based with weighted-random passing tiles.
+  // accel/cruise advance, offset-based with weighted-random passing tiles.
   function _advance(col: number, px: number): void {
     const r = reels[col]
     r.offset += px
@@ -396,7 +396,7 @@
     if (rafId == null) { lastFrame = 0; rafId = requestAnimationFrame(_frame) }
   }
 
-  // ── Landing — decelerate into an index-aligned stop, then overshoot/settle
+  // ── Landing, decelerate into an index-aligned stop, then overshoot/settle
   function _startReel(col: number, cruiseV: number): void {
     const r = reels[col]
     r.state = 'accel'; r.t = 0; r.velocity = 0; r.cruiseV = cruiseV
@@ -484,7 +484,7 @@
     })
   }
 
-  // ── Drop mode — the same tiles fall from above with gravity + squash ─────
+  // ── Drop mode, the same tiles fall from above with gravity + squash ─────
   function _dropReel(col: number, resultRows: string[], delayMs: number): Promise<void> {
     return new Promise<void>((resolve) => {
       const strip = stripRefs[col]
@@ -568,7 +568,7 @@
         overlay.style.display = 'none'
       }
     }
-    // Idle micro-motion class — only meaningful on settled tiles; the .spinning
+    // Idle micro-motion class, only meaningful on settled tiles; the .spinning
     // class on the column gates the animations off while travelling. Use
     // classList (not className=) so the Svelte scope hash class survives.
     if (img) { img.classList.remove(...IDLE_ALL); img.classList.add(idleClass(sym)) }
@@ -686,7 +686,7 @@
     }
   }
 
-  // ── Win burst — brighten winners, dim others, plate bloom, punch, particles
+  // ── Win burst, brighten winners, dim others, plate bloom, punch, particles
   function _winningCells(
     wins: Array<{ symbol: string; kind: number }>,
     board: string[][],
@@ -771,7 +771,7 @@
     }
   }
 
-  // ── Scatter anticipation (Set B) — charge glow on the still-travelling reels,
+  // ── Scatter anticipation (Set B), charge glow on the still-travelling reels,
   // plus a landed-scatter charge loop (glow bloom + scanline + orbiting spark)
   // on every scatter already on the board while the final reel decides.
   // `includeResting` exists because the two choreographies disagree about what
@@ -855,7 +855,7 @@
   // was turbo-gated so fast play never saw it. Nothing replaced it: tension now
   // comes only from scatters the player can see.
 
-  // ── Win overlay — PixiJS draws gold borders + connecting lines ────────────
+  // ── Win overlay, PixiJS draws gold borders + connecting lines ────────────
   function _applyWinHighlights(): void {
     if (!winHighlightLayer) return
     winHighlightLayer.clear()
@@ -902,7 +902,7 @@
     _triggerWinBurst(wins, board)
   }
 
-  // ── Slam-stop — collapse to a fast deceleration (never a teleport) ───────
+  // ── Slam-stop, collapse to a fast deceleration (never a teleport) ───────
   let slamRequested = false
   export function slamStop(): void {
     if (!get(isSpinning) || slamRequested) return
@@ -910,7 +910,7 @@
     if (_pendingWaitAbort) _pendingWaitAbort()
   }
 
-  // ── Public API — called by App.svelte ─────────────────────────────────────
+  // ── Public API, called by App.svelte ─────────────────────────────────────
   export async function animateSpin(finalBoard: string[][]): Promise<void> {
     if (!assetsReady) return
     winHighlightLayer?.clear()
@@ -1101,7 +1101,7 @@
 
   // ── Cancellable stagger wait (resolves instantly on slam) ────────────────
   // setTimeout-based (not rAF-polled) so a long cruise wait allocates one timer,
-  // not a closure every frame — needless GC pressure otherwise.
+  // not a closure every frame, needless GC pressure otherwise.
   let _pendingWaitAbort: (() => void) | null = null
   function _sleepOrSlam(ms: number): Promise<void> {
     if (slamRequested) return Promise.resolve()
@@ -1113,7 +1113,7 @@
 </script>
 
 <div class="grid-container">
-  <!-- Symbol grid — 5 columns × 4 visible rows, each a wrapped travelling strip -->
+  <!-- Symbol grid, 5 columns × 4 visible rows, each a wrapped travelling strip -->
   <div class="symbol-grid" bind:this={gridRef}>
     {#each Array(REELS) as _, col}
       <div class="symbol-col">
@@ -1169,10 +1169,10 @@
        transform loop, no per-symbol JS). -->
   <div class="idle-glint-sweep" class:active={idleAttract} aria-hidden="true"></div>
 
-  <!-- PixiJS canvas — transparent overlay for win lines, particles and borders -->
+  <!-- PixiJS canvas, transparent overlay for win lines, particles and borders -->
   <div bind:this={pixiContainer} class="pixi-overlay"></div>
 
-  <!-- Per-cell modifier overlay — mechanic-agnostic badges (multiplier wilds,
+  <!-- Per-cell modifier overlay, mechanic-agnostic badges (multiplier wilds,
        prizes, upgrades). Publishes the board's cell geometry as CSS variables so
        each CellModifier positions itself by (reel, row); populated from the
        cellMultipliers store during the win step and cleared on the next spin. -->
@@ -1187,7 +1187,7 @@
 </div>
 
 <style>
-  /* Outer container — fixed to match PixiJS canvas dimensions (616 × 412) */
+  /* Outer container, fixed to match PixiJS canvas dimensions (616 × 412) */
   .grid-container {
     position: relative;
     width: 616px;
@@ -1291,7 +1291,7 @@
     transform-origin: 50% 50%;
   }
 
-  /* Flipbook / fx overlay layer (Symbol Life v2) — a centred 82x82 square
+  /* Flipbook / fx overlay layer (Symbol Life v2), a centred 82x82 square
      aligned to the symbol's contained render, screen-blended over the base. */
   .symbol-fx {
     position: absolute;
@@ -1306,13 +1306,13 @@
     opacity: 0.9;
   }
   .symbol-fx.fx-none { display: none; }
-  /* M3 booster flame — 6-frame flipbook at ~9fps */
+  /* M3 booster flame, 6-frame flipbook at ~9fps */
   .symbol-fx.fx-flame {
     background-size: 492px 82px;
     animation: fx-flame-cycle 0.66s steps(6) infinite;
   }
   @keyframes fx-flame-cycle { from { background-position-x: 0; } to { background-position-x: -492px; } }
-  /* L2 fuse arc — 4-frame flicker at an irregular cadence */
+  /* L2 fuse arc, 4-frame flicker at an irregular cadence */
   .symbol-fx.fx-arc {
     background-size: 328px 82px;
     animation: fx-arc-cycle 0.34s steps(4) infinite;
@@ -1421,7 +1421,7 @@
     100% { opacity: 0; transform: translateY(-380px) scale(1.1); }
   }
 
-  /* ── Symbol Life v2 idles (Set A) — tuned to read at 120px ─────────────── */
+  /* ── Symbol Life v2 idles (Set A), tuned to read at 120px ─────────────── */
   @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
   .idle-breathe { animation: idle-breathe 3.4s ease-in-out infinite; }
 
@@ -1433,25 +1433,25 @@
   @keyframes valve-hiss { 0%,90%,100% { opacity: 1; } 93% { opacity: 0.82; } 96% { opacity: 1; } }
   .idle-charge { animation: idle-charge 2.4s ease-in-out infinite, valve-hiss 1.7s steps(1) infinite; }
 
-  /* M1 rev — rim dash stream + rev LED chase (the LED strip is the fx layer) */
+  /* M1 rev, rim dash stream + rev LED chase (the LED strip is the fx layer) */
   @keyframes idle-rev {
     0%, 100% { filter: brightness(1); transform: scale(1); }
     50%      { filter: brightness(1.12) saturate(1.15); transform: scale(1.012); }
   }
   .idle-rev { animation: idle-rev 1.8s ease-in-out infinite; }
 
-  /* M2 coilover — coil highlight chase (1.4s) + 3px body bob */
+  /* M2 coilover, coil highlight chase (1.4s) + 3px body bob */
   @keyframes idle-coil {
     0%, 100% { transform: translateY(0); filter: brightness(1); }
     50%      { transform: translateY(-3px); filter: brightness(1.12) drop-shadow(0 0 6px rgba(138, 92, 255, 0.6)); }
   }
   .idle-coil { animation: idle-coil 1.4s ease-in-out infinite; }
 
-  /* M3 booster — the flame flipbook lives on the fx layer; base gently breathes */
+  /* M3 booster, the flame flipbook lives on the fx layer; base gently breathes */
   @keyframes idle-flame { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.08); } }
   .idle-flame { animation: idle-flame 1.2s ease-in-out infinite; }
 
-  /* L1 chrome lug — facet glint sweep every 3s + bore ring pulse */
+  /* L1 chrome lug, facet glint sweep every 3s + bore ring pulse */
   @keyframes idle-glint {
     0%, 82%, 100% { filter: brightness(1); }
     88%           { filter: brightness(1.55) drop-shadow(0 0 7px rgba(255, 215, 0, 0.85)); }
@@ -1459,7 +1459,7 @@
   }
   .idle-glint { animation: idle-glint 3s ease-in-out infinite; }
 
-  /* L2 fuse — arc flicker lives on the fx layer; base steady */
+  /* L2 fuse, arc flicker lives on the fx layer; base steady */
   @keyframes idle-arc { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.06); } }
   .idle-arc { animation: idle-arc 2s ease-in-out infinite; }
 
@@ -1470,14 +1470,14 @@
   }
   .idle-pump { animation: idle-pump 2.2s ease-in-out infinite; }
 
-  /* W wild — dual rings pulsing in opposite phase (approximated on the base) */
+  /* W wild, dual rings pulsing in opposite phase (approximated on the base) */
   @keyframes idle-rings {
     0%, 100% { filter: brightness(1) drop-shadow(0 0 3px rgba(255, 0, 255, 0.4)); transform: scale(1); }
     50%      { filter: brightness(1.2) drop-shadow(0 0 11px rgba(255, 0, 255, 0.85)); transform: scale(1.03); }
   }
   .idle-rings { animation: idle-rings 1.9s ease-in-out infinite; }
 
-  /* S scatter — rays rotating (1 rev / 12s) + core pulse */
+  /* S scatter, rays rotating (1 rev / 12s) + core pulse */
   @keyframes idle-rays { to { transform: rotate(360deg); } }
   @keyframes scatter-core {
     0%, 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.5)); }
@@ -1485,13 +1485,13 @@
   }
   .idle-rays { animation: idle-rays 12s linear infinite, scatter-core 2s ease-in-out infinite; }
 
-  /* H1 — continuous idle rotation on the spoke overlay, fast on wins. */
+  /* H1, continuous idle rotation on the spoke overlay, fast on wins. */
   @keyframes h1-idle-spin { to { transform: rotate(72deg); } }
   @keyframes h1-win-spin  { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
   .symbol-overlay { animation: h1-idle-spin 8s linear infinite; }
   .symbol-overlay.win-spin-fast { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
 
-  /* ── Win state — brighten, plate bloom, punch scale ──────────────────────── */
+  /* ── Win state, brighten, plate bloom, punch scale ──────────────────────── */
   /* Stronger, larger edge bloom in the symbol's tint (bigger spread + a wider
      outer halo) so winners glow hard against the dimmed losers. */
   @keyframes plate-bloom-pulse {
@@ -1551,7 +1551,7 @@
       win-flash-pulse 0.55s ease-in-out infinite;
   }
 
-  /* ── Scatter charge (Set B) — landed scatters charge during anticipation ── */
+  /* ── Scatter charge (Set B), landed scatters charge during anticipation ── */
   /* ── Celebratory beats (2 SECURED, 4 fourth, 6 eruption) ─────────────────
      Compositor-only properties (transform, opacity, filter) so the busiest
      moment of the round costs no layout. Each is a single shot; the class is
@@ -1612,7 +1612,7 @@
   }
   .pixi-overlay :global(canvas) { display: block; }
 
-  /* Per-cell modifier overlay — sits above the tiles and the pixi win lines, its
+  /* Per-cell modifier overlay, sits above the tiles and the pixi win lines, its
      origin aligned to the symbol grid (reel 0, row 0) so CellModifier's
      cell-index positioning lands on the matching cell. */
   .cell-mod-overlay {
