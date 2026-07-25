@@ -34,8 +34,9 @@ const CANDIDATES = [
   { key: 'b-core-crop',               label: 'b  core crop  RETIRED', retired: true },
   { key: 'c-core-bold',               label: 'c  core bold  RETIRED', retired: true },
   { key: 'd-purpose-drawn',           label: 'd  purpose-drawn' },
-  { key: 'e-owner-supplied',          label: 'e  owner-supplied  NEW', highlight: true },
-  { key: 'e-owner-supplied-transparent', label: 'e  transparent  NEW', highlight: true },
+  { key: 'e-owner-supplied',          label: 'e  owner-supplied' },
+  { key: 'e-owner-supplied-transparent', label: 'e  transparent' },
+  { key: 'f-owner-transparent',       label: 'f  owner transparent  NEW', highlight: true },
 ]
 
 const items = []
@@ -91,6 +92,7 @@ for (const i of items) console.log(`  ${i.label}`)
 // laid out at the sizes the platform will really show. A mark is chosen on real
 // pixels or it is chosen on a flattering render.
 const STRIP = [
+  { key: 'f-owner-transparent', label: 'f  owner transparent' },
   { key: 'e-owner-supplied', label: 'e  on its field' },
   { key: 'e-owner-supplied-transparent', label: 'e  transparent' },
 ]
@@ -135,8 +137,8 @@ const strip = await page2.evaluate(async (rows) => {
   }
   return c.toDataURL('image/png')
 }, stripItems)
-writeFileSync(join(OUT, 'candidate-e-true-size.png'), Buffer.from(strip.split(',')[1], 'base64'))
+writeFileSync(join(OUT, 'candidates-true-size.png'), Buffer.from(strip.split(',')[1], 'base64'))
 await browser2.close()
-console.log(`true-size strip written: ${join(OUT, 'candidate-e-true-size.png')}`)
+console.log(`true-size strip written: ${join(OUT, 'candidates-true-size.png')}`)
 
 console.log('\nNo adoption here. The eye-call is the owner\'s.')
