@@ -1,0 +1,78 @@
+MATHS UPLOAD SET, verified before packaging
+===========================================
+
+Every file below was checked against BOTH:
+  - SUBMISSION_DOSSIER.md section 5c hash table
+  - BOOKS_MANIFEST.md (for the five books)
+before it was copied here, and checked AGAIN after copying. All 12 matched.
+
+You do not need to verify anything. This file is the record, not a task.
+
+HOW MANY FILES: TWELVE. Not eleven.
+-----------------------------------
+You may see 'eleven' written in SUBMISSION_DOSSIER.md and in the brief for this
+kit. That is a miscount, found and corrected 2026-07-26. index.json DECLARES ten
+files (5 books, 5 lookup tables). Add index.json itself and that is eleven. Add
+game_metadata.json, which index.json does not declare but which the platform
+still needs, and the real total is TWELVE.
+
+If you count twelve files in this folder, that is correct.
+
+UPLOAD ORDER (index.json first, game_metadata.json last)
+--------------------------------------------------------
+
+ 1. index.json
+    893 bytes
+    SHA-256 8857dbc027c5e2ceb0b2e39ec0a7dd05bc63272938dc8db515cdf7422d6f1aac
+
+ 2. books_base.jsonl.zst
+    28,678,793 bytes
+    SHA-256 b86c8bb484523a53b8a42db6dbaef0bc26c51843077b5f06d01f492c40d39331
+
+ 3. lookUpTable_base_0.csv
+    2,008,101 bytes
+    SHA-256 7aa435857dcac59756f96b21dd128c58a9e3ed538b647c9056cebeee25e71990
+
+ 4. books_cruise.jsonl.zst
+    17,203,911 bytes
+    SHA-256 7b5a1ddcfcdfde76a2f286a36992df5f9e8632cf9cfdc442fcc71dfd3fcc5b24
+
+ 5. lookUpTable_cruise_0.csv
+    1,995,754 bytes
+    SHA-256 da3e45c577866d7357f6b1e83b9a2d14e406d2daf24b662e1a55003e2ed5de01
+
+ 6. books_antelite.jsonl.zst
+    40,306,089 bytes
+    SHA-256 9e5e8a0ad24f00383a6497f7debdf1ecaf46145d7f23f7d5d345e86ffd381377
+
+ 7. lookUpTable_antelite_0.csv
+    2,019,963 bytes
+    SHA-256 150a6d243dcca205a7b9aff1c25c6ce5e3b31c634ac58f7b7e72274e4a054b15
+
+ 8. books_bonus.jsonl.zst
+    151,905,143 bytes
+    SHA-256 a38d2b8f5da04ac4f401f33bcdfbbcde56f6b661bcc0f7ad50e518763dd9bbb9
+
+ 9. lookUpTable_bonus_0.csv
+    2,259,824 bytes
+    SHA-256 a77241f1a2e6606bebe94b5e6bb86bc6dda957732316d4962cffc199731d50cd
+
+10. books_super.jsonl.zst
+    149,331,268 bytes
+    SHA-256 c079226d718cab54825b91d5fdab631d7d2f8dd542f432e9b7b6ec7d57347445
+
+11. lookUpTable_super_0.csv
+    2,262,723 bytes
+    SHA-256 2e94fe04ad0c44a69789f871b1c969e2c36021ce4db1c25bb328c8ee3dd4330e
+
+12. game_metadata.json
+    1,463 bytes
+    SHA-256 51e7dceeacd41fd292e769b75383ac8c77f726e8f275b1808ad898d99d9abc38
+
+TOTAL: 12 files, 397,973,925 bytes (379.5 MB)
+
+The five books_*.jsonl.zst files are deliberately NOT in the git repository
+(Fable ruling 2026-07-28: they are the complete outcome distribution, and two
+of them exceed GitHub's 100 MB per-file limit anyway). They were read from the
+build machine for this kit. BOOKS_MANIFEST.md in the repository is the public
+fingerprint that lets anyone verify them without holding them.

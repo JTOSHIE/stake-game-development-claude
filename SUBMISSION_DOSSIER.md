@@ -181,7 +181,7 @@ upload a stale or hand-edited `dist/`.
    details must already be confirmed one-time - see 5d below).
 2. Upload the frontend bundle: the full contents of `frontend/dist/` as produced in 5a,
    for this exact commit.
-3. Upload the maths/publish bundle: the eleven files in 5c below, from
+3. Upload the maths/publish bundle: the TWELVE files in 5c below, from
    `games/future_spinner/library/publish_files/` - `index.json` first (declares the five
    modes and their file references), then each mode's `books_*.jsonl.zst` and
    `lookUpTable_*_0.csv`, then `game_metadata.json`.
@@ -220,7 +220,16 @@ plain commit could not succeed regardless.
 size, row count and provenance, so the private set is verifiable without being
 published. All five hashes below are byte-identical to that manifest.
 
-The eleven files `index.json` declares, with fresh SHA-256 hashes:
+**TWELVE files, and the count was wrong here until 2026-07-26.** This heading said
+"the eleven files `index.json` declares", which is wrong twice: `index.json` declares
+**ten** files (five books, five lookup tables), and the table below lists **twelve**,
+because `index.json` itself and `game_metadata.json` are both uploaded and neither is
+declared by the index. Step 3 above named eleven for the same reason. Corrected in both
+places. The artefacts were always right; the arithmetic was not, and a first-time uploader
+counting twelve against a document saying eleven would reasonably think something was
+missing.
+
+The twelve upload files, with fresh SHA-256 hashes:
 
 | File | SHA-256 |
 |---|---|
