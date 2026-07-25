@@ -34,10 +34,14 @@
   })()
 
   // Keep scatter labels and wincap flag for the label area
-  $: scatterKey = $scatterCount >= 5 ? 'scatter5'
+  // R10, 2026-07-27: annotated so the ternary keeps its literal union instead of
+  // widening to `string`. All three keys exist in Translations; this was type
+  // widening on a correct lookup, not a missing translation, but the widening
+  // also meant a genuinely wrong key here would NOT have been caught.
+  $: scatterKey = ($scatterCount >= 5 ? 'scatter5'
                 : $scatterCount === 4 ? 'scatter4'
                 : $scatterCount === 3 ? 'scatter3'
-                : null
+                : null) as 'scatter3' | 'scatter4' | 'scatter5' | null
 
   function startCountUp(target: number): void {
     cancelAnimationFrame(animFrame)

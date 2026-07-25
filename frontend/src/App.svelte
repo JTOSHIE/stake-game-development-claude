@@ -353,9 +353,12 @@
   // the route is known the instant the purchase is made rather than when the
   // presentation catches up. liveIsNitroEntry is kept as an OR because it also
   // covers any future non-buy path into a pre-revved entry.
-  $: flameColourway = (liveIsNitroEntry || $selectedBetMode === 'super')
+  // R10, 2026-07-27: annotated to the union FlameJets declares, so the three
+  // route names are checked at the point of derivation rather than widening to
+  // `string` and failing at the prop. A typo in a route name is now a type error.
+  $: flameColourway = ((liveIsNitroEntry || $selectedBetMode === 'super')
     ? 'nitro'
-    : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
+    : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')) as 'natural' | 'overdrive' | 'nitro'
   // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
   // Motion Polish v2) — false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.

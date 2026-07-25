@@ -12,10 +12,21 @@
   export let opacity = 0.55
   // Scopes the CSS keyframe/class names so this component can be mounted
   // twice on one page (splash + backdrop) without one instance's animation
-  // rules clobbering the other's - Svelte scopes the <style> block per
+  // rules clobbering the other's - Svelte scopes the style block per
   // component instance automatically, so this is actually already safe;
   // kept as an explicit prop anyway for callers that want visibly distinct
   // markup in devtools.
+  //
+  // R10, 2026-07-27: that sentence used to contain a literal style tag written
+  // out in angle brackets. svelte.compile parses comments correctly and never
+  // minded, so the component always built and shipped - but svelte2tsx, which
+  // svelte-check runs on, is naive about tags inside script comments: it treated
+  // the tag as a real element, considered the script closed there, and misparsed
+  // the rest of the file, reporting "`<script>` was left open" at EOF and making
+  // both importers report "no default export". THREE of the eleven baseline
+  // type errors came from this one comment, and the side effect was worse than
+  // the noise: this component's props were never type-checked at all. Do not
+  // write literal element tags in angle brackets inside this script block.
   export let variant = 'default'
 
   interface RainStreak { id: number; left: number; delay: number; dur: number; h: number }
