@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="We Roll Spinners">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="24" cy="24" r="22.5" stroke="#00FFFF" stroke-width="3"/>
+    <circle cx="24" cy="24" r="17.5" stroke="#00FFFF" stroke-width="3"/>
+    <rect x="10.10" y="18" width="8.2" height="12" rx="2" stroke="#FF00FF" stroke-width="1.6"/>
+    <rect x="19.90" y="18" width="8.2" height="12" rx="2" stroke="#FF00FF" stroke-width="1.6"/>
+    <rect x="29.70" y="18" width="8.2" height="12" rx="2" stroke="#FF00FF" stroke-width="1.6"/>
+    <path d="M 12.00 19.00 L 16.40 19.00 L 13.20 29.00" stroke="#FF00FF" stroke-width="1.8"/>
+    <path d="M 21.80 19.00 L 26.20 19.00 L 23.00 29.00" stroke="#FF00FF" stroke-width="1.8"/>
+    <path d="M 31.60 19.00 L 36.00 19.00 L 32.80 29.00" stroke="#FF00FF" stroke-width="1.8"/>
+  </g>
+</svg>
