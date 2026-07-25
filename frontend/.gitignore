@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# TR-047: untracked, unreferenced branding assets shipped out of public/ into
+# dist/, so a clone built 14.81MB where this machine built 21.87MB and the
+# uploaded bundle was not reproducible. Deleted 2026-07-26 on owner approval.
+public/assets/themes/future-spinner/branding/
