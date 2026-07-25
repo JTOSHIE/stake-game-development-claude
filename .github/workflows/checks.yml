@@ -124,7 +124,15 @@ jobs:
         working-directory: frontend
         run: node scripts/player_string_dash_check.mjs
 
-      # ── Gate 8: currency display contract ────────────────────────────────────
+      # ── Gate 8: authenticated bet ladder ─────────────────────────────────────
+      # Both bet-changing surfaces must drive from the RGS-supplied levels. The
+      # first three assertions reproduce the shipped defect arithmetically:
+      # off the authenticated ladder, "+" dropped the bet to 0.10. (R5/TR-013)
+      - name: bet ladder model
+        working-directory: frontend
+        run: npx tsx src/lib/stores/betLadder.test.ts
+
+      # ── Gate 9: currency display contract ────────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.

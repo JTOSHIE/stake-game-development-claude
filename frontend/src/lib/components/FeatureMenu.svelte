@@ -22,14 +22,24 @@
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
   import {
-    betAmount, currencyCode, isSpinning, balance,
-    increaseBet, decreaseBet, canIncreaseBet, showPaytable,
+    betAmount, currencyCode, isSpinning, balance, showPaytable,
   } from '../stores/gameStore'
+  // R5/TR-013: the bet arrows here previously used gameStore's actions, which
+  // operate on the hardcoded BET_LEVELS rather than the authenticated ladder.
+  // Off-ladder, "+" dropped the bet to 0.10 and "-" did nothing. Both surfaces
+  // now share one model.
+  import {
+    increaseBetLevel, decreaseBetLevel, canIncreaseBetLevel, canDecreaseBetLevel,
+  } from '../stores/betLadder'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
 
   const dispatch = createEventDispatcher<{ buy: BetMode }>()
+
+  // Thin wrappers: the ladder model is shared, the click sound is presentation.
+  function decreaseBet(): void { playClick(); decreaseBetLevel() }
+  function increaseBet(): void { playClick(); increaseBetLevel() }
 
   // Portrait layout mode (2026-07-14 portrait pass): renders a compact,
   // native-DOM-scale trigger (reachable above the HUD controls row) instead
@@ -273,9 +283,9 @@
           <div class="fs-face">
             <span class="fm-spin-cost" data-testid="current-spin-cost">{$tr('hudSpinCost')} <span class="fs-num">{currentSpinCost}</span></span>
             <span class="fm-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
-            <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label={$tr('a11yDecreaseBet')}>-</button>
+            <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
-            <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label={$tr('a11yIncreaseBet')}>+</button>
+            <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>+</button>
           </div>
         </div>
 
