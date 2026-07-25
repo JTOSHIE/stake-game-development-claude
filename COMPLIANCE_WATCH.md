@@ -362,8 +362,20 @@ loads without sign-in and offers "Download all". If it contains the
 `books_*.jsonl.zst` files, then the complete pre-release outcome distribution and event
 choreography are currently downloadable by anyone holding the link, which is precisely
 the exposure the same day's ruling rejected Git LFS to avoid. The link is deliberately
-NOT recorded in this repository. Owner decision required: restrict the folder to named
-accounts, or accept the exposure knowingly and record that acceptance here.
+NOT recorded in this repository.
+
+**Owner clarification, same day:** the folder was created as a personal reference backup
+and shared here only to demonstrate that a backup exists. It was **not** an intentional
+publication. That is worth recording because it changes the character of the finding
+from a decision to a setting: nothing about the backup's purpose requires public access,
+so restricting the folder to named accounts costs nothing and closes the exposure.
+
+**Status: open, pending an owner action of two clicks.** Restrict the share, or record a
+knowing acceptance here. No second copy is needed for builder access: the books are read
+directly from `games/future_spinner/library/publish_files/` on the build machine, which
+is how their hashes and row counts were verified for `BOOKS_MANIFEST.md`. Additional
+copies add custody surface without adding capability, so any further backup should be
+for owner-side disaster recovery only, and should not be publicly shared.
 
 **ANTELITE TAIL CONCENTRATION, ACCEPTED BY DESIGN (Fable ruling, 2026-07-28).**
 Review 1 computed that antelite's largest 1% of weighted probability mass supplies about
