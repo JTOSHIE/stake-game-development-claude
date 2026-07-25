@@ -7,7 +7,7 @@ behaviour. Australian English, metric units, no em dashes or en dashes anywhere.
 
 Two instruction documents exist and they do not compete.
 
-- **`CLAUDE_PROJECT_INSTRUCTIONS_v6.md`** at the repository root is the **stable project
+- **`CLAUDE_PROJECT_INSTRUCTIONS_v7.md`** at the repository root is the **stable project
   operating frame**: the triad, the session-start protocol, platform reality and the
   standing board. It is pinned verbatim in the owner's Claude project for Fable check-ins,
   so it changes rarely and deliberately. It supersedes v5, which stays archived.
