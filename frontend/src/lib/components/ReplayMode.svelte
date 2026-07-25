@@ -103,63 +103,88 @@
     replayPhase.set('playing')
 
     try {
-      // Future Spinner stores the round as an events array in state.
-      // Shape: [{ type: 'board', data: { symbols: string[][] } },
-      //         { type: 'win',   data: { symbol, kind, ways, payout } }, ...]
-      const events: any[] = Array.isArray(response.state?.events)
-        ? response.state.events
+      // ══════════════════════════════════════════════════════════════════════
+      // R2R JOB 5, 2026-07-25. EVERY ROUND GOES THROUGH THE CANONICAL READER.
+      // ══════════════════════════════════════════════════════════════════════
+      //
+      // Round-two reviewer 3's second BLOCKER. This function used the canonical
+      // interpreter ONLY when the round carried a `freeSpinTrigger`. Every
+      // ordinary round - every loss, every base win, every capped base round -
+      // fell through to a search for three event types:
+      //
+      //   { type: 'board',   data: { symbols } }
+      //   { type: 'win',     data: { symbol, kind, ways, payout } }
+      //   { type: 'scatter', data: { count, ... } }
+      //
+      // None of them exists. They are the same invented schema PR #103 removed
+      // from the live path, left behind here. Measured across the first 300
+      // rounds of the shipped `books_base.jsonl.zst`: reveal 724, winInfo 499,
+      // and board 0, win 0, scatter 0. So `board` resolved to `[]`, no reel
+      // animation ran, `activeWins` was empty and `scatterCount` was 0: a
+      // player replaying an ordinary win watched a static, empty grid. Bet
+      // Replay is a mandatory platform requirement, which is why this is a
+      // blocker rather than a defect.
+      //
+      // There is now ONE call to `interpretEvents` covering every round, and
+      // the base-round mapping below is line-for-line the mapping
+      // `rgsService._parsePlayResponse` performs, so replay and live cannot
+      // disagree about what a round means. The `response.state.board` fallback
+      // is gone too: it was a second invented shape, and falling back to one
+      // invention when another is missing is not a fallback.
+      const events: RawEvent[] = Array.isArray(response.state?.events)
+        ? (response.state.events as RawEvent[])
         : []
 
       // Set bet + currency so amounts format correctly during playback.
       betAmount.set(microsToDisplay(params.amount))
       currencyCode.set(params.currency)
 
+      const betDollars = microsToDisplay(params.amount)
+      const script = interpretEvents(events)
+
       // --- Overdrive free-spins round -------------------------------------
       // If the replayed round triggered the feature, play the full free-spins
       // sequence via the shared interpreter and presentation overlay. The
       // disclaimer stays visible in every phase (rendered at the top).
-      const isFeatureRound = events.some((ev: any) => ev.type === 'freeSpinTrigger')
-      if (isFeatureRound) {
-        const script = interpretEvents(events as RawEvent[])
-        if (script.triggered) {
-          const wincapNow = response.payoutMultiplier >= WINCAP
-          if (wincapNow) {
-            // Wincap flow applies in replay too: splash first, then on COLLECT
-            // present the complete round sequence, finishing on the summary.
-            isWincap.set(true)
-            await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
-          }
-          featureScript = script
-          featureActive = true
-          await new Promise<void>((resolve) => { featureResolve = resolve })
-          winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
-          isWincap.set(wincapNow)
-          phase = 'complete'
-          replayPhase.set('complete')
-          return
+      if (script.triggered) {
+        const wincapNow = response.payoutMultiplier >= WINCAP
+        if (wincapNow) {
+          // Wincap flow applies in replay too: splash first, then on COLLECT
+          // present the complete round sequence, finishing on the summary.
+          isWincap.set(true)
+          await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
         }
+        featureScript = script
+        featureActive = true
+        await new Promise<void>((resolve) => { featureResolve = resolve })
+        winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
+        isWincap.set(wincapNow)
+        phase = 'complete'
+        replayPhase.set('complete')
+        return
       }
 
-      // --- Board ----------------------------------------------------------
-      const boardEvent = events.find((ev: any) => ev.type === 'board')
-      // Fall back to response.state.board if the event array is absent
-      const board: string[][] = boardEvent?.data?.symbols ?? response.state?.board ?? []
+      // --- Ordinary round, from the canonical reader -----------------------
+      const base = script.baseSpin
 
-      // --- Win events (payout in micros, kind = match length 3|4|5) -------
-      const winEvents = events
-        .filter((ev: any) => ev.type === 'win')
-        .map((ev: any) => ({
-          symbol: ev.data.symbol as string,
-          kind:   ev.data.kind   as number,
-          ways:   ev.data.ways   as number,
-          payout: ev.data.payout as number,
-        }))
+      // `reveal` carries SIX rows per reel: the visible 5x4 grid plus one
+      // padding row above and below, used by the spin animation and never
+      // shown. slice(1, -1) drops exactly one row at each end. Counting the
+      // padding as real is the error behind the retracted six-scatter claim
+      // (CLAUDE.md convention (l), worked example).
+      const board: string[][] = base.board.map((reel) =>
+        reel.slice(1, reel.length - 1).map((cell) => cell.name),
+      )
 
-      // --- Scatter --------------------------------------------------------
-      const scatterEvt = events.find((ev: any) => ev.type === 'scatter')
-
-      // Set bet so winMultiplier derived store resolves correctly
-      betAmount.set(microsToDisplay(params.amount))
+      // Wins arrive in centibets (bet-multiples x100). `activeWins` holds
+      // DOLLARS, which is what App.svelte puts there after a live spin. The
+      // deleted code put micros here, from a field that never existed.
+      const winEvents = base.wins.map((w) => ({
+        symbol: w.symbol,
+        kind:   w.kind,
+        ways:   w.ways,
+        payout: (w.winCentibets / 100) * betDollars,
+      }))
 
       // Wincap flow (non-feature base round reaching the cap — see the
       // feature-round branch above for the more common triggered case):
@@ -181,7 +206,9 @@
       // Populate result stores — exactly as App.svelte does post-spin
       boardSymbols.set(board)
       activeWins.set(winEvents)
-      scatterCount.set(scatterEvt?.data?.count ?? 0)
+      // The interpreter counts scatters on the VISIBLE window, not the padded
+      // board, which is the same count the live path shows.
+      scatterCount.set(base.scatterCount)
       // winAmount drives the derived winMultiplier (winAmount / betAmount)
       winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
       isWincap.set(wincapNow)

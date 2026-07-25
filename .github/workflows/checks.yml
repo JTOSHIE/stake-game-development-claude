@@ -196,3 +196,15 @@ jobs:
       - name: currency static assertions
         working-directory: frontend
         run: npx tsx src/lib/utils/currency.test.ts
+
+      # ── Gate 13: replay through the canonical interpreter ────────────────────
+      # ReplayMode used the canonical interpreter only for freeSpinTrigger
+      # rounds and searched every ORDINARY round for board/win/scatter, which
+      # occur zero times in the shipped books, so a loss or a base win replayed
+      # as an empty static grid. Mandatory platform requirement. Asserted over
+      # five categories in every mode that has them, against real book rounds
+      # committed as fixtures, plus a source scan proving the legacy search has
+      # not come back. (R2R JOB 5 / TR-040)
+      - name: replay rounds
+        working-directory: frontend
+        run: npx tsx src/lib/services/replayRounds.test.ts
