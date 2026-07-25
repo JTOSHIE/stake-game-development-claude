@@ -16,7 +16,7 @@
 // defect. utils/currency.ts is canonical (Fable ruling 8, 2026-07-26); the
 // locked rgsService.ts copy is recorded in CLAUDE.md's LOCKED_FILE_DEBTS and
 // held to the canonical value by scripts/currency_scale_drift.test.mjs.
-import { currencySymbolFor, CURRENCY_SCALE } from '../utils/currency'
+import { currencySymbolFor, CURRENCY_SCALE, isVirtualCurrency } from '../utils/currency'
 
 export interface ReplayParams {
   replay: true
@@ -74,8 +74,26 @@ export function parseReplayParams(): ReplayParams | null {
     ? rgsUrlRaw
     : `https://${rgsUrlRaw}`
 
-  const social = params.get('social') === 'true'
-  const currency = params.get('currency') ?? (social ? 'SC' : 'USD')
+  // Social presentation follows the CURRENCY as well as the flag.
+  //
+  // The platform documents `social=true/false` as its signal
+  // (docs/stake-engine-live/jurisdiction-requirements.md line 17), and that flag
+  // stays authoritative for turning social mode ON. But a replay URL carrying
+  // `currency=XSC` and no `social` flag previously rendered the full real-money
+  // vocabulary next to an SC balance, which is a prohibited-terms breach in the
+  // jurisdictions that use those codes. Deriving from the currency as well can
+  // only ever turn social mode ON, never off, so it cannot suppress real-money
+  // language where that language is correct. isVirtualCurrency() is the
+  // canonical test in utils/currency.ts rather than a second code list here.
+  //
+  // Scope note: XEC is deliberately NOT handled. Three first-party sources (the
+  // live docs, the currency reference and the official ts-client SDK) have no
+  // trace of it, and the standing recommendation in
+  // docs/stake-engine-live/2026-07-25/DELTA_NOTES.md is not to record it as a
+  // supported code until a first-party source is produced. See TR-012.
+  const socialFlag = params.get('social') === 'true'
+  const currency = params.get('currency') ?? (socialFlag ? 'SC' : 'USD')
+  const social = socialFlag || isVirtualCurrency(currency)
 
   // Guard against a missing or malformed amount: parseInt can yield NaN (or a
   // non-positive value) for junk input, which would render as "NaN" in the UI.

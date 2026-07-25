@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-07-25T04:39:04.953Z",
+  "authenticatedLadder": [
+    100,
+    200,
+    500,
+    1000,
+    2000,
+    5000,
+    10000,
+    20000,
+    50000,
+    100000
+  ],
+  "steps": {
+    "afterLadderApplied": 100,
+    "hudAfterPlus": 200,
+    "hudAfterMinus": 100,
+    "featureMenuAfterPlus": 200,
+    "featureMenuAfterMinus": 100
+  },
+  "everyValueOnAuthenticatedLadder": true,
+  "hudStepsUp": true,
+  "featureMenuStepsUp": true,
+  "neverCollapsedToHardcodedMinimum": true,
+  "pass": true
+}
