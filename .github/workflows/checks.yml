@@ -131,8 +131,16 @@ jobs:
       - name: bet ladder model
         working-directory: frontend
         run: npx tsx src/lib/stores/betLadder.test.ts
+      # ── Gate 9: responsible-gambling enforcement ─────────────────────────────
+      # Jurisdiction flags must be ENFORCED, not merely derived. turboDisabled
+      # previously had zero readers anywhere: the flag was computed correctly and
+      # every consumer ignored it, so a market banning fast play still got it.
+      # (R7/TR-015)
+      - name: responsible gambling enforcement
+        working-directory: frontend
+        run: npx tsx src/lib/stores/responsibleGambling.test.ts
 
-      # ── Gate 9: currency display contract ────────────────────────────────────
+      # ── Gate 10: currency display contract ───────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.

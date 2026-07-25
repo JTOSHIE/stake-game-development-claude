@@ -24,7 +24,10 @@
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
-  import { autoplayLimits, rgJurisdiction, showSessionPanel } from '../stores/responsibleGambling'
+  import {
+    autoplayLimits, rgJurisdiction, showSessionPanel,
+    rgAllowedAutoplayCounts, rgClampAutoplayCount, rgInfiniteAutoplayAllowed,
+  } from '../stores/responsibleGambling'
   import { standingMode } from '../stores/betMode'
   import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
   import { jurisdictionFlags } from '../stores/jurisdiction'
@@ -64,6 +67,9 @@
   })
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
+  // R7/TR-015: the offered counts must respect maxAutoplaySpins. Reactive, not
+  // a constant, because the flags arrive with the authenticate response.
+  $: allowedAutoOptions = rgAllowedAutoplayCounts(AUTO_OPTIONS, $rgJurisdiction.maxAutoplaySpins)
   // OWNER AUDIT REMEDIATION B5: an infinite autoplay option, gated on the
   // jurisdiction flag that already models an autoplay cap (defaults
   // Infinity/uncapped - see stores/responsibleGambling's rgJurisdiction).
@@ -127,8 +133,11 @@
   function decreaseBet() { playClick(); decreaseBetLevel() }
   function setMaxBet()   { playClick(); setMaxBetLevel() }
 
-  function startAuto(count: number) {
+  function startAuto(requested: number) {
     playClick()
+    // Clamped as well as filtered: the menu is the only route today, but a cap
+    // that is only enforced in markup is one refactor away from being lost.
+    const count = rgClampAutoplayCount(requested)
     autoplayLimits.set({
       count,
       stopOnAnyWin: stopOnWin,
@@ -369,7 +378,7 @@
         class="p-round-btn"
         class:engaged={$speedTier !== 'normal'}
         on:click={toggleTurbo}
-        disabled={$isSpinning}
+        disabled={$isSpinning || $rgJurisdiction.turboDisabled}
         aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
         title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
       >
@@ -423,10 +432,10 @@
                 <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
               {/if}
               <div class="auto-menu-sep">Spins</div>
-              {#each AUTO_OPTIONS as n}
+              {#each allowedAutoOptions as n}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
               {/each}
-              {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+              {#if $rgInfiniteAutoplayAllowed}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
               {/if}
             </div>
@@ -505,7 +514,7 @@
     class="c-round-btn"
     class:engaged={$speedTier !== 'normal'}
     on:click={toggleTurbo}
-    disabled={$isSpinning}
+    disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
@@ -541,10 +550,10 @@
             <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
           {/if}
           <div class="auto-menu-sep">Spins</div>
-          {#each AUTO_OPTIONS as n}
+          {#each allowedAutoOptions as n}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
           {/each}
-          {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+          {#if $rgInfiniteAutoplayAllowed}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
           {/if}
         </div>
@@ -582,7 +591,7 @@
     class="fs-turbo fs-knob"
     class:engaged={$speedTier !== 'normal'}
     on:click={toggleTurbo}
-    disabled={$isSpinning}
+    disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
@@ -739,10 +748,10 @@
           <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
         {/if}
         <div class="auto-menu-sep">Spins</div>
-        {#each AUTO_OPTIONS as n}
+        {#each allowedAutoOptions as n}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
         {/each}
-        {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+        {#if $rgInfiniteAutoplayAllowed}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
         {/if}
       </div>
