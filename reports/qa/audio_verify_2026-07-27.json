@@ -85,9 +85,14 @@
       "http://localhost:52407/assets/themes/future-spinner/sounds/win_medium.mp3"
     ]
   },
-  "_SUPERSEDED": {
-    "by": "reports/qa/audio_verify_2026-07-27.json",
+  "_meta": {
     "date": "2026-07-27",
-    "reason": "Convention (h): superseded artefacts are explicitly marked, never left ambient. This file is the 2026-07-13 measurement and is no longer current state."
+    "supersedes": "reports/qa/audio_verify_2026-07-13.json",
+    "status": "PARTIAL - 5 of 8 pass. Recorded honestly rather than reported green.",
+    "note": "R12 attempted to regenerate this green. Two of the three failures did not resolve and the item is PARKED with options in the review tracker (TR-020a). What WAS fixed this pass: the harness now clicks through the CLICK TO CONTINUE gate before sampling, which it never did. That was a real click-path gap of the same class Round 3 fixed across twenty-two scripts, but it was not the cause of the bed-swap failure.",
+    "verified_not_the_cause": [
+      "crossfade wiring: soundService subscribes to overdriveVisual (line 360) and App sets it (line 318); the signal path exists",
+      "harness gate click: added this pass, did not change the result"
+    ]
   }
 }
