@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 009 - 2026-07-28 - Rulings executed: books resolved by design, FAIR captured, one lock conflict named
+
+**COMMS-ACK.** Rulings of 2026-07-28 received and executed. Entry 008 closed.
+
+**RULING 1, books.** LFS rejected, books stay out of the public repository.
+`BOOKS_MANIFEST.md` created as the public fingerprint of the private set, and
+`SUBMISSION_DOSSIER.md` 5c reworded around an explicit two-set table with the manifest
+as the bridge. TR-023 closed **RESOLVED BY DESIGN**, TR-024 **FIXED**.
+
+Verified while building the manifest, all computed not assumed: every book holds exactly
+**100,000 rows**, matching its lookup table; the mode set matches `index.json`; and **all
+five SHA-256 values are byte-identical to those already in dossier 5c**. The dossier's
+hash record was always correct. Only its sentence was wrong, which is precisely how three
+reviewers cloned the repo and one raised a BLOCKER. Row-by-row payout equality is stated
+in the manifest as **not yet proven**, and remains R3's work.
+
+**RULING 2, antelite: ACCEPTED BY DESIGN.** Closed. **But it could not be recorded where
+you asked.**
+
+31. **The PAR sheet is inside a locked path and the ruling named no deny lines to lift.**
+    `games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md` is covered by
+    `Edit(games/future_spinner/**)` and `Write(games/future_spinner/**)`. Convention (e)
+    requires a sanctioning brief to name the exact deny lines; this one did not, and
+    routing around a deny via Bash is explicitly forbidden. So I did not edit it.
+    The same content is recorded in `COMPLIANCE_WATCH.md` under 2026-07-28, flagged to
+    move into the PAR on the next sanctioned locked pass. **Ruling wanted:** accept the
+    compliance-register location, or issue a lift naming
+    `Edit(games/future_spinner/**)` for this single line.
+
+**RULING 3, art contradiction: SCHEDULED.** TR-027 closed as ruled, with R1's bar
+governing and the targeted cohesion pass recorded in three parts.
+`feature/cohesion-pass` to be sequenced with `feature/scatter-anticipation` after
+Wave 3. Not branched yet, per the execution order.
+
+**RULING 4, FAIR API: captured.** `docs/stake-engine-live/2026-07-28/fair-catalogue.md`,
+with the schema and a verbatim excerpt. `COMPLIANCE_WATCH.md` records that our maths
+package is its data source and **no additional work is owed**.
+
+Two things the capture told us that are worth knowing, both computed from the payload:
+
+- **Our `weight_range` is conventional.** Published games cluster at `1.1259e15` (2^50),
+  exactly where our per-mode totals sit.
+- **Our 100,000 events per mode is at the LOW end of the published field.** Others run
+  1M to 10M; Obey The Reptillians sits at exactly 10,000,000, the platform cap. We are
+  compliant, on the stated 100,000 minimum, but it is publicly visible to anyone reading
+  the catalogue, including competitors and reviewers. Worth an owner decision at some
+  point. Also visible: several live games run above the 96.70% ceiling (Lokis Vault at
+  0.98), consistent with the ceiling binding new submissions only.
+
+32. **Missing input, named not guessed: the FAIR outcome endpoint.**
+    `https://fair.stake-engine.com/` returns **404**, and the catalogue payload carries
+    no schema link, no documentation and no per-game outcome URL. The outcome endpoint
+    contract is therefore **not captured**. Per convention (m) I will not infer a URL
+    pattern. **Need: the endpoint URL.**
+
+**Owner note recorded.** A full OneDrive copy of the `games/future_spinner` library
+including publish files was taken 2026-07-28; recorded in `BOOKS_MANIFEST.md` and the
+dossier as the off-repo custody location for the upload set.
+
+**Next, per the execution order, no deviation:** merges #94, #95, #93, #92 with rebases,
+then R24, R14, audio instrumentation, Wave 2.
+
 ## 008 - 2026-07-27 - DECISION REQUEST: wave 1 complete bar one, ten items need a ruling
 
 Written as a decision document rather than a status update. Everything below is

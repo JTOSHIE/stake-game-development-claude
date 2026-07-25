@@ -311,3 +311,50 @@ the platform uses, the answer is already on file.
   leading-symbol style. Part 3 drives display from platform-provided session data
   rather than from either assumption, so this does not block, but the final format
   needs a ruling. `XEC` could not be verified from any source, see the delta notes.
+
+
+### 2026-07-28: FAIR API, and two design rulings recorded
+
+**FAIR API.** `https://fair.stake-engine.com/catalogue` is a public JSON endpoint
+listing every published game with, per active version and per mode, the mode `name`,
+`rtp`, `weight_range` and `events` count. Captured to
+`docs/stake-engine-live/2026-07-28/fair-catalogue.md`.
+
+**Our position: no additional work is owed.** Our maths package IS the data source for
+these figures; FAIR publishes what the ACP already holds. Nothing in the endpoint asks
+anything of the frontend or the build.
+
+Two observations worth recording, both computed from the captured payload rather than
+assumed:
+
+- **`weight_range` convention matches ours.** Published games cluster around
+  `1.1259e15` (2^50), which is exactly the order of our own per-mode total weights
+  (base 1,125,899,906,813,400). Our tables are conventional, not anomalous.
+- **Our 100,000 events per mode is at the LOW end of the published field.** Others run
+  1,000,000 to 10,000,000 (Obey The Reptillians sits at exactly 10,000,000, the cap).
+  We remain inside the platform minimum of 100,000 and two orders below the 10,000,000
+  ceiling, so this is compliant, but it is a visible differentiator in a public
+  catalogue and worth an owner decision at some point.
+
+**Missing input, named rather than guessed:** the ruling also asked for "the outcome
+endpoint contract". `https://fair.stake-engine.com/` returns 404 and the catalogue
+payload contains no endpoint documentation. The outcome endpoint's URL has not been
+supplied and is not discoverable from what is published, so it is **not captured**.
+Needs the URL from Fable.
+
+**ANTELITE TAIL CONCENTRATION, ACCEPTED BY DESIGN (Fable ruling, 2026-07-28).**
+Review 1 computed that antelite's largest 1% of weighted probability mass supplies about
+75.4% of its RTP, and flagged it for commercial scrutiny. Ruled accepted by design, no
+maths change: it passes every platform gate (ETL 0.6654 against a 0.9 3-star limit and
+0.8 at 2-star); the tail weighting **is** the OVERBOOST product promise, since an ante
+paid for boosted feature access rides the feature tail by construction; post-approval
+lockdown would make any change permanent in the wrong direction; and the player-facing
+disclosures already carry the truth (per-spin cost, RTP, max win are all displayed).
+
+**Recorded here rather than in the PAR sheet, deliberately.** The ruling asked for a
+commercial-notes line in `games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md`. That path
+is inside the `Edit/Write(games/future_spinner/**)` deny rules and the ruling did not
+name deny lines to lift, so per convention (e) it was not edited and per the facts
+discipline the blocker is named rather than worked around silently. This entry carries
+the same content in an unlocked compliance document. **Move it into the PAR on the next
+sanctioned locked pass**, where it belongs.

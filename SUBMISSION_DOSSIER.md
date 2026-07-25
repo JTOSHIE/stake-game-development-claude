@@ -163,11 +163,31 @@ audio files shipped in JOB 1. Regenerate immediately before staging with a clean
    been explicitly owner-approved**, otherwise upload the blurb without it.
 6. Do not request review yet - proceed to 5e (post-upload verification) first.
 
-### 5c. `publish_files` inventory with fresh SHA-256 hashes (2026-07-14, gap closed)
+### 5c. `publish_files` inventory, TWO ARTEFACT SETS (reworded 2026-07-28)
 
-The eleven files `index.json` actually declares (five modes: `base`, `cruise`,
-`antelite`, `bonus`, `super`) - **all eleven now present and hash-verified**,
-closing the `books_super.jsonl.zst` gap this section flagged on 2026-07-13:
+**Read this heading carefully: there are two sets, and they are not the same.** The
+previous wording said "all eleven now present and hash-verified", which was true of the
+build machine and false of this repository. All three external reviewers cloned the
+repository, saw seven files, and one correctly raised it as a BLOCKER. The wording, not
+the artefacts, was the defect.
+
+| Set | Contents | Where it lives |
+|---|---|---|
+| **REPO-COMMITTED** | `index.json`, `game_metadata.json`, and the five `lookUpTable_<mode>_0.csv` files. **Seven files.** | This repository |
+| **LOCAL UPLOAD SET** | Those seven **plus** the five `books_<mode>.jsonl.zst`. **Eleven files.** | The build machine, plus an owner-held OneDrive copy of the full library (2026-07-28) |
+
+**The upload set is what goes to the ACP. The books are deliberately NOT in the
+repository** and never will be, per the Fable ruling of 2026-07-28: LFS bandwidth on a
+public repo, no platform requirement to commit them, and decisively, the books are the
+complete outcome distribution and publishing them pre-release would hand the product to
+anyone who clones. Two of them also exceed GitHub's hard 100 MB per-file limit, so a
+plain commit could not succeed regardless.
+
+**The bridge is `BOOKS_MANIFEST.md`** in the repository root: per-book SHA-256, byte
+size, row count and provenance, so the private set is verifiable without being
+published. All five hashes below are byte-identical to that manifest.
+
+The eleven files `index.json` declares, with fresh SHA-256 hashes:
 
 | File | SHA-256 |
 |---|---|
