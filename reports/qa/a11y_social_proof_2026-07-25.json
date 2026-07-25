@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-07-25T04:27:47.425Z",
+  "realMoneyLabels": 12,
+  "socialLabels": 12,
+  "realMoneyRestrictedHits": [
+    "Features and bet modes",
+    "Decrease bet",
+    "Increase bet",
+    "MAX BET"
+  ],
+  "socialRestrictedHits": [],
+  "socialSample": [
+    "Features and play modes",
+    "Decrease play",
+    "Increase play",
+    "MAX PLAY",
+    "PLAY"
+  ],
+  "pass": true
+}

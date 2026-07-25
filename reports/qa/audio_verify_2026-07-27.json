@@ -93,6 +93,12 @@
     "verified_not_the_cause": [
       "crossfade wiring: soundService subscribes to overdriveVisual (line 360) and App sets it (line 318); the signal path exists",
       "harness gate click: added this pass, did not change the result"
-    ]
+    ],
+    "SUPERSEDED": {
+      "by": "reports/qa/audio_verify_2026-07-13.json",
+      "on": "2026-07-25",
+      "reason": "All three red checks in this file were harness artefacts, not product defects, proven by instrumenting setOverdriveBed under Fable ruling 23. bedSwapFiredOnBonusBuy/bedRevertedAfterFeature failed because the pinned ?mockCategory=base_win_small applied to the BUY as well as the spin, so serveCategory('bonus','base_win_small') returned null and no feature was ever presented. loopSeamsWithinTolerance failed because runSeamChecks appended the asset path AFTER the query string, so it decoded index.html instead of audio. The successor run is green on all eight checks.",
+      "do_not_cite": "This file records a harness fault. Do not cite it as evidence of an audio defect."
+    }
   }
 }

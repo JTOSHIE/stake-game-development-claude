@@ -50,6 +50,12 @@ const ALLOWLIST = {
   buyBonusActive: 'locked gameStore.ts, LOCKED_FILE_DEBTS',
   canSetMaxBet:   'locked gameStore.ts, LOCKED_FILE_DEBTS',
   sessionStats:   'locked gameStore.ts, LOCKED_FILE_DEBTS',
+  // R5/TR-013 (2026-07-25): became unread when both bet surfaces moved onto
+  // stores/betLadder.ts. It is NOT merely dead, it was WRONG: it indexes the
+  // hardcoded BET_LEVELS, so off the authenticated ladder it returned true and
+  // enabled a "+" that dropped the bet to 0.10. Locked, so it cannot be deleted
+  // here. Leaving it unread is strictly safer than leaving it wired.
+  canIncreaseBet: 'locked gameStore.ts, LOCKED_FILE_DEBTS',
   // R8/TR-016 (2026-07-25): became unread when the confirm dialog moved to the
   // per-tier check. Like canIncreaseBet it was not merely dead but WRONG: it is
   // `bal >= bet * 100` for every tier, so at the 400x tier it enabled CONFIRM

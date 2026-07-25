@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-07-25T04:45:53.233Z",
+  "cases": {
+    "unrestricted": {
+      "count": 1,
+      "allDisabled": false,
+      "tier": "turbo",
+      "autoplayOffered": [
+        "10",
+        "25",
+        "50",
+        "100",
+        "∞"
+      ]
+    },
+    "turboBanned": {
+      "count": 1,
+      "allDisabled": true,
+      "tier": "normal"
+    },
+    "minSpin2500": {
+      "count": 1,
+      "allDisabled": true,
+      "tier": "normal"
+    },
+    "autoplayCapped25": {
+      "autoplayOffered": [
+        "10",
+        "25"
+      ]
+    }
+  },
+  "pass": true
+}

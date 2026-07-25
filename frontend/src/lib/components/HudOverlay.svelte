@@ -9,9 +9,13 @@
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
-    isMuted, showPaytable, winAmount, winMultiplier, BET_LEVELS, locale,
+    isMuted, showPaytable, winAmount, winMultiplier, locale,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
+  import {
+    activeBetLevels, canIncreaseBetLevel, canDecreaseBetLevel, canSetMaxBetLevel,
+    increaseBetLevel, decreaseBetLevel, setMaxBetLevel, snapBetToLadder,
+  } from '../stores/betLadder'
   import { musicVolume, sfxVolume } from '../stores/audioSettings'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { autofitText } from '../actions/autofitText'
@@ -20,7 +24,10 @@
   import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
-  import { autoplayLimits, rgJurisdiction, showSessionPanel } from '../stores/responsibleGambling'
+  import {
+    autoplayLimits, rgJurisdiction, showSessionPanel,
+    rgAllowedAutoplayCounts, rgClampAutoplayCount, rgInfiniteAutoplayAllowed,
+  } from '../stores/responsibleGambling'
   import { setModalOpen } from '../stores/modalGuard'
   import { standingMode } from '../stores/betMode'
   import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
@@ -61,6 +68,9 @@
   })
 
   const AUTO_OPTIONS = [10, 25, 50, 100]
+  // R7/TR-015: the offered counts must respect maxAutoplaySpins. Reactive, not
+  // a constant, because the flags arrive with the authenticate response.
+  $: allowedAutoOptions = rgAllowedAutoplayCounts(AUTO_OPTIONS, $rgJurisdiction.maxAutoplaySpins)
   // OWNER AUDIT REMEDIATION B5: an infinite autoplay option, gated on the
   // jurisdiction flag that already models an autoplay cap (defaults
   // Infinity/uncapped - see stores/responsibleGambling's rgJurisdiction).
@@ -95,26 +105,24 @@
   $: setModalOpen('auto-menu', showAutoMenu)
   $: setModalOpen('hud-menu', showMenu)
 
-  // ── Bet ladder - ported from the retired ControlBar unchanged ────────────
-  $: activeLevels = $rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS
+  // ── Bet ladder ───────────────────────────────────────────────────────────
+  // R5/TR-013 (2026-07-25): this logic used to live here as a local copy, and
+  // FeatureMenu.svelte had its own divergent one via gameStore's hardcoded
+  // BET_LEVELS actions. Two bet-changing surfaces, two ladders. Both now share
+  // stores/betLadder.ts, which drives from the AUTHENTICATED levels. Behaviour
+  // here is unchanged; the duplication that let them drift is gone.
+  // The markup binds to these stores DIRECTLY rather than through `$:` aliases.
+  // An alias latched a stale value: when the RGS ladder arrives, the bet is
+  // briefly off the new ladder, the guards are correctly false for that instant,
+  // and the snap below then moves the bet onto it. The alias kept the transient
+  // false and both arrows stayed disabled with a perfectly valid bet on screen.
+  // A store read in markup is always live, so the transient cannot stick.
 
-  function nearestLevel(levels: number[], value: number): number {
-    return levels.reduce(
-      (best, lvl) => (Math.abs(lvl - value) < Math.abs(best - value) ? lvl : best),
-      levels[0],
-    )
+  // Snap an off-ladder bet onto the ladder once the RGS supplies it, so the
+  // player never sits on an amount the platform did not authorise.
+  $: if ($activeBetLevels.length > 0 && !$activeBetLevels.includes($betAmount)) {
+    snapBetToLadder()
   }
-
-  $: if (activeLevels.length > 0 && !activeLevels.includes($betAmount)) {
-    betAmount.set(nearestLevel(activeLevels, $betAmount))
-  }
-
-  $: curIndex = activeLevels.indexOf($betAmount)
-  $: canIncrease =
-    curIndex > -1 &&
-    curIndex < activeLevels.length - 1 &&
-    activeLevels[curIndex + 1] <= $balance
-  $: canDecrease = curIndex > 0
 
   // Pressing SPIN mid-spin slam-stops all reels instantly (Motion Polish v2,
   // reel feel item 1); the outcome is already determined, this only fast
@@ -127,35 +135,15 @@
     }
   }
 
-  function increaseBet() {
-    playClick()
-    const idx = activeLevels.indexOf($betAmount)
-    if (idx > -1 && idx < activeLevels.length - 1 && activeLevels[idx + 1] <= $balance) {
-      betAmount.set(activeLevels[idx + 1])
-    }
-  }
+  function increaseBet() { playClick(); increaseBetLevel() }
+  function decreaseBet() { playClick(); decreaseBetLevel() }
+  function setMaxBet()   { playClick(); setMaxBetLevel() }
 
-  function decreaseBet() {
+  function startAuto(requested: number) {
     playClick()
-    const idx = activeLevels.indexOf($betAmount)
-    if (idx > 0) betAmount.set(activeLevels[idx - 1])
-  }
-
-  // MAX bet (v3.3) - highest affordable ladder level, consistent with the
-  // affordability guard the increase arrow already uses.
-  $: maxLevel = (() => {
-    const affordable = activeLevels.filter((l) => l <= $balance)
-    return affordable.length ? affordable[affordable.length - 1] : activeLevels[0]
-  })()
-  $: canSetMax = curIndex > -1 && $betAmount !== maxLevel
-
-  function setMaxBet() {
-    playClick()
-    if ($betAmount !== maxLevel) betAmount.set(maxLevel)
-  }
-
-  function startAuto(count: number) {
-    playClick()
+    // Clamped as well as filtered: the menu is the only route today, but a cap
+    // that is only enforced in markup is one refactor away from being lost.
+    const count = rgClampAutoplayCount(requested)
     autoplayLimits.set({
       count,
       stopOnAnyWin: stopOnWin,
@@ -348,11 +336,11 @@
     <div class="p-bet-stat" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
       <span class="p-stat-label">{$tr('bet')}</span>
       <div class="p-bet-row" data-testid="bet-arrows">
-        <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
+        <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
         <span class="p-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
-        <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
+        <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
       </div>
@@ -396,7 +384,7 @@
         class="p-round-btn"
         class:engaged={$speedTier !== 'normal'}
         on:click={toggleTurbo}
-        disabled={$isSpinning}
+        disabled={$isSpinning || $rgJurisdiction.turboDisabled}
         aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
         title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
       >
@@ -419,7 +407,7 @@
     </button>
 
     <div class="p-controls-side">
-      <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
+      <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label={$tr('betMax')} data-testid="max-chip">
         <span class="p-max-cap">{$tr('hudMax')}</span>
       </button>
       {#if !$rgJurisdiction.autoplayDisabled}
@@ -450,10 +438,10 @@
                 <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
               {/if}
               <div class="auto-menu-sep">Spins</div>
-              {#each AUTO_OPTIONS as n}
+              {#each allowedAutoOptions as n}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
               {/each}
-              {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+              {#if $rgInfiniteAutoplayAllowed}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
               {/if}
             </div>
@@ -513,11 +501,11 @@
   <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
     <div class="c-bet-row" data-testid="bet-arrows">
-      <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet">
+      <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
       <span class="c-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
-      <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet">
+      <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
     </div>
@@ -532,7 +520,7 @@
     class="c-round-btn"
     class:engaged={$speedTier !== 'normal'}
     on:click={toggleTurbo}
-    disabled={$isSpinning}
+    disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
@@ -568,10 +556,10 @@
             <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
           {/if}
           <div class="auto-menu-sep">Spins</div>
-          {#each AUTO_OPTIONS as n}
+          {#each allowedAutoOptions as n}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
           {/each}
-          {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+          {#if $rgInfiniteAutoplayAllowed}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
           {/if}
         </div>
@@ -579,7 +567,7 @@
     </div>
   {/if}
 
-  <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
+  <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label={$tr('betMax')} data-testid="max-chip">
     <span class="c-max-cap">{$tr('hudMax')}</span>
   </button>
 
@@ -609,7 +597,7 @@
     class="fs-turbo fs-knob"
     class:engaged={$speedTier !== 'normal'}
     on:click={toggleTurbo}
-    disabled={$isSpinning}
+    disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
@@ -623,8 +611,8 @@
   <button
     class="fs-max"
     on:click={setMaxBet}
-    disabled={$isSpinning || !canSetMax}
-    aria-label="Max bet"
+    disabled={$isSpinning || !$canSetMaxBetLevel}
+    aria-label={$tr('betMax')}
     data-testid="max-chip"
   ><span class="cap">{$tr('hudMax')}</span></button>
 
@@ -712,8 +700,8 @@
 
   <!-- Stacked cyan bet arrows - own FIXED column x 906 (v3.3), independent of BET box -->
   <div class="fs-arrows" data-testid="bet-arrows">
-    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !canIncrease} aria-label="Increase bet"><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
-    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !canDecrease} aria-label="Decrease bet"><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
+    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
+    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
   </div>
 
   <!-- SPIN - v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
@@ -766,10 +754,10 @@
           <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
         {/if}
         <div class="auto-menu-sep">Spins</div>
-        {#each AUTO_OPTIONS as n}
+        {#each allowedAutoOptions as n}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
         {/each}
-        {#if $rgJurisdiction.maxAutoplaySpins === Infinity}
+        {#if $rgInfiniteAutoplayAllowed}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
         {/if}
       </div>
