@@ -790,9 +790,45 @@
     }, delay)
   }
 
+  // ── Anticipation demo, DEV only ──────────────────────────────────────────
+  // ?anticipationDemo=3|4|5 plays the scatter build with that many scatters and
+  // NOTHING else: no wallet call, no round, no bonus entry. ?anticipationDemo=1
+  // cycles 2,3,4,5 on successive presses so the whole ladder can be compared
+  // back to back.
+  //
+  // This exists because the obvious way to watch the sequence, ?mockCategory=
+  // trigger_5, pins every round to the curated trigger and drops you into the
+  // bonus on every spin, which is precisely when you cannot see the build. It
+  // also does not control the symbols the grid animates: the mock generates a
+  // RANDOM board, so mockCategory sets the round's events while the reels show
+  // something else entirely.
+  const _antDemo = import.meta.env.DEV
+    ? new URLSearchParams(window.location.search).get('anticipationDemo')
+    : null
+  const _antCycle = [2, 3, 4, 5]
+  let _antIndex = 0
+  function _antDemoBoard(): string[][] {
+    const n = _antDemo === '1' || _antDemo === 'cycle'
+      ? _antCycle[_antIndex++ % _antCycle.length]
+      : Math.max(0, Math.min(5, Number(_antDemo) || 0))
+    // One scatter per reel from the left, which is how the shipped books place
+    // them in all but 0.5% of rounds.
+    return Array.from({ length: 5 }, (_, reel) =>
+      Array.from({ length: 4 }, (_, row) => (reel < n && row === 0 ? 'S' : 'L3')))
+  }
+
   async function handleSpin() {
     if ($isSpinning || featureActive) return
     if ($bettingDisabled) return   // R2: no bet may be placed off a live session
+
+    if (import.meta.env.DEV && _antDemo) {
+      // Choreography only. Returns before anything touches the wallet, the RGS
+      // or the feature presentation.
+      isSpinning.set(true)
+      await gridRef?.animateSpin(_antDemoBoard())
+      isSpinning.set(false)
+      return
+    }
     // Standing mode for normal spins (Normal/Cruise) plus the OVERBOOST
     // enhancer toggle - both live in the one standingMode store (FeatureMenu's
     // selectStanding()/toggleEnhancer() write it; see betMode.ts). The locked
