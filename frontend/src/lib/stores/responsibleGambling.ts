@@ -11,32 +11,96 @@ import { writable, derived, get } from 'svelte/store'
 import { jurisdictionFlags } from './jurisdiction'
 
 // ── Jurisdiction-derived RG configuration ───────────────────────────────────
-// Flags are supplied by the platform via the authenticate passthrough; unknown
-// flags default to the permissive (off) behaviour.
+//
+// RETYPED TO THE OFFICIAL FLAGS, R2R JOB 4 / TR-042, 2026-07-25.
+//
+// Round-two reviewer 3's fourth finding, and it was exactly right. This derived
+// store read `minSpinMs`, `realityCheckMs`, `maxAutoplaySpins` and
+// `mandatorySessionDisplay`. NONE of those is a field of the official
+// `JurisdictionFlags`, so no platform response has ever set one, and the whole
+// RG layer was permanently in its permissive default on a real session. The
+// tests passed because they injected the same four invented properties: a test
+// that supplies the property the code invented proves only that the code can
+// read its own invention.
+//
+// The official twelve, transcribed in rgsService.ts as
+// `OfficialJurisdictionFlags`, are:
+//
+//   socialCasino, disabledFullscreen, disabledTurbo, disabledSuperTurbo,
+//   disabledAutoplay, disabledSlamstop, disabledSpacebar, disabledBuyFeature,
+//   displayNetPosition, displayRTP, displaySessionTimer, minimumRoundDuration
+//
+// MAPPING, each with its reasoning rather than a guess:
+//
+//   minSpinMs            -> minimumRoundDuration. The official numeric
+//                           equivalent, same meaning and same unit
+//                           (milliseconds), so the UK 2,500 ms rule now has a
+//                           real field behind it for the first time.
+//   maxAutoplaySpins     -> NO official equivalent. The official contract can
+//                           disable autoplay outright (disabledAutoplay) but
+//                           cannot cap it. The cap therefore becomes what it
+//                           always effectively was, uncapped, unless a caller
+//                           passes a count. Kept in the interface because the
+//                           autoplay UI's own count still flows through it.
+//   realityCheckMs       -> NO official equivalent. Reality checks are not a
+//                           platform-driven feature at the pin. Held at 0
+//                           (off), which is exactly what a live session did
+//                           anyway; nothing regresses.
+//   mandatorySessionDisplay -> displaySessionTimer. The official flag that
+//                           requires the session display to be on screen.
+//   rgEnabled            -> derived from the real flags now, rather than from
+//                           two fields that never arrived.
+//
+// The two with no official equivalent are NOT deleted, because both are read by
+// the autoplay and session UI and deleting them would spread this change across
+// components for no gain. They are pinned to their permissive values with the
+// reason stated, so nobody re-wires them to an invented flag again.
+
 export interface RgJurisdiction {
   rgEnabled: boolean // master switch for the RG UI (session panel, reality checks)
   autoplayDisabled: boolean // some markets ban autoplay entirely (e.g. UK real-money)
-  minSpinMs: number // minimum spin/round duration (UK: 2500)
+  minSpinMs: number // minimum round duration, from official minimumRoundDuration
   turboDisabled: boolean // fast-play banned where min spin applies
-  realityCheckMs: number // reality-check reminder interval (0 = off)
-  maxAutoplaySpins: number // cap on autoplay count (Infinity = uncapped)
-  // 2026-07-14c: some markets require the session (time/spins/net) display to
-  // be PERSISTENTLY on-screen, not just reachable on demand - distinct from
-  // rgEnabled, which only gates whether RG features exist at all. Defaults
-  // off, matching every other flag here (permissive unless the platform says
-  // otherwise).
-  mandatorySessionDisplay: boolean
+  realityCheckMs: number // no official flag at the pin; always 0 (off)
+  maxAutoplaySpins: number // no official flag at the pin; always Infinity
+  mandatorySessionDisplay: boolean // from official displaySessionTimer
+  // The official flags with no prior representation here at all. Added so the
+  // controls they govern can be wired to them rather than to nothing.
+  superTurboDisabled: boolean // disabledSuperTurbo
+  slamStopDisabled: boolean // disabledSlamstop
+  spacebarDisabled: boolean // disabledSpacebar
+  fullscreenDisabled: boolean // disabledFullscreen
+  displayRTP: boolean // displayRTP
+  displayNetPosition: boolean // displayNetPosition
+  socialCasino: boolean // socialCasino
 }
 
-export const rgJurisdiction = derived(jurisdictionFlags, ($f): RgJurisdiction => ({
-  rgEnabled: $f.rgEnabled === true || $f.minSpinMs != null || $f.realityCheckMs != null,
-  autoplayDisabled: $f.disabledAutoplay === true,
-  minSpinMs: typeof $f.minSpinMs === 'number' ? $f.minSpinMs : 0,
-  turboDisabled: $f.disabledTurbo === true || (typeof $f.minSpinMs === 'number' && $f.minSpinMs > 0),
-  realityCheckMs: typeof $f.realityCheckMs === 'number' ? $f.realityCheckMs : 0,
-  maxAutoplaySpins: typeof $f.maxAutoplaySpins === 'number' ? $f.maxAutoplaySpins : Infinity,
-  mandatorySessionDisplay: $f.mandatorySessionDisplay === true,
-}))
+export const rgJurisdiction = derived(jurisdictionFlags, ($f): RgJurisdiction => {
+  const minSpinMs = typeof $f.minimumRoundDuration === 'number' ? $f.minimumRoundDuration : 0
+  return {
+    // Any operative restriction switches the RG layer on. Reading a set of real
+    // flags rather than the presence of two invented ones.
+    rgEnabled:
+      minSpinMs > 0 ||
+      $f.disabledAutoplay === true ||
+      $f.displaySessionTimer === true ||
+      $f.displayNetPosition === true,
+    autoplayDisabled: $f.disabledAutoplay === true,
+    minSpinMs,
+    turboDisabled: $f.disabledTurbo === true || minSpinMs > 0,
+    // No official flag. Held at the permissive value with the reason above.
+    realityCheckMs: 0,
+    maxAutoplaySpins: Infinity,
+    mandatorySessionDisplay: $f.displaySessionTimer === true,
+    superTurboDisabled: $f.disabledSuperTurbo === true,
+    slamStopDisabled: $f.disabledSlamstop === true,
+    spacebarDisabled: $f.disabledSpacebar === true,
+    fullscreenDisabled: $f.disabledFullscreen === true,
+    displayRTP: $f.displayRTP === true,
+    displayNetPosition: $f.displayNetPosition === true,
+    socialCasino: $f.socialCasino === true,
+  }
+})
 
 // ── Session panel on-demand visibility (2026-07-14c) ─────────────────────────
 // Set by the HUD menu's "Session" item (all three layout modes), read by
@@ -137,9 +201,21 @@ export function rgAllowedAutoplayCounts(
   return allowed.length ? allowed : [cap]
 }
 
-/** Clamp a requested autoplay count to the jurisdiction cap. Belt and braces. */
-export function rgClampAutoplayCount(count: number): number {
-  const cap = get(rgJurisdiction).maxAutoplaySpins
+/**
+ * Clamp a requested autoplay count to the jurisdiction cap. Belt and braces.
+ *
+ * R2R JOB 4 / TR-042: `cap` is now an explicit optional parameter, matching
+ * `rgAllowedAutoplayCounts` above. At the pinned official contract the store's
+ * cap is always Infinity, because no official flag caps autoplay, so without a
+ * parameter this function and its sibling would be untestable and would quietly
+ * become dead code. The capping LOGIC is correct and worth keeping intact for
+ * the day a cap flag exists; what changed is that it is no longer fed by a flag
+ * name we invented.
+ */
+export function rgClampAutoplayCount(
+  count: number,
+  cap: number = get(rgJurisdiction).maxAutoplaySpins,
+): number {
   if (!Number.isFinite(cap)) return count
   return Math.min(count, cap)
 }

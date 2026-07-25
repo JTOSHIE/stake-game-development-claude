@@ -2,51 +2,71 @@
 //
 // THE GAP
 //
-// The authenticate response carries `round?: { roundId, state }`, present when a
-// round is still in progress, and rgsService.authenticate() maps it faithfully
-// (line 334). initRGS() then throws it away: it publishes balance, currency,
-// bet levels and jurisdiction flags, and never looks at `round`.
+// The authenticate response carries a round when one is still in progress, and
+// rgsService.authenticate() maps it faithfully. initRGS() then throws it away:
+// it publishes balance, currency, bet levels and jurisdiction flags, and never
+// looks at `round`.
 //
 // So a player who reloads mid-round - a dropped connection, a phone rotating
 // into a browser reload, a crash during the free-spins presentation - came back
-// to a fresh game while the RGS still held an open round for them. On a
-// `pending_end` round that is money: the win is computed and waiting to be
-// credited, and nothing was ever going to ask for it.
+// to a fresh game while the RGS still held an open round for them. That is
+// money: a computed win waiting to be credited, with nothing ever going to ask
+// for it.
 //
-// rgsService.ts is locked and out of scope for this run. It does not need to
-// change: `parseSessionParams`, `authenticate` and `endRound` are all exported,
-// so recovery is entirely implementable from outside the lock.
+// RETYPED TO THE OFFICIAL CONTRACT, R2R JOB 4, 2026-07-25.
 //
-// WHAT THIS DOES, AND WHERE IT STOPS
+// This module previously modelled the round as `{ roundId: string, state:
+// 'open' | 'pending_end' }`. Both fields were invented. The official round, at
+// the pinned ts-client ref, is `{ betID: number, amount?, payout?,
+// payoutMultiplier?, active: boolean, mode: string, event?, state: unknown }`:
+// the identity is a NUMBER called `betID`, the in-progress signal is a BOOLEAN
+// called `active`, and `state` is the round's own game payload rather than a
+// status string. There is no `'pending_end'` anywhere in the official contract.
 //
-//   state 'pending_end'  the round is settled by calling the platform's own
-//                        endRound, which credits it and returns the
-//                        authoritative balance. Unambiguous, and done.
+// TWO CONSEQUENCES, both recorded rather than acted on unilaterally:
 //
-//   state 'open'         the round exists but has NOT been resolved. Recovering
-//                        it needs the round's events, and authenticate does not
-//                        return them. This module surfaces the open round and
-//                        stops there. It does NOT guess: settling an open round
-//                        could forfeit a feature the player has not seen, and
-//                        fabricating a presentation for it would be inventing an
-//                        outcome. The options are recorded in the tracker as
-//                        TR-035b and resolved empirically at the DTT session.
+//   1. The auto-settle branch is REMOVED, not disabled. It fired on
+//      `state === 'pending_end'`, a value no platform response can produce, so
+//      against a real RGS it was already unreachable. Leaving unreachable
+//      money-path code behind a false condition is worse than deleting it,
+//      because the next reader believes the case is handled.
+//
+//   2. TR-035b's premise has changed and the row needs re-ruling. It was parked
+//      because "recovering an open round needs the round's events, and
+//      authenticate does not return them". Under the official contract
+//      authenticate DOES return them: `round.state` is the same payload the Bet
+//      Replay endpoint serves, so the presentation is rebuildable. The official
+//      client's own instruction is likewise unambiguous, that EndRound is
+//      called when a round is active. This module still parks rather than
+//      settles, because changing recovery BEHAVIOUR is TR-035b's decision and
+//      not JOB 4's, and because the inference about where `state` puts its
+//      events wants DTT confirmation before a settle rides on it.
 //
 // Everything here is a no-op in mock/dev, where there is no session to recover.
 
-import { writable, get } from 'svelte/store'
+// `get` and the `balance` store were used only by the auto-settle branch that
+// fired on the invented `'pending_end'` state. That branch is gone (see the
+// header), so the imports go with it rather than lingering as a hint that this
+// module still writes to the balance. It does not.
+import { writable } from 'svelte/store'
 import { parseSessionParams, authenticate, endRound } from '../services/rgsService'
-import { balance } from './gameStore'
+import type { OfficialRound } from '../services/rgsService'
 
+/**
+ * The official round, narrowed to the three fields recovery reads. Named
+ * ActiveRound still, so consumers and the existing proof keep compiling.
+ */
 export interface ActiveRound {
-  roundId: string
-  state: 'open' | 'pending_end'
+  betID: number
+  active: boolean
+  /** The round's own game payload. Carries the events; see the header. */
+  state: unknown
 }
 
 export type RecoveryOutcome =
   | { kind: 'none' }                                   // nothing to recover
-  | { kind: 'settled'; roundId: string; balance: number }
-  | { kind: 'open-round-parked'; roundId: string }     // needs DTT semantics
+  | { kind: 'settled'; betID: number; balance: number }
+  | { kind: 'open-round-parked'; betID: number }       // needs DTT semantics
   | { kind: 'failed'; error: string }
 
 /** The round the RGS says is still in progress, or null. */
@@ -88,25 +108,26 @@ export async function recoverSession(
   try {
     const params = platform.parseSessionParams()
     const auth = await platform.authenticate(params)
-    const round = auth.round as ActiveRound | undefined
-    if (!round) {
+    const round: OfficialRound | null = auth.round ?? null
+
+    // `active: false` is a round the platform has already closed. It is
+    // reported in the authenticate response as history, not as work, and
+    // treating it as recoverable would settle a round twice.
+    if (!round || round.active !== true) {
       activeRound.set(null)
       const out: RecoveryOutcome = { kind: 'none' }
       lastRecovery.set(out)
       return out
     }
-    activeRound.set(round)
 
-    if (round.state === 'pending_end') {
-      const resp = await platform.endRound(params, round.roundId)
-      balance.set(resp.balance)
-      activeRound.set(null)
-      const out: RecoveryOutcome = { kind: 'settled', roundId: round.roundId, balance: resp.balance }
-      lastRecovery.set(out)
-      return out
-    }
+    activeRound.set({ betID: round.betID, active: round.active, state: round.state })
 
-    const out: RecoveryOutcome = { kind: 'open-round-parked', roundId: round.roundId }
+    // Parked, deliberately. See the header: the official contract says to call
+    // EndRound here, and `round.state` now gives us the events to present the
+    // round properly first. Both of those change TR-035b's premise, and TR-035b
+    // is the row that owns the decision. JOB 4's scope is the contract, not the
+    // recovery policy.
+    const out: RecoveryOutcome = { kind: 'open-round-parked', betID: round.betID }
     lastRecovery.set(out)
     return out
   } catch (err) {

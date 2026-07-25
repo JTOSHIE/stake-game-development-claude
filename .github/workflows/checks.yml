@@ -189,6 +189,17 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/services/rgsService.parse.test.ts
 
+      # ── Gate 11a: official wallet contract ───────────────────────────────────
+      # Every raw shape in rgsService.ts was invented: flat authenticate, flat
+      # play, an end-round that sent and read a roundId the platform neither
+      # accepts nor returns, and an rgs_url used unprefixed so requests never
+      # left our own origin. Asserted against fixtures transcribed from the
+      # pinned ts-client (df9e126), importing the real functions rather than
+      # restating them. (R2R JOB 4 / TR-039, TR-042)
+      - name: wallet contract
+        working-directory: frontend
+        run: npx tsx src/lib/services/rgsService.contract.test.ts
+
       # ── Gate 12: currency display contract ───────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing

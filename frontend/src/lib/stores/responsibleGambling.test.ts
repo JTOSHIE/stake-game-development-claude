@@ -1,8 +1,29 @@
 // responsibleGambling.test.ts — compliance gate for the RG autoplay logic.
 // Run: npx tsx src/lib/stores/responsibleGambling.test.ts
 //
-// Verifies the autoplay STOP CONDITIONS, the minimum-spin-interval enforcement,
+// Verifies the autoplay STOP CONDITIONS, the minimum-round-duration enforcement,
 // and session accounting - the pieces a regulator checks. Pure logic, no DOM.
+//
+// ============================================================================
+// REWRITTEN AGAINST THE OFFICIAL FLAGS, R2R JOB 4 / TR-042, 2026-07-25.
+// ============================================================================
+//
+// Round-two reviewer 3's fourth finding was aimed squarely at this file: "the
+// tests pass because they inject those same non-platform properties". It was
+// correct. Every jurisdiction assertion below used to call
+//
+//     jurisdictionFlags.set({ minSpinMs: 2500 })
+//     jurisdictionFlags.set({ maxAutoplaySpins: 25 })
+//
+// and neither `minSpinMs` nor `maxAutoplaySpins` is a field of the official
+// `JurisdictionFlags`. The store read what the test wrote, the test asserted
+// what the store read, and the loop was closed with the platform outside it.
+// A green gate proved only that two pieces of our own code agreed.
+//
+// Every flag name used below is now one of the official twelve, transcribed in
+// rgsService.ts as `OfficialJurisdictionFlags` from the pinned ts-client. The
+// first block is a REGRESSION GUARD asserting the four invented names do
+// nothing, so reintroducing one cannot pass unnoticed.
 
 import {
   autoplayLimits, defaultAutoplayLimits, autoplayShouldStop,
@@ -51,52 +72,68 @@ rgResetSession()
 rgRecordSpin(2 * M, 5 * M) // wager 2, win 5 -> net +3
 check('session: net +3 after a winning spin', get(rgNetMicros) === 3 * M)
 
-// --- minimum spin interval ---
-jurisdictionFlags.set({ minSpinMs: 2500 })
-check('minSpin: raises a short delay to 2500', rgSpinDelay(800) === 2500)
-check('minSpin: leaves a longer delay alone', rgSpinDelay(6000) === 6000)
-jurisdictionFlags.set({}) // no min -> passthrough
-check('minSpin: no floor when unset', rgSpinDelay(800) === 800)
+// ── THE REGRESSION GUARD, R2R3 finding 4 ────────────────────────────────────
+// The four invented flag names, set together, must change NOTHING. If any of
+// these fails, someone has re-wired the store to a property the platform does
+// not send, and a live session will silently run permissive again.
+jurisdictionFlags.set({
+  minSpinMs: 2500,
+  realityCheckMs: 60_000,
+  maxAutoplaySpins: 25,
+  mandatorySessionDisplay: true,
+})
+check('invented minSpinMs sets no floor', get(rgJurisdiction).minSpinMs === 0)
+check('invented minSpinMs does not ban turbo', get(rgJurisdiction).turboDisabled === false)
+check('invented realityCheckMs stays off', get(rgJurisdiction).realityCheckMs === 0)
+check('invented maxAutoplaySpins does not cap', get(rgJurisdiction).maxAutoplaySpins === Infinity)
+check('invented mandatorySessionDisplay is ignored', get(rgJurisdiction).mandatorySessionDisplay === false)
+check('invented flags do not switch the RG layer on', get(rgJurisdiction).rgEnabled === false)
 
-// --- Wiring Integrity Audit, item 3(i): the platform manual has no general
-// minimum spin interval (only UKGC-specific jurisdictions do), so Stake
-// sessions with no jurisdiction data must see a literal 0ms floor - not just
-// "whatever delay was requested happens to pass through unchanged" (the check
-// above), but the resolved floor value itself must be exactly 0. ---
-jurisdictionFlags.set({}) // default, permissive state (no authenticate jurisdiction data)
-check('minSpin: resolves to a literal 0ms floor with no jurisdiction data (native game feel, no platform-wide floor)', get(rgJurisdiction).minSpinMs === 0)
-jurisdictionFlags.set({ minSpinMs: 2500 })
-check('minSpin: floor only ever raises above 0 when a jurisdiction flag explicitly sets it (UKGC-style)', get(rgJurisdiction).minSpinMs === 2500)
+// ── minimum round duration, the OFFICIAL flag ───────────────────────────────
+jurisdictionFlags.set({ minimumRoundDuration: 2500 })
+check('minimumRoundDuration: raises a short delay to 2500', rgSpinDelay(800) === 2500)
+check('minimumRoundDuration: leaves a longer delay alone', rgSpinDelay(6000) === 6000)
+check('minimumRoundDuration: derives onto minSpinMs', get(rgJurisdiction).minSpinMs === 2500)
+check('minimumRoundDuration: switches the RG layer on', get(rgJurisdiction).rgEnabled === true)
+
+// Wiring Integrity Audit, item 3(i): the platform manual has no general minimum
+// spin interval (only UKGC-style jurisdictions do), so a session with no
+// jurisdiction data must see a literal 0 ms floor - not just "the requested
+// delay happens to pass through unchanged", but the resolved floor itself.
 jurisdictionFlags.set({})
+check('no jurisdiction data: no floor is applied', rgSpinDelay(800) === 800)
+check('no jurisdiction data: floor resolves to a literal 0 ms', get(rgJurisdiction).minSpinMs === 0)
+check('no jurisdiction data: RG layer is off', get(rgJurisdiction).rgEnabled === false)
 
-// --- R7/TR-015: jurisdiction ENFORCEMENT, not just derivation --------------
-// Every flag below was derived correctly before this pass and then ignored by
-// every consumer. These assertions exist because "the store has the right
-// value" is not the compliance claim; "the player cannot do the banned thing"
-// is.
+// ── autoplay counts ─────────────────────────────────────────────────────────
+// R7/TR-015's capping logic is intact and still asserted. What changed is where
+// the cap comes from: no official flag caps autoplay, so the store is always
+// uncapped and the cap is supplied explicitly by the caller. Asserting the
+// logic against a passed cap keeps the behaviour pinned for the day a real flag
+// exists, without pretending a flag exists today.
 
 const AUTO_OPTIONS = [10, 25, 50, 100]
 
-// Uncapped market: everything on offer, including infinite.
 jurisdictionFlags.set({})
+check('official contract: autoplay is never capped by a flag', get(rgJurisdiction).maxAutoplaySpins === Infinity)
 check('uncapped: all autoplay counts offered', JSON.stringify(rgAllowedAutoplayCounts(AUTO_OPTIONS)) === JSON.stringify(AUTO_OPTIONS))
 check('uncapped: infinite autoplay allowed', get(rgInfiniteAutoplayAllowed) === true)
 check('uncapped: count is not clamped', rgClampAutoplayCount(100) === 100)
 
-// Capped market: options above the cap must not be offered OR startable.
-jurisdictionFlags.set({ maxAutoplaySpins: 25 })
-check('capped at 25: only 10 and 25 offered', JSON.stringify(rgAllowedAutoplayCounts(AUTO_OPTIONS)) === JSON.stringify([10, 25]))
-check('capped at 25: infinite is withdrawn', get(rgInfiniteAutoplayAllowed) === false)
-check('capped at 25: a request for 100 clamps to 25', rgClampAutoplayCount(100) === 25)
-check('capped at 25: a legal request is untouched', rgClampAutoplayCount(10) === 10)
+check('cap 25: only 10 and 25 offered', JSON.stringify(rgAllowedAutoplayCounts(AUTO_OPTIONS, 25)) === JSON.stringify([10, 25]))
+check('cap 25: a request for 100 clamps to 25', rgClampAutoplayCount(100, 25) === 25)
+check('cap 25: a legal request is untouched', rgClampAutoplayCount(10, 25) === 10)
+check('cap below every option: the cap itself is offered', JSON.stringify(rgAllowedAutoplayCounts(AUTO_OPTIONS, 5)) === JSON.stringify([5]))
+check('cap below every option: request clamps to the cap', rgClampAutoplayCount(10, 5) === 5)
 
-// A cap below every offered option must still leave autoplay reachable.
-jurisdictionFlags.set({ maxAutoplaySpins: 5 })
-check('cap below every option: the cap itself is offered', JSON.stringify(rgAllowedAutoplayCounts(AUTO_OPTIONS)) === JSON.stringify([5]))
-check('cap below every option: request clamps to the cap', rgClampAutoplayCount(10) === 5)
+// ── autoplay ban, official disabledAutoplay ─────────────────────────────────
+jurisdictionFlags.set({ disabledAutoplay: true })
+check('disabledAutoplay: derives', get(rgJurisdiction).autoplayDisabled === true)
+check('disabledAutoplay: switches the RG layer on', get(rgJurisdiction).rgEnabled === true)
 
-// Turbo ban. Previously turboDisabled had ZERO readers: the flag was correct
-// and the control cycled anyway.
+// ── turbo ban ───────────────────────────────────────────────────────────────
+// Previously turboDisabled had ZERO readers: the flag was correct and the
+// control cycled anyway.
 jurisdictionFlags.set({})
 forceNormalSpeed()
 cycleSpeed()
@@ -110,18 +147,44 @@ check('explicit ban: locked isTurbo reset too', get(isTurbo) === false)
 cycleSpeed()
 check('explicit ban: cycleSpeed cannot reach turbo', get(speedTier) === 'normal')
 
-// A minimum spin duration implies the fast-play ban.
-jurisdictionFlags.set({ minSpinMs: 2500 })
-check('minSpinMs implies turboDisabled', get(rgJurisdiction).turboDisabled === true)
+// A minimum round duration implies the fast-play ban.
+jurisdictionFlags.set({ minimumRoundDuration: 2500 })
+check('minimumRoundDuration implies turboDisabled', get(rgJurisdiction).turboDisabled === true)
 cycleSpeed()
-check('minSpinMs: speed stays normal', get(speedTier) === 'normal')
-check('minSpinMs: autoplay delay is raised to the minimum', rgSpinDelay(300) === 2500)
-check('minSpinMs: a longer delay is left alone', rgSpinDelay(4000) === 4000)
+check('minimumRoundDuration: speed stays normal', get(speedTier) === 'normal')
+check('minimumRoundDuration: autoplay delay is raised to the minimum', rgSpinDelay(300) === 2500)
+check('minimumRoundDuration: a longer delay is left alone', rgSpinDelay(4000) === 4000)
+
+// ── the official flags that were being IGNORED entirely ─────────────────────
+// R2R3: "it ignores several real flags". Each now derives onto a named field,
+// so the controls they govern have something to read.
+jurisdictionFlags.set({
+  disabledSpacebar: true,
+  disabledSlamstop: true,
+  disabledSuperTurbo: true,
+  disabledFullscreen: true,
+  displayRTP: true,
+  displaySessionTimer: true,
+  displayNetPosition: true,
+  socialCasino: true,
+})
+const j = get(rgJurisdiction)
+check('disabledSpacebar derives', j.spacebarDisabled === true)
+check('disabledSlamstop derives', j.slamStopDisabled === true)
+check('disabledSuperTurbo derives', j.superTurboDisabled === true)
+check('disabledFullscreen derives', j.fullscreenDisabled === true)
+check('displayRTP derives', j.displayRTP === true)
+check('displaySessionTimer derives', j.displayNetPosition === true && j.mandatorySessionDisplay === true)
+check('displayNetPosition derives', j.displayNetPosition === true)
+check('socialCasino derives', j.socialCasino === true)
+check('displaySessionTimer switches the RG layer on', j.rgEnabled === true)
 
 jurisdictionFlags.set({})
+forceNormalSpeed()
 
 console.log('='.repeat(64))
 console.log('RESPONSIBLE GAMBLING: autoplay stop-conditions + limits + enforcement')
+console.log('against the OFFICIAL jurisdiction flags (TR-042)')
 console.log('='.repeat(64))
 console.log(`checks passed: ${pass}`)
 if (fail.length) {
