@@ -1,0 +1,11 @@
+FS_V3_CONSOLIDATED_RESUME_Prompt.md. Save this verbatim to reports/briefs/ and commit it with the work. FS_V3_CONSOLIDATED_Prompt.md remains the live instruction set; this note scopes the resumption after the tool outage. Explicit paths only, commit per job, no em or en dashes, no lock exceptions.
+
+STEP 0, PUSH AND RECONCILE. Push the existing local commits (JOB 1 at 16ca128, JOB 2 at 545b963, plus the saved briefs) to origin/main before anything else; Fable verifies from the remote and has confirmed the remote currently ends at 8e58c98. If the push reveals any divergence, stop and report rather than force anything.
+
+STEP 1, JOB 3(a) COMPLETION UNDER THE NEW RULING. Fable rules: fix all 169 comment dashes as well, in ONE isolated mechanical commit titled as a style purge, so both the dist gate and the source scan read zero findings with no allowlist and the convention (a) header stays absolute. First re-verify the working tree's five uncommitted fixes by re-running the source scan and the gate's seeded-violation self-test, then apply the 169-line purge, then build and run the dist gate, then commit 3(a) with all gate outputs recorded. The gate is not called green until the full chain has run post-outage.
+
+STEP 2, CONTINUE THE LIVE BRIEF EXACTLY AS WRITTEN: JOB 3(b) through (g), with TR-069 (the clipped, unreachable rightmost control at mobile portrait), TR-070 (FEATURES label contrast) and TR-071 (logo overlap at Popout S) in 3(b)'s scope alongside item 15, all fixed by re-derived layout maths per the TR-065 method constraint, never by hiding overflow, each with a measured assertion; then JOBs 4, 5 and 6 as written.
+
+STEP 3, JOB 7 WITH ONE AMENDMENT LEARNED FROM CONTACT: drop the make-a-folder instruction that did not survive the first run. The walkthrough now says: save screenshots anywhere convenient on the Desktop with the suggested filenames; the builder finds, verifies and files them afterwards. Everything else in JOB 7 as written, including deleting math/HASHES.txt, the Design Thumbnail tile, the five observations, the Guidelines ticking procedure, and no Start Approval.
+
+STEP 4, JOB 8 as written, with one addition to the session report: note the three excluded personal captures by exclusion only, no contents, and that the owner has been advised to rotate the exposed credential.
