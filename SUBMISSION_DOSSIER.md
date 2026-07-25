@@ -38,6 +38,8 @@ checklist in the docs must be satisfied.
 
 ## 3. SUBMISSION BLURB v2 (Overdrive) - soundtrack sentence restored as DRAFT, PENDING OWNER APPROVAL
 
+> **Status superseded: blurb B is FINAL. See section 8a.**
+
 **Status (2026-07-13, JOB 5):** the blurb below now includes a draft soundtrack sentence
 (marked inline) - restored per `docs/CHAT_CLOSEOUT_2026-07-06.md` §2's own note that
 "reports/archive/superseded/PROMO_BLURB.md restores its soundtrack sentence once audio ships, then the owner
@@ -131,6 +133,8 @@ PENDING OWNER APPROVAL**, not yet an approved claim. Do not treat the draft sent
 approved copy until the owner explicitly signs off on it.
 
 ## 5. STAGING PROTOCOL (JOB 5, rewritten 2026-07-13 - was "POST-UPLOAD VERIFICATION
+
+> **Amended by section 8h: the official Developer Testing Tool stage is added before submission.**
 PROTOCOL"; that content is preserved below as 5e, now framed inside the fuller staging
 sequence a real upload actually requires)
 
@@ -345,6 +349,8 @@ would produce a false clean result. See
 `docs/stake-engine-live/2026-07-25/DELTA_NOTES.md`.
 
 ## 6. DOCUMENTATION GAPS TO CLOSE
+
+> **Amended by section 8. Several gaps listed here are closed; see 8b, 8d and 8e.**
 Headless capture of the interactive approval checklist items at
 https://stake-engine.com/docs/approval/checklist plus the full game tile
 guidelines at https://stake-engine.com/docs/approval/game-tile plus any other
