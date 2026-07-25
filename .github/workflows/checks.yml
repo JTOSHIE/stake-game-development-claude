@@ -164,6 +164,15 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/sessionRecovery.test.ts
 
+      # ── Gate 10c: scatter anticipation integrity ─────────────────────────────
+      # The escalation level must be a function of VISIBLE state only. The test
+      # asserts, among other things, that two rounds identical so far escalate
+      # identically however they end - which is the property that makes the
+      # build honest rather than a tell.
+      - name: scatter anticipation
+        working-directory: frontend
+        run: npx tsx src/lib/stores/scatterEscalation.test.ts
+
       # ── Gate 11: live event schema alignment ─────────────────────────────────
       # The locked parser looked for board/win/scatter events. Across the first
       # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs

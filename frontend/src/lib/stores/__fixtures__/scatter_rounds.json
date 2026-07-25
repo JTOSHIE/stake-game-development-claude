@@ -1,0 +1,62 @@
+{
+ "dies_at_two": {
+  "id": 6,
+  "perReel": [
+   1,
+   0,
+   0,
+   1,
+   0
+  ]
+ },
+ "secured_on_last": {
+  "id": 74,
+  "perReel": [
+   1,
+   1,
+   0,
+   0,
+   1
+  ]
+ },
+ "secured_early": {
+  "id": 78,
+  "perReel": [
+   1,
+   1,
+   1,
+   0,
+   0
+  ]
+ },
+ "four": {
+  "id": 19,
+  "perReel": [
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ "five": {
+  "id": 1,
+  "perReel": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ "double_on_one_reel": {
+  "id": 92,
+  "perReel": [
+   0,
+   2,
+   0,
+   0,
+   0
+  ]
+ }
+}

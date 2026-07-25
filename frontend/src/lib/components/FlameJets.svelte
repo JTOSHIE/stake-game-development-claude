@@ -8,8 +8,30 @@
   // prefers-reduced-motion swaps to the static-glow frame with no animation.
   import { onMount } from 'svelte'
   import { themeAssets } from '../stores/themeStore'
+  import { flameIntensity } from '../stores/scatterEscalation'
 
   export let active = false
+
+  // TENSION GAUGE (2026-07-25, the owner's idea, adopted in the ship spec).
+  //
+  // The jets were binary: lit for the whole bonus, dark otherwise. They are now
+  // also a READOUT during scatter anticipation - height and glow track how many
+  // scatters have landed, so the player has one persistent, glanceable answer to
+  // "how good has this round already become" instead of a series of unrelated
+  // flashes.
+  //
+  // They stay dark below level 2 on purpose. Igniting them while the bonus is
+  // not yet secured would make the gauge mean "maybe"; its whole value is that
+  // it means "yes, and this much".
+  //
+  // `active` (the Overdrive bonus) still wins outright: during the feature the
+  // jets burn at full and the gauge is irrelevant, so the two never fight.
+  $: gauge = $flameIntensity
+  $: lit = active || gauge > 0
+  $: intensity = active ? 1 : gauge
+  // 0.34 is the original fixed scale, kept as the full-burn value so the
+  // Overdrive appearance is byte-identical to before.
+  $: jetScale = 0.34 * (0.55 + 0.45 * intensity)
   // OWNER AUDIT ROUND 2, item 4 (Fable's ruling, contrast law throughout -
   // flame hue at least 90 degrees from the backdrop hue, never green-on-
   // green): the source sprite (jet_flame_sheet.png) is a fixed green asset,
@@ -63,11 +85,20 @@
   }
 </script>
 
-<div class="jets colourway-{colourway}" class:active class:reduced aria-hidden="true">
+<div
+  class="jets colourway-{colourway}"
+  class:active={lit}
+  class:reduced
+  class:gauge-only={!active && gauge > 0}
+  style="--gauge:{intensity}"
+  data-testid="flame-jets"
+  data-gauge={intensity.toFixed(2)}
+  aria-hidden="true"
+>
   {#each JETS as j}
     <div
       class="jet"
-      style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale(0.34); --wave-delay:{waveDelay(j)}s;"
+      style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale({jetScale}); --wave-delay:{waveDelay(j)}s;"
     >
       <div
         class="flame"
@@ -89,9 +120,15 @@
     height: 0;
     transform-origin: 0 0;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    /* The gauge changes `transform: scale()` between levels, so it is
+       transitioned alongside opacity: the flames RISE to the new level rather
+       than snapping to it, which is what makes it read as a gauge rather than a
+       series of state changes. Both are compositor properties, so this costs no
+       layout at the busiest moment of the round. */
+    transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .jets.active .jet { opacity: 1; }
+  .jets.active .jet { opacity: calc(0.55 + 0.45 * var(--gauge, 1)); }
+  .jets.active.gauge-only .flame { filter: brightness(calc(0.8 + 0.4 * var(--gauge, 0))); }
 
   .nozzle {
     position: absolute;
@@ -187,6 +224,9 @@
   /* Reduced motion: static glow per colourway (item 4) - no cycle, no wave,
      just the recoloured still frame + nozzle glow above. */
   @media (prefers-reduced-motion: reduce) {
+    /* The gauge still reads: height and opacity are static states driven by
+       --gauge, not motion, so they stay. Only the animation goes. */
+    .jet { transition: none; }
     .jets.active .flame { animation: none; }
   }
 </style>
