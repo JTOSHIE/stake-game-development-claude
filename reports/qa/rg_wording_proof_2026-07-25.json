@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-07-25T05:43:22.112Z",
+  "cases": {
+    "englishRows": [
+      "Time played",
+      "Spins",
+      "Total wagered",
+      "Total won",
+      "Net result"
+    ],
+    "germanRows": [
+      "Spielzeit",
+      "Drehungen",
+      "Gesamteinsatz",
+      "Gesamtgewinn",
+      "Nettoergebnis"
+    ],
+    "realityCheck": {
+      "body": "You have been playing for 00:00:00. Your net result this session is +$0.00.",
+      "interpolated": true,
+      "autoplayBefore": {
+        "auto": true,
+        "count": 25
+      },
+      "autoplayAfter": {
+        "auto": false,
+        "count": 0
+      }
+    }
+  },
+  "pass": true
+}
