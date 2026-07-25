@@ -119,6 +119,37 @@ export function autoplayShouldStop(ctx: AutoplaySpinContext): { stop: boolean; r
   return { stop: false }
 }
 
+/**
+ * The autoplay counts a player may actually choose.
+ *
+ * R7/TR-015 (2026-07-25): `maxAutoplaySpins` previously gated only the infinite
+ * option, so a market capping autoplay at 25 still offered 50 and 100 and the
+ * player could start them. Options above the cap are removed, and if the cap
+ * falls below every offered option the cap itself is offered so autoplay stays
+ * reachable at a legal count rather than silently disappearing.
+ */
+export function rgAllowedAutoplayCounts(
+  options: number[],
+  cap: number = get(rgJurisdiction).maxAutoplaySpins,
+): number[] {
+  if (!Number.isFinite(cap)) return [...options]
+  const allowed = options.filter((n) => n <= cap)
+  return allowed.length ? allowed : [cap]
+}
+
+/** Clamp a requested autoplay count to the jurisdiction cap. Belt and braces. */
+export function rgClampAutoplayCount(count: number): number {
+  const cap = get(rgJurisdiction).maxAutoplaySpins
+  if (!Number.isFinite(cap)) return count
+  return Math.min(count, cap)
+}
+
+/** True when the infinite autoplay option may be offered at all. */
+export const rgInfiniteAutoplayAllowed = derived(
+  rgJurisdiction,
+  ($j) => !Number.isFinite($j.maxAutoplaySpins),
+)
+
 /** Enforce the jurisdiction minimum spin interval on a requested autoplay delay. */
 export function rgSpinDelay(requestedMs: number): number {
   return Math.max(requestedMs, get(rgJurisdiction).minSpinMs)
