@@ -1,0 +1,83 @@
+{
+  "spec": "lang | No | Language code (game-replay-requirements.md)",
+  "locales": {
+    "en": {
+      "rendered": "SPIN",
+      "expected": "SPIN"
+    },
+    "ar": {
+      "rendered": "دوران",
+      "expected": "دوران"
+    },
+    "de": {
+      "rendered": "DREHEN",
+      "expected": "DREHEN"
+    },
+    "es": {
+      "rendered": "GIRAR",
+      "expected": "GIRAR"
+    },
+    "fi": {
+      "rendered": "PYÖRITÄ",
+      "expected": "PYÖRITÄ"
+    },
+    "fr": {
+      "rendered": "TOURNER",
+      "expected": "TOURNER"
+    },
+    "hi": {
+      "rendered": "स्पिन",
+      "expected": "स्पिन"
+    },
+    "id": {
+      "rendered": "PUTAR",
+      "expected": "PUTAR"
+    },
+    "ja": {
+      "rendered": "スピン",
+      "expected": "スピン"
+    },
+    "ko": {
+      "rendered": "스핀",
+      "expected": "스핀"
+    },
+    "pl": {
+      "rendered": "OBRÓĆ",
+      "expected": "OBRÓĆ"
+    },
+    "pt": {
+      "rendered": "GIRAR",
+      "expected": "GIRAR"
+    },
+    "ru": {
+      "rendered": "КРУТИТЬ",
+      "expected": "КРУТИТЬ"
+    },
+    "tr": {
+      "rendered": "ÇEVİR",
+      "expected": "ÇEVİR"
+    },
+    "vi": {
+      "rendered": "QUAY",
+      "expected": "QUAY"
+    },
+    "zh": {
+      "rendered": "旋转",
+      "expected": "旋转"
+    }
+  },
+  "fallback": {
+    "\"xx\"": "SPIN",
+    "\"EN-GB\"": "SPIN",
+    "\"\"": "SPIN",
+    "\"   \"": "SPIN",
+    "\"zz-ZZ\"": "SPIN",
+    "\"../en\"": "SPIN",
+    "\"ja;drop\"": "SPIN",
+    "\"123\"": "SPIN",
+    "\"null\"": "SPIN",
+    "\"ENGLISH\"": "SPIN"
+  },
+  "failures": [],
+  "pass": true
+}

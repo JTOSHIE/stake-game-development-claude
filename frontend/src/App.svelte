@@ -71,6 +71,7 @@
   } from './lib/services/roundInterpreter'
   import { cellMultipliers } from './lib/stores/cellMultipliers'
   import { currencyCode } from './lib/stores/gameStore'
+  import { locales, type Locale } from './lib/i18n/translations'
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
@@ -109,6 +110,40 @@
     currency: get(currencyCode) || 'USD',
     social: get(isSocial),
   }))
+  // ── R6: launch language, applied BEFORE first render ──────────────────────
+  //
+  // SPEC (quoted, docs/stake-engine-live/game-replay-requirements.md, parameter
+  // table): "lang | No | Language code". Optional, so absence is legitimate and
+  // must fall back to English rather than error.
+  //
+  // THE GAP THIS CLOSES: rgsService.parseSessionParams() already read `lang`
+  // into SessionParams (line 298) and sent it to the RGS, but nothing ever
+  // published it to the `locale` store, which is writable<Locale>('en') in the
+  // locked gameStore and was never set at boot. A launch URL carrying ?lang=ja
+  // therefore rendered the whole game in English. The parameter was parsed,
+  // carried, and dropped.
+  //
+  // This runs in the component script body, NOT onMount, so the store is set
+  // before the first render rather than causing a visible English flash.
+  //
+  // Validation is against the SHIPPED `locales` map rather than a hardcoded
+  // list, so adding or removing a locale updates this check for free and the two
+  // can never disagree.
+  {
+    try {
+      const raw = new URLSearchParams(window.location.search).get('lang')
+      const candidate = (raw ?? '').toLowerCase().trim()
+      if (candidate && Object.prototype.hasOwnProperty.call(locales, candidate)) {
+        locale.set(candidate as Locale)
+      }
+      // Anything else (absent, unknown, malformed, empty) keeps the 'en'
+      // default the store already holds. No throw, no console noise: an
+      // unrecognised language code is a valid launch, not an error.
+    } catch {
+      /* non-browser context; keep the default */
+    }
+  }
+
   if (import.meta.env.DEV) {
     const buf: TelemetryEvent[] = []
     ;(window as unknown as { __telemetry: unknown[] }).__telemetry = buf
