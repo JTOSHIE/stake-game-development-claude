@@ -69,6 +69,21 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   the local declaration and importing the canonical one the next time `rgsService.ts`
   is under a sanctioned edit.
 
+- **The bet-ladder actions inside `gameStore.ts` operate on the hardcoded `BET_LEVELS`,
+  not on the authenticated ladder.** `increaseBet`, `decreaseBet`, `setMaxBet`,
+  `setMinBet`, `canIncreaseBet` and `canSetMaxBet` all index the module-level
+  `BET_LEVELS` array. When the RGS authenticate response supplies a different ladder
+  (any currency that is not USD-shaped, and any jurisdiction with its own levels), the
+  current bet is absent from that array, `indexOf` returns -1, and `increaseBet`
+  evaluates `BET_LEVELS[-1 + 1]`, i.e. `BET_LEVELS[0]`: pressing "+" DROPPED the bet to
+  0.10 while "-" silently did nothing, with `canIncreaseBet` returning true so the
+  control stayed enabled. Found by R5/TR-013 (2026-07-25). **No longer reachable:** both
+  bet-changing surfaces now drive from the non-locked `stores/betLadder.ts`, which uses
+  `rgsBetLevels` with `BET_LEVELS` only as fallback, and `betLadder.test.ts` pins the
+  behaviour including the three arithmetic cases that reproduce the old defect. The
+  locked functions are now unreferenced by production code. Delete them on the next
+  sanctioned `gameStore.ts` pass; do not re-import them.
+
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
   read anywhere in production code, verified including `derived()` and `.subscribe()`
