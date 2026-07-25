@@ -34,6 +34,7 @@ import { speedTier, cycleSpeed, forceNormalSpeed } from './speedMode.ts'
 import { isTurbo } from './gameStore.ts'
 import { jurisdictionFlags } from './jurisdiction.ts'
 import { get } from 'svelte/store'
+import { readFileSync } from 'node:fs'
 
 const M = 1_000_000 // one currency unit in micros
 let pass = 0
@@ -42,6 +43,7 @@ function check(name: string, cond: boolean) {
   if (cond) pass++
   else fail.push(name)
 }
+const checkThat = check
 
 // --- stop on any win ---
 rgResetSession()
@@ -178,6 +180,42 @@ check('displaySessionTimer derives', j.displayNetPosition === true && j.mandator
 check('displayNetPosition derives', j.displayNetPosition === true)
 check('socialCasino derives', j.socialCasino === true)
 check('displaySessionTimer switches the RG layer on', j.rgEnabled === true)
+
+// ── THE FLAGS ARE ENFORCED, not merely derived ─────────────────────────────
+// R7/TR-015's whole finding was that turboDisabled was computed correctly and
+// every consumer ignored it. Seven of the flags added in the R2R wallet pass
+// were in exactly that state: derived onto named fields with ZERO readers. The
+// three that are ENFORCEMENT flags now have readers, and these assertions are
+// what stop them losing them again.
+console.log('\nENFORCEMENT, not derivation')
+
+// disabledSuperTurbo bans the TOP tier only, so the cycle must still reach 2x.
+jurisdictionFlags.set({ disabledSuperTurbo: true })
+forceNormalSpeed()
+cycleSpeed()
+check('superTurbo ban: the first press still reaches turbo', get(speedTier) === 'turbo')
+cycleSpeed()
+check('superTurbo ban: the next press skips 4x and returns to normal', get(speedTier) === 'normal')
+check('  and the ban is not confused with a turbo ban', get(rgJurisdiction).turboDisabled === false)
+
+// A ban arriving AFTER the player already chose 4x must drop them to 2x, not
+// to a standstill: the flag bans the top tier, not fast play.
+jurisdictionFlags.set({})
+forceNormalSpeed(); cycleSpeed(); cycleSpeed()
+check('without the ban, 4x is reachable', get(speedTier) === 'super')
+jurisdictionFlags.set({ disabledSuperTurbo: true })
+check('a late ban drops 4x to 2x, not to normal', get(speedTier) === 'turbo')
+
+// disabledSpacebar is read by App.svelte's key handler. Asserted against the
+// SHIPPED source, because the defect was an absent reader and no store
+// assertion can see one of those.
+{
+  const app = readFileSync('src/App.svelte', 'utf8')
+  checkThat('App.svelte reads spacebarDisabled in the key handler',
+    /if \(\$rgJurisdiction\.spacebarDisabled\) return/.test(app))
+  checkThat('and it gates the KEY, not the spin button',
+    !/spacebarDisabled[\s\S]{0,400}data-testid="spin-button"/.test(app))
+}
 
 jurisdictionFlags.set({})
 forceNormalSpeed()

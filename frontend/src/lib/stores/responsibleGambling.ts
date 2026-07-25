@@ -66,13 +66,32 @@ export interface RgJurisdiction {
   mandatorySessionDisplay: boolean // from official displaySessionTimer
   // The official flags with no prior representation here at all. Added so the
   // controls they govern can be wired to them rather than to nothing.
-  superTurboDisabled: boolean // disabledSuperTurbo
-  slamStopDisabled: boolean // disabledSlamstop
-  spacebarDisabled: boolean // disabledSpacebar
-  fullscreenDisabled: boolean // disabledFullscreen
-  displayRTP: boolean // displayRTP
-  displayNetPosition: boolean // displayNetPosition
-  socialCasino: boolean // socialCasino
+  superTurboDisabled: boolean // disabledSuperTurbo, read by speedMode.cycleSpeed
+  slamStopDisabled: boolean // disabledSlamstop, read by App.svelte's slam handler
+  spacebarDisabled: boolean // disabledSpacebar, read by App.svelte's key handler
+  // ── NO CONSUMER YET, and said so rather than left ambiguous ──────────────
+  //
+  // R7/TR-015's finding was a flag that was derived correctly and read by
+  // nobody. Three of the flags below are in that state on purpose rather than
+  // by oversight, and the difference is worth writing down: the enforcement
+  // flags above all have readers, and these three describe affordances this
+  // game does not currently offer.
+  //
+  //   fullscreenDisabled  the game has no fullscreen control of its own; the
+  //                       platform frame owns that chrome. Nothing to disable.
+  //   displayRTP          the RTP is shown UNCONDITIONALLY in the paytable,
+  //                       which is the stricter behaviour. A flag that can only
+  //                       ask us to show it has nothing to change.
+  //   displayNetPosition  the session panel already shows net position whenever
+  //                       the RG layer is on. Same reasoning.
+  //
+  // If any of the three ever needs to gate something, it is already derived and
+  // waiting. They are listed here so a future reader does not have to work out
+  // whether their silence is a bug.
+  fullscreenDisabled: boolean // disabledFullscreen, no consumer, see above
+  displayRTP: boolean // displayRTP, no consumer, see above
+  displayNetPosition: boolean // displayNetPosition, no consumer, see above
+  socialCasino: boolean // socialCasino, read by stores/socialMode.isSocial
 }
 
 export const rgJurisdiction = derived(jurisdictionFlags, ($f): RgJurisdiction => {

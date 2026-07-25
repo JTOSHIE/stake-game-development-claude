@@ -46,7 +46,14 @@ export function cycleSpeed(): void {
     return
   }
   speedTier.update((tier) => {
-    const next = NEXT[tier]
+    let next = NEXT[tier]
+    // R2R follow-up, 2026-07-26. `disabledSuperTurbo` is a separate official
+    // flag from `disabledTurbo`: a market may permit 2x and ban 4x. It was
+    // derived onto the store and had ZERO consumers, which is the same shape
+    // as R7/TR-015, where turboDisabled was computed correctly and every
+    // consumer ignored it. Skipping straight past 'super' keeps the control
+    // usable rather than dead: the cycle becomes normal -> turbo -> normal.
+    if (next === 'super' && get(rgJurisdiction).superTurboDisabled) next = NEXT[next]
     isTurbo.set(next !== 'normal')
     return next
   })
@@ -57,4 +64,10 @@ export function cycleSpeed(): void {
 // never applied to the speed already chosen.
 rgJurisdiction.subscribe(($j) => {
   if ($j.turboDisabled && get(speedTier) !== 'normal') forceNormalSpeed()
+  // A super-turbo ban arriving late must drop 4x to 2x, not to a standstill:
+  // the flag bans the top tier, not fast play in general.
+  else if ($j.superTurboDisabled && get(speedTier) === 'super') {
+    speedTier.set('turbo')
+    isTurbo.set(true)
+  }
 })

@@ -102,7 +102,7 @@
   const hazeLevel = Math.max(0, Math.min(3, Number(_cohesionParam('haze') ?? 0) || 0))
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
-  import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
+  import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
   import { anyModalOpen } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
   import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner } from './lib/stores/sessionRecovery'
@@ -1192,6 +1192,13 @@
     // registration those surfaces now write to, so a new modal suppresses the
     // spacebar by announcing itself rather than by being added to this line.
     if ($bettingDisabled) return
+    // R2R follow-up, 2026-07-26. The official `disabledSpacebar` flag was
+    // derived onto rgJurisdiction and had ZERO consumers: the flag was right
+    // and the spacebar span the reels anyway, in exactly the markets that ban
+    // it. That is the R7/TR-015 shape reproduced, and this is the reader it was
+    // missing. Nothing else changes: the spin BUTTON stays available, because
+    // the flag bans the key, not the bet.
+    if ($rgJurisdiction.spacebarDisabled) return
     if ($anyModalOpen) return
     if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash || showHeroSplash) return
 
@@ -1542,7 +1549,7 @@
            compact-landscape each render their own native-DOM instance in
            .native-hud-slot below. -->
       {#if !portrait && !compactLandscape && !miniPlayer}
-        <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
+        <HudOverlay on:spin={handleSpin} on:slam={() => { if (!$rgJurisdiction.slamStopDisabled) gridRef?.slamStop() }} />
       {/if}
     </div>
   </div>
@@ -1574,7 +1581,7 @@
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
         <FeatureMenu {portrait} {compactLandscape} {miniPlayer} idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
-      <HudOverlay {portrait} {compactLandscape} {miniPlayer} on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
+      <HudOverlay {portrait} {compactLandscape} {miniPlayer} on:spin={handleSpin} on:slam={() => { if (!$rgJurisdiction.slamStopDisabled) gridRef?.slamStop() }} />
     </div>
   {/if}
 

@@ -12,6 +12,7 @@
 
 import { derived } from 'svelte/store'
 import { currencyCode } from './gameStore'
+import { jurisdictionFlags } from './jurisdiction'
 
 // Social currency codes used by Stake social casinos.
 // XEC added 2026-07-25 on the first-party Stake EU announcement: "Similar to
@@ -72,10 +73,21 @@ export const socialFromUrlCurrency: boolean =
 export const socialAtBoot: boolean = socialFromUrl || socialFromUrlCurrency
 
 /**
- * True when the game should present social-casino language: the URL flag is
- * set, the URL currency is a social one, or the RGS returned a social currency
- * code. A single boolean the whole app reads.
+ * True when the game should present social-casino language. A single boolean
+ * the whole app reads.
+ *
+ * R2R follow-up, 2026-07-26. The official contract carries a `socialCasino`
+ * flag, which is the PLATFORM stating the answer directly rather than us
+ * inferring it. It was derived onto the RG store with zero readers; this is the
+ * reader. It joins the URL flag and the currency code rather than replacing
+ * them: all three are defence in depth, and any one of them being true is
+ * enough, because presenting social wording to a real-money player is a
+ * cosmetic error while the reverse is a compliance breach.
  */
-export const isSocial = derived(currencyCode, ($ccy) =>
-  socialAtBoot || SOCIAL_CURRENCIES.has(($ccy || '').toUpperCase()),
+export const isSocial = derived(
+  [currencyCode, jurisdictionFlags],
+  ([$ccy, $flags]) =>
+    socialAtBoot ||
+    $flags.socialCasino === true ||
+    SOCIAL_CURRENCIES.has(($ccy || '').toUpperCase()),
 )
