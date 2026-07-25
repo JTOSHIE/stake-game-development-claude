@@ -1,0 +1,46 @@
+{
+  "spec": "front-end-communication.md:20",
+  "viewports": {
+    "popout-S-400x225": {
+      "vh": 225,
+      "cardTop": 8,
+      "cardBottom": 217,
+      "cardH": 209,
+      "btnTop": 161,
+      "btnBottom": 202,
+      "btnH": 40,
+      "btnInViewport": true,
+      "cardWithinViewport": true,
+      "realClick": true,
+      "dismissed": true
+    },
+    "popout-L-800x450": {
+      "vh": 450,
+      "cardTop": 60,
+      "cardBottom": 390,
+      "cardH": 331,
+      "btnTop": 320,
+      "btnBottom": 360,
+      "btnH": 40,
+      "btnInViewport": true,
+      "cardWithinViewport": true,
+      "realClick": true,
+      "dismissed": true
+    },
+    "mobile-S-320x568": {
+      "vh": 568,
+      "cardTop": 65,
+      "cardBottom": 503,
+      "cardH": 438,
+      "btnTop": 433,
+      "btnBottom": 473,
+      "btnH": 40,
+      "btnInViewport": true,
+      "cardWithinViewport": true,
+      "realClick": true,
+      "dismissed": true
+    }
+  },
+  "failures": [],
+  "pass": true
+}

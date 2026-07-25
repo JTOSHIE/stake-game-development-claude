@@ -20,6 +20,12 @@
 #
 # Post-merge auto-archiving is ON as a repository setting; it is not this
 # workflow's concern.
+#
+# NOT ADDED HERE ON PURPOSE: frontend/scripts/popout_conformance.mjs (R14). It
+# asserts a REAL Playwright click at Stake's 400x225 mini-player size, which needs
+# a browser and a dev server, so it stays local and in the external audit per this
+# workflow's stated scope. Its result is committed as
+# reports/qa/popout_conformance_2026-07-27.json.
 
 name: checks
 
