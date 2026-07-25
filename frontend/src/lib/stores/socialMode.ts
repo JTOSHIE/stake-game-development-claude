@@ -31,14 +31,51 @@ function readUrlSocial(): boolean {
   }
 }
 
+/**
+ * Read the ?currency= URL parameter once at module load.
+ *
+ * R2R JOB 6 / TR-041, 2026-07-25. Round-two reviewer 3: "Replay's initial mode
+ * derives only from social=true, so an XSC/XEC URL can briefly render the
+ * real-money disclaimer before mount." That was exactly right, and the window
+ * was not theoretical: `isSocial` derived from the `currencyCode` STORE, and in
+ * replay that store is not written until `ReplayMode.startReplay` runs, which
+ * is after the first paint. A replay URL carrying `currency=XSC` but no
+ * `social=true` therefore painted the real-money disclaimer first and switched
+ * afterwards, which is the one frame a compliance screenshot would catch.
+ *
+ * The currency is in the URL from the very first byte, so it is read at module
+ * load alongside the flag. This is the same defence-in-depth reasoning that put
+ * currency inference in `isSocial` at all: the platform sets the flag, and we do
+ * not rely on it alone.
+ */
+function readUrlCurrency(): string {
+  try {
+    return new URLSearchParams(window.location.search).get('currency') ?? ''
+  } catch {
+    return ''
+  }
+}
+
 /** Resolved once at boot from the URL flag. */
 export const socialFromUrl: boolean = readUrlSocial()
 
+/** Resolved once at boot from the URL currency, before any store is written. */
+export const socialFromUrlCurrency: boolean =
+  SOCIAL_CURRENCIES.has(readUrlCurrency().toUpperCase())
+
+/**
+ * True at module-evaluation time, before mount and before any store write,
+ * whenever the URL alone is enough to establish social mode. Components that
+ * need to render social-correct text on their FIRST paint read this rather
+ * than subscribing.
+ */
+export const socialAtBoot: boolean = socialFromUrl || socialFromUrlCurrency
+
 /**
  * True when the game should present social-casino language: the URL flag is
- * set, or the RGS returned a social currency code. A single boolean the whole
- * app reads.
+ * set, the URL currency is a social one, or the RGS returned a social currency
+ * code. A single boolean the whole app reads.
  */
 export const isSocial = derived(currencyCode, ($ccy) =>
-  socialFromUrl || SOCIAL_CURRENCIES.has(($ccy || '').toUpperCase()),
+  socialAtBoot || SOCIAL_CURRENCIES.has(($ccy || '').toUpperCase()),
 )

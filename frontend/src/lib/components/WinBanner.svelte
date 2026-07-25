@@ -20,6 +20,8 @@
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { isSocial } from '../stores/socialMode'
+  // The single social-aware vocabulary layer (R2R JOB 6 / TR-041).
+  import { sv } from '../i18n/vocabulary'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { themeAssets } from '../stores/themeStore'
   import { autofitText } from '../actions/autofitText'
@@ -192,6 +194,11 @@
     : ($isSocial ? 'BIG PRIZE' : 'BIG WIN')
   $: amountLabel = formatBalance(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD')
   $: multLabel = `${Math.round(shownMultiplier)}x`
+  // R2R JOB 6 / TR-041. This line rendered "12x BET" unconditionally, in every
+  // mode, on the single most prominent surface in the game. "bet" is on the
+  // platform's restricted list (replacement: "play"), and `sv` preserves the
+  // ALL-CAPS shape so social reads "12x PLAY" rather than "12x play".
+  $: multUnitLabel = sv('BET', $isSocial)
 </script>
 
 {#if visible}
@@ -245,7 +252,7 @@
         <div class="fs-face">
           <div class="c1-tier-label">{tierLabel}</div>
           <div class="c1-amount fs-num" use:autofitText={amountLabel}>{amountLabel}</div>
-          <div class="c1-mult fs-num">{multLabel} BET</div>
+          <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
         </div>
       </div>
     </div>

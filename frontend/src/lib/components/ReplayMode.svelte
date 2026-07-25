@@ -20,6 +20,7 @@
   import FreeSpinsPresentation from './FreeSpinsPresentation.svelte'
   import MaxWinCelebration from './MaxWinCelebration.svelte'
   import { interpretEvents, type PresentationScript, type RawEvent } from '../services/roundInterpreter'
+  import { socialAtBoot } from '../stores/socialMode'
 
   // Drive the animation pipeline by setting gameStore writables via their
   // public .set() API — gameStore.ts itself is NOT modified.
@@ -44,7 +45,12 @@
   // during the initial loading phase (before onMount assigns `params`).
   const search = new URLSearchParams(window.location.search)
   const initialLang = (search.get('lang') ?? 'en') as Locale
-  const initialMode: GameMode = search.get('social') === 'true' ? 'social' : 'real'
+  // R2R JOB 6 / TR-041. This derived the first-paint mode from the `social`
+  // flag ALONE, so a replay URL carrying `currency=XSC` without the flag
+  // painted the real-money disclaimer for one frame before the currency store
+  // was written in startReplay. `socialAtBoot` resolves the flag AND the URL
+  // currency at module load, before mount, which closes that frame.
+  const initialMode: GameMode = socialAtBoot ? 'social' : 'real'
 
   let params: ReplayParams | null = null
   let response: ReplayResponse | null = null

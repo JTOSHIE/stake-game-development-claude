@@ -14,6 +14,8 @@
   import { themeAssets } from '../stores/themeStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
+  // The single social-aware vocabulary layer (R2R JOB 6 / TR-041).
+  import { sv } from '../i18n/vocabulary'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
@@ -36,12 +38,22 @@
 
   $: rulesList = $isSocial
     ? [
-        'Prizes pay left to right on adjacent reels starting from reel 1.',
+        // R2R JOB 6 / TR-041, found by the new full-DOM scan and not by the old
+        // narrow one: "pay" is itself a restricted phrase (replacement: "win"),
+        // and it survived here because the previous rewrite of this block only
+        // changed "Wins" to "Prizes" at the front of the sentence. "Prizes win
+        // left to right" is not English, so this is authored rather than
+        // mechanically substituted.
+        'Prizes are awarded left to right on adjacent reels starting from reel 1.',
         'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
         'WILD substitutes for all symbols except SCATTER.',
         '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
         'Maximum prize per play is capped at 5,000× your total play.',
-        'Malfunctions void all pays and plays.',
+        // R2R JOB 6 / TR-041: this line read "Malfunctions void all pays and
+        // plays." in BOTH branches. "pays" is on the platform's restricted list
+        // (replacement: "wins"), so the social branch was carrying a prohibited
+        // term in the one place a reviewer is guaranteed to look, the rules.
+        'Malfunctions void all wins and plays.',
       ]
     : [
         'Wins pay left to right on adjacent reels starting from reel 1.',
@@ -93,7 +105,13 @@
   // Interface Guide — each game control with its rendered UI art and a
   // one-line description. `kind: 'img'` rows use the theme's UI PNGs; `kind:
   // 'pill'` rows have no dedicated art and render a styled text token instead.
-  const INTERFACE_GUIDE = [
+  // R2R JOB 6 / TR-041. Every `name` and `desc` below was a hardcoded literal
+  // that rendered identically in social mode, so the guide read "Increase Bet",
+  // "Max Bet", "Bet the maximum" and "pick a bet mode or buy the feature" to a
+  // stake.us player. It is now routed through the single vocabulary layer, so
+  // adding a row cannot reintroduce the problem: `sv()` applies to whatever the
+  // row says.
+  const INTERFACE_GUIDE_RAW = [
     { kind: 'img',  file: 'spin_button.png',   name: 'Spin',         desc: 'Start a spin at the current bet.' },
     { kind: 'img',  file: 'btn_bet_plus.png',  name: 'Increase Bet', desc: 'Raise your bet to the next level.' },
     { kind: 'img',  file: 'btn_bet_minus.png', name: 'Decrease Bet', desc: 'Lower your bet to the previous level.' },
@@ -107,6 +125,12 @@
     { kind: 'img',  file: 'btn_turbo.png',     name: 'Turbo',        desc: 'Speed up spins.' },
     { kind: 'img',  file: 'btn_max.png',       name: 'Max Bet',      desc: 'Bet the maximum.' },
   ] as const
+
+  $: INTERFACE_GUIDE = INTERFACE_GUIDE_RAW.map((row) => ({
+    ...row,
+    name: sv(row.name, $isSocial),
+    desc: sv(row.desc, $isSocial),
+  }))
 
   // Buy price — 100x current bet, only meaningful where the buy is not disabled.
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')

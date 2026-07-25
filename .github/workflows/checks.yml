@@ -119,6 +119,19 @@ jobs:
         working-directory: frontend
         run: node scripts/a11y_social_terms_check.mjs
 
+      # ── Gate 6b: the social vocabulary layer ─────────────────────────────────
+      # The static half of the social gate. It re-derives the prohibited-term
+      # table from the dated jurisdiction mirror and fails if the module's copy
+      # has drifted, exercises sv() including case preservation and word
+      # boundaries, and reads the three surfaces R2R3 named out of the SHIPPED
+      # component source rather than a copy. The full rendered-DOM scan needs
+      # Playwright and a dev server and so stays local, per this workflow's
+      # stated scope; its result is committed as
+      # reports/qa/social_dom_conformance_2026-07-25.json. (R2R JOB 6 / TR-041)
+      - name: social vocabulary
+        working-directory: frontend
+        run: npx tsx src/lib/i18n/vocabulary.test.ts
+
       # ── Gate 7: no em or en dashes in player-facing strings ──────────────────
       - name: player string dash check
         working-directory: frontend

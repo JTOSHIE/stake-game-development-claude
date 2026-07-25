@@ -1,0 +1,67 @@
+{
+  "generated": "2026-07-25",
+  "supersedes": "reports/qa/social_string_conformance_2026-07-14b.json",
+  "termTableSource": {
+    "path": "docs/stake-engine-live/jurisdiction-requirements.md",
+    "fetched": "2026-07-04",
+    "contentSha256": "b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c",
+    "rows": 39
+  },
+  "termsScanned": 33,
+  "termsReportedNotFailed": [
+    "stake",
+    "currency",
+    "fund"
+  ],
+  "surfacesCovered": [
+    "first-paint",
+    "features-menu",
+    "paytable",
+    "autoplay",
+    "session",
+    "spin",
+    "win-banner"
+  ],
+  "stringsHarvested": {
+    "real": 4289,
+    "social": 3242
+  },
+  "checks": {
+    "social.zeroProhibitedTerms": {
+      "pass": true,
+      "hits": []
+    },
+    "real.vocabularyUnchanged": {
+      "pass": true,
+      "note": "real-money mode is EXPECTED to carry restricted terms; zero here would mean the social rewrite leaked into both modes",
+      "sampleCount": 38
+    },
+    "coverage.surfaces": {
+      "pass": true,
+      "surfaces": [
+        "first-paint",
+        "features-menu",
+        "paytable",
+        "autoplay",
+        "session",
+        "spin",
+        "win-banner"
+      ]
+    },
+    "coverage.stringsHarvested": {
+      "pass": true,
+      "count": 3242
+    },
+    "social.noHarvestErrors": {
+      "pass": true,
+      "errors": []
+    },
+    "zeroConsoleErrors": {
+      "pass": true,
+      "real": [],
+      "social": []
+    }
+  },
+  "socialInformationalHits": [],
+  "allPass": true
+}
