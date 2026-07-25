@@ -2,7 +2,7 @@
 The strategist chat that ran this project from compliance foundation through the graphics
 overhaul is retired for token economics. This document captures everything that lived only
 in that chat: decisions, parked work, open eye-calls and queued items, so nothing is lost.
-Reconcile against HANDOVER_2026-07-06_Fable.md (PR 38), which covers the recent build arc.
+Reconcile against reports/archive/handovers/HANDOVER_2026-07-06_Fable.md (PR 38), which covers the recent build arc.
 
 ## 1. FABLE'S RATIFIED VERDICTS (the consolidated review, canonical record)
 - D1 to D6 locks ratified as implemented: OVERBOOST at 1.25x, Cruise ships, ladder is
@@ -30,7 +30,7 @@ Reconcile against HANDOVER_2026-07-06_Fable.md (PR 38), which covers the recent 
 ## 2. QUEUED ITEMS NOT IN PR 38
 - GAME TILE artwork (the Stake storefront tile per their tile guidelines): a Fable art
   turn, racer plus hover car plus logo composed to spec. Required for the portal upload.
-- Blurb final approval: PROMO_BLURB.md restores its soundtrack sentence once audio ships,
+- Blurb final approval: reports/archive/superseded/PROMO_BLURB.md restores its soundtrack sentence once audio ships,
   then the owner approves the final text.
 - External audit refresh: re-run the FS_AuditPack plus auditor prompt through external
   AIs after audio and FeatureMath v2, before submission.

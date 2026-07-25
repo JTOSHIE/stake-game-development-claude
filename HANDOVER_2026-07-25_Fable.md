@@ -2,7 +2,7 @@
 
 **From:** the working session (Claude Sonnet 5). **To:** Fable (has main-repo access).
 **Purpose:** new arc document per standing convention (j) - supersedes
-`HANDOVER_2026-07-07_Fable.md` (which now carries a pointer note to here). This arc covers
+`reports/archive/handovers/HANDOVER_2026-07-07_Fable.md` (which now carries a pointer note to here). This arc covers
 the identity canonicalisation and HUD lock work, and Owner Audit rounds 1 through 3, all
 now merged to `main`.
 
@@ -44,7 +44,7 @@ Australian English throughout; no em or en dashes anywhere.
 
 All conventions referenced above are as pinned in `CLAUDE.md` (locked files, the
 lock-exception mechanism, integer-micros rule, session reporting, explicit-path commits)
-and `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` - both still current, neither touched this arc.
+and `reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md` - both still current, neither touched this arc.
 
 ---
 

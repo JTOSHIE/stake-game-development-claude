@@ -24,7 +24,7 @@ display-name reconciliation and integrity statement is in `docs/PAR_NAMING_ADDEN
 Note (2026-07-07): the "Verified mathematics" section below (§2) was compiled before
 FeatureMath v2 and documents `base`/`bonus` only. Cruise/antelite/super's independently
 re-verified figures (all 96.350000% RTP; SD 11.29x/20.32x/539.16x; wincap 1-in-250k/
-1-in-80k/1-in-250) are in `HANDOVER_2026-07-07_Fable.md`'s per-mode table and
+1-in-80k/1-in-250) are in `reports/archive/handovers/HANDOVER_2026-07-07_Fable.md`'s per-mode table and
 `FUTURE_SPINNER_PAR_SHEET.md` §§10-11; a full three-mode audit-sheet expansion mirroring
 the Base/Bonus sections below remains a follow-up, not done in this pass.
 

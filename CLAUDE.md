@@ -150,7 +150,7 @@ jackpot, gamble, or continuation.
   the feature). Not 5x/15x/50x.
 - **RTP: 96.3500% at 4dp in ALL FIVE modes** (base 10dp 96.3499998727%, bonus
   96.3499999962%; cruise/antelite/super independently re-verified 2026-07-07 at
-  96.350000% - see `HANDOVER_2026-07-07_Fable.md` for the full per-mode table).
+  96.350000% - see `reports/archive/handovers/HANDOVER_2026-07-07_Fable.md` for the full per-mode table).
 - Max win 5,000x (hard cap every mode). Grid 5x4, 1,024 ways. 100,000 rounds per mode.
 - **Base mode:** hit rate 29.11%, volatility (weighted SD) 17.28x, free-spin trigger rate
   1 in 184.7 (0.5415%), average triggered-round win 79.4x, wincap 1 in 100,000.
@@ -197,10 +197,13 @@ summarising what ran, what changed, verification results and anything needing ow
 attention. Copy it to `reports/archive/<date>_<topic>.md`. Commit and push both.
 
 **(b) Pasted briefs.** When executing a pasted brief, first save it verbatim as its named
-prompt file in the repo root (for example `FS_Something_Prompt.md`) and include that file
-in the session's commits.
+prompt file and include that file in the session's commits. **From 2026-07-25 briefs are
+saved to `reports/briefs/`, not the repository root.** The root previously accumulated
+twenty of them, which buried the functional documents a reviewer actually opens. Briefs
+written before that date stay where they were archived, at
+`reports/archive/briefs/`, with an index; nothing was edited and nothing deleted.
 
-**(c) Status doc.** `FUTURE_SPINNER_PROJECT_STATUS.md` is still copied to `~/Desktop/` at
+**(c) Status doc.** `reports/archive/superseded/FUTURE_SPINNER_PROJECT_STATUS.md` is still copied to `~/Desktop/` at
 the end of a session that changes it.
 
 **(d) Docs watch.** Periodically refresh the live Stake Engine docs pages (approval
@@ -213,8 +216,9 @@ differences found.
 commit; Bash-routing around a deny is forbidden).
 
 **(f) Briefs saved verbatim.** Briefs arrive as pasted messages. The session saves each one
-verbatim as its named prompt file in the repo root and commits it with that session's work
-(this reinforces (b)).
+verbatim as its named prompt file in `reports/briefs/` and commits it with that session's
+work (this reinforces (b)). Verbatim means verbatim: a brief is the evidence for every
+claim the resulting session report makes, so it is never tidied, summarised or corrected.
 
 **(g) Autonomy posture.** The owner pre-authorises all commands, network access and Desktop
 writes for every session; never pause to request approval for anything the settings permit;

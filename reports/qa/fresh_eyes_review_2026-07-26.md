@@ -1,7 +1,7 @@
 # Fresh-eyes deep review, 2026-07-26
 
 First major deliverable of the model handover, per section 3 of
-`FS_Fable_ModelHandover_2026-07-25.md`. **Findings only. Nothing was changed in this
+`reports/archive/handovers/FS_Fable_ModelHandover_2026-07-25.md`. **Findings only. Nothing was changed in this
 pass.**
 
 Scope: the full `frontend/src` tree (61 files, 15,026 lines) and `frontend/scripts`
