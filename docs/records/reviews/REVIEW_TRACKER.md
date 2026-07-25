@@ -12,18 +12,20 @@ Australian English, no em dashes or en dashes.
 
 ## Status of the source ingest
 
-**The three review documents have not been provided to the builder session.**
-`sources/review1_claude.md`, `sources/review2.md` and `sources/review3_openai.md` are
-placeholders awaiting their verbatim text. See `sources/README.md`.
+**RESOLVED 2026-07-27.** All three review documents supplied by the owner and saved
+verbatim to `sources/`, unedited, with SHA-256 recorded:
 
-Consequence, stated plainly: the rows below are **complete for every disposition that
-could be established independently**, and **incomplete as coverage**. Without the source
-documents there is no way to know which findings are missing from this table. The
-dispositions that are here are sound; the list is not yet known to be exhaustive.
+| File | Lines | SHA-256 (truncated) |
+|---|---|---|
+| `review1_claude.md` | 285 | `6fac7e82...` |
+| `review2.md` | 295 | `97b6a339...` |
+| `review3_openai.md` | 425 | `69c5b170...` |
 
-Rows are provisionally numbered `TR-nnn`. Once the sources land, each row gains its
-reviewers' own IDs (review 3's `F`-numbering in particular must be preserved, since
-`F3`, `F5`, `F7`, `F8` and `F10` are already cited by that numbering).
+**Coverage is now exhaustive**: every distinct finding across all three reviews has a
+row below, deduplicated where two reviewers found the same thing.
+
+Scores as submitted: review 1 **0.67 / 3.00 (reject)**, review 2 no numeric score given,
+review 3 **2.00 / 3.00**.
 
 ## Disposition vocabulary
 
@@ -42,11 +44,11 @@ reviewers' own IDs (review 3's `F`-numbering in particular must be preserved, si
 | TR-001 | Build loads fonts from an external CDN (google-fonts), breaching the static-build rule | Review 2 | **REFUTED** | Blocker as filed | n/a | CLOSED | **Independently re-verified 2026-07-27, not accepted on relay.** Zero hits for `fonts.googleapis`/`fonts.gstatic` in `frontend/src`, in `frontend/index.html`, across the whole `frontend` tree excluding `node_modules`, **and in the built `frontend/dist` bundle**. Fonts load via `@fontsource/orbitron` imported in `src/main.ts` (400/700/900), which is bundled locally. The reviewer's blocker does not exist in this codebase. |
 | TR-002 | Missing `sweeps_en.json` language file required for social mode | Review 2 | **REFUTED** (HALLUCINATED path) | Blocker as filed | n/a | CLOSED | **Independently re-verified 2026-07-27.** `find` for `sweeps*` across the repo excluding `node_modules` and `.git` returns **zero** matches: no such file, and no reference to one. Social strings are implemented via the `socialLabel`/`socialBlurb` overrides in `frontend/src/lib/config/fsModes.ts` plus the `isSocial` store, not via a `sweeps_<lang>` file. The platform docs *recommend* that pattern; we did not adopt it. The reviewer asserted a missing file for an approach we never took. |
 | TR-003 | NITRO/super wincap frequency disagrees with our stated figure | Review 2 | **REFUTED**, pending the reviewer's arithmetic | High as filed | n/a | OPEN pending reviewer | **Independently recomputed 2026-07-25 and re-checked 2026-07-27.** `super` P(>=5000x) = `4.000000e-03`, which is **exactly 1 in 250.0**, from `reports/qa/bet_level_compliance_raw_2026-07-25.json`, itself produced by `scripts/qa/bet_level_compliance.py` reading the frozen publish tables with exact integer ratios and no sampling. This is the third independent agreement (Fable, the Part 2 recomputation, and this re-check). Row stays OPEN only because the reviewer's own working has not been seen; if they used the raw cap probability without the documented 0.8 cost scale, or divided by a different denominator, that would explain the gap. Not a code change either way. |
-| TR-004 | Review 3 finding F3 | Review 3 (OpenAI) | **STALE SNAPSHOT** | unknown | n/a | BLOCKED on source | Fable's disposition relayed in the programme brief: fixed on `main` before the review was received. **The finding text and the specific PR citation cannot be recorded until `sources/review3_openai.md` is ingested.** Row exists so the disposition is not lost. |
-| TR-005 | Review 3 finding F5 | Review 3 (OpenAI) | **STALE SNAPSHOT** | unknown | n/a | BLOCKED on source | As TR-004. |
-| TR-006 | Review 3 finding F7 | Review 3 (OpenAI) | **STALE SNAPSHOT** | unknown | n/a | BLOCKED on source | As TR-004. |
-| TR-007 | Review 3 finding F8 | Review 3 (OpenAI) | **STALE SNAPSHOT** | unknown | n/a | BLOCKED on source | As TR-004. |
-| TR-008 | Review 3 finding F10 | Review 3 (OpenAI) | **STALE SNAPSHOT** | unknown | n/a | BLOCKED on source | As TR-004. |
+| TR-004 | R3 F3: prohibited "Buy" language in `fsModes.ts` blurb/label for bonus and super, no social branching | R3 (BLOCKER for stake.us) | **STALE SNAPSHOT** | was Blocker | n/a | CLOSED | Fixed before receipt. Verified on current `main`: `fsModes.ts` carries **9** `socialLabel`/`socialBlurb` occurrences and both consumers branch on `$isSocial`. Landed in the 2026-07-14b wording ruling and extended 2026-07-26. |
+| TR-005 | R3 F5: game tile assets (BG, FG hero, provider logo) not produced, hard blocker for portal upload | R3 (BLOCKER) | **STALE SNAPSHOT** | was Blocker | n/a | CLOSED | Fixed before receipt. Verified on disk: `design-system/brand/tile/` holds `tile_background_master.jpg`, `tile_hero_full.png` plus generation notes. **Review 1 independently confirms these as PASS** ("2048x1152 and well under 3 MB", "transparent and under the combined size ceiling"), which is the stronger evidence since two reviewers disagreed. Provider-logo naming and 48px legibility remain open, see TR-031. |
+| TR-006 | R3 F7: `CLAUDE.md` compliance line names `ControlBar`/`AutoPlayModal`, which do not exist | R3 (MINOR) | **STALE SNAPSHOT** | was Minor | n/a | CLOSED | Fixed before receipt. Reworded to describe behaviour rather than component names in the cleanup pass (PR #90, merged). The remaining textual occurrence is the parenthetical that explains the reword. |
+| TR-007 | R3 F8: `CURRENCY_SCALE` defined three times, money path drift risk | R3 (MINOR) | **STALE SNAPSHOT** | was Minor | n/a | CLOSED | Fixed before receipt. Verified: `replayService.ts` now **0** local definitions (imports canonical), `utils/currency.ts` 1 (canonical), locked `rgsService.ts` 1 (recorded in `LOCKED_FILE_DEBTS` and held by `currency_scale_drift.test.mjs`). PR #90. |
+| TR-008 | R3 F10: `endRound()` not wrapped in `_withRetry` | R3 (MINOR) | **CONFIRMED, still live. Fable's STALE disposition is incorrect.** | Minor | `fix/R11-session-recovery` | OPEN (wave 3) | **Disposition corrected on evidence, per the facts discipline.** Fable listed F10 among the stale items. It is not: verified on current `main`, `endRound()` at `rgsService.ts:377` calls `_post` directly, while `_withRetry` (defined line 221) is applied to `play` at line 349 only. Review 1 records the same gap independently. Folded into R11, which already owns idempotent end-round retry and reconciliation. |
 | TR-009 | Live path parses legacy `board`/`win`/`scatter` in locked `rgsService.ts` while the canonical `roundInterpreter` and shipped books use `reveal`/`winInfo` | Consensus (per programme brief) | CONFIRMED | Critical | `fix/R1-event-contract`, `fix/R1a-rgs-locked-pass` | OPEN (wave 3) | Not started. Diagnosis first: adapter if raw events are exposed, sanctioned locked pass only if not. |
 | TR-010 | Production builds can reach `_mockSpin`; auth failure falls through to mock instead of hard-disabling betting | Consensus | CONFIRMED | Critical | `fix/R2-mock-containment` | OPEN (wave 3) | Not started. Acceptance: mock symbol absent from a production bundle. |
 | TR-011 | Books/lookup equality unproven; dossier does not distinguish repo-committed artefacts from the local upload set | Consensus | CONFIRMED | High | `fix/R3-books-equality` | OPEN (wave 3) | Not started. |
@@ -62,11 +64,41 @@ reviewers' own IDs (review 3's `F`-numbering in particular must be preserved, si
 | TR-021 | Mini-player popout proofs stale; `IntroSplash` Continue button can render outside the viewport at 400x225 | Review(s) + internal (Round 3) | CONFIRMED | High | `fix/R14-popout-refresh` | OPEN (wave 1) | Long-standing internal finding, carried in the handover as unfixed. Regenerate proofs on the current build, fix any real collision, add the assert permanently. |
 | TR-022 | Splash shows only once per browser profile, so a returning player never sees the brand screen | Owner observation 2026-07-26 | CONFIRMED | Low | `fix/R12-evidence-hygiene` | OPEN (wave 1) | Diagnosed 2026-07-26: `introSeen()` in `App.svelte` reads **localStorage first**, so the flag persists across sessions. That is why incognito shows it and a normal desktop profile does not. Owner ruled: splash on every cold load, implemented via `sessionStorage` only. |
 
+| TR-023 | **All five event books are absent from the repository**, contradicting the dossier's "eleven files present and hash-verified" | R1 (BLOCKER) | **CONFIRMED, and the proposed fix is impossible as stated** | **Blocker** | `fix/R3-books-equality` | OPEN (wave 3) | **The most consequential finding across all three reviews, and both other reviewers missed it.** Verified: all five books exist on disk (387 MB total) but `git ls-files` returns only **7 of 11** publish files; the books are excluded by `.gitignore:9` (`**/library/**`). Every reviewer cloned the repo and correctly saw no books. **Review 1's prescribed fix cannot be executed:** `books_bonus.jsonl.zst` is **144.9 MB** and `books_super.jsonl.zst` is **142.4 MB**, both above **GitHub's hard 100 MB per-file limit**, so they cannot be committed to a normal git remote at all. **Options:** (a) Git LFS for the two oversize books, or all five for consistency; (b) leave them uncommitted and reword `SUBMISSION_DOSSIER.md` so it distinguishes **repo-committed artefacts** from the **local upload set**, recording hashes for the latter, which is what R3 already instructs; (c) both. **Recommendation: (c).** (b) alone kills the misread class and is required regardless; (a) additionally lets a reviewer verify book-to-lookup equality themselves, which is the thing three reviewers could not do. |
+| TR-024 | Dossier claims "all eleven mandatory publish files present and hash-verified" while the repository holds seven | R1 (BLOCKER, same root as TR-023) | **CONFIRMED** | **Blocker** | `fix/R3-books-equality` | OPEN (wave 3) | Same root cause as TR-023, tracked separately because the fix is documentary rather than technical. `SUBMISSION_DOSSIER.md` §5c is true of the working directory and false of the repository. R3 already requires the reword. |
+| TR-025 | `frontend/dist` is committed but contains only `index.html` and `vite.svg`, not the built asset set | R1 (MARGINAL) | **CONFIRMED** | Minor | unassigned | OPEN | A partially-committed build directory is worse than none: it invites a reviewer to conclude the shipped bundle is two files. Note `vite.svg` was deleted in PR #93 (R12). **Decision needed:** commit the full `dist` from the submission commit, or remove `dist` from the repository entirely and build fresh at staging. Recommendation: remove it; the build is reproducible and `build_diet_verify.mjs` gates its size. |
+| TR-026 | Antelite is unusually tail-concentrated: top 1% of weighted probability supplies ~75.4% of its RTP | R1 (observation) | **CONFIRMED, not a gate failure** | Minor | n/a | **PARKED** | Independently computed by review 1 and consistent with our own ETL figure (OVERBOOST 0.6654, the binding mode). It passes every published gate. Review 1 flags it as deserving "commercial scrutiny" rather than compliance action. **Maths-adjacent, so escalated rather than ruled on:** this is a deliberate volatility choice by the maths author. Options: (a) accept as designed; (b) revisit antelite's distribution post-launch. No pre-submission action proposed. |
+| TR-027 | Art direction reads as assembled rather than unified: cinematic backgrounds against flat character art and mixed symbol rendering | R1 (MARGINAL), R3 (positive) | **CONFLICTING REVIEWS** | Major for score | unassigned | **PARKED** | **The two reviewers directly disagree.** Review 1: "assembled art direction, not a unified premium production", and cites the same split in the tile. Review 3: "art consistency is on the high end of what I would expect from a debut studio", crediting the in-house vector pipeline. Both judged from the same committed proofs. This is an art-direction call for Fable and the owner, not a builder decision, and it is the single largest lever on the score gap between 0.67 and 2.00. |
+| TR-028 | Animation quality "serviceable, not exceptional"; several captures begin in dialogs or artificial test states | R1 (MARGINAL) | **CONFIRMED as evidence weakness** | Major for score | unassigned | OPEN | The capture criticism is actionable and cheap: proofs that open in a dialog or a forced state are weak experience evidence. Regenerating a clean capture set from the submission commit is already required by R13. The deeper "bespoke choreography" gap is what `feature/scatter-anticipation` targets. |
+| TR-029 | Proof evidence predates the reviewed implementation; a "2026-07-26" review was committed on 2026-07-25 | R1 (MINOR), R3 (implicit) | **CONFIRMED** | Minor | `fix/R13-close` | OPEN | Correct and precisely observed. `fresh_eyes_review_2026-07-26.md` was authored and committed on 2026-07-25 under a next-day filename. R13 already requires all proofs regenerated from the closing commit; the date convention should also be corrected so a filename never claims a date ahead of its commit. |
+| TR-030 | Buy dialog drops the "what you get" and RTP/max-win detail at short viewport heights | R1 (MARGINAL) | **CONFIRMED, and FIXED** | High | `fix/R12-evidence-hygiene` | **MERGED (PR #93)** | Review 1 independently found what R12 measured: at 390x664 the buy dialog showed less information than the taller layout. Our measurement went further, finding the disclosure fully out of view at 360x600 and at compact landscape 812x375. Fixed by making `.buy-stats-row` sticky; verified in view at all four heights. Per-mode cost, RTP and max win are a stated review requirement. |
+| TR-031 | Provider mark: delivery naming does not match convention and the 48px proof is poorly legible | R1 (MARGINAL) | **CONFIRMED** | Major | unassigned | OPEN | Distinct from TR-005 (tile BG/FG, which pass). The provider logo exists but review 1 finds it "nearly unreadable" at 48px and misnamed for delivery. Review 3's path-to-three item 13 makes the same point about small-scale branding. Needs an art pass plus a delivery-named export, both owner/Fable territory. |
+| TR-032 | Review 2 cites `frontend/src/locales/sweeps_en.json`, `frontend/src/index.html` google-fonts link, `Controls.svelte`, `RulesModal.svelte`, `soundManager.ts`, `rgsApi.ts`, `i18n.ts`, `Board.svelte`, `reports/screens/mini_player_preview.png` | R2 | **HALLUCINATED** | n/a | n/a | CLOSED | **None of these paths exist in the repository.** Verified individually: zero `sweeps*` files; zero `fonts.googleapis`/`fonts.gstatic` hits in source, in `index.html`, across the whole `frontend` tree, or in the built `dist` bundle; `mini_player_preview.png` absent. Our actual files are `HudOverlay.svelte`, `PaytableModal.svelte`, `soundService.ts`, `rgsService.ts`, `translations.ts`, `GameGrid.svelte`. Review 2's two BLOCKERs and its MAJOR all rest on files that do not exist, so its findings cannot be actioned and its verdicts carry no weight against this build. Recorded in full rather than discarded, because the source document is retained verbatim and a future reader must know why it was set aside. |
+| TR-033 | Review 2 finding 4: super-mode cap frequency discrepancy, claims 106 cap outcomes | R2 (MINOR) | **REFUTED** | n/a | n/a | CLOSED | Recomputed from the shipped table: `super` P(>=5000x) = **4.000000e-03 = exactly 1 in 250.0** (`reports/qa/bet_level_compliance_raw_2026-07-25.json`). Review 1 independently computes **1 / 250.000** and review 3 records the same. Three independent agreements against review 2's outlier. Review 2 also states a cross-mode RTP delta of 0.061% (bonus 96.382%, cruise 96.321%); reviews 1 and 3 and our own computation all find the spread **0.0000pp** with every mode at 96.35%. Review 2's arithmetic is not reproducible. |
+| TR-034 | Review 2 finding 5: win count-up audio 450ms shorter than the 4,000ms rollup | R2 (POLISH) | **HALLUCINATED** | n/a | n/a | CLOSED | Cites `sfx_win_countup.mp3` and durations in files that do not exist under those paths. No such asset name is in the shipped sound set. |
+
 ## Parked rows
 
-None yet. Per the operating rules, any finding without a clean answer gets two or three
-options with trade-offs written into its row and is marked PARKED rather than stalling
-the wave.
+Per the operating rules, a finding without a clean answer gets two or three options with
+trade-offs in its row and is marked PARKED rather than stalling the wave.
+
+| Row | Why parked |
+|---|---|
+| TR-020a | Audio bed swap: two attempts, neither resolved it. Three options recorded; ruling 23 has since directed instrument-then-test, so this moves to step 4 of the execution order. |
+| TR-026 | Antelite tail concentration: passes every gate, maths-adjacent, an author's volatility choice rather than a defect. |
+| TR-027 | Art direction: the two reviewers **directly contradict each other** from the same proofs. Not a builder call. |
+
+## Score gap, for Fable
+
+The two scoring reviewers are **1.33 apart** (0.67 reject versus 2.00), which is not a
+matter of taste. Review 1 found the absent event books (TR-023) and the live event
+contract mismatch and scored accordingly; review 3 did not open the publish directory,
+relied on our own compliance reports as its maths reference, and explicitly recorded
+that limitation. Review 1's findings are, on the evidence checked here, the more
+reliable: every one I have tested independently has held, including the books.
+
+Review 2 cannot be reconciled with either, because its findings cite files that do not
+exist (TR-032, TR-034) and its arithmetic does not reproduce (TR-033).
 
 ## Wave plan
 

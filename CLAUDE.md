@@ -280,3 +280,36 @@ Two things made it worse, and both are covered above:
 
 The owner caught it by asking the obvious question the builder had skipped: how many
 reels are in play, how many tiles are in play. There is the answer.
+
+**(m) External documents must physically exist in the repository before work cites them.
+Owner/Fable ruling, 2026-07-27.**
+
+Any brief referencing an external document must state where that document physically
+lives. Work citing it does not start until the document is in the repository. Missing
+inputs are **named and waited for, never reconstructed**.
+
+This exists because the consolidated remediation programme instructed the builder to
+ingest three external reviews and build a tracker from them, and the review documents
+had not been supplied. The correct response was to create placeholders, say plainly
+that coverage could not be called exhaustive, and stop work that depended on them,
+rather than inferring finding text from the dispositions that had been relayed.
+Reconstructing them would have put fabricated findings into a compliance record and
+made every downstream row unverifiable.
+
+## THE FACTS DISCIPLINE (owner's order, 2026-07-27, standing)
+
+Recorded verbatim as given.
+
+1. Where calculation is possible, calculation is mandatory: this project runs on finite
+   information (reels, tiles, tables, shipped files, published requirements), so answers
+   are computed or looked up, never imagined, never shaped by what would please.
+2. Every claim carries its source path or its computation; a claim with neither does not
+   get written.
+3. An unsolved problem parked honestly beats a problem solved wrongly, every time:
+   parking means two or three options with trade-offs in the tracker and moving on.
+4. After every task, before commit: self-audit against the brief, the conventions, and
+   the platform requirements, and record the audit in the session report.
+5. When blocked on a missing input, name it and stop that item; asking is compliance,
+   guessing is the violation.
+6. Decision questions batch into numbered comms items for one Fable ruling block,
+   exactly as entry 008 did, which is the correct pattern and is now the named pattern.
