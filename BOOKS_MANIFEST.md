@@ -29,7 +29,7 @@ A fourth, purely mechanical point makes the alternative impossible anyway:
 | Set | Contents | Where it lives | Verifiable by |
 |---|---|---|---|
 | **Repo-committed** | `index.json`, `game_metadata.json`, 5 x `lookUpTable_<mode>_0.csv` (7 files) | This repository, `games/future_spinner/library/publish_files/` | Anyone, directly |
-| **Local upload set** | The 7 above **plus** 5 x `books_<mode>.jsonl.zst` (11 files) | The build machine, and an owner-held OneDrive copy of the full library taken 2026-07-28 | This manifest's hashes |
+| **Local upload set** | The 7 above **plus** 5 x `books_<mode>.jsonl.zst` (11 files) | The build machine, and an owner-held **Google Drive** copy of the full `games` directory taken 2026-07-28 | This manifest's hashes |
 
 The **upload set is what goes to the ACP**. The repo-committed set is what a reviewer,
 an auditor or Fable can inspect without it.

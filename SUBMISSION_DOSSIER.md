@@ -174,7 +174,7 @@ the artefacts, was the defect.
 | Set | Contents | Where it lives |
 |---|---|---|
 | **REPO-COMMITTED** | `index.json`, `game_metadata.json`, and the five `lookUpTable_<mode>_0.csv` files. **Seven files.** | This repository |
-| **LOCAL UPLOAD SET** | Those seven **plus** the five `books_<mode>.jsonl.zst`. **Eleven files.** | The build machine, plus an owner-held OneDrive copy of the full library (2026-07-28) |
+| **LOCAL UPLOAD SET** | Those seven **plus** the five `books_<mode>.jsonl.zst`. **Eleven files.** | The build machine, plus an owner-held **Google Drive** copy of the full `games` directory (2026-07-28). Sharing scope is an owner-controlled setting and is tracked in `COMPLIANCE_WATCH.md`; the link itself is deliberately not recorded in this public repository. |
 
 **The upload set is what goes to the ACP. The books are deliberately NOT in the
 repository** and never will be, per the Fable ruling of 2026-07-28: LFS bandwidth on a

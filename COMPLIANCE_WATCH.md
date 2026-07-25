@@ -336,11 +336,34 @@ assumed:
   ceiling, so this is compliant, but it is a visible differentiator in a public
   catalogue and worth an owner decision at some point.
 
-**Missing input, named rather than guessed:** the ruling also asked for "the outcome
-endpoint contract". `https://fair.stake-engine.com/` returns 404 and the catalogue
-payload contains no endpoint documentation. The outcome endpoint's URL has not been
-supplied and is not discoverable from what is published, so it is **not captured**.
-Needs the URL from Fable.
+**Outcome endpoint contract: CAPTURED 2026-07-28.** The URL came from the owner's
+dashboard capture: `https://stake-engine.com/fair/api`. Full contract mirrored at
+`docs/stake-engine-live/2026-07-28/fair-api.md`. Four public, unauthenticated endpoints:
+catalogue, outcome verification, **event table**, and peek. Comms finding 32 closed.
+
+**This materially refines the books-privacy position.** The **event table** endpoint
+(`GET /event/{team}/{game}/{version}/{mode}`, no auth) returns, quoting the platform,
+"the ordered list of every possible payout outcome and its corresponding probability
+weight range". That is exactly the content of our `lookUpTable_<mode>_0.csv` files.
+**After publication the platform makes our payout distribution public by design**, and
+the docs state the weight and payout tables are "published and immutable" per version.
+
+The 2026-07-28 ruling still stands on its narrow ground, because the **event books hold
+more than FAIR publishes**: the per-round event streams, board reveals and feature
+choreography are not exposed by any FAIR endpoint. But the phrase "the complete outcome
+distribution" should be read as pre-release only. Post-release, that distribution is
+public by platform design, and it becomes independently verifiable by any third party
+against the platform's own copy, which is the strongest available answer to review 1's
+complaint that book-to-lookup equality could not be checked.
+
+**PRE-RELEASE EXPOSURE, RAISED FOR OWNER DECISION (2026-07-28).** The off-repo custody
+copy of the full `games` directory is a **publicly accessible** Google Drive folder: it
+loads without sign-in and offers "Download all". If it contains the
+`books_*.jsonl.zst` files, then the complete pre-release outcome distribution and event
+choreography are currently downloadable by anyone holding the link, which is precisely
+the exposure the same day's ruling rejected Git LFS to avoid. The link is deliberately
+NOT recorded in this repository. Owner decision required: restrict the folder to named
+accounts, or accept the exposure knowingly and record that acceptance here.
 
 **ANTELITE TAIL CONCENTRATION, ACCEPTED BY DESIGN (Fable ruling, 2026-07-28).**
 Review 1 computed that antelite's largest 1% of weighted probability mass supplies about
