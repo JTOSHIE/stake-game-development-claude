@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-25T07:40:13.541Z",
+  "timestamp": "2026-07-25T10:22:38.407Z",
   "cases": {
     "trigger_3": {
       "category": "trigger_3",
@@ -11,23 +11,23 @@
         },
         {
           "level": 1,
-          "atMs": 138
+          "atMs": 105
         },
         {
           "level": 2,
-          "atMs": 1168
+          "atMs": 1103
         },
         {
           "level": 3,
-          "atMs": 1524
+          "atMs": 1526
         },
         {
           "level": 2,
-          "atMs": 3726
+          "atMs": 3760
         },
         {
           "level": 0,
-          "atMs": 4306
+          "atMs": 4328
         }
       ],
       "finalGauge": "0.00",
@@ -44,31 +44,31 @@
         },
         {
           "level": 1,
-          "atMs": 100
+          "atMs": 108
         },
         {
           "level": 2,
-          "atMs": 1098
+          "atMs": 1106
         },
         {
           "level": 3,
-          "atMs": 1451
+          "atMs": 1458
         },
         {
           "level": 4,
-          "atMs": 2553
+          "atMs": 2560
         },
         {
           "level": 5,
-          "atMs": 3006
+          "atMs": 3025
         },
         {
           "level": 4,
-          "atMs": 4202
+          "atMs": 4239
         },
         {
           "level": 0,
-          "atMs": 4764
+          "atMs": 4809
         }
       ],
       "finalGauge": "0.00",
@@ -85,31 +85,31 @@
         },
         {
           "level": 1,
-          "atMs": 113
+          "atMs": 104
         },
         {
           "level": 2,
-          "atMs": 1111
+          "atMs": 1101
         },
         {
           "level": 3,
-          "atMs": 1464
+          "atMs": 1454
         },
         {
           "level": 4,
-          "atMs": 2573
+          "atMs": 2551
         },
         {
           "level": 5,
-          "atMs": 3040
+          "atMs": 3007
         },
         {
           "level": 6,
-          "atMs": 4245
+          "atMs": 4232
         },
         {
           "level": 0,
-          "atMs": 4949
+          "atMs": 4934
         }
       ],
       "finalGauge": "0.00",
@@ -126,31 +126,31 @@
         },
         {
           "level": 1,
-          "atMs": 102
+          "atMs": 136
         },
         {
           "level": 2,
-          "atMs": 1099
+          "atMs": 1135
         },
         {
           "level": 3,
-          "atMs": 1451
+          "atMs": 1488
         },
         {
           "level": 4,
-          "atMs": 2547
+          "atMs": 2595
         },
         {
           "level": 5,
-          "atMs": 2999
+          "atMs": 3047
         },
         {
           "level": 6,
-          "atMs": 4199
+          "atMs": 4251
         },
         {
           "level": 0,
-          "atMs": 4902
+          "atMs": 4953
         }
       ],
       "finalGauge": "0.00",
