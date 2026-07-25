@@ -132,6 +132,12 @@ soundtrack sentence is now restored as a draft (section 3) - **but remains
 PENDING OWNER APPROVAL**, not yet an approved claim. Do not treat the draft sentence as
 approved copy until the owner explicitly signs off on it.
 
+> **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
+> 5b below is the upload steps and 5d is the one-time versus per-update checklist;
+> `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each
+> with its expected value and the single line of code that changes if it disagrees. Order:
+> 5b, then DTT_PROTOCOL.md, then 5e. (Added 2026-07-26.)
+
 ## 5. STAGING PROTOCOL (JOB 5, rewritten 2026-07-13 - was "POST-UPLOAD VERIFICATION
 
 > **Amended by section 8h: the official Developer Testing Tool stage is added before submission.**
