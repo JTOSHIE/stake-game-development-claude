@@ -37,6 +37,10 @@
   import { reelMode } from '../stores/reelMode'
   import { assetLoadProgress } from '../stores/loadingStore'
   import { playSpinStart, playReelStop, playAnticipation, playScatterLand } from '../services/soundService'
+  import {
+    escalationFor, pulseLevelFor, holdMsFor, scaledHoldMs, scaledPulseMs,
+    scatterEscalation, resetEscalation, type EscalationLevel,
+  } from '../stores/scatterEscalation'
   import { activeTheme, themeAssets } from '../stores/themeStore'
 
   // Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5): App.svelte
@@ -296,6 +300,11 @@
     charged: boolean     // scatter-anticipation glow applied
     lastM: number        // last applied motion factor (throttles var writes)
   }
+  // Reels whose result is now on screen. Read by _pulseBeat so a celebratory
+  // beat glows the scatters that have actually landed and not the ones still to
+  // come, which in drop mode are showing the previous round.
+  let _landedThrough = 0
+
   const reels: Reel[] = Array.from({ length: REELS }, () => ({
     state: 'rest', velocity: 0, offset: 0, t: 0, cruiseV: 0,
     decelDur: 0, decelDist: 0, decelOffset0: 0, injects: 0, queue: [],
@@ -587,6 +596,18 @@
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMount(() => {
+    // DEV-only choreography hook. The mock spin generates a RANDOM board, so
+    // `?mockCategory=trigger_5` controls the round's events but not the symbols
+    // the grid animates, which makes the scatter sequence impossible to drive
+    // deterministically from a test. This exposes the choreography alone, with
+    // an exact board, and touches no wallet or spin path. Never present in a
+    // production build (import.meta.env.DEV is false there), and read only by
+    // scripts/anticipation_proof.mjs.
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __gridAnimate?: (b: string[][]) => Promise<void> })
+        .__gridAnimate = (b: string[][]) => animateSpin(b)
+    }
+
     try {
       app = new Application({
         width:           CANVAS_W,
@@ -753,46 +774,86 @@
   // ── Scatter anticipation (Set B) — charge glow on the still-travelling reels,
   // plus a landed-scatter charge loop (glow bloom + scanline + orbiting spark)
   // on every scatter already on the board while the final reel decides.
-  function _scatterAnticipation(fromReel: number): void {
+  // `includeResting` exists because the two choreographies disagree about what
+  // "still to come" looks like. In strip mode a pending reel is visibly
+  // travelling, so `state !== 'rest'` identifies it. In DROP mode every reel
+  // sits at rest until it is released, so that guard excluded all of them and
+  // the anticipation visuals never applied. Drop mode passes true and relies on
+  // `fromReel` alone, which the caller already knows precisely.
+  function _scatterAnticipation(fromReel: number, includeResting = false): void {
     for (let r = fromReel; r < REELS; r++) {
       const strip = stripRefs[r]
-      if (strip && reels[r].state !== 'rest') {
+      if (strip && (includeResting || reels[r].state !== 'rest')) {
         strip.classList.add('anticipate')
         strip.parentElement?.classList.add('col-anticipate')
+        // The FOCAL reel is the one about to decide. The expensive layers - the
+        // rising sparks and the strong glow - are scoped to it rather than run
+        // on every remaining reel. That is a performance decision and a
+        // direction decision at once: it puts the player's eye on the reel that
+        // matters instead of lighting all of them equally, and it is what the
+        // ship spec means by dropping sparks first under pressure.
+        strip.parentElement?.classList.toggle('col-focus', r === fromReel)
         reels[r].charged = true
       }
     }
     gridRef?.classList.add('grid-anticipating')
-    _chargeLandedScatters()
+    _chargeLandedScatters(fromReel)
   }
-  function _chargeLandedScatters(): void {
-    for (let c = 0; c < REELS; c++) {
-      if (reels[c].state !== 'rest') continue
+
+  /**
+   * Put the charge glow on scatters that have ALREADY committed.
+   *
+   * `landedThrough` is an exclusive upper bound: reels below it have shown their
+   * result. Passing it explicitly rather than inferring from `reels[].state`
+   * makes this correct in both choreographies; the state test was strip-only and
+   * charged the wrong reels in drop mode, where a not-yet-dropped reel is at
+   * rest but is still displaying the PREVIOUS round's symbols.
+   */
+  function _chargeLandedScatters(landedThrough: number = REELS): void {
+    for (let c = 0; c < Math.min(landedThrough, REELS); c++) {
       for (let row = 0; row < ROWS; row++) {
         if (slotSym[c][visIdx(row)] === 'S') visCell(c, row)?.classList.add('scatter-charge')
       }
     }
   }
+  /** Publishes the level to CSS so reduced motion can render it statically. */
+  function _setEscalationVar(level: EscalationLevel): void {
+    gridRef?.style.setProperty('--escalation', String(level))
+  }
+
+  /**
+   * One-shot celebratory beat. Pure CSS: a class is added and removed, and the
+   * animation runs on the compositor. No per-frame JS, because the frame gate
+   * allows zero frames over 100ms and this fires at the busiest moment of the
+   * round.
+   */
+  function _pulseBeat(level: EscalationLevel): void {
+    if (!gridRef) return
+    const cls = `escalate-pulse-${level}`
+    gridRef.classList.remove('escalate-pulse-2', 'escalate-pulse-4', 'escalate-pulse-6')
+    // Force a reflow so a repeated beat restarts the animation rather than
+    // being ignored as an unchanged class list.
+    void gridRef.offsetWidth
+    gridRef.classList.add(cls)
+    _chargeLandedScatters(_landedThrough)
+    window.setTimeout(() => gridRef?.classList.remove(cls), 900)
+  }
+
   function _clearAnticipation(): void {
     for (let r = 0; r < REELS; r++) {
       stripRefs[r]?.classList.remove('anticipate')
-      stripRefs[r]?.parentElement?.classList.remove('col-anticipate')
+      stripRefs[r]?.parentElement?.classList.remove('col-anticipate', 'col-focus')
       for (let i = 0; i < STRIP; i++) slotCell[r]?.[i]?.classList.remove('scatter-charge')
     }
     gridRef?.classList.remove('grid-anticipating')
   }
 
-  function _checkAnticipation(board: string[][]): boolean {
-    const highValue = ['H1', 'H2', 'S']
-    const isWild = (s: string | undefined) => s === 'W'
-    const matches = (a: string | undefined, b: string | undefined) =>
-      a !== undefined && b !== undefined && (a === b || isWild(a) || isWild(b))
-    for (let row = 0; row < ROWS; row++) {
-      const s0 = board[0]?.[row], s1 = board[1]?.[row], s2 = board[2]?.[row]
-      if (s0 !== undefined && highValue.includes(s0) && matches(s0, s1) && matches(s0, s2)) return true
-    }
-    return false
-  }
+  // `_checkAnticipation(finalBoard)` was removed 2026-07-25. It scanned the
+  // FINAL BOARD for a high-symbol pattern across reels 0 to 2 and held the last
+  // reel on the strength of it. That is a synthetic near-miss built from a
+  // decided outcome, which the integrity ruling forbids on both counts, and it
+  // was turbo-gated so fast play never saw it. Nothing replaced it: tension now
+  // comes only from scatters the player can see.
 
   // ── Win overlay — PixiJS draws gold borders + connecting lines ────────────
   function _applyWinHighlights(): void {
@@ -884,37 +945,73 @@
     const STAGGER    = Math.max(70, 120 * speedFactor)
     const settles: Promise<void>[] = []
     let scattersLanded = 0
+    let riserPlaying = false
+    resetEscalation()
 
+    // ── Scatter anticipation, state machine ─────────────────────────────────
+    // Rewritten 2026-07-25 to the ship spec, under the integrity ruling. Three
+    // things changed and each was a defect:
+    //
+    //   1. Only the FINAL reel held. A player who secured the bonus on reel 3
+    //      got no acknowledgement at all until the entry card, which is the
+    //      moment the game should be loudest.
+    //   2. The near-miss branch read `finalBoard` to fabricate tension from a
+    //      high-symbol pattern. That is both a synthetic near-miss and a read of
+    //      a decided outcome. Deleted, along with `_checkAnticipation`.
+    //   3. That branch was `!isT` gated, so turbo removed it entirely rather
+    //      than shortening it.
+    //
+    // The level is COMPUTED from visible state each stop, never incremented,
+    // because 0.5% of measured base rounds land two scatters on one reel and an
+    // incrementing ladder is wrong on every one of them.
     for (let r = 0; r < REELS; r++) {
       const delay = r === 0 ? MIN_CRUISE : STAGGER
       await _sleepOrSlam(delay)
 
-      // Scatter anticipation before the final reel commits to its stop.
-      if (r === REELS - 1) {
-        const scatterAnticipate = scattersLanded >= 2
-        const nearMiss = !isT && !scatterAnticipate && _checkAnticipation(finalBoard)
-        if (!slamRequested && (scatterAnticipate || nearMiss)) {
-          _scatterAnticipation(REELS - 1)
-          playAnticipation()
-          const holdMs = Math.max(300, (scatterAnticipate ? 900 : 600) * speedFactor)
-          await _sleepOrSlam(holdMs)
-        }
+      // Sustained tension BEFORE this reel commits. `REELS - r` counts this reel
+      // as still moving, which it is.
+      const holdLevel = escalationFor(scattersLanded, REELS - r)
+      if (!slamRequested && holdMsFor(holdLevel) > 0) {
+        _scatterAnticipation(r)
+        scatterEscalation.set(holdLevel)
+        _setEscalationVar(holdLevel)
+        // The riser is one continuous sound across the whole build, not one per
+        // reel, so it starts once and is left to run.
+        if (!riserPlaying) { playAnticipation(); riserPlaying = true }
+        await _sleepOrSlam(scaledHoldMs(holdLevel, speedFactor))
       }
 
+      const landedBefore = scattersLanded
       const p = _landReel(r, boardRows[r], slamRequested).then(() => {
         _clearAnticipationFor(r)
       })
       settles.push(p)
-
-      // Count scatters that have now committed (their queue is set on landing).
       scattersLanded += boardRows[r].filter((s) => s === 'S').length
-      if (scattersLanded >= 2 && !slamRequested && r < REELS - 1) {
-        _scatterAnticipation(r + 1)
+      _landedThrough = r + 1
+
+      // Celebratory beat on the TRANSITION, so it fires when the scatter lands
+      // rather than when the round happens to end. 46.2% of triggers secure on
+      // the final reel, but the other 53.8% must not wait for it.
+      const pulse = pulseLevelFor(landedBefore, scattersLanded)
+      if (pulse !== null && !slamRequested) {
+        scatterEscalation.set(pulse)
+        _setEscalationVar(pulse)
+        _pulseBeat(pulse)
+        await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
       }
+
+      // Settle the gauge to what the now-visible state justifies. At rest after
+      // three scatters that is level 2, not the 3 the build was pushing: the
+      // gauge tells the truth once the round stops pushing it.
+      const settled = escalationFor(scattersLanded, REELS - 1 - r)
+      scatterEscalation.set(settled)
+      _setEscalationVar(settled)
     }
 
     await Promise.all(settles)
     _clearAnticipation()
+    resetEscalation()
+    _setEscalationVar(0)
 
     if (import.meta.env.DEV) {
       for (let c = 0; c < REELS; c++) {
@@ -932,16 +1029,74 @@
 
   function _clearAnticipationFor(col: number): void {
     stripRefs[col]?.classList.remove('anticipate')
-    stripRefs[col]?.parentElement?.classList.remove('col-anticipate')
+    stripRefs[col]?.parentElement?.classList.remove('col-anticipate', 'col-focus')
     if (!stripRefs.some((s) => s?.classList.contains('anticipate'))) {
       gridRef?.classList.remove('grid-anticipating')
     }
   }
 
+  /**
+   * Drop choreography, now sequenced so anticipation can run.
+   *
+   * THIS IS THE SHIPPING PATH. `reelMode` defaults to 'drop' (owner eye-call,
+   * 2026-07-07), and `_spinSequence()` returns early for it, which meant the
+   * whole scatter-anticipation system - the final-reel hold, the tremble, the
+   * sparks, all of it - was unreachable in the shipped configuration. It ran
+   * only in 'strip', a mode a player reaches solely through a dev URL param.
+   * Found 2026-07-25 while proving the new sequence and, on the evidence, the
+   * most likely reason an external reviewer called the animation "serviceable,
+   * not exceptional": the best of it was never on screen.
+   *
+   * The reels were previously all released at once with a per-reel delay baked
+   * into each drop, so there was no point at which the sequence could pause.
+   * They are now released one at a time with the stagger awaited between them,
+   * which is visually identical when no anticipation fires and leaves a seam to
+   * hold open when it does.
+   */
   async function _dropAll(boardRows: string[][]): Promise<void> {
     const stagger = get(isTurbo) ? 60 : 95
-    const drops = Array.from({ length: REELS }, (_, c) => _dropReel(c, boardRows[c], c * stagger))
-    await Promise.all(drops)
+    const speedFactor = get(speedTier) === 'super' ? 0.16 : get(isTurbo) ? 0.5 : 1
+    const settles: Promise<void>[] = []
+    let scattersLanded = 0
+    let riserPlaying = false
+    _landedThrough = 0
+    resetEscalation()
+    _setEscalationVar(0)
+
+    for (let c = 0; c < REELS; c++) {
+      const holdLevel = escalationFor(scattersLanded, REELS - c)
+      if (!slamRequested && holdMsFor(holdLevel) > 0) {
+        _scatterAnticipation(c, /* includeResting */ true)
+        scatterEscalation.set(holdLevel)
+        _setEscalationVar(holdLevel)
+        if (!riserPlaying) { playAnticipation(); riserPlaying = true }
+        await _sleepOrSlam(scaledHoldMs(holdLevel, speedFactor))
+      }
+
+      const landedBefore = scattersLanded
+      settles.push(_dropReel(c, boardRows[c], 0).then(() => _clearAnticipationFor(c)))
+      scattersLanded += boardRows[c].filter((sym) => sym === 'S').length
+      _landedThrough = c + 1
+
+      const pulse = pulseLevelFor(landedBefore, scattersLanded)
+      if (pulse !== null && !slamRequested) {
+        scatterEscalation.set(pulse)
+        _setEscalationVar(pulse)
+        _pulseBeat(pulse)
+        await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
+      }
+
+      const settled = escalationFor(scattersLanded, REELS - 1 - c)
+      scatterEscalation.set(settled)
+      _setEscalationVar(settled)
+
+      if (c < REELS - 1) await _sleepOrSlam(stagger)
+    }
+
+    await Promise.all(settles)
+    _clearAnticipation()
+    resetEscalation()
+    _setEscalationVar(0)
   }
 
   // ── Cancellable stagger wait (resolves instantly on slam) ────────────────
@@ -1196,15 +1351,49 @@
      documented escape hatch for exactly this pattern (imperative DOM class
      toggling paired with scoped component CSS) and fixes all of these
      rules, not just the ones added this pass. */
+  /* --escalation (0 to 6) is published by _setEscalationVar() on the grid, so
+     one custom property drives every treatment below. calc() keeps the ramp in
+     CSS rather than recomputing styles from JS each beat, which matters because
+     the frame gate allows zero frames over 100ms. */
+  .symbol-grid { --escalation: 0; }
+
+  /* Non-focal anticipating reels: colour only, NO drop-shadow. A filtered
+     shadow on every tile of every remaining reel was the dominant cost. */
   .reel-strip:global(.anticipate) .tile-inner {
-    filter: brightness(1.5) saturate(1.75) drop-shadow(0 0 16px rgba(0, 255, 255, 0.85));
+    filter:
+      brightness(calc(1.28 + var(--escalation) * 0.05))
+      saturate(calc(1.4 + var(--escalation) * 0.06));
+  }
+  .symbol-col:global(.col-focus) .reel-strip:global(.anticipate) .tile-inner {
+    /* The drop-shadow RADIUS is deliberately fixed. Scaling it with
+       --escalation re-rasterises the shadow for every tile on every level
+       change, which is the most expensive thing in the sequence. Brightness and
+       saturation still ramp: they are cheap colour-matrix operations, they carry
+       the escalation just as legibly, and the flame gauge is the primary
+       readout in any case. */
+    filter:
+      brightness(calc(1.5 + var(--escalation) * 0.06))
+      saturate(calc(1.75 + var(--escalation) * 0.08))
+      drop-shadow(0 0 16px rgba(0, 255, 255, 0.85));
   }
   @keyframes reel-tremble {
     0%, 100% { transform: translateX(0) scale(1); }
     25%      { transform: translateX(-1.5px) scale(1.015); }
     75%      { transform: translateX(1.5px) scale(1.015); }
   }
-  .reel-strip:global(.anticipate) .symbol-cell { animation: reel-tremble 0.09s linear infinite; }
+  /* PERFORMANCE (2026-07-25, measured). The tremble used to run on
+     `.reel-strip.anticipate .symbol-cell`, which is STRIP (7) cells per reel and
+     up to 35 independently animated elements once anticipation covers every
+     remaining reel. Measured against a control in the same environment, that
+     took anticipation rounds from ~42 fps to ~30 and produced a 100ms frame
+     where plain spins produced none.
+     It now animates `.symbol-col`, which is ONE element per reel and carries no
+     transform of its own, so it cannot fight the strip's scroll transform. The
+     column clips its strip, so shaking the column shakes the whole reel: the
+     effect reads the same, at a seventh of the elements. */
+  .symbol-col:global(.col-focus) {
+    animation: reel-tremble calc(0.09s - var(--escalation) * 0.006s) linear infinite;
+  }
 
   /* Spotlight dim on neighbouring reels (item 4): .grid-anticipating (on
      .symbol-grid) and .col-anticipate (on the specific .symbol-col) are both
@@ -1214,7 +1403,7 @@
      Svelte's scoped-CSS output, so this uses the same JS-toggle approach
      the component already relies on for .anticipate. */
   .symbol-grid:global(.grid-anticipating) .symbol-col:not(:global(.col-anticipate)) .reel-strip {
-    filter: brightness(0.62) saturate(0.75);
+    filter: brightness(calc(0.62 - var(--escalation) * 0.03)) saturate(0.75);
     transition: filter 0.25s ease;
   }
 
@@ -1224,8 +1413,8 @@
   .edge-spark { position: absolute; bottom: -10%; width: 22px; height: 22px; opacity: 0; }
   .spark-a { left: 4px; }
   .spark-b { right: 4px; }
-  .symbol-col:global(.col-anticipate) .spark-a { animation: edge-spark-rise 0.85s ease-out infinite; }
-  .symbol-col:global(.col-anticipate) .spark-b { animation: edge-spark-rise 0.85s ease-out infinite 0.35s; }
+  .symbol-col:global(.col-focus) .spark-a { animation: edge-spark-rise 0.85s ease-out infinite; }
+  .symbol-col:global(.col-focus) .spark-b { animation: edge-spark-rise 0.85s ease-out infinite 0.35s; }
   @keyframes edge-spark-rise {
     0%   { opacity: 0; transform: translateY(0) scale(0.7); }
     20%  { opacity: 0.9; }
@@ -1363,6 +1552,38 @@
   }
 
   /* ── Scatter charge (Set B) — landed scatters charge during anticipation ── */
+  /* ── Celebratory beats (2 SECURED, 4 fourth, 6 eruption) ─────────────────
+     Compositor-only properties (transform, opacity, filter) so the busiest
+     moment of the round costs no layout. Each is a single shot; the class is
+     removed after it plays. */
+  @keyframes escalate-flash {
+    0%   { filter: brightness(1); }
+    18%  { filter: brightness(var(--flash-peak, 1.6)); }
+    100% { filter: brightness(1); }
+  }
+  @keyframes escalate-shock {
+    0%   { opacity: 0; transform: scale(0.72); }
+    35%  { opacity: 0.85; }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+  .symbol-grid:global(.escalate-pulse-2),
+  .symbol-grid:global(.escalate-pulse-4),
+  .symbol-grid:global(.escalate-pulse-6) {
+    animation: escalate-flash 0.35s ease-out 1;
+  }
+  .symbol-grid:global(.escalate-pulse-2) { --flash-peak: 1.35; }
+  .symbol-grid:global(.escalate-pulse-4) { --flash-peak: 1.6;  animation-duration: 0.45s; }
+  .symbol-grid:global(.escalate-pulse-6) { --flash-peak: 2.0;  animation-duration: 0.7s; }
+
+  /* The eruption alone earns a ring. Cheapest possible: one pseudo-element,
+     no extra DOM, and it is the first thing the reduced-motion block removes. */
+  .symbol-grid:global(.escalate-pulse-6)::after {
+    content: ''; position: absolute; inset: -12%;
+    border: 3px solid rgba(0, 255, 255, 0.9); border-radius: 50%;
+    pointer-events: none; z-index: 8;
+    animation: escalate-shock 0.7s ease-out 1;
+  }
+
   @keyframes scatter-charge-bloom {
     0%, 100% { box-shadow: inset 0 0 12px 2px rgba(255, 215, 0, 0.5), 0 0 10px 2px rgba(255, 215, 0, 0.4); }
     50%      { box-shadow: inset 0 0 26px 6px rgba(255, 215, 0, 0.95), 0 0 22px 6px rgba(255, 215, 0, 0.8); }
@@ -1443,5 +1664,23 @@
        but loses its transition; edge sparks are motion, so they're hidden. */
     .symbol-grid:global(.grid-anticipating) .symbol-col:not(:global(.col-anticipate)) .reel-strip { transition: none; }
     .edge-spark { display: none; }
+
+    /* Escalation still has to be READABLE without motion, which is the whole
+       point of the gauge. The tremble, the sparks and the beat animations are
+       all suppressed; the level instead drives a STATIC step in glow and
+       brightness, so a player who cannot take movement still sees how good the
+       round has become. Holds are unchanged, so pacing is identical. */
+    .symbol-grid:global(.escalate-pulse-2),
+    .symbol-grid:global(.escalate-pulse-4),
+    .symbol-grid:global(.escalate-pulse-6) { animation: none !important; }
+    .symbol-grid:global(.escalate-pulse-6)::after { display: none; }
+
+    .symbol-col:global(.col-focus) { animation: none !important; }
+    .reel-strip:global(.anticipate) .tile-inner {
+      filter:
+        brightness(calc(1.2 + var(--escalation) * 0.09))
+        drop-shadow(0 0 12px rgba(0, 255, 255, 0.9));
+      transition: filter 0.2s linear;
+    }
   }
 </style>

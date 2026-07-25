@@ -15,6 +15,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync, statSync, renameSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { dismissIntro, waitFeatureDrained } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'motion-v2')
@@ -28,12 +29,14 @@ async function waitSpinDone(page, timeout = 15000) {
 /** Every fresh browser context has its own sessionStorage, so the once-per-
  *  session intro splash shows on every new page — dismiss it before driving
  *  spins/buys so it doesn't block the SPIN button. */
+// 2026-07-25: this script carried its own intro dismiss that only knew about
+// [data-testid="intro-continue"]. The hero splash added later sits on top of it
+// and intercepts pointer events, so every click in this proof timed out. Now
+// delegates to the shared helper, which is the same class of harness gap fixed
+// across the other suites: a proof with a private copy of a click path drifts
+// away from the game the moment the game gains an overlay.
 async function dismissIntroIfPresent(page) {
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await btn.click()
-    await page.waitForTimeout(100)
-  }
+  await dismissIntro(page)
 }
 
 // ── Gate: fps across 20 spins including a bonus entry ───────────────────────
@@ -63,7 +66,11 @@ async function runFpsGate(browser) {
   for (let i = 0; i < 20; i++) {
     if (i === 9) {
       // FeatureMenu replaced the old single-tier FeatureButton (2026-07-07).
-      await page.locator('[data-testid="feature-menu-button"]').click()
+      // A preceding base spin can trigger the feature naturally, which hides the
+      // FEATURES button until the presentation drains, and the button itself has
+      // one node per layout branch so it needs .first().
+      await waitFeatureDrained(page)
+      await page.locator('[data-testid="feature-menu-button"]').first().click()
       await page.waitForTimeout(150)
       await page.locator('[data-testid="activate-bonus"]').click()
       await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 5000 })
@@ -193,23 +200,35 @@ async function run() {
   console.log(`  avg fps: ${results.fps.avgFps.toFixed(1)}, p95: ${results.fps.p95FrameMs.toFixed(1)}ms, p99: ${results.fps.p99FrameMs.toFixed(1)}ms, long frames (>100ms): ${results.fps.longFrameCount}`)
 
   // ── Anticipation floor (audit remediation, Task 2) ──────────────────────────
-  // Effective final-reel anticipation hold per tier, mirroring GameGrid's
-  // Math.max(300, base * speedFactor). Base 900ms (scatter) / 600ms (near-miss),
-  // factors Normal 1 / Turbo 0.5 / Super Turbo 0.16. Gate: every hold >= 300ms.
+  // Anticipation floors per tier and per escalation level.
+  //
+  // Rewritten 2026-07-25 with the anticipation state machine. The near-miss row
+  // is GONE because the near-miss path is gone: it read the final board to
+  // fabricate tension from a high-symbol pattern, which the integrity ruling
+  // forbids, and it was turbo-gated so fast play never saw it at all.
+  //
+  // The gate is now the "turbo shortens, never skips" property across every
+  // sustained level (1, 3, 5) AND every celebratory beat (2, 4, 6). A beat that
+  // rounds to nothing under Super Turbo would be a skip wearing a shortening's
+  // clothes, which is exactly what the floors exist to prevent.
   results.anticipationFloor = (() => {
     const factors = { normal: 1, turbo: 0.5, super: 0.16 }
+    const HOLDS = { 1: 900, 3: 1000, 5: 1100 }
+    const PULSES = { 2: 350, 4: 450, 6: 700 }
+    const HOLD_FLOOR = 300, PULSE_FLOOR = 180
     const rows = {}
     let pass = true
     for (const [tier, f] of Object.entries(factors)) {
-      const scatterHoldMs = Math.max(300, 900 * f)
-      const nearMissHoldMs = Math.max(300, 600 * f)
-      rows[tier] = { scatterHoldMs, nearMissHoldMs }
-      if (scatterHoldMs < 300 || nearMissHoldMs < 300) pass = false
+      const holds = Object.fromEntries(Object.entries(HOLDS).map(([l, ms]) => [`L${l}`, Math.max(HOLD_FLOOR, ms * f)]))
+      const pulses = Object.fromEntries(Object.entries(PULSES).map(([l, ms]) => [`L${l}`, Math.max(PULSE_FLOOR, ms * f)]))
+      rows[tier] = { holds, pulses }
+      if (Object.values(holds).some((ms) => ms < HOLD_FLOOR)) pass = false
+      if (Object.values(pulses).some((ms) => ms < PULSE_FLOOR)) pass = false
     }
     return { rows, pass }
   })()
   console.log('  anticipation holds ms:', JSON.stringify(results.anticipationFloor.rows),
-    results.anticipationFloor.pass ? 'PASS (>=300 all tiers)' : 'FAIL')
+    results.anticipationFloor.pass ? 'PASS (holds >=300ms, pulses >=180ms, all tiers)' : 'FAIL')
 
   console.log('[2/4] Occlusion gate (1280x720)...')
   results.occlusion = await runOcclusionGate(browser)
@@ -260,7 +279,7 @@ async function run() {
   let fail = false
   if (results.fps.avgFps < 55) { console.error(`FAIL: avg fps ${results.fps.avgFps.toFixed(1)} < 55`); fail = true }
   if (results.fps.longFrameCount > 0) { console.error(`FAIL: ${results.fps.longFrameCount} frame(s) over 100ms`); fail = true }
-  if (!results.anticipationFloor.pass) { console.error('FAIL: anticipation floor < 300ms at some tier'); fail = true }
+  if (!results.anticipationFloor.pass) { console.error('FAIL: an anticipation hold or pulse fell below its floor at some tier'); fail = true }
   if (results.occlusion.failures.length > 0) { console.error('FAIL: occlusion failures detected'); fail = true }
   for (const [k, v] of Object.entries(gifResults)) {
     if (v.sizeMb >= 3) { console.error(`FAIL: ${k}.gif is ${v.sizeMb.toFixed(2)} MB (>= 3MB)`); fail = true }
