@@ -20,7 +20,7 @@ Started 2026-07-25 during the pre-review pass.
 | Buy dialogs | **REGENERATED** | `buy-dialogs-2026-07-25/` | Four captures including the **affordability boundary**: at $150 with a $1 bet, Buy Overdrive (100x) is enabled and NITRO (400x) is disabled, which is the R8/TR-016 fix proven rather than described. Asserted on the real DOM enabled state, not read off a screenshot. `owner-audit-v4/` marked SUPERSEDED in the same commit. |
 | Menu | **REGENERATED** | `menus-2026-07-25/` | Four panels, each opened by clicking the control a player uses: FEATURES bet-mode cards, HUD menu, autoplay menu, and the RG session panel reached through the HUD menu's Session item. |
 | Rules and paytable | **REGENERATED** | `rules-paytable-2026-07-25/` | All nine sections. Content asserted, not just screenshotted: RTP, max win, all five mode costs, Interface Guide and Responsible Play all present. Surfaced TR-037 (max win truncated on every card), **now fixed and the group re-captured after the fix**. |
-| Brand assets | **STALE** | `brand-emblem/`, `brand-tile-*`, `brand-vector-mark*/` | TR-031 provider mark candidates land separately under `provider-mark/` |
+| Brand assets | **REGENERATED** | `brand-assets-2026-07-25/` | Hero emblem at 512/96/48 alongside the three TR-031 provider-mark candidates, so the legibility question is answered in one place. Comparison sheet at `provider-mark/48px-legibility-comparison.png`. |
 | Scatter anticipation | **CURRENT** | `scatter-anticipation/` | Captured 2026-07-25 during the anticipation pass, after the art adoption |
 | Cohesion pass | **CURRENT** | `cohesion-pass/` | Captured 2026-07-25, includes the adopted art in situ |
 
@@ -52,5 +52,5 @@ authoritative. Regenerated replacements carry the true date.
 
 ## Gate on external review round two
 
-**Round two is NOT cleared while any group above reads STALE.** A reviewer scoring stale
+**All seven capture groups are REGENERATED as at 2026-07-25.** Round two is not blocked by stale captures. A reviewer scoring stale
 captures scores the drift rather than the game, which is the whole reason this pass exists.
