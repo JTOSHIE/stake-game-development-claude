@@ -206,3 +206,69 @@ Reel frequencies, which are maths-locked, are unaffected by the cosmetic rename.
 `reports/archive/2026-07-04_ux-polish.md` · `reports/archive/2026-07-04_motion-polish-v2.md` ·
 `reports/archive/2026-07-04_opus-elevate.md` · `reports/archive/2026-07-04_opus-elevate-2.md` ·
 `reports/audio/GENERATION_LOG_2026-07-13.md` · `reports/archive/2026-07-13_job1-audio-integration.md`
+
+---
+
+## STATE AT HEAD, 2026-07-25
+
+Authoritative where it conflicts with anything above. Every figure below is either measured
+from the shipped package or cited to its source.
+
+### Maths, unchanged and now proven row by row
+
+| Fact | Value |
+|---|---|
+| RTP, all five modes | **96.3500%** at 4dp |
+| Max win | **5,000x**, hard cap every mode |
+| Grid | 5x4, 1,024 ways |
+| Outcomes per mode | **100,000** (platform cap 10,000,000) |
+| Base hit rate | 29.11% |
+| Base volatility (weighted SD) | 17.28x |
+| Feature trigger rate | 1 in 184.7 (0.5415%) |
+
+**Book-to-lookup equality is proven**, not asserted: 500,000 rounds, 4,455,829 assertions,
+zero failures (`tools/verify_books_lookup_equality.py`).
+
+**Weighted wincap frequency**, computed as capped weight over total weight rather than from
+raw row counts:
+
+| Mode | 1 in |
+|---|---|
+| base | 100,000 |
+| cruise | 250,000 |
+| antelite | 80,000 |
+| bonus | 1,000 |
+| super | 250 |
+
+### Scatter placement, measured across 40,000 base rounds
+
+| Fact | Value |
+|---|---|
+| Anticipation opens (2+ scatters) | 23.18% of base rounds |
+| Of those, convert to a trigger | 64.5% |
+| Triggers going past three scatters | 24.0% |
+| Third scatter lands on the final reel | 46.2% |
+| Rounds with two scatters on one reel | 0.5% |
+
+Maximum scatters on the visible 5x4 window is **5**, one per reel. The `reveal` event
+carries a six-row board per reel, the visible four plus one padding row at each end; the
+padding is never shown to a player and must not be counted.
+
+### Currency
+
+Fiat via `Intl` from the platform's code. Virtual: **XGC** to GC, **XSC** to SC, and
+**XEC** to SC for Stake EU, where XEC support is a release gate. The raw code is never
+shown to a player, asserted for every virtual code. Symbol placement is driven by the
+platform's own display metadata where supplied, with both placements asserted from fixture
+payloads.
+
+### Responsible gambling
+
+Jurisdiction flags are **enforced**, not merely derived: autoplay cap, `turboDisabled` and
+`minSpinMs` all gate real controls. Session panel and reality check carry native RG wording
+across 16 locales, and "Stop playing" halts autoplay and returns to idle.
+
+### Audio
+
+No soundtrack claim is made here. Audio ships or it does not; this document does not
+describe it in advance.
