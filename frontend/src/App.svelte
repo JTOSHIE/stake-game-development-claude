@@ -72,10 +72,12 @@
   import { cellMultipliers } from './lib/stores/cellMultipliers'
   import { currencyCode } from './lib/stores/gameStore'
   import { locales, type Locale } from './lib/i18n/translations'
+  import { tr } from './lib/i18n/tr'
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import { anyModalOpen } from './lib/stores/modalGuard'
+  import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -416,6 +418,7 @@
   // below); it must never be assumed to be 'bonus'.
   async function handleBuy(mode: BetMode = 'bonus'): Promise<void> {
     if ($isSpinning || featureActive) return
+    if ($bettingDisabled) return   // R2: no bet may be placed off a live session
     isSpinning.set(true)
     resetWin()
     lastRoundHadFeature = false
@@ -647,6 +650,21 @@
 
     await initRGS(gameId, token)
     // isLoading is cleared inside initRGS's finally block
+
+    // R2/TR-010, 2026-07-25. MOCK CONTAINMENT.
+    //
+    // rgsService sets _rgsMode = false on a real authenticate failure as well as
+    // on the dev no-params case, and spin() falls through to _mockSpin() in both.
+    // A production player whose session failed to authenticate would therefore
+    // have been served the mock: fabricated boards, fabricated wins, a balance
+    // moving on screen and nothing reaching the wallet. The file is locked, so
+    // the fallthrough is made unreachable rather than removed: betting is
+    // enabled only when we can positively establish a live session.
+    evaluateLiveGuard(
+      params.get('session') !== null && params.get('rgs_url') !== null,
+      Boolean(get(errorMessage)),
+      import.meta.env.DEV,
+    )
     playBGM()
 
     // Background is now static graded stills (video retired); the Overdrive
@@ -764,6 +782,7 @@
 
   async function handleSpin() {
     if ($isSpinning || featureActive) return
+    if ($bettingDisabled) return   // R2: no bet may be placed off a live session
     // Standing mode for normal spins (Normal/Cruise) plus the OVERBOOST
     // enhancer toggle - both live in the one standingMode store (FeatureMenu's
     // selectStanding()/toggleEnhancer() write it; see betMode.ts). The locked
@@ -964,6 +983,7 @@
     // Spacebar span the reels underneath all six. `$anyModalOpen` is the shared
     // registration those surfaces now write to, so a new modal suppresses the
     // spacebar by announcing itself rather than by being added to this line.
+    if ($bettingDisabled) return
     if ($anyModalOpen) return
     if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash || showHeroSplash) return
 
@@ -1155,6 +1175,17 @@
 
       {#if $errorMessage}
         <div class="error-banner">{errorDisplay}</div>
+      {/if}
+
+      <!-- R2/TR-010: a blocked session must SAY SO. Silently disabling the spin
+           button would look like a bug and invite reloading into the same
+           state. This is deliberately non-dismissible: there is no safe way to
+           continue, and it is a full-width banner rather than a modal so it
+           cannot be mistaken for something the player is meant to close. -->
+      {#if $bettingDisabled}
+        <div class="live-guard-banner" role="alert" data-testid="live-guard-banner">
+          {$tr('errSessionUnavailable')}
+        </div>
       {/if}
 
       <!-- SCENE GROUP — left, set further back (z8), future-spinner only.
@@ -1366,6 +1397,15 @@
 {/if}
 
 <style>
+  .live-guard-banner {
+    position: fixed; left: 0; right: 0; top: 0; z-index: 9000;
+    padding: 14px 18px; text-align: center;
+    font-family: 'Orbitron', monospace; font-size: 13px; line-height: 1.45;
+    color: #ffe6e6; background: rgba(96, 10, 16, 0.97);
+    border-bottom: 2px solid rgba(255, 90, 90, 0.75);
+    text-wrap: balance;
+  }
+
   :global(*, *::before, *::after) {
     box-sizing: border-box;
     margin: 0;
