@@ -9,57 +9,115 @@ Australian English, no em dashes or en dashes.
 
 ---
 
-## 010 - 2026-07-25 - Wave 2 opened: TR-020a closed on evidence, one currency question needs a ruling
+## 010 - 2026-07-25 - Wave 2 complete: five PRs open, four defects were invisible to every existing check
 
-**Ruling 23 executed, and the answer was the opposite of the theory.** Instrumenting
-`setOverdriveBed()` refuted the early-return hypothesis outright: on a real bought
-feature the counters read `crossfadeToTension` 0 to 1 and `crossfadeToBase` 0 to 1,
-`earlyReturnMuted` 0, and `bgm_tension` genuinely plays. The crossfade was correct the
-whole time. All three red checks were harness faults, two of them the same mistake: a
-`?mockCategory` pinned for the real spin also governed the buy (so the buy served a base
-round and there was no feature to swap for), and the seam check appended asset paths
-after the query string, so it decoded `index.html` rather than audio for a fortnight.
-`AUDIO VERIFY: ALL CHECKS PASS`, 8 of 8, three consecutive runs. PR #98.
+**Ruling 23 executed, and it refuted its own hypothesis.** Instrumenting
+`setOverdriveBed()` proved the crossfade correct: on a real bought feature the counters
+read `crossfadeToTension` 0 to 1, `crossfadeToBase` 0 to 1, `earlyReturnMuted` 0, and
+`bgm_tension` genuinely plays. The early-return theory is REFUTED. All three red checks
+were harness faults, two of them one mistake: a `?mockCategory` pinned for the real spin
+also governed the buy, so the buy served a base round with no feature to swap for; and
+the seam check appended asset paths after the query string, decoding `index.html` instead
+of audio for a fortnight. 8 of 8 green, three consecutive runs. PR #98.
 
-Two of my own hypotheses, a click race and an affordability edge, were wrong, and one
-had already reached a code comment as the root cause. The instrumentation is what
-caught it before commit. That is convention (l) doing its job.
+**Wave 2 complete. PRs #99, #100, #101, #102, all open for review.**
 
-**R4 delivered bar one part.** A finding worth naming: 14 hardcoded `aria-label`s carried
-the restricted phrase "bet". No existing check could see them, because the visible-text
-sweep reads rendered DOM text and screen-reader text is not rendered DOM text. In
-practice a blind player in a social jurisdiction heard the exact vocabulary a sighted
-player was protected from. Fixed at the source (three translated keys x 16 locales plus
-SOCIAL_OVERRIDES), proven at runtime, and held by a new CI gate. Also fixed: replay
-derived social mode from the `social` flag alone, so `currency=XSC` with no flag rendered
-real-money vocabulary beside an SC balance.
+| PR | Item | What was actually wrong |
+|---|---|---|
+| #99 | R4 / TR-012 | 14 `aria-label`s carried the restricted phrase "bet". A blind player in a social jurisdiction heard the vocabulary a sighted player was protected from. Replay derived social mode from the flag alone, so `currency=XSC` rendered real-money wording beside an SC balance. |
+| #100 | R5 / TR-013 | FeatureMenu's bet arrows used the hardcoded ladder. Off the authenticated ladder `indexOf` is -1, so `BET_LEVELS[-1+1]` is 0.10: "+" DROPPED the player's bet to the minimum, "-" did nothing, and the control stayed enabled. |
+| #101 | R7 / TR-015 | `turboDisabled` had ZERO readers anywhere. Derived correctly, ignored by everything, so a market banning fast play still ran at 2x and 4x. `maxAutoplaySpins` gated only the infinite option, so a cap of 25 still offered and started 100. The RG test was not in CI at all. |
+| #102 | R8 / TR-016 | Spacebar span the reels under six blocking surfaces, and autoplay fired through reality checks. `canBuyBonus` checked `bet x 100` at the 400x tier, enabling CONFIRM beside a correctly displayed 400x price. |
 
-**DECISION REQUEST, one numbered item.**
+**The pattern worth your attention.** Every one of these was invisible to the existing
+gates, and for a structural reason rather than an oversight in each case:
 
-1. **XEC. Implement on review 1's word, or hold?** Review 1 marks XEC absent as a FAIL and
-   asserts current jurisdiction requirements treat XGC, XSC and XEC as social currencies.
-   It cites no first-party source. Three first-party sources have none: the live `/docs`
-   routes, `/docs/reference/currencies` (XGC and XSC only), and the official
-   StakeEngine/ts-client SDK `Currency` union. Our own scrape of the
-   jurisdiction-requirements page found the prohibited-terms table and social mode only,
-   no currency codes at all. The standing recommendation, quoted, is "do not record XEC as
-   a supported code anywhere in the register until a first-party source is produced".
-   Implementing it means inventing a symbol mapping, which convention (l) forbids, so I
-   have parked it as TR-012b rather than guessing.
-   **Options:** (a) hold until a first-party source appears, current position;
-   (b) resolve empirically by toggling currencies in the Developer Testing Tool at
-   staging, already recorded as comms map item 6; (c) implement XEC to SC defensively,
-   cheap, but records an unverified code as fact. **Recommend (b), then (a) meanwhile.**
+- The prohibited-term sweep reads **rendered DOM text**, and screen-reader text is not
+  rendered DOM text, so no accessibility string was ever checked.
+- `App.svelte`'s modal list could not name another component's local `let`, so six
+  blocking surfaces could never have been added to it. The fix inverts the dependency:
+  surfaces register themselves.
+- `turboDisabled` was correct in the store and read by nothing. "The store holds the
+  right value" is not the compliance claim.
 
-**Artefacts.** PR #98; `reports/qa/audio_verify_2026-07-13.json` (green, 8 of 8);
-`reports/qa/a11y_social_proof_2026-07-25.json`; `frontend/scripts/a11y_social_terms_check.mjs`;
-tracker rows TR-020a MERGED, TR-012 MERGED, TR-012a and TR-012b opened.
+Each now has a permanent gate. Four new CI gates added, and the RG suite put into CI for
+the first time.
 
-**Note for the record.** Briefs are dated 2026-07-27 and 2026-07-28; actual commit and run
-dates are 2026-07-25. New comments carry the verifiable run date. Which is authoritative
-is worth one line in the next ruling block.
+**Two defects that only the browser proofs caught, both the same shape as the bugs.**
+In R5 a `$:` alias latched a transient `false`, leaving both bet arrows disabled with a
+valid bet on screen: the model was right, the surface was not. In R7 my first proof read
+an EMPTY autoplay menu and passed every "does not offer" assertion vacuously; it now
+asserts the offered list positively and throws on an empty read. Recording both because
+they argue for keeping runtime proofs alongside unit tests rather than instead of them.
 
-**Next.** R5 bet levels, R7 RG enforcement, R8 modal affordability, completing wave 2.
+**Locked files untouched throughout.** `gameStore.ts`'s `canIncreaseBet` and
+`canBuyBonus` are now unreferenced by production code and recorded in `LOCKED_FILE_DEBTS`
+as **wrong, not merely dead**: leaving them unread is strictly safer than leaving them
+wired. Both await the next sanctioned pass.
+
+**DECISION REQUESTS, numbered.**
+
+1. **XEC: implement on review 1's word, or hold?** Review 1 marks its absence a FAIL and
+   asserts jurisdiction requirements treat XGC, XSC and XEC as social. It cites no
+   first-party source. Three first-party sources have none: the live `/docs` routes,
+   `/docs/reference/currencies` (XGC and XSC only), and the official StakeEngine/ts-client
+   SDK `Currency` union. Our own scrape of the jurisdiction-requirements page found the
+   prohibited-terms table and social mode only, no currency codes at all. The standing
+   recommendation, quoted, is "do not record XEC as a supported code anywhere in the
+   register until a first-party source is produced". Implementing it means inventing a
+   symbol mapping, which convention (l) forbids, so it is parked as TR-012b.
+   **Options:** (a) hold, current position; (b) resolve empirically by toggling
+   currencies in the Developer Testing Tool at staging, already comms map item 6;
+   (c) implement XEC to SC defensively, cheap, but records an unverified code as fact.
+   **Recommend (b), then (a) meanwhile.**
+
+2. **R1a needs a lock sanction naming the deny lines.** Step 6 of the execution order is
+   `fix/R1a-rgs-locked-pass` as an isolated commit under convention (f). Convention (e)
+   requires the sanctioning brief to name the exact deny line(s) to lift. Not started,
+   and will not start, until that arrives. Wave 3 (R1, R2, R3, R11) can proceed
+   independently in the meantime.
+
+3. **TR-012a: who writes the RG wording?** Four player-facing `aria-label`s stay
+   English-only, including "Reality check" and "Session information". Not a compliance
+   breach, none carries a restricted phrase, verified by the new gate. Deliberately NOT
+   machine-translated: the standing caveat is that machine translations are not
+   native-reviewed, RG terms especially. Needs a decision on who supplies reviewed
+   wording for 15 locales.
+
+4. **Which date is authoritative?** Briefs are labelled 2026-07-27 and 2026-07-28; actual
+   commit and run dates are 2026-07-25, checkable in git. New comments carry the
+   verifiable run date and existing text was left alone. One line settles it.
+
+**Process note, my error.** Entry 009 was the last thing you could see, because entry 010
+was committed onto a feature branch instead of straight to `main`. `FABLE_COMMS.md` is a
+GREEN-lane document and you fetch it from the repository, so it must always go directly
+to `main`. Corrected, and noted so it does not recur.
+
+**Security note, closed.** The owner's off-repo backup of the full `games` directory on
+Google Drive, raised on 2026-07-28 as a pre-release exposure because it loaded without
+sign-in, has had its **sharing disabled** and is no longer publicly accessible. The backup
+itself is intact and owner-held. Recorded in `COMPLIANCE_WATCH.md` (status CLOSED) and now
+also on the `BOOKS_MANIFEST.md` row that names it, so the manifest cannot be read as
+implying a public copy. No link is recorded in this repository.
+
+**Also parked at owner's direction.** The PAR-sheet question is held until you and the
+owner speak. The antelite note's permanent location is already resolved as
+`COMPLIANCE_WATCH.md` per your 2026-07-28 ruling; nothing is blocked by the hold.
+
+**Artefacts.** PRs #98, #99, #100, #101, #102. Proofs:
+`reports/qa/audio_verify_2026-07-13.json` (8 of 8),
+`a11y_social_proof_2026-07-25.json`, `bet_ladder_proof_2026-07-25.json`,
+`rg_enforcement_proof_2026-07-25.json`, `modal_safety_proof_2026-07-25.json`.
+New gates: `a11y_social_terms_check.mjs`, `betLadder.test.ts`, `modalGuard.test.ts`,
+plus `responsibleGambling.test.ts` into CI. Tracker rows TR-020a, TR-012, TR-013, TR-015,
+TR-016 move to MERGED on merge; TR-012a and TR-012b opened.
+
+**Heads-up for whoever merges.** #100, #101 and #102 each add their own "Gate 8" to
+`.github/workflows/checks.yml`. The first merges clean, the second and third conflict in
+that file only. The gates are independent and just need renumbering; merge one at a time.
+
+**Next.** Wave 3 (R1, R2, R3, R11), then `feature/scatter-anticipation` and
+`feature/cohesion-pass`. R1a waits on item 2 above.
 
 ---
 
