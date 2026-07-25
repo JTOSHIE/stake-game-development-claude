@@ -174,7 +174,7 @@
         <div class="fs-htw fs-plate">
           <div class="fs-face">
             <h4>Match symbols on adjacent reels starting from reel 1 (left to right).</h4>
-            <p>All matching symbol positions count — no fixed paylines.</p>
+            <p>All matching symbol positions count, with no fixed paylines.</p>
             <div class="fs-ways-callout fs-plate">
               <div class="fs-face">
                 <span class="fs-ways-num fs-num">1,024</span>
@@ -199,7 +199,7 @@
               {/each}
             </div>
           </div>
-          <p class="fs-caption">Reels 1, 2 and 3 hold the same symbol (highlighted) — a match, read left to right from reel 1. Reels 4 and 5 are not required.</p>
+          <p class="fs-caption">Reels 1, 2 and 3 hold the same symbol (highlighted), which is a match read left to right from reel 1. Reels 4 and 5 are not required.</p>
         </div>
 
         <!-- Symbol payouts -->
@@ -217,9 +217,9 @@
                     <span class="fs-sym-note">Substitutes for all symbols except SCATTER</span>
                   {:else}
                     <div class="fs-pay-rows">
-                      <div class="fs-pay-row"><span class="fs-pay-count">3×</span><span class="fs-pay-val fs-num">{sym.pays[2] ?? '—'}</span></div>
-                      <div class="fs-pay-row"><span class="fs-pay-count">4×</span><span class="fs-pay-val fs-num">{sym.pays[3] ?? '—'}</span></div>
-                      <div class="fs-pay-row"><span class="fs-pay-count">5×</span><span class="fs-pay-val fs-num">{sym.pays[4] ?? '—'}</span></div>
+                      <div class="fs-pay-row"><span class="fs-pay-count">3×</span><span class="fs-pay-val fs-num">{sym.pays[2] ?? '-'}</span></div>
+                      <div class="fs-pay-row"><span class="fs-pay-count">4×</span><span class="fs-pay-val fs-num">{sym.pays[3] ?? '-'}</span></div>
+                      <div class="fs-pay-row"><span class="fs-pay-count">5×</span><span class="fs-pay-val fs-num">{sym.pays[4] ?? '-'}</span></div>
                     </div>
                   {/if}
                 </div>

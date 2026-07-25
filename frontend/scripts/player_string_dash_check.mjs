@@ -13,7 +13,7 @@
 //
 // Run (from frontend/): node scripts/player_string_dash_check.mjs
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative, resolve } from 'node:path'
 
@@ -22,9 +22,24 @@ const ROOT = resolve(here, '..')
 
 // The i18n tree is the authority for player-facing copy. fsModes carries the
 // mode labels and blurbs, which are equally player-facing.
+//
+// WIDENED 2026-07-26, from the owner's first live portal session. This list was
+// exactly the two files below, and the convention it enforces says "no em
+// dashes or en dashes anywhere". Two em dashes were therefore sitting in
+// PaytableModal.svelte's prose and rendering to the player on the real
+// platform, in a gate that reported PASS while scanning two files.
+//
+// That is the same shape as the social conformance script round-two reviewer 3
+// dismantled: a gate whose name implies broad coverage while its scope is a
+// couple of hand-listed files. Every component is now scanned, because every
+// component can carry a hardcoded player-facing string, which is precisely how
+// these two got there.
 const FILES = [
   'src/lib/i18n/translations.ts',
   'src/lib/config/fsModes.ts',
+  ...readdirSync(join(ROOT, 'src/lib/components'))
+    .filter((f) => f.endsWith('.svelte'))
+    .map((f) => `src/lib/components/${f}`),
 ]
 
 const EM = '—'

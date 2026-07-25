@@ -93,7 +93,7 @@
   <!-- Zero-win state: dim panel matching original layout -->
   <div class="win-panel win-idle">
     <div class="win-label idle">{$tr('win')}</div>
-    <div class="win-amount win-amount--empty">—</div>
+    <div class="win-amount win-amount--empty">-</div>
   </div>
 {/if}
 

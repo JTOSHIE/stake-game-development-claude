@@ -623,7 +623,7 @@
       app.ticker.add(() => _tickParticles(app.ticker.deltaMS))
       assetsReady = true
     } catch (err) {
-      console.error('[GameGrid] PixiJS init failed — win lines disabled:', err)
+      console.error('[GameGrid] PixiJS init failed, win lines disabled:', err)
       assetsReady = true // tiles are DOM; still render/animate without the canvas
     }
 
