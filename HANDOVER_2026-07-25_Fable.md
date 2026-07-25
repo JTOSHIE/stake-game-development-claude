@@ -48,7 +48,7 @@ Australian English throughout; no em or en dashes anywhere.
 
 All conventions referenced above are as pinned in `CLAUDE.md` (locked files, the
 lock-exception mechanism, integer-micros rule, session reporting, explicit-path commits)
-and `reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md` - both still current, neither touched this arc.
+and `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` - both still current, neither touched this arc.
 
 ---
 

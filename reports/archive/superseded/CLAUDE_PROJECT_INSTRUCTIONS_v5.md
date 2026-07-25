@@ -1,3 +1,6 @@
+> **SUPERSEDED.** The active project operating frame is `CLAUDE_PROJECT_INSTRUCTIONS_v6.md`
+> at the repository root. This file's own header still reads ACTIVE; that is stale.
+
 # Claude Project Instructions: We Roll Spinners
 
 **Version:** 5.1

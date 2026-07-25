@@ -9,7 +9,7 @@ several of these are cited by session reports written while they were current.
 | Document | Superseded by |
 |---|---|
 | `CLAUDE_PROJECT_INSTRUCTIONS_v5.md` | `CLAUDE.md` |
-| `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` | `CLAUDE.md` |
+| `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` | restored to the repository root on 2026-07-25 by owner instruction; ACTIVE there as the project operating frame |
 | `AUDIT_PACK_INDEX.md` | `SUBMISSION_DOSSIER.md` |
 | `FUTURE_SPINNER_PROJECT_STATUS.md` | `SUBMISSION_DOSSIER.md` and `docs/records/reviews/REVIEW_TRACKER.md` |
 | `MATH_VALIDATION.md` | `GAME_FACTS.md`, `SUBMISSION_DOSSIER.md`, and `tools/verify_books_lookup_equality.py` |

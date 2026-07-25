@@ -3,6 +3,25 @@
 Project instructions for Claude Code. Read at session start. These override default
 behaviour. Australian English, metric units, no em dashes or en dashes anywhere.
 
+## Division of authority (recorded 2026-07-25, owner instruction)
+
+Two instruction documents exist and they do not compete.
+
+- **`CLAUDE_PROJECT_INSTRUCTIONS_v6.md`** at the repository root is the **stable project
+  operating frame**: the triad, the session-start protocol, platform reality and the
+  standing board. It is pinned verbatim in the owner's Claude project for Fable check-ins,
+  so it changes rarely and deliberately. It supersedes v5, which stays archived.
+- **`CLAUDE.md`**, this file, is the **builder's conventions document**. It accumulates
+  beyond v6 and already carries conventions past it, including (n).
+
+**Where the two conflict on builder conduct, `CLAUDE.md` governs**, because it is the
+document kept current with the work.
+
+**Live project state is read from the repository, never from either instructions
+document.** v6's own header says so, and its sections 4 and 6 are a dated snapshot rather
+than current status. The tracker, the session report and the living handover are state;
+these two files are frame.
+
 ## Locked files (do not modify)
 
 These are also machine-enforced by the `deny` rules in `.claude/settings.json`:
