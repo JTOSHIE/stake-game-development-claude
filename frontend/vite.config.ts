@@ -30,7 +30,11 @@ import { resolve, join } from 'node:path'
 // is itself gated on the same flag. closeBundle only ever runs for `vite
 // build`, never `vite dev`, so the dev server keeps every theme for local
 // theme-selector testing; only the shipped artifact is pruned.
-function dirSize(absPath) {
+// R2R3 finding 9 / TR-046, fixed R2R-R JOB F (2026-07-26). This parameter was
+// untyped, so `tsc -p tsconfig.node.json` reported TS7006 and `npm run check`
+// exited non-zero, which is why CI only ever ran the Svelte half. One
+// annotation, and the complete command is green.
+function dirSize(absPath: string): number {
   let total = 0
   for (const entry of readdirSync(absPath, { withFileTypes: true })) {
     const p = join(absPath, entry.name)

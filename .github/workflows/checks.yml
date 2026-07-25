@@ -233,6 +233,29 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/services/replayRounds.test.ts
 
+      # ── Gate 1a: the COMPLETE type-check, not just the Svelte half ───────────
+      # R2R3 finding 9 / TR-046: "npm run check reports 0 Svelte errors, 36
+      # warnings and vite.config.ts:33 TS7006. CI runs only the Svelte baseline,
+      # so TR-018's 'baseline is zero and CI enforces it' is incomplete." It was
+      # right: gate 1 runs typecheck_baseline.mjs, which is svelte-check alone,
+      # and the tsc half of `npm run check` had been red the whole time. The
+      # TS7006 is fixed and the whole command now runs here, so the claim and
+      # the gate finally agree.
+      - name: npm run check (svelte-check AND tsc)
+        working-directory: frontend
+        run: npm run check
+
+      # ── Gate 1b: the production build ────────────────────────────────────────
+      # Also R2R3 finding 9, which asked for "the complete command green and run,
+      # plus a production build, in CI". A build catches what no type-check can:
+      # a broken import chain, a missing asset, a plugin that throws at
+      # closeBundle. It is also what every Playwright proof that serves `dist`
+      # depends on existing, so a build failure here is a failure of half the
+      # evidence pipeline.
+      - name: production build
+        working-directory: frontend
+        run: npm run build
+
       # ── Gate 14: the books verifier fails closed ─────────────────────────────
       # Run at HEAD with the private books absent, the verifier produced five
       # `zstd: can't stat` errors, processed zero rounds, made zero assertions
