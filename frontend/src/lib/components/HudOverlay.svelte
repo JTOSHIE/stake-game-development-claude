@@ -21,6 +21,7 @@
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { autoplayLimits, rgJurisdiction, showSessionPanel } from '../stores/responsibleGambling'
+  import { setModalOpen } from '../stores/modalGuard'
   import { standingMode } from '../stores/betMode'
   import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
   import { jurisdictionFlags } from '../stores/jurisdiction'
@@ -88,6 +89,11 @@
   let singleWinLimitOn = false
   let singleWinLimitMult = 10
   let showMenu = false
+
+  // R8/TR-016: both of these are component-local, so App.svelte's spacebar
+  // handler could never name them. Registered instead of listed.
+  $: setModalOpen('auto-menu', showAutoMenu)
+  $: setModalOpen('hud-menu', showMenu)
 
   // ── Bet ladder - ported from the retired ControlBar unchanged ────────────
   $: activeLevels = $rgsBetLevels.length > 0 ? $rgsBetLevels : BET_LEVELS

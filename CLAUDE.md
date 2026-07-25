@@ -69,6 +69,17 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   the local declaration and importing the canonical one the next time `rgsService.ts`
   is under a sanctioned edit.
 
+- **`canBuyBonus` inside `gameStore.ts` is `$bal >= $bet * 100` for EVERY buy tier.**
+  That is the Buy Overdrive price. NITRO OVERDRIVE costs 400x, so at bet 1.00 with
+  balance 150.00 the gate returned true and the confirm dialog enabled CONFIRM beside
+  a correctly displayed 400.00 price. Recorded here previously as compensated by
+  `FeatureMenu`'s own per-mode guard running first, which remains true. R8/TR-016
+  (2026-07-25) replaced it at both consumers with the non-locked
+  `stores/buyAffordability.ts`, so the card and the dialog now share one per-tier
+  truth and cannot disagree. The locked derived store is now unreferenced by
+  production code and allowlisted in the dead-wiring gate. Delete it on the next
+  sanctioned `gameStore.ts` pass; do not re-import it.
+
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
   read anywhere in production code, verified including `derived()` and `.subscribe()`

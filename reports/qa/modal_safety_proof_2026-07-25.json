@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-25T04:52:24.095Z",
+  "cases": {
+    "nothingOpen": {
+      "modals": [],
+      "spun": true
+    },
+    "featureMenuOpen": {
+      "modals": [
+        "feature-menu"
+      ],
+      "spun": false
+    },
+    "buyConfirmOpen": {
+      "modals": [
+        "buy-confirm"
+      ],
+      "spun": false
+    }
+  },
+  "pass": true
+}
