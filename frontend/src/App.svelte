@@ -673,7 +673,13 @@
     if (isReplay) return
 
     const params  = new URLSearchParams(window.location.search)
-    const token   = params.get('session') ?? 'dev-mock-token'
+    // R2R blocker 1. The OFFICIAL launch sends `sessionID`; only `session` was
+    // read here, so a real launch fell through to the dev token, failed to
+    // authenticate, and the R2 live guard then correctly refused to take a bet.
+    // The game was dead on arrival on an official URL. `session` is kept as a
+    // legacy fallback, and the order matches parseSessionParams so the token
+    // read and the guard below cannot disagree about which launch this is.
+    const token   = params.get('sessionID') ?? params.get('session') ?? 'dev-mock-token'
     const gameId  = 'future_spinner'
 
     await initRGS(gameId, token)
@@ -689,7 +695,7 @@
     // the fallthrough is made unreachable rather than removed: betting is
     // enabled only when we can positively establish a live session.
     evaluateLiveGuard(
-      params.get('session') !== null && params.get('rgs_url') !== null,
+      (params.get('sessionID') !== null || params.get('session') !== null) && params.get('rgs_url') !== null,
       Boolean(get(errorMessage)),
       import.meta.env.DEV,
     )

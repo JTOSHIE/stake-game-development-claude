@@ -173,6 +173,14 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/scatterEscalation.test.ts
 
+      # ── Gate 10d: official launch parameters ─────────────────────────────────
+      # The official launch sends sessionID; App.svelte read only `session`, so a
+      # real launch authenticated with a dev token, failed, and the live guard
+      # then correctly refused to bet. Unplayable on a real URL. (R2R blocker 1)
+      - name: launch params
+        working-directory: frontend
+        run: npx tsx src/lib/stores/launchParams.test.ts
+
       # ── Gate 11: live event schema alignment ─────────────────────────────────
       # The locked parser looked for board/win/scatter events. Across the first
       # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs
