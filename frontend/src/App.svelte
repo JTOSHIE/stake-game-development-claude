@@ -696,12 +696,62 @@
   // scrolled a few px past the viewport bottom - caught before committing
   // any screenshot, not assumed from the CSS alone.
   const PORTRAIT_HUD_MIN_H = 290
+  // JOB 3(b), TR-065/TR-069. The constant above is now a FLOOR, not the answer.
+  //
+  // It has drifted twice: 260 was hand-summed from the component styles and
+  // undercounted rendered padding, so it became a measured 290, and by
+  // 2026-07-26 the real content-driven height had grown again to ~301, which
+  // put 11px of the HUD past the viewport bottom at Mobile M and Mobile S and
+  // produced the scrollbar guideline item 15 forbids. Bumping the number a
+  // third time would just restart the same clock.
+  //
+  // So the scale is derived from the slot's ACTUAL content height, measured
+  // from the live element, with the constant kept only as a floor for the first
+  // frame before any measurement exists. This cannot drift, because nothing is
+  // being estimated any more.
+  //
+  // No feedback loop: the HUD renders at native scale and its content height
+  // does not depend on the canvas scale, so one measurement settles it.
+  // Measured at Mobile M (375x667) on 2026-07-26, which is why both constants
+  // below are now fallbacks rather than answers:
+  //
+  //   wordmark   assumed 28, actually 42        (14px under)
+  //   HUD slot   assumed 290, content needs 287, but .p-hud inside it ran to
+  //              y=678 against a 667 viewport   (11px past the bottom)
+  //
+  // 42 + 287 = 329 needed above the canvas; the old maths reserved 28 + 290 =
+  // 318 and handed the canvas 349px where only 338 existed. The 11px overshoot
+  // is exactly the scrollbar guideline item 15 forbids.
+  let hudSlotEl: HTMLElement | null = null
+  let wordmarkEl: HTMLElement | null = null
+  let measuredHudH = 0        // 0 = not yet measured, fall back to the constant
+  let measuredWordmarkH = 0
   function computePortraitCanvasScale(): number {
     if (typeof window === 'undefined') return 1
     const widthBasedScale = (0.96 * window.innerWidth) / GRID_SPEC_W
-    const availableCanvasH = Math.max(window.innerHeight - PORTRAIT_WORDMARK_H - PORTRAIT_HUD_MIN_H, 1)
+    // Once a real measurement exists it is used as-is. Clamping it back up to
+    // the old constant would reinstate the very estimate that drifted, which is
+    // the mistake the first draft of this fix made: Math.max(287, 290) returned
+    // 290 and nothing changed.
+    const hudH = measuredHudH > 0 ? measuredHudH : PORTRAIT_HUD_MIN_H
+    const wordH = measuredWordmarkH > 0 ? measuredWordmarkH : PORTRAIT_WORDMARK_H
+    const availableCanvasH = Math.max(window.innerHeight - wordH - hudH, 1)
     const heightBasedScale = availableCanvasH / PORTRAIT_CROP_BOTTOM_Y
     return Math.min(widthBasedScale, heightBasedScale)
+  }
+  /** Re-measure the portrait chrome and rescale the canvas if it has changed. */
+  function remeasurePortraitHud(): void {
+    if (!portrait || !hudSlotEl) return
+    // scrollHeight, not clientHeight: the slot is a flex item that can be
+    // squeezed below its content, and it is exactly that squeeze which
+    // overflows the wrapper. scrollHeight reports what the content really needs.
+    const h = hudSlotEl.scrollHeight
+    const w = wordmarkEl ? wordmarkEl.getBoundingClientRect().height : 0
+    if ((h > 0 && Math.abs(h - measuredHudH) > 1) || (w > 0 && Math.abs(w - measuredWordmarkH) > 1)) {
+      if (h > 0) measuredHudH = h
+      if (w > 0) measuredWordmarkH = w
+      portraitCanvasScale = computePortraitCanvasScale()
+    }
   }
   // Landscape compact HUD pass (2026-07-14b): gate by HEIGHT, not aspect
   // ratio - a landscape phone (innerWidth >= innerHeight) with innerHeight
@@ -791,7 +841,20 @@
     compactCanvasScale = computeCompactCanvasScale()
     miniPlayer = computeMiniPlayer()
     miniCanvasScale = computeMiniCanvasScale()
+    // The HUD's content height can change with orientation and with locale (a
+    // longer translated label wraps), so re-measure on every resize rather than
+    // trusting the value taken at mount.
+    remeasurePortraitHud()
   }
+
+  // Watch the slot itself, not just the window: the HUD grows when a feature
+  // strip appears mid-round, which no resize event announces.
+  let hudSlotObserver: ResizeObserver | null = null
+  $: if (hudSlotEl && typeof ResizeObserver !== 'undefined' && !hudSlotObserver) {
+    hudSlotObserver = new ResizeObserver(() => remeasurePortraitHud())
+    hudSlotObserver.observe(hudSlotEl)
+  }
+  onDestroy(() => { hudSlotObserver?.disconnect(); hudSlotObserver = null })
 
   onMount(async () => {
     // Skip all RGS initialisation in replay mode, ReplayMode handles its own flow
@@ -1320,7 +1383,7 @@
          Still native-DOM and never stage-scaled, so it costs the canvas no
          vertical space beyond its own box. Text fallback retained for a failed
          image load, mirroring the desktop lockup's own on:error behaviour. -->
-    <div class="portrait-wordmark">
+    <div bind:this={wordmarkEl} class="portrait-wordmark">
       {#if portraitLogoFailed}
         <span class="portrait-wordmark-text">{$activeTheme.name}</span>
       {:else}
@@ -1561,7 +1624,7 @@
          get a `portrait` or `compactLandscape` prop so their own CSS
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
-    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
+    <div bind:this={hudSlotEl} class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
       <!-- Portrait Overdrive meter (2026-07-15, item 2): docked between the
            grid (canvas-slot above) and the FEATURES bar - occupies the same
            slot FeatureMenu's trigger would, since that's hidden during the
@@ -1829,6 +1892,19 @@
     position: relative;
     width: 100%;
     height: 100%;
+    /* JOB 3(b). The slot is a fixed viewport onto the 1280x720 stage, and the
+       scene deliberately bleeds past it (car-layer and char-layer extend beyond
+       the frame by design, which is what gives the background its depth).
+       Desktop already clips that bleed via .stage's own overflow:hidden; the
+       native-HUD modes had no equivalent, so at Popout S the bleed made the
+       slot 403px wide inside a 400px viewport and the wrapper scrolled
+       sideways.
+       This is NOT the forbidden "hide the overflow to fake a fit": what is
+       being clipped is decorative background, and the layout gate proves it by
+       asserting separately that every interactive control lies inside its
+       clipping ancestor. A control pushed out here would fail that assertion,
+       clipped or not. */
+    overflow: hidden;
   }
   .canvas-slot.compact-landscape {
     flex: 0 0 auto;

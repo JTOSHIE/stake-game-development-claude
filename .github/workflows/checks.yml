@@ -264,6 +264,25 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      # ── Gate 13b: the dash gate's dist scan ──────────────────────────────────
+      # Runs after the build because dist is the authority: it catches a dash
+      # however it was authored, including in a public asset that no scan of
+      # src/ could ever see. Its first run found 17 in a shipped sounds README.
+      - name: dash gate, dist scan
+        working-directory: frontend
+        run: node scripts/dash_gate.mjs
+
+      # ── Gate 13c: the frame FITS at all seven platform presets ───────────────
+      # Guideline item 15. Asserts two independent things, because satisfying one
+      # by breaking the other is exactly how this nearly went wrong: the frame
+      # must not scroll, AND every interactive control must lie inside its
+      # clipping ancestor. Changing overflow to hidden would have passed the
+      # first and silently failed the second (TR-069). The seven viewports are
+      # the platform's own, read off the DTT Screen menu. (JOB 3b, TR-065/069/071)
+      - name: layout fit gate, seven presets
+        working-directory: frontend
+        run: node scripts/layout_fit_gate.mjs
+
       # ── Gate 14: the books verifier fails closed ─────────────────────────────
       # Run at HEAD with the private books absent, the verifier produced five
       # `zstd: can't stat` errors, processed zero rounds, made zero assertions

@@ -1,0 +1,75 @@
+{
+  "rows": [
+    {
+      "preset": "Desktop",
+      "size": "1200x675",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 12,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Laptop",
+      "size": "1024x576",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 12,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Popout S",
+      "size": "400x225",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 8,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Popout L",
+      "size": "800x450",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 11,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Mobile L",
+      "size": "425x812",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 11,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Mobile M",
+      "size": "375x667",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 11,
+      "offscreen": [],
+      "clipped": []
+    },
+    {
+      "preset": "Mobile S",
+      "size": "320x568",
+      "vScroll": false,
+      "hScroll": false,
+      "docScroll": false,
+      "controls": 11,
+      "offscreen": [],
+      "clipped": []
+    }
+  ],
+  "failures": []
+}
