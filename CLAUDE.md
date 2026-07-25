@@ -358,6 +358,32 @@ This binds every gate, not only new ones. Where an existing gate claims a class 
 has no seeded-violation self-test, it is making an unverified claim, and adding the self-test
 is the cheapest way to find out whether the claim is true.
 
+## THE STANDING MANDATE (owner's order, 2026-07-26, binding to submission)
+
+Recorded verbatim as given, and it outranks every convenience below it.
+
+> this title is the studio's flagship and the template for every future build.
+> Whatever is found gets fixed now, not later; before submission there is no
+> minor-defer category, only fixed or explicitly owner-parked with reasons. The
+> bar is that a player, a reviewer, or a rival studio inspecting any surface
+> concludes this was made by a professional outfit adhering to industry
+> conventions. Nothing player-visible may read as machine-generated.
+
+**What this changes in practice.** "Minor" is no longer a disposition. A finding
+is FIXED, or it is OWNER-PARKED with a written reason, and there is no third
+category. Severity still decides ORDER, never whether something gets done. The
+phrase "polish item for later" does not apply between now and submission, and a
+tracker row cannot be closed by arguing the defect is small.
+
+**The inspection test.** Before any surface is called done, ask what a rival
+studio's art director would conclude from it alone. Machine-tells are the specific
+failure this names: em dashes in prose, straight and curly quotes mixed in one
+view, double spaces, capitalisation that changes between two screens showing the
+same word, decimal or currency formats that disagree, placeholder strings that
+survived, button casing that drifts, iconography from two different families,
+and the system default font leaking through where the brand face should be. The
+sweep list and the repeatable gate live in `docs/QUALITY_CHARTER.md`.
+
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
 
