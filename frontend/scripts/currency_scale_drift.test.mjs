@@ -1,21 +1,27 @@
-// currency_scale_drift.test.mjs - Fable ruling 8 (2026-07-26).
+// currency_scale_drift.test.mjs - Fable ruling 8 (2026-07-26), updated by the
+// R1a sanctioned locked pass (2026-07-25).
 //
-// CURRENCY_SCALE exists in two places and cannot be reduced to one:
+// THE DUPLICATION IS GONE. There is now exactly ONE declaration of
+// CURRENCY_SCALE in the codebase:
 //
-//   src/lib/utils/currency.ts    CANONICAL
-//   src/lib/services/rgsService.ts   LOCKED, cannot be edited
+//   src/lib/utils/currency.ts        CANONICAL, and the only declaration
+//   src/lib/services/rgsService.ts   imports it (was a second declaration)
+//   src/lib/services/replayService.ts imports it (was a third)
 //
-// A third module-local copy in replayService.ts was removed in the same pass;
-// it now imports the canonical one.
+// The earlier version of this gate held two agreeing copies to each other,
+// because rgsService.ts was locked and could not be changed. The first lock
+// sanction (scope item d) removed that copy, so the gate's job changes: it no
+// longer reconciles duplicates, it asserts that duplicates have not come back.
+// That is the stronger property, and it is why the old failure message said the
+// gate "must be updated deliberately, not deleted" if the declaration ever
+// moved. This is that deliberate update.
 //
-// All copies currently agree. The money path is exactly where silent drift is
-// least acceptable (CLAUDE.md makes integer micros mandatory with zero float
-// tolerance), and "they agree because someone checked once" is the shape that
-// produced the 2026-07-25 currency defect. This gate holds the remaining
-// duplication with an assert rather than a comment.
+// The money path is exactly where silent drift is least acceptable (CLAUDE.md
+// makes integer micros mandatory with zero float tolerance), and "they agree
+// because someone checked once" is the shape that produced the 2026-07-25
+// currency defect.
 //
-// READ-ONLY. This script parses rgsService.ts as text and never writes to it.
-// Reading a locked file is permitted; writing is not, and nothing here does.
+// READ-ONLY. This script parses source as text and never writes to any of it.
 //
 // Run (from frontend/): node scripts/currency_scale_drift.test.mjs
 
@@ -28,7 +34,13 @@ const src = (p) => readFileSync(resolve(here, '..', p), 'utf-8')
 
 const SOURCES = [
   { label: 'canonical', path: 'src/lib/utils/currency.ts', locked: false },
-  { label: 'locked RGS', path: 'src/lib/services/rgsService.ts', locked: true },
+]
+
+// Modules that must IMPORT the canonical constant and must never declare their
+// own. rgsService.ts joined this list when the lock sanction removed its copy.
+const MUST_IMPORT = [
+  'src/lib/services/rgsService.ts',
+  'src/lib/services/replayService.ts',
 ]
 
 // Matches `export const CURRENCY_SCALE = 1_000_000` and the un-exported form,
@@ -69,13 +81,17 @@ if (!canonical) {
   }
 }
 
-// replayService must not reintroduce its own copy.
-const replay = src('src/lib/services/replayService.ts')
-if (DECL.test(replay)) {
-  failures.push('src/lib/services/replayService.ts has reintroduced a local CURRENCY_SCALE declaration; it must import the canonical one from utils/currency.ts')
-}
-if (!/import\s*\{[^}]*CURRENCY_SCALE[^}]*\}\s*from\s*['"]\.\.\/utils\/currency['"]/.test(replay)) {
-  failures.push('src/lib/services/replayService.ts no longer imports CURRENCY_SCALE from utils/currency')
+// No consumer may reintroduce a local copy, and each must still import the
+// canonical one. A module that stops importing it has either stopped using
+// money maths, which is worth knowing, or has grown a copy under another name.
+for (const path of MUST_IMPORT) {
+  const text = src(path)
+  if (DECL.test(text)) {
+    failures.push(`${path} has reintroduced a local CURRENCY_SCALE declaration; it must import the canonical one from utils/currency.ts`)
+  }
+  if (!/CURRENCY_SCALE[^\n]*from\s*['"]\.\.\/utils\/currency['"]|from\s*['"]\.\.\/utils\/currency['"][^\n]*CURRENCY_SCALE/.test(text)) {
+    failures.push(`${path} no longer references CURRENCY_SCALE from utils/currency`)
+  }
 }
 
 for (const f of found) {
@@ -87,4 +103,5 @@ if (failures.length) {
   for (const f of failures) console.error(`  - ${f}`)
   process.exit(1)
 }
-console.log('\nCURRENCY SCALE DRIFT: PASS (all declarations agree at 1,000,000)')
+console.log(`\n  ${MUST_IMPORT.length} consumer(s) verified as importing, not declaring`)
+console.log('\nCURRENCY SCALE DRIFT: PASS (one declaration at 1,000,000, no copies)')
