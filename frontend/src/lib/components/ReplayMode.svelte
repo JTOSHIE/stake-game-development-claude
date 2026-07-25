@@ -262,7 +262,7 @@
     <div class="replay-controls">
       {#if phase === 'ready'}
         <button class="replay-btn start-replay" on:click={startReplay}>
-          <div class="btn-line-1">START REPLAY</div>
+          <div class="btn-line-1">{t(params.lang as Locale, 'hudStartReplay', mode)}</div>
           <div class="btn-line-2">Mode: <strong>{params.mode}</strong></div>
           <div class="btn-line-3">
             {mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>

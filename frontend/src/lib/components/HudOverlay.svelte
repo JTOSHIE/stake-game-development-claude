@@ -17,11 +17,12 @@
   import { autofitText } from '../actions/autofitText'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
+  import { isSocial } from '../stores/socialMode'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import { autoplayLimits, rgJurisdiction, showSessionPanel } from '../stores/responsibleGambling'
   import { standingMode } from '../stores/betMode'
-  import { MODE_COST } from '../config/fsModes'
+  import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
   import { jurisdictionFlags } from '../stores/jurisdiction'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
@@ -223,6 +224,14 @@
   $: effectiveCost = Math.round($betAmount * (MODE_COST[$standingMode] ?? 1) * CURRENCY_SCALE) / CURRENCY_SCALE
   $: isOverboost = $standingMode === 'antelite'
   $: isCruise    = $standingMode === 'cruise'
+  // R24, 2026-07-27: the HUD mode badges READ their names from fsModes, the single
+  // source of truth, instead of re-typing them. They were hardcoded as 'OVERBOOST'
+  // and 'CRUISE' in three template branches here while fsModes declares 'OVERBOOST'
+  // and 'Cruise' - the two had ALREADY diverged in case, which is the duplicated-concept
+  // class the fresh-eyes review flagged. modeLabel() also applies the social override,
+  // so the badges follow social mode for free. Uppercasing stays in CSS where it was.
+  $: overboostLabel = modeLabel(FS_MODES.find((m) => m.serverMode === 'antelite')!, $isSocial)
+  $: cruiseLabel    = modeLabel(FS_MODES.find((m) => m.serverMode === 'cruise')!, $isSocial)
 
   // NEON LIFT (2026-07-15, item 3): a brief glow pulse on the bet figure the
   // moment OVERBOOST toggles ON (the effective cost jumping to 1.25x is
@@ -342,9 +351,9 @@
         </button>
       </div>
       {#if isOverboost}
-        <span class="p-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+        <span class="p-mode-badge overboost" data-testid="hud-overboost-badge">{overboostLabel}</span>
       {:else if isCruise}
-        <span class="p-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+        <span class="p-mode-badge cruise" data-testid="hud-cruise-label">{cruiseLabel}</span>
       {/if}
     </div>
   </div>
@@ -364,12 +373,12 @@
                 {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
               </button>
               <div class="audio-row">
-                <span class="audio-label">MUSIC</span>
+                <span class="audio-label">{$tr('hudMusic')}</span>
                 <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
                 <span class="audio-pct">{musicPct}%</span>
               </div>
               <div class="audio-row">
-                <span class="audio-label">SOUND</span>
+                <span class="audio-label">{$tr('hudSound')}</span>
                 <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
                 <span class="audio-pct">{sfxPct}%</span>
               </div>
@@ -405,7 +414,7 @@
 
     <div class="p-controls-side">
       <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
-        <span class="p-max-cap">MAX</span>
+        <span class="p-max-cap">{$tr('hudMax')}</span>
       </button>
       {#if !$rgJurisdiction.autoplayDisabled}
         <div class="p-autoplay-wrapper">
@@ -473,12 +482,12 @@
             {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
           </button>
           <div class="audio-row">
-            <span class="audio-label">MUSIC</span>
+            <span class="audio-label">{$tr('hudMusic')}</span>
             <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
             <span class="audio-pct">{musicPct}%</span>
           </div>
           <div class="audio-row">
-            <span class="audio-label">SOUND</span>
+            <span class="audio-label">{$tr('hudSound')}</span>
             <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
             <span class="audio-pct">{sfxPct}%</span>
           </div>
@@ -507,9 +516,9 @@
       </button>
     </div>
     {#if isOverboost}
-      <span class="c-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+      <span class="c-mode-badge overboost" data-testid="hud-overboost-badge">{overboostLabel}</span>
     {:else if isCruise}
-      <span class="c-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+      <span class="c-mode-badge cruise" data-testid="hud-cruise-label">{cruiseLabel}</span>
     {/if}
   </div>
 
@@ -565,7 +574,7 @@
   {/if}
 
   <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !canSetMax} aria-label="Max bet" data-testid="max-chip">
-    <span class="c-max-cap">MAX</span>
+    <span class="c-max-cap">{$tr('hudMax')}</span>
   </button>
 
   <button
@@ -611,7 +620,7 @@
     disabled={$isSpinning || !canSetMax}
     aria-label="Max bet"
     data-testid="max-chip"
-  ><span class="cap">MAX</span></button>
+  ><span class="cap">{$tr('hudMax')}</span></button>
 
   <!-- Hamburger + menu - fixed at x 344 -->
   <div class="menu-wrapper">
@@ -627,7 +636,7 @@
             {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
           </button>
           <div class="audio-row">
-            <span class="audio-label">MUSIC</span>
+            <span class="audio-label">{$tr('hudMusic')}</span>
             <input
               class="audio-slider"
               type="range" min="0" max="100"
@@ -638,7 +647,7 @@
             <span class="audio-pct">{musicPct}%</span>
           </div>
           <div class="audio-row">
-            <span class="audio-label">SOUND</span>
+            <span class="audio-label">{$tr('hudSound')}</span>
             <input
               class="audio-slider"
               type="range" min="0" max="100"
@@ -688,9 +697,9 @@
   {#if isOverboost || isCruise}
     <div class="fs-bet-badge-anchor">
       {#if isOverboost}
-        <span class="fs-mode-badge overboost" data-testid="hud-overboost-badge">OVERBOOST</span>
+        <span class="fs-mode-badge overboost" data-testid="hud-overboost-badge">{overboostLabel}</span>
       {:else}
-        <span class="fs-mode-badge cruise" data-testid="hud-cruise-label">CRUISE</span>
+        <span class="fs-mode-badge cruise" data-testid="hud-cruise-label">{cruiseLabel}</span>
       {/if}
     </div>
   {/if}

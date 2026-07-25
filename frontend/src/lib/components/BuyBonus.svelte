@@ -118,7 +118,7 @@
             <span class="buy-stat-val">{FS_RTP_LABEL}</span>
           </div>
           <div class="buy-stat">
-            <span class="buy-stat-label">MAX WIN</span>
+            <span class="buy-stat-label">{t($locale, 'hudMaxWin', localeMode)}</span>
             <!-- ROUND 4 item 4: quoted against the BASE bet, because this stat
                  sits beside a 100x/400x cost multiplier. -->
             <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial)}</span>

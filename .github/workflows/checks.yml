@@ -95,7 +95,20 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/config/fsModes.drift.test.ts
 
-      # ── Gate 6: currency display contract ────────────────────────────────────
+      # ── Gate 6: locale completeness ──────────────────────────────────────────
+      # Every required key in all 16 locales, and no unexplained hardcoded
+      # player-facing literal in any component. Kills the class where 18 strings
+      # rendered English in fifteen locales because the keys never existed.
+      - name: locale completeness
+        working-directory: frontend
+        run: node scripts/locale_completeness_check.mjs
+
+      # ── Gate 7: no em or en dashes in player-facing strings ──────────────────
+      - name: player string dash check
+        working-directory: frontend
+        run: node scripts/player_string_dash_check.mjs
+
+      # ── Gate 8: currency display contract ────────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.

@@ -15,6 +15,7 @@
   //     HUD menu's "Session" item (all three layout modes), which sets the
   //     shared showSessionPanel store this component reads.
   import { onMount, onDestroy } from 'svelte'
+  import { tr } from '../i18n/tr'
   import {
     rgSession, rgNetMicros, rgJurisdiction, realityCheckDue, ackRealityCheck,
     showSessionPanel,
@@ -52,8 +53,8 @@
        default everywhere else; see .sp-sheet below for the on-demand path
        every player can reach via the HUD menu regardless of jurisdiction. -->
   <div class="sp" role="status" aria-label="Session information" data-testid="session-panel-pinned">
-    <div class="sp-row"><span>TIME</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
-    <div class="sp-row"><span>SPINS</span><span class="sp-val">{$rgSession.spins}</span></div>
+    <div class="sp-row"><span>{$tr('hudTime')}</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
+    <div class="sp-row"><span>{$tr('hudSpins')}</span><span class="sp-val">{$rgSession.spins}</span></div>
     <div class="sp-row"><span>NET {coinsWord}</span><span class="sp-val" class:neg={net < 0} class:pos={net > 0}>{netLabel}</span></div>
   </div>
 {/if}
@@ -68,11 +69,11 @@
   <div class="sp-sheet-backdrop" role="dialog" aria-modal="true" aria-label="Session information" data-testid="session-panel-sheet" on:click={closeSheet}>
     <div class="sp-sheet" on:click|stopPropagation>
       <div class="sp-sheet-head">
-        <h2>SESSION</h2>
+        <h2>{$tr('hudSession')}</h2>
         <button class="sp-sheet-close" on:click={closeSheet} aria-label="Close">×</button>
       </div>
-      <div class="sp-row"><span>TIME</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
-      <div class="sp-row"><span>SPINS</span><span class="sp-val">{$rgSession.spins}</span></div>
+      <div class="sp-row"><span>{$tr('hudTime')}</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
+      <div class="sp-row"><span>{$tr('hudSpins')}</span><span class="sp-val">{$rgSession.spins}</span></div>
       <div class="sp-row"><span>NET {coinsWord}</span><span class="sp-val" class:neg={net < 0} class:pos={net > 0}>{netLabel}</span></div>
     </div>
   </div>
@@ -81,10 +82,10 @@
 {#if $realityCheckDue}
   <div class="rc-backdrop" role="dialog" aria-modal="true" aria-label="Reality check">
     <div class="rc-modal">
-      <h2>REALITY CHECK</h2>
+      <h2>{$tr('hudRealityCheck')}</h2>
       <p>You have been playing for {hh}:{mm}:{ss} over {$rgSession.spins} spins.</p>
       <p class="rc-net">Net this session: <strong class:neg={net < 0}>{netLabel}</strong></p>
-      <button class="rc-ok" on:click={ackRealityCheck}>CONTINUE</button>
+      <button class="rc-ok" on:click={ackRealityCheck}>{$tr('introContinue')}</button>
     </div>
   </div>
 {/if}
