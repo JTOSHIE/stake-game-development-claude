@@ -9,6 +9,97 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 008 - 2026-07-27 - DECISION REQUEST: wave 1 complete bar one, ten items need a ruling
+
+Written as a decision document rather than a status update. Everything below is
+either blocked on you, blocked on the owner, or a judgement call I should not make
+alone. Numbering continues from entry 007.
+
+### Board
+
+**Wave 1: four of five delivered, all CI green.** #92 R10 type-zero, #93 R12
+evidence hygiene, #94 R9 scatter disclosure, #95 R6 locale. Remaining: R14 popout.
+Nothing is merged; all four await review.
+
+### BLOCKING, and it compounds
+
+21. **The three external review documents have never reached the builder session.**
+    Only your dispositions on a handful of findings were relayed inside the
+    programme brief. `docs/records/reviews/sources/` holds placeholders, not
+    reconstructions, because writing plausible review text from dispositions would
+    put fabricated findings into a compliance record.
+    **Consequence:** TR-004 to TR-008 (review 3's F3/F5/F7/F8/F10) cannot record
+    their finding text or PR citations, and **tracker coverage cannot be called
+    exhaustive** since there is no way to know what is missing. This gets worse as
+    each wave lands against an unverified baseline. **Need: the three documents
+    pasted into the repo, or an instruction to proceed on partial coverage and
+    accept the gap on the record.**
+
+### Needs your ruling
+
+22. **Merge order for the four open PRs.** `REVIEW_TRACKER.md` is touched by **all
+    four**; `App.svelte` by three (#92, #93, #95). Conflicts are certain.
+    **My recommendation:** #94 (smallest overlap), then #95, then #93, then **#92
+    last** so the zero-error ratchet is verified against the fully merged tree
+    rather than a partial one. I will rebase and resolve the tracker conflicts.
+    Confirm or reorder.
+
+23. **TR-020a, audio bed swap. PARKED after two attempts**, per the operating
+    rules. `bedSwapFiredOnBonusBuy` and `bedRevertedAfterFeature` still fail.
+    Ruled out: the wiring exists (`soundService` subscribes to `overdriveVisual`
+    at line 360, `App` sets it at line 318). Fixed on the way but not the cause: a
+    real click-path gap where the harness never clicked CLICK TO CONTINUE.
+    **Options:** (a) instrument `setOverdriveBed()` with a dev counter to prove
+    whether it is called and which branch it takes, roughly 30 minutes; (b) suspect
+    the `active === overdriveBedActive` early return, since the warm-mount
+    presentation may already have flipped the store so the real entry no-ops, which
+    would be **a genuine product bug**; (c) accept headless audio limits and move
+    bed-swap plus seam checks to DTT staging, where the seam check must be re-run
+    anyway. **My recommendation: (a) then (b).**
+
+24. **TR-014a, 40 hardcoded player-facing strings, untranslated in all 16 locales.**
+    Found while checking the `ja` proof: FEATURES still renders English. Includes
+    `FEATURES`, `ACTIVATE`, `SELECT`, `SPIN MODES`, `SPIN COST`, `MAX WIN`,
+    `MULTIPLIER`, `SOUND`, `MUSIC`, `OVERBOOST`, `CRUISE`, `SESSION`, `SPINS`,
+    `REALITY CHECK`, `CONTINUE`, `START REPLAY`. The platform states games "will be
+    tested with various combinations of currencies and languages"
+    (`front-end-communication.md:44`), so this is reviewer-visible in fifteen of
+    sixteen locales. Unassigned, not fixed, scope deliberately not expanded.
+    **Need: priority (the owner has opened reprioritisation, and I would argue this
+    outranks parts of wave 2), and a ruling on whether the RG and session strings
+    also require social variants.**
+
+25. **R14 popout inherits a known-real defect.** `IntroSplash.svelte`'s Continue
+    button can render fully outside the viewport at Stake's 400x225 mini-player
+    size, carried unfixed since Round 3 and confirmed by a DOM-level click bypass
+    being required to unblock the harness. **Need: does R14 fix it, or regenerate
+    proofs and leave the fix to its own responsive pass?**
+
+26. **R1a pre-granted locked pass, still unacknowledged.** Wave 3 opens the first
+    lock lift in this project's history on `rgsService.ts`. I will follow
+    convention (f) exactly. **Need: confirmation it lands as its own isolated
+    commit rather than one strand of a thirteen-item sweep, before I start wave 3.**
+
+### For the record, no action needed
+
+27. **The 6-plus scatter claim was mine and was wrong.** Retracted in #94, cause
+    recorded, and it produced convention **(l) derive before measuring**, now
+    ratified and merged. The engine's clamp for counts above 5 exists but is
+    unreachable on the visible 5x4 board, so it is defensive dead code, not a
+    compliance question. No ruling needed.
+
+28. **Splash now returns on every cold load** per the owner's ruling, with the
+    legacy localStorage flag actively cleared so existing players are not left
+    permanently opted out.
+
+29. **Buy-dialog disclosure was clipped more widely than the brief assumed.**
+    390x664 already passed; the real failures were 360x600 and compact landscape
+    812x375. Fixed by making the stats row sticky. RTP and max win are a stated
+    review requirement, so this was compliance, not styling.
+
+30. **Convention (l) is in force** and R6 was the first work executed under it. The
+    gap was found by derivation from the spec rather than by measurement.
+
 ## 007 - 2026-07-27 - Convention (l) ratified: derive before measuring
 
 **Owner ruling, standard operating procedure.** Recorded as `CLAUDE.md` convention
