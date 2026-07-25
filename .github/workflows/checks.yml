@@ -157,6 +157,13 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/liveGuard.test.ts
 
+      # ── Gate 10b: session recovery ───────────────────────────────────────────
+      # authenticate reports an in-progress round and initRGS discarded it. On a
+      # pending_end round that is an uncredited win. (R11/TR-017)
+      - name: session recovery
+        working-directory: frontend
+        run: npx tsx src/lib/stores/sessionRecovery.test.ts
+
       # ── Gate 11: live event schema alignment ─────────────────────────────────
       # The locked parser looked for board/win/scatter events. Across the first
       # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs

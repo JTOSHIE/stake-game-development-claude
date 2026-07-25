@@ -78,6 +78,7 @@
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import { anyModalOpen } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
+  import { recoverSession } from './lib/stores/sessionRecovery'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -665,6 +666,15 @@
       Boolean(get(errorMessage)),
       import.meta.env.DEV,
     )
+
+    // R11/TR-017, 2026-07-25. SESSION RECOVERY.
+    // authenticate reports an in-progress round and initRGS discards it, so a
+    // player who reloaded mid-round came back to a fresh game while the RGS
+    // still held their open round. On a pending_end round that is money sitting
+    // uncollected. Only attempted on a session we have already accepted as live.
+    if (!get(bettingDisabled)) {
+      await recoverSession(import.meta.env.DEV)
+    }
     playBGM()
 
     // Background is now static graded stills (video retired); the Overdrive

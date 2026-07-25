@@ -65,6 +65,15 @@ const ALLOWLIST = {
   // Diagnostics rather than product state; kept because a proof that can only
   // see a boolean cannot show which registration fired.
   openModalIds:   'read by modal_safety_proof.mjs, diagnostics not product state',
+  // R11/TR-017b (2026-07-25). Written by recoverSession and deliberately not
+  // consumed yet. WHAT CONSUMES activeRound IS THE PARKED QUESTION: acting on an
+  // open round could forfeit an unseen feature, so the build surfaces it and
+  // stops until the DTT session says what the platform expects
+  // (docs/staging/DTT_SESSION_RECOVERY_VERIFICATION.md, step 3). lastRecovery is
+  // the diagnostic the same session captures. Wiring either to a consumer now
+  // would mean choosing the answer before observing it.
+  activeRound:    'surfaced for TR-017b, consumer decided at the DTT session',
+  lastRecovery:   'recovery diagnostic, captured at the DTT session',
   // Fable ruling 7 (2026-07-26): write-only replay store, ReplayMode renders
   // from parallel locals. Real finding, explicitly deferred to post-launch as
   // elegance under the section 1 bar. Bet Replay is compliance-bearing and is
