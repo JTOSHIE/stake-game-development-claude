@@ -110,7 +110,7 @@
 
 <style>
   /* Column overall bounds: x 1000..1262, y 96.. (gauge top) through the
-     stacked plates beneath — see LAYOUT_SPEC. */
+     stacked plates beneath, see LAYOUT_SPEC. */
   .instrument-column {
     position: absolute;
     left: 1000px;
@@ -208,7 +208,7 @@
     text-shadow: 0 0 10px rgba(255, 213, 74, 0.7);
     line-height: 1;
     /* Large-win totals (up to the 5,000x wincap) can outgrow the plate at the
-       nominal 30px size — clip rather than overflow into neighbouring HUD text. */
+       nominal 30px size: clip rather than overflow into neighbouring HUD text. */
     max-width: 230px;
     white-space: nowrap;
     overflow: hidden;

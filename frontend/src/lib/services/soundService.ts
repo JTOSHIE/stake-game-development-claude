@@ -71,7 +71,7 @@ function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
   el.addEventListener('error', () => {
     const fb = `${FS_BASE}/${fallbackName}.mp3`
     if (el.src !== fb) {
-      console.warn(`[Sound] Failed: ${url} — using fallback: ${fb}`)
+      console.warn(`[Sound] Failed: ${url}, using fallback: ${fb}`)
       el.src = fb
     }
   }, { once: true })

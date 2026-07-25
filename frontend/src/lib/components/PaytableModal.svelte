@@ -404,7 +404,7 @@
   }
 
   /* ==========================================================================
-     FUTURE SPINNER — B3 PAYTABLE RESKIN
+     FUTURE SPINNER: B3 PAYTABLE RESKIN
      Same chrome vocabulary as B1 (.fs-plate / .fs-knob / .fs-rail). All colour
      comes from the 5 scheme tokens; base + Overdrive + scheme-driven.
      ========================================================================== */

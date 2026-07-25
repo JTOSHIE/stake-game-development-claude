@@ -132,10 +132,18 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/i18n/vocabulary.test.ts
 
-      # ── Gate 7: no em or en dashes in player-facing strings ──────────────────
-      - name: player string dash check
+      # ── Gate 7: no em or en dashes anywhere that can reach a player ──────────
+      # Replaces player_string_dash_check.mjs, which passed twice while broken
+      # (TR-060, then TR-063). The self-test runs FIRST and plants the four real
+      # forms the old gate was blind to: if the gate cannot fail on a seeded
+      # dash, its PASS means nothing. CLAUDE.md convention (p).
+      - name: dash gate, seeded-violation self-test
         working-directory: frontend
-        run: node scripts/player_string_dash_check.mjs
+        run: node scripts/dash_gate.mjs --self-test
+
+      - name: dash gate, source scan
+        working-directory: frontend
+        run: node scripts/dash_gate.mjs --source
 
       # ── Gate 8: authenticated bet ladder ─────────────────────────────────────
       # Both bet-changing surfaces must drive from the RGS-supplied levels. The

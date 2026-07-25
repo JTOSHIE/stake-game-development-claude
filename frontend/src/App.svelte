@@ -1212,7 +1212,7 @@
 </script>
 
 <svelte:head>
-  <title>{$activeTheme.name} — We Roll Spinners</title>
+  <title>{$activeTheme.name} - We Roll Spinners</title>
 </svelte:head>
 
 <!-- Spacebar to spin. The handler is inert in replay mode and while a modal
