@@ -9,6 +9,100 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 017 - 2026-07-26 - Hero fixed, Front V2 live, 143 real rounds settled; the platform's own 58-item checklist found us 3 failures and 1 genuine contract conflict
+
+**Read this one instead of 016 if you only read one.** 016 stands, this supersedes its open
+actions. Twenty-one further captures committed to `reports/screens/dtt-live-2026-07-26/`;
+full transcription appended as PART 2 of `reports/qa/dtt_live_session_2026-07-26.md`.
+
+**TR-061 RESOLVED.** The owner re-dragged the same folder; the sync dialog read
+**`Upload 4 Files, Skip 104 Files`** and named exactly the four files my diff named, from
+its own content comparison. Independent corroboration in the (l.4) sense, and it settles the
+cause: the folder held 108 on both runs, so the **first upload was handed 108 and the portal
+stored 104, dropping four silently with no error**. Worth reporting upstream. Republished to
+**Front V2**; the pilot renders. Math stayed V1, correctly, since no maths file changed.
+
+**TR-062 still live in V2**, exactly as predicted: the re-upload sent four images, it did not
+rebuild, and the paytable capture still shows the em dashes. Fresh-clone rebuild still owed.
+
+**The maths figures have not moved and could not have.** The owner asked directly. I compared
+every field: identical. Two reasons, both worth stating because the question will recur. The
+page is pinned to **Math V1** and only the frontend changed; and more fundamentally it is a
+static analysis of the uploaded books at `Simulation Count 100000`, not telemetry. Live play
+surfaces in the Bets panel, never here.
+
+**New from the now-untruncated distribution table, and it is the most load-bearing number in
+the game: the wincap band contributes 5.00% of RTP from a single 1-in-100,000 outcome.**
+5,000x over 100,000 is exactly 0.05, so **5.19% of total return lives in one outcome most
+players never see**. Deliberate, passes every constraint, previously unwritten. The fourteen
+contributions sum to 96.34% against the stated 96.3500, the residual being rounding.
+
+**143 live rounds, and the money path reconciles exactly.** Session panel net result
++$9,590.00 against a HUD balance of $50,009,590.00 from a $50,000,000 start, and -$61,260.00
+against $49,938,740.00 twelve spins earlier. **Our own accounting agrees with the platform
+wallet to the cent across 143 settled rounds.** First end-to-end confirmation in production.
+
+**What the play data says about RTP: nothing, and I want that on the record.** At 143 spins
+the observed 106.71% sits **0.07 standard deviations** from 96.35% using the platform's own
+SD of 17.2841. Twelve spins earlier it was 53.24%, at -0.29 SD. Both unremarkable. One spin
+did it: **06:08:38, +$80,650 on a $1,000 bet, x80.65**; strip it out and the other 142 spins
+returned 50.66%. To resolve RTP to plus or minus one point at 95% needs **11,476,400 spins**;
+to ten points, 114,764. **RTP is not verifiable by playing**, which is convention (l) in one
+sentence. Pleasingly, that single feature paid **80.65x against our modelled 79.4x average
+triggered win**, and arrived at spin ~140 against a modelled 1-in-184.7 trigger rate, so
+frequency and magnitude both landed on the nose.
+
+**The new deliverable: `docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`.** The
+platform exposes a 58-item testing checklist, at 0 of 58. Owner instruction was to work it
+ourselves before ticking anything there. Our pass: **31 PASS, 14 OBSERVE, 8 OWNER, 3 FAIL,
+1 CONFLICT, 1 N/A.**
+
+**Findings for your ruling, numbered:**
+
+1. **TR-064, and this is the real one. The official client and the platform's own checklist
+   give opposite instructions.** Guideline item 12 says *"Zero-win bets do not send an
+   end-round request"*. Our gate is the round's `active` flag, changed deliberately under the
+   JOB 4 sanction because the client says *"Only call this API if Play() has returned an
+   Active result"*, and because `winMicros > 0` is wrong in both directions against that
+   contract. If the RGS returns `active: true` on a zero-win round we breach the checklist;
+   if `false`, both are satisfied. **This must not be "fixed" before it is observed** or we
+   reintroduce the bug the sanction closed. Options: (a) observe one zero-win spin, (b)
+   revert literally, (c) `active && winMicros > 0`. **Recommend (a)**, thirty seconds of
+   Network tab, and it is now the highest-value single observation in the project, ahead of
+   DTT check 3.
+
+2. **TR-065, guideline item 15, confirmed FAIL.** `.game-wrapper.portrait`,
+   `.compact-landscape` and `.mini-player` carry `overflow-y: auto` at `App.svelte:1821`, so
+   the frame scrolls at mobile portrait, Mobile S and Popout S, and not on desktop. Derived
+   from code, then corroborated by three captures at three sizes. One rule, but the reason
+   `auto` was chosen needs checking so the fix does not clip instead.
+
+3. **TR-066, guideline item 25, confirmed FAIL.** No `maximum-scale`, no `user-scalable=no`,
+   and `touch-action` appears nowhere in `frontend/src`. Nothing disables double-tap zoom.
+   Note the meta tag alone is ignored by modern iOS Safari, so the durable fix is
+   `touch-action: manipulation`. Filed with a cosmetic sibling: the Popout S mini strip clips
+   the WIN readout mid-glyph.
+
+4. **TR-067, guideline item 46, confirmed FAIL.** *"English is the only supported language in
+   Social Mode"*. `tr.ts:14` derives from `[locale, isSocial]` but social selects only the
+   **vocabulary variant**, never the locale, so a social session with `lang=de` renders
+   German. The 39-term substitution layer is fine; this is a separate axis nobody connected.
+   Options: force `en` under social (one line), leave it and treat the guideline as a
+   statement about platform behaviour, or force with a warning. **Recommend forcing.**
+
+**All three failures are small self-contained frontend changes touching no locked file and
+no maths**, and they should ride the same fresh-clone rebuild that clears TR-062.
+
+**Also new and useful.** The Bets panel exposes Event IDs and a per-row **"Replay this bet"**
+button, which largely solves DTT check 8 (replay confirmed working live, disclaimer and all,
+on Event ID 52121) and removes the guesswork in `REPLAY_TEST_EVENTS.md`. Popout S renders the
+mini strip with all seven controls, closing the substance of check 10. The portal still shows
+a **placeholder game thumbnail**, which is an unstarted owner action.
+
+**Lane.** Green: captures, QA artefact, self-assessment, tracker rows. No behaviour changed.
+
+---
+
 ## 016 - 2026-07-26 - THE GAME IS LIVE ON THE PLATFORM. Maths passes everything; four files never uploaded; two findings need your ruling
 
 **State delta.** The owner ran the upload kit end to end. Future Spinner is published,

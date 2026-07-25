@@ -28,3 +28,31 @@ Nothing in this folder is edited or cropped; filenames were assigned from conten
 | `17_maths_base_detailed_metrics_and_6of6.png` | BASE 6 of 6, including Cross-Mode RTP Consistency at 0.00% variance, and the platform's RTP ceiling of 96.70%. |
 | `18_maths_base_hit_rate_distribution.png` | Hit rate bands with counts and RTP contributions. |
 | `19_maths_base_property_table_rtp_963500_sd_172841.png` | The platform's own figures: RTP 96.3500, Standard Deviation 17.2841, Simulation Count 100000. Independent corroboration of our committed claims. |
+
+---
+
+## Part 2, the remediation round and live play (21 further captures)
+
+| File | What it proves |
+|---|---|
+| `20_RESOLVED_sync_upload_4_skip_104_names_the_same_four.png` | **`Upload 4 Files, Skip 104 Files`.** The portal independently names the same four files the diff named. Resolves TR-061 and settles its cause. |
+| `21_sync_dialog_detail_four_filenames.png` | The four filenames legible: `bgm_loop.mp3`, `scene_character.png`, `brand_mark_base.png`, `frame-1.png`. |
+| `22_FIXED_hero_pilot_rendering_front_v2.png` | The pilot renders. `Front (Current V2)`, `Math (Current V1)`. |
+| `23_mobile_portrait_TR065_scrollbar.png` | Mobile portrait, playable. Scrollbar on the game frame: TR-065. |
+| `24_mobile_s_320x568_TR065_scrollbar.png` | Mobile S, same scrollbar. |
+| `25_popout_l_800x450_hero_splash.png` | Popout L, the WE ROLL SPINNERS hero splash and TAP TO CONTINUE. |
+| `26_popout_l_800x450_full_landscape_hud.png` | Popout L renders the full landscape HUD, correctly not the mini strip. |
+| `27_popout_s_400x225_selected.png` | Popout S selected. |
+| `28_popout_s_mini_strip_TR066_win_clipped.png` | Mini strip with all seven controls, closing DTT check 10. WIN readout clipped mid-glyph: TR-066. |
+| `29_laptop_1024x576_clean.png` | Laptop, clean, no scrollbar. |
+| `30_TR062_paytable_em_dash_still_shipping_in_v2.png` | The em dash still rendering in V2. TR-062 unresolved. Also pins H1 1.5/6/22 and H2 0.8/3/10 against the PAR. |
+| `31_bets_panel_50_rounds_settled.png` | The Bets panel: time, mode, cost, payout, multiplier, status. |
+| `32_guidelines_tab_0_of_58_prechecks.png` | The 58-item checklist at 0 of 58. |
+| `33_guidelines_tail_final_approval.png` | Tail of the checklist through Game Released. |
+| `34_guidelines_beside_running_game.png` | Checklist beside the running game. |
+| `35_guidelines_scroll.png` | Mid-list scroll position. |
+| `36_bet_detail_event_52121_replay_this_bet.png` | Event ID 52121, Operator, Currency, Cost, Payout, Cost multiplier, and the **Replay this bet** button. |
+| `37_REPLAY_WORKING_event_52121_with_disclaimer.png` | **Replay working live**, disclaimer rendering, `Mode: base`, `Bet: $1.00`, `Currency: USD`. |
+| `38_autoplay_1000_bet_47_remaining.png` | Autoplay at $1,000 a spin, 4x turbo, 47 remaining, $50M balance. |
+| `39_session_131_spins_net_minus_61260.png` | 131 spins, wagered $131,000, won $69,740, net -$61,260. Reconciles to the HUD balance exactly. |
+| `40_session_143_spins_net_plus_9590_after_80650_win.png` | 143 spins, won $152,590, net +$9,590. One x80.65 win twelve spins earlier caused the whole swing. |

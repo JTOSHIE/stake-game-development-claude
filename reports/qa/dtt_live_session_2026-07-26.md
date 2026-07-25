@@ -356,3 +356,205 @@ require any of these and does not conflict with them.
 stamp, and should the upload kit be regenerated rather than reused), and TR-063's proposed
 rewrite of the dash gate from literal-matching to markup-aware scanning. Both are recorded
 with options in the tracker.
+
+---
+
+# PART 2, appended 2026-07-26: the remediation round, live play data, and the guidelines
+
+The owner re-uploaded, republished to **Front V2**, ran 143 live rounds, and captured the
+platform's testing checklist. Twenty-one further captures, 05.46.02 to 06.08.50, committed
+to the same folder. This part is appended rather than filed separately so the session reads
+as one story.
+
+## 8. TR-061 is FIXED, and the portal named the same four files I did
+
+The owner re-dragged the same kit folder. The sync dialog, captured this time, read:
+
+> **Upload 4 Files. Skip 104 Files. Delete 0 Files. Move 0 Files.**
+>
+> `upload bgm_loop.mp3` / `upload scene_character.png` / `upload brand_mark_base.png` /
+> `upload frame-1.png` / `skip win_pod_v3_idle.png` / `skip win_pod_v3_active.png` / ...
+
+**The portal independently identified exactly the four files I identified by diff.** That is
+genuine independent corroboration in the (l.4) sense: my four came from a local `find`
+diffed against a pasted text listing; the portal's four came from its own content
+comparison against what it already held. Different inputs, same four names.
+
+**It also settles the cause, which Part 1 left open.** The sync is content-aware. Re-dragging
+the same folder produced "upload 4, skip 104", which proves the folder held 108 on both
+runs. So the first upload handed the portal 108 and the portal stored 104: **the four were
+dropped platform-side, silently, with no error surfaced to the owner.** The first run's
+dialog was still never captured, so I state this as strongly supported rather than proven.
+
+This is worth reporting upstream. A sync that drops files without reporting them is a
+platform defect, and the only reason it was caught is that the walkthrough told the owner to
+compare the panel count against 108.
+
+**Confirmed visually:** the 05.50.11 capture shows the pilot rendering against the car.
+Versions now read **`Front (Current V2)`**, `Math (Current V1)`.
+
+## 9. TR-062 is still live in V2, exactly as predicted
+
+The re-upload sent four PNG and MP3 files. It did not rebuild anything. The 05.57.57 capture
+of the paytable still shows *"Reels 1, 2 and 3 hold the same symbol (highlighted) — a match"*
+with the em dash intact. **The published V2 bundle is still one commit behind `main`** and
+still ships the strings TR-060 removed. The remedy remains a fresh-clone rebuild.
+
+## 10. The maths figures have NOT changed, and they could not have
+
+The owner asked directly whether the figures moved after a few hundred spins. **They are
+identical, field for field, to the first capture.** I compared every value: the eleven
+bet-level constraints, all five mode cards, the detailed metrics block, the six per-mode
+compliance rows, and all fourteen property rows. Nothing differs.
+
+**That is correct behaviour, not a stale page, and the reason matters:**
+
+1. The page header reads **Version 1**, and it is the **Math** version. Only frontend files
+   were re-uploaded, so Math stayed at V1 while Front went to V2. A page pinned to Math V1
+   describes Math V1.
+2. More fundamentally, this page is a **static analysis of the uploaded books**: 100,000
+   simulated rounds per mode, computed once when the maths was ingested. `Simulation Count`
+   reads 100000 and will keep reading 100000. It is not a live telemetry surface and no
+   amount of play will move it. Live play appears in the **Bets** panel and in Accounting.
+
+The full hit-rate distribution is now visible where the first capture truncated it. The
+complete table, with the four previously unseen bands:
+
+| Band | Count | Effective hit-rate | RTP contribution |
+|---|---|---|---|
+| (0, 0.1) | 2 | 1.40 | 0.00% |
+| (0.1, 1) | 73 | 3.89 | 14.33% |
+| (1, 2) | 86 | 451.30 | 0.33% |
+| (2, 5) | 190 | 215.88 | 1.57% |
+| (5, 10) | 242 | 241.62 | 3.05% |
+| (10, 20) | 481 | 139.19 | 10.47% |
+| (20, 50) | 1637 | 138.30 | 21.55% |
+| (50, 100) | 2428 | 250.58 | 27.60% |
+| (100, 200) | 2927 | 1175.62 | 10.53% |
+| (200, 500) | 2368 | 19016.25 | 1.48% |
+| **(500, 1000)** | **452** | **160934.03** | **0.40%** |
+| **(1000, 2000)** | **42** | **3702760.60** | **0.03%** |
+| **(2000, 5000)** | **1** | **261347920.01** | **0.00%** |
+| **(5000, 10000)** | **1** | **100000.00** | **5.00%** |
+
+**The contributions sum to 96.34%**, against the stated 96.3500%, the residual being
+rounding across fourteen printed values. That is an internal consistency check the platform
+does not perform for us and it passes.
+
+**One fact in that table deserves the board's attention.** The wincap band contributes
+**5.00% of RTP from a single outcome at 1 in 100,000**: 5,000x divided by 100,000 is exactly
+0.05. So **5.19% of the game's entire return lives in one outcome most players will never
+see**. That is a legitimate and deliberate design choice for a 17.28 SD game, it passes every
+platform constraint, and it is not a defect. It is stated here because it is the single most
+load-bearing number in the distribution and it has not previously been written down.
+
+## 11. Live play: what 143 spins actually tell us, which is almost nothing
+
+Two Session information captures, twenty-four seconds apart:
+
+| Capture | Spins | Wagered | Won | Net |
+|---|---|---|---|---|
+| 06:08:26 | 131 | $131,000.00 | $69,740.00 | **-$61,260.00** |
+| 06:08:50 | 143 | $143,000.00 | $152,590.00 | **+$9,590.00** |
+
+**First, an internal check that passes.** The owner set the balance to $50,000,000. At the
+second capture the HUD reads $50,009,590.00, and the panel's Net result reads +$9,590.00.
+Those reconcile exactly. At the first, $49,938,740.00 against -$61,260.00. Also exact. **Our
+own session accounting agrees with the platform's wallet to the cent across 143 settled
+rounds.** That is the first end-to-end confirmation that the money path is right in
+production.
+
+**Second, the statistics.** Using the platform's own SD of 17.2841:
+
+| Capture | Observed RTP | Deviation from 96.35% | Standard error of the mean | z |
+|---|---|---|---|---|
+| 131 spins | 53.24% | -43.11 points | 151.0 points | **-0.29** |
+| 143 spins | 106.71% | +10.36 points | 144.5 points | **+0.07** |
+
+Both are statistically indistinguishable from expectation. The 143-spin result sits **0.07
+standard deviations** from the model. There is no signal here of any kind, good or bad.
+
+**Third, the thing that makes it vivid.** Between those two captures, twelve spins wagered
+$12,000 and won $82,850, swinging the session from -$61,260 to +$9,590. Essentially all of
+it is one spin: **06:08:38, +$80,650.00 on a $1,000 bet, a ×80.65**. Remove that single
+outcome and the remaining 142 spins returned **50.66%**.
+
+So one spin in 143 moved the measured RTP from 50.7% to 106.7%, a 56-point swing. **That is
+what a standard deviation of 17.28 means in practice**, and it is the clearest possible
+answer to how the game is "tracking".
+
+**Fourth, and this is the good news, that win was textbook.** Our committed model says the
+base free-spin trigger rate is 1 in 184.7 and the average triggered-round win is 79.4x. In
+143 base spins the expected number of triggers is **0.774**. The owner got one, and it paid
+**80.65x against a modelled average of 79.4x**. Frequency and magnitude both landed on the
+model's nose. That is not proof of anything at n=1, but it is exactly what should happen.
+
+### How much play would it actually take?
+
+Derived from the platform's own SD, at 95% confidence:
+
+| To resolve RTP to | Spins required |
+|---|---|
+| plus or minus 10 points | **114,764** |
+| plus or minus 5 points | **459,056** |
+| plus or minus 1 point | **11,476,400** |
+
+**RTP cannot be verified by playing.** Eleven and a half million spins to pin it to a single
+percentage point. This is precisely why convention (l) exists: the RTP is *derived* from the
+lookup tables and *confirmed* by the platform's static analysis of the books, both of which
+already agree at 96.3500. Live play confirms that the money path works, not that the maths
+is right. Both captures above are consistent with the model, and that is the most any
+session of this size can say.
+
+**Practical advice for the owner:** more autospins are useful for finding UI, animation and
+settlement bugs, and for exercising the feature. They are not useful for validating RTP, and
+a run that ends well down or well up means nothing. Do not read the session panel as a
+verdict on the maths.
+
+## 12. The Bets panel and the Guidelines tab, both new surfaces
+
+**Bets.** Every round is listed with time, mode, cost, payout, multiplier and status.
+Expanding a row gives **Event ID, Operator, Currency, Cost, Payout, Cost multiplier, Created,
+Updated**, and a **"Replay this bet"** button. Event ID 52121 was replayed successfully.
+
+Two consequences. First, **DTT check 8 is largely solved**: `REPLAY_TEST_EVENTS.md` guessed
+at IDs and warned they might be one out; the owner can now replay any real round by clicking
+it. Second, replay is confirmed working in production, disclaimer and all, which is a
+mandatory compliance feature.
+
+**Guidelines.** A 58-item "Reference checklist for testing", showing **0 of 58**. The owner
+transcribed it in full and instructed that we work against it ourselves first. That
+assessment is now at **`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`**:
+**31 PASS, 14 OBSERVE, 8 OWNER, 3 FAIL, 1 CONFLICT, 1 not applicable.**
+
+The three failures and one conflict are new tracker rows TR-064 through TR-067, summarised
+in the comms entry. All three failures are small, self-contained frontend changes touching
+no locked file and no maths.
+
+## 13. Responsive behaviour, checked properly this time
+
+All seven DTT presets were exercised. Desktop and Laptop are clean. Popout L renders the
+full landscape HUD. Popout S renders the mini strip with all seven controls present, which
+closes the substance of DTT check 10. Mobile portrait and Mobile S are playable.
+
+Two defects, both new:
+
+- **A scrollbar on the game frame** at mobile portrait, Mobile S and Popout S, absent on
+  desktop. Root-caused to `App.svelte:1821`, where `.game-wrapper.portrait`,
+  `.compact-landscape` and `.mini-player` carry `overflow-y: auto`. Exactly the three
+  layouts, exactly the three captures. Guideline item 15. TR-065.
+- **The mini strip's WIN readout is clipped mid-glyph** at Popout S, reading `$0.0` plus a
+  partial character. The balance also drops its cents (`BAL $1,040` where the true balance
+  is $1,040.06), which may be intentional but the clipping is not. TR-066.
+
+## 14. Revised open actions
+
+1. **Fresh-clone rebuild and re-upload the frontend**, which clears TR-062 and can carry the
+   TR-065, TR-066 and TR-067 fixes in the same bundle. Republish afterwards.
+2. **One network capture on a zero-win spin** to settle TR-064. This is now the highest
+   value single observation in the project, ahead of DTT check 3, because it is a named
+   guideline item with a pass or fail rather than a shape question.
+3. Delete `math/HASHES.txt` so MATH reads twelve files.
+4. Upload the game thumbnail in the Tile Editor; the portal still shows the placeholder.
+5. Scroll and capture the full DTT Language list for TR-059 sizing.
+6. Work the remaining fourteen OBSERVE items, most of which fall out of DTT_PROTOCOL.md.
