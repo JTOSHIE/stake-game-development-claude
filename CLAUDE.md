@@ -306,6 +306,18 @@ path by name. This has been followed as informal discipline throughout; recorded
 standing convention (2026-07-08 hygiene pass) so it does not need re-establishing per
 session.
 
+**(o) The staging bundle is always built from a fresh clone, never from a working
+machine, so the uploaded artefact is reproducible by definition.**
+
+Established 2026-07-26 by TR-047. An untracked, unreferenced `branding/` directory sat in
+`frontend/public/`, and Vite copies `public/` verbatim into `dist/`, so 7.06MB shipped in
+the bundle while being invisible to git: a clone built 14.81MB where the working machine
+built 21.87MB. The committed bundle-size figure was a number nobody else could check.
+Deleting it closed the gap to four `.DS_Store` files, which the build now strips, and a
+clone and this machine then produced byte-identical 15,510,083-byte builds. Building from a
+clone makes that property structural rather than something to remember: whatever is on a
+working machine and not in the repository cannot reach the upload.
+
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
 
