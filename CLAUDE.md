@@ -318,6 +318,32 @@ clone and this machine then produced byte-identical 15,510,083-byte builds. Buil
 clone makes that property structural rather than something to remember: whatever is on a
 working machine and not in the repository cannot reach the upload.
 
+**(p) Every gate that claims a class closed ships a self-test that plants a violation and
+must FAIL on it before its PASS counts. Ratified 2026-07-26 by Fable, generalising the
+TR-063 ruling.**
+
+A gate that has never been seen to fail is not evidence. It is a script that prints PASS.
+
+This project has now produced the same failure four separate times, each time with a green
+gate sitting over it: the social conformance script, the books verifier, `build_diet_verify.mjs`,
+and `player_string_dash_check.mjs`. The last of those is the worked example, and it is worth
+keeping because the second attempt failed too. TR-060 found two em dashes rendering to
+players while the dash gate reported PASS, because its file list was two files. The gate was
+widened to twenty-five files and recorded as closed. **It was still wrong**: it read only
+single-quoted JavaScript literals, and the two strings it had been written to catch were
+markup prose between tags, so the widened gate could not have caught them either. A seeded
+violation would have exposed that in one run. Instead it took a fresh reading of the gate's
+own regex, four days later, to notice.
+
+So the requirement is not "write a test for the gate". It is specifically: **plant the exact
+defect the gate exists to catch, in the form it really occurs, and prove the gate goes red.**
+A gate whose self-test seeds a defect in a form the gate happens to handle, while the real
+defect occurs in another form, has learned nothing. Seed the form that actually shipped.
+
+This binds every gate, not only new ones. Where an existing gate claims a class is closed and
+has no seeded-violation self-test, it is making an unverified claim, and adding the self-test
+is the cheapest way to find out whether the claim is true.
+
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
 
