@@ -109,6 +109,16 @@ jobs:
         working-directory: frontend
         run: node scripts/locale_completeness_check.mjs
 
+      # ── Gate 6a: accessibility strings are social-safe ───────────────────────
+      # Screen-reader text is player-facing text. The visible-text sweep reads
+      # rendered DOM text and therefore never saw aria-label/title/alt, which is
+      # how 14 control labels shipped carrying the restricted phrase "bet": a
+      # blind player in a social jurisdiction heard the real-money vocabulary a
+      # sighted player was protected from. (R4 / TR-012)
+      - name: a11y social terms
+        working-directory: frontend
+        run: node scripts/a11y_social_terms_check.mjs
+
       # ── Gate 7: no em or en dashes in player-facing strings ──────────────────
       - name: player string dash check
         working-directory: frontend
