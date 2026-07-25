@@ -58,16 +58,22 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   fix opportunistically the next time `gameStore.ts` is under a sanctioned edit for
   something else.
 
-- **`rgsService.ts` declares its own `CURRENCY_SCALE = 1_000_000`** (line 29), a second
-  copy of the constant whose canonical home is `frontend/src/lib/utils/currency.ts`.
-  A third copy in `replayService.ts` was removed 2026-07-26 (it now imports the
-  canonical one); this one cannot be, because the file is locked. Both copies currently
-  agree, and per Fable ruling 8 (2026-07-26) the duplication is now **held by a gate,
-  not by a comment**: `frontend/scripts/currency_scale_drift.test.mjs` parses both
-  declarations as text (read-only, it never writes to the locked file) and fails if
-  they ever diverge or if `replayService.ts` reintroduces a local copy. Fix by deleting
-  the local declaration and importing the canonical one the next time `rgsService.ts`
-  is under a sanctioned edit.
+- **`rgsService.ts`: ALL RECORDED DEBTS CLEARED, 2026-07-25.** The first lock sanction
+  (Fable, 2026-07-25, PR #103) ran an isolated pass over this file and closed every debt it
+  carried. Kept here as a record of what was fixed, not as outstanding work:
+  - the **live event schema**. The parser read `board`/`win`/`scatter`, none of which the
+    shipped books emit (0, 0 and 0 across the first 300 rounds of `books_base.jsonl.zst`,
+    against `reveal` 724 and `winInfo` 499), so a live round returned an empty board with
+    no wins. It now delegates to `roundInterpreter`, the canonical reader, rather than
+    reimplementing the schema. Held by `rgsService.parse.test.ts` (CI gate 11) against real
+    decoded book rows.
+  - **`endRound` unretried**. It called `_post` directly while `play` was wrapped, leaving
+    the CREDIT leg unprotected: one transient failure and the wallet had taken the bet
+    while the player had not been paid. Now routed through `_withRetry`; safe because
+    end-round is idempotent on the round id. This also closed the R11/TR-008 gap.
+  - **the local `CURRENCY_SCALE` copy**. Removed; the canonical value is imported and
+    re-exported. There is now exactly one declaration in the codebase, and
+    `currency_scale_drift.test.mjs` asserts no copy returns rather than reconciling two.
 
 - **The bet-ladder actions inside `gameStore.ts` operate on the hardcoded `BET_LEVELS`,
   not on the authenticated ladder.** `increaseBet`, `decreaseBet`, `setMaxBet`,
@@ -305,6 +311,25 @@ Two things made it worse, and both are covered above:
 
 The owner caught it by asking the obvious question the builder had skipped: how many
 reels are in play, how many tiles are in play. There is the answer.
+
+**(n) Where a recorded method and a subsequent sanction conflict, the SANCTION governs.
+Standing rule, Fable ruling 2026-07-25.**
+
+A method recorded earlier in a tracker row, a plan or a convention is the best guidance
+available at the time it was written. A sanction issued later, naming the same work, is
+both the later and the better-informed instrument: it was written with the diagnosis in
+hand. When the two disagree, follow the sanction.
+
+Established by PR #103. TR-009's recorded method said "adapter if raw events are exposed,
+sanctioned locked pass only if not", and raw events were exposed. The sanction nonetheless
+enumerated the at-source fix. The at-source fix was ratified, for reasons worth keeping:
+the diagnosis showed **total** breakage rather than partial, so there was no working code
+to preserve behind an adapter; and a fully dead parser left in a money-path file behind an
+adapter is two sources of truth, which is the failure mode the adapter was meant to avoid.
+
+**The obligation this does not remove:** surface the tension explicitly and let it be
+ruled on, rather than silently picking a side. Doing so is the expected move, not an
+escalation. Choosing quietly is the violation, in either direction.
 
 **(m) External documents must physically exist in the repository before work cites them.
 Owner/Fable ruling, 2026-07-27.**

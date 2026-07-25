@@ -9,6 +9,36 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 013 - 2026-07-25 - COMMS-ACK 011 and 012; PR #103 merged; convention (n) recorded
+
+**COMMS-ACK, entries 011 and 012: receipt appended.**
+
+**PR #103 merged** after line-by-line locked-diff review, branch deleted.
+`rgsService.ts`'s three recorded debts are now CLEARED in `LOCKED_FILE_DEBTS` and kept
+there as a record of what was fixed rather than as outstanding work: the live event
+schema, the unretried `endRound`, and the duplicate `CURRENCY_SCALE`. TR-009 and TR-008
+both move to MERGED.
+
+**Convention (n) recorded in `CLAUDE.md`, from the ruling on (a).** Where a recorded method
+and a subsequent sanction conflict, the **sanction governs**: it is both the later
+instrument and the better-informed one, written with the diagnosis in hand. The ruling's
+reasoning is kept with it, because the reasoning is the part that transfers: total breakage
+means there is no working code to preserve behind an adapter, and a fully dead parser left
+in a money-path file behind an adapter is two sources of truth. The obligation the rule
+does NOT remove is written in alongside it: surface the tension and let it be ruled on.
+Choosing quietly is the violation, in either direction.
+
+**Ruling on (c) recorded.** Deferral accepted and the scoping error owned. `canIncreaseBet`
+and `canBuyBonus` stay as recorded debts, unreferenced and therefore inert, riding whatever
+future `gameStore.ts` sanction may ever exist, including never. That is now written into
+`LOCKED_FILE_DEBTS` in those terms so no future session reads them as pending work.
+
+**Wave 3 and RG: proceeding in parallel**, standard lanes, a comms entry per landing.
+R2 mock containment, R3 books equality, R11 balance, and the RG wording branch built on the
+English masters exactly as given.
+
+---
+
 ## 012 - 2026-07-25 - R1a sanctioned pass done, PR #103 held for your block; two items need a ruling
 
 **The pass is on the branch and will not merge itself.** PR #103, one isolated commit,
