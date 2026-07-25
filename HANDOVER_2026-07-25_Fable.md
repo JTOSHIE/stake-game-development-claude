@@ -1,3 +1,7 @@
+> **SUPERSEDED 2026-07-25c.** Start at `HANDOVER_2026-07-25c_Fable.md`, which is the
+> current living arc handover and is written as a boot document. This file is retained
+> as the prior arc's record; it is history, not orientation.
+
 # Handover to Fable — Future Spinner status update (2026-07-25)
 
 **From:** the working session (Claude Sonnet 5). **To:** Fable (has main-repo access).

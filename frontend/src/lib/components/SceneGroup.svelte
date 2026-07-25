@@ -19,11 +19,46 @@
   // All motion is subtle ambient scene life and is disabled under
   // prefers-reduced-motion. The group is decorative (aria-hidden).
   import { themeAssets } from '../stores/themeStore'
+
+  // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
+  // The car and pilot were separated from the backdrop by a flat drop-shadow
+  // alone, which is exactly what makes the art read as PLACED ON the scene
+  // rather than sitting IN it. Three things fix that, and they are levels rather
+  // than a single switch because how hard to push it is an eye-call:
+  //
+  //   1. DEPTH HAZE. A scene-coloured wash between the backdrop and each sprite,
+  //      which is what atmosphere actually does at distance.
+  //   2. SCENE-MATCHED GRADING. A slight shift of the flat art toward the
+  //      backdrop's own temperature, so the sprite is lit by the same world.
+  //   3. RIM LIGHT. The existing drop-shadow extended into a directional edge
+  //      light, which is what separates a subject from its background once the
+  //      haze has deliberately reduced the contrast that used to do that job.
+  //
+  // 0 keeps the shipped look exactly. The hero read is the thing to watch when
+  // comparing: the pilot was deliberately pulled out of hiding and left-
+  // justified so he reads as a presented feature, and hazing him too hard undoes
+  // that staging decision.
+  export let haze: 0 | 1 | 2 | 3 | number = 0
+
+  const HAZE = [
+    { wash: 0,    blur: 0,  grade: 0,    rim: 0    },
+    { wash: 0.10, blur: 2,  grade: 0.10, rim: 0.35 },
+    { wash: 0.18, blur: 4,  grade: 0.18, rim: 0.55 },
+    { wash: 0.28, blur: 7,  grade: 0.28, rim: 0.75 },
+  ]
+  $: h = HAZE[Math.max(0, Math.min(3, Math.round(haze)))] ?? HAZE[0]
 </script>
 
-<div class="scene-group" data-testid="scene-group" aria-hidden="true">
+<div
+  class="scene-group"
+  data-testid="scene-group"
+  data-haze={haze}
+  style="--haze-wash:{h.wash}; --haze-blur:{h.blur}px; --haze-grade:{h.grade}; --rim:{h.rim};"
+  aria-hidden="true"
+>
   <!-- CAR — lower-left scenery, tail slides under the frame (z8, below frame z10) -->
   <div class="car-layer" aria-hidden="true">
+    <div class="depth-haze" aria-hidden="true"></div>
     <img class="car-img" src="{$themeAssets.assetBase}/ui/scene_car.png" alt="" draggable="false" />
     <div class="underglow" aria-hidden="true"></div>
     <div class="car-neon" aria-hidden="true"></div>
@@ -32,6 +67,7 @@
 
   <!-- CHARACTER — feature hero, left-justified in the gutter, fully visible (z30) -->
   <div class="char-layer" aria-hidden="true">
+    <div class="depth-haze" aria-hidden="true"></div>
     <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
     <div class="antenna-light" aria-hidden="true"></div>
     <div class="visor-glint" aria-hidden="true"></div>
@@ -39,6 +75,44 @@
 </div>
 
 <style>
+  /* ── Cohesion: depth haze, scene grading, rim light ──────────────────────
+     All three are STATIC state, not motion, so they apply identically under
+     prefers-reduced-motion and are deliberately NOT gated behind it. Atmosphere
+     is not an animation. */
+  .depth-haze {
+    position: absolute;
+    inset: -6%;
+    pointer-events: none;
+    /* Scene-coloured wash: the backdrop's own cyan-violet, laid between the
+       backdrop and the sprite so distance reads as distance. */
+    background: radial-gradient(
+      ellipse at 50% 60%,
+      rgba(90, 190, 220, calc(var(--haze-wash, 0) * 1.15)) 0%,
+      rgba(58, 40, 120, calc(var(--haze-wash, 0) * 0.85)) 55%,
+      transparent 78%
+    );
+    filter: blur(var(--haze-blur, 0px));
+    /* No opacity switch is needed: at level 0 --haze-wash is 0, so every colour
+       stop in the gradient is fully transparent and the layer renders nothing. */
+    z-index: 0;
+  }
+  .car-layer .depth-haze, .char-layer .depth-haze { z-index: -1; }
+
+  /* Scene-matched grading + rim light on the sprites themselves. The rim is the
+     existing drop-shadow extended into a directional edge light: once haze has
+     deliberately reduced the contrast that separated subject from background,
+     something has to put that separation back, and a rim is what does it
+     without flattening the haze again. */
+  .car-img, .char-img {
+    filter:
+      drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5))
+      drop-shadow(-2px -1px 0 rgba(120, 240, 255, var(--rim, 0)))
+      drop-shadow(2px -1px 0 rgba(180, 120, 255, calc(var(--rim, 0) * 0.7)))
+      saturate(calc(1 - var(--haze-grade, 0) * 0.35))
+      brightness(calc(1 - var(--haze-grade, 0) * 0.12))
+      contrast(calc(1 - var(--haze-grade, 0) * 0.10));
+  }
+
   /* Non-stacking wrapper: no z-index/transform of its own, so the two layers
      resolve their z-index against the 1280x720 design surface (frame z10,
      grid z20, HUD z50). The car can therefore sit below the frame while the

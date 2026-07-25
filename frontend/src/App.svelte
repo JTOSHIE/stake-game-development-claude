@@ -73,6 +73,33 @@
   import { currencyCode } from './lib/stores/gameStore'
   import { locales, type Locale } from './lib/i18n/translations'
   import { tr } from './lib/i18n/tr'
+
+  // ── COHESION PASS (TR-027) ───────────────────────────────────────────────
+  // Shipped as VARIANTS first, defaults second. Both the global grade and the
+  // character haze are eye-calls, and an eye-call that needs a rebuild between
+  // options spends the reviewer's attention on waiting rather than judging.
+  //   ?grade=neutral|warm|cool|deep
+  //   ?haze=0|1|2|3
+  // DEV-gated and read once at boot. The chosen values become the defaults; the
+  // parameters stay afterwards as comparison tools, because the next art
+  // question will want the same harness and they cost nothing in production.
+  const _cohesionParam = (name: string): string | null =>
+    import.meta.env.DEV ? new URLSearchParams(window.location.search).get(name) : null
+
+  const GRADES: Record<string, { colour: string; strength: number; blend: string }> = {
+    // A single palette temperature laid over backdrop, scene, frame, symbols and
+    // celebrations at once. That is the point: grading the layers independently
+    // is how the art came to read as assembled rather than unified.
+    neutral: { colour: 'transparent',            strength: 0,    blend: 'normal' },
+    warm:    { colour: 'rgb(255, 174, 92)',      strength: 0.16, blend: 'overlay' },
+    cool:    { colour: 'rgb(96, 168, 255)',      strength: 0.16, blend: 'overlay' },
+    deep:    { colour: 'rgb(58, 22, 96)',        strength: 0.26, blend: 'soft-light' },
+  }
+  const _gradeKey = _cohesionParam('grade') ?? 'neutral'
+  $: grade = GRADES[_gradeKey] ?? GRADES.neutral
+
+  // 0 = off (current shipped look), 3 = deepest. Passed to SceneGroup.
+  const hazeLevel = Math.max(0, Math.min(3, Number(_cohesionParam('haze') ?? 0) || 0))
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
@@ -1241,7 +1268,7 @@
            .bg-still-container (unaffected either way, since that's outside
            .game-wrapper entirely). -->
       {#if $activeTheme.id === 'future-spinner' && !portrait}
-        <SceneGroup />
+        <SceneGroup haze={hazeLevel} />
       {/if}
 
       <!-- FRAME — 640x468 at (320,84), z10. Neon hue-shifts during Overdrive
@@ -1264,6 +1291,24 @@
       <!-- OVERDRIVE FLAME JETS — 8 frame-edge jets (v3.4), ignite on Overdrive -->
       {#if $activeTheme.id === 'future-spinner'}
         <FlameJets active={overdriveVisualActive} colourway={flameColourway} />
+      {/if}
+
+      <!-- GLOBAL GRADE (TR-027). A blended overlay rather than a filter, on
+           purpose. `.tile-inner` already carries a filter chain during scatter
+           anticipation, driven by the escalation ramp; a second filter on the
+           same element MULTIPLIES rather than blends and would look wrong during
+           the sequence just signed off. An overlay composites instead, costs one
+           compositor layer, and sits at z40: above the backdrop, scene, frame and
+           grid, below the HUD at z50, so it unifies the ART without tinting the
+           readouts. -->
+      {#if grade.strength > 0}
+        <div
+          class="global-grade"
+          data-testid="global-grade"
+          data-grade={_gradeKey}
+          style="background: {grade.colour}; opacity: {grade.strength}; mix-blend-mode: {grade.blend};"
+          aria-hidden="true"
+        ></div>
       {/if}
 
       <!-- GRID — 522x349, centred inside the frame, z20 -->
@@ -1499,6 +1544,13 @@
   /* LAYOUT_SPEC v3.1 stage: fixed 1280x720 design surface, every child
      absolutely positioned per spec, the whole thing scaled by S (set in the
      script and updated on resize) so it shrinks or grows together. */
+  .global-grade {
+    position: absolute;
+    inset: 0;
+    z-index: 40;          /* above art (frame 10, grid 20, character 30), below HUD (50) */
+    pointer-events: none;
+  }
+
   .game-wrapper {
     position: relative;
     width: 1280px;

@@ -83,3 +83,73 @@ deliberately. Check the anticipation captures before and after.
 - **TR-028**: several proof captures begin in dialogs or artificial test states, which is
   weak experience evidence. The before and after pairs from this pass are the natural
   opportunity to regenerate a clean set. Cheap, and it was review 1's actual complaint.
+
+---
+
+# Addendum, 2026-07-25: the grade landed, the haze did not, and why
+
+## What the first pass established
+
+**The global grade works** and is merged. At `?grade=deep` the image reads as one
+photograph rather than several assets. The HUD is untinted, confirming the overlay sits at
+the right depth (z40, above art, below HUD at z50).
+
+**The haze does not, and tuning it further is not the answer.** Even at level 3 it barely
+moves. The reason is a style mismatch, not an atmosphere deficit: the pilot and car are
+**flat vector illustrations** against a **rendered, atmospheric** backdrop. Haze softens
+edges; it cannot turn a cutout into a rendered subject.
+
+## Claude Design is not an art generator
+
+Recorded because the assumption is easy to make and expensive to act on. `DesignSync`
+syncs **design-system** projects: component libraries, HTML previews, design tokens. It
+reads and writes files in a claude.ai/design project. It does **not** generate or edit
+artwork, and it cannot produce a better character or car.
+
+## The real lever: the vector masters
+
+The project's own rule (CLAUDE.md) is that all visual assets are produced in-house from
+**SVG vector masters** via the asset pipeline. Those masters exist:
+
+    frontend/scripts/scene/scene_character.svg    5.0 KB
+    frontend/scripts/scene/scene_car.svg          3.8 KB
+
+Measured contents of the character master: **25 paths, 6 circles, 4 rects, 10 linear
+gradients, ZERO radial gradients, ZERO filters.** That composition is the flatness. There
+is no volumetric shading in the file, so no amount of CSS downstream can add it
+convincingly.
+
+**Fixing it at the master is the correct pass**, and it is the one thing that would move
+review 1's art-direction score rather than mitigate it:
+
+1. **Volumetric shading.** Radial gradients on the helmet dome, shoulders, arms and the
+   car body, so forms read as round rather than filled.
+2. **Rim light baked in**, keyed to the scene's own cyan-violet key light. Baked into the
+   master it will be correct at every scale; the CSS rim added in the first pass is a
+   stopgap and should be reduced or removed once the master carries it.
+3. **Ambient occlusion** where the character meets the car and the ground, which is what
+   actually seats a subject in a scene.
+4. **Specular highlights** on the visor and any chrome, which is what sells "rendered".
+
+## Blocker to clear first: there is no scripted render step
+
+`scene_proof.mjs` only COPIES the existing PNG; it does not produce it. Nothing in the
+repository rasterises `scene_character.svg` to `scene_character.png`, so the current PNGs
+cannot be regenerated reproducibly and an edited master would have no way to reach the
+game.
+
+**First task of the art pass is a render script**, headless Chrome rasterising each master
+at its exact shipped dimensions, committed so the pipeline claim in CLAUDE.md becomes true
+rather than aspirational. Measure the existing PNG dimensions and match them exactly, so
+the swap is a like-for-like replacement and layout cannot shift.
+
+## Order of work
+
+1. Render script, verified by re-rendering the CURRENT masters and diffing against the
+   shipped PNGs. If they do not match, the masters are not the true source and that must
+   be resolved before any art change.
+2. Character master: shading, rim, occlusion, specular. Re-render, compare in situ.
+3. Car master, same treatment.
+4. Reduce or remove the CSS rim in `SceneGroup.svelte` once the master carries it.
+5. Re-decide the haze level against the improved art. It may earn its keep once the
+   subject is rendered rather than flat.
