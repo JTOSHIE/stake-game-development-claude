@@ -44,6 +44,18 @@ function dirSize(absPath: string): number {
   return total
 }
 
+/** Remove every file with the given name anywhere under `root`. Returns the count. */
+function pruneByName(root: string, name: string): number {
+  if (!existsSync(root)) return 0
+  let removed = 0
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const p = join(root, entry.name)
+    if (entry.isDirectory()) removed += pruneByName(p, name)
+    else if (entry.name === name) { rmSync(p, { force: true }); removed++ }
+  }
+  return removed
+}
+
 function pruneLegacyAssets() {
   const LEGACY_DIRS = [
     'assets/symbols', 'assets/frames', 'assets/videos',
@@ -94,6 +106,23 @@ function pruneLegacyAssets() {
           rmSync(abs)
         }
         console.log(`[build-diet] pruned ${UI_DIR}/* except ${[...KEEP_UI].join(', ')}`)
+      }
+
+      // TR-047 follow-up, 2026-07-26. macOS writes .DS_Store into any directory
+      // Finder has opened, including public/, and Vite copies public/ verbatim
+      // into dist/. git ignores them; the BUILD did not, so the uploaded bundle
+      // carried Finder metadata that is not in the repository.
+      //
+      // That is the same reproducibility defect as the branding directory,
+      // three orders of magnitude smaller: after deleting that directory a
+      // clean clone built 14.79MB and this machine built 14.83MB, and the
+      // entire 36,880-byte difference was four .DS_Store files. Stripping them
+      // makes the two builds match FILE FOR FILE rather than within rounding,
+      // which is the only version of "reproducible" worth claiming.
+      const strayCount = pruneByName(resolve(__dirname, 'dist'), '.DS_Store')
+      if (strayCount > 0) {
+        prunedCount += strayCount
+        console.log(`[build-diet] pruned ${strayCount} stray .DS_Store file(s)`)
       }
 
       console.log(`[build-diet] total pruned: ${prunedCount} paths, ${(prunedBytes / 1024 / 1024).toFixed(2)} MB`)

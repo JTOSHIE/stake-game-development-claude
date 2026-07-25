@@ -15,6 +15,7 @@ import { mkdirSync, writeFileSync, existsSync, statSync, readdirSync } from 'nod
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -126,11 +127,8 @@ async function run() {
 
     await page.goto(baseUrl, { waitUntil: 'networkidle' })
     await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
-    const intro = page.locator('[data-testid="intro-continue"]')
-    if (await intro.count() > 0 && await intro.isVisible().catch(() => false)) {
-      await intro.click()
-      await page.waitForTimeout(150)
-    }
+    await dismissIntro(page)
+    await page.waitForTimeout(200)
 
     // A bonus buy first (balance must cover the 100x cost) — production
     // preview has no live RGS / curated mock-round data (see reports/qa
@@ -139,6 +137,23 @@ async function run() {
     // chain's own assets are checked statically below. FeatureMenu replaced
     // the old single-tier FeatureButton (2026-07-07): open the menu, then
     // ACTIVATE the Buy Overdrive card, which opens the same confirm modal.
+    // TR-047 follow-up, 2026-07-26. THIS SCRIPT HAD BEEN BROKEN SINCE 2026-07-16
+    // AND NOBODY NOTICED, because it is local-only and not a CI gate. HeroSplash
+    // (ANIMATION UPLIFT PASS, 2026-07-16) renders over everything on load and
+    // intercepts pointer events, so the click below sat out its full 30s
+    // actionability timeout and the run died. The committed result it produced,
+    // reports/qa/build-diet-network-log.json, is dated 2026-07-14: two days
+    // BEFORE the splash landed. So the network-hygiene proof the dossier cites
+    // in section 5 was ten days stale and could not be regenerated.
+    //
+    // dismissIntro is the shared helper that already existed for exactly this;
+    // roughly twenty scripts were deduplicated onto it and this one was missed.
+    // Wait for the app to be READY before dismissing. dismissIntro polls for
+    // about two seconds, and HeroSplash only mounts once loading finishes, so
+    // calling it straight after navigation can poll an empty page and return
+    // before the splash has even appeared. Every working harness in this
+    // directory waits for the spin button first; this one did not exist when
+    // that pattern was established.
     const featureMenuBtn = page.locator('[data-testid="feature-menu-button"]')
     if (await featureMenuBtn.count() > 0) {
       await featureMenuBtn.click()
@@ -181,11 +196,13 @@ async function run() {
     await rmPage.emulateMedia({ reducedMotion: 'reduce' })
     await rmPage.goto(baseUrl, { waitUntil: 'networkidle' })
     await rmPage.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
-    const rmIntro = rmPage.locator('[data-testid="intro-continue"]')
-    if (await rmIntro.count() > 0 && await rmIntro.isVisible().catch(() => false)) {
-      await rmIntro.click()
-      await rmPage.waitForTimeout(150)
-    }
+    // The reduced-motion page needs the same treatment, and it is the one that
+    // was actually failing: the Playwright log named
+    // `class="hero-splash ... reduced"`, and only this page emulates reduced
+    // motion. Both pages carried their own intro-only block, written before
+    // HeroSplash existed; both now use the shared helper.
+    await dismissIntro(rmPage)
+    await rmPage.waitForTimeout(200)
     await rmPage.locator('[data-testid="spin-button"]').click()
     await rmPage.waitForFunction(() => !document.querySelector('[data-testid="spin-button"].spinning'), { timeout: 15000 })
     await rmPage.waitForTimeout(150)
