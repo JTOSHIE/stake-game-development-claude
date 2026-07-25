@@ -9,6 +9,78 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 016 - 2026-07-26 - THE GAME IS LIVE ON THE PLATFORM. Maths passes everything; four files never uploaded; two findings need your ruling
+
+**State delta.** The owner ran the upload kit end to end. Future Spinner is published,
+running and playable on the real platform with real RGS. `Front (Current V1)`,
+`Math (Current V1)`. Bonus buys action correctly. Language switching works.
+
+**You cannot see the nineteen screenshots this is drawn from, so they are transcribed in
+full at `reports/qa/dtt_live_session_2026-07-26.md`.** That is the artefact for this entry;
+everything below is a pointer into it.
+
+**The maths verdict is uniformly good, and it is independent of us.** The platform computed
+its own figures from the uploaded books. All five modes COMPLIANT. Overall bet level
+compliance passes every constraint at both 2 Star and 3 Star. BASE scores 6 of 6. The
+platform reports RTP **96.3500**, Standard Deviation **17.2841**, Simulation Count 100000,
+Max Payout Multiplier 5000, Probability of Zero Win 70.8870 (so hit rate 29.1130).
+Our committed claims are 96.3500%, 17.28, 100,000, 5,000x and 29.11%. Cross-Mode RTP
+Consistency returns **0.00% variance**. This is protocol 6 corroboration arriving from a
+third party for free. One number new to our records: the platform states the RTP ceiling as
+**96.70%**, which we had not previously quoted from a first-party surface.
+
+**Four frontend files never reached the portal (TR-061, OPEN).** Panel reads 104 files /
+13.0 MB against the kit's 108 / 15,510,083 B. One of the four is live:
+`ui/scene_character.png`, the hero pilot, which renders as a broken image in the published
+build. The other three have no reader. Corroborated by byte arithmetic to 13.015 MB. Cause
+ruled out on size, de-duplication, position and reported skips; **not determined, and not
+guessed**. The frontend sync dialog was never captured, which is named as the missing input
+rather than reconstructed.
+
+**Findings for your ruling, numbered:**
+
+1. **TR-062: the published bundle is one commit behind `main`, and nothing ties a bundle to
+   a commit.** The kit predates `5674bd7`; its shipped JS still carries nine em dashes and
+   the owner's capture shows two of them rendering to a player now. So the TR-061 remedy
+   must be a fresh-clone build, not a reuse of the kit on the Desktop. The general problem
+   is that `dist/` carries no build stamp, so "what is live" is not answerable from the
+   repository. Same class as TR-047. Options (a) stamp `dist/` with the SHA and refuse to
+   package a non-HEAD tree, (b) treat the kit as single-use, (c) SHA in the kit README only.
+   **Recommend (a) with (b).**
+
+2. **TR-063: I am correcting my own TR-060 closure.** I widened the dash gate from 2 files
+   to 25 and recorded the class as closed. It was not. The gate reads single-quoted JS
+   literals only, and the two strings it was written to catch were markup prose, so it still
+   cannot see them. It also does not scan `App.svelte`, which ships an em dash in the
+   document title at line 1215 while the gate reports PASS. **This is the same pattern we
+   have now named four times**, one level down: instance fixed, class reported closed.
+   Options (a) whole-text scan with allowlist, (b) strip comments and scan all text plus add
+   `App.svelte`, (c) move the gate onto `dist/` so it checks what actually ships.
+   **Recommend (c) with (b)**, because (c) would also have caught finding 1.
+
+3. **TR-059 is confirmed live and is wider than filed.** The German session shows translated
+   chrome against fully English body copy, exactly as measured. New: the platform's Language
+   menu offers `da` (Danish), which we do not ship, and the list was still scrolling at the
+   capture edge, so the real gap is unknown. Parked pending a full capture rather than
+   estimated.
+
+**Confirmed by the platform, worth banking.** Popout S is **exactly 400 x 225**, so the
+mini-player target we took on a reviewer's assertion is correct; I re-derived our
+breakpoint conjunction against all seven presets and Mobile S (320 x 568) correctly stays
+out. The DTT also exposes a **Local Testing redirect URL**, so we can iterate against the
+real RGS from a local dev server without an upload cycle. That materially cheapens the
+TR-059 and TR-061 work.
+
+**Lane.** Green: this entry, the QA artefact, tracker rows. Nothing merged to game
+behaviour this session.
+
+**Outstanding.** Nine of the ten DTT protocol checks are unrun; check 3
+(`round.state.events`) remains the highest value. Replay read "No game modes available" but
+that capture predates the publish, so it is unresolved rather than failed. `math/HASHES.txt`
+is my packaging error and should be deleted from the portal.
+
+---
+
 ## 015 - 2026-07-25 - COMMS-ACK 013 and 014; TR-012c dissolved and implemented; custody rule held
 
 **COMMS-ACK, entries 013 and 014: receipt appended.**

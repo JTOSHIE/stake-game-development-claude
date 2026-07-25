@@ -1,0 +1,30 @@
+# DTT live session captures, 2026-07-26
+
+The owner's first real portal session: upload, publish, launch, and the Math Distribution
+and Summary page. Committed per convention (h) so the independent verifier can review the
+rendering from the repository rather than relying on a description.
+
+**Full transcription and audit: `reports/qa/dtt_live_session_2026-07-26.md`.**
+Nothing in this folder is edited or cropped; filenames were assigned from content.
+
+| File | What it proves |
+|---|---|
+| `01_maths_sync_dialog_13_files_skip_0.png` | Maths upload dialog: 13 files, `Skip 0 Files`, `Delete 0`, `Move 0`. The 13th is `HASHES.txt`, a packaging error. |
+| `02_maths_upload_in_progress_frontend_already_104.png` | Maths at 305 MB in flight; FRONTEND panel already reads 13.0 MB / 104 files, so the frontend shortfall predates the maths upload. |
+| `03_files_page_math_380mb_13_files.png` | MATH 380 MB, 13 files, with per-file sizes. |
+| `04_files_page_frontend_13mb_104_files.png` | FRONTEND 13.0 MB, 104 files. The basis of TR-061. |
+| `05_dtt_replay_no_game_modes_prepublish.png` | Replay menu reads "No game modes available". Timestamped before the publish, so unresolved rather than failed. |
+| `06_dtt_versions_front_vundefined_prepublish.png` | `Front (Current Vundefined)`, `Math (Current V)`: the pre-publish state the walkthrough predicted. |
+| `07_dtt_settings_menu_and_balance_presets.png` | Settings surface: Balance, Currency, Language, Device Type, Open in New Tab, Social Mode. |
+| `08_dtt_local_testing_redirect_url.png` | Local Testing offers a Redirect URL defaulting to `http://localhost:3000`. Lets us iterate against real RGS without an upload cycle. |
+| `09_dtt_screen_presets_popout_s_400x225.png` | Seven viewport presets. **Popout S is exactly 400 x 225**, confirming the mini-player target. |
+| `10_LIVE_GAME_hero_image_broken.png` | The running game. Broken-image placeholder where the pilot stands, car rendering correctly behind it. TR-061's live evidence. |
+| `11_dtt_versions_front_v1_math_v1_published.png` | `Front (Current V1)`, `Math (Current V1)`. Publishing succeeded. |
+| `12_dtt_language_menu_lists_da_danish.png` | Platform language list includes `da` (Danish), which we do not ship. Still scrolling at the capture edge. TR-059 extension. |
+| `13_TR059_features_menu_german_chrome_english_body.png` | German session: `DREHKOSTEN`, `DREHMODI`, `WÄHLEN`, `AKTIV`, `AKTIVIEREN` beside English mode names and blurbs. Also shows correct per-tier pricing (100x, $50,000.00 at a $500.00 bet). |
+| `14_TR059_TR062_paytable_german_title_english_body_em_dashes.png` | `GEWINNTABELLE` over English body copy, and the two em dash strings still rendering to a player. Evidence for both TR-059 and TR-062. |
+| `15_maths_overall_bet_level_compliance_all_pass.png` | Every constraint green at both 2 Star and 3 Star. |
+| `16_maths_all_five_modes_compliant.png` | BASE, CRUISE, ANTELITE, BONUS, SUPER all COMPLIANT, all 96.35% RTP, all 5,000x max. |
+| `17_maths_base_detailed_metrics_and_6of6.png` | BASE 6 of 6, including Cross-Mode RTP Consistency at 0.00% variance, and the platform's RTP ceiling of 96.70%. |
+| `18_maths_base_hit_rate_distribution.png` | Hit rate bands with counts and RTP contributions. |
+| `19_maths_base_property_table_rtp_963500_sd_172841.png` | The platform's own figures: RTP 96.3500, Standard Deviation 17.2841, Simulation Count 100000. Independent corroboration of our committed claims. |
