@@ -70,13 +70,52 @@ already correct. `books_super.jsonl.zst` was the one regeneration, on 2026-07-14
 a temporary scoped lift of the `games/future_spinner/**` deny lines, restored with a
 verified-empty diff.
 
-## What this manifest does NOT yet prove
+## Semantic equivalence: PROVEN, 2026-07-25
 
-**Row-by-row book-to-lookup payout equality is not proven here.** That is R3's remaining
-work: decode every row of every book and prove the summed event payout equals the
-lookup payout, for all 100,000 rows in all five modes. Review 1 named this as the thing
-it could not verify, and it is the reason the manifest exists rather than a bare
-assertion.
+**Row-by-row book-to-lookup equality is no longer an open claim.** Review 1 named it as the
+thing it could not verify, and this manifest previously said plainly that it established
+identity and integrity but not semantic equivalence. It now does both.
 
-Until that runs, this manifest establishes **identity and integrity** (the right files,
-unmodified, with the right shape), not **semantic equivalence**.
+`tools/verify_books_lookup_equality.py` decodes **every row of every mode** and makes five
+independent reconciliations per round:
+
+| Check | Claim |
+|---|---|
+| A | `book.payoutMultiplier` equals the lookup table's payout for the **same id** |
+| B | the closing `finalWin` equals the declared payout |
+| C | the last `setTotalWin`, the running total a player sees, lands on the same number |
+| D | the per-spin `winInfo.totalWin` values **sum** to the declared payout |
+| E | within each spin, the individual symbol wins sum to that spin's own total |
+
+D and E together are the substantive claim: individual symbol awards sum, spin by spin and
+through the Overdrive meter, to the payout the lookup table prices. A alone would only prove
+that two files agree on a number.
+
+**Result: 500,000 rounds, 4,455,829 assertions, 0 failures.** Report:
+`reports/qa/books_lookup_equality_2026-07-25.json`. The verifier is read-only, streams via
+the `zstd` CLI so it needs no third-party Python package, and a reviewer can run it against
+their own copy of the upload set.
+
+### Two things the run established that were not previously measured
+
+**The 5,000x cap truncates the recorded totals, and that is correct.** On a capped round the
+declared payout is exactly 500,000 centibets while the event stream still records what the
+wins actually came to, so the sum legitimately exceeds the declared total. The first draft
+of the verifier asserted plain equality and reported 22 failures across 2,500 rounds, every
+one of them at exactly 500,000 and none anywhere else. They were the cap working, not book
+defects. The verifier now asserts that a capped round genuinely EARNED at least the cap.
+
+**Wincap frequency, weighted, matches the published figures exactly.** Raw capped-row counts
+are not probabilities, because the books are a sample set and the lookup table carries the
+weights. Computed as `sum(weight of capped rows) / total weight`:
+
+| Mode | Weighted P(wincap) | 1 in | Against the stated fact |
+|---|---|---|---|
+| `base` | 0.0000100000 | 100,000 | matches "1 in 100,000" exactly |
+| `cruise` | 0.0000040000 | 250,000 | not previously stated |
+| `antelite` | 0.0000125000 | 80,000 | not previously stated |
+| `bonus` | 0.0010000000 | 1,000 | matches "1 in 1,000" exactly |
+| `super` | 0.0040000000 | 250 | not previously stated |
+
+Every mode's total weight sits at 1.1259e15, the convention the FAIR catalogue shows as most
+common across published games.

@@ -1,0 +1,89 @@
+{
+  "modes": [
+    {
+      "mode": "base",
+      "rounds": 100000,
+      "lookup_rows": 100000,
+      "failures": [],
+      "checked": {
+        "A": 100000,
+        "B": 100000,
+        "C": 100000,
+        "D": 50564,
+        "E": 176906
+      },
+      "no_win_rounds": 49436,
+      "capped_rounds": 200,
+      "max_payout_centibets": 500000
+    },
+    {
+      "mode": "cruise",
+      "rounds": 100000,
+      "lookup_rows": 100000,
+      "failures": [],
+      "checked": {
+        "A": 100000,
+        "B": 100000,
+        "C": 100000,
+        "D": 52395,
+        "E": 103195
+      },
+      "no_win_rounds": 47605,
+      "capped_rounds": 100,
+      "max_payout_centibets": 500000
+    },
+    {
+      "mode": "antelite",
+      "rounds": 100000,
+      "lookup_rows": 100000,
+      "failures": [],
+      "checked": {
+        "A": 100000,
+        "B": 100000,
+        "C": 100000,
+        "D": 57434,
+        "E": 259211
+      },
+      "no_win_rounds": 42566,
+      "capped_rounds": 250,
+      "max_payout_centibets": 500000
+    },
+    {
+      "mode": "bonus",
+      "rounds": 100000,
+      "lookup_rows": 100000,
+      "failures": [],
+      "checked": {
+        "A": 100000,
+        "B": 100000,
+        "C": 100000,
+        "D": 100000,
+        "E": 1037965
+      },
+      "no_win_rounds": 0,
+      "capped_rounds": 400,
+      "max_payout_centibets": 500000
+    },
+    {
+      "mode": "super",
+      "rounds": 100000,
+      "lookup_rows": 100000,
+      "failures": [],
+      "checked": {
+        "A": 100000,
+        "B": 100000,
+        "C": 100000,
+        "D": 100000,
+        "E": 1018159
+      },
+      "no_win_rounds": 0,
+      "capped_rounds": 3002,
+      "max_payout_centibets": 500000
+    }
+  ],
+  "totals": {
+    "rounds": 500000,
+    "assertions": 4455829,
+    "failures": 0
+  }
+}
