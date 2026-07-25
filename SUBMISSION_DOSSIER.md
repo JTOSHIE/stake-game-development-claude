@@ -371,3 +371,147 @@ AssetForge v2: all art including tile background, tile hero and provider
 logo. Motion Polish v2: final presentation. Build Diet v2: final dist
 and bundle. Compliance re-validation: evidence pack refreshed against the final
 build. Then section 5, then submit.
+
+---
+
+## 8. STATE AT HEAD (2026-07-25, refreshed end to end)
+
+**This section is authoritative where it conflicts with sections 1 to 7 above**, which
+predate the work below. Sections 1, 2, 4 and 7 remain accurate as structure; sections 3, 5
+and 6 are amended here.
+
+### 8a. Submission blurb: B is FINAL
+
+Blurb B is recorded as final per owner instruction relayed 2026-07-25. Section 3's header
+still reads DRAFT, PENDING OWNER APPROVAL; that status is superseded by this section. The
+soundtrack sentence ships only if audio ships, per the standing rule that no claim precedes
+its artefact.
+
+### 8b. Maths: book-to-lookup equality is PROVEN, not asserted
+
+Review 1 named this as the one thing it could not verify. It is now proven for **every row
+of every mode**.
+
+`tools/verify_books_lookup_equality.py`, read-only against the locked package:
+
+```
+rounds verified : 500,000
+assertions made : 4,455,829
+failures        : 0
+```
+
+Five independent reconciliations per round: book payout against the lookup table on the same
+id; the closing `finalWin`; the last `setTotalWin`; the per-spin `winInfo.totalWin` values
+summing to the declared payout; and each spin's individual symbol wins summing to its own
+total. The last two are the substantive claim, because they prove individual symbol awards
+sum, spin by spin and through the Overdrive meter, to the payout the lookup prices. The
+first alone would only prove two files agree on a number.
+
+**Wincap frequency, weighted, matches the published figures exactly.** Raw capped-row counts
+are not probabilities; the books are a sample set and the lookup carries the weights:
+
+| Mode | Weighted P(wincap) | 1 in |
+|---|---|---|
+| base | 0.0000100000 | 100,000 |
+| cruise | 0.0000040000 | 250,000 |
+| antelite | 0.0000125000 | 80,000 |
+| bonus | 0.0010000000 | 1,000 |
+| super | 0.0040000000 | 250 |
+
+`BOOKS_MANIFEST.md` is the bridge between the repository-committed artefacts and the local
+upload set: the seven committed files any reviewer can inspect, plus the five
+`books_*.jsonl.zst` that go to the ACP, with SHA-256 for each. It now records semantic
+equivalence, not merely identity and integrity.
+
+### 8c. Platform limits: compliant with margin, and the source is named
+
+| Limit | Requirement | Ours |
+|---|---|---|
+| RTP band, new submissions | 90.0% to 96.70% | **96.35%** in all five modes |
+| Outcomes per mode | max 10,000,000 | **100,000** per mode |
+| Max win | 5,000x cap | 5,000x, every table |
+
+Both the RTP band and the outcome cap come from the **first-party platform announcement of
+2026-07-25**, quoted verbatim with its date in `COMPLIANCE_WATCH.md`. As at the 5g sweep of
+the same date they are **not yet on the published approval-guidelines page**; the
+announcement said the RTP range takes effect "shortly with the next deploy". Cited as an
+announcement rather than as a page, so the citation is checkable.
+
+### 8d. Currency: XSC, XGC and XEC, with one gap named
+
+XEC is implemented and is a **release gate** for Stake EU: *"Games that don't support it
+won't be released on the platform."* It is defined identical to XSC by construction, and the
+tests assert `XEC == XSC` rather than hardcoded output, so the pair cannot drift.
+
+Symbol placement is **payload driven**. `formatBalance` accepts the platform's own
+`CurrencyDisplay` metadata (`symbol`, `symbolAfter`, `decimals`) and renders per payload;
+absent metadata, output is byte-identical to before. Both placements are asserted from
+fixture payloads, so the game is correct whichever the platform sends.
+
+**The gap, named rather than hidden:** locked `rgsService.authenticate()` builds a typed
+object and drops any field not in its list, so a real payload's display metadata cannot yet
+reach the consumption layer. Closing it needs either a lock sanction adding the field to
+that mapping, or confirmation at the platform testing session that the metadata arrives
+inside a field the mapping already carries. Not guessed at, and not routed around.
+
+The raw code is never shown to a player: asserted for every virtual code.
+
+### 8e. Session recovery, and what is deliberately unresolved
+
+`authenticate.round` was mapped and then discarded, so a mid-round reload abandoned an open
+round. On a `pending_end` round that is a **decided win nothing was ever going to collect**.
+Now settled through the platform's own `endRound`, proven by 17 assertions against an
+injected stub, since a `pending_end` round cannot be produced on demand against a live RGS.
+
+**TR-035b is parked with options**, because an `open` round cannot be resumed from
+`authenticate` alone: it reports the state but not the round's events. Settling it could
+forfeit a feature the player has not seen; fabricating a presentation would be inventing an
+outcome. The three options and the four questions that settle them are in
+`docs/staging/DTT_SESSION_RECOVERY_VERIFICATION.md`, including a double-credit test on
+repeated reloads which would be a blocker if it failed.
+
+### 8f. Presentation integrity: scatter anticipation
+
+Escalation is a function of **scatters visibly landed** and **whether reels are still
+moving**, and of nothing else. A build therefore states "three are down and reels are still
+turning", which is true one hundred per cent of the time; it never claims a scatter that has
+not landed. The signature enforces it: the function cannot be passed a board.
+
+The prior synthetic near-miss path, which read the final board to fabricate tension from a
+high-symbol pattern, is deleted.
+
+Designed against measurement rather than intuition: 40,000 shipped rounds, anticipation
+opening in 23.18% of base rounds with 64.5% converting, and 0.5% of rounds landing two
+scatters on one reel, which is why levels are computed from state rather than incremented.
+
+### 8g. Production safety: the mock cannot be reached
+
+`initRGS` sets `_rgsMode = false` on a genuine authenticate failure as well as the dev case,
+and `spin()` fell through to the mock. A production player with a failed session would have
+been served **fabricated wins against no wallet**. Betting is now enabled only on positive
+evidence of a live session, every bet route is gated, and a blocked session shows a
+translated, non-dismissible banner. A bundle gate asserts no mock marker reaches production,
+and its negative control is recorded: injecting a marker makes the gate fail.
+
+### 8h. Staging protocol amendment: the Developer Testing Tool stage
+
+Section 5's protocol gains one stage before submission: a session on the **official
+on-platform Developer Testing Tool**, which is where the remaining empirical questions are
+settled in one sitting. It carries the 5f Math screen read.
+
+Community-hosted tooling is **not** an acceptable substitute: our frozen tables and books do
+not leave our custody for any third party pre-release, and every question the community
+cloud would answer is answered identically on the platform's own infrastructure, where
+uploading is the entire point. Self-hosting the community tool remains permitted.
+
+**What the session settles:** XEC live behaviour and the currency display metadata; the
+TR-012c placement question, by reading what the platform actually sends; TR-035b's
+open-round semantics; and the CVaR definition.
+
+### 8i. Presentation: cohesion
+
+The scene character and car are enhanced art, adopted under an owner ruling that amended the
+assets convention: **external enhancement of art we already own is permitted; externally
+designed art is not, and symbols are never externally designed.** Verified before adoption:
+subject bounding boxes match the originals to 0.7% and identically respectively, so no
+layout shifted. A single global grade is available and ships at neutral.
