@@ -1,0 +1,578 @@
+{
+  "generated": "2026-07-26",
+  "row": "TR-043, dedicated 400x225 mini-player HUD",
+  "viewport": {
+    "width": 400,
+    "height": 225
+  },
+  "supersedes": "reports/screens/layouts-2026-07-25/popout-400x225.png and reports/qa/popout_conformance_2026-07-27.json",
+  "states": [
+    "idle",
+    "spinning",
+    "result",
+    "feature",
+    "modal"
+  ],
+  "measurements": {
+    "idle": {
+      "present": true,
+      "hud": {
+        "x": 0,
+        "y": 181,
+        "width": 400,
+        "height": 44,
+        "top": 181,
+        "right": 400,
+        "bottom": 225,
+        "left": 0
+      },
+      "controls": {
+        "menu": {
+          "x": 6,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 48,
+          "y": 194.5,
+          "w": 99.109375,
+          "h": 18,
+          "targetW": 99.109375,
+          "targetH": 18,
+          "text": "BAL $100.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 153.109375,
+          "y": 194.5,
+          "w": 80.890625,
+          "h": 18,
+          "targetW": 80.890625,
+          "targetH": 18,
+          "text": "WIN $0.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 240,
+          "y": 188.5,
+          "w": 104,
+          "h": 30,
+          "targetW": 104,
+          "targetH": 30,
+          "text": "$1.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 244,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betUp": {
+          "x": 314,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "spin": {
+          "x": 350,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    },
+    "spinning": {
+      "present": true,
+      "hud": {
+        "x": 0,
+        "y": 181,
+        "width": 400,
+        "height": 44,
+        "top": 181,
+        "right": 400,
+        "bottom": 225,
+        "left": 0
+      },
+      "controls": {
+        "menu": {
+          "x": 6,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 48,
+          "y": 194.5,
+          "w": 99.109375,
+          "h": 18,
+          "targetW": 99.109375,
+          "targetH": 18,
+          "text": "BAL $100.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 153.109375,
+          "y": 194.5,
+          "w": 80.890625,
+          "h": 18,
+          "targetW": 80.890625,
+          "targetH": 18,
+          "text": "WIN $0.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 240,
+          "y": 188.5,
+          "w": 104,
+          "h": 30,
+          "targetW": 104,
+          "targetH": 30,
+          "text": "$1.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 244,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 26,
+          "targetH": 30,
+          "text": "",
+          "truncated": false,
+          "disabled": true,
+          "visible": true
+        },
+        "betUp": {
+          "x": 314,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 26,
+          "targetH": 30,
+          "text": "",
+          "truncated": false,
+          "disabled": true,
+          "visible": true
+        },
+        "spin": {
+          "x": 350,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    },
+    "result": {
+      "present": true,
+      "hud": {
+        "x": 0,
+        "y": 181,
+        "width": 400,
+        "height": 44,
+        "top": 181,
+        "right": 400,
+        "bottom": 225,
+        "left": 0
+      },
+      "controls": {
+        "menu": {
+          "x": 6,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 48,
+          "y": 194.5,
+          "w": 99.109375,
+          "h": 18,
+          "targetW": 99.109375,
+          "targetH": 18,
+          "text": "BAL $102.90",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 153.109375,
+          "y": 194.5,
+          "w": 80.890625,
+          "h": 18,
+          "targetW": 80.890625,
+          "targetH": 18,
+          "text": "WIN $3.90",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 240,
+          "y": 188.5,
+          "w": 104,
+          "h": 30,
+          "targetW": 104,
+          "targetH": 30,
+          "text": "$1.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 244,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betUp": {
+          "x": 314,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "spin": {
+          "x": 350,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    },
+    "feature": {
+      "present": true,
+      "hud": {
+        "x": 0,
+        "y": 181,
+        "width": 400,
+        "height": 44,
+        "top": 181,
+        "right": 400,
+        "bottom": 225,
+        "left": 0
+      },
+      "controls": {
+        "menu": {
+          "x": 6,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 48,
+          "y": 194.5,
+          "w": 99.109375,
+          "h": 18,
+          "targetW": 99.109375,
+          "targetH": 18,
+          "text": "BAL $101.90",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 153.109375,
+          "y": 194.5,
+          "w": 80.890625,
+          "h": 18,
+          "targetW": 80.890625,
+          "targetH": 18,
+          "text": "WIN $3.90",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 240,
+          "y": 188.5,
+          "w": 104,
+          "h": 30,
+          "targetW": 104,
+          "targetH": 30,
+          "text": "$1.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 244,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betUp": {
+          "x": 314,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "spin": {
+          "x": 350,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    },
+    "modal": {
+      "present": true,
+      "hud": {
+        "x": 0,
+        "y": 181,
+        "width": 400,
+        "height": 44,
+        "top": 181,
+        "right": 400,
+        "bottom": 225,
+        "left": 0
+      },
+      "controls": {
+        "menu": {
+          "x": 6,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 48,
+          "y": 194.5,
+          "w": 99.109375,
+          "h": 18,
+          "targetW": 99.109375,
+          "targetH": 18,
+          "text": "BAL $100.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 153.109375,
+          "y": 194.5,
+          "w": 80.890625,
+          "h": 18,
+          "targetW": 80.890625,
+          "targetH": 18,
+          "text": "WIN $0.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 240,
+          "y": 188.5,
+          "w": 104,
+          "h": 30,
+          "targetW": 104,
+          "targetH": 30,
+          "text": "$1.00",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 244,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betUp": {
+          "x": 314,
+          "y": 188.5,
+          "w": 26,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 48,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "spin": {
+          "x": 350,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    }
+  },
+  "checks": {
+    "sessionIsLive": {
+      "pass": true,
+      "note": "without launch params the live guard blocks betting and every spin capture is of an idle screen"
+    },
+    "theSpinActuallyRan": {
+      "pass": true,
+      "before": "BAL $100.00",
+      "after": "BAL $102.90"
+    },
+    "theWinIsPresented": {
+      "pass": true
+    },
+    "modalIsScrollableAndClosable": {
+      "pass": true
+    },
+    "modalClosesOnEscape": {
+      "pass": true
+    },
+    "dedicatedProfileIsActive": {
+      "pass": true,
+      "note": "the mini HUD renders at 400x225, not the compact-landscape strip"
+    },
+    "noControlsOverlap": {
+      "pass": true,
+      "findings": []
+    },
+    "everyTargetIs44px": {
+      "pass": true,
+      "findings": []
+    },
+    "nothingRendersOffscreen": {
+      "pass": true,
+      "findings": []
+    },
+    "noStatValueIsTruncated": {
+      "pass": true,
+      "findings": []
+    },
+    "hudFitsItsBudget": {
+      "pass": true,
+      "heights": {
+        "idle": 44,
+        "spinning": 44,
+        "result": 44,
+        "feature": 44,
+        "modal": 44
+      }
+    },
+    "zeroConsoleErrors": {
+      "pass": true,
+      "errors": []
+    }
+  },
+  "allPass": true
+}

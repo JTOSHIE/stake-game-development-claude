@@ -117,6 +117,11 @@ export interface Translations {
   // fifteen locales is exactly the defect TR-006 closed.
   /** TR-036 option (b): the retrigger build is the same gauge, capped. */
   rulesOverdriveRetriggerBuild?: string
+  /** Menu label for the speed control in the mini-player HUD. */
+  hudTurboLabel?: string
+  /** Abbreviated stat labels for the 400x225 mini-player row. */
+  hudBalanceShort?: string
+  hudWinShort?: string
   recoveryResumed?: string
   /** Accessible name for the recovery banner's close control. */
   recoveryDismiss?: string
@@ -133,7 +138,7 @@ export type FeatureKey =
   | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyWhatYouGet' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
   | 'rulesOverdriveRetriggerBuild' | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
-  | 'recoveryResumed' | 'recoveryDismiss'
+  | 'hudBalanceShort' | 'hudWinShort' | 'hudTurboLabel' | 'recoveryResumed' | 'recoveryDismiss'
   | 'splashPressAnywhere'
 export type FeatureStrings = Record<FeatureKey, string>
 
@@ -1241,6 +1246,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 or more Scatters during free spins award +5 free spins.',
     rulesOverdriveRetriggerBuild: 'The scatter build runs shorter on a retrigger than on the entry, because the feature is already secured.',
     recoveryResumed: 'Your previous round has been completed and its result applied.',
+    hudBalanceShort: 'BAL',
+    hudWinShort: 'WIN',
+    hudTurboLabel: 'Speed',
     recoveryDismiss: 'Dismiss',
     rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
     rulesOverdriveModes: 'Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.',
@@ -1259,6 +1267,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 رموز سكاتر أو أكثر خلال اللفات المجانية تمنح 5 لفات إضافية.',
     rulesOverdriveRetriggerBuild: 'يكون تصاعد السكاتر أقصر عند إعادة التنشيط منه عند الدخول، لأن الميزة مؤمنة بالفعل.',
     recoveryResumed: 'تم إكمال جولتك السابقة وتطبيق نتيجتها.',
+    hudBalanceShort: 'الرصيد',
+    hudWinShort: 'الفوز',
+    hudTurboLabel: 'السرعة',
     recoveryDismiss: 'إغلاق',
     rulesOverdriveBuy: 'شراء البونص: ادفع 100× رهانك لبدء الميزة فوراً.',
     rulesOverdriveModes: 'اللعبة الأساسية وشراء البونص يمنحان نسبة عائد 96.35٪. أقصى فوز 5000× الرهان.',
@@ -1277,6 +1288,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 oder mehr Scatter während der Freispiele vergeben 5 zusätzliche Freispiele.',
     rulesOverdriveRetriggerBuild: 'Der Scatter-Aufbau läuft bei einem Retrigger kürzer als beim Einstieg, da das Feature bereits gesichert ist.',
     recoveryResumed: 'Ihre vorherige Runde wurde abgeschlossen und ihr Ergebnis angewendet.',
+    hudBalanceShort: 'GUTH',
+    hudWinShort: 'GEW',
+    hudTurboLabel: 'Tempo',
     recoveryDismiss: 'Schließen',
     rulesOverdriveBuy: 'Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten.',
     rulesOverdriveModes: 'Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.',
@@ -1295,6 +1309,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 o más Scatters durante los giros gratis otorgan 5 giros gratis adicionales.',
     rulesOverdriveRetriggerBuild: 'La acumulación de Scatters es más corta en un reactivado que en la entrada, porque la función ya está asegurada.',
     recoveryResumed: 'Tu ronda anterior se ha completado y su resultado se ha aplicado.',
+    hudBalanceShort: 'SALDO',
+    hudWinShort: 'GANA',
+    hudTurboLabel: 'Velocidad',
     recoveryDismiss: 'Cerrar',
     rulesOverdriveBuy: 'Compra de bono: paga 100× tu apuesta para iniciar la función de inmediato.',
     rulesOverdriveModes: 'El juego base y la Compra de bono devuelven 96,35 % de RTP. Ganancia máxima 5.000× la apuesta.',
@@ -1313,6 +1330,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 tai useampi Scatter ilmaiskierrosten aikana antaa 5 lisäkierrosta.',
     rulesOverdriveRetriggerBuild: 'Scatter-jännitys kestää uudelleenlaukaisussa lyhyemmän ajan kuin sisääntulossa, koska ominaisuus on jo varmistettu.',
     recoveryResumed: 'Edellinen kierroksesi on saatettu loppuun ja sen tulos on kirjattu.',
+    hudBalanceShort: 'SALDO',
+    hudWinShort: 'VOITTO',
+    hudTurboLabel: 'Nopeus',
     recoveryDismiss: 'Sulje',
     rulesOverdriveBuy: 'Bonusosto: maksa 100× panoksesi aloittaaksesi ominaisuuden heti.',
     rulesOverdriveModes: 'Peruspeli ja Bonusosto palauttavat molemmat 96,35 % RTP. Enimmäisvoitto 5 000× panos.',
@@ -1331,6 +1351,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 Scatters ou plus pendant les tours gratuits accordent 5 tours gratuits supplémentaires.',
     rulesOverdriveRetriggerBuild: 'La montée des Scatters est plus courte lors d\'un redéclenchement que lors de l\'entrée, car la fonctionnalité est déjà acquise.',
     recoveryResumed: 'Votre tour précédent a été terminé et son résultat appliqué.',
+    hudBalanceShort: 'SOLDE',
+    hudWinShort: 'GAIN',
+    hudTurboLabel: 'Vitesse',
     recoveryDismiss: 'Fermer',
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
     rulesOverdriveModes: 'Le jeu de base et l’Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
@@ -1349,6 +1372,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'फ्री स्पिन के दौरान 3 या अधिक स्कैटर 5 अतिरिक्त फ्री स्पिन देते हैं।',
     rulesOverdriveRetriggerBuild: 'रीट्रिगर पर स्कैटर बिल्ड प्रवेश की तुलना में छोटा चलता है, क्योंकि फीचर पहले ही सुरक्षित है।',
     recoveryResumed: 'आपका पिछला राउंड पूरा हो गया है और उसका परिणाम लागू कर दिया गया है।',
+    hudBalanceShort: 'शेष',
+    hudWinShort: 'जीत',
+    hudTurboLabel: 'गति',
     recoveryDismiss: 'बंद करें',
     rulesOverdriveBuy: 'बोनस खरीद: फ़ीचर तुरंत शुरू करने के लिए अपने दांव का 100× भुगतान करें।',
     rulesOverdriveModes: 'बेस गेम और बोनस खरीद दोनों 96.35% RTP देते हैं। अधिकतम जीत दांव का 5,000×।',
@@ -1367,6 +1393,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 atau lebih Scatter selama free spin memberikan 5 free spin tambahan.',
     rulesOverdriveRetriggerBuild: 'Penumpukan Scatter berjalan lebih singkat saat retrigger dibandingkan saat masuk, karena fitur sudah dipastikan.',
     recoveryResumed: 'Ronde Anda sebelumnya telah diselesaikan dan hasilnya diterapkan.',
+    hudBalanceShort: 'SALDO',
+    hudWinShort: 'MENANG',
+    hudTurboLabel: 'Kecepatan',
     recoveryDismiss: 'Tutup',
     rulesOverdriveBuy: 'Beli Bonus: bayar 100× taruhan Anda untuk memulai fitur segera.',
     rulesOverdriveModes: 'Game dasar dan Beli Bonus keduanya memberikan RTP 96,35%. Kemenangan maksimum 5.000× taruhan.',
@@ -1385,6 +1414,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'フリースピン中にスキャッター3個以上でフリースピンを5回追加します。',
     rulesOverdriveRetriggerBuild: 'リトリガー時のスキャッター演出は、フィーチャーがすでに確定しているため、突入時より短くなります。',
     recoveryResumed: '前回のラウンドが完了し、結果が反映されました。',
+    hudBalanceShort: '残高',
+    hudWinShort: '配当',
+    hudTurboLabel: 'スピード',
     recoveryDismiss: '閉じる',
     rulesOverdriveBuy: 'ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。',
     rulesOverdriveModes: 'ベースゲームとボーナス購入はどちらもRTP96.35%です。最大配当はベットの5,000倍。',
@@ -1403,6 +1435,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '프리 스핀 중 스캐터 3개 이상이면 프리 스핀 5회를 추가로 지급합니다.',
     rulesOverdriveRetriggerBuild: '재발동 시 스캐터 연출은 기능이 이미 확정되어 있으므로 진입 시보다 짧게 진행됩니다.',
     recoveryResumed: '이전 라운드가 완료되어 결과가 반영되었습니다.',
+    hudBalanceShort: '잔액',
+    hudWinShort: '당첨',
+    hudTurboLabel: '속도',
     recoveryDismiss: '닫기',
     rulesOverdriveBuy: '보너스 구매: 베팅액의 100배를 지불하면 기능이 즉시 시작됩니다.',
     rulesOverdriveModes: '기본 게임과 보너스 구매 모두 RTP 96.35%입니다. 최대 당첨은 베팅액의 5,000배입니다.',
@@ -1421,6 +1456,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 lub więcej symboli Scatter podczas darmowych spinów przyznaje 5 dodatkowych spinów.',
     rulesOverdriveRetriggerBuild: 'Narastanie symboli Scatter przy ponownym uruchomieniu trwa krócej niż przy wejściu, ponieważ funkcja jest już zapewniona.',
     recoveryResumed: 'Twoja poprzednia runda została zakończona, a jej wynik zastosowany.',
+    hudBalanceShort: 'SALDO',
+    hudWinShort: 'WYGR',
+    hudTurboLabel: 'Prędkość',
     recoveryDismiss: 'Zamknij',
     rulesOverdriveBuy: 'Zakup bonusu: zapłać 100× swojego zakładu, aby natychmiast uruchomić funkcję.',
     rulesOverdriveModes: 'Gra podstawowa i Zakup bonusu zwracają 96,35% RTP. Maksymalna wygrana 5000× zakładu.',
@@ -1439,6 +1477,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 ou mais Scatters durante os giros grátis concedem 5 giros grátis adicionais.',
     rulesOverdriveRetriggerBuild: 'A escalada de Scatters é mais curta num reativamento do que na entrada, porque a funcionalidade já está garantida.',
     recoveryResumed: 'A sua rodada anterior foi concluída e o resultado foi aplicado.',
+    hudBalanceShort: 'SALDO',
+    hudWinShort: 'GANHO',
+    hudTurboLabel: 'Velocidade',
     recoveryDismiss: 'Fechar',
     rulesOverdriveBuy: 'Compra de bônus: pague 100× a sua aposta para iniciar o recurso imediatamente.',
     rulesOverdriveModes: 'O jogo base e a Compra de bônus retornam ambos 96,35% de RTP. Ganho máximo de 5.000× a aposta.',
@@ -1457,6 +1498,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 или более скаттеров во время фриспинов дают 5 дополнительных фриспинов.',
     rulesOverdriveRetriggerBuild: 'Нарастание скаттеров при повторном запуске короче, чем при входе, поскольку функция уже обеспечена.',
     recoveryResumed: 'Ваш предыдущий раунд завершён, результат применён.',
+    hudBalanceShort: 'БАЛАНС',
+    hudWinShort: 'ВЫИГР',
+    hudTurboLabel: 'Скорость',
     recoveryDismiss: 'Закрыть',
     rulesOverdriveBuy: 'Покупка бонуса: заплатите 100× вашей ставки, чтобы запустить функцию сразу.',
     rulesOverdriveModes: 'Базовая игра и Покупка бонуса возвращают 96,35% RTP. Максимальный выигрыш 5000× ставки.',
@@ -1475,6 +1519,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: 'Bedava dönüşler sırasında 3 veya daha fazla Scatter 5 ek bedava dönüş verir.',
     rulesOverdriveRetriggerBuild: 'Yeniden tetiklemede Scatter yükselişi girişe göre daha kısa sürer, çünkü özellik zaten güvence altındadır.',
     recoveryResumed: 'Önceki turunuz tamamlandı ve sonucu uygulandı.',
+    hudBalanceShort: 'BAKİYE',
+    hudWinShort: 'KAZANÇ',
+    hudTurboLabel: 'Hız',
     recoveryDismiss: 'Kapat',
     rulesOverdriveBuy: 'Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin.',
     rulesOverdriveModes: 'Temel oyun ve Bonus Satın Alma her ikisi de %96,35 RTP döndürür. Maksimum kazanç bahsin 5.000 katı.',
@@ -1493,6 +1540,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '3 biểu tượng Scatter trở lên trong vòng quay miễn phí trao thêm 5 vòng quay miễn phí.',
     rulesOverdriveRetriggerBuild: 'Hiệu ứng dồn Scatter khi kích hoạt lại ngắn hơn so với lúc vào tính năng, vì tính năng đã được đảm bảo.',
     recoveryResumed: 'Vòng chơi trước của bạn đã hoàn tất và kết quả đã được áp dụng.',
+    hudBalanceShort: 'SỐ DƯ',
+    hudWinShort: 'THẮNG',
+    hudTurboLabel: 'Tốc độ',
     recoveryDismiss: 'Đóng',
     rulesOverdriveBuy: 'Mua Thưởng: trả 100× tiền cược của bạn để bắt đầu tính năng ngay lập tức.',
     rulesOverdriveModes: 'Trò chơi cơ bản và Mua Thưởng đều trả về RTP 96,35%. Thắng tối đa 5.000× tiền cược.',
@@ -1511,6 +1561,9 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveRetrigger: '免费旋转期间出现 3 个或以上分散符号可额外获得 5 次免费旋转。',
     rulesOverdriveRetriggerBuild: '再次触发时的分散符号蓄势比进入时更短，因为该功能已经确定。',
     recoveryResumed: '您的上一轮已完成，结果已生效。',
+    hudBalanceShort: '余额',
+    hudWinShort: '赢分',
+    hudTurboLabel: '速度',
     recoveryDismiss: '关闭',
     rulesOverdriveBuy: '购买奖励：支付 100 倍投注即可立即启动功能。',
     rulesOverdriveModes: '基础游戏和购买奖励的 RTP 均为 96.35%。最高赢额为投注的 5,000 倍。',

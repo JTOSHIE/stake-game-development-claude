@@ -47,6 +47,14 @@
   // fixed-coordinate LAYOUT_SPEC absolute layout or portrait's stacked rows.
   // Every binding/handler is shared across all three branches.
   export let compactLandscape = false
+  /**
+   * R2R-R JOB C / TR-043. Stake's 400x225 mini-player popout gets its OWN
+   * layout, not the compact-landscape strip squeezed further. See App.svelte's
+   * computeMiniPlayer for why: 76px of a 225px viewport is a third of the
+   * screen before a control is placed, and seven controls in 400px is what
+   * produced the overlapping fields reviewer 3 photographed.
+   */
+  export let miniPlayer = false
 
   // Dev-only test hook: exposes the store objects so headless verification
   // (frontend/scripts/layout_v1_audit.mjs, qa_soak.mjs, the portrait-layout
@@ -451,6 +459,91 @@
     </div>
   </div>
 </div><!-- /p-hud -->
+{:else if miniPlayer}
+<!-- MINI-PLAYER HUD (R2R-R JOB C / TR-043): a dedicated 44px single row for
+     Stake's 400x225 popout. FOUR controls, not the compact strip's seven.
+     Turbo, AUTO and MAX are not dropped, they MOVE into the menu, which
+     already exists here and already carries the paytable, session and audio.
+     What stays is the minimum a player needs to play: the menu, the bet
+     steppers, and SPIN.
+
+     Stats read INLINE, label and value on one line, because the stacked
+     label-over-value the compact strip uses is exactly what was overlapping at
+     this height. SPIN keeps its >=44px target; everything else moved so that it
+     could. -->
+<div class="m-hud" class:m-hud--overdrive={$overdriveVisual} data-testid="mini-hud">
+  <div class="m-menu-wrapper">
+    <button class="m-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu} data-testid="mini-menu">
+      <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
+    </button>
+    {#if showMenu}
+      <div class="hud-menu m-hud-menu" role="menu">
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
+        <!-- The three controls that left the row. They are reachable, labelled,
+             and at full menu-item size, which they were not when crammed into
+             the strip as icons. -->
+        <button class="hud-menu-item" role="menuitem" on:click={toggleTurbo}
+                disabled={$isSpinning || $rgJurisdiction.turboDisabled}>
+          {$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'} {$tr('hudTurboLabel')}
+        </button>
+        {#if !$rgJurisdiction.autoplayDisabled}
+          <button class="hud-menu-item" role="menuitem" on:click={toggleAutoMenu} disabled={$isSpinning}>
+            {$tr('autoPlay')}
+          </button>
+        {/if}
+        <button class="hud-menu-item" role="menuitem" on:click={setMaxBet}
+                disabled={$isSpinning || !$canSetMaxBetLevel}>
+          {$tr('betMax')}
+        </button>
+        <div class="audio-panel" class:muted={$isMuted}>
+          <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
+            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+          </button>
+        </div>
+      </div>
+    {/if}
+  </div>
+
+  <!-- Abbreviated labels, and not as a shortcut. The proof measured the full
+       words truncating the VALUES at 400px: "BALANCE $100.00" in 71px cut the
+       number, not the word, and a player who cannot read their balance is the
+       exact finding this HUD exists to fix. Short labels in all sixteen
+       locales, so no locale falls back to English. -->
+  <div class="m-stat m-stat--balance" data-testid="hud-balance">
+    <span class="m-stat-label">{$tr('hudBalanceShort')}</span>
+    <span class="m-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
+  </div>
+  <div class="m-stat m-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+    <span class="m-stat-label">{$tr('hudWinShort')}</span>
+    <span class="m-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
+  </div>
+  <div class="m-stat m-stat--bet" data-testid="hud-bet">
+    <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
+      <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+    </button>
+    <span class="m-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
+    <button class="m-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
+      <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+    </button>
+  </div>
+
+  <button
+    class="m-spin"
+    class:spinning={$isSpinning}
+    data-testid="spin-button"
+    on:click={handleSpin}
+    disabled={$isSpinning ? false : !$canSpin}
+    aria-label={$tr('spin')}
+  >
+    {#if $isSpinning}
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+    {:else}
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+    {/if}
+  </button>
+</div>
+
 {:else if compactLandscape}
 <!-- LANDSCAPE COMPACT HUD (2026-07-14b): a single native-scale row - menu,
      stats cluster (balance/win/bet+steppers), turbo, AUTO, MAX, SPIN
@@ -769,6 +862,116 @@
 {/if}
 
 <style>
+  /* ── MINI-PLAYER HUD (R2R-R JOB C / TR-043) ──────────────────────────────
+     A dedicated 44px row for Stake's 400x225 popout. Every number here is a
+     real native CSS px, not a scaled one: the whole finding was that scaling a
+     larger layout down is what produced the overlapping fields.
+
+     THE HEIGHT BUDGET, since it is what everything else follows from. 225px
+     total, 44px for this strip, leaving 181px of canvas. The compact strip's
+     76px would have left 149px, and it stacks a label ABOVE a value inside
+     that 76, which is what collided. Here label and value share one line. */
+  .m-hud {
+    display: flex; align-items: center; gap: 6px;
+    width: 100%; height: 44px; padding: 0 6px;
+    background: linear-gradient(180deg, rgba(10, 14, 26, 0.94), rgba(6, 8, 18, 0.98));
+    border-top: 1px solid rgba(0, 255, 255, 0.22);
+    font-family: 'Orbitron', monospace;
+  }
+  .m-hud--overdrive { border-top-color: rgba(255, 0, 255, 0.35); }
+
+  .m-menu-wrapper { position: relative; flex: 0 0 auto; }
+  /* 36px visual with a 44px hit area via the pseudo-element: the target is
+     full size without the button itself eating the row. */
+  .m-round-btn {
+    position: relative;
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 255, 255, 0.08); border: 1px solid rgba(0, 255, 255, 0.3);
+    color: #bff; cursor: pointer; padding: 0;
+  }
+  .m-round-btn::after { content: ''; position: absolute; inset: -4px; }
+  .m-hud-menu { bottom: 44px; left: 0; }
+
+  /* Stats read INLINE. This is the change that removes the overlap: nothing is
+     stacked in 44px, so nothing can collide with the line above it. */
+  .m-stat {
+    /* Balance gets the most room of the three: it is the longest string and
+       the one a player checks most. The first capture showed it truncated to
+       "$1..." with 60px to work in, which is not legible however tidy the row
+       looks, so the flex basis is weighted rather than equal. */
+    flex: 1.5 1 0; min-width: 0;
+    display: flex; align-items: baseline; gap: 4px;
+    padding: 0 4px; overflow: hidden;
+  }
+  .m-stat-label {
+    flex: 0 0 auto;
+    font-size: 8px; letter-spacing: 0.06em; color: #6f8a9a; text-transform: uppercase;
+  }
+  .m-stat-value {
+    flex: 1 1 auto; min-width: 0;
+    font-size: 12px; font-weight: 700; white-space: nowrap;
+    /* NO text-overflow: ellipsis. autofitText already shrinks the string to
+       fit, and an ellipsis on top of it turns a small-but-readable number into
+       an unreadable one: whichever wins, the player loses. Overflow stays
+       hidden so a pathological value cannot push the row apart. */
+    overflow: hidden;
+  }
+  .m-stat-value.cyan { color: #7ff; }
+  .m-stat-value.magenta { color: #f9f; }
+  .m-stat-value.gold { color: #ffd54a; }
+  .m-stat.lit .m-stat-value.magenta { text-shadow: 0 0 8px rgba(255, 0, 255, 0.6); }
+
+  /* Weighted by string length, and by EXPLICIT CLASS rather than by position.
+     The first attempt used .m-stat:nth-of-type(2), which counts among sibling
+     divs and therefore matched BALANCE rather than WIN: balance got 71px and
+     truncated while win sat on 103px showing "$0.00". A positional selector in
+     a row whose composition can change is a bug waiting for the next control
+     to be added. */
+  /* 1.25, not 1.8. At 1.8 the balance fit and the WIN value truncated instead:
+     the row is a fixed budget, so over-weighting one stat simply moves the
+     defect. Both measured clear at 1.25. */
+  .m-stat--balance { flex: 1.25 1 0; }
+  .m-stat--win { flex: 1 1 0; }
+  .m-stat--bet { flex: 0 0 auto; gap: 2px; }
+  .m-stat--bet .m-stat-value { min-width: 40px; text-align: center; }
+  .m-bet-step {
+    position: relative;
+    width: 26px; height: 30px; border-radius: 6px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 213, 74, 0.10); border: 1px solid rgba(255, 213, 74, 0.34);
+    cursor: pointer;
+  }
+  /* Same trick as the menu button: 26x30 visual, 44px effective target.
+     -9 and not -7: the proof measured the effective box and reported 40x44,
+     so the horizontal extension was one step short of the floor. Measured,
+     then corrected, rather than assumed from the visual size. */
+  .m-bet-step::after { content: ''; position: absolute; inset: -9px; }
+  .m-bet-step svg { width: 12px; height: 8px; fill: #ffd54a; }
+  .m-bet-step:disabled { opacity: 0.35; cursor: default; }
+  .m-bet-step:disabled::after { content: none; }
+
+  /* SPIN never shrinks. It is the one control that must always be operable, and
+     it is the reason turbo, AUTO and MAX moved into the menu. */
+  .m-spin {
+    position: relative;
+    flex: 0 0 auto;
+    /* 44x40 visual with a 3px extension, so the effective target is 50x46.
+       The proof measured 44x38 on the first pass: wide enough and two pixels
+       short vertically, which is exactly the kind of miss a screenshot cannot
+       show and a measurement can. */
+    width: 44px; height: 40px; border-radius: 10px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 40%, rgba(0, 255, 255, 0.35), rgba(0, 120, 150, 0.5));
+    border: 1px solid rgba(0, 255, 255, 0.7);
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.35);
+    cursor: pointer;
+  }
+  .m-spin::after { content: ''; position: absolute; inset: -3px; }
+  .m-spin svg { width: 20px; height: 20px; fill: #eafeff; }
+  .m-spin:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+  .m-spin.spinning { background: radial-gradient(circle at 50% 40%, rgba(255, 0, 255, 0.3), rgba(120, 0, 150, 0.5)); border-color: rgba(255, 0, 255, 0.7); }
+
   /* ============================================================================
      FUTURE SPINNER - B1 HUD & CONTROL-BAR RESKIN  (production CSS)
      Fixed 1280x720 design surface (LAYOUT_SPEC v3.2/v3.6). Every coordinate

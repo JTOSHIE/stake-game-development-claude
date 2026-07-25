@@ -59,6 +59,8 @@
   // App.svelte's .native-hud-slot.compact-landscape row. Same modal, same
   // reasoning as portrait above - only the trigger's own markup/CSS differs.
   export let compactLandscape = false
+  /** R2R-R JOB C / TR-043: the 400x225 mini-player profile. */
+  export let miniPlayer = false
 
   let open = false
 

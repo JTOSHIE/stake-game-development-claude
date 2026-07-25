@@ -714,8 +714,61 @@
   // inside the LAYOUT_SPEC v3.x panel.
   const COMPACT_HEIGHT_BREAKPOINT = 500
   const COMPACT_STRIP_H = 76
+
+  // ── MINI-PLAYER, R2R-R JOB C / TR-043 (2026-07-26) ─────────────────────────
+  //
+  // Stake's mini-player popout is 400x225. Until now that fell into the
+  // COMPACT LANDSCAPE profile, which is a 76px strip carrying seven controls in
+  // one row: menu, balance, win, bet with two steppers, turbo, AUTO, MAX and
+  // SPIN. Round-two reviewer 3 looked at the committed capture and described
+  // the result exactly: "the balance and bet fields compressed into overlapping
+  // vertical fragments, an unlabeled feature control and collisions across the
+  // bottom bar".
+  //
+  // The compact strip is not wrong; it is a phone-landscape layout being asked
+  // to do a job three times smaller than it was drawn for. 76px of a 225px
+  // viewport is a third of the screen before a single control is placed, and
+  // seven controls in 400px leaves about 50px each including the stats.
+  //
+  // So this is a DEDICATED PROFILE rather than the compact strip scaled down,
+  // which is what the brief asked for and what the finding requires. What
+  // changes, and why each:
+  //
+  //   the strip is 44px, not 76      one row of 44px targets, no stacked
+  //                                  label-over-value, which is what was
+  //                                  overlapping
+  //   four controls, not seven       menu, bet steppers and SPIN stay because
+  //                                  they are the only ones a player must reach
+  //                                  to play; turbo, AUTO and MAX move into the
+  //                                  menu, which already exists and already
+  //                                  holds the paytable, session and audio
+  //   stats read inline              BAL and WIN render as one line each with
+  //                                  the label inline rather than above, so
+  //                                  nothing is stacked in 44px
+  //   SPIN stays >=44px              it is the one control that must never
+  //                                  shrink, and it is why the others moved
+  //
+  // The breakpoint is BOTH dimensions. A 400px-wide portrait phone is not a
+  // mini-player and must not get this layout; the popout is defined by being
+  // small in both directions at once.
+  const MINI_WIDTH_BREAKPOINT = 480
+  const MINI_HEIGHT_BREAKPOINT = 300
+  const MINI_STRIP_H = 44
+  function computeMiniPlayer(): boolean {
+    if (typeof window === 'undefined') return false
+    return window.innerWidth <= MINI_WIDTH_BREAKPOINT && window.innerHeight <= MINI_HEIGHT_BREAKPOINT
+  }
+  function computeMiniCanvasScale(): number {
+    if (typeof window === 'undefined') return 1
+    const availH = Math.max(window.innerHeight - MINI_STRIP_H, 1)
+    return Math.min(window.innerWidth / STAGE_W, availH / STAGE_H)
+  }
+
   function computeCompactLandscape(): boolean {
     if (typeof window === 'undefined') return false
+    // Mini-player takes precedence: it is a strictly smaller case, and letting
+    // both be true would leave the two strips fighting over the same slot.
+    if (computeMiniPlayer()) return false
     return window.innerHeight < window.innerWidth && window.innerHeight < COMPACT_HEIGHT_BREAKPOINT
   }
   function computeCompactCanvasScale(): number {
@@ -728,12 +781,16 @@
   let portraitCanvasScale = computePortraitCanvasScale()
   let compactLandscape = computeCompactLandscape()
   let compactCanvasScale = computeCompactCanvasScale()
+  let miniPlayer = computeMiniPlayer()
+  let miniCanvasScale = computeMiniCanvasScale()
   function handleResize(): void {
     S = computeS()
     portrait = computePortrait()
     portraitCanvasScale = computePortraitCanvasScale()
     compactLandscape = computeCompactLandscape()
     compactCanvasScale = computeCompactCanvasScale()
+    miniPlayer = computeMiniPlayer()
+    miniCanvasScale = computeMiniCanvasScale()
   }
 
   onMount(async () => {
@@ -1209,6 +1266,7 @@
   class="game-wrapper"
   class:portrait
   class:compact-landscape={compactLandscape}
+  class:mini-player={miniPlayer}
   class:shake={shakeActive}
   style="
     --theme-primary: {$activeTheme.palette.primary};
@@ -1287,13 +1345,15 @@
     class="canvas-slot"
     class:portrait
     class:compact-landscape={compactLandscape}
-    style={portrait ? `height:${PORTRAIT_CROP_BOTTOM_Y * portraitCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
+    class:mini-player={miniPlayer}
+    style={portrait ? `height:${PORTRAIT_CROP_BOTTOM_Y * portraitCanvasScale}px` : miniPlayer ? `height:${STAGE_H * miniCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
   >
     <div
       class="canvas-inner"
       class:portrait
       class:compact-landscape={compactLandscape}
-      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
+      class:mini-player={miniPlayer}
+      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : miniPlayer ? `transform: translateX(-50%) scale(${miniCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
     >
       {#if !portrait}
         <!-- LOGO — top centre, 380 wide, y 18 (z70). Desktop/landscape only:
@@ -1474,27 +1534,27 @@
            beside the frame in the 1280x720 coordinate space); portrait and
            compact-landscape each render their own native-scale trigger in
            .native-hud-slot below. -->
-      {#if !portrait && !compactLandscape && $activeTheme.id === 'future-spinner' && !featureActive}
+      {#if !portrait && !compactLandscape && !miniPlayer && $activeTheme.id === 'future-spinner' && !featureActive}
         <FeatureMenu idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
 
       <!-- HUD OVERLAY — desktop landscape only here; portrait and
            compact-landscape each render their own native-DOM instance in
            .native-hud-slot below. -->
-      {#if !portrait && !compactLandscape}
+      {#if !portrait && !compactLandscape && !miniPlayer}
         <HudOverlay on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
       {/if}
     </div>
   </div>
 
-  {#if portrait || compactLandscape}
+  {#if portrait || compactLandscape || miniPlayer}
     <!-- NATIVE HUD SLOT — native DOM scale, never stage-scaled (2026-07-14
          portrait pass; 2026-07-14b extends it to compact-landscape). Sits
          below the canvas slot in normal flow; FeatureMenu/HudOverlay each
          get a `portrait` or `compactLandscape` prop so their own CSS
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
-    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape}>
+    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
       <!-- Portrait Overdrive meter (2026-07-15, item 2): docked between the
            grid (canvas-slot above) and the FEATURES bar - occupies the same
            slot FeatureMenu's trigger would, since that's hidden during the
@@ -1512,9 +1572,9 @@
         />
       {/if}
       {#if $activeTheme.id === 'future-spinner' && !featureActive}
-        <FeatureMenu {portrait} {compactLandscape} idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
+        <FeatureMenu {portrait} {compactLandscape} {miniPlayer} idleAttract={idleAttractActive} on:buy={(e) => buyBonusRef?.openConfirm(e.detail)} />
       {/if}
-      <HudOverlay {portrait} {compactLandscape} on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
+      <HudOverlay {portrait} {compactLandscape} {miniPlayer} on:spin={handleSpin} on:slam={() => gridRef?.slamStop()} />
     </div>
   {/if}
 
@@ -1589,6 +1649,8 @@
 {/if}
 
 <style>
+.native-hud-slot.mini-player { flex-direction: row; align-items: stretch; }
+
   .jets-holder { position: absolute; inset: 0; pointer-events: none; }
   /* Above the free-spins overlay (z80) only while the retrigger beat runs. */
   .jets-holder.above-overlay { z-index: 90; }
@@ -1720,7 +1782,8 @@
     80%      { transform: translate(5px, -3px); }
   }
   .game-wrapper.portrait.shake,
-  .game-wrapper.compact-landscape.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
+  .game-wrapper.compact-landscape.shake,
+  .game-wrapper.mini-player.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
 
   @media (prefers-reduced-motion: reduce) {
     .game-wrapper.shake { animation: none; }
@@ -1740,7 +1803,8 @@
      coordinate space for the scene/frame/grid unchanged in both. Desktop
      landscape (neither class) is completely untouched. */
   .game-wrapper.portrait,
-  .game-wrapper.compact-landscape {
+  .game-wrapper.compact-landscape,
+  .game-wrapper.mini-player {
     width: 100%;
     height: 100%;
     flex: 1 1 auto;
@@ -1762,6 +1826,15 @@
   .canvas-slot.compact-landscape {
     flex: 0 0 auto;
     /* height set inline per-frame (STAGE_H * compactCanvasScale) */
+  }
+  .canvas-slot.mini-player {
+    flex: 0 0 auto;
+    /* height set inline per-frame (STAGE_H * miniCanvasScale) */
+  }
+  .canvas-inner.mini-player {
+    position: absolute; left: 50%; top: 0;
+    transform-origin: top center;
+    /* transform set inline per-frame (translateX(-50%) scale(miniCanvasScale)) */
   }
   .canvas-slot.portrait {
     flex: 0 0 auto;
