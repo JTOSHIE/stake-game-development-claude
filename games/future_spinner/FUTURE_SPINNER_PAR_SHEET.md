@@ -85,7 +85,7 @@ participate in the ways calculation.
 | 3+ (retrigger, in free spins) | award x current meter | +5 |
 
 *During free spins the instant scatter pay is multiplied by the current
-Overdrive meter. 6+ scatters can appear on a free-spin board (scatters stack);
+Overdrive meter. FIVE scatters is the maximum on the visible 5x4 board; when five land
 they pay the 5-scatter award and retrigger +5 spins.*
 
 ---
