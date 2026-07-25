@@ -84,6 +84,38 @@ does.
 - **Slam still wins**, unchanged: every wait routes through `_sleepOrSlam()`.
 - No beat is skipped at any speed. That is the whole point of a floor.
 
+### The hold lengths are RULED, not provisional (owner, 2026-07-25)
+
+The builder raised the level-3 hold as a possible drag: it runs for a fixed 1000ms whether
+or not a fourth scatter is coming, and 76% of the time nothing more is coming. **Ruled to
+stand, and the reasoning is the part that matters:**
+
+> "If you're getting the bonus of three, you still want to see if you're getting the four
+> or the five, because that's the increase multiplier, it's the increase spin, so people
+> don't mind waiting that additional time... you're not going to get spins that often, so
+> there's got to be that anticipation and buildup. The fact that you're getting spins,
+> people are already locked in. That's already a time to focus and slow down. **It's when
+> it's dead spins that people just want it to go quicker.**"
+
+**The principle, stated generally: attention is earned by the round.** A round that has
+secured something deserves time; a round that has produced nothing should get out of the
+way. Anyone tempted to shorten these holds later should check that principle first, because
+the ladder already implements it:
+
+| Round state | Hold | Why |
+|---|---|---|
+| 0 or 1 scatter, a dead spin | **none at all** | full speed, nothing has been earned |
+| 2 down, reels turning | 900ms | genuinely live, something is still possible |
+| 3 or more, reels turning | 1000 to 1100ms | locked in, and the player wants to see 4 or 5 |
+
+Note what this does NOT license: shortening a hold *because the outcome is known to be
+disappointing*. That is the book lookahead the integrity ruling forbids. Dead spins are
+fast because they never open the ladder at all, which is a property of visible state, not
+of the outcome.
+
+The pause between the sequence resolving and the free spins beginning was raised in the
+same review and accepted as natural. No change.
+
 ## 5. Reduced motion
 
 `prefers-reduced-motion` gets the same **information** without movement: no tremble, no
