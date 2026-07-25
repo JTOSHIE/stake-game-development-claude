@@ -14,17 +14,17 @@
 import { chromium } from 'playwright'
 import { writeFileSync } from 'node:fs'
 
-const [,, SRC, OUT] = process.argv
+const [,, SRC, OUT, REF] = process.argv
 const b = await chromium.launch(); const p = await b.newPage()
 await p.goto('http://localhost:5173/')
 
-const dataUrl = await p.evaluate(async ({ src }) => {
+const dataUrl = await p.evaluate(async ({ src, ref }) => {
   const load = async (s) => { const i = new Image(); i.src = s; await i.decode(); return i }
   const ctxOf = (img) => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height
     const x = c.getContext('2d'); x.drawImage(img, 0, 0); return { c, x, d: x.getImageData(0,0,img.width,img.height) } }
 
   // ── reference geometry from the sprite being replaced ────────────────────
-  const orig = await load('/assets/themes/future-spinner/ui/scene_character.png')
+  const orig = await load(ref)
   const od = ctxOf(orig).d.data
   let ox0=1e9, oy0=1e9, ox1=-1, oy1=-1
   for (let y=0;y<orig.height;y++) for (let x=0;x<orig.width;x++) {
@@ -60,7 +60,7 @@ const dataUrl = await p.evaluate(async ({ src }) => {
   ox.imageSmoothingQuality = 'high'
   ox.drawImage(c, nx0, ny0, nx1-nx0+1, ny1-ny0+1, ox0, oy0, ox1-ox0+1, oy1-oy0+1)
   return out.toDataURL('image/png')
-}, { src: SRC })
+}, { src: SRC, ref: REF })
 
 writeFileSync(OUT, Buffer.from(dataUrl.split(',')[1], 'base64'))
 console.log('wrote', OUT)
