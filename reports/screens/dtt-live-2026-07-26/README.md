@@ -56,3 +56,18 @@ Nothing in this folder is edited or cropped; filenames were assigned from conten
 | `38_autoplay_1000_bet_47_remaining.png` | Autoplay at $1,000 a spin, 4x turbo, 47 remaining, $50M balance. |
 | `39_session_131_spins_net_minus_61260.png` | 131 spins, wagered $131,000, won $69,740, net -$61,260. Reconciles to the HUD balance exactly. |
 | `40_session_143_spins_net_plus_9590_after_80650_win.png` | 143 spins, won $152,590, net +$9,590. One x80.65 win twelve spins earlier caused the whole swing. |
+
+---
+
+## Part 3, buy modes and the money path (8 further captures)
+
+| File | What it proves |
+|---|---|
+| `41_session_524_base_spins_balance_reconciles.png` | 524 base spins, wagered $524,000, won $441,330, net -$82,670. Balance $49,917,330 reconciles exactly. |
+| `42_after_three_bonus_buys_balance_reconciles.png` | After three $500 bonus buys at 100x. Balance $49,972,875 reconciles exactly against the bet log. |
+| `43_bonus_win_presentation.png` | Bonus round win presentation. |
+| `44_bonus_win_presentation_2.png` | Bonus round win presentation, continued. |
+| `45_nitro_confirm_price_200000_at_500_bet.png` | NITRO OVERDRIVE confirm at a $500 bet: `PRICE $200,000.00`, RTP 96.35%, MAX WIN 5,000x base bet. **The game shows the true cost up front.** Guideline item 27 confirmed live. |
+| `46_TR068_win_57215_while_balance_falls_142785.png` | **TR-068.** `WIN $57,215.00` in large green type while the balance falls by $142,785, because the round cost $200,000. Balance $49,830,090 reconciles exactly. |
+| `47_nitro_confirm_price_400000_at_1000_bet.png` | Same dialog at a $1,000 bet: `PRICE $400,000.00`. Cost scales correctly with bet level. |
+| `48_final_balance_48916485_reconciles_exactly.png` | After five super buys. Balance $48,916,485 reconciles exactly. The 400x debit is charged correctly. |

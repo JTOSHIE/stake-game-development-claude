@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 018 - 2026-07-26 - Buy modes exercised live: the money path reconciles to the cent four times over, and the one real finding is that a buy round headlines a loss as a win
+
+**Two things the owner flagged, and both need care rather than a fix.**
+
+**1. "The bet cost is wrong."** It is not. The platform's Bets panel row shows **COST = bet
+level**; the expanded detail shows **Cost (USD) = what was debited**. The 06:25:18 row reads
+`super $1,000.00` and its detail reads `Cost (USD) $400,000.00, Cost multiplier x400.00`.
+Super is 400x, so that is correct. **Our own confirm dialog shows the true price up front**,
+captured twice: `PRICE $200,000.00` at a $500 bet and `PRICE $400,000.00` at $1,000. The trap
+is the platform's **MULT column, which is payout divided by bet level, not by what was
+staked**: a green `+$102,930.00 at x102.93` was a **loss of $297,070**. Across eight buy
+rounds the owner staked $1,550,000 for $553,845 back, a 35.7% return, entirely ordinary
+against super's 71.8% break-even.
+
+**2. "The balance wasn't updating."** It was, every time. I reconciled four HUD balances
+against the platform's own bet log, each derived independently using the true per-mode cost:
+
+| Time | Expected | HUD | |
+|---|---|---|---|
+| 06:20:58 | $49,917,330.00 | $49,917,330.00 | exact |
+| 06:22:36 | $49,972,875.00 | $49,972,875.00 | exact |
+| 06:23:37 | $49,830,090.00 | $49,830,090.00 | exact |
+| 06:28:31 | $48,916,485.00 | $48,916,485.00 | exact |
+
+**Four exact reconciliations across base, 100x bonus and 400x super.** Confirmed in code too:
+`App.svelte:1002` computes `cost = bet * MODE_COST[mode]`, and that same `cost` feeds both the
+balance path and `rgRecordSpin`, so the wallet and the session panel cannot drift apart.
+**This is now the strongest evidence we have that the money path is correct in production**,
+and it covers the buy tiers, which is exactly where this project has been bitten before.
+
+**TR-068, the real finding, and it needs your ruling.** What the owner saw is genuine: at
+06:23:37 the HUD reads `WIN $57,215.00` in large green type while the balance falls by
+$142,785. Gross-payout WIN readouts are the genre convention and are not wrong in themselves.
+The problem is that **the typical buy round pays back less than it cost** (super break-even
+71.8%, bonus 76.5%), so at 400x the convention inverts the meaning of the round in the common
+case, not the edge case: seven of the owner's eight buy rounds were "wins" that lost money.
+It also sits against guideline item 50, *"UI clearly displays bet cost and applied
+multiplier"*. **Options:** (a) show cost beside win on buy rounds, `WIN $57,215 / COST
+$200,000`, most honest and breaks no convention; (b) show net for buy rounds, clearest but a
+reviewer expecting a WIN readout would read it as wrong; (c) show the multiplier against cost
+(`x0.29`) instead of against bet level; (d) leave it. **Recommend (a) with (c).** Player-money
+presentation, so it comes to you under (l.8) rather than being decided here.
+
+**New artefact: `docs/records/reviews/FIX_LIST_2026-07-26.md`.** Owner asked for a
+consolidated list of everything the day's sessions turned up, prioritised. It carries the two
+not-a-bug findings first so they are not re-investigated, then eight confirmed defects, the
+one escalation, what is the platform's rather than ours, and the owner's own actions.
+**The headline: B.2 through B.5 are all small, self-contained frontend changes touching no
+locked file and no maths, and doing them in one pass plus a fresh-clone rebuild also clears
+TR-062.**
+
+**Nothing about the maths changed.** The Math page is still Math V1, still identical field
+for field, and still will be: it is a static analysis of the uploaded books, not telemetry.
+
+**Lane.** Green: fix list, tracker row, eight further captures. No behaviour changed.
+
+**Awaiting your ruling on:** TR-064 (zero-win end-round, client versus checklist, must not be
+fixed blind), TR-068 (buy-round win presentation), TR-067 (force English in social), and
+TR-062/TR-063 from entry 017.
+
+---
+
 ## 017 - 2026-07-26 - Hero fixed, Front V2 live, 143 real rounds settled; the platform's own 58-item checklist found us 3 failures and 1 genuine contract conflict
 
 **Read this one instead of 016 if you only read one.** 016 stands, this supersedes its open
