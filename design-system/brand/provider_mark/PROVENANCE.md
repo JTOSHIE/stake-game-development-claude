@@ -1,5 +1,11 @@
 # Provider mark candidates, provenance (TR-031)
 
+> **SUPERSEDED 2026-07-26, non-preferred (convention (h)).** Candidates a, b and c are
+> derivations from the hero-emblem master and are kept, not deleted: they stay in the
+> 48px comparison sheet so the owner can see what the later candidates are better
+> than. See `README.md` in this directory for current status. The mark awaiting the
+> owner eye-call is **e**, the owner-supplied one.
+
 - derived: 2026-07-25 by `frontend/scripts/provider_mark_derive.mjs`
 - source: `design-system/brand/hero_emblem/master_1024.png` (unmodified)
 - deterministic canvas operations only, no hand editing; re-running reproduces identical output
