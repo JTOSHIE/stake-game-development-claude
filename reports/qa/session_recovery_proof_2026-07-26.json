@@ -1,0 +1,72 @@
+{
+  "generated": "2026-07-26",
+  "row": "TR-035b resume-and-settle, TR-049 banner capture",
+  "servedFrom": "production build via vite preview, so import.meta.env.DEV is false",
+  "intercepted": [
+    "/wallet/authenticate",
+    "/wallet/end-round"
+  ],
+  "walletCalls": [
+    {
+      "url": "https://rgs.recovery-proof.invalid/wallet/authenticate",
+      "body": {
+        "sessionID": "proof-session",
+        "language": "en"
+      }
+    },
+    {
+      "url": "https://rgs.recovery-proof.invalid/wallet/authenticate",
+      "body": {
+        "sessionID": "proof-session",
+        "language": "en"
+      }
+    },
+    {
+      "url": "https://rgs.recovery-proof.invalid/wallet/end-round",
+      "body": {
+        "sessionID": "proof-session"
+      }
+    }
+  ],
+  "checks": {
+    "bannerWaitsForTheSplash": {
+      "pass": true,
+      "note": "the banner must not be showing while a boot splash still covers the game"
+    },
+    "roundIsReplayedOnScreen": {
+      "pass": true,
+      "cells": 35
+    },
+    "bannerRendered": {
+      "pass": true,
+      "text": "Your previous round has been completed and its result applied."
+    },
+    "authenticateCalled": {
+      "pass": true
+    },
+    "endRoundCalled": {
+      "pass": true
+    },
+    "endRoundBodyIsOfficial": {
+      "pass": true,
+      "body": {
+        "sessionID": "proof-session"
+      }
+    },
+    "rgsUrlWasNormalised": {
+      "pass": true,
+      "sample": "https://rgs.recovery-proof.invalid/wallet/authenticate"
+    },
+    "bannerIsDismissible": {
+      "pass": true
+    },
+    "zeroConsoleErrors": {
+      "pass": true,
+      "errors": []
+    },
+    "bannerDismisses": {
+      "pass": true
+    }
+  },
+  "allPass": true
+}

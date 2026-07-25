@@ -35,22 +35,56 @@
 //      because "recovering an open round needs the round's events, and
 //      authenticate does not return them". Under the official contract
 //      authenticate DOES return them: `round.state` is the same payload the Bet
-//      Replay endpoint serves, so the presentation is rebuildable. The official
-//      client's own instruction is likewise unambiguous, that EndRound is
-//      called when a round is active. This module still parks rather than
-//      settles, because changing recovery BEHAVIOUR is TR-035b's decision and
-//      not JOB 4's, and because the inference about where `state` puts its
-//      events wants DTT confirmation before a settle rides on it.
+//      Replay endpoint serves, so the presentation is rebuildable.
+//
+// ============================================================================
+// RESUME AND SETTLE, R2R-R JOB B, 2026-07-26, per Fable's re-ruling on TR-035b.
+// ============================================================================
+//
+// The row is re-ruled and this module now RESUMES AND SETTLES. THERE IS NO
+// FORFEIT PATH, and the absence is the point: the reason the old design parked
+// was that settling blind could take a feature the player had never seen, and
+// the only honest alternatives were to forfeit it or to guess at it. Neither is
+// necessary once the events are in hand.
+//
+// The sequence, in this order and for these reasons:
+//
+//   1. EXTRACT the round's events from `round.state`, using the same tolerant
+//      extraction the service uses (`_extractRoundEvents`, imported rather than
+//      reimplemented, so recovery and live play cannot disagree about where a
+//      round's events live).
+//   2. INTERPRET them through `roundInterpreter`, the canonical reader. The
+//      script it returns is the same shape the live path and Bet Replay both
+//      present, so the player sees the true outcome of their own round rather
+//      than a summary of it.
+//   3. PRESENT, by awaiting the caller's playback. Playback comes BEFORE the
+//      settle deliberately. A player who reloads during a free-spins round is
+//      owed the round, not just its number, and settling first would let the
+//      balance jump before the presentation explained why.
+//   4. SETTLE via `endRound`, then adopt the authoritative balance it returns.
+//   5. BANNER, once, plainly: the previous round has been completed and its
+//      result applied.
+//
+// WHAT HAPPENS IF THE EVENTS ARE NOT WHERE WE THINK. Extraction returns an
+// empty array rather than throwing, and an empty array still settles. The money
+// is not held hostage to the presentation: a round we cannot replay is still a
+// round the platform is holding open, and leaving it open to avoid an
+// unexplained balance change would be the worse failure by a wide margin. The
+// outcome records `presented: false` so the case is visible rather than silent.
+//
+// WHAT REMAINS FOR DTT. Not the design, which is settled. Only the confirmation
+// that a real active round carries its events at `round.state.events`, which is
+// inference from the Bet Replay endpoint until a live payload is seen.
 //
 // Everything here is a no-op in mock/dev, where there is no session to recover.
 
-// `get` and the `balance` store were used only by the auto-settle branch that
-// fired on the invented `'pending_end'` state. That branch is gone (see the
-// header), so the imports go with it rather than lingering as a hint that this
-// module still writes to the balance. It does not.
 import { writable } from 'svelte/store'
-import { parseSessionParams, authenticate, endRound } from '../services/rgsService'
+import {
+  parseSessionParams, authenticate, endRound, _extractRoundEvents,
+} from '../services/rgsService'
 import type { OfficialRound } from '../services/rgsService'
+import { interpretEvents, type PresentationScript } from '../services/roundInterpreter'
+import { balance } from './gameStore'
 
 /**
  * The official round, narrowed to the three fields recovery reads. Named
@@ -65,8 +99,9 @@ export interface ActiveRound {
 
 export type RecoveryOutcome =
   | { kind: 'none' }                                   // nothing to recover
-  | { kind: 'settled'; betID: number; balance: number }
-  | { kind: 'open-round-parked'; betID: number }       // needs DTT semantics
+  /** Resumed and settled. `presented` is false only when the round carried no
+   *  readable events, in which case it was settled without a replay. */
+  | { kind: 'resumed'; betID: number; balance: number; presented: boolean; triggered: boolean }
   | { kind: 'failed'; error: string }
 
 /** The round the RGS says is still in progress, or null. */
@@ -75,12 +110,32 @@ export const activeRound = writable<ActiveRound | null>(null)
 /** The last recovery attempt's outcome, for diagnostics and the proof. */
 export const lastRecovery = writable<RecoveryOutcome>({ kind: 'none' })
 
+// NO `recoveredScript` STORE. An earlier draft published the interpreted script
+// as a store as well as handing it to the playback callback, and the dead-wiring
+// gate correctly failed it: nothing ever read the store, because the callback
+// already carries the script to the only consumer that wants it. A store that
+// looks wired and is not is exactly the standingMode shape that gate exists to
+// catch, and allowlisting it would have been the wrong answer to a correct
+// finding.
+
+/**
+ * True once a round has been resumed and settled. Drives ONE plain banner.
+ *
+ * Deliberately a boolean and not a queue: a session recovers at most one round,
+ * at boot, and a banner that could stack would invite a design where it does.
+ */
+export const recoveryBannerVisible = writable<boolean>(false)
+
+/** Dismiss the banner. The player may close it; nothing depends on it staying. */
+export function dismissRecoveryBanner(): void {
+  recoveryBannerVisible.set(false)
+}
+
 /**
  * The three platform calls recovery makes, injectable so the branches can be
  * tested. ES module exports are read-only bindings and cannot be stubbed in
- * place, and the branch that matters most - a pending_end round waiting to be
- * credited - cannot be produced on demand against a live RGS. Production passes
- * nothing and gets the real implementations.
+ * place, and an active round cannot be produced on demand against a live RGS.
+ * Production passes nothing and gets the real implementations.
  */
 export interface RecoveryPlatform {
   parseSessionParams: typeof parseSessionParams
@@ -88,6 +143,14 @@ export interface RecoveryPlatform {
   endRound: typeof endRound
 }
 const REAL: RecoveryPlatform = { parseSessionParams, authenticate, endRound }
+
+/**
+ * Play the recovered round back. Production passes App.svelte's presentation
+ * driver; tests pass a spy; the default resolves immediately so a caller that
+ * has no presentation still settles correctly rather than stalling.
+ */
+export type PresentFn = (script: PresentationScript) => Promise<void>
+const NO_PRESENTATION: PresentFn = async () => {}
 
 /**
  * Read the session's in-progress round and act on it.
@@ -99,6 +162,7 @@ const REAL: RecoveryPlatform = { parseSessionParams, authenticate, endRound }
 export async function recoverSession(
   isDev: boolean,
   platform: RecoveryPlatform = REAL,
+  present: PresentFn = NO_PRESENTATION,
 ): Promise<RecoveryOutcome> {
   if (isDev) {
     const out: RecoveryOutcome = { kind: 'none' }
@@ -122,15 +186,46 @@ export async function recoverSession(
 
     activeRound.set({ betID: round.betID, active: round.active, state: round.state })
 
-    // Parked, deliberately. See the header: the official contract says to call
-    // EndRound here, and `round.state` now gives us the events to present the
-    // round properly first. Both of those change TR-035b's premise, and TR-035b
-    // is the row that owns the decision. JOB 4's scope is the contract, not the
-    // recovery policy.
-    const out: RecoveryOutcome = { kind: 'open-round-parked', betID: round.betID }
+    // 1. EXTRACT, using the service's own reader rather than a second copy.
+    const events = _extractRoundEvents(round.state)
+
+    // 2. INTERPRET. An empty event list still produces a script; what it does
+    //    not produce is anything worth showing, which `presented` records.
+    let script: PresentationScript | null = null
+    let triggered = false
+    if (events.length > 0) {
+      script = interpretEvents(events)
+      triggered = script.triggered
+    }
+
+    // 3. PRESENT, before settling. See the header: a player who reloaded during
+    //    a feature is owed the round, not just its number.
+    if (script) {
+      await present(script)
+    }
+
+    // 4. SETTLE. This runs whether or not the replay ran. A round we cannot
+    //    present is still a round the platform is holding open, and leaving it
+    //    open to avoid an unexplained balance change is the worse failure.
+    const resp = await platform.endRound(params, String(round.betID))
+    balance.set(resp.balance)
+    activeRound.set(null)
+
+    // 5. BANNER, once.
+    recoveryBannerVisible.set(true)
+
+    const out: RecoveryOutcome = {
+      kind: 'resumed',
+      betID: round.betID,
+      balance: resp.balance,
+      presented: script !== null,
+      triggered,
+    }
     lastRecovery.set(out)
     return out
   } catch (err) {
+    // Still deliberately tolerant: a recovery failure must never stop the
+    // player reaching the game. A blocked session is the live guard's job.
     const out: RecoveryOutcome = { kind: 'failed', error: err instanceof Error ? err.message : String(err) }
     lastRecovery.set(out)
     return out
@@ -141,4 +236,5 @@ export async function recoverSession(
 export function resetSessionRecovery(): void {
   activeRound.set(null)
   lastRecovery.set({ kind: 'none' })
+  recoveryBannerVisible.set(false)
 }

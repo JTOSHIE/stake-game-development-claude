@@ -105,7 +105,7 @@
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
   import { anyModalOpen } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
-  import { recoverSession } from './lib/stores/sessionRecovery'
+  import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner } from './lib/stores/sessionRecovery'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -238,14 +238,43 @@
     } else if (!introSeen()) {
       showIntroSplash = true
     }
+    // If neither splash is going to be shown at all - a returning session on a
+    // theme without the hero emblem - nothing would ever call the dismiss
+    // handlers, and a recovery waiting on them would hang forever holding the
+    // round open. That would be worse than the defect this gate fixes, so the
+    // gate resolves itself here. It is a no-op while a splash IS showing.
+    resolveSplashesClearedIfDone()
   }
   function handleHeroSplashDismiss(): void {
     showHeroSplash = false
     if (!introSeen()) showIntroSplash = true
+    resolveSplashesClearedIfDone()
   }
   function handleIntroContinue(): void {
     showIntroSplash = false
     markIntroSeen()
+    resolveSplashesClearedIfDone()
+  }
+
+  // R2R-R JOB B / TR-035b. A recovered round must be REPLAYED IN FRONT OF THE
+  // PLAYER, and the boot splashes sit on top of everything. The first capture
+  // of this feature caught the defect exactly: the banner rendered correctly
+  // while the replay had already played out behind "TAP TO CONTINUE", so the
+  // player was told their round had been completed and never saw it happen.
+  // Presenting behind a splash is indistinguishable from not presenting at all.
+  //
+  // Recovery therefore waits for every boot splash to clear before it presents.
+  // It does NOT wait to settle: settling is downstream of presenting, so the
+  // whole sequence simply starts when the player is actually looking.
+  let splashesClearedResolve: (() => void) | null = null
+  const splashesCleared: Promise<void> = new Promise((resolve) => {
+    splashesClearedResolve = resolve
+  })
+  function resolveSplashesClearedIfDone(): void {
+    if (showHeroSplash || showIntroSplash) return
+    const r = splashesClearedResolve
+    splashesClearedResolve = null
+    if (r) r()
   }
   let showThemeSelector = false
   // 2026-07-14c: single collapsed toggle for the dev-only theme/reel-mode
@@ -437,6 +466,42 @@
     const r = featureResolve
     featureResolve = null
     if (r) r()
+  }
+
+  /**
+   * R2R-R JOB B / TR-035b. Play back a round that was still open at boot.
+   *
+   * Handed to `recoverSession` as its presentation driver, so the player sees
+   * the true outcome of their own interrupted round BEFORE it is settled and
+   * the balance moves. Two shapes, because a round is one or the other:
+   *
+   *   triggered   the full free-spins overlay, the same `presentFeature` a
+   *               live trigger uses. A player who reloaded mid-feature gets
+   *               the feature, which is the entire reason TR-035b refused to
+   *               settle blind.
+   *   ordinary    the board, wins and scatter count, mapped exactly as the live
+   *               settle block maps them, held long enough to be read. No reel
+   *               animation: the reels never spun this session, and animating a
+   *               spin that already happened elsewhere would be a re-enactment
+   *               rather than a result.
+   */
+  async function presentRecoveredRound(script: PresentationScript): Promise<void> {
+    // Wait for the player to be looking. See resolveSplashesClearedIfDone.
+    await splashesCleared
+    if (script.triggered) {
+      await presentFeature(script)
+      return
+    }
+    const base = script.baseSpin
+    const bet = get(betAmount)
+    boardSymbols.set(base.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name)))
+    activeWins.set(base.wins.map((w) => ({
+      symbol: w.symbol, kind: w.kind, ways: w.ways,
+      payout: (w.winCentibets / 100) * bet,
+    })))
+    scatterCount.set(base.scatterCount)
+    winAmount.set((script.totalWinCentibets / 100) * bet)
+    await new Promise((r) => setTimeout(r, 2200))
   }
 
   // ── Buy: place a buy-tier spin and present the guaranteed feature ──────────
@@ -706,7 +771,11 @@
     // still held their open round. On a pending_end round that is money sitting
     // uncollected. Only attempted on a session we have already accepted as live.
     if (!get(bettingDisabled)) {
-      await recoverSession(import.meta.env.DEV)
+      // R2R-R JOB B / TR-035b, re-ruled: RESUME AND SETTLE. The round is
+      // replayed through the canonical interpreter so the player sees their own
+      // outcome, then settled, then one plain banner. presentRecoveredRound is
+      // the playback driver; there is no forfeit path.
+      await recoverSession(import.meta.env.DEV, undefined, presentRecoveredRound)
     }
     playBGM()
 
@@ -1267,6 +1336,19 @@
         </div>
       {/if}
 
+      <!-- R2R-R JOB B / TR-035b. ONE plain banner, after a round that was still
+           open at boot has been replayed and settled. Unlike the live-guard
+           banner above it IS dismissible, because nothing is wrong: the round
+           finished, the balance is correct, and the player is free to carry on.
+           A non-dismissible notice would imply an unresolved problem. -->
+      {#if $recoveryBannerVisible}
+        <div class="recovery-banner" role="status" data-testid="recovery-banner">
+          <span>{$tr('recoveryResumed')}</span>
+          <button type="button" class="recovery-banner-close" on:click={dismissRecoveryBanner}
+                  aria-label={$tr('recoveryDismiss')}>×</button>
+        </div>
+      {/if}
+
       <!-- SCENE GROUP — left, set further back (z8), future-spinner only.
            Desktop/landscape only (2026-07-14c): portrait's brief explicitly
            excludes the car/pilot/billboard scene - the grid is the whole
@@ -1502,6 +1584,29 @@
     border-bottom: 2px solid rgba(255, 90, 90, 0.75);
     text-wrap: balance;
   }
+
+  /* R2R-R JOB B / TR-035b. Same slot and same shape as the live-guard banner,
+     deliberately cooler in colour: this is information, not an error. The
+     live-guard banner is red because the session is unusable; this one is cyan
+     because the round completed correctly and the player has lost nothing. */
+  .recovery-banner {
+    position: fixed; left: 0; right: 0; top: 0; z-index: 9000;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    padding: 14px 18px; text-align: center;
+    font-family: 'Orbitron', monospace; font-size: 13px; line-height: 1.45;
+    color: #dffbff; background: rgba(6, 46, 58, 0.97);
+    border-bottom: 2px solid rgba(0, 255, 255, 0.55);
+    text-wrap: balance;
+  }
+  .recovery-banner-close {
+    flex: 0 0 auto;
+    width: 26px; height: 26px; line-height: 1;
+    font-size: 18px; font-family: inherit;
+    color: #dffbff; background: rgba(0, 255, 255, 0.12);
+    border: 1px solid rgba(0, 255, 255, 0.45); border-radius: 4px;
+    cursor: pointer;
+  }
+  .recovery-banner-close:hover { background: rgba(0, 255, 255, 0.22); }
 
   :global(*, *::before, *::after) {
     box-sizing: border-box;
