@@ -145,7 +145,17 @@
     aria-expanded={open}
     data-testid="feature-menu-button"
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <!-- OWNER AUDIT ROUND 4, item 5: the retired car-grille mark, drawn inline
+         at hamburger scale. Inline SVG rather than a symbol PNG on purpose:
+         it inherits currentColor (so the purple accent needs no second
+         declaration), stays crisp at every stage scale, and cannot be
+         pruned out of the bundle by the build-diet plugin the way an
+         assets/symbols/* reference could. Identical markup in both the
+         portrait and desktop entries, so the two cannot drift. -->
+    <svg class="fm-entry-grille" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
+      <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
+    </svg>
     <span class="p-fm-entry-label">FEATURES</span>
     {#if entryActiveLabel}
       <span
@@ -175,7 +185,17 @@
     aria-expanded={open}
     data-testid="feature-menu-button"
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <!-- OWNER AUDIT ROUND 4, item 5: the retired car-grille mark, drawn inline
+         at hamburger scale. Inline SVG rather than a symbol PNG on purpose:
+         it inherits currentColor (so the purple accent needs no second
+         declaration), stays crisp at every stage scale, and cannot be
+         pruned out of the bundle by the build-diet plugin the way an
+         assets/symbols/* reference could. Identical markup in both the
+         portrait and desktop entries, so the two cannot drift. -->
+    <svg class="fm-entry-grille" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
+      <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
+    </svg>
   </button>
 {:else}
 <!-- ── Single FEATURES entry (right of the frame, old FeatureButton spot).
@@ -198,7 +218,17 @@
     aria-expanded={open}
     data-testid="feature-menu-button"
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <!-- OWNER AUDIT ROUND 4, item 5: the retired car-grille mark, drawn inline
+         at hamburger scale. Inline SVG rather than a symbol PNG on purpose:
+         it inherits currentColor (so the purple accent needs no second
+         declaration), stays crisp at every stage scale, and cannot be
+         pruned out of the bundle by the build-diet plugin the way an
+         assets/symbols/* reference could. Identical markup in both the
+         portrait and desktop entries, so the two cannot drift. -->
+    <svg class="fm-entry-grille" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
+      <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
+    </svg>
     <span class="fm-entry-label">FEATURES</span>
     {#if entryActiveLabel}
       <span
@@ -521,6 +551,14 @@
   .fm-entry-pill:hover:not(:disabled) { filter: brightness(1.1); }
   .fm-entry-pill:disabled { opacity: 0.5; cursor: not-allowed; }
   .fm-entry-pill svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+  /* ROUND 4 item 5: the grille carries more geometry than the old three-bar
+     glyph, so it needs a finer stroke to stay legible at the same size. Written
+     against all three entry containers rather than as a bare .fm-entry-grille
+     rule: each container already sets `<container> svg { stroke-width: 2.2 }`,
+     which is (0,1,1) and would otherwise out-specify a lone (0,1,0) class. */
+  .fm-entry-pill svg.fm-entry-grille,
+  .p-fm-entry svg.fm-entry-grille,
+  .c-fm-entry svg.fm-entry-grille { stroke-width: 1.7; stroke-linejoin: round; }
   /* OVERBOOST engaged: the pill glows orange (matching the enhancer card's
      tone) instead of the default pink, so the FEATURES chip itself reflects
      the toggle state at a glance (cost-visibility item). */

@@ -9,7 +9,7 @@
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { MODE_COST, FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
+  import { MODE_COST, FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel, modeLabel, modeBlurb } from '../config/fsModes'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -119,7 +119,9 @@
           </div>
           <div class="buy-stat">
             <span class="buy-stat-label">MAX WIN</span>
-            <span class="buy-stat-val">{FS_MAX_WIN_LABEL}</span>
+            <!-- ROUND 4 item 4: quoted against the BASE bet, because this stat
+                 sits beside a 100x/400x cost multiplier. -->
+            <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial)}</span>
           </div>
         </div>
         {#if !$canBuyBonus}

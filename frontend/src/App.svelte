@@ -284,8 +284,31 @@
   // the tier that was actually bought for the whole feature (handleBuy only
   // resets it to 'base' in its `finally`, which runs after presentFeature
   // resolves), so it is a reliable signal here.
+  // ROUND 4 item 6: portrait lockup image load-failure fallback.
+  let portraitLogoFailed = false
   let liveIsNitroEntry = false
-  $: flameColourway = liveIsNitroEntry ? 'nitro' : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
+  // OWNER AUDIT ROUND 4, item 3. The NITRO route previously depended SOLELY on
+  // liveIsNitroEntry, which is bound out of FreeSpinsPresentation and therefore
+  // only arrives once that component has mounted and reached its entry phase.
+  // The Overdrive route never had this problem because it reads $selectedBetMode
+  // directly - which is exactly why the bug looked like "bought entries render
+  // green" while only NITRO actually did.
+  //
+  // The window that exposed it: a bought round that hits the 5,000x cap. The
+  // MaxWinCelebration COLLECT gate runs BEFORE presentFeature, so for its whole
+  // duration liveIsNitroEntry is still false and 'super' matched neither branch,
+  // falling through to 'natural' - green flames on a NITRO buy. Measured
+  // (reports/screens/owner-audit-v4/): nitro-wincap read colourway-natural
+  // before COLLECT and colourway-nitro after, while overdrive-wincap read
+  // colourway-overdrive throughout.
+  //
+  // Fix: derive NITRO from the bought tier the same way Overdrive already is, so
+  // the route is known the instant the purchase is made rather than when the
+  // presentation catches up. liveIsNitroEntry is kept as an OR because it also
+  // covers any future non-buy path into a pre-revved entry.
+  $: flameColourway = (liveIsNitroEntry || $selectedBetMode === 'super')
+    ? 'nitro'
+    : ($selectedBetMode === 'bonus' ? 'overdrive' : 'natural')
   // Drives the bg crossfade + frame neon hue-shift (Overdrive transition,
   // Motion Polish v2) — false again once the 'end' phase starts, so the
   // reverse shift plays out behind the total win summary, not after it.
@@ -909,7 +932,8 @@
       <img
         class="bg-still overdrive"
         class:active={overdriveVisualActive}
-        class:nitro-active={overdriveVisualActive && liveIsNitroEntry}
+        class:route-natural={overdriveVisualActive && flameColourway === 'natural'}
+        class:nitro-active={overdriveVisualActive && flameColourway === 'nitro'}
         src="assets/themes/future-spinner/backgrounds/bg_overdrive.jpg"
         alt=""
         aria-hidden="true"
@@ -983,12 +1007,28 @@
   {/if}
 
   {#if portrait}
-    <!-- PORTRAIT WORDMARK (2026-07-14c, grid-first recomposition): a small
-         native-DOM text wordmark - never the desktop title lockup image
-         (game-logo-img), which is a "desktop title lockup" the brief
-         explicitly excludes from portrait. Sits above canvas-slot in normal
-         flow, native px, never stage-scaled. -->
-    <div class="portrait-wordmark">{$activeTheme.name}</div>
+    <!-- PORTRAIT WORDMARK. OWNER AUDIT ROUND 4, item 6 (2026-07-26): portrait
+         now uses the SAME wordmark lockup as desktop, scaled to the portrait
+         top zone. This deliberately REVERSES the 2026-07-14c grid-first
+         decision, which rendered plain Orbitron text here and explicitly
+         excluded the lockup image from portrait; the owner ruled the plain
+         text reads as unbranded beside the desktop treatment.
+         Still native-DOM and never stage-scaled, so it costs the canvas no
+         vertical space beyond its own box. Text fallback retained for a failed
+         image load, mirroring the desktop lockup's own on:error behaviour. -->
+    <div class="portrait-wordmark">
+      {#if portraitLogoFailed}
+        <span class="portrait-wordmark-text">{$activeTheme.name}</span>
+      {:else}
+        <img
+          class="portrait-wordmark-img"
+          src="{$themeAssets.logo}"
+          alt="{$activeTheme.name}"
+          draggable="false"
+          on:error={() => { portraitLogoFailed = true }}
+        />
+      {/if}
+    </div>
   {/if}
 
   <!-- CANVAS SLOT — the fixed 1280x720 design surface (frame/grid, plus
@@ -1066,7 +1106,8 @@
           src="{$themeAssets.frame}"
           class="game-frame"
           class:overdrive-active={overdriveVisualActive}
-          class:nitro-active={overdriveVisualActive && liveIsNitroEntry}
+          class:route-natural={overdriveVisualActive && flameColourway === 'natural'}
+          class:nitro-active={overdriveVisualActive && flameColourway === 'nitro'}
           alt=""
           aria-hidden="true"
           on:error={(e) => {
@@ -1468,6 +1509,24 @@
     flex: 0 0 auto;
     padding: 4px 0 2px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* ROUND 4 item 6: the desktop lockup, scaled to the portrait top zone. The
+     desktop box is 380x60; portrait gets the same art at roughly 60% of that
+     height, width-capped in vw so a narrow device shrinks it rather than
+     letting it crowd the grid. Same drop-shadow as desktop so the treatment
+     reads as one brand, not two. */
+  .portrait-wordmark-img {
+    max-height: 36px;
+    max-width: 74vw;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.9));
+  }
+  /* Fallback only - shown if the lockup image fails to load. */
+  .portrait-wordmark-text {
     font-family: 'Orbitron', system-ui, sans-serif;
     font-size: 13px;
     font-weight: 800;
@@ -1582,6 +1641,24 @@
 
   .bg-still.overdrive.active {
     opacity: 0.92;
+  }
+  /* OWNER AUDIT ROUND 4, item 3 (owner clarification, 2026-07-26): "it needs to
+     differentiate itself between a bonus that has been spun in versus a bonus
+     that you pay for". Before this pass the backdrop and frame had only TWO
+     states - Overdrive and NITRO - so a NATURALLY TRIGGERED feature and a BOUGHT
+     Overdrive rendered identically magenta. Only the flames differed, and the
+     owner was describing the borders and shading, not the jets.
+     Natural now grades the same asset GREEN-leaning, matching its green flames,
+     so the three entry routes read as three distinct treatments:
+       natural  green backdrop, green flames
+       overdrive  magenta backdrop, cyan flames
+       nitro  deep pink backdrop, pink flames
+     All three are driven off flameColourway, the single route derivation, so the
+     backdrop, the frame and the jets can never disagree about which route is
+     live. They previously each re-derived it from liveIsNitroEntry, which is why
+     they all shared the same late-binding bug. */
+  .bg-still.overdrive.active.route-natural {
+    filter: saturate(1.15) brightness(1.02) hue-rotate(-95deg);
   }
   /* NITRO OVERDRIVE (OWNER AUDIT ROUND 3, item 4: shifted pink-forward per
      the owner, was magenta-leaning) - the same graded bg_overdrive.jpg
@@ -1717,6 +1794,16 @@
     0%, 100% { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
     50%       { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 24px color-mix(in srgb, var(--theme-secondary, #ff00ff) 95%, transparent)); }
   }
+  /* ROUND 4 item 3: the naturally-triggered route, green-leaning to match its
+     green flames and to read as clearly NOT a purchase. Same pulse rhythm and
+     the same single keyframe pattern as the other two routes. */
+  .game-frame.overdrive-active.route-natural {
+    animation-name: frame-pulse-natural;
+  }
+  @keyframes frame-pulse-natural {
+    0%, 100% { filter: hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 10px color-mix(in srgb, #5dff3c 60%, transparent)); }
+    50%       { filter: hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 24px color-mix(in srgb, #5dff3c 95%, transparent)); }
+  }
   /* NITRO (OWNER AUDIT ROUND 3, item 4: shifted pink-forward per the owner):
      the same pulse, intensified and hue-shifted warmer than the base
      Overdrive-buy pulse's 280deg - higher saturation and a brighter peak
@@ -1731,8 +1818,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .game-frame, .game-frame.overdrive-active, .game-frame.overdrive-active.nitro-active { animation: none; }
+    .game-frame, .game-frame.overdrive-active,
+    .game-frame.overdrive-active.route-natural,
+    .game-frame.overdrive-active.nitro-active { animation: none; }
     .bg-still.overdrive.active.nitro-active { filter: saturate(1.2) brightness(1.05); }
+    .bg-still.overdrive.active.route-natural { filter: saturate(1.1) hue-rotate(-95deg); }
   }
 
   /* ── Grid — 522x349, centred inside the frame, z20 ──────────────────────── */
