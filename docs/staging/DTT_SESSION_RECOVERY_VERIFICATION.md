@@ -1,6 +1,6 @@
 # Session recovery: live-path verification at the Developer Testing Tool
 
-R11 / TR-017. Written 2026-07-25, to be executed at the DTT staging session.
+R11 / TR-035. Written 2026-07-25, to be executed at the DTT staging session.
 
 ## Why this document exists
 
@@ -55,7 +55,7 @@ credit on every mid-settlement reload.
 The current build surfaces the open round and stops. It deliberately does **not**
 settle it, because settling could forfeit a feature the player has not seen, and it does
 not fabricate a presentation, because that would be inventing an outcome. Which of the
-options in TR-017b is correct is decided by what step 3 observes.
+options in TR-035b is correct is decided by what step 3 observes.
 
 ## Step 4: hostile ordering
 
@@ -71,4 +71,4 @@ options in TR-017b is correct is decided by what step 3 observes.
 
 The captured `authenticate` payload for each of steps 1 to 3, the before/after balances
 for step 2, the two responses from step 4, and a plain answer to the four questions in
-step 3. That closes TR-017b and either ratifies or replaces the current behaviour.
+step 3. That closes TR-035b and either ratifies or replaces the current behaviour.

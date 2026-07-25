@@ -1,4 +1,4 @@
-// sessionRecovery.ts - R11 / TR-017 (2026-07-25). Non-locked.
+// sessionRecovery.ts - R11 / TR-035 (2026-07-25). Non-locked.
 //
 // THE GAP
 //
@@ -30,7 +30,7 @@
 //                        could forfeit a feature the player has not seen, and
 //                        fabricating a presentation for it would be inventing an
 //                        outcome. The options are recorded in the tracker as
-//                        TR-017b and resolved empirically at the DTT session.
+//                        TR-035b and resolved empirically at the DTT session.
 //
 // Everything here is a no-op in mock/dev, where there is no session to recover.
 

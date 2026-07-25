@@ -9,6 +9,61 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 014 - 2026-07-25 - FULL-RUN REPORT (PARTIAL): four branches merged, three not reached, one blocked on a missing input
+
+**Stated plainly at the top: this run is NOT complete.** Four of the eight build branches
+merged. Three were not reached. One cannot start because its input was never supplied.
+The brief said the run does not stall, and it did not; it ran out of session, which is a
+different thing and is reported as such rather than dressed up.
+
+### Merged, with evidence
+
+| Branch | What was actually wrong | Gates and evidence |
+|---|---|---|
+| #106 `fix/R2-mock-containment` | `initRGS` sets `_rgsMode = false` on a REAL auth failure as well as the dev case, and `spin()` falls through to `_mockSpin()`. A production player with a failed session was served the mock: fabricated wins, no wallet. | New `liveGuard` (11 assertions, CI gate 10a) + `mock_containment_check.mjs`. Negative control run: injecting a marker into `dist` makes the gate FAIL. |
+| #107 `fix/R11-session-recovery` | `authenticate.round` was mapped and then discarded. On a `pending_end` round that is a decided win nothing was ever going to collect. | 17 assertions against an injected stub (CI gate 10b), plus `docs/staging/DTT_SESSION_RECOVERY_VERIFICATION.md`. |
+| #108 `chore/repo-presentation` | 41 markdown files in root, 20 of them briefs. | Root reduced to the functional nine; 32 documents relocated by `git mv` with three indexes; 12 files relinked. |
+| (this) tracker repair | Two stale duplicate rows, and an ID COLLISION I created. | See below. |
+
+### Two mistakes I made in this run, both caught and both recorded
+
+**`git add -A` staged 4,249 paths**, sweeping in the untracked 450 MB
+`games/future_spinner_super/` prototype. That is exactly what convention (k) forbids, and
+it was caught by the other half of the same convention, reading `git status` after
+staging. Staged explicitly instead; both untracked trees are untouched.
+
+**I reused TR-017 for session recovery when it already belonged to the scatter-disclosure
+finding.** A first pass at de-duplicating the tracker then "helpfully" deleted the older
+row along with three rows from the parked-items summary table. Reverted, and the real fix
+applied: session recovery is renumbered **TR-035 / TR-035b**, only the two genuinely stale
+`OPEN (wave 2)` copies of TR-015 and TR-016 are gone, and TR-017 stands as it was. The
+lesson is small and worth keeping: a de-duplicator that matches on id alone will happily
+destroy a record whose id was reused by mistake.
+
+### Not reached
+
+`feature/scatter-anticipation`, `feature/cohesion-pass` and `chore/docs-refresh` were not
+started. No partial work exists for them and nothing is half-landed.
+
+### Blocked on a missing input
+
+**Tool vetting cannot start.** The brief names "the Claude skills pack from the owner's
+Discord list". That list has not been supplied to this session and is not in the
+repository. Convention (m) is explicit that work does not begin until the external
+document physically exists here, and the whole point of the item is to treat the pack as
+untrusted input and read every file, which cannot be done against a guess at a URL. Named
+and waiting, per the facts discipline.
+
+### Closing run
+
+Not performed, because it must run against the final merged state and three branches are
+outstanding. The individual gates were run per branch and all passed.
+
+**Next.** Supply the skills-pack source, then the three remaining branches and the closing
+run.
+
+---
+
 ## 013 - 2026-07-25 - COMMS-ACK 011 and 012; PR #103 merged; convention (n) recorded
 
 **COMMS-ACK, entries 011 and 012: receipt appended.**
