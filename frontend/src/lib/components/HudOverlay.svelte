@@ -321,11 +321,11 @@
     <div class="p-bet-stat" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
       <span class="p-stat-label">{$tr('bet')}</span>
       <div class="p-bet-row" data-testid="bet-arrows">
-        <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label="Decrease bet">
+        <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
         <span class="p-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
-        <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label="Increase bet">
+        <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
       </div>
@@ -392,7 +392,7 @@
     </button>
 
     <div class="p-controls-side">
-      <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label="Max bet" data-testid="max-chip">
+      <button class="p-round-btn p-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label={$tr('betMax')} data-testid="max-chip">
         <span class="p-max-cap">{$tr('hudMax')}</span>
       </button>
       {#if !$rgJurisdiction.autoplayDisabled}
@@ -486,11 +486,11 @@
   <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
     <div class="c-bet-row" data-testid="bet-arrows">
-      <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label="Decrease bet">
+      <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
       <span class="c-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
-      <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label="Increase bet">
+      <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
     </div>
@@ -552,7 +552,7 @@
     </div>
   {/if}
 
-  <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label="Max bet" data-testid="max-chip">
+  <button class="c-round-btn c-max" on:click={setMaxBet} disabled={$isSpinning || !$canSetMaxBetLevel} aria-label={$tr('betMax')} data-testid="max-chip">
     <span class="c-max-cap">{$tr('hudMax')}</span>
   </button>
 
@@ -597,7 +597,7 @@
     class="fs-max"
     on:click={setMaxBet}
     disabled={$isSpinning || !$canSetMaxBetLevel}
-    aria-label="Max bet"
+    aria-label={$tr('betMax')}
     data-testid="max-chip"
   ><span class="cap">{$tr('hudMax')}</span></button>
 
@@ -685,8 +685,8 @@
 
   <!-- Stacked cyan bet arrows - own FIXED column x 906 (v3.3), independent of BET box -->
   <div class="fs-arrows" data-testid="bet-arrows">
-    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label="Increase bet"><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
-    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label="Decrease bet"><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
+    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
+    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
   </div>
 
   <!-- SPIN - v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin

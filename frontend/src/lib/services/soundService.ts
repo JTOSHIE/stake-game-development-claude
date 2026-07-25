@@ -330,6 +330,30 @@ function rampVolume(el: HTMLAudioElement, from: number, to: number, durationMs: 
 }
 
 /**
+ * Dev-only instrumentation for the bed crossfade (2026-07-25).
+ *
+ * `audio_verify.mjs`'s bedSwapFiredOnBonusBuy / bedRevertedAfterFeature checks
+ * failed from 2026-07-13 and survived a real harness click-path fix, so this
+ * records WHICH branch the function actually takes rather than inferring it.
+ * Guarded by import.meta.env.DEV, so it cannot exist in a production build.
+ */
+export interface BedSwapTrace {
+  calls: number
+  earlyReturnSameState: number
+  earlyReturnMuted: number
+  crossfadeToTension: number
+  crossfadeToBase: number
+  lastArg: boolean | null
+}
+const bedTrace: BedSwapTrace = {
+  calls: 0, earlyReturnSameState: 0, earlyReturnMuted: 0,
+  crossfadeToTension: 0, crossfadeToBase: 0, lastArg: null,
+}
+if (import.meta.env.DEV) {
+  ;(window as unknown as { __bedSwapTrace: BedSwapTrace }).__bedSwapTrace = bedTrace
+}
+
+/**
  * Crossfades the base bed (bgm_loop) to the tension bed (bgm_tension) on
  * Overdrive feature entry, and back on exit. Driven by the shared
  * `overdriveVisual` store (App.svelte/FreeSpinsPresentation.svelte already flip
@@ -337,9 +361,13 @@ function rampVolume(el: HTMLAudioElement, from: number, to: number, durationMs: 
  * reused here rather than adding a second signal for the same event).
  */
 function setOverdriveBed(active: boolean): void {
-  if (active === overdriveBedActive) return
+  bedTrace.calls++
+  bedTrace.lastArg = active
+  if (active === overdriveBedActive) { bedTrace.earlyReturnSameState++; return }
   overdriveBedActive = active
-  if (muted) return
+  if (muted) { bedTrace.earlyReturnMuted++; return }
+  if (active) bedTrace.crossfadeToTension++
+  else bedTrace.crossfadeToBase++
   const target = musicVol * bgmDuck
 
   if (active) {
