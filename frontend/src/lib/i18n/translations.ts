@@ -69,7 +69,6 @@ export interface Translations {
   rulesOverdriveTitle?:    string
   rulesOverdriveTrigger?:  string
   rulesOverdriveMeter?:    string
-  rulesScatterSixPlus?:    string
   rulesOverdriveRetrigger?: string
   rulesOverdriveBuy?:      string
   rulesOverdriveModes?:    string
@@ -83,7 +82,6 @@ export type FeatureKey =
   | 'overdrive' | 'overdriveFreeSpins' | 'freeSpins' | 'totalWin' | 'featureComplete'
   | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyWhatYouGet' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
-  | 'rulesScatterSixPlus'
   | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
   | 'splashPressAnywhere'
 export type FeatureStrings = Record<FeatureKey, string>
@@ -677,8 +675,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'OVERDRIVE FREE SPINS',
     rulesOverdriveTrigger: '3, 4 or 5 Scatters award 8, 12 or 16 free spins and pay an instant 1×, 3× or 10× total bet.',
     rulesOverdriveMeter: 'The Overdrive meter starts at 1× and rises +1× after every winning free spin, multiplying all later wins. It never resets during the feature.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 or more Scatters during free spins award +5 free spins.',
     rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
     rulesOverdriveModes: 'Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.',
@@ -694,8 +690,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'لفات أوفردرايف المجانية',
     rulesOverdriveTrigger: '3 أو 4 أو 5 رموز سكاتر تمنح 8 أو 12 أو 16 لفة مجانية وتدفع فوراً 1× أو 3× أو 10× من إجمالي الرهان.',
     rulesOverdriveMeter: 'يبدأ عداد أوفردرايف من 1× ويرتفع 1× بعد كل لفة مجانية رابحة، مضاعفاً كل الأرباح اللاحقة. لا يعاد ضبطه خلال الميزة.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 رموز سكاتر أو أكثر خلال اللفات المجانية تمنح 5 لفات إضافية.',
     rulesOverdriveBuy: 'شراء البونص: ادفع 100× رهانك لبدء الميزة فوراً.',
     rulesOverdriveModes: 'اللعبة الأساسية وشراء البونص يمنحان نسبة عائد 96.35٪. أقصى فوز 5000× الرهان.',
@@ -711,8 +705,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'OVERDRIVE FREISPIELE',
     rulesOverdriveTrigger: '3, 4 oder 5 Scatter vergeben 8, 12 oder 16 Freispiele und zahlen sofort 1×, 3× oder 10× des Gesamteinsatzes.',
     rulesOverdriveMeter: 'Der Overdrive-Zähler startet bei 1× und steigt nach jedem gewonnenen Freispiel um 1×, was alle folgenden Gewinne multipliziert. Er wird während des Features nie zurückgesetzt.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 oder mehr Scatter während der Freispiele vergeben 5 zusätzliche Freispiele.',
     rulesOverdriveBuy: 'Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten.',
     rulesOverdriveModes: 'Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.',
@@ -728,8 +720,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'GIROS GRATIS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 o 5 Scatters otorgan 8, 12 o 16 giros gratis y pagan al instante 1×, 3× o 10× de la apuesta total.',
     rulesOverdriveMeter: 'El medidor Overdrive empieza en 1× y sube 1× tras cada giro gratis ganador, multiplicando todas las ganancias posteriores. No se reinicia durante la función.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 o más Scatters durante los giros gratis otorgan 5 giros gratis adicionales.',
     rulesOverdriveBuy: 'Compra de bono: paga 100× tu apuesta para iniciar la función de inmediato.',
     rulesOverdriveModes: 'El juego base y la Compra de bono devuelven 96,35 % de RTP. Ganancia máxima 5.000× la apuesta.',
@@ -745,8 +735,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'OVERDRIVE-ILMAISKIERROKSET',
     rulesOverdriveTrigger: '3, 4 tai 5 Scatteria antaa 8, 12 tai 16 ilmaiskierrosta ja maksaa heti 1×, 3× tai 10× kokonaispanoksesta.',
     rulesOverdriveMeter: 'Overdrive-mittari alkaa arvosta 1× ja nousee 1× jokaisen voittavan ilmaiskierroksen jälkeen kertoen kaikki myöhemmät voitot. Se ei nollaudu ominaisuuden aikana.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 tai useampi Scatter ilmaiskierrosten aikana antaa 5 lisäkierrosta.',
     rulesOverdriveBuy: 'Bonusosto: maksa 100× panoksesi aloittaaksesi ominaisuuden heti.',
     rulesOverdriveModes: 'Peruspeli ja Bonusosto palauttavat molemmat 96,35 % RTP. Enimmäisvoitto 5 000× panos.',
@@ -762,8 +750,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'TOURS GRATUITS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 ou 5 Scatters accordent 8, 12 ou 16 tours gratuits et paient instantanément 1×, 3× ou 10× la mise totale.',
     rulesOverdriveMeter: 'Le compteur Overdrive démarre à 1× et augmente de 1× après chaque tour gratuit gagnant, multipliant tous les gains suivants. Il ne se réinitialise jamais pendant la fonction.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 Scatters ou plus pendant les tours gratuits accordent 5 tours gratuits supplémentaires.',
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
     rulesOverdriveModes: 'Le jeu de base et l’Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
@@ -779,8 +765,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'ओवरड्राइव फ्री स्पिन',
     rulesOverdriveTrigger: '3, 4 या 5 स्कैटर 8, 12 या 16 फ्री स्पिन देते हैं और तुरंत कुल दांव का 1×, 3× या 10× भुगतान करते हैं।',
     rulesOverdriveMeter: 'ओवरड्राइव मीटर 1× से शुरू होता है और हर जीतने वाले फ्री स्पिन के बाद 1× बढ़ता है, बाद की सभी जीतों को गुणा करता है। फ़ीचर के दौरान यह रीसेट नहीं होता।',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: 'फ्री स्पिन के दौरान 3 या अधिक स्कैटर 5 अतिरिक्त फ्री स्पिन देते हैं।',
     rulesOverdriveBuy: 'बोनस खरीद: फ़ीचर तुरंत शुरू करने के लिए अपने दांव का 100× भुगतान करें।',
     rulesOverdriveModes: 'बेस गेम और बोनस खरीद दोनों 96.35% RTP देते हैं। अधिकतम जीत दांव का 5,000×।',
@@ -796,8 +780,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'FREE SPIN OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 atau 5 Scatter memberikan 8, 12 atau 16 free spin dan langsung membayar 1×, 3× atau 10× dari total taruhan.',
     rulesOverdriveMeter: 'Meter Overdrive dimulai dari 1× dan naik 1× setelah setiap free spin yang menang, mengalikan semua kemenangan berikutnya. Meter tidak pernah direset selama fitur.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 atau lebih Scatter selama free spin memberikan 5 free spin tambahan.',
     rulesOverdriveBuy: 'Beli Bonus: bayar 100× taruhan Anda untuk memulai fitur segera.',
     rulesOverdriveModes: 'Game dasar dan Beli Bonus keduanya memberikan RTP 96,35%. Kemenangan maksimum 5.000× taruhan.',
@@ -813,8 +795,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'オーバードライブ フリースピン',
     rulesOverdriveTrigger: 'スキャッター3・4・5個で8・12・16回のフリースピンを獲得し、合計ベットの1倍・3倍・10倍を即時に配当します。',
     rulesOverdriveMeter: 'オーバードライブメーターは1倍から始まり、勝利したフリースピンごとに1倍上昇し、以降のすべての配当に乗算されます。フィーチャー中はリセットされません。',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: 'フリースピン中にスキャッター3個以上でフリースピンを5回追加します。',
     rulesOverdriveBuy: 'ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。',
     rulesOverdriveModes: 'ベースゲームとボーナス購入はどちらもRTP96.35%です。最大配当はベットの5,000倍。',
@@ -830,8 +810,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: '오버드라이브 프리 스핀',
     rulesOverdriveTrigger: '스캐터 3, 4 또는 5개가 8, 12 또는 16회의 프리 스핀을 지급하고 총 베팅액의 1×, 3× 또는 10×를 즉시 지급합니다.',
     rulesOverdriveMeter: '오버드라이브 미터는 1×에서 시작하여 당첨된 프리 스핀마다 1× 상승하며 이후 모든 당첨에 곱해집니다. 기능 중에는 초기화되지 않습니다.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '프리 스핀 중 스캐터 3개 이상이면 프리 스핀 5회를 추가로 지급합니다.',
     rulesOverdriveBuy: '보너스 구매: 베팅액의 100배를 지불하면 기능이 즉시 시작됩니다.',
     rulesOverdriveModes: '기본 게임과 보너스 구매 모두 RTP 96.35%입니다. 최대 당첨은 베팅액의 5,000배입니다.',
@@ -847,8 +825,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'DARMOWE SPINY OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 lub 5 symboli Scatter przyznaje 8, 12 lub 16 darmowych spinów i natychmiast wypłaca 1×, 3× lub 10× całkowitego zakładu.',
     rulesOverdriveMeter: 'Licznik Overdrive zaczyna od 1× i rośnie o 1× po każdym wygranym darmowym spinie, mnożąc wszystkie kolejne wygrane. Nie resetuje się podczas funkcji.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 lub więcej symboli Scatter podczas darmowych spinów przyznaje 5 dodatkowych spinów.',
     rulesOverdriveBuy: 'Zakup bonusu: zapłać 100× swojego zakładu, aby natychmiast uruchomić funkcję.',
     rulesOverdriveModes: 'Gra podstawowa i Zakup bonusu zwracają 96,35% RTP. Maksymalna wygrana 5000× zakładu.',
@@ -864,8 +840,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'GIROS GRÁTIS OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 ou 5 Scatters concedem 8, 12 ou 16 giros grátis e pagam instantaneamente 1×, 3× ou 10× da aposta total.',
     rulesOverdriveMeter: 'O medidor Overdrive começa em 1× e sobe 1× após cada giro grátis vencedor, multiplicando todos os ganhos seguintes. Nunca é reiniciado durante o recurso.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 ou mais Scatters durante os giros grátis concedem 5 giros grátis adicionais.',
     rulesOverdriveBuy: 'Compra de bônus: pague 100× a sua aposta para iniciar o recurso imediatamente.',
     rulesOverdriveModes: 'O jogo base e a Compra de bônus retornam ambos 96,35% de RTP. Ganho máximo de 5.000× a aposta.',
@@ -881,8 +855,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'ФРИСПИНЫ ОВЕРДРАЙВ',
     rulesOverdriveTrigger: '3, 4 или 5 скаттеров дают 8, 12 или 16 фриспинов и мгновенно выплачивают 1×, 3× или 10× от общей ставки.',
     rulesOverdriveMeter: 'Счётчик Овердрайв начинается с 1× и растёт на 1× после каждого выигрышного фриспина, умножая все последующие выигрыши. Он не сбрасывается во время функции.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 или более скаттеров во время фриспинов дают 5 дополнительных фриспинов.',
     rulesOverdriveBuy: 'Покупка бонуса: заплатите 100× вашей ставки, чтобы запустить функцию сразу.',
     rulesOverdriveModes: 'Базовая игра и Покупка бонуса возвращают 96,35% RTP. Максимальный выигрыш 5000× ставки.',
@@ -898,8 +870,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'OVERDRIVE BEDAVA DÖNÜŞLER',
     rulesOverdriveTrigger: '3, 4 veya 5 Scatter 8, 12 veya 16 bedava dönüş verir ve anında toplam bahsin 1×, 3× veya 10× katını öder.',
     rulesOverdriveMeter: 'Overdrive göstergesi 1× ile başlar ve kazanan her bedava dönüşün ardından 1× artarak sonraki tüm kazançları çarpar. Özellik boyunca sıfırlanmaz.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: 'Bedava dönüşler sırasında 3 veya daha fazla Scatter 5 ek bedava dönüş verir.',
     rulesOverdriveBuy: 'Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin.',
     rulesOverdriveModes: 'Temel oyun ve Bonus Satın Alma her ikisi de %96,35 RTP döndürür. Maksimum kazanç bahsin 5.000 katı.',
@@ -915,8 +885,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE',
     rulesOverdriveTrigger: '3, 4 hoặc 5 biểu tượng Scatter trao 8, 12 hoặc 16 vòng quay miễn phí và trả ngay 1×, 3× hoặc 10× tổng tiền cược.',
     rulesOverdriveMeter: 'Đồng hồ Overdrive bắt đầu ở 1× và tăng 1× sau mỗi vòng quay miễn phí thắng, nhân tất cả các phần thắng sau đó. Nó không bao giờ đặt lại trong tính năng.',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '3 biểu tượng Scatter trở lên trong vòng quay miễn phí trao thêm 5 vòng quay miễn phí.',
     rulesOverdriveBuy: 'Mua Thưởng: trả 100× tiền cược của bạn để bắt đầu tính năng ngay lập tức.',
     rulesOverdriveModes: 'Trò chơi cơ bản và Mua Thưởng đều trả về RTP 96,35%. Thắng tối đa 5.000× tiền cược.',
@@ -932,8 +900,6 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTitle: '超载免费旋转',
     rulesOverdriveTrigger: '3、4 或 5 个分散符号可获得 8、12 或 16 次免费旋转，并立即支付总投注的 1 倍、3 倍或 10 倍。',
     rulesOverdriveMeter: '超载计量表从 1 倍开始，每次赢得免费旋转后增加 1 倍，乘以之后的所有赢额。功能期间不会重置。',
-    rulesScatterSixPlus:
-      '6 or more Scatters award the same as 5: 16 free spins and an instant 10x total bet. Scatter awards are multiplied by the current Overdrive meter during free spins.',
     rulesOverdriveRetrigger: '免费旋转期间出现 3 个或以上分散符号可额外获得 5 次免费旋转。',
     rulesOverdriveBuy: '购买奖励：支付 100 倍投注即可立即启动功能。',
     rulesOverdriveModes: '基础游戏和购买奖励的 RTP 均为 96.35%。最高赢额为投注的 5,000 倍。',
@@ -996,7 +962,6 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
   scatter3:            '3 SCATTERS: 8 FREE SPINS + 1× PLAY',
   scatter4:            '4 SCATTERS: 12 FREE SPINS + 3× PLAY',
   scatter5:            '5 SCATTERS: 16 FREE SPINS + 10× PLAY!',
-  rulesScatterSixPlus: '6 or more Scatters award the same as 5: 16 free spins and an instant 10x of your total play. Scatter awards are multiplied by the current Overdrive meter during free spins.',
   rulesOverdriveBuy:
     'Feature Play: play 100× your total play to start the feature instantly.',
   rulesOverdriveModes:
