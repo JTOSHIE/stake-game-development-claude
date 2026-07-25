@@ -38,3 +38,8 @@ reports/screens/**/_video_*/
 # AudioForge build venv (never committed)
 tools/audio_forge/.venv/
 tools/audio_forge/__pycache__/
+
+# Build output. Reproducible via npm run build and size-gated by
+# frontend/scripts/build_diet_verify.mjs. Committing it invited a reviewer to
+# conclude the shipped bundle was two files (TR-025).
+frontend/dist/
