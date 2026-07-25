@@ -26,9 +26,9 @@ checklist in the docs must be satisfied.
 | 2 | Maths files: index.json, both lookup tables, both books, game_metadata.json | Overdrive pass | MERGED to main | Done (v1.1.0) |
 | 3 | PAR sheet (five modes, FeatureMath v2 documented) | Overdrive pass + FeatureMath v2 | MERGED to main | Done |
 | 4 | Submission blurb v2 (Overdrive) | Section 3 below | Owner-approved text unchanged; a DRAFT soundtrack sentence added 2026-07-13, PENDING OWNER APPROVAL (not yet part of the approved blurb) | Owner |
-| 5 | Game tile background image | Design system Phase B | To design | AssetForge v2 |
-| 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | To design | AssetForge v2 |
-| 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
+| 5 | Game tile background image | Design system Phase B | **DELIVERED** as `design-system/brand/delivery/FutureSpinner-BG.jpg`, under the platform naming convention | Owner uploads in the Tile Editor |
+| 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | **DELIVERED** as `design-system/brand/delivery/FutureSpinner-FG.png` | Owner uploads in the Tile Editor |
+| 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Owner-supplied, externally commissioned | **DELIVERED and ADOPTED** (candidate f, 2026-07-26) as `design-system/brand/delivery/WeRollSpinners-Logo.png`, 1024x1024 RGBA, real alpha, 39KB | Owner uploads once in Team Settings Branding |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
 | 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, reports/archive/superseded/MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy |
@@ -152,9 +152,30 @@ Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'
 `pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
 (confirmed empty of pruned-path requests and under the 25MB budget by
 `frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
-Current measured size: **13.59MB** (JOB 4, 2026-07-13), including the twelve mastered
-audio files shipped in JOB 1. Regenerate immediately before staging with a clean
-`npm run build` from `frontend/` - never upload a stale or hand-edited `dist/`.
+Current measured size: **21.87MB** (re-measured from a fresh build, 2026-07-26), against
+the 25MB budget. Supersedes the 13.59MB figure recorded at JOB 4 on 2026-07-13.
+
+**The drift has a specific cause and it is worth acting on before staging.** 7.06MB of the
+current total is `frontend/public/assets/themes/future-spinner/branding/`, which is
+**untracked in git and referenced by no source file**. Everything under `public/` is copied
+verbatim into `dist/` by Vite, so it ships. Without it the build is 14.81MB, which is
+consistent with the 13.59MB recorded in July plus subsequent asset work.
+
+Two consequences, and the second is the serious one:
+
+- **7.06MB of dead weight** in a 25MB budget, for assets nothing loads.
+- **The bundle is not reproducible from the repository.** Anyone cloning and building gets
+  14.81MB; this machine gets 21.87MB. A committed size figure that a reviewer cannot
+  reproduce is worse than no figure.
+
+**Options, for the owner.** (a) delete the directory, since nothing references it;
+(b) commit it, if those assets are meant to ship, and then something should reference them;
+(c) exclude it in `vite.config.ts`'s `pruneLegacyAssets`, which already strips
+non-shipping paths. Recommended: **(a)**, on the evidence that no source file mentions it.
+Not done here because deleting owner-supplied art is not a builder's call.
+
+Regenerate immediately before staging with a clean `npm run build` from `frontend/` - never
+upload a stale or hand-edited `dist/`.
 
 ### 5b. Exact portal upload steps
 
@@ -167,8 +188,12 @@ audio files shipped in JOB 1. Regenerate immediately before staging with a clean
    modes and their file references), then each mode's `books_*.jsonl.zst` and
    `lookUpTable_*_0.csv`, then `game_metadata.json`.
 4. Compose the game tile in the dashboard Tile Editor from the background image,
-   foreground hero and provider logo (see JOB 7 - these are still design-pending, not
-   part of this pass).
+   foreground hero and provider logo. **All three are delivered** under the platform's
+   naming convention in `design-system/brand/delivery/`: `FutureSpinner-BG.jpg`,
+   `FutureSpinner-FG.png` and `WeRollSpinners-Logo.png`. The provider logo is a separate
+   one-time upload in Team Settings Branding rather than in the Tile Editor. See
+   `design-system/brand/delivery/README.md` for hashes and `DTT_PROTOCOL.md` for the
+   owner-action checklist.
 5. Enter the submission blurb (section 3) - **only once the draft soundtrack sentence has
    been explicitly owner-approved**, otherwise upload the blurb without it.
 6. Do not request review yet - proceed to 5e (post-upload verification) first.
