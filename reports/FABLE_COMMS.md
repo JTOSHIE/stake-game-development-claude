@@ -9,6 +9,61 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 011 - 2026-07-25 - COMMS-ACK 010 received; wave 2 merged; PAR converted to a numbered item
+
+**COMMS-ACK, entry 010: receipt appended.** All four rulings actioned. Recorded here
+rather than only in the tracker so the loop closes in the file Fable fetches.
+
+**Wave 2 merged in the ordered sequence.** PRs #98, #99, #100, #101, #102, merged in that
+order, branches deleted, tracker rows updated. Three of the five needed conflict
+resolution and none of it was mechanical: #100 and #102 each touched the same components
+as an earlier PR in the sequence, so the resolutions had to keep BOTH changes rather than
+take a side. The R5 bet-ladder guards and the R4 translated `aria-label`s, for instance,
+occupy the same three lines of two components; both survive, verified by running the R4
+and R5 gates together after the merge. CI gates renumbered 1 to 11 with 6a, all twelve
+green on the merged tree before each push.
+
+**DECISION 1 actioned, XEC HOLD.** TR-012b updated to record the ruling: the hold is
+confirmed and the resolution path is the Developer Testing Tool session. No code written,
+no code form recorded anywhere in the register.
+
+**DECISION 3 actioned, RG wording.** The English masters are taken verbatim as given and
+are now the source strings. Translation follows the standard casino
+responsible-gambling lexicon per locale rather than literal rendering, and each locale's
+confidence is recorded in the tracker row. Landing as its own branch, not folded into the
+sanctioned pass, since the sanction says nothing else goes in that commit.
+
+**DECISION 4 actioned, dates.** Commit dates are authoritative; today is 2026-07-25.
+Nothing relabelled retroactively. The drift is noted once, in the tracker, and every
+document from here carries the true date.
+
+**PAR, converted from a parked conversation into a numbered item as directed.**
+
+1. **Where does the antelite tail-concentration note permanently live?** Your 2026-07-28
+   ruling already resolved this to `COMPLIANCE_WATCH.md` as the permanent location, not a
+   temporary one, and nothing is blocked today. What remains open is only whether the PAR
+   sheet itself should ALSO carry it, which matters because the PAR is what a regulator
+   reads first and `COMPLIANCE_WATCH.md` is not part of the submission pack.
+   **Options:** (a) leave as ruled, `COMPLIANCE_WATCH.md` only, and accept that the note
+   is absent from the artefact a reviewer opens first; (b) mirror the note into the PAR
+   under a future lock sanction naming the PAR deny lines, so the submission artefact
+   carries its own disclosure; (c) add a one-line pointer in the PAR to the
+   `COMPLIANCE_WATCH.md` entry, cheapest, keeps the PAR authoritative without duplicating
+   analysis that may later drift out of step. **Recommend (c).** No further work happens
+   on this until it is ruled, and it is no longer a conversation to be had later.
+
+**SECURITY, lesson recorded.** The Drive closure is confirmed; the backup stays private,
+sharing off, location on record. The lesson line is now in `COMPLIANCE_WATCH.md`:
+**backups of pre-release game internals are private by default, verified at creation, not
+after.**
+
+**Next.** The R1a sanctioned pass, on `fix/R1a-rgs-locked-pass`, one isolated commit,
+scope (a) to (d) exactly and nothing else. It will NOT merge on the standing same-day
+authorisation; it waits for the explicit block after a line-by-line review of the locked
+diff.
+
+---
+
 ## 010 - 2026-07-25 - Wave 2 complete: five PRs open, four defects were invisible to every existing check
 
 **Ruling 23 executed, and it refuted its own hypothesis.** Instrumenting

@@ -378,6 +378,13 @@ is how their hashes and row counts were verified for `BOOKS_MANIFEST.md`. Additi
 copies add custody surface without adding capability, so any further backup should be
 for owner-side disaster recovery only, and should not be publicly shared.
 
+**LESSON FOR THE REGISTER (Fable ruling, 2026-07-25).** Backups of pre-release game
+internals are **private by default, verified at creation, not after**. The Drive folder
+was not an intentional publication and was closed the same day it was raised, but it was
+public for as long as it existed because nobody checked the setting when the copy was
+made. Verification belongs at creation time, where it costs one look, rather than at
+discovery time, where it costs an exposure window of unknown length.
+
 **ANTELITE TAIL CONCENTRATION, ACCEPTED BY DESIGN (Fable ruling, 2026-07-28).**
 Review 1 computed that antelite's largest 1% of weighted probability mass supplies about
 75.4% of its RTP, and flagged it for commercial scrutiny. Ruled accepted by design, no
