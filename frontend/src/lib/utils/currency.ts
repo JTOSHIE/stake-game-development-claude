@@ -26,6 +26,7 @@
  *          BGN HRK RUB UAH KZT TRY ZAR NGN KES GHS EGP INR BRL MXN
  *          CLP ARS PEN COP CRC KRW CNY HKD SGD MYR THB IDR PHP VND TWD
  *   Virtual - XGC (Gold Coins -> "GC")  XSC (Sweepstakes Coins -> "SC")
+ *             XEC (Stake EU sweepstakes -> "SC")
  *
  * Zero-decimal currencies: JPY IDR KRW VND CLP
  */
@@ -83,6 +84,20 @@ export const VIRTUAL_CURRENCIES: Record<string, VirtualCurrency> = {
   XSC: { symbol: 'SC', decimals: 2 },
   GC:  { symbol: 'GC', decimals: 2 },
   SC:  { symbol: 'SC', decimals: 2 },
+  // Stake EU, confirmed by first-party platform announcement 2026-07-25 and
+  // quoted verbatim in reports/briefs/FS_PlatformDiscordDump_2026-07-25.md:
+  //   "Internally, the currency code used is XEC. However, players will not see
+  //    XEC in-game. Just like Stake US, the currency will be displayed using the
+  //    SC format"
+  // "Just like Stake US" is the operative instruction, so XEC is defined to be
+  // byte-identical to XSC rather than given its own formatting rules. If the
+  // SC presentation ever changes it must change for both, and defining them
+  // separately is how they would drift apart.
+  //
+  // This supersedes the HOLD on TR-012b. The hold was correct while three
+  // first-party sources had no trace of the code; a first-party source now
+  // exists, so the position changes with the evidence rather than despite it.
+  XEC: { symbol: 'SC', decimals: 2 },
 }
 
 /** True when the code is a platform virtual currency. */

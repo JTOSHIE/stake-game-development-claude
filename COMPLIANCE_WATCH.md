@@ -378,6 +378,72 @@ is how their hashes and row counts were verified for `BOOKS_MANIFEST.md`. Additi
 copies add custody surface without adding capability, so any further backup should be
 for owner-side disaster recovery only, and should not be publicly shared.
 
+## PLATFORM DELTA, 2026-07-25 (first-party announcements, relayed from Discord)
+
+Source saved verbatim at `reports/briefs/FS_PlatformDiscordDump_2026-07-25.md`. Quoted,
+not paraphrased, per convention (l.7).
+
+### 1. XEC and Stake EU. ACTIONED, and it reverses a standing hold.
+
+Quoted: **"To be eligible for release on Stake EU, your games must support the XEC
+currency. Games that don't support it won't be released on the platform."**
+
+This is the first-party source TR-012b was waiting for. The HOLD was correct while three
+first-party sources had no trace of the code; the position changes now **because** the
+evidence changed, which is the discipline working rather than failing. XEC is implemented
+and identical to XSC by construction.
+
+Quoted: **"Internally, the currency code used is XEC. However, players will not see XEC
+in-game."** Held by an assertion that a formatted XEC balance never contains the string
+"XEC".
+
+Quoted: **"Similar to Stake US, games released on Stake EU will have social set to true."**
+XEC is also in the social-currency set as defence in depth, so an XEC session presents
+social vocabulary even if the flag were ever absent.
+
+Quoted: **"We're also likely to introduce additional sweepstakes-style currencies in the
+future."** Adding one is a single line in `VIRTUAL_CURRENCIES` plus one in the social set.
+
+### 2. CONTRADICTION: SC display format. NEEDS A RULING, affects XSC as well as XEC.
+
+The announcement says the currency is **"displayed using the SC format (e.g. SC 1,000)"**,
+which is **leading** placement. We ship **trailing**, `1,000.00 SC`, under Fable ruling 2
+of 2026-07-26, which was itself based on two first-party sources: the currency reference
+documenting `symbolAfter: true`, and the official `StakeEngine/ts-client` SDK
+(`XSC: { symbol: 'SC', decimals: 2, symbolAfter: true }`).
+
+So two first-party sources now disagree, and this is **not new to XEC**: it applies to the
+XSC balance already shipping for Stake US. No unilateral change has been made. Recorded as
+a numbered comms item with options.
+
+### 3. Outcome cap, 10 million per mode. COMPLIANT, verified.
+
+Quoted: **"modes must not exceed 10 million outcomes."** Measured from the shipped lookup
+tables: **100,000 rows in every one of the five modes**, two orders of magnitude below the
+cap. No action. Note this cuts against the earlier observation that 100,000 sits at the low
+end of the published field: the platform has now capped the top rather than raised the
+floor.
+
+### 4. RTP range 90.0% to 96.70% for new submissions. COMPLIANT, unchanged.
+
+Quoted: **"the required math range for all modes must fall within the range 90.0% —>
+96.70%"**, and **"this will not be applied retroactively"**. Future Spinner is 96.35% in
+all five modes, inside the band with 0.35pp of headroom. Already the ceiling this project
+has been building to.
+
+### 5. New payments documentation page. NOT YET MIRRORED.
+
+`https://stake-engine.com/docs/payments`. Named here so the docs-refresh pass fetches it
+rather than discovering it late.
+
+### 6. Roadmap, recorded for awareness rather than action.
+
+Additional operators beyond Stake; more games taken through regulation; a **minor rebrand
+away from Stake-specific branding**; stateful games deferred. The rebrand item is worth
+watching: our compliance rule is already that no Stake branding appears in any shipped
+asset or string, so a platform-side rebrand does not create work for us, and that is worth
+knowing in advance rather than discovering it.
+
 **LESSON FOR THE REGISTER (Fable ruling, 2026-07-25).** Backups of pre-release game
 internals are **private by default, verified at creation, not after**. The Drive folder
 was not an intentional publication and was closed the same day it was raised, but it was

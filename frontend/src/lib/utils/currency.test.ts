@@ -85,10 +85,26 @@ ok('unknown code does not throw', (() => {
   try { formatBalance(S, 'ZZZ', 'en'); return true } catch { return false }
 })())
 
+// ── XEC, Stake EU (2026-07-25 first-party announcement) ─────────────────────
+// The platform's instruction is "Just like Stake US", so every assertion here
+// is that XEC behaves EXACTLY as XSC does. Asserting equality against XSC
+// rather than against hardcoded expectations means the pair cannot drift: if
+// the SC presentation is ever changed for one, this fails until it changes for
+// both.
+eq('XEC is recognised as a virtual currency', isVirtualCurrency('XEC'), true)
+eq('XEC never shows the raw code to a player', currencySymbolFor('XEC'), 'SC')
+eq('XEC symbol matches XSC exactly', currencySymbolFor('XEC'), currencySymbolFor('XSC'))
+eq('XEC formats identically to XSC', formatBalance(1_000_000_000, 'XEC'), formatBalance(1_000_000_000, 'XSC'))
+eq('XEC formats identically to XSC at zero', formatBalance(0, 'XEC'), formatBalance(0, 'XSC'))
+eq('XEC formats identically to XSC on a fractional amount', formatBalance(1_234_560, 'XEC'), formatBalance(1_234_560, 'XSC'))
+eq('XEC is case-insensitive on the code', currencySymbolFor('xec'), 'SC')
+eq('the raw code XEC never appears in a formatted balance', formatBalance(1_000_000_000, 'XEC').includes('XEC'), false)
+
 console.log(`currency static assertions: ${pass} passed, ${failures.length} failed`)
 if (failures.length) {
   for (const f of failures) console.error(`  - ${f}`)
   console.error('\nCURRENCY STATIC: FAIL')
   process.exit(1)
 }
+
 console.log('CURRENCY STATIC: PASS')

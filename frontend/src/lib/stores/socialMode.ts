@@ -14,7 +14,12 @@ import { derived } from 'svelte/store'
 import { currencyCode } from './gameStore'
 
 // Social currency codes used by Stake social casinos.
-const SOCIAL_CURRENCIES = new Set(['XGC', 'XSC', 'SC', 'GC'])
+// XEC added 2026-07-25 on the first-party Stake EU announcement: "Similar to
+// Stake US, games released on Stake EU will have social set to true." The
+// platform sets the social flag itself, so this is defence in depth rather than
+// the primary route: a session that arrives with an XEC balance and no flag
+// still gets social presentation instead of real-money vocabulary.
+const SOCIAL_CURRENCIES = new Set(['XGC', 'XSC', 'SC', 'GC', 'XEC'])
 
 /** Read the ?social= URL flag once at module load. Accepts true or 1. */
 function readUrlSocial(): boolean {
