@@ -149,6 +149,14 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/modalGuard.test.ts
 
+      # ── Gate 10a: production mock containment (source half) ──────────────────
+      # rgsService falls through to _mockSpin() when _rgsMode is false, which it
+      # sets on a real auth failure as well as the dev case. The bundle half of
+      # this gate needs a build and runs in the closing suite. (R2/TR-010)
+      - name: live guard
+        working-directory: frontend
+        run: npx tsx src/lib/stores/liveGuard.test.ts
+
       # ── Gate 11: live event schema alignment ─────────────────────────────────
       # The locked parser looked for board/win/scatter events. Across the first
       # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs
