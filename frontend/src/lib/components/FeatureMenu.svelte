@@ -185,6 +185,37 @@
       >{entryActiveLabel}</span>
     {/if}
   </button>
+{:else if miniPlayer}
+  <!-- MINI-PLAYER trigger (R2R-R JOB C / TR-043). Without this branch the
+       component fell through to the DESKTOP trigger inside a 44px row, and the
+       result was that a player in the popout could not reach the bet modes or
+       the buy at all. That is a functional regression, and it was found only
+       because svelte-check flagged the `miniPlayer` prop as an unused export:
+       the prop was threaded through and never consumed. A warning about a
+       missing export turned out to be a missing CONTROL.
+
+       Icon-only and 36px visual with the same ::after extension the rest of the
+       mini row uses to reach a 44px target. No mode badge: HudOverlay's own bet
+       cell carries OVERBOOST/CRUISE in the same visible row. -->
+  <button
+    class="m-fm-entry"
+    class:mode-enhancer={$standingMode === 'antelite'}
+    class:idle-shimmer={idleAttract}
+    on:click={openMenu}
+    disabled={$isSpinning}
+    aria-label={$tr('a11yFeatureMenu')}
+    aria-haspopup="dialog"
+    aria-expanded={open}
+    data-testid="feature-menu-button"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <circle cx="9" cy="6" r="2.2" fill="currentColor"/>
+      <circle cx="15" cy="12" r="2.2" fill="currentColor"/>
+      <circle cx="7" cy="18" r="2.2" fill="currentColor"/>
+    </svg>
+  </button>
+
 {:else if compactLandscape}
   <!-- Compact-landscape native-scale trigger (2026-07-14b) - a flex item
        alongside HudOverlay's .c-hud strip, icon-only (no room for the
@@ -469,6 +500,23 @@
 {/if}
 
 <style>
+  /* MINI-PLAYER trigger (R2R-R JOB C / TR-043). Matches .m-round-btn in
+     HudOverlay: 36px visual, 44px effective target via the ::after extension,
+     so the whole mini row is consistent about how it reaches the floor. */
+  .m-fm-entry {
+    position: relative;
+    flex: 0 0 auto;
+    width: 36px; height: 36px; border-radius: 8px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 0, 255, 0.10); border: 1px solid rgba(255, 0, 255, 0.34);
+    color: #f9f; cursor: pointer;
+  }
+  .m-fm-entry::after { content: ''; position: absolute; inset: -4px; }
+  .m-fm-entry svg { width: 20px; height: 20px; }
+  .m-fm-entry:disabled { opacity: 0.4; cursor: default; }
+  .m-fm-entry:disabled::after { content: none; }
+  .m-fm-entry.mode-enhancer { border-color: rgba(255, 213, 74, 0.55); color: #ffd54a; }
+
   /* ==========================================================================
      FUTURE SPINNER - FEATURES MENU
      Built on the shared chrome vocabulary (.fs-plate / .fs-knob / .fs-rail /

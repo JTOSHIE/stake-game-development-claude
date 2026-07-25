@@ -1649,7 +1649,7 @@
 {/if}
 
 <style>
-.native-hud-slot.mini-player { flex-direction: row; align-items: stretch; }
+.native-hud-slot.mini-player { flex-direction: row; align-items: center; gap: 4px; padding: 0 4px; }
 
   .jets-holder { position: absolute; inset: 0; pointer-events: none; }
   /* Above the free-spins overlay (z80) only while the retrigger beat runs. */

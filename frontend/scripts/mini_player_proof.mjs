@@ -156,6 +156,11 @@ const MEASURE = `(() => {
     ['betUp',     '[data-testid="hud-bet"] .m-bet-step:last-of-type'],
     ['spin',      '[data-testid="spin-button"]'],
   ]
+  // The FEATURES trigger is a SIBLING of the mini HUD, not a child: App puts
+  // both in the native-hud-slot row. It is measured because it went missing
+  // entirely in an earlier draft of this layout, and a control a player cannot
+  // reach is the worst failure this proof can catch.
+  const fm = document.querySelector('[data-testid="feature-menu-button"]')
   const out = { present: true, hud: hud.getBoundingClientRect().toJSON(), controls: {} }
   for (const [name, q] of sel) {
     const el = hud.querySelector(q)
@@ -183,6 +188,22 @@ const MEASURE = `(() => {
       disabled: !!el.disabled,
       visible: r.width > 0 && r.height > 0,
     }
+  }
+  if (fm) {
+    const r = fm.getBoundingClientRect()
+    const after = getComputedStyle(fm, '::after')
+    let grow = 0
+    if (after && after.content && after.content !== 'none') {
+      grow = Math.abs(Math.min(0, parseFloat(after.top) || 0))
+    }
+    out.controls.features = {
+      x: r.x, y: r.y, w: r.width, h: r.height,
+      targetW: r.width + grow * 2, targetH: r.height + grow * 2,
+      text: '', truncated: false, disabled: !!fm.disabled,
+      visible: r.width > 0 && r.height > 0,
+    }
+  } else {
+    out.controls.features = null
   }
   // Anything rendered below the viewport is not operable, whatever its size.
   out.viewportH = window.innerHeight
@@ -313,7 +334,7 @@ async function run() {
         }
       }
       for (const [name, c] of named) {
-        if (['menu', 'betUp', 'betDown', 'spin'].includes(name)) {
+        if (['menu', 'betUp', 'betDown', 'spin', 'features'].includes(name)) {
           // A DISABLED control is exempt, and this is a real distinction rather
           // than a convenience. The bet steppers are disabled mid-spin, and the
           // CSS deliberately drops their touch extension with them: a 44px
@@ -354,6 +375,14 @@ async function run() {
     checks.hudFitsItsBudget = {
       pass: Object.values(states).every((m) => !m.present || m.hud.height <= 46),
       heights: Object.fromEntries(Object.entries(states).map(([k, m]) => [k, m?.hud?.height ?? null])),
+    }
+    // The FEATURES trigger must EXIST and be reachable in every non-feature
+    // state. It fell out of the row entirely in an earlier draft, and only
+    // svelte-check noticing an unused prop revealed it.
+    const featureStates = ['idle', 'result', 'modal']
+    checks.featuresTriggerIsReachable = {
+      pass: featureStates.every((st) => states[st]?.controls?.features?.visible),
+      states: Object.fromEntries(featureStates.map((st) => [st, !!states[st]?.controls?.features?.visible])),
     }
     checks.zeroConsoleErrors = { pass: consoleErrors.length === 0, errors: consoleErrors.slice(0, 5) }
 

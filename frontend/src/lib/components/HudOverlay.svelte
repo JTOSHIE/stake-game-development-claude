@@ -872,8 +872,11 @@
      76px would have left 149px, and it stacks a label ABOVE a value inside
      that 76, which is what collided. Here label and value share one line. */
   .m-hud {
-    display: flex; align-items: center; gap: 6px;
-    width: 100%; height: 44px; padding: 0 6px;
+    display: flex; align-items: center; gap: 4px;
+    /* flex, not width:100%. The slot is a row shared with FeatureMenu's mini
+       trigger; a full-width strip would push that trigger out of the row, which
+       is how the FEATURES control went missing in the first place. */
+    flex: 1 1 auto; min-width: 0; height: 44px; padding: 0 4px 0 2px;
     background: linear-gradient(180deg, rgba(10, 14, 26, 0.94), rgba(6, 8, 18, 0.98));
     border-top: 1px solid rgba(0, 255, 255, 0.22);
     font-family: 'Orbitron', monospace;
@@ -902,15 +905,20 @@
        looks, so the flex basis is weighted rather than equal. */
     flex: 1.5 1 0; min-width: 0;
     display: flex; align-items: baseline; gap: 4px;
-    padding: 0 4px; overflow: hidden;
+    padding: 0 2px; overflow: hidden;
   }
   .m-stat-label {
     flex: 0 0 auto;
-    font-size: 8px; letter-spacing: 0.06em; color: #6f8a9a; text-transform: uppercase;
+    font-size: 7px; letter-spacing: 0.04em; color: #6f8a9a; text-transform: uppercase;
   }
   .m-stat-value {
     flex: 1 1 auto; min-width: 0;
-    font-size: 12px; font-weight: 700; white-space: nowrap;
+    /* 11px is the documented legibility floor for this size class, and the
+       whole row is measured against it: the FEATURES trigger had to come back
+       into the row (it was missing entirely) and something had to give. The
+       stat VALUES are the last thing that may shrink and the last thing that
+       may truncate, so the labels went to 7px and the gaps to 4 first. */
+    font-size: 11px; font-weight: 700; white-space: nowrap;
     /* NO text-overflow: ellipsis. autofitText already shrinks the string to
        fit, and an ellipsis on top of it turns a small-but-readable number into
        an unreadable one: whichever wins, the player loses. Overflow stays
@@ -931,13 +939,13 @@
   /* 1.25, not 1.8. At 1.8 the balance fit and the WIN value truncated instead:
      the row is a fixed budget, so over-weighting one stat simply moves the
      defect. Both measured clear at 1.25. */
-  .m-stat--balance { flex: 1.25 1 0; }
+  .m-stat--balance { flex: 1.15 1 0; }
   .m-stat--win { flex: 1 1 0; }
   .m-stat--bet { flex: 0 0 auto; gap: 2px; }
-  .m-stat--bet .m-stat-value { min-width: 40px; text-align: center; }
+  .m-stat--bet .m-stat-value { min-width: 36px; text-align: center; }
   .m-bet-step {
     position: relative;
-    width: 26px; height: 30px; border-radius: 6px; padding: 0;
+    width: 24px; height: 30px; border-radius: 6px; padding: 0;
     display: flex; align-items: center; justify-content: center;
     background: rgba(255, 213, 74, 0.10); border: 1px solid rgba(255, 213, 74, 0.34);
     cursor: pointer;
@@ -946,7 +954,7 @@
      -9 and not -7: the proof measured the effective box and reported 40x44,
      so the horizontal extension was one step short of the floor. Measured,
      then corrected, rather than assumed from the visual size. */
-  .m-bet-step::after { content: ''; position: absolute; inset: -9px; }
+  .m-bet-step::after { content: ''; position: absolute; inset: -10px; }
   .m-bet-step svg { width: 12px; height: 8px; fill: #ffd54a; }
   .m-bet-step:disabled { opacity: 0.35; cursor: default; }
   .m-bet-step:disabled::after { content: none; }
