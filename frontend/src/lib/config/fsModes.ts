@@ -154,6 +154,39 @@ export function maxWinVsBaseBetLabel(social: boolean): string {
   return social ? `${FS_MAX_WIN_LABEL} base play` : `${FS_MAX_WIN_LABEL} base bet`
 }
 
+/**
+ * TR-037 (2026-07-25). The per-mode cards rendered the whole phrase as the VALUE
+ * and clipped it to "5,000x ba..." on every card at 1280x720, so the one figure
+ * of the required three that a player could not read was the max win. The
+ * platform requires cost, RTP and max win to be DISPLAYED to the player, and a
+ * value truncated mid-word is not displayed.
+ *
+ * The qualifier moves to the stat label, where it has a whole line to itself,
+ * and the value becomes the bare figure, which is the same width class as the
+ * cost values beside it and so cannot clip. Both social forms still route
+ * through one place so the pair cannot drift, which is why this is a function
+ * rather than a literal in the component.
+ */
+export function maxWinStatLabel(): string {
+  return 'Max Win'
+}
+
+/**
+ * The qualifier as a single footnote under the mode grid, rather than repeated
+ * in five column labels.
+ *
+ * The first attempt at TR-037 moved "base bet" from the value into the label and
+ * simply moved the truncation with it: the value read in full at last, and the
+ * label clipped to "MAX WIN (BASE BE". A four-column stat row has no room for a
+ * qualified label, and repeating the same six words five times was never the
+ * right shape anyway. One footnote reads better and cannot clip.
+ */
+export function maxWinFootnote(social: boolean): string {
+  return social
+    ? 'Max win is quoted against the base play amount.'
+    : 'Max win is quoted against the base bet.'
+}
+
 /** OWNER AUDIT ROUND 3, item 2 (naming uniformity): the single source of
  * truth for the in-feature HUD field labels, so portrait/compact-landscape/
  * desktop templates render the exact same string instead of independently

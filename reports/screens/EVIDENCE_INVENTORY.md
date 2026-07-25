@@ -19,7 +19,7 @@ Started 2026-07-25 during the pre-review pass.
 | Win celebrations | **STALE** | `opus-elevate/`, `opus-elevate-2/` | |
 | Buy dialogs | **STALE** | `owner-audit-v4/` | Also predates the per-tier affordability fix |
 | Menu | **STALE** | `owner-audit-v3/` | |
-| Rules and paytable | **REGENERATED** | `rules-paytable-2026-07-25/` | All nine sections. Content asserted, not just screenshotted: RTP, max win, all five mode costs, Interface Guide and Responsible Play all present. **Surfaced a live defect, TR-037: the MAX WIN value is truncated to `5,000x ba...` on every mode card.** |
+| Rules and paytable | **REGENERATED** | `rules-paytable-2026-07-25/` | All nine sections. Content asserted, not just screenshotted: RTP, max win, all five mode costs, Interface Guide and Responsible Play all present. Surfaced TR-037 (max win truncated on every card), **now fixed and the group re-captured after the fix**. |
 | Brand assets | **STALE** | `brand-emblem/`, `brand-tile-*`, `brand-vector-mark*/` | TR-031 provider mark candidates land separately under `provider-mark/` |
 | Scatter anticipation | **CURRENT** | `scatter-anticipation/` | Captured 2026-07-25 during the anticipation pass, after the art adoption |
 | Cohesion pass | **CURRENT** | `cohesion-pass/` | Captured 2026-07-25, includes the adopted art in situ |

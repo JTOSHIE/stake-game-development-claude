@@ -18,7 +18,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel, maxWinStatLabel, maxWinFootnote, modeLabel, modeBlurb } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -283,12 +283,16 @@
                       <span class="fs-mode-stat-value fs-num">{FS_RTP_LABEL}</span>
                     </div>
                     <div class="fs-mode-stat">
-                      <span class="fs-mode-stat-label">Max Win</span>
                       <!-- ROUND 4 item 4: per-mode card, quoted against the BASE
                            bet since each card shows its own cost multiplier. The
                            general rules row below deliberately keeps the short
-                           form. -->
-                      <span class="fs-mode-stat-value fs-num">{maxWinVsBaseBetLabel($isSocial)}</span>
+                           form.
+                           TR-037: the qualifier lives in the LABEL, not the
+                           value. Rendering "5,000x base bet" as the value clipped
+                           it to "5,000x ba..." on every card, hiding the very
+                           figure the platform requires to be displayed. -->
+                      <span class="fs-mode-stat-label">{maxWinStatLabel()}</span>
+                      <span class="fs-mode-stat-value fs-num">{FS_MAX_WIN_LABEL}</span>
                     </div>
                   </div>
                   <p class="fs-mode-blurb">{modeBlurb(m, $isSocial)}</p>
@@ -300,6 +304,8 @@
 
         <!-- ── Interface Guide — every game control explained ────────────── -->
         <div data-testid="interface-guide">
+          <p class="fs-mode-footnote">{maxWinFootnote($isSocial)}</p>
+
           <h3 class="fs-heading" style="margin-bottom:10px;">Interface Guide</h3>
           <div class="fs-guide-list">
             {#each INTERFACE_GUIDE as g}
@@ -355,6 +361,18 @@
 </div>
 
 <style>
+  /* TR-037: the max-win qualifier as one footnote under the mode grid. Repeating
+     it in five column labels clipped every one of them; a four-column stat row
+     has no width for a qualified label. */
+  .fs-mode-footnote {
+    margin: 10px 0 18px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(190, 214, 230, 0.72);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.02em;
+  }
+
   /* ==========================================================================
      FUTURE SPINNER — B3 PAYTABLE RESKIN
      Same chrome vocabulary as B1 (.fs-plate / .fs-knob / .fs-rail). All colour
