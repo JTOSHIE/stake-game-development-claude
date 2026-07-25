@@ -208,3 +208,14 @@ jobs:
       - name: replay rounds
         working-directory: frontend
         run: npx tsx src/lib/services/replayRounds.test.ts
+
+      # ── Gate 14: the books verifier fails closed ─────────────────────────────
+      # Run at HEAD with the private books absent, the verifier produced five
+      # `zstd: can't stat` errors, processed zero rounds, made zero assertions
+      # and printed PASS. The books are gitignored, so that is what EVERY
+      # reviewer working from this repository got. The self-test runs the tool
+      # against absent input and asserts a non-zero exit, which is the one proof
+      # that cannot rot, and it needs no books, so it belongs in CI where the
+      # books are always absent. (R2R JOB 7 / TR-044)
+      - name: books verifier self-test
+        run: python3 tools/verify_books_lookup_equality.py --self-test

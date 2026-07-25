@@ -14,7 +14,9 @@
       },
       "no_win_rounds": 49436,
       "capped_rounds": 200,
-      "max_payout_centibets": 500000
+      "max_payout_centibets": 500000,
+      "duplicate_ids": [],
+      "lookup_ids_never_seen": 0
     },
     {
       "mode": "cruise",
@@ -30,7 +32,9 @@
       },
       "no_win_rounds": 47605,
       "capped_rounds": 100,
-      "max_payout_centibets": 500000
+      "max_payout_centibets": 500000,
+      "duplicate_ids": [],
+      "lookup_ids_never_seen": 0
     },
     {
       "mode": "antelite",
@@ -46,7 +50,9 @@
       },
       "no_win_rounds": 42566,
       "capped_rounds": 250,
-      "max_payout_centibets": 500000
+      "max_payout_centibets": 500000,
+      "duplicate_ids": [],
+      "lookup_ids_never_seen": 0
     },
     {
       "mode": "bonus",
@@ -62,7 +68,9 @@
       },
       "no_win_rounds": 0,
       "capped_rounds": 400,
-      "max_payout_centibets": 500000
+      "max_payout_centibets": 500000,
+      "duplicate_ids": [],
+      "lookup_ids_never_seen": 0
     },
     {
       "mode": "super",
@@ -78,12 +86,17 @@
       },
       "no_win_rounds": 0,
       "capped_rounds": 3002,
-      "max_payout_centibets": 500000
+      "max_payout_centibets": 500000,
+      "duplicate_ids": [],
+      "lookup_ids_never_seen": 0
     }
   ],
   "totals": {
     "rounds": 500000,
     "assertions": 4455829,
-    "failures": 0
+    "failures": 0,
+    "expect_rounds_per_mode": 100000,
+    "expect_lookup_rows_per_mode": 100000,
+    "limited": null
   }
 }
