@@ -9,6 +9,58 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 012 - 2026-07-25 - R1a sanctioned pass done, PR #103 held for your block; two items need a ruling
+
+**The pass is on the branch and will not merge itself.** PR #103, one isolated commit,
+scope (a), (b) and (d). Lock proof in the commit message and the PR: exactly the two named
+deny entries lifted, `git diff .claude/settings.json` 0 bytes, SHA-256 identical before and
+after, `gameStore.ts` and `games/future_spinner/` untouched, no Bash routing at any point.
+
+**(a) was worse than TR-009 described, and the numbers say so.** The locked parser read
+`board`, `win` and `scatter`. Across the first 300 rounds of the shipped
+`books_base.jsonl.zst` those occur **0, 0 and 0** times, against `reveal` 724 and `winInfo`
+499. Every branch was dead on a live round, so `_emptyBoard()` came back unchanged: a live
+player would have watched an empty grid. Now delegated to `roundInterpreter` rather than
+reimplemented. The six-row padding is stripped to the visible 5x4, verified against the
+book rather than assumed, and the test asserts scatter never exceeds 5.
+
+**(b)** `endRound` now goes through `_withRetry`. It was the credit leg that was
+unprotected: one transient failure and the wallet had taken the bet while the player had
+not been paid. Safe to retry because end-round is idempotent on the round id.
+
+**(d)** The local `CURRENCY_SCALE` copy is gone and there is now exactly one declaration in
+the codebase. The drift gate is updated deliberately, which is what its own failure message
+demanded if the declaration ever moved.
+
+**DECISION REQUESTS, numbered.**
+
+1. **Scope (c) cannot be executed under this sanction, and I have not forced it.**
+   `canIncreaseBet` and `canBuyBonus` are in `gameStore.ts`, not in `rgsService.ts`: grep
+   finds **0** occurrences of either name in the file the sanction unlocked. The sanction
+   lifts only the `rgsService.ts` deny entries, and convention (e) both requires the brief
+   to name the deny lines and forbids routing around a deny by any other means.
+   **Options:** (a) issue a second sanction naming the two `gameStore.ts` deny lines and I
+   run it as its own isolated pass; (b) fold it into whatever the next `gameStore.ts`
+   sanction is, since both helpers are already unreferenced and recorded in
+   `LOCKED_FILE_DEBTS` so nothing regresses by waiting; (c) leave them permanently, on the
+   basis that unreferenced-and-wrong is harmless. **Recommend (b)**: it costs nothing to
+   wait and avoids a lock lift whose only purpose is deleting dead code.
+
+2. **One tension in (a) that is yours to settle, not mine.** The sanction says (a) happens
+   "only as R1's diagnosis requires". TR-009's own recorded method says "adapter if raw
+   events are exposed, sanctioned locked pass only if not", and raw events ARE exposed:
+   `lastRoundEvents` publishes them before flattening. On that reading (a) could have been
+   an adapter in non-locked code. I did it at source because the sanction enumerates it
+   explicitly and is the later instruction, because the parser is 100% broken rather than
+   partially, and because a wrong parser left behind an adapter is a landmine for any
+   future consumer of `SpinResult`. **If you would rather it were an adapter, say so and I
+   will revert (a) and keep (b) and (d).**
+
+**Next while #103 waits.** Wave 3 remainder: R2 mock containment, R3 books equality, R11
+balance. Plus decision 3's RG wording, which lands on its own branch as its own item.
+
+---
+
 ## 011 - 2026-07-25 - COMMS-ACK 010 received; wave 2 merged; PAR converted to a numbered item
 
 **COMMS-ACK, entry 010: receipt appended.** All four rulings actioned. Recorded here
