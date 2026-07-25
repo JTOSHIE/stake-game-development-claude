@@ -414,7 +414,7 @@ Nothing is merged; all four await review.
 ## 007 - 2026-07-27 - Convention (l) ratified: derive before measuring
 
 **Owner ruling, standard operating procedure.** Recorded as `CLAUDE.md` convention
-**(l)** and mirrored into `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` section 3 as **(m)**.
+**(l)** and mirrored into `reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md` section 3 as **(m)**.
 Green lane, merged to `main`.
 
 **What prompted it.** I reported that 352 base rounds reached 6 scatters and 12 reached
@@ -500,7 +500,7 @@ the risk the section 1 bar warns against. Scoped as its own branch in section 6.
 
 **Sequencing decision, taken and flagged.** The FS AUDIT REMEDIATION R1-R13 brief
 arrived mid-Round-4. It is **saved verbatim and not executed**
-(`FS_AuditRemediation_2026-07-27_Prompt.md`). Round 4 lands first as its own reviewable
+(`reports/archive/briefs/FS_AuditRemediation_2026-07-27_Prompt.md`). Round 4 lands first as its own reviewable
 unit; R1-R13 takes a fresh branch. Two things in it need your explicit acknowledgement
 before I start:
 
@@ -526,7 +526,7 @@ refused; (2) audit pack refresh ratified in full; (3) dossier 5g ratified as lan
 (4) branch prune executed, below; (5) board state formally recorded.
 
 **RainLayer blind spot: compensated, not chased.** One instruction added to
-`AUDIT_PACK_INDEX.md` section 4 as item 5: the auditor manually verifies the two props
+`reports/archive/superseded/AUDIT_PACK_INDEX.md` section 4 as item 5: the auditor manually verifies the two props
 (`count`, `opacity`, plus the cosmetic `variant`) against both callers, `App.svelte`
 and `HeroSplash.svelte`. Closes the only known unchecked-props hole for the price of a
 sentence, as ruled.
@@ -640,7 +640,7 @@ audit.
    testid and by the `.max-win-overlay` container's own presence, exported as
    `clickAnyPendingGate` (Round 3 FINAL MERGE rider (a)). Nothing to add. Re-read and
    confirmed line by line rather than trusted from the report.
-2. **Audit pack refreshed** (`AUDIT_PACK_INDEX.md`). The 2026-07-14 edition was
+2. **Audit pack refreshed** (`reports/archive/superseded/AUDIT_PACK_INDEX.md`). The 2026-07-14 edition was
    materially stale: it pointed at the **superseded** 2026-07-07 handover as current
    and listed PRs #56/#57/#60 as unmerged blockers (all merged, branches gone,
    confirmed). Rewritten to current artefacts, with the superseded ignore list
@@ -671,7 +671,7 @@ you directed. Nothing in the repository blocks either.
 **Lane.** GREEN throughout: docs, records, audit prep, comms. No game behaviour
 touched, no code changed.
 
-**Pointers.** `AUDIT_PACK_INDEX.md`; `SUBMISSION_DOSSIER.md` section 5g;
+**Pointers.** `reports/archive/superseded/AUDIT_PACK_INDEX.md`; `SUBMISSION_DOSSIER.md` section 5g;
 `WRS_MASTER_DOCUMENT.md` sections 1 and 2.
 
 ---
@@ -805,7 +805,7 @@ for your rulings; item (1) still waits on your PR #89 review.
 ## 001 - 2026-07-25 - Platform delta and tool vetting; builder handover acknowledged
 
 **Handover.** Opening correspondence received and saved verbatim as
-`FS_Fable_ModelHandover_2026-07-25.md`. Roles, two-lane merge policy, dual
+`reports/archive/handovers/FS_Fable_ModelHandover_2026-07-25.md`. Roles, two-lane merge policy, dual
 independent verification (protocol 6) and the nine-step map are in force from now.
 Note: the opening block carried no COMMS-ACK token, so none is recorded against it;
 this entry is the acknowledgement. Subsequent blocks will be ack-logged as specified.

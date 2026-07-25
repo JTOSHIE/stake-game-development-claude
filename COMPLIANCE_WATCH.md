@@ -78,7 +78,7 @@ Source snapshots saved under `docs/stake-engine-live/` (rendered via headless Ch
 
 - **approval-guidelines:** captured. Confirms strictly stateless; no jackpots, gamble,
   continuation or early cashout; original designs only; no Stake branding; no underage
-  appeal; a short promotional blurb must accompany the submission (we have `PROMO_BLURB.md`).
+  appeal; a short promotional blurb must accompany the submission (we have `reports/archive/superseded/PROMO_BLURB.md`).
   Post-release, only minor visual updates are allowed once approved: no math or new-mode
   changes. No conflict with our build.
 - **jurisdiction-requirements:** captured. Prohibited-terms table for stake.us with
@@ -121,7 +121,7 @@ and this section's "now a two-mode package" framing) are both superseded. Featur
 shipped three more modes into the locked package the same day: Cruise (1.0x, low-vol),
 OVERBOOST (1.25x ante toggle, debits every spin while ON), and NITRO OVERDRIVE (400x,
 Overdrive meter pre-revved to 5x). The package is now five modes, all stateless, all
-capped at 5,000x, all 96.3500% RTP (see `HANDOVER_2026-07-07_Fable.md` for the full
+capped at 5,000x, all 96.3500% RTP (see `reports/archive/handovers/HANDOVER_2026-07-07_Fable.md` for the full
 per-mode table and independent re-verification). This closes the star-rating concern the
 2026-07-03 entry flagged more fully than the original two-mode answer did - a five-mode
 package with a genuine ante mechanic and two buy tiers is a stronger answer to "additional

@@ -31,7 +31,7 @@ checklist in the docs must be satisfied.
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Design system Phase B | To design | AssetForge v2 |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
-| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy |
+| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, reports/archive/superseded/MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy |
 | 11 | High resolution asset link (Drive or Dropbox, public) | Owner | Pending | Pre-submission |
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
@@ -40,7 +40,7 @@ checklist in the docs must be satisfied.
 
 **Status (2026-07-13, JOB 5):** the blurb below now includes a draft soundtrack sentence
 (marked inline) - restored per `docs/CHAT_CLOSEOUT_2026-07-06.md` §2's own note that
-"PROMO_BLURB.md restores its soundtrack sentence once audio ships, then the owner
+"reports/archive/superseded/PROMO_BLURB.md restores its soundtrack sentence once audio ships, then the owner
 approves the final text." No original wording survives anywhere in the repo (checked -
 it was fully removed, not archived), so this is freshly drafted to match what actually
 shipped (`tools/audio_forge/`, `reports/audio/GENERATION_LOG_2026-07-13.md`), not a
@@ -109,7 +109,7 @@ variation 0.0000%, base hit 29.11% (SD 17.28x), cruise SD 11.29x, antelite
 (OVERBOOST) SD 20.32x, bonus SD 206.63x, super (NITRO OVERDRIVE) SD 539.16x,
 max 5,000x every mode, wincap base 1-in-100k / cruise 1-in-250k / antelite
 1-in-80k / bonus 1-in-1k / super 1-in-250, all Stake checks pass
-(MATH_VALIDATION.md). The RGS wire contract is documented and our client
+(reports/archive/superseded/MATH_VALIDATION.md). The RGS wire contract is documented and our client
 verified aligned in docs/RGS_CONTRACT_REFERENCE.md. Community tooling assessed
 in docs/TOOLING_REVIEW.md.
 

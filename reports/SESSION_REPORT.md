@@ -1,6 +1,6 @@
 # Session Report - PLATFORM DELTA AND TOOL VETTING (2026-07-25)
 
-Brief saved verbatim: `FS_PlatformDelta_ToolVetting_Prompt.md`.
+Brief saved verbatim: `reports/archive/briefs/FS_PlatformDelta_ToolVetting_Prompt.md`.
 Branch: `claude/platform-delta-tool-vetting-v1` (fresh off `main` at `a261b7e`).
 `games/future_spinner/**` read-only throughout (read for computation only, never
 written). `.claude/settings.json` diff verified empty at every commit.
@@ -176,7 +176,7 @@ corrected**: it had been listing the stale repository route tree.
 
 ## Files touched
 
-- New: `FS_PlatformDelta_ToolVetting_Prompt.md`, `docs/stake-engine-live/2026-07-25/**`
+- New: `reports/archive/briefs/FS_PlatformDelta_ToolVetting_Prompt.md`, `docs/stake-engine-live/2026-07-25/**`
   (math-verification, payments, DELTA_NOTES, _manifest.json),
   `scripts/qa/bet_level_compliance.py`,
   `reports/qa/math_bet_level_compliance_2026-07-25.md`,
