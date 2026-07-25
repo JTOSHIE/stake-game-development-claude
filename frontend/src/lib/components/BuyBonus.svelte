@@ -199,12 +199,27 @@
   /* Price / RTP / max win, three stat cells on one instrument-plate styled
      row (notched corners, magenta rim - same treatment the old single
      price plate used). */
+  /* R12, 2026-07-27: STICKY, and this is a compliance requirement rather than a
+     styling preference. Per-mode cost, RTP and max win must be DISPLAYED to the
+     player; this row is where the buy flow discloses all three.
+     The modal already scrolled (max-height 90dvh, overflow-y auto), so at short
+     viewports the row was still reachable but sat BELOW THE FOLD: measured out of
+     view at 360x600 and at compact landscape 812x375, where a reviewer who does
+     not scroll simply never sees the disclosure. (390x664, the height the brief
+     named, was already fine.)
+     Sticking it to the bottom of the modal's scroll box keeps it on screen at
+     every height without reordering the owner-approved B4 presentation. The
+     opaque background is required: the content scrolling underneath would
+     otherwise show through the clip-path notches. */
   .buy-stats-row {
     display: flex; align-items: stretch; justify-content: space-between;
     padding: 10px 4px; margin: 0 0 4px;
     background: linear-gradient(180deg, #1a2236, #080c16);
     clip-path: polygon(0 12%, 3% 0, 97% 0, 100% 12%, 100% 100%, 3% 100%, 0 88%);
     box-shadow: inset 0 0 0 1.5px rgba(255, 43, 214, 0.85), 0 0 12px rgba(255, 43, 214, 0.25);
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
   }
   .buy-stat {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;

@@ -166,16 +166,28 @@
   // localStorage so it does not re-show on every load in incognito/memory-
   // cleared contexts, falling back silently to sessionStorage then in-memory if
   // a store is unavailable or blocked (each guarded, so no console errors).
+  // R12 / TR-022 (owner ruling, 2026-07-26): SESSION storage only, so the rules
+  // modal returns on every COLD load and is still skipped for the rest of the
+  // session. It previously wrote localStorage first, which made the flag
+  // effectively permanent for a browser profile: the owner reported the splash
+  // never reappearing on desktop and having to use incognito to see it again,
+  // and that persistence was exactly why. A returning player got a game that had
+  // silently dropped its own rules screen.
+  //
+  // Any legacy localStorage flag is actively cleared on first read, otherwise
+  // every existing player stays permanently opted out and the fix would be
+  // invisible to precisely the people who hit the bug.
   const INTRO_KEY = 'fs_intro_seen_v1'
   let introSeenMemory = false
   function introSeen(): boolean {
-    try { if (localStorage.getItem(INTRO_KEY)) return true } catch {}
+    try {
+      if (localStorage.getItem(INTRO_KEY)) localStorage.removeItem(INTRO_KEY)
+    } catch {}
     try { if (sessionStorage.getItem(INTRO_KEY)) return true } catch {}
     return introSeenMemory
   }
   function markIntroSeen(): void {
     introSeenMemory = true
-    try { localStorage.setItem(INTRO_KEY, '1'); return } catch {}
     try { sessionStorage.setItem(INTRO_KEY, '1') } catch {}
   }
   let showIntroSplash = false

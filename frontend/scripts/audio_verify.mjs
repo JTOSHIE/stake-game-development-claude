@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
-import { dismissIntro, waitSpinDone, waitFeatureDrained } from './lib/dismissOverlays.mjs'
+import { dismissIntro, waitSpinDone, waitFeatureDrained, clickAnyPendingGate } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
@@ -200,10 +200,18 @@ async function run() {
     await page.locator('[data-testid="activate-bonus"]').click()
     await page.locator('[data-testid="buy-confirm"]').click()
     await waitSpinDone(page)
-    // Overdrive presentation entry (and the crossfade it drives) happens on a
-    // short animated delay after the round resolves - give it a moment before
-    // reading back what played.
-    await page.waitForTimeout(1200)
+    // R12, 2026-07-27: the bed swap fires when the free-spins presentation
+    // actually STARTS, which is gated behind CLICK TO CONTINUE. waitSpinDone()
+    // returns as soon as `.spinning` clears, which can be BEFORE that gate has
+    // rendered, so nothing ever clicked it and the crossfade never ran. The
+    // check had been recorded as a failing audio finding since 2026-07-13; it
+    // was a harness click-path gap, not a missing crossfade. This is the same
+    // class Round 3 fixed across twenty-two scripts.
+    for (let i = 0; i < 40; i++) {
+      if (await clickAnyPendingGate(page)) break
+      await page.waitForTimeout(150)
+    }
+    await page.waitForTimeout(1500)
     const playedAfterBuy = await page.evaluate(() => window.__playedSounds)
     const bedSwapFired = playedAfterBuy.some((s) => /bgm_tension\.(mp3|webm)$/.test(s))
 
