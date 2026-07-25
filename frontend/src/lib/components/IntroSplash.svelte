@@ -51,8 +51,24 @@
     animation: intro-fade-in 0.35s ease both;
   }
 
+  /* R14, 2026-07-27: the rules modal must stay usable at Stake's mini-player
+     popout size. Measured before the fix at 400x225: the card was 399px tall in a
+     225px viewport, top at -87 and bottom at 312, overflowing BOTH directions
+     because the backdrop centres with `align-items: center` and nothing capped the
+     card's height. The Continue button landed at 242 to 282, entirely below the
+     fold and genuinely unreachable: Playwright's {force:true} still hard-errors
+     "outside of the viewport" there, which is why the harness needed a DOM-level
+     click bypass. A real player opening the game directly in mini-player mode
+     could not dismiss the rules and could not proceed.
+     Two changes fix it, and the second is the guarantee:
+       1. cap the card to the viewport and let it scroll;
+       2. pin the Continue button to the bottom of that scroll box, so it is on
+          screen at every height regardless of scroll position.
+     Same sticky pattern as the buy dialog's disclosure row (R12). */
   .intro-card {
     width: min(92vw, 480px);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
     padding: 1.8rem 1.6rem;
     border-radius: 14px;
     background: linear-gradient(160deg, #0c0c22 0%, #08081a 100%);
@@ -98,7 +114,21 @@
     color: rgba(0, 255, 255, 0.7);
   }
 
+  /* Short viewports: reclaim vertical space before resorting to scrolling, so
+     the common popout case fits outright rather than merely being reachable. */
+  @media (max-height: 400px) {
+    .intro-backdrop { padding: 0.5rem; }
+    .intro-card { padding: 0.9rem 1rem; gap: 0.55rem; max-height: calc(100dvh - 1rem); }
+    .intro-title { font-size: 1rem; }
+    .intro-rules { font-size: 0.72rem; line-height: 1.35; }
+    .intro-continue { padding: 0.6rem 1.2rem; }
+  }
+
   .intro-continue {
+    position: sticky;
+    bottom: 0;
+    /* Opaque, because card content scrolls underneath this button. */
+    background-color: #0a0a1e;
     align-self: center;
     padding: 0.7rem 2.4rem;
     border-radius: 8px;
