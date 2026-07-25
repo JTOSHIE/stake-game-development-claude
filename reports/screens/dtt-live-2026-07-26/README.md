@@ -65,8 +65,8 @@ Nothing in this folder is edited or cropped; filenames were assigned from conten
 |---|---|
 | `41_session_524_base_spins_balance_reconciles.png` | 524 base spins, wagered $524,000, won $441,330, net -$82,670. Balance $49,917,330 reconciles exactly. |
 | `42_after_three_bonus_buys_balance_reconciles.png` | After three $500 bonus buys at 100x. Balance $49,972,875 reconciles exactly against the bet log. |
-| `43_bonus_win_presentation.png` | Bonus round win presentation. |
-| `44_bonus_win_presentation_2.png` | Bonus round win presentation, continued. |
+| `43_bets_panel_bonus_rows_cost_column.png` | The Bets panel showing the three bonus rows as `bonus $500.00` in the COST column, which is the bet level and not the $50,000 actually debited. The source of the cost confusion. |
+| `44_features_menu_shows_true_buy_cost.png` | The FEATURES menu in English: `SPIN COST $500.00`, and Buy Overdrive priced `100x, $50,000.00` on the card itself. **The game states the true buy cost in two places before purchase**, the card and the confirm dialog. |
 | `45_nitro_confirm_price_200000_at_500_bet.png` | NITRO OVERDRIVE confirm at a $500 bet: `PRICE $200,000.00`, RTP 96.35%, MAX WIN 5,000x base bet. **The game shows the true cost up front.** Guideline item 27 confirmed live. |
 | `46_TR068_win_57215_while_balance_falls_142785.png` | **TR-068.** `WIN $57,215.00` in large green type while the balance falls by $142,785, because the round cost $200,000. Balance $49,830,090 reconciles exactly. |
 | `47_nitro_confirm_price_400000_at_1000_bet.png` | Same dialog at a $1,000 bet: `PRICE $400,000.00`. Cost scales correctly with bet level. |
