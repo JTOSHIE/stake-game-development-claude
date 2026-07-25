@@ -162,7 +162,45 @@ jackpot, gamble, or continuation.
 
 Manus is retired. All visual and audio assets are produced in-house from vector masters
 (SVG) via the asset pipeline: deterministic, exact-size rendering, front-facing symbols
-carry no baked-in text. Do not reintroduce Manus briefs or externally sourced art.
+carry no baked-in text. Do not reintroduce Manus briefs.
+
+**AMENDED 2026-07-25 by owner ruling: external ENHANCEMENT of existing art is permitted.
+Externally DESIGNED art is not.**
+
+The original prohibition was written after Manus, and it was aimed at a specific failure:
+externally designed assets, symbols above all, that did not fit the animation pipeline and
+had to be redone. That reason still holds and the rule still holds for that case.
+
+It does not cover what happened here. The scene character and car were **enhanced, not
+redesigned**: the same artwork, the same silhouette, given the volumetric shading, rim
+light and specular that flat vector masters could not carry. Verified rather than asserted
+before adoption:
+
+- `scene_character.png` 680x1344 RGBA, subject bounding box matching the original to
+  **0.7%**;
+- `scene_car.png` 2840x1000 RGBA, subject bounding box **identical** at 2729x914, 40.7%
+  transparent in both.
+
+The owner's reasoning, recorded because it is the test to apply next time: *"we're only
+subbing out and subbing in pretty much the same images... this enhanced is actually great
+because this is taking us where we need to get to. It's actually solved a massive
+problem."*
+
+**The test for any future external asset**, in order:
+
+1. **Is it an enhancement of art we already own, or a new design?** Enhancement is
+   permitted; new external design is not, and symbols are never externally designed.
+2. **Does the silhouette match?** Measure the subject bounding box against the asset it
+   replaces. A changed silhouette is a redesign wearing an enhancement's clothes, and it
+   breaks layout: overlay effects are positioned by percentage within their layer.
+3. **Does it preserve the alpha channel and every effect anchor?** The car's own green
+   nose booster glow is 0.08% of its opaque pixels; a naive green-screen key would have
+   punched holes in it. Check before converting, not after.
+4. **Record the provenance** in the tracker row and the commit.
+
+The SVG masters remain the source for anything generated fresh, and remain committed. An
+enhanced raster that supersedes its master is recorded as such rather than silently
+diverging from it.
 
 ## Theme selector
 
