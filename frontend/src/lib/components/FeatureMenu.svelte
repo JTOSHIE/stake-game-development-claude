@@ -16,6 +16,7 @@
   // Because everything renders from FS_MODES, flipping a mode live later is a
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
+  import { tr } from '../i18n/tr'
   import { FS_MODES, FS_RTP_LABEL, MODE_COST, modeLabel, modeBlurb } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
@@ -156,7 +157,7 @@
       <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
       <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
     </svg>
-    <span class="p-fm-entry-label">FEATURES</span>
+    <span class="p-fm-entry-label">{$tr('hudFeatures')}</span>
     {#if entryActiveLabel}
       <span
         class="p-fm-entry-active"
@@ -229,7 +230,7 @@
       <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
       <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
     </svg>
-    <span class="fm-entry-label">FEATURES</span>
+    <span class="fm-entry-label">{$tr('hudFeatures')}</span>
     {#if entryActiveLabel}
       <span
         class="fm-entry-active"
@@ -258,7 +259,7 @@
 
         <!-- Header -->
         <div class="fm-head">
-          <h2 class="fm-title">FEATURES</h2>
+          <h2 class="fm-title">{$tr('hudFeatures')}</h2>
           <button class="fm-close fs-knob" on:click={close} aria-label="Close" data-testid="feature-menu-close">
             <span class="fs-face">✕</span>
           </button>
@@ -270,7 +271,7 @@
              so the two header lines condense into one). -->
         <div class="fm-betbar fs-plate">
           <div class="fs-face">
-            <span class="fm-spin-cost" data-testid="current-spin-cost">SPIN COST <span class="fs-num">{currentSpinCost}</span></span>
+            <span class="fm-spin-cost" data-testid="current-spin-cost">{$tr('hudSpinCost')} <span class="fs-num">{currentSpinCost}</span></span>
             <span class="fm-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
             <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label="Decrease bet">-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
@@ -284,7 +285,7 @@
              config-driven card markup via a shared snippet-like block below,
              so adding a mode is still a one-line FS_MODES edit. -->
         <div class="fm-cards" data-testid="feature-menu-cards">
-          <div class="fm-section-label">SPIN MODES</div>
+          <div class="fm-section-label">{$tr('hudSpinModes')}</div>
 
           <!-- ITERATION 3, item 6: Normal + Cruise as one paired switch, not
                two stacked cards - same per-mode markup/testids as the plain
@@ -305,14 +306,14 @@
                     <div class="fm-action">
                       <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
                       {#if active}
-                        <span class="fm-active-tag" data-testid="standing-active-{m.id}">ACTIVE</span>
+                        <span class="fm-active-tag" data-testid="standing-active-{m.id}">{$tr('hudActive')}</span>
                       {:else}
                         <button
                           class="fm-select"
                           on:click={() => selectStanding(m)}
                           disabled={$isSpinning}
                           data-testid="standing-select-{m.id}"
-                        >SELECT</button>
+                        >{$tr('hudSelect')}</button>
                       {/if}
                     </div>
                   </div>
@@ -342,7 +343,7 @@
                     {/if}
                     <span class="fm-name">{modeLabel(m, $isSocial)}</span>
                     {#if !m.available}
-                      <span class="fm-soon">COMING SOON</span>
+                      <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
                       <span class="fm-vol">{m.volatility}</span>
                     {/if}
@@ -361,17 +362,17 @@
                   <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
 
                   {#if !m.available}
-                    <span class="fm-tag" aria-hidden="true">SOON</span>
+                    <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>
                   {:else if m.kind === 'standing'}
                     {#if active}
-                      <span class="fm-active-tag" data-testid="standing-active-{m.id}">ACTIVE</span>
+                      <span class="fm-active-tag" data-testid="standing-active-{m.id}">{$tr('hudActive')}</span>
                     {:else}
                       <button
                         class="fm-select"
                         on:click={() => selectStanding(m)}
                         disabled={$isSpinning}
                         data-testid="standing-select-{m.id}"
-                      >SELECT</button>
+                      >{$tr('hudSelect')}</button>
                     {/if}
                   {:else}
                     <button
@@ -402,7 +403,7 @@
                   <div class="fm-name-row">
                     <span class="fm-name">{modeLabel(m, $isSocial)}</span>
                     {#if !m.available}
-                      <span class="fm-soon">COMING SOON</span>
+                      <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
                       <span class="fm-vol">{m.volatility}</span>
                     {/if}
@@ -414,14 +415,14 @@
                   <span class="fm-cost fs-num">{m.cost}× · {price(m.cost)}</span>
 
                   {#if !m.available}
-                    <span class="fm-tag" aria-hidden="true">SOON</span>
+                    <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>
                   {:else}
                     <button
                       class="fm-activate"
                       on:click={() => activateBuy(m)}
                       disabled={$isSpinning || $balance < $betAmount * m.cost}
                       data-testid="activate-{m.id}"
-                    >ACTIVATE</button>
+                    >{$tr('hudActivate')}</button>
                   {/if}
                 </div>
               </div>

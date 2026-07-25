@@ -16,6 +16,7 @@
   // TOTAL WIN (no multiplier field - the tachometer is a landscape-only
   // centrepiece per the brief).
   import { onMount } from 'svelte'
+  import { tr } from '../i18n/tr'
   import { betAmount, currencyCode } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
   import { HUD_LABEL_FREE_SPINS, HUD_LABEL_TOTAL_WIN } from '../config/fsModes'
@@ -101,7 +102,7 @@
     </div>
 
     <div class="plate">
-      <span class="plate-label">MULTIPLIER</span>
+      <span class="plate-label">{$tr('hudMultiplier')}</span>
       <span class="plate-value">{multiplier}×</span>
     </div>
   </div>
