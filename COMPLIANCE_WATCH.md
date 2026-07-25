@@ -444,6 +444,29 @@ watching: our compliance rule is already that no Stake branding appears in any s
 asset or string, so a platform-side rebrand does not create work for us, and that is worth
 knowing in advance rather than discovering it.
 
+### 7. Payments page. MIRRORED 2026-07-25, no build work owed.
+
+Captured at `docs/stake-engine-live/2026-07-25/payments.md`. Commercial terms only: two
+models, 10% of actual GGR with an indefinite carry-forward debt, or 7.5% of expected GGR
+with no debt and no upside from variance. Quoted: **"GGR = Total Bets − Total Wins Paid to
+Players"**, and **"You never pay Stake money out of pocket."** It places no obligation on
+the code, the maths package or the submission artefacts. Owner decision, recorded rather
+than recommended.
+
+### 8. Stake Dev Tool 2.0 cloud. REJECTED (Fable ruling, 2026-07-25b). Custody rule stands.
+
+The community tool's hosted cloud and share links are a **community-run server**, and the
+standing custody rule is unchanged: **our frozen tables and books do not leave our custody
+for any third party pre-release.** Every empirical question the cloud would answer is
+answered identically by the OFFICIAL on-platform Developer Testing Tool during staging,
+where uploading to Stake's own infrastructure is the entire point of the exercise.
+
+**Self-hosting remains the only permitted mode** for the community tool, since a
+`docker compose up` on our own machine never transfers custody.
+
+This applies to all three open empirical questions: TR-012c SC placement, TR-035b
+open-round semantics, and the CVaR definition. None of them is a reason to move the books.
+
 **LESSON FOR THE REGISTER (Fable ruling, 2026-07-25).** Backups of pre-release game
 internals are **private by default, verified at creation, not after**. The Drive folder
 was not an intentional publication and was closed the same day it was raised, but it was

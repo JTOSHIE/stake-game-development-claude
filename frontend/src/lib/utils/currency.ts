@@ -58,6 +58,28 @@ const ZERO_DECIMAL = new Set<string>(['JPY', 'IDR', 'KRW', 'VND', 'CLP'])
  */
 export const VIRTUAL_SYMBOL_TRAILING = true
 
+/**
+ * Currency display metadata as the platform supplies it.
+ *
+ * Fable ruling on TR-012c (2026-07-25b) dissolved the leading-vs-trailing
+ * dispute rather than picking a side: the Stake EU announcement's own words are
+ * the instruction, "Your game should use the provided display information
+ * rather than showing the raw currency code to players." So placement is not a
+ * constant we choose, it is a value the session hands us.
+ *
+ * The field names follow the documented currency reference exactly
+ * (`symbol`, `symbolAfter`, `decimals`) rather than a shape of our own
+ * invention. `symbolAfter: true` means trailing, "1,000.00 SC".
+ *
+ * Every field is optional and each falls back independently, so a partial
+ * payload degrades field by field instead of being discarded whole.
+ */
+export interface CurrencyDisplay {
+  symbol?: string
+  symbolAfter?: boolean
+  decimals?: number
+}
+
 interface VirtualCurrency {
   /** Player-facing symbol. The raw code is NEVER shown to players. */
   symbol: string
@@ -151,9 +173,26 @@ export function formatBalance(
   micros: number,
   currencyCode: string,
   localeTag?: string,
+  display?: CurrencyDisplay | null,
 ): string {
   const amount = micros / CURRENCY_SCALE
   const code = (currencyCode || '').toUpperCase()
+
+  // Platform-provided display information wins over anything we hold locally,
+  // for ANY code including fiat. This is the TR-012c resolution: we render what
+  // the session tells us to render. Absent metadata, every field falls back to
+  // the behaviour below, which is unchanged.
+  if (display && (display.symbol || display.symbolAfter !== undefined || display.decimals !== undefined)) {
+    const local = VIRTUAL_CURRENCIES[code]
+    const symbol = display.symbol ?? local?.symbol ?? currencySymbolFor(code, localeTag)
+    const decimals = display.decimals ?? local?.decimals ?? (ZERO_DECIMAL.has(code) ? 0 : 2)
+    const trailing = display.symbolAfter ?? (local ? VIRTUAL_SYMBOL_TRAILING : false)
+    const formatted = amount.toLocaleString(localeTag, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })
+    return trailing ? `${formatted} ${symbol}` : `${symbol} ${formatted}`
+  }
 
   // Virtual currencies. Grouped like fiat so large sweepstakes balances stay
   // readable ("SC 1,000.00", not "SC 1000.00"), and the code is never rendered.

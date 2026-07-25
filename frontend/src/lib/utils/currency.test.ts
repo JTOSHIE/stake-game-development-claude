@@ -20,6 +20,7 @@ import {
   formatBalance,
   currencySymbolFor,
   isVirtualCurrency,
+  type CurrencyDisplay,
 } from './currency.ts'
 
 let pass = 0
@@ -99,6 +100,32 @@ eq('XEC formats identically to XSC at zero', formatBalance(0, 'XEC'), formatBala
 eq('XEC formats identically to XSC on a fractional amount', formatBalance(1_234_560, 'XEC'), formatBalance(1_234_560, 'XSC'))
 eq('XEC is case-insensitive on the code', currencySymbolFor('xec'), 'SC')
 eq('the raw code XEC never appears in a formatted balance', formatBalance(1_000_000_000, 'XEC').includes('XEC'), false)
+
+// ── TR-012c: placement comes from the payload, not from us ──────────────────
+// Fable dissolved the leading-vs-trailing dispute by taking the announcement's
+// own instruction literally: "use the provided display information". These
+// assert BOTH placements render correctly from fixture payloads, which is the
+// point - the game must be correct whichever the platform sends, so neither
+// side of the original argument needs to have been right.
+
+const LEADING: CurrencyDisplay  = { symbol: 'SC', symbolAfter: false, decimals: 2 }
+const TRAILING: CurrencyDisplay = { symbol: 'SC', symbolAfter: true,  decimals: 2 }
+
+eq('payload leading renders "SC 1,000.00"',  formatBalance(1000 * S, 'XEC', 'en', LEADING),  'SC 1,000.00')
+eq('payload trailing renders "1,000.00 SC"', formatBalance(1000 * S, 'XEC', 'en', TRAILING), '1,000.00 SC')
+eq('the same payload governs XSC identically', formatBalance(1000 * S, 'XSC', 'en', LEADING), 'SC 1,000.00')
+eq('placement is honoured for fiat too', formatBalance(1000 * S, 'USD', 'en', { symbol: '$', symbolAfter: true, decimals: 2 }), '1,000.00 $')
+
+// Partial payloads degrade field by field rather than being discarded whole.
+eq('symbol alone, placement falls back to trailing', formatBalance(1000 * S, 'XEC', 'en', { symbol: 'SC' }), '1,000.00 SC')
+eq('decimals alone are honoured', formatBalance(1000 * S, 'XEC', 'en', { decimals: 0 }), '1,000 SC')
+eq('symbolAfter false alone flips placement', formatBalance(1000 * S, 'XEC', 'en', { symbolAfter: false }), 'SC 1,000.00')
+
+// Absent metadata must leave existing behaviour untouched, which is what makes
+// this change safe to ship before the DTT confirms which placement is live.
+eq('no metadata is identical to the old two-arg call', formatBalance(1000 * S, 'XEC', 'en', null), formatBalance(1000 * S, 'XEC', 'en'))
+eq('an empty metadata object changes nothing', formatBalance(1000 * S, 'XEC', 'en', {}), formatBalance(1000 * S, 'XEC', 'en'))
+eq('the raw code still never reaches a player under metadata', formatBalance(1000 * S, 'XEC', 'en', LEADING).includes('XEC'), false)
 
 console.log(`currency static assertions: ${pass} passed, ${failures.length} failed`)
 if (failures.length) {

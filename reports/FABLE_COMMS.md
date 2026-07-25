@@ -9,6 +9,49 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 015 - 2026-07-25 - COMMS-ACK 013 and 014; TR-012c dissolved and implemented; custody rule held
+
+**COMMS-ACK, entries 013 and 014: receipt appended.**
+
+**TR-012c, resolved by dissolving it, and the ruling is the better answer.** Neither side
+of the leading-vs-trailing argument had to be right. `formatBalance` now takes optional
+`CurrencyDisplay` metadata and renders per payload, using the **documented** field names
+(`symbol`, `symbolAfter`, `decimals`) rather than a shape of our own invention. Partial
+payloads degrade field by field. Absent metadata the output is byte-identical to before,
+asserted, which is what makes it safe to ship ahead of the DTT. 10 new assertions, 39 to
+49, covering both placements, fiat as well as virtual, every partial combination, and the
+no-metadata equivalence.
+
+**One gap, named rather than worked around.** Locked `rgsService.authenticate()` builds a
+typed object and **drops any field not in its list**, so a real payload's display metadata
+cannot reach the consumption layer yet. The mechanism is complete and proven; the wiring
+needs either a lock sanction adding the field to that mapping, or confirmation at the DTT
+that the platform sends it inside a field the mapping already carries. I have not guessed
+which, and I have not routed around the lock.
+
+**Custody ruling recorded and applied.** The Stake Dev Tool cloud is rejected; self-host
+remains the only permitted mode. Written into `COMPLIANCE_WATCH.md` in the ruling's own
+terms, including the part that matters most: every empirical question the cloud would
+answer is answered identically by the official on-platform tool during staging, so there
+is never a reason to move the books to a third party to get an answer. My earlier
+suggestion that the cloud would be a convenient DTT environment was wrong on exactly this
+point, and the correction is on the record rather than quietly dropped.
+
+**Payments page mirrored.** `docs/stake-engine-live/2026-07-25/payments.md`, captured
+through headless Chrome because a plain fetch returns only "Loading...". Commercial terms
+only, no build work owed: 10% of actual GGR with an indefinite carry-forward debt, or 7.5%
+of expected GGR with no debt and no variance upside. Recorded as an owner decision without
+a recommendation, since it is commercial rather than compliance. Worth one line though:
+this package knows its own variance precisely, base-mode weighted SD 17.28x and a 1-in-250
+wincap on `super`, so the carry-forward risk under the 10% model is real rather than
+theoretical.
+
+**Continuation run, honest status.** Item 1 is partially delivered: the TR-012c
+implementation and the payments capture are done, the wider dossier and GAME_FACTS refresh
+and the second review pack are not. Items 2 to 6 are not started. Nothing is half-landed.
+
+---
+
 ## 014 - 2026-07-25 - FULL-RUN REPORT (PARTIAL): four branches merged, three not reached, one blocked on a missing input
 
 **Stated plainly at the top: this run is NOT complete.** Four of the eight build branches
