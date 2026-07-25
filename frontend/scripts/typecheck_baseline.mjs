@@ -1,7 +1,21 @@
 // typecheck_baseline.mjs - Fable ruling 11 (2026-07-26), CI gate.
 //
-// svelte-check currently reports a non-zero number of pre-existing errors. They
-// fall into two groups, neither of which is a behavioural defect:
+// BASELINE IS ZERO as of 2026-07-27 (R10). All eleven pre-existing errors were
+// fixed rather than tolerated, and three of them turned out to be one defect
+// each rather than noise:
+//
+//   - RainLayer.svelte carried a literal style tag inside a script COMMENT.
+//     svelte.compile respects comments so the file always built and shipped, but
+//     svelte2tsx (what svelte-check runs) treated it as a real element, considered
+//     the script closed, and misparsed to EOF. That produced 3 errors AND silently
+//     disabled type-checking for the whole component.
+//   - telemetry.ts used `Omit<Union, K>`, which is NOT distributive and collapses
+//     a union to its common properties. Every per-variant field vanished from
+//     track()'s parameter type: 5 errors from one operator.
+//   - The remaining 3 were literal-union widening and one genuinely dead markup
+//     branch left behind by Round 3 item 5.
+//
+// Historical note, kept because it explains why this gate exists at all:
 //
 //   1. (RESOLVED 2026-07-26) tsx-run test files were producing ~22 spurious
 //      errors because the browser app's tsconfig was being applied to scripts
@@ -20,8 +34,9 @@
 // only on REGRESSION: new type errors cannot be introduced, and the existing
 // ones cannot be quietly added to.
 //
-// Lowering BASELINE after a cleanup is expected and welcome. Raising it requires
-// a deliberate edit and a reason in the commit message.
+// The baseline is now zero and MUST STAY THERE. Raising it requires a deliberate
+// edit and a reason in the commit message, and should be treated as a red flag
+// rather than routine maintenance.
 //
 // Known limitation, stated rather than hidden: this compares counts, not
 // identities. Removing one error and adding a different one nets to zero and
@@ -32,7 +47,7 @@
 
 import { execSync } from 'node:child_process'
 
-const BASELINE_ERRORS = 11
+const BASELINE_ERRORS = 0
 const BASELINE_WARNINGS = 36
 
 let out = ''

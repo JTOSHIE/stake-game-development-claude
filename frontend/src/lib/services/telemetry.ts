@@ -64,8 +64,23 @@ export function configureTelemetry(fn: () => Omit<TelemetryBase, 'ts'>): void {
   base = fn
 }
 
+/**
+ * Distributive Omit.
+ *
+ * R10, 2026-07-27. `Omit<Union, K>` is NOT distributive: it collapses the union
+ * to the properties COMMON to every member, so every per-variant field
+ * (`costMicros`, `tier`, `winMicros`, `multiple`, `scatters`, ...) vanished from
+ * `track()`'s parameter type. Callers passing perfectly valid payloads were told
+ * the field "does not exist", which is five of the eleven baseline type errors
+ * from one operator.
+ *
+ * `T extends unknown ? ... : never` forces distribution over each union member,
+ * so each variant keeps its own fields.
+ */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+
 /** Emit an event. No-op when no sink is registered. Never throws into the caller. */
-export function track(ev: Omit<TelemetryEvent, keyof TelemetryBase> & Partial<TelemetryBase>): void {
+export function track(ev: DistributiveOmit<TelemetryEvent, keyof TelemetryBase> & Partial<TelemetryBase>): void {
   if (!sink) return
   try {
     const env = base()

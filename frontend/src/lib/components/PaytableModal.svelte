@@ -305,11 +305,14 @@
             {#each INTERFACE_GUIDE as g}
               <div class="fs-guide-row">
                 <div class="fs-guide-icon">
-                  {#if g.kind === 'img'}
-                    <img src="{$themeAssets.assetBase}/ui/{g.file}" alt={g.name} class="fs-guide-img" />
-                  {:else}
-                    <span class="fs-guide-pill">{g.label}</span>
-                  {/if}
+                  <!-- R10, 2026-07-27: the former {:else} branch rendered a
+                       `kind: 'pill'` text token via `g.label`. OWNER AUDIT ROUND 3
+                       item 5 converted Turbo and Max to real captures, so ALL
+                       eight INTERFACE_GUIDE entries are `kind: 'img'` and the
+                       branch became unreachable. It survived as dead markup
+                       referencing a `label` field no entry has, which is what the
+                       type error was reporting. Removed rather than silenced. -->
+                  <img src="{$themeAssets.assetBase}/ui/{g.file}" alt={g.name} class="fs-guide-img" />
                 </div>
                 <div class="fs-guide-text">
                   <span class="fs-guide-name">{g.name}</span>

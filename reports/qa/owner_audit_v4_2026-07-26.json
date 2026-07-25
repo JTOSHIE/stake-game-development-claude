@@ -1,29 +1,29 @@
 {
   "item1_entryGate": {
     "desktop-landscape": {
-      "w": 233,
-      "h": 82,
+      "w": 241,
+      "h": 85,
       "inViewport": true,
       "visible": true,
       "text": "CLICK TO CONTINUE"
     },
     "iphone14-portrait": {
-      "w": 167,
+      "w": 168,
       "h": 59,
       "inViewport": true,
       "visible": true,
       "text": "CLICK TO CONTINUE"
     },
     "pixel7-portrait": {
-      "w": 183,
-      "h": 64,
+      "w": 179,
+      "h": 63,
       "inViewport": true,
       "visible": true,
       "text": "CLICK TO CONTINUE"
     },
     "compact-landscape": {
-      "w": 98,
-      "h": 34,
+      "w": 100,
+      "h": 35,
       "inViewport": true,
       "visible": true,
       "text": "CLICK TO CONTINUE"
