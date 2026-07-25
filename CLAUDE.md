@@ -213,3 +213,70 @@ or `git add .` - review `git status` after any broad staging step and stage each
 path by name. This has been followed as informal discipline throughout; recorded here as a
 standing convention (2026-07-08 hygiene pass) so it does not need re-establishing per
 session.
+
+**(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
+by the owner after a real failure (worked example below).**
+
+This project is surrounded by compliance, facts, figures and mathematics. There is no
+interpretation and no imagination in it. An answer is either exactly correct or it is
+not one. The following is not advice, it is the procedure.
+
+**(l.1) Derive from the specification first.** For any question about game behaviour,
+a limit, or a number, go to the specification before touching data:
+`games/future_spinner/game_config.py`, the PAR sheet, `frontend/src/lib/config/fsModes.ts`,
+`docs/stake-engine-live/`. State the closed-form answer and cite the exact `file:line`
+it came from. Most questions here are finite and exactly calculable. Calculate them.
+
+**(l.2) Measurement confirms, it never discovers.** Empirical work exists to CONFIRM a
+derived answer. If you are measuring in order to find out what the answer is, stop: it
+means the specification has not been found yet, and it exists. A measurement that
+disagrees with the specification is a broken measurement until proven otherwise. The
+specification is the authority.
+
+**(l.3) Every number carries its source.** No figure enters a report, a commit message,
+a tracker row or a chat reply without a citation the owner could check. If it cannot be
+cited, it is not known, and the honest output is "not known".
+
+**(l.4) Corroboration requires INDEPENDENT inputs.** Two methods agreeing means nothing
+if they share an input, because they also share its flaw. Before treating agreement as
+confirmation, state explicitly what each side relies on. This is the same rule as the
+self-verifying-recentre lesson and as protocol 6's two-computer reconciliation.
+
+**(l.5) Self-audit BEFORE reporting, not after.** Before anything is written up:
+re-derive the claim from the specification; check it against the measurement; confirm
+the locked paths were respected; confirm the stake-engine requirement was followed as
+written rather than as remembered. Only then report.
+
+**(l.6) Unsolved beats wrongly solved.** Where certainty is not reachable, PARK the item
+with its options and their trade-offs and move on. Never fill a gap with a
+plausible-sounding answer. An open question handed to the owner is a good outcome; a
+confident error is not.
+
+**(l.7) Compliance text is quoted, never paraphrased.** Limits, prohibited terms, RTP
+bands and disclosure wording are quoted verbatim from the live docs or the dated mirror,
+with the date. Never restated from memory, never inferred.
+
+**(l.8) Maths-adjacent findings escalate.** Anything touching the maths package, player
+money display, or a submission claim goes to the owner and Fable as a question with
+evidence attached. The builder does not rule on it.
+
+**WORKED EXAMPLE, the failure that produced this convention (2026-07-27).** Asked to
+document a "6-plus scatter rule", the builder decompressed all 100,000 rounds of
+`books_base.jsonl.zst`, counted scatter cells per board, and reported that 352 rounds
+reached 6 scatters and 12 reached 7. A disclosure string was written into all 16 locales
+on that basis.
+
+It was wrong. The `reveal` event emits a **six-row board per reel**: the visible 5x4 grid
+plus one padding row above and below, carried for the spin animation and never shown to a
+player. The count included padding. Re-measured on the visible window only: **maximum 5,
+zero rounds at 6 or 7.**
+
+Two things made it worse, and both are covered above:
+- The exact answer was available in **one line of specification**, `num_reels = 5`, with
+  no measurement at all. That is (l.1) and (l.2).
+- Switching from name-matching to the engine's own `scatter: true` flag produced
+  IDENTICAL counts, which read as independent corroboration. It was not: both read the
+  same padded array, and the flag is set on padding cells too. That is (l.4).
+
+The owner caught it by asking the obvious question the builder had skipped: how many
+reels are in play, how many tiles are in play. There is the answer.

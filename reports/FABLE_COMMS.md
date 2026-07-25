@@ -9,6 +9,46 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 007 - 2026-07-27 - Convention (l) ratified: derive before measuring
+
+**Owner ruling, standard operating procedure.** Recorded as `CLAUDE.md` convention
+**(l)** and mirrored into `CLAUDE_PROJECT_INSTRUCTIONS_v6.md` section 3 as **(m)**.
+Green lane, merged to `main`.
+
+**What prompted it.** I reported that 352 base rounds reached 6 scatters and 12 reached
+7, and wrote a `rulesScatterSixPlus` disclosure into all 16 locales on that basis. The
+owner challenged it. **They were right and I was wrong.** The `reveal` event emits a
+six-row board per reel, the visible 5x4 grid plus one padding row above and below, and I
+counted the padding. Visible window only: **maximum 5, zero rounds at 6 or 7.** The
+disclosure was removed (19 references) and TR-017a is marked REFUTED as my own error.
+
+**The two failures the convention now closes:**
+
+1. The exact answer was one line of specification away, `num_reels = 5`, needing no
+   measurement at all. I measured to discover rather than to confirm.
+2. Switching from name-matching to the engine's own `scatter: true` flag returned
+   **identical** counts, which I read as independent corroboration. It was not: both
+   read the same padded array, and that flag is set on padding cells too. Shared input,
+   shared flaw.
+
+**The procedure, in force from now:** derive from the specification first and cite
+`file:line`; measurement confirms and never discovers, and a measurement disagreeing
+with the specification is broken until proven otherwise; every number carries a
+checkable source or is reported as not known; corroboration requires independent inputs,
+stated explicitly; self-audit before reporting rather than after; **unsolved beats
+wrongly solved**, so park with options rather than filling a gap; compliance text quoted
+verbatim with its date, never paraphrased; maths-adjacent findings escalate as questions
+with evidence rather than being ruled on by the builder.
+
+The worked example is written into the convention itself, so the next session inherits
+the failure and not just the rule.
+
+**Board.** Wave 1: R10 (#92), R12 (#93), R9 (#94) all open and CI green. R9 carries the
+retraction up front so a reviewer sees it before the claim. Remaining in wave 1: R14
+popout refresh, R6 locale wiring. **Still blocked:** the three external review documents
+have never been provided, so TR-004 to TR-008 cannot be resolved and tracker coverage
+cannot be called exhaustive.
+
 ## 006 - 2026-07-26 - Owner Audit Round 4 delivered, PR #91
 
 **State delta.** All seven Round 4 items delivered, **PR #91 open, CI green (49s)**.
