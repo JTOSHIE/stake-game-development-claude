@@ -107,12 +107,19 @@ async function measureSeamRmsDeltaDb(page, url) {
   }, { url, windowMs: SEAM_RMS_WINDOW_MS })
 }
 
-async function runSeamChecks(page, baseUrl) {
+// `origin` must be the bare scheme+host+port. It used to receive `baseUrl`,
+// which carries `?mockCategory=...`, so every asset URL came out as
+// `http://host:port?mockCategory=base_win_small/assets/.../bgm_loop.webm`:
+// the path landed AFTER the query string, the dev server answered with
+// index.html, and decodeAudioData reported "Unable to decode audio data" for
+// all six rows in both formats. That was read as a loop-seam defect for two
+// weeks; the audio was never fetched at all. (2026-07-25)
+async function runSeamChecks(page, origin) {
   const results = {}
   for (const name of SEAM_ROWS) {
     results[name] = {}
     for (const ext of ['webm', 'mp3']) {
-      const url = `${baseUrl}/assets/themes/future-spinner/sounds/${name}.${ext}`
+      const url = `${origin}/assets/themes/future-spinner/sounds/${name}.${ext}`
       results[name][ext] = await measureSeamRmsDeltaDb(page, url)
     }
   }
@@ -126,7 +133,8 @@ async function run() {
   // feature): pins this "real spin" so win-sound coverage doesn't depend on
   // random luck landing a payline win, and so it never risks a natural
   // trigger racing the deliberate bonus-buy step later in this script.
-  const baseUrl = `http://localhost:${port}?mockCategory=base_win_small`
+  const origin = `http://localhost:${port}`
+  const baseUrl = `${origin}?mockCategory=base_win_small`
 
   const soundRequests = []
   const soundFailures = []
@@ -194,35 +202,64 @@ async function run() {
     const wonASoundThisSpin = playedAfterSpin.some((s) => /win_(small|medium|big|epic)\.(mp3|webm)$/.test(s))
 
     // Bonus buy - exercises the bed-swap crossfade (bgm_loop -> bgm_tension).
+    //
+    // 2026-07-25, ROOT CAUSE of the bedSwap/bedRevert failures recorded since
+    // 2026-07-13. It was never the crossfade. Instrumenting setOverdriveBed
+    // (soundService.ts, __bedSwapTrace) proved the product path fires exactly
+    // as designed. TWO defects, both in this harness:
+    //
+    //   1. `mockCategory` is GLOBAL, not per-spin. baseUrl pins
+    //      `?mockCategory=base_win_small` and App.svelte re-reads
+    //      window.location.search on EVERY mock round, the buy included. So the
+    //      buy called serveCategory('bonus', 'base_win_small'), which searches
+    //      the BONUS sample pool, found no such category, and returned null.
+    //      lastRoundEvents stayed null, no script was built, no feature was
+    //      presented, and the bed therefore had nothing to swap for. The
+    //      pinning was added to stop a natural trigger racing the buy; it also
+    //      disabled the buy. Repointed below via history.replaceState so no
+    //      reload occurs and the trace and played-sound log both survive.
+    //
+    //   2. The assert sniffed __playedSounds for bgm_tension. That log is a
+    //      record of every .play() call, and the one-off preload/unlock burst
+    //      plays every clip in the manifest, bgm_tension included. Whether that
+    //      burst lands before or after the reset depends on when the first user
+    //      gesture unlocks audio, so the old assert could read a preload as a
+    //      crossfade. The counters are unambiguous, so they are the assert now
+    //      (Fable ruling 23: keep the instrumentation as the assert).
+    await page.evaluate(() => { history.replaceState(null, '', '?mockCategory=bonus_win_mid') })
     await page.evaluate(() => { window.__playedSounds = [] })
-    await page.locator('[data-testid="feature-menu-button"]').click()
-    await page.waitForTimeout(120)
+    const traceBeforeBuy = await page.evaluate(() => window.__bedSwapTrace)
+    await page.locator('[data-testid="feature-menu-button"]').first().click()
+    await page.waitForSelector('[data-testid="feature-menu-cards"]', { timeout: 10000 })
     await page.locator('[data-testid="activate-bonus"]').click()
+    // activate dispatches straight to BuyBonus's confirm modal; it is not in the
+    // DOM until then, so this wait is required rather than cosmetic.
+    await page.waitForSelector('[data-testid="buy-confirm"]', { timeout: 10000 })
     await page.locator('[data-testid="buy-confirm"]').click()
     await waitSpinDone(page)
     // R12, 2026-07-27: the bed swap fires when the free-spins presentation
     // actually STARTS, which is gated behind CLICK TO CONTINUE. waitSpinDone()
     // returns as soon as `.spinning` clears, which can be BEFORE that gate has
-    // rendered, so nothing ever clicked it and the crossfade never ran. The
-    // check had been recorded as a failing audio finding since 2026-07-13; it
-    // was a harness click-path gap, not a missing crossfade. This is the same
-    // class Round 3 fixed across twenty-two scripts.
+    // rendered, so nothing ever clicked it and the crossfade never ran.
     for (let i = 0; i < 40; i++) {
       if (await clickAnyPendingGate(page)) break
       await page.waitForTimeout(150)
     }
     await page.waitForTimeout(1500)
+    const traceAfterBuy = await page.evaluate(() => window.__bedSwapTrace)
     const playedAfterBuy = await page.evaluate(() => window.__playedSounds)
-    const bedSwapFired = playedAfterBuy.some((s) => /bgm_tension\.(mp3|webm)$/.test(s))
+    const bedSwapFired = traceAfterBuy.crossfadeToTension > traceBeforeBuy.crossfadeToTension
 
-    // Let the free-spins presentation run its course so we exit Overdrive too
-    // (bed should crossfade back to bgm_loop) - best-effort, not asserted hard
-    // since presentation length varies with the awarded spin count.
-    await page.waitForTimeout(4000)
+    // Let the free-spins presentation run to completion so the bed crossfades
+    // back to bgm_loop. A bought bonus awards 8-16 spins, so a fixed timeout is
+    // not enough; drain it properly.
+    await waitFeatureDrained(page)
+    await page.waitForTimeout(500)
+    const traceAfterFeature = await page.evaluate(() => window.__bedSwapTrace)
     const playedAfterFeature = await page.evaluate(() => window.__playedSounds)
-    const bedReverted = playedAfterFeature.filter((s) => /bgm_loop\.(mp3|webm)$/.test(s)).length > 0
+    const bedReverted = traceAfterFeature.crossfadeToBase > traceBeforeBuy.crossfadeToBase
 
-    const seamResults = await runSeamChecks(page, baseUrl)
+    const seamResults = await runSeamChecks(page, origin)
     const seamFailures = []
     for (const [name, byExt] of Object.entries(seamResults)) {
       for (const [ext, r] of Object.entries(byExt)) {
@@ -240,6 +277,9 @@ async function run() {
       spinSoundFired: playedAfterSpin.some((s) => /\/spin\.(mp3|webm)$/.test(s)),
       reelStopSoundFired: playedAfterSpin.some((s) => /reel_stop(_anticipation)?\.(mp3|webm)$/.test(s)),
       winSoundFiredOnRealSpin: wonASoundThisSpin,
+      // Raw counters recorded so a reviewer can see the crossfade evidence
+      // itself rather than only this script's verdict on it.
+      bedSwapTrace: { beforeBuy: traceBeforeBuy, afterBuy: traceAfterBuy, afterFeature: traceAfterFeature },
       bedSwapFiredOnBonusBuy: bedSwapFired,
       bedRevertedAfterFeature: bedReverted,
       zeroSoundRequestFailures: soundFailures.length === 0,
