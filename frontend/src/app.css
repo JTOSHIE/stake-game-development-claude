@@ -1,3 +1,21 @@
+/* JOB 3(c), guideline item 25: "Double tap to zoom is disabled on mobile".
+ *
+ * touch-action: manipulation, NOT a viewport meta tag. The obvious fix is
+ * `user-scalable=no, maximum-scale=1` in index.html, and it is the wrong one:
+ * iOS Safari has ignored those directives since version 10 for accessibility
+ * reasons, so the gate would read green while a player could still double-tap
+ * the reels and zoom the board. That is the failure mode this project has now
+ * named repeatedly, a check that passes while the behaviour persists.
+ *
+ * `manipulation` disables the double-tap-to-zoom delay while leaving panning
+ * and PINCH zoom intact, so a player who needs to magnify the paytable still
+ * can. Suppressing pinch as well would be an accessibility regression the
+ * guideline does not ask for.
+ */
+html, body {
+  touch-action: manipulation;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
