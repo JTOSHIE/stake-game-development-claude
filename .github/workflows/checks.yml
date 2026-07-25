@@ -149,7 +149,15 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/modalGuard.test.ts
 
-      # ── Gate 11: currency display contract ───────────────────────────────────
+      # ── Gate 11: live event schema alignment ─────────────────────────────────
+      # The locked parser looked for board/win/scatter events. Across the first
+      # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs
+      # 724 times. Asserted against real decoded book rows. (R1a/TR-009)
+      - name: rgs parse alignment
+        working-directory: frontend
+        run: npx tsx src/lib/services/rgsService.parse.test.ts
+
+      # ── Gate 12: currency display contract ───────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.

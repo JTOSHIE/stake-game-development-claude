@@ -23,10 +23,19 @@ import { rgsBetLevels } from '../stores/rgsBetLevels'
 import { selectedBetMode } from '../stores/betMode'
 import { jurisdictionFlags } from '../stores/jurisdiction'
 import { lastRoundEvents } from '../stores/roundEvents'
+// Canonical reader of the reveal/winInfo schema. See _parsePlayResponse.
+import { interpretEvents, type RawEvent } from './roundInterpreter'
 
 // ── Currency ──────────────────────────────────────────────────────────────────
-/** 1 dollar = 1,000,000 micros. Use ONLY integer arithmetic for money. */
-export const CURRENCY_SCALE = 1_000_000
+// R1a scope (d), 2026-07-25. This file previously declared its own
+// `CURRENCY_SCALE = 1_000_000`, a second copy of a money-path constant whose
+// canonical home is utils/currency.ts. The copies always agreed, and
+// scripts/currency_scale_drift.test.mjs held them to that, but a gate that
+// watches a duplicate is a worse outcome than not having the duplicate. The
+// value is now imported. It is still re-exported so this module's public
+// surface is unchanged for any consumer that reads it from here.
+export { CURRENCY_SCALE } from '../utils/currency'
+import { CURRENCY_SCALE } from '../utils/currency'
 
 function microsToDisplay(micros: number): number {
   return micros / CURRENCY_SCALE
@@ -380,10 +389,23 @@ export async function endRound(
 ): Promise<EndRoundResponse> {
   _devLog('endRound →', { sessionID: params.sessionID, roundId })
 
-  const raw = await _post<RawEndRoundResponse>(`${params.rgs_url}/wallet/end-round`, {
-    sessionID: params.sessionID,
-    roundId,
-  })
+  // R1a scope (b), 2026-07-25, closing the R11 gap inside this file.
+  // `play` has always been wrapped; `endRound` called `_post` directly, so a
+  // single transient network failure on the CREDIT leg left the round open: the
+  // wallet had taken the bet and the player had not been paid, with no retry.
+  // That is the worst leg to leave unprotected.
+  //
+  // Retrying is safe here because end-round is IDEMPOTENT ON THE ROUND ID: the
+  // request carries `roundId`, the RGS settles that round once, and a repeat
+  // for an already-settled round returns the same settled balance rather than
+  // crediting twice. `_withRetry` only repeats errors it has classified as
+  // retryable, so a genuine rejection still surfaces on the first attempt.
+  const raw = await _withRetry('endRound', () =>
+    _post<RawEndRoundResponse>(`${params.rgs_url}/wallet/end-round`, {
+      sessionID: params.sessionID,
+      roundId,
+    }),
+  )
 
   const resp: EndRoundResponse = {
     balance: microsToDisplay(raw.balance),
@@ -486,45 +508,62 @@ async function _rgsSpinReal(req: SpinRequest): Promise<SpinResult> {
 
 // ── Event parser: PlayResponse → SpinResult ───────────────────────────────────
 //
-// Expected event types emitted by the Stake Engine for Future Spinner:
+// R1a scope (a), 2026-07-25. TR-009, and it was total rather than partial.
 //
-//   { type: 'board',   data: { symbols: string[][] } }
-//   { type: 'win',     data: { symbol, kind, ways, payout } }  (payout in micros)
-//   { type: 'scatter', data: { count, multiplier, award } }    (award  in micros)
+// This parser used to read three event types of its own invention:
 //
-// If the RGS sends a different shape, adjust the type-guards below.
+//   { type: 'board',   data: { symbols } }
+//   { type: 'win',     data: { symbol, kind, ways, payout } }
+//   { type: 'scatter', data: { count, multiplier, award } }
+//
+// The shipped books emit none of them. Measured across the first 300 rounds of
+// `books_base.jsonl.zst`: reveal 724, winInfo 499, setWin 499, setTotalWin 774,
+// and board 0, win 0, scatter 0. Every branch below was therefore dead on a live
+// round, and a live player would have been shown an EMPTY board with no wins and
+// no scatter, because `_emptyBoard()` was returned unchanged.
+//
+// It is not re-implemented here. `roundInterpreter.ts` is the canonical reader of
+// the reveal/winInfo schema, it is already what the Overdrive presentation plays
+// back, and a second implementation of the same schema is precisely the
+// duplication that produced this defect. This function now delegates and maps.
+//
+// PADDING. `reveal` carries a SIX-row board per reel: the visible 5x4 grid plus
+// one padding row above and one below, used by the spin animation and never
+// shown to a player. Verified against the shipped book, not assumed:
+// 5 reels, [6,6,6,6,6] rows. `SpinResult.board` is the VISIBLE grid, 5x4, so the
+// first and last row of each reel are dropped. Counting the padding as real is
+// exactly the error that produced the retracted six-scatter claim (CLAUDE.md
+// convention (l), worked example), so it is stated and measured here rather than
+// inferred.
 
 function _parsePlayResponse(resp: PlayResponse, betDollars: number): SpinResult {
-  let board:        string[][] = _emptyBoard()
-  const winEvents:  WinEvent[] = []
-  let scatterEvent: ScatterEvent | null = null
+  const script = interpretEvents(resp.events as unknown as RawEvent[])
+  const base = script.baseSpin
 
-  for (const ev of resp.events) {
-    if (ev.type === 'board' && Array.isArray(ev.data?.symbols)) {
-      board = ev.data.symbols as string[][]
-      continue
-    }
+  // Cell[][] including padding -> visible string[][]. slice(1, -1) drops exactly
+  // the one padding row at each end.
+  const board: string[][] = base.board.map((reel) =>
+    reel.slice(1, reel.length - 1).map((cell) => cell.name),
+  )
 
-    if (ev.type === 'win') {
-      const d = ev.data
-      winEvents.push({
-        symbol:  String(d.symbol  ?? ''),
-        kind:    Number(d.kind    ?? 0),
-        ways:    Number(d.ways    ?? 1),
-        payout:  microsToDisplay(Number(d.payout ?? 0)),
-      })
-      continue
-    }
+  // Centibets are bet-multiples x100, so a win is (centibets / 100) x the bet.
+  const winEvents: WinEvent[] = base.wins.map((w) => ({
+    symbol: w.symbol,
+    kind:   w.kind,
+    ways:   w.ways,
+    payout: (w.winCentibets / 100) * betDollars,
+  }))
 
-    if (ev.type === 'scatter') {
-      const d = ev.data
-      scatterEvent = {
-        count:      Number(d.count      ?? 0),
-        multiplier: Number(d.multiplier ?? 1),
-        award:      microsToDisplay(Number(d.award ?? 0)),
-      }
-    }
-  }
+  // The instant scatter award is a bet-multiple in centibets at meter 1x, which
+  // is the same quantity the legacy `multiplier` field carried (1x / 3x / 10x).
+  const scatterEvent: ScatterEvent | null =
+    base.scatterCount >= 3
+      ? {
+          count:      base.scatterCount,
+          multiplier: script.instantScatterCentibets / 100,
+          award:      (script.instantScatterCentibets / 100) * betDollars,
+        }
+      : null
 
   return {
     board,
