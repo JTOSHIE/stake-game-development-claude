@@ -119,6 +119,20 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   production code and allowlisted in the dead-wiring gate. Delete it on the next
   sanctioned `gameStore.ts` pass; do not re-import it.
 
+- **`gameStore.ts` carries four em dashes in comments that the 2026-07-26 style purge
+  could not remove.** The purge cleared 175 dashes across 42 files so the source tree
+  matches the CLAUDE.md header, but this file is locked and that session carried no lock
+  exception, so its four remain: line 1, the `isTurbo` doc comment, the `boardSymbols` doc
+  comment, and the trailing comment on `balance.set(authBalance)`. **All four are comments,
+  so none reaches `dist` and the shipped artefact is unaffected**: the dist gate reads zero
+  and the source scan reports them without failing. Purely cosmetic debt. Sweep them on the
+  next sanctioned `gameStore.ts` pass, alongside the four dead stores and the two dead
+  derived stores already listed here; not worth a pass of its own. **A related process note:
+  the purge script walked `src/` in bulk and wrote to this file before it was caught by the
+  commit's own verification and reverted. The `deny` rules guard the Edit and Write tools,
+  not a python loop invoked through Bash. Any future bulk rewrite over a tree containing
+  locked paths must carry an explicit exclusion list up front rather than a check afterwards.**
+
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
   read anywhere in production code, verified including `derived()` and `.subscribe()`
