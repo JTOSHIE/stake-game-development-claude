@@ -141,7 +141,7 @@
     class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
-    aria-label="Features and bet modes"
+    aria-label={$tr('a11yFeatureMenu')}
     aria-haspopup="dialog"
     aria-expanded={open}
     data-testid="feature-menu-button"
@@ -181,7 +181,7 @@
     class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
-    aria-label="Features and bet modes"
+    aria-label={$tr('a11yFeatureMenu')}
     aria-haspopup="dialog"
     aria-expanded={open}
     data-testid="feature-menu-button"
@@ -214,7 +214,7 @@
     class:idle-shimmer={idleAttract}
     on:click={openMenu}
     disabled={$isSpinning}
-    aria-label="Features and bet modes"
+    aria-label={$tr('a11yFeatureMenu')}
     aria-haspopup="dialog"
     aria-expanded={open}
     data-testid="feature-menu-button"
@@ -273,9 +273,9 @@
           <div class="fs-face">
             <span class="fm-spin-cost" data-testid="current-spin-cost">{$tr('hudSpinCost')} <span class="fs-num">{currentSpinCost}</span></span>
             <span class="fm-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
-            <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label="Decrease bet">-</button>
+            <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning} aria-label={$tr('a11yDecreaseBet')}>-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
-            <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label="Increase bet">+</button>
+            <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBet} aria-label={$tr('a11yIncreaseBet')}>+</button>
           </div>
         </div>
 

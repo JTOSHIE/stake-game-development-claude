@@ -9,6 +9,60 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 010 - 2026-07-25 - Wave 2 opened: TR-020a closed on evidence, one currency question needs a ruling
+
+**Ruling 23 executed, and the answer was the opposite of the theory.** Instrumenting
+`setOverdriveBed()` refuted the early-return hypothesis outright: on a real bought
+feature the counters read `crossfadeToTension` 0 to 1 and `crossfadeToBase` 0 to 1,
+`earlyReturnMuted` 0, and `bgm_tension` genuinely plays. The crossfade was correct the
+whole time. All three red checks were harness faults, two of them the same mistake: a
+`?mockCategory` pinned for the real spin also governed the buy (so the buy served a base
+round and there was no feature to swap for), and the seam check appended asset paths
+after the query string, so it decoded `index.html` rather than audio for a fortnight.
+`AUDIO VERIFY: ALL CHECKS PASS`, 8 of 8, three consecutive runs. PR #98.
+
+Two of my own hypotheses, a click race and an affordability edge, were wrong, and one
+had already reached a code comment as the root cause. The instrumentation is what
+caught it before commit. That is convention (l) doing its job.
+
+**R4 delivered bar one part.** A finding worth naming: 14 hardcoded `aria-label`s carried
+the restricted phrase "bet". No existing check could see them, because the visible-text
+sweep reads rendered DOM text and screen-reader text is not rendered DOM text. In
+practice a blind player in a social jurisdiction heard the exact vocabulary a sighted
+player was protected from. Fixed at the source (three translated keys x 16 locales plus
+SOCIAL_OVERRIDES), proven at runtime, and held by a new CI gate. Also fixed: replay
+derived social mode from the `social` flag alone, so `currency=XSC` with no flag rendered
+real-money vocabulary beside an SC balance.
+
+**DECISION REQUEST, one numbered item.**
+
+1. **XEC. Implement on review 1's word, or hold?** Review 1 marks XEC absent as a FAIL and
+   asserts current jurisdiction requirements treat XGC, XSC and XEC as social currencies.
+   It cites no first-party source. Three first-party sources have none: the live `/docs`
+   routes, `/docs/reference/currencies` (XGC and XSC only), and the official
+   StakeEngine/ts-client SDK `Currency` union. Our own scrape of the
+   jurisdiction-requirements page found the prohibited-terms table and social mode only,
+   no currency codes at all. The standing recommendation, quoted, is "do not record XEC as
+   a supported code anywhere in the register until a first-party source is produced".
+   Implementing it means inventing a symbol mapping, which convention (l) forbids, so I
+   have parked it as TR-012b rather than guessing.
+   **Options:** (a) hold until a first-party source appears, current position;
+   (b) resolve empirically by toggling currencies in the Developer Testing Tool at
+   staging, already recorded as comms map item 6; (c) implement XEC to SC defensively,
+   cheap, but records an unverified code as fact. **Recommend (b), then (a) meanwhile.**
+
+**Artefacts.** PR #98; `reports/qa/audio_verify_2026-07-13.json` (green, 8 of 8);
+`reports/qa/a11y_social_proof_2026-07-25.json`; `frontend/scripts/a11y_social_terms_check.mjs`;
+tracker rows TR-020a MERGED, TR-012 MERGED, TR-012a and TR-012b opened.
+
+**Note for the record.** Briefs are dated 2026-07-27 and 2026-07-28; actual commit and run
+dates are 2026-07-25. New comments carry the verifiable run date. Which is authoritative
+is worth one line in the next ruling block.
+
+**Next.** R5 bet levels, R7 RG enforcement, R8 modal affordability, completing wave 2.
+
+---
+
 ## 009 - 2026-07-28 - Rulings executed: books resolved by design, FAIR captured, one lock conflict named
 
 **COMMS-ACK.** Rulings of 2026-07-28 received and executed. Entry 008 closed.
