@@ -140,7 +140,16 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/responsibleGambling.test.ts
 
-      # ── Gate 10: currency display contract ───────────────────────────────────
+      # ── Gate 10: modal safety and per-tier buy affordability ─────────────────
+      # Blocking surfaces register themselves instead of being listed in
+      # App.svelte, which could not see component-local state and so let the
+      # spacebar spin under six of them. Affordability is checked against the
+      # tier's real cost, not a flat 100x. (R8/TR-016)
+      - name: modal guard and buy affordability
+        working-directory: frontend
+        run: npx tsx src/lib/stores/modalGuard.test.ts
+
+      # ── Gate 11: currency display contract ───────────────────────────────────
       # Static subset of the currency conformance harness: no browser, no dev
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.

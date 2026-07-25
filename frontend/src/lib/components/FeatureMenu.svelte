@@ -32,6 +32,8 @@
     increaseBetLevel, decreaseBetLevel, canIncreaseBetLevel, canDecreaseBetLevel,
   } from '../stores/betLadder'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
+  import { canAffordMode, shortfallFor } from '../stores/buyAffordability'
+  import { setModalOpen } from '../stores/modalGuard'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
 
@@ -120,10 +122,15 @@
     standingMode.update((sel) => (sel === m.serverMode ? 'base' : m.serverMode))
   }
 
+  // The FEATURES panel blocks the reels underneath it.
+  $: setModalOpen('feature-menu', open)
+
   function activateBuy(m: FsMode): void {
     // Only live buy modes ever dispatch. Placeholder buys are non-interactive.
     if (!m.available || $isSpinning) return
-    if ($balance < $betAmount * m.cost) return
+    // Same shared affordability truth the confirm dialog uses, so the two
+    // surfaces cannot disagree about whether a tier is affordable.
+    if (!$canAffordMode(m.serverMode)) return
     playClick()
     open = false
     dispatch('buy', m.serverMode)
@@ -427,10 +434,18 @@
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>
                   {:else}
+                    <!-- Owner observation 2026-07-26: NITRO read as "not always
+                         selectable" because an unaffordable tier was simply a dead
+                         control with no reason given. The shortfall is now stated,
+                         using the existing translated insufficient-balance string
+                         so no untranslated copy is introduced. -->
                     <button
                       class="fm-activate"
                       on:click={() => activateBuy(m)}
-                      disabled={$isSpinning || $balance < $betAmount * m.cost}
+                      disabled={$isSpinning || !$canAffordMode(m.serverMode)}
+                      title={$shortfallFor(m.serverMode) > 0
+                        ? `${$tr('insufficientBalance')} (${formatBalance(Math.round($shortfallFor(m.serverMode) * CURRENCY_SCALE), $currencyCode || 'USD')})`
+                        : undefined}
                       data-testid="activate-{m.id}"
                     >{$tr('hudActivate')}</button>
                   {/if}

@@ -28,6 +28,7 @@
     autoplayLimits, rgJurisdiction, showSessionPanel,
     rgAllowedAutoplayCounts, rgClampAutoplayCount, rgInfiniteAutoplayAllowed,
   } from '../stores/responsibleGambling'
+  import { setModalOpen } from '../stores/modalGuard'
   import { standingMode } from '../stores/betMode'
   import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
   import { jurisdictionFlags } from '../stores/jurisdiction'
@@ -98,6 +99,11 @@
   let singleWinLimitOn = false
   let singleWinLimitMult = 10
   let showMenu = false
+
+  // R8/TR-016: both of these are component-local, so App.svelte's spacebar
+  // handler could never name them. Registered instead of listed.
+  $: setModalOpen('auto-menu', showAutoMenu)
+  $: setModalOpen('hud-menu', showMenu)
 
   // ── Bet ladder ───────────────────────────────────────────────────────────
   // R5/TR-013 (2026-07-25): this logic used to live here as a local copy, and

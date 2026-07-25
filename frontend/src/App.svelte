@@ -75,6 +75,7 @@
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay } from './lib/stores/responsibleGambling'
+  import { anyModalOpen } from './lib/stores/modalGuard'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -750,6 +751,13 @@
     const delay = rgSpinDelay(delayMs * factor)
     autoSpinTimer = setTimeout(() => {
       autoSpinTimer = null
+      // R8/TR-016: re-checked at FIRE time, not only at schedule time. A player
+      // can open the buy dialog, the session panel or a reality check during the
+      // pause, and autoplay used to spin straight through it. A reality check in
+      // particular exists to be acknowledged, so spinning underneath it defeats
+      // the control entirely. Re-arm rather than cancel, so autoplay resumes by
+      // itself once the surface is dismissed.
+      if (get(anyModalOpen)) { scheduleAutoSpin(delayMs); return }
       handleSpin()
     }, delay)
   }
@@ -947,6 +955,16 @@
 
     // Let space behave normally (for example scrolling the modal) while a
     // modal or overlay is open.
+    //
+    // R8/TR-016 (2026-07-25): the named list below covers only the surfaces
+    // App.svelte can actually see. Every blocking surface whose open state is
+    // COMPONENT-LOCAL was missing, because a local `let` in another component
+    // cannot be named from here: the buy confirm dialog, the FEATURES menu, the
+    // autoplay menu, the HUD menu, the session panel and the reality check.
+    // Spacebar span the reels underneath all six. `$anyModalOpen` is the shared
+    // registration those surfaces now write to, so a new modal suppresses the
+    // spacebar by announcing itself rather than by being added to this line.
+    if ($anyModalOpen) return
     if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash || showHeroSplash) return
 
     // From here we own the spacebar: stop the page from scrolling.

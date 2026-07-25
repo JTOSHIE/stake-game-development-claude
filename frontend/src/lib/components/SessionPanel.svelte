@@ -20,11 +20,17 @@
     rgSession, rgNetMicros, rgJurisdiction, realityCheckDue, ackRealityCheck,
     showSessionPanel,
   } from '../stores/responsibleGambling'
+  import { setModalOpen } from '../stores/modalGuard'
   import { currencyCode } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
   import { formatBalance } from '../utils/currency'
 
   $: autoPinned = $rgJurisdiction.mandatorySessionDisplay
+
+  // A reality check demands acknowledgement, so it must suppress the spacebar
+  // and pause autoplay. The on-demand sheet blocks too while it is open.
+  $: setModalOpen('reality-check', $realityCheckDue)
+  $: setModalOpen('session-panel', $showSessionPanel)
   function closeSheet(): void { showSessionPanel.set(false) }
 
   let nowMs = perf()

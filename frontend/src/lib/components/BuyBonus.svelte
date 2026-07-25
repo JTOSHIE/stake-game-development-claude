@@ -3,7 +3,13 @@
   // (final art in AssetForge v2). Fully hidden where the jurisdiction disables
   // feature buys. All strings localised with social overrides.
   import { createEventDispatcher } from 'svelte'
-  import { betAmount, currencyCode, canBuyBonus, locale, isSpinning } from '../stores/gameStore'
+  import { betAmount, currencyCode, locale, isSpinning } from '../stores/gameStore'
+  // R8/TR-016: the confirm button used gameStore's canBuyBonus, hardcoded to
+  // bet x 100. At the 400x NITRO tier that enabled CONFIRM beside a correctly
+  // displayed 400x price. gameStore is locked, so the correct per-tier check
+  // lives in this non-locked module, shared with the FEATURES menu.
+  import { canAffordMode } from '../stores/buyAffordability'
+  import { setModalOpen } from '../stores/modalGuard'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { isSocial } from '../stores/socialMode'
@@ -52,6 +58,11 @@
     buyMode = mode
     showConfirm = true
   }
+  // Announce this dialog to the shared modal guard so the spacebar handler and
+  // the autoplay scheduler both suppress themselves while it is open. Neither
+  // could see `showConfirm` before: it is component-local state.
+  $: setModalOpen('buy-confirm', showConfirm)
+
   function cancel() { showConfirm = false }
   function confirm() {
     showConfirm = false
@@ -124,12 +135,12 @@
             <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial)}</span>
           </div>
         </div>
-        {#if !$canBuyBonus}
+        {#if !$canAffordMode(buyMode)}
           <p class="buy-warn">{t($locale, 'insufficientBalance', localeMode)}</p>
         {/if}
         <div class="buy-actions">
           <button class="buy-cancel" on:click={cancel}>{t($locale, 'buyCancel', localeMode)}</button>
-          <button class="buy-confirm" on:click={confirm} disabled={!$canBuyBonus} data-testid="buy-confirm">
+          <button class="buy-confirm" on:click={confirm} disabled={!$canAffordMode(buyMode)} data-testid="buy-confirm">
             {t($locale, 'buyConfirm', localeMode)}
           </button>
         </div>

@@ -56,6 +56,15 @@ const ALLOWLIST = {
   // enabled a "+" that dropped the bet to 0.10. Locked, so it cannot be deleted
   // here. Leaving it unread is strictly safer than leaving it wired.
   canIncreaseBet: 'locked gameStore.ts, LOCKED_FILE_DEBTS',
+  // R8/TR-016 (2026-07-25): became unread when the confirm dialog moved to the
+  // per-tier check. Like canIncreaseBet it was not merely dead but WRONG: it is
+  // `bal >= bet * 100` for every tier, so at the 400x tier it enabled CONFIRM
+  // beside a correctly displayed 400x price. Locked, so it cannot be deleted.
+  canBuyBonus:    'locked gameStore.ts, LOCKED_FILE_DEBTS',
+  // Read by scripts/modal_safety_proof.mjs to assert WHICH surface is blocking.
+  // Diagnostics rather than product state; kept because a proof that can only
+  // see a boolean cannot show which registration fired.
+  openModalIds:   'read by modal_safety_proof.mjs, diagnostics not product state',
   // Fable ruling 7 (2026-07-26): write-only replay store, ReplayMode renders
   // from parallel locals. Real finding, explicitly deferred to post-launch as
   // elegance under the section 1 bar. Bet Replay is compliance-bearing and is
