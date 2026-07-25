@@ -80,5 +80,22 @@ correcting it would be redrawing the owner's art inside an ingest.
 
 ## Adoption
 
-**NOT adopted.** `design-system/brand/delivery/WeRollSpinners-Logo.png` is unchanged and
-still carries candidate d. The eye-call is the owner's.
+**ADOPTED 2026-07-26**, on the owner's instruction "Go with F".
+
+`design-system/brand/delivery/WeRollSpinners-Logo.png` is this mark at its **native 1024
+master**, not the 512 export. The master is a full-frame crop of the owner's file at its
+own resolution, so the delivered asset has been through no resampling at all; downscaling
+to 512 to match what the previous candidate happened to use would have discarded
+resolution for nothing.
+
+The two things recorded above are **not** resolved by adoption and are not defects to fix
+here. Both were reported so the choice was informed:
+
+- the structural near-black is opaque and sits at low contrast on a dark surface;
+- the alpha is hard-edged, with zero partially transparent pixels in the source.
+
+If either turns out to matter once the mark is seen on the real portal, the fix is new
+artwork from the owner, not a retouch of this file.
+
+**What remains is the owner's**: the provider logo is a one-time square upload in Team
+Settings Branding, and it cannot be done from here.

@@ -1,5 +1,9 @@
 # Provider mark, candidate E: owner-supplied, externally commissioned
 
+> **SUPERSEDED 2026-07-26, non-preferred (convention (h)).** The owner supplied a
+> second mark, candidate **f**, which was adopted. Candidate e is kept, not deleted,
+> and remains in the comparison sheet. See `README.md` for status.
+
 ## Provenance
 
 | Field | Value |
@@ -87,7 +91,7 @@ same measurement was taken on it rather than assumed either way:
 
 ## Adoption
 
-**NOT adopted.** `design-system/brand/delivery/WeRollSpinners-Logo.png` is unchanged and
-still carries candidate d. The eye-call is the owner's, across e and d, with a, b and c
-retired as non-preferred. On the owner's one-line confirmation the delivery file is
-regenerated from the chosen candidate and TR-031 closes.
+**NOT adopted.** The owner chose candidate **f** on 2026-07-26. Both of the questions
+recorded above are what f answered: f carries a real alpha channel, so the platform's
+transparent-background rule is met by the artwork rather than by a keying step, and f has
+no wordmark, so the 0.81 px per stroke measurement does not arise.

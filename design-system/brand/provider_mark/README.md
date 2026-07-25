@@ -13,17 +13,30 @@ candidate produced since, with its provenance, so the eye-call is made on eviden
 | `b-core-crop` | derived from the hero emblem | **SUPERSEDED, non-preferred** |
 | `c-core-bold` | derived from the hero emblem | **SUPERSEDED, non-preferred** |
 | `d-purpose-drawn` | drawn in-house to Fable's spec | **SUPERSEDED, non-preferred** |
-| `e-owner-supplied` | externally commissioned, owner-supplied | **DELIVERED, awaiting the owner eye-call** |
-| **`f-owner-transparent`** | **externally commissioned, owner-supplied, second of two** | **DELIVERED, awaiting the owner eye-call** |
+| `e-owner-supplied` | externally commissioned, owner-supplied | **SUPERSEDED, non-preferred** |
+| **`f-owner-transparent`** | **externally commissioned, owner-supplied, second of two** | **ADOPTED 2026-07-26** |
 
 Superseded per convention (h): the files are **kept, not deleted**, and they remain in the
 48px comparison sheet. A comparison that quietly drops the options it has moved past stops
 being a comparison, and a future reader should be able to check that the retirement was
 earned rather than asserted.
 
-**Nothing here is adopted.** `design-system/brand/delivery/WeRollSpinners-Logo.png` is
-unchanged and still carries candidate d. On the owner's one-line confirmation the delivery
-file is regenerated from the chosen candidate and TR-031 closes.
+## Adopted: candidate f
+
+`design-system/brand/delivery/WeRollSpinners-Logo.png` is candidate **f**, adopted
+2026-07-26 on the owner's instruction "Go with F", delivered at its **native 1024**
+resolution so the submitted asset has been through no resampling at all.
+
+**A contradiction in the adopting brief, recorded rather than resolved silently.** That
+brief opens with "Go with F" and then names `provider_mark_e-owner-supplied-transparent`
+in its JOB 1 body. Those cannot both be followed. "Go with F" was taken as the decision:
+it is unambiguous, it stands alone at the top, and it directly answers the question the
+previous session asked. The JOB 1 filename reads as carried over from when e-transparent
+was the leading candidate. **Reversing this is one path in
+`frontend/scripts/tile_delivery_build.mjs` and a re-run.**
+
+TR-031 is MERGED. What remains is not a code or asset task: the provider logo is a
+one-time square upload in Team Settings Branding, and that is the owner's to do.
 
 ## Provenance records
 

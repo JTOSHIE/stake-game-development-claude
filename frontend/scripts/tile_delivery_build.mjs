@@ -51,9 +51,25 @@ const SET = [
     countsToward3MB: true,
   },
   {
-    // Written by provider_mark_build.mjs, which owns the mark itself. Listed
-    // here so the delivery set is described in one place.
-    from: join(BRAND, 'provider_mark', 'provider_mark_d-purpose-drawn_512.png'),
+    // ADOPTED 2026-07-26 on the owner's instruction, "Go with F".
+    //
+    // Candidate f, the owner's second supplied mark, delivered at its NATIVE
+    // 1024 master rather than at the 512 export. The platform asks for a "High
+    // resolution PNG with a transparent background", and f's master is a
+    // straight full-frame crop of the owner's file at its own resolution, so
+    // delivering it means the submitted asset has been through no resampling
+    // at all. Downscaling to 512 to match what candidate d happened to use
+    // would have thrown away resolution for no reason.
+    //
+    // WHY f AND NOT e-transparent. The brief that adopted this opens with "Go
+    // with F" and then names provider_mark_e-owner-supplied-transparent in its
+    // JOB 1 body. Those contradict. "Go with F" is taken as the decision: it is
+    // unambiguous, it stands alone at the top, and it directly answers the
+    // question the previous session asked ("say f and I'll regenerate"). The
+    // JOB 1 filename reads as carried over from when e-transparent was the
+    // leading candidate. Recorded here rather than resolved silently, and
+    // reversible by changing this one path and re-running.
+    from: join(BRAND, 'provider_mark', 'provider_mark_f-owner-transparent_master_1024.png'),
     to: 'WeRollSpinners-Logo.png',
     role: 'Provider Logo',
     rule: 'ProviderName-Logo.png',
@@ -112,13 +128,25 @@ const doc = [
   '',
   ...rows.map((r) => `- \`${r.to}\` from \`${r.from.replace('/Users/jt/math-sdk/', '')}\``),
   '',
-  '## Not yet adopted',
+  '## Provider logo: ADOPTED',
   '',
-  'The provider logo here is candidate **d**, the purpose-drawn mark. The owner',
-  'eye-call across a, b, c and d is still open',
-  '(`reports/screens/provider-mark/48px-legibility-comparison.png`). If the owner',
-  'picks a different candidate, re-point the logo row above and re-run; nothing',
-  'else in the set changes.',
+  'The provider logo is candidate **f**, the owner\'s second supplied mark, adopted',
+  '2026-07-26 on the instruction "Go with F". It is delivered at its NATIVE 1024',
+  'resolution: f\'s master is a full-frame crop of the owner\'s file at its own',
+  'size, so this asset has been through no resampling at all.',
+  '',
+  'It carries a real alpha channel, so the platform\'s transparent-background rule',
+  'is met by the artwork itself rather than by a keying step performed on it, and',
+  'it uses exactly three colours: `#00FFFF` and `#FF00FF` verbatim from the brand',
+  'palette plus `#0A0A14` as structural near-black.',
+  '',
+  'Candidates a, b, c, d and e are superseded and kept. The comparison evidence',
+  'stays at `reports/screens/provider-mark/`. To change the adopted mark, re-point',
+  'the logo row in this script and re-run; nothing else in the set changes.',
+  '',
+  '**One thing still belongs to the owner**: the actual upload. The provider logo is',
+  'a one-time square upload in Team Settings Branding, and the tile layers go into',
+  'the Tile Editor. Neither can be done from here.',
 ]
 writeFileSync(join(DELIVERY, 'README.md'), doc.join('\n') + '\n')
 
