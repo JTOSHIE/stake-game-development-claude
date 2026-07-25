@@ -370,8 +370,9 @@ publication. That is worth recording because it changes the character of the fin
 from a decision to a setting: nothing about the backup's purpose requires public access,
 so restricting the folder to named accounts costs nothing and closes the exposure.
 
-**Status: open, pending an owner action of two clicks.** Restrict the share, or record a
-knowing acceptance here. No second copy is needed for builder access: the books are read
+**Status: CLOSED 2026-07-28.** The owner disabled the folder's sharing; it is no longer
+publicly accessible. The backup itself is unaffected and remains available to the owner.
+No further action. No second copy is needed for builder access: the books are read
 directly from `games/future_spinner/library/publish_files/` on the build machine, which
 is how their hashes and row counts were verified for `BOOKS_MANIFEST.md`. Additional
 copies add custody surface without adding capability, so any further backup should be
@@ -386,10 +387,19 @@ paid for boosted feature access rides the feature tail by construction; post-app
 lockdown would make any change permanent in the wrong direction; and the player-facing
 disclosures already carry the truth (per-spin cost, RTP, max win are all displayed).
 
-**Recorded here rather than in the PAR sheet, deliberately.** The ruling asked for a
-commercial-notes line in `games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md`. That path
-is inside the `Edit/Write(games/future_spinner/**)` deny rules and the ruling did not
-name deny lines to lift, so per convention (e) it was not edited and per the facts
-discipline the blocker is named rather than worked around silently. This entry carries
-the same content in an unlocked compliance document. **Move it into the PAR on the next
-sanctioned locked pass**, where it belongs.
+**Recorded here rather than in the PAR sheet. RESOLVED 2026-07-28: this is now the
+permanent location, not a temporary one.**
+
+The ruling asked for a commercial-notes line in
+`games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md`. That path is inside the
+`Edit/Write(games/future_spinner/**)` deny rules, and convention (e) requires a
+sanctioning brief to name the exact deny lines to lift. The ruling did not name them, and
+routing around a deny via Bash is explicitly forbidden, so the edit was not made and the
+blocker was named rather than worked around.
+
+**Owner decision: leave it here.** The reasoning, recorded so it is not revisited:
+lifting the lock on the shipped maths package to relocate a note that already exists,
+dated and findable, is more risk than the tidiness is worth. `COMPLIANCE_WATCH.md` is
+the compliance register and a reasonable home for a commercial-design note. If the PAR is
+ever opened for a substantive reason under a properly sanctioned pass, the note can move
+then as a free rider. **No lock lift is being sought for this.**
