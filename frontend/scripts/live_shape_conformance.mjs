@@ -204,17 +204,20 @@ const isAllDefault = (f) => Object.entries(DEFAULTS).every(([k, v]) => f[k] === 
 const checks = []
 const check = (name, pass, detail) => { checks.push({ name, pass, detail }); return pass }
 
-check('CASE A, config carries no jurisdiction: flags arrive at their DEFAULTS',
-  isAllDefault(liveA.jurisdictionFlags),
-  'authenticate() reads raw.config.jurisdiction only. With the block absent from config, the '
-  + 'spread contributes nothing and EMPTY_JURISDICTION survives intact, while the response\'s '
-  + 'real top-level jurisdiction is never read. THIS IS THE DEFECT, and it is REACHABLE, not proven live.')
+check('CASE A, config carries no jurisdiction: flags now populate from the TOP-LEVEL block',
+  liveA.jurisdictionFlags.minimumRoundDuration === 0
+  && Object.keys(liveA.jurisdictionFlags).length === 12
+  && liveA.jurisdictionFlags.socialCasino === false,
+  'FIXED under the 2026-07-26 sanction. authenticate() now reads '
+  + 'config.jurisdiction ?? raw.jurisdiction ?? {}, so the live top-level block is used when '
+  + 'config carries no copy. Before the fix this case returned EMPTY_JURISDICTION and the '
+  + 'response\'s real flags were never read.')
 
-check('CASE B, config carries its own jurisdiction: flags arrive correctly',
+check('CASE B, config carries its own jurisdiction: config STILL WINS, the fix is additive',
   liveB.jurisdictionFlags.disabledTurbo === true,
-  `disabledTurbo=${liveB.jurisdictionFlags.disabledTurbo}. If the live response nests a copy under `
-  + 'config, today\'s parser is already right and there is nothing to fix. The captures cannot '
-  + 'distinguish A from B, because the frame shows the response TAIL only.')
+  `disabledTurbo=${liveB.jurisdictionFlags.disabledTurbo}. config.jurisdiction is first in the `
+  + 'chain, so where the pinned shape exists it is still authoritative. The fix adds a fallback, '
+  + 'it does not swap the source.')
 
 check('bet configuration arrives on the live shape, corroborating SA-020',
   liveA.betLevels.length === 4 && liveA.betLevels.includes(450),
@@ -273,7 +276,7 @@ await vite.close()
 
 for (const c of checks) console.log(`  ${c.pass ? 'ok  ' : 'FAIL'}  ${c.name}\n        ${c.detail}`)
 
-const defectReachable = checks[0].pass
+const fixedLiveShape = checks[0].pass
 const fixWorks = checks.slice(6).every((c) => c.pass)
 const controlsOk = checks[1].pass && checks[2].pass && checks[3].pass && checks[4].pass && checks[5].pass
 
@@ -288,11 +291,10 @@ writeFileSync(join(QA, 'live_shape_conformance_2026-07-26.json'), JSON.stringify
     'reports/screens/live-shapes-2026-07-26/05_play_response_state_is_event_array_micros.png',
     'reports/screens/live-shapes-2026-07-26/06_end_round_response_balance_only.png',
   ],
-  defect_status: 'REACHABLE, NOT CONFIRMED LIVE. The capture shows the response tail only, so '
-    + 'whether config also carries a jurisdiction block is unknown. Case A reproduces the defect, '
-    + 'case B shows the parser already correct. One screenshot of the authenticate response '
-    + 'scrolled to the TOP settles it, and it is on the owner list.',
-  defect_reachable: defectReachable,
+  defect_status: 'FIXED 2026-07-26 under owner sanction. The read is now tolerant of both shapes, '
+    + 'so the question the earlier pass could not settle (whether config also carries a copy) no '
+    + 'longer needs settling: either shape populates the flags.',
+  live_top_level_shape_populates: fixedLiveShape,
   negative_controls_pass: controlsOk,
   proposed_fix_verified: fixWorks,
   proposed_fix: {
@@ -305,11 +307,11 @@ writeFileSync(join(QA, 'live_shape_conformance_2026-07-26.json'), JSON.stringify
   checks,
 }, null, 2))
 
-console.log(`\nlive_shape_conformance: defect ${defectReachable ? 'REACHABLE (case A)' : 'not reproduced'}, `
+console.log(`\nlive_shape_conformance: live top-level shape ${fixedLiveShape ? 'POPULATES' : 'FAILS'}, `
   + `controls ${controlsOk ? 'pass' : 'FAIL'}, proposed fix ${fixWorks ? 'verified' : 'FAILED'}`)
 
 // This script FAILS while the defect is present. It is a live-conformance
 // finding, not a gate on the build, so it is not wired into CI: it would block
 // every push over a defect that only an owner sanction can fix. It is run by
 // hand and its result is committed.
-process.exit(defectReachable && controlsOk && fixWorks ? 0 : 1)
+process.exit(fixedLiveShape && controlsOk && fixWorks ? 0 : 1)

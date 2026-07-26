@@ -216,6 +216,8 @@ export interface OfficialEndRoundResponse {
  */
 interface RawAuthenticateWire {
   balance: OfficialBalance
+  /** TOP-LEVEL, as the live RGS sends it. Pinned types nest it under `config`. TR-080. */
+  jurisdiction?: OfficialJurisdictionFlags
   config: OfficialAuthenticateConfig & {
     jurisdiction: OfficialJurisdictionFlags
     /**
@@ -555,7 +557,7 @@ export async function authenticate(params: SessionParams): Promise<AuthResponse>
   const config = raw.config ?? ({} as RawAuthenticateWire['config'])
   const flags: OfficialJurisdictionFlags = {
     ...EMPTY_JURISDICTION,
-    ...(config.jurisdiction ?? {}),
+    ...(config.jurisdiction ?? raw.jurisdiction ?? {}),
   }
 
   const auth: AuthResponse = {
