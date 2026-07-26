@@ -166,7 +166,28 @@ Attempt #: | Date: | Build commit: | Math package hashes: | Blurb version: | Rev
 - Weekly: check Friday re-rank position; monitor approval-thread/messages; record payments per cycle against the payments register.
 - Licence watch: Stability revenue threshold; keep provenance folder current.
 
-## 7. NEXT-TITLE TEMPLATE (applies to LUMEN, queued after Future Spinner submits)
+## 7. HORIZON, and the next-title template
+
+### 7a. Off-repo archive: the LUMEN side project (owner ruled, 2026-07-26)
+
+`sideproject/` is **out of the repository entirely**. It held an early LUMEN
+concept build (a Svelte and Pixi frontend with its own `node_modules`), it was
+never tracked by git, never referenced by the Future Spinner build, and it sat
+in the working tree as 112 MB of untracked material that every `git status`
+had to step over.
+
+| Field | Value |
+|---|---|
+| Archived to | `~/Desktop/WRS_ARCHIVE/sideproject_2026-07-26.zip` |
+| Size | 52,738,480 bytes |
+| Contents | 4,188 non-directory entries and 483 directories, verified against the working tree before deletion: `unzip -t` clean, file counts and symlink counts equal |
+| Carries | `sideproject/README_ARCHIVE.txt`, one line, stating it is concept material and possible future theme inspiration, not project code |
+
+**It is concept material, not code to resume from.** When LUMEN starts, the
+template below is the starting point, and the archive is worth opening for
+theme and art ideas rather than for anything to build on.
+
+### 7b. Next-title template (applies to LUMEN, queued after Future Spinner submits)
 Reuse in order: maths package + validate_math + PAR -> wiring integrity audit pattern -> statelessness/replay evidence -> AssetForge + AudioForge (new seeds/prompts) -> rules/paytable/UI guide conformance -> QA soak + platform conformance suite (all scripts are reusable) -> math self-audit -> compliance watch -> dossier from this register's 3a-3d -> tile layers -> submit. Company layer (section 1) does not repeat; only per-title rows do.
 
 ## 8. STANDING ANSWERS
