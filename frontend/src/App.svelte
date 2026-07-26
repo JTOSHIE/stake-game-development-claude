@@ -683,6 +683,32 @@
     return window.innerHeight > window.innerWidth
   }
   const GRID_SPEC_W = 522
+  // ── THE COMPOSITION'S OWN GEOMETRY, in stage units ─────────────────────────
+  //
+  // FS_SMALLSCREEN_RECOMPOSE (2026-07-26). Every small-screen scale below is
+  // derived from these, so they are stated once here instead of being spelled
+  // out again inside each function as a literal.
+  //
+  // They are not new numbers: they are the numbers this file's own rules already
+  // use, read off `.game-frame` (App.svelte's "FRAME, 640x468 at (320,84)"),
+  // `.grid-slot` (`left:379px; top:143.5px; width:522px; height:349px`) and
+  // `.logo-box`. Each was then CONFIRMED by measuring the rendered element at
+  // Desktop, where the scale is a known 1200/1280 = 0.9375:
+  //
+  //   .game-frame  measured 640.0 x 468.1 at (320.0, 84.1)   against 640x468 at (320,84)
+  //   .grid-slot   measured 522.0 x 349.0 at (379.0, 143.5)  against 522x349 at (379,143.5)
+  //
+  // The frame is horizontally centred in the 1280 stage by construction (320
+  // units of margin each side), which is why centring the STAGE also centres the
+  // frame and no horizontal offset term is needed anywhere below.
+  const FRAME_TOP_Y = 84
+  const FRAME_BOTTOM_Y = 552
+  const FRAME_H = FRAME_BOTTOM_Y - FRAME_TOP_Y   // 468
+  const FRAME_W = 640
+  // The desktop title lockup's top edge. Used as the mini profile's crop top so
+  // the wordmark stays in the composition at Popout S, which is how the owner's
+  // brief describes it ("the height between title and strip").
+  const LOGO_TOP_Y = 18
   // Vertical crop window (portrait v2): SceneGroup and the desktop logo are
   // not rendered in portrait at all (see the template), so canvas-slot only
   // needs to reserve enough height to show the frame (y84-552) plus a small
@@ -736,35 +762,109 @@
   // 42 + 287 = 329 needed above the canvas; the old maths reserved 28 + 290 =
   // 318 and handed the canvas 349px where only 338 existed. The 11px overshoot
   // is exactly the scrollbar guideline item 15 forbids.
-  let hudSlotEl: HTMLElement | null = null
-  let wordmarkEl: HTMLElement | null = null
-  let measuredHudH = 0        // 0 = not yet measured, fall back to the constant
-  let measuredWordmarkH = 0
+  // FS_SMALLSCREEN_RECOMPOSE (2026-07-26): the two runtime measurements this block
+  // describes, and the element bindings that fed them, are GONE. They existed to
+  // reconstruct the canvas box by subtracting chrome from the viewport, and that
+  // reconstruction is what went stale and non-deterministically overflowed. The box
+  // is now read directly from the element CSS sizes (see the inversion below), so
+  // there is nothing left to keep in step and the two constants above survive only
+  // as the first-frame estimate, before any box exists to measure.
+  // FS_SMALLSCREEN_RECOMPOSE (2026-07-26). The height term used to divide by
+  // PORTRAIT_CROP_BOTTOM_Y, i.e. it demanded room for the whole 592-unit crop
+  // window measured from stage y=0. But the frame only occupies y=84..552, so
+  // 124 of those 592 units (21%) are empty stage: 84 above the frame and 40 of
+  // bleed margin below. The height budget was being spent on nothing, and
+  // because the two terms are a min(), spending it there is what stopped the
+  // WIDTH term from binding at Mobile M and Mobile S. Measured before: the grid
+  // reached 79.5% of the viewport width at Mobile M and 65.8% at Mobile S, which
+  // is the owner's "reels not filling width" exactly.
+  //
+  // What must fit is the FRAME, not the decorative stage around it. So the
+  // height term divides by FRAME_H, and how much stage is shown is then decided
+  // separately by computePortraitCrop() out of whatever height is left over.
+  // Deriving the two independently is what lets Mobile M reach the width cap
+  // while Mobile L still shows the full decorative window.
+  // ── THE BOX COMES FROM THE LAYOUT ENGINE, NOT FROM ARITHMETIC ──────────────
+  //
+  // FS_SMALLSCREEN_RECOMPOSE (2026-07-26). The height above was computed as
+  // (viewport - wordmark - HUD), with both chrome heights measured separately and
+  // subtracted. That is two sources of truth for one box, and they disagreed: the
+  // subtraction has to be re-run every time either measurement lands, and if a
+  // measurement arrives late the canvas has already been sized from a stale one.
+  // It failed exactly that way, and NON-DETERMINISTICALLY. Measured on the first
+  // draft of this pass: Mobile M produced a 338px canvas on one run and 374px on
+  // another from an identical load, and Mobile S overflowed its viewport by 25.5px
+  // until a 1px resize nudge corrected it to a 10.5px fit. Five controls including
+  // SPIN were pushed off the bottom, which is TR-069's defect class returning by a
+  // new route.
+  //
+  // So the dependency is inverted. `.canvas-slot.portrait` is now `flex: 1 1 0`,
+  // which means CSS gives it exactly the space the wordmark and the content-sized
+  // HUD leave over, with no arithmetic and nothing to go stale. This code then
+  // MEASURES that box and picks a scale to fill it. Two consequences worth having:
+  //
+  //   the canvas can never push a control off screen, because it is physically
+  //   incapable of being taller than the box flex handed it; and
+  //
+  //   if the HUD grows mid-round, flex shrinks the box in the same frame, so the
+  //   worst case is one frame of slightly-too-large stage inside a correct box
+  //   (clipped as decoration) rather than a control moving out of reach.
+  //
+  // This is what "measure the real available box" in the brief has to mean: read
+  // the box, do not reconstruct it.
+  let canvasSlotEl: HTMLElement | null = null
+  let measuredSlotH = 0
+  function portraitAvailableCanvasH(): number {
+    if (measuredSlotH > 0) return measuredSlotH
+    // First frame only, before the box exists to be read. Deliberately the
+    // conservative estimate: it is better to open too small for one frame and
+    // grow than to overshoot and clip a control.
+    return Math.max(window.innerHeight - PORTRAIT_WORDMARK_H - PORTRAIT_HUD_MIN_H, 1)
+  }
   function computePortraitCanvasScale(): number {
     if (typeof window === 'undefined') return 1
     const widthBasedScale = (0.96 * window.innerWidth) / GRID_SPEC_W
-    // Once a real measurement exists it is used as-is. Clamping it back up to
-    // the old constant would reinstate the very estimate that drifted, which is
-    // the mistake the first draft of this fix made: Math.max(287, 290) returned
-    // 290 and nothing changed.
-    const hudH = measuredHudH > 0 ? measuredHudH : PORTRAIT_HUD_MIN_H
-    const wordH = measuredWordmarkH > 0 ? measuredWordmarkH : PORTRAIT_WORDMARK_H
-    const availableCanvasH = Math.max(window.innerHeight - wordH - hudH, 1)
-    const heightBasedScale = availableCanvasH / PORTRAIT_CROP_BOTTOM_Y
+    const heightBasedScale = portraitAvailableCanvasH() / FRAME_H
     return Math.min(widthBasedScale, heightBasedScale)
   }
-  /** Re-measure the portrait chrome and rescale the canvas if it has changed. */
-  function remeasurePortraitHud(): void {
-    if (!portrait || !hudSlotEl) return
-    // scrollHeight, not clientHeight: the slot is a flex item that can be
-    // squeezed below its content, and it is exactly that squeeze which
-    // overflows the wrapper. scrollHeight reports what the content really needs.
-    const h = hudSlotEl.scrollHeight
-    const w = wordmarkEl ? wordmarkEl.getBoundingClientRect().height : 0
-    if ((h > 0 && Math.abs(h - measuredHudH) > 1) || (w > 0 && Math.abs(w - measuredWordmarkH) > 1)) {
-      if (h > 0) measuredHudH = h
-      if (w > 0) measuredWordmarkH = w
+  /**
+   * How much of the stage's vertical extent to show, from where, and where to sit
+   * it inside the box.
+   *
+   * The crop window grows from the bare frame (468 units) up to the full portrait
+   * window (592) depending on how much of the box the scale leaves spare, and it
+   * is positioned to keep the frame CENTRED both inside the window and inside the
+   * box. That is what makes the composition read as composed at every height
+   * rather than jammed against the top: at Mobile L the window opens to the full
+   * 592 with the frame centred in it, at Mobile M to about 490, and at Mobile S it
+   * closes down to the frame itself.
+   *
+   * Nothing here is hidden by the crop except decorative background. Every
+   * interactive control is a native-DOM element BELOW the canvas, so no control is
+   * ever inside this window, and the layout gate proves that separately by
+   * measuring each control against its clipping ancestors.
+   */
+  function computePortraitCrop(scale: number): { cropH: number, cropTop: number, offsetY: number } {
+    if (typeof window === 'undefined') return { cropH: PORTRAIT_CROP_BOTTOM_Y, cropTop: 0, offsetY: 0 }
+    const boxH = portraitAvailableCanvasH()
+    const showable = boxH / Math.max(scale, 0.0001)
+    const cropH = Math.min(Math.max(showable, FRAME_H), PORTRAIT_CROP_BOTTOM_Y)
+    // Centre the frame in the window, but never start above the stage's own top.
+    const cropTop = Math.min(Math.max(FRAME_TOP_Y - (cropH - FRAME_H) / 2, 0), FRAME_TOP_Y)
+    // Where the width term binds, the crop window can be shorter than the box (at
+    // Mobile L by about 21px). Centring the window in the box turns that into
+    // symmetric breathing room instead of a seam along one edge.
+    const offsetY = Math.max((boxH - cropH * scale) / 2, 0) - cropTop * scale
+    return { cropH, cropTop, offsetY }
+  }
+  /** Read the box CSS produced, and rescale to fill it if it has changed. */
+  function remeasurePortraitBox(): void {
+    if (!portrait || !canvasSlotEl) return
+    const h = canvasSlotEl.clientHeight
+    if (h > 0 && Math.abs(h - measuredSlotH) > 0.5) {
+      measuredSlotH = h
       portraitCanvasScale = computePortraitCanvasScale()
+      portraitCrop = computePortraitCrop(portraitCanvasScale)
     }
   }
   // Landscape compact HUD pass (2026-07-14b): gate by HEIGHT, not aspect
@@ -822,10 +922,51 @@
     if (typeof window === 'undefined') return false
     return window.innerWidth <= MINI_WIDTH_BREAKPOINT && window.innerHeight <= MINI_HEIGHT_BREAKPOINT
   }
+  // ── POPOUT S RECOMPOSITION, FS_SMALLSCREEN_RECOMPOSE (2026-07-26) ──────────
+  //
+  // The owner's capture (reports/screens/live-round2-2026-07-26/
+  // 08_DEFECT_popout_s_stage_small_and_right_anchored.png) shows the stage small
+  // and hard right-anchored with the left of the frame empty. Both halves of that
+  // were real and both are fixed here and in the CSS below.
+  //
+  // THE ANCHORING was not a scale problem at all. `.canvas-inner.mini-player`
+  // omitted the `width:1280px; height:720px` pair that `.canvas-inner.portrait`
+  // and `.canvas-inner.compact-landscape` both carry, so the base rule's
+  // `width:100%` resolved against the 400px slot and the element's box was 400x181
+  // rather than the 1280x720 the stage's children are positioned in. That makes
+  // `translateX(-50%)` translate by 200px where centring the stage needs 640px, so
+  // the whole composition sat (640-200)*scale to the right: 440 * 0.2514 =
+  // 110.6px, measured at exactly +110.6px. The fix is the missing declaration,
+  // in the CSS below. Derived from the stylesheet first, then confirmed.
+  //
+  // THE SCALE is fixed here. It divided the full 1280-unit stage width and the
+  // full 720-unit height, so the frame got 40.2% of the viewport width while over
+  // half the frame's own width budget went to scene art that is decorative. What
+  // has to fit is the frame (640 wide) and the crop window from the title down to
+  // the frame's bottom edge; the scene either side is clipped as bleed, exactly as
+  // it already is on desktop via `.stage`.
+  const MINI_CROP_TOP_Y = LOGO_TOP_Y                        // 18, keeps the title in frame
+  const MINI_CROP_H = FRAME_BOTTOM_Y - MINI_CROP_TOP_Y      // 534
   function computeMiniCanvasScale(): number {
     if (typeof window === 'undefined') return 1
     const availH = Math.max(window.innerHeight - MINI_STRIP_H, 1)
-    return Math.min(window.innerWidth / STAGE_W, availH / STAGE_H)
+    return Math.min(window.innerWidth / FRAME_W, availH / MINI_CROP_H)
+  }
+  /**
+   * The mini crop window, and the honest note about what "fill" can mean here.
+   *
+   * At Popout S the available box is 400 x 181, an aspect of 2.21:1, and the
+   * content is the frame at 1.37:1. The height therefore binds and no centred,
+   * undistorted composition can also fill the width: the arithmetic gives
+   * 181/534 = 0.339, a frame 217px wide, 54.2% of the viewport, against 40.2%
+   * before. The side margins are inherent to the aspect mismatch and are not
+   * dead space to be recovered; the alternative, dropping the title to crop
+   * tighter, buys 61.9% and is recorded in the session report as the owner's
+   * call rather than taken here, because their brief describes the composition
+   * as "the height between title and strip".
+   */
+  function computeMiniCrop(): { cropH: number, cropTop: number } {
+    return { cropH: MINI_CROP_H, cropTop: MINI_CROP_TOP_Y }
   }
 
   function computeCompactLandscape(): boolean {
@@ -847,28 +988,39 @@
   let compactCanvasScale = computeCompactCanvasScale()
   let miniPlayer = computeMiniPlayer()
   let miniCanvasScale = computeMiniCanvasScale()
+  // The crop window is derived from the scale, so it is recomputed everywhere the
+  // scale is, and never stored independently of it.
+  let portraitCrop = computePortraitCrop(portraitCanvasScale)
+  let miniCrop = computeMiniCrop()
   function handleResize(): void {
     S = computeS()
     portrait = computePortrait()
     portraitCanvasScale = computePortraitCanvasScale()
+    portraitCrop = computePortraitCrop(portraitCanvasScale)
     compactLandscape = computeCompactLandscape()
     compactCanvasScale = computeCompactCanvasScale()
     miniPlayer = computeMiniPlayer()
     miniCanvasScale = computeMiniCanvasScale()
-    // The HUD's content height can change with orientation and with locale (a
-    // longer translated label wraps), so re-measure on every resize rather than
-    // trusting the value taken at mount.
-    remeasurePortraitHud()
+    miniCrop = computeMiniCrop()
+    // The box is about to be re-laid out by CSS at the new viewport, so the value
+    // read from the old one is worthless. Dropping it means the next observation
+    // is used as-is rather than being compared against a stale number.
+    measuredSlotH = 0
+    remeasurePortraitBox()
   }
 
-  // Watch the slot itself, not just the window: the HUD grows when a feature
-  // strip appears mid-round, which no resize event announces.
-  let hudSlotObserver: ResizeObserver | null = null
-  $: if (hudSlotEl && typeof ResizeObserver !== 'undefined' && !hudSlotObserver) {
-    hudSlotObserver = new ResizeObserver(() => remeasurePortraitHud())
-    hudSlotObserver.observe(hudSlotEl)
+  // Watch the CANVAS SLOT, which is the box being filled. Watching it rather than
+  // the HUD is the point of the inversion above: whatever changes the space
+  // available to the stage (the HUD growing a feature strip mid-round, a longer
+  // translated label wrapping, an orientation change, the address bar collapsing)
+  // reaches this one observer as a change in the box itself, so none of those
+  // causes needs its own listener and none can be forgotten.
+  let canvasSlotObserver: ResizeObserver | null = null
+  $: if (canvasSlotEl && typeof ResizeObserver !== 'undefined' && !canvasSlotObserver) {
+    canvasSlotObserver = new ResizeObserver(() => remeasurePortraitBox())
+    canvasSlotObserver.observe(canvasSlotEl)
   }
-  onDestroy(() => { hudSlotObserver?.disconnect(); hudSlotObserver = null })
+  onDestroy(() => { canvasSlotObserver?.disconnect(); canvasSlotObserver = null })
 
   onMount(async () => {
     // ── BUILD PROVENANCE, JOB 4 / TR-062 ───────────────────────────────────
@@ -1422,7 +1574,7 @@
          Still native-DOM and never stage-scaled, so it costs the canvas no
          vertical space beyond its own box. Text fallback retained for a failed
          image load, mirroring the desktop lockup's own on:error behaviour. -->
-    <div bind:this={wordmarkEl} class="portrait-wordmark">
+    <div class="portrait-wordmark">
       {#if portraitLogoFailed}
         <span class="portrait-wordmark-text">{$activeTheme.name}</span>
       {:else}
@@ -1451,18 +1603,19 @@
        slot's height to the frame's bleed margin instead of the full 720
        stage height - see PORTRAIT_CROP_BOTTOM_Y above). -->
   <div
+    bind:this={canvasSlotEl}
     class="canvas-slot"
     class:portrait
     class:compact-landscape={compactLandscape}
     class:mini-player={miniPlayer}
-    style={portrait ? `height:${PORTRAIT_CROP_BOTTOM_Y * portraitCanvasScale}px` : miniPlayer ? `height:${STAGE_H * miniCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
+    style={portrait ? '' : miniPlayer ? `height:${miniCrop.cropH * miniCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
   >
     <div
       class="canvas-inner"
       class:portrait
       class:compact-landscape={compactLandscape}
       class:mini-player={miniPlayer}
-      style={portrait ? `transform: translateX(-50%) scale(${portraitCanvasScale})` : miniPlayer ? `transform: translateX(-50%) scale(${miniCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
+      style={portrait ? `top:${portraitCrop.offsetY}px; transform: translateX(-50%) scale(${portraitCanvasScale})` : miniPlayer ? `top:${-miniCrop.cropTop * miniCanvasScale}px; transform: translateX(-50%) scale(${miniCanvasScale})` : compactLandscape ? `transform: translateX(-50%) scale(${compactCanvasScale})` : ''}
     >
       {#if !portrait}
         <!-- LOGO, top centre, 380 wide, y 18 (z70). Desktop/landscape only:
@@ -1663,7 +1816,7 @@
          get a `portrait` or `compactLandscape` prop so their own CSS
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
-    <div bind:this={hudSlotEl} class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
+    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
       <!-- Portrait Overdrive meter (2026-07-15, item 2): docked between the
            grid (canvas-slot above) and the FEATURES bar - occupies the same
            slot FeatureMenu's trigger would, since that's hidden during the
@@ -1955,17 +2108,45 @@
   }
   .canvas-inner.mini-player {
     position: absolute; left: 50%; top: 0;
+    /* THE 1280x720 COORDINATE SPACE. FS_SMALLSCREEN_RECOMPOSE (2026-07-26).
+       These two declarations were missing, and their absence was the whole of the
+       Popout S right-anchoring. The stage's children (.game-frame at 320,84,
+       .grid-slot at 379,143.5) are positioned in stage units against THIS box, so
+       when the base .canvas-inner rule's `width:100%` resolved against the 400px
+       slot instead, the box became 400x181 and `translateX(-50%)` translated by
+       200px where centring the stage needs 640px. The composition sat
+       (640-200)*0.2514 = 110.6px right of centre, measured at exactly +110.6px.
+       The portrait and compact-landscape rules below always carried the pair; the
+       mini profile was added later (TR-043) and did not, which is why desktop,
+       portrait and compact-landscape all centred correctly and only the popout
+       did not. Kept adjacent to that rule deliberately so the three cannot drift
+       apart again. */
+    width: 1280px;
+    height: 720px;
     transform-origin: top center;
-    /* transform set inline per-frame (translateX(-50%) scale(miniCanvasScale)) */
+    /* top and transform set inline per-frame: top is -cropTop*scale, so the crop
+       window's top edge lands on the slot's top edge. */
   }
   .canvas-slot.portrait {
-    flex: 0 0 auto;
-    /* height set inline per-frame (PORTRAIT_CROP_BOTTOM_Y *
-       portraitCanvasScale) - deliberately shorter than canvas-inner's own
-       logical 720-tall height (2026-07-14c): SceneGroup and the desktop
-       logo aren't rendered in portrait, so everything below the frame's
-       bleed margin (y592+) is empty stage space, not real content - overflow
-       hidden crops it rather than reserving a dead band for nothing. */
+    /* FS_SMALLSCREEN_RECOMPOSE (2026-07-26). This was `flex: 0 0 auto` with its
+       height set inline from the layout maths, which made the box a COMPUTED
+       value that had to be kept in step with two separately-measured chrome
+       heights. It could not be, reliably: an identical load produced a 338px
+       canvas on one run and 374px on another, and Mobile S overflowed by 25.5px
+       until a resize nudge corrected it, pushing SPIN and four other controls off
+       the bottom.
+       `flex: 1 1 0` makes the box whatever the wordmark and the content-sized HUD
+       leave over, decided by the layout engine in the same pass that lays them
+       out. There is no second number to keep in step, and the stage physically
+       cannot be taller than the box it was given. The script MEASURES this box and
+       picks a scale to fill it, which is the one direction that cannot go stale.
+       The height still shows less than canvas-inner's logical 720 (2026-07-14c):
+       SceneGroup and the desktop logo are not rendered in portrait, so the stage
+       below the frame's bleed margin is empty, and the crop window sizes and
+       centres itself on the frame instead of reserving a dead band for nothing. */
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
     overflow: hidden;
   }
   .canvas-inner {
@@ -2015,7 +2196,27 @@
      immediately below the grid - no gap - since it's a separate, auto-sized
      flex item before HudOverlay's flex:1 .p-hud fills the rest. */
   .native-hud-slot.portrait {
-    flex: 1 1 auto;
+    /* CONTENT-SIZED, not stretched. FS_SMALLSCREEN_RECOMPOSE (2026-07-26).
+       This was `flex: 1 1 auto`, which made the slot absorb every spare pixel in
+       the viewport; HudOverlay's `.p-hud` is itself flex:1 with
+       justify-content:space-between, so that surplus was distributed INTO the HUD
+       as a gap between the stats/bet group and the controls row. The gap was
+       therefore (viewportH - wordmark - canvas - hudContent), which grows 1.000px
+       for every extra px of viewport height once the canvas is width-bound:
+       measured 30.8px at 425x812, 118.8 at 900, 249.8 at 1031 and 618.8 at 1400,
+       a slope of exactly 1.000. That is the owner's "roughly 250px dead band
+       between BET and the controls" at Mobile L, and it reconciles their figure
+       with this machine's 30.8px: the platform's Screen preset sets the WIDTH and
+       the window supplies the height, so their Mobile L was about 1031px tall.
+       Content-sizing the slot makes the hole structurally impossible rather than
+       merely smaller, and any genuine surplus now collects after the HUD as
+       bottom padding, which is what this region's own 2026-07-14c comment said
+       was intended all along.
+       It is also what lets the canvas slot below be measured honestly. A stretching
+       HUD and a stretching canvas cannot both be sized from the same leftover: one
+       of them has to be the content, and the HUD is the one whose height is
+       genuinely decided by what is in it. */
+    flex: 0 0 auto;
     min-height: 0;
   }
   /* Compact-landscape (2026-07-14b): a single native-scale row - FeatureMenu's

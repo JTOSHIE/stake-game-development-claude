@@ -303,7 +303,15 @@
     tabindex="-1"
     on:click|self={close}
   >
-    <div class="fm-panel fs-plate">
+    <!-- FS_SMALLSCREEN_RECOMPOSE (2026-07-26): the panel gets a MINI profile at
+         Popout S. The trigger above has existed since TR-043, but opening it in a
+         400x225 popout produced a panel whose head (67px) and bet bar (91px) ate
+         158 of its 198px, leaving the mode list a 28px window onto 663px of
+         content with all four cards outside their clipping ancestor. The control
+         was reachable and the thing it controls was not, so the brief's "make
+         FEATURES present usably from the strip" is about this class, not the
+         button. -->
+    <div class="fm-panel fs-plate" class:fm-panel--mini={miniPlayer}>
       <span class="fs-rail"></span>
       <div class="fs-face">
 
@@ -699,6 +707,108 @@
     overflow: hidden;
   }
   @keyframes fm-pop { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+
+  /* ── MINI PANEL PROFILE, Popout S (FS_SMALLSCREEN_RECOMPOSE, 2026-07-26) ────
+     A purpose-built composition for a 400x225 box, not the desktop panel scaled
+     down. The measured problem: at 400x225 the panel is 198px tall and the head
+     and bet bar are fixed-height blocks drawn for a 560px-wide desktop dialog, so
+     they consumed 158px of it and the mode list was left 28px for 663px of
+     content. Every one of the four cards lay outside its clipping ancestor, and
+     the BET MODES button sat 8px below the viewport.
+     The budget is reallocated rather than the whole thing shrunk: the head and
+     bet bar are compressed to single rows of about 30px each, which leaves the
+     MODE LIST the majority of the panel for the first time. That is the right
+     split because the list is what the panel is FOR; the head is a title and a
+     close button, and the bet bar duplicates a stepper the mini strip already
+     shows in its visible row.
+     What is dropped at this size, and why it is safe: each card's prose blurb and
+     OVERBOOST's secondary effect line. Both are descriptive rather than
+     load-bearing, the per-mode COST stays on every card (the platform display
+     convention requires the effective price to be stated, and it still is), and
+     the BET MODES button that opens the full explanation stays reachable. Nothing
+     here is hidden by an overflow: the list scrolls, and the gate asserts the
+     cards lie inside their clipping ancestors rather than merely existing. */
+  /* TOUCH TARGETS AT THIS SIZE. Four mode rows at a 44px visual height is 176px
+     of button in a panel that has 216px for everything, so 44px VISUAL does not
+     fit and no amount of CSS makes it. The mini strip already solved this exact
+     problem the same way (.m-fm-entry is a 36px visual with `::after{inset:-4px}`
+     reaching a 44px target, and mini_player_proof measures targets INCLUDING that
+     extension), so this profile follows the codebase's own established pattern
+     rather than inventing a second one: compact visuals, hit areas extended to
+     44px. Card pitch is 43px and the extended hit areas are 44px tall, so
+     consecutive rows do not overlap, which the mini proof also checks. */
+  .fm-panel--mini {
+    width: 96%;
+    max-width: none;
+    max-height: 96dvh;
+  }
+  .fm-panel--mini > .fs-face { max-height: 96dvh; }
+  .fm-panel--mini .fm-head { padding: 2px 10px; }
+  .fm-panel--mini .fm-title { font-size: 0.78rem; letter-spacing: 0.12em; }
+  .fm-panel--mini .fm-close { width: 24px; height: 24px; padding: 2px; position: relative; }
+  .fm-panel--mini .fm-close::after { content: ''; position: absolute; inset: -10px; }
+  .fm-panel--mini .fm-close > .fs-face { font-size: 0.7rem; }
+  /* One row, never wrapping: the wrap is what made this 91px tall. */
+  .fm-panel--mini .fm-betbar { margin: 2px 8px 0; }
+  .fm-panel--mini .fm-betbar > .fs-face {
+    flex-wrap: nowrap; gap: 0.4rem; padding: 2px 8px;
+  }
+  .fm-panel--mini .fm-spin-cost { font-size: 0.52rem; letter-spacing: 0.04em; }
+  .fm-panel--mini .fm-betlabel { font-size: 0.5rem; letter-spacing: 0.08em; }
+  .fm-panel--mini .fm-betval { font-size: 0.72rem; }
+  .fm-panel--mini .fm-step {
+    width: 26px; height: 26px; min-width: 26px; min-height: 26px; position: relative;
+  }
+  .fm-panel--mini .fm-step::after { content: ''; position: absolute; inset: -9px; }
+  .fm-panel--mini .fm-cards { padding: 3px 8px; margin-top: 0; gap: 5px; }
+  .fm-panel--mini .fm-section-label { font-size: 0.52rem; padding: 0; line-height: 1.2; }
+  .fm-panel--mini .fm-section-separator { margin: 1px 2px 0; }
+  /* Cards become compact single rows: name, volatility, cost, action. */
+  .fm-panel--mini .fm-card > .fs-face { padding: 5px 8px; gap: 0.4rem; }
+  .fm-panel--mini .fm-blurb,
+  .fm-panel--mini .fm-enh-effect { display: none; }
+  .fm-panel--mini .fm-card-main { gap: 0; }
+  .fm-panel--mini .fm-name { font-size: 0.64rem; }
+  .fm-panel--mini .fm-vol, .fm-panel--mini .fm-soon { font-size: 0.48rem; }
+  .fm-panel--mini .fm-cost { font-size: 0.52rem; }
+  /* Cost BESIDE the action, not above it. This is what actually buys the room:
+     the base .fm-action is a column, so every card carried cost + gap + button
+     stacked (43px) where the name row needed 16, making the cards 57 to 62px tall
+     and fitting one at a time. Side by side the card is the button's own height
+     and two cards clear the window. */
+  .fm-panel--mini .fm-action {
+    flex-direction: row; align-items: center; gap: 0.35rem;
+  }
+  .fm-panel--mini .fm-select, .fm-panel--mini .fm-buy,
+  .fm-panel--mini .fm-activate, .fm-panel--mini .fm-toggle {
+    font-size: 0.55rem; padding: 3px 8px; min-height: 28px; min-width: 70px;
+    position: relative;
+  }
+  .fm-panel--mini .fm-select::after, .fm-panel--mini .fm-buy::after,
+  .fm-panel--mini .fm-activate::after, .fm-panel--mini .fm-toggle::after {
+    content: ''; position: absolute; inset: -8px;
+  }
+  .fm-panel--mini .fm-active-tag { font-size: 0.48rem; }
+  /* The paired Normal/Cruise card stays side by side (the base .fm-paired-face
+     rule sets that with !important, which is why these two need it as well to
+     reach the padding and gap at all). At 384px of panel each option gets about
+     180px, which holds a name, a cost and a SELECT once the blurb is gone. */
+  .fm-panel--mini .fm-paired-face { padding: 4px 4px !important; }
+  /* Each paired option also becomes a row, for the same reason the plain cards
+     did: stacked, this one card was 59px against the others' 42, and it is the
+     first in the list, so its height alone decided whether a second card cleared
+     the window. */
+  .fm-panel--mini .fm-paired-opt {
+    flex-direction: row; align-items: center; gap: 0.3rem; padding: 0 5px;
+  }
+  .fm-panel--mini .fm-paired-opt .fm-name-row { flex: 1 1 auto; min-width: 0; }
+  .fm-panel--mini .fm-paired-opt .fm-action { margin-top: 0; flex: 0 0 auto; }
+  .fm-panel--mini .fm-paired-opt .fm-select { min-width: 56px; }
+  .fm-panel--mini .fm-info-btn {
+    font-size: 0.55rem; padding: 3px 8px; min-height: 26px; position: relative;
+  }
+  .fm-panel--mini .fm-info-btn::after { content: ''; position: absolute; inset: -9px; }
+  .fm-panel--mini .fm-foot { padding: 3px 8px; }
 
   /* header */
   .fm-head {

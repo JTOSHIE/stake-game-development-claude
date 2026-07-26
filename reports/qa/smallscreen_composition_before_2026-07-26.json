@@ -1,0 +1,163 @@
+{
+  "phase": "before",
+  "presets": 7,
+  "floors": {
+    "Mobile L": 94,
+    "Mobile M": 94,
+    "Mobile S": 81,
+    "Popout S": 42,
+    "Desktop": 40,
+    "Laptop": 40,
+    "Popout L": 33
+  },
+  "rows": [
+    {
+      "preset": "Desktop",
+      "size": "1200x675",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 50,
+      "gridFillPctW": 40.8,
+      "gridFillFloor": 40,
+      "deadBandPx": null,
+      "canvasSlotH": 675
+    },
+    {
+      "preset": "Laptop",
+      "size": "1024x576",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 50,
+      "gridFillPctW": 40.8,
+      "gridFillFloor": 40,
+      "deadBandPx": null,
+      "canvasSlotH": 576
+    },
+    {
+      "preset": "Popout S",
+      "size": "400x225",
+      "frameCentreOffsetX": 110.6,
+      "frameFillPctW": 40.2,
+      "gridFillPctW": 32.8,
+      "gridFillFloor": 42,
+      "deadBandPx": null,
+      "canvasSlotH": 181
+    },
+    {
+      "preset": "Popout L",
+      "size": "800x450",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 41.5,
+      "gridFillPctW": 33.9,
+      "gridFillFloor": 33,
+      "deadBandPx": null,
+      "canvasSlotH": 374
+    },
+    {
+      "preset": "Mobile L",
+      "size": "425x812",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 117.7,
+      "gridFillPctW": 96,
+      "gridFillFloor": 94,
+      "deadBandPx": 30.8,
+      "canvasSlotH": 462.7
+    },
+    {
+      "preset": "Mobile M",
+      "size": "375x667",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 97.4,
+      "gridFillPctW": 79.5,
+      "gridFillFloor": 94,
+      "deadBandPx": 10.5,
+      "canvasSlotH": 338
+    },
+    {
+      "preset": "Mobile S",
+      "size": "320x568",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 80.7,
+      "gridFillPctW": 65.8,
+      "gridFillFloor": 81,
+      "deadBandPx": 10.5,
+      "canvasSlotH": 239
+    },
+    {
+      "preset": "Popout S FEATURES",
+      "cardsWindowH": 28,
+      "cardsContentH": 663,
+      "cardCount": 4,
+      "cardsFullyVisible": 0,
+      "closeReachable": true
+    },
+    {
+      "sweep": [
+        {
+          "height": 568,
+          "deadBandPx": 10.5,
+          "gridFillPctW": 49.6
+        },
+        {
+          "height": 667,
+          "deadBandPx": 10.5,
+          "gridFillPctW": 70.1
+        },
+        {
+          "height": 740,
+          "deadBandPx": 10.5,
+          "gridFillPctW": 85.3
+        },
+        {
+          "height": 812,
+          "deadBandPx": 30.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 900,
+          "deadBandPx": 118.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1000,
+          "deadBandPx": 218.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1031,
+          "deadBandPx": 249.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1100,
+          "deadBandPx": 318.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1200,
+          "deadBandPx": 418.8,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1400,
+          "deadBandPx": 618.8,
+          "gridFillPctW": 96
+        }
+      ]
+    }
+  ],
+  "failures": [
+    "Popout S: stage not centred, frame centre is +110.6px from the viewport centre",
+    "Popout S: stage does not fill its box, grid is 32.8% of the viewport width against a derived floor of 42%",
+    "Mobile L: dead band of 30.8px between the HUD top group and the controls row (the one deliberate gap is 10px)",
+    "Mobile M: stage does not fill its box, grid is 79.5% of the viewport width against a derived floor of 94%",
+    "Mobile S: stage does not fill its box, grid is 65.8% of the viewport width against a derived floor of 81%",
+    "Popout S: FEATURES panel first mode card is not fully visible",
+    "Popout S: FEATURES panel shows 0 of 4 mode cards fully, needs at least 2 (card window 28px for 663px of content)",
+    "425x812: dead band of 30.8px (the one deliberate gap is 10px)",
+    "425x900: dead band of 118.8px (the one deliberate gap is 10px)",
+    "425x1000: dead band of 218.8px (the one deliberate gap is 10px)",
+    "425x1031: dead band of 249.8px (the one deliberate gap is 10px)",
+    "425x1100: dead band of 318.8px (the one deliberate gap is 10px)",
+    "425x1200: dead band of 418.8px (the one deliberate gap is 10px)",
+    "425x1400: dead band of 618.8px (the one deliberate gap is 10px)"
+  ]
+}
