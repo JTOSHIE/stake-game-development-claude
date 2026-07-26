@@ -1,0 +1,44 @@
+{
+  "generated": "2026-07-26",
+  "job": "JOB 3(i), no documentation ships",
+  "dist": {
+    "files": 107,
+    "bytes": 15514619,
+    "megabytes": 14.8
+  },
+  "budgetBytes": 26214400,
+  "filesByExtension": {
+    ".css": 1,
+    ".js": 3,
+    ".woff": 3,
+    ".woff2": 3,
+    ".mp3": 26,
+    ".jpg": 3,
+    ".png": 63,
+    ".json": 1,
+    ".webm": 3,
+    ".html": 1
+  },
+  "documentationFound": [],
+  "seeded": [
+    {
+      "why": "the file that really shipped, deep inside an asset directory",
+      "caught": true
+    },
+    {
+      "why": "a bare LICENSE with no extension",
+      "caught": true
+    },
+    {
+      "why": "a text file at the bundle root",
+      "caught": true
+    },
+    {
+      "why": "an uppercase extension",
+      "caught": true
+    }
+  ],
+  "negativeControl": true,
+  "pass": true,
+  "failures": []
+}

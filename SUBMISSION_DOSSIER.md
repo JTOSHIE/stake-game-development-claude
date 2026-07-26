@@ -152,14 +152,36 @@ Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'
 `pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
 (confirmed empty of pruned-path requests and under the 25MB budget by
 `frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
-Current measured size: **14.79MB** (108 files, 15,510,083 bytes; fresh build 2026-07-26)
-against the 25MB budget. Supersedes both the 13.59MB recorded at JOB 4 on 2026-07-13 and
-the 21.87MB measured earlier on 2026-07-26.
+Current measured size: **14.80MB** (107 files, 15,514,619 bytes; fresh build 2026-07-26,
+after JOB 3(i)) against the 25MB budget. Supersedes both the 13.59MB recorded at JOB 4 on
+2026-07-13 and the 21.87MB measured earlier on 2026-07-26.
 
-**That figure is reproducible, and it was verified rather than asserted.** A clean clone
+**The 108-file / 15,510,083-byte figure recorded earlier on 2026-07-26 is superseded, and
+both movements are accounted for.** The FILE COUNT falls from 108 to 107 because JOB 3(i)
+stops documentation shipping and `assets/themes/future-spinner/sounds/README.md` was the
+only such file. The BYTE TOTAL nonetheless rises by 4,536, because the same session added
+the mini-player abbreviation formatter, the social locale rule, the FEATURE PRICE line and
+twenty new translation keys across sixteen locales, all of which are bundled JavaScript
+and together outweigh the removed file.
+
+No exact byte-for-byte reconciliation between the two figures is offered, and that is
+deliberate rather than an omission. The two builds are of different source trees, and the
+README itself was edited between them by the TR-063 dash purge, so its size at the earlier
+measurement is not its size now. Per convention (l.3) a figure is either cited or it is not
+known: the current figure is computed and cited below, and a difference decomposed across
+two trees would be an estimate wearing a decimal point.
+
+The figure above is computed by `frontend/scripts/dist_hygiene_gate.mjs` on the build it
+describes and written to `reports/qa/dist_hygiene_2026-07-26.json`, so it is re-derivable
+rather than carried forward. That gate also asserts the 25MB budget and that no
+documentation file is present.
+
+**That property is reproducible, and it was verified rather than asserted.** A clean clone
 taken from origin, installed with `npm ci` and built with `npm run build`, produced
-**108 files and 15,510,083 bytes: identical file lists and an exact byte match** against
-this machine.
+**identical file lists and an exact byte match** against this machine, at the
+108-file / 15,510,083-byte figure current when that check ran. Convention (o) makes the
+property structural rather than something to remember, and the clone build for the current
+figure is JOB 5's, where the kit is assembled.
 
 Getting there took two fixes, both recorded under TR-047. An untracked, unreferenced
 `branding/` directory in `frontend/public/` was shipping 7.06MB into `dist/` while being
