@@ -4763,3 +4763,25 @@ glance, do the WILD and SCAT panels reach the bottom of their cards, and does th
 darkening reach every edge with the window deliberately the wrong shape. Carried
 over from V5 and still open: the twenty bracketed Cruise spins and the Guidelines
 ticks, both written out in full in PART 9d, neither blocked by anything in V6.
+
+---
+
+## Rule 10 closing
+
+**Final push `da77ab2`, run 30215681101, GREEN on both jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30215681101
+
+The run before it, **30215328100** on `14b6506`, is the one that carries every
+code change this session made, and it was green on both jobs too. Its browser
+job ran all six new steps on the remote runner and passed each: splash calm
+self-test and gate, turbo intensity self-test and gate, paytable card fill
+self-test and gate, scrim coverage self-test and gate. That matters more than
+the closing run, which is documentation only.
+
+**Two runs in between show `cancelled` and neither is a red.** 30215154559 and
+30215238993 were superseded by the next push, and 30215589795 by the push after
+that; `concurrency: cancel-in-progress` in `checks.yml` cancels a run when a
+newer commit lands on the same ref. Recorded here because rule 9 says an
+unexplained non-green is treated as real, and the honest way to keep that rule
+worth something is to explain the explainable ones by name rather than let a
+reader discover three cancellations and have to work out which kind they were.
