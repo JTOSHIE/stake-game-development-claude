@@ -152,17 +152,23 @@ Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'
 `pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
 (confirmed empty of pruned-path requests and under the 25MB budget by
 `frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
-Current measured size: **14.80MB** (107 files, 15,514,619 bytes; fresh build 2026-07-26,
-after JOB 3(i)) against the 25MB budget. Supersedes both the 13.59MB recorded at JOB 4 on
+Current measured size: **14.80MB** (108 files, 15,515,125 bytes) against the 25MB budget,
+measured on the artefact that ships: the JOB 5 kit V3 build, from a fresh clone at commit
+`7dd83e6a`, clean tree, 2026-07-26. Supersedes both the 13.59MB recorded at JOB 4 on
 2026-07-13 and the 21.87MB measured earlier on 2026-07-26.
 
-**The 108-file / 15,510,083-byte figure recorded earlier on 2026-07-26 is superseded, and
-both movements are accounted for.** The FILE COUNT falls from 108 to 107 because JOB 3(i)
-stops documentation shipping and `assets/themes/future-spinner/sounds/README.md` was the
-only such file. The BYTE TOTAL nonetheless rises by 4,536, because the same session added
-the mini-player abbreviation formatter, the social locale rule, the FEATURE PRICE line and
-twenty new translation keys across sixteen locales, all of which are bundled JavaScript
-and together outweigh the removed file.
+The 108th file is `build-info.json` itself, the JOB 4 provenance stamp, which records the
+other 107 files and 15,514,744 bytes and is excluded from its own total for want of a
+fixed point. 15,514,744 plus the stamp's own 381 bytes is 15,515,125, and
+`dist_hygiene_gate.mjs` asserts exactly that reconciliation on every build.
+
+**The earlier 108-file / 15,510,083-byte figure is superseded, and both movements are
+accounted for.** JOB 3(i) removed one file, `assets/themes/future-spinner/sounds/README.md`,
+because documentation no longer ships; JOB 4 added one, `build-info.json`, so the count is
+108 again for a different reason. The byte total rises because the same session added the
+mini-player abbreviation formatter, the social locale rule, the FEATURE PRICE line, the
+boot stamp and twenty new translation keys across sixteen locales, all of which are bundled
+JavaScript and together outweigh the removed file.
 
 No exact byte-for-byte reconciliation between the two figures is offered, and that is
 deliberate rather than an omission. The two builds are of different source trees, and the
