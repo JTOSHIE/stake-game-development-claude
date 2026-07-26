@@ -25,6 +25,18 @@
 //              the defect was proportional to viewport height and the presets
 //              alone would have missed it. See THE HEIGHT SWEEP below.
 //
+// WHERE SCRIM COVERAGE LIVES, because a reader will look for it here first.
+// FS VISUAL FIXPACK JOB 4's brief said to "assert coverage in the composition
+// gate at all seven presets plus three swept window sizes", and it is asserted
+// at exactly that scope, but in its own file: scrim_coverage_gate.mjs. The
+// reason is this gate's own opening argument turned on itself. Its subject is
+// whether the STAGE is composed correctly on SMALL screens, and scrim coverage
+// is whether an OVERLAY covers the viewport, measured with dialogs open, and
+// its three swept sizes are 1600x600, 900x900 and 1100x980, which are not small
+// screens at all. Folding those in would have made a gate that says two things
+// and is named for one. The deviation is recorded in the session report rather
+// than taken quietly, per convention (n).
+//
 // Plus, at Popout S only:
 //   FEATURES USABLE
 //              the FEATURES panel opens from the mini strip and its mode cards are
