@@ -43,3 +43,8 @@ tools/audio_forge/__pycache__/
 # frontend/scripts/build_diet_verify.mjs. Committing it invited a reviewer to
 # conclude the shipped bundle was two files (TR-025).
 frontend/dist/
+
+# MULTI-TRACK PROTOCOL rule 11: every track session works in its own git
+# worktree at worktrees/<track>/. Ignored so a worktree can never be committed
+# and can never reach a build.
+worktrees/
