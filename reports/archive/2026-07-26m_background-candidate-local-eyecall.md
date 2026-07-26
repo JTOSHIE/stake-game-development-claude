@@ -292,7 +292,12 @@ appears in both builds above.
 
 ## Rule 10 closing link
 
-Recorded below after the final push, per rule 10.
+Final push at `6eaea1a`, BOTH JOBS GREEN on the remote runner:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30202708950`
+  static gates: success
+  browser gates: success
+
+`main` is green, so the line is not stopped and the next job may start.
 
 ## FOR THE NEXT SESSION
 
