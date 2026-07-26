@@ -2794,7 +2794,7 @@ Built from a **fresh clone of `origin/main` at `1b31c5be`**, per convention (o).
 
 | Gate, run in the clone | Result |
 |---|---|
-| production build | PASS, 108 files, 15,514,792 bytes |
+| production build | PASS, 108 files, 15,515,173 bytes (the build stamp records 107 and 15,514,792, not counting itself) |
 | dash gate, source scan, 82 files | PASS |
 | dash gate, dist scan | PASS |
 | dist hygiene, no documentation ships | PASS, four seeded violations caught, negative control clean |
@@ -2898,3 +2898,22 @@ its archive copy. `sideproject/` removed from the working tree.
 Also still open and not touched by this session: the six social strings blocking stake.us,
 the JOB 2 addendum's platform-conformance extensions, JOB 3b's math self-audit, and JOB 5b's
 in-game rules conformance UI.
+
+**Rule 10 closing (2026-07-26k).** Remote run
+[30194550651](https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30194550651)
+on `31dbc1f`: **green, both jobs** (static gates, browser gates). The mid-session
+push at `1b31c5b` was also green, run
+[30194275519](https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30194275519).
+Verified from the runs' own conclusions, not from local gate results.
+
+**One correction folded into this commit.** The kit README and the report both
+gave the bundle as "108 files, 15,514,792 bytes", which mixes two counts: 108
+files includes `build-info.json`, and 15,514,792 excludes it, because the stamp
+does not count itself. The bundle is 108 files and 15,515,173 bytes; the stamp
+records 107 and 15,514,792. The 381-byte gap is the stamp.
+
+**One finding added to section 7a.** The archived `sideproject/` mattered less
+than its size suggested: the LUMEN source is on the pushed branch
+`claude/lumen-sideproject` (`4f4d6ef`), and 89 MB of the 112 MB in the working
+tree was `node_modules`. Recorded so a future reader does not treat the zip as
+the only copy.

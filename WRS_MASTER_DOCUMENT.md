@@ -187,6 +187,14 @@ had to step over.
 template below is the starting point, and the archive is worth opening for
 theme and art ideas rather than for anything to build on.
 
+**And the deletion risked less than it looked like it did.** The LUMEN source
+lives on the branch `claude/lumen-sideproject` (`4f4d6ef`, confirmed present on
+origin 2026-07-26), which the 2026-07-25 owner audit already recorded as
+intentionally parked and not for merge. What sat in the working tree was
+overwhelmingly build output: 89 MB of `node_modules` and a built `dist/` out of
+112 MB total. The zip is a belt-and-braces copy of a directory whose meaningful
+contents were already on a pushed branch.
+
 ### 7b. Next-title template (applies to LUMEN, queued after Future Spinner submits)
 Reuse in order: maths package + validate_math + PAR -> wiring integrity audit pattern -> statelessness/replay evidence -> AssetForge + AudioForge (new seeds/prompts) -> rules/paytable/UI guide conformance -> QA soak + platform conformance suite (all scripts are reusable) -> math self-audit -> compliance watch -> dossier from this register's 3a-3d -> tile layers -> submit. Company layer (section 1) does not repeat; only per-title rows do.
 
