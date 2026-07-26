@@ -376,24 +376,41 @@ notes than have you work around it.
 
 ---
 
-# PART 9: THE SECOND VISIT
+# PART 9: THE V3 VISIT (SUPERSEDED, DO NOT RUN)
 
-**This is a separate session from everything above, and you do the whole of it
-after the first visit is finished.** Everything above stays true: nothing is
-public until **Submit for review**, every upload replaces rather than stacks,
-"Publish" means *make my uploads runnable for me*, and stopping to screenshot is
-always safe.
+**This section is dead and its kit is dead.** It was written for
+`~/Desktop/FS_UPLOAD_KIT_V3/`, that visit was never run, and a newer build has
+replaced it. Running it would upload a bundle that is missing the replay fix.
 
-Allow about forty minutes.
+**Go to PART 9c below.** It is the whole visit, in order, and it absorbs
+everything the V3 section asked for.
 
-**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V3/`. The old
-`~/Desktop/FS_UPLOAD_KIT/` is **DEAD**. Do not upload anything out of it. If it
-is still on your Desktop, drag it to the Bin now so it cannot be picked up by
-mistake.
+If `~/Desktop/FS_UPLOAD_KIT_V3/` or `~/Desktop/FS_UPLOAD_KIT/` is still on your
+Desktop, drag both to the Bin now, so neither can be picked up by mistake. The
+full text of this superseded section stays in the repository's history.
 
-**Where the screenshots go:** just save them **loose on the Desktop**. Do not sort
-them into folders and do not rename them. I will file them. A screenshot in the
-wrong folder is worse than one sitting on the Desktop, because I will not find it.
+---
+
+# PART 9c: THE NEXT VISIT (V4)
+
+**This is a self-contained session. You do not need to read anything above it.**
+Everything earlier stays true: nothing is public until **Submit for review**,
+every upload replaces rather than stacks, "Publish" means *make my uploads
+runnable for me*, and stopping to screenshot is always safe.
+
+Allow about forty-five minutes. You can stop at any step and come back.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V4/`. Its `README.md`
+names the exact commit it was built from, `1b31c5be`, and that is the only kit
+to use today.
+
+**Where the screenshots go:** just save them **loose on the Desktop**. Do not
+sort them into folders and do not rename them. I will file them. A screenshot in
+the wrong folder is worse than one sitting on the Desktop, because I will not
+find it.
+
+**The one thing not to do:** do not press **Start Approval**. It is in the
+left-hand menu, it is not part of today, and nothing below needs it.
 
 ---
 
@@ -413,37 +430,40 @@ notes file that was dragged up with the real ones by accident.
 If the list does not offer a delete control, stop and screenshot it, and I will
 find another route.
 
-**The maths is not being re-uploaded today.** It stays exactly as it is.
+**The maths is not being re-uploaded today.** It stays exactly as it is, and
+there is no maths folder in the V4 kit for exactly that reason.
 
 ---
 
-## Step 2: upload the new game files
+## Step 2: upload the new game files, and publish
 
 1. Still on the **Files** page, press **Import Files**.
-2. Open `~/Desktop/FS_UPLOAD_KIT_V3/02_frontend_upload`.
+2. Open `~/Desktop/FS_UPLOAD_KIT_V4/02_frontend_upload`.
 3. Select **everything inside that folder** and drag it in. **The contents, not
    the folder.** If `index.html` ends up one level down, the game will not load.
    This is the single most likely mistake and it is easy to undo.
 4. A sync dialog appears saying how many files it will upload, skip, delete or
-   move. **Screenshot that dialog before you confirm it.** Last time this dialog
-   was the thing that explained a problem, and it was not captured.
+   move. **Screenshot that dialog before you confirm it.** On an earlier visit
+   this dialog was the thing that explained a problem, and it was not captured.
 5. Confirm, and wait. It is about 15 MB, so it should be quick.
 6. When it finishes, the **FRONTEND** panel should read **108 files**. Screenshot it.
 
    If it reads anything other than 108, screenshot it and tell me. Do not try to
    fix it by uploading again.
 
-7. Press **Publish Game**.
+7. Press **Publish Game**. This is not optional: until you publish, the platform
+   has your files but no runnable version of them.
 
 ---
 
 ## Step 3: confirm the new build is the one running
 
 Open the game (**Play Game**, or the Developer page's launch), and check these
-six things. Screenshot each one.
+five things. Screenshot each one.
 
-1. **The version reads Front V3.** On the Versions panel. If it still says V2, the
-   publish did not take, so press **Publish Game** again.
+1. **The version has gone up.** On the Versions panel. If it still shows the
+   number it showed before you published, the publish did not take, so press
+   **Publish Game** again.
 2. **The pilot is there.** The character on the left of the screen renders as
    artwork, not as a broken-image icon. This was broken once before, so it is
    worth a look.
@@ -473,31 +493,84 @@ six things. Screenshot each one.
    - **The menu button**, second from the left, should show **three horizontal
      lines**. It used to render as an empty box. If it is empty, screenshot it.
 
-6. **Screenshot the whole Popout S screen** as well as the strip.
+   **Screenshot the whole Popout S screen** as well as the strip.
 
 ---
 
-## Step 4: the game tile
+## Step 4: the replay, which is the most valuable minute of this visit
 
-The game card still shows a **Design Thumbnail** placeholder.
+**Replay this bet did nothing at all on the live build.** A full-screen backdrop
+was sitting over the replay screen and swallowing the click. It is fixed in the
+bundle you just uploaded, and this step is where we find out whether the fix
+reached the platform.
+
+It is also the last chance to photograph the max win celebration, which we have
+never actually seen on screen.
+
+1. Open the **Bets** panel.
+2. **Ideally, find event `22975`**, a SUPER round. If you cannot find it, **any
+   bet will do**: the point is that the Replay button works at all.
+   If you would rather have the spectacular one, look for the round paying
+   **`+EUR 3,750,000.00`**. It is the largest number in the list by a very long
+   way, and it is exactly 5,000x, the cap.
+3. Click the row to open it, and press **Replay this bet**.
+4. **Expect: the replay actually plays.** Previously nothing happened at all.
+5. **Watch it to the end** and look for a full-screen celebration: three stars,
+   the words **MAX WIN**, a large **5,000x** and a **COLLECT** button.
+6. **Screenshot it while it is on screen**, before pressing COLLECT.
+
+**If the replay still does nothing, that is the important answer**, so screenshot
+the screen and tell me. And if it plays but no celebration appears on a max win
+round, screenshot the end of the replay anyway. Either outcome settles something.
+
+---
+
+## Step 5: twenty Cruise spins, bracketed
+
+Cruise is the one mode we have never been able to check the money on, because
+every screenshot of it so far has been a single moment with nothing to compare
+against.
+
+1. Open **FEATURES** and select **Cruise**.
+2. **Before you spin at all:** open the menu, open **Session information**, and
+   **screenshot it**. This is the "before" and the run is worthless without it.
+3. Close that panel and spin **twenty times**. Autoplay is fine.
+4. **After the twentieth spin:** open **Session information** again and
+   **screenshot it**.
+
+Two screenshots, the same panel, before and after. That is the whole thing. With
+both, the money can be differenced and Cruise is settled; with only one, it is
+not, which is exactly where we are now.
+
+---
+
+## Step 6: the game tile
+
+The game card still shows a **Design Thumbnail** placeholder. Nobody here has
+ever opened that editor, so **the first thing to do is look at what it asks
+for**, and the kit carries both possible answers.
 
 1. Open the **Design Thumbnail** editor from the game card.
-2. Use the two images in `~/Desktop/FS_UPLOAD_KIT_V3/03_branding/`:
-   - `FutureSpinner-BG.jpg` is the **background** layer.
-   - `FutureSpinner-FG.png` is the **foreground** layer, and it has a transparent
-     background, so it goes on top.
-3. Save, and **screenshot the finished tile**.
+2. **Screenshot it before you upload anything.** This is the one surface in the
+   whole submission we have never seen, and one screenshot of it settles a
+   question that has been open for weeks.
+3. Then give it whichever it wants, from `~/Desktop/FS_UPLOAD_KIT_V4/03_branding/`:
+   - **If it takes a single composed image**, use `FutureSpinner-Tile.png`. This
+     is the finished tile, at 408x546, which is the exact size the platform's own
+     published tiles use.
+   - **If it wants separate layers**, use `FutureSpinner-BG.jpg` as the
+     **background** and `FutureSpinner-FG.png` as the **foreground**. The
+     foreground has a transparent background, so it goes on top.
+4. Save, and **screenshot the finished tile**.
 
-If the editor asks for anything the two files do not cover, stop and screenshot
-it.
+If it asks for something neither of those covers, stop and screenshot it.
 
 ---
 
-## Part 9b: the seven observations
+## Step 7: the remaining observations
 
-These are the same shape as the ten checks in Part 8: **look at this, expect
-this, screenshot this.** The technical detail sits in `DTT_PROTOCOL.md`, which is
-for me and for Fable, not for you.
+These are the same shape as the checks above: **look at this, expect this,
+screenshot this.** They are what is left of the earlier observation list.
 
 **Being wrong is fine and it is cheap.** Every one of these either confirms
 something we assumed or names one line of code to change. There is no answer
@@ -515,7 +588,9 @@ Open the browser's developer tools, **Network** tab, and leave it open.
 5. **Screenshot the Network list and the `play` response.**
 
 Whatever it does is the right answer. We are checking which of two contradictory
-platform instructions the RGS actually follows.
+platform instructions the RGS actually follows. This is the highest value single
+observation left in the project, because it is a named guideline item with a pass
+or a fail rather than a shape question.
 
 ### Observation 2: where the round's events live
 
@@ -562,46 +637,9 @@ one value in our code.
    to English with nothing missing, no blank labels and no odd codes on screen.
 5. **Screenshot the game running in that session.**
 
-### Observation 6: the max win, replayed
-
-**You already hit the maximum win.** On 26 July a NITRO OVERDRIVE round at a
-`EUR 750.00` bet paid `EUR 3,750,000.00`, which is exactly 5,000x, the cap. What
-we do not have is a picture of the celebration screen that is supposed to appear
-when it happens, because by the time the screenshot was taken it had already been
-collected.
-
-1. Open the **Bets** panel and scroll to the round paying **`+EUR 3,750,000.00`**.
-   It is the largest number in the list by a very long way, so it is easy to find.
-2. Click that row to open it, and press **Replay this bet**.
-3. Watch the replay through to the end.
-4. **The thing to watch for:** a full-screen celebration with three stars, the
-   words **MAX WIN**, a large **5,000x** and a **COLLECT** button.
-5. **Screenshot it while it is on screen**, before pressing COLLECT.
-
-**If no celebration appears, that is the more important answer**, so screenshot
-the end of the replay anyway and tell me. Either way this takes about a minute
-and it is the last piece of evidence the max win is missing.
-
-### Observation 7: twenty Cruise spins, bracketed
-
-Cruise is the one mode we have never been able to check the money on, because
-every screenshot of it so far has been a single moment with nothing to compare
-against.
-
-1. Open **FEATURES** and select **Cruise**.
-2. **Before you spin at all:** open the menu, open **Session information**, and
-   **screenshot it**. This is the "before" and the run is worthless without it.
-3. Close that panel and spin **twenty times**. Autoplay is fine.
-4. **After the twentieth spin:** open **Session information** again and
-   **screenshot it**.
-
-Two screenshots, the same panel, before and after. That is the whole thing. With
-both, the money can be differenced and Cruise is settled; with only one, it is
-not, which is exactly where we are now.
-
 ---
 
-## Part 9c: the Guidelines checklist
+## Step 8: the Guidelines checklist
 
 Open the portal's **Guidelines** tab, and open
 `docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md` beside it. That
@@ -611,13 +649,13 @@ document already has our answer for every one of the 58 items.
 2. **Nine items are marked OWNER.** Those are yours, not the build's: the
    thumbnail, the approval requests, the Provably Fair toggle, the channel post
    and the post-release steps. Item 7, the thumbnail, you will have just done in
-   Step 4.
+   Step 6.
 3. If the portal's list and our document disagree about anything, **stop and
    screenshot it**. A disagreement is worth more than a tick.
 
 ---
 
-## Part 9d: finishing
+## Step 9: finishing
 
 1. Leave every screenshot loose on the Desktop. Do not sort or rename them.
 2. Tell me anything that came back different from what this document said to
@@ -626,7 +664,7 @@ document already has our answer for every one of the 58 items.
 3. **Do not press Start Approval.** It is in the left-hand menu and it is not
    part of today. Nothing above requires it and nothing above is affected by
    leaving it alone.
-4. When you are done, delete `~/Desktop/FS_UPLOAD_KIT_V3/`. It is single use.
+4. When you are done, delete `~/Desktop/FS_UPLOAD_KIT_V4/`. It is single use.
    The next upload gets a freshly built kit, because a kit sitting on the Desktop
    is a kit that eventually gets uploaded when it is out of date, which has
    already happened once.

@@ -1,28 +1,4 @@
-BRANDING SET, verified before packaging
-========================================
-
-Three files, three destinations. They do NOT all go to the same place.
-
-1. WeRollSpinners-Logo.png
-   GOES TO: Team Settings, then Branding
-   WHAT IT IS: the studio logo, uploaded once
-   40,314 bytes
-   SHA-256 66c692daf309293568214bd57b350b02b930d610c6b7d09ecb181a35dc7a03c6
-
-2. FutureSpinner-BG.jpg
-   GOES TO: Tile Editor
-   WHAT IT IS: the background layer of the game tile
-   381,863 bytes
-   SHA-256 493ee21658d126d7a45ff2407d56a18af0be1da08aac45c3db3c3d124fe5f143
-
-3. FutureSpinner-FG.png
-   GOES TO: Tile Editor
-   WHAT IT IS: the foreground character layer, transparent
-   433,497 bytes
-   SHA-256 0dede15b7cac8ac0fcf402959da7d1ee4731aedd39a087994993b2bbb66baf9a
-
-Background plus foreground: 796 KB against the platform 3 MB limit for those two combined.
-The logo is not counted in that limit.
-
-The logo is candidate f, the mark you commissioned, at its native 1024x1024
-with a real transparent background. It has been through no resizing at all.
+493ee21658d126d7a45ff2407d56a18af0be1da08aac45c3db3c3d124fe5f143  FutureSpinner-BG.jpg
+0dede15b7cac8ac0fcf402959da7d1ee4731aedd39a087994993b2bbb66baf9a  FutureSpinner-FG.png
+741e77face74f7e93fb29790eb16dfc22f15b7a13d3d9f47a00a682e7c99434e  FutureSpinner-Tile.png
+66c692daf309293568214bd57b350b02b930d610c6b7d09ecb181a35dc7a03c6  WeRollSpinners-Logo.png
