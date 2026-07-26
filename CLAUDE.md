@@ -508,6 +508,32 @@ integrator merges pull requests **one at a time** and resolves any report confli
 accounts of two pieces of work; keeping both is the whole point, and a merge that
 drops one has destroyed evidence to save a scroll.
 
+**9. Expected failures are declared before they run** (filled 2026-07-26, from
+the replay-blocker brief, with the slot's originally intended content).
+
+Seeded-failure proofs, the convention (p) red runs that prove a gate can fail,
+run LOCALLY wherever that is possible; a seeded red never needs to reach origin
+to count. Where a red run against origin is genuinely required:
+
+- it runs on a branch named `test/expected-fail-<topic>`, never on `main` or a
+  track branch;
+- its commit message OPENS with `EXPECTED FAIL`;
+- the branch is deleted after the run;
+- the session report names the run BEFORE the owner can meet the notification,
+  so a red email arriving on the owner's phone already has its explanation
+  committed.
+
+**An unexplained red on any other branch is treated as real**, full stop. The
+whole value of rule 10 is that a red run means something; a deliberate red that
+looks identical to an accident would spend that meaning.
+
+RECORDED BESIDE IT, so the history is honest: this slot sat empty because the
+rule's brief was issued but never executed. Rules 10 and 11 were added by the CI
+triage and rule 11 sessions respectively, neither found a 9 to follow, and the
+gap was left rather than renumbered because 10 and 11 were already cited by
+number in session reports, tracker rows and commit messages. The numbering note
+that recorded the gap is superseded by this entry.
+
 **10. A red run on main stops the line** (owner's order, 2026-07-26, from the CI
 triage brief, reports/briefs/FS_CI_TRIAGE_Prompt.md). No new job starts until
 main is green. Every session verifies its own final push's REMOTE CI result
@@ -560,12 +586,10 @@ instead, unprompted, and reported the gap. Rule 1 made `main` single-writer for
 the BRANCH; it never said anything about the working tree, and a shared working
 tree is a shared mutable resource that rule 1 does not protect. This closes that.
 
-A NOTE ON THE NUMBERING, recorded rather than tidied away: there is no rule 9,
-in this document or in the WRS mirror. Rule 10 was added by the CI triage
-session and rule 11 by this one, and neither found a 9 to follow. It is left as
-a gap rather than renumbered, because rules 10 and 11 are already cited by number
-in session reports, tracker rows and commit messages, and silently shifting them
-would make those citations wrong. The owner may fill 9 or leave it.
+A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
+2026-07-26 by the replay-blocker session, on the owner's instruction, with the
+slot's originally intended content (expected-fail declarations, above). Rules
+10 and 11 keep their numbers, so every existing citation stays correct.
 
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
