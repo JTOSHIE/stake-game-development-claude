@@ -2,7 +2,7 @@
 """AssetForge v2 static background grader.
 
 Extracts two frames from the retired background loop and grades them per
-HANDOVER.md section 3 (static backgrounds), producing bg_base.jpg and
+reports/archive/handovers/HANDOVER.md section 3 (static backgrounds), producing bg_base.jpg and
 bg_overdrive.jpg. The served build uses these static images; the video is
 excluded from the build (kept in the repo for reference).
 
