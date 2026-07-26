@@ -59,9 +59,19 @@ jobs:
           # passes when it cannot see is the exact failure convention (p) names.
           fetch-depth: 0
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
       # ── Gate 0: LOCKED PATHS ─────────────────────────────────────────────────
-      # First, before anything else, because it is the only gate whose subject is
-      # the repository's own integrity rather than the code's.
+      # FIRST AMONG THE GATES, because it is the only one whose subject is the
+      # repository's own integrity rather than the code's. It sits after Set up
+      # Node rather than before it so it runs on the pinned Node rather than
+      # whatever the runner image happens to ship; it needs no npm dependencies,
+      # so it still runs before the install.
       #
       # `.claude/settings.json`'s deny rules guard the Edit and Write TOOLS. They
       # do not guard git. CLAUDE.md records the near-miss in terms: a bulk purge
@@ -75,21 +85,21 @@ jobs:
       #   LOCK-SANCTION: <YYYY-MM-DD> <locked-path>[, <locked-path>]...
       # naming exactly the locked paths it changes, checked in both directions.
       # Token format documented in CLAUDE.md beside the locks. (JOB 3h)
-      - name: locked paths, self-test
+      - name: locked paths and track scope, self-test
         run: node scripts/qa/locked_paths_gate.mjs --self-test
 
-      - name: locked paths
+      # The same script now carries the TRACK SCOPE rule too (MULTI-TRACK JOB 2):
+      # on a branch named track/<name>, every changed file must match a glob in
+      # docs/records/tracks/<name>.manifest. GITHUB_HEAD_REF is the PR's SOURCE
+      # branch and is the one that carries the track name; GITHUB_REF_NAME on a
+      # pull request is the merge ref and would never match track/<name>.
+      - name: locked paths and track scope
         env:
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         run: node scripts/qa/locked_paths_gate.mjs
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         working-directory: frontend

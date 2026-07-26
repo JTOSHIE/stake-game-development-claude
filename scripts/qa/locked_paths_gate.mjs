@@ -1,7 +1,17 @@
-// locked_paths_gate.mjs, JOB 3(h) (2026-07-26).
+// locked_paths_gate.mjs, JOB 3(h) and the MULTI-TRACK JOB 2 (2026-07-26).
 //
-// Fails any push or pull request that touches a LOCKED path without an
-// owner-sanction token in the commit message that touched it.
+// TWO RULES, ONE GATE, because both answer the same question from the same
+// input: "did this change touch something it had no business touching?"
+//
+//   LOCKED PATHS  fails any push or pull request that touches a locked path
+//                 without an owner-sanction token in the commit message that
+//                 touched it.
+//   TRACK SCOPE   on a branch named `track/<name>`, fails any diff outside the
+//                 globs in `docs/records/tracks/<name>.manifest`.
+//
+// The scope half is what makes the MULTI-TRACK PROTOCOL's rule 3 real. That rule
+// says parallel tracks require PROVABLY disjoint scopes, and "provably" has to
+// mean something a machine checks: a manifest nobody enforces is a comment.
 //
 // WHY A CI GATE AND NOT JUST THE DENY RULES
 // -----------------------------------------
@@ -50,7 +60,7 @@
 //   node scripts/qa/locked_paths_gate.mjs --self-test      # convention (p)
 
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, appendFileSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, appendFileSync, readFileSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -140,6 +150,75 @@ function commitsIn(base, head, cwd) {
       .split('\n').map((s) => s.trim()).filter(Boolean)
     return { sha, message, files: files.filter(isLocked) }
   })
+}
+
+/**
+ * Compile one manifest glob to a matcher.
+ *
+ * A DELIBERATELY SMALL GLOB LANGUAGE. Three forms, and nothing else:
+ *
+ *   docs/RESKIN_BOUNDARY.md   an exact path
+ *   docs/records/tracks/      a trailing slash means the whole directory
+ *   frontend/src/**           `**` matches any depth, `*` matches one segment
+ *
+ * Small on purpose. A manifest is a scope declaration a human has to be able to
+ * read and agree is disjoint from another one, and negations, braces and
+ * character classes make that judgement harder rather than easier. Anything this
+ * cannot express is a sign the scope wants splitting.
+ */
+function globToRegExp(glob) {
+  const trimmed = glob.trim()
+  const dir = trimmed.endsWith('/')
+  const body = dir ? trimmed.slice(0, -1) : trimmed
+  // Escape everything, then re-open the two wildcards. Order matters: `**` has
+  // to be substituted before `*`, or the first pass eats half of it.
+  let re = body.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  re = re.replace(/\\\*\\\*/g, '\u0000')      // `**` to a placeholder
+  re = re.replace(/\\\*/g, '[^/]*')            // `*` to one segment
+  re = re.split('\u0000').join('.*')              // placeholder to any depth
+  return new RegExp(`^${re}${dir ? '(/.*)?' : ''}$`)
+}
+
+/** Read a manifest into matchers. Comments start with #; blank lines ignored. */
+export function loadManifest(text) {
+  const globs = text.split('\n').map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('#'))
+  return { globs, matchers: globs.map(globToRegExp) }
+}
+
+/**
+ * Which files fall outside the manifest.
+ *
+ * Reported rather than counted, because the useful output of a scope failure is
+ * "you touched this file", not "you touched three files".
+ */
+export function outOfScope(files, matchers) {
+  return files.filter((f) => !matchers.some((m) => m.test(f)))
+}
+
+/** `track/<name>` gives `<name>`; anything else gives null. */
+export function trackNameOf(branch) {
+  const m = /^track\/(.+)$/.exec((branch || '').trim())
+  return m ? m[1] : null
+}
+
+/**
+ * The branch under test.
+ *
+ * On a pull request GITHUB_HEAD_REF is the SOURCE branch, which is the one that
+ * carries the track name; GITHUB_REF_NAME on a PR is the merge ref and is
+ * useless here. Locally, whatever is checked out.
+ */
+function currentBranch() {
+  // Every source is trimmed. The local `git()` helper here deliberately does NOT
+  // trim, because `rev-list` and `--name-only` output are parsed line by line and
+  // a global trim would eat the leading space off the first line, which is the
+  // exact bug that bit `kit_build.mjs`'s porcelain parse. So the trim belongs
+  // here, at the one call whose output is a single token.
+  const raw = process.env.GITHUB_HEAD_REF
+    || process.env.GITHUB_REF_NAME
+    || (() => { try { return git(['rev-parse', '--abbrev-ref', 'HEAD']) } catch { return '' } })()
+  return raw.trim()
 }
 
 function resolveRange(argv) {
@@ -245,6 +324,55 @@ function selfTest() {
     // 9. An empty range must not pass by having nothing to look at in a way that
     //    hides an error. It passes, but it says so.
     allGood &= run('negative control: an empty range', () => ({ expected: 'PASS', actual: verdict(c8, c8) }))
+
+    // ── TRACK SCOPE, the MULTI-TRACK JOB 2 half ─────────────────────────────
+    //
+    // Same discipline: a REAL branch, a REAL manifest committed in the repo, and
+    // real commits. The defect this exists to catch is a track quietly editing a
+    // file another track owns, which is how two provably disjoint scopes stop
+    // being disjoint, so that is exactly what gets planted.
+    mkdirSync(join(dir, 'docs/records/tracks'), { recursive: true })
+    const scopeVerdict = (base, head) => {
+      const manifest = loadManifest(readFileSync(join(dir, 'docs/records/tracks/demo.manifest'), 'utf-8'))
+      const changed = git(['diff', '--no-renames', '--name-only', `${base}..${head}`], dir)
+        .split('\n').map((x) => x.trim()).filter(Boolean)
+      return outOfScope(changed, manifest.matchers).length === 0 ? 'PASS' : 'FAIL'
+    }
+    const cM = commit('chore: declare the demo track scope', {
+      'docs/records/tracks/demo.manifest': '# demo\ndocs/DEMO.md\ndocs/records/tracks/\nfrontend/src/**\n',
+    })
+
+    const cS1 = commit('docs: in scope', { 'docs/DEMO.md': 'hello\n' })
+    allGood &= run('scope: a change INSIDE the manifest passes',
+      () => ({ expected: 'PASS', actual: scopeVerdict(cM, cS1) }))
+
+    const cS2 = commit('docs: out of scope', { 'GAME_FACTS.md': 'x\n' })
+    allGood &= run('scope: a change OUTSIDE the manifest fails, the real defect',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(cS1, cS2) }))
+
+    const cS3 = commit('feat: deep in a ** glob', { 'frontend/src/lib/a/b/c.ts': 'export const x = 1\n' })
+    allGood &= run('scope: ** matches at any depth',
+      () => ({ expected: 'PASS', actual: scopeVerdict(cS2, cS3) }))
+
+    const cS4 = commit('feat: one in, one out', {
+      'frontend/src/ok.ts': 'export const y = 1\n',
+      'COMPLIANCE_WATCH.md': 'x\n',
+    })
+    allGood &= run('scope: one in-scope file does not excuse an out-of-scope one',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(cS3, cS4) }))
+
+    // A sibling directory must NOT be swept in by a prefix rule. `docs/records/
+    // tracks/` ends with a slash and must not also match `docs/records/tracksX/`,
+    // which is the classic off-by-one in prefix matching.
+    const cS5 = commit('chore: a sibling directory', { 'docs/records/tracksX/y.md': 'x\n' })
+    allGood &= run('scope: a directory glob does not match a same-prefixed sibling',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(cS4, cS5) }))
+
+    allGood &= run('scope: branch name parsing',
+      () => ({ expected: 'ok', actual:
+        trackNameOf('track/docs-reskin') === 'docs-reskin'
+        && trackNameOf('main') === null
+        && trackNameOf('feature/x') === null ? 'ok' : 'broken' }))
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
@@ -285,6 +413,42 @@ console.log(`LOCKED PATHS: ${commits.length} commit(s) in ${base}..${head}, ${sa
 if (process.env.GITHUB_STEP_SUMMARY && violations.length) {
   appendFileSync(process.env.GITHUB_STEP_SUMMARY,
     `### Locked paths\n\n${violations.map((v) => `- \`${v.sha}\` ${v.reason}\n  - ${v.files.join('\n  - ')}`).join('\n')}\n`)
+}
+
+// ── TRACK SCOPE ──────────────────────────────────────────────────────────────
+const branch = currentBranch()
+const track = trackNameOf(branch)
+if (track) {
+  const manifestPath = join('docs', 'records', 'tracks', `${track}.manifest`)
+  if (!existsSync(manifestPath)) {
+    console.error(`\nTRACK SCOPE: FAIL`)
+    console.error(`  branch ${branch} declares a track, and ${manifestPath} does not exist.`)
+    console.error('  A track without a committed manifest is not a track: the protocol requires')
+    console.error('  the scope to be declared before the work starts, so it can be compared')
+    console.error('  against another track and shown disjoint. See CLAUDE.md, MULTI-TRACK.')
+    process.exit(1)
+  }
+  const manifest = loadManifest(readFileSync(manifestPath, 'utf-8'))
+  const changed = git(['diff', '--no-renames', '--name-only', `${base}..${head}`])
+    .split('\n').map((f) => f.trim()).filter(Boolean)
+  const stray = outOfScope(changed, manifest.matchers)
+  console.log(`TRACK SCOPE: branch ${branch}, ${manifest.globs.length} glob(s), `
+    + `${changed.length} changed file(s), ${stray.length} out of scope`)
+  if (stray.length) {
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+        `### Track scope\n\n\`${branch}\` changed files outside \`${manifestPath}\`:\n\n`
+        + stray.map((f) => `- \`${f}\``).join('\n') + '\n')
+    }
+    console.error('\nTRACK SCOPE: FAIL')
+    for (const f of stray) console.error(`  outside the manifest: ${f}`)
+    console.error(`\nEither the change belongs to another track, or ${manifestPath} needs`)
+    console.error('widening AND re-checking for disjointness against every other live track.')
+    console.error('Widening it silently is how two parallel tracks stop being parallel.')
+    process.exit(1)
+  }
+} else {
+  console.log(`TRACK SCOPE: branch ${branch || '(unknown)'} is not a track branch, scope check not applicable`)
 }
 
 if (violations.length) {
