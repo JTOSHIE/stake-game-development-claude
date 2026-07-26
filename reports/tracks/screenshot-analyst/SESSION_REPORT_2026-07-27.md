@@ -32,7 +32,11 @@ sessions in
 
 Per-frame verdicts, duty 3 and the brief's one line requirement, are in
 `reports/screens/CAPTURE_CATALOGUE_2026-07-27.md`: eight new frames plus the
-fourteen already-committed frames re-read this pass. Twenty CORRECT, two DEFECT.
+fourteen already-committed frames re-read this pass. **Fifteen CORRECT, three
+DEFECT, four carrying no money figures to reconcile** (`live-round2` 07, and
+`live-shapes` 01, 02 and 03, which are a replay input form, a tile editor and a
+sync dialog). The three DEFECT verdicts are two ledger rows: frame 04 of this set
+and `live-round2` 08 are both `SA-021`, and `live-round2` 01 is `SA-022`.
 
 **What is new this round, and why it settles the question rather than repeating
 it.** The previous round proved the debits by differencing balances and inferred
