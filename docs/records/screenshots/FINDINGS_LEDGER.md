@@ -82,18 +82,38 @@ an observed delta of `-$913,605.00`. Single-round corroboration inside frame 46:
 Evidence `reports/screens/dtt-live-2026-07-26/46_TR068_win_57215_while_balance_falls_142785.png`,
 `48_final_balance_48916485_reconciles_exactly.png`.
 
-## SA-006  ANOMALY  severity LOW  `cruise` cost is unproven by any capture
+## SA-006  ANOMALY  severity LOW  `cruise` cost, now confirmed at display level
 
-No capture in `reports/screens/` shows a `cruise` row in the Bets panel or a
-`cruise` badge on the HUD, so four of five modes are confirmed live and the
-fifth is not. There is no reason to doubt it: `fsModes.ts:72` declares 1.0 and
-the platform Math page lists `cruise 1x`. It is recorded as unproven rather than
-assumed, per convention (l.6).
+**UPDATED 2026-07-26, second intake.** The gap this row opened is mostly closed.
 
-Closing it costs one short `cruise` autospin run with a session panel captured
-before and after.
+*As first written:* no capture in `reports/screens/` showed a `cruise` row in the
+Bets panel or a `cruise` badge on the HUD, so four of five modes were confirmed
+live and the fifth was not. Recorded as unproven rather than assumed, per
+convention (l.6).
 
-Evidence: absence. Searched all 54 committed capture sets.
+*Now:* the owner supplied
+`reports/screens/screenshot-analyst-2026-07-26/12_cruise_badge_bet_1000_matches_cost_column.png`,
+the first `cruise` evidence in the repository, and an updated
+`Math Distribution & Summary .docx` carrying fifty `cruise` Bets rows at two bet
+levels. In the capture the HUD BET reads `EUR 10.00` with the `CRUISE` badge lit
+and the COST column reads `EUR 10.00`.
+
+That closes the cost multiplier by a chain of two already-established results
+rather than by a new measurement: the HUD renders the effective debit (SA-001)
+and the COST column carries the bet level (SA-002), so the two being equal means
+`cruise` resolves at 1.0. Across all fifty docx rows every MULT equals payout
+over COST, and both bet levels present, `EUR 1.00` and `EUR 10.00`, behave the
+same way.
+
+**What is still not measured:** a wallet delta. Every other mode was proven by
+differencing two BALANCE readouts; `cruise` has one balance anchor, `EUR 921.50`,
+and no second. The inference above is sound but it is inference, and convention
+(l.4) says to say which results it leans on rather than present it as
+independent. One short `cruise` run with a session panel before and after still
+closes it properly, and it is now the only such gap left.
+
+Evidence `reports/screens/screenshot-analyst-2026-07-26/12_cruise_badge_bet_1000_matches_cost_column.png`,
+`reports/qa/live_stats/2026-07-26b_bets_page_all_modes_126_rows.json`.
 
 ## SA-007  ANOMALY  severity LOW  the platform MULT column is against the bet level
 
@@ -204,6 +224,95 @@ to fix today because `track/quality-sweep` has zero commits and has not started.
 Either narrow its `reports/qa/**` to the gate outputs it actually writes, or
 record a sequence decision. One line on `main`, by the integrator.
 
+**RESOLVED 2026-07-26 by the integrator, on `main`.** `quality-sweep.manifest`
+now reads `reports/qa/*` in place of `reports/qa/**`. Because `*` matches exactly
+one path segment, that covers every gate output written directly into
+`reports/qa/` while excluding every subtree, `live_stats` included. Confirmed by
+reading the change; it was still uncommitted in the `main` working tree when
+this track observed it, so the integrator should confirm it landed before
+merging this pull request.
+
+## SA-017  NOT-A-DEFECT  severity n/a  the 5,000x wincap fired live, exactly at the cap
+
+The single most significant event in the evidence base, and the first time the
+repository has caught it. A `super` round at a `EUR 750.00` bet level paid
+`EUR 3,750,000.00`, and `3,750,000 / 750 = 5,000.00` exactly. The platform's own
+row reads `x5000.00`.
+
+At the cap, not through it. `WINCAP` is 5,000 at `gameStore.ts:8` and
+`CLAUDE.md:250` calls it a hard cap in every mode. Duty 6's anomaly test is "any
+payout above 5,000x bet"; nothing anywhere in the 126 ingested rows exceeds it,
+and this row lands on it.
+
+Worth noting what the cap is measured against, because it matters for a buy
+tier: 5,000x is against the BET LEVEL, so this round paid 12.5x what it actually
+cost (`3,750,000 / (400 x 750)`). Both `gameStore.ts:158` and
+`roundInterpreter.ts:265` compute the wincap flag against the bet level, so the
+game and the platform agree.
+
+Evidence `reports/screens/screenshot-analyst-2026-07-26/10_eur_max_win_3750000_exactly_5000x_at_bet_750.png`,
+`11_bets_panel_super_5000x_wincap_row_and_buy_tiers.png`.
+
+## SA-018  ANOMALY  severity MEDIUM  no capture of the max-win celebration exists
+
+The wincap has now demonstrably fired in live play, and the repository has no
+capture of `MaxWinCelebration.svelte` on screen anywhere. Frame 10 is the
+aftermath: reels at rest, `WIN EUR 3,750,000.00` in the HUD, no overlay, taken
+twelve seconds after the round settled.
+
+Specification says it should have shown. `App.svelte:362` and `:618` both
+describe the overlay as already showing, reactive to `$isWincap`, and
+`$isWincap` is set against the bet level, which this round cleared exactly. So
+the expected reading of frame 10 is that the overlay fired and was collected
+inside those twelve seconds.
+
+**That is inference, not observation, and it is not good enough for a
+submission-facing claim.** Per convention (l.6) it is parked rather than
+concluded either way. The fix is one capture: hit or replay a wincap round and
+photograph the overlay before pressing COLLECT. Bet Replay is mandatory and
+already working (`reports/screens/dtt-live-2026-07-26/37_REPLAY_WORKING_event_52121_with_disclaimer.png`),
+and `ReplayMode.svelte:266` renders the same component, so the round can be
+replayed from its event id rather than waited for again.
+
+Evidence `reports/screens/screenshot-analyst-2026-07-26/10_eur_max_win_3750000_exactly_5000x_at_bet_750.png`.
+
+## SA-019  ANOMALY  severity LOW  scene visible through unfilled reel cells mid-spin
+
+In the `cruise` capture, taken mid-spin, reels 1 and 2 are populated, reel 3
+holds two symbols and reels 4 and 5 hold one each, and the city scene behind the
+game is visible through the cells not yet filled. Reels populating left to right
+is ordinary; the question is whether the reel viewport is meant to be
+translucent while it does so.
+
+Not called a DEFECT, because there is no settled-state capture at the same
+viewport to compare against, and the game's whole aesthetic is a translucent
+neon frame over a city scene. What makes it worth a row is that the idle board
+in frame 10 is fully opaque across all twenty cells, so the two states do
+differ, and a reviewer scrubbing a spin will see the difference.
+
+One settled-state capture at the same viewport settles it.
+
+Evidence `reports/screens/screenshot-analyst-2026-07-26/12_cruise_badge_bet_1000_matches_cost_column.png`,
+compared against `10_eur_max_win_3750000_exactly_5000x_at_bet_750.png`.
+
+## SA-020  NOT-A-DEFECT  severity n/a  the authenticated bet ladder is live, confirmed
+
+The second intake's rows carry bet levels of `EUR 450.00`, `EUR 500.00`,
+`EUR 750.00` and `EUR 1,000.00`. None of those is in the hardcoded fallback
+ladder, which is `[0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00,
+100.00]` at `gameStore.ts:7` and tops out at 100.
+
+So the game is driving from `rgsBetLevels`, the authenticated ladder, and not
+from the hardcoded array. That is a positive live confirmation of the R5/TR-013
+fix, which moved both bet-changing surfaces onto the non-locked
+`stores/betLadder.ts` precisely so a non-USD-shaped ladder could not send
+`indexOf` to -1 and drop the bet to the minimum. The failure mode recorded in
+`CLAUDE.md` under LOCKED_FILE_DEBTS is not reachable in these sessions, and now
+there is evidence of that rather than only a unit test.
+
+Evidence `reports/qa/live_stats/2026-07-26b_bets_page_all_modes_126_rows.json`,
+`reports/screens/screenshot-analyst-2026-07-26/11_bets_panel_super_5000x_wincap_row_and_buy_tiers.png`.
+
 ## SA-014  NOT-A-DEFECT  severity n/a  HUD WIN lags its settled row, by design
 
 Two readings that look like disagreements and are not:
@@ -249,18 +358,27 @@ Recorded so the next session of this track does not rediscover it.
 | tag | count | rows |
 | --- | --- | --- |
 | DEFECT | 1 | SA-012 |
-| ANOMALY | 6 | SA-002, SA-006, SA-007, SA-008, SA-011, SA-015 |
-| NOT-A-DEFECT | 7 | SA-001, SA-003, SA-004, SA-005, SA-009, SA-010, SA-014 |
-| PROCESS | 2 | SA-013, SA-016 |
+| ANOMALY | 8 | SA-002, SA-006, SA-007, SA-008, SA-011, SA-015, SA-018, SA-019 |
+| NOT-A-DEFECT | 9 | SA-001, SA-003, SA-004, SA-005, SA-009, SA-010, SA-014, SA-017, SA-020 |
+| PROCESS | 2 | SA-013 (resolved), SA-016 |
 
-**Wanting a decision before anything else:** SA-013, because CI on this pull
-request fails until it is made, and it is one line while `track/quality-sweep`
-is still unstarted.
+**Resolved since the first pass:** SA-013, by the integrator narrowing
+`quality-sweep.manifest` to `reports/qa/*` on `main`. Confirm it is committed
+before merging.
 
 **Wanting an owner or Fable ruling:** SA-002 and SA-007 (whether the platform
 COST and MULT convention needs raising with the platform before submission),
 SA-011 (a maths-adjacent statistics question, escalated per (l.8) rather than
 answered), and SA-012 (restore or recommit the altered evidence).
 
+**Wanting one capture each, and cheap:** SA-018 (the max-win overlay, obtainable
+by replaying the wincap round from its event id), SA-006 (a `cruise` session
+panel before and after), SA-019 (a settled-state frame at the `cruise`
+viewport).
+
 **The owner's question, answered:** the HUD is right, the debits are right, and
 the surface that disagrees is the platform's Bets page. SA-001, SA-002, SA-003.
+
+**The headline from the second intake:** the 5,000x cap fired live and landed on
+5,000.00x exactly, cross-checked between our HUD and the platform's own row.
+SA-017.

@@ -4,7 +4,9 @@ Track: `track/screenshot-analyst`. Duties 2 (catalogue), 3 (within-frame
 arithmetic) and 5 (visual lens). Timestamps are the capture time carried in the
 source filename, local time, and they are also the ordering key duty 4 uses.
 
-Set: `reports/screens/screenshot-analyst-2026-07-26/`, nine captures.
+Set: `reports/screens/screenshot-analyst-2026-07-26/`, twelve captures. Nine
+arrived in the first intake and are catalogued in section 1; three more were
+supplied by the owner later the same day and are catalogued in section 5.
 Sixteen committed frames from other sets were re-read for duties 4 and 5 and are
 catalogued in section 3.
 
@@ -316,3 +318,103 @@ knowing about before a reviewer asks.
 pixels, and the project's contrast claim is made by
 `reports/qa/contrast_2026-07-26.json` against real composited pixels per TR-070.
 No contrast verdict is offered here, per convention (l.6).
+
+---
+
+## 5. Second intake, same day
+
+Three further captures supplied by the owner after the first pull request was
+opened, alongside an updated `Math Distribution & Summary .docx`. Two of them
+carry the most significant single event in the whole evidence base: the 5,000x
+wincap firing live.
+
+### 10_eur_max_win_3750000_exactly_5000x_at_bet_750.png
+
+- **Captured** 2026-07-26 14:29:48
+- **Purpose tag** The aftermath of a max-win round. Should prove the payout
+  landed on the cap rather than through it.
+- **Surface** Live game, full landscape, no Bets panel docked, reels at rest.
+- **Viewport** Desktop landscape, game pane 1254 by 706 css px.
+- **Figures verbatim** BALANCE `EUR 3,762,951.50`; WIN `EUR 3,750,000.00`;
+  BET `EUR 750.00`; turbo dial `1x`; `FEATURES` pill, no mode badge. Reel grid
+  showing the idle all-piston board, all twenty cells filled and opaque.
+- **Within-frame** `3,750,000.00 / 750.00 = 5,000.00` exactly, which is `WINCAP`
+  at `gameStore.ts:8`. No mode badge is correct: the round was a `super` buy
+  (frame 11 names it) and a buy is one-shot, so the HUD has returned to the
+  standing `base` mode and BET reads the standing bet level. Consistent.
+  Implied pre-credit balance `3,762,951.50 - 3,750,000.00 = EUR 12,951.50`.
+
+### 11_bets_panel_super_5000x_wincap_row_and_buy_tiers.png
+
+- **Captured** 2026-07-26 14:30:26
+- **Purpose tag** The platform's own record of the max-win round, plus the buy
+  tier rows around it.
+- **Surface** Stake Engine dashboard Bets panel, cropped, horizontally scrolled
+  so the TIME column is clipped to its last two digits.
+- **Viewport** Panel crop, 429 by 621 px.
+- **Figures verbatim** `Bets 50`, `Guidelines 0/58`. Rows, newest first:
+  `super EUR 750.00 +EUR 3,750,000.00 x5000.00`,
+  `bonus EUR 500.00 +EUR 308,375.00 x616.75`,
+  `super EUR 450.00 +EUR 45,391.50 x100.87`,
+  `super EUR 500.00 +EUR 99,840.00 x199.68`,
+  `super EUR 1,000.00 +EUR 121,050.00 x121.05`,
+  `bonus EUR 1,000.00 +EUR 515,850.00 x515.85`,
+  `bonus EUR 500.00 +EUR 151,755.00 x303.51`,
+  `bonus EUR 750.00 +EUR 30,120.00 x40.16`,
+  `bonus EUR 1,000.00 +EUR 29,180.00 x29.18`,
+  `bonus EUR 1,000.00 +EUR 43,060.00 x43.06`,
+  `bonus EUR 1,000.00 +EUR 96,910.00 x96.91`,
+  `bonus EUR 1,000.00 +EUR 182,350.00 x182.35`,
+  `super EUR 1,000.00 +EUR 108,150.00 x108.15`,
+  `bonus EUR 1,000.00 +EUR 358,280.00 x358.28`,
+  `bonus EUR 1,000.00 +EUR 66,510.00 x66.51`,
+  `super EUR 1,000.00 +EUR 141,540.00 x141.54`. All `Settled`.
+- **Within-frame** Every MULT equals payout divided by its COST value. The
+  `x5000.00` row is at the cap, not above it. Consistent.
+- **Visual lens** The TIME column is horizontally clipped to its final two
+  digits by the panel's own scroll position, and the STATUS column is clipped to
+  `Settle`. Platform panel at a narrow width, not our surface.
+
+### 12_cruise_badge_bet_1000_matches_cost_column.png
+
+- **Captured** 2026-07-26 15:02:04
+- **Purpose tag** The first `cruise` evidence in the repository. Closes the
+  mode-coverage gap SA-006 opened.
+- **Surface** Live game with the `CRUISE` badge lit, Bets panel right,
+  mid-spin.
+- **Viewport** Desktop landscape, game pane roughly 980 by 690 css px.
+- **Figures verbatim** HUD BALANCE `EUR 921.50`; WIN `EUR 0.00`;
+  BET `EUR 10.00`; badge `CRUISE` above the BET box; pill
+  `FEATURES  CRUISE`; autoplay control showing the infinity glyph. `Bets 34`,
+  `Guidelines 0`. Rows, all `cruise EUR 10.00`:
+  `15:02:05 +EUR 59.50 x5.95`, `15:02:02 +EUR 7.00 x0.70`,
+  `15:02:00 EUR 0.00`, `15:01:58 EUR 0.00`, `15:01:56 EUR 0.00`,
+  `15:01:54 EUR 0.00`, `15:01:52 EUR 0.00`, `15:01:50 EUR 0.00`,
+  `15:01:47 +EUR 7.90 x0.79`, `15:01:43 +EUR 6.60 x0.66`,
+  `15:01:38 +EUR 122.40 x12.24`, `15:01:35 +EUR 8.10 x0.81`,
+  `15:01:32 +EUR 4.70 x0.47`, `15:01:29 +EUR 4.40 x0.44`,
+  `15:01:27 EUR 0.00`, `15:01:25 EUR 0.00`, `15:01:21 +EUR 3.20 x0.32`.
+- **Within-frame** HUD BET `EUR 10.00` equals the COST column's `EUR 10.00`.
+  Since the HUD is proven to render the effective debit (SA-001) and the COST
+  column is proven to carry the bet level (SA-002), the two being equal means
+  `cruise` resolves at cost multiplier 1.0. Every MULT equals payout over
+  `10.00`. Consistent.
+- **Visual lens** The frame is mid-spin: reels 1 and 2 are filled, reel 3 holds
+  two symbols, reels 4 and 5 hold one each, and the city scene is visible
+  through the cells not yet populated. Reels populating left to right, which is
+  ordinary. Recorded as SA-019 because it is worth one settled-state comparison
+  at the same viewport to establish whether the reel viewport is meant to be
+  translucent during a spin or whether a backdrop layer is missing; the idle
+  board in frame 10 is fully opaque, so the two states differ.
+
+## 6. Between-frame arithmetic for the second intake
+
+The three new frames do not form a continuous timeline with each other or with
+the first nine: frames 10 and 11 are 38 seconds apart with no shared balance
+anchor visible in frame 11, and frame 12 is a different currency window 32
+minutes later. No between-frame reconciliation is attempted across them, and
+none is forced.
+
+What they do carry is the strongest single-frame arithmetic in the evidence
+base: frame 10's `3,750,000.00 / 750.00 = 5,000.00` exactly, cross-checked
+against frame 11's independent platform row reading `x5000.00`.

@@ -19,16 +19,21 @@ Bets panel lists between them.
 
 ## The result in one line
 
-Four of the five modes are confirmed to the cent. `cruise` is NOT covered by any
-capture in the repository and is recorded as unproven rather than assumed.
+Four of the five modes are confirmed to the cent by a wallet delta. `cruise` is
+confirmed at display level only, by inference from two other results, and its
+wallet delta remains unmeasured.
 
 | mode | declared cost | proven by | residual |
 | --- | --- | --- | --- |
 | `base` | 1.00x | session panel, 524 spins | 0.00 |
-| `cruise` | 1.00x | NO CAPTURE EXISTS | not proven |
+| `cruise` | 1.00x | display level only, one balance anchor | not measured |
 | `antelite` | 1.25x | frames 03 to 04 | 0.00 |
 | `bonus` | 100x | frames 41 to 42 | 0.00 |
 | `super` | 400x | frames 46 to 48 | 0.00 |
+
+Updated 2026-07-26 after the owner's second intake supplied the first `cruise`
+capture and fifty `cruise` Bets rows. The `cruise` section below is rewritten;
+nothing else in this document changed.
 
 ## base, 1.0x
 
@@ -140,15 +145,36 @@ Single-round corroboration inside frame 46 alone: the row 06:23:26 `super` pays
 +$57,215.00 at a $500.00 bet level, and 400 x 500 - 57,215 = 142,785, which is
 the balance fall the frame's own filename records and TR-068 was raised about.
 
-## cruise, 1.0x, NOT PROVEN
+## cruise, 1.0x, CONFIRMED AT DISPLAY LEVEL, wallet delta not measured
 
-No capture in `reports/screens/` shows a `cruise` row in the Bets panel or a
-`cruise` badge on the HUD. The mode is declared at cost 1.0 in
-`frontend/src/lib/config/fsModes.ts:76-88` and the Stake Engine Math page in the
-owner's document lists `cruise 1x`, so there is no reason to doubt it. There is
-simply no measurement, and per convention (l.6) that is recorded as unproven
-rather than filled in. One short `cruise` autospin run with a session panel
-before and after would close it.
+The owner's second intake supplied
+`reports/screens/screenshot-analyst-2026-07-26/12_cruise_badge_bet_1000_matches_cost_column.png`,
+the first `cruise` evidence in the repository, plus fifty `cruise` rows in the
+updated `Math Distribution & Summary .docx` spanning 15:01:56 to 15:03:37 at two
+bet levels.
+
+In the capture, read verbatim: HUD BALANCE `EUR 921.50`, WIN `EUR 0.00`, BET
+`EUR 10.00`, the `CRUISE` badge lit above the BET box, and every Bets row
+reading `cruise EUR 10.00`.
+
+The argument, and it is an argument rather than a measurement:
+
+    the HUD BET box renders the EFFECTIVE debit          established at SA-001
+    the platform COST column carries the BET LEVEL       established at SA-002
+    both read EUR 10.00 in this frame
+    therefore effective debit equals bet level, so the multiplier is 1.0
+
+Corroborating detail across the fifty docx rows: every MULT equals payout
+divided by COST, and both bet levels present, `EUR 1.00` and `EUR 10.00`, behave
+identically. Neither of those is independent of the argument above, and per
+convention (l.4) that is said rather than implied.
+
+**What is still missing is a wallet delta.** The other four modes were proven by
+differencing two BALANCE readouts across a known row set. `cruise` has exactly
+one balance anchor, `EUR 921.50`, and no second frame, so the differencing
+cannot be done. This is the last remaining gap in the mode-cost table, and one
+short `cruise` run with a session panel captured before and after closes it
+properly.
 
 ## What the COST column actually means
 

@@ -234,3 +234,152 @@ measurement would have been suspect first.
    platform-facing, escalated per (l.8) rather than answered here.
 5. SA-008 wants its native-resolution measurement taken.
 6. The two unread session panels in `dtt-live-2026-07-26/`.
+
+---
+
+# 2026-07-26, appended section: the owner's second intake
+
+Appended per convention (j), which keeps one living document per arc extended
+with dated sections rather than a fresh file per update. Same track, same day,
+same branch. Everything below re-verifies fresh rather than carrying forward the
+first pass's numbers.
+
+## What arrived
+
+The owner supplied three further captures and an updated
+`Math Distribution & Summary .docx`, the document having grown from 40,810 to
+87,050 bytes. Both were checked by modification time rather than taken on trust:
+the captures at 14:29:57, 14:30:32 and 15:02:09, the document at 15:05.
+
+## A working-tree change this track had to work around, stated plainly
+
+The repository at `/Users/jt/math-sdk` had been switched to `main` by another
+session between the first pull request and this one, with uncommitted work in
+progress on `CLAUDE.md`, `WRS_MASTER_DOCUMENT.md` and
+`docs/records/tracks/quality-sweep.manifest`.
+
+Checking out `track/screenshot-analyst` in that working tree would have pulled
+the checkout out from under a concurrent writer. This track instead created an
+isolated `git worktree` for its own branch, leaving `main` and its uncommitted
+work untouched. Verified after the fact: `main` still checked out, still seven
+entries in `git status --short`, none of them this track's.
+
+That is MULTI-TRACK rule 1 working as intended rather than a problem, and it is
+recorded because the protocol does not currently say what a track should do when
+it finds the shared working tree checked out to someone else's branch. A worktree
+is the answer, and it is worth writing into the protocol.
+
+## SA-013 was resolved while this track was working
+
+The integrator narrowed `quality-sweep.manifest` from `reports/qa/**` to
+`reports/qa/*` on `main`. Because `*` matches exactly one path segment, that
+covers every gate output written directly into `reports/qa/` while excluding
+every subtree, `live_stats` included. The collision this track declared in its
+own manifest before the first file landed there is closed.
+
+Observed as an uncommitted working-tree change, so it is reported as observed
+rather than as landed. The integrator confirms it is committed before merging.
+
+## New findings
+
+**SA-017, the 5,000x wincap fired live, exactly at the cap.** The most
+significant event in the evidence base and the first time the repository has
+caught it. A `super` round at a `EUR 750.00` bet level paid `EUR 3,750,000.00`.
+
+    3,750,000.00 / 750.00 = 5,000.00 exactly
+
+Cross-checked between our own HUD (frame 10) and the platform's independent row
+(frame 11, reading `x5000.00`). `WINCAP` is 5,000 at `gameStore.ts:8`. At the
+cap, not through it. Nothing in the 126 ingested rows exceeds it.
+
+**SA-018, and this is the one worth acting on: there is no capture of the
+max-win celebration anywhere in the repository.** The wincap has now
+demonstrably fired, and `MaxWinCelebration.svelte` has never been photographed
+on screen in live play. Frame 10 is the aftermath, taken twelve seconds later,
+with the reels at rest and no overlay.
+
+Specification says it should have shown, and `$isWincap` is computed against the
+bet level at both `gameStore.ts:158` and `roundInterpreter.ts:265`, which this
+round cleared exactly. So the expected reading is that it fired and was
+collected inside those twelve seconds. **That is inference, and it is parked
+rather than concluded**, because a submission-facing claim about the max-win
+presentation should not rest on inference. One capture closes it, and Bet Replay
+can replay the round from its event id rather than waiting for another wincap.
+
+**SA-019**, scene visible through unfilled reel cells in a mid-spin frame. Not
+called a defect: reels populate left to right and the game's aesthetic is a
+translucent frame over a city scene. Recorded because the idle board in frame 10
+is fully opaque, so the two states do differ, and one settled-state capture at
+the same viewport settles it.
+
+**SA-020**, a positive confirmation rather than a fault. The observed bet levels
+are `EUR 450.00`, `500.00`, `750.00` and `1,000.00`, none of which is in the
+hardcoded fallback ladder at `gameStore.ts:7`, which tops out at 100. The game
+is therefore driving from `rgsBetLevels`, the authenticated ladder. That is the
+R5/TR-013 fix confirmed in live conditions, where previously it was held only by
+a unit test.
+
+## SA-006 moved, and honestly
+
+`cruise` was the one mode with no evidence at all. It now has a capture and fifty
+Bets rows, and its cost multiplier is confirmed **at display level**: HUD BET and
+the COST column both read `EUR 10.00`, and since the HUD renders the effective
+debit (SA-001) while COST carries the bet level (SA-002), the two being equal
+means the multiplier is 1.0.
+
+**The wallet delta is still not measured.** Every other mode was proven by
+differencing two BALANCE readouts; `cruise` has one anchor and no second frame.
+The row is updated to say exactly that rather than being closed. It is now the
+only gap left in the mode-cost table.
+
+## Stats intake, second snapshot
+
+`reports/qa/live_stats/2026-07-26b_bets_page_all_modes_126_rows.json`, 126 unique
+rows: 58 `base`, 50 `cruise`, 11 `bonus`, 7 `super`. It is COMPLEMENTARY to the
+first snapshot, not superseding: the Bets panel is a rolling window capped at 50,
+so each export holds a different slice. They share exactly one row, 14:10:32,
+which agrees in both.
+
+Anomaly checks across all 126, all clean:
+
+- No payout above 5,000x bet. One row lands exactly on it, SA-017.
+- No settlement gap. All 126 read `Settled`.
+- Every stated MULT equals payout over COST at a tolerance of 0.006.
+
+No RTP verdict is issued. The committed statistics note stands.
+
+## Verification, measured again
+
+    node scripts/qa/locked_paths_gate.mjs main HEAD
+      LOCKED PATHS: 4 commit(s) in main..HEAD, 0 sanctioned, 0 violation(s)
+      TRACK SCOPE: branch track/screenshot-analyst, 8 glob(s), 24 changed file(s), 0 out of scope
+      LOCKED PATHS: PASS
+
+Dash check: zero em or en dashes across every file this track has written.
+
+The `--check-disjoint` result now depends on whether the integrator's
+`quality-sweep.manifest` narrowing is committed, which is not this branch's to
+determine. Both outcomes are recorded in SA-013 rather than one being asserted.
+
+## FOR THE NEXT SESSION, revised
+
+Open threads, in the order they are worth doing:
+
+1. **SA-018**, capture the max-win celebration. Replayable from the wincap
+   round's event id, so it does not need another 1-in-100,000 round. This is the
+   highest-value single capture available to this track.
+2. **SA-006**, one `cruise` run with a session panel before and after, closing
+   the last mode-cost gap with a real wallet delta.
+3. **SA-012**, the four altered evidence files in
+   `reports/screens/scatter-anticipation/`. Still needs an owner or integrator
+   decision; unchanged since the first pass.
+4. **SA-019**, one settled-state frame at the `cruise` viewport.
+5. **SA-002, SA-007, SA-011**, still wanting owner or Fable rulings.
+6. **SA-008**, still wants its native-resolution measurement.
+7. The two unread session panels in `reports/screens/dtt-live-2026-07-26/`.
+
+Worth putting to the owner as a protocol question rather than a finding: the
+MULTI-TRACK PROTOCOL does not say what a track should do when it finds the shared
+working tree checked out to another session's branch. This session used a
+`git worktree`, which cost nothing and disturbed nothing. It is a candidate for
+rule 9.
