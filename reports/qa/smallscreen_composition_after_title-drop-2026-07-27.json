@@ -1,0 +1,148 @@
+{
+  "phase": "after",
+  "presets": 7,
+  "floors": {
+    "Mobile L": 94,
+    "Mobile M": 94,
+    "Mobile S": 81,
+    "Popout S": 48,
+    "Desktop": 40,
+    "Laptop": 40,
+    "Popout L": 33
+  },
+  "rows": [
+    {
+      "preset": "Desktop",
+      "size": "1200x675",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 50,
+      "gridFillPctW": 40.8,
+      "gridFillFloor": 40,
+      "deadBandPx": null,
+      "canvasSlotH": 675
+    },
+    {
+      "preset": "Laptop",
+      "size": "1024x576",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 50,
+      "gridFillPctW": 40.8,
+      "gridFillFloor": 40,
+      "deadBandPx": null,
+      "canvasSlotH": 576
+    },
+    {
+      "preset": "Popout S",
+      "size": "400x225",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 61.9,
+      "gridFillPctW": 50.5,
+      "gridFillFloor": 48,
+      "deadBandPx": null,
+      "canvasSlotH": 181
+    },
+    {
+      "preset": "Popout L",
+      "size": "800x450",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 41.5,
+      "gridFillPctW": 33.9,
+      "gridFillFloor": 33,
+      "deadBandPx": null,
+      "canvasSlotH": 374
+    },
+    {
+      "preset": "Mobile L",
+      "size": "425x812",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 117.7,
+      "gridFillPctW": 96,
+      "gridFillFloor": 94,
+      "deadBandPx": 10,
+      "canvasSlotH": 483.5
+    },
+    {
+      "preset": "Mobile M",
+      "size": "375x667",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 117.7,
+      "gridFillPctW": 96,
+      "gridFillFloor": 94,
+      "deadBandPx": 10,
+      "canvasSlotH": 338.5
+    },
+    {
+      "preset": "Mobile S",
+      "size": "320x568",
+      "frameCentreOffsetX": 0,
+      "frameFillPctW": 102.6,
+      "gridFillPctW": 83.7,
+      "gridFillFloor": 81,
+      "deadBandPx": 10,
+      "canvasSlotH": 239.5
+    },
+    {
+      "preset": "Popout S FEATURES",
+      "cardsWindowH": 118,
+      "cardsContentH": 226,
+      "cardCount": 4,
+      "cardsFullyVisible": 2,
+      "closeReachable": true
+    },
+    {
+      "sweep": [
+        {
+          "height": 568,
+          "deadBandPx": 10,
+          "gridFillPctW": 63
+        },
+        {
+          "height": 667,
+          "deadBandPx": 10,
+          "gridFillPctW": 89
+        },
+        {
+          "height": 740,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 812,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 900,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1000,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1031,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1100,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1200,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        },
+        {
+          "height": 1400,
+          "deadBandPx": 10,
+          "gridFillPctW": 96
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

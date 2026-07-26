@@ -993,8 +993,13 @@
   // has to fit is the frame (640 wide) and the crop window from the title down to
   // the frame's bottom edge; the scene either side is clipped as bleed, exactly as
   // it already is on desktop via `.stage`.
-  const MINI_CROP_TOP_Y = LOGO_TOP_Y                        // 18, keeps the title in frame
-  const MINI_CROP_H = FRAME_BOTTOM_Y - MINI_CROP_TOP_Y      // 534
+  // TITLE: DROP, the owner's ruling, FS_V5_CLOSEOUT (2026-07-27). The
+  // recomposition session recorded both numbers and left the call open: keeping
+  // the title in frame gives a 44.2% grid fill, dropping it and cropping to the
+  // frame alone gives 50.5%, a frame 247px wide against 217px. The owner has
+  // taken the second. This is the one-constant change that session named.
+  const MINI_CROP_TOP_Y = FRAME_TOP_Y                       // 84, crops to the frame, title dropped
+  const MINI_CROP_H = FRAME_BOTTOM_Y - MINI_CROP_TOP_Y      // 468, exactly FRAME_H
   function computeMiniCanvasScale(): number {
     if (typeof window === 'undefined') return 1
     const availH = Math.max(window.innerHeight - MINI_STRIP_H, 1)
@@ -1005,13 +1010,17 @@
    *
    * At Popout S the available box is 400 x 181, an aspect of 2.21:1, and the
    * content is the frame at 1.37:1. The height therefore binds and no centred,
-   * undistorted composition can also fill the width: the arithmetic gives
-   * 181/534 = 0.339, a frame 217px wide, 54.2% of the viewport, against 40.2%
-   * before. The side margins are inherent to the aspect mismatch and are not
-   * dead space to be recovered; the alternative, dropping the title to crop
-   * tighter, buys 61.9% and is recorded in the session report as the owner's
-   * call rather than taken here, because their brief describes the composition
-   * as "the height between title and strip".
+   * undistorted composition can also fill the width. With the title dropped the
+   * arithmetic gives 181/468 = 0.3868, a frame 247.5px wide, 61.9% of the
+   * viewport, against 54.2% with the title kept and 40.2% before the
+   * recomposition. The side margins that remain are inherent to the aspect
+   * mismatch and are not dead space to be recovered.
+   *
+   * The title is dropped at THIS PROFILE ONLY. Every other preset keeps it: the
+   * mini player is the one place where 18 stage units of wordmark cost 7.7
+   * percentage points of grid, because it is the only profile whose height
+   * budget is this tight. Reverting is the same one constant, back to
+   * LOGO_TOP_Y.
    */
   function computeMiniCrop(): { cropH: number, cropTop: number } {
     return { cropH: MINI_CROP_H, cropTop: MINI_CROP_TOP_Y }

@@ -69,7 +69,19 @@ const SELF_TEST = argv.includes('--self-test')
 const phaseArg = argv.indexOf('--phase')
 const PHASE = phaseArg >= 0 ? argv[phaseArg + 1] : 'after'
 
-const SCREENS = evidenceDir('reports', 'screens', 'smallscreen-recompose-2026-07-26', PHASE)
+// The evidence directory is selectable so a later pass that changes this
+// composition can commit its own before and after without overwriting the
+// recomposition session's, which is committed evidence for a different change.
+// Defaults to the original, so every existing invocation is unaffected.
+const dirArg = argv.indexOf('--evidence-dir')
+const EVIDENCE_DIR = dirArg >= 0 ? argv[dirArg + 1] : 'smallscreen-recompose-2026-07-26'
+// The QA result filename is scoped the same way, so a later pass cannot
+// overwrite an earlier one's committed numbers. The default keeps the original
+// name byte for byte: renaming committed evidence to fix an overwrite hazard
+// would be a worse cure than the disease.
+const QA_TAG = dirArg >= 0 ? EVIDENCE_DIR : '2026-07-26'
+
+const SCREENS = evidenceDir('reports', 'screens', EVIDENCE_DIR, PHASE)
 const QA = evidenceDir('reports', 'qa')
 announceEvidenceMode('smallscreen_composition_gate')
 
@@ -90,7 +102,13 @@ const PRESETS = [
 // stage geometry is `.grid-slot` 522x349 at (379,143.5) and `.game-frame`
 // 640x468 at (320,84) inside the 1280x720 stage (App.svelte's own rules, and
 // measured at Desktop as 522.0x349.0 and 640.0x468.1). The portrait scale is
-// min(0.96*vw/522, availH/468) and the mini scale is min(vw/640, availH/534).
+// min(0.96*vw/522, availH/468) and the mini scale is min(vw/640, availH/468).
+//
+// The mini divisor was 534 until the owner's TITLE: DROP ruling
+// (FS_V5_CLOSEOUT, 2026-07-27). The mini crop now starts at the frame's top
+// edge rather than the wordmark's, so the crop window is 552-84 = 468 rather
+// than 552-18 = 534, and the Popout S floor below is re-derived from it. The
+// floor moved because the DERIVATION moved, not because a measurement did.
 //
 // Where the WIDTH term binds the grid reaches 96% of the viewport by
 // construction. Where the HEIGHT term binds the grid cannot reach 96% without
@@ -101,7 +119,7 @@ const PRESETS = [
 //   Mobile L 425x812  width-bound   0.96*425/522 = 0.7816 -> 522*s/425 = 96.0%
 //   Mobile M 375x667  width-bound   0.96*375/522 = 0.6897 -> 96.0%
 //   Mobile S 320x568  HEIGHT-bound  availH 239 / 468 = 0.5107 -> 522*s/320 = 83.3%
-//   Popout S 400x225  HEIGHT-bound  availH 181 / 534 = 0.3390 -> 522*s/400 = 44.2%
+//   Popout S 400x225  HEIGHT-bound  availH 181 / 468 = 0.3868 -> 522*s/400 = 50.5%
 //
 // Desktop, Laptop and Popout L are the untouched scale(S) landscape profile and
 // are asserted for centring and no-regression only, at their measured values.
@@ -109,7 +127,7 @@ const FLOORS = {
   'Mobile L': 94.0,
   'Mobile M': 94.0,
   'Mobile S': 81.0,
-  'Popout S': 42.0,
+  'Popout S': 48.0,
   'Desktop': 40.0,
   'Laptop': 40.0,
   'Popout L': 33.0,
@@ -440,7 +458,14 @@ try {
 
   console.log(`SMALLSCREEN COMPOSITION GATE (phase: ${PHASE})\n`)
   const { failures, rows } = await runPass({ capture: true })
-  writeFileSync(join(QA, `smallscreen_composition_${PHASE}_2026-07-26.json`),
+  // Named for the evidence directory, not a hardcoded date. The date was
+  // hardcoded when this gate had run exactly once, and the first re-run under a
+  // different `--evidence-dir` overwrote the recomposition session's committed
+  // results with a later pass's numbers while the screenshots went elsewhere.
+  // Convention (h.1) again, and the near-miss was caught by `git status` before
+  // it was committed. Scoping the JSON the same way the captures are scoped is
+  // what actually closes it.
+  writeFileSync(join(QA, `smallscreen_composition_${PHASE}_${QA_TAG}.json`),
     JSON.stringify({ phase: PHASE, presets: PRESETS.length, floors: FLOORS, rows, failures }, null, 2))
 
   if (CAPTURE_ONLY) {
