@@ -1,0 +1,76 @@
+{
+  "generated": "2026-07-26T12:38:51.330Z",
+  "script": "frontend/scripts/background_candidate_proof.mjs",
+  "devServer": "http://localhost:5173",
+  "presetSource": "reports/qa/dtt_live_session_2026-07-26.md, the DTT Screen menu",
+  "note": "One dev server, one build; the arms differ only in the ?bg= parameter.",
+  "results": [
+    {
+      "preset": "desktop_1200x675",
+      "arm": "current",
+      "url": "http://localhost:5173/?mock=1&bg=current",
+      "file": "reports/screens/background-candidate-2026-07-26/desktop_1200x675__current.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    },
+    {
+      "preset": "desktop_1200x675",
+      "arm": "v2",
+      "url": "http://localhost:5173/?mock=1&bg=v2",
+      "file": "reports/screens/background-candidate-2026-07-26/desktop_1200x675__v2.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    },
+    {
+      "preset": "mobile_portrait_375x667",
+      "arm": "current",
+      "url": "http://localhost:5173/?mock=1&bg=current",
+      "file": "reports/screens/background-candidate-2026-07-26/mobile_portrait_375x667__current.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    },
+    {
+      "preset": "mobile_portrait_375x667",
+      "arm": "v2",
+      "url": "http://localhost:5173/?mock=1&bg=v2",
+      "file": "reports/screens/background-candidate-2026-07-26/mobile_portrait_375x667__v2.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    },
+    {
+      "preset": "popout_s_400x225",
+      "arm": "current",
+      "url": "http://localhost:5173/?mock=1&bg=current",
+      "file": "reports/screens/background-candidate-2026-07-26/popout_s_400x225__current.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    },
+    {
+      "preset": "popout_s_400x225",
+      "arm": "v2",
+      "url": "http://localhost:5173/?mock=1&bg=v2",
+      "file": "reports/screens/background-candidate-2026-07-26/popout_s_400x225__v2.png",
+      "servedSrc": "assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg",
+      "servedDecoded": true,
+      "armVerified": true,
+      "hudPresent": true,
+      "openDialogs": 0
+    }
+  ],
+  "allArmsVerified": true
+}

@@ -102,6 +102,54 @@
 
   // 0 = off (current shipped look), 3 = deepest. Passed to SceneGroup.
   const hazeLevel = Math.max(0, Math.min(3, Number(_cohesionParam('haze') ?? 0) || 0))
+
+  // BACKGROUND CANDIDATE EYE-CALL, 2026-07-26. Same harness as ?grade and
+  // ?haze above, for the same stated reason: an eye-call that needs a rebuild
+  // between options spends the owner's attention on waiting rather than
+  // judging. This one exists so the owner can A/B the scene background inside
+  // a single local session against the real RGS, via the platform's Local
+  // Testing redirect.
+  //   ?bg=current   the shipped background (default, and what omitting it gives)
+  //   ?bg=v1|v2     the ingested candidate of that tag
+  // DEV-gated like its siblings, so it cannot alter a shipped build, and the
+  // candidate files are pruned from dist by the build diet for the same
+  // reason. NOTHING HERE ADOPTS ANYTHING: the default is the shipped asset and
+  // stays the shipped asset until the owner calls it.
+  const BG_DIR = 'assets/themes/future-spinner/backgrounds'
+  const BG_CANDIDATES: Record<string, string> = {
+    current: `${BG_DIR}/bg_base.jpg`,
+    v1: `${BG_DIR}/candidates/bg_base_candidate_v1.jpg`,
+    v2: `${BG_DIR}/candidates/bg_base_candidate_v2.jpg`,
+  }
+
+  // The choice STICKS for the browsing session, and that is not a convenience.
+  // The eye-call runs through the platform's Local Testing redirect, which
+  // launches the game with its own `?sessionID=...&rgs_url=...` query. Whether
+  // it preserves a query already on the redirect URL is not documented and we
+  // have not observed it, so a parameter-only switch could silently fall back
+  // to the shipped background and the owner would be eye-calling the wrong
+  // frame without any way to tell. Storing the choice means it survives a
+  // redirect that drops the query: set it once directly, then launch through
+  // the DTT as normal. sessionStorage, so it dies with the tab and cannot
+  // leak into a later session.
+  const _bgChoice = ((): string => {
+    if (!import.meta.env.DEV) return 'current'
+    const fromUrl = _cohesionParam('bg')
+    try {
+      if (fromUrl && fromUrl in BG_CANDIDATES) {
+        window.sessionStorage.setItem('fsBgCandidate', fromUrl)
+        return fromUrl
+      }
+      const stored = window.sessionStorage.getItem('fsBgCandidate')
+      if (stored && stored in BG_CANDIDATES) return stored
+    } catch {
+      // sessionStorage can throw in a partitioned or storage-blocked frame.
+      // The parameter still works in that case; only stickiness is lost.
+      if (fromUrl && fromUrl in BG_CANDIDATES) return fromUrl
+    }
+    return 'current'
+  })()
+  const bgBaseSrc = BG_CANDIDATES[_bgChoice] ?? BG_CANDIDATES.current
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
@@ -1482,7 +1530,7 @@
     <div class="bg-still-container">
       <img
         class="bg-still"
-        src="assets/themes/future-spinner/backgrounds/bg_base.jpg"
+        src={bgBaseSrc}
         alt=""
         aria-hidden="true"
       />

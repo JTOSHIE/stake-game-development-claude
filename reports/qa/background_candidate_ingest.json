@@ -1,0 +1,297 @@
+{
+  "generated_utc": "2026-07-26T12:34:40Z",
+  "script": "scripts/assets/background_candidate_ingest.py",
+  "adopts_anything": false,
+  "note": "Candidates only. The shipped bg_base.jpg is not written by this script and is byte-unchanged by this session.",
+  "source_directory": "/Users/jt/Downloads/slot_background_assets",
+  "incumbent": {
+    "path": "frontend/public/assets/themes/future-spinner/backgrounds/bg_base.jpg",
+    "dimensions": "1920x1080",
+    "mode": "RGB",
+    "bytes": 277172,
+    "sha256": "23e63e54e99aa0b03ddd52649e7838af33c6661121c1da2563ad81342c57539f",
+    "regions": {
+      "full": {
+        "mean_luma_255": 76.59,
+        "p05_luma_255": 13.04,
+        "p95_luma_255": 165.21,
+        "stdev_luma_255": 48.06
+      },
+      "title_band_top_18pc": {
+        "mean_luma_255": 57.58,
+        "p05_luma_255": 10.77,
+        "p95_luma_255": 106.18,
+        "stdev_luma_255": 34.32
+      },
+      "stage_band_middle_64pc": {
+        "mean_luma_255": 84.99,
+        "p05_luma_255": 15.26,
+        "p95_luma_255": 180.29,
+        "stdev_luma_255": 50.05
+      },
+      "hud_strip_bottom_18pc": {
+        "mean_luma_255": 65.72,
+        "p05_luma_255": 8.38,
+        "p95_luma_255": 161.16,
+        "stdev_luma_255": 44.89
+      }
+    }
+  },
+  "provenance_anchor": {
+    "file": "bg_original.jpg",
+    "present": true,
+    "sha256": "23e63e54e99aa0b03ddd52649e7838af33c6661121c1da2563ad81342c57539f",
+    "bytes": 277172,
+    "byte_identical_to_shipped_bg_base": true,
+    "readme_claim": "Your original file for reference."
+  },
+  "external_art_test_reference": "CLAUDE.md, 'The test for any future external asset'",
+  "controls": [
+    {
+      "file": "bg_original.jpg",
+      "present": true,
+      "role": "identity anchor, expected r = 1.0",
+      "vendor_readme_claim": "Your original file for reference.",
+      "sha256": "23e63e54e99aa0b03ddd52649e7838af33c6661121c1da2563ad81342c57539f",
+      "bytes": 277172,
+      "dimensions": "1920x1080",
+      "composition_vs_incumbent": {
+        "downsample_grid": "64x36",
+        "pearson_r_vs_incumbent": 1.0,
+        "share_cells_moved_gt_half_sd": 0.0,
+        "mean_abs_diff_standardised_sd": 0.0,
+        "raw_mean_abs_diff_luma_255": 0.0,
+        "raw_share_cells_moved_gt_10pc_range": 0.0
+      },
+      "ingested": false
+    },
+    {
+      "file": "bg_original_enhanced.jpg",
+      "present": true,
+      "role": "DECLARED ENHANCEMENT, the permitted-class signature",
+      "vendor_readme_claim": "Your original image with contrast, sharpness and colour boost applied (keeps the exact same scene).",
+      "sha256": "e5cb49e546737fe2e7e82d168cc08ec386f9692e46368a689bffe6e031b2f2b5",
+      "bytes": 442008,
+      "dimensions": "1920x1080",
+      "composition_vs_incumbent": {
+        "downsample_grid": "64x36",
+        "pearson_r_vs_incumbent": 0.9966,
+        "share_cells_moved_gt_half_sd": 0.0,
+        "mean_abs_diff_standardised_sd": 0.0661,
+        "raw_mean_abs_diff_luma_255": 4.18,
+        "raw_share_cells_moved_gt_10pc_range": 0.0
+      },
+      "ingested": false
+    },
+    {
+      "file": "bg_highquality_1920x1080.jpg",
+      "present": true,
+      "role": "vendor's recommended file, relationship undeclared",
+      "vendor_readme_claim": "New higher-quality version (recommended). Much sharper, richer neon, better reflections and atmosphere.",
+      "sha256": "6334f04153b695d38c1ac9ca891be9104bb98b8c5dafee2b8add4f2fbadfc9ed",
+      "bytes": 642577,
+      "dimensions": "1920x1080",
+      "composition_vs_incumbent": {
+        "downsample_grid": "64x36",
+        "pearson_r_vs_incumbent": 0.3457,
+        "share_cells_moved_gt_half_sd": 0.5781,
+        "mean_abs_diff_standardised_sd": 0.8561,
+        "raw_mean_abs_diff_luma_255": 45.32,
+        "raw_share_cells_moved_gt_10pc_range": 0.5903
+      },
+      "ingested": false
+    }
+  ],
+  "candidates": [
+    {
+      "tag": "v1",
+      "source_path": "/Users/jt/Downloads/slot_background_assets/bg_improved_v1.jpg",
+      "source_sha256": "65ef44c1ce96d351e96f69831bde8146d6cb77f4f7f86ad1b56bca1e0340f467",
+      "source_bytes": 569573,
+      "source_mtime_utc": "2026-07-26T07:44:13Z",
+      "source_dimensions": "1920x1080",
+      "source_mode": "RGB",
+      "vendor_readme_claim": "Alternative compositions in the same style.",
+      "ingested_to": "frontend/public/assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v1.jpg",
+      "ingested_sha256": "c7ecfa15dde8db421f3c9428211810c24cf292db6ba49fd149973a6fbffd9491",
+      "compression": {
+        "sweep": [
+          {
+            "quality": 92,
+            "bytes": 455553
+          },
+          {
+            "quality": 88,
+            "bytes": 356136
+          },
+          {
+            "quality": 85,
+            "bytes": 316603
+          },
+          {
+            "quality": 82,
+            "bytes": 289504
+          },
+          {
+            "quality": 80,
+            "bytes": 273173
+          }
+        ],
+        "chosen_quality": 80,
+        "budget_bytes": 277172,
+        "output_bytes": 273173,
+        "within_budget": true,
+        "encoder_settings": "JPEG optimize=True progressive=True subsampling=4:2:0"
+      },
+      "test_1_dimensions_match_incumbent": true,
+      "test_2_composition_vs_incumbent": {
+        "downsample_grid": "64x36",
+        "pearson_r_vs_incumbent": 0.385,
+        "share_cells_moved_gt_half_sd": 0.5816,
+        "mean_abs_diff_standardised_sd": 0.8376,
+        "raw_mean_abs_diff_luma_255": 43.56,
+        "raw_share_cells_moved_gt_10pc_range": 0.5829
+      },
+      "test_3_alpha": {
+        "source_has_alpha": false,
+        "note": "Opaque RGB background layer; no alpha to preserve. The anchors that matter are the HUD and title regions the interface draws over, measured below."
+      },
+      "regions_after_web_compression": {
+        "full": {
+          "mean_luma_255": 73.61,
+          "p05_luma_255": 4.93,
+          "p95_luma_255": 200.89,
+          "stdev_luma_255": 60.74
+        },
+        "title_band_top_18pc": {
+          "mean_luma_255": 40.85,
+          "p05_luma_255": 1.27,
+          "p95_luma_255": 179.91,
+          "stdev_luma_255": 51.29
+        },
+        "stage_band_middle_64pc": {
+          "mean_luma_255": 91.07,
+          "p05_luma_255": 14.14,
+          "p95_luma_255": 210.99,
+          "stdev_luma_255": 61.11
+        },
+        "hud_strip_bottom_18pc": {
+          "mean_luma_255": 44.34,
+          "p05_luma_255": 2.21,
+          "p95_luma_255": 124.95,
+          "stdev_luma_255": 39.71
+        }
+      },
+      "region_delta_vs_incumbent_mean_luma": {
+        "full": -2.98,
+        "title_band_top_18pc": -16.73,
+        "stage_band_middle_64pc": 6.08,
+        "hud_strip_bottom_18pc": -21.38
+      },
+      "test_1_verdict": {
+        "class": "NEW DESIGN",
+        "candidate_r": 0.385,
+        "declared_enhancement_control_r": 0.9966,
+        "candidate_share_cells_moved": 0.5816,
+        "declared_enhancement_control_share_cells_moved": 0.0,
+        "threshold_applied": "r >= 0.9 and cells moved <= 20 per cent",
+        "classifier_selftest": "scripts/assets/background_candidate_ingest_selftest.py, convention (p): seeds a real enhancement and a real recomposition and proves the classifier separates them",
+        "claude_md_rule": "external ENHANCEMENT of existing art is permitted; externally DESIGNED art is not",
+        "permitted_under_that_rule_without_a_new_ruling": false
+      }
+    },
+    {
+      "tag": "v2",
+      "source_path": "/Users/jt/Downloads/slot_background_assets/bg_improved_v2.jpg",
+      "source_sha256": "d24cc6cc2ffd0d2a79577c906fba80862f1e851c4a5ff6522820edfdc303673a",
+      "source_bytes": 574103,
+      "source_mtime_utc": "2026-07-26T07:44:13Z",
+      "source_dimensions": "1920x1080",
+      "source_mode": "RGB",
+      "vendor_readme_claim": "Alternative compositions in the same style.",
+      "ingested_to": "frontend/public/assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg",
+      "ingested_sha256": "54043357cdd251e61aba61c509e616040b2fa1d3d2d66f6b0b564a088310c3fa",
+      "compression": {
+        "sweep": [
+          {
+            "quality": 92,
+            "bytes": 405849
+          },
+          {
+            "quality": 88,
+            "bytes": 324862
+          },
+          {
+            "quality": 85,
+            "bytes": 291033
+          },
+          {
+            "quality": 82,
+            "bytes": 259918
+          }
+        ],
+        "chosen_quality": 82,
+        "budget_bytes": 277172,
+        "output_bytes": 259918,
+        "within_budget": true,
+        "encoder_settings": "JPEG optimize=True progressive=True subsampling=4:2:0"
+      },
+      "test_1_dimensions_match_incumbent": true,
+      "test_2_composition_vs_incumbent": {
+        "downsample_grid": "64x36",
+        "pearson_r_vs_incumbent": 0.3455,
+        "share_cells_moved_gt_half_sd": 0.5773,
+        "mean_abs_diff_standardised_sd": 0.8561,
+        "raw_mean_abs_diff_luma_255": 45.34,
+        "raw_share_cells_moved_gt_10pc_range": 0.5903
+      },
+      "test_3_alpha": {
+        "source_has_alpha": false,
+        "note": "Opaque RGB background layer; no alpha to preserve. The anchors that matter are the HUD and title regions the interface draws over, measured below."
+      },
+      "regions_after_web_compression": {
+        "full": {
+          "mean_luma_255": 92.02,
+          "p05_luma_255": 15.39,
+          "p95_luma_255": 207.0,
+          "stdev_luma_255": 60.46
+        },
+        "title_band_top_18pc": {
+          "mean_luma_255": 65.24,
+          "p05_luma_255": 7.18,
+          "p95_luma_255": 195.78,
+          "stdev_luma_255": 54.79
+        },
+        "stage_band_middle_64pc": {
+          "mean_luma_255": 102.8,
+          "p05_luma_255": 18.05,
+          "p95_luma_255": 214.75,
+          "stdev_luma_255": 62.72
+        },
+        "hud_strip_bottom_18pc": {
+          "mean_luma_255": 80.44,
+          "p05_luma_255": 19.12,
+          "p95_luma_255": 166.06,
+          "stdev_luma_255": 45.39
+        }
+      },
+      "region_delta_vs_incumbent_mean_luma": {
+        "full": 15.43,
+        "title_band_top_18pc": 7.66,
+        "stage_band_middle_64pc": 17.81,
+        "hud_strip_bottom_18pc": 14.72
+      },
+      "test_1_verdict": {
+        "class": "NEW DESIGN",
+        "candidate_r": 0.3455,
+        "declared_enhancement_control_r": 0.9966,
+        "candidate_share_cells_moved": 0.5773,
+        "declared_enhancement_control_share_cells_moved": 0.0,
+        "threshold_applied": "r >= 0.9 and cells moved <= 20 per cent",
+        "classifier_selftest": "scripts/assets/background_candidate_ingest_selftest.py, convention (p): seeds a real enhancement and a real recomposition and proves the classifier separates them",
+        "claude_md_rule": "external ENHANCEMENT of existing art is permitted; externally DESIGNED art is not",
+        "permitted_under_that_rule_without_a_new_ruling": false
+      }
+    }
+  ]
+}

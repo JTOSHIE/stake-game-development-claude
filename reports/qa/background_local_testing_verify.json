@@ -1,0 +1,33 @@
+{
+  "generated": "2026-07-26T12:41:24.766Z",
+  "script": "frontend/scripts/background_local_testing_verify.mjs",
+  "lanAddress": "192.168.4.92",
+  "port": 5173,
+  "devServerUrl": "http://192.168.4.92:5173/",
+  "fakeSessionUsed": "LOCALTEST-DO-NOT-USE",
+  "fakeRgsHostUsed": "rgs.invalid.localtest",
+  "note": "The authenticate request is intercepted and aborted; no live RGS session is consumed by this verification.",
+  "checks": [
+    {
+      "name": "dev server answers on the LAN address",
+      "pass": true,
+      "detail": "http://192.168.4.92:5173/?mock=1 -> HTTP 200, game mounted"
+    },
+    {
+      "name": "candidate v2 served over HTTP at the app path, byte sizes agree",
+      "pass": true,
+      "detail": "HTTP 200, served 259,918B, on disk 259,918B, content-type image/jpeg"
+    },
+    {
+      "name": "the ?bg=v2 choice survives a redirect carrying only the RGS parameters",
+      "pass": true,
+      "detail": "after ?bg=v2: assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg (stored v2); after RGS-only redirect: assets/themes/future-spinner/backgrounds/candidates/bg_base_candidate_v2.jpg (stored v2)"
+    },
+    {
+      "name": "the game boots on the real launch shape and addresses the given rgs_url",
+      "pass": true,
+      "detail": "1 request(s) to the supplied host, first: POST https://rgs.invalid.localtest/wallet/authenticate"
+    }
+  ],
+  "allPass": true
+}
