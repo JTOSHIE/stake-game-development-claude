@@ -391,7 +391,11 @@ full text of this superseded section stays in the repository's history.
 
 ---
 
-# PART 9c: THE NEXT VISIT (V4)
+# PART 9c: THE V4 VISIT (SUPERSEDED, DO NOT RUN)
+
+**Superseded by PART 9d below, 2026-07-27.** Kept because three of its five
+open items were answered on that visit and the record of what was asked is
+worth keeping. Do not work from this section.
 
 **This is the whole visit and it fits on one page.** You do not need to read
 anything above it.
@@ -540,3 +544,135 @@ the platform sends currency display information. **Your DevTools screenshots of
 where we thought, a losing spin settles without a second request, and the money
 figures are the units we assumed. Those are recorded as TR-077, TR-078 and
 TR-079. This page is shorter because you already did that work.
+
+---
+
+# PART 9d: THE V5 VISIT
+
+**This is the whole visit and it fits on one page.** You do not need to read
+anything above it.
+
+Allow about twenty minutes. You can stop at any step and come back. Nothing is
+public until **Submit for review**, and you are not pressing that today.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V5/`. Its `README.md`
+names the commit it was built from. That is the only kit to use.
+
+**Where the screenshots go:** loose on the Desktop. Do not sort or rename them.
+I will file them.
+
+**What is new in V5**, so you know what you are looking at:
+
+- **The background is your V1 pick**, now the shipped art rather than a
+  candidate served through a switch. The Overdrive version of it was rebuilt to
+  match, so the feature still lights the same street rather than cutting to a
+  different one.
+- **Popout S drops the title**, your DROP call. The reels are noticeably bigger:
+  the grid went from 44.2 to 50.5 per cent of the frame width.
+- **The bonus TAP TO CONTINUE button is now tappable in landscape.** It measured
+  under the 44px minimum on phones held sideways and did not on phones held
+  upright, which is why it took this long to catch.
+
+---
+
+## The update, in four steps
+
+**1. Import.** Games, then Future Spinner, then **Files**, then **Import Files**.
+Open `~/Desktop/FS_UPLOAD_KIT_V5/02_frontend_upload` and drag in **everything
+inside that folder**, the contents and not the folder itself. That is the only
+step where a mistake is likely, and it is undoable.
+
+**2. Read the sync dialog, then confirm it.** Upload, delete and skip counts are
+all normal: upload is what changed, delete is the previous version of those same
+files, skip is everything unchanged. You never delete anything by hand.
+**Screenshot the dialog before confirming**, then press **Start Sync**.
+
+**3. Publish.** One green **Publish Game** button. Press it and wait for success.
+
+**4. Check the version went up.** Launch the game, open the **Versions** panel,
+and confirm the front-end number is higher than it was. If it is unchanged,
+press **Publish Game** again.
+
+That is the update. Everything below is looking at things.
+
+### Three things you do not need to do
+
+- **The maths is not being touched.** It is already uploaded and correct, and
+  there is no maths folder in the V5 kit for that reason.
+- **`math/HASHES.txt` can stay.** Harmless, not part of the game, not worth a
+  step.
+- **The game tile is done.** You composed it already.
+
+---
+
+## What is still open
+
+Three things, and only these.
+
+### 1. Eyeball the new art and the new small screens. Five minutes.
+
+This is the one that needs your eye rather than a measurement, because
+everything below the eye has already been measured.
+
+1. In the toolbar, open **Screen** and step through **Desktop**, **Popout S**,
+   **Mobile S**, **Mobile M** and **Mobile L**, playing a spin or two at each.
+2. **At Desktop, look at the background.** It is your V1 pick. This is the first
+   time you are seeing it as the real shipped art rather than through the local
+   switch.
+3. **At Popout S, look at the reels.** The title is gone and the grid is bigger.
+   The question is whether losing the title reads as an improvement or a loss at
+   that size, which is exactly the trade you called.
+4. **At the three Mobile sizes, look for anything cramped or cut.**
+5. **Trigger the bonus at least once and press TAP TO CONTINUE with your thumb,
+   on a phone held sideways if you can.** That is the fix from this round and a
+   real thumb is the only test that counts.
+6. **Screenshot anything that looks wrong.** If nothing looks wrong, say so and
+   that is the answer.
+
+### 2. Twenty Cruise spins, bracketed
+
+Still the one mode whose money we have never been able to check, and the only
+thing that closes it.
+
+1. Open **FEATURES** and select **Cruise**.
+2. **Before you spin at all:** open the menu, open **Session information**, and
+   **screenshot it**. The run is worthless without this one.
+3. Close it and spin **twenty times**. Autoplay is fine.
+4. **After the twentieth spin:** open **Session information** again and
+   **screenshot it**.
+
+Two screenshots of the same panel, before and after. That is the whole thing.
+
+### 3. The Guidelines ticks
+
+Open the portal's **Guidelines** tab with
+`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md` beside it. That
+document already has our answer for all 58 items.
+
+1. Work down the list and tick the items the document marks as ours.
+2. **Nine are marked OWNER** and are yours rather than the build's: the
+   thumbnail, the approval requests, the Provably Fair toggle, the channel post
+   and the post-release steps.
+3. If the portal's list and our document disagree anywhere, **stop and
+   screenshot it**. A disagreement is worth more than a tick.
+
+---
+
+## Finishing
+
+1. Leave every screenshot loose on the Desktop.
+2. Tell me anything that came back different from what this page said to expect.
+   **"That step made no sense" is a useful answer.**
+3. **Do not press Start Approval.**
+4. Delete `~/Desktop/FS_UPLOAD_KIT_V5/` when you are done. It is single use, and
+   a kit left on the Desktop is a kit that eventually gets uploaded when it is
+   out of date, which has already happened once.
+
+---
+
+**What came off this list since V4, and why.** The max win replay is **done**:
+you captured the celebration and it closed TR-073 and TR-076. The Danish
+fallback is **done** and passed. **Gold Coins is parked**, not forgotten: the
+environment you have does not offer GC, so there is nothing to check until one
+does. That leaves the three items above, and two of them are unchanged from last
+time because they are the two that still have no answer.

@@ -47,7 +47,18 @@ import { tmpdir, homedir } from 'node:os'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '..')
-const KIT = join(homedir(), 'Desktop', 'FS_UPLOAD_KIT_V3')
+// The kit VERSION is a parameter, not a literal. It was hardcoded to V3 while a
+// V4 was built and shipped, so the script and the Desktop disagreed about which
+// kit it makes, and the README inside a V4 folder would have told the owner to
+// confirm "Front V3". One number, read once, used everywhere below.
+//   node scripts/kit_build.mjs --version 5
+const KIT_VERSION = (() => {
+  const i = process.argv.indexOf('--version')
+  const v = i >= 0 ? Number(process.argv[i + 1]) : NaN
+  return Number.isInteger(v) && v > 0 ? v : 5
+})()
+const KIT_NAME = `FS_UPLOAD_KIT_V${KIT_VERSION}`
+const KIT = join(homedir(), 'Desktop', KIT_NAME)
 
 const git = (args, cwd = REPO) => execFileSync('git', args, { cwd, encoding: 'utf-8' }).trim()
 
@@ -231,7 +242,7 @@ for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners
   cpSync(join(clone, 'design-system/brand/delivery', f), join(KIT, '03_branding', f))
 }
 
-const readme = `# FS_UPLOAD_KIT_V3, frontend only
+const readme = `# ${KIT_NAME}, frontend only
 
 **Built from commit \`${facts.head}\`** (\`${facts.head.slice(0, 8)}\`), clean tree,
 in a fresh clone, ${info.builtAt}.
@@ -252,7 +263,7 @@ The short version:
    taking it from 13 files to 12. Nothing else in Math is touched.
 2. Upload the CONTENTS of \`02_frontend_upload\` as the Front End. Not the folder:
    if \`index.html\` ends up one level down the game will not load.
-3. Publish, and confirm the version reads Front V3.
+3. Publish, and confirm the version reads Front V${KIT_VERSION}.
 4. Compose the tile in Design Thumbnail from the two images in \`03_branding/\`.
 5. The maths package stays at V1 and is NOT re-uploaded.
 6. Do NOT press Start Approval.
