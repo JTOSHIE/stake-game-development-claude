@@ -1,0 +1,435 @@
+{
+ "record": "stake_engine_bets_page",
+ "ingested_by": "track/screenshot-analyst",
+ "ingested_on": "2026-07-26",
+ "source_document": "Math Distribution & Summary .docx, supplied by the owner on ~/Desktop, an export of the Stake Engine dashboard page stake-engine.com/teams/we-roll-spinners/games/future-spinner",
+ "source_note": "The same session is independently visible in the capture reports/screens/screenshot-analyst-2026-07-26/09_eur_win_321750_x32175_balance_58950000.png, whose top row 14:10:32 matches row 1 below exactly. The capture and the document are NOT independent inputs: both render the same platform page.",
+ "session_window_local": {
+  "first_row": "14:09:25",
+  "last_row": "14:10:32"
+ },
+ "currency": "EUR",
+ "row_count": 50,
+ "column_semantics": {
+  "cost": "The platform Bets page COST column carries the BET LEVEL, not the effective debit. Proven for antelite, bonus and super in reports/qa/live_stats/2026-07-26_mode_cost_reconciliation.md. For these rows mode is base, whose cost multiplier is 1.0, so COST and debit coincide.",
+  "mult": "payout divided by the COST column value, i.e. against the bet level."
+ },
+ "totals": {
+  "rows": 50,
+  "sum_cost_column_eur": 50000.0,
+  "sum_payout_eur": 362290.0,
+  "net_eur": 312290.0,
+  "zero_payout_rows": 36,
+  "paying_rows": 14,
+  "max_multiplier": 321.75
+ },
+ "anomaly_checks": {
+  "payout_above_5000x_bet": [],
+  "debit_not_matching_mode_cost": "none: every row is mode base at cost multiplier 1.0 and every COST reads 1,000.00",
+  "settlement_gaps": [],
+  "stated_mult_disagrees_with_payout_over_cost": []
+ },
+ "rtp_verdict": "NOT ISSUED. The committed statistics note stands: RTP is not verifiable by play. 50 rows is a sample of no inferential weight and no return figure is computed from it.",
+ "rows": [
+  {
+   "time": "14:10:32",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 321750.0,
+   "mult": 321.75,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:31",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:29",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:28",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:27",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 600.0,
+   "mult": 0.6,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:25",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 550.0,
+   "mult": 0.55,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:24",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:23",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:22",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:20",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:19",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:18",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:16",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:15",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:14",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:12",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:11",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:10",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:09",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:07",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:06",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:05",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:04",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:03",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:01",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:00",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:57",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 920.0,
+   "mult": 0.92,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:56",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:54",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 470.0,
+   "mult": 0.47,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:51",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 33800.0,
+   "mult": 33.8,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:50",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:49",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 820.0,
+   "mult": 0.82,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:47",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 550.0,
+   "mult": 0.55,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:46",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 330.0,
+   "mult": 0.33,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:43",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 610.0,
+   "mult": 0.61,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:42",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:41",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:40",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:38",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:37",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:36",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:35",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:34",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:33",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:31",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:30",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:29",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 750.0,
+   "mult": 0.75,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:28",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:26",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:25",
+   "mode": "base",
+   "cost_eur": 1000.0,
+   "payout_eur": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  }
+ ]
+}

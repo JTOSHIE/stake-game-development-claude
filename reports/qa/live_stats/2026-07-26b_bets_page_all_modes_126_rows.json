@@ -1,0 +1,1088 @@
+{
+ "record": "stake_engine_bets_page",
+ "snapshot": "second, later than 2026-07-26_bets_page_eur_base_50_rows.json",
+ "ingested_by": "track/screenshot-analyst",
+ "ingested_on": "2026-07-26",
+ "source_document": "Math Distribution & Summary .docx on the owner's Desktop, updated by the owner at 15:05 local, 87,050 bytes. The first ingest read the 40,810 byte version.",
+ "relationship_to_first_snapshot": "COMPLEMENTARY, not superseding. The platform Bets panel is a rolling window capped at 50 rows, so each snapshot holds a different slice. The first covers base 14:09:25 to 14:10:32; this one covers base 14:10:32 to 14:18:46 and adds cruise, bonus and super entirely. They share exactly one row, 14:10:32, which agrees in both.",
+ "currency": "EUR",
+ "unique_row_count": 126,
+ "column_semantics": {
+  "cost": "the BET LEVEL, not the effective debit; see reports/qa/live_stats/2026-07-26_mode_cost_reconciliation.md",
+  "mult": "payout divided by the COST column value, i.e. against the bet level"
+ },
+ "per_mode": {
+  "base": {
+   "rows": 58,
+   "window": [
+    "14:18:46",
+    "14:10:32"
+   ],
+   "bet_levels_eur": [
+    1000.0
+   ],
+   "payout_sum_eur": 364080.0,
+   "max_multiplier": 321.75
+  },
+  "super": {
+   "rows": 7,
+   "window": [
+    "14:21:26",
+    "14:29:36"
+   ],
+   "bet_levels_eur": [
+    450.0,
+    500.0,
+    750.0,
+    1000.0
+   ],
+   "payout_sum_eur": 4368021.5,
+   "max_multiplier": 5000.0
+  },
+  "bonus": {
+   "rows": 11,
+   "window": [
+    "14:20:57",
+    "14:28:38"
+   ],
+   "bet_levels_eur": [
+    500.0,
+    750.0,
+    1000.0
+   ],
+   "payout_sum_eur": 2066640.0,
+   "max_multiplier": 616.75
+  },
+  "cruise": {
+   "rows": 50,
+   "window": [
+    "15:01:56",
+    "15:03:37"
+   ],
+   "bet_levels_eur": [
+    1.0,
+    10.0
+   ],
+   "payout_sum_eur": 142.1,
+   "max_multiplier": 47.65
+  }
+ },
+ "anomaly_checks": {
+  "payout_above_5000x_bet": "NONE. Zero rows exceed the cap.",
+  "payout_at_exactly_5000x_bet": "ONE, 14:29:36 super, bet level EUR 750.00, payout EUR 3,750,000.00, MULT x5000.00. The wincap landing exactly on the 5,000x hard cap, which is specified behaviour, not a breach. See ledger SA-017.",
+  "debit_not_matching_mode_cost": "none detectable from this record alone; the COST column carries bet level for every mode, which is SA-002",
+  "settlement_gaps": "NONE. All 126 rows read Settled.",
+  "stated_mult_disagrees_with_payout_over_cost": "NONE across all 126 rows, checked programmatically at a tolerance of 0.006"
+ },
+ "rtp_verdict": "NOT ISSUED. The committed statistics note stands: RTP is not verifiable by play. 126 rows carry no inferential weight against a 100,000 round certification and no return figure is computed here.",
+ "rows": [
+  {
+   "time": "14:10:32",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 321750.0,
+   "mult": 321.75,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:31",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:29",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:28",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:27",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 600.0,
+   "mult": 0.6,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:25",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 550.0,
+   "mult": 0.55,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:24",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:23",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:22",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:20",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:19",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:18",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:16",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:15",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:14",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:12",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:11",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:10",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:09",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:07",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:06",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:05",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:04",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:03",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:01",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:10:00",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:57",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 920.0,
+   "mult": 0.92,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:56",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:54",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 470.0,
+   "mult": 0.47,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:51",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 33800.0,
+   "mult": 33.8,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:50",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:49",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 820.0,
+   "mult": 0.82,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:47",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 550.0,
+   "mult": 0.55,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:46",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 330.0,
+   "mult": 0.33,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:43",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 610.0,
+   "mult": 0.61,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:42",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:41",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:40",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:38",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:37",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:36",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:35",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:34",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:33",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:31",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:30",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:29",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 750.0,
+   "mult": 0.75,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:28",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:26",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:09:25",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 380.0,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "14:29:36",
+   "mode": "super",
+   "cost": 750.0,
+   "payout": 3750000.0,
+   "mult": 5000.0,
+   "status": "Settled"
+  },
+  {
+   "time": "14:28:38",
+   "mode": "bonus",
+   "cost": 500.0,
+   "payout": 308375.0,
+   "mult": 616.75,
+   "status": "Settled"
+  },
+  {
+   "time": "14:28:06",
+   "mode": "super",
+   "cost": 450.0,
+   "payout": 45391.5,
+   "mult": 100.87,
+   "status": "Settled"
+  },
+  {
+   "time": "14:27:36",
+   "mode": "super",
+   "cost": 500.0,
+   "payout": 99840.0,
+   "mult": 199.68,
+   "status": "Settled"
+  },
+  {
+   "time": "14:27:12",
+   "mode": "super",
+   "cost": 1000.0,
+   "payout": 121050.0,
+   "mult": 121.05,
+   "status": "Settled"
+  },
+  {
+   "time": "14:26:27",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 515850.0,
+   "mult": 515.85,
+   "status": "Settled"
+  },
+  {
+   "time": "14:25:50",
+   "mode": "bonus",
+   "cost": 500.0,
+   "payout": 151755.0,
+   "mult": 303.51,
+   "status": "Settled"
+  },
+  {
+   "time": "14:25:31",
+   "mode": "bonus",
+   "cost": 750.0,
+   "payout": 30120.0,
+   "mult": 40.16,
+   "status": "Settled"
+  },
+  {
+   "time": "14:25:11",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 29180.0,
+   "mult": 29.18,
+   "status": "Settled"
+  },
+  {
+   "time": "14:24:52",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 43060.0,
+   "mult": 43.06,
+   "status": "Settled"
+  },
+  {
+   "time": "14:24:29",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 96910.0,
+   "mult": 96.91,
+   "status": "Settled"
+  },
+  {
+   "time": "14:24:03",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 182350.0,
+   "mult": 182.35,
+   "status": "Settled"
+  },
+  {
+   "time": "14:23:40",
+   "mode": "super",
+   "cost": 1000.0,
+   "payout": 108150.0,
+   "mult": 108.15,
+   "status": "Settled"
+  },
+  {
+   "time": "14:22:55",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 358280.0,
+   "mult": 358.28,
+   "status": "Settled"
+  },
+  {
+   "time": "14:22:22",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 66510.0,
+   "mult": 66.51,
+   "status": "Settled"
+  },
+  {
+   "time": "14:21:53",
+   "mode": "super",
+   "cost": 1000.0,
+   "payout": 141540.0,
+   "mult": 141.54,
+   "status": "Settled"
+  },
+  {
+   "time": "14:21:26",
+   "mode": "super",
+   "cost": 1000.0,
+   "payout": 102050.0,
+   "mult": 102.05,
+   "status": "Settled"
+  },
+  {
+   "time": "14:20:57",
+   "mode": "bonus",
+   "cost": 1000.0,
+   "payout": 284250.0,
+   "mult": 284.25,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:55",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:54",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:53",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 560.0,
+   "mult": 0.56,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:51",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:50",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 330.0,
+   "mult": 0.33,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:48",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 900.0,
+   "mult": 0.9,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:47",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "14:18:46",
+   "mode": "base",
+   "cost": 1000.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:37",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:36",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.41,
+   "mult": 0.41,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:35",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:33",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.45,
+   "mult": 0.45,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:32",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:30",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.5,
+   "mult": 0.5,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:29",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.31,
+   "mult": 0.31,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:27",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.72,
+   "mult": 0.72,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:26",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:25",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:24",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:22",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.39,
+   "mult": 0.39,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:21",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.76,
+   "mult": 0.76,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:20",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:18",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.51,
+   "mult": 0.51,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:17",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:16",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:15",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:13",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.31,
+   "mult": 0.31,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:12",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:10",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.4,
+   "mult": 0.4,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:08",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.8,
+   "mult": 0.8,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:07",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.46,
+   "mult": 0.46,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:05",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.32,
+   "mult": 0.32,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:04",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:03",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:02",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:03:01",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:59",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:58",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.2,
+   "mult": 0.2,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:57",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:55",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:54",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:53",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:52",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:49",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 47.65,
+   "mult": 47.65,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:47",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.51,
+   "mult": 0.51,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:44",
+   "mode": "cruise",
+   "cost": 1.0,
+   "payout": 0.6,
+   "mult": 0.6,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:23",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 8.4,
+   "mult": 0.84,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:21",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:19",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:17",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:14",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 3.8,
+   "mult": 0.38,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:11",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:08",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 8.1,
+   "mult": 0.81,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:05",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 59.5,
+   "mult": 5.95,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:02",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 7.0,
+   "mult": 0.7,
+   "status": "Settled"
+  },
+  {
+   "time": "15:02:00",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:01:58",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  },
+  {
+   "time": "15:01:56",
+   "mode": "cruise",
+   "cost": 10.0,
+   "payout": 0.0,
+   "mult": null,
+   "status": "Settled"
+  }
+ ]
+}
