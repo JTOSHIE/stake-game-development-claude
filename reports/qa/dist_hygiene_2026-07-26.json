@@ -3,7 +3,7 @@
   "job": "JOB 3(i), no documentation ships",
   "dist": {
     "files": 108,
-    "bytes": 15515001,
+    "bytes": 15515148,
     "megabytes": 14.8
   },
   "budgetBytes": 26214400,
@@ -22,12 +22,12 @@
   "documentationFound": [],
   "buildStamp": {
     "game": "future-spinner",
-    "commit": "856fd171afcf48bfc3793e95061980d778eefa25",
+    "commit": "a1ff78bbe5fcc85ee0d32278a1e63c880c46f5ed",
     "branch": "main",
     "cleanTree": false,
-    "builtAt": "2026-07-26T03:10:44.006Z",
+    "builtAt": "2026-07-26T03:17:28.609Z",
     "bundleFilesExcludingThisFile": 107,
-    "bundleBytesExcludingThisFile": 15514619,
+    "bundleBytesExcludingThisFile": 15514766,
     "note": "Provenance only. Nothing in the running game fetches this file; the boot line is inlined at build time. See TR-062."
   },
   "seeded": [
