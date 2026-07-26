@@ -2127,6 +2127,12 @@
     inset: 0;
     z-index: 0;
     overflow: hidden;
+    /* TR-076. The backdrop is decoration and must never take a hit. As a
+       positioned layer at z-index 0 it hit-tests ABOVE unpositioned content,
+       which is exactly how it sat over ReplayMode's START REPLAY button and
+       swallowed every click (the game-stage at z-index 2 covered it in normal
+       play, so only replay mode was exposed). */
+    pointer-events: none;
   }
 
   /* Static image backgrounds (non-future-spinner themes) */

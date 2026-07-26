@@ -333,6 +333,12 @@
 
 <style>
   .replay-container {
+    /* TR-076. Positioned above App.svelte's fixed .bg-layer (z-index 0), the
+       same relationship .game-stage (z-index 2) has in normal play. Without
+       this the backdrop painted over the whole replay UI, leaving START
+       REPLAY a shadow under the dark overlay. */
+    position: relative;
+    z-index: 2;
     width: 100%;
     height: 100vh;
     display: flex;
