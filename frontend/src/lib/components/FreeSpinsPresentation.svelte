@@ -578,6 +578,7 @@
      burst text, appears the instant the gate opens (no entrance delay of
      its own beyond that), 44px+ touch target throughout. */
   .entry-continue {
+    position: relative;
     display: flex; align-items: center; justify-content: center;
     /* This button lives inside the LAYOUT_SPEC 1280x720 stage coordinate
        system, which portrait scales down well below 1:1 (as low as ~0.58x
@@ -585,7 +586,16 @@
        screen at only ~28px, under the 44px touch-target floor
        (portrait_layout_conformance.mjs's touchTargetAudit caught this).
        96px pre-scale clears 44px on screen even at that smallest observed
-       scale, with margin. */
+       scale, with margin.
+
+       TR-085, 2026-07-27: that reasoning was right and its scale was wrong.
+       LANDSCAPE scales further than portrait ever does. Measured rendered
+       heights of this 96-unit button: iPhone 14 portrait 55.8px, Pixel 7
+       portrait 61.8px, but Pixel 7 landscape 32.1px and iPhone 14 landscape
+       29.8px, the last of those a stage scale of 0.3104. So the button was
+       under the floor on both landscape profiles while passing on both
+       portrait ones, which is why the audit that found it only sees it
+       sometimes. */
     min-height: 96px; padding: 0 28px;
     font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.12em;
     color: #0a0614; background: linear-gradient(180deg, #ffe98a, #ffd700 60%, #d9a81e);
@@ -593,6 +603,23 @@
     box-shadow: 0 0 18px rgba(255, 215, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.6);
     animation: continue-pulse 1.1s ease-in-out infinite;
   }
+  /* The compact-visual-with-extended-hit pattern, as `.m-fm-entry` in
+     FeatureMenu.svelte uses it: the visual keeps its size, the pseudo-element
+     carries the touch target past the floor.
+
+     Raising min-height instead would need about 142 units to clear 44px at the
+     0.3104 landscape scale, and that extra third would be spent on desktop and
+     portrait too, where the button is already generously sized. A control that
+     must be enormous everywhere to be tappable somewhere is the wrong fix.
+
+     28 units each side, derived not guessed: 96 + 56 = 152 units, which at the
+     smallest measured scale of 0.3104 renders 47.2px against the 44px floor,
+     roughly 7 per cent of margin. VERTICAL ONLY, because width was never the
+     problem: the narrowest measured visual is 78.6px, comfortably clear, and
+     widening the target sideways would push it under neighbouring layout for
+     no gain. Nothing beside or above it in `.entry-bottom-group` is
+     interactive, so the extension cannot swallow another control's press. */
+  .entry-continue::after { content: ''; position: absolute; inset: -28px 0; }
   .entry-continue:hover, .entry-continue:focus-visible { filter: brightness(1.08); }
   @keyframes continue-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 

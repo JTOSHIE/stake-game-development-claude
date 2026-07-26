@@ -1,0 +1,85 @@
+{
+  "generated": "2026-07-26T15:58:13.841Z",
+  "row": "TR-085",
+  "script": "frontend/scripts/entry_continue_touch_gate.mjs",
+  "minTouchPx": 44,
+  "rows": [
+    {
+      "profile": "iphone14-portrait",
+      "visualW": 146.5,
+      "visualH": 55.6,
+      "hitW": 146.5,
+      "hitH": 88.1,
+      "stageScale": 0.5795,
+      "layoutH": 96,
+      "afterPresent": true,
+      "afterExtensionRenderedPx": {
+        "top": 16.2,
+        "bottom": 16.2
+      },
+      "extensionClickable": true,
+      "found": true,
+      "sizeOk": true,
+      "clickOk": true,
+      "pass": true
+    },
+    {
+      "profile": "iphone14-landscape",
+      "visualW": 78.7,
+      "visualH": 29.9,
+      "hitW": 78.7,
+      "hitH": 47.3,
+      "stageScale": 0.3114,
+      "layoutH": 96,
+      "afterPresent": true,
+      "afterExtensionRenderedPx": {
+        "top": 8.7,
+        "bottom": 8.7
+      },
+      "extensionClickable": true,
+      "found": true,
+      "sizeOk": true,
+      "clickOk": true,
+      "pass": true
+    },
+    {
+      "profile": "pixel7-portrait",
+      "visualW": 162.3,
+      "visualH": 61.6,
+      "hitW": 162.3,
+      "hitH": 97.6,
+      "stageScale": 0.6421,
+      "layoutH": 96,
+      "afterPresent": true,
+      "afterExtensionRenderedPx": {
+        "top": 18,
+        "bottom": 18
+      },
+      "extensionClickable": true,
+      "found": true,
+      "sizeOk": true,
+      "clickOk": true,
+      "pass": true
+    },
+    {
+      "profile": "pixel7-landscape",
+      "visualW": 84.6,
+      "visualH": 32.1,
+      "hitW": 84.6,
+      "hitH": 50.9,
+      "stageScale": 0.3347,
+      "layoutH": 96,
+      "afterPresent": true,
+      "afterExtensionRenderedPx": {
+        "top": 9.4,
+        "bottom": 9.4
+      },
+      "extensionClickable": true,
+      "found": true,
+      "sizeOk": true,
+      "clickOk": true,
+      "pass": true
+    }
+  ],
+  "pass": true
+}
