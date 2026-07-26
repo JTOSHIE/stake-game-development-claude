@@ -1,7 +1,4 @@
-
----
-
-# 2026-07-27b: FS VISUAL FIXPACK, four owner-reported visual defects
+# Session Report - FS VISUAL FIXPACK, four owner-reported visual defects (2026-07-27)
 
 **Brief:** `reports/briefs/FS_VISUAL_FIXPACK_Prompt.md`, saved verbatim and
 committed with JOB 1 per conventions (b) and (f).
