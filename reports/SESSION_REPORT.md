@@ -2435,7 +2435,17 @@ them.
 PR #115 CI, both jobs green:
 `https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30189878160`
 
-Final push CI run link recorded below, per rule 10.
+
+Rule 10 closing link, this session's final push (`c03089b`), BOTH JOBS GREEN:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30190220946`
+  static gates: success
+  browser gates: success
+
+The PR #115 merge commit `bdc6771` also ran green on `main` in its own right:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30190146930`
+Recorded separately because a merge that is green on the branch and red on
+`main` is exactly the case rule 10 exists for, and it is worth showing it was
+checked rather than assumed.
 
 ### FOR THE NEXT SESSION
 
