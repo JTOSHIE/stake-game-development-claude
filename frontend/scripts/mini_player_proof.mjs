@@ -40,6 +40,11 @@ mkdirSync(QA, { recursive: true })
 
 const VIEWPORT = { width: 400, height: 225 }   // Stake's mini-player popout
 const MIN_TARGET = 44
+// The legible floor, declared in frontend/src/lib/actions/fitMoney.ts as
+// MINI_LEGIBLE_FLOOR_PX. Repeated here so the gate can state what it is
+// asserting, and immediately checked against the value the running code
+// published onto the element, so the two cannot drift apart silently.
+const MIN_LEGIBLE_FLOOR = 9
 
 // ── The session, and why this proof has one ──────────────────────────────────
 //
@@ -66,7 +71,23 @@ const RGS_HOST = 'rgs.mini-player-proof.invalid'
 // ran this game at a $50,000,000 balance, and the DTT offers presets up to
 // $10,000,000,000.00. Twelve significant characters plus separators and cents is
 // the worst case a player can actually reach, so it is what the strip must hold.
-const START_MICROS = 52_431_098_760_000
+//
+// BOTH FIXTURES ARE REQUIRED, because Fable's ruling closing TR-066 has two
+// halves and a proof of one half is not a proof of the ruling:
+//
+//   HOSTILE  the full string cannot fit the measured slot at the legible floor,
+//            so the strip must ABBREVIATE ("$52.43M") rather than cut.
+//   FITS     the full string does fit, so it must render IN FULL. Without this
+//            case, a build that abbreviated everything unconditionally would
+//            pass, and that is a worse product than the defect.
+//
+// FITS_MICROS is not an invented number. It is the balance in the owner's own
+// Popout S capture, 28_popout_s_mini_strip_TR066_win_clipped.png, where the
+// strip rendered "BAL $1,040" with the cents cut off. It is therefore the exact
+// value that must now render as "$1,040.06".
+const HOSTILE_MICROS = 52_431_098_760_000
+const FITS_MICROS    = 1_040_060_000
+let START_MICROS = HOSTILE_MICROS
 
 const cell = (n) => ({ name: n, wild: n === 'W', scatter: n === 'S' })
 const boardOf = (rows) => rows.map((reel) => reel.map(cell))
@@ -111,13 +132,29 @@ const playBody = () => {
 }
 const endBody = () => ({ balance: { amount: START_MICROS - betCount * 1_000_000 + 3_900_000, currency: 'USD' } })
 
+// Wallet calls actually made, counted at the interception point.
+//
+// THIS REPLACED A DISPLAY-STRING COMPARISON, and the reason is worth keeping.
+// The check that proves "a real spin happened, this is not a photograph of an
+// idle screen" used to read the BALANCE readout before and after and require it
+// to differ. That worked while the strip rendered "$100.00"; it broke the
+// moment the abbreviation ruling landed, because at a $52,431,098.76 balance a
+// $1.00 bet leaves the rendered string at "$52.43M" both times. The check went
+// red and it was RIGHT to: its evidence source had stopped being evidence.
+//
+// The repair is not a looser comparison, it is a better source. A count of
+// intercepted /wallet/play calls proves the round reached the wallet, and it
+// cannot be affected by how the result is formatted, which is precisely the
+// property the old version lacked.
+const walletCalls = { authenticate: 0, play: 0, endRound: 0 }
+
 async function routeWallet(page) {
   await page.route(`**://${RGS_HOST}/**`, async (route) => {
     const url = route.request().url()
     const json = (o) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) })
-    if (url.includes('/wallet/authenticate')) return json(authBody())
-    if (url.includes('/wallet/play')) return json(playBody())
-    if (url.includes('/wallet/end-round')) return json(endBody())
+    if (url.includes('/wallet/authenticate')) { walletCalls.authenticate += 1; return json(authBody()) }
+    if (url.includes('/wallet/play')) { walletCalls.play += 1; return json(playBody()) }
+    if (url.includes('/wallet/end-round')) { walletCalls.endRound += 1; return json(endBody()) }
     return json({})
   })
 }
@@ -208,6 +245,26 @@ const MEASURE = `(() => {
       //   illegible          autofit "succeeded" by shrinking the rendered text
       //                      below a readable size. Fitting by becoming
       //                      unreadable is not fitting.
+      //
+      // EXTENDED 2026-07-26 for the abbreviation ruling. 'truncated' now also
+      // fails when the effective rendered size the action settled on is under
+      // the legible floor the action itself published. The floor is read off
+      // 'data-fit-floor' rather than hardcoded here, so the gate cannot drift
+      // away from the value the code actually used.
+      fitMode: (() => {
+        const v = el.querySelector('.m-stat-value')
+        return v ? (v.dataset.fitMode ?? null) : null
+      })(),
+      fitPx: (() => {
+        const v = el.querySelector('.m-stat-value')
+        const n = v ? parseFloat(v.dataset.fitPx ?? '') : NaN
+        return Number.isFinite(n) ? n : null
+      })(),
+      fitFloor: (() => {
+        const v = el.querySelector('.m-stat-value')
+        const n = v ? parseFloat(v.dataset.fitFloor ?? '') : NaN
+        return Number.isFinite(n) ? n : null
+      })(),
       truncated: (() => {
         const v = el.querySelector('.m-stat-value')
         if (!v) return false
@@ -240,6 +297,13 @@ const MEASURE = `(() => {
         // popout is not readable, and "it fits" stops meaning anything.
         const effective = (parseFloat(cs.fontSize) || 0)
         if (effective > 0 && effective < 9) return true
+        // The action's own settled size against the action's own published
+        // floor. This catches a fit bought below the legible floor even where
+        // the computed font-size has already been rounded back up by the
+        // engine, which the raw computed read above cannot see.
+        const px = parseFloat(v.dataset.fitPx ?? '')
+        const floor = parseFloat(v.dataset.fitFloor ?? '')
+        if (Number.isFinite(px) && Number.isFinite(floor) && px < floor - 0.01) return true
         return false
       })(),
       disabled: !!el.disabled,
@@ -327,10 +391,13 @@ async function run() {
 
     // THE SPIN ACTUALLY HAPPENED. Without this the two captures above could be
     // an idle screen twice, which is what the first run of this script produced.
+    // Asserted against the WALLET, not against the readout: see walletCalls.
     const balanceAfter = await readBalance()
     checks.theSpinActuallyRan = {
-      pass: balanceAfter !== balanceAtStart,
-      before: balanceAtStart, after: balanceAfter,
+      pass: walletCalls.play >= 1,
+      playCalls: walletCalls.play,
+      balanceBefore: balanceAtStart, balanceAfter,
+      note: 'counted at the wallet, because at an abbreviated balance a $1.00 bet does not change the rendered string',
     }
     checks.theWinIsPresented = {
       pass: !/\$0\.00\s*$/.test(await page.evaluate(
@@ -441,6 +508,95 @@ async function run() {
       pass: featureStates.every((st) => states[st]?.controls?.features?.visible),
       states: Object.fromEntries(featureStates.map((st) => [st, !!states[st]?.controls?.features?.visible])),
     }
+    // ── THE ABBREVIATION RULING, both halves ────────────────────────────────
+    //
+    // Fable, closing TR-066: "In the 400x225 profile alone, BALANCE and WIN
+    // abbreviate (up to four significant characters plus magnitude suffix,
+    // $52.43M form) exactly when the fully formatted value cannot fit the
+    // measured slot at the legible floor; values that fit render in full; every
+    // other profile keeps full precision everywhere."
+    //
+    // Half one, on the hostile fixture already captured above.
+    const RULED_FORM = /^\$\d{1,3}(?:\.\d{1,3})?[KMBT]$/
+    const abbrevFindings = []
+    for (const [state, m] of Object.entries(states)) {
+      if (!m || !m.present) continue
+      for (const name of ['balance', 'win']) {
+        const c = m.controls[name]
+        if (!c || !c.visible) continue
+        if (c.fitMode === null) { abbrevFindings.push({ state, name, why: 'no fitMode published, the action did not run' }); continue }
+        if (c.fitMode !== 'compact') continue
+        // The VALUE text, with the label stripped: c.text is "BAL $52.43M".
+        const value = c.text.split(/\s+/).slice(1).join(' ')
+        if (!RULED_FORM.test(value)) abbrevFindings.push({ state, name, value, why: 'not the ruled $52.43M form' })
+      }
+    }
+    checks.abbreviationTakesTheRuledForm = { pass: abbrevFindings.length === 0, findings: abbrevFindings }
+    // The floor this gate reasons about must be the floor the code used.
+    const publishedFloors = Object.values(states)
+      .flatMap((m) => (m && m.present ? ['balance', 'win'] : []).map((n) => m.controls[n]?.fitFloor))
+      .filter((v) => v !== null && v !== undefined)
+    checks.theLegibleFloorIsTheOneTheCodeUsed = {
+      pass: publishedFloors.length > 0 && publishedFloors.every((f) => f === MIN_LEGIBLE_FLOOR),
+      expected: MIN_LEGIBLE_FLOOR,
+      published: [...new Set(publishedFloors)],
+    }
+    checks.balanceAbbreviatesAtTheHostileBalance = {
+      pass: ['idle', 'spinning', 'result', 'modal'].every(
+        (st) => states[st]?.controls?.balance?.fitMode === 'compact'),
+      note: `$52,431,098.76 cannot fit the measured slot at the ${MIN_LEGIBLE_FLOOR}px floor, so it must abbreviate rather than be cut`,
+      modes: Object.fromEntries(Object.entries(states).map(([k, m]) => [k, m?.controls?.balance?.fitMode ?? null])),
+      rendered: Object.fromEntries(Object.entries(states).map(([k, m]) => [k, m?.controls?.balance?.text ?? null])),
+    }
+
+    // Half two: a value that FITS must render in full. Without this a build
+    // that abbreviated unconditionally would pass every check above.
+    START_MICROS = FITS_MICROS
+    betCount = 0
+    await page.goto(LAUNCH(base), { waitUntil: 'domcontentloaded' })
+    await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30000 })
+    await dismissIntro(page)
+    await page.waitForTimeout(600)
+    await page.screenshot({ path: join(SCREENS, 'idle-fits-in-full.png') })
+    const fits = await page.evaluate(MEASURE)
+    states['idle-fits-in-full'] = fits
+    checks.aValueThatFitsRendersInFull = {
+      pass: fits?.controls?.balance?.fitMode === 'full'
+        && fits?.controls?.win?.fitMode === 'full'
+        && /1,040\.06/.test(fits?.controls?.balance?.text ?? '')
+        && !fits?.controls?.balance?.truncated
+        && !fits?.controls?.win?.truncated,
+      note: 'the owner-captured balance, which the shipped build rendered as "BAL $1,040" with the cents cut off',
+      balance: fits?.controls?.balance ?? null,
+      win: fits?.controls?.win ?? null,
+    }
+
+    // "Every other profile keeps full precision everywhere." Same hostile
+    // balance, three larger profiles, asserting the complete figure is present.
+    START_MICROS = HOSTILE_MICROS
+    betCount = 0
+    const OTHER_PROFILES = [
+      ['desktop',   { width: 1280, height: 800 }],
+      ['portrait',  { width: 390,  height: 844 }],
+      ['landscape', { width: 812,  height: 375 }],
+    ]
+    const fullPrecision = {}
+    for (const [name, vp] of OTHER_PROFILES) {
+      await page.setViewportSize(vp)
+      await page.goto(LAUNCH(base), { waitUntil: 'domcontentloaded' })
+      await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30000 })
+      await dismissIntro(page)
+      await page.waitForTimeout(600)
+      fullPrecision[name] = await page.evaluate(
+        () => (document.querySelector('[data-testid="hud-balance"]')?.innerText ?? '')
+          .replace(/\s+/g, ' ').trim())
+    }
+    await page.setViewportSize(VIEWPORT)
+    checks.everyOtherProfileKeepsFullPrecision = {
+      pass: Object.values(fullPrecision).every((txt) => txt.includes('52,431,098.76')),
+      rendered: fullPrecision,
+    }
+
     checks.zeroConsoleErrors = { pass: consoleErrors.length === 0, errors: consoleErrors.slice(0, 5) }
 
     // ── SEEDED VIOLATION, convention (p) ────────────────────────────────────
@@ -467,6 +623,15 @@ async function run() {
         `(() => { const v = document.querySelector('[data-testid="hud-win"] .m-stat-value'); v.textContent = '$1,234,567,890.00'; v.style.setProperty('--autofit-scale','0.4'); v.style.setProperty('width','20px','important'); v.style.setProperty('display','block','important'); v.style.setProperty('overflow','hidden','important'); v.style.setProperty('white-space','nowrap','important') })()`],
       ['fits only by becoming illegible, effective font under 9px',
         `document.querySelector('[data-testid="hud-win"] .m-stat-value').style.fontSize = '6px'`],
+      // The two seeds below plant the failure of the ABBREVIATION ruling
+      // itself, which is a new claim and therefore needs its own proof that
+      // the gate can go red on it. The first is literally the pre-fix build:
+      // the full string left in a slot too small for it, at full size, which
+      // is what produced "BAL $1,040" in the owner's capture.
+      ['the abbreviation did not happen and the full value is left to be cut',
+        `(() => { const v = document.querySelector('[data-testid="hud-win"] .m-stat-value'); v.textContent = '$52,431,098.76'; v.dataset.fitMode = 'full'; v.style.setProperty('--autofit-scale','1') })()`],
+      ['abbreviated, but the fit was bought below the published legible floor',
+        `(() => { const v = document.querySelector('[data-testid="hud-win"] .m-stat-value'); v.dataset.fitPx = String(parseFloat(v.dataset.fitFloor || '9') - 1) })()`],
     ]
     for (const [why, js] of mutations) {
       await page.evaluate(js)

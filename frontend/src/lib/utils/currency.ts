@@ -223,3 +223,105 @@ export function formatBalance(
     return `${code} ${amount.toFixed(decimals)}`
   }
 }
+
+/**
+ * Significant digits kept by an abbreviated money value.
+ *
+ * Fable's ruling closing TR-066 (2026-07-26) states the form exactly: "up to
+ * four significant characters plus magnitude suffix, $52.43M form".
+ */
+export const COMPACT_SIGNIFICANT_DIGITS = 4
+
+/**
+ * Truncate toward zero at `digits` significant figures.
+ *
+ * TRUNCATION, not rounding, and this is a money rule rather than a style
+ * preference. Rounding to nearest renders a balance of $999,999.99 as "$1M",
+ * telling a player they hold more than they do. Truncating renders "$999.9K",
+ * which can only ever understate. The exact figure is never lost: it is
+ * rendered in full on every other layout profile and in the session panel, and
+ * the abbreviation only ever appears where the full string physically cannot.
+ *
+ * The error is at most one unit in the last significant digit and is always
+ * downward, including in the binary-floating-point edge cases, because the
+ * only operation applied is `Math.floor`.
+ */
+function truncateToSignificant(amount: number, digits: number): number {
+  if (!Number.isFinite(amount) || amount === 0) return amount
+  const sign = amount < 0 ? -1 : 1
+  const abs = Math.abs(amount)
+  const magnitude = Math.floor(Math.log10(abs))
+  const factor = Math.pow(10, digits - 1 - magnitude)
+  return (sign * Math.floor(abs * factor)) / factor
+}
+
+/**
+ * Format a micros amount as an ABBREVIATED currency string, e.g. "$52.43M".
+ *
+ * WHERE THIS IS ALLOWED, and it is one place only. Fable's ruling closing
+ * TR-066: the 400x225 mini-player profile alone, for BALANCE and WIN alone,
+ * and only when the fully formatted value cannot fit its MEASURED slot at the
+ * legible floor. Values that fit render in full. Every other profile keeps
+ * full precision everywhere. The decision is made by `actions/fitMoney.ts`
+ * from a real measurement, never from a magnitude threshold, because a
+ * threshold guesses at a width that depends on the currency, the locale and
+ * the font that actually loaded.
+ *
+ * WHY Intl COMPACT NOTATION RATHER THAN A SUFFIX TABLE OF OUR OWN. A hand
+ * written K/M/B table is English, and this game ships in sixteen locales. Intl
+ * carries the platform locale's own magnitude words, so `de` renders
+ * "52,43 Mio. $" and `ja` renders "$5243万" without a single translated string
+ * being authored, and it takes the same `localeTag` parameter `formatBalance`
+ * already takes, so the two forms cannot drift onto different locales.
+ *
+ * @example
+ *   formatBalanceCompact(52_431_098_760_000, 'USD')  // "$52.43M"
+ *   formatBalanceCompact(1_040_060_000, 'USD')       // "$1.04K"
+ *   formatBalanceCompact(52_431_098_760_000, 'XSC')  // "52.43M SC"
+ */
+export function formatBalanceCompact(
+  micros: number,
+  currencyCode: string,
+  localeTag?: string,
+  display?: CurrencyDisplay | null,
+): string {
+  const amount = truncateToSignificant(micros / CURRENCY_SCALE, COMPACT_SIGNIFICANT_DIGITS)
+  const code = (currencyCode || '').toUpperCase()
+
+  const compact = {
+    notation:                 'compact',
+    compactDisplay:           'short',
+    maximumSignificantDigits: COMPACT_SIGNIFICANT_DIGITS,
+  } as const
+
+  // Platform-supplied display metadata wins, exactly as it does in
+  // formatBalance: the TR-012c resolution applies unchanged and only the
+  // numeral part differs. `decimals` is deliberately NOT applied, because a
+  // compact form has no cents position to place them in.
+  if (display && (display.symbol || display.symbolAfter !== undefined || display.decimals !== undefined)) {
+    const local = VIRTUAL_CURRENCIES[code]
+    const symbol = display.symbol ?? local?.symbol ?? currencySymbolFor(code, localeTag)
+    const trailing = display.symbolAfter ?? (local ? VIRTUAL_SYMBOL_TRAILING : false)
+    const formatted = amount.toLocaleString(localeTag, compact)
+    return trailing ? `${formatted} ${symbol}` : `${symbol} ${formatted}`
+  }
+
+  const virtual = VIRTUAL_CURRENCIES[code]
+  if (virtual) {
+    const formatted = amount.toLocaleString(localeTag, compact)
+    return VIRTUAL_SYMBOL_TRAILING
+      ? `${formatted} ${virtual.symbol}`
+      : `${virtual.symbol} ${formatted}`
+  }
+
+  try {
+    return new Intl.NumberFormat(localeTag, {
+      style:           'currency',
+      currency:        code,
+      currencyDisplay: 'narrowSymbol',
+      ...compact,
+    }).format(amount)
+  } catch {
+    return `${code} ${amount.toLocaleString(localeTag, compact)}`
+  }
+}

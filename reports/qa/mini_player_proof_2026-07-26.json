@@ -11,7 +11,8 @@
     "spinning",
     "result",
     "feature",
-    "modal"
+    "modal",
+    "idle-fits-in-full"
   ],
   "measurements": {
     "idle": {
@@ -35,6 +36,9 @@
           "targetW": 44,
           "targetH": 44,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -46,8 +50,11 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $52,431,098.76",
-          "truncated": true,
+          "text": "BAL $52.43M",
+          "fitMode": "compact",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
           "disabled": false,
           "visible": true
         },
@@ -59,6 +66,9 @@
           "targetW": 73.765625,
           "targetH": 16.5,
           "text": "WIN $0.00",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -71,6 +81,9 @@
           "targetW": 92,
           "targetH": 30,
           "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -83,6 +96,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -95,6 +111,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -107,6 +126,9 @@
           "targetW": 50,
           "targetH": 46,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -148,6 +170,9 @@
           "targetW": 44,
           "targetH": 44,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -159,8 +184,11 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $52,431,098.76",
-          "truncated": true,
+          "text": "BAL $52.43M",
+          "fitMode": "compact",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
           "disabled": false,
           "visible": true
         },
@@ -172,6 +200,9 @@
           "targetW": 73.765625,
           "targetH": 16.5,
           "text": "WIN $0.00",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -184,6 +215,9 @@
           "targetW": 92,
           "targetH": 30,
           "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -196,6 +230,9 @@
           "targetW": 24,
           "targetH": 30,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": true,
           "visible": true
@@ -208,6 +245,9 @@
           "targetW": 24,
           "targetH": 30,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": true,
           "visible": true
@@ -220,6 +260,9 @@
           "targetW": 50,
           "targetH": 46,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -261,6 +304,9 @@
           "targetW": 44,
           "targetH": 44,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -272,8 +318,11 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $52,431,101.66",
-          "truncated": true,
+          "text": "BAL $52.43M",
+          "fitMode": "compact",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
           "disabled": false,
           "visible": true
         },
@@ -285,6 +334,9 @@
           "targetW": 73.765625,
           "targetH": 16.5,
           "text": "WIN $3.90",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -297,6 +349,9 @@
           "targetW": 92,
           "targetH": 30,
           "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -309,6 +364,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -321,6 +379,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -333,6 +394,9 @@
           "targetW": 50,
           "targetH": 46,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -374,6 +438,9 @@
           "targetW": 44,
           "targetH": 44,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -385,8 +452,11 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $52,431,100.66",
-          "truncated": true,
+          "text": "BAL $52.43M",
+          "fitMode": "compact",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
           "disabled": false,
           "visible": true
         },
@@ -398,6 +468,9 @@
           "targetW": 73.765625,
           "targetH": 16.5,
           "text": "WIN $3.90",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -410,6 +483,9 @@
           "targetW": 92,
           "targetH": 30,
           "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -422,6 +498,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -434,6 +513,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -446,6 +528,9 @@
           "targetW": 50,
           "targetH": 46,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -487,6 +572,9 @@
           "targetW": 44,
           "targetH": 44,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -498,8 +586,11 @@
           "h": 16.5,
           "targetW": 84.234375,
           "targetH": 16.5,
-          "text": "BAL $52,431,098.76",
-          "truncated": true,
+          "text": "BAL $52.43M",
+          "fitMode": "compact",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
           "disabled": false,
           "visible": true
         },
@@ -511,6 +602,9 @@
           "targetW": 73.765625,
           "targetH": 16.5,
           "text": "WIN $0.00",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -523,6 +617,9 @@
           "targetW": 92,
           "targetH": 30,
           "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -535,6 +632,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -547,6 +647,9 @@
           "targetW": 44,
           "targetH": 50,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -559,6 +662,143 @@
           "targetW": 50,
           "targetH": 46,
           "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "features": {
+          "x": 4,
+          "y": 185,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        }
+      },
+      "viewportH": 225,
+      "viewportW": 400
+    },
+    "idle-fits-in-full": {
+      "present": true,
+      "hud": {
+        "x": 44,
+        "y": 181,
+        "width": 352,
+        "height": 44,
+        "top": 181,
+        "right": 396,
+        "bottom": 225,
+        "left": 44
+      },
+      "controls": {
+        "menu": {
+          "x": 46,
+          "y": 185.5,
+          "w": 36,
+          "h": 36,
+          "targetW": 44,
+          "targetH": 44,
+          "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "balance": {
+          "x": 86,
+          "y": 196.0625,
+          "w": 84.234375,
+          "h": 14.875,
+          "targetW": 84.234375,
+          "targetH": 14.875,
+          "text": "BAL $1,040.06",
+          "fitMode": "full",
+          "fitPx": 9.92,
+          "fitFloor": 9,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "win": {
+          "x": 174.234375,
+          "y": 195.25,
+          "w": 73.765625,
+          "h": 16.5,
+          "targetW": 73.765625,
+          "targetH": 16.5,
+          "text": "WIN $0.00",
+          "fitMode": "full",
+          "fitPx": 11,
+          "fitFloor": 9,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "bet": {
+          "x": 252,
+          "y": 188.5,
+          "w": 92,
+          "h": 30,
+          "targetW": 92,
+          "targetH": 30,
+          "text": "$1.00",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betDown": {
+          "x": 254,
+          "y": 188.5,
+          "w": 24,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 50,
+          "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "betUp": {
+          "x": 318,
+          "y": 188.5,
+          "w": 24,
+          "h": 30,
+          "targetW": 44,
+          "targetH": 50,
+          "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
+          "truncated": false,
+          "disabled": false,
+          "visible": true
+        },
+        "spin": {
+          "x": 348,
+          "y": 183.5,
+          "w": 44,
+          "h": 40,
+          "targetW": 50,
+          "targetH": 46,
+          "text": "",
+          "fitMode": null,
+          "fitPx": null,
+          "fitFloor": null,
           "truncated": false,
           "disabled": false,
           "visible": true
@@ -587,8 +827,10 @@
     },
     "theSpinActuallyRan": {
       "pass": true,
-      "before": "BAL $52,431,098.76",
-      "after": "BAL $52,431,101.66"
+      "playCalls": 1,
+      "balanceBefore": "BAL $52.43M",
+      "balanceAfter": "BAL $52.43M",
+      "note": "counted at the wallet, because at an abbreviated balance a $1.00 bet does not change the rendered string"
     },
     "theWinIsPresented": {
       "pass": true
@@ -616,34 +858,8 @@
       "findings": []
     },
     "noStatValueIsTruncated": {
-      "pass": false,
-      "findings": [
-        {
-          "state": "idle",
-          "name": "balance",
-          "text": "BAL $52,431,098.76"
-        },
-        {
-          "state": "spinning",
-          "name": "balance",
-          "text": "BAL $52,431,098.76"
-        },
-        {
-          "state": "result",
-          "name": "balance",
-          "text": "BAL $52,431,101.66"
-        },
-        {
-          "state": "feature",
-          "name": "balance",
-          "text": "BAL $52,431,100.66"
-        },
-        {
-          "state": "modal",
-          "name": "balance",
-          "text": "BAL $52,431,098.76"
-        }
-      ]
+      "pass": true,
+      "findings": []
     },
     "hudFitsItsBudget": {
       "pass": true,
@@ -661,6 +877,77 @@
         "idle": true,
         "result": true,
         "modal": true
+      }
+    },
+    "abbreviationTakesTheRuledForm": {
+      "pass": true,
+      "findings": []
+    },
+    "theLegibleFloorIsTheOneTheCodeUsed": {
+      "pass": true,
+      "expected": 9,
+      "published": [
+        9
+      ]
+    },
+    "balanceAbbreviatesAtTheHostileBalance": {
+      "pass": true,
+      "note": "$52,431,098.76 cannot fit the measured slot at the 9px floor, so it must abbreviate rather than be cut",
+      "modes": {
+        "idle": "compact",
+        "spinning": "compact",
+        "result": "compact",
+        "feature": "compact",
+        "modal": "compact"
+      },
+      "rendered": {
+        "idle": "BAL $52.43M",
+        "spinning": "BAL $52.43M",
+        "result": "BAL $52.43M",
+        "feature": "BAL $52.43M",
+        "modal": "BAL $52.43M"
+      }
+    },
+    "aValueThatFitsRendersInFull": {
+      "pass": true,
+      "note": "the owner-captured balance, which the shipped build rendered as \"BAL $1,040\" with the cents cut off",
+      "balance": {
+        "x": 86,
+        "y": 196.0625,
+        "w": 84.234375,
+        "h": 14.875,
+        "targetW": 84.234375,
+        "targetH": 14.875,
+        "text": "BAL $1,040.06",
+        "fitMode": "full",
+        "fitPx": 9.92,
+        "fitFloor": 9,
+        "truncated": false,
+        "disabled": false,
+        "visible": true
+      },
+      "win": {
+        "x": 174.234375,
+        "y": 195.25,
+        "w": 73.765625,
+        "h": 16.5,
+        "targetW": 73.765625,
+        "targetH": 16.5,
+        "text": "WIN $0.00",
+        "fitMode": "full",
+        "fitPx": 11,
+        "fitFloor": 9,
+        "truncated": false,
+        "disabled": false,
+        "visible": true
+      }
+    },
+    "everyOtherProfileKeepsFullPrecision": {
+      "pass": true,
+      "rendered": {
+        "desktop": "BALANCE $52,431,098.76",
+        "portrait": "BALANCE $52,431,098.76",
+        "landscape": "BALANCE $52,431,098.76"
       }
     },
     "zeroConsoleErrors": {
@@ -681,10 +968,18 @@
         {
           "why": "fits only by becoming illegible, effective font under 9px",
           "caught": true
+        },
+        {
+          "why": "the abbreviation did not happen and the full value is left to be cut",
+          "caught": true
+        },
+        {
+          "why": "abbreviated, but the fit was bought below the published legible floor",
+          "caught": true
         }
       ],
       "negativeControl": true
     }
   },
-  "allPass": false
+  "allPass": true
 }

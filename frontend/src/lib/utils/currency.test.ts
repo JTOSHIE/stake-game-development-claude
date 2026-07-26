@@ -18,10 +18,12 @@ import {
   CURRENCY_SCALE,
   VIRTUAL_SYMBOL_TRAILING,
   formatBalance,
+  formatBalanceCompact,
   currencySymbolFor,
   isVirtualCurrency,
   type CurrencyDisplay,
 } from './currency.ts'
+import { scanProhibited } from '../i18n/vocabulary.ts'
 
 let pass = 0
 const failures: string[] = []
@@ -126,6 +128,78 @@ eq('symbolAfter false alone flips placement', formatBalance(1000 * S, 'XEC', 'en
 eq('no metadata is identical to the old two-arg call', formatBalance(1000 * S, 'XEC', 'en', null), formatBalance(1000 * S, 'XEC', 'en'))
 eq('an empty metadata object changes nothing', formatBalance(1000 * S, 'XEC', 'en', {}), formatBalance(1000 * S, 'XEC', 'en'))
 eq('the raw code still never reaches a player under metadata', formatBalance(1000 * S, 'XEC', 'en', LEADING).includes('XEC'), false)
+
+// ── The abbreviated form, TR-066 / Fable's ruling of 2026-07-26 ───────────────
+//
+// "up to four significant characters plus magnitude suffix, $52.43M form".
+// These assert the CONTRACT of the formatter. Where it is allowed to be used is
+// a separate question, decided by measurement in actions/fitMoney.ts and proved
+// by scripts/mini_player_proof.mjs, because it is a geometric question and not
+// a formatting one.
+
+eq('the ruled example renders exactly as ruled',
+  formatBalanceCompact(52_431_098_760_000, 'USD', 'en'), '$52.43M')
+eq('four significant digits, not two',
+  formatBalanceCompact(1_234_567_890 * S, 'USD', 'en'), '$1.234B')
+eq('the owner-captured balance abbreviates as $1.04K',
+  formatBalanceCompact(1_040_060_000, 'USD', 'en'), '$1.04K')
+eq('small values keep their own magnitude and gain no suffix',
+  formatBalanceCompact(100 * S, 'USD', 'en'), '$100')
+eq('zero is zero', formatBalanceCompact(0, 'USD', 'en'), '$0')
+
+// TRUNCATION, NOT ROUNDING, and this is the money assertion in this block.
+// Rounding to nearest renders $999,999.99 as "$1M", which tells a player they
+// hold more than they do. A money readout may understate under abbreviation; it
+// may never overstate.
+eq('a balance one cent under a million never reads as a million',
+  formatBalanceCompact(999_999_99 * 10_000, 'USD', 'en'), '$999.9K')
+ok('the abbreviated value never exceeds the true value',
+  [999_999_99 * 10_000, 52_431_098_760_000, 1_040_060_000, 9_999_999_999_999].every((micros) => {
+    const shown = formatBalanceCompact(micros, 'USD', 'en')
+    const suffix = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 }[shown.slice(-1)] ?? 1
+    const numeral = parseFloat(shown.replace(/[^0-9.]/g, '')) * suffix
+    return numeral <= micros / S + 1e-6
+  }))
+
+// The raw platform code must never reach a player here either. This is the same
+// requirement the full formatter carries, restated because a second formatter
+// is a second chance to leak it, which is exactly how the 2026-07-25 replay
+// defect happened.
+// The X-prefixed forms are what the RGS actually sends, so they are the ones
+// that can leak. SC and GC are the player-facing SYMBOLS and are supposed to
+// appear, which is why they are checked from the other direction below.
+for (const code of ['XSC', 'XGC', 'XEC']) {
+  const rendered = formatBalanceCompact(52_431_098_760_000, code, 'en')
+  ok(`compact never prints the raw code ${code}`, !rendered.includes(code), rendered)
+}
+for (const [code, symbol] of [['XSC', 'SC'], ['XGC', 'GC'], ['XEC', 'SC']] as const) {
+  ok(`compact renders the ${code} symbol ${symbol}`,
+    formatBalanceCompact(52_431_098_760_000, code, 'en').includes(symbol))
+}
+eq('XSC abbreviates trailing, like its full form',
+  formatBalanceCompact(52_431_098_760_000, 'XSC', 'en'), '52.43M SC')
+eq('XEC is byte-identical to XSC in compact form too',
+  formatBalanceCompact(52_431_098_760_000, 'XEC', 'en'),
+  formatBalanceCompact(52_431_098_760_000, 'XSC', 'en'))
+eq('platform display metadata governs the compact form as well',
+  formatBalanceCompact(52_431_098_760_000, 'XEC', 'en', { symbol: 'SC', symbolAfter: false }), 'SC 52.43M')
+
+// The magnitude word is the LOCALE'S own, which is the whole reason this uses
+// Intl compact notation rather than a hand-written K/M/B table: a table would
+// have been English in a game that ships sixteen locales.
+ok('a non-English locale gets its own magnitude word, not "M"',
+  formatBalanceCompact(52_431_098_760_000, 'USD', 'de').includes('Mio'),
+  formatBalanceCompact(52_431_098_760_000, 'USD', 'de'))
+
+// And it must survive the social vocabulary layer. A magnitude word that
+// happened to be a prohibited term would ship a jurisdiction breach through a
+// formatter nobody thought to scan.
+for (const loc of ['en', 'de', 'es', 'fr', 'pt', 'pl', 'ru', 'tr', 'id', 'vi', 'fi', 'hi', 'ar', 'ja', 'ko', 'zh']) {
+  const text = formatBalanceCompact(52_431_098_760_000, 'XSC', loc)
+  ok(`compact form carries no prohibited term in ${loc}`,
+    scanProhibited(text, { includeNeverRewrite: true }).length === 0,
+    `${text} -> ${scanProhibited(text, { includeNeverRewrite: true }).join(', ')}`)
+}
 
 console.log(`currency static assertions: ${pass} passed, ${failures.length} failed`)
 if (failures.length) {

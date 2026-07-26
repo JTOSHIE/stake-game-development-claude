@@ -19,10 +19,11 @@
   import { musicVolume, sfxVolume } from '../stores/audioSettings'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { autofitText } from '../actions/autofitText'
+  import { fitMoney } from '../actions/fitMoney'
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, formatBalanceCompact, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import {
     autoplayLimits, rgJurisdiction, showSessionPanel,
@@ -253,6 +254,10 @@
 
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
+  // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed
+  // here rather than inside the action so both forms come from the one currency
+  // module and cannot disagree about the symbol, the locale or the code.
+  $: balanceCompact = formatBalanceCompact(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
 
   // HUD win count-up (2026-07-14b, ITEM B): every win ticks the HUD figure up
   // incrementally rather than jumping straight to the final value, the same
@@ -308,6 +313,7 @@
   })
 
   $: winLabel = formatBalance(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: winCompact = formatBalanceCompact(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
 {#if portrait}
@@ -510,13 +516,21 @@
        number, not the word, and a player who cannot read their balance is the
        exact finding this HUD exists to fix. Short labels in all sixteen
        locales, so no locale falls back to English. -->
+  <!-- BALANCE and WIN use fitMoney, not autofitText, and they are the only two
+       readouts in the game that do. Fable's ruling closing TR-066: in this
+       profile alone, a value that cannot fit its measured slot at the legible
+       floor renders abbreviated ("$52.43M") rather than cut; a value that fits
+       renders in full; every other profile keeps full precision everywhere.
+       The spans are deliberately EMPTY, because the action owns the text: the
+       choice between the two forms is the result of a measurement that can
+       only be taken after layout. -->
   <div class="m-stat m-stat--balance" data-testid="hud-balance">
     <span class="m-stat-label">{$tr('hudBalanceShort')}</span>
-    <span class="m-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
+    <span class="m-stat-value cyan" use:fitMoney={{ full: balanceLabel, compact: balanceCompact }}></span>
   </div>
   <div class="m-stat m-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
     <span class="m-stat-label">{$tr('hudWinShort')}</span>
-    <span class="m-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
+    <span class="m-stat-value magenta" use:fitMoney={{ full: winLabel, compact: winCompact }}></span>
   </div>
   <div class="m-stat m-stat--bet" data-testid="hud-bet">
     <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
@@ -880,8 +894,28 @@
     background: linear-gradient(180deg, rgba(10, 14, 26, 0.94), rgba(6, 8, 18, 0.98));
     border-top: 1px solid rgba(0, 255, 255, 0.22);
     font-family: 'Orbitron', monospace;
+    /* THE MENU BUTTON'S ICON WAS INVISIBLE HERE. Found 2026-07-26 while
+       comparing the rebuilt Popout S against the owner's live capture, where
+       the second control reads as an empty dark box in both.
+
+       The cause is a borrowed rule. This profile's menu button reuses the
+       portrait profile's markup, `.p-hamburger` with three `.p-hamburger-bar`
+       children, and that rule paints the bars with `background: var(--p-acc)`.
+       `--p-acc` is declared on `.p-hud` and nowhere else, so inside `.m-hud`
+       the property is unset, the declaration is invalid at computed-value time,
+       and `background` falls back to its initial value, transparent. Three bars
+       of nothing, in a button a player in the popout has to find in order to
+       reach the paytable, the session panel, turbo, autoplay and MAX.
+
+       Declaring the accent here is the fix, rather than rewriting the bar rule,
+       because the same borrowing happens in `.c-hud` and any future profile
+       that reuses the markup would inherit the same silence. */
+    --p-acc: var(--theme-primary, #00ffff);
   }
-  .m-hud--overdrive { border-top-color: rgba(255, 0, 255, 0.35); }
+  .m-hud--overdrive {
+    border-top-color: rgba(255, 0, 255, 0.35);
+    --p-acc: var(--theme-secondary, #ff00ff);
+  }
 
   .m-menu-wrapper { position: relative; flex: 0 0 auto; }
   /* 36px visual with a 44px hit area via the pseudo-element: the target is
@@ -913,16 +947,35 @@
   }
   .m-stat-value {
     flex: 1 1 auto; min-width: 0;
-    /* 11px is the documented legibility floor for this size class, and the
-       whole row is measured against it: the FEATURES trigger had to come back
-       into the row (it was missing entirely) and something had to give. The
-       stat VALUES are the last thing that may shrink and the last thing that
-       may truncate, so the labels went to 7px and the gaps to 4 first. */
-    font-size: 11px; font-weight: 700; white-space: nowrap;
-    /* NO text-overflow: ellipsis. autofitText already shrinks the string to
-       fit, and an ellipsis on top of it turns a small-but-readable number into
-       an unreadable one: whichever wins, the player loses. Overflow stays
-       hidden so a pathological value cannot push the row apart. */
+    /* 11px is the base size for this size class, and the whole row is measured
+       against it: the FEATURES trigger had to come back into the row (it was
+       missing entirely) and something had to give. The stat VALUES are the last
+       thing that may shrink and the last thing that may truncate, so the labels
+       went to 7px and the gaps to 4 first.
+
+       THE var() IS THE TR-066 FIX AND IT IS NOT COSMETIC. This rule read a flat
+       `font-size: 11px` from the day this profile was written, while the markup
+       carried `use:autofitText` and the comment below claimed autofit was doing
+       the work. It was not. The action writes --autofit-scale and the font-size
+       rule has to multiply it in for anything to happen; .p-stat-value,
+       .c-stat-value and .fs-value all do, and this one did not. So on the one
+       profile with the least room, nothing ever shrank, and a long value was
+       simply cut by the overflow below. That is the mid-glyph cut in the
+       owner's Popout S capture, and no amount of re-tuning the flex weights
+       could have fixed it.
+
+       The legible FLOOR is 9px and lives in actions/fitMoney.ts, which stops
+       shrinking there and switches to the abbreviated form instead. */
+    font-size: calc(11px * var(--autofit-scale, 1));
+    font-weight: 700; white-space: nowrap;
+    /* Uniform digit advance, so a counting-up win does not re-fit on every
+       frame as the glyph widths change under it. */
+    font-variant-numeric: tabular-nums;
+    /* NO text-overflow: ellipsis. The value is shrunk, then abbreviated, before
+       anything is allowed to be lost, and an ellipsis on top of that turns a
+       small-but-readable number into an unreadable one: whichever wins, the
+       player loses. Overflow stays hidden so a pathological value cannot push
+       the row apart. */
     overflow: hidden;
   }
   .m-stat-value.cyan { color: #7ff; }
@@ -1791,6 +1844,11 @@
     --c-gold: #ffd700;
     --c-orange: #ff9a2e;
     --c-acc: var(--c-cyan);
+    /* Same borrowed-rule defect as `.m-hud` above: this profile's menu button
+       reuses `.p-hamburger-bar`, which paints from `--p-acc`, and `--p-acc` is
+       declared only on `.p-hud`. Aliased onto this profile's own accent so the
+       bars follow the compact palette, overdrive shift included. */
+    --p-acc: var(--c-acc);
     display: flex;
     flex-direction: row;
     align-items: center;
