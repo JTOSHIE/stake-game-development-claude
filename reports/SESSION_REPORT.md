@@ -2584,8 +2584,10 @@ correct.
 ## JOB 4. Close
 
 Working tree at close: clean except `sideproject/` (untouched by instruction). Locked
-paths untouched; `git diff .claude/settings.json` empty throughout. Remote CI result for
-the final push is recorded in the closing commit per rule 10.
+paths untouched; `git diff .claude/settings.json` empty throughout. **Rule 10: remote run
+30191773602 on `main` GREEN, both jobs**
+(https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30191773602),
+verified from the run's own conclusion, not from local gate results.
 
 **Self-audit per THE FACTS DISCIPLINE item 4:** brief re-read against the work; every
 number above carries its artefact (proof output, tracker row, diff); the one
