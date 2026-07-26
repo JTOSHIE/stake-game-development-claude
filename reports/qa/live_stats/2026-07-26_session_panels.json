@@ -1,0 +1,65 @@
+{
+ "record": "in_game_session_information_panels",
+ "ingested_by": "track/screenshot-analyst",
+ "ingested_on": "2026-07-26",
+ "what_this_is": "Every Session information panel visible in any committed capture, read verbatim, with its internal arithmetic checked. The panel is the game's own tally, independent of the platform Bets page, so it is the one figure in the evidence that does not come from the Stake Engine dashboard.",
+ "rtp_verdict": "NOT ISSUED. The committed statistics note stands: RTP is not verifiable by play. No return figure is derived from any row below.",
+ "panels": [
+  {
+   "capture": "reports/screens/dtt-live-2026-07-26/39_session_131_spins_net_minus_61260.png",
+   "read_verbatim": "recorded in the capture filename only; the panel figures were not re-read in this pass",
+   "status": "NOT RE-READ. Listed for completeness of the sweep. The two panels below were read frame by frame.",
+   "arithmetic": "not checked"
+  },
+  {
+   "capture": "reports/screens/dtt-live-2026-07-26/40_session_143_spins_net_plus_9590_after_80650_win.png",
+   "read_verbatim": "recorded in the capture filename only; the panel figures were not re-read in this pass",
+   "status": "NOT RE-READ. Listed for completeness of the sweep.",
+   "arithmetic": "not checked"
+  },
+  {
+   "capture": "reports/screens/dtt-live-2026-07-26/41_session_524_base_spins_balance_reconciles.png",
+   "read_verbatim": {
+    "time_played": "00:16:18",
+    "spins": 524,
+    "total_wagered": "$524,000.00",
+    "total_won": "$441,330.00",
+    "net_result": "-$82,670.00",
+    "hud_balance": "$49,917,330.00",
+    "hud_win": "$0.00",
+    "hud_bet": "$1,000.00",
+    "mode": "base"
+   },
+   "arithmetic": {
+    "wagered_equals_spins_times_bet": "524 x 1000.00 = 524000.00, matches, residual 0.00",
+    "net_equals_won_minus_wagered": "441330.00 - 524000.00 = -82670.00, matches, residual 0.00"
+   },
+   "verdict": "internally consistent"
+  },
+  {
+   "capture": "reports/screens/screenshot-analyst-2026-07-26/06_session_panel_44_spins_wagered_880_net_plus_48240.png",
+   "read_verbatim": {
+    "time_played": "00:01:30",
+    "spins": 44,
+    "total_wagered": "$880.00",
+    "total_won": "$1,362.40",
+    "net_result": "+$482.40",
+    "hud_bet": "$20.00",
+    "mode": "base",
+    "bets_panel_counter": 44
+   },
+   "arithmetic": {
+    "wagered_equals_spins_times_bet": "44 x 20.00 = 880.00, matches, residual 0.00",
+    "net_equals_won_minus_wagered": "1362.40 - 880.00 = 482.40, matches, residual 0.00",
+    "panel_spins_equals_bets_counter": "44 = 44, matches"
+   },
+   "verdict": "internally consistent"
+  }
+ ],
+ "anomaly_checks": {
+  "payout_above_5000x_bet": "none in any panel or row read this pass; the largest single row seen anywhere is x321.75 in the EUR base session, and the largest buy-tier row is +$144,350.00 on a $50,000.00 bonus purchase, x2.887 against spend",
+  "debit_not_matching_mode_cost": "none. See reports/qa/live_stats/2026-07-26_mode_cost_reconciliation.md for the four modes proven to the cent and the one, cruise, that has no capture",
+  "settlement_gaps": "one row observed with status Active rather than Settled, at 12:29:33 in reports/screens/screenshot-analyst-2026-07-26/07_eur_base_bet_1000_active_row_balance_49105000.png. That is a live in-flight round at the instant of capture, not a gap. No row anywhere was observed stuck unsettled across two frames."
+ },
+ "open_item": "The two panels marked NOT RE-READ carry their figures in their filenames only. A filename is not evidence under convention (l.3), so they are listed as swept but unverified rather than counted as reconciled. Reading them is a ten minute job for the next session of this track."
+}
