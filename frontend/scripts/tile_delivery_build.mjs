@@ -51,7 +51,30 @@ const SET = [
     countsToward3MB: true,
   },
   {
-    // ADOPTED 2026-07-26 on the owner's instruction, "Go with F".
+    // ADDED 2026-07-26. The owner's composed portrait tile, byte-identical.
+    //
+    // It is 408x546, which is the platform's OWN published tile geometry,
+    // measured across a live sample of published assets rather than taken from
+    // the docs, which give no dimensions at all
+    // (docs/stake-engine-live/2026-07-26/published-tile-geometry.md).
+    //
+    // It does not replace the BG and FG layers, it sits beside them, because we
+    // do not know which form the portal's Design Thumbnail editor takes and
+    // nobody here has ever opened it. Why the layers could not simply be
+    // derived from this file is measured in
+    // design-system/brand/tile/TILE_LAYER_DERIVATION.md.
+    from: join(BRAND, 'tile', 'tile_composed_master.png'),
+    to: 'FutureSpinner-Tile.png',
+    role: 'Composed tile, flat',
+    rule: 'no published rule, matches observed published geometry',
+    countsToward3MB: false,
+  },
+  {
+    // ADOPTED 2026-07-26 on the owner's instruction, "Go with F", and
+    // RE-CONFIRMED BY DERIVATION the same day when candidate g arrived: f took
+    // 3 of 3 legibility measures at 32px and 2 of 3 at every other size on the
+    // ladder. Full working in
+    // design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md.
     //
     // Candidate f, the owner's second supplied mark, delivered at its NATIVE
     // 1024 master rather than at the 512 export. The platform asks for a "High
@@ -128,7 +151,34 @@ const doc = [
   '',
   ...rows.map((r) => `- \`${r.to}\` from \`${r.from.replace('/Users/jt/math-sdk/', '')}\``),
   '',
-  '## Provider logo: ADOPTED',
+  '## Two forms of the tile, and why both ship',
+  '',
+  '**We do not know which form the portal\'s Design Thumbnail editor takes, because',
+  'nobody here has opened it: the game card still shows its placeholder.** So the set',
+  'carries both, and the owner uses whichever the editor asks for.',
+  '',
+  '| If the editor wants | Use |',
+  '|---|---|',
+  '| a single composed image | `FutureSpinner-Tile.png` |',
+  '| separate layers | `FutureSpinner-BG.jpg` and `FutureSpinner-FG.png` |',
+  '',
+  '`FutureSpinner-Tile.png` is the owner\'s composed artwork, byte-identical, at',
+  '**408x546**. That is the platform\'s own published tile geometry, measured across a',
+  'live sample of published assets rather than read off the docs, which give no',
+  'dimensions at all: see `docs/stake-engine-live/2026-07-26/published-tile-geometry.md`.',
+  'It is also the first portrait tile asset the project has held; BG and FG are both',
+  'landscape.',
+  '',
+  '**The layers could not be derived from the composed master, and that was tested',
+  'rather than assumed.** Roughly a fifth of the frame would have to be painted to',
+  'recover a complete background behind the character, the type is baked into the',
+  'pixels, and a third of the character silhouette has no confident matte edge. The',
+  'measurements and the proof sheet are in',
+  '`design-system/brand/tile/TILE_LAYER_DERIVATION.md`. If the editor wants layers, the',
+  'composed master is the **reference** for how BG and FG should sit, not a source to',
+  'cut them from.',
+  '',
+  '## Provider logo: ADOPTED, and re-confirmed by measurement',
   '',
   'The provider logo is candidate **f**, the owner\'s second supplied mark, adopted',
   '2026-07-26 on the instruction "Go with F". It is delivered at its NATIVE 1024',
@@ -140,13 +190,20 @@ const doc = [
   'it uses exactly three colours: `#00FFFF` and `#FF00FF` verbatim from the brand',
   'palette plus `#0A0A14` as structural near-black.',
   '',
-  'Candidates a, b, c, d and e are superseded and kept. The comparison evidence',
+  '**Candidate g, a full variant pack, arrived later the same day and was tested',
+  'against f rather than filed beside it.** f took 3 of 3 legibility measures at 32px',
+  'and 2 of 3 at every other size on the ladder, so the delivered file did not change.',
+  'The working is in `design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md`.',
+  'g is superseded for the portal mark and adopted as the studio brand set for',
+  'everything else: favicon, site and print.',
+  '',
+  'Candidates a, b, c, d, e and g are superseded and kept. The comparison evidence',
   'stays at `reports/screens/provider-mark/`. To change the adopted mark, re-point',
   'the logo row in this script and re-run; nothing else in the set changes.',
   '',
   '**One thing still belongs to the owner**: the actual upload. The provider logo is',
-  'a one-time square upload in Team Settings Branding, and the tile layers go into',
-  'the Tile Editor. Neither can be done from here.',
+  'a one-time square upload in Team Settings Branding, and the tile goes into the',
+  'Tile Editor. Neither can be done from here.',
 ]
 writeFileSync(join(DELIVERY, 'README.md'), doc.join('\n') + '\n')
 
