@@ -264,6 +264,19 @@ into a defect with a mechanism.
    readout between 02:27 and 02:31.
 4. `SA-002`, `SA-007`, `SA-011`, `SA-023`, `SA-026`, all still waiting on rulings.
 
-**Remote CI, rule 10.** Recorded on the pull request rather than here, because
-this branch's run is created by the push that follows this commit. The run link
-goes in the PR body and the next session verifies it before starting work.
+**Remote CI, rule 10, verified rather than assumed.** Run 30217577160 on the
+pull request, both jobs green:
+
+    https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30217577160
+      static gates    PASS  1m11s
+      browser gates   PASS  6m26s
+
+Watched to completion rather than left to a notification, per rule 10's own
+lesson: local gate results never substitute for the remote run. The only
+annotations on the run are the repository's standing Node 20 deprecation warnings
+on `actions/checkout@v4` and `actions/setup-node@v4`, which predate this branch
+and are unrelated to it.
+
+Pull request https://github.com/JTOSHIE/stake-game-development-claude/pull/116,
+awaiting Fable's verification and the integrator's merge per rules 7 and 1. The
+worktree is removed at close per rule 11.
