@@ -447,6 +447,55 @@ survived, button casing that drifts, iconography from two different families,
 and the system default font leaking through where the brand face should be. The
 sweep list and the repeatable gate live in `docs/QUALITY_CHARTER.md`.
 
+## THE MULTI-TRACK PROTOCOL (owner's order, 2026-07-26, standing)
+
+Until now this project has had exactly one writer working one job at a time on
+`main`. That is why the record is coherent, and nothing below weakens it. What
+changes is that more than one session may now work at once, and the protocol
+exists so that concurrency cannot cost what single-writer discipline bought.
+
+**1. `main` is single-writer.** Exactly one session at a time holds the
+INTEGRATOR role, and only the integrator merges or pushes `main`. Every other
+session works on a branch and delivers by pull request. A session that is not the
+integrator does not push `main`, and its brief says so in its opening lines.
+
+**2. A track is a branch plus a manifest.** One branch, `track/<name>`, and one
+committed scope manifest at `docs/records/tracks/<name>.manifest` listing path
+globs. The manifest is declared in the track's brief and committed before the
+work starts. Tracks deliver by pull request only.
+
+**3. Parallel tracks require provably disjoint scopes.** Not "unlikely to
+collide": disjoint, checkable by comparing the manifests. Where two tracks want
+the same path, they do not run in parallel, they run in sequence. This is the
+rule that keeps merges mechanical, and it is cheaper than any merge-conflict
+policy could be.
+
+**4. One job per session by default, in a fresh context.** A session that runs
+several jobs is not forbidden, but it justifies itself in its session report,
+because the failure mode is real: judgement degrades late in a long session and
+the last job of six gets the least of it.
+
+**5. Model policy.** Sonnet at High for mechanical and suite work; Opus for
+judgement work; xHigh and above reserved for a single hard bounded problem in a
+short surgical session, never for a long mixed one. **The twice-failed escalation
+rule stands**, as recorded in `CLAUDE_PROJECT_INSTRUCTIONS_v7.md`: a brief failing
+its gates twice escalates one tier.
+
+**6. Hard problems are extracted, not solved mid-flow.** When a job turns out to
+contain a genuinely hard bounded problem, it is written up as its own surgical
+brief and handed back, rather than absorbed into the session that found it. A hard
+problem solved in the margins of another job gets the attention that was left over.
+
+**7. Fable verifies every pull request before merge**, and the scope gate enforces
+the manifests in CI, so a track that wanders outside its declared paths fails
+before a human has to notice.
+
+**8. Session reports on tracks are dated AND track-tagged sections.** The
+integrator merges pull requests **one at a time** and resolves any report conflict
+**by concatenation, never by discarding a section.** Two tracks' reports are two
+accounts of two pieces of work; keeping both is the whole point, and a merge that
+drops one has destroyed evidence to save a scroll.
+
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
 

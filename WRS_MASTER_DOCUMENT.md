@@ -93,6 +93,51 @@ Carried from the 2026-07-25 brief. **No first-party source for any of the three 
 | PR merge sweep (all ten open PRs resolved) | reports/archive/2026-07-14_pr-merge-sweep.md | DONE 2026-07-14. Zero open PRs remain. Two genuinely stale branches (JOB 1's carrier branch, and the oldest pre-work-order incremental-logging fix) needed real reconciliation; the other eight were already correctly merged against the post-hygiene-pass main by the sessions that created them. Locked files, frontend build and math validation all re-verified clean on the final merged main. |
 | Round-two audio slots (bonus_trigger, buy_confirm, wild_land, coin_count, win_max, ambience_rain) | reports/archive/2026-07-14_job8-audio-round2-placeholder.md | OPEN, deliberately deferred (JOB 8) - gated on the owner playing the JOB 1 build and Fable ruling on the mix. Not started, by design. |
 
+### 3e. Process protocol: MULTI-TRACK (owner's order, 2026-07-26, standing)
+
+Mirrored from `CLAUDE.md`, which holds the authoritative text. Recorded here
+because this document is the register a reader opens first, and a protocol nobody
+finds is a protocol nobody follows.
+
+Until now this project has had exactly one writer working one job at a time on
+`main`. That is why the record is coherent, and nothing here weakens it. What
+changes is that more than one session may now work at once.
+
+| # | Rule |
+|---|---|
+| 1 | **`main` is single-writer.** Exactly one session at a time holds the INTEGRATOR role, and only it merges or pushes `main`. Every other session works on a branch and delivers by pull request. |
+| 2 | **A track is a branch plus a manifest.** `track/<name>`, and a committed scope manifest at `docs/records/tracks/<name>.manifest` listing path globs, declared in the track's brief. Tracks deliver by pull request only. |
+| 3 | **Parallel tracks require provably disjoint scopes.** Not unlikely to collide: disjoint, checkable by comparing manifests. Overlap forces sequence rather than a merge policy. |
+| 4 | **One job per session by default, fresh context.** A multi-job session justifies itself in its session report, because judgement degrades late in a long session and the last job gets the least of it. |
+| 5 | **Model policy.** Sonnet High for mechanical and suite work; Opus for judgement; xHigh and above reserved for a single hard bounded problem in a short surgical session. The twice-failed escalation rule stands (`CLAUDE_PROJECT_INSTRUCTIONS_v7.md`: a brief failing its gates twice escalates one tier). |
+| 6 | **Hard problems are extracted, not solved mid-flow.** A hard bounded problem found inside a job is written up as its own surgical brief and handed back, rather than absorbed into the session that found it. |
+| 7 | **Fable verifies every pull request before merge**, and the scope gate enforces the manifests in CI, so a track that wanders outside its declared paths fails before a human has to notice. |
+| 8 | **Track session reports are dated AND track-tagged sections.** The integrator merges pull requests one at a time and resolves report conflicts **by concatenation, never by discarding a section**. |
+
+Enforced by `scripts/qa/locked_paths_gate.mjs`, which carries both the locked-path
+rule and the track scope gate, and runs first in CI.
+
+### 3f. Process protocol: THE RETRO MECHANISM (owner's order, 2026-07-26, standing)
+
+**After the owner's second portal visit, Fable's benchmark polish review nominates
+up to THREE surfaces for focused redo sessions, one specialist session each, on its
+own track.**
+
+The three are selected by **measured weakness against the professional bar**, not by
+taste and not by whichever surface was discussed most recently. The bar is THE
+STANDING MANDATE's inspection test: what a rival studio's art director would
+conclude from that surface alone.
+
+Why three and why separate. A single "polish pass" over everything is how polish
+becomes uniform and shallow; three named surfaces with a session each get depth, and
+being on their own tracks means they can run in parallel under section 3e's rules
+provided their manifests are disjoint. Fewer than three is a legitimate outcome: the
+review nominates **up to** three, and nominating one is a stronger statement than
+padding to three.
+
+Each nomination carries the measurement that justified it, so a redo session starts
+from a stated deficiency rather than from an instruction to make something nicer.
+
 ## 4. TESTING GATES BEFORE SUBMISSION (evidence lands in reports/qa/)
 1. Five-mode QA re-soak: cost integrity (integer micros), buy boundary, OVERBOOST cost visibility, drop default, reduced motion. (JOB 2)
 2. Audio pass: all files 200, event firing, bed swap, gesture-gated start, mute/slider persistence. (JOB 1f)
@@ -122,6 +167,7 @@ Reuse in order: maths package + validate_math + PAR -> wiring integrity audit pa
 - Gambling licence: WRS does not hold operator licences; games publish under Stake's operation via the Stake Engine ToS. Owner to confirm personal/company legal position with a professional (see 1).
 
 ## 9. CHANGE LOG
+- 2026-07-26 (MULTI-TRACK PROTOCOL V2): new sections 3e and 3f record the owner's multi-track protocol and the retro mechanism, mirroring the authoritative text in `CLAUDE.md`. `main` becomes single-writer with exactly one INTEGRATOR session; every other session works a `track/<name>` branch against a committed manifest at `docs/records/tracks/<name>.manifest` and delivers by pull request. Parallel tracks require provably disjoint scopes, checked by comparing manifests rather than hoped for. Enforced in CI by `scripts/qa/locked_paths_gate.mjs`, which now carries the track scope gate beside the locked-path rule and runs first. Two tracks opened: `track/docs-reskin` and `track/quality-sweep`, with their briefs written as paste-ready prompts in `docs/records/tracks/`. The walkthrough gained its authoritative SECOND VISIT section so the owner's portal visit is unblocked by nothing.
 - 2026-07-13: Document created (Fable). Statuses reflect main at PR #54 with PRs #52/#53 approved and awaiting merge.
 - 2026-07-14: Jobs 1-8 of the 2026-07-13 consolidated work order, and reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md, all merged to main via a full PR sweep (`reports/archive/2026-07-14_pr-merge-sweep.md`). Ten open PRs resolved to zero; locked files, frontend build and math validation all re-verified clean on the final merged main. Sections 3b/3c/3d above updated to reflect landed work. Two real findings surfaced during the sweep and JOB 6/7 prep, both still open: `SUBMISSION_BLURB.md` (repo root) is stale pre-Overdrive text contradicting the shipped game (3a); the provider logo requirement turns out to already be satisfied by the existing `brand_mark.svg` master, pending only a confirmation, not new art (3c). Remaining before submission: JOB 3b (math self-audit), JOB 5b (in-game rules conformance UI), JOB 9b (social-mode string audit), and the JOB 2 addendum's platform-conformance extensions (a-g) - none of these have started. 24 stale merged remote/local branches cleaned up in the same pass, preserving the two deliberately-named reference branches (`claude/collect-prototype`, `claude/gap-analysis`).
 - 2026-07-23: Trademark clearance row (section 1) flipped IN PROGRESS -> DONE. Closed by Fable's AU similarity ruling (both names clear against the 2026-07-18 variant-scan dataset) and the owner's manually-conducted USPTO searches (attested clear); full record at `docs/records/trademark/2026-07-15/SEARCH_LOG.md`, 2026-07-23 entry. Retained as a standing caveat in the row itself: documented pragmatic clearance, not a formal legal opinion; a trademark professional is still required before any enforcement action or if the names are ever challenged.
