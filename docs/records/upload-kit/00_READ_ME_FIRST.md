@@ -373,3 +373,223 @@ notes than have you work around it.
 
 **You are unsure whether you have broken something.** You have not. Nothing before
 **Submit for review** is visible outside your team, and every upload can be replaced.
+
+---
+
+# PART 9: THE SECOND VISIT
+
+**This is a separate session from everything above, and you do the whole of it
+after the first visit is finished.** Everything above stays true: nothing is
+public until **Submit for review**, every upload replaces rather than stacks,
+"Publish" means *make my uploads runnable for me*, and stopping to screenshot is
+always safe.
+
+Allow about forty minutes.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V3/`. The old
+`~/Desktop/FS_UPLOAD_KIT/` is **DEAD**. Do not upload anything out of it. If it
+is still on your Desktop, drag it to the Bin now so it cannot be picked up by
+mistake.
+
+**Where the screenshots go:** just save them **loose on the Desktop**. Do not sort
+them into folders and do not rename them. I will file them. A screenshot in the
+wrong folder is worse than one sitting on the Desktop, because I will not find it.
+
+---
+
+## Step 1: delete one file from the Math list
+
+The Math files list has **13 files**. It should have **12**. The extra one is a
+notes file that was dragged up with the real ones by accident.
+
+1. Go to **Games**, then **Future Spinner**, then **Files**.
+2. In the **Math files** list, find the row named exactly `math/HASHES.txt`. It is
+   the first row and it is about 2.82 KB, which makes it the smallest by a very
+   long way. Every other Math file is either megabytes or a `.json`.
+3. Delete that one row.
+4. **Screenshot the Math list afterwards.** It should read **12 files**.
+
+**Do not delete anything else from the Math list.** The other twelve are the game.
+If the list does not offer a delete control, stop and screenshot it, and I will
+find another route.
+
+**The maths is not being re-uploaded today.** It stays exactly as it is.
+
+---
+
+## Step 2: upload the new game files
+
+1. Still on the **Files** page, press **Import Files**.
+2. Open `~/Desktop/FS_UPLOAD_KIT_V3/02_frontend_upload`.
+3. Select **everything inside that folder** and drag it in. **The contents, not
+   the folder.** If `index.html` ends up one level down, the game will not load.
+   This is the single most likely mistake and it is easy to undo.
+4. A sync dialog appears saying how many files it will upload, skip, delete or
+   move. **Screenshot that dialog before you confirm it.** Last time this dialog
+   was the thing that explained a problem, and it was not captured.
+5. Confirm, and wait. It is about 15 MB, so it should be quick.
+6. When it finishes, the **FRONTEND** panel should read **108 files**. Screenshot it.
+
+   If it reads anything other than 108, screenshot it and tell me. Do not try to
+   fix it by uploading again.
+
+7. Press **Publish Game**.
+
+---
+
+## Step 3: confirm the new build is the one running
+
+Open the game (**Play Game**, or the Developer page's launch), and check these
+six things. Screenshot each one.
+
+1. **The version reads Front V3.** On the Versions panel. If it still says V2, the
+   publish did not take, so press **Publish Game** again.
+2. **The pilot is there.** The character on the left of the screen renders as
+   artwork, not as a broken-image icon. This was broken once before, so it is
+   worth a look.
+3. **No long dashes in the paytable.** Open the paytable and read the rules text.
+   You are looking for a **long horizontal dash**, noticeably wider than a hyphen,
+   sitting mid-sentence where a comma or a full stop would normally go. Two of
+   them used to render here. **There should now be none anywhere in the game.**
+   If you find one, screenshot it and note which screen it was on.
+4. **The FEATURE PRICE line.** Buy a feature (FEATURES, then one of the buy
+   tiers), let it play out, and look at the win banner at the end. Under the big
+   win amount and the "x BET" line there should be a small line reading
+   **FEATURE PRICE** followed by what the round cost you.
+
+   **The point of that line is that the price can be bigger than the win.** That
+   is normal, it is how bought features work, and the line is there so the round
+   tells you the truth. Seeing a big green win beside a bigger price is the line
+   working, not a bug.
+
+5. **The mini player.** Set the Screen menu to **Popout S (400x225)** and look at
+   the bottom strip.
+   - **BAL** should show a complete number. If your balance has cents, the cents
+     should be there. If your balance is very large it may read something like
+     `$52.43M`, and **that is correct and deliberate**: at that size the full
+     number does not fit at a readable size, so it shortens rather than being cut
+     in half.
+   - **WIN** should be complete too, with no half-cut character at the end.
+   - **The menu button**, second from the left, should show **three horizontal
+     lines**. It used to render as an empty box. If it is empty, screenshot it.
+
+6. **Screenshot the whole Popout S screen** as well as the strip.
+
+---
+
+## Step 4: the game tile
+
+The game card still shows a **Design Thumbnail** placeholder.
+
+1. Open the **Design Thumbnail** editor from the game card.
+2. Use the two images in `~/Desktop/FS_UPLOAD_KIT_V3/03_branding/`:
+   - `FutureSpinner-BG.jpg` is the **background** layer.
+   - `FutureSpinner-FG.png` is the **foreground** layer, and it has a transparent
+     background, so it goes on top.
+3. Save, and **screenshot the finished tile**.
+
+If the editor asks for anything the two files do not cover, stop and screenshot
+it.
+
+---
+
+## Part 9b: the five observations
+
+These are the same shape as the ten checks in Part 8: **look at this, expect
+this, screenshot this.** The technical detail sits in `DTT_PROTOCOL.md`, which is
+for me and for Fable, not for you.
+
+**Being wrong is fine and it is cheap.** Every one of these either confirms
+something we assumed or names one line of code to change. There is no answer
+here that creates work you will regret.
+
+### Observation 1: a losing spin and the end of a round
+
+Open the browser's developer tools, **Network** tab, and leave it open.
+
+1. Spin until you get a spin that wins **nothing**.
+2. Look at the network requests for that spin.
+3. **Expect:** a `play` request, and **no `end-round` request**.
+4. Also look at the `play` response and find the field called `active`. Note
+   whether it says `true` or `false`.
+5. **Screenshot the Network list and the `play` response.**
+
+Whatever it does is the right answer. We are checking which of two contradictory
+platform instructions the RGS actually follows.
+
+### Observation 2: where the round's events live
+
+1. On any spin, open the `play` response.
+2. Expand the part called `round`, then the part inside it called `state`.
+3. **Expect:** something called `events`, which is a long list.
+4. **Screenshot it expanded**, far enough that the structure is visible.
+
+If `events` is not inside `state`, that is the useful answer, so screenshot
+wherever it actually is.
+
+### Observation 3: display information
+
+1. Open the very first request of the session, the `authenticate` one.
+2. Read through the whole response looking for anything about how to display
+   money: a currency **symbol**, a number of **decimals**, or whether the symbol
+   goes before or after the number.
+3. **Expect: none of it.** We think the platform does not send this.
+4. **Screenshot the whole response.**
+
+**This one is easy to get wrong by confirming an absence too quickly.** Please
+screenshot the entire response rather than just telling me it is not there, so I
+can look myself.
+
+### Observation 4: Gold Coins
+
+1. Open **Settings** in the game toolbar and find the **Currency** selector.
+2. Switch to **GC (Gold Coins)**.
+3. Look at the balance and the bet.
+4. **Expect:** two decimal places, like `1,000.00`.
+5. **Screenshot it.**
+
+If it shows whole numbers with no decimals, that is a real finding and it changes
+one value in our code.
+
+### Observation 5: the language list, and Danish
+
+1. Open the **Language** menu in the toolbar.
+2. **Scroll it all the way to the bottom** and screenshot it in two or three
+   overlapping shots so the whole list is captured. Last time it was still
+   scrolling when the screenshot was taken, so we do not know the full list.
+3. Then start a session with Danish selected, or add `&lang=da` to the game URL.
+4. **Expect: clean English.** Danish is one we do not ship, so it should fall back
+   to English with nothing missing, no blank labels and no odd codes on screen.
+5. **Screenshot the game running in that session.**
+
+---
+
+## Part 9c: the Guidelines checklist
+
+Open the portal's **Guidelines** tab, and open
+`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md` beside it. That
+document already has our answer for every one of the 58 items.
+
+1. Work down the portal's list and tick the items the document marks as ours.
+2. **Nine items are marked OWNER.** Those are yours, not the build's: the
+   thumbnail, the approval requests, the Provably Fair toggle, the channel post
+   and the post-release steps. Item 7, the thumbnail, you will have just done in
+   Step 4.
+3. If the portal's list and our document disagree about anything, **stop and
+   screenshot it**. A disagreement is worth more than a tick.
+
+---
+
+## Part 9d: finishing
+
+1. Leave every screenshot loose on the Desktop. Do not sort or rename them.
+2. Tell me anything that came back different from what this document said to
+   expect, and anything that was confusing. **"That step made no sense" is a
+   useful answer.**
+3. **Do not press Start Approval.** It is in the left-hand menu and it is not
+   part of today. Nothing above requires it and nothing above is affected by
+   leaving it alone.
+4. When you are done, delete `~/Desktop/FS_UPLOAD_KIT_V3/`. It is single use.
+   The next upload gets a freshly built kit, because a kit sitting on the Desktop
+   is a kit that eventually gets uploaded when it is out of date, which has
+   already happened once.

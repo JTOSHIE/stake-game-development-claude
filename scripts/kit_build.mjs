@@ -212,6 +212,25 @@ if (copied.files !== stats.files || copied.bytes !== stats.bytes) {
   process.exit(1)
 }
 
+// The walkthrough and the tile images travel WITH the kit, and both come out of
+// the CLONE rather than off this machine, so convention (o) still holds for every
+// byte in the folder rather than only for the bundle.
+//
+// The walkthrough, because the owner needs Part 9 beside the files they are
+// uploading, not in a repository they are not reading at the time. The tile
+// images, because the Design Thumbnail step is part of the same visit and the
+// only other copy sits inside ~/Desktop/FS_UPLOAD_KIT/, which is DEAD and which
+// the walkthrough tells the owner to bin. Pointing at a folder we have just told
+// them to delete is how the wrong thing gets uploaded.
+//
+// 03_branding is NOT uploaded as Front End, and the README says so twice.
+cpSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'),
+  join(KIT, '00_READ_ME_FIRST_SECOND_VISIT.md'))
+mkdirSync(join(KIT, '03_branding'), { recursive: true })
+for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png']) {
+  cpSync(join(clone, 'design-system/brand/delivery', f), join(KIT, '03_branding', f))
+}
+
 const readme = `# FS_UPLOAD_KIT_V3, frontend only
 
 **Built from commit \`${facts.head}\`** (\`${facts.head.slice(0, 8)}\`), clean tree,
@@ -225,10 +244,21 @@ the artefact rather than by grepping it.
 
 ## What to do
 
-1. Upload the CONTENTS of \`02_frontend_upload\` as the Front End. Not the folder:
+**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9.** It is the
+full walkthrough and it covers everything below plus the checks and observations.
+The short version:
+
+1. Delete the one stray \`math/HASHES.txt\` row from the portal's Math files list,
+   taking it from 13 files to 12. Nothing else in Math is touched.
+2. Upload the CONTENTS of \`02_frontend_upload\` as the Front End. Not the folder:
    if \`index.html\` ends up one level down the game will not load.
-2. Publish.
-3. The maths package stays at V1 and is NOT re-uploaded.
+3. Publish, and confirm the version reads Front V3.
+4. Compose the tile in Design Thumbnail from the two images in \`03_branding/\`.
+5. The maths package stays at V1 and is NOT re-uploaded.
+6. Do NOT press Start Approval.
+
+\`03_branding/\` is here for the tile editor only. **Nothing in it is uploaded as
+Front End.**
 
 ## This kit is SINGLE USE
 
