@@ -1,0 +1,195 @@
+{
+  "locales": [
+    "en",
+    "ar",
+    "de",
+    "es",
+    "fi",
+    "fr",
+    "hi",
+    "id",
+    "ja",
+    "ko",
+    "pl",
+    "pt",
+    "ru",
+    "tr",
+    "vi",
+    "zh"
+  ],
+  "eps_px": 0.75,
+  "card_selectors": [
+    ".fs-sym-card",
+    ".fs-mode-card",
+    ".fs-rtp-row"
+  ],
+  "cards_checked": 374,
+  "rows": [
+    {
+      "locale": "en",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ar",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "de",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "es",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "fi",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "fr",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "hi",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "id",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ja",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ko",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "pl",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "pt",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ru",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "tr",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "vi",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "zh",
+      "preset": "Desktop",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "en",
+      "preset": "Mobile L",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "en",
+      "preset": "Popout S",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "de",
+      "preset": "Mobile L",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "de",
+      "preset": "Popout S",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ar",
+      "preset": "Mobile L",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    },
+    {
+      "locale": "ar",
+      "preset": "Popout S",
+      "cards": 17,
+      "worstExposedPx": 0,
+      "contentOverflows": 0
+    }
+  ],
+  "screenshots": [
+    "after-cards-en-desktop.png",
+    "after-cards-ar-desktop.png",
+    "after-cards-de-desktop.png",
+    "after-cards-en-mobile-l.png",
+    "after-cards-en-popout-s.png",
+    "after-cards-de-mobile-l.png",
+    "after-cards-de-popout-s.png",
+    "after-cards-ar-mobile-l.png",
+    "after-cards-ar-popout-s.png"
+  ],
+  "failures": []
+}

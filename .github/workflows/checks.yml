@@ -400,10 +400,19 @@ jobs:
   # whose inherited stdout pipe held the node event loop open. Both gates now
   # also carry a 4-minute internal watchdog and an explicit process.exit, so a
   # hang is a loud red at three layers before a human has to cancel anything.
+  # timeout-minutes raised 10 to 20 by FS VISUAL FIXPACK, which adds three
+  # browser gates and their three self-tests. Measured locally: splash calm 70s
+  # plus 31s self-test, turbo intensity 20s plus 10s, paytable card fill 55s
+  # plus 9s, so about 3.3 minutes of new work on a machine faster than the
+  # runner. The 10-minute figure was set after run 122's hang, and raising it
+  # does not weaken that: each of these gates carries its OWN internal watchdog
+  # (4 to 8 minutes) that exits red, which is the level the run-122 note itself
+  # argues a hang should be caught at. The job timeout is the last resort, not
+  # the first.
   browser:
     name: browser gates
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Check out
@@ -506,3 +515,26 @@ jobs:
       - name: turbo intensity gate, seven presets
         working-directory: frontend
         run: node scripts/turbo_intensity_gate.mjs
+
+      # ── Gate 13h: a card's fill encloses its content ─────────────────────────
+      # FS VISUAL FIXPACK JOB 3. The paytable's card primitive is a chrome FRAME
+      # with a dark FILL child. The frame was a block container, so the fill was
+      # only ever as tall as its own content, and .fs-sym-grid stretches its
+      # items to the row height. On a row with a taller card the frame grew and
+      # the fill did not: WILD showed 23.0px of bare chrome and SCAT 36.9px.
+      # The mode cards had it too, at 15.4px, unreported.
+      #
+      # Asserted in BOTH directions across all sixteen locales, because a fix
+      # can fail either way: the fill must cover the frame (the shipped defect),
+      # AND every text box and image must sit inside the fill (the defect a
+      # fixed-height fill would introduce instead). The locale list is derived
+      # from the shipped Locale union, so a seventeenth locale is covered the day
+      # it lands. Convention (p) --self-test plants both forms, and seed 1
+      # reproduces the shipped numbers to two decimal places.
+      - name: paytable card fill gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/paytable_card_fill_gate.mjs --self-test
+
+      - name: paytable card fill gate, all sixteen locales
+        working-directory: frontend
+        run: node scripts/paytable_card_fill_gate.mjs

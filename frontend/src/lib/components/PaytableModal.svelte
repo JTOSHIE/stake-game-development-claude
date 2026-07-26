@@ -460,8 +460,27 @@
   .fs-pt--overdrive   { --acc: var(--sig-pink); --acc2: var(--sig-orange); }
 
   /* ---- shared chrome primitives (same as B1) ---- */
+  /* FS VISUAL FIXPACK JOB 3: THE FILL NOW FOLLOWS THE FRAME.
+     The plate is a two-part primitive: this element is the brushed-chrome
+     FRAME, and its `.fs-face` child is the dark FILL that carries the content.
+     The frame was a block container, so the fill was only ever as tall as its
+     own content. That is invisible everywhere the frame is content-sized too,
+     and wrong the moment the frame is stretched by something else.
+     `.fs-sym-grid` stretches its items to the row height, so on a row where
+     another card is taller, a shorter card's fill stopped where its text
+     stopped and the chrome gradient showed through beneath it.
+     Measured at 1200x675 before the fix, Symbol Payouts row 1: every card frame
+     197.4px; H1, H2, M1 and M2 fills 193.6px, which is the frame less its 2px
+     of padding on each side; WILD's fill 170.3px, leaving 23.0px of exposed
+     chrome, and SCAT's 156.6px, leaving 36.8px. Those are the two the owner
+     reported, and they are the two whose content is a short note rather than
+     three payout rows.
+     Making the frame a flex container and the fill a stretching item fixes the
+     class rather than those two cards: any plate, any content length, any
+     locale, the fill is the frame. Held by paytable_card_fill_gate.mjs. */
   .fs-plate {
     position: relative;
+    display: flex;
     --sig: var(--sig-cyan);
     padding: 2px;
     clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
@@ -473,6 +492,10 @@
   }
   .fs-plate > .fs-face {
     position: relative;
+    /* The fill is one flex item filling the frame. min-width:0 so a long word
+       in any locale wraps inside the fill instead of widening it. */
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
