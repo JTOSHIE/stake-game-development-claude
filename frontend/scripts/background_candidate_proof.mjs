@@ -1,5 +1,14 @@
 // background_candidate_proof.mjs - 2026-07-26.
 //
+// HISTORICAL, 2026-07-27. The eye-call it served is decided: the owner ruled
+// BG: V1 and candidate v1 is now the shipped background, so the `candidates/`
+// directory and App.svelte's `?bg=` parameter are both gone. This script
+// therefore no longer runs against the working tree. It is kept because it is
+// how the committed evidence in reports/screens/background-candidate-2026-07-26/
+// was produced, and evidence whose method has been deleted is weaker evidence.
+// To re-run it, restore the candidate files and the parameter from commit
+// 6eaea1a. What shipped is proved by background_adopted_proof.mjs instead.
+//
 // Side-by-side in-game proofs for the background eye-call: the shipped
 // background against ingested candidate v2, behind the live frame with the HUD
 // present, at the three views the brief names.

@@ -282,17 +282,59 @@ subbing out and subbing in pretty much the same images... this enhanced is actua
 because this is taking us where we need to get to. It's actually solved a massive
 problem."*
 
+**AMENDED AGAIN 2026-07-27 by owner ruling (BG: V1, `reports/briefs/FS_V5_CLOSEOUT_Prompt.md`):
+owner-commissioned NEW DESIGNS are permitted for SCENE and MARKETING art, with recorded
+provenance. Symbols remain never externally designed, and unrequested external design
+remains prohibited.**
+
+The 2026-07-25 amendment drew the line at enhancement because that was the case in front
+of it. Two adoptions since have not fitted on either side of that line, and both were
+accepted on their merits, so the rule is restated to describe what the project actually
+does rather than leaving the record at odds with itself:
+
+- **The published tile** (`design-system/brand/tile/tile_composed_master.png`, 2026-07-26).
+  Its own generation record states the origin as *"Externally generated, commissioned by
+  the owner"*. It is not an enhancement of anything: nothing portrait existed to enhance,
+  and it landed byte-identical at 408x546, the platform's own published tile geometry.
+- **The scene background** (`bg_base.jpg`, this ruling). Measured at Pearson r 0.3850
+  against the background it replaced, with a declared enhancement scoring 0.9966 as the
+  control, so it is unambiguously a new design and was adopted as one.
+
+**What actually distinguishes the permitted case from the Manus failure** is not
+enhancement versus design. It is these three things, and they are the conditions:
+
+1. **The owner commissioned it.** Art that arrives unrequested is out, whatever its
+   quality. The Manus failure was a pipeline handing over work nobody had specified.
+2. **It does not enter the animation pipeline.** Symbols, frames and anything the effect
+   system positions or animates are still produced in-house from vector masters, full
+   stop. Scene backdrops, tiles and marketing art are flat, terminal, and animate nothing,
+   which is why they can come from outside without the failure recurring.
+3. **Its provenance is recorded and measured**, per point 4 below, before it ships.
+
 **The test for any future external asset**, in order:
 
-1. **Is it an enhancement of art we already own, or a new design?** Enhancement is
-   permitted; new external design is not, and symbols are never externally designed.
-2. **Does the silhouette match?** Measure the subject bounding box against the asset it
-   replaces. A changed silhouette is a redesign wearing an enhancement's clothes, and it
-   breaks layout: overlay effects are positioned by percentage within their layer.
+1. **Which class is it?** A symbol, or anything the animation pipeline touches: in-house
+   only, no exceptions, and no measurement will change that answer. Scene, tile or
+   marketing art: continue, and state plainly whether it is an enhancement or a new
+   design rather than letting the question go unasked.
+2. **Measure it against what it replaces rather than asserting the answer.** For a subject
+   with a silhouette, the subject bounding box; a changed silhouette breaks layout,
+   because overlay effects are positioned by percentage within their layer. For a
+   background, composition correspondence against a CONTROL whose relationship to our art
+   is declared, since a correlation figure alone means nothing
+   (`scripts/assets/background_candidate_ingest.py`, and its convention (p) self-test).
 3. **Does it preserve the alpha channel and every effect anchor?** The car's own green
    nose booster glow is 0.08% of its opaque pixels; a naive green-screen key would have
-   punched holes in it. Check before converting, not after.
-4. **Record the provenance** in the tracker row and the commit.
+   punched holes in it. Check before converting, not after. For an opaque asset the
+   equivalent anchors are the regions the interface draws over, measured per region.
+4. **Record the provenance** in a generation record beside the asset, in the tracker row,
+   and in the commit. Source path, source hash, shipped hash, dimensions, what the
+   supplier claimed and what the measurement found. `design-system/brand/GENERATION_NOTE_background.md`
+   and `design-system/brand/tile/GENERATION_NOTE_composed_master.md` are the shape.
+5. **Check what else is derived from it.** An adopted asset with siblings computed from
+   the old one leaves the set incoherent, and nothing in the build will say so. Adopting
+   the background required deriving a matching Overdrive variant, because `App.svelte`
+   crossfades the two and they would otherwise have been two different cities.
 
 The SVG masters remain the source for anything generated fresh, and remain committed. An
 enhanced raster that supersedes its master is recorded as such rather than silently

@@ -162,12 +162,6 @@ function pruneLegacyAssets() {
     // Dev-only alternate themes plus concept art, unreachable once shipped (see above).
     'assets/themes/beautiful-game', 'assets/themes/oil-and-fire',
     'assets/themes/trap-lane', 'assets/themes/source',
-    // Background candidates awaiting the owner's eye-call. Reachable only via
-    // App.svelte's DEV-gated `?bg=` parameter, so like the alternate themes
-    // they are unreachable in the served build and must not be paid for in it.
-    // An adopted candidate is copied over bg_base.jpg and this directory goes
-    // away; it is never the thing that ships.
-    'assets/themes/future-spinner/backgrounds/candidates',
   ]
   const LEGACY_FILES = ['assets/themes/future-spinner/backgrounds/bg-1.mp4']
   const UI_DIR = 'assets/ui'

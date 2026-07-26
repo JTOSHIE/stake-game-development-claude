@@ -16,10 +16,18 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-mkdirSync(OUT_DIR, { recursive: true })
+// CONVENTION (h.1), migrated 2026-07-27. This wrote straight into committed
+// evidence, so every plain run dirtied reports/qa/build-diet-network-log.json.
+// Almost all of that churn was noise: the preview server picks a random port,
+// so 54 of 54 changed lines were a port number, and the real signal was buried
+// under it. Caught during the background adoption, when a routine gate run left
+// the file modified in a commit that had nothing to do with it. The committed
+// snapshot is now written only under FS_WRITE_EVIDENCE=1.
+const OUT_DIR = evidenceDir('reports', 'qa')
+announceEvidenceMode('build_diet_verify')
 
 const DIST_DIR = join(__dirname, '..', 'dist')
 const DIST_BUDGET_BYTES = 25 * 1024 * 1024

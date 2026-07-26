@@ -1,0 +1,35 @@
+{
+  "generated": "2026-07-26T15:48:36.783Z",
+  "script": "frontend/scripts/background_adopted_proof.mjs",
+  "ruling": "BG: V1, owner, 2026-07-27",
+  "rows": [
+    {
+      "preset": "desktop_1200x675",
+      "baseSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "baseDecoded": true,
+      "overSrc": "assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
+      "overDecoded": true,
+      "noCandidatePath": true,
+      "ok": true
+    },
+    {
+      "preset": "mobile_portrait_375x667",
+      "baseSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "baseDecoded": true,
+      "overSrc": "assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
+      "overDecoded": true,
+      "noCandidatePath": true,
+      "ok": true
+    },
+    {
+      "preset": "popout_s_400x225",
+      "baseSrc": "assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "baseDecoded": true,
+      "overSrc": "assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
+      "overDecoded": true,
+      "noCandidatePath": true,
+      "ok": true
+    }
+  ],
+  "allOk": true
+}
