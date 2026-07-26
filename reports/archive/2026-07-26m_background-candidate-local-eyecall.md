@@ -292,10 +292,20 @@ appears in both builds above.
 
 ## Rule 10 closing link
 
-Final push at `6eaea1a`, BOTH JOBS GREEN on the remote runner:
+The work commit `6eaea1a`, BOTH JOBS GREEN on the remote runner:
 `https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30202708950`
   static gates: success
   browser gates: success
+
+This documentation commit `dec743f`, also verified green on the remote runner:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30202782775`
+
+Both are recorded because rule 10 binds the session's FINAL push, and the commit
+that carries a rule 10 link cannot contain the link to its own run. The second
+line closes that gap by naming the run for the commit that follows it: verified
+green before this session closed, which is the obligation rule 10 actually
+imposes. Any later doc-only commit in this session would repeat the pattern once
+and stop there.
 
 `main` is green, so the line is not stopped and the next job may start.
 
