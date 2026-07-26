@@ -483,3 +483,26 @@ jobs:
       - name: splash calm gate, boot logos still
         working-directory: frontend
         run: node scripts/splash_calm_gate.mjs
+
+      # ── Gate 13g: the three speeds are distinguishable ───────────────────────
+      # FS VISUAL FIXPACK JOB 2. The owner removed the "1x / 2x / 4x" numeral
+      # from the speed control, so intensity is now the ONLY thing separating
+      # Normal, Turbo and Super Turbo. Before this pass the control lit on a
+      # single boolean and the top two tiers were styled identically, which
+      # means deleting the numeral without measuring would have shipped two
+      # speeds a player cannot tell apart.
+      #
+      # The gate screenshots the real composited control at each speed at all
+      # seven presets, decodes it through the browser's canvas, and asserts the
+      # mean WCAG relative luminance rises monotonically with a real contrast
+      # step between adjacent states, plus that no numeral has come back. The
+      # measured floor on the shipped design is 1.30:1 against a 1.25:1 bar.
+      # Self-test first per convention (p): it flattens Super Turbo back to
+      # Normal (the exact shape of the old boolean) and puts the numeral back.
+      - name: turbo intensity gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/turbo_intensity_gate.mjs --self-test
+
+      - name: turbo intensity gate, seven presets
+        working-directory: frontend
+        run: node scripts/turbo_intensity_gate.mjs

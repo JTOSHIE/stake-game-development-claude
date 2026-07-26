@@ -20,6 +20,13 @@
 // Run (from frontend/): node scripts/interface_guide_icon_proof.mjs
 
 import { chromium } from 'playwright'
+// FS VISUAL FIXPACK JOB 2: this import was sitting on line 2 of the PYTHON
+// source string that builds the proof grid, which is the same bad insertion
+// found in regen_interface_guide_icons.mjs and produced by the same dedup pass.
+// The module therefore threw "dismissIntro is not defined" before it reached
+// the grid, and the grid's python would not have parsed if it had. Both files
+// are the only two in scripts/ that embed python, which is why both were hit.
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
@@ -27,14 +34,21 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn, spawnSync } from 'node:child_process'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const FRONTEND = join(__dirname, '..')
 const ROOT = join(FRONTEND, '..')
 const VENV_PY = join(ROOT, 'scripts', 'assets', '.venv', 'bin', 'python')
 const UI_DIR = join(FRONTEND, 'public', 'assets', 'themes', 'future-spinner', 'ui')
-const OUT_DIR = join(ROOT, 'reports', 'screens', 'owner-audit-v3', 'interface-guide-icons')
-mkdirSync(OUT_DIR, { recursive: true })
+// CONVENTION (h.1), migrated FS VISUAL FIXPACK JOB 2. This wrote its proof grid
+// straight into the committed evidence directory, so any casual re-run silently
+// replaced committed evidence in the working tree. That is the exact pattern
+// SA-012 found in anticipation_proof.mjs, and CLAUDE.md records migrating the
+// remaining writers as open work; this is one of them. Scratch by default,
+// FS_WRITE_EVIDENCE=1 for a deliberate regeneration.
+const OUT_DIR = evidenceDir('reports', 'screens', 'owner-audit-v3', 'interface-guide-icons')
+announceEvidenceMode('interface_guide_icon_proof')
 
 // live selector = the real HUD control; guideName = its `name` field in
 // PaytableModal's INTERFACE_GUIDE array (used to find its row there).
@@ -49,6 +63,14 @@ const ENTRIES = [
   { live: '.fs-turbo', guideName: 'Turbo', file: 'btn_turbo.png' },
   { live: '.fs-max', guideName: 'Max Bet', file: 'btn_max.png' },
 ]
+
+// FS VISUAL FIXPACK JOB 2: the speed control ships THREE icons, one per speed.
+// They are not three guide rows, because there is one control, so they are not
+// ENTRIES. They are three shipped FILES, so they belong in the byte-uniqueness
+// gate below: if the capture run failed to advance the control between crops,
+// all three would come back identical and the guide would silently be showing
+// the same state three times while claiming to show a progression.
+const EXTRA_ICON_FILES = ['btn_turbo_2.png', 'btn_turbo_3.png']
 
 async function getFreePort() {
   return new Promise((resolvePromise, reject) => {
@@ -158,19 +180,23 @@ async function run() {
     console.log('Checking guide icon uniqueness (no two files byte-identical)...')
     const hashes = new Map()
     const dupes = []
-    for (const e of ENTRIES) {
-      const filePath = join(UI_DIR, e.file)
+    const uniqueTargets = [
+      ...ENTRIES.map((e) => ({ label: `${e.guideName} (${e.file})`, file: e.file })),
+      ...EXTRA_ICON_FILES.map((f) => ({ label: `Turbo (${f})`, file: f })),
+    ]
+    for (const t of uniqueTargets) {
+      const filePath = join(UI_DIR, t.file)
       const hash = createHash('sha256').update(readFileSync(filePath)).digest('hex')
       if (hashes.has(hash)) {
-        dupes.push(`${e.guideName} (${e.file}) is byte-identical to ${hashes.get(hash)}`)
+        dupes.push(`${t.label} is byte-identical to ${hashes.get(hash)}`)
       } else {
-        hashes.set(hash, `${e.guideName} (${e.file})`)
+        hashes.set(hash, t.label)
       }
     }
     if (dupes.length) {
       throw new Error(`guide icon uniqueness FAILED:\n  ${dupes.join('\n  ')}`)
     }
-    console.log(`  OK: all ${ENTRIES.length} guide icon files are byte-unique`)
+    console.log(`  OK: all ${uniqueTargets.length} guide icon files are byte-unique`)
 
     console.log('Assembling proof grid...')
     const manifestPath = join(tmpDir, 'manifest.json')
@@ -184,7 +210,6 @@ async function run() {
     const gridOut = join(OUT_DIR, 'proof-grid.png')
     const py = `
 import json, sys
-import { dismissIntro } from './lib/dismissOverlays.mjs'
 from PIL import Image, ImageDraw, ImageFont
 
 with open(sys.argv[1]) as f:

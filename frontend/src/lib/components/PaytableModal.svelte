@@ -111,19 +111,31 @@
   // stake.us player. It is now routed through the single vocabulary layer, so
   // adding a row cannot reintroduce the problem: `sv()` applies to whatever the
   // row says.
+  // FS VISUAL FIXPACK JOB 2: `file` became `files`, a list, because the speed
+  // control now needs three. Every other row carries a one-item list rather
+  // than a second optional shape, so the markup has one branch and not two.
   const INTERFACE_GUIDE_RAW = [
-    { kind: 'img',  file: 'spin_button.png',   name: 'Spin',         desc: 'Start a spin at the current bet.' },
-    { kind: 'img',  file: 'btn_bet_plus.png',  name: 'Increase Bet', desc: 'Raise your bet to the next level.' },
-    { kind: 'img',  file: 'btn_bet_minus.png', name: 'Decrease Bet', desc: 'Lower your bet to the previous level.' },
-    { kind: 'img',  file: 'feature_button.png',name: 'Features',     desc: 'Open the FEATURES menu to pick a bet mode or buy the feature.' },
-    { kind: 'img',  file: 'btn_autoplay.png',  name: 'Autoplay',     desc: 'Spin automatically with optional loss and win limits.' },
-    { kind: 'img',  file: 'btn_menu.png',      name: 'Menu',         desc: 'Open the menu for the paytable and sound settings.' },
+    { kind: 'img',  files: ['spin_button.png'],    name: 'Spin',         desc: 'Start a spin at the current bet.' },
+    { kind: 'img',  files: ['btn_bet_plus.png'],   name: 'Increase Bet', desc: 'Raise your bet to the next level.' },
+    { kind: 'img',  files: ['btn_bet_minus.png'],  name: 'Decrease Bet', desc: 'Lower your bet to the previous level.' },
+    { kind: 'img',  files: ['feature_button.png'], name: 'Features',     desc: 'Open the FEATURES menu to pick a bet mode or buy the feature.' },
+    { kind: 'img',  files: ['btn_autoplay.png'],   name: 'Autoplay',     desc: 'Spin automatically with optional loss and win limits.' },
+    { kind: 'img',  files: ['btn_menu.png'],       name: 'Menu',         desc: 'Open the menu for the paytable and sound settings.' },
     // OWNER AUDIT ROUND 3, item 5: Turbo and Max were text pills with no
     // captured icon at all - now real live-component captures (each its own
     // distinct selector, see regen_interface_guide_icons.mjs), consistent
     // with every other control in this guide.
-    { kind: 'img',  file: 'btn_turbo.png',     name: 'Turbo',        desc: 'Speed up spins.' },
-    { kind: 'img',  file: 'btn_max.png',       name: 'Max Bet',      desc: 'Bet the maximum.' },
+    //
+    // FS VISUAL FIXPACK JOB 2 (owner ruling, 2026-07-27): the control lost its
+    // "1x / 2x / 4x" numeral and now says which speed it is by INTENSIFYING.
+    // A guide row showing one state would therefore be showing the player the
+    // one thing this control is not about, so the row shows all three captures
+    // in order. They are real crops of the live control at each speed
+    // (regen_interface_guide_icons.mjs cycles it between captures), so the
+    // guide cannot drift from the button the way a hand-drawn icon would.
+    { kind: 'img',  files: ['btn_turbo.png', 'btn_turbo_2.png', 'btn_turbo_3.png'],
+      name: 'Turbo', desc: 'Speed up spins. The bolt brightens at each of the three speeds: normal, turbo, super turbo.' },
+    { kind: 'img',  files: ['btn_max.png'],        name: 'Max Bet',      desc: 'Bet the maximum.' },
   ] as const
 
   $: INTERFACE_GUIDE = INTERFACE_GUIDE_RAW.map((row) => ({
@@ -340,7 +352,7 @@
           <div class="fs-guide-list">
             {#each INTERFACE_GUIDE as g}
               <div class="fs-guide-row">
-                <div class="fs-guide-icon">
+                <div class="fs-guide-icon" class:fs-guide-icon--set={g.files.length > 1}>
                   <!-- R10, 2026-07-27: the former {:else} branch rendered a
                        `kind: 'pill'` text token via `g.label`. OWNER AUDIT ROUND 3
                        item 5 converted Turbo and Max to real captures, so ALL
@@ -348,7 +360,18 @@
                        branch became unreachable. It survived as dead markup
                        referencing a `label` field no entry has, which is what the
                        type error was reporting. Removed rather than silenced. -->
-                  <img src="{$themeAssets.assetBase}/ui/{g.file}" alt={g.name} class="fs-guide-img" />
+                  {#each g.files as f, i (f)}
+                    <!-- Only the first image is named. The other two are the
+                         SAME control in another state, so repeating the name
+                         would have a screen reader announce one control three
+                         times; the description carries what they show. -->
+                    <img
+                      src="{$themeAssets.assetBase}/ui/{f}"
+                      alt={i === 0 ? g.name : ''}
+                      aria-hidden={i === 0 ? undefined : 'true'}
+                      class="fs-guide-img"
+                    />
+                  {/each}
                 </div>
                 <div class="fs-guide-text">
                   <span class="fs-guide-name">{g.name}</span>
@@ -686,6 +709,22 @@
     border-radius: 8px;
   }
   .fs-guide-img { width: 44px; height: 44px; object-fit: contain; }
+
+  /* FS VISUAL FIXPACK JOB 2: the speed row shows three captures, one per speed,
+     so its slot widens rather than squeezing three icons into a 56px box. The
+     row is `min-width: 0` on its text side, so the description reflows instead
+     of pushing the panel wider; verified at Popout S, where the paytable is at
+     its narrowest. */
+  .fs-guide-icon--set {
+    width: auto;
+    gap: 6px;
+    padding: 0 8px;
+  }
+  .fs-guide-icon--set .fs-guide-img { width: 34px; height: 34px; }
+  @media (max-width: 420px) {
+    .fs-guide-icon--set { gap: 4px; padding: 0 5px; }
+    .fs-guide-icon--set .fs-guide-img { width: 28px; height: 28px; }
+  }
   .fs-guide-pill {
     display: inline-flex;
     align-items: center;

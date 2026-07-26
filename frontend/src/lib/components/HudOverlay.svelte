@@ -396,15 +396,15 @@
         {/if}
       </div>
       <button
-        class="p-round-btn"
-        class:engaged={$speedTier !== 'normal'}
+        class="p-round-btn p-turbo"
+        data-speed={$speedTier}
+        data-testid="hud-turbo"
         on:click={toggleTurbo}
         disabled={$isSpinning || $rgJurisdiction.turboDisabled}
         aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
         title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
       >
         <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
-        <span class="p-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
       </button>
     </div>
 
@@ -490,9 +490,18 @@
         <!-- The three controls that left the row. They are reachable, labelled,
              and at full menu-item size, which they were not when crammed into
              the strip as icons. -->
-        <button class="hud-menu-item" role="menuitem" on:click={toggleTurbo}
-                disabled={$isSpinning || $rgJurisdiction.turboDisabled}>
-          {$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'} {$tr('hudTurboLabel')}
+        <!-- FS VISUAL FIXPACK JOB 2: the numeral is gone here too. At this size
+             the control lives only in the menu, so the menu item IS the control
+             at Popout S and has to carry the same three-step intensity. The
+             localised word stays: a menu item without a label would be worse
+             than the numeral ever was. -->
+        <button class="hud-menu-item m-turbo-item" role="menuitem" on:click={toggleTurbo}
+                data-speed={$speedTier}
+                data-testid="hud-turbo"
+                disabled={$isSpinning || $rgJurisdiction.turboDisabled}
+                title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}>
+          <svg class="m-turbo-bolt" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+          {$tr('hudTurboLabel')}
         </button>
         {#if !$rgJurisdiction.autoplayDisabled}
           <button class="hud-menu-item" role="menuitem" on:click={toggleAutoMenu} disabled={$isSpinning}>
@@ -625,15 +634,15 @@
   </div>
 
   <button
-    class="c-round-btn"
-    class:engaged={$speedTier !== 'normal'}
+    class="c-round-btn c-turbo"
+    data-speed={$speedTier}
+    data-testid="hud-turbo"
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
     <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
-    <span class="c-tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
   </button>
 
   {#if !$rgJurisdiction.autoplayDisabled}
@@ -703,7 +712,8 @@
   <!-- TURBO - v3.2: OUTSIDE the panel, centre (268,604) -->
   <button
     class="fs-turbo fs-knob"
-    class:engaged={$speedTier !== 'normal'}
+    data-speed={$speedTier}
+    data-testid="hud-turbo"
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
@@ -711,7 +721,6 @@
   >
     <span class="fs-face">
       <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
-      <span class="tier">{$speedTier === 'normal' ? '1×' : $speedTier === 'turbo' ? '2×' : '4×'}</span>
     </span>
   </button>
 
@@ -1257,24 +1266,55 @@
      Bumped to 82x82 (recentred on the old 72x72 box) so it clears 44px
      effective at 0.54 scale with margin (82*0.54=~44.3px); the 40px gap to
      .fs-menu absorbs the size increase without collision. */
+  /* FS VISUAL FIXPACK JOB 2 (owner-specified, 2026-07-27): THE NUMERAL IS GONE.
+     The control was a bolt with a 0.5rem "1x / 2x / 4x" caption underneath it,
+     which the owner called too small and silly. The new design is the bolt
+     alone, and the three speeds are carried by the CONTROL INTENSIFYING:
+     brighter face, brighter bolt, stronger glow at each step.
+
+     WHY THE STEPS ARE LUMINANCE STEPS, NOT HUE STEPS. Encoding state in hue
+     alone fails WCAG 1.4.1 for a colour-blind player and fails again on a
+     washed-out phone screen in daylight. Every step here raises brightness,
+     which is the channel that survives both, and it is the channel
+     turbo_intensity_gate.mjs measures: it screenshots the real composited
+     control at each tier and asserts the mean relative luminance rises
+     monotonically with a real contrast step between adjacent states.
+
+     THE FLAME ANIMATION IS REMOVED, and that is deliberate rather than
+     collateral. It ran `fs-flame .8s alternate`, swinging brightness 1.0 to
+     1.28 twice a second on any engaged tier. Once intensity IS the state, an
+     animation that changes intensity makes the state ambiguous: a pulsing
+     Turbo passes through the brightness of Super Turbo on every cycle, so at a
+     glance the two are not distinguishable, which is exactly what the ruling
+     asks for. It also made the states unmeasurable.
+
+     The bolt grew 26px to 34px: it no longer shares the face with a caption. */
   .fs-turbo{position:absolute;left:227px;top:563px;width:82px;height:82px;z-index:60;
     padding:0;border:none;cursor:pointer;}
-  .fs-turbo .fs-face{background:radial-gradient(circle at 36% 28%,#33210c,#0c0803 72%);}
-  .fs-turbo svg{width:26px;height:26px;}
-  .fs-turbo svg path{fill:rgba(255,190,120,.7);}
-  .fs-turbo .tier{font-family:'Orbitron',monospace;font-size:.5rem;font-weight:800;
-    letter-spacing:.06em;color:rgba(255,200,140,.75);font-variant-numeric:tabular-nums;
-    /* Alignment nit (2026-07-15, item 5, per the owner's note): nudged down
-       a couple of px relative to the icon above it - it read as crowding
-       the icon's own glyph before. */
-    margin-top:3px;}
+  .fs-turbo svg{width:34px;height:34px;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
-  .fs-turbo.engaged svg path{fill:#ffc46a;}
-  .fs-turbo.engaged .tier{color:#ffce7a;}
-  .fs-turbo.engaged{filter:drop-shadow(0 0 14px rgba(255,120,30,.7));
-    animation:fs-flame .8s ease-in-out infinite alternate;}
-  @keyframes fs-flame{from{filter:drop-shadow(0 0 10px rgba(255,120,30,.55)) brightness(1);}
-    to{filter:drop-shadow(0 0 20px rgba(255,140,40,.9)) brightness(1.28);}}
+
+  /* Step 1 of 3, Normal. Resting: a dim bolt on a near-black face, no glow. */
+  .fs-turbo[data-speed="normal"] .fs-face{
+    background:radial-gradient(circle at 36% 28%,#241505,#070502 72%);
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.08),inset 0 -6px 12px rgba(0,0,0,.78);}
+  .fs-turbo[data-speed="normal"] svg path{fill:rgba(255,178,100,.40);}
+
+  /* Step 2 of 3, Turbo. The face warms, the bolt lights, a glow appears. */
+  .fs-turbo[data-speed="turbo"] .fs-face{
+    background:radial-gradient(circle at 36% 28%,#96601b,#2a1808 72%);
+    box-shadow:inset 0 2px 4px rgba(255,225,180,.3),inset 0 -6px 12px rgba(0,0,0,.5);}
+  .fs-turbo[data-speed="turbo"] svg path{fill:#ffc266;}
+  .fs-turbo[data-speed="turbo"]{filter:drop-shadow(0 0 16px rgba(255,125,30,.78));}
+
+  /* Step 3 of 3, Super Turbo. The bolt goes white hot, the face is at its
+     brightest, and the glow grows in radius and gains a second wider pass. */
+  .fs-turbo[data-speed="super"] .fs-face{
+    background:radial-gradient(circle at 36% 28%,#ffb43c,#5e3410 72%);
+    box-shadow:inset 0 2px 8px rgba(255,248,232,.62),inset 0 -6px 12px rgba(0,0,0,.3);}
+  .fs-turbo[data-speed="super"] svg path{fill:#fffaf0;}
+  .fs-turbo[data-speed="super"]{
+    filter:drop-shadow(0 0 24px rgba(255,160,60,1)) drop-shadow(0 0 46px rgba(255,100,25,.72));}
 
   /* ===== AUTOPLAY - chrome knob. OWNER AUDIT ROUND 3 item 7: docked as a
      circle tangent to SPIN's right edge (x1111 = SPIN's left 1027 + its own
@@ -1352,7 +1392,10 @@
   .fs-hud--overdrive .fs-auto{filter:hue-rotate(-6deg) saturate(1.08);}
 
   @media (prefers-reduced-motion:reduce){
-    .fs-win.lit .fs-rail,.fs-win.lit .fs-value,.fs-turbo.engaged,.fs-auto.active,
+    /* .fs-turbo.engaged is no longer listed: the flame animation it stilled
+       was removed outright by FS VISUAL FIXPACK JOB 2, so the control is
+       already motionless at every tier for every player. */
+    .fs-win.lit .fs-rail,.fs-win.lit .fs-value,.fs-auto.active,
     .fs-spin.spinning .glyph.arrows,.fs-hud--overdrive .fs-panel{animation:none;}
   }
 
@@ -1395,6 +1438,45 @@
     cursor: pointer;
   }
   .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
+
+  /* FS VISUAL FIXPACK JOB 2: at Popout S the speed control lives ONLY in this
+     menu, so the menu item has to carry the same three-step intensity the knob
+     carries everywhere else. Same bolt, same brightening, same fill growth; the
+     localised word stays because a menu item needs a label. */
+  /* THE WHOLE ROW CARRIES THE STEP, not just the glyph. First measured with the
+     intensity on the 16px bolt alone: the adjacent-state contrast at Popout S
+     came out at 1.014:1 and 1.030:1, effectively flat, because the bolt is a few
+     percent of the row's area and the row is what a player looks at. A cue that
+     only a measuring instrument can find is not "clearly distinguishable at a
+     glance". So the row's fill and its leading edge intensify with the bolt. */
+  .m-turbo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .m-turbo-bolt { width: 20px; height: 20px; flex: 0 0 auto; }
+  /* All three tiers carry the leading edge; it is the edge's brightness that
+     steps, so the row's shape never changes and only its intensity does. */
+  .m-turbo-item[data-speed="normal"] {
+    background: rgba(0, 0, 0, 0.22);
+    box-shadow: inset 3px 0 0 rgba(255, 200, 150, 0.26);
+  }
+  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: rgba(255, 200, 150, 0.5); stroke-width: 1.8; fill: none; }
+
+  .m-turbo-item[data-speed="turbo"] {
+    background: linear-gradient(90deg, rgba(255, 154, 46, 0.48), rgba(255, 154, 46, 0.12));
+    box-shadow: inset 3px 0 0 #ff9a2e;
+  }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: #ffc266; stroke-width: 1.8; fill: rgba(255, 154, 46, 0.55); }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt { filter: drop-shadow(0 0 6px rgba(255, 130, 30, 0.8)); }
+
+  .m-turbo-item[data-speed="super"] {
+    background: linear-gradient(90deg, rgba(255, 186, 74, 0.82), rgba(255, 150, 50, 0.26));
+    box-shadow: inset 4px 0 0 #fffaf0, 0 0 18px rgba(255, 140, 40, 0.55);
+    color: #1a0d02;
+  }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #fffaf0; stroke-width: 1.8; fill: #ffdca8; }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt { filter: drop-shadow(0 0 10px rgba(255, 170, 70, 1)) drop-shadow(0 0 18px rgba(255, 100, 25, 0.7)); }
 
   /* ── Audio panel - Mute toggle + MUSIC / SOUND volume sliders ─────────────── */
   .audio-panel {
@@ -1772,9 +1854,35 @@
   .p-round-btn svg { width: 20px; height: 20px; }
   .p-round-btn svg path { fill: none; stroke: var(--p-acc); stroke-width: 1.8; }
   .p-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .p-round-btn.engaged { box-shadow: 0 0 12px color-mix(in srgb, var(--p-orange) 70%, transparent); }
-  .p-round-btn.engaged svg path { stroke: var(--p-orange); }
   .p-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--p-acc) 70%, transparent); }
+
+  /* FS VISUAL FIXPACK JOB 2: the portrait speed control, three intensity steps.
+     Replaces the former boolean `.engaged`, which lit Turbo and Super Turbo
+     identically and left the numeral as the only thing telling them apart. The
+     bolt also FILLS as it intensifies, so the step is a change in the amount of
+     lit area as well as in brightness: a second, independent cue that survives
+     a washed-out screen. Bolt grown 20px to 24px now the caption is gone. */
+  .p-turbo svg { width: 24px; height: 24px; }
+  .p-turbo[data-speed="normal"] {
+    background: radial-gradient(circle at 36% 28%, #151d29, #04070d 72%);
+  }
+  .p-turbo[data-speed="normal"] svg path { stroke: rgba(255, 200, 150, 0.5); fill: none; }
+  .p-turbo[data-speed="turbo"] {
+    background: radial-gradient(circle at 36% 28%, #96601b, #22160a 72%);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--p-orange) 80%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+  .p-turbo[data-speed="turbo"] svg path {
+    stroke: #ffc266;
+    fill: color-mix(in srgb, var(--p-orange) 55%, transparent);
+  }
+  .p-turbo[data-speed="super"] {
+    background: radial-gradient(circle at 36% 28%, #ffb43c, #533008 72%);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--p-orange) 100%, transparent),
+                0 0 52px color-mix(in srgb, var(--p-orange) 55%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .p-turbo[data-speed="super"] svg path { stroke: #fffaf0; fill: #ffdca8; }
   .p-tier {
     font-size: 11px;
     font-weight: 800;
@@ -1884,9 +1992,31 @@
   .c-round-btn svg { width: 18px; height: 18px; }
   .c-round-btn svg path { fill: none; stroke: var(--c-acc); stroke-width: 1.8; }
   .c-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .c-round-btn.engaged { box-shadow: 0 0 12px color-mix(in srgb, var(--c-orange) 70%, transparent); }
-  .c-round-btn.engaged svg path { stroke: var(--c-orange); }
   .c-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--c-acc) 70%, transparent); }
+
+  /* FS VISUAL FIXPACK JOB 2: the compact-landscape speed control, same three
+     steps as portrait at this strip's smaller 44px box. */
+  .c-turbo svg { width: 22px; height: 22px; }
+  .c-turbo[data-speed="normal"] {
+    background: radial-gradient(circle at 36% 28%, #151d29, #04070d 72%);
+  }
+  .c-turbo[data-speed="normal"] svg path { stroke: rgba(255, 200, 150, 0.5); fill: none; }
+  .c-turbo[data-speed="turbo"] {
+    background: radial-gradient(circle at 36% 28%, #96601b, #22160a 72%);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--c-orange) 80%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+  .c-turbo[data-speed="turbo"] svg path {
+    stroke: #ffc266;
+    fill: color-mix(in srgb, var(--c-orange) 55%, transparent);
+  }
+  .c-turbo[data-speed="super"] {
+    background: radial-gradient(circle at 36% 28%, #ffb43c, #533008 72%);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--c-orange) 100%, transparent),
+                0 0 52px color-mix(in srgb, var(--c-orange) 55%, transparent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .c-turbo[data-speed="super"] svg path { stroke: #fffaf0; fill: #ffdca8; }
 
   .c-tier { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(230, 245, 255, 0.85); }
   .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--c-gold); }

@@ -42,6 +42,13 @@
 // Run (from frontend/): node scripts/regen_interface_guide_icons.mjs
 
 import { chromium } from 'playwright'
+// FS VISUAL FIXPACK JOB 2: this import was sitting on line 2 of the PYTHON
+// source string below, not here. The script was therefore broken twice over:
+// the Pillow post-process had a JavaScript import statement in the middle of
+// its python and could not parse, and dismissIntro was never defined in this
+// module so the run threw before reaching it. A dedup pass inserted it at a
+// byte offset rather than at a statement boundary. Nothing else was wrong.
+import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
@@ -67,7 +74,15 @@ const TARGETS = [
   // controls), so a byte-uniqueness check across the whole guide can catch
   // this exact class of copy-paste mistake permanently (see
   // interface_guide_icon_proof.mjs's uniqueness assert).
-  { selector: '.fs-turbo', out: 'btn_turbo.png', label: 'Turbo' },
+  // FS VISUAL FIXPACK JOB 2: the speed control is now THREE captures, not one.
+  // Its whole design is that the three speeds are told apart by the control
+  // intensifying, so a guide showing one state would be showing the player the
+  // one thing the redesign is not about. `clicks` cycles the live control the
+  // requested number of times before the crop, so each icon is the real
+  // rendered state rather than a mock of it.
+  { selector: '.fs-turbo', out: 'btn_turbo.png', label: 'Speed, normal', clicks: 0 },
+  { selector: '.fs-turbo', out: 'btn_turbo_2.png', label: 'Speed, turbo', clicks: 1 },
+  { selector: '.fs-turbo', out: 'btn_turbo_3.png', label: 'Speed, super turbo', clicks: 1 },
   { selector: '.fs-max', out: 'btn_max.png', label: 'Max Bet' },
 ]
 
@@ -145,6 +160,14 @@ async function restore(page) {
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
 
 async function captureIcon(page, tmpDir, target) {
+  // Advance the live control before cropping, where the target asks for it.
+  // Clicked rather than driven through the store, so the captured icon is the
+  // state a player reaches by pressing the button.
+  for (let i = 0; i < (target.clicks || 0); i++) {
+    await page.locator(target.selector).evaluate((el) => el.click())
+    await page.waitForTimeout(200)
+  }
+
   const box = await page.locator(target.selector).boundingBox()
   if (!box) throw new Error(`no bounding box for ${target.selector}`)
 
@@ -171,7 +194,6 @@ async function captureIcon(page, tmpDir, target) {
   const outPath = join(UI_DIR, target.out)
   const py = `
 import sys
-import { dismissIntro } from './lib/dismissOverlays.mjs'
 from PIL import Image
 im = Image.open(sys.argv[1]).convert('RGBA')
 w, h = im.size
