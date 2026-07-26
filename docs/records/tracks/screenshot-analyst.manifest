@@ -18,6 +18,16 @@
 # ── The ledger and the track's own records ──────────────────────────────────
 docs/records/screenshots/**
 
+# ── The owner-facing money page, round 3 ────────────────────────────────────
+#
+# Named explicitly by FS_ANALYST_ROUND3_Prompt.md, assignment A: "write
+# docs/records/MONEY_DISPLAY_EXPLAINED.md for the owner". Declared as the exact
+# file rather than as `docs/records/**`, because the wider glob would swallow
+# `docs/records/reviews/FIX_LIST_2026-07-26.md`, which track/docs-reskin
+# declares, and rule 3 requires the manifests to be provably disjoint. No other
+# manifest names this path.
+docs/records/MONEY_DISPLAY_EXPLAINED.md
+
 # ── Live statistics intake, duty 6 ──────────────────────────────────────────
 #
 # COLLISION, DECLARED RATHER THAN HIDDEN. track/quality-sweep declares
@@ -53,6 +63,13 @@ reports/qa/live_stats/**
 reports/screens/screenshot-analyst-2026-07-26/**
 reports/screens/CAPTURE_CATALOGUE_2026-07-26.md
 
+# Round 3, 2026-07-27, added by FS_ANALYST_ROUND3_Prompt.md. Same pattern, new
+# date, and disjoint by construction from every other manifest: the only other
+# `reports/screens/` claim anywhere is track/quality-sweep's
+# `reports/screens/quality-sweep/**`.
+reports/screens/screenshot-analyst-2026-07-27/**
+reports/screens/CAPTURE_CATALOGUE_2026-07-27.md
+
 # ── This manifest ───────────────────────────────────────────────────────────
 #
 # Narrowed from `docs/records/tracks/` to this track's own two files, for the
@@ -65,6 +82,10 @@ docs/records/tracks/screenshot-analyst.manifest
 # path is in any other live manifest, so both are disjoint.
 docs/records/tracks/FS_TRACK_SCREENSHOT_ANALYST_Prompt.md
 reports/briefs/FS_TRACK_SCREENSHOT_ANALYST_Prompt.md
+
+# Round 3's brief, saved to both locations on the same explicit instruction.
+docs/records/tracks/FS_ANALYST_ROUND3_Prompt.md
+reports/briefs/FS_ANALYST_ROUND3_Prompt.md
 
 # ── Per-track session report, rule 8 ────────────────────────────────────────
 #

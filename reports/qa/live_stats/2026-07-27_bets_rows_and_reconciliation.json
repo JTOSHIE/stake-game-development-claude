@@ -1,0 +1,293 @@
+{
+  "generated_for": "track/screenshot-analyst, 2026-07-27 intake",
+  "sessions": [
+    {
+      "id": "S1",
+      "label": "live-round2-2026-07-26, 20:14:23 to 20:22:12",
+      "closing_frame": "reports/screens/live-round2-2026-07-26/05_DEFECT_mobile_portrait_reels_small_in_pane.png",
+      "rounds": 6,
+      "closing_balance_micros": 512290000,
+      "true_debit_micros": 776250000,
+      "credit_micros": 288540000,
+      "cost_column_debit_micros": 68000000,
+      "implied_opening_true_costs_micros": 1000000000,
+      "implied_opening_cost_column_micros": 291750000,
+      "residual_micros": 0,
+      "rows": [
+        {
+          "time": "20:14:23",
+          "mode": "antelite",
+          "cost_column_micros": 20000000,
+          "true_debit_micros": 25000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "20:14:35",
+          "mode": "antelite",
+          "cost_column_micros": 20000000,
+          "true_debit_micros": 25000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "20:19:06",
+          "mode": "bonus",
+          "cost_column_micros": 7000000,
+          "true_debit_micros": 700000000,
+          "payout_micros": 288540000,
+          "mult_vs_level": 41.22,
+          "mult_vs_true_cost": 0.4122
+        },
+        {
+          "time": "20:20:54",
+          "mode": "antelite",
+          "cost_column_micros": 7000000,
+          "true_debit_micros": 8750000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "20:20:57",
+          "mode": "antelite",
+          "cost_column_micros": 7000000,
+          "true_debit_micros": 8750000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "20:21:04",
+          "mode": "antelite",
+          "cost_column_micros": 7000000,
+          "true_debit_micros": 8750000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "label": "screenshot-analyst-2026-07-27 frame 01, 02:22:18 to 02:23:39",
+      "closing_frame": "reports/screens/screenshot-analyst-2026-07-27/01_dtt_bonus_row_275430_cost_column_reads_bet_level_1000.png",
+      "rounds": 10,
+      "closing_balance_micros": 1167050000000,
+      "true_debit_micros": 109750000000,
+      "credit_micros": 276800000000,
+      "cost_column_debit_micros": 10000000000,
+      "implied_opening_true_costs_micros": 1000000000000,
+      "implied_opening_cost_column_micros": 900250000000,
+      "residual_micros": 0,
+      "rows": [
+        {
+          "time": "02:22:18",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 410000000,
+          "mult_vs_level": 0.41,
+          "mult_vs_true_cost": 0.41
+        },
+        {
+          "time": "02:22:21",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:22:25",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 550000000,
+          "mult_vs_level": 0.55,
+          "mult_vs_true_cost": 0.55
+        },
+        {
+          "time": "02:22:37",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:22:39",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 100000000,
+          "mult_vs_level": 0.1,
+          "mult_vs_true_cost": 0.1
+        },
+        {
+          "time": "02:22:42",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:22:50",
+          "mode": "bonus",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 100000000000,
+          "payout_micros": 275430000000,
+          "mult_vs_level": 275.43,
+          "mult_vs_true_cost": 2.7543
+        },
+        {
+          "time": "02:23:33",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:23:35",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 310000000,
+          "mult_vs_level": 0.31,
+          "mult_vs_true_cost": 0.248
+        },
+        {
+          "time": "02:23:39",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "label": "screenshot-analyst-2026-07-27 frame 02, 02:26:06 to 02:26:53",
+      "closing_frame": "reports/screens/screenshot-analyst-2026-07-27/02_play_response_antelite_amount_1000000000_is_bet_level_hud_1250.png",
+      "rounds": 11,
+      "closing_balance_micros": 501870000000,
+      "true_debit_micros": 11750000000,
+      "credit_micros": 13620000000,
+      "cost_column_debit_micros": 11000000000,
+      "implied_opening_true_costs_micros": 500000000000,
+      "implied_opening_cost_column_micros": 499250000000,
+      "residual_micros": 0,
+      "rows": [
+        {
+          "time": "02:26:06",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 910000000,
+          "mult_vs_level": 0.91,
+          "mult_vs_true_cost": 0.91
+        },
+        {
+          "time": "02:26:14",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 610000000,
+          "mult_vs_level": 0.61,
+          "mult_vs_true_cost": 0.61
+        },
+        {
+          "time": "02:26:18",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:26:19",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:26:20",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:26:21",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:26:22",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        },
+        {
+          "time": "02:26:24",
+          "mode": "base",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1000000000,
+          "payout_micros": 870000000,
+          "mult_vs_level": 0.87,
+          "mult_vs_true_cost": 0.87
+        },
+        {
+          "time": "02:26:48",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 10750000000,
+          "mult_vs_level": 10.75,
+          "mult_vs_true_cost": 8.6
+        },
+        {
+          "time": "02:26:51",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 480000000,
+          "mult_vs_level": 0.48,
+          "mult_vs_true_cost": 0.384
+        },
+        {
+          "time": "02:26:53",
+          "mode": "antelite",
+          "cost_column_micros": 1000000000,
+          "true_debit_micros": 1250000000,
+          "payout_micros": 0,
+          "mult_vs_level": 0.0,
+          "mult_vs_true_cost": 0.0
+        }
+      ]
+    }
+  ]
+}
