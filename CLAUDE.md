@@ -363,6 +363,18 @@ exceptions continue to follow convention (e).
 screenshots to `reports/screens/<pass>/` so the independent verifier can review rendering
 from the repository.
 
+**(h.1) Evidence directories are write-once outside regeneration jobs** (SA-012, CI triage
+session, 2026-07-26). Proof and gate scripts write to scratch paths only; committed evidence
+directories are never written outside a job that explicitly regenerates evidence. The earned
+case: frontend/scripts/anticipation_proof.mjs screenshots straight into the committed
+`reports/screens/scatter-anticipation/`, so a re-run at 01:11 on 2026-07-26 silently modified
+four committed evidence PNGs in the working tree. Evidence that a casual re-run can overwrite
+is not evidence. The four files were restored from HEAD; a script that regenerates committed
+evidence must do so only in a job whose brief says that is what it is doing. The same session
+observed the pattern twice more: layout_fit_gate.mjs and contrast_gate.mjs rewrite their
+committed reports/qa JSON and contrast-2026-07-26 screenshots on every run, so a plain local
+re-run dirties committed evidence. Migrating the gate writers to scratch paths is open work.
+
 **(i) Handover block.** Every session report ends with a FOR THE NEXT SESSION section stating
 the model and effort used, the approach taken, alternatives tried and rejected, files touched,
 and open threads; and every brief opens with a READ FIRST list of the repo documents that
