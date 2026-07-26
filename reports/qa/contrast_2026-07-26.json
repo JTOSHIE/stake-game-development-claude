@@ -1,0 +1,204 @@
+{
+  "standard": "WCAG 2.1 AA, 4.5:1 for normal-size text",
+  "threshold": 4.5,
+  "presets": {
+    "Mobile L": {
+      "features label": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 12,
+        "fontWeight": "800",
+        "samples": 1290,
+        "region": {
+          "w": 86,
+          "h": 15
+        },
+        "worstRatio": 10.057,
+        "meanRatio": 11.971,
+        "worstPixel": [
+          42,
+          41,
+          67
+        ]
+      },
+      "active mode chip": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 11,
+        "fontWeight": "800",
+        "samples": 1420,
+        "region": {
+          "w": 71,
+          "h": 20
+        },
+        "worstRatio": 10.695,
+        "meanRatio": 12.695,
+        "worstPixel": [
+          36,
+          38,
+          55
+        ]
+      }
+    },
+    "Mobile M": {
+      "features label": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 12,
+        "fontWeight": "800",
+        "samples": 1290,
+        "region": {
+          "w": 86,
+          "h": 15
+        },
+        "worstRatio": 7.982,
+        "meanRatio": 11.646,
+        "worstPixel": [
+          68,
+          55,
+          72
+        ]
+      },
+      "active mode chip": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 11,
+        "fontWeight": "800",
+        "samples": 1420,
+        "region": {
+          "w": 71,
+          "h": 20
+        },
+        "worstRatio": 10.177,
+        "meanRatio": 12.506,
+        "worstPixel": [
+          51,
+          38,
+          58
+        ]
+      }
+    },
+    "Mobile S": {
+      "features label": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 12,
+        "fontWeight": "800",
+        "samples": 1290,
+        "region": {
+          "w": 86,
+          "h": 15
+        },
+        "worstRatio": 7.573,
+        "meanRatio": 11.313,
+        "worstPixel": [
+          70,
+          59,
+          75
+        ]
+      },
+      "active mode chip": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 11,
+        "fontWeight": "800",
+        "samples": 1420,
+        "region": {
+          "w": 71,
+          "h": 20
+        },
+        "worstRatio": 9.25,
+        "meanRatio": 11.647,
+        "worstPixel": [
+          46,
+          49,
+          63
+        ]
+      }
+    },
+    "Portrait": {
+      "features label": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 12,
+        "fontWeight": "800",
+        "samples": 1290,
+        "region": {
+          "w": 86,
+          "h": 15
+        },
+        "worstRatio": 9.046,
+        "meanRatio": 11.585,
+        "worstPixel": [
+          41,
+          51,
+          73
+        ]
+      },
+      "active mode chip": {
+        "present": true,
+        "textColor": "color(srgb 1 0.795098 0.942157)",
+        "textRgb": [
+          255,
+          203,
+          240
+        ],
+        "fontSize": 11,
+        "fontWeight": "800",
+        "samples": 1420,
+        "region": {
+          "w": 71,
+          "h": 20
+        },
+        "worstRatio": 10.579,
+        "meanRatio": 12.276,
+        "worstPixel": [
+          31,
+          40,
+          58
+        ]
+      }
+    }
+  },
+  "seeded": {
+    "before": 10.728,
+    "afterSeed": 1
+  },
+  "failures": [],
+  "pass": true
+}

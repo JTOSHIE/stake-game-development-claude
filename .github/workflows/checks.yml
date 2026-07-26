@@ -298,6 +298,20 @@ jobs:
         working-directory: frontend
         run: node scripts/layout_fit_gate.mjs
 
+      # ── Gate 13d: text contrast, measured on composited pixels ───────────────
+      # TR-070. The portrait FEATURES bar sits over the background art behind a
+      # plate whose gradient starts at 10% opacity, so the contrast a player
+      # experiences is against whatever the art happens to be there. No
+      # stylesheet states that value; only a screenshot knows it. The gate hides
+      # the glyphs, screenshots the exact box, decodes it through the browser's
+      # own canvas and reports the ratio against the WORST pixel rather than the
+      # average, because a player does not read the average. WCAG 2.1 AA, 4.5:1
+      # for normal text; the label is 12px, so that is the applicable figure.
+      # Ships a seeded violation per convention (p). (JOB 3g)
+      - name: contrast gate, portrait presets
+        working-directory: frontend
+        run: node scripts/contrast_gate.mjs
+
       # ── Gate 14: the books verifier fails closed ─────────────────────────────
       # Run at HEAD with the private books absent, the verifier produced five
       # `zstd: can't stat` errors, processed zero rounds, made zero assertions
