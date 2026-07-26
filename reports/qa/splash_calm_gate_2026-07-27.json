@@ -1,0 +1,315 @@
+{
+  "window_ms": 10000,
+  "sample_ms": 250,
+  "eps_px": 0.01,
+  "profiles": [
+    {
+      "name": "Desktop",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "name": "Mobile L",
+      "width": 425,
+      "height": 812
+    },
+    {
+      "name": "Popout S",
+      "width": 400,
+      "height": 225
+    }
+  ],
+  "rows": [
+    {
+      "profile": "Desktop",
+      "surface": "loader",
+      "target": "WRS mark",
+      "selector": ".brand-mark img",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Desktop",
+      "surface": "loader",
+      "target": "WE ROLL SPINNERS wordmark",
+      "selector": ".wordmark",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Desktop",
+      "surface": "loader",
+      "target": "game logo",
+      "selector": ".loading-logo",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Desktop",
+      "surface": "splash",
+      "target": "hero emblem",
+      "selector": ".emblem-full",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Desktop",
+      "surface": "splash",
+      "target": "emblem glow",
+      "selector": ".ring-glow",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Desktop",
+      "surface": "splash",
+      "target": "TAP TO CONTINUE",
+      "selector": ".press-prompt",
+      "samples": 37,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "loader",
+      "target": "WRS mark",
+      "selector": ".brand-mark img",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "loader",
+      "target": "WE ROLL SPINNERS wordmark",
+      "selector": ".wordmark",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "loader",
+      "target": "game logo",
+      "selector": ".loading-logo",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "splash",
+      "target": "hero emblem",
+      "selector": ".emblem-full",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "splash",
+      "target": "emblem glow",
+      "selector": ".ring-glow",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Mobile L",
+      "surface": "splash",
+      "target": "TAP TO CONTINUE",
+      "selector": ".press-prompt",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "loader",
+      "target": "WRS mark",
+      "selector": ".brand-mark img",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "loader",
+      "target": "WE ROLL SPINNERS wordmark",
+      "selector": ".wordmark",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "loader",
+      "target": "game logo",
+      "selector": ".loading-logo",
+      "samples": 38,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "splash",
+      "target": "hero emblem",
+      "selector": ".emblem-full",
+      "samples": 39,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "splash",
+      "target": "emblem glow",
+      "selector": ".ring-glow",
+      "samples": 39,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    },
+    {
+      "profile": "Popout S",
+      "surface": "splash",
+      "target": "TAP TO CONTINUE",
+      "selector": ".press-prompt",
+      "samples": 39,
+      "maxDx": 0,
+      "maxDy": 0,
+      "maxDw": 0,
+      "maxDh": 0,
+      "animProps": [
+        "opacity"
+      ],
+      "transformAtFirstSample": "none"
+    }
+  ],
+  "screenshots": [
+    "after-loader-desktop-t0ms.png",
+    "after-loader-desktop-t2000ms.png",
+    "after-loader-desktop-t4000ms.png",
+    "after-loader-desktop-t6000ms.png",
+    "after-loader-desktop-t8000ms.png",
+    "after-loader-desktop-t10000ms.png",
+    "after-splash-desktop-t0ms.png",
+    "after-splash-desktop-t2000ms.png",
+    "after-splash-desktop-t4000ms.png",
+    "after-splash-desktop-t6000ms.png",
+    "after-splash-desktop-t8000ms.png",
+    "after-splash-desktop-t10000ms.png",
+    "after-loader-mobile-l-t0ms.png",
+    "after-loader-mobile-l-t2000ms.png",
+    "after-loader-mobile-l-t4000ms.png",
+    "after-loader-mobile-l-t6000ms.png",
+    "after-loader-mobile-l-t8000ms.png",
+    "after-loader-mobile-l-t10000ms.png",
+    "after-splash-mobile-l-t0ms.png",
+    "after-splash-mobile-l-t2000ms.png",
+    "after-splash-mobile-l-t4000ms.png",
+    "after-splash-mobile-l-t6000ms.png",
+    "after-splash-mobile-l-t8000ms.png",
+    "after-splash-mobile-l-t10000ms.png",
+    "after-loader-popout-s-t0ms.png",
+    "after-loader-popout-s-t2000ms.png",
+    "after-loader-popout-s-t4000ms.png",
+    "after-loader-popout-s-t6000ms.png",
+    "after-loader-popout-s-t8000ms.png",
+    "after-loader-popout-s-t10000ms.png",
+    "after-splash-popout-s-t0ms.png",
+    "after-splash-popout-s-t2000ms.png",
+    "after-splash-popout-s-t4000ms.png",
+    "after-splash-popout-s-t6000ms.png",
+    "after-splash-popout-s-t8000ms.png",
+    "after-splash-popout-s-t10000ms.png"
+  ],
+  "failures": []
+}

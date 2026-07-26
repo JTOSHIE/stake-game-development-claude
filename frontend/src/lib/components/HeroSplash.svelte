@@ -105,7 +105,19 @@
     mix-blend-mode: screen;
     /* Gentle steady glow. The 22s rotation is gone with the flicker sequence:
        the owner ruling asks for a static mark with a steady glow, and a slowly
-       rotating ring behind a static emblem reads as drift, not calm. */
+       rotating ring behind a static emblem reads as drift, not calm.
+
+       FS VISUAL FIXPACK JOB 1 (2026-07-27): the ruling for this pass is "logo
+       sitting still with its gentle pulse", so the steady glow now breathes.
+       OPACITY only, matching the loader's filter pulse: the emblem itself does
+       not move, does not scale and does not rotate, and splash_calm_gate.mjs
+       asserts its box is identical across every sample of a ten-second window.
+       A scale pulse would have made that assertion impossible to state. */
+    animation: emblem-glow-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes emblem-glow-pulse {
+    0%, 100% { opacity: 0.34; }
+    50%      { opacity: 0.52; }
   }
 
   .emblem-layer {
@@ -138,11 +150,11 @@
   /* Reduced motion is unaffected by this ruling (it never showed the flicker
      staging). The only remaining motion on this screen is the press-prompt
      pulse, which reduced motion still stills. */
-  .hero-splash.reduced .ring-glow { opacity: 0.3; }
+  .hero-splash.reduced .ring-glow { animation: none; opacity: 0.3; }
   .hero-splash.reduced .press-prompt { animation: none; opacity: 0.75; }
 
   @media (prefers-reduced-motion: reduce) {
-    .ring-glow { opacity: 0.3; }
+    .ring-glow { animation: none; opacity: 0.3; }
     .press-prompt { animation: none; opacity: 0.75; }
   }
 </style>

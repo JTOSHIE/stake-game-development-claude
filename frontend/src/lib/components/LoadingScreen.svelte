@@ -1,42 +1,108 @@
 <script lang="ts">
   // LoadingScreen.svelte, Motion Polish v2 brand screens: the WRS standard
-  // loading screen. The brand mark (a neon chrome rim) renders large with its
-  // inner five-fold blade layer spinning continuously as the loader itself;
-  // WE ROLL SPINNERS wordmark above in CSS Orbitron, the active theme's game
-  // logo below. DESIGN_SYSTEM: "the rim spinning as the loader, the WE ROLL
-  // SPINNERS wordmark above, the game logo slot beneath", every WRS title.
+  // loading screen. WE ROLL SPINNERS wordmark above, the brand mark large in
+  // the middle, the active theme's game logo below, progress beneath that.
+  //
+  // FS VISUAL FIXPACK JOB 1 (owner ruling, 2026-07-27): THE BRAND MARK NO
+  // LONGER ROTATES, AND NOTHING ON THIS SCREEN SLIDES INTO PLACE.
+  //
+  // The owner reported "the load screen's We Roll Spinners logo now jumps
+  // around and starts spinning", and ruled: "the splash is calm, black screen,
+  // logo sitting still with its gentle pulse, raindrops, TAP TO CONTINUE,
+  // nothing else moving."
+  //
+  // WHAT ACTUALLY REGRESSED. This screen used to draw the mark as TWO layers:
+  // a static chrome rim (brand_mark_base.png) with an inner five-fold blade
+  // (brand_mark_spin.png) over it. Only the INNER BLADE carried
+  // `animation: brand-spin 2.6s linear infinite`, so the mark's own outline
+  // never moved. DESIGN_SYSTEM.md describes exactly that: "a neon chrome rim
+  // whose inner layer spins independently".
+  //
+  // Commit 54544e4 (OWNER AUDIT ROUND 3 item 1, logo canonicalisation) replaced
+  // both layers with ONE image, hero_icon_96.png, the canonical We Roll Spinners
+  // mark, and left the rotation sitting on it. The animation was keyed to a
+  // layer that no longer existed, so from that commit onward it rotated the
+  // whole logo rather than the blade inside it. Measured at 1280x720 before the
+  // fix, over ten seconds: the mark's bounding box swung 77.25px in width and
+  // height and 38.6px in x and y, because the canonical artwork is not radially
+  // symmetric. That is the "jumps around" in numbers, and it is the same one
+  // defect as the spin, not a second one.
+  //
+  // THE TENSION, RECORDED RATHER THAN RESOLVED QUIETLY (convention n).
+  // DESIGN_SYSTEM.md's brand layer states the standard loading screen for EVERY
+  // WRS game is "the rim spinning as the loader". This ruling is the later and
+  // better-informed instrument and therefore governs, so the mark is still. The
+  // design system line is left for the owner to amend or restore deliberately;
+  // it is raised as a comms item in the session report rather than edited here
+  // on the builder's own authority.
+  //
+  // WHAT REPLACED IT. The mark sits still and its glow breathes: a FILTER pulse
+  // on the container, never a transform and never a scale. That distinction is
+  // load-bearing rather than stylistic. A scale pulse would move the bounding
+  // box, and splash_calm_gate.mjs could then only assert "the logo moved a
+  // little", which is not a property anyone can hold a build to. A filter pulse
+  // lets the assertion be exactly zero.
+  //
+  // The two entry fades animate opacity only. They previously carried
+  // `translateY(-8px)` with staggered delays, so the wordmark and the game logo
+  // each slid 8px down into place on every load. That is small, and it is still
+  // the wordmark visibly moving on a screen the owner has ruled is calm.
+  //
+  // The rain layer is the same RainLayer.svelte the splash uses, at the same
+  // density and opacity, so the two boot screens read as one continuous calm
+  // presentation rather than a stark loader cutting to a rainy splash. It
+  // inherits the component's own reduced-motion gating.
+  //
+  // Held by frontend/scripts/splash_calm_gate.mjs, which samples this screen and
+  // the splash every 250ms across ten seconds at three presets and asserts zero
+  // geometry variance, no rotation, no translation and no transform-writing
+  // animation on any boot logo.
   import { assetLoadProgress } from '../stores/loadingStore'
   import { themeAssets } from '../stores/themeStore'
+  import RainLayer from './RainLayer.svelte'
 </script>
 
 <div class="loading-screen">
+  <RainLayer count={10} opacity={0.55} variant="splash" />
 
-  <div class="wordmark">WE ROLL SPINNERS</div>
+  <!-- Positioned wrapper so the in-flow content paints above the absolutely
+       positioned rain layer rather than under it. -->
+  <div class="loading-content">
 
-  <!-- OWNER AUDIT ROUND 3, item 1 (logo canonicalisation): the hero emblem
-       is the sole WRS mark - this loader now spins the hero icon (a tight
-       circular crop of the emblem's wheel-and-reel core, tools/brand/
-       derive_hero_icon.py) as a single layer, replacing the old bespoke
-       brand_mark_base/brand_mark_spin two-layer rim+blade composite. -->
-  <div class="brand-mark" aria-hidden="true">
-    <img class="brand-spin" src="{$themeAssets.assetBase}/ui/hero_icon_96.png" alt="" draggable="false" />
+    <div class="wordmark">WE ROLL SPINNERS</div>
+
+    <!-- OWNER AUDIT ROUND 3, item 1 (logo canonicalisation): the hero emblem
+         is the sole WRS mark, so this loader draws the hero icon (a tight
+         circular crop of the emblem's wheel-and-reel core, tools/brand/
+         derive_hero_icon.py) as a single layer, replacing the old bespoke
+         brand_mark_base/brand_mark_spin two-layer rim+blade composite.
+         FS VISUAL FIXPACK JOB 1: it is STILL. The class is named for what it
+         does, so nobody re-adds a rotation to something called brand-spin. -->
+    <div class="brand-mark" aria-hidden="true">
+      <img class="brand-still" src="{$themeAssets.assetBase}/ui/hero_icon_96.png" alt="" draggable="false" />
+    </div>
+
+    <div class="logo-block">
+      <img
+        src="{$themeAssets.logo}"
+        class="loading-logo"
+        alt=""
+        draggable="false"
+      />
+    </div>
+
+    <!-- Progress bar. This is a readout of real load progress, not decoration,
+         so it is the one thing on this screen that changes while the player
+         waits. Raised as a comms item against the ruling's "nothing else
+         moving" rather than removed on the builder's own authority: a loading
+         screen with no progress indication is a product decision, not a defect
+         fix. -->
+    <div class="progress-track">
+      <div class="progress-fill" style="width: {$assetLoadProgress}%"></div>
+    </div>
+    <p class="progress-label">LOADING CYBERNETICS... {$assetLoadProgress}%</p>
+
   </div>
-
-  <div class="logo-block">
-    <img
-      src="{$themeAssets.logo}"
-      class="loading-logo"
-      alt=""
-      draggable="false"
-    />
-  </div>
-
-  <!-- Progress bar -->
-  <div class="progress-track">
-    <div class="progress-fill" style="width: {$assetLoadProgress}%"></div>
-  </div>
-  <p class="progress-label">LOADING CYBERNETICS... {$assetLoadProgress}%</p>
-
 </div>
 
 <style>
@@ -44,12 +110,20 @@
     position: fixed;
     inset: 0;
     background: #000;
+    overflow: hidden;
+    z-index: 1000;
+  }
+
+  .loading-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1.1rem;
-    z-index: 1000;
   }
 
   .wordmark {
@@ -62,27 +136,34 @@
     animation: fade-in 0.8s ease both;
   }
 
-  /* ── Brand mark, the rim spinning as the loader ─────────────────────── */
+  /* Brand mark: still, with its glow breathing. */
   .brand-mark {
     position: relative;
     width: clamp(140px, 24vw, 220px);
     height: clamp(140px, 24vw, 220px);
     filter: drop-shadow(0 0 24px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
+    animation: brand-glow-pulse 3.2s ease-in-out infinite;
   }
-  .brand-spin {
+  .brand-still {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: brand-spin 2.6s linear infinite;
-    transform-origin: 50% 50%;
   }
-  @keyframes brand-spin {
-    to { transform: rotate(360deg); }
+  /* Filter only. Nothing here may touch transform or scale: the gate asserts
+     the mark's box is byte-identical across every sample of a ten-second
+     window, and that assertion is only possible because the pulse is a glow. */
+  @keyframes brand-glow-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 18px rgba(0, 255, 255, 0.38)) drop-shadow(0 0 30px rgba(255, 0, 255, 0.22));
+    }
+    50% {
+      filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.62)) drop-shadow(0 0 52px rgba(255, 0, 255, 0.40));
+    }
   }
 
-  /* ── Game logo slot ───────────────────────────────────────────────────── */
+  /* Game logo slot */
   .logo-block {
     text-align: center;
     animation: fade-in 0.8s 0.15s ease both;
@@ -94,7 +175,7 @@
     filter: drop-shadow(0 0 16px rgba(0, 255, 255, 0.6));
   }
 
-  /* ── Progress bar ── */
+  /* Progress bar */
   .progress-track {
     width: min(240px, 60vw);
     height: 4px;
@@ -120,12 +201,15 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Opacity only. The 8px translateY these two carried is what made the
+     wordmark and the game logo slide into place on every load. */
   @keyframes fade-in {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .brand-spin { animation-duration: 8s; }
+    .brand-mark { animation: none; }
+    .wordmark, .logo-block { animation: none; }
   }
 </style>

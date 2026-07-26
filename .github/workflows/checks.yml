@@ -460,3 +460,26 @@ jobs:
       - name: contrast gate, portrait presets
         working-directory: frontend
         run: node scripts/contrast_gate.mjs
+
+      # ── Gate 13f: the boot screens are CALM ──────────────────────────────────
+      # FS VISUAL FIXPACK JOB 1. The load screen's brand mark rotated because
+      # commit 54544e4 replaced a two-layer rim+blade composite with a single
+      # canonical logo and left the blade's `brand-spin` animation sitting on it.
+      # The artwork is not radially symmetric, so the mark's bounding box swung
+      # 77px at Desktop and 98px at Popout S: the owner's "jumps around and
+      # starts spinning" was one defect, not two.
+      #
+      # A still frame cannot assert this, because a photograph of a rotating
+      # logo looks like a logo. The gate samples geometry every 250ms across ten
+      # seconds at three presets and asserts zero variance, no rotation, no
+      # translation, and no animation writing `transform` on any boot logo. The
+      # permitted gentle pulse animates opacity or filter, which is why it can
+      # assert exactly zero rather than "not much". Self-test first, per
+      # convention (p); it plants the real rotation and must go red on it.
+      - name: splash calm gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/splash_calm_gate.mjs --self-test
+
+      - name: splash calm gate, boot logos still
+        working-directory: frontend
+        run: node scripts/splash_calm_gate.mjs
