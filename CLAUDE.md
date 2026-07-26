@@ -528,6 +528,45 @@ reports/qa/** (SA-013), a collision that manifest declared rather than hid.
 Repairs: the two-job split in checks.yml (this session, JOB 1) and the
 quality-sweep manifest narrowing (this session, JOB 3).
 
+**11. Concurrent sessions never share a working tree** (owner's order,
+2026-07-26, from reports/briefs/FS_RULE11_MERGE115_Prompt.md).
+
+- **Every track session creates its own git worktree at boot**, at
+  `worktrees/<track>/`, and removes it at close. The path is gitignored, so a
+  worktree can never be committed and can never reach a build.
+- **The primary checkout at the repository root belongs to the integrator
+  alone.** No track session checks out a branch there, for any reason, however
+  briefly.
+- **A session that finds the primary checkout on an unexpected branch touches
+  nothing and reports it.** It does not check out, stash, reset or "put it
+  back". An unexpected branch means another session is mid-flight, and the state
+  of their working tree is theirs.
+
+The commands, so the rule is followed the same way every time:
+
+```
+git worktree add worktrees/<track> track/<name>    # at boot, from the repo root
+git worktree remove worktrees/<track>              # at close, after the push
+```
+
+WHERE THIS CAME FROM, because the near-miss is the argument. On 2026-07-26 the
+screenshot-analyst track returned for a second intake and found the primary
+checkout switched to `main` by the CI triage session, with uncommitted work in
+progress on `CLAUDE.md`, `WRS_MASTER_DOCUMENT.md` and
+`docs/records/tracks/quality-sweep.manifest`. Checking out `track/screenshot-analyst`
+there would have pulled the checkout out from under a live writer and put three
+files of someone else's uncommitted work at risk. That track used a worktree
+instead, unprompted, and reported the gap. Rule 1 made `main` single-writer for
+the BRANCH; it never said anything about the working tree, and a shared working
+tree is a shared mutable resource that rule 1 does not protect. This closes that.
+
+A NOTE ON THE NUMBERING, recorded rather than tidied away: there is no rule 9,
+in this document or in the WRS mirror. Rule 10 was added by the CI triage
+session and rule 11 by this one, and neither found a 9 to follow. It is left as
+a gap rather than renumbered, because rules 10 and 11 are already cited by number
+in session reports, tracker rows and commit messages, and silently shifting them
+would make those citations wrong. The owner may fill 9 or leave it.
+
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**
 

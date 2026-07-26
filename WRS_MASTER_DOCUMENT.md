@@ -114,6 +114,11 @@ changes is that more than one session may now work at once.
 | 7 | **Fable verifies every pull request before merge**, and the scope gate enforces the manifests in CI, so a track that wanders outside its declared paths fails before a human has to notice. |
 | 8 | **Track session reports are dated AND track-tagged sections.** The integrator merges pull requests one at a time and resolves report conflicts **by concatenation, never by discarding a section**. |
 | 10 | **A red run on main stops the line.** No new job starts until main is green. Every session verifies its own final push's REMOTE CI result before closing and records the run link in the session report. Local gate results never substitute for the remote run. (Owner's order, 2026-07-26; earned by runs 117 to 120, four consecutive red pushes to main that every session's local gates had passed. The corrected account of runs 117 to 121 is recorded beside the authoritative rule in `CLAUDE.md`.) |
+| 11 | **Concurrent sessions never share a working tree.** Every track session creates its own git worktree at boot, at `worktrees/<track>/` (gitignored), and removes it at close. The primary checkout at the repository root belongs to the integrator alone. A session finding the primary checkout on an unexpected branch touches nothing and reports it: no checkout, no stash, no reset, because an unexpected branch means another session is mid-flight and their working tree is theirs. (Owner's order, 2026-07-26; earned by a near-miss where the screenshot-analyst track returned to find the primary checkout switched to `main` with three files of another session's uncommitted work in it. Rule 1 made `main` single-writer for the BRANCH and never covered the working tree.) |
+
+There is no rule 9, here or in `CLAUDE.md`. The gap is left rather than
+renumbered, because rules 10 and 11 are already cited by number in session
+reports and commit messages.
 
 Enforced by `scripts/qa/locked_paths_gate.mjs`, which carries both the locked-path
 rule and the track scope gate, and runs first in CI.
