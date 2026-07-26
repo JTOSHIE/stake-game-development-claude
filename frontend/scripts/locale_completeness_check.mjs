@@ -80,20 +80,60 @@ const ALLOW = new Set([
   'SELECT THEME',     // ThemeSelector is dev-only (import.meta.env.DEV gated in App.svelte)
   'BACK',             // ThemeSelector, dev-only
   'COMING SOON',      // ThemeSelector's own copy is dev-only; the FeatureMenu one is translated
+  // Added 2026-07-26 (TR-072) when the repaired regex first saw it. Same reason
+  // as SELECT THEME and BACK above: ThemeSelector is gated behind
+  // `import.meta.env.DEV` in App.svelte and is not rendered in production, so
+  // no player in any locale can reach this string.
+  'PLAY THIS THEME',
 ])
 
 const COMPONENTS = join(ROOT, 'src/lib/components')
 const files = readdirSync(COMPONENTS).filter((f) => f.endsWith('.svelte'))
+  .map((f) => ['src/lib/components/' + f, join(COMPONENTS, f)])
+// src/App.svelte is scanned too. TR-063 found the dash gate reporting PASS at
+// 25 files while App.svelte shipped an em dash in the document title, for the
+// same reason: the file list was a list.
+files.push(['src/App.svelte', join(ROOT, 'src/App.svelte')])
+
+/**
+ * The literal scan.
+ *
+ * REPAIRED 2026-07-26 (TR-072). This was `/>([A-Z][A-Z0-9 &'.-]{2,})</g`,
+ * requiring the literal's first character to sit IMMEDIATELY after the `>`.
+ * That is only true when an element and its text are on one line. The moment an
+ * element carries enough attributes to be wrapped, which is the normal
+ * formatting in this codebase, its text sits on its own line preceded by a
+ * newline and indentation, and the gate could not see it at all:
+ *
+ *     <button
+ *       class="entry-continue"
+ *       on:click={continueFromEntry}
+ *     >
+ *       CLICK TO CONTINUE          <-- invisible to the old regex
+ *     </button>
+ *
+ * So a gate whose entire purpose is "no new hardcoded player strings" was blind
+ * to every hardcoded player string written in the house style, and it reported
+ * PASS while four of them shipped to players in fifteen locales. This is the
+ * TR-060 and TR-063 pattern for the third time: a gate that reads one authoring
+ * form of the defect while the defect occurs in another.
+ *
+ * `\s*` on both sides is the fix. The self-test below seeds the exact form that
+ * shipped, per convention (p), so the next time this regex is wrong it is one
+ * run rather than four days of reading that finds out.
+ */
+const LITERAL_RE = />\s*([A-Z][A-Z0-9 &'.,!?:-]{2,})\s*</g
 const hardcoded = []
 
-for (const f of files) {
-  const body = readFileSync(join(COMPONENTS, f), 'utf-8')
+for (const [label, path] of files) {
+  const body = readFileSync(path, 'utf-8')
   const markup = body.split('<style>')[0]
-  for (const m of markup.matchAll(/>([A-Z][A-Z0-9 &'.-]{2,})</g)) {
+  for (const m of markup.matchAll(LITERAL_RE)) {
     const text = m[1].trim()
     if (!text || ALLOW.has(text)) continue
+    if (text.includes('{') || text.includes('}')) continue  // interpolation, not a literal
     const line = markup.slice(0, m.index).split('\n').length
-    hardcoded.push({ file: f, line, text })
+    hardcoded.push({ file: label, line, text })
   }
 }
 
@@ -107,6 +147,60 @@ if (hardcoded.length) {
 }
 
 console.log(`HARDCODED SCAN: ${files.length} components, ${hardcoded.length} unexplained literal(s)`)
+
+// ── SEEDED VIOLATION SELF-TEST, convention (p) ───────────────────────────────
+//
+// "Every gate that claims a class closed ships a self-test that plants a
+//  violation and must FAIL on it before its PASS counts."
+//
+// This gate claimed the hardcoded-player-string class was closed and reported
+// PASS for months while four such strings shipped, because its regex read one
+// authoring form of the defect and the defect occurred in another. That is
+// exactly what convention (p) is written to catch, and a seeded violation would
+// have caught it in one run.
+//
+// So the seeds are the forms that ACTUALLY OCCUR, not a form the regex happens
+// to handle. The first is the one that shipped: an element wrapped across lines
+// with its text on its own line. Convention (p) is explicit that seeding a
+// convenient form teaches nothing.
+const SEEDS = [
+  ['the form that shipped: wrapped element, text on its own line',
+   '<button\n  class="entry-continue"\n  on:click={go}\n>\n  CLICK TO CONTINUE\n</button>'],
+  ['same line, the only form the old regex could see',
+   '<span>PLAY AGAIN</span>'],
+  ['leading whitespace only',
+   '<div>   COLLECT</div>'],
+  ['trailing newline only',
+   '<h1>REACHED!\n</h1>'],
+  ['punctuation the old character class excluded',
+   '<p>\n  NO WIN, TRY AGAIN\n</p>'],
+]
+const seedResults = SEEDS.map(([why, markup]) => {
+  LITERAL_RE.lastIndex = 0
+  const caught = [...markup.matchAll(LITERAL_RE)]
+    .map((m) => m[1].trim())
+    .some((t) => t && !ALLOW.has(t) && !t.includes('{'))
+  return { why, caught }
+})
+// The negative control. Without it a regex matching everything would "catch"
+// all five seeds and the self-test would certify a gate that fails on clean
+// markup, which is a different way of being useless.
+const CLEAN = '<span>{$tr(\'spin\')}</span>\n<div class="x">{value}</div>\n<p>\n  {label}\n</p>'
+LITERAL_RE.lastIndex = 0
+const cleanIsClean = [...CLEAN.matchAll(LITERAL_RE)]
+  .map((m) => m[1].trim())
+  .every((t) => !t || ALLOW.has(t) || t.includes('{'))
+
+for (const s of seedResults) {
+  console.log(`  ${s.caught ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+}
+console.log(`  ${cleanIsClean ? 'clean ' : 'FALSE+'}  seeded: negative control, translated markup must pass`)
+if (!seedResults.every((s) => s.caught) || !cleanIsClean) {
+  failures.push({
+    gate: 'self-test',
+    detail: 'the hardcoded-literal scan did not fail on a seeded violation, so its PASS means nothing',
+  })
+}
 
 if (failures.length) {
   console.error(`\nLOCALE COMPLETENESS: FAIL (${failures.length})`)

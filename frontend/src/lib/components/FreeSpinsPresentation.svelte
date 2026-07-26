@@ -387,7 +387,7 @@
               data-testid="entry-continue"
               on:click={continueFromEntry}
             >
-              CLICK TO CONTINUE
+              {t(lang, 'featureContinue', mode)}
             </button>
           {/if}
         </div>

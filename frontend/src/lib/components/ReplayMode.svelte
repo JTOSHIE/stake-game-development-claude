@@ -309,7 +309,7 @@
         <div class="replay-status playing">Replaying round…</div>
       {:else if phase === 'complete'}
         <button class="replay-btn play-again" on:click={playAgain}>
-          PLAY AGAIN
+          {t(params.lang as Locale, 'replayAgain', mode)}
         </button>
       {/if}
     </div>

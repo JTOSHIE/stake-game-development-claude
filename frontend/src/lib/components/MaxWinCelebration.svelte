@@ -9,8 +9,12 @@
 
   import { createEventDispatcher, onDestroy } from 'svelte'
   import { isSocial } from '../stores/socialMode'
+  import { locale } from '../stores/gameStore'
+  import { t, type GameMode } from '../i18n/translations'
 
   export let show: boolean = false
+
+  $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
 
   const dispatch = createEventDispatcher<{ collect: void }>()
 
@@ -93,7 +97,7 @@
 
       <div class="c1-crown crown" aria-hidden="true">★ ★ ★</div>
 
-      <h1 class="c1-max-headline headline">{$isSocial ? 'MAX PRIZE' : 'MAX WIN'}<br>REACHED!</h1>
+      <h1 class="c1-max-headline headline">{t($locale, 'hudMaxWin', localeMode)}<br>{t($locale, 'maxWinReached', localeMode)}</h1>
 
       <div class="c1-max-multwrap multiplier-wrap">
         <span class="c1-max-mult fs-num">5,000</span><span class="c1-max-x">x</span>
@@ -101,7 +105,7 @@
       </div>
 
       <button class="c1-collect collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">
-        COLLECT
+        {t($locale, 'collect', localeMode)}
       </button>
 
       <p class="c1-hint hint" aria-live="polite">Press COLLECT or hit Enter to continue</p>
