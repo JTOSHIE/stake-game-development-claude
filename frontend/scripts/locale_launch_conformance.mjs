@@ -20,12 +20,12 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT = join(__dirname, '..', '..', 'reports', 'qa')
-const SHOTS = join(__dirname, '..', '..', 'reports', 'screens', 'audit-remediation-v1')
-mkdirSync(OUT, { recursive: true })
-mkdirSync(SHOTS, { recursive: true })
+const OUT = evidenceDir('reports', 'qa')
+const SHOTS = evidenceDir('reports', 'screens', 'audit-remediation-v1')
+announceEvidenceMode('locale_launch_conformance')
 
 // Unknown / malformed values. Every one must fall back to English silently.
 const BAD = ['xx', 'EN-GB', '', '   ', 'zz-ZZ', '../en', 'ja;drop', '123', 'null', 'ENGLISH']

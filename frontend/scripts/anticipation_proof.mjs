@@ -13,11 +13,12 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT = join(__dirname, '..', '..', 'reports', 'qa')
-const SHOTS = join(__dirname, '..', '..', 'reports', 'screens', 'scatter-anticipation')
-mkdirSync(OUT, { recursive: true }); mkdirSync(SHOTS, { recursive: true })
+const OUT = evidenceDir('reports', 'qa')
+const SHOTS = evidenceDir('reports', 'screens', 'scatter-anticipation')
+announceEvidenceMode('anticipation_proof')
 
 const port = await new Promise((res, rej) => {
   const s = createServer(); s.on('error', rej)

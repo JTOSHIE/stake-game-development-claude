@@ -30,13 +30,13 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro, waitSpinDone } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
-const SCREENS = join(ROOT, '..', 'reports', 'screens', 'mini-player-2026-07-26')
-const QA = join(ROOT, '..', 'reports', 'qa')
-mkdirSync(SCREENS, { recursive: true })
-mkdirSync(QA, { recursive: true })
+const SCREENS = evidenceDir('reports', 'screens', 'mini-player-2026-07-26')
+const QA = evidenceDir('reports', 'qa')
+announceEvidenceMode('mini_player_proof')
 
 const VIEWPORT = { width: 400, height: 225 }   // Stake's mini-player popout
 const MIN_TARGET = 44

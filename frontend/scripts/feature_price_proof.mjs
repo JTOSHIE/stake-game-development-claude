@@ -43,13 +43,13 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro, waitSpinDone, clickAnyPendingGate } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
-const QA = join(ROOT, '..', 'reports', 'qa')
-const SHOTS = join(ROOT, '..', 'reports', 'screens', 'feature-price-2026-07-26')
-mkdirSync(QA, { recursive: true })
-mkdirSync(SHOTS, { recursive: true })
+const QA = evidenceDir('reports', 'qa')
+const SHOTS = evidenceDir('reports', 'screens', 'feature-price-2026-07-26')
+announceEvidenceMode('feature_price_proof')
 
 const failures = []
 const check = (name, cond, detail = '') => {

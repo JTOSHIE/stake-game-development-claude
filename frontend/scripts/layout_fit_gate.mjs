@@ -31,11 +31,12 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
-const QA = join(ROOT, '..', 'reports', 'qa')
-mkdirSync(QA, { recursive: true })
+const QA = evidenceDir('reports', 'qa')
+announceEvidenceMode('layout_fit_gate')
 
 // The platform's own Screen menu, verbatim.
 const PRESETS = [

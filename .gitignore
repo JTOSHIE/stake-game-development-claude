@@ -48,3 +48,7 @@ frontend/dist/
 # worktree at worktrees/<track>/. Ignored so a worktree can never be committed
 # and can never reach a build.
 worktrees/
+
+# Convention (h.1): proof and gate scripts write here, never into committed
+# evidence directories. See frontend/scripts/lib/evidencePaths.mjs.
+.evidence-scratch/

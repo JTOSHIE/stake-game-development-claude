@@ -32,12 +32,13 @@
 import { readdirSync, statSync, existsSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative } from 'node:path'
+import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const DIST = join(ROOT, 'dist')
-const QA = join(ROOT, '..', 'reports', 'qa')
-mkdirSync(QA, { recursive: true })
+const QA = evidenceDir('reports', 'qa')
+announceEvidenceMode('dist_hygiene_gate')
 
 /**
  * Documentation extensions and bare names.
