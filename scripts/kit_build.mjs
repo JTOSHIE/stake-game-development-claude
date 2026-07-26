@@ -255,7 +255,7 @@ the artefact rather than by grepping it.
 
 ## What to do
 
-**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9d.** It is the
+**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9e.** It is the
 full walkthrough, it is one page, and it covers everything below plus what to look
 at once the upload is done. The short version:
 
@@ -265,7 +265,7 @@ at once the upload is done. The short version:
 3. The maths package stays at V1 and is NOT re-uploaded.
 4. Do NOT press Start Approval.
 
-Three things PART 9d says you do NOT need to do, listed here too because earlier
+Three things PART 9e says you do NOT need to do, listed here too because earlier
 kits asked for them: \`math/HASHES.txt\` can stay, the game tile is already
 composed, and the maths is not being touched.
 

@@ -547,7 +547,10 @@ TR-079. This page is shorter because you already did that work.
 
 ---
 
-# PART 9d: THE V5 VISIT
+# PART 9d: THE V5 VISIT (SUPERSEDED, DO NOT RUN)
+
+**Superseded by PART 9e below.** Kept, not deleted, so the record of what was
+asked at V5 stays readable. Do not run it.
 
 **This is the whole visit and it fits on one page.** You do not need to read
 anything above it.
@@ -676,3 +679,141 @@ fallback is **done** and passed. **Gold Coins is parked**, not forgotten: the
 environment you have does not offer GC, so there is nothing to check until one
 does. That leaves the three items above, and two of them are unchanged from last
 time because they are the two that still have no answer.
+
+---
+
+# PART 9e: THE V6 VISIT
+
+**This is the whole visit and it fits on one page.** You do not need to read
+anything above it. PART 9d and everything before it are superseded.
+
+Allow about ten minutes. This is a short one: four fixes, all of them things you
+reported, and the only thing being asked of you afterwards is to look at them.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V6/`. Its `README.md`
+names the commit it was built from. That is the only kit to use.
+
+**Where the screenshots go:** loose on the Desktop. Do not sort or rename them.
+I will file them.
+
+**What is new in V6**, so you know what you are looking at. All four are yours.
+
+- **The load screen is calm again.** The We Roll Spinners mark was spinning and
+  its outline was swinging about 77 pixels as it turned. It sits still now, with
+  its glow breathing, and nothing on that screen slides into place any more.
+- **The speed button is the bolt alone.** The little 1x, 2x and 4x caption is
+  gone. The three speeds are told apart by the control getting brighter at each
+  step instead.
+- **The WILD and SCAT cards are fixed.** Their dark fill stopped short of the
+  card, so the chrome showed underneath. It was 23 pixels on WILD and 37 on
+  SCAT. Every card now fills its frame whatever its text says, in any language.
+- **The blackout behind dialogs covers the whole screen.** It was covering the
+  game area only, which looks identical while the window is 16:9 and leaves bare
+  strips at every other shape. That is why it was the corners you saw.
+
+---
+
+## The update, in four steps
+
+**1. Import.** Games, then Future Spinner, then **Files**, then **Import Files**.
+Open `~/Desktop/FS_UPLOAD_KIT_V6/02_frontend_upload` and drag in **everything
+inside that folder**, the contents and not the folder itself. That is the only
+step where a mistake is likely, and it is undoable.
+
+**2. Read the sync dialog, then confirm it.** Upload, delete and skip counts are
+all normal: upload is what changed, delete is the previous version of those same
+files, skip is everything unchanged. You never delete anything by hand.
+**Screenshot the dialog before confirming**, then press **Start Sync**.
+
+**3. Publish.** One green **Publish Game** button. Press it and wait for success.
+
+**4. Check the version went up.** Launch the game, open the **Versions** panel,
+and confirm the front-end number reads **Front V6**. If it is unchanged, press
+**Publish Game** again.
+
+That is the update. Everything below is looking at things.
+
+### Three things you do not need to do
+
+- **The maths is not being touched.** It is already uploaded and correct, and
+  there is no maths folder in the V6 kit for that reason.
+- **`math/HASHES.txt` can stay.** Harmless, not part of the game, not worth a
+  step.
+- **The game tile is done.** You composed it already.
+
+---
+
+## What is still open: four things to look at
+
+Every one of these has already been measured and gated, so none of them is a
+test. They are here because you reported them and you should see them fixed.
+
+### 1. The splash, on the way in
+
+Launch the game and watch the first ten seconds without touching anything.
+
+The mark should sit dead still. Its glow should breathe slowly. Rain should
+fall, TAP TO CONTINUE should pulse, and nothing else should move at all. If the
+logo moves by any amount, that is the defect returning and it is worth a
+screenshot.
+
+### 2. The speed button
+
+Find the bolt button and press it three times, so you see all three speeds and
+come back to where you started.
+
+The question is only this: **can you tell the three apart at a glance, without
+studying them?** Each step should be visibly brighter than the one before. If
+two of them look the same to you, say which two, because that is the whole
+design and a measurement saying they differ is not the same as your eye saying
+so.
+
+### 3. The two paytable cards
+
+Open the paytable and look at **Symbol Payouts**, top row, the WILD and SCAT
+cards.
+
+Their dark panel should reach the bottom of the card exactly like every other
+card in the grid. There should be no pale band underneath their text.
+
+### 4. A dialog with the window stretched
+
+This one needs the window deliberately the wrong shape, because that is the only
+condition it ever went wrong in.
+
+1. **Drag the browser window wide and short**, much wider than it is tall.
+2. Open the **paytable**, or any dialog.
+3. **Look at the far left and far right edges, and at all four corners.** The
+   darkening should reach every edge. Nothing bright should be showing beside
+   the game.
+4. Then drag the window **tall and narrow** and open the same dialog again. Look
+   at the top and bottom this time.
+
+---
+
+## Finishing
+
+1. Leave every screenshot loose on the Desktop.
+2. Tell me anything that came back different from what this page said to expect.
+   **"That step made no sense" is a useful answer.**
+3. **Do not press Start Approval.**
+4. Delete `~/Desktop/FS_UPLOAD_KIT_V6/` when you are done. It is single use, and
+   a kit left on the Desktop is a kit that eventually gets uploaded when it is
+   out of date, which has already happened once.
+
+---
+
+**A missing input, named rather than guessed.** The brief for this round says
+"the remaining owner list is in `OWNER_CHECKLIST.md`". That file is not in the
+repository, and has never been: there is no commit in the history that added it
+and no file of that name anywhere in the tree. Convention (m) says a missing
+input is named and waited for, never reconstructed, so the four items above are
+the brief's own eyeball list and nothing has been invented to stand in for the
+rest. **If there is a further list, send the file and it becomes PART 9f.**
+
+**What carried over from V5 and is still open**, so it is not lost: the twenty
+bracketed Cruise spins with a Session information screenshot either side, and
+the Guidelines ticks against
+`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`. Both are written
+out in full in PART 9d above. They are not repeated here because this visit was
+asked for as a short one, and neither is blocked by anything in V6.
