@@ -31,7 +31,8 @@
   } from '../stores/responsibleGambling'
   import { setModalOpen } from '../stores/modalGuard'
   import { standingMode } from '../stores/betMode'
-  import { MODE_COST, FS_MODES, modeLabel } from '../config/fsModes'
+  import { FS_MODES, modeLabel } from '../config/fsModes'
+  import { spinCostMicros } from '../stores/buyAffordability'
   import { jurisdictionFlags } from '../stores/jurisdiction'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
@@ -224,7 +225,7 @@
   // pattern), not the base bet, or the HUD silently disagrees with the real
   // wallet cost. Mirrors handleSpin's own cost computation exactly (App.svelte)
   // so the displayed figure can never drift from what is actually charged.
-  $: effectiveCost = Math.round($betAmount * (MODE_COST[$standingMode] ?? 1) * CURRENCY_SCALE) / CURRENCY_SCALE
+  $: effectiveCost = spinCostMicros($betAmount, $standingMode) / CURRENCY_SCALE
   $: isOverboost = $standingMode === 'antelite'
   $: isCruise    = $standingMode === 'cruise'
   // R24, 2026-07-27: the HUD mode badges READ their names from fsModes, the single

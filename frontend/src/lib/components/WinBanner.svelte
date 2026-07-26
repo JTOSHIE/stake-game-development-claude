@@ -20,6 +20,9 @@
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { isSocial } from '../stores/socialMode'
+  import { boughtRound } from '../stores/boughtRound'
+  import { locale } from '../stores/gameStore'
+  import { t } from '../i18n/translations'
   // The single social-aware vocabulary layer (R2R JOB 6 / TR-041).
   import { sv } from '../i18n/vocabulary'
   import { overdriveVisual } from '../stores/overdriveVisual'
@@ -199,6 +202,34 @@
   // platform's restricted list (replacement: "play"), and `sv` preserves the
   // ALL-CAPS shape so social reads "12x PLAY" rather than "12x play".
   $: multUnitLabel = sv('BET', $isSocial)
+
+  // ── FEATURE PRICE, JOB 3(f) / TR-068 ───────────────────────────────────────
+  //
+  // Fable's ruling, option (a) refined: the gross WIN readout above is
+  // RETAINED and the headline multiplier stays against the BET LEVEL, both
+  // because they are the genre convention and a reviewer expecting them would
+  // read a net figure as wrong. This SECONDARY line is the whole change: on a
+  // bought round only, the banner states what the round cost beside what it
+  // paid, so a $57,215 "win" on a $200,000 purchase reads as what it is.
+  //
+  // Base rounds are untouched: `$boughtRound` is null for every ordinary spin,
+  // so nothing renders and nothing shifts.
+  //
+  // The price comes from `spinCostMicros`, the same function `BuyBonus.svelte`
+  // prices the confirm dialog from, so the figure here and the figure the
+  // player agreed to cannot disagree. It is passed as micros and formatted
+  // once, here, rather than carried as a formatted string.
+  //
+  // Routed through `sv()` as the ruling requires. Nothing in "FEATURE PRICE" is
+  // on the platform's restricted table today, so this is a no-op in social mode
+  // right now; it is wired anyway because the table is the platform's to change
+  // and a label that is not routed is a label nobody will remember to route.
+  $: featurePriceLabel = $boughtRound
+    ? sv(t($locale, 'featurePrice', $isSocial ? 'social' : 'real'), $isSocial)
+    : ''
+  $: featurePriceValue = $boughtRound
+    ? formatBalance($boughtRound.priceMicros, $currencyCode || 'USD')
+    : ''
 </script>
 
 {#if visible}
@@ -253,6 +284,12 @@
           <div class="c1-tier-label">{tierLabel}</div>
           <div class="c1-amount fs-num" use:autofitText={amountLabel}>{amountLabel}</div>
           <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
+          {#if $boughtRound}
+            <div class="c1-price fs-num" data-testid="win-feature-price">
+              <span class="c1-price-label">{featurePriceLabel}</span>
+              <span class="c1-price-value">{featurePriceValue}</span>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -355,6 +392,26 @@
   .tier-mega .c1-amount { font-size: calc(64px * var(--autofit-scale, 1)); }
   .tier-epic .c1-amount { font-size: calc(80px * var(--autofit-scale, 1)); }
   .c1-mult { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; }
+  /* SECONDARY by design, TR-068. Deliberately quieter than the amount and the
+     multiplier above it: the ruling retains the gross WIN as the headline, and
+     a price line competing with it for attention would be option (b), the net
+     presentation Fable declined. Muted, smaller, wide-tracked, and it sits
+     below rather than beside, so nothing above it moves when it appears. */
+  .c1-price {
+    display: flex; align-items: baseline; justify-content: center; gap: 8px;
+    margin-top: 4px;
+    font-family: 'Orbitron', system-ui, sans-serif;
+    white-space: nowrap;
+  }
+  .c1-price-label {
+    font-weight: 700; font-size: 10px; letter-spacing: .18em;
+    color: rgba(190, 232, 255, 0.72);
+  }
+  .c1-price-value {
+    font-weight: 800; font-size: 13px; letter-spacing: .04em;
+    color: rgba(230, 245, 255, 0.92);
+    font-variant-numeric: tabular-nums;
+  }
 
   /* ── Entry + pulse (ANIMATION UPLIFT PASS 2026-07-16, item 3: stronger
        slam-in overshoot - 0.4->1.1->1 instead of 0.5->1.06->1) ───────────── */

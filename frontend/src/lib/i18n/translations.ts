@@ -122,6 +122,21 @@ export interface Translations {
   /** Abbreviated stat labels for the 400x225 mini-player row. */
   hudBalanceShort?: string
   hudWinShort?: string
+  /**
+   * JOB 3(f) / TR-068. Label for the secondary line on a BOUGHT round's result
+   * banner, stating what the round cost beside what it paid.
+   *
+   * Authored per locale rather than composed by concatenation. Every locale
+   * already ships its own word for "feature" (`hudFeatures`) and its own
+   * cost-of-something phrasing (`hudSpinCost`), but joining them would produce
+   * "FONCTIONS COUT DU TOUR" in French and equivalent nonsense elsewhere, so
+   * each is written in that locale's own grammar, taking the noun from the
+   * shipped `hudFeatures` value and inflecting it as the language requires.
+   * This is the TR-017 method (compose from the locale's own vocabulary) rather
+   * than the TR-014a method (a fresh translation), applied where grammar rules
+   * out a straight join.
+   */
+  featurePrice?: string
   recoveryResumed?: string
   /** Accessible name for the recovery banner's close control. */
   recoveryDismiss?: string
@@ -139,6 +154,7 @@ export type FeatureKey =
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
   | 'rulesOverdriveRetriggerBuild' | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
   | 'hudBalanceShort' | 'hudWinShort' | 'hudTurboLabel' | 'recoveryResumed' | 'recoveryDismiss'
+  | 'featurePrice'
   | 'splashPressAnywhere'
 export type FeatureStrings = Record<FeatureKey, string>
 
@@ -1248,6 +1264,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Your previous round has been completed and its result applied.',
     hudBalanceShort: 'BAL',
     hudWinShort: 'WIN',
+    featurePrice: 'FEATURE PRICE',
     hudTurboLabel: 'Speed',
     recoveryDismiss: 'Dismiss',
     rulesOverdriveBuy: 'Bonus Buy: pay 100× your bet to start the feature immediately.',
@@ -1269,6 +1286,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'تم إكمال جولتك السابقة وتطبيق نتيجتها.',
     hudBalanceShort: 'الرصيد',
     hudWinShort: 'الفوز',
+    featurePrice: 'سعر الميزة',
     hudTurboLabel: 'السرعة',
     recoveryDismiss: 'إغلاق',
     rulesOverdriveBuy: 'شراء البونص: ادفع 100× رهانك لبدء الميزة فوراً.',
@@ -1290,6 +1308,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Ihre vorherige Runde wurde abgeschlossen und ihr Ergebnis angewendet.',
     hudBalanceShort: 'GUTH',
     hudWinShort: 'GEW',
+    featurePrice: 'FEATURE-PREIS',
     hudTurboLabel: 'Tempo',
     recoveryDismiss: 'Schließen',
     rulesOverdriveBuy: 'Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten.',
@@ -1311,6 +1330,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Tu ronda anterior se ha completado y su resultado se ha aplicado.',
     hudBalanceShort: 'SALDO',
     hudWinShort: 'GANA',
+    featurePrice: 'PRECIO DE LA FUNCIÓN',
     hudTurboLabel: 'Velocidad',
     recoveryDismiss: 'Cerrar',
     rulesOverdriveBuy: 'Compra de bono: paga 100× tu apuesta para iniciar la función de inmediato.',
@@ -1332,6 +1352,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Edellinen kierroksesi on saatettu loppuun ja sen tulos on kirjattu.',
     hudBalanceShort: 'SALDO',
     hudWinShort: 'VOITTO',
+    featurePrice: 'OMINAISUUDEN HINTA',
     hudTurboLabel: 'Nopeus',
     recoveryDismiss: 'Sulje',
     rulesOverdriveBuy: 'Bonusosto: maksa 100× panoksesi aloittaaksesi ominaisuuden heti.',
@@ -1353,6 +1374,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Votre tour précédent a été terminé et son résultat appliqué.',
     hudBalanceShort: 'SOLDE',
     hudWinShort: 'GAIN',
+    featurePrice: 'PRIX DE LA FONCTION',
     hudTurboLabel: 'Vitesse',
     recoveryDismiss: 'Fermer',
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
@@ -1374,6 +1396,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'आपका पिछला राउंड पूरा हो गया है और उसका परिणाम लागू कर दिया गया है।',
     hudBalanceShort: 'शेष',
     hudWinShort: 'जीत',
+    featurePrice: 'फ़ीचर मूल्य',
     hudTurboLabel: 'गति',
     recoveryDismiss: 'बंद करें',
     rulesOverdriveBuy: 'बोनस खरीद: फ़ीचर तुरंत शुरू करने के लिए अपने दांव का 100× भुगतान करें।',
@@ -1395,6 +1418,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Ronde Anda sebelumnya telah diselesaikan dan hasilnya diterapkan.',
     hudBalanceShort: 'SALDO',
     hudWinShort: 'MENANG',
+    featurePrice: 'HARGA FITUR',
     hudTurboLabel: 'Kecepatan',
     recoveryDismiss: 'Tutup',
     rulesOverdriveBuy: 'Beli Bonus: bayar 100× taruhan Anda untuk memulai fitur segera.',
@@ -1416,6 +1440,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: '前回のラウンドが完了し、結果が反映されました。',
     hudBalanceShort: '残高',
     hudWinShort: '配当',
+    featurePrice: 'フィーチャー価格',
     hudTurboLabel: 'スピード',
     recoveryDismiss: '閉じる',
     rulesOverdriveBuy: 'ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。',
@@ -1437,6 +1462,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: '이전 라운드가 완료되어 결과가 반영되었습니다.',
     hudBalanceShort: '잔액',
     hudWinShort: '당첨',
+    featurePrice: '피처 가격',
     hudTurboLabel: '속도',
     recoveryDismiss: '닫기',
     rulesOverdriveBuy: '보너스 구매: 베팅액의 100배를 지불하면 기능이 즉시 시작됩니다.',
@@ -1458,6 +1484,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Twoja poprzednia runda została zakończona, a jej wynik zastosowany.',
     hudBalanceShort: 'SALDO',
     hudWinShort: 'WYGR',
+    featurePrice: 'CENA FUNKCJI',
     hudTurboLabel: 'Prędkość',
     recoveryDismiss: 'Zamknij',
     rulesOverdriveBuy: 'Zakup bonusu: zapłać 100× swojego zakładu, aby natychmiast uruchomić funkcję.',
@@ -1479,6 +1506,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'A sua rodada anterior foi concluída e o resultado foi aplicado.',
     hudBalanceShort: 'SALDO',
     hudWinShort: 'GANHO',
+    featurePrice: 'PREÇO DO RECURSO',
     hudTurboLabel: 'Velocidade',
     recoveryDismiss: 'Fechar',
     rulesOverdriveBuy: 'Compra de bônus: pague 100× a sua aposta para iniciar o recurso imediatamente.',
@@ -1500,6 +1528,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Ваш предыдущий раунд завершён, результат применён.',
     hudBalanceShort: 'БАЛАНС',
     hudWinShort: 'ВЫИГР',
+    featurePrice: 'ЦЕНА ФУНКЦИИ',
     hudTurboLabel: 'Скорость',
     recoveryDismiss: 'Закрыть',
     rulesOverdriveBuy: 'Покупка бонуса: заплатите 100× вашей ставки, чтобы запустить функцию сразу.',
@@ -1521,6 +1550,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Önceki turunuz tamamlandı ve sonucu uygulandı.',
     hudBalanceShort: 'BAKİYE',
     hudWinShort: 'KAZANÇ',
+    featurePrice: 'ÖZELLİK FİYATI',
     hudTurboLabel: 'Hız',
     recoveryDismiss: 'Kapat',
     rulesOverdriveBuy: 'Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin.',
@@ -1542,6 +1572,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: 'Vòng chơi trước của bạn đã hoàn tất và kết quả đã được áp dụng.',
     hudBalanceShort: 'SỐ DƯ',
     hudWinShort: 'THẮNG',
+    featurePrice: 'GIÁ TÍNH NĂNG',
     hudTurboLabel: 'Tốc độ',
     recoveryDismiss: 'Đóng',
     rulesOverdriveBuy: 'Mua Thưởng: trả 100× tiền cược của bạn để bắt đầu tính năng ngay lập tức.',
@@ -1563,6 +1594,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     recoveryResumed: '您的上一轮已完成，结果已生效。',
     hudBalanceShort: '余额',
     hudWinShort: '赢分',
+    featurePrice: '功能价格',
     hudTurboLabel: '速度',
     recoveryDismiss: '关闭',
     rulesOverdriveBuy: '购买奖励：支付 100 倍投注即可立即启动功能。',

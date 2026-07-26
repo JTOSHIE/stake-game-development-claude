@@ -62,7 +62,8 @@
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, type BetMode } from './lib/stores/betMode'
-  import { MODE_COST } from './lib/config/fsModes'
+  import { spinCostMicros } from './lib/stores/buyAffordability'
+  import { boughtRound } from './lib/stores/boughtRound'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
   import { overdriveVisual } from './lib/stores/overdriveVisual'
@@ -527,10 +528,19 @@
     // math (CLAUDE.md's zero-float-tolerance rule) - a raw `bet * cost` float
     // multiplication (e.g. 0.1 * 400) can land a hair off a clean value, and
     // recordSpinResult's mock-mode balance update does plain float subtraction.
-    const cost = Math.round(bet * (MODE_COST[mode] ?? 100) * CURRENCY_SCALE) / CURRENCY_SCALE
+    // ONE cost source, shared with the confirm dialog the player just agreed
+    // to and with the FEATURE PRICE line the result banner will show
+    // (JOB 3(f) / TR-068). This was five separate copies of the same integer
+    // micros expression, which is five chances for the price quoted and the
+    // price charged to disagree.
+    const costMicros = spinCostMicros(bet, mode)
+    const cost = costMicros / CURRENCY_SCALE
     try {
       selectedBetMode.set(mode)
-      track({ type: 'buy', tier: mode, costMicros: Math.round(cost * CURRENCY_SCALE) })
+      // Recorded BEFORE the wallet call, so a round that resolves fast cannot
+      // reach its celebration before the banner knows what it cost.
+      boughtRound.set({ mode, priceMicros: costMicros })
+      track({ type: 'buy', tier: mode, costMicros })
       lastRoundEvents.set(null)   // clear any prior round so mock serves a fresh round
       // NOTE: the locked rgsService.SpinRequest.mode type is 'base'|'bonus' only
       // - it is NOT what reaches the real RGS. play() reads get(selectedBetMode)
@@ -1066,15 +1076,21 @@
     // before the spin lock engages - mirrors handleBuy's per-tier cost.
     const mode = $standingMode
     const bet  = $betAmount
-    const cost = Math.round(bet * (MODE_COST[mode] ?? 1) * CURRENCY_SCALE) / CURRENCY_SCALE
+    const costMicros = spinCostMicros(bet, mode)
+    const cost = costMicros / CURRENCY_SCALE
     if (cost > bet && $balance < cost) return
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
     lastRoundHadFeature = false
+    // This round was not bought, so the result banner carries no price line.
+    // Cleared on the next SPIN rather than on banner dismissal: see
+    // stores/boughtRound.ts for why the lifetime is tied to the round rather
+    // than to whichever of the two WinBanner instances raised the celebration.
+    boughtRound.set(null)
     selectedBetMode.set(mode)
     lastRoundEvents.set(null)   // clear any prior round before this spin publishes
 
-    track({ type: 'spin', costMicros: Math.round(cost * CURRENCY_SCALE) })
+    track({ type: 'spin', costMicros })
 
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })

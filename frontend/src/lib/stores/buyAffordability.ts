@@ -26,11 +26,40 @@
 import { derived } from 'svelte/store'
 import { balance, betAmount, isSpinning, isLoading } from './gameStore'
 import { MODE_COST } from '../config/fsModes'
+import { CURRENCY_SCALE } from '../utils/currency'
 import type { BetMode } from './betMode'
 
 /** Cost multiplier for a buy tier, from the single source of truth. */
 export function modeCostFor(mode: BetMode): number {
   return MODE_COST[mode] ?? 100
+}
+
+/**
+ * What one round in `mode` actually costs, in INTEGER MICROS.
+ *
+ * Added JOB 3(f) / TR-068 (2026-07-26). The ruling requires the new FEATURE
+ * PRICE line on a bought round's result banner to be "driven by the same
+ * integer-micros cost source as the confirm dialog", and the only way to make
+ * that literally true rather than merely intended is for there to be one
+ * source. This expression previously existed five times over: in
+ * `BuyBonus.svelte`, in `App.handleBuy`, in `App.handleSpin`, in
+ * `HudOverlay`'s effective-cost readout and in `FeatureMenu`'s current-spin
+ * cost. Five copies of a money calculation is five chances for a price the
+ * player is quoted to disagree with the price they are charged, which is
+ * precisely the class of defect TR-016 found in the affordability gate and the
+ * reason this module exists at all.
+ *
+ * CLAUDE.md's integer-micros rule, verbatim: "All currency maths uses integer
+ * micros. Never multiply dollars by a multiplier directly." The rounding
+ * happens once, here, against the scaled value, so a bet of 0.10 at 400x cannot
+ * land a hair off 40.00 in one caller and exactly on it in another.
+ *
+ * The default multiplier is 1 rather than 100: this function answers "what does
+ * a round in this mode cost", and an unrecognised mode is a base spin, not a
+ * bonus buy. Callers that specifically want a BUY tier's price pass a buy mode.
+ */
+export function spinCostMicros(betDisplay: number, mode: BetMode): number {
+  return Math.round(betDisplay * (MODE_COST[mode] ?? 1) * CURRENCY_SCALE)
 }
 
 /**

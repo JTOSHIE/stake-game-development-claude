@@ -8,14 +8,14 @@
   // bet x 100. At the 400x NITRO tier that enabled CONFIRM beside a correctly
   // displayed 400x price. gameStore is locked, so the correct per-tier check
   // lives in this non-locked module, shared with the FEATURES menu.
-  import { canAffordMode } from '../stores/buyAffordability'
+  import { canAffordMode, modeCostFor, spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { MODE_COST, FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel, modeLabel, modeBlurb } from '../config/fsModes'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -39,8 +39,8 @@
   let buyMode: BetMode = 'bonus'
 
   $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
-  $: modeCost = MODE_COST[buyMode] ?? 100
-  $: priceMicros = Math.round($betAmount * modeCost * CURRENCY_SCALE)
+  $: modeCost = modeCostFor(buyMode)
+  $: priceMicros = spinCostMicros($betAmount, buyMode)
   $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD')
   // OWNER AUDIT REMEDIATION B4: the modal's own feature name/description
   // now come straight from FS_MODES (the single source of truth already

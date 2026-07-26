@@ -17,7 +17,7 @@
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
   import { tr } from '../i18n/tr'
-  import { FS_MODES, FS_RTP_LABEL, MODE_COST, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
@@ -32,7 +32,7 @@
     increaseBetLevel, decreaseBetLevel, canIncreaseBetLevel, canDecreaseBetLevel,
   } from '../stores/betLadder'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
-  import { canAffordMode, shortfallFor } from '../stores/buyAffordability'
+  import { canAffordMode, shortfallFor, spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
@@ -77,7 +77,7 @@
   // inside a called function is invisible to it and never re-triggers this
   // line (confirmed the hard way: this exact bug shipped once already,
   // caught by the conformance suite's live-reactivity check, not by eye).
-  $: currentSpinCost = formatBalance(Math.round($betAmount * (MODE_COST[$standingMode] ?? 1) * CURRENCY_SCALE), cur)
+  $: currentSpinCost = formatBalance(spinCostMicros($betAmount, $standingMode), cur)
 
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.
