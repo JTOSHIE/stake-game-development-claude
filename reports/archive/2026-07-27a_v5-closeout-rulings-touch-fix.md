@@ -266,7 +266,30 @@ current one is exactly how TR-062 happened.
 
 ## Rule 10 closing link
 
-Recorded below after the final push, per rule 10.
+Final push `d20a356`, BOTH JOBS GREEN on the remote runner, verified before
+closing rather than inferred from the local results:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30209594478`
+  static gates: success
+  browser gates: success
+
+Every push this session, so the record is complete rather than only the last one:
+
+| Commit | Run | Result |
+|---|---|---|
+| `6f4be54` JOB 1, `7b5c22c` JOB 2, `1d7df5c` JOB 3, `c1f131f` JOB 4 | 30209450883 | **cancelled** |
+| `ffdd7dc` JOB 4 kit README fix | 30209491592 | success |
+| `d20a356` JOB 5 report | 30209594478 | success |
+
+**The cancelled run is explained rather than left sitting there.** Run 30209450883
+was superseded when `ffdd7dc` was pushed about a minute later, and the workflow's
+concurrency group cancels an in-flight run when a newer commit lands on the same
+branch. It is not a failure and it is not a red. Its content is fully covered:
+`ffdd7dc` is a direct descendant of `c1f131f` and contains all four job commits,
+and run 30209491592 over that tree passed both jobs. Recorded because rule 10's
+value depends on every non-green result on `main` having an account attached to
+it, and "cancelled" is not "passed".
+
+`main` is green, so the line is not stopped.
 
 ## FOR THE NEXT SESSION
 
