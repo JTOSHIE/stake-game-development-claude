@@ -1,0 +1,33 @@
+# track/quality-sweep scope manifest
+#
+# MULTI-TRACK PROTOCOL rule 2: a track is a branch plus this file. Every path a
+# commit on track/quality-sweep touches must match one of the globs below, and
+# scripts/qa/locked_paths_gate.mjs fails CI otherwise.
+#
+# Glob forms: an exact path; a trailing slash for a whole directory; ** for any
+# depth and * for one segment.
+#
+# Declared by the owner in FS_MULTITRACK_PROTOCOL_V2_Prompt.md, JOB 4(b).
+#
+# NOTE the locked paths are NOT excluded here and do not need to be. The same
+# gate carries the locked-path rule, so frontend/src/lib/stores/gameStore.ts and
+# frontend/src/lib/services/rgsService.ts still fail without an owner-sanction
+# token even though frontend/src/** matches them. Scope and locks are separate
+# questions and both are asked.
+
+frontend/src/**
+frontend/scripts/**
+.github/workflows/**
+docs/QUALITY_CHARTER.md
+
+# Narrowed from the brief's `docs/records/tracks/` for the disjointness reason
+# recorded in the sibling manifest.
+docs/records/tracks/quality-sweep.manifest
+
+# Evidence. A sweep that fixes things re-runs gates, and the gates write here.
+# Disjoint from track/docs-reskin, which touches no evidence path at all.
+reports/qa/**
+reports/screens/quality-sweep/**
+
+# Per-track session report, per rule 8. See the sibling manifest for why.
+reports/tracks/quality-sweep/

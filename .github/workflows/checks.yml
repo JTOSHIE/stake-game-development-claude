@@ -88,6 +88,13 @@ jobs:
       - name: locked paths and track scope, self-test
         run: node scripts/qa/locked_paths_gate.mjs --self-test
 
+      # MULTI-TRACK rule 3: parallel tracks require PROVABLY disjoint scopes.
+      # Proved over every file git actually tracks, so it re-proves itself on
+      # every run and a manifest widened later is caught the day it is widened,
+      # rather than at the merge that discovers two tracks edited one file.
+      - name: track manifests are disjoint
+        run: node scripts/qa/locked_paths_gate.mjs --check-disjoint
+
       # The same script now carries the TRACK SCOPE rule too (MULTI-TRACK JOB 2):
       # on a branch named track/<name>, every changed file must match a glob in
       # docs/records/tracks/<name>.manifest. GITHUB_HEAD_REF is the PR's SOURCE

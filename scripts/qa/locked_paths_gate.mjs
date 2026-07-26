@@ -60,7 +60,7 @@
 //   node scripts/qa/locked_paths_gate.mjs --self-test      # convention (p)
 
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, appendFileSync, readFileSync, existsSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, appendFileSync, readFileSync, existsSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -233,6 +233,73 @@ function resolveRange(argv) {
   return { base: 'HEAD~1', head: 'HEAD' }
 }
 
+/**
+ * PROVE that every pair of live track manifests is disjoint. MULTI-TRACK rule 3.
+ *
+ * Rule 3 says parallel tracks require PROVABLY disjoint scopes. "Provably" has to
+ * mean something better than two people reading two lists and agreeing, because
+ * that is exactly the check that passes right up until it does not.
+ *
+ * A general proof over arbitrary globs is undecidable-ish and not worth it. This
+ * proves the thing that actually matters: over EVERY FILE GIT ACTUALLY TRACKS,
+ * no file matches two manifests. That is a real proof about the real repository
+ * rather than about the glob language, and it re-proves itself on every run, so
+ * a manifest widened later is caught the day it is widened.
+ *
+ * Its blind spot is stated rather than hidden: a file that does not exist yet
+ * could match two manifests and this would not see it. That is why the pairwise
+ * LITERAL overlap check runs too, catching the common case of the same glob
+ * written into two manifests, which is how the brief's own first draft had both
+ * tracks claiming docs/records/tracks/.
+ */
+function checkDisjoint(dirOverride, trackedOverride) {
+  const dir = dirOverride ?? join('docs', 'records', 'tracks')
+  if (!existsSync(dir)) {
+    console.log('DISJOINT: no docs/records/tracks/ directory, nothing to check')
+    return true
+  }
+  const names = readdirSync(dir).filter((f) => f.endsWith('.manifest'))
+  if (names.length < 2) {
+    console.log(`DISJOINT: ${names.length} manifest(s), nothing to compare`)
+    return true
+  }
+  const manifests = names.map((n) => ({
+    name: n.replace(/\.manifest$/, ''),
+    ...loadManifest(readFileSync(join(dir, n), 'utf-8')),
+  }))
+
+  const tracked = trackedOverride ?? git(['ls-files']).split('\n').map((f) => f.trim()).filter(Boolean)
+  const collisions = []
+  for (const f of tracked) {
+    const owners = manifests.filter((m) => m.matchers.some((re) => re.test(f))).map((m) => m.name)
+    if (owners.length > 1) collisions.push({ file: f, owners })
+  }
+  const literal = []
+  for (let i = 0; i < manifests.length; i++) {
+    for (let j = i + 1; j < manifests.length; j++) {
+      const shared = manifests[i].globs.filter((g) => manifests[j].globs.includes(g))
+      if (shared.length) literal.push({ a: manifests[i].name, b: manifests[j].name, shared })
+    }
+  }
+
+  console.log(`DISJOINT: ${manifests.length} manifest(s), ${tracked.length} tracked file(s), `
+    + `${collisions.length} file collision(s), ${literal.length} shared glob(s)`)
+  for (const m of manifests) console.log(`  ${m.name}: ${m.globs.length} glob(s)`)
+  if (collisions.length === 0 && literal.length === 0) return true
+
+  console.error('\nDISJOINT: FAIL')
+  for (const c of collisions.slice(0, 20)) {
+    console.error(`  ${c.file} is claimed by ${c.owners.join(' and ')}`)
+  }
+  for (const l of literal) {
+    console.error(`  ${l.a} and ${l.b} both declare: ${l.shared.join(', ')}`)
+  }
+  console.error('\nRule 3: overlap forces SEQUENCE, not a merge policy. Either narrow one')
+  console.error('manifest until the scopes are disjoint, or run the two tracks one after')
+  console.error('the other.')
+  return false
+}
+
 // ── The seeded self-test, convention (p) ─────────────────────────────────────
 //
 // "plant the exact defect the gate exists to catch, in the form it really
@@ -368,6 +435,35 @@ function selfTest() {
     allGood &= run('scope: a directory glob does not match a same-prefixed sibling',
       () => ({ expected: 'FAIL', actual: scopeVerdict(cS4, cS5) }))
 
+    // ── DISJOINTNESS, MULTI-TRACK rule 3 ────────────────────────────────────
+    //
+    // Seeded in the form it really occurs, which is not hypothetical: the brief
+    // that commissioned these two tracks declared `docs/records/tracks/` in BOTH
+    // manifests. That is a real overlap written by hand, in a real brief, and it
+    // is what this check exists to catch.
+    const dj = join(dir, 'seed-tracks')
+    mkdirSync(dj, { recursive: true })
+    const writeM = (n, body) => writeFileSync(join(dj, `${n}.manifest`), body)
+    const TRACKED = ['docs/A.md', 'docs/B.md', 'docs/records/tracks/x.manifest', 'frontend/src/a.ts']
+
+    writeM('alpha', 'docs/A.md\ndocs/records/tracks/\n')
+    writeM('beta', 'docs/B.md\ndocs/records/tracks/\n')
+    allGood &= run('disjoint: the brief\'s own overlap, both claiming a shared directory',
+      () => ({ expected: 'FAIL', actual: checkDisjoint(dj, TRACKED) ? 'PASS' : 'FAIL' }))
+
+    writeM('alpha', 'docs/A.md\ndocs/records/tracks/alpha.manifest\n')
+    writeM('beta', 'docs/B.md\ndocs/records/tracks/beta.manifest\n')
+    allGood &= run('disjoint: negative control, narrowed manifests pass',
+      () => ({ expected: 'PASS', actual: checkDisjoint(dj, TRACKED) ? 'PASS' : 'FAIL' }))
+
+    // A collision that no shared GLOB would reveal: two different globs that
+    // both match the same real file. The literal comparison cannot see this and
+    // the file-level proof is the only thing that can.
+    writeM('alpha', 'frontend/src/**\n')
+    writeM('beta', 'frontend/src/a.ts\n')
+    allGood &= run('disjoint: two DIFFERENT globs matching one real file',
+      () => ({ expected: 'FAIL', actual: checkDisjoint(dj, TRACKED) ? 'PASS' : 'FAIL' }))
+
     allGood &= run('scope: branch name parsing',
       () => ({ expected: 'ok', actual:
         trackNameOf('track/docs-reskin') === 'docs-reskin'
@@ -384,6 +480,9 @@ function selfTest() {
 const argv = process.argv.slice(2)
 if (argv.includes('--self-test')) {
   process.exit(selfTest() ? 0 : 1)
+}
+if (argv.includes('--check-disjoint')) {
+  process.exit(checkDisjoint() ? 0 : 1)
 }
 
 const { base, head } = resolveRange(argv)

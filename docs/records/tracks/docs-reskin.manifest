@@ -1,0 +1,33 @@
+# track/docs-reskin scope manifest
+#
+# MULTI-TRACK PROTOCOL rule 2: a track is a branch plus this file. Every path a
+# commit on track/docs-reskin touches must match one of the globs below, and
+# scripts/qa/locked_paths_gate.mjs fails CI otherwise.
+#
+# Glob forms: an exact path; a trailing slash for a whole directory; ** for any
+# depth and * for one segment.
+#
+# Declared by the owner in FS_MULTITRACK_PROTOCOL_V2_Prompt.md, JOB 4(a).
+
+docs/RESKIN_BOUNDARY.md
+docs/records/reviews/FIX_LIST_2026-07-26.md
+SUBMISSION_DOSSIER.md
+GAME_FACTS.md
+COMPLIANCE_WATCH.md
+WRS_MASTER_DOCUMENT.md
+
+# The brief declared `docs/records/tracks/`, the whole directory. Narrowed to
+# THIS track's own manifest, because the whole directory is also in
+# track/quality-sweep's manifest and rule 3 requires parallel tracks to be
+# provably disjoint. Neither track needs the directory: both manifests and both
+# briefs are committed on main by the integrator before either track starts.
+docs/records/tracks/docs-reskin.manifest
+
+# Rule 8 requires a track session report, and convention (a) requires one of
+# every session, but `reports/` is in neither manifest as the brief wrote them,
+# so a track literally could not write its report. Resolved with a per-track
+# report directory rather than by sharing reports/SESSION_REPORT.md: disjoint by
+# construction, and it is what makes rule 8's "resolve report conflicts by
+# concatenation" mechanical instead of a merge argument. The integrator
+# concatenates these into reports/SESSION_REPORT.md on main.
+reports/tracks/docs-reskin/
