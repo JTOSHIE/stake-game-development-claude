@@ -229,6 +229,21 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/utils/currency.test.ts
 
+      # ── Gate 12a: social mode forces English ─────────────────────────────────
+      # Stake Engine testing guideline item 46, quoted: "English is the only
+      # supported language in Social Mode". It is written as a requirement on
+      # the game, so the game enforces it rather than trusting the platform to
+      # only ever send `en`. TR-067: the social flag selected the VOCABULARY
+      # variant and never touched the LOCALE, so a social session launched with
+      # lang=de rendered German chrome wearing social wording. The named case is
+      # a social `da` launch, which exercises the forcing and the
+      # unshipped-locale fallback at once, Danish being offered by the
+      # platform's own Language menu and not one of our sixteen (TR-059).
+      # The browser half lives in scripts/locale_launch_conformance.mjs.
+      - name: social mode forces English
+        working-directory: frontend
+        run: npx tsx src/lib/stores/socialLocale.test.ts
+
       # ── Gate 13: replay through the canonical interpreter ────────────────────
       # ReplayMode used the canonical interpreter only for freeSpinTrigger
       # rounds and searched every ORDINARY round for board/win/scatter, which

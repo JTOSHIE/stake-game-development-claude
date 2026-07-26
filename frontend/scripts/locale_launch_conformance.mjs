@@ -120,6 +120,98 @@ async function run() {
       await page.close()
     }
 
+    // ── SOCIAL MODE FORCES ENGLISH, JOB 3(d) / TR-067 ───────────────────────
+    //
+    // Guideline item 46: "English is the only supported language in Social
+    // Mode". `stores/socialLocale.test.ts` proves the RULE with no browser;
+    // this proves the WIRING, which is a different claim and the one this
+    // project keeps getting wrong. R7/TR-015 was a correctly computed flag with
+    // no consumer, and TR-067 itself was a correct vocabulary layer that nobody
+    // had connected to the locale axis. A rule nothing calls renders nothing.
+    //
+    // The `da` cases are the ones Fable named: Danish is offered by the
+    // platform's own Language menu and is not one of our sixteen (TR-059), so a
+    // social `da` launch exercises the forcing and the unshipped-locale
+    // fallback at once.
+    const SOCIAL_CASES = [
+      ['social=true&lang=da', 'the named case: forced, and the language is one we do not ship'],
+      ['social=true&lang=de', 'forced over a language we DO ship, which is the case that used to fail'],
+      ['social=1&lang=ja',    'the numeric flag form is equally social'],
+      ['currency=XSC&lang=de', 'social inferred from a social currency with no flag at all'],
+      ['currency=XEC&lang=fr', 'Stake EU sweepstakes, same requirement'],
+    ]
+    results.social = {}
+    for (const [query, why] of SOCIAL_CASES) {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+      const errs = []
+      page.on('pageerror', (e) => errs.push(e.message))
+      await page.goto(`${base}/?${query}`, { waitUntil: 'networkidle' })
+      await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      await dismissIntro(page)
+      const { spinText } = await probe(page)
+      // ENGLISH IN THE SOCIAL VOCABULARY, which is not `locales.en.spin`.
+      // The first draft of this check compared against the real-money English
+      // string and failed on all five cases, reporting "rendered PLAY, expected
+      // SPIN". That was the assertion being wrong, not the build: `spin` is
+      // itself a prohibited term on stake.us and the vocabulary layer correctly
+      // substitutes it. The two axes are independent, which is the whole point
+      // of TR-067, so the expectation has to name both: locale `en`, mode
+      // `social`.
+      const enSocialSpin = await page.evaluate(async () => {
+        const m = await import('/src/lib/i18n/translations.ts')
+        return m.t('en', 'spin', 'social')
+      })
+      // The locale STORE, not only the rendered string. Forcing the text while
+      // leaving the store on `de` would leave every other consumer of the
+      // locale, the currency formatter's locale tag included, disagreeing with
+      // the words next to it.
+      // Read by subscribing rather than via svelte's `get`: bare specifiers do
+      // not resolve inside page.evaluate, and a store calls its subscriber
+      // synchronously with the current value, so this needs no helper.
+      const storeLocale = await page.evaluate(async () => {
+        const gs = await import('/src/lib/stores/gameStore.ts')
+        let v
+        gs.locale.subscribe((x) => { v = x })()
+        return v
+      })
+      results.social[query] = { rendered: spinText, storeLocale, expected: enSocialSpin, why }
+      check(`social ${query}: renders English (social vocabulary)`, spinText === enSocialSpin,
+        `rendered ${JSON.stringify(spinText)}, expected ${JSON.stringify(enSocialSpin)}`)
+      check(`social ${query}: the locale STORE reads en`, storeLocale === 'en',
+        `store reads ${JSON.stringify(storeLocale)}`)
+      check(`social ${query}: no page errors`, errs.length === 0, errs.slice(0, 2).join(' | '))
+      if (query === 'social=true&lang=da') {
+        await page.screenshot({ path: join(SHOTS, 'locale-social-da.png') })
+      }
+      await page.close()
+    }
+
+    // The negative control. Without it, a build that forced English for EVERY
+    // session would pass every assertion above, and that is a worse defect than
+    // the one being fixed.
+    {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+      await page.goto(`${base}/?lang=de`, { waitUntil: 'networkidle' })
+      await page.waitForSelector('[data-testid="spin-button"]', { timeout: 15000 })
+      await dismissIntro(page)
+      const { spinText, enSpin } = await probe(page)
+      const deSpin = await page.evaluate(async () => {
+        const m = await import('/src/lib/i18n/translations.ts')
+        return m.locales.de.spin
+      })
+      results.social['NEGATIVE CONTROL lang=de, not social'] = { rendered: spinText, expected: deSpin, english: enSpin }
+      // The control only discriminates if the two strings actually differ, so
+      // that is asserted rather than assumed. de.spin is 'DREHEN' against
+      // en.spin 'SPIN'; if a future translation pass ever made them equal, this
+      // control would silently stop testing anything.
+      check('negative control is discriminating: de and en SPIN differ', deSpin !== enSpin,
+        `both render ${JSON.stringify(deSpin)}`)
+      check('negative control: a real-money de session still renders German',
+        spinText === deSpin,
+        `rendered ${JSON.stringify(spinText)}, expected ${JSON.stringify(deSpin)}`)
+      await page.close()
+    }
+
     await browser.close()
   } finally { server.kill() }
 

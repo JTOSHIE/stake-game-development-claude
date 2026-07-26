@@ -54,7 +54,8 @@
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
   import { playBGM, playWin, warmUpAudio } from './lib/services/soundService'
-  import { isSocial } from './lib/stores/socialMode'
+  import { isSocial, socialAtBoot } from './lib/stores/socialMode'
+  import { resolveLaunchLocale, enforceSocialEnglish } from './lib/stores/socialLocale'
   // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
   import { get } from 'svelte/store'
   import { speedTier } from './lib/stores/speedMode'
@@ -160,20 +161,23 @@
   // Validation is against the SHIPPED `locales` map rather than a hardcoded
   // list, so adding or removing a locale updates this check for free and the two
   // can never disagree.
+  //
+  // JOB 3(d) / TR-067, 2026-07-26. Stake Engine testing guideline item 46:
+  // "English is the only supported language in Social Mode". The decision now
+  // runs through `resolveLaunchLocale`, which checks social FIRST so no amount
+  // of parameter parsing can produce a non-English social session, and
+  // `socialAtBoot` is resolved at module load from the URL, so this still
+  // happens before the first render. `enforceSocialEnglish` below covers the
+  // other route, where social arrives with the authenticate response instead.
   {
     try {
       const raw = new URLSearchParams(window.location.search).get('lang')
-      const candidate = (raw ?? '').toLowerCase().trim()
-      if (candidate && Object.prototype.hasOwnProperty.call(locales, candidate)) {
-        locale.set(candidate as Locale)
-      }
-      // Anything else (absent, unknown, malformed, empty) keeps the 'en'
-      // default the store already holds. No throw, no console noise: an
-      // unrecognised language code is a valid launch, not an error.
+      locale.set(resolveLaunchLocale(raw, socialAtBoot, locales))
     } catch {
       /* non-browser context; keep the default */
     }
   }
+  enforceSocialEnglish()
 
   if (import.meta.env.DEV) {
     const buf: TelemetryEvent[] = []

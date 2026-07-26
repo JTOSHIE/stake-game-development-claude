@@ -78,6 +78,43 @@
     "\"null\"": "SPIN",
     "\"ENGLISH\"": "SPIN"
   },
+  "social": {
+    "social=true&lang=da": {
+      "rendered": "PLAY",
+      "storeLocale": "en",
+      "expected": "PLAY",
+      "why": "the named case: forced, and the language is one we do not ship"
+    },
+    "social=true&lang=de": {
+      "rendered": "PLAY",
+      "storeLocale": "en",
+      "expected": "PLAY",
+      "why": "forced over a language we DO ship, which is the case that used to fail"
+    },
+    "social=1&lang=ja": {
+      "rendered": "PLAY",
+      "storeLocale": "en",
+      "expected": "PLAY",
+      "why": "the numeric flag form is equally social"
+    },
+    "currency=XSC&lang=de": {
+      "rendered": "PLAY",
+      "storeLocale": "en",
+      "expected": "PLAY",
+      "why": "social inferred from a social currency with no flag at all"
+    },
+    "currency=XEC&lang=fr": {
+      "rendered": "PLAY",
+      "storeLocale": "en",
+      "expected": "PLAY",
+      "why": "Stake EU sweepstakes, same requirement"
+    },
+    "NEGATIVE CONTROL lang=de, not social": {
+      "rendered": "DREHEN",
+      "expected": "DREHEN",
+      "english": "SPIN"
+    }
+  },
   "failures": [],
   "pass": true
 }
