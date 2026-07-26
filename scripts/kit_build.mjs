@@ -255,21 +255,23 @@ the artefact rather than by grepping it.
 
 ## What to do
 
-**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9.** It is the
-full walkthrough and it covers everything below plus the checks and observations.
-The short version:
+**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9d.** It is the
+full walkthrough, it is one page, and it covers everything below plus what to look
+at once the upload is done. The short version:
 
-1. Delete the one stray \`math/HASHES.txt\` row from the portal's Math files list,
-   taking it from 13 files to 12. Nothing else in Math is touched.
-2. Upload the CONTENTS of \`02_frontend_upload\` as the Front End. Not the folder:
+1. Upload the CONTENTS of \`02_frontend_upload\` as the Front End. Not the folder:
    if \`index.html\` ends up one level down the game will not load.
-3. Publish, and confirm the version reads Front V${KIT_VERSION}.
-4. Compose the tile in Design Thumbnail from the two images in \`03_branding/\`.
-5. The maths package stays at V1 and is NOT re-uploaded.
-6. Do NOT press Start Approval.
+2. Publish, and confirm the version reads Front V${KIT_VERSION}.
+3. The maths package stays at V1 and is NOT re-uploaded.
+4. Do NOT press Start Approval.
 
-\`03_branding/\` is here for the tile editor only. **Nothing in it is uploaded as
-Front End.**
+Three things PART 9d says you do NOT need to do, listed here too because earlier
+kits asked for them: \`math/HASHES.txt\` can stay, the game tile is already
+composed, and the maths is not being touched.
+
+\`03_branding/\` is here for the tile editor only, and the tile is already done, so
+on this visit you should not need it at all. **Nothing in it is uploaded as Front
+End.**
 
 ## This kit is SINGLE USE
 
