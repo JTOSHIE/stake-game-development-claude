@@ -136,4 +136,4 @@ Open threads:
 - (h.1) open work: move the three gate writers' evidence output to scratch
   paths so a re-run can never dirty committed evidence.
 - Remote CI link for this session's final push, per rule 10:
-  filled by the closing commit after the remote run for this session's final push is verified green.
+  run 124 GREEN, both jobs: https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30189187685
