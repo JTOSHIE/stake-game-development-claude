@@ -1,0 +1,68 @@
+{
+  "ran": "2026-07-26",
+  "purpose": "Does rgsService.authenticate() read the shape the live RGS sends",
+  "method": "The captured live body is served by a local HTTP server to the REAL exported authenticate(). Nothing is re-implemented, so this cannot agree with the parser by sharing its mistake.",
+  "evidence": [
+    "reports/screens/live-shapes-2026-07-26/04_authenticate_response_jurisdiction_TOP_LEVEL.png",
+    "reports/screens/live-shapes-2026-07-26/05_play_response_state_is_event_array_micros.png",
+    "reports/screens/live-shapes-2026-07-26/06_end_round_response_balance_only.png"
+  ],
+  "defect_status": "REACHABLE, NOT CONFIRMED LIVE. The capture shows the response tail only, so whether config also carries a jurisdiction block is unknown. Case A reproduces the defect, case B shows the parser already correct. One screenshot of the authenticate response scrolled to the TOP settles it, and it is on the owner list.",
+  "defect_reachable": true,
+  "negative_controls_pass": true,
+  "proposed_fix_verified": true,
+  "proposed_fix": {
+    "file": "frontend/src/lib/services/rgsService.ts",
+    "line": 558,
+    "from": "...(config.jurisdiction ?? {}),",
+    "to": "...(config.jurisdiction ?? raw.jurisdiction ?? {}),",
+    "status": "PARKED as a sanction request. LOCKED FILE, no lock exception granted in this brief."
+  },
+  "checks": [
+    {
+      "name": "CASE A, config carries no jurisdiction: flags arrive at their DEFAULTS",
+      "pass": true,
+      "detail": "authenticate() reads raw.config.jurisdiction only. With the block absent from config, the spread contributes nothing and EMPTY_JURISDICTION survives intact, while the response's real top-level jurisdiction is never read. THIS IS THE DEFECT, and it is REACHABLE, not proven live."
+    },
+    {
+      "name": "CASE B, config carries its own jurisdiction: flags arrive correctly",
+      "pass": true,
+      "detail": "disabledTurbo=true. If the live response nests a copy under config, today's parser is already right and there is nothing to fix. The captures cannot distinguish A from B, because the frame shows the response TAIL only."
+    },
+    {
+      "name": "bet configuration arrives on the live shape, corroborating SA-020",
+      "pass": true,
+      "detail": "betLevels=[450,500,750,1000]. Modelled from config because SA-020 observed those four levels in live play, which is independent evidence that config exists in the live response."
+    },
+    {
+      "name": "negative control, pinned shape: the flags DO arrive, so the reader is not simply broken",
+      "pass": true,
+      "detail": "disabledBuyFeature=true minimumRoundDuration=250. The parser reads one place correctly; the platform writes another."
+    },
+    {
+      "name": "negative control, pinned shape: bet configuration arrives",
+      "pass": true,
+      "detail": "betLevels=[0.1,1] maxBet=1000"
+    },
+    {
+      "name": "balance is read correctly on BOTH shapes, so the failure is scoped to config",
+      "pass": true,
+      "detail": "live=996.8 pinned=996.8. balance is top level in both, and it works, which is what makes the config-nesting difference the whole story."
+    },
+    {
+      "name": "PROPOSED FIX satisfies the live shape",
+      "pass": true,
+      "detail": "all twelve flags present and sourced from raw.jurisdiction"
+    },
+    {
+      "name": "PROPOSED FIX still satisfies the pinned shape, so it is additive not a swap",
+      "pass": true,
+      "detail": "config.jurisdiction still wins where it exists, because it is first in the chain"
+    },
+    {
+      "name": "PROPOSED FIX is inert where neither key exists",
+      "pass": true,
+      "detail": "falls through to EMPTY_JURISDICTION exactly as today"
+    }
+  ]
+}
