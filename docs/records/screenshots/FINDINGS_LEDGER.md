@@ -205,6 +205,21 @@ them as a new dated capture set with the reason recorded, or restore them with
 `git checkout -- reports/screens/scatter-anticipation/`. This track cannot do
 either, because that path is outside its manifest by design.
 
+**RESOLVED AND LANDED 2026-07-26**, by the integrator, as commit `4f5ab47`
+"docs(JOB 4, SA-012): the modified evidence, restored and ruled on". The four
+files were restored from `HEAD`, and the cause was found: `anticipation_proof.mjs`
+line 19 pointed its screenshot output at the committed evidence directory
+itself, so every re-run of the proof script rewrote committed evidence in place.
+
+The ruling generalises further than this row did. A new convention (h.1) now
+says proof and gate scripts write to scratch paths only, and committed evidence
+directories are never written outside a job that explicitly regenerates
+evidence. The integrator records the same pattern in `layout_fit_gate` and
+`contrast_gate`, with migrating those writers noted as open work.
+
+Closed, and better closed than this row asked for: this track reported an
+altered file, and the answer found the mechanism that alters files.
+
 ## SA-013  PROCESS  severity HIGH for the integrator  manifest collision, CI will fail
 
 `docs/records/tracks/screenshot-analyst.manifest` declares
@@ -364,19 +379,21 @@ Recorded so the next session of this track does not rediscover it.
 
 | tag | count | rows |
 | --- | --- | --- |
-| DEFECT | 1 | SA-012 |
+| DEFECT | 1 | SA-012 (resolved) |
 | ANOMALY | 8 | SA-002, SA-006, SA-007, SA-008, SA-011, SA-015, SA-018, SA-019 |
 | NOT-A-DEFECT | 9 | SA-001, SA-003, SA-004, SA-005, SA-009, SA-010, SA-014, SA-017, SA-020 |
 | PROCESS | 2 | SA-013 (resolved), SA-016 |
 
-**Resolved since the first pass:** SA-013, by the integrator narrowing
-`quality-sweep.manifest` to `reports/qa/*` on `main`. Confirm it is committed
-before merging.
+**Closed since the first pass, both by the integrator, both verified here rather
+than assumed:** SA-013 as `e73b18f`, confirmed by merging `main` and re-running
+`--check-disjoint` to 0 collisions; SA-012 as `4f5ab47`, which restored the four
+files and found the mechanism, a proof script writing its output into the
+committed evidence directory, now barred by a new convention (h.1).
 
 **Wanting an owner or Fable ruling:** SA-002 and SA-007 (whether the platform
-COST and MULT convention needs raising with the platform before submission),
+COST and MULT convention needs raising with the platform before submission), and
 SA-011 (a maths-adjacent statistics question, escalated per (l.8) rather than
-answered), and SA-012 (restore or recommit the altered evidence).
+answered).
 
 **Wanting one capture each, and cheap:** SA-018 (the max-win overlay, obtainable
 by replaying the wincap round from its event id), SA-006 (a `cruise` session
