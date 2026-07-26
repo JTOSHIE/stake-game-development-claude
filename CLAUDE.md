@@ -39,6 +39,65 @@ forward (no further edits without a new sanction):
 - `_rgsSpinReal()` publishes the full raw round events to `lastRoundEvents` before flattening.
 `SpinResult` and all existing consumers are unchanged; base-mode behaviour is identical.
 
+### The owner-sanction token, and the CI gate that reads it (added 2026-07-26, JOB 3h)
+
+The `deny` rules guard the **Edit and Write tools**. They do not guard git. The
+near-miss recorded under LOCKED_FILE_DEBTS is exactly this: a bulk purge script
+walked `src/` through Bash and wrote to `gameStore.ts`, and no deny rule fired,
+because a python loop is not the Edit tool. A `cp`, a `sed -i`, a rebase that
+resurrects a reverted hunk, or a merge that carries someone else's change all
+reach a locked path by the same route.
+
+So `scripts/qa/locked_paths_gate.mjs` runs first in CI and reads **what actually
+landed**. It fails any push or pull request whose commits touch one of the four
+locked paths without an owner-sanction token in the message of the commit that
+touched it.
+
+**The token, on its own line in the commit message:**
+
+```
+LOCK-SANCTION: <YYYY-MM-DD> <locked-path>[, <locked-path>]...
+```
+
+for example:
+
+```
+LOCK-SANCTION: 2026-07-25 frontend/src/lib/services/rgsService.ts
+```
+
+**The four locked paths, as the gate spells them** (they must match exactly;
+`games/future_spinner/` is a prefix):
+
+- `frontend/src/lib/services/rgsService.ts`
+- `frontend/src/lib/stores/gameStore.ts`
+- `games/future_spinner/`
+- `.claude/settings.json`
+
+`.claude/settings.json` is on the list because it is the lock **mechanism**: a
+commit that quietly removes a deny line has unlocked everything else, and the
+lock-exception convention below already requires that lift to be temporary and
+never committed. A committed change to it is therefore always either a mistake
+or a deliberate policy change, and both want a human to have said so.
+
+**The paths are enumerated, and checked in BOTH directions.** Every locked path
+the commit touches must be named, so nothing slips in alongside; and every path
+named must actually be touched, so a blanket sanction is rejected rather than
+ignored. The second direction is what keeps this honest over time: without it, a
+single sanction naming all four would be pasted forward forever and the gate
+would become a formality. PR #103's real sanction named exactly two deny lines,
+and that is the discipline this encodes.
+
+**The token records the sanction; it does not create one.** Writing the line does
+not authorise the change. The owner's brief authorises it, per the mechanism
+below, and the token is how that authorisation becomes visible to a reviewer
+reading `git log` a year later.
+
+The gate ships a seeded self-test (convention (p)) that builds a real throwaway
+git repository and makes real commits in it, rather than calling the predicate
+with hand-made arrays. Nine cases, including the two negative controls; the git
+plumbing is where a path-matching gate actually goes wrong, so the plumbing is
+what is tested.
+
 ### Lock-exception mechanism (the real one)
 
 A `deny` in `.claude/settings.json` takes precedence over any `allow` in
@@ -132,6 +191,10 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   commit's own verification and reverted. The `deny` rules guard the Edit and Write tools,
   not a python loop invoked through Bash. Any future bulk rewrite over a tree containing
   locked paths must carry an explicit exclusion list up front rather than a check afterwards.**
+  **That near-miss now has a machine backstop as well as a rule: `scripts/qa/locked_paths_gate.mjs`
+  runs first in CI and fails any commit that touches a locked path without the owner-sanction
+  token, reading what actually landed in git rather than which tool was used. The exclusion-list
+  discipline above still stands and is still the first line; the gate is the last one.**
 
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single

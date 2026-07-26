@@ -53,6 +53,36 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          # fetch-depth: 0 so the locked-paths gate below can read the real
+          # commit range. A shallow checkout has no base commit to diff against
+          # and the gate would have to either guess or pass, and a gate that
+          # passes when it cannot see is the exact failure convention (p) names.
+          fetch-depth: 0
+
+      # ── Gate 0: LOCKED PATHS ─────────────────────────────────────────────────
+      # First, before anything else, because it is the only gate whose subject is
+      # the repository's own integrity rather than the code's.
+      #
+      # `.claude/settings.json`'s deny rules guard the Edit and Write TOOLS. They
+      # do not guard git. CLAUDE.md records the near-miss in terms: a bulk purge
+      # script walked src/ through Bash and wrote to a locked file, and no deny
+      # rule fired, because a python loop is not the Edit tool. A `cp`, a `sed
+      # -i`, a rebase resurrecting a reverted hunk or a merge carrying someone
+      # else's change all reach a locked path the same way. This reads what
+      # actually landed.
+      #
+      # A commit that legitimately changes a locked path carries, on its own line:
+      #   LOCK-SANCTION: <YYYY-MM-DD> <locked-path>[, <locked-path>]...
+      # naming exactly the locked paths it changes, checked in both directions.
+      # Token format documented in CLAUDE.md beside the locks. (JOB 3h)
+      - name: locked paths, self-test
+        run: node scripts/qa/locked_paths_gate.mjs --self-test
+
+      - name: locked paths
+        env:
+          GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        run: node scripts/qa/locked_paths_gate.mjs
 
       - name: Set up Node
         uses: actions/setup-node@v4
