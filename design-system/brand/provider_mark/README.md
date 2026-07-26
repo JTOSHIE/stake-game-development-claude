@@ -14,14 +14,59 @@ candidate produced since, with its provenance, so the eye-call is made on eviden
 | `c-core-bold` | derived from the hero emblem | **SUPERSEDED, non-preferred** |
 | `d-purpose-drawn` | drawn in-house to Fable's spec | **SUPERSEDED, non-preferred** |
 | `e-owner-supplied` | externally commissioned, owner-supplied | **SUPERSEDED, non-preferred** |
-| **`f-owner-transparent`** | **externally commissioned, owner-supplied, second of two** | **ADOPTED 2026-07-26** |
+| **`f-owner-transparent`** | **externally commissioned, owner-supplied, second of three** | **ADOPTED 2026-07-26, re-confirmed by derivation the same day** |
+| `g-owner-pack` | externally commissioned, owner-supplied, third of three, a 25-file variant pack | **SUPERSEDED for the portal mark 2026-07-26. ADOPTED as the studio brand set for non-portal use.** |
 
 Superseded per convention (h): the files are **kept, not deleted**, and they remain in the
-48px comparison sheet. A comparison that quietly drops the options it has moved past stops
+comparison sheets. A comparison that quietly drops the options it has moved past stops
 being a comparison, and a future reader should be able to check that the retirement was
 earned rather than asserted.
 
-## Adopted: candidate f
+## The f-versus-g decision was DERIVED, not asked
+
+Candidate g arrived on 2026-07-26 as a full variant pack and had to be tested against the
+adopted mark rather than filed beside it. The test was run to a rule set in advance, in
+`frontend/scripts/provider_logo_derivation.mjs`: the delivery goes to whichever candidate
+is measurably more legible at the smallest size the platform renders. Full working in
+`PROVIDER_LOGO_DERIVATION.md`.
+
+**Candidate f won 3 of 3 measures at 32px**, and by wide margins: 1.62x the internal detail
+(mean absolute Laplacian), 1.90x the global contrast, and 2.31x less ink sitting below a
+1.5:1 contrast ratio against the real portal surface. The eye agrees with the arithmetic:
+in `reports/screens/provider-mark/f-vs-g-rendered-sizes.png`, f still reads as a ring
+carrying three 7s at 32px while g has become an indistinct disc.
+
+**Why g loses is structural, and it is the same finding candidate e carried.** g is a
+detailed wheel inside an arched `WE ROLL SPINNERS` text ring. That text is the whole
+problem at small size: it is below one pixel per stroke long before 32px and resolves as
+texture, and the detail it wraps averages toward a single mid tone. It is also
+continuous-tone artwork, 546,589 distinct opaque colours against f's three, so a downscale
+has a great deal to average away. None of that is a criticism of the artwork at full size,
+where it is the strongest mark the project has been given.
+
+**The decision was a real test and it could have gone the other way.** It did not change
+the delivered file: `WeRollSpinners-Logo.png` is byte-identical to what it already held.
+Recorded because a test that only ever confirms is worth less than one that could have
+overturned, and this one is on the record either way.
+
+## Candidate g IS the studio brand set, for everything that is not the portal mark
+
+Losing the portal slot is not a retirement. The pack is the right set for every use where
+the mark is not being squeezed into a small square, and it ships purpose-made files for
+exactly those uses. It is kept in whole at `pack_g/`, all 25 files, hash-verified against
+the delivery in `PROVENANCE_g.md`.
+
+Per the pack's own README:
+
+| Use | File |
+|---|---|
+| Favicon | `we_roll_spinners_favicon.ico` (carries 32, 64, 128) |
+| Website, social | `we_roll_spinners_1254x1254_transparent.png`, or the WebP variants |
+| Letterhead, email signature | transparent PNG, or `we_roll_spinners_logo.pdf` |
+| Print, business cards | `we_roll_spinners_logo.pdf`, converted to CMYK in design software |
+| Applications without alpha | the `_whitebg` and `_blackbg` JPGs |
+
+## Adopted for the portal: candidate f
 
 `design-system/brand/delivery/WeRollSpinners-Logo.png` is candidate **f**, adopted
 2026-07-26 on the owner's instruction "Go with F", delivered at its **native 1024**
@@ -46,6 +91,8 @@ one-time square upload in Team Settings Branding, and that is the owner's to do.
 | `PROVENANCE_d.md` | d: the in-house purpose-drawn vector mark, with its spec assertions |
 | `PROVENANCE_e.md` | e: the first owner-supplied mark, with its source hash and measurements |
 | `PROVENANCE_f.md` | f: the second owner-supplied mark, transparent, with its measurements |
+| `PROVENANCE_g.md` | g: the owner-supplied variant pack, all 25 files hashed, with its measurements |
+| `PROVIDER_LOGO_DERIVATION.md` | the f-versus-g derivation: the rendered-size anchors, the measures, the verdict |
 
 ## Evidence
 
@@ -54,6 +101,7 @@ one-time square upload in Team Settings Branding, and that is the owner's to do.
 | `reports/screens/provider-mark/48px-legibility-comparison.png` | all six exports at 8x with smoothing OFF, and the true 48px beside each |
 | `reports/screens/provider-mark/candidates-true-size.png` | e and f at ACTUAL 512, 96 and 48, no upscaling |
 | `reports/screens/provider-mark/candidate-f-on-surfaces.png` | every candidate at true size over light, mid, dark and portal surfaces |
+| `reports/screens/provider-mark/f-vs-g-rendered-sizes.png` | f and g at true 128, 96, 64, 48 and 32, drawn 1:1 with smoothing off, over the measured portal surface |
 
 ## Candidate f closes both of candidate e's open questions
 
