@@ -1,0 +1,77 @@
+# track/screenshot-analyst scope manifest
+#
+# MULTI-TRACK PROTOCOL rule 2: a track is a branch plus this file. Every path a
+# commit on track/screenshot-analyst touches must match one of the globs below,
+# and scripts/qa/locked_paths_gate.mjs fails CI otherwise.
+#
+# Glob forms: an exact path; a trailing slash for a whole directory; ** for any
+# depth and * for one segment. There is no negation in the language, by design,
+# so a scope that needs an exception is expressed by naming what is IN rather
+# than what is OUT. That shapes several lines below.
+#
+# Declared by the owner in FS_TRACK_SCREENSHOT_ANALYST_Prompt.md.
+#
+# This track NEVER writes REVIEW_TRACKER.md. Findings go to the ledger named
+# below and the integrator promotes them. That is a rule the manifest can also
+# enforce, because REVIEW_TRACKER.md is not in any glob here.
+
+# ── The ledger and the track's own records ──────────────────────────────────
+docs/records/screenshots/**
+
+# ── Live statistics intake, duty 6 ──────────────────────────────────────────
+#
+# COLLISION, DECLARED RATHER THAN HIDDEN. track/quality-sweep declares
+# `reports/qa/**`, which contains this path. The two manifests are therefore
+# NOT disjoint and `--check-disjoint` fails the moment a file is committed
+# here. Rule 3 says overlap forces SEQUENCE, not a merge policy.
+#
+# It is not resolvable from inside this track: the owner named this exact path
+# for duty 6, so narrowing it here would silently drop an assigned scope, and
+# quality-sweep.manifest is another track's file and out of scope for this
+# branch. Editing it here would fail the scope check it exists to enforce.
+#
+# The remediation is one line on main by the integrator, and it is cheap today
+# because track/quality-sweep has ZERO commits and has not started: narrow
+# `reports/qa/**` to `reports/qa/` minus this subtree by enumerating what that
+# track actually writes, or record a sequence decision. See the ledger entry
+# SA-013 and the session report for the measured gate output.
+reports/qa/live_stats/**
+
+# ── Capture sets, duty 1 ────────────────────────────────────────────────────
+#
+# NARROWED from the brief's `reports/screens/**`, for the disjointness reason
+# the sibling manifests already record. track/quality-sweep declares
+# `reports/screens/quality-sweep/**`; a bare `reports/screens/**` here would
+# swallow it. The narrowing costs this track nothing, because the brief's own
+# parenthesis limits it to "new capture sets and catalogue files only, never
+# altering existing evidence": a set this track creates is the only thing it
+# was ever entitled to write. Existing sets stay readable and unwritable, which
+# is what the brief asked for and what the manifest now also enforces.
+#
+# The set name follows the established `reports/screens/<pass>/` pattern, dated
+# as `contrast-2026-07-26/` and `dtt-live-2026-07-26/` already are.
+reports/screens/screenshot-analyst-2026-07-26/**
+reports/screens/CAPTURE_CATALOGUE_2026-07-26.md
+
+# ── This manifest ───────────────────────────────────────────────────────────
+#
+# Narrowed from `docs/records/tracks/` to this track's own two files, for the
+# reason recorded in both sibling manifests: the whole directory is claimed by
+# nobody precisely so that it can be claimed by everybody's integrator.
+docs/records/tracks/screenshot-analyst.manifest
+
+# The brief, saved verbatim per conventions (b) and (f) and per the owner's
+# explicit instruction to commit it in BOTH locations with the work. Neither
+# path is in any other live manifest, so both are disjoint.
+docs/records/tracks/FS_TRACK_SCREENSHOT_ANALYST_Prompt.md
+reports/briefs/FS_TRACK_SCREENSHOT_ANALYST_Prompt.md
+
+# ── Per-track session report, rule 8 ────────────────────────────────────────
+#
+# Same reason the docs-reskin manifest records: rule 8 requires a track session
+# report and convention (a) requires one of every session, but `reports/` is in
+# no manifest as the briefs write them, so a track could not write its report.
+# A per-track directory is disjoint by construction and makes rule 8's
+# "resolve report conflicts by concatenation" mechanical. The integrator
+# concatenates these into reports/SESSION_REPORT.md on main.
+reports/tracks/screenshot-analyst/
