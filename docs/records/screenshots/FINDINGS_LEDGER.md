@@ -375,34 +375,282 @@ Recorded so the next session of this track does not rediscover it.
 
 ---
 
+# Round 3, 2026-07-27 intake
+
+## SA-021  DEFECT  severity HIGH  the mini strip cuts the BALANCE without an ellipsis, and the remainder reads as a smaller number
+
+**A player holding EUR 479,710.00 is shown `BAL €479`.**
+
+Frame `reports/screens/screenshot-analyst-2026-07-27/04_DEFECT_popout_s_balance_479710_renders_as_479.png`,
+2026-07-27 02:31:05. The same wallet reads `€479,710.00` in
+`05_narrow_pane_balance_479710_in_full_bet_1250.png` eleven seconds later and in
+`03_desktop_v1_background_in_game_balance_479710_bet_1250.png` twenty four
+seconds earlier, so the value is not in doubt and the difference is the profile.
+
+**Measured on the shipped bundle rather than read off the picture.** Rebuilt at
+355 by 226 with the owner's own balance through an intercepted authenticate:
+
+    element text        "€479.7K"      <- the compact form was produced correctly
+    data-fit-mode       compact
+    data-fit-px         9.00           <- already at MINI_LEGIBLE_FLOOR_PX
+    clientWidth         25
+    scrollWidth         42             <- 17px of the string has nowhere to go
+
+`frontend/src/lib/components/HudOverlay.svelte:989` sets
+`.m-stat-value { overflow: hidden }` and the comment above it at `:984` states
+there is deliberately no `text-overflow: ellipsis`, on the reasoning that the value is
+shrunk and then abbreviated before anything is lost. **There is no third step.**
+When the abbreviated form also fails to fit, `fitMoney` returns without another
+lever and the box cuts the string in silence.
+
+**Why this is worse than a truncation.** `formatBalanceCompact` truncates rather
+than rounds precisely so an abbreviation can only ever understate
+(`utils/currency.ts:238` and its comment). Cutting at the box edge breaks that
+guarantee's whole point in a different way: `€479` is not an understatement a
+player can recognise as one, it is a complete looking number three orders of
+magnitude low. The same fault at
+`reports/screens/live-round2-2026-07-26/08_DEFECT_popout_s_stage_small_and_right_anchored.png`
+renders `€512.29` as `BAL €512.2`, which is the more dangerous form again.
+
+**It is a REGRESSION WINDOW, not a reopened TR-066.** TR-066 is correctly closed
+at 400 by 225, the profile Fable's ruling named, and this measurement confirms it:
+at 400 wide the balance renders `€479.7K` whole with `clientWidth` 50 against
+`scrollWidth` 50. The cut appears below about 390 css px and worsens as the pane
+narrows. `mini_player_proof.mjs` tests one viewport, 400 by 225, so the class it
+proves closed is closed only at that exact width.
+
+    viewport width   rendered      clientW/scrollW   visible
+    400              €479.7K       50 / 50           whole
+    390              €479.7K       44 / 44           whole
+    380              €479.7K       39 / 42           cut
+    370              €479.7K       33 / 42           cut
+    355              €479.7K       25 / 42           cut, reads as "€479"
+    330              €479.7K       12 / 42           cut, reads as "€4"
+
+**Escalated, not ruled on**, per convention (l.8): it is player money display.
+The options are the same shape as TR-066's were and this track does not pick
+between them: give the strip a fourth step below abbreviation; widen the balance
+slot at the expense of WIN below 390px; or set a minimum pane width for the
+profile. Any of them needs the proof widened past a single viewport first, per
+convention (p), or the next narrowing will do this again.
+
+Evidence `reports/screens/screenshot-analyst-2026-07-27/04_DEFECT_popout_s_balance_479710_renders_as_479.png`,
+`05_narrow_pane_balance_479710_in_full_bet_1250.png`,
+`annotated/A4_the_one_real_display_defect.png`,
+`repro/repro_355x226_balance_479710_eur.png` and its two siblings,
+`reports/screens/live-round2-2026-07-26/08_DEFECT_popout_s_stage_small_and_right_anchored.png`.
+
+## SA-022  DEFECT  severity HIGH  Bet Replay renders player money with no separators and no currency symbol, and overflows its plate
+
+`reports/screens/live-round2-2026-07-26/01_replay_22975_celebration_multiplier_5000x_win_3750000.png`
+shows the neon instrument plate reading `MULTIPLIER  5000.0x` and
+`WIN  3750000.00`. Both values render wider than the plate boxes that contain
+them and spill across the pod art; the win figure also sits on the plate's top
+edge rather than inside its window.
+
+**The source, found by derivation rather than by eye.**
+`frontend/src/lib/components/WinPod.svelte:5-6`:
+
+    $: multText = $winMultiplier > 0 ? `${$winMultiplier.toFixed(1)}×` : ''
+    $: amtText  = $winAmount > 0 ? $winAmount.toFixed(2) : ''
+
+That is the **only** money `.toFixed(2)` anywhere in `frontend/src`; every other
+occurrence in the tree is a CSS transform or a data attribute. It bypasses
+`formatBalance`, so it carries no locale separators, no currency symbol and no
+platform display metadata. In the same view the `MEGA WIN!!!` banner beside it
+renders through `formatBalance` (`WinBanner.svelte:198`) and shows
+`...0,000.00` with separators, so two money figures disagree about their own
+format inside one frame. That is the STANDING MANDATE's inspection test failing
+on its own named example, "decimal or currency formats that disagree".
+
+The zones are fixed at `width: 99px` with `white-space: nowrap` and no fit
+action (`WinPod.svelte:72` and `:92`), and their coordinates are commented
+`(from Manus QC)`, so this is Manus era layout that the in-house pipeline never
+revisited.
+
+**Where it is reachable.** `WinPod` has exactly one consumer,
+`ReplayMode.svelte:290`. It renders in **Bet Replay and nowhere else**. Bet
+Replay is mandatory under the platform's own requirements and it is a surface a
+reviewer will open deliberately, on a bet chosen for being large, which is
+precisely the input that overflows the zone.
+
+Severity HIGH for that reason rather than for the pixel count: the worse the win
+being demonstrated, the worse this looks.
+
+Escalated per (l.8), money display. Not fixed here; this track does not write
+`frontend/`.
+
+## SA-023  ANOMALY  severity LOW  a stray stroke is baked into the shipped car sprite
+
+A hard dark near vertical stroke runs down the car's rear quarter panel in
+`reports/screens/screenshot-analyst-2026-07-27/03_desktop_v1_background_in_game_balance_479710_bet_1250.png`,
+crossing both the gold trim line and the magenta underglow and stopping dead in
+the middle of the panel.
+
+Not a compositing artefact of the live build: it is in the shipped asset.
+`frontend/public/assets/themes/future-spinner/ui/scene_car.png`, 2840 by 1000
+RGBA, carries it at column x 1864, a continuous darker than neighbours run from
+y 263 to y 554, which is 29 per cent of the sprite height.
+
+Tagged ANOMALY rather than DEFECT because it is not this track's call whether it
+is a designed shut line or a leftover from the enhancement pass. Against it being
+designed: a shut line follows the body contour and terminates at a panel edge,
+and this one is straight and stops mid panel; and it crosses two lighting
+elements that a real panel gap would sit under. The asset's own generation record
+(`CLAUDE.md`, Assets) measures the enhanced car's bounding box as identical to the
+original's, so nobody was looking at interior detail.
+
+One question for the owner or the art owner, and it costs nothing to answer.
+
+## SA-024  NOT-A-DEFECT  severity n/a  SA-002 is no longer an inference, the platform publishes the cost multiplier itself
+
+`reports/screens/live-shapes-2026-07-26/04_authenticate_response_jurisdiction_TOP_LEVEL.png`
+shows the platform's own authenticate response carrying a per mode table, two
+entries of which are legible:
+
+    "mode": "bonus",  "costMultiplier": 100, "maxBet": 1000000000
+    "mode": "super",  "costMultiplier": 400, "maxBet": 1000000000
+
+So the platform holds the bet **level** and the **cost multiplier** as two
+separate fields, and renders the first of them in the Bets page COST column. That
+converts `SA-002` from "one platform convention applied uniformly, inferred from
+three modes agreeing" into an observed property of the payload, and it is the
+answer the owner's question actually needed.
+
+`reports/screens/screenshot-analyst-2026-07-27/02_play_response_antelite_amount_1000000000_is_bet_level_hud_1250.png`
+completes it from the other end: `"amount": 1000000000` with `"mode":
+"antelite"` while the HUD reads `€1,250.00` in the same frame.
+
+Recorded as its own row rather than folded into `SA-002` because `SA-002` is
+awaiting a Fable ruling and its evidence base changing is exactly the sort of
+thing a ruling needs to be told about.
+
+## SA-025  NOT-A-DEFECT  severity n/a  the max win overlay's thousands separator renders as a baseline square
+
+`reports/screens/live-round2-2026-07-26/02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`
+reads `5.000` `x` `BET` at a glance, which a European player would read as five.
+
+It is a comma. `MaxWinCelebration.svelte:103` is the literal string `5,000`, with
+no locale formatting anywhere near it, so no other glyph is reachable. Orbitron,
+the brand display face, draws U+002C at this size as a square block sitting on
+the baseline with no descending tail, which is what the capture shows at
+sixteen times magnification.
+
+Recorded rather than dropped for the same reason `SA-009` was: it looks like a
+defect, someone will raise it, and the answer should already be written down. If
+the owner decides the ambiguity is worth removing, that is a typography choice
+about the display face, not a formatting bug.
+
+## SA-026  ANOMALY  severity LOW  the Overdrive background variant is a magenta shift, and it is unproven in live play
+
+Two halves, both from measurement.
+
+**The variant is real and is the same city.** Measured on the shipped assets:
+`bg_base.jpg` mean RGB `(56.23, 77.84, 97.32)` against `bg_overdrive.jpg`
+`(56.90, 65.57, 97.12)`. The rendered proofs in
+`reports/screens/background-adopted-2026-07-27/` differ over 489,162 of 810,000
+pixels, so the crossfade is wired and the two states are genuinely different
+frames.
+
+**It is hotter in magenta, not in red.** The difference is almost entirely green
+removed, 15.8 per cent of it, with red up 1.2 per cent and blue flat. Red minus
+blue is `-41.09` before and `-40.22` after, unchanged to within one unit. The
+brief's phrase was "same city, hotter light"; the first half is confirmed, the
+second is true only in the magenta direction. A design call, raised rather than
+ruled on.
+
+**Not proven live.** No capture in this intake shows the Overdrive variant in
+game: free spins appear in none of the eight new frames. Proven in the asset and
+in the offline render, unproven in play. One paired capture closes it, same
+window and same size, one frame in base play and one during Overdrive Free Spins.
+
+## SA-018  UPDATED AND CLOSED 2026-07-26  the max win celebration now has a capture
+
+This row recorded that the wincap had demonstrably fired in live play and that
+the repository held no capture of `MaxWinCelebration.svelte` on screen anywhere,
+and it named the fix: replay the wincap round from its event id and photograph
+the overlay before pressing COLLECT.
+
+**That is exactly what happened.** `reports/screens/live-round2-2026-07-26/02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`,
+2026-07-26 19:59:41, is the overlay on screen with `MAX WIN REACHED!`, the
+`5,000` `x` `BET` figure and the un pressed `COLLECT` button, from a Bet Replay
+of `super` event 22975 at amount 750 EUR. A second capture of the same overlay
+exists at `reports/screens/replay-blocker/05_super_wincap_maxwin_celebration.png`.
+
+Closed. The inference this row refused to accept is now an observation.
+
+## SA-008  UPDATED 2026-07-27  the win strip measurement, taken at last
+
+This row recorded that the per line win strip renders on the reel frame's bottom
+border and that "the measurement duty 5 asks for was not taken".
+
+Taken now, at native capture resolution, on
+`reports/screens/screenshot-analyst-2026-07-27/08_local_dev_v1_background_win_21228_bet_100.png`:
+the strip's lower edge and the reel frame's inner neon border are coincident, and
+the silver frame rail begins about 16 native px below that, which is roughly
+8 css px at this capture's scale. The strip text `M2  x3  1 ways  $0.30` is clear
+of every edge and nothing is cut off.
+
+So the row's own reading was right: crowding, not clipping. It stays ANOMALY at
+LOW with a measurement behind it instead of an impression.
+
+---
+
 ## Summary for the integrator
+
+Updated 2026-07-27, round 3.
 
 | tag | count | rows |
 | --- | --- | --- |
-| DEFECT | 1 | SA-012 (resolved) |
-| ANOMALY | 8 | SA-002, SA-006, SA-007, SA-008, SA-011, SA-015, SA-018, SA-019 |
-| NOT-A-DEFECT | 9 | SA-001, SA-003, SA-004, SA-005, SA-009, SA-010, SA-014, SA-017, SA-020 |
+| DEFECT | 3 | **SA-021 (HIGH, open)**, **SA-022 (HIGH, open)**, SA-012 (resolved) |
+| ANOMALY | 9 | SA-002, SA-006, SA-007, SA-008, SA-011, SA-015, SA-019, **SA-023**, **SA-026** |
+| NOT-A-DEFECT | 12 | SA-001, SA-003, SA-004, SA-005, SA-009, SA-010, SA-014, SA-017, SA-018 (closed), SA-020, **SA-024**, **SA-025** |
 | PROCESS | 2 | SA-013 (resolved), SA-016 |
 
-**Closed since the first pass, both by the integrator, both verified here rather
-than assumed:** SA-013 as `e73b18f`, confirmed by merging `main` and re-running
-`--check-disjoint` to 0 collisions; SA-012 as `4f5ab47`, which restored the four
-files and found the mechanism, a proof script writing its output into the
-committed evidence directory, now barred by a new convention (h.1).
+**PROMOTE FIRST, both new, both HIGH, both player money display and therefore
+both escalated under convention (l.8) rather than ruled on here:**
+
+- **SA-021**, the mini strip cuts the BALANCE without an ellipsis below about
+  390 css px, so `EUR 479,710.00` renders as `EUR 479`. Reproduced from the
+  shipped bundle with the failing measurement recorded. TR-066 is correctly
+  closed at the one viewport it was proven at, 400 by 225; this is the window
+  below it, and the proof tests one width.
+- **SA-022**, `WinPod.svelte` renders player money with `.toFixed(2)`, the only
+  money `.toFixed` left in `frontend/src`, so Bet Replay shows
+  `3750000.00` with no separators and no currency symbol, overflowing a fixed
+  99px Manus era zone, beside a banner that formats correctly in the same frame.
+  Bet Replay is a mandatory surface and the defect scales with the size of the
+  win being demonstrated.
+
+**Closed this round:** SA-018, by
+`reports/screens/live-round2-2026-07-26/02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`,
+which is the capture that row asked for, obtained the way that row proposed.
+
+**Closed previously, by the integrator:** SA-013 as `e73b18f`; SA-012 as
+`4f5ab47`.
 
 **Wanting an owner or Fable ruling:** SA-002 and SA-007 (whether the platform
-COST and MULT convention needs raising with the platform before submission), and
-SA-011 (a maths-adjacent statistics question, escalated per (l.8) rather than
-answered).
+COST and MULT convention needs raising with the platform before submission,
+now with SA-024's stronger evidence behind it), SA-011 (a maths-adjacent
+statistics question), SA-023 (is the stroke on the car a shut line or a
+leftover), SA-026 (is a magenta shift the intended Overdrive reading).
 
-**Wanting one capture each, and cheap:** SA-018 (the max-win overlay, obtainable
-by replaying the wincap round from its event id), SA-006 (a `cruise` session
-panel before and after), SA-019 (a settled-state frame at the `cruise`
-viewport).
+**Wanting one capture each, and cheap:** SA-006 (a `cruise` session panel before
+and after, still the only mode never proven by a wallet delta), SA-019 (a
+settled-state frame at the `cruise` viewport), SA-026 (one paired base and
+Overdrive frame at the same window size), and the open `02:27:04 to 02:30:41`
+leg of this round's timeline (a Bets panel with COST and PAYOUT visible beside
+the BALANCE readout).
 
-**The owner's question, answered:** the HUD is right, the debits are right, and
-the surface that disagrees is the platform's Bets page. SA-001, SA-002, SA-003.
+**The owner's question, answered again and this time from the platform's own
+payload:** the HUD is right, the debits are right, and the surface that
+disagrees is the platform's Bets page, which renders the bet LEVEL because the
+platform stores level and cost multiplier as two separate fields. SA-001,
+SA-002, SA-003, SA-024, and the owner-facing page at
+`docs/records/MONEY_DISPLAY_EXPLAINED.md`.
 
-**The headline from the second intake:** the 5,000x cap fired live and landed on
-5,000.00x exactly, cross-checked between our HUD and the platform's own row.
-SA-017.
+**The headline from round 3:** three independent sessions, at three bet levels,
+on two days, each close to a residual of 0.00 against a round platform opening
+balance under the true per-mode costs, and to an arbitrary one under the COST
+column reading. The bet size is not the defect. The balance readout in the
+smallest popout is.
