@@ -114,9 +114,19 @@ jobs:
       # docs/records/tracks/<name>.manifest. GITHUB_HEAD_REF is the PR's SOURCE
       # branch and is the one that carries the track name; GITHUB_REF_NAME on a
       # pull request is the merge ref and would never match track/<name>.
+      #
+      # GITHUB_HEAD_SHA is the PR's head BRANCH tip, and it is what the gate
+      # ranges against. Actions checks out the MERGE ref, which carries the base
+      # branch as it is NOW, so ranging base.sha..merge-ref blames the branch for
+      # every commit the base branch gained after the event fired. That is what
+      # failed run 30189226937 against a track that had touched neither file.
+      # Taking the merge base alone does NOT fix it: base.sha is an ancestor of
+      # the merge ref, so their merge base is base.sha. The head branch tip is
+      # the fix, and the gate's seeded self-test plants all three forms.
       - name: locked paths and track scope
         env:
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GITHUB_EVENT_BEFORE: ${{ github.event.before }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_REF_NAME: ${{ github.ref_name }}

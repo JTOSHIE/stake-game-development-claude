@@ -221,14 +221,79 @@ function currentBranch() {
   return raw.trim()
 }
 
+/**
+ * The MERGE BASE of two refs, or null when it cannot be computed.
+ *
+ * Separated out and null-tolerant on purpose: a shallow CI checkout can have no
+ * common ancestor in its history, and in that case falling back to the raw base
+ * is strictly better than crashing the gate that guards everything else.
+ */
+export function mergeBaseOf(base, head, cwd) {
+  try {
+    const mb = git(['merge-base', base, head], cwd).trim()
+    return mb || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The range to judge.
+ *
+ * ON A PULL REQUEST THE HEAD MUST BE THE HEAD BRANCH, NOT THE MERGE REF. This is
+ * the defect that failed run 30189226937, and it is worth spelling out because
+ * the obvious half-fix does nothing at all.
+ *
+ * Actions checks out the pull request's MERGE ref: the head branch with the base
+ * branch AS IT IS NOW merged into it. `GITHUB_SHA` is that merge commit.
+ * `github.event.pull_request.base.sha` is the base branch AS IT WAS when the
+ * event fired. So once `main` moves after the event, `base.sha..merge-ref`
+ * contains main's own newer commits, and the gate attributes them to the track.
+ * That is exactly what happened: two files that only ever existed on main,
+ * `reports/SESSION_REPORT.md` and `reports/archive/2026-07-26h_ci-triage.md`,
+ * were reported as track/screenshot-analyst changing files outside its manifest.
+ * The track had never touched either.
+ *
+ * THE HALF-FIX THAT LOOKS RIGHT AND IS NOT: taking the merge base of `base.sha`
+ * and the merge ref. `base.sha` is always an ancestor of the merge ref, and the
+ * merge base of a commit and its own ancestor is that ancestor, so this returns
+ * `base.sha` unchanged and fixes precisely nothing. It was written, it was
+ * tested, the seeded case below stayed red, and that is why the case exists.
+ *
+ * The fix is to range against the head BRANCH tip, `pull_request.head.sha`,
+ * which does not contain the base branch's later commits. The merge base is
+ * still taken, for the case where `base.sha` is not an ancestor of the head
+ * branch at all.
+ *
+ * The failure mode is not cosmetic. A false TRACK SCOPE failure blocks a correct
+ * pull request, and the temptation it creates is to widen the manifest to make
+ * the gate green, which would silently break rule 3's disjointness for a defect
+ * that was never in the track. The same mis-ranging feeds `commitsIn`, so a
+ * locked-path commit belonging to main could be judged as if it belonged to the
+ * pull request.
+ */
 function resolveRange(argv) {
   if (argv.length >= 2) return { base: argv[0], head: argv[1] }
   // GitHub Actions supplies these; locally, fall back to HEAD's parent.
   const evBefore = process.env.GITHUB_EVENT_BEFORE
   const baseRef = process.env.GITHUB_BASE_SHA
-  const headRef = process.env.GITHUB_SHA || 'HEAD'
+  // The head BRANCH tip on a pull request, falling back to the checked-out
+  // commit (which is the merge ref on a PR, and the pushed commit on a push).
+  const headRef = process.env.GITHUB_HEAD_SHA || process.env.GITHUB_SHA || 'HEAD'
   const ZERO = '0000000000000000000000000000000000000000'
-  if (baseRef) return { base: baseRef, head: headRef }
+  if (baseRef) {
+    if (process.env.GITHUB_HEAD_SHA) {
+      console.log(`RANGE: ranging against the head branch ${headRef.slice(0, 8)} rather than the `
+        + 'merge ref, so the base branch\'s own later commits are not attributed to this branch.')
+    }
+    const mb = mergeBaseOf(baseRef, headRef, process.cwd())
+    if (!mb) {
+      console.log(`RANGE: no merge base for ${baseRef.slice(0, 8)}..${String(headRef).slice(0, 8)}, `
+        + 'using the raw base. On a shallow checkout set fetch-depth: 0.')
+      return { base: baseRef, head: headRef }
+    }
+    return { base: mb, head: headRef }
+  }
   if (evBefore && evBefore !== ZERO) return { base: evBefore, head: headRef }
   return { base: 'HEAD~1', head: 'HEAD' }
 }
@@ -434,6 +499,63 @@ function selfTest() {
     const cS5 = commit('chore: a sibling directory', { 'docs/records/tracksX/y.md': 'x\n' })
     allGood &= run('scope: a directory glob does not match a same-prefixed sibling',
       () => ({ expected: 'FAIL', actual: scopeVerdict(cS4, cS5) }))
+
+    // ── THE MOVED-BASE DEFECT, seeded in the form that really shipped ────────
+    //
+    // Run 30189226937 failed TRACK SCOPE on a pull request whose track had not
+    // touched either of the two files reported against it. The cause is that
+    // `github.event.pull_request.base.sha` is the base branch AS IT WAS when the
+    // event fired, while Actions checks out the PR's MERGE ref, which carries
+    // the base branch as it is NOW. Once main moves, `base.sha..merge-ref`
+    // contains main's own commits and the gate blames the track for them.
+    //
+    // Convention (p) says to plant the defect IN THE FORM IT REALLY OCCURS. So
+    // this builds the real shape: a track branch, a base branch that advances
+    // AFTER the branch point with a file outside the track's manifest, and a
+    // real merge commit standing in for the PR merge ref. Both rangings are then
+    // computed on the same repository, and the test asserts that the stale base
+    // is what goes red and the merge base is what does not. A test that only
+    // checked the fixed path would pass just as happily against the bug.
+    git(['branch', 'pr-base'], dir)                         // stands in for main
+    const staleBase = git(['rev-parse', 'pr-base'], dir).trim()   // the event's base.sha
+
+    git(['checkout', '-q', '-b', 'track/moved-base'], dir)
+    const headSha = commit('docs: the track does ONLY in-scope work',
+      { 'docs/DEMO.md': 'track work\n' })                   // pull_request.head.sha
+
+    git(['checkout', '-q', 'pr-base'], dir)
+    commit('docs: the BASE branch moves on, nothing to do with the track',
+      { 'GAME_FACTS.md': 'a base-branch-only file, outside the track manifest\n' })
+
+    // What Actions actually checks out: the head branch with the CURRENT base
+    // merged in. Built on a throwaway branch so the head branch tip stays where
+    // it is, exactly as it does on GitHub.
+    git(['checkout', '-q', '-b', 'pr-merge-ref', headSha], dir)
+    git(['-c', 'user.email=t@t', '-c', 'user.name=t', 'merge', '-q', 'pr-base', '--no-edit'], dir)
+    const mergeRef = git(['rev-parse', 'HEAD'], dir).trim()
+
+    allGood &= run('range: base.sha to the MERGE REF blames the track for the base branch, the real defect',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(staleBase, mergeRef) }))
+
+    // The half-fix, kept as a case precisely because it is convincing and wrong.
+    // base.sha is an ancestor of the merge ref, so their merge base IS base.sha
+    // and nothing changes. A fix that stopped here would ship the bug.
+    allGood &= run('range: merge base against the MERGE REF changes nothing, the half-fix',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(mergeBaseOf(staleBase, mergeRef, dir), mergeRef) }))
+
+    // The real fix: range against the head BRANCH tip.
+    allGood &= run('range: merge base against the HEAD BRANCH clears it, the fix',
+      () => ({ expected: 'PASS', actual: scopeVerdict(mergeBaseOf(staleBase, headSha, dir), headSha) }))
+
+    // And the fix must not have blunted the gate: an ACTUAL out-of-scope commit
+    // on the track still fails.
+    git(['checkout', '-q', 'track/moved-base'], dir)
+    const cT2 = commit('docs: the track genuinely wanders out of scope',
+      { 'COMPLIANCE_WATCH.md': 'a real out-of-scope edit by the track itself\n' })
+    allGood &= run('range: the fix still catches a REAL out-of-scope change',
+      () => ({ expected: 'FAIL', actual: scopeVerdict(mergeBaseOf(staleBase, cT2, dir), cT2) }))
+
+    git(['checkout', '-q', 'main'], dir)
 
     // ── DISJOINTNESS, MULTI-TRACK rule 3 ────────────────────────────────────
     //
