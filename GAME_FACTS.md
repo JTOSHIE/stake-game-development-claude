@@ -133,6 +133,58 @@ Source: `FUTURE_SPINNER_PAR_SHEET.md` §2 and `CLAUDE.md` "True game facts".
 (`design-system/DESIGN_SYSTEM.md` "APPROVED SYMBOL LINEUP"; `FUTURE_SPINNER_PAR_SHEET.md` §3/§4.
 Reel frequencies, which are maths-locked, are unaffected by the cosmetic rename.)
 
+## 3a. PLATFORM DISPLAY CONVENTION, and what our own surfaces show
+
+Confirmed live on 2026-07-26 from the owner's DevTools captures. This exists
+because the two numbers look like they should agree and do not, and every future
+reader of a Bets page will hit it.
+
+**The platform reports the BET LEVEL, not what the round cost.**
+
+Both the Bets page COST column and the `round.amount` field in the play response
+carry the bet level, on every mode. They do NOT carry the effective debit. The
+platform keeps the multiplier as a separate `costMultiplier` field rather than
+folding it into the amount.
+
+Worked example, all from one capture,
+`reports/screens/live-round2-2026-07-26/03_antelite_play_round_amount_20000000_is_BET_LEVEL_hud_2500.png`:
+
+| what | reads | which is |
+| --- | --- | --- |
+| `round.amount` | `20000000` micros, EUR 20.00 | the BET LEVEL |
+| Bets page COST | `EUR 20.00` | the BET LEVEL |
+| our HUD BET | `EUR 25.00` | the EFFECTIVE debit, 20.00 x 1.25 |
+
+**The effective debit is bet level times the mode cost multiplier:**
+
+| mode | multiplier | proven live to the cent |
+| --- | --- | --- |
+| `base` | 1.00x | yes, 524 spin session panel |
+| `cruise` | 1.00x | **NO. Display level only. TR-075 open.** |
+| `antelite` | 1.25x | yes, balance delta across two frames, residual 0.00 |
+| `bonus` | 100x | yes, residual 0.00 |
+| `super` | 400x | yes, residual 0.00 |
+
+Working at `reports/qa/live_stats/2026-07-26_mode_cost_reconciliation.md`.
+
+**Our surfaces state effective prices, and that is deliberate.** Confirmed in
+`reports/screens/live-round2-2026-07-26/04_features_menu_effective_prices_spincost_875_buy_70000.png`,
+at a EUR 7.00 bet level with OVERBOOST on:
+
+- the HUD BET plate reads `EUR 8.75`, the effective debit;
+- the FEATURES header reads `SPIN COST EUR 8.75` beside `BET EUR 7.00`, so both
+  figures are visible and labelled rather than one standing for the other;
+- the OVERBOOST card reads `1.25x per spin while ON . EUR 8.75`;
+- the Buy Overdrive card reads `100x . EUR 700.00`;
+- the buy confirm dialog states the same price the card does.
+
+**The consequence to keep in view.** The platform's MULT column is payout divided
+by the bet level, so it is against the bet level too. An `antelite` row reading
+`x91.60` is `x73.28` against what the player actually spent. No cap is breached
+in either reading: the 5,000x cap is measured against the bet level by both the
+platform and by `gameStore.ts`'s `WINCAP`, and the largest multiplier observed
+live is exactly 5,000.00x on the wincap round itself.
+
 ## 4. Technology summary
 
 - **Frontend:** Svelte + PixiJS. Reel motion is ticker-driven (PixiJS `app.ticker`, 60fps);
