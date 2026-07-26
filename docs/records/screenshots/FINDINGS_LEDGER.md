@@ -224,13 +224,20 @@ to fix today because `track/quality-sweep` has zero commits and has not started.
 Either narrow its `reports/qa/**` to the gate outputs it actually writes, or
 record a sequence decision. One line on `main`, by the integrator.
 
-**RESOLVED 2026-07-26 by the integrator, on `main`.** `quality-sweep.manifest`
-now reads `reports/qa/*` in place of `reports/qa/**`. Because `*` matches exactly
-one path segment, that covers every gate output written directly into
-`reports/qa/` while excluding every subtree, `live_stats` included. Confirmed by
-reading the change; it was still uncommitted in the `main` working tree when
-this track observed it, so the integrator should confirm it landed before
-merging this pull request.
+**RESOLVED AND LANDED 2026-07-26**, by the integrator, as commit `e73b18f`
+"fix(JOB 3, SA-013): quality-sweep releases the analyst's live_stats subtree".
+`quality-sweep.manifest` now reads `reports/qa/*` in place of `reports/qa/**`.
+Because `*` matches exactly one path segment, that covers every gate output
+written directly into `reports/qa/` while excluding every subtree, `live_stats`
+included.
+
+Verified rather than assumed: `main` was merged into this branch and the gate
+re-run.
+
+    node scripts/qa/locked_paths_gate.mjs --check-disjoint
+      DISJOINT: 3 manifest(s), 2518 tracked file(s), 0 file collision(s), 0 shared glob(s)
+
+Closed. Nothing further is needed from this row.
 
 ## SA-017  NOT-A-DEFECT  severity n/a  the 5,000x wincap fired live, exactly at the cap
 
