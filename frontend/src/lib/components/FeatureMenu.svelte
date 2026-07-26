@@ -296,7 +296,7 @@
 {#if open}
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
   <div
-    class="fm"
+    class="fm fs-scrim"
     role="dialog"
     aria-modal="true"
     aria-label="Features"
@@ -679,9 +679,9 @@
   }
 
   /* ---- modal shell ---- */
+  /* FS VISUAL FIXPACK JOB 4: geometry moved to the shared .fs-scrim class in
+     app.css. This element supplies only paint and layout. */
   .fm {
-    position: fixed;
-    inset: 0;
     z-index: 200;
     display: flex;
     align-items: center;

@@ -67,9 +67,22 @@ async function clickViaDom(locator) {
   await locator.evaluate((el) => el.click())
 }
 
+// FS VISUAL FIXPACK JOB 4, found while verifying the scrim pass and fixed here
+// because it is the same bug in the same helper, one paragraph further down.
+//
+// The splash half POLLS, for the reason written above it. The rules-modal half
+// did not: it took a single instantaneous look at [data-testid="intro-continue"]
+// 100ms after dismissing the splash. But the rules modal is only MOUNTED by
+// handleHeroSplashDismiss, so on any run where Svelte had not flushed and
+// painted within that one window, the check saw nothing, returned, and left a
+// full-screen rules modal sitting over every control the caller was about to
+// drive. modal_safety_proof.mjs times out clicking the FEATURES button for
+// exactly this reason, and it reproduces at HEAD, so it is not new.
+//
+// Same polling shape as the splash, same reasoning, same 2s ceiling.
 export async function dismissIntro(page) {
-  const deadline = Date.now() + 2000
-  while (Date.now() < deadline) {
+  const splashDeadline = Date.now() + 2000
+  while (Date.now() < splashDeadline) {
     const splash = page.locator('[data-testid="hero-splash"]')
     if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {
       await clickViaDom(splash)
@@ -78,9 +91,20 @@ export async function dismissIntro(page) {
     }
     await page.waitForTimeout(100)
   }
-  const btn = page.locator('[data-testid="intro-continue"]')
-  if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
-    await clickViaDom(btn)
+  const introDeadline = Date.now() + 2000
+  while (Date.now() < introDeadline) {
+    const btn = page.locator('[data-testid="intro-continue"]')
+    if (await btn.count() > 0 && await btn.isVisible().catch(() => false)) {
+      await clickViaDom(btn)
+      await page.waitForTimeout(100)
+      return
+    }
+    // The modal is not there AND the splash is gone: this session is one where
+    // the rules modal is legitimately skipped (already seen this session), so
+    // there is nothing to wait for.
+    const splashGone = await page.locator('[data-testid="hero-splash"]').count() === 0
+    const introGone = await page.locator('.intro-backdrop').count() === 0
+    if (splashGone && introGone) return
     await page.waitForTimeout(100)
   }
 }

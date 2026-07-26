@@ -159,7 +159,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="fs-pt"
+  class="fs-pt fs-scrim"
   class:fs-pt--overdrive={$overdriveVisual}
   role="dialog"
   aria-modal="true"
@@ -440,10 +440,13 @@
     --navy: #060610;
     --acc: var(--sig-cyan);
     --acc2: var(--sig-pink);
-    /* Fixed (not absolute): App.svelte's transform:scale re-anchors position:fixed
-       descendants to the 1280x720 stage, so this covers the stage exactly. */
-    position: fixed;
-    inset: 0;
+    /* FS VISUAL FIXPACK JOB 4: geometry moved to the shared .fs-scrim class in
+       app.css. This comment used to read "App.svelte's transform:scale
+       re-anchors position:fixed descendants to the 1280x720 stage, so this
+       covers the stage exactly", which was an accurate description of the
+       defect: covering the stage exactly leaves the letterbox bands bare at
+       every window shape that is not 16:9. This element now supplies only its
+       paint and its layout. */
     z-index: 200;
     display: flex;
     align-items: center;

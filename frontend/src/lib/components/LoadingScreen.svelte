@@ -62,7 +62,7 @@
   import RainLayer from './RainLayer.svelte'
 </script>
 
-<div class="loading-screen">
+<div class="loading-screen fs-scrim">
   <RainLayer count={10} opacity={0.55} variant="splash" />
 
   <!-- Positioned wrapper so the in-flow content paints above the absolutely
@@ -107,8 +107,6 @@
 
 <style>
   .loading-screen {
-    position: fixed;
-    inset: 0;
     background: #000;
     overflow: hidden;
     z-index: 1000;

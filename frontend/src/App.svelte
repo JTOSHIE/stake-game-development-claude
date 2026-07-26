@@ -1015,6 +1015,21 @@
   // scale is, and never stored independently of it.
   let portraitCrop = computePortraitCrop(portraitCanvasScale)
   let miniCrop = computeMiniCrop()
+
+  // FS VISUAL FIXPACK JOB 4: what the shared .fs-scrim class divides by.
+  //
+  // A `transform` makes an element the containing block for its position:fixed
+  // DESCENDANTS, so every scrim inside .game-wrapper is anchored to the wrapper
+  // rather than to the viewport wherever the wrapper is scaled. The scrim
+  // therefore has to be sized in the wrapper's own pre-scale units, which is the
+  // viewport divided by the scale.
+  //
+  // This is NOT the same as --S, and using --S here would be wrong: the three
+  // native-HUD modes set `transform: none` on the wrapper while --S keeps its
+  // computed value, so a scrim in portrait would be divided by a scale that is
+  // not being applied to it. This variable is 1 exactly when the wrapper carries
+  // no transform, which is the condition that actually matters.
+  $: scrimScale = (portrait || compactLandscape || miniPlayer) ? 1 : S
   function handleResize(): void {
     S = computeS()
     portrait = computePortrait()
@@ -1557,6 +1572,7 @@
     --theme-secondary: {$activeTheme.palette.secondary};
     --theme-bg: {$activeTheme.palette.background};
     --S: {S};
+    --scrim-scale: {scrimScale};
   "
 >
   <!-- Max win overlay, requires explicit COLLECT click; sits below LoadingScreen (z200) -->

@@ -19,7 +19,7 @@
   }
 </script>
 
-<div class="overlay" role="dialog" aria-modal="true" aria-label="Select game theme">
+<div class="overlay fs-scrim" role="dialog" aria-modal="true" aria-label="Select game theme">
   <div class="panel">
 
     <header>
@@ -72,8 +72,7 @@
 </div>
 
 <style>
-  .overlay {
-    position: fixed; inset: 0; z-index: 1000;
+  .overlay { z-index: 1000;
     background: rgba(0,0,0,0.92);
     display: flex; align-items: center; justify-content: center;
     backdrop-filter: blur(4px);

@@ -51,7 +51,7 @@
 </script>
 
 <div
-  class="hero-splash"
+  class="hero-splash fs-scrim"
   class:reduced
   role="button"
   tabindex="0"
@@ -72,8 +72,6 @@
 
 <style>
   .hero-splash {
-    position: fixed;
-    inset: 0;
     z-index: 300;
     display: flex;
     flex-direction: column;

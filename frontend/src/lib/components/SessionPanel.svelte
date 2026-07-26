@@ -90,7 +90,7 @@
        since checking your own session stats is a reasonable thing to want
        even where it isn't mandated. -->
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-  <div class="sp-sheet-backdrop" role="dialog" aria-modal="true" aria-label={$tr('rgSessionTitle')} data-testid="session-panel-sheet" on:click={closeSheet}>
+  <div class="sp-sheet-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={$tr('rgSessionTitle')} data-testid="session-panel-sheet" on:click={closeSheet}>
     <div class="sp-sheet" on:click|stopPropagation>
       <div class="sp-sheet-head">
         <h2>{$tr('rgSessionTitle')}</h2>
@@ -108,7 +108,7 @@
 {/if}
 
 {#if $realityCheckDue}
-  <div class="rc-backdrop" role="dialog" aria-modal="true" aria-label={$tr('rgRealityCheckTitle')}>
+  <div class="rc-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={$tr('rgRealityCheckTitle')}>
     <div class="rc-modal">
       <h2>{$tr('rgRealityCheckTitle')}</h2>
       <!-- The body is one interpolated sentence, exactly as supplied. It was
@@ -152,7 +152,7 @@
   .sp-val { color: #fff; font-variant-numeric: tabular-nums; font-size: 13px; }
   .sp-val.neg { color: #ff6b6b; }
   .sp-val.pos { color: #58e; }
-  .rc-backdrop { position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); }
+  .rc-backdrop { z-index: 130; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); }
   .rc-modal { width: min(90vw, 360px); padding: 22px; border-radius: 14px; text-align: center; font-family: 'Orbitron', sans-serif; color: #fff; background: linear-gradient(160deg, #0c0c22, #08081a); border: 1px solid rgba(0,255,255,0.4); }
   .rc-modal h2 { color: #00ffff; font-size: 1.1rem; margin: 0 0 12px; }
   .rc-modal p { font-size: 0.85rem; opacity: 0.9; margin: 0 0 8px; }
@@ -160,8 +160,7 @@
 
   /* On-demand session sheet (2026-07-14c) - reuses .sp-row/.sp-val, own
      modal chrome matching .rc-modal's visual language. */
-  .sp-sheet-backdrop {
-    position: fixed; inset: 0; z-index: 130;
+  .sp-sheet-backdrop { z-index: 130;
     display: flex; align-items: center; justify-content: center;
     background: rgba(0, 0, 0, 0.65);
   }

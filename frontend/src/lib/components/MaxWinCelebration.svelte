@@ -66,7 +66,7 @@
 <svelte:window on:keydown={handleKey} />
 
 {#if show}
-  <div class="c1-win c1-win--overdrive max-win-overlay c1-max" role="dialog" aria-modal="true" aria-label="Max Win reached">
+  <div class="c1-win c1-win--overdrive max-win-overlay c1-max fs-scrim" role="dialog" aria-modal="true" aria-label="Max Win reached">
 
     <!-- Rotating halo ring behind everything -->
     <div class="c1-halo halo-ring" aria-hidden="true"></div>
@@ -131,8 +131,6 @@
 
   /* ── Overlay ────────────────────────────────────────────────────────────── */
   .c1-max {
-    position: fixed;
-    inset: 0;
     z-index: 150;
     display: flex;
     align-items: center;

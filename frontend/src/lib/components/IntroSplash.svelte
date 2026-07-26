@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="intro-backdrop" role="dialog" aria-modal="true" aria-label={t($locale, 'overdriveFreeSpins', mode)}>
+<div class="intro-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={t($locale, 'overdriveFreeSpins', mode)}>
   <div class="intro-card">
     <h2 class="intro-title">{t($locale, 'overdriveFreeSpins', mode)}</h2>
     <ul class="intro-rules">
@@ -39,8 +39,6 @@
 
 <style>
   .intro-backdrop {
-    position: fixed;
-    inset: 0;
     z-index: 300;
     display: flex;
     align-items: center;

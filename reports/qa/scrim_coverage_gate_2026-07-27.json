@@ -1,0 +1,1076 @@
+{
+  "eps_px": 1,
+  "sizes": [
+    {
+      "name": "Desktop",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "name": "Laptop",
+      "width": 1024,
+      "height": 576
+    },
+    {
+      "name": "Popout S",
+      "width": 400,
+      "height": 225
+    },
+    {
+      "name": "Popout L",
+      "width": 800,
+      "height": 450
+    },
+    {
+      "name": "Mobile L",
+      "width": 425,
+      "height": 812
+    },
+    {
+      "name": "Mobile M",
+      "width": 375,
+      "height": 667
+    },
+    {
+      "name": "Mobile S",
+      "width": 320,
+      "height": 568
+    },
+    {
+      "name": "Swept wide",
+      "width": 1600,
+      "height": 600
+    },
+    {
+      "name": "Swept square",
+      "width": 900,
+      "height": 900
+    },
+    {
+      "name": "Swept tall",
+      "width": 1100,
+      "height": 980
+    }
+  ],
+  "surfaces": [
+    "hero-splash",
+    "intro-rules",
+    "paytable",
+    "feature-menu",
+    "session-sheet"
+  ],
+  "shared_rule": {
+    "present": true,
+    "usesViewportUnits": true,
+    "referencesSafeArea": false,
+    "body": "position: fixed; left: 50%; top: 50%; width: calc(100vw / var(--scrim-scale, 1)); height: calc(100dvh / var(--scrim-scale, 1)); transform: translate(-50%, -50%);"
+  },
+  "hand_rolled": [],
+  "rows": [
+    {
+      "size": "Desktop",
+      "viewport": "1200x675",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1200,
+        "h": 675
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Desktop",
+      "viewport": "1200x675",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1200,
+        "h": 675
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1200,
+        "h": 675
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Desktop",
+      "viewport": "1200x675",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1200,
+        "h": 675
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Desktop",
+      "viewport": "1200x675",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1200,
+        "h": 675
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Laptop",
+      "viewport": "1024x576",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 576
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Laptop",
+      "viewport": "1024x576",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 576
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Laptop",
+      "viewport": "1024x576",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 576
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Laptop",
+      "viewport": "1024x576",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 576
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Laptop",
+      "viewport": "1024x576",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1024,
+        "h": 576
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout S",
+      "viewport": "400x225",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 225
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout S",
+      "viewport": "400x225",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 225
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout S",
+      "viewport": "400x225",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 225
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout S",
+      "viewport": "400x225",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 225
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout S",
+      "viewport": "400x225",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 225
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout L",
+      "viewport": "800x450",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 450
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout L",
+      "viewport": "800x450",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 450
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout L",
+      "viewport": "800x450",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 450
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout L",
+      "viewport": "800x450",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 450
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Popout L",
+      "viewport": "800x450",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 800,
+        "h": 450
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile L",
+      "viewport": "425x812",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 425,
+        "h": 812
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile L",
+      "viewport": "425x812",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 425,
+        "h": 812
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 425,
+        "h": 812
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile L",
+      "viewport": "425x812",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 425,
+        "h": 812
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile L",
+      "viewport": "425x812",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 425,
+        "h": 812
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile M",
+      "viewport": "375x667",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 375,
+        "h": 667
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile M",
+      "viewport": "375x667",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 375,
+        "h": 667
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile M",
+      "viewport": "375x667",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 375,
+        "h": 667
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile M",
+      "viewport": "375x667",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 375,
+        "h": 667
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile M",
+      "viewport": "375x667",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 375,
+        "h": 667
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile S",
+      "viewport": "320x568",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 568
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile S",
+      "viewport": "320x568",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 568
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile S",
+      "viewport": "320x568",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 568
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile S",
+      "viewport": "320x568",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 568
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Mobile S",
+      "viewport": "320x568",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 320,
+        "h": 568
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept wide",
+      "viewport": "1600x600",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 600
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept wide",
+      "viewport": "1600x600",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 600
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept wide",
+      "viewport": "1600x600",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 600
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept wide",
+      "viewport": "1600x600",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 600
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept wide",
+      "viewport": "1600x600",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1600,
+        "h": 600
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept square",
+      "viewport": "900x900",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 900,
+        "h": 900
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept square",
+      "viewport": "900x900",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 900,
+        "h": 900
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept square",
+      "viewport": "900x900",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 900,
+        "h": 900
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept square",
+      "viewport": "900x900",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 900,
+        "h": 900
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept square",
+      "viewport": "900x900",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 900,
+        "h": 900
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept tall",
+      "viewport": "1100x980",
+      "surface": "hero-splash",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1100,
+        "h": 980
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept tall",
+      "viewport": "1100x980",
+      "surface": "intro-rules",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1100,
+        "h": 980
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept tall",
+      "viewport": "1100x980",
+      "surface": "paytable",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1100,
+        "h": 980
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept tall",
+      "viewport": "1100x980",
+      "surface": "feature-menu",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1100,
+        "h": 980
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    },
+    {
+      "size": "Swept tall",
+      "viewport": "1100x980",
+      "surface": "session-sheet",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "w": 1100,
+        "h": 980
+      },
+      "gaps": {
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0
+      },
+      "worstGap": 0,
+      "uncoveredSamples": 0,
+      "sampled": 40
+    }
+  ],
+  "screenshots": [
+    "after-paytable-swept-wide.png",
+    "after-paytable-swept-square.png"
+  ],
+  "failures": []
+}

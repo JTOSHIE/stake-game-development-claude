@@ -538,3 +538,29 @@ jobs:
       - name: paytable card fill gate, all sixteen locales
         working-directory: frontend
         run: node scripts/paytable_card_fill_gate.mjs
+
+      # ── Gate 13i: a full-screen scrim covers the full screen ─────────────────
+      # FS VISUAL FIXPACK JOB 4. `.game-wrapper` carries transform: scale on
+      # desktop, and a transform makes an element the containing block for its
+      # position:fixed DESCENDANTS, so every dialog scrim resolved `inset: 0` to
+      # the 1280x720 STAGE rather than the viewport. That is invisible at 16:9,
+      # because then the stage IS the viewport, and leaves the letterbox bands
+      # bare at every other window shape: measured 266.67px uncovered at
+      # 1600x600, 196.88px at 900x900, 180.63px at 1100x980. Exactly the owner's
+      # "at some sizes the corners show through".
+      #
+      # Ten scrims now share ONE implementation, .fs-scrim in src/app.css. The
+      # gate asserts all three of: the shared rule exists and does not shrink
+      # itself by the safe-area insets; no component hand-rolls scrim geometry
+      # (read out of the source, because the point is that it must not be
+      # WRITTEN); and zero uncovered pixels by rect AND by hit-testing forty
+      # points one pixel inside every edge, at seven presets and three swept
+      # sizes. Convention (p) --self-test plants the re-anchored scrim and the
+      # inset-shrunk scrim.
+      - name: scrim coverage gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/scrim_coverage_gate.mjs --self-test
+
+      - name: scrim coverage gate, seven presets plus three swept sizes
+        working-directory: frontend
+        run: node scripts/scrim_coverage_gate.mjs

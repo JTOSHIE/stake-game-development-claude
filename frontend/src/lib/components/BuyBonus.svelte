@@ -87,7 +87,7 @@
   {/if}
 
   {#if showConfirm}
-    <div class="buy-backdrop" role="dialog" aria-modal="true" aria-label={featureName}>
+    <div class="buy-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={featureName}>
       <div class="buy-modal">
         <!-- Grille art carries the header (LAYOUT_SPEC feature accent) -->
         <img class="buy-header-art" src="{base}/ui/feature_button.png" alt="" draggable="false" />
@@ -162,8 +162,7 @@
   .buy-btn:disabled { opacity: 0.5; cursor: default; }
   .buy-btn-label { font-size: 0.8rem; }
   .buy-btn-price { font-size: 0.72rem; color: #ffd54a; }
-  .buy-backdrop {
-    position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center;
+  .buy-backdrop { z-index: 120; display: flex; align-items: center; justify-content: center;
     background: rgba(0, 0, 0, 0.6);
     animation: buy-fade 0.2s ease;
   }

@@ -16,6 +16,60 @@ html, body {
   touch-action: manipulation;
 }
 
+/* THE ONE FULL-SCREEN SCRIM. FS VISUAL FIXPACK JOB 4 (owner report, 2026-07-27).
+ *
+ * The owner reported: "The full-screen dark overlay behind dialogs and
+ * transitions does not always cover the whole screen; at some sizes the corners
+ * show through."
+ *
+ * WHY IT HAPPENED. On desktop, App.svelte's `.game-wrapper` is a 1280x720 box
+ * carrying `transform: scale(var(--S))`, and a transform makes an element the
+ * containing block for its `position: fixed` DESCENDANTS. Every dialog scrim
+ * lives inside it, so `position: fixed; inset: 0` resolved to the STAGE rather
+ * than to the viewport. PaytableModal's own comment said so in terms: it
+ * "covers the stage exactly". Covering the stage exactly is invisible while the
+ * window happens to be 16:9, because then the stage IS the viewport. At any
+ * other aspect ratio the stage is letterboxed and those bands are simply not
+ * covered. That is the owner's "at some sizes", and the corners are where a
+ * player's eye meets the two bands. Measured before the fix: 266.67px uncovered
+ * at 1600x600, 196.88px at 900x900, 180.63px at 1100x980.
+ *
+ * WHY THIS LIVES IN app.css AND NOT IN A COMPONENT. Svelte scopes a component's
+ * styles to that component, so ten components carrying "the same" scrim rule is
+ * ten rules that only look identical, and the project has now been bitten by
+ * that shape twice (the duplicated dismissIntro, the duplicated .fs-plate).
+ * This file is the global sheet, imported once by main.ts, so there is exactly
+ * one definition and a component supplies only its own paint.
+ *
+ * HOW IT COVERS THE VIEWPORT FROM INSIDE A SCALED ANCESTOR. `.game-stage`
+ * centres `.game-wrapper` in the viewport, so the wrapper's centre and the
+ * viewport's centre are the same point. Anchoring the scrim to that centre and
+ * sizing it to the viewport DIVIDED by the stage scale makes it render at
+ * exactly the viewport once the ancestor's scale is applied. Where there is no
+ * scaled ancestor (portrait, compact landscape, mini player, and anything
+ * outside the wrapper) `--scrim-scale` is 1 and this reduces to a plain
+ * viewport-sized box anchored to the viewport centre. One rule, both cases.
+ *
+ * SAFE-AREA INSETS: deliberately not referenced. 100vw and 100dvh already span
+ * the whole visual viewport INCLUDING the inset regions. An inset is advisory
+ * geometry saying where an obstruction sits; a scrim's job is to pass under it,
+ * not to stop at it. scrim_coverage_gate.mjs asserts this rule contains no
+ * env(safe-area-inset reference, because respecting one here is the regression
+ * a well-meaning later edit would introduce.
+ *
+ * Held by frontend/scripts/scrim_coverage_gate.mjs at seven platform presets
+ * and three swept window sizes, by rect and by hit-testing a ring of points one
+ * pixel inside every edge.
+ */
+.fs-scrim {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: calc(100vw / var(--scrim-scale, 1));
+  height: calc(100dvh / var(--scrim-scale, 1));
+  transform: translate(-50%, -50%);
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
