@@ -90,3 +90,28 @@ unsolved problem parked with options beats a problem solved wrongly. Locked file
 machine-enforced and a lift must name its deny lines. Briefs are saved verbatim to
 `reports/briefs/`. Full text in `CLAUDE.md`, conventions (l) and (m) and THE FACTS
 DISCIPLINE.
+
+---
+
+## Appended 2026-07-26: the replay blocker (TR-076), fixed and proven
+
+Bet Replay on the live platform was dead: the board static, START REPLAY an unclickable
+shadow. Reproduced locally at the exact live parameter shape before any code was blamed:
+the fixed `.bg-layer` backdrop (z-index 0) hit-tests above unpositioned content, and
+ReplayMode's container was unpositioned, so the backdrop sat over the whole replay UI.
+Only replay mode was exposed because the game stage (z-index 2) covers the backdrop in
+normal play. Fixed both directions (backdrop `pointer-events: none`; replay container
+positioned at z-index 2), proven by `frontend/scripts/replay_blocker_proof.mjs`, 7 of 7
+including the convention (p) seeded red, evidence in `reports/screens/replay-blocker/`.
+
+**TR-073 is closed by pass 3 of that proof**: MaxWinCelebration presents at the wincap in
+replay and COLLECT answers a real click. The brief's "TR-075" reference maps to TR-073;
+recorded in the tracker, not silently renumbered. The deployed bundle still carries the
+defect until the owner re-uploads the frontend; event 22975 via the Bets panel Replay
+button is the one-click live confirmation afterwards.
+
+Also this session: rule 9 filled with the expected-fail protocol (both documents),
+the working-tree relocations completed with nothing discarded (`chore/wip-backgrounds`
+pushed; `claude/fs-super-prototype` already carried the super package byte-identical, so
+the loose 450MB copy was simply removed), and `sideproject/` listed for the owner's
+LUMEN-branch or off-repo call. Full account: `reports/archive/2026-07-26j_replay-blocker.md`.
