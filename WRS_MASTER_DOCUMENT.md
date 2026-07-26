@@ -113,6 +113,7 @@ changes is that more than one session may now work at once.
 | 6 | **Hard problems are extracted, not solved mid-flow.** A hard bounded problem found inside a job is written up as its own surgical brief and handed back, rather than absorbed into the session that found it. |
 | 7 | **Fable verifies every pull request before merge**, and the scope gate enforces the manifests in CI, so a track that wanders outside its declared paths fails before a human has to notice. |
 | 8 | **Track session reports are dated AND track-tagged sections.** The integrator merges pull requests one at a time and resolves report conflicts **by concatenation, never by discarding a section**. |
+| 10 | **A red run on main stops the line.** No new job starts until main is green. Every session verifies its own final push's REMOTE CI result before closing and records the run link in the session report. Local gate results never substitute for the remote run. (Owner's order, 2026-07-26; earned by runs 117 to 120, four consecutive red pushes to main that every session's local gates had passed. The corrected account of runs 117 to 121 is recorded beside the authoritative rule in `CLAUDE.md`.) |
 
 Enforced by `scripts/qa/locked_paths_gate.mjs`, which carries both the locked-path
 rule and the track scope gate, and runs first in CI.
