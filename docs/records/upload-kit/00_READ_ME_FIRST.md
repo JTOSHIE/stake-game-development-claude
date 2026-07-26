@@ -493,7 +493,7 @@ it.
 
 ---
 
-## Part 9b: the five observations
+## Part 9b: the seven observations
 
 These are the same shape as the ten checks in Part 8: **look at this, expect
 this, screenshot this.** The technical detail sits in `DTT_PROTOCOL.md`, which is
@@ -561,6 +561,43 @@ one value in our code.
 4. **Expect: clean English.** Danish is one we do not ship, so it should fall back
    to English with nothing missing, no blank labels and no odd codes on screen.
 5. **Screenshot the game running in that session.**
+
+### Observation 6: the max win, replayed
+
+**You already hit the maximum win.** On 26 July a NITRO OVERDRIVE round at a
+`EUR 750.00` bet paid `EUR 3,750,000.00`, which is exactly 5,000x, the cap. What
+we do not have is a picture of the celebration screen that is supposed to appear
+when it happens, because by the time the screenshot was taken it had already been
+collected.
+
+1. Open the **Bets** panel and scroll to the round paying **`+EUR 3,750,000.00`**.
+   It is the largest number in the list by a very long way, so it is easy to find.
+2. Click that row to open it, and press **Replay this bet**.
+3. Watch the replay through to the end.
+4. **The thing to watch for:** a full-screen celebration with three stars, the
+   words **MAX WIN**, a large **5,000x** and a **COLLECT** button.
+5. **Screenshot it while it is on screen**, before pressing COLLECT.
+
+**If no celebration appears, that is the more important answer**, so screenshot
+the end of the replay anyway and tell me. Either way this takes about a minute
+and it is the last piece of evidence the max win is missing.
+
+### Observation 7: twenty Cruise spins, bracketed
+
+Cruise is the one mode we have never been able to check the money on, because
+every screenshot of it so far has been a single moment with nothing to compare
+against.
+
+1. Open **FEATURES** and select **Cruise**.
+2. **Before you spin at all:** open the menu, open **Session information**, and
+   **screenshot it**. This is the "before" and the run is worthless without it.
+3. Close that panel and spin **twenty times**. Autoplay is fine.
+4. **After the twentieth spin:** open **Session information** again and
+   **screenshot it**.
+
+Two screenshots, the same panel, before and after. That is the whole thing. With
+both, the money can be differenced and Cruise is settled; with only one, it is
+not, which is exactly where we are now.
 
 ---
 
