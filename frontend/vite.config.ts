@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { rmSync, existsSync, statSync, readdirSync } from 'node:fs'
+import { rmSync, existsSync, statSync, readdirSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
 
 // Build Diet v2: prune every legacy asset that no longer has a live consumer
@@ -103,6 +104,58 @@ function pruneDocs(root: string, base = root): string[] {
   return removed
 }
 
+/**
+ * Build provenance. JOB 4 / TR-062, 2026-07-26.
+ *
+ * THE FINDING. The published bundle was one commit behind `main`, and nothing
+ * in the artefact tied a bundle to a commit. "What is live" was not answerable
+ * from the repository at all: it was established by grepping the shipped
+ * JavaScript for em dashes, which is not a method anyone should need.
+ *
+ * Fable ruled option (a) with (b): `dist/` carries a build stamp, and kits are
+ * single use. This is the (a) half.
+ *
+ * READ FROM GIT, AND THE DIRTY FLAG IS NOT DECORATION. A stamp that says
+ * "abc1234" while the tree had uncommitted edits names a commit that does not
+ * describe the bundle. `clean: false` is the honest answer in that case, and
+ * `scripts/kit_build.mjs` refuses to package such a build outright.
+ */
+function gitFacts(): { commit: string; clean: boolean; branch: string } {
+  const run = (args: string[]): string => {
+    try {
+      return execFileSync('git', args, { cwd: __dirname, encoding: 'utf-8' }).trim()
+    } catch {
+      return ''
+    }
+  }
+  const commit = run(['rev-parse', 'HEAD'])
+  const branch = run(['rev-parse', '--abbrev-ref', 'HEAD'])
+  // --porcelain over the whole repository, not just frontend/: a change to the
+  // maths package or to a gate is still a change this bundle was built beside.
+  const status = run(['status', '--porcelain'])
+  return {
+    commit: commit || 'unknown',
+    branch: branch || 'unknown',
+    clean: commit !== '' && status === '',
+  }
+}
+
+/** Total bytes and file count under `root`, excluding one path. */
+function measureDist(root: string, exclude: string): { files: number; bytes: number } {
+  let files = 0
+  let bytes = 0
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, entry.name)
+      if (p === exclude) continue
+      if (entry.isDirectory()) walk(p)
+      else { files += 1; bytes += statSync(p).size }
+    }
+  }
+  if (existsSync(root)) walk(root)
+  return { files, bytes }
+}
+
 function pruneLegacyAssets() {
   const LEGACY_DIRS = [
     'assets/symbols', 'assets/frames', 'assets/videos',
@@ -182,14 +235,54 @@ function pruneLegacyAssets() {
       }
 
       console.log(`[build-diet] total pruned: ${prunedCount} paths, ${(prunedBytes / 1024 / 1024).toFixed(2)} MB`)
+
+      // JOB 4 / TR-062. Written LAST, after every prune, so the figures
+      // describe the bundle that actually ships rather than the one Vite
+      // emitted before the diet ran.
+      //
+      // The byte total EXCLUDES this file, and the name says so. Including it
+      // is impossible without a fixed point, and a figure that silently means
+      // something slightly different from the one the hygiene gate measures is
+      // how two documents start disagreeing. The gate reconciles the two
+      // explicitly instead: recorded bytes plus this file's own size must equal
+      // the measured total.
+      const distRoot = resolve(__dirname, 'dist')
+      const infoPath = join(distRoot, 'build-info.json')
+      const git = gitFacts()
+      const measured = measureDist(distRoot, infoPath)
+      const info = {
+        game: 'future-spinner',
+        commit: git.commit,
+        branch: git.branch,
+        cleanTree: git.clean,
+        builtAt: new Date().toISOString(),
+        bundleFilesExcludingThisFile: measured.files,
+        bundleBytesExcludingThisFile: measured.bytes,
+        note: 'Provenance only. Nothing in the running game fetches this file; '
+          + 'the boot line is inlined at build time. See TR-062.',
+      }
+      writeFileSync(infoPath, JSON.stringify(info, null, 2) + '\n')
+      console.log(`[build-info] ${git.commit.slice(0, 8)}${git.clean ? '' : ' DIRTY'} `
+        + `${measured.files} files, ${measured.bytes} bytes`)
     },
   }
 }
 
 // https://vite.dev/config/
+// The same provenance, INLINED at build time so the boot line costs no network
+// request. TR-062's ruling requires the network-hygiene gate to assert exactly
+// that, and a runtime fetch of build-info.json would have been the obvious and
+// wrong way to print it.
+const BUILD_GIT = gitFacts()
+
 export default defineConfig({
   plugins: [svelte(), pruneLegacyAssets()],
   base: './',
+  define: {
+    __BUILD_COMMIT__: JSON.stringify(BUILD_GIT.commit),
+    __BUILD_CLEAN__: JSON.stringify(BUILD_GIT.clean),
+    __BUILD_AT__: JSON.stringify(new Date().toISOString()),
+  },
   build: {
     target: 'es2020',
     rollupOptions: {

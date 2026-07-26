@@ -29,7 +29,7 @@
 //
 // Run (from frontend/, after `npm run build`): node scripts/dist_hygiene_gate.mjs
 
-import { readdirSync, statSync, existsSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readdirSync, statSync, existsSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative } from 'node:path'
 
@@ -104,6 +104,33 @@ check('the bundle is inside the 25 MB budget', totalBytes <= BUDGET_BYTES,
 // reported PASS while scanning one file.
 check('dist is a real build rather than an empty directory', files.length > 50, `${files.length} files`)
 
+// ── The build stamp describes THIS bundle, JOB 4 / TR-062 ───────────────────
+//
+// A provenance file that says the wrong thing is worse than none, and the way
+// it goes wrong is drift: someone moves the write earlier in closeBundle, the
+// prunes then run after it, and the recorded figures describe a bundle that no
+// longer exists. So the two are reconciled rather than both merely recorded.
+//
+// build-info.json deliberately records the total EXCLUDING itself, since
+// including it has no fixed point. The check is therefore: recorded bytes plus
+// this file's own size equals what is on disk.
+const infoPath = join(DIST, 'build-info.json')
+let info = null
+if (existsSync(infoPath)) {
+  try { info = JSON.parse(readFileSync(infoPath, 'utf-8')) } catch { info = null }
+}
+check('dist carries a build stamp', info !== null, 'build-info.json missing or unparseable')
+if (info) {
+  const infoBytes = statSync(infoPath).size
+  check('the build stamp names a commit',
+    /^[0-9a-f]{40}$/.test(info.commit || ''), String(info.commit))
+  check('the build stamp reconciles with the bundle on disk',
+    info.bundleBytesExcludingThisFile + infoBytes === totalBytes
+      && info.bundleFilesExcludingThisFile + 1 === files.length,
+    `stamp says ${info.bundleFilesExcludingThisFile} files / ${info.bundleBytesExcludingThisFile} bytes `
+      + `plus itself at ${infoBytes}; disk has ${files.length} files / ${totalBytes} bytes`)
+}
+
 // ── SEEDED VIOLATION, convention (p) ─────────────────────────────────────────
 //
 // This gate claims the shipped-documentation class is closed, so it must be
@@ -139,6 +166,7 @@ writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({
   budgetBytes: BUDGET_BYTES,
   filesByExtension: byExt,
   documentationFound: docs,
+  buildStamp: info,
   seeded, negativeControl: controlClean,
   pass: failures.length === 0,
   failures,

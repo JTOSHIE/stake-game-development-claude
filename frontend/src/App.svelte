@@ -871,6 +871,25 @@
   onDestroy(() => { hudSlotObserver?.disconnect(); hudSlotObserver = null })
 
   onMount(async () => {
+    // ── BUILD PROVENANCE, JOB 4 / TR-062 ───────────────────────────────────
+    //
+    // One line, first thing, in every mode including replay.
+    //
+    // The published bundle was once a commit behind main and nothing in the
+    // artefact said so: "what is live" had to be established by grepping the
+    // shipped JavaScript for em dashes. This makes the question answerable by
+    // opening the console, and `dist/build-info.json` answers it for anyone
+    // reading the artefact instead.
+    //
+    // The values are INLINED by Vite's `define`, not fetched. A runtime fetch
+    // of build-info.json would have been the obvious way to print this and
+    // would have added a request to every session, which is precisely what the
+    // ruling has the network-hygiene gate assert against.
+    console.info(
+      `Future Spinner build ${__BUILD_COMMIT__.slice(0, 8)}`
+      + `${__BUILD_CLEAN__ ? '' : ' (uncommitted changes)'} built ${__BUILD_AT__}`,
+    )
+
     // Skip all RGS initialisation in replay mode, ReplayMode handles its own flow
     if (isReplay) return
 

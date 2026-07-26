@@ -220,7 +220,25 @@ async function run() {
 
   const distSizeBytes = getDirSizeBytes(DIST_DIR)
 
+  // JOB 4 / TR-062. The build stamp must cost NOTHING at runtime.
+  //
+  // `dist/build-info.json` exists so a human or a tool reading the artefact can
+  // answer "which commit is this", and the console boot line prints the same
+  // facts from values Vite inlined at build time. The obvious wrong way to
+  // print them is a runtime fetch of that file, which would add a request to
+  // every single session, so the ruling has this gate assert against it
+  // explicitly rather than trusting the implementation to stay honest.
+  const buildInfoRequests = requests.filter((r) => /build-info\.json/.test(r.url))
+  if (buildInfoRequests.length > 0) {
+    failures.push({
+      url: buildInfoRequests[0].url,
+      reason: 'build-info.json was FETCHED at runtime. It is provenance, not configuration: '
+        + 'the boot line reads values inlined by vite define. See TR-062.',
+    })
+  }
+
   const summary = {
+    buildInfoRequests: buildInfoRequests.length,
     totalRequests: requests.length,
     notFound: requests.filter((r) => r.status === 404).length,
     failed: requests.filter((r) => r.status === 'FAILED').length,
