@@ -83,10 +83,24 @@ async function getFreePort() {
   })
 }
 
+// HARD TIMEOUT (CI triage, run 122). The gate's work takes ~13s; on the CI
+// runner the process then hung forever AFTER printing PASS, because killing
+// the `npx` wrapper orphans the real vite child, whose inherited stdout pipe
+// holds this process's event loop open. The watchdog turns any such hang into
+// a loud red instead of a silent wait, and the explicit exit below makes
+// success independent of lingering handles.
+const GATE_TIMEOUT_MS = 4 * 60_000
+setTimeout(() => {
+  console.error(`LAYOUT FIT GATE: HARD TIMEOUT after ${GATE_TIMEOUT_MS / 1000}s, failing red`)
+  process.exit(1)
+}, GATE_TIMEOUT_MS)
+
 function startPreview(port) {
   return new Promise((res, rej) => {
+    // detached: the preview gets its own process group, so killPreview can
+    // signal the GROUP and reach vite itself, not just the npx wrapper.
     const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true,
     })
     let done = false
     const onData = (d) => {
@@ -98,6 +112,11 @@ function startPreview(port) {
     proc.on('error', rej)
     setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
   })
+}
+
+function killPreview(proc) {
+  // Negative pid signals the whole detached group: npx AND the vite it spawned.
+  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch {} }
 }
 
 // Measured in the page. Two independent questions, plus the text-overflow check
@@ -227,7 +246,7 @@ try {
   }
 } finally {
   await browser.close()
-  preview.kill()
+  killPreview(preview)
 }
 
 writeFileSync(join(QA, 'layout_fit_gate_2026-07-26.json'), JSON.stringify({ rows, failures }, null, 2))
@@ -239,3 +258,6 @@ if (failures.length) {
   process.exit(1)
 }
 console.log('LAYOUT FIT GATE: PASS (fits and every control reachable at all seven presets)')
+// Explicit, because on the CI runner an orphaned preview pipe kept the event
+// loop alive after this line and the job hung green-in-all-but-exit (run 122).
+process.exit(0)

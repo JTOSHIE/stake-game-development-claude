@@ -384,10 +384,16 @@ jobs:
   # The second job of the two-job policy (see header). Only the gates that
   # launch chromium live here. Blocking, no secrets, contents:read only, same
   # pull_request trigger, exactly like the static job.
+  # timeout-minutes is 10 on Fable's mid-session direction after run 122: the
+  # layout gate finished its work in 13 seconds, printed PASS, and then hung
+  # for 18 minutes because killing its npx wrapper orphaned the vite preview,
+  # whose inherited stdout pipe held the node event loop open. Both gates now
+  # also carry a 4-minute internal watchdog and an explicit process.exit, so a
+  # hang is a loud red at three layers before a human has to cancel anything.
   browser:
     name: browser gates
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - name: Check out
