@@ -192,6 +192,20 @@ owner's own words as "the height between title and strip". Both figures are reco
 the call can be made against numbers. Say the word and it is a one-constant change
 (`MINI_CROP_TOP_Y`).
 
+### Rule 10 closing link
+
+Final push, BOTH JOBS GREEN on the remote runner, verified before closing rather
+than inferred from the local results:
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30201767190`
+  commit `bc9e8a5`
+  static gates: success
+  browser gates: success
+
+The browser job is the one that matters here, because it is where
+`layout_fit_gate.mjs` runs, and this pass's near-miss was a layout regression that
+only the fit gate caught. It is green on a different machine from the one that made
+the change.
+
 ### FOR THE NEXT SESSION
 
 **Model and effort.** Opus, high effort, single job in a fresh context per rule 4.
