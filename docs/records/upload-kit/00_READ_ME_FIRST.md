@@ -29,7 +29,7 @@ screen is more useful than a guess. Nothing breaks by pausing.
 | Folder | What it holds | Where it goes |
 |---|---|---|
 | `01_maths_upload/` | 12 files: the game's maths | The game's **Files** page |
-| `02_frontend_upload/` | 108 files: the game itself | The game's **Files** page |
+| `02_frontend_upload/` | the game itself | The game's **Files** page |
 | `03_branding/` | 3 images | Two different pages, see below |
 
 The two `HASHES.txt` files sit in the kit root, NOT inside the upload folders. That is
@@ -104,13 +104,20 @@ top level. If the portal ends up with a folder called `02_frontend_upload` conta
 everything, the game will not load, and the fix is to delete and re-upload from inside the
 folder.
 
-12. There are 108 files, most of them small. This upload is much quicker than Part 3.
+12. It is a few hundred small files. This upload is much quicker than Part 3.
 
-13. When it finishes, the **FRONTEND** panel should read **108 files**.
+13. When it finishes, the **FRONTEND** panel should read the same file count as the
+    kit's own `README.md` and `BUILD_INFO.json`, which both state it.
 
-    **If it reads fewer than 108, stop and tell me the number.** It means some files did
-    not make it, and a game missing even one asset can fail in ways that are hard to
+    **If it reads fewer than that, stop and tell me the number.** It means some files
+    did not make it, and a game missing even one asset can fail in ways that are hard to
     diagnose later. Do not publish over a short upload.
+
+    **The number is deliberately not written out here.** It changes with every release,
+    and this page carried a stale 108 into a 110-file kit, which is the same class of
+    defect as a kit and its walkthrough disagreeing about which part to read. The kit
+    states its own count, and the kit is built from a clone, so that number cannot be
+    stale.
 
 ---
 
