@@ -1,10 +1,24 @@
-# Static checks on every pull request. Fable ruling 11 (2026-07-26).
+# Checks on every pull request. Fable ruling 11 (2026-07-26); two-job split per
+# the CI triage ruling (2026-07-26, reports/briefs/FS_CI_TRIAGE_Prompt.md).
 #
-# SCOPE, deliberately narrow. Cheap static gates only. The Playwright suites
-# (qa_soak, portrait_layout_conformance, currency_conformance, the proof scripts)
-# stay local and in the external audit: they need a dev server and a browser,
-# they take tens of minutes, and their value is in a real environment rather than
-# in a CI container.
+# TWO JOBS, ON PURPOSE.
+#   1. "static gates": browser-free checks only. No Playwright browser is
+#      installed here, so any gate that launches one crashes by construction.
+#   2. "browser gates": the two self-contained browser gates (layout fit,
+#      contrast). They serve the built dist themselves via vite preview, need
+#      no dev server and no secrets, so they belong in CI, but they need the
+#      chromium binary, which this job installs after npm ci. Blocking, same
+#      security posture as job 1.
+# WHY: layout_fit_gate.mjs and contrast_gate.mjs import chromium and were added
+# to the browser-free static job; they crashed at chromium.launch() on every
+# run since (runs 117 to 120 on main). A gate must run in an environment that
+# can execute it, or its placement is the failure.
+#
+# SCOPE, still deliberately narrow. The Playwright suites that need a real dev
+# server and a real environment (qa_soak, portrait_layout_conformance,
+# currency_conformance, the proof scripts) stay local and in the external
+# audit: they take tens of minutes and their value is in a real environment
+# rather than in a CI container.
 #
 # SECURITY POSTURE. This repository is PUBLIC.
 #   - This workflow receives NO secrets. There is no `secrets:` usage anywhere in
@@ -334,30 +348,9 @@ jobs:
         working-directory: frontend
         run: node scripts/dash_gate.mjs
 
-      # ── Gate 13c: the frame FITS at all seven platform presets ───────────────
-      # Guideline item 15. Asserts two independent things, because satisfying one
-      # by breaking the other is exactly how this nearly went wrong: the frame
-      # must not scroll, AND every interactive control must lie inside its
-      # clipping ancestor. Changing overflow to hidden would have passed the
-      # first and silently failed the second (TR-069). The seven viewports are
-      # the platform's own, read off the DTT Screen menu. (JOB 3b, TR-065/069/071)
-      - name: layout fit gate, seven presets
-        working-directory: frontend
-        run: node scripts/layout_fit_gate.mjs
-
-      # ── Gate 13d: text contrast, measured on composited pixels ───────────────
-      # TR-070. The portrait FEATURES bar sits over the background art behind a
-      # plate whose gradient starts at 10% opacity, so the contrast a player
-      # experiences is against whatever the art happens to be there. No
-      # stylesheet states that value; only a screenshot knows it. The gate hides
-      # the glyphs, screenshots the exact box, decodes it through the browser's
-      # own canvas and reports the ratio against the WORST pixel rather than the
-      # average, because a player does not read the average. WCAG 2.1 AA, 4.5:1
-      # for normal text; the label is 12px, so that is the applicable figure.
-      # Ships a seeded violation per convention (p). (JOB 3g)
-      - name: contrast gate, portrait presets
-        working-directory: frontend
-        run: node scripts/contrast_gate.mjs
+      # Gates 13c and 13d (layout fit, contrast) live in the "browser gates"
+      # job below: they launch chromium, which this job deliberately does not
+      # install. See the header for the two-job policy.
 
       # ── Gate 13e: no documentation ships ─────────────────────────────────────
       # JOB 3(i). vite.config.ts's pruneDocs deletes documentation from dist at
@@ -387,3 +380,73 @@ jobs:
       # books are always absent. (R2R JOB 7 / TR-044)
       - name: books verifier self-test
         run: python3 tools/verify_books_lookup_equality.py --self-test
+
+  # The second job of the two-job policy (see header). Only the gates that
+  # launch chromium live here. Blocking, no secrets, contents:read only, same
+  # pull_request trigger, exactly like the static job.
+  # timeout-minutes is 10 on Fable's mid-session direction after run 122: the
+  # layout gate finished its work in 13 seconds, printed PASS, and then hung
+  # for 18 minutes because killing its npx wrapper orphaned the vite preview,
+  # whose inherited stdout pipe held the node event loop open. Both gates now
+  # also carry a 4-minute internal watchdog and an explicit process.exit, so a
+  # hang is a loud red at three layers before a human has to cancel anything.
+  browser:
+    name: browser gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --ignore-scripts
+
+      # The one step the static job deliberately lacks: the chromium binary.
+      # --with-deps also installs the OS libraries chromium needs on the
+      # runner image. No other browser is installed; the gates use chromium.
+      - name: Install chromium
+        working-directory: frontend
+        run: npx playwright install chromium --with-deps
+
+      # Both gates serve dist via vite preview, so the build must exist first.
+      # The static job builds too; duplicating the build here keeps the two
+      # jobs independent, which is the point of the split.
+      - name: production build
+        working-directory: frontend
+        run: npm run build
+
+      # ── Gate 13c: the frame FITS at all seven platform presets ───────────────
+      # Guideline item 15. Asserts two independent things, because satisfying one
+      # by breaking the other is exactly how this nearly went wrong: the frame
+      # must not scroll, AND every interactive control must lie inside its
+      # clipping ancestor. Changing overflow to hidden would have passed the
+      # first and silently failed the second (TR-069). The seven viewports are
+      # the platform's own, read off the DTT Screen menu. (JOB 3b, TR-065/069/071)
+      - name: layout fit gate, seven presets
+        working-directory: frontend
+        run: node scripts/layout_fit_gate.mjs
+
+      # ── Gate 13d: text contrast, measured on composited pixels ───────────────
+      # TR-070. The portrait FEATURES bar sits over the background art behind a
+      # plate whose gradient starts at 10% opacity, so the contrast a player
+      # experiences is against whatever the art happens to be there. No
+      # stylesheet states that value; only a screenshot knows it. The gate hides
+      # the glyphs, screenshots the exact box, decodes it through the browser's
+      # own canvas and reports the ratio against the WORST pixel rather than the
+      # average, because a player does not read the average. WCAG 2.1 AA, 4.5:1
+      # for normal text; the label is 12px, so that is the applicable figure.
+      # Ships a seeded violation per convention (p). (JOB 3g)
+      - name: contrast gate, portrait presets
+        working-directory: frontend
+        run: node scripts/contrast_gate.mjs

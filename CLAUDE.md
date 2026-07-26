@@ -363,6 +363,18 @@ exceptions continue to follow convention (e).
 screenshots to `reports/screens/<pass>/` so the independent verifier can review rendering
 from the repository.
 
+**(h.1) Evidence directories are write-once outside regeneration jobs** (SA-012, CI triage
+session, 2026-07-26). Proof and gate scripts write to scratch paths only; committed evidence
+directories are never written outside a job that explicitly regenerates evidence. The earned
+case: frontend/scripts/anticipation_proof.mjs screenshots straight into the committed
+`reports/screens/scatter-anticipation/`, so a re-run at 01:11 on 2026-07-26 silently modified
+four committed evidence PNGs in the working tree. Evidence that a casual re-run can overwrite
+is not evidence. The four files were restored from HEAD; a script that regenerates committed
+evidence must do so only in a job whose brief says that is what it is doing. The same session
+observed the pattern twice more: layout_fit_gate.mjs and contrast_gate.mjs rewrite their
+committed reports/qa JSON and contrast-2026-07-26 screenshots on every run, so a plain local
+re-run dirties committed evidence. Migrating the gate writers to scratch paths is open work.
+
 **(i) Handover block.** Every session report ends with a FOR THE NEXT SESSION section stating
 the model and effort used, the approach taken, alternatives tried and rejected, files touched,
 and open threads; and every brief opens with a READ FIRST list of the repo documents that
@@ -495,6 +507,26 @@ integrator merges pull requests **one at a time** and resolves any report confli
 **by concatenation, never by discarding a section.** Two tracks' reports are two
 accounts of two pieces of work; keeping both is the whole point, and a merge that
 drops one has destroyed evidence to save a scroll.
+
+**10. A red run on main stops the line** (owner's order, 2026-07-26, from the CI
+triage brief, reports/briefs/FS_CI_TRIAGE_Prompt.md). No new job starts until
+main is green. Every session verifies its own final push's REMOTE CI result
+before closing and records the run link in the session report. Local gate
+results never substitute for the remote run: the remote runner is a different
+machine with a different inventory, which is exactly how this rule was earned.
+
+THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
+118, 119 and 120 on main all failed at the step "layout fit gate, seven
+presets": layout_fit_gate.mjs and contrast_gate.mjs launch chromium, and they
+had been added to the deliberately browser-free static job, so they crashed at
+chromium.launch() on every run after they landed. Four consecutive sessions
+pushed onto a red main and closed without checking the remote result, because
+the same gates passed locally, where chromium is installed. Run 121, on the
+track/screenshot-analyst pull request, failed at "track manifests are
+disjoint": the declared reports/qa/live_stats/** overlap with quality-sweep's
+reports/qa/** (SA-013), a collision that manifest declared rather than hid.
+Repairs: the two-job split in checks.yml (this session, JOB 1) and the
+quality-sweep manifest narrowing (this session, JOB 3).
 
 **(l) Derive before measuring. Standard operating procedure, ratified 2026-07-27
 by the owner after a real failure (worked example below).**

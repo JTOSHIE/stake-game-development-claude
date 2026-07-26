@@ -26,7 +26,17 @@ docs/records/tracks/quality-sweep.manifest
 
 # Evidence. A sweep that fixes things re-runs gates, and the gates write here.
 # Disjoint from track/docs-reskin, which touches no evidence path at all.
-reports/qa/**
+#
+# NARROWED from `reports/qa/**` by the integrator (SA-013, CI triage session,
+# 2026-07-26). track/screenshot-analyst's duty 6 owns reports/qa/live_stats/**
+# by the owner's own naming, and `reports/qa/**` swallowed it, so the two
+# manifests were not disjoint and --check-disjoint failed (run 121). The glob
+# language has no negation, so the narrowing names what is IN: every file the
+# sweep's gates actually write lands directly in reports/qa/ (the directory is
+# flat today; the gates join one filename onto the reports/qa root), and `*`
+# matches exactly one segment, so `reports/qa/*` covers all of it while
+# excluding every subtree, live_stats included.
+reports/qa/*
 reports/screens/quality-sweep/**
 
 # Per-track session report, per rule 8. See the sibling manifest for why.

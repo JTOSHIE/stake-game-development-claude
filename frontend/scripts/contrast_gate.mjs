@@ -105,10 +105,21 @@ async function getFreePort() {
     srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
   })
 }
+// HARD TIMEOUT (CI triage, run 122). Same defence as layout_fit_gate.mjs: on
+// the CI runner the sibling gate hung forever AFTER its own PASS line, because
+// killing the `npx` wrapper orphans the real vite child, whose inherited
+// stdout pipe holds the event loop open. Any hang becomes a loud red.
+const GATE_TIMEOUT_MS = 4 * 60_000
+setTimeout(() => {
+  console.error(`CONTRAST GATE: HARD TIMEOUT after ${GATE_TIMEOUT_MS / 1000}s, failing red`)
+  process.exit(1)
+}, GATE_TIMEOUT_MS)
+
 function startPreview(port) {
   return new Promise((res, rej) => {
+    // detached: own process group, so killPreview reaches vite, not just npx.
     const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'],
-      { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] })
+      { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true })
     let done = false
     const onData = (d) => {
       const s = d.toString()
@@ -117,6 +128,10 @@ function startPreview(port) {
     proc.stdout.on('data', onData); proc.stderr.on('data', onData); proc.on('error', rej)
     setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
   })
+}
+
+function killPreview(proc) {
+  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch {} }
 }
 
 // ── WCAG 2.1 relative luminance and contrast ratio ───────────────────────────
@@ -328,7 +343,7 @@ async function run() {
       `real worst ${before?.worstRatio}:1`)
 
     await browser.close()
-  } finally { preview.kill() }
+  } finally { killPreview(preview) }
 
   results.failures = failures
   results.pass = failures.length === 0
@@ -339,6 +354,9 @@ async function run() {
     process.exit(1)
   }
   console.log('\nCONTRAST: PASS')
+  // Explicit, for the same run 122 reason: success must not depend on every
+  // lingering handle draining.
+  process.exit(0)
 }
 
 run().catch((e) => { console.error(e); process.exit(1) })
