@@ -211,6 +211,98 @@ because a sweep that only records its wins is not a record.
 
 **A second finding underneath it, found while restoring.** The committed evidence is **stale**: it records the paytable rendering `MAX WIN 5,000× base bet`, and the shipped build renders `MAX WIN 5,000×`, the words having been dropped when they were found to clip to `5,000x ba...` on every card. So that evidence file has been describing a paytable that no longer exists. It was restored rather than updated, because regenerating committed evidence belongs in a job whose brief says that is what it is doing, and this was not one.
 
+### 4.2d The four remaining verifications, 2026-07-27, and the blind spot they measured
+
+The four findings whose verifiers died to a usage limit, and whose classes no sibling agent
+covered, were run to completion. **All four returned, none errored, and every one reported
+`git status --porcelain` empty at the end**, which was the new guardrail added after Q-31.
+
+| Finding | Verdict | What it changed |
+|---|---|---|
+| `LoadingScreen` flavour text | **FIX_CONFIRMED** | And it measured the blind spot below |
+| `HudOverlay` "Session" casing | **STILL_PRESENT** | Expected, it is parked. But **the park is not honest**, see below |
+| `fsModes` OVERBOOST casing | **NEVER_A_DEFECT** | The original finding was wrong, and a real one sits beside it |
+| `translations` trophy emoji | **FIX_CONFIRMED** | Clean across all sixteen locales |
+
+#### Q-32. The locale gate's blind spot, now counted
+
+Q-30 recorded that `locale_completeness_check.mjs` cannot see a literal sharing a text node
+with an interpolation, and said nobody had counted what else that hides. **It is 14 render
+sites of genuine player-visible hardcoded English.** Measured against the gate's own file
+list, its own regex and its own allowlist.
+
+The regex is `/>\s*([A-Z][A-Z0-9 &'.,!?:-]{2,})\s*</g`, and it is defeated by any character
+outside that class between the uppercase run and the closing tag. A separate line discards
+any node containing `{` outright. So there are three escape hatches, not one:
+
+| Shape | Sites | Examples |
+|---|---|---|
+| Uppercase literal sharing a node with an interpolation | 1 | `SessionPanel.svelte` `<span>NET {coinsWord}</span>`, on the responsible-gambling session overlay |
+| **Uppercase literal INSIDE an interpolation** | 6 | `FeatureMenu.svelte` `{$isSocial ? 'GET FEATURES' : 'BUY FEATURES'}` and `{$isSocial ? 'PLAY MODES' : 'BET MODES'}`; `MaxWinCelebration` and `WinCelebration` `{$isSocial ? 'PRIZE!' : 'WIN!'}` |
+| Uppercase literal imported from a `.ts` module, which the gate never opens | 5 | `BonusInstrumentColumn` `{HUD_LABEL_FREE_SPINS}` = `'OVERDRIVE FREE SPINS'`, `{HUD_LABEL_TOTAL_WIN}`; `WinBreakdown` `{SYMBOL_LABELS[...]}` = `'WILD'`, `'SCATTER'` |
+| Uppercase amid lowercase prose | 2 | Already carried in the parked Q-16 list |
+
+**Two things about this set matter more than its size.**
+
+First, **the six interpolation cases are the stake.us prohibited-term strings**. `BET MODES`,
+`BUY FEATURES` and `BET` are the exact strings recorded as blocking stake.us. They are
+handled for SOCIAL mode, which is why `GET FEATURES` and `PLAY MODES` exist as the ternary's
+other branch. They are **not handled for LOCALE**: both branches are hardcoded English, so a
+German player in real-money mode reads `BET MODES`. The social problem was solved inline and
+the locale problem was never noticed, because the instrument that would have noticed cannot
+see inside an interpolation.
+
+Second, **the same blind spot defeated this session's own sweep scanner**, which matched
+`aria-label|title|alt|placeholder` followed by a *quoted* value. Anything whose value is an
+interpolation was invisible to it too. That is why 4.3's list has the gaps below.
+
+#### Q-33. The Q-16 park is not complete, so 4.3's claim to be is wrong
+
+4.3 calls itself "The complete list, so the surgical brief needs no rediscovery". It is not,
+and the correction matters because a park is only honest if its enumeration is.
+
+- **`aria-label="Menu"` at four layout branches of `HudOverlay`** is absent from 4.3
+  entirely. It is the hamburger that opens the very menu 4.3 does list three other labels
+  from.
+- **`title={$speedTier === 'normal' ? 'Normal speed' : ...}` at four branches** is absent.
+  This is the sharpest one: at the old HEAD those `title=` lines sat **directly below** the
+  `aria-label="Cycle speed (...)"` lines that 4.3 DOES list, on the same element. The sweep
+  read one line and skipped the next, because its pattern required a quoted value and this
+  one is an interpolation. A native browser tooltip is player-visible on any desktop hover.
+
+#### Q-34. A real casing defect, found by refuting a false one
+
+The `fsModes` casing finding was **wrong**, and saying so is worth more than agreeing:
+`OVERBOOST` and `NITRO OVERDRIVE` are stylised proper nouns spelled identically in
+`CLAUDE.md`'s own "True game facts", in the file's header, and in TR-014a, which treats the
+`fsModes` spelling as the CORRECT form. The blurb field is nine for nine sentence case. There
+is no drift in that file.
+
+**But there is a genuine class-4 defect a few lines away, and it is CSS-driven rather than
+string-driven.** `text-transform: uppercase` is set on the HUD mode badge in all three layout
+profiles and is absent from the features-menu card, the paytable mode row and the buy dialog.
+So the same mode reads **`Cruise` on three surfaces and `CRUISE` on a fourth**. `Normal` and
+`Buy Overdrive` are affected identically; `OVERBOOST` and `NITRO OVERDRIVE` are immune only
+because they are already capitals.
+
+That is precisely the mandate's class 4, "capitalisation that changes between two screens
+showing the same word", and **no gate covers it**:
+`hud_naming_uniformity_check.mjs` checks only `OVERDRIVE FREE SPINS` and `TOTAL WIN`.
+
+**OPEN.** It is a one-property fix in either direction, but which direction is an art call:
+either drop the `text-transform` so the HUD matches the specification's own spelling, or add
+it to the other three so everything is capitals.
+
+#### Q-23, corrected a second time
+
+The verifier also caught that the Q-23 fix was **arithmetically short**. `min-width: 3ch`
+does not reserve the width of `100`, because `ch` is the advance of the `0` glyph and
+excludes letter-spacing, while the label carries `letter-spacing: 0.2em` which the browser
+adds after every character. Three digits occupy `3ch + 3 x 0.2em`; the box was short by
+`0.6em`, so the text still moved, just less than before. Now `calc(3ch + 0.6em)`, with both
+terms visible rather than asserted. **Two corrections to the same six-line fix, both found by
+verification rather than by review.**
+
 ### 4.3 The hardcoded-string set: why it is PARKED and not half-done
 
 **This is the one item in the sweep that is not closed, and the reason is protocol rule 6,
@@ -242,7 +334,7 @@ all sixteen locales. They did before this session and they still do. Nothing reg
 nothing was hidden; what changed is that the set is now counted, listed and gated for
 growth rather than being an unbounded estimate in a tracker row.
 
-**The complete list, so the surgical brief needs no rediscovery.**
+**The list as it stood on 2026-07-27. CORRECTED: it called itself complete and is not.** Section 4.2d Q-33 names two classes it misses in `HudOverlay` alone, and Q-32 counts 14 further render sites the locale gate cannot see. Treat this as the starting set, not the closing one.
 
 *Markup text nodes, player-visible (deduplicated):*
 

@@ -227,12 +227,22 @@
     color: rgba(0, 255, 255, 0.5);
     font-variant-numeric: tabular-nums;
   }
-  /* 3ch reserves the width of "100" in the current face, so the label's text
-     cannot move as the number grows. Right-aligned so the digits settle against
-     the per cent sign rather than drifting away from it. */
+  /* Reserves the width of "100" so the label's text cannot move as the number
+     grows. Right-aligned so the digits settle against the per cent sign rather
+     than drifting away from it.
+
+     CORRECTED 2026-07-27, second time. This first read `min-width: 3ch` with a
+     comment claiming that reserved the width of "100". It did not, and the
+     verifier that caught it was right: `ch` is defined as the advance of the
+     "0" glyph and does NOT include letter-spacing, while `.progress-label`
+     above carries `letter-spacing: 0.2em`, which the browser adds after EVERY
+     character including the last. Three digits therefore occupy 3ch plus
+     3 x 0.2em, and the box was short by 0.6em, so the text still moved, just
+     less than before. The calc states both terms so the arithmetic is visible
+     rather than asserted. QUALITY_CHARTER.md Q-23. */
   .progress-pct {
     display: inline-block;
-    min-width: 3ch;
+    min-width: calc(3ch + 0.6em);
     text-align: right;
   }
 
