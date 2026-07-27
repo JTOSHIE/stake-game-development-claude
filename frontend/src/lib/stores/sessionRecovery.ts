@@ -85,6 +85,9 @@ import {
 import type { OfficialRound } from '../services/rgsService'
 import { interpretEvents, type PresentationScript } from '../services/roundInterpreter'
 import { balance } from './gameStore'
+import {
+  readCheckpoint, clearCheckpoint, validateCheckpoint, type CheckpointRejection,
+} from './presentationCheckpoint'
 
 /**
  * The official round, narrowed to the three fields recovery reads. Named
@@ -101,7 +104,11 @@ export type RecoveryOutcome =
   | { kind: 'none' }                                   // nothing to recover
   /** Resumed and settled. `presented` is false only when the round carried no
    *  readable events, in which case it was settled without a replay. */
-  | { kind: 'resumed'; betID: number; balance: number; presented: boolean; triggered: boolean }
+  | { kind: 'resumed'; betID: number; balance: number; presented: boolean; triggered: boolean
+      /** TR-099. The first spin played, or null when the round was replayed whole. */
+      resumedFromIndex?: number | null
+      /** TR-099. Why a stored cursor was not used, when one was rejected. */
+      checkpointRejection?: CheckpointRejection | null }
   | { kind: 'failed'; error: string }
 
 /** The round the RGS says is still in progress, or null. */
@@ -148,9 +155,28 @@ const REAL: RecoveryPlatform = { parseSessionParams, authenticate, endRound }
  * Play the recovered round back. Production passes App.svelte's presentation
  * driver; tests pass a spy; the default resolves immediately so a caller that
  * has no presentation still settles correctly rather than stalling.
+ *
+ * TR-099: `resumeFromIndex` is the first free spin to PLAY when the player
+ * accepted a RESUME, and null for a full replay. A driver that ignores it still
+ * behaves exactly as it did before this feature existed, which is what keeps
+ * the fallback path honest.
  */
-export type PresentFn = (script: PresentationScript) => Promise<void>
+export type PresentFn = (script: PresentationScript, resumeFromIndex?: number | null) => Promise<void>
 const NO_PRESENTATION: PresentFn = async () => {}
+
+/**
+ * Ask the player whether to continue from where they left off.
+ *
+ * OFFERED, NEVER ASSUMED, and the second reason is the one that matters: a
+ * player who left BECAUSE something looked wrong needs a way to see the whole
+ * round, and auto-resuming would remove the only route to the full replay at
+ * exactly the moment they most want it.
+ *
+ * The default DECLINES, so any caller that does not implement the offer gets
+ * today's full-replay behaviour rather than a silent skip.
+ */
+export type OfferResumeFn = (info: { playedSpins: number; totalSpins: number }) => Promise<boolean>
+const NO_OFFER: OfferResumeFn = async () => false
 
 /**
  * Read the session's in-progress round and act on it.
@@ -163,6 +189,7 @@ export async function recoverSession(
   isDev: boolean,
   platform: RecoveryPlatform = REAL,
   present: PresentFn = NO_PRESENTATION,
+  offerResume: OfferResumeFn = NO_OFFER,
 ): Promise<RecoveryOutcome> {
   if (isDev) {
     const out: RecoveryOutcome = { kind: 'none' }
@@ -198,10 +225,35 @@ export async function recoverSession(
       triggered = script.triggered
     }
 
+    // 2b. THE CURSOR, TR-099. Read a stored presentation checkpoint and decide
+    //     whether it may be used against THIS round's script. Every rejection
+    //     falls to the same place: the full replay below, which is the flow
+    //     that shipped before this feature existed.
+    let resumeFromIndex: number | null = null
+    let checkpointRejection: CheckpointRejection | null = null
+    if (script) {
+      const verdict = validateCheckpoint(readCheckpoint(), script, round.betID)
+      checkpointRejection = verdict.rejection
+      if (verdict.rejection !== null) {
+        // A cursor we will not use is a cursor that should not survive. The
+        // 'none' case clears nothing, because there was nothing there.
+        if (verdict.rejection !== 'none') clearCheckpoint()
+      } else if (verdict.resumeFromIndex !== null) {
+        // OFFERED, not applied. Declining is a first-class choice and plays the
+        // round from the start; both branches settle identically.
+        const accepted = await offerResume({
+          playedSpins: verdict.resumeFromIndex,
+          totalSpins: script.freeSpins.length,
+        })
+        if (accepted) resumeFromIndex = verdict.resumeFromIndex
+        else clearCheckpoint()
+      }
+    }
+
     // 3. PRESENT, before settling. See the header: a player who reloaded during
     //    a feature is owed the round, not just its number.
     if (script) {
-      await present(script)
+      await present(script, resumeFromIndex)
     }
 
     // 4. SETTLE. This runs whether or not the replay ran. A round we cannot
@@ -210,6 +262,10 @@ export async function recoverSession(
     const resp = await platform.endRound(params, String(round.betID))
     balance.set(resp.balance)
     activeRound.set(null)
+    // TR-099. The round is closed, so the cursor is dead. Cleared here as well
+    // as in the presentation, because a round can settle without the
+    // presentation ever having run (an empty event list still settles).
+    clearCheckpoint()
 
     // 5. BANNER, once.
     recoveryBannerVisible.set(true)
@@ -220,6 +276,8 @@ export async function recoverSession(
       balance: resp.balance,
       presented: script !== null,
       triggered,
+      resumedFromIndex: resumeFromIndex,
+      checkpointRejection,
     }
     lastRecovery.set(out)
     return out

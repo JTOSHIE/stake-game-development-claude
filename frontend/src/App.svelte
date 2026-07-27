@@ -121,7 +121,8 @@
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
   import { anyModalOpen } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
-  import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner } from './lib/stores/sessionRecovery'
+  import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound } from './lib/stores/sessionRecovery'
+  import ResumeOffer from './lib/components/ResumeOffer.svelte'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
   // is tree-shaken out of the production build (live RGS supplies real events).
@@ -363,6 +364,12 @@
   // ── Overdrive free-spins presentation state ───────────────────────────────
   let featureActive = false
   let featureScript: PresentationScript | null = null
+  // TR-099. Non-null only for a recovered round the player chose to continue.
+  let featureResumeFromIndex: number | null = null
+  // TR-099. The official round identity the feature presentation is allowed to
+  // checkpoint against. Null disables checkpointing, which is the correct state
+  // for mock rounds and for the warm mount.
+  let liveBetID: number | null = null
   let featureResolve: (() => void) | null = null
   // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix): true for the single frame
   // in which the just-finished feature's real recordSpinResult() settlement
@@ -477,9 +484,10 @@
 
   /** Play the free-spins overlay to completion. Resolves when the player has
    *  seen the whole round. Autoplay treats the entire bonus as one round. */
-  function presentFeature(script: PresentationScript): Promise<void> {
+  function presentFeature(script: PresentationScript, resumeFromIndex: number | null = null): Promise<void> {
     return new Promise((resolve) => {
       featureScript = script
+      featureResumeFromIndex = resumeFromIndex
       featureActive = true
       if (script.triggered) triggerShake() // screen shake on feature trigger
       featureResolve = resolve
@@ -507,6 +515,7 @@
   function onFeatureComplete(): void {
     featureActive = false
     featureScript = null
+    featureResumeFromIndex = null
     const r = featureResolve
     featureResolve = null
     if (r) r()
@@ -529,11 +538,42 @@
    *               spin that already happened elsewhere would be a re-enactment
    *               rather than a result.
    */
-  async function presentRecoveredRound(script: PresentationScript): Promise<void> {
+  // ── TR-099, feature resume ────────────────────────────────────────────────
+  //
+  // The offer is a promise the player resolves. `recoverSession` awaits it
+  // between interpreting the round and presenting it, so nothing has been shown
+  // yet when the question is asked.
+  let resumeOfferOpen = false
+  let resumeOfferPlayed = 0
+  let resumeOfferTotal = 0
+  let resumeOfferResolve: ((accepted: boolean) => void) | null = null
+
+  function offerResume(info: { playedSpins: number; totalSpins: number }): Promise<boolean> {
+    // Wait for the player to be looking, exactly as the playback driver does.
+    return splashesCleared.then(() => {
+      resumeOfferPlayed = info.playedSpins
+      resumeOfferTotal = info.totalSpins
+      resumeOfferOpen = true
+      return new Promise<boolean>((resolve) => { resumeOfferResolve = resolve })
+    })
+  }
+
+  function answerResume(accepted: boolean): void {
+    resumeOfferOpen = false
+    const r = resumeOfferResolve
+    resumeOfferResolve = null
+    if (r) r(accepted)
+  }
+
+  async function presentRecoveredRound(script: PresentationScript, resumeFromIndex: number | null = null): Promise<void> {
     // Wait for the player to be looking. See resolveSplashesClearedIfDone.
     await splashesCleared
     if (script.triggered) {
-      await presentFeature(script)
+      // TR-099. A recovered feature checkpoints as it plays, so a player who
+      // reloads a SECOND time during the same round resumes again rather than
+      // being sent back to spin one.
+      liveBetID = get(activeRound)?.betID ?? null
+      await presentFeature(script, resumeFromIndex)
       return
     }
     const base = script.baseSpin
@@ -1167,7 +1207,7 @@
       // replayed through the canonical interpreter so the player sees their own
       // outcome, then settled, then one plain banner. presentRecoveredRound is
       // the playback driver; there is no forfeit path.
-      await recoverSession(import.meta.env.DEV, undefined, presentRecoveredRound)
+      await recoverSession(import.meta.env.DEV, undefined, presentRecoveredRound, offerResume)
     }
     playBGM()
 
@@ -1372,6 +1412,14 @@
 
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
+
+      // TR-099. The round identity a checkpoint may be written against. A mock
+      // round's id is prefixed `mock-` and parses to NaN, which is exactly the
+      // wanted answer: no live round, no checkpoint.
+      {
+        const n = Number(result.roundId)
+        liveBetID = Number.isFinite(n) ? n : null
+      }
 
       // A dev-only ?mockCategory= override lets headless verification force a
       // specific curated round for STANDING-mode spins too, mirroring the
@@ -1789,6 +1837,14 @@
            banner above it IS dismissible, because nothing is wrong: the round
            finished, the balance is correct, and the player is free to carry on.
            A non-dismissible notice would imply an unresolved problem. -->
+      <ResumeOffer
+        bind:open={resumeOfferOpen}
+        playedSpins={resumeOfferPlayed}
+        totalSpins={resumeOfferTotal}
+        on:resume={() => answerResume(true)}
+        on:restart={() => answerResume(false)}
+      />
+
       {#if $recoveryBannerVisible}
         <div class="recovery-banner" role="status" data-testid="recovery-banner">
           <span>{$tr('recoveryResumed')}</span>
@@ -1871,6 +1927,8 @@
           <FreeSpinsPresentation
             bind:this={featureRef}
             script={featureScript}
+            checkpointBetID={liveBetID}
+            resumeFromIndex={featureResumeFromIndex}
             active={featureActive}
             bind:displayMeter={liveMeter}
             bind:spinsRemaining={liveSpinsRemaining}

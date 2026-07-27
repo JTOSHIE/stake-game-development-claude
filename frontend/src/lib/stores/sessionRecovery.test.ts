@@ -242,8 +242,15 @@ checkThat('endRound is reached on every active round, not behind a condition',
   /4\. SETTLE\. This runs whether or not the replay ran/.test(src))
 
 const app = readFileSync('src/App.svelte', 'utf8')
+// TR-099 widened this from three arguments to four. The assertion's INTENT is
+// unchanged and is the reason it exists: both callbacks default to a no-op
+// (`NO_PRESENTATION` presents nothing, `NO_OFFER` declines), so a missing
+// argument here is not a compile error, it is a silently dead feature. Both are
+// therefore named, not just counted.
 checkThat('App passes a real playback driver, so recovery is not silently a no-op',
-  /recoverSession\(import\.meta\.env\.DEV, undefined, presentRecoveredRound\)/.test(app))
+  /recoverSession\(import\.meta\.env\.DEV, undefined, presentRecoveredRound, offerResume\)/.test(app))
+checkThat('and a real resume offer, so the cursor is not silently always declined',
+  /function offerResume\(/.test(app) && /on:resume=/.test(app) && /on:restart=/.test(app))
 checkThat('and renders exactly one recovery banner',
   (app.match(/data-testid="recovery-banner"/g) ?? []).length === 1)
 

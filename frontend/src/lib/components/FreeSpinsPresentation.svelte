@@ -22,6 +22,9 @@
     type EscalationLevel,
   } from '../stores/scatterEscalation'
   import { speedTier } from '../stores/speedMode'
+  import {
+    writeCheckpoint, clearCheckpoint, figuresAt, BEFORE_FIRST_SPIN,
+  } from '../stores/presentationCheckpoint'
 
   export let script: PresentationScript | null = null
   export let active = false
@@ -31,6 +34,34 @@
   // later stage once to pay the paint/decode cost - this flag lets it
   // synthesize the click immediately instead of waiting forever unclicked.
   export let skipContinueGate = false
+
+  /**
+   * TR-099. The official round identity this presentation belongs to, or null.
+   *
+   * NULL MEANS DO NOT CHECKPOINT, and that is the default on purpose. The
+   * warm-mount instance, Bet Replay and mock rounds all present a script that
+   * is not a live open round, and a cursor written from any of them would be a
+   * checkpoint for a round the RGS is not holding. Only App.svelte's live
+   * feature presentation passes a betID.
+   */
+  export let checkpointBetID: number | null = null
+
+  /**
+   * TR-099. When set, the auto-start below resumes at this free spin instead of
+   * playing the entry sequence and every spin before it. Null is a normal
+   * start, which is every live trigger and every replay.
+   */
+  export let resumeFromIndex: number | null = null
+
+  function saveCheckpoint(freeSpinIndex: number): void {
+    if (checkpointBetID === null || !script || !script.triggered) return
+    writeCheckpoint({
+      betID: checkpointBetID,
+      phase: 'free',
+      freeSpinIndex,
+      ...figuresAt(script, freeSpinIndex),
+    })
+  }
 
   const dispatch = createEventDispatcher<{ complete: { totalWin: number } }>()
 
@@ -131,6 +162,41 @@
     runEntrySequence()
   }
 
+  /**
+   * TR-099. Resume the feature at a spin boundary, skipping the entry sequence
+   * and every spin already watched.
+   *
+   * `resumeFromIndex` is the first free spin to PLAY. Everything else is
+   * DERIVED FROM THE SCRIPT rather than restored from storage, which is the
+   * whole safety property of this feature: `nextSpin()` already reads the
+   * meter, the running total and the spins remaining out of
+   * `script.freeSpins[spinIndex]`, so setting the index is the entire resume.
+   *
+   * `awardedTotal` is the one value that is not on the spin itself, because it
+   * accumulates. It is recomputed here from the retrigger entries BELOW the
+   * cursor rather than stored, for the same reason: a number recovered from the
+   * round cannot be stale, and a number recovered from storage can.
+   */
+  export function startFrom(resumeFromIndex: number) {
+    clear()
+    if (!script || !script.triggered || resumeFromIndex <= 0
+        || resumeFromIndex >= script.freeSpins.length) {
+      start()
+      return
+    }
+    awardedTotal = script.initialFreeSpins
+    for (let i = 0; i < resumeFromIndex; i++) {
+      const r = script.freeSpins[i]?.retrigger
+      if (r) awardedTotal = r.newTotal
+    }
+    displayMeter = script.freeSpins[resumeFromIndex].meterBefore
+    runningTotalCentibets = script.freeSpins[resumeFromIndex - 1].runningTotalCentibets
+    showRetrigger = false
+    overdriveVisualActive = true
+    spinIndex = resumeFromIndex - 1   // nextSpin() increments into the target
+    nextSpin()
+  }
+
   /** Overdrive transition (DESIGN_SYSTEM concept of record, retimed
    *  2026-07-16 for the ANIMATION UPLIFT PASS item 2 - "under 1.5 seconds
    *  total, never delays the first free spin beyond it"): scatter flare
@@ -164,6 +230,9 @@
   function continueFromEntry(): void {
     if (!awaitingContinue) return
     awaitingContinue = false
+    // TR-099, the first safe checkpoint. The player has accepted the entry, so
+    // the feature is genuinely under way, and no free spin has run yet.
+    saveCheckpoint(BEFORE_FIRST_SPIN)
     entryStage = 'settle'
     timer = setTimeout(nextSpin, dur(300))
   }
@@ -250,6 +319,7 @@
     revealedReels = 5
 
     const spin = currentSpin
+    const thisIndex = spinIndex
     const advance = () => {
       showRetrigger = !!spin.retrigger
       // After a winning spin, animate the meter increment. Bigger wins dwell
@@ -260,6 +330,11 @@
       const holdWin = winMult > 0 ? Math.min(3200, 700 + winMult * 24) : 500
       timer = setTimeout(() => {
         if (willInc) displayMeter = spin.meterAfter
+        // TR-099. The cursor moves only at a SPIN BOUNDARY, once this spin's
+        // meter has landed and the figures on screen are exactly the script's
+        // values for this index. Mid-animation is never a checkpoint, because
+        // "half way through spin 4" is not a resumable position.
+        saveCheckpoint(thisIndex)
         timer = setTimeout(nextSpin, dur(willInc ? 450 : 150))
       }, dur(holdWin))
     }
@@ -275,6 +350,10 @@
 
   function toEnd() {
     phase = 'end'
+    // TR-099. The feature is over, so the cursor is cleared here rather than
+    // only on settle: a checkpoint that outlives its round is a stale cursor
+    // waiting to be matched against a future round.
+    clearCheckpoint()
     currentSpin = null
     // Reverse the bg-crossfade/frame-hue shift behind the total win summary,
     // not after it.
@@ -299,13 +378,20 @@
 
   function finish() {
     clear()
+    clearCheckpoint()
     phase = 'idle'
     const totalWin = script ? (script.totalWinCentibets / 100) * $betAmount : 0
     dispatch('complete', { totalWin })
   }
 
-  // Start automatically when activated with a script.
-  $: if (active && script && phase === 'idle') start()
+  // Start automatically when activated with a script. TR-099: a resume enters
+  // at a spin boundary instead, skipping the entry sequence the player already
+  // watched. `startFrom` falls back to `start()` for any index it cannot use,
+  // so a bad value degrades to today's behaviour rather than to a blank screen.
+  $: if (active && script && phase === 'idle') {
+    if (resumeFromIndex !== null) startFrom(resumeFromIndex)
+    else start()
+  }
 
   // Dev-only QA hook (OWNER AUDIT ROUND 2, item 1 hard assert): publishes the
   // live script + the spin index actually reached so a headless check can

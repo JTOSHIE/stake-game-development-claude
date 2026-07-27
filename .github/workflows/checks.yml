@@ -330,6 +330,26 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/stores/sessionRecovery.test.ts
 
+      # ── Gate 10b.i: feature resume, the cursor model ─────────────────────────
+      # TR-099. What is persisted is an INDEX, never a figure, so a forged or
+      # stale cursor can at worst skip part of an animation. These are the
+      # REFUSALS: wrong round, wrong checksum, out of range, wrong version,
+      # unreadable storage. Each asserts WHICH guard fired, because a validator
+      # that rejects everything for the wrong reason passes a boolean test and
+      # is still broken.
+      - name: feature resume, checkpoint model
+        working-directory: frontend
+        run: npx tsx src/lib/stores/presentationCheckpoint.test.ts
+
+      # ── Gate 10b.ii: feature resume, the flow ────────────────────────────────
+      # The two orderings the design turns on, asserted by call sequence rather
+      # than by independent spies: the offer is made BEFORE anything is
+      # presented, and the round is presented BEFORE it is settled, resumed or
+      # not.
+      - name: feature resume, recovery flow
+        working-directory: frontend
+        run: npx tsx src/lib/stores/featureResume.test.ts
+
       # ── Gate 10c: scatter anticipation integrity ─────────────────────────────
       # The escalation level must be a function of VISIBLE state only. The test
       # asserts, among other things, that two rounds identical so far escalate
