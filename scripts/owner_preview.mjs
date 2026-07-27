@@ -49,7 +49,7 @@
 //                                                  next run stops it properly
 //
 import { execFileSync, spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, statSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, openSync, closeSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
@@ -330,14 +330,32 @@ function statusLine(sha, commitDate, startedAt) {
   }
 
   // 5. START, bound to the LAN on the fixed port.
+  //
+  // TWO THINGS HERE ARE DELIBERATE AND BOTH WERE LEARNED THE HARD WAY ON THE
+  // FIRST RUN, when the server came up, answered the readiness probe, and then
+  // DIED the moment this script exited.
+  //
+  // (a) STDIO GOES TO A FILE, NOT A PIPE. A detached child whose stdout is a
+  //     pipe to its parent gets that pipe closed when the parent exits, and the
+  //     next write kills it. The log file is an fd the child owns outright, so
+  //     it survives, and it is also where a failed start's output is read from.
+  // (b) VITE IS SPAWNED DIRECTLY, NOT THROUGH `npm run dev`. `npm` would be the
+  //     tracked pid while the real server sat underneath it, which is exactly
+  //     the wrapper-orphans-the-child shape TR-101 was about. The pid in the
+  //     pidfile is now the server itself.
   mkdirSync(STATE_DIR, { recursive: true })
-  const child = spawn('npm', ['run', 'dev', '--', '--host', HOST, '--port', String(PORT), '--strictPort'], {
-    cwd: FRONTEND, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
+  const logFd = openSync(LOGFILE, 'w')
+  const viteBin = join(FRONTEND, 'node_modules', '.bin', 'vite')
+  if (!existsSync(viteBin)) {
+    loud(`OWNER PREVIEW FAILED: ${viteBin} is missing. Run npm ci in frontend/ and try again.`)
+    process.exit(1)
+  }
+  const child = spawn(viteBin, ['--host', HOST, '--port', String(PORT), '--strictPort'], {
+    cwd: FRONTEND, detached: true, stdio: ['ignore', logFd, logFd],
   })
-  const log = []
-  child.stdout.on('data', (d) => log.push(String(d)))
-  child.stderr.on('data', (d) => log.push(String(d)))
   child.unref()
+  closeSync(logFd)
+  const readLog = () => { try { return readFileSync(LOGFILE, 'utf-8') } catch { return '' } }
 
   const startedAt = processStartedAt(child.pid)
   writeRecord({ pid: child.pid, startedAt, cmd: `vite dev --host ${HOST} --port ${PORT}`,
@@ -349,19 +367,17 @@ function statusLine(sha, commitDate, startedAt) {
   if (!ready) {
     // NOTHING HALF-STARTED. Reap what was spawned before reporting the failure,
     // so a failed run leaves the machine exactly as it found it.
-    writeFileSync(LOGFILE, log.join(''))
     stopTracked()
     loud(`OWNER PREVIEW FAILED: the dev server did not answer on port ${PORT} `
       + `within ${READY_TIMEOUT_MS / 1000}s.\n`
       + 'It has been stopped, so nothing is half-started.\n'
       + `Its output is in ${LOGFILE}\n\n`
-      + log.join('').split('\n').slice(-12).map((l) => '    ' + l).join('\n'))
+      + readLog().split('\n').slice(-12).map((l) => '    ' + l).join('\n'))
     process.exit(1)
   }
 
   const sha = git(['rev-parse', '--short', 'HEAD'])
   const commitDate = git(['show', '-s', '--format=%cI', 'HEAD'])
-  writeFileSync(LOGFILE, log.join(''))
 
   say('')
   say(statusLine(sha, commitDate, new Date().toISOString()))
