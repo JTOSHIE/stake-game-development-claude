@@ -23,7 +23,15 @@
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
-  import { formatBalance, formatBalanceCompact, CURRENCY_SCALE } from '../utils/currency'
+  import {
+    formatBalance, formatBalanceCompact, CURRENCY_SCALE,
+    // The autoplay loss limit rendered a hardcoded `$` beside its input at three
+    // layout profiles. The game runs in EUR, XEC and SC among others, and the
+    // owner's own live sessions were EUR, so a euro player set a loss limit
+    // labelled in dollars. Same class as the XSC leak PR #89 fixed: a second,
+    // divergent idea of what the currency is. QUALITY_CHARTER.md Q-10.
+    currencySymbolFor, isVirtualCurrency, VIRTUAL_SYMBOL_TRAILING,
+  } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import {
     autoplayLimits, rgJurisdiction, showSessionPanel,
@@ -253,6 +261,10 @@
   }
   $: prevOverboost = isOverboost
 
+  // Derived from the session's currency, and placed on the side that currency
+  // places it, exactly as formatBalance() does for every other money readout.
+  $: lossLimitSymbol   = currencySymbolFor($currencyCode || 'USD')
+  $: lossLimitTrailing = isVirtualCurrency($currencyCode || 'USD') && VIRTUAL_SYMBOL_TRAILING
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
   // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed
@@ -379,7 +391,15 @@
             <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
             <div class="audio-panel" class:muted={$isMuted}>
               <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-                {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+                {$isMuted ? 'Unmute' : 'Mute'}
+                <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" />
+                  {#if $isMuted}
+                    <path class="mute-slash" d="M17 9.5l5 5M22 9.5l-5 5" />
+                  {:else}
+                    <path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7" />
+                  {/if}
+                </svg>
               </button>
               <div class="audio-row">
                 <span class="audio-label">{$tr('hudMusic')}</span>
@@ -450,7 +470,7 @@
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
               {#if lossLimitOn}
-                <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+                <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
               {/if}
               <div class="auto-menu-sep">Spins</div>
               {#each allowedAutoOptions as n}
@@ -514,7 +534,15 @@
         </button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+            {$isMuted ? 'Unmute' : 'Mute'}
+                <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" />
+                  {#if $isMuted}
+                    <path class="mute-slash" d="M17 9.5l5 5M22 9.5l-5 5" />
+                  {:else}
+                    <path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7" />
+                  {/if}
+                </svg>
           </button>
         </div>
       </div>
@@ -590,7 +618,15 @@
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+            {$isMuted ? 'Unmute' : 'Mute'}
+                <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" />
+                  {#if $isMuted}
+                    <path class="mute-slash" d="M17 9.5l5 5M22 9.5l-5 5" />
+                  {:else}
+                    <path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7" />
+                  {/if}
+                </svg>
           </button>
           <div class="audio-row">
             <span class="audio-label">{$tr('hudMusic')}</span>
@@ -670,7 +706,7 @@
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
           {#if lossLimitOn}
-            <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+            <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
           {/if}
           <div class="auto-menu-sep">Spins</div>
           {#each allowedAutoOptions as n}
@@ -744,7 +780,15 @@
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'} {$isMuted ? '🔇' : '🔊'}
+            {$isMuted ? 'Unmute' : 'Mute'}
+                <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9v6h4l5 4V5L8 9H4z" />
+                  {#if $isMuted}
+                    <path class="mute-slash" d="M17 9.5l5 5M22 9.5l-5 5" />
+                  {:else}
+                    <path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7" />
+                  {/if}
+                </svg>
           </button>
           <div class="audio-row">
             <span class="audio-label">{$tr('hudMusic')}</span>
@@ -868,7 +912,7 @@
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
         {#if lossLimitOn}
-          <label class="auto-menu-amount">$<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" /></label>
+          <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
         {/if}
         <div class="auto-menu-sep">Spins</div>
         {#each allowedAutoOptions as n}
@@ -1487,6 +1531,26 @@
   /* When muted, dim the sliders (they stay adjustable). */
   .audio-panel.muted .audio-row { opacity: 0.45; }
   .audio-mute { padding-top: 0.55rem; }
+  /* The speaker was two operating-system emoji, U+1F507 and U+1F50A, typeset in
+     a text run beside this menu's drawn 24x24 SVG icons. An emoji is rendered by
+     the platform's colour emoji font, so it looked like a different product on
+     every device and could never carry the brand face. Now one drawn icon in the
+     same geometric family as the turbo bolt and the autoplay glyphs above it.
+     QUALITY_CHARTER.md Q-03. */
+  .audio-mute-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
+    margin-left: 6px;
+  }
+  .audio-mute-icon path { fill: currentColor; }
+  .audio-mute-icon path.wave,
+  .audio-mute-icon path.mute-slash {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
   .audio-row {
     display: flex;
     align-items: center;

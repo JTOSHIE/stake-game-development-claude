@@ -192,7 +192,12 @@
   }
 
   .progress-label {
-    font-family: 'Courier New', monospace;
+    /* The boot progress label is the FIRST text a player reads, and it was set
+       in Courier New: not the brand face, and on a device without Courier New
+       it is whatever the generic monospace happens to be. Orbitron leads now
+       and the monospace chain stays behind it for the tabular figures.
+       QUALITY_CHARTER.md Q-15. */
+    font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: rgba(0, 255, 255, 0.5);

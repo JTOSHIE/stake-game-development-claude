@@ -48,7 +48,10 @@
               <span class="badge">COMING SOON</span>
             {/if}
             {#if selected === theme.id}
-              <span class="check">✓</span>
+              <!-- Was `✓`, U+2713, absent from the Orbitron subset. Dev-only
+                   surface, so never player-visible, but the literal shipped in
+                   the bundle. QUALITY_CHARTER.md Q-22. -->
+              <span class="check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4.5 4.5L19 7" /></svg></span>
             {/if}
           </div>
           <div class="card-body">
@@ -135,6 +138,8 @@
     font-weight: 700; letter-spacing: 0.15em; padding: 3px 8px;
     border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);
   }
+  .check svg { width: 13px; height: 13px; }
+  .check svg path { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
   .check {
     position: absolute; top: 8px; left: 8px;
     width: 22px; height: 22px; border-radius: 50%;

@@ -175,7 +175,10 @@
       <div class="fs-pt-head">
         <h2 class="fs-pt-title">{$tr('paytable')}</h2>
         <button class="fs-pt-close fs-knob" on:click={close} aria-label={$tr('close')}>
-          <span class="fs-face">✕</span>
+          <!-- Was `✕`, U+2715, which the Orbitron subset does not carry, so the
+               close control on a mandatory information surface rendered in the
+               operating system's font. QUALITY_CHARTER.md Q-05. -->
+          <span class="fs-face"><svg class="fs-close-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></span>
         </button>
       </div>
 
@@ -205,7 +208,7 @@
                 <div style="display:flex;align-items:center;">
                   <div class="fs-way-cell" class:matched={i < 3}>{reelNum}</div>
                   {#if i < 4}
-                    <span class="fs-way-arrow" class:matched={i < 2}>→</span>
+                    <span class="fs-way-arrow" class:matched={i < 2}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 7l5 5-5 5" /></svg></span>
                   {/if}
                 </div>
               {/each}
@@ -583,6 +586,10 @@
   .fs-pt-close { width: 38px; height: 38px; padding: 3px; border: none; cursor: pointer; flex-shrink: 0; }
   .fs-pt-close > .fs-face { color: #cfe6f2; font-size: 0.9rem; }
   .fs-pt-close:hover > .fs-face { color: #fff; filter: brightness(1.2); }
+  /* Sized in em off the font-size the glyph used, and stroked in currentColor,
+     so the existing colour and hover rules above keep working untouched. */
+  .fs-close-glyph { width: 1.05em; height: 1.05em; display: block; }
+  .fs-close-glyph path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 
   /* body */
   .fs-pt-body {
@@ -632,8 +639,13 @@
     background: color-mix(in srgb, var(--acc) 10%, transparent);
     box-shadow: 0 0 14px color-mix(in srgb, var(--acc) 45%, transparent);
   }
-  .fs-way-arrow { font-size: 1.3rem; padding: 0 8px; color: rgba(255, 255, 255, 0.2); }
-  .fs-way-arrow.matched { color: var(--acc); text-shadow: 0 0 8px var(--acc); }
+  .fs-way-arrow { font-size: 1.3rem; padding: 0 8px; color: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; }
+  /* The arrow was `→`, U+2192, absent from the Orbitron subset. Drawn now, and
+     the matched glow moves from text-shadow to drop-shadow because a stroked
+     path takes the second and not the first. QUALITY_CHARTER.md Q-06. */
+  .fs-way-arrow svg { width: 1em; height: 1em; display: block; }
+  .fs-way-arrow svg path { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .fs-way-arrow.matched { color: var(--acc); filter: drop-shadow(0 0 8px var(--acc)); }
   .fs-caption { font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); text-align: center; line-height: 1.4; margin: 6px 0 0; }
 
   /* symbol grid */

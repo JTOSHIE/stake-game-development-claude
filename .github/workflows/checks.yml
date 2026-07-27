@@ -216,6 +216,35 @@ jobs:
         working-directory: frontend
         run: node scripts/dash_gate.mjs --source
 
+      # ── Gate 7a: the machine-tell gate ───────────────────────────────────────
+      # The second gate of the dash gate's family, added 2026-07-27 by the
+      # quality sweep. CLAUDE.md's STANDING MANDATE ends "Nothing player-visible
+      # may read as machine-generated" and its inspection test names the
+      # specific failures; docs/QUALITY_CHARTER.md holds the full list and this
+      # enforces the sweepable subset: emoji and dingbats typeset as icons,
+      # scaffold placeholders, double spaces, one locale using both apostrophe
+      # forms, a French elision missing its apostrophe, hardcoded currency
+      # symbols, and player money rendered by .toFixed() outside the canonical
+      # formatter.
+      #
+      # WHAT IT FOUND ON ITS FIRST RUN, so the gate's value is on the record:
+      # 35 symbol glyphs shipping in dist, 31 of them player-visible, and
+      # `<title>future-spinner-frontend</title>`, the Vite starter's own package
+      # name, as the browser tab title on the live platform.
+      #
+      # Self-test first, per convention (p). Every one of its ten seeds is a
+      # string that was really in this repository at HEAD 3f0d686, in the file
+      # shape it was found in, not an invented example of the class. Eight
+      # negative controls, two of which encode corrections the gate's own first
+      # real run forced.
+      - name: machine tell gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/machine_tell_gate.mjs --self-test
+
+      - name: machine tell gate, source scan
+        working-directory: frontend
+        run: node scripts/machine_tell_gate.mjs --source
+
       # ── Gate 8: authenticated bet ladder ─────────────────────────────────────
       # Both bet-changing surfaces must drive from the RGS-supplied levels. The
       # first three assertions reproduce the shipped defect arithmetically:
@@ -357,6 +386,15 @@ jobs:
       - name: dash gate, dist scan
         working-directory: frontend
         run: node scripts/dash_gate.mjs
+
+      # ── Gate 13b2: the machine-tell gate's dist scan ─────────────────────────
+      # Same reasoning as the dash gate's dist scan directly above: dist is the
+      # authority because a glyph is a glyph however it was authored, and the
+      # tab title is read straight out of the shipped HTML rather than inferred
+      # from the source that produced it.
+      - name: machine tell gate, dist scan
+        working-directory: frontend
+        run: node scripts/machine_tell_gate.mjs
 
       # Gates 13c and 13d (layout fit, contrast) live in the "browser gates"
       # job below: they launch chromium, which this job deliberately does not

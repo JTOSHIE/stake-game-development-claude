@@ -71,7 +71,15 @@ html, body {
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* The brand face leads the root stack. This read
+     `system-ui, Avenir, Helvetica, Arial, sans-serif`, the Vite starter's own
+     default, from the scaffold commit until 2026-07-27: it named no brand face
+     at all, so every surface that did not declare one inherited the operating
+     system's UI font, and which font that was depended on the player's device.
+     Orbitron is self-hosted via @fontsource (see src/main.ts) and is Latin-only
+     by design, so the fallbacks behind it still carry the non-Latin locales.
+     QUALITY_CHARTER.md Q-13. */
+  font-family: 'Orbitron', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 

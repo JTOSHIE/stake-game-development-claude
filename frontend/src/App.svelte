@@ -1914,7 +1914,7 @@
             aria-label="Change theme"
             title="Change theme"
             data-dev="true"
-          >🎨</button>
+          >THEME</button>
           <!-- Reel choreography toggle, dev-only eye test (drop is the
                shipping default; strip is the dev-toggle alternative). -->
           <button
@@ -1924,7 +1924,7 @@
             title="Reel mode: {$reelMode} (click to toggle strip/drop)"
             data-testid="reel-mode-toggle"
             data-dev="true"
-          >{$reelMode === 'drop' ? '⬇' : '⇅'}<span class="reel-mode-label">{$reelMode}</span></button>
+          ><span class="reel-mode-label">{$reelMode}</span></button>
         </div>
       {/if}
     </div>
@@ -1999,7 +1999,12 @@
     margin: 0;
     padding: 0;
     color: #fff;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    /* Read `'Segoe UI', system-ui, sans-serif` until 2026-07-27. Segoe UI is the
+       WINDOWS system face: it resolves on Windows and on nothing else, so this
+       rule styled one operating system deliberately and every other one by
+       accident. The brand face leads now, matching src/app.css's root stack.
+       QUALITY_CHARTER.md Q-14. */
+    font-family: 'Orbitron', system-ui, sans-serif;
     overflow: hidden;
     height: 100dvh;
   }
@@ -2321,7 +2326,9 @@
 
   /* Text hidden by default, only shown by JS when img fails to load */
   .logo-text {
-    font-family: 'Courier New', monospace;
+    /* The fallback for a failed brand mark should still be the brand face.
+       Courier New was the scaffold-era placeholder. QUALITY_CHARTER.md Q-15. */
+    font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 1.6rem;
     font-weight: 900;
     letter-spacing: 0.18em;

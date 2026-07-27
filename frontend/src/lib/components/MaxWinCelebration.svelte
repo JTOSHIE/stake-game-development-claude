@@ -95,12 +95,27 @@
     <!-- Content -->
     <div class="c1-max-content content">
 
-      <div class="c1-crown crown" aria-hidden="true">★ ★ ★</div>
+      <!-- Three drawn stars. This was `★ ★ ★`, U+2605, which the shipped
+           Orbitron subset does not carry (183 codepoints, verified against
+           frontend/dist/assets/orbitron-latin-400-normal-*.woff), so the crown
+           on the single most photographed surface in the game rendered in
+           whatever the operating system fell back to. QUALITY_CHARTER.md Q-04. -->
+      <div class="c1-crown crown" aria-hidden="true">
+        {#each [0, 1, 2] as i}
+          <svg class="c1-crown-star" viewBox="0 0 24 24" style="--i:{i}">
+            <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45-4.7-4.6 6.5-.95z" />
+          </svg>
+        {/each}
+      </div>
 
       <h1 class="c1-max-headline headline">{t($locale, 'hudMaxWin', localeMode)}<br>{t($locale, 'maxWinReached', localeMode)}</h1>
 
       <div class="c1-max-multwrap multiplier-wrap">
-        <span class="c1-max-mult fs-num">5,000</span><span class="c1-max-x">x</span>
+        <!-- A letter `x` here while the paytable, the mode cards and the feature
+             menu all write the multiplication sign `×` (U+00D7, which Orbitron
+             carries). Same quantity, two glyphs, two screens: the mandate's
+             "decimal or currency formats that disagree". QUALITY_CHARTER.md Q-12. -->
+        <span class="c1-max-mult fs-num">5,000</span><span class="c1-max-x">×</span>
         <span class="c1-max-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
       </div>
 
@@ -204,10 +219,21 @@
   /* ── Crown stars ────────────────────────────────────────────────────────── */
   .c1-crown {
     color: var(--sig-gold);
-    letter-spacing: 0.4em;
-    font-size: 22px;
-    text-shadow: 0 0 10px color-mix(in srgb, var(--sig-gold) 80%, transparent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4em;
   }
+  /* Sized and glowing to match the former 22px glyph run with its 0.4em
+     letter-spacing, so the composition is unchanged and only the rendering
+     path is: a drawn path in the brand's own gold rather than a font glyph
+     the brand face does not carry. */
+  .c1-crown-star {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--sig-gold) 80%, transparent));
+  }
+  .c1-crown-star path { fill: var(--sig-gold); }
 
   /* ── Headline ───────────────────────────────────────────────────────────── */
   .c1-max-headline {

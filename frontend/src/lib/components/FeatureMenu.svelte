@@ -319,7 +319,9 @@
         <div class="fm-head">
           <h2 class="fm-title">{$tr('hudFeatures')}</h2>
           <button class="fm-close fs-knob" on:click={close} aria-label="Close" data-testid="feature-menu-close">
-            <span class="fs-face">✕</span>
+            <!-- Was `✕`, U+2715, absent from the Orbitron subset. Same glyph and
+                 same fix as PaytableModal's close. QUALITY_CHARTER.md Q-05. -->
+            <span class="fs-face"><svg class="fm-close-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></span>
           </button>
         </div>
 
@@ -827,6 +829,10 @@
   .fm-close { width: 34px; height: 34px; padding: 3px; border: none; cursor: pointer; flex-shrink: 0; }
   .fm-close > .fs-face { color: #cfe6f2; font-size: 0.82rem; }
   .fm-close:hover > .fs-face { color: #fff; filter: brightness(1.2); }
+  /* Sized in em off the font-size the glyph used, stroked in currentColor, so
+     the two rules above keep working unchanged. QUALITY_CHARTER.md Q-05. */
+  .fm-close-glyph { width: 1.05em; height: 1.05em; display: block; }
+  .fm-close-glyph path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 
   /* bet selector row - ITERATION 3 (item 6): now also carries the spin-cost
      text (formerly its own line under the SPIN MODES label), merged into

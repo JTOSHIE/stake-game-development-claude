@@ -85,6 +85,14 @@ const ALLOW = new Set([
   // `import.meta.env.DEV` in App.svelte and is not rendered in production, so
   // no player in any locale can reach this string.
   'PLAY THIS THEME',
+  // Added 2026-07-27 by the machine-tell sweep (QUALITY_CHARTER.md Q-22). The
+  // dev panel's theme button was the emoji `🎨`, U+1F3A8, which shipped as a
+  // literal in the production bundle even though the panel itself is gated
+  // behind `import.meta.env.DEV` and never renders for a player. Swapping the
+  // emoji for a word is what surfaced it here, and the same dev-only reasoning
+  // that covers DEV and SELECT THEME above covers it: no player in any locale
+  // can reach this string.
+  'THEME',
 ])
 
 const COMPONENTS = join(ROOT, 'src/lib/components')

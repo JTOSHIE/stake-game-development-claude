@@ -1,9 +1,19 @@
 <script lang="ts">
-  import { winMultiplier, winAmount, isSpinning } from '../stores/gameStore'
+  import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 
   $: isActive = $winAmount > 0 && !$isSpinning
   $: multText = $winMultiplier > 0 ? `${$winMultiplier.toFixed(1)}×` : ''
-  $: amtText  = $winAmount > 0 ? $winAmount.toFixed(2) : ''
+  // Was `$winAmount.toFixed(2)`, the last money `.toFixed` in frontend/src and the
+  // one the analyst track raised as ledger row SA-022. It printed `3750000.00`:
+  // no grouping, no currency symbol, in a fixed 99px zone, beside a banner in the
+  // same frame that formatted correctly. Bet Replay is the only consumer
+  // (ReplayMode.svelte), which is a mandatory approval surface, and a large bet
+  // is exactly the input that overflows. Now the one canonical formatter, like
+  // every other money readout in the build. QUALITY_CHARTER.md Q-11.
+  $: amtText  = $winAmount > 0
+    ? formatBalance(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+    : ''
 </script>
 
 {#if isActive}

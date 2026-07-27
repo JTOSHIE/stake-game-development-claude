@@ -94,7 +94,14 @@
     <div class="sp-sheet" on:click|stopPropagation>
       <div class="sp-sheet-head">
         <h2>{$tr('rgSessionTitle')}</h2>
-        <button class="sp-sheet-close" on:click={closeSheet} aria-label="Close">×</button>
+        <!-- Was the multiplication sign `×`, U+00D7. Orbitron carries it, so this
+             was never a font leak, but it made three modals close with two
+             different affordances, and it spent the same glyph the paytable and
+             the mode cards use to mean "times". One drawn cross now, matching
+             PaytableModal and FeatureMenu. QUALITY_CHARTER.md Q-05. -->
+        <button class="sp-sheet-close" on:click={closeSheet} aria-label="Close">
+          <svg class="sp-close-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
       </div>
       <!-- Fable's masters, 2026-07-25: five rows, in this order. The panel
            previously showed three and hardcoded "NET" in English. -->
@@ -181,6 +188,8 @@
     margin-bottom: 6px;
   }
   .sp-sheet-head h2 { color: #00ffff; font-size: 1rem; letter-spacing: 0.08em; margin: 0; }
+  .sp-close-glyph { width: 1.1em; height: 1.1em; display: block; margin: 0 auto; }
+  .sp-close-glyph path { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
   .sp-sheet-close {
     /* 44px, not a smaller "icon button" size - a real touch target, same
        floor this project holds every interactive element to. */
