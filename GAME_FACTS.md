@@ -1,4 +1,4 @@
-# FUTURE SPINNER — GAME FACTS
+# FUTURE SPINNER: GAME FACTS
 
 Authoritative facts sheet compiled for external audit. Every figure below is quoted from a
 committed repo document (cited inline); none is invented or estimated for this sheet. Where
@@ -68,7 +68,7 @@ verified against the books.
   96.3500% RTP at 4dp (`FUTURE_SPINNER_PAR_SHEET.md` §9).
 - Books match the lookup tables positionally by id and as sorted multisets, in both modes
   (`FUTURE_SPINNER_PAR_SHEET.md` §9).
-- Simulation is deterministic — fixed seeds reproduce identical payouts
+- Simulation is deterministic: fixed seeds reproduce identical payouts
   (`FUTURE_SPINNER_PAR_SHEET.md` §9).
 - Round-shape audit of freegame-containing books confirmed correct trigger counts,
   retriggers, Overdrive multiplier progression (+1 only after winning spins, applied to
@@ -88,7 +88,7 @@ verified against the books.
 Wild substitutes for all pay symbols (no independent pay). Scatter pays instantly and does
 not participate in the ways calculation (`FUTURE_SPINNER_PAR_SHEET.md` §3).
 
-## 3. Feature rules — Overdrive Free Spins
+## 3. Feature rules: Overdrive Free Spins
 
 Source: `FUTURE_SPINNER_PAR_SHEET.md` §2 and `CLAUDE.md` "True game facts".
 
@@ -103,7 +103,7 @@ Source: `FUTURE_SPINNER_PAR_SHEET.md` §2 and `CLAUDE.md` "True game facts".
 - **Win cap:** 5,000x total per round, hard, both modes.
 - **Stateless:** the entire feature resolves inside a single book round; no state carries
   between rounds. No jackpot, gamble, or continuation mechanic.
-- **Scatter values are 1x/3x/10x everywhere** (maths, PAR, frontend) — not 5x/15x/50x.
+- **Scatter values are 1x/3x/10x everywhere** (maths, PAR, frontend), not 5x/15x/50x.
 
 ### Trigger distribution
 
@@ -138,6 +138,36 @@ Reel frequencies, which are maths-locked, are unaffected by the cosmetic rename.
 Confirmed live on 2026-07-26 from the owner's DevTools captures. This exists
 because the two numbers look like they should agree and do not, and every future
 reader of a Bets page will hit it.
+
+**HARDENED 2026-07-27, and the upgrade matters: this stopped being an inference.**
+The 2026-07-26 evidence was three modes behaving alike, which is a strong inference
+but still an inference. Two independent things landed since:
+
+1. **The platform says it itself.** The authenticate response carries a per-mode
+   table publishing `"mode": "bonus", "costMultiplier": 100` and
+   `"mode": "super", "costMultiplier": 400` as its OWN fields, and a play response
+   carries `"amount": 1000000000` with `"mode": "antelite"` in the same instant the
+   HUD reads `EUR 1,250.00`. Level and cost multiplier are two separate fields and
+   the COST column renders the first. Per convention (l.4) this counts as
+   corroboration precisely because `fsModes.ts` and that payload share no input.
+2. **Three sessions were reconciled by solving for the opening balance TWICE**, once
+   under each competing reading, so the round figures are a test rather than
+   decoration. Under the true per-mode costs the openings come out at exactly
+   EUR 1,000.00, EUR 1,000,000.00 and EUR 500,000.00; under the COST column they
+   come out at EUR 291.75, EUR 900,250.00 and EUR 499,250.00. Residual 0.00 in all
+   three under the true costs.
+
+Working, generated rather than typed:
+`reports/qa/live_stats/2026-07-27_money_timeline.md`,
+`reports/qa/live_stats/2026-07-27_reconcile.py` and its JSON output.
+**The owner-facing one-page explanation of the same thing, with four annotated
+frames from the owner's own sessions, is `docs/records/MONEY_DISPLAY_EXPLAINED.md`.**
+
+**An open decision sits on top of this, and it is not the builder's to make.**
+Ledger rows SA-002 and SA-007 ask whether the convention should be raised with the
+platform before submission, so that a reviewer reading the Bets page alone does not
+underestimate spend on every non-unit mode. Awaiting a Fable or owner ruling since
+2026-07-26 (`docs/records/screenshots/FINDINGS_LEDGER.md`).
 
 **The platform reports the BET LEVEL, not what the round cost.**
 
@@ -196,12 +226,37 @@ live is exactly 5,000.00x on the wincap round itself.
   exports (e.g. H1's rotating spoke sprite, H2's needle, the Overdrive flame jets) isolate
   named SVG groups so the engine animates parts independently of the static base art
   (`design-system/DESIGN_SYSTEM.md`; `reports/archive/2026-07-04_motion-polish-v2.md`;
-  `reports/archive/2026-07-04_opus-elevate-2.md`). No externally sourced or AI-generated
-  stock art; Manus is retired (`CLAUDE.md` "Assets").
+  `reports/archive/2026-07-04_opus-elevate-2.md`). Manus is retired
+  (`CLAUDE.md` "Assets").
+- **Externally sourced art: FOUR assets, all owner-commissioned, all scene or marketing,
+  none of them symbols, each with recorded provenance.** Corrected 2026-07-27. This bullet
+  previously read "No externally sourced or AI-generated stock art", which was true when it
+  was written and has not been true since 2026-07-25. It is stated plainly here because this
+  document is compiled for external audit and because the platform's quality-rankings page
+  warns specifically against over-reliance on generic AI-generated assets
+  (`COMPLIANCE_WATCH.md`). The permitting rule is `CLAUDE.md`'s Assets section as amended
+  2026-07-27: owner-commissioned NEW DESIGNS are permitted for SCENE and MARKETING art with
+  recorded provenance; **symbols remain never externally designed**, and unrequested
+  external design remains prohibited.
+
+  | Asset | Class | Measured against what it replaced | Provenance record |
+  |---|---|---|---|
+  | `backgrounds/bg_base.jpg` 1920x1080 | Owner-commissioned NEW DESIGN | Pearson r **0.3850**, 58.2% of cells moved, against a declared ENHANCEMENT control scoring 0.9966 and an identity control at 1.0000 | `design-system/brand/GENERATION_NOTE_background.md`, `reports/qa/background_candidate_ingest.json` |
+  | `backgrounds/bg_overdrive.jpg` 1920x1080 | Derived in-house from the above | Deterministic grade by `scripts/assets/background_overdrive_derive.py`, ratios taken from the original two-grade pipeline | `reports/qa/background_overdrive_derive.json` |
+  | `design-system/brand/tile/tile_composed_master.png` 408x546 | Owner-commissioned NEW DESIGN | Landed byte-identical at the platform's own observed published tile geometry, 408x546 | `design-system/brand/tile/GENERATION_NOTE_composed_master.md` |
+  | `ui/scene_character.png` 680x1344, `ui/scene_car.png` 2840x1000 | External ENHANCEMENT of art we already own | Character subject bounding box matching the original to **0.7%**; car bounding box **identical** at 2729x914, 40.7% transparent in both | `CLAUDE.md` Assets section; shipped hashes recorded in `SUBMISSION_DOSSIER.md` section 9 |
+
+  **Every symbol, frame, particle and animated element still derives from the in-house SVG
+  masters.** That is the line the rule actually draws, and it is unbroken: none of the four
+  above enters the animation pipeline. Scene backdrops, tiles and marketing art are flat and
+  terminal and animate nothing, which is why they can come from outside without recreating
+  the failure the original prohibition was written for.
 - **Backgrounds:** static graded stills (one base scene, one Overdrive-state variant), no
   background video ships (`design-system/DESIGN_SYSTEM.md` ADDENDUM "Static environment
-  backgrounds").
-- **Speed tiers:** three — Normal, Turbo, Super Turbo — scale every reel-motion duration
+  backgrounds"). Since 2026-07-27 the base is owner-commissioned art and the Overdrive
+  variant is DERIVED from it rather than graded from a second video frame, so the two can
+  never be of two different cities: `App.svelte` crossfades them.
+- **Speed tiers:** three, Normal, Turbo and Super Turbo, scaling every reel-motion duration
   (`design-system/LAYOUT_SPEC.md` "Reel feel requirements"; implemented in
   `frontend/src/lib/stores/speedMode.ts`, verified in
   `reports/archive/2026-07-04_motion-polish-v2.md`). Autoplay honours the active tier.
@@ -232,9 +287,23 @@ live is exactly 5,000.00x on the wincap round itself.
 - **Bet Replay:** implemented and mandatory-compliant, no player session required; bonus-buy
   replays display the amount spent including the 100x cost multiplier
   (`COMPLIANCE_WATCH.md`; `SUBMISSION_DOSSIER.md` §4).
+  **CONFIRMED WORKING ON THE LIVE PLATFORM, 2026-07-26** (TR-076), and it was a genuine
+  blocker before that: the panel launched, the board rendered static, and START REPLAY sat
+  at the bottom as an unclickable shadow. Root cause was a `position: fixed` backdrop at
+  `z-index: 0` hit-testing above the unpositioned replay container; fixed in both
+  directions. Confirmed live on a `super` buy-tier wincap round through to its celebration
+  and PLAY AGAIN: `reports/screens/live-round2-2026-07-26/01_replay_22975_celebration_multiplier_5000x_win_3750000.png`
+  and `02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`.
+  **One OPEN defect on this exact surface, and the dossier must not claim replay compliance
+  without it:** ledger row SA-022, HIGH. `WinPod.svelte` rendered player money with
+  `.toFixed(2)`, so replay showed `3750000.00` with no separators and no currency symbol,
+  overflowing its fixed zone, beside a banner formatting correctly in the same frame.
+  **Fixed at source 2026-07-27** by routing it through the canonical `formatBalance`
+  (`docs/QUALITY_CHARTER.md` Q-11); still awaiting a live re-capture to confirm it on the
+  platform, so it is recorded as fixed-not-yet-re-observed rather than closed.
 - **Disclaimer:** the Stake Engine seven-point disclaimer and full paytable are always
   reachable (`SUBMISSION_DOSSIER.md` §4).
-- **Responsive viewports:** verified at all six required viewports — Mobile S 320x568,
+- **Responsive viewports:** verified at all six required viewports: Mobile S 320x568,
   Mobile M 375x667, Mobile L 425x812, Popout S 400x225, Popout L 800x450, Desktop 1200x675
   (`SUBMISSION_DOSSIER.md` §4; occlusion/position audits in
   `reports/archive/2026-07-04_layout-install.md` and `reports/archive/2026-07-04_ux-polish.md`).

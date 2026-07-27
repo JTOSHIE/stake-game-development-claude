@@ -583,7 +583,174 @@ open-round semantics; and the CVaR definition.
 ### 8i. Presentation: cohesion
 
 The scene character and car are enhanced art, adopted under an owner ruling that amended the
-assets convention: **external enhancement of art we already own is permitted; externally
-designed art is not, and symbols are never externally designed.** Verified before adoption:
-subject bounding boxes match the originals to 0.7% and identically respectively, so no
-layout shifted. A single global grade is available and ships at neutral.
+assets convention. Verified before adoption: subject bounding boxes match the originals to
+0.7% and identically respectively, so no layout shifted. A single global grade is available
+and ships at neutral.
+
+**SUPERSEDED 2026-07-27, and the correction is recorded rather than the old text edited
+away.** This paragraph used to state the rule as "external enhancement of art we already own
+is permitted; externally designed art is not, and symbols are never externally designed."
+That was the 2026-07-25 amendment and it is no longer the operative rule. `CLAUDE.md`'s
+Assets section was amended again on 2026-07-27: **owner-commissioned NEW DESIGNS are
+permitted for SCENE and MARKETING art, with recorded provenance. Symbols remain never
+externally designed, and unrequested external design remains prohibited.** Two shipped
+assets fit neither side of the old line, which is why the rule was restated to describe what
+the project actually does. The full adoption register, with hashes and measurements, is
+section 9c below.
+
+---
+
+## 9. STATE AT HEAD (2026-07-27): the live confirmations, the art adoptions, the display convention
+
+Section 8 above is a **2026-07-25 snapshot** and is kept as one. This section carries what
+landed after it, and it is the current one. Written by the round-three prep session; every
+figure carries a path a reader can open, per convention (l.3).
+
+### 9a. The live confirmations
+
+These are the four things the game has now been observed doing on the live platform rather
+than asserted about. Each was a real risk before it was observed.
+
+| # | Confirmation | Evidence | Row |
+|---|---|---|---|
+| 1 | **Bet Replay WORKS on the live platform.** It did not before 2026-07-26. The panel launched, the board rendered static, and START REPLAY sat as an unclickable shadow. Root cause: `App.svelte`'s `.bg-layer` is `position: fixed` at `z-index: 0`, and a positioned layer at z-index 0 paints and hit-tests ABOVE unpositioned content, so the entire replay UI sat under the backdrop. Fixed in both directions. Bet Replay is a **mandatory** approval requirement, so this was a submission blocker. | Live: `reports/screens/live-round2-2026-07-26/01_replay_22975_celebration_multiplier_5000x_win_3750000.png` and `02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`, a `super` buy-tier wincap round replayed through to its celebration and PLAY AGAIN. Earlier live sighting with the disclaimer rendering: `reports/screens/dtt-live-2026-07-26/37_REPLAY_WORKING_event_52121_with_disclaimer.png`. Seeded-defect proof and the fixed flow: `reports/screens/replay-blocker/`. Gate: `frontend/scripts/replay_blocker_proof.mjs`, 7 of 7. | TR-076, CLOSED |
+| 2 | **The MAX WIN celebration has been photographed.** The 5,000x cap fired on a real live round and the overlay presented correctly: three gold stars, MAX WIN REACHED, the `5,000 x BET` figure, and COLLECT. The underlying round was a `super` bet at EUR 750.00 paying EUR 3,750,000.00, exactly 5,000.00x, the platform's own row reading `x5000.00`. **At the cap, not through it.** | `reports/screens/live-round2-2026-07-26/02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`; second capture `reports/screens/replay-blocker/05_super_wincap_maxwin_celebration.png` | TR-073 CLOSED; ledger SA-018 CLOSED, SA-017 |
+| 3 | **The payload shapes are confirmed from the wire**, quoted rather than inferred. See 9b. | `reports/screens/live-shapes-2026-07-26/` | TR-077, TR-078, TR-079 |
+| 4 | **The jurisdiction read is TOLERANT of both live shapes.** The live authenticate carries `jurisdiction` at TOP LEVEL; the parser read `config.jurisdiction` only. Now `...(config.jurisdiction ?? raw.jurisdiction ?? {})`, additive rather than a swap, so the pinned shape still wins where it exists. Taken under an owner lock sanction: exactly the two named deny lines lifted as a never-committed working-tree edit, restored with `git diff .claude/settings.json` verified empty, commit carrying `LOCK-SANCTION: 2026-07-26 frontend/src/lib/services/rgsService.ts`, gate reading 1 commit, 1 sanctioned, 0 violations. | Proof runs against the **shipped exported function**, not a copy: `frontend/scripts/live_shape_conformance.mjs` serves the captured live body to the real `authenticate()`. 9 of 9 including both negative controls. Result `reports/qa/live_shape_conformance_2026-07-26.json`. | TR-080, CLOSED |
+
+**A fifth, which the brief did not name and which is a mandatory dossier gate:** the ACP
+Math Distribution and Summary screen has been read live and **every constraint passes at
+both star tiers**. Transcribed at `reports/qa/dtt_live_session_2026-07-26.md`, frames at
+`reports/screens/dtt-live-2026-07-26/15_...png` through `19_...png`. Headline figures as the
+platform itself displays them: Max Payout Multiplier 5,000.0 against 100,000.0; Cost
+Multiplier 400.0 against 1,500.0; Base Volatility 17.3 inside 0.6 to 60.0; Tail Probability
+at 5,000x 0.003 against 0.010; **Risk Limit (CVaR) 205.710 against 700.000 and 800.000**;
+ETL(Sum) 0.641 against 1.500. All five modes COMPLIANT, all at 96.35%, all 5,000x max, BASE
+6 of 6 with cross-mode RTP variance 0.00%.
+
+**Three consequences, stated as open rather than closed:**
+
+1. **Section 5f still reads as an un-run gate. It has substantially been run.** Its step 3
+   asks for captures at `reports/screens/acp-math-summary/<date>/`; that directory does not
+   exist and the evidence is at `reports/screens/dtt-live-2026-07-26/` instead. The gate is
+   satisfied in substance and not in filing.
+2. **The CVaR open question recorded in `COMPLIANCE_WATCH.md` has an answer on file.** The
+   platform displays `Risk Limit (CVaR) 205.710` against 700/800, which resolves the
+   which-limit-and-which-value half of the three unknowns even if the quantile definition
+   survives.
+3. **Two cited sources disagree on the 2-star Maximum Exposure limit.** `COMPLIANCE_WATCH.md`
+   records the published table as `$10,000,000` at 2-star; the platform's own ACP screen
+   displays `15,000,000.0`. **Raised here rather than silently corrected**, because it
+   touches a published compliance limit and section 5f step 6 says the platform's figures
+   are definitive where they disagree with ours. Owner and Fable item.
+
+### 9b. The payload shapes, quoted from the wire
+
+Per convention (l.7), quoted rather than paraphrased.
+
+**Play response** (TR-077), from `reports/screens/live-shapes-2026-07-26/05_play_response_state_is_event_array_micros.png`:
+
+```
+round.betID            1055919443
+round.amount           1000000
+round.payout           800000
+round.payoutMultiplier 0.8
+round.active           true
+round.mode             "base"
+round.state            [ { "index": 0, "type": "reveal", "board": [...] } ]
+```
+
+Two findings in that one shape. `state` **is** the event array, not an object containing
+one. And the board rows carry **six** cells against a five-reel visible grid: the padding
+row, seen on the live wire for the first time, and the same padding that produced the
+worked example behind convention (l).
+
+**Authenticate, money fields** (TR-078): `balance.amount` 996800000 with `currency` "EUR",
+with the HUD reading `EUR 995.06` in the same frame.
+
+**Authenticate, per-mode cost table** (ledger SA-024), the field that settles the display
+convention:
+
+```
+"mode": "bonus",  "costMultiplier": 100, "maxBet": 1000000000
+"mode": "super",  "costMultiplier": 400, "maxBet": 1000000000
+```
+
+**End-round** (TR-079), the entire response on one line:
+
+```
+{"balance":{"amount":995060000,"currency":"EUR"}}
+```
+
+No `roundId`, no `betID`, nothing else. `CURRENCY_SCALE` is 1,000,000, so the integer-micros
+rule holds in both directions.
+
+### 9c. The art adoptions, with provenance
+
+Four external adoptions ship. **Only one of them was recorded in this dossier before
+2026-07-27.** The operative permitting clause for all of them is `CLAUDE.md`'s Assets
+section as amended 2026-07-27; the superseding note is in section 8i above.
+
+| Asset | Class | Dimensions | Shipped SHA-256 | What the measurement found | Record |
+|---|---|---|---|---|---|
+| `frontend/public/assets/themes/future-spinner/backgrounds/bg_base.jpg` | Owner-commissioned **NEW DESIGN** | 1920x1080 RGB, 273,173 bytes at JPEG q80 progressive 4:2:0 | `c7ecfa15dde8db42...` | **Pearson r 0.3850**, 58.2% of cells moved, against an identity control at 1.0000 and a declared ENHANCEMENT control at 0.9966. Source `65ef44c1ce96d351...`, 569,573 bytes. The encode was chosen by a sweep against the incumbent's own 277,172-byte budget. | `design-system/brand/GENERATION_NOTE_background.md`, `reports/qa/background_candidate_ingest.json` |
+| `.../backgrounds/bg_overdrive.jpg` | Derived in-house from the above | 1920x1080 RGB, 269,186 bytes | `909dbeefd304b10b...` | Deterministic grade, ratios taken from the original pipeline's own two parameter sets. **Derived because `App.svelte` crossfades the two**: adopting only the base would have cut to a different skyline on every bonus trigger, with every gate green. This is what added point 5 to the CLAUDE.md assets test. | `reports/qa/background_overdrive_derive.json` |
+| `design-system/brand/tile/tile_composed_master.png`, and its delivery copy `FutureSpinner-Tile.png` | Owner-commissioned **NEW DESIGN** | **408x546** portrait, aspect 0.7473 | `741e77face74f7e9...`, byte-identical in both copies and byte-identical to the source | 408x546 is the platform's own **observed** published tile geometry, at 93.1% of an 87-tile decoded sample. The platform publishes no number. First portrait asset in the project: BG 2048x1152 and FG 4159x1875 are both landscape. Layers could not be cut from it, and that was **tested rather than assumed**: the type is baked into the pixels and 37.62% of the silhouette boundary has no confident matte edge, so both forms ship. | `design-system/brand/tile/GENERATION_NOTE_composed_master.md`, `TILE_LAYER_DERIVATION.md` |
+| `.../ui/scene_character.png`, `.../ui/scene_car.png` | External **ENHANCEMENT** of art we already own | 680x1344 RGBA and 2840x1000 RGBA | `1acbd781ce1c7b79...` (629,245 bytes) and `627c6920c26e5be2...` (1,036,271 bytes), both measured for this record | Character subject bounding box matching the original to **0.7%**; car bounding box **identical** at 2729x914, 40.7% transparent in both. | `CLAUDE.md` Assets section; hashes recorded here for the first time |
+
+**Two honest gaps against these, named rather than smoothed over:**
+
+- **The scene character and car have no source hash on record.** The provenance requirement
+  (source path, source hash, shipped hash, dimensions, supplier claim, measurement) postdates
+  their adoption by two days, so it does not bind retroactively. It matters anyway: ledger
+  row **SA-023** has since found a hard dark stroke baked into `scene_car.png` at column
+  x 1864, y 263 to 554, 29% of the sprite height and visible to a player, awaiting an owner
+  ruling on whether it is a designed shut line or a leftover from the enhancement pass.
+  **Without a source hash there is no way to test whether the stroke came in with the
+  enhancement.**
+- **The Overdrive background variant is unproven in live play.** Ledger row **SA-026**: the
+  variant is measurably a magenta shift rather than a red one (15.8% of the green removed,
+  red up 1.2%, blue flat), and no committed capture shows it in game.
+
+### 9d. The display convention, and what it costs a reader who does not know it
+
+**The platform's Bets panel COST column, and the `round.amount` field in the play response,
+both carry the BET LEVEL, not the amount debited.** The platform holds the multiplier
+separately as `costMultiplier`. This is a platform-wide convention applied to every studio
+and every mode; **our game is right**.
+
+| What is seen | Where | What it actually is |
+|---|---|---|
+| BET EUR 1,250.00 | our HUD gold plate | what the next spin costs: bet level times mode multiplier |
+| COST EUR 1,000.00 | the platform's Bets page | the BET LEVEL, never the multiplier, never the charge |
+| `"amount": 1000000000` | the play response | the same bet level, in micros, and it feeds that COST column |
+
+Proven in four stages, each independent of the last: inference from three modes agreeing;
+wallet deltas to the cent across base, antelite, bonus and super with residual 0.00; the
+platform's own `costMultiplier` fields; and three sessions reconciled by solving for the
+opening balance twice, once under each competing reading, giving exact round openings under
+the true costs and nothing round under the alternative.
+
+**The consequence a reviewer must not be left to trip over:** the MULT column is payout over
+the bet level too, so an `antelite` row reading `x91.60` is `x73.28` against actual spend. No
+cap is breached in either reading; the 5,000x cap is measured against the bet level by both
+the platform and our own `WINCAP`.
+
+Owner-facing one-page explanation with four annotated frames:
+`docs/records/MONEY_DISPLAY_EXPLAINED.md`. Full statement of what our own surfaces show:
+`GAME_FACTS.md` section 3a.
+
+**OPEN DECISION, not the builder's**: ledger rows SA-002 and SA-007 ask whether the
+convention should be raised with the platform before submission. Waiting since 2026-07-26.
+
+### 9e. Corrections to section 8, so it is not read as current
+
+| Section 8 claim | Correction at HEAD |
+|---|---|
+| §8 header "STATE AT HEAD (2026-07-25)" | It is a 2026-07-25 snapshot. This section 9 is the current state. |
+| §8e "TR-035b is parked with options" | **Not parked.** RE-RULED and RESOLVED by Fable 2026-07-26, status MERGED, RESUME AND SETTLE with no forfeit path. The premise the park rested on is gone: authenticate does return the round's events at `round.state`. |
+| §8h lists four things the DTT session will settle | Two are settled: TR-035b is resolved and the CVaR figure has been displayed. **XEC live behaviour and the currency display metadata remain genuinely unobserved** and are the only two that should still be listed. |
+| §5c maths file hashes | **Verified NOT stale**, so the next session need not re-derive them: all seven repo-committed maths files hash exactly to the §5c table, and `git ls-files` returns exactly those seven. |
+| Bundle figure in §5 | Superseded. Current kit is V6, built from a fresh clone, **110 files, 15,601,767 bytes (14.88 MB)**. The two files added since V5 are the two speed-control captures. |
+| §2 item 10, "live docs refreshed 2026-07-04" | Dated mirrors now exist at `docs/stake-engine-live/2026-07-25/`, `2026-07-25b/`, `2026-07-26/` and `2026-07-28/`. |
+| §6 and §2 item 13, which read as though the portal has never been entered | The game is published and the owner has run at least four live portal sessions. The two URLs §6 asks to capture are recorded in `COMPLIANCE_WATCH.md` as wrong and erroring. |

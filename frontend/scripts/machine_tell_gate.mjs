@@ -110,7 +110,10 @@ const PLACEHOLDER_WORDS = /\b(TODO|TBD|FIXME|XXX|Lorem ipsum|lorem ipsum)\b/
 // separated, no spaces. Derived rather than matched against one hardcoded
 // string, so it catches the class and not only the instance. This is exactly
 // what `future-spinner-frontend` was, straight from the Vite scaffold, and it
-// was the browser tab title on the live platform.
+// was the PRE-HYDRATION browser tab title: what the tab reads from first paint
+// until App.svelte's <svelte:head> replaces it. Transient, not permanent; the
+// first assessment of this got that wrong and QUALITY_CHARTER.md Q-01 records
+// the correction.
 const TITLE_TAG = /<title>([^<]*)<\/title>/g
 const PACKAGE_SHAPED = /^[a-z0-9]+(?:-[a-z0-9]+)+$/
 
@@ -444,7 +447,7 @@ if (process.argv.includes('--self-test')) {
       name: 'scaffold-title.html',
       body: '<!doctype html>\n<html>\n  <head>\n    <title>future-spinner-frontend</title>\n  </head>\n</html>\n',
       run: (p) => scanPlaceholders([p]),
-      why: 'Q-01, the Vite scaffold package name as the browser tab title, in MARKUP',
+      why: 'Q-01, the Vite scaffold package name as the pre-hydration tab title, in MARKUP',
     },
     {
       name: 'locale-emoji.ts',

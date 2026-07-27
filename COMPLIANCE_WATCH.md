@@ -499,3 +499,98 @@ dated and findable, is more risk than the tidiness is worth. `COMPLIANCE_WATCH.m
 the compliance register and a reasonable home for a commercial-design note. If the PAR is
 ever opened for a substantive reason under a properly sanctioned pass, the note can move
 then as a free rider. **No lock lift is being sought for this.**
+
+---
+
+## LIVE OBSERVATION DELTA, 2026-07-27 (what the portal itself has now shown us)
+
+Added by the round-three prep session. Everything below is an observation from a live
+portal or ACP session with a committed capture, not a docs read. Where it corrects an
+earlier section of this file, the earlier section is left in place and the correction is
+recorded here, so the history stays honest.
+
+### 1. Bet Replay: the posture bullet is superseded, in our favour
+
+The "Current posture" bullet says event IDs are captured on the deployed staging build per
+`docs/REVIEW_EVENTS_PLAN.md`, and lists buy-tier cost display as Stage 2.
+
+**Both are now overtaken by what the platform actually provides.** The platform's own Bets
+panel exposes the Event ID on every row with a per-row "Replay this bet" button, which
+removes the guesswork in `REPLAY_TEST_EVENTS.md` and largely settles the DTT replay check.
+And Bet Replay is **confirmed working live** on a `super` buy-tier wincap round through to
+its celebration and PLAY AGAIN (`SUBMISSION_DOSSIER.md` section 9a, TR-076).
+
+**One open defect on that surface**, so this is not recorded as unqualified compliance:
+ledger row SA-022 found player money rendered by `.toFixed(2)` in the replay win pod, so a
+large win read `3750000.00` with no separators and no currency symbol. **Fixed at source
+2026-07-27** (`docs/QUALITY_CHARTER.md` Q-11) and awaiting a live re-capture.
+
+### 2. The CVaR open question has an answer on file
+
+The open question recorded earlier in this file is genuinely ambiguous on three axes, and
+the resolution path adopted was procedural: read the platform's own figure at the ACP
+pre-review gate.
+
+**That gate has now been run.** The ACP Math Distribution and Summary screen displays:
+
+```
+Risk Limit (CVaR)    205.710     2 Star limit 700.000     3 Star limit 800.000
+```
+
+(`reports/qa/dtt_live_session_2026-07-26.md`, frames
+`reports/screens/dtt-live-2026-07-26/15_maths_overall_bet_level_compliance_all_pass.png`
+onward.)
+
+**What this resolves and what it does not.** It resolves the which-limit-and-which-value
+half: the platform computes one figure from our uploaded tables and it passes at both
+tiers with margin. It does not settle the quantile definition question in the abstract, and
+it does not need to: the platform's own computation is the one that decides approval.
+Recorded as RESOLVED IN PRACTICE rather than closed as a definition.
+
+### 3. A limit disagreement, RAISED not silently corrected
+
+**Two first-party sources disagree on the 2-star Maximum Exposure limit.**
+
+| Source | 2-star Maximum Exposure |
+|---|---|
+| The published limits table, recorded earlier in this file | `$10,000,000` |
+| The platform's own ACP Math screen, read live 2026-07-26 | `15,000,000.0` |
+
+Per convention (l.6) this is parked with its options rather than resolved by picking one.
+Both readings pass comfortably for us (our figures are 1,000,000.0 and 5,000,000.0), so
+nothing is at risk either way, and that is exactly why it is safe to leave open and wrong
+to quietly overwrite. `SUBMISSION_DOSSIER.md` section 5f step 6 says the platform's figures
+are definitive where they disagree with ours, which points at 15,000,000.0; but the
+published table is what a reviewer would cite. **Owner and Fable item.**
+
+### 4. The Developer Testing Tool has been used, repeatedly
+
+The "Process reminders" section reads as though the DTT is a future step. It is not: the
+game is published, the owner has run at least four live portal sessions, and the DTT
+evidence set is committed at `reports/screens/dtt-live-2026-07-26/` with the session
+transcribed at `reports/qa/dtt_live_session_2026-07-26.md`. The reminder is kept because it
+is still the right sequence for the NEXT version, not because the step is outstanding.
+
+### 5. Every bet-level constraint, as the platform itself displays it
+
+Recorded here so the compliance position rests on the platform's own arithmetic and not
+only on ours. Our figures and the platform's were computed from the same uploaded tables by
+different code, so this is confirmation of the upload rather than independent corroboration
+of the maths, and it is stated that way per convention (l.4).
+
+| Constraint | Ours, as displayed | 2 Star | 3 Star |
+|---|---|---|---|
+| Max Exposure | 1,000,000.0 / 5,000,000.0 | 15,000,000.0 | 50,000,000.0 |
+| Max Payout Multiplier | 5,000.0 | 25,000.0 | 100,000.0 |
+| Max Bet Cost | 80,000.0 / 400,000.0 | 100,000.0 | 500,000.0 |
+| Cost Multiplier | 400.0 | 1,000.0 | 1,500.0 |
+| Base Volatility (Std Dev) | 17.3 | 0.6 to 50.0 | 0.6 to 60.0 |
+| Tail Probability (5,000x) | 0.003 | 0.010 | 0.010 |
+| Tail Probability (10,000x) | 0 | 0.002 | 0.005 |
+| Risk Limit (CVaR) | 205.710 | 700.000 | 800.000 |
+| ETL (40x) | 0.641 | 0.800 | 0.900 |
+| ETL (10,000x) | 0 | 0.600 | 0.800 |
+| ETL (Sum) | 0.641 | 1.300 | 1.500 |
+
+All five modes COMPLIANT, all at 96.35%, all 5,000x max win, BASE 6 of 6 with cross-mode
+RTP variance 0.00%.

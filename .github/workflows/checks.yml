@@ -230,7 +230,8 @@ jobs:
       # WHAT IT FOUND ON ITS FIRST RUN, so the gate's value is on the record:
       # 35 symbol glyphs shipping in dist, 31 of them player-visible, and
       # `<title>future-spinner-frontend</title>`, the Vite starter's own package
-      # name, as the browser tab title on the live platform.
+      # name, as the pre-hydration browser tab title (transient: App.svelte's
+      # <svelte:head> replaces it on mount, which the first assessment missed).
       #
       # Self-test first, per convention (p). Every one of its ten seeds is a
       # string that was really in this repository at HEAD 3f0d686, in the file

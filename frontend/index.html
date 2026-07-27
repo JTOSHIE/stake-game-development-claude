@@ -6,11 +6,16 @@
          (design-system/brand/hero_icon/hero_icon_32.png, the ratified mark). -->
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- The browser tab title, and the only title a player sees before the app
-         boots. Nothing sets document.title at runtime, so this string IS the
-         shipped title. It read `future-spinner-frontend`, the Vite starter's own
-         npm package name, from the scaffold commit until 2026-07-27
-         (QUALITY_CHARTER.md Q-01). -->
+    <!-- The PRE-HYDRATION tab title: what a player's browser tab reads from
+         first paint until Svelte mounts and App.svelte's <svelte:head> replaces
+         it with "<theme name> - We Roll Spinners". That window is short but real,
+         and it is longest on exactly the slow connection where a player is most
+         likely to look at the tab.
+
+         It read `future-spinner-frontend`, the Vite starter's own npm package
+         name, from the scaffold commit until 2026-07-27. QUALITY_CHARTER.md Q-01,
+         where the first assessment of this was CORRECTED: it is a transient title
+         and not the permanent one. -->
     <title>Future Spinner</title>
   </head>
   <body>
