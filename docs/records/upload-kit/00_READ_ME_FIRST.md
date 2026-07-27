@@ -900,10 +900,10 @@ disagreement is worth more than a tick.
 
 ---
 
-# PART 9g: THE FIRST PLAYER-VISIBLE VISIT (V8)
+# PART 9g: THE FIRST PLAYER-VISIBLE VISIT (V8) (SUPERSEDED, DO NOT RUN)
 
-**This is the whole visit and it fits on one page.** You do not need to read anything above
-it. PART 9f and everything before it are superseded.
+**Superseded by PART 9h below.** If you never ran this visit, that is fine: PART 9h does
+everything this one did, against a newer kit. Kept for the record, not to be run.
 
 **What is different about this one.** Every kit from V3 to V7 was fixes you could not see:
 hygiene, provenance, gates, tidying. **V8 is the first kit since V7 that changes what a
@@ -1009,3 +1009,88 @@ most while you are already in the portal:
 
 If the portal's list and our document disagree anywhere, **stop and screenshot it**. A
 disagreement is worth more than a tick.
+
+---
+
+# PART 9h: THE v9 VISIT
+
+**This is the whole visit and it fits on one page.** You do not need to read anything above
+it. PART 9g and everything before it are superseded.
+
+**Two things are different this time.**
+
+1. **The kit has a HUMAN VERSION now.** It is **v9**. You will see `v9` in the kit folder's
+   README, inside the bundle, and as the first thing the browser console prints. You no
+   longer have to read a hash to know which build you are looking at.
+2. **You are uploading to `future-spinner-2`**, which is the submission entry. The original
+   `future-spinner` entry is superseded and gets deleted once the cooldown allows.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V9/`. Delete every older kit.
+
+## 1. Import the FULL kit contents to `future-spinner-2`
+
+Drag in **everything** in `FS_UPLOAD_KIT_V9/`, not a subset. The portal's sync dialog compares
+what you hand it against what it holds and reports four numbers: Upload, Skip, Delete, Move.
+
+**Handing it the full set is what makes the deletions happen.** A partial import can only add
+and replace; it can never remove a file that should no longer be there.
+
+**Screenshot the sync dialog before you confirm it.** Those four numbers are the record of
+what the portal actually held, and we have been surprised by them before: an early upload
+handed the portal 108 files and it stored 104, dropping four with no error shown (TR-061).
+
+## 2. Publish
+
+The maths package stays at V1 and is NOT re-uploaded. Do NOT press Start Approval.
+
+## 3. THE ONE SCREENSHOT THIS VISIT IS FOR
+
+Open the published game with the browser console open, and screenshot the first console line.
+It reads:
+
+```
+Future Spinner v9 build <sha> built <timestamp>
+```
+
+**That single line does three jobs at once**, which is why it is the one capture that matters:
+
+- it tells us **v9** is what is live, in words rather than a hash;
+- it carries the **SHA**, which is the exact identity;
+- and **if the city background, the car and the rain are all on screen behind it, it proves
+  the background files served**. Last visit three of them returned 403 from the platform's
+  unpublished area. They were never missing, and they came good six minutes later, but this
+  is the frame that confirms it on a clean upload.
+
+**If any background is missing this time, screenshot the console with the red rows expanded.**
+That would be new information and we would want it.
+
+## 4. The eyeball list, about three minutes
+
+None of these is a test you can fail. Anything that looks wrong is worth a screenshot.
+
+- **The recomposed surfaces.** The paytable cards, the feature menu and the boot screen. Look
+  for anything clipped, overlapping or cut mid-word, especially at Popout S.
+- **Tap the BET window.** It should open a panel listing every bet level, current one
+  highlighted in gold, smallest marked MIN BET and largest MAX BET. Tap any level and the
+  panel closes with the BET readout showing it. **The levels should be the platform's own for
+  your currency**, not a list we invented; an unusual currency is the interesting screenshot.
+- **The max-win hold, only if you happen to hit one.** Do not go hunting: it is 1 in 100,000.
+  If you see it, leave it on screen for a minute before pressing COLLECT and tell us whether
+  anything moved behind it. It is supposed to wait for you indefinitely.
+- **Feature resume.** Trigger Overdrive Free Spins, and part way through the free spins
+  **reload the page**. It should come back asking **CONTINUE YOUR ROUND**, telling you how
+  many free spins you already watched. Both buttons pay exactly the same; the choice only
+  decides where the animation starts. **If that prompt does not appear, that is the useful
+  result and not a failure**, and telling us is worth more than debugging it.
+
+## 5. Delete the kit, and the old entry
+
+Delete `~/Desktop/FS_UPLOAD_KIT_V9/` when you are done, along with every older kit. Kits are
+single use. Then, once the platform's cooldown allows, delete the original `future-spinner`
+entry so only `future-spinner-2` remains.
+
+## 6. Then the owner list
+
+`OWNER_CHECKLIST.md` at the repository root. Item 0b now says what is already done and where
+the proof is, so you are not asked twice. What is left needs you: the Guidelines ticks on
+`future-spinner-2`, the USPTO position, confirming the payments model, and the accountant.
