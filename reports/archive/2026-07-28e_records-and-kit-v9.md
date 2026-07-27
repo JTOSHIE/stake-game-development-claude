@@ -160,3 +160,49 @@ TR-081 row.
 **Owner actions:** PART 9h with kit V9, then the checklist remainder, which item 0b has now
 narrowed to the Guidelines ticks, USPTO, confirming payments, the accountant, and deleting the
 old entry.
+
+## Rule 10 closing
+
+**Final push, run 30312119731 on `00620bf`, GREEN on all eleven jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30312119731
+
+    static gates                    76s      browser: contrast            74s
+    browser: win count-up steady    73s      browser: bet selector        76s
+    browser: preview server         79s      browser: layout fit          80s
+    browser: turbo intensity        87s      browser: paytable card fill 115s
+    browser: max-win hold          130s      browser: splash calm        159s
+    browser: scrim coverage        161s
+
+**ONE RED ON THE RECORD, and it is mine.** Run **30311834071** failed on `static gates`.
+I placed the two new asset-reference legs near the top of that job, which runs its production
+build much further down, so in CI there was no `dist/` and the self-test's **negative control**
+failed while everything passed locally.
+
+That is exactly the placement failure this workflow's own header records about `layout_fit_gate`
+and `contrast_gate` being added to the browser-free job: **a gate must run in an environment
+that can execute it, or its placement is the failure.** Moved to sit with the other
+dist-consuming gates after the build, and green on the next run. No new work started in
+between.
+
+**Worth naming: the self-test caught it, not the gate.** The leg that went red was the negative
+control, the assertion whose whole job is to prove the checker is looking at something real. A
+gate without one would have reported a cheerful PASS over an empty directory.
+
+## Rule 12 closing
+
+```
+OWNER PREVIEW  |  v9 line, main  |  commit e3f9952  |  built 2026-07-28T08:45:07+10:00  |  started 2026-07-27T22:45:18.841Z  |  http://192.168.4.92:5173
+```
+
+Curled rather than trusted: `http://192.168.4.92:5173/` answers **HTTP 200** with
+`<title>Future Spinner</title>`.
+
+**A second small thing the reading caught.** The label first printed as a bare `main`, because
+it is derived from the walkthrough's live PART heading and the regex only matched a
+parenthesised `(V8)`, while PART 9h's heading reads "THE v9 VISIT". It still printed a line and
+the line still looked fine, which is the quiet kind of wrong. Widened to match both. **Both of
+this session's rule 12 findings came from reading the line rather than assuming it**, which is
+the discipline the rule was given the day the preview server itself turned out to be dead.
+
+Per rule 12's own one-commit-lag clause, the preview is refreshed once more after this final
+push, so the owner's machine ends on the tip.
