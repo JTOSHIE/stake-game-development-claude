@@ -32,6 +32,34 @@
 #   - No auto-merge, no auto-fix, no comment-writing. Those UI options are OFF by
 #     standing policy; this file must not reintroduce them by another route.
 #
+# EXPECTED RUN TIMES, measured 2026-07-27 across six consecutive runs on main so
+# nobody investigates a slow run that is not slow:
+#
+#   static gates    1.2 to 1.4 minutes
+#   browser gates   6.1 to 6.5 minutes
+#
+# The variance across six runs was 24 seconds, so these are stable constants.
+# The browser job decomposes as roughly 1.5 min of setup (npm ci, playwright
+# install chromium --with-deps, npm run build) plus 4.5 to 5 min of gates, which
+# is ten steps because five of the six browser gates run their convention (p)
+# seeded self-test as its own step before the gate. Six minutes is therefore the
+# NORMAL cost of a push, not a fault, and it sits well inside the 20-minute
+# timeout.
+#
+# If it ever needs to be faster, the lever is a job matrix (one gate per job),
+# which would drop wall-clock to roughly the slowest single gate at the cost of
+# more runner minutes. Not worth doing while six minutes is tolerable.
+#
+# A NOTE ON `cancelled` RUNS, because rule 10 says an unexplained non-green is
+# treated as real and that is only worth something if the explainable ones are
+# explained. `concurrency: cancel-in-progress` below cancels an in-flight run
+# when a newer commit lands on the same ref. So a rapid sequence of pushes
+# leaves some commits with a cancelled run rather than a green one. The CONTENT
+# is still tested, by the next commit's run, because the later commit contains
+# it; but the per-commit record has gaps. That is a deliberate trade of record
+# completeness for runner minutes. If per-commit greens ever matter more than
+# minutes, set cancel-in-progress to false for pushes to main.
+#
 # Post-merge auto-archiving is ON as a repository setting; it is not this
 # workflow's concern.
 #

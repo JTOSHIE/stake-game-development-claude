@@ -337,6 +337,40 @@ Stated so a future reader does not mistake silence for coverage.
 
 ---
 
+## 5.3 WHAT THE 2026-07-27 SWEEP DID NOT COVER
+
+Added at the stock-take, and it is the most important section in this document for anyone
+deciding whether the game is ready. **Section 4 lists what was found. This lists where
+nobody looked.** An audit's credibility rests on its stated limits, and silence reads as
+coverage.
+
+| Surface | State | Why it matters |
+|---|---|---|
+| **Audio** | **NEVER SWEPT.** Twelve shipped rows. No check on loudness consistency between rows, tail behaviour, the bed swap heard in context, or whether any row reads as generic. | The platform's own quality-rankings page warns by name against over-reliance on generic AI-generated assets, and every row here was model-generated. This is a scored axis with zero coverage. |
+| **Social mode** | **NEVER CAPTURED.** It forces English and swaps the entire vocabulary layer. Absent from the 91-frame polish set. | stake.us was BLOCKED on six visible prohibited-term strings at one point. A whole distribution target is gated on a surface with no committed proof set. |
+| **Accessibility beyond prohibited terms** | Only `a11y_social_terms_check.mjs` exists. No focus order, no keyboard-only walk, no screen-reader pass. `contrast_gate.mjs` covers one label class, not all text. | Screen-reader text is player-facing text; that lesson already cost this project 14 mislabelled controls (R4/TR-012). The rest of the a11y surface has never been examined. |
+| **Animation quality and timing** | Nothing gates it. `reel_v3_proof.mjs` gates frame RATE, which is not the same question. | The reviewer prompt names animation quality as one of the three axes real reviewers most often deduct on. |
+| **Cross-surface capitalisation, button casing** | Sweep classes 4 and 7. Review items, not gated. | Needs rendered DOM at a viewport, which is a browser gate's job. Named in section 3 as PARTLY covered rather than claimed. |
+| **The 560-value locale pass** | PARKED with a complete list at 4.3. | These strings render English in all sixteen locales today. |
+| **Repo presentation** | Recorded 2026-07-27 as TR-088, see below. | What a reviewer concludes from browsing the repository, as distinct from playing the game. |
+| **The maths package** | Out of scope by design: `games/future_spinner/**` is locked and no sanction was held. | Wants its own audit pass with its own sanction. |
+
+**A finding from the stock-take itself, recorded here and as TR-088.** A fresh clone shows
+**ten entries under `games/`**, of which exactly one ships. The other nine are the upstream
+`math-sdk`'s sample games and template, and they ARE documented as such in
+`docs/math_docs/directory.md`, so they are explained rather than orphaned. Checked before
+being called a defect: `games/lumen`, `future_spinner_collect`, `future_spinner_bigwin`,
+`future_spinner_multiwild` and `future_spinner_rtp94` are all **untracked local
+directories** and cannot reach a clone, a kit or a reviewer.
+
+So this is a presentation question rather than a correctness one, and it is rated
+**MEDIUM-LOW**: a reviewer cloning this repository sees a forked SDK carrying ten maths
+packages rather than a studio repository carrying one game. `CLAUDE.md`'s own rule that
+"a second maths package sitting beside the shipping one is exactly the stale-artefact
+misread that has previously cost a star at external audit" was written about our own forks
+and is satisfied; the upstream samples are a different category, and no session has ever
+recorded a view on them.
+
 ## 6. How to run it
 
 From `frontend/`:

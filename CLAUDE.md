@@ -700,6 +700,52 @@ Two things made it worse, and both are covered above:
 The owner caught it by asking the obvious question the builder had skipped: how many
 reels are in play, how many tiles are in play. There is the answer.
 
+**(q) A workflow that reports partial failure is RESUMED before anything else is done.
+Standing rule, recorded 2026-07-27 after the cost of not doing it was measured.**
+
+Multi-agent workflows persist their script and return a run id, and a resume replays every
+completed agent from cache while re-running only the ones that failed. **That makes recovery
+from a partial failure roughly free, and improvising around the gap expensive.**
+
+WHERE THIS CAME FROM. The round-three prep session ran a 51-agent research workflow: 10
+discovery agents and 41 adversarial verifiers. A usage limit killed 28 of them mid-run. The
+session read the failure list, observed that **all 28 failures were verifiers and all 10
+discovery agents had completed**, judged the audit survivable, and proceeded by hand.
+
+The audit did survive, because discovery is the part that finds things. But the layer that
+died was the layer that stops a finding being over-claimed, and **the one over-claim that
+reached a committed document was precisely the finding whose verifier had died**
+(`verify:placeholder:index.html`, and the `index.html` title severity claim in
+`docs/QUALITY_CHARTER.md` Q-01). It survived six commits before being caught by accident.
+A resume would have cost about 1.4M subagent tokens against a session that had 87 per cent
+of its allowance left.
+
+TWO THINGS THE RESUME MUST GET RIGHT, both learned in the same session:
+
+1. **Check the EPOCH before resuming.** If the tree has changed since the run started, the
+   cached results describe the old tree and the fresh ones describe the new one, and a
+   plain resume silently concatenates two epochs into one report. Worse, a verifier written
+   to ask "does this defect still exist" now reads a repository where the defect was
+   correctly FIXED, and returns "refuted", which reads as "the finding was bogus". Rewrite
+   the verifier to ask *was it real, is it fixed, is the fix complete, did the fix break
+   anything* before resuming. Editing the script invalidates the cache from the first
+   changed agent call onward, which is exactly the wanted behaviour.
+2. **Resume is same-session only.** So the decision cannot be deferred to the next session,
+   which is precisely why it belongs at the top of the list rather than in a follow-up.
+
+**(r) An audit is sized and scheduled like a job, not squeezed into what is left.
+Recorded 2026-07-27.**
+
+The same session measured the real cost of a full stand-back audit, so it can be planned
+rather than guessed at: a 51-agent workflow was about 1.5M subagent tokens and 23 minutes of
+wall-clock; the whole session, INCLUDING the fixes, a new CI gate, three production builds,
+eight browser-gate runs and a 91-frame capture pass, came to about a third of a five-hour
+allowance. A clean uninterrupted run would have been about 4 to 6 percentage points more.
+
+The rule that follows: **do not start a thorough audit on the last quarter of a budget.**
+It is not that the audit is expensive; it is that a partial audit produces a findings list
+nobody has verified, which is the most dangerous artefact this project can generate.
+
 **(n) Where a recorded method and a subsequent sanction conflict, the SANCTION governs.
 Standing rule, Fable ruling 2026-07-25.**
 
