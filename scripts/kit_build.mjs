@@ -123,6 +123,31 @@ function dirStats(root) {
 }
 
 // ── Self-test, convention (p) ────────────────────────────────────────────────
+/**
+ * The LIVE walkthrough part, read out of the walkthrough itself.
+ *
+ * This was the literal string 'PART 9e' for three kit versions. The walkthrough
+ * moved to 9f with V7 and the README went on pointing the owner at a section
+ * whose own heading says SUPERSEDED, DO NOT RUN. A hardcoded cross-reference
+ * into a document that gains a section per visit is a cross-reference that is
+ * wrong by default, so it is derived: the last `# PART 9x:` heading NOT marked
+ * superseded.
+ *
+ * It THROWS rather than falling back. A kit whose README cannot name the visit
+ * it belongs to is worse than no kit, because the owner follows the walkthrough
+ * and would follow the wrong half of it.
+ */
+export function livePart(walkthrough) {
+  const live = [...walkthrough.matchAll(/^# (PART 9[a-z]?):([^\n]*)$/gm)]
+    .filter((m) => !/SUPERSEDED/i.test(m[2]))
+    .map((m) => m[1])
+  if (live.length !== 1) {
+    throw new Error(`kit build: the walkthrough names ${live.length} live parts `
+      + `(${live.join(', ') || 'none'}); exactly one must be unsuperseded.`)
+  }
+  return live[0]
+}
+
 function selfTest() {
   const cases = [
     ['an unpushed HEAD is REFUSED, the case that produced TR-062',
@@ -144,6 +169,28 @@ function selfTest() {
     ok &&= good
     console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}  (expected ${expected}, got ${actual})`)
   }
+  // THE WALKTHROUGH CROSS-REFERENCE, seeded in the form it really occurred:
+  // the walkthrough gained a section and the previous one was marked
+  // superseded, while the README went on naming the old one.
+  const REAL = readFileSync(join(REPO, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8')
+  const partCases = [
+    ['the live part is read out of the real walkthrough, not guessed',
+     REAL, (v) => /^PART 9[a-z]$/.test(v)],
+    ['seeded: the section that is superseded is NOT chosen',
+     '# PART 9f: OLD (SUPERSEDED, DO NOT RUN)\n# PART 9g: NEW\n', (v) => v === 'PART 9g'],
+    ['seeded: TWO live sections throws rather than picking one',
+     '# PART 9f: ONE\n# PART 9g: TWO\n', 'throws'],
+    ['seeded: NO live section throws rather than shipping a dangling reference',
+     '# PART 9f: OLD (SUPERSEDED, DO NOT RUN)\n', 'throws'],
+  ]
+  for (const [label, doc, expect] of partCases) {
+    let got
+    try { got = livePart(doc) } catch { got = 'throws' }
+    const good = expect === 'throws' ? got === 'throws' : (got !== 'throws' && expect(got))
+    ok &&= good
+    console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}  (got ${got})`)
+  }
+
   console.log(ok ? '\nKIT BUILD SELF-TEST: PASS' : '\nKIT BUILD SELF-TEST: FAIL')
   return ok
 }
@@ -242,6 +289,9 @@ for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners
   cpSync(join(clone, 'design-system/brand/delivery', f), join(KIT, '03_branding', f))
 }
 
+const PART = livePart(readFileSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8'))
+console.log(`walkthrough live section: ${PART}`)
+
 const readme = `# ${KIT_NAME}, frontend only
 
 **Built from commit \`${facts.head}\`** (\`${facts.head.slice(0, 8)}\`), clean tree,
@@ -255,7 +305,7 @@ the artefact rather than by grepping it.
 
 ## What to do
 
-**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, PART 9e.** It is the
+**Follow \`00_READ_ME_FIRST_SECOND_VISIT.md\` in this folder, ${PART}.** It is the
 full walkthrough, it is one page, and it covers everything below plus what to look
 at once the upload is done. The short version:
 
@@ -265,7 +315,7 @@ at once the upload is done. The short version:
 3. The maths package stays at V1 and is NOT re-uploaded.
 4. Do NOT press Start Approval.
 
-Three things PART 9e says you do NOT need to do, listed here too because earlier
+Three things ${PART} says you do NOT need to do, listed here too because earlier
 kits asked for them: \`math/HASHES.txt\` can stay, the game tile is already
 composed, and the maths is not being touched.
 

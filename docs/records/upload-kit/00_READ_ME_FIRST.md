@@ -827,10 +827,10 @@ asked for as a short one, and neither is blocked by anything in V6.
 
 ---
 
-# PART 9f: THE CLEAN-BASELINE VISIT (V7)
+# PART 9f: THE CLEAN-BASELINE VISIT (V7) (SUPERSEDED, DO NOT RUN)
 
-**This is the whole visit and it fits on one page.** You do not need to read anything above
-it. PART 9e and everything before it are superseded.
+**Superseded by PART 9g below.** If you never ran this visit, that is fine: PART 9g does
+everything this one did, against a newer kit. Kept for the record, not to be run.
 
 **Why this one is different from every visit before it.** Every previous visit added files to
 what was already on the portal. This one **reconciles**, so that afterwards we know exactly
@@ -891,6 +891,118 @@ uploaded when it is out of date, and that has already happened once.
 Everything else that needs you is in **`OWNER_CHECKLIST.md`** at the repository root, seven
 items, each with what to send and a DONE-when. The two that matter most while you are already
 in the portal:
+
+- the **twenty Cruise spins** bracketed by session panels, still the only open money item;
+- the **Guidelines ticks**, with our self-assessment open beside you.
+
+If the portal's list and our document disagree anywhere, **stop and screenshot it**. A
+disagreement is worth more than a tick.
+
+---
+
+# PART 9g: THE FIRST PLAYER-VISIBLE VISIT (V8)
+
+**This is the whole visit and it fits on one page.** You do not need to read anything above
+it. PART 9f and everything before it are superseded.
+
+**What is different about this one.** Every kit from V3 to V7 was fixes you could not see:
+hygiene, provenance, gates, tidying. **V8 is the first kit since V7 that changes what a
+player actually does**, and there are three of those changes. So this visit has the usual
+upload half, and then a short LOOK half where you use the game for two minutes.
+
+**If you never ran the V7 visit, run this instead.** It does everything that one did.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V8/`. Its `README.md` names the
+commit it was built from. **That is the only kit to use.** Delete every older one.
+
+## 1. Import the FULL kit contents, not just changed files
+
+Drag in **everything** in `FS_UPLOAD_KIT_V8/`, not a subset. The portal's sync dialog
+compares what you hand it against what it holds and reports four numbers: Upload, Skip,
+Delete, Move.
+
+**Handing it the full set is what makes the deletions happen.** A partial import can only
+add and replace; it can never remove a file that should no longer be there.
+
+**Screenshot the sync dialog before you confirm it.** Those four numbers are the record of
+what the portal actually held, and we have been surprised by them before: the first upload
+handed the portal 108 files and it stored 104, dropping four with no error shown anywhere
+(TR-061). If Delete is greater than zero, that is expected and is the point.
+
+## 2. Publish, and confirm it reads Front V8
+
+The maths package stays at V1 and is NOT re-uploaded. Do NOT press Start Approval.
+
+## 3. The capture that answers "which build is live"
+
+Open the published game and read the build SHA. Either route works:
+
+- **The console route.** DevTools, Console tab, reload. The boot line prints the commit.
+- **The file route.** Open `build-info.json` from the published bundle in a browser tab.
+
+**Screenshot whichever one you used, showing the SHA legibly.** Any SHA closes it. The value
+is not that it matches a particular build, it is that the repository stops inferring.
+
+---
+
+## THE LOOK HALF: three things that are new, about two minutes
+
+None of these is a test you can fail. They are three things to look at, and anything that
+looks wrong is worth a screenshot.
+
+### 4. Tap the BET window
+
+**It should open a panel listing every bet level**, with your current one highlighted in
+gold, the smallest marked MIN BET and the largest MAX BET. Tap any level and the panel
+closes with the BET readout showing it. The little up and down arrows still work as before;
+the panel is an addition, not a replacement.
+
+**The one thing worth checking**, because it is the whole point of building it this way:
+**the levels in that panel should be the platform's own bet levels for your currency**, not
+a list we invented. If you are in a currency where the levels are unusual, that is the
+interesting case, and a screenshot of the open panel is exactly what we want.
+
+### 5. Leave a bonus half way through, and come back
+
+**This is the new one, and it is the one thing that needs a real portal to confirm.**
+
+1. Play until you trigger Overdrive Free Spins. A bought entry is the quick way.
+2. **Part way through the free spins, reload the page.** Not close and reopen: reload.
+3. When the game comes back it should ask **CONTINUE YOUR ROUND**, telling you how many of
+   the free spins you already watched, with two buttons: CONTINUE, and WATCH FROM START.
+
+**Both answers are correct and both pay exactly the same.** The choice only decides where the
+animation starts. Press CONTINUE and it should carry on from roughly where you left off;
+press WATCH FROM START and it plays the whole round again.
+
+**What to send:** a screenshot of that prompt if it appears, and a note of which button you
+pressed and whether the balance afterwards looked right.
+
+**If the prompt does NOT appear**, that is the useful result and not a failure. It would mean
+a real in-progress round does not carry its event data where we expect it, which is the one
+assumption in this feature we have not been able to observe against the live platform. The
+round still settles and still pays either way, which is why it is safe to ship unconfirmed.
+Tell us it did not appear and we will know exactly what to change.
+
+### 6. A max win, only if one happens
+
+The max-win celebration now waits for you indefinitely: nothing dismisses it but your own
+COLLECT or the Enter key. **Do not go hunting for one**, it is a 1 in 100,000 round. If you
+happen to see it, leave it on screen for a minute before collecting and tell us whether
+anything moved behind it.
+
+---
+
+## 7. Delete the kit
+
+Delete `~/Desktop/FS_UPLOAD_KIT_V8/` when you are done, along with every older kit still
+sitting there. Kits are single use. A kit left on the Desktop is a kit that eventually gets
+uploaded when it is out of date, and that has already happened once (TR-062).
+
+## 8. Then the owner list
+
+Everything else is in **`OWNER_CHECKLIST.md`** at the repository root. The two that matter
+most while you are already in the portal:
 
 - the **twenty Cruise spins** bracketed by session panels, still the only open money item;
 - the **Guidelines ticks**, with our self-assessment open beside you.
