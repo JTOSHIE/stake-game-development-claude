@@ -206,6 +206,47 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   `frontend/scripts/dead_wiring_scan.mjs`, so the gate stays green while remembering
   them. Delete on the next sanctioned `gameStore.ts` pass; not worth a pass of its own.
 
+## BRANCHES: what exists, and why each one is still here
+
+Owner's order, 2026-07-28 (`reports/briefs/FS_HYGIENE_AND_REGISTER_Prompt.md`, JOB 1), so a
+stale head can never again be mistaken for mergeable work.
+
+**Six branches exist on the remote and that is the whole list.** Anything not named here has
+been deleted, and if a branch appears that is not on this list, it is either new work that
+should add itself here or a stale head that should go.
+
+| Branch | Ahead of main | What it is |
+|---|---|---|
+| `main` | | The only branch anyone merges into. Single writer, per multi-track rule 1. |
+| `chore/wip-backgrounds` | 1 | A one-line docstring fix in `backgrounds.py` pointing at an archived handover path. Unmerged on purpose: it is trivial and nobody has needed it. Tip `88df4f9`, 2026-07-26. |
+| `claude/collect-prototype` | **0** | **A bookmark into main's own history, not divergent work.** See the note below, because the two obvious readings of it disagree. Tip `75eff45`, 2026-07-08. |
+| `claude/fs-super-prototype` | 1 | The Super Buy maths prototype, 400x with a 5x pre-revved meter, preserved off `main` so a second maths package never sits beside the shipping one. Tip `d270019`, 2026-07-06. |
+| `claude/gap-analysis` | 18 | Frontend determinism test and the telemetry taxonomy and emitter. Horizon work, not scheduled. Tip `bcbe152`, 2026-07-05. |
+| `claude/lumen-sideproject` | 38 | LUMEN, a different title. Kept here deliberately rather than in its own repository; it is not Future Spinner work and must never be merged into `main`. Tip `4f4d6ef`, 2026-07-05. |
+
+**THE `collect-prototype` SUBTLETY, written out because it took two commands to see and the
+wrong one alone would justify deleting it.** `git rev-list --count origin/main..origin/claude/collect-prototype`
+returns **0**, and its tip IS an ancestor of main, both of which read as "fully merged, safe to
+delete". But `git ls-tree -r origin/claude/collect-prototype` holds **sixteen files** under
+`games/future_spinner_collect/` that `main`'s tip does not have. Both facts are true and they
+answer different questions: the branch carries no unique COMMIT, and it points at an OLD commit
+on main's history from BEFORE those files were removed from main. So it is a named handle on a
+tree state, and deleting it would lose the handle rather than the commits. **A branch with zero
+unique commits is not automatically deletable.** Ask what its tree holds as well as what its
+log holds.
+
+### Deleted 2026-07-28, with the verification kept
+
+`fix/R2R-wallet-contract`, `track/screenshot-analyst`, `track/docs-reskin` and
+`track/quality-sweep` were deleted after being verified mechanically by two independent
+commands each: zero unique commits against main, AND tip is an ancestor of main. Both had to
+pass. The full table, including every tip SHA so any of them can be resurrected with
+`git branch <name> <tip>`, is at **`docs/records/BRANCH_HYGIENE_2026-07-28.md`**.
+
+The verification is recorded rather than merely performed because a deletion is not auditable
+after the head is gone: the table is what lets a reader a year from now check the decision
+instead of trusting it.
+
 ### Reference / prototype branches (not on main)
 
 Not-for-release maths prototypes and forks live on their own branch, never on `main` -
