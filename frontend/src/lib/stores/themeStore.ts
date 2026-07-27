@@ -48,7 +48,14 @@ export const themeAssets = derived(activeTheme, ($t) => {
     },
     // Background
     background:      `${b}/backgrounds/bg-1.jpg`,
-    backgroundVideo: `${b}/backgrounds/bg-1.mp4`,
+    // `backgroundVideo` REMOVED 2026-07-28 (asset reference gate, JOB 1). It
+    // derived `${b}/backgrounds/bg-1.mp4` for every theme, and
+    // `build_diet_verify.mjs` prunes that exact path BY NAME because it is
+    // 6,083,487 bytes of retired video. The field had ZERO consumers, so nothing
+    // ever requested it and no runtime gate could see it: a dangling reference
+    // to a deliberately unshipped file, sitting in the bundle waiting for the
+    // day someone wired it up. Found by `asset_reference_gate.mjs` on its first
+    // run, which is what that gate exists for.
     isVideo:         $t.id === 'future-spinner',
     // Frame, frame-2 for every theme (LAYOUT_INSTALL: switched future-spinner
     // from frame-1 to frame-2 per the owner-approved blueprint; frame-2 has a

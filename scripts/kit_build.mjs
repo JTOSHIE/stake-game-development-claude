@@ -241,6 +241,7 @@ for (const [name, cmd] of [
   ['dist hygiene', 'node scripts/dist_hygiene_gate.mjs'],
   ['dash gate, dist scan', 'node scripts/dash_gate.mjs'],
   ['mock containment', 'node scripts/mock_containment_check.mjs'],
+  ['asset references', 'node scripts/asset_reference_gate.mjs'],
 ]) {
   try {
     execSync(cmd, { cwd: fe, stdio: 'inherit' })

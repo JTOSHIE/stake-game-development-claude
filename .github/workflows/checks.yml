@@ -191,6 +191,20 @@ jobs:
 
       # ── Gate 2: dead wiring ──────────────────────────────────────────────────
       # The standingMode class: state a control writes that nothing ever reads.
+      # ── Asset references resolve (JOB 1, 2026-07-28) ─────────────────────────
+      # Every asset path the code references must exist in dist. Static, because
+      # the runtime half is already covered: build_diet_verify fails a REQUEST
+      # into a pruned path, which cannot see a reference nothing requests. That
+      # is the half that was real: themeStore derived a path to a 6MB video the
+      # build prunes by name, with zero consumers, so no gate could see it.
+      - name: asset references, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/asset_reference_gate.mjs --self-test
+
+      - name: asset references resolve in dist
+        working-directory: frontend
+        run: node scripts/asset_reference_gate.mjs
+
       - name: dead wiring scan
         working-directory: frontend
         run: node scripts/dead_wiring_scan.mjs
