@@ -191,20 +191,6 @@ jobs:
 
       # ── Gate 2: dead wiring ──────────────────────────────────────────────────
       # The standingMode class: state a control writes that nothing ever reads.
-      # ── Asset references resolve (JOB 1, 2026-07-28) ─────────────────────────
-      # Every asset path the code references must exist in dist. Static, because
-      # the runtime half is already covered: build_diet_verify fails a REQUEST
-      # into a pruned path, which cannot see a reference nothing requests. That
-      # is the half that was real: themeStore derived a path to a 6MB video the
-      # build prunes by name, with zero consumers, so no gate could see it.
-      - name: asset references, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/asset_reference_gate.mjs --self-test
-
-      - name: asset references resolve in dist
-        working-directory: frontend
-        run: node scripts/asset_reference_gate.mjs
-
       - name: dead wiring scan
         working-directory: frontend
         run: node scripts/dead_wiring_scan.mjs
@@ -493,6 +479,22 @@ jobs:
       # the owner's own 104-file listing. Ships a seeded violation whose first
       # seed is that exact path. Also re-records the bundle figure against the
       # 25 MB budget, so the number in the report is one this script computed.
+      # ── Asset references resolve (JOB 1, 2026-07-28) ─────────────────────────
+      # AFTER the production build above, deliberately. Both legs read dist/:
+      # the gate compares references against it, and the self-test's negative
+      # control asserts a real shipped asset IS present. Placed before the build
+      # on the first attempt, they went red in CI on the negative control while
+      # passing locally, which is the layout_fit_gate placement failure this
+      # workflow's own header records: a gate must run in an environment that
+      # can execute it, or its placement is the failure.
+      - name: asset references, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/asset_reference_gate.mjs --self-test
+
+      - name: asset references resolve in dist
+        working-directory: frontend
+        run: node scripts/asset_reference_gate.mjs
+
       - name: dist hygiene, no documentation ships
         working-directory: frontend
         run: node scripts/dist_hygiene_gate.mjs
