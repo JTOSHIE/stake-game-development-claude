@@ -17,6 +17,7 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // CONVENTION (h.1), migrated 2026-07-27. This wrote straight into committed
@@ -30,6 +31,21 @@ const OUT_DIR = evidenceDir('reports', 'qa')
 announceEvidenceMode('build_diet_verify')
 
 const DIST_DIR = join(__dirname, '..', 'dist')
+
+// ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
+// Fable's ruling 2026-07-28, option (c). See lib/previewServer.mjs. The three
+// names below are adapters so every call site reads unchanged; there is no
+// child process to orphan. This script is one of the three that never called
+// killPreview at all and leaked a server on every run; under option (c) that
+// is no longer a leak, because the server dies with the process.
+let _server = null
+async function getFreePort() {
+  _server = await startStaticServer(DIST_DIR)
+  return _server.port
+}
+function startPreview() { return _server }
+function killPreview() { return _server ? _server.close() : undefined }
+
 const DIST_BUDGET_BYTES = 25 * 1024 * 1024
 
 function getDirSizeBytes(dir) {
@@ -52,43 +68,7 @@ const PRUNED_PREFIXES = [
 // assets/ui/ is prune-except-two; individual matches checked separately.
 const KEEP_UI = new Set(['win_pod_v3_active.png', 'win_pod_v3_idle.png'])
 
-// A fixed port is a real collision risk on a host that runs other concurrent
-// sessions (same fix already applied in qa_soak.mjs) - ask the OS for a free
-// one immediately before spawning instead.
-async function getFreePort() {
-  return new Promise((resolvePromise, reject) => {
-    const srv = createServer()
-    srv.on('error', reject)
-    srv.listen(0, '127.0.0.1', () => {
-      const { port } = srv.address()
-      srv.close(() => resolvePromise(port))
-    })
-  })
-}
 
-function startPreview(port) {
-  return new Promise((resolvePreview, reject) => {
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-      cwd: join(__dirname, '..'),
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    let resolved = false
-    const onData = (d) => {
-      const s = d.toString()
-      // `vite preview`'s banner puts an ANSI reset code between "Local" and
-      // ":" (unlike `vite dev`'s), so /Local:/ never matches - just check
-      // for the word, or the printed URL, either is a reliable enough signal.
-      if (!resolved && (/Local/.test(s) || /localhost:\d+/.test(s))) {
-        resolved = true
-        resolvePreview(proc)
-      }
-    }
-    proc.stdout.on('data', onData)
-    proc.stderr.on('data', onData)
-    proc.on('error', reject)
-    setTimeout(() => { if (!resolved) reject(new Error('vite preview did not start in time')) }, 15000)
-  })
-}
 
 async function run() {
   const port = await getFreePort()

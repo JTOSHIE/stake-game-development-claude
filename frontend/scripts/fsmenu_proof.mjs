@@ -13,21 +13,22 @@ import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const OUT = join(ROOT, 'screens')
 mkdirSync(OUT, { recursive: true })
 
-const PORT = 4185
-const BASE_URL = `http://localhost:${PORT}`
-
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
-  cwd: ROOT,
-  stdio: ['ignore', 'pipe', 'pipe'],
-})
-server.stdout.on('data', (d) => process.stdout.write(`[preview] ${d}`))
-server.stderr.on('data', (d) => process.stderr.write(`[preview] ${d}`))
+// TR-101, Fable's ruling 2026-07-28, option (c). The server runs IN THIS
+// PROCESS, so there is no vite child to orphan.
+//
+// THE FIXED PORT IS GONE TOO, and it was its own defect: 4185 was hardcoded,
+// so two of these proofs running at once fought over one port and the second
+// died on --strictPort. The kernel now picks, and reports what it picked.
+const server = await startStaticServer(join(ROOT, 'dist'))
+const PORT = server.port
+const BASE_URL = server.url
 
 function waitForServer(url, timeoutMs = 20000) {
   const start = Date.now()

@@ -379,6 +379,34 @@ the orphaned chromium groups terminated; the two `vite --host` dev servers delib
 alone. Nothing in the repository changed.
 
 
+## TR-101 resolved: the orphanable child is deleted, not managed
+
+Fable ruled option (c) on the preview leak. `frontend/scripts/lib/previewServer.mjs` serves
+`dist/` over `node:http` from inside the gate process. No `npx`, no vite child, no process
+group, nothing that can survive the script. **Adopted across the whole family, all eighteen
+scripts, in one pass.**
+
+**Port-reaping was never written.** The ruling approved it only as a temporary guard during a
+staged migration, to be removed by the pass that completed it. This completed in one pass, so
+there was no window for it to cover, and adding then deleting it would have been ceremony.
+Recorded because the ruling named it: its absence is deliberate.
+
+**Two further defects found while migrating, both now impossible rather than fixed.** Three
+scripts never called `killPreview` at all and leaked on every run; under option (c) forgetting
+to close costs nothing, because the server dies with the process. And four hardcoded a fixed
+port, so two running at once fought over it and the second died on `--strictPort`; the kernel
+now picks and reports, which also deletes the old `getFreePort()` race where a socket was
+opened, closed, and the number handed to a process that bound it a second later.
+
+**The assertion asserts and does not clean up**, because killing there would hide the defect
+it reports. It carries a two second grace, since `browser.close()` resolves when playwright
+has told chromium to go rather than when the kernel has reaped it, and a gate that goes red at
+random teaches everyone to ignore it. Two seconds cannot hide a leak that lasts hours.
+
+**MEASURED AFTER THE MIGRATION: fourteen gate runs, ZERO leaked processes.** Before it, every
+run leaked one.
+
+
 ## Rule 10 closing
 
 **Final push, run 30300598617 on `576e276`, GREEN on all ten jobs.**

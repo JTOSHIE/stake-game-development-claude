@@ -53,9 +53,33 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { evidenceDir, WRITES_COMMITTED_EVIDENCE } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
+
+// ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
+//
+// Fable's ruling 2026-07-28, option (c): the orphanable child is DELETED rather
+// than managed. `lib/previewServer.mjs` serves dist/ over node:http from inside
+// this process, so there is no `npx`, no vite child, no process group, and
+// nothing that can survive this script.
+//
+// The three names below are kept so every call site reads exactly as it did.
+// They are adapters, not implementations: the implementation is shared.
+//
+// NOTE WHAT THIS MAKES IMPOSSIBLE. Three scripts in this family never called
+// killPreview at all and leaked a server on every single run. Under option (c)
+// that is no longer a leak: forgetting to close costs nothing, because the
+// server dies with the process instead of outliving it.
+let _server = null
+async function getFreePort() {
+  _server = await startStaticServer(join(ROOT, 'dist'))
+  return _server.port
+}
+function startPreview() { return _server }
+function killPreview() { return _server ? _server.close() : undefined }
+
 
 const HARD_TIMEOUT_MS = 5 * 60_000
 setTimeout(() => {
@@ -107,34 +131,8 @@ async function routeWallet(page) {
   })
 }
 
-async function getFreePort() {
-  return new Promise((res, rej) => {
-    const srv = createServer()
-    srv.on('error', rej)
-    srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
-  })
-}
 
-function startPreview(port) {
-  return new Promise((res, rej) => {
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true,
-    })
-    let done = false
-    const onData = (d) => {
-      const s = d.toString()
-      if (!done && (/Local/.test(s) || /localhost:\d+/.test(s))) { done = true; res(proc) }
-    }
-    proc.stdout.on('data', onData)
-    proc.stderr.on('data', onData)
-    proc.on('error', rej)
-    setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
-  })
-}
 
-function killPreview(proc) {
-  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch { /* gone */ } }
-}
 
 /** Boot to a live HUD. Two splash surfaces, and they dismiss differently. */
 async function boot(page, port) {
@@ -351,6 +349,12 @@ async function run(seeded) {
       console.error(`\nBET SELECTOR GATE SELF-TEST: FAIL (${problems.length})`)
       process.exit(1)
     }
+    // TR-101, Fable's ruling: a gate leaves nothing running. Asserted, not
+    // cleaned up, because killing here would hide the defect it reports.
+    if (!assertNoSurvivors('bet selector gate self-test')) {
+      console.error('\nBET SELECTOR GATE SELF-TEST: FAIL, this gate left processes behind')
+      process.exit(1)
+    }
     console.log('BET SELECTOR GATE SELF-TEST: PASS (every seeded defect reproduces and is caught)')
     process.exit(0)
   }
@@ -372,6 +376,12 @@ async function run(seeded) {
   if (all.length) {
     for (const f of all) console.error(`  ${f}`)
     console.error(`\nBET SELECTOR GATE: FAIL (${all.length})`)
+    process.exit(1)
+  }
+  // TR-101, Fable's ruling: a gate leaves nothing running. ASSERTED, not
+  // cleaned up, because killing here would hide the defect it reports.
+  if (!assertNoSurvivors('bet selector gate')) {
+    console.error('\nBET SELECTOR GATE: FAIL, this gate left processes behind')
     process.exit(1)
   }
   console.log('\nBET SELECTOR GATE: PASS (the panel is the platform ladder, one tap end to end, at all three profiles)')

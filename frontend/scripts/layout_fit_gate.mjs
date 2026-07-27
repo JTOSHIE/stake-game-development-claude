@@ -32,9 +32,33 @@ import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
+
+// ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
+//
+// Fable's ruling 2026-07-28, option (c): the orphanable child is DELETED rather
+// than managed. `lib/previewServer.mjs` serves dist/ over node:http from inside
+// this process, so there is no `npx`, no vite child, no process group, and
+// nothing that can survive this script.
+//
+// The three names below are kept so every call site reads exactly as it did.
+// They are adapters, not implementations: the implementation is shared.
+//
+// NOTE WHAT THIS MAKES IMPOSSIBLE. Three scripts in this family never called
+// killPreview at all and leaked a server on every single run. Under option (c)
+// that is no longer a leak: forgetting to close costs nothing, because the
+// server dies with the process instead of outliving it.
+let _server = null
+async function getFreePort() {
+  _server = await startStaticServer(join(ROOT, 'dist'))
+  return _server.port
+}
+function startPreview() { return _server }
+function killPreview() { return _server ? _server.close() : undefined }
+
 const QA = evidenceDir('reports', 'qa')
 announceEvidenceMode('layout_fit_gate')
 
@@ -76,13 +100,6 @@ async function routeWallet(page) {
   })
 }
 
-async function getFreePort() {
-  return new Promise((res, rej) => {
-    const srv = createServer()
-    srv.on('error', rej)
-    srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
-  })
-}
 
 // HARD TIMEOUT (CI triage, run 122). The gate's work takes ~13s; on the CI
 // runner the process then hung forever AFTER printing PASS, because killing
@@ -96,29 +113,7 @@ setTimeout(() => {
   process.exit(1)
 }, GATE_TIMEOUT_MS)
 
-function startPreview(port) {
-  return new Promise((res, rej) => {
-    // detached: the preview gets its own process group, so killPreview can
-    // signal the GROUP and reach vite itself, not just the npx wrapper.
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true,
-    })
-    let done = false
-    const onData = (d) => {
-      const s = d.toString()
-      if (!done && (/Local/.test(s) || /localhost:\d+/.test(s))) { done = true; res(proc) }
-    }
-    proc.stdout.on('data', onData)
-    proc.stderr.on('data', onData)
-    proc.on('error', rej)
-    setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
-  })
-}
 
-function killPreview(proc) {
-  // Negative pid signals the whole detached group: npx AND the vite it spawned.
-  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch {} }
-}
 
 // Measured in the page. Two independent questions, plus the text-overflow check
 // that TR-066 needs, plus the overlap check TR-071 needs.
@@ -261,4 +256,10 @@ if (failures.length) {
 console.log('LAYOUT FIT GATE: PASS (fits and every control reachable at all seven presets)')
 // Explicit, because on the CI runner an orphaned preview pipe kept the event
 // loop alive after this line and the job hung green-in-all-but-exit (run 122).
+// TR-101, Fable's ruling: a gate leaves nothing running. ASSERTED, not
+// cleaned up, because killing here would hide the defect it reports.
+if (!assertNoSurvivors('layout fit gate')) {
+  console.error('\nLAYOUT FIT GATE: FAIL, this gate left processes behind')
+  process.exit(1)
+}
 process.exit(0)

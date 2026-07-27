@@ -24,6 +24,7 @@ import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const OUT = evidenceDir('reports', 'screens', 'background-adopted-2026-07-27')
 const QA = evidenceDir('reports', 'qa')
@@ -75,10 +76,9 @@ const freePort = () => new Promise((res) => {
   srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
 })
 
-const port = await freePort()
-const preview = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-  cwd: join(import.meta.dirname, '..'), stdio: ['ignore', 'pipe', 'pipe'],
-})
+// TR-101, option (c): served in-process, no child to orphan.
+const server = await startStaticServer(join(import.meta.dirname, '..', 'dist'))
+const port = server.port
 await new Promise((res, rej) => {
   let done = false
   preview.stdout.on('data', (d) => {

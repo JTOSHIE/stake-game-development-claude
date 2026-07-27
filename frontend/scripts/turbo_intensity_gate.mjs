@@ -66,9 +66,33 @@ import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
+
+// ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
+//
+// Fable's ruling 2026-07-28, option (c): the orphanable child is DELETED rather
+// than managed. `lib/previewServer.mjs` serves dist/ over node:http from inside
+// this process, so there is no `npx`, no vite child, no process group, and
+// nothing that can survive this script.
+//
+// The three names below are kept so every call site reads exactly as it did.
+// They are adapters, not implementations: the implementation is shared.
+//
+// NOTE WHAT THIS MAKES IMPOSSIBLE. Three scripts in this family never called
+// killPreview at all and leaked a server on every single run. Under option (c)
+// that is no longer a leak: forgetting to close costs nothing, because the
+// server dies with the process instead of outliving it.
+let _server = null
+async function getFreePort() {
+  _server = await startStaticServer(join(ROOT, 'dist'))
+  return _server.port
+}
+function startPreview() { return _server }
+function killPreview() { return _server ? _server.close() : undefined }
+
 
 const SELF_TEST = process.argv.includes('--self-test')
 const CAPTURE = process.argv.includes('--capture')
@@ -133,13 +157,6 @@ async function routeWallet(page) {
   })
 }
 
-function getFreePort() {
-  return new Promise((res, rej) => {
-    const srv = createServer()
-    srv.on('error', rej)
-    srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
-  })
-}
 
 const GATE_TIMEOUT_MS = 6 * 60_000
 setTimeout(() => {
@@ -147,26 +164,7 @@ setTimeout(() => {
   process.exit(1)
 }, GATE_TIMEOUT_MS)
 
-function startPreview(port) {
-  return new Promise((res, rej) => {
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'], {
-      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true,
-    })
-    let done = false
-    const onData = (d) => {
-      const s = d.toString()
-      if (!done && (/Local/.test(s) || /localhost:\d+/.test(s))) { done = true; res(proc) }
-    }
-    proc.stdout.on('data', onData)
-    proc.stderr.on('data', onData)
-    proc.on('error', rej)
-    setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
-  })
-}
 
-function killPreview(proc) {
-  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch {} }
-}
 
 const ratio = (l1, l2) => {
   const hi = Math.max(l1, l2), lo = Math.min(l1, l2)
@@ -528,4 +526,12 @@ try {
   killPreview(preview)
 }
 
+// TR-101, Fable's ruling: a gate leaves nothing running. ASSERTED, not cleaned
+// up, because killing here would hide the defect it reports. Folded into the
+// exit code rather than exiting early, so a gate that both fails its own
+// checks and leaks still reports both.
+if (!assertNoSurvivors('turbo intensity gate')) {
+  console.error('\nTURBO INTENSITY GATE: this gate left processes behind')
+  exitCode = 1
+}
 process.exit(exitCode)

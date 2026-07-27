@@ -577,6 +577,11 @@ jobs:
           # Convention (h.1).
           - name: "browser: bet selector"
             run: node scripts/bet_selector_gate.mjs --self-test && node scripts/bet_selector_gate.mjs
+          # TR-101, Fable's ruling option (c). Proves the in-process replacement
+          # for `vite preview` actually serves the bundle to a real browser, and
+          # that the post-run assertion goes RED on a seeded leaked child.
+          - name: "browser: preview server"
+            run: node scripts/preview_server_gate.mjs --self-test && node scripts/preview_server_gate.mjs
 
     steps:
       - name: Check out

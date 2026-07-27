@@ -46,9 +46,33 @@ import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
+import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
+
+// ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
+//
+// Fable's ruling 2026-07-28, option (c): the orphanable child is DELETED rather
+// than managed. `lib/previewServer.mjs` serves dist/ over node:http from inside
+// this process, so there is no `npx`, no vite child, no process group, and
+// nothing that can survive this script.
+//
+// The three names below are kept so every call site reads exactly as it did.
+// They are adapters, not implementations: the implementation is shared.
+//
+// NOTE WHAT THIS MAKES IMPOSSIBLE. Three scripts in this family never called
+// killPreview at all and leaked a server on every single run. Under option (c)
+// that is no longer a leak: forgetting to close costs nothing, because the
+// server dies with the process instead of outliving it.
+let _server = null
+async function getFreePort() {
+  _server = await startStaticServer(join(ROOT, 'dist'))
+  return _server.port
+}
+function startPreview() { return _server }
+function killPreview() { return _server ? _server.close() : undefined }
+
 const QA = evidenceDir('reports', 'qa')
 const SHOTS = evidenceDir('reports', 'screens', 'contrast-2026-07-26')
 announceEvidenceMode('contrast_gate')
@@ -99,12 +123,6 @@ async function routeWallet(page) {
 }
 const LAUNCH = (base) => `${base}/?sessionID=contrast-gate&rgs_url=${RGS_HOST}&lang=en`
 
-async function getFreePort() {
-  return new Promise((res, rej) => {
-    const srv = createServer(); srv.on('error', rej)
-    srv.listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => res(port)) })
-  })
-}
 // HARD TIMEOUT (CI triage, run 122). Same defence as layout_fit_gate.mjs: on
 // the CI runner the sibling gate hung forever AFTER its own PASS line, because
 // killing the `npx` wrapper orphans the real vite child, whose inherited
@@ -115,24 +133,7 @@ setTimeout(() => {
   process.exit(1)
 }, GATE_TIMEOUT_MS)
 
-function startPreview(port) {
-  return new Promise((res, rej) => {
-    // detached: own process group, so killPreview reaches vite, not just npx.
-    const proc = spawn('npx', ['vite', 'preview', '--port', String(port), '--strictPort'],
-      { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true })
-    let done = false
-    const onData = (d) => {
-      const s = d.toString()
-      if (!done && (/Local/.test(s) || /localhost:\d+/.test(s))) { done = true; res(proc) }
-    }
-    proc.stdout.on('data', onData); proc.stderr.on('data', onData); proc.on('error', rej)
-    setTimeout(() => { if (!done) rej(new Error('vite preview did not start in time')) }, 20000)
-  })
-}
 
-function killPreview(proc) {
-  try { process.kill(-proc.pid, 'SIGTERM') } catch { try { proc.kill() } catch {} }
-}
 
 // ── WCAG 2.1 relative luminance and contrast ratio ───────────────────────────
 // Transcribed from the specification rather than remembered: the 0.03928
@@ -356,6 +357,12 @@ async function run() {
   console.log('\nCONTRAST: PASS')
   // Explicit, for the same run 122 reason: success must not depend on every
   // lingering handle draining.
+  // TR-101, Fable's ruling: a gate leaves nothing running. ASSERTED, not
+  // cleaned up, because killing here would hide the defect it reports.
+  if (!assertNoSurvivors('contrast gate')) {
+    console.error('\nCONTRAST GATE: FAIL, this gate left processes behind')
+    process.exit(1)
+  }
   process.exit(0)
 }
 
