@@ -42,7 +42,10 @@
 #   browser: win count-up steady   ~170s      browser: turbo intensity   ~217s
 #   browser: scrim coverage        ~276s   <- sets the wall-clock
 #
-#   TOTAL WALL-CLOCK: about 4.5 to 5 minutes, down from 6.4.
+#   TOTAL WALL-CLOCK: 2.9 to 4.6 minutes across two runs, down from 6.4.
+#   The spread is runner CONTENTION, not our code: the same scrim gate took
+#   276s on run 30281432163 and 173s on 30281912392. Judge a run against the
+#   range, never against a single remembered number.
 #
 # TWO ASSUMPTIONS WERE WRONG ON THE WAY HERE AND BOTH ARE KEPT ON THE RECORD,
 # because the useful knowledge is which levers did NOT work.

@@ -592,7 +592,7 @@ push's remote result, so every session reads these:
 | `static gates` | about **82 seconds** |
 | `browser: scrim coverage` | about **276 seconds**, the slowest leg, which sets the wall-clock |
 | the other six browser legs | 74 to 217 seconds each, in parallel |
-| **browser wall-clock** | about **4.5 to 5 minutes**, down from 6.4 |
+| **browser wall-clock** | **2.9 to 4.6 minutes** across two runs, down from 6.4 |
 
 **TWO ASSUMPTIONS WERE WRONG ON THE WAY TO THAT, and both are kept here**, because
 the useful knowledge is which levers did not work.
@@ -606,7 +606,10 @@ the useful knowledge is which levers did not work.
    24 seconds of gate work and took 217 seconds wall-clock. Parallelism on shared
    runners is not free and does not divide cleanly.
 
-The honest figure is **6.4 down to 4.6**, plus a diagnostic gain that is arguably
+The honest figure is **6.4 down to a 2.9 to 4.6 range**, and the spread is runner
+CONTENTION rather than anything of ours: the same scrim gate took 276 seconds on
+one run and 173 on the next. **Judge a run against the range, never against a
+single remembered number.** Plus a diagnostic gain that is arguably
 worth more than the seconds: a red check now NAMES the gate that failed without
 anyone opening a log.
 

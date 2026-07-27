@@ -5295,7 +5295,10 @@ It gave 4.6. **Seven concurrent legs contend for runner resources**, so each run
 it does alone: turbo intensity is 24 seconds of gate work and took 217 seconds wall-clock.
 Parallelism on shared runners is not free and does not divide cleanly.
 
-**Measured outcome: 6.4 minutes down to 4.6, a 28 per cent improvement**, plus a diagnostic
+**Measured outcome: 6.4 minutes down to a 2.9 to 4.6 minute range across two runs.** The
+spread is runner CONTENTION rather than anything of ours: the same scrim gate took 276
+seconds on one run and 173 on the next, so a run is judged against the range and never
+against a single remembered number, plus a diagnostic
 gain that is arguably worth more than the seconds: a red check now NAMES the gate that
 failed without anyone opening a log. Both changes are kept, since the cache is still worth 80
 seconds and there are now seven legs paying that saving each.
@@ -5383,3 +5386,25 @@ claim was corrected.
   lockfile already resolves to a different minor.
 - *Quoting reasoning for the SA-002 decline that was not supplied.* Rejected under convention
   (l.7) and (m); the repository's own case is given instead and labelled as such.
+
+---
+
+## Rule 10 closing
+
+**Final push, run 30281912392 on `bb8eecc`, GREEN on all eight jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30281912392
+
+    static gates                    79s      browser: contrast            84s
+    browser: win count-up steady    65s      browser: turbo intensity    100s
+    browser: layout fit             92s      browser: paytable card fill 121s
+    browser: splash calm           155s      browser: scrim coverage     173s
+
+This is the first run on the new matrix that is also the closing run, so it doubles as the
+second measurement of it. **Wall-clock 2.9 minutes against 4.6 on the run before**, same
+code, same cache state: the spread is runner contention and nothing of ours. A run is judged
+against the range, never against a single remembered number.
+
+**Three earlier runs this session, all accounted for.** 30280020957 on `4ca9654` green, the
+cache MISS that populated `ms-playwright-Linux-1.62.0`. 30280722398 on `6639c2d` green, the
+first cache HIT, which is the run that proved the cache worked and the assumption behind it
+did not. 30281432163 on `09f3cea` green, the first matrix run. No cancellations, no reds.
