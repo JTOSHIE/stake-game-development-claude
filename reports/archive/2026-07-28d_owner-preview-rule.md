@@ -128,3 +128,18 @@ waiting on the owner's PART 9g visit, whose LOOK half is the live confirmation T
 - *A version label naming a specific kit.* Rejected: the preview tracks `main`, which moves
   ahead of the last kit, so a label claiming `Front V8` would go quietly wrong. It names the
   generation and the SHA carries the identity.
+
+## Rule 10 closing
+
+**Final push, run 30309950472 on `742bf44`, GREEN on all eleven jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30309950472
+
+**Rule 12 applied to this session, including the wrinkle it exposed in itself.** The report is
+a commit, so a preview refreshed before the report is written is one commit behind the moment
+that report lands. That is unavoidable and it is not a fault. Rule 12 now says so explicitly:
+refresh before the report so the quoted line is real evidence, and run it once more as the
+LAST action of the close, after the final push, so the owner's machine ends on the true tip.
+The line quoted above is the earlier one; the address is the later one.
+
+The same clarification carries the harder lesson from the first run: **printing a URL is not
+evidence the URL works.** Curl the address before believing the line.

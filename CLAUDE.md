@@ -689,6 +689,22 @@ a recycled pid can never be mistaken for ours. It never guesses at processes.
 It refuses a dirty tree and reports it in full rather than discarding work. It
 leaves nothing half-started: a failure after the server spawns reaps it first.
 
+**THE ONE-COMMIT LAG, named rather than left to be rediscovered.** The report is
+itself a commit, so a preview refreshed BEFORE the report is written is one
+commit behind the moment that report lands. That is unavoidable and it is not a
+fault. The rule is therefore: refresh before the report so the line is real
+evidence, and **run it once more as the LAST action of the close, after the final
+push**, so the owner's machine ends on the true tip. The line quoted in the
+report is the earlier one; the address is the later one. A session that finds
+them one docs commit apart has found the design, not a bug.
+
+**PRINTING A URL IS NOT EVIDENCE THE URL WORKS.** Earned on the rule's own first
+run, 2026-07-28: the server came up, answered the readiness probe, printed its
+version line, and died the moment the script exited, because its stdio was a pipe
+to the parent and it was spawned through an `npm` wrapper that was not the server.
+A green log said it had worked. **Curl the owner's actual address before believing
+the line**, which the close now does.
+
 
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
