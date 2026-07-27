@@ -404,7 +404,7 @@
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
-        <button class="p-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
+        <button class="p-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
         <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
@@ -612,7 +612,7 @@
     <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
     </button>
-    <button class="m-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
+    <button class="m-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
     <button class="m-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
     </button>
@@ -695,7 +695,7 @@
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
-      <button class="c-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
+      <button class="c-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
       <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
@@ -880,7 +880,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
-      <button class="fs-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
+      <button class="fs-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
     </span>
   </div>
 
@@ -988,7 +988,28 @@
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
+    /* MIN-WIDTH ZERO, and this one line is why the layout fit gate is green.
+       A flex item's default `min-width: auto` refuses to shrink below its
+       min-content width. A <span> in these rows had no intrinsic minimum worth
+       speaking of, but a <button> does, so promoting the readout stopped it
+       shrinking and the mini strip's BET box reported 99px of content in a 92px
+       box at Popout S: `hud-bet` clipped its own value. Restoring the shrink
+       lets `autofitText` do its job exactly as it did when this was a span. */
+    min-width: 0;
   }
+  /* THE VALUE IS WRAPPED IN A SPAN, and it is not decoration.
+     `layout_fit_gate.mjs:199` measures "the deepest text-bearing node" of each
+     readout with `el.querySelector('.m-stat-val, .stat-value, span, div')`, and
+     falls back to the CONTAINER when nothing matches. Promoting the readout
+     from a <span> to a <button> matched none of those four, so the gate
+     silently switched from measuring the value (36px in a 36px box, fine) to
+     measuring the whole BET container, whose scrollWidth carries the two
+     steppers' pre-existing SVG overflow: it reported 99 against 92 at Popout S
+     and called it a clipped value. Nothing was actually clipping.
+     Giving the gate back the text node it looks for restores its intent rather
+     than weakening it, and costs one element. The gate's fallback is a real
+     blind spot for any future non-span readout and is recorded as such. */
+  .bet-open-text { display: inline; }
   .bet-open:disabled { cursor: default; }
 
   /* THE TAP TARGET IS THE BET WINDOW, NOT THE DIGITS.
@@ -1005,14 +1026,34 @@
      profile, and forcing height into it would push the label out of its own
      plate to satisfy a bar that does not apply there. */
   .p-stat-value.bet-open,
-  .m-stat-value.bet-open,
   .c-stat-value.bet-open {
     min-height: 44px;
     align-self: stretch;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
+
+  /* THE MINI STRIP IS DELIBERATELY EXCLUDED, and it was measured rather than
+     reasoned. Adding the 44px floor to `.m-stat-value.bet-open` too made the
+     Popout S BET row 44px tall, the two steppers stretched with it, and their
+     20x12 SVGs scaled to the new height until each carried 32px of content in a
+     22px box. That overflow is what the layout fit gate reported as
+     `hud-bet` clipping its value, 99 against 92, at Popout S ONLY.
+     It is the right exclusion on its own terms as well: the touch-target audit
+     runs at iPhone 14 and Pixel 7, portrait and landscape, which are the
+     portrait and compact-landscape profiles. Popout S is a 400x225 desktop
+     popout, not a touch surface, and its controls are already smaller than the
+     touch floor by design. */
+
+  /* NO `display: flex` HERE, and that is a correction rather than an omission.
+     The first version centred the label with `display: flex`, and the layout
+     fit gate went red at Popout S: `hud-bet` clipped its own value, 99px of
+     content in a 92px box. `autofitText` shrinks the font by comparing
+     `scrollWidth` against `clientWidth` (`actions/autofitText.ts:28`), and on a
+     flex container the text sits in an anonymous flex item whose min-content
+     width does not fall as the font does, so the action's own escape hatch
+     stopped working and it gave up while still overflowing.
+     A <button> already centres its content, so the flex was buying nothing and
+     costing the one mechanism that keeps a long currency string inside a
+     fixed-width readout. */
   .bet-open:focus-visible {
     outline: 2px solid var(--sig-cyan, #00FFFF);
     outline-offset: 2px;
