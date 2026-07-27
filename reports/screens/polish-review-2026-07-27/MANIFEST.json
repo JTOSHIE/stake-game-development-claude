@@ -1,0 +1,694 @@
+{
+  "date": "2026-07-27",
+  "build": {
+    "game": "future-spinner",
+    "commit": "2745b4d8ed5c4f02dda9daf38f3b6e8f3200d5f9",
+    "branch": "main",
+    "cleanTree": true,
+    "builtAt": "2026-07-27T02:04:26.231Z",
+    "bundleFilesExcludingThisFile": 109,
+    "bundleBytesExcludingThisFile": 15607103,
+    "note": "Provenance only. Nothing in the running game fetches this file; the boot line is inlined at build time. See TR-062."
+  },
+  "presets": [
+    {
+      "name": "Desktop",
+      "viewport": "1200x675",
+      "fullSweep": true
+    },
+    {
+      "name": "Laptop",
+      "viewport": "1024x576",
+      "fullSweep": false
+    },
+    {
+      "name": "Popout L",
+      "viewport": "800x450",
+      "fullSweep": false
+    },
+    {
+      "name": "Popout S",
+      "viewport": "400x225",
+      "fullSweep": false
+    },
+    {
+      "name": "Mobile L",
+      "viewport": "425x812",
+      "fullSweep": true
+    },
+    {
+      "name": "Mobile M",
+      "viewport": "375x667",
+      "fullSweep": false
+    },
+    {
+      "name": "Mobile S",
+      "viewport": "320x568",
+      "fullSweep": false
+    }
+  ],
+  "walletCalls": {
+    "authenticate": 18,
+    "play": 8,
+    "endRound": 8
+  },
+  "captures": [
+    {
+      "file": "001_desktop_splash.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "002_desktop_intro_rules.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "003_desktop_base_idle.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "004_desktop_hud_menu.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "005_desktop_session_panel.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "006_desktop_paytable_top.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "007_desktop_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "note": "Paytable section"
+    },
+    {
+      "file": "008_desktop_paytable_02_ways_to_win.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_02_ways_to_win",
+      "note": "Paytable section"
+    },
+    {
+      "file": "009_desktop_paytable_03_symbol_payouts.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_03_symbol_payouts",
+      "note": "Paytable section"
+    },
+    {
+      "file": "010_desktop_paytable_04_rules.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_04_rules",
+      "note": "Paytable section"
+    },
+    {
+      "file": "011_desktop_paytable_05_overdrive_free_spins.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_05_overdrive_free_spins",
+      "note": "Paytable section"
+    },
+    {
+      "file": "012_desktop_paytable_06_bet_modes.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_06_bet_modes",
+      "note": "Paytable section"
+    },
+    {
+      "file": "013_desktop_paytable_07_interface_guide.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_07_interface_guide",
+      "note": "Paytable section"
+    },
+    {
+      "file": "014_desktop_paytable_08_responsible_play.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_08_responsible_play",
+      "note": "Paytable section"
+    },
+    {
+      "file": "015_desktop_paytable_09_disclaimer.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "paytable_09_disclaimer",
+      "note": "Paytable section"
+    },
+    {
+      "file": "016_desktop_features_menu.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "017_desktop_mode_cruise_selected.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "mode_cruise_selected",
+      "note": "Cruise selected, standing mode"
+    },
+    {
+      "file": "018_desktop_mode_overboost_on.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "mode_overboost_on",
+      "note": "OVERBOOST on, effective spin cost shown"
+    },
+    {
+      "file": "019_desktop_dialog_buy_overdrive.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "dialog_buy_overdrive",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "020_desktop_dialog_nitro_overdrive.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "dialog_nitro_overdrive",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "021_desktop_autoplay_menu.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "022_desktop_celebration_win.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "celebration_win",
+      "note": "Win presentation"
+    },
+    {
+      "file": "023_desktop_celebration_big_win.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "celebration_big_win",
+      "note": "Win presentation"
+    },
+    {
+      "file": "024_desktop_feature_entry_card.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "feature_entry_card",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "025_desktop_feature_in_play.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "feature_in_play",
+      "note": "Overdrive free spins in play, meter and totals"
+    },
+    {
+      "file": "026_desktop_celebration_max_win.png",
+      "preset": "Desktop",
+      "viewport": "1200x675",
+      "surface": "celebration_max_win",
+      "note": "MAX WIN celebration, the 5,000x cap, first spin of a fresh session"
+    },
+    {
+      "file": "027_laptop_splash.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "028_laptop_intro_rules.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "029_laptop_base_idle.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "030_laptop_hud_menu.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "031_laptop_session_panel.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "032_laptop_paytable_top.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "033_laptop_features_menu.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "034_laptop_autoplay_menu.png",
+      "preset": "Laptop",
+      "viewport": "1024x576",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "035_popout-l_splash.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "036_popout-l_intro_rules.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "037_popout-l_base_idle.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "038_popout-l_hud_menu.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "039_popout-l_session_panel.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "040_popout-l_paytable_top.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "041_popout-l_features_menu.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "042_popout-l_autoplay_menu.png",
+      "preset": "Popout L",
+      "viewport": "800x450",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "043_popout-s_splash.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "044_popout-s_intro_rules.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "045_popout-s_base_idle.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "046_popout-s_hud_menu.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "047_popout-s_session_panel.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "048_popout-s_paytable_top.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "049_popout-s_features_menu.png",
+      "preset": "Popout S",
+      "viewport": "400x225",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "050_mobile-l_splash.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "051_mobile-l_intro_rules.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "052_mobile-l_base_idle.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "053_mobile-l_hud_menu.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "054_mobile-l_session_panel.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "055_mobile-l_paytable_top.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "056_mobile-l_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "note": "Paytable section"
+    },
+    {
+      "file": "057_mobile-l_paytable_02_ways_to_win.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_02_ways_to_win",
+      "note": "Paytable section"
+    },
+    {
+      "file": "058_mobile-l_paytable_03_symbol_payouts.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_03_symbol_payouts",
+      "note": "Paytable section"
+    },
+    {
+      "file": "059_mobile-l_paytable_04_rules.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_04_rules",
+      "note": "Paytable section"
+    },
+    {
+      "file": "060_mobile-l_paytable_05_overdrive_free_spins.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_05_overdrive_free_spins",
+      "note": "Paytable section"
+    },
+    {
+      "file": "061_mobile-l_paytable_06_bet_modes.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_06_bet_modes",
+      "note": "Paytable section"
+    },
+    {
+      "file": "062_mobile-l_paytable_07_interface_guide.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_07_interface_guide",
+      "note": "Paytable section"
+    },
+    {
+      "file": "063_mobile-l_paytable_08_responsible_play.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_08_responsible_play",
+      "note": "Paytable section"
+    },
+    {
+      "file": "064_mobile-l_paytable_09_disclaimer.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "paytable_09_disclaimer",
+      "note": "Paytable section"
+    },
+    {
+      "file": "065_mobile-l_features_menu.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "066_mobile-l_mode_cruise_selected.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "mode_cruise_selected",
+      "note": "Cruise selected, standing mode"
+    },
+    {
+      "file": "067_mobile-l_mode_overboost_on.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "mode_overboost_on",
+      "note": "OVERBOOST on, effective spin cost shown"
+    },
+    {
+      "file": "068_mobile-l_dialog_buy_overdrive.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "dialog_buy_overdrive",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "069_mobile-l_dialog_nitro_overdrive.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "dialog_nitro_overdrive",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "070_mobile-l_autoplay_menu.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "071_mobile-l_celebration_win.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "celebration_win",
+      "note": "Win presentation"
+    },
+    {
+      "file": "072_mobile-l_celebration_big_win.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "celebration_big_win",
+      "note": "Win presentation"
+    },
+    {
+      "file": "073_mobile-l_feature_entry_card.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "feature_entry_card",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "074_mobile-l_feature_in_play.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "feature_in_play",
+      "note": "Overdrive free spins in play, meter and totals"
+    },
+    {
+      "file": "075_mobile-l_celebration_max_win.png",
+      "preset": "Mobile L",
+      "viewport": "425x812",
+      "surface": "celebration_max_win",
+      "note": "MAX WIN celebration, the 5,000x cap, first spin of a fresh session"
+    },
+    {
+      "file": "076_mobile-m_splash.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "077_mobile-m_intro_rules.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "078_mobile-m_base_idle.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "079_mobile-m_hud_menu.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "080_mobile-m_session_panel.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "081_mobile-m_paytable_top.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "082_mobile-m_features_menu.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "083_mobile-m_autoplay_menu.png",
+      "preset": "Mobile M",
+      "viewport": "375x667",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "084_mobile-s_splash.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "splash",
+      "note": "Hero splash, first surface a player sees"
+    },
+    {
+      "file": "085_mobile-s_intro_rules.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "intro_rules",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "086_mobile-s_base_idle.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "base_idle",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "087_mobile-s_hud_menu.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "hud_menu",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "088_mobile-s_session_panel.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "session_panel",
+      "note": "Session information panel"
+    },
+    {
+      "file": "089_mobile-s_paytable_top.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "paytable_top",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "090_mobile-s_features_menu.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "features_menu",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "091_mobile-s_autoplay_menu.png",
+      "preset": "Mobile S",
+      "viewport": "320x568",
+      "surface": "autoplay_menu",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    }
+  ]
+}

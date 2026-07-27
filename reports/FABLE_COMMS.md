@@ -9,6 +9,105 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 019 - 2026-07-27 - The two unrun tracks executed on main: 35 machine-tell glyphs were shipping, a scaffold package name was the boot tab title, and the documents now match reality
+
+**What ran.** The prepared `track/quality-sweep` and `track/docs-reskin` briefs had never
+been run. Their substance was executed on `main` by the integrator, plus four other jobs.
+The analyst PR #116 was merged first under your standing conditions: scope gate green,
+ledger-only content, 25 files, no source and no locked path.
+
+**The sweep found more than expected, and it was counted rather than estimated.**
+`docs/QUALITY_CHARTER.md` now exists, which matters because `CLAUDE.md`'s standing mandate
+has cited that path since the mandate was written and the file was not there.
+
+- **35 symbol glyphs were shipping in `dist`, 31 of them player-visible.** A trophy emoji
+  in the max-win string in all sixteen locales; two emoji speakers in the audio menu at four
+  layout profiles; `★★★` on the max-win crown; two `✕` close controls; a `→` in the
+  paytable. **The Orbitron subset carries 183 codepoints and does not carry U+2605, U+2715 or
+  U+2192**, verified against the shipped woff files before any string was judged. So those
+  were not only the wrong icon family, they were rendering in the operating system's font
+  mid-interface, and no stylesheet said so. All drawn now.
+- **`<title>future-spinner-frontend</title>`**, the Vite starter's own npm package name,
+  was the tab title from first paint until the app mounts. **I got the severity wrong first
+  time and the record says so**: I claimed nothing overrode it, on a grep for
+  `document.title` that returned nothing. `App.svelte:1507` sets it through
+  `<svelte:head>`, which never mentions `document.title`. Transient, not permanent. Fix
+  stands, claim corrected in four places.
+- **The French locale used both apostrophe forms in one rules list**, and a French error
+  banner read `Votre session n a pas pu` with the apostrophe absent entirely. `git log -S`
+  shows it was never there: authored inside a single-quoted literal and dropped rather than
+  escaped.
+- **A hardcoded `# FABLE COMMS
+
+Append-only. Newest entry first. One entry per session or significant event, one
+screen maximum. Fable fetches this file directly from the repository at each
+check-in. Rulings arrive as pasted blocks from the owner; each Fable block carries a
+COMMS-ACK line appended here to close the loop.
+
+Australian English, no em dashes or en dashes.
+
+ beside the autoplay loss limit** at three layout profiles, in a game
+  you play in euro. Same class as the `XSC` leak PR #89 fixed.
+- **The Vite scaffold's own `:root` font stack**, naming no brand face at all, plus a
+  `Segoe UI` declaration (the Windows system face, resolving on nothing else) and Courier
+  New on the first text a player reads.
+
+Held by `frontend/scripts/machine_tell_gate.mjs`, in CI. All ten of its seeded violations
+are strings that were really in this repository, in the file shape they were found in,
+including the two forms a plain string scan cannot see. Its own first real run corrected it
+twice, and both corrections are pinned by negative controls.
+
+**Current HEAD.** `2745b4d8` at the time of the capture set; see the top of `main` for the
+close. Bundle 109 files, 15,607,103 bytes, clean tree.
+
+**Kit version live on the portal: NOT KNOWN, and that is a finding.** Six kits sit on the
+Desktop. The last frontend version confirmed published anywhere in the repository is
+**Front V2**, published on the morning of 2026-07-26. Four kits have been built since. **Every
+fix in this session, and every fix in the two before it, is therefore of unknown liveness.**
+It is item 3 on the new `OWNER_CHECKLIST.md`.
+
+**Open rows.** TR-075 (the Cruise wallet delta, the only open money item, unanswered across
+three visits). TR-064 (the zero-win end-round conflict, ruled observe-first and now absent
+from every current walkthrough section, so nobody is being asked). TR-081 (the red
+authenticate, low urgency). **TR-086 and TR-087 are new**, promoted by me from the analyst
+ledger: the mini strip cutting a balance to `BAL €479` below about 390 css px, and the
+replay win pod's `.toFixed(2)`, which I fixed at source. Both were HIGH and unpromoted.
+Three tracker Status cells read OPEN while their own fix evidence recorded the fix; corrected.
+
+**The three questions this pass could not settle.**
+
+1. **The 2-star Maximum Exposure limit disagrees between two first-party sources.**
+   `COMPLIANCE_WATCH.md` records the published table at `$10,000,000`; the platform's own
+   ACP screen displays `15,000,000.0`. Both pass for us comfortably, which is exactly why
+   it is safe to leave open and wrong to overwrite. Raised, not corrected.
+2. **Should the COST-column convention be raised with the platform before submission?**
+   SA-002 and SA-007 have asked since 2026-07-26. The convention is now proven from the
+   platform's own `costMultiplier` field, so the question is no longer whether it is true
+   but whether a reviewer reading the Bets page alone will underestimate spend on every
+   non-unit mode. Yours or the owner's, not mine.
+3. **Is the round-three reviewer prompt legitimate to run as drafted?** The round-TWO prompt
+   does not exist in this repository. I did not reconstruct it, per convention (m). The draft
+   at `docs/records/reviews/round3_reviewer_prompt_DRAFT.md` is built on the round-ONE
+   prompt, which survives verbatim, plus the round-two deliverable's eighth section inferred
+   from its outputs. Marked DRAFT FOR YOUR RATIFICATION with five decisions listed. It also
+   discloses the prior rounds and their scores, which anchors a reviewer; the alternative is
+   disclosing findings without scores.
+
+**Parked, and named rather than half-done.** Roughly 35 keys times 16 locales of
+player-visible English is still hardcoded, counted at 27 attributes and 48 markup text nodes
+and listed in full in the charter. 560 translated values written in the margins of a six-job
+session is the exact case protocol rule 6 exists to prevent, and a partial pass leaves the
+locale gate red, which rule 10 forbids. It wants its own surgical brief.
+
+**For your eye: `reports/screens/polish-review-2026-07-27/`.** 91 frames from the
+production build at seven platform presets, eight real rounds through the intercepted wallet,
+with a README naming what the set does not cover. `OWNER_CHECKLIST.md` at the repository
+root is the owner's seven items, phone-readable; three of the brief's own premises about them
+turned out to be wrong and it says so.
+
+---
+
+
 ## 018 - 2026-07-26 - Buy modes exercised live: the money path reconciles to the cent four times over, and the one real finding is that a buy round headlines a loss as a win
 
 **Two things the owner flagged, and both need care rather than a fix.**
