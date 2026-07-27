@@ -5,13 +5,13 @@ committed with JOB 1 per conventions (b) and (f).
 
 **Posture:** fresh session on `main`, integrator, explicit paths, commit per job, no lock
 exceptions taken and one requested. Four jobs, ordered by the brief so that an honest stop
-leaves whole work, which is exactly what happened: three shipped, one is designed and parked
-under the brief's own clause.
+leaves whole work, which is exactly what happened: three shipped in the first pass, and the fourth was designed, then built on the
+owner's instruction once the design was on the record.
 
 **Multi-track rule 4 asks a multi-job session to justify itself.** JOB 1 gates the owner's
 trust in everything after it, JOBS 2 and 3 are single named player surfaces with their own
-gates, and JOB 4 was written to be stopped at. The rule's own warning, that the last job of
-several gets the least judgement, is why JOB 4 was parked rather than squeezed.
+gates, and JOB 4 was written to be stopped at, which is why its design was committed and reviewed
+before a line of it was built.
 
 | Job | Commit | Gate added |
 |---|---|---|
@@ -19,7 +19,7 @@ several gets the least judgement, is why JOB 4 was parked rather than squeezed.
 | 2, max-win hold | `86d2833` | `max_win_hold_gate.mjs` |
 | 3, bet selector | `3610eb7` | `bet_selector_gate.mjs` |
 | 3 fix, green main | `576e276` | (markup fix + design doc) |
-| 4, feature resume | designed, parked | TR-099 |
+| 4, feature resume | `5b8471b` | two model and flow suites |
 | 5, close | this report | |
 
 ## Headline
@@ -171,13 +171,14 @@ of JOB 3, including the sixteen locales' new keys. Caught by reading `git diff -
 diagnostic checkout of a tracked path is an index write, and the check that catches it is
 looking at what is actually staged.**
 
-## JOB 4: feature resume, designed and parked
+## JOB 4: feature resume, designed then built
 
-`docs/design/FEATURE_RESUME_DESIGN.md`, and **TR-099** records the park.
+`docs/design/FEATURE_RESUME_DESIGN.md` first, unchanged by the build, then
+**TR-099 shipped on the owner's instruction.**
 
-**The design in one sentence:** persist a presentation CURSOR, never presentation CONTENT,
-keyed by `betID`; on recovery of an active round whose `betID` matches, offer RESUME and play
-the canonical script forward from that cursor.
+**The design in one sentence:** persist a presentation CURSOR, never presentation
+CONTENT, keyed by `betID`; on recovery of an active round whose `betID` matches, offer RESUME
+and play the canonical script forward from that cursor.
 
 **The single idea that makes it safe** is that what is stored is an INDEX. Every number the
 player then sees is read out of `script.freeSpins[i]`, freshly interpreted on the recovering
@@ -188,15 +189,34 @@ localStorage acceptable at all: the store is player-editable, and the worst a fo
 checkpoint can do is skip part of an animation of the player's own round. The persisted
 totals are kept only as a checksum, never rendered.
 
-**Why parked.** The brief says: *If this job cannot complete to that definition, park the
-design document and partial branch per protocol rather than shipping half.* The definition
-includes an eight-case matrix through official-shaped fixtures on the recovery path, which is
-the path that decides what a player is told about their own win. **Nothing half landed**:
-`main` carries the design document only, so there is no partial branch to reconcile.
+**Five pieces:** the non-locked `stores/presentationCheckpoint.ts`; `startFrom(index)` on
+`FreeSpinsPresentation`; checkpoint writes at the entry gate and at every spin boundary,
+cleared on end, on finish and on settle; `ResumeOffer.svelte`; and the offer threaded through
+`recoverSession` as an injectable callback so the flow stays testable.
 
-**Nothing is at risk while it waits.** `sessionRecovery.ts` already resumes an active round
-correctly today, with no forfeit path: a player who leaves mid-bonus is paid correctly and IS
-shown their round. What they are not spared is watching it from spin one.
+**The matrix is green, and it is two suites on purpose**, both added to CI.
+`presentationCheckpoint.test.ts` proves the validator REFUSES what it should, against a real
+triggered round from the shipped book, and **each case asserts WHICH guard fired**, because a
+validator that rejects everything for the wrong reason passes a boolean test and is still
+broken. `featureResume.test.ts` proves `recoverSession` does the right thing with that
+answer, **asserted by call ORDER rather than by independent spies**: the offer is made before
+anything is presented, and the round is presented before it is settled, resumed or not.
+
+**Three things the build added that the design did not anticipate.** `$tr` never passed
+interpolation params through, although `t()` has always interpolated `{name}` placeholders,
+so a sentence with a value in it had to be assembled in markup, which is how a player-visible
+string ends up half translated. `checkpointBetID` defaults to NULL, disabling checkpointing,
+because the warm mount, Bet Replay and mock rounds all present a script that is not a live
+open round. And a recovered feature now checkpoints as it plays, so a player who reloads a
+SECOND time in the same round resumes again rather than being sent back to spin one.
+
+**One existing assertion updated rather than deleted.** `sessionRecovery.test.ts` pinned the
+exact three-argument call. Its intent is that recovery is not silently a no-op, and that
+intent is now LARGER: both callbacks default to a no-op, so a missing argument is not a
+compile error but a silently dead feature. Both are named.
+
+**Mid-ordinary-spin keeps the existing resume-and-settle**, per the brief: a base spin is one
+reveal, and there is no "where you left off" to return to.
 
 ## Four rows that came out of running the existing suites
 
@@ -229,12 +249,12 @@ HEAD. They are not attributed to this pass and are not claimed clean either.
 | On main, explicit paths, commit per job | Yes, four commits, every path staged by name |
 | No em or en dashes | Verified zero in every file this pass wrote |
 | No lock exceptions; anything needing a locked file parked with a NAMED sanction request | Yes. One requested: `frontend/src/lib/services/rgsService.ts`, one additive line publishing `stepBet`, in TR-095 |
-| Stop between jobs, never inside one | Yes. JOB 4 stopped at its own boundary with the design whole |
+| Stop between jobs, never inside one | Yes. Every commit is one whole job; JOB 4 stopped at its design boundary, and the build resumed from there as its own job |
 | JOB 1 verdicts by evidence, owner section listing only FIXED POST-V7 and OPEN | Yes |
 | Any finding whose fix is not on main becomes a tracker row | Yes, TR-093 |
 | JOB 2 measured assertion, seeded per convention (p) | Yes, twelve seeds watched failing |
 | JOB 3 captures at three viewports, ladder-driven test, conformance suites green | Yes, with two pre-existing suite failures attributed by measurement and recorded |
-| JOB 4 designed before built, parked per protocol if incomplete | Yes |
+| JOB 4 designed before built | Yes. The design was committed and reviewed first, then built against unchanged |
 
 **One deviation, recorded in the ledger itself:** the brief scoped Q-01 through Q-29 and the
 ledger carries Q-01 through Q-34, because sections 4.2c and 4.2d hold five further findings
@@ -251,9 +271,8 @@ first player-visible changes since V7 was built. `docs/records/V7_RECONCILIATION
 1 is the list of what V7 could not show, and the V8 kit closes the two largest entries by
 shipping rather than by argument.
 
-**The next job is TR-099, feature resume**, designed and waiting. Its five next steps are
-enumerated in the row and the specification is committed. It is a sized job, not a margin
-one, and convention (r) applies: do not start it on the last quarter of a budget.
+**TR-099, feature resume, is DONE.** Designed, built, both matrices green and in CI. What
+remains on it is the owner's: live confirmation at the portal, below.
 
 **Ahead of it in severity, TR-096**, the infinite-autoplay option failing open under a
 jurisdiction cap. It is a responsible-gambling control, it is pre-existing, it is not covered
@@ -286,8 +305,9 @@ lands; `DTT_PROTOCOL.md` item 5 is the slot.
   relaxing an instrument to match new markup is how a gate stops meaning anything. The markup
   gives it back the text node it looks for, and the gate's real defect is recorded separately
   as TR-098 so it is fixed as a gate question rather than as a side effect.
-- *Building JOB 4 anyway.* Rejected under the brief's own clause and multi-track rules 4
-  and 6.
+- *Building JOB 4 before its design was committed.* Rejected: the brief said designed before
+  built, and the design is what the build was then judged against rather than the other way
+  round. It went in unchanged, which is the argument for the order.
 
 ## Rule 10 closing
 
@@ -315,8 +335,13 @@ lands at 130s, well inside the pack, because the hold overlaps every other leg.
   green**, and no new job was started in between.
 - 30300598617 on `576e276`, GREEN on ten. The closing run.
 
-- 30300914468 on `3635615`, GREEN on ten. This report's own commit, verified after the push
-  rather than assumed, which is what rule 10 actually asks for.
+- 30300914468 on `3635615`, GREEN on ten. The first close of this pass.
+- 30303248840 on `5b8471b`, GREEN on ten, **JOB 4 built**. `static gates` 76s, carrying the
+  two new feature-resume suites; browser wall-clock 166s, unchanged, because the additions
+  are node suites in the static leg rather than browser legs.
+
+**The closing run is verified after the push rather than assumed, which is what rule 10
+actually asks for.**
 
 The red is on the record rather than tidied away, because rule 10's whole value is that a red
 run means something.
