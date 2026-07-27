@@ -552,6 +552,11 @@ jobs:
           # both seeds fire at four and the detector is what is being proved.
           - name: "browser: max-win hold"
             run: node scripts/max_win_hold_gate.mjs --self-test && node scripts/max_win_hold_gate.mjs
+          # Runs WITHOUT FS_WRITE_EVIDENCE, so it captures to scratch and cannot
+          # rewrite the committed evidence under reports/screens/bet-selector/.
+          # Convention (h.1).
+          - name: "browser: bet selector"
+            run: node scripts/bet_selector_gate.mjs --self-test && node scripts/bet_selector_gate.mjs
 
     steps:
       - name: Check out

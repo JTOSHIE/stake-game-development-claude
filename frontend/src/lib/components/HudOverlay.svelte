@@ -38,6 +38,7 @@
     rgAllowedAutoplayCounts, rgClampAutoplayCount, rgInfiniteAutoplayAllowed,
   } from '../stores/responsibleGambling'
   import { setModalOpen } from '../stores/modalGuard'
+  import BetSelector from './BetSelector.svelte'
   import { standingMode } from '../stores/betMode'
   import { FS_MODES, modeLabel } from '../config/fsModes'
   import { spinCostMicros } from '../stores/buyAffordability'
@@ -151,6 +152,24 @@
     } else if ($canSpin) {
       dispatch('spin')
     }
+  }
+
+  // THE BET WINDOW IS A BUTTON (owner's order, 2026-07-28, industry convention).
+  //
+  // Tapping the BET readout opens a denomination panel listing every level the
+  // platform authorised, so a player reaches the maximum in one tap instead of
+  // holding an arrow through a ladder that can be twenty levels long on a
+  // non-USD currency. THE ARROWS ARE UNCHANGED and remain the fine adjustment;
+  // this is an addition.
+  //
+  // Registered with modalGuard by the panel itself, so autoplay re-arms rather
+  // than spinning underneath it and the spacebar does not reach the reels while
+  // a player is choosing a stake.
+  let showBetSelector = false
+  function openBetSelector() {
+    if ($isSpinning) return   // the arrows are disabled mid-spin; so is this
+    playClick()
+    showBetSelector = true
   }
 
   function increaseBet() { playClick(); increaseBetLevel() }
@@ -385,7 +404,7 @@
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
-        <span class="p-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
+        <button class="p-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
         <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
@@ -593,7 +612,7 @@
     <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
     </button>
-    <span class="m-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
+    <button class="m-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
     <button class="m-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
     </button>
@@ -676,7 +695,7 @@
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
-      <span class="c-stat-value gold" use:autofitText={betLabel}>{betLabel}</span>
+      <button class="c-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
       <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
@@ -861,7 +880,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
-      <span class="fs-value gold" use:autofitText={betLabel}>{betLabel}</span>
+      <button class="fs-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window">{betLabel}</button>
     </span>
   </div>
 
@@ -948,7 +967,58 @@
 </div><!-- /fs-hud -->
 {/if}
 
+<!-- The denomination picker. ONE mount for all four layout profiles: it is
+     fixed to the viewport rather than to the 1280x720 design surface, so it
+     needs no per-profile copy and cannot drift between them. -->
+<BetSelector bind:open={showBetSelector} />
+
 <style>
+  /* The BET readout is a button in all four profiles. These four rules are the
+     entire visual cost of that: the element keeps its profile's own class and
+     therefore its own geometry, colour and autofit behaviour, and this strips
+     only the things a <button> brings with it that a <span> did not. Written
+     once rather than per profile so the four cannot drift. */
+  .bet-open {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .bet-open:disabled { cursor: default; }
+
+  /* THE TAP TARGET IS THE BET WINDOW, NOT THE DIGITS.
+     Measured, and it was a regression this change introduced: promoting the
+     readout from a <span> to a <button> made it an audited touch target for the
+     first time, and portrait_layout_conformance reported it at 50.8x24 on
+     iPhone 14 and Pixel 7 portrait and 44.4x21 in compact landscape, against a
+     44px floor. A span is not a control and was never measured; a button is,
+     and it was too small the moment it became one.
+     The three small profiles put the readout in a flex row BETWEEN two 44px
+     steppers, so the row is already 44px tall and stretching the readout to
+     match costs no layout at all. The landscape plate is deliberately excluded:
+     it is a fixed-geometry 120px box with a clip-path, it is not a touch
+     profile, and forcing height into it would push the label out of its own
+     plate to satisfy a bar that does not apply there. */
+  .p-stat-value.bet-open,
+  .m-stat-value.bet-open,
+  .c-stat-value.bet-open {
+    min-height: 44px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bet-open:focus-visible {
+    outline: 2px solid var(--sig-cyan, #00FFFF);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
   /* ── MINI-PLAYER HUD (R2R-R JOB C / TR-043) ──────────────────────────────
      A dedicated 44px row for Stake's 400x225 popout. Every number here is a
      real native CSS px, not a scaled one: the whole finding was that scaling a

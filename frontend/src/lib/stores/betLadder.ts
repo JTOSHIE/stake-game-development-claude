@@ -100,6 +100,35 @@ export function setMaxBetLevel(): void {
 }
 
 /**
+ * Set the bet to a level the player picked out of the denomination panel.
+ *
+ * THE ONLY WAY A LEVEL CAN BE SET DIRECTLY, and it refuses anything that is not
+ * ON the active ladder. That refusal is what makes the platform's `minStep`
+ * hold without this module ever reading `minStep`: every value the panel can
+ * offer came out of `activeBetLevels`, which is the authenticate response's own
+ * `betLevels` (or the built-in ladder in mock and dev), so a selection is by
+ * construction a value the platform authorised. Nothing here synthesises an
+ * amount, rounds one, or interpolates between two levels, which are the three
+ * ways a stepper normally produces an off-ladder bet.
+ *
+ * Affordability is deliberately NOT enforced here. The `+` arrow refuses to
+ * climb past what the balance covers, because holding a key should not walk a
+ * player into an unaffordable bet by accident; picking a specific number out of
+ * a list is a different act, and a player who selects one they cannot currently
+ * afford should see the SPIN button disabled rather than have the panel
+ * silently substitute a smaller figure. `canSpin` already handles that.
+ *
+ * Returns true when it moved the bet.
+ */
+export function setBetLevel(level: number): boolean {
+  const levels = get(activeBetLevels)
+  if (!levels.includes(level)) return false
+  if (get(betAmount) === level) return false
+  betAmount.set(level)
+  return true
+}
+
+/**
  * Snap an off-ladder bet onto the active ladder. Called once when the ladder
  * arrives from the RGS, so the player never sits on an amount the platform did
  * not authorise. Returns true when it moved the bet.
