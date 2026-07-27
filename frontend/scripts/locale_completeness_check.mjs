@@ -129,8 +129,6 @@ const KNOWN_DEBT = new Set([
   // Constants. `overdriveFreeSpins` and `totalWin` ALREADY exist in all sixteen
   // locales in the feature block, so these two are second copies of translated
   // strings rather than missing translations.
-  'src/lib/components/BonusInstrumentColumn.svelte|OVERDRIVE FREE SPINS',
-  'src/lib/components/BonusInstrumentColumn.svelte|TOTAL WIN',
   // Symbol labels, rendered from a local record and from the paytable.
   'src/lib/components/WinBreakdown.svelte|WILD',
   'src/lib/components/WinBreakdown.svelte|SCATTER',

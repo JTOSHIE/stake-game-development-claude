@@ -192,8 +192,12 @@ export function maxWinFootnote(social: boolean): string {
  * desktop templates render the exact same string instead of independently
  * hand-typed copies that can silently drift (portrait previously said
  * "OVERDRIVE FREE SPINS", desktop said just "FREE SPINS" - same field). */
-export const HUD_LABEL_FREE_SPINS = 'OVERDRIVE FREE SPINS'
-export const HUD_LABEL_TOTAL_WIN = 'TOTAL WIN'
+// REMOVED 2026-07-28 (TR-091): HUD_LABEL_FREE_SPINS and HUD_LABEL_TOTAL_WIN.
+// They were second copies of strings that already exist in all sixteen locales
+// as `overdriveFreeSpins` and `totalWin` in the feature block of
+// src/lib/i18n/translations.ts, and being constants in a .ts module they were
+// unreachable by the locale gate, which only opened .svelte files. The one
+// consumer, BonusInstrumentColumn, now asks the tr layer like everything else.
 
 /** Resolves a mode's displayed label/blurb for the current social-mode
  * state - the single place both FeatureMenu.svelte and PaytableModal.svelte
