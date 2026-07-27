@@ -3060,7 +3060,47 @@ is in fact not composed, this line is where that gets noticed.
     git diff frontend/src/lib/services/rgsService.ts     EMPTY, no lock exception taken
     dash check across every file written                 0
 
-### Rule 10 closing link
+### The records pass: kit V8
+
+Assembled after the merge, as the brief's FOR THE NEXT SESSION said it would be.
+
+`~/Desktop/FS_UPLOAD_KIT_V8/`, built by `scripts/kit_build.mjs --version 8` from a FRESH
+CLONE per convention (o), at `e0c30611`, clean tree. **110 files, 15,633,567 bytes.** All
+three dist gates run IN THE CLONE and green.
+
+**Verified independently of the builder's own report**, because a builder that reports its
+own success is one number rather than two: measured on disk at 110 files and 15,633,567
+bytes, and the bundle's own `build-info.json` says 109 files and 15,633,186 bytes EXCLUDING
+ITSELF, which reconciles exactly once its own 381 bytes are added back.
+
+**All four player-visible commits of this pass are ancestors of the kit commit**, confirmed
+by `git merge-base --is-ancestor`. `docs/records/V7_RECONCILIATION.md` section 1 listed what
+V7 could not show; this kit closes the two largest entries by shipping rather than by
+argument.
+
+**THE DEFECT FOUND WHILE ASSEMBLING.** `kit_build.mjs` wrote the literal `PART 9e` into every
+kit README and had done since V5. The walkthrough moved to PART 9f with V7, and 9f's own
+heading now reads SUPERSEDED, DO NOT RUN. **So V5, V6 and V7 each handed the owner a README
+pointing at a section the document itself says not to run**, and nobody noticed because a
+README looks correct until somebody follows it. Fixed at the cause: the part is DERIVED from
+the walkthrough in the clone, and it THROWS rather than falling back, because a kit whose
+README cannot name its own visit is worse than no kit. Four new convention (p) seeds, nine
+in total, all watched failing. TR-100.
+
+**PART 9g is the V8 visit.** It keeps 9f's full-kit reconcile and SHA capture, then adds a
+two-minute LOOK half, because this is the first kit whose changes a player can see: tap the
+BET window and check the levels are the platform's own for that currency, and leave a bonus
+half way through and reload. **That reload is the live confirmation TR-099 is waiting on.**
+The walkthrough says plainly that the prompt NOT appearing is the useful result rather than a
+failure, and that the round settles and pays either way. An owner told what a negative result
+means reports one; an owner told only what success looks like assumes they did it wrong.
+
+**Left for the owner, deliberately:** `~/Desktop/FS_UPLOAD_KIT/` and `FS_UPLOAD_KIT_V7/` are
+both still on the Desktop and both dead. Not deleted by this pass, because that is the
+owner's machine; PART 9g asks for it at step 7.
+
+
+## Rule 10 closing link
 
 This session's final push, BOTH JOBS GREEN:
 `https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30197391943`
@@ -5678,11 +5718,9 @@ range is the incompleteness Q-29 and Q-33 exist to correct.
 
 **Model and effort.** Opus 5 at high effort, integrator on `main`.
 
-**Kit V8 assembles in the records pass after this merges**, per the brief. It should carry
-JOBS 2 and 3: the max-win hold fixes and the bet selector are player-visible and are the
-first player-visible changes since V7 was built. `docs/records/V7_RECONCILIATION.md` section
-1 is the list of what V7 could not show, and the V8 kit closes the two largest entries by
-shipping rather than by argument.
+**Kit V8 is BUILT**, at `e0c30611`, carrying JOBS 2, 3 and 4. See the records pass section
+above. What remains is the owner's: upload it and run PART 9g, whose LOOK half is the live
+confirmation TR-099 is waiting on.
 
 **TR-099, feature resume, is DONE.** Designed, built, both matrices green and in CI. What
 remains on it is the owner's: live confirmation at the portal, below.
