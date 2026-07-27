@@ -100,7 +100,14 @@
     <div class="progress-track">
       <div class="progress-fill" style="width: {$assetLoadProgress}%"></div>
     </div>
-    <p class="progress-label">LOADING CYBERNETICS... {$assetLoadProgress}%</p>
+    <!-- The percentage sits in its own fixed-width box so the text before it
+         cannot shift as the number counts 0 to 100. It needs one because
+         Orbitron's digits are NOT equal width (measured on the shipped woff:
+         "1" is 391 units against "0" at 834, a 443/1000 em spread) and the
+         `font-variant-numeric: tabular-nums` below is INERT against it, since
+         that property maps to the OpenType `tnum` feature and Orbitron ships no
+         GSUB features at all. See QUALITY_CHARTER.md Q-23. -->
+    <p class="progress-label">LOADING CYBERNETICS... <span class="progress-pct">{$assetLoadProgress}</span>%</p>
 
   </div>
 </div>
@@ -194,14 +201,32 @@
   .progress-label {
     /* The boot progress label is the FIRST text a player reads, and it was set
        in Courier New: not the brand face, and on a device without Courier New
-       it is whatever the generic monospace happens to be. Orbitron leads now
-       and the monospace chain stays behind it for the tabular figures.
-       QUALITY_CHARTER.md Q-15. */
+       it is whatever the generic monospace happens to be. Orbitron leads now.
+       QUALITY_CHARTER.md Q-15.
+
+       CORRECTED 2026-07-27, and the correction is the point. This comment used
+       to end "and the monospace chain stays behind it for the tabular figures".
+       That was wrong twice over. A fallback stack only participates when the
+       leading family is UNAVAILABLE, so once Orbitron loads the tail renders
+       nothing; and `font-variant-numeric` below is INERT against Orbitron
+       regardless, because it maps to the OpenType `tnum` feature and Orbitron
+       ships no GSUB features at all. Putting Orbitron first therefore removed
+       the only thing keeping these digits steady, which is why the percentage
+       now sits in its own fixed-width box in the markup. QUALITY_CHARTER.md
+       Q-23. */
     font-family: 'Orbitron', 'Courier New', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: rgba(0, 255, 255, 0.5);
     font-variant-numeric: tabular-nums;
+  }
+  /* 3ch reserves the width of "100" in the current face, so the label's text
+     cannot move as the number grows. Right-aligned so the digits settle against
+     the per cent sign rather than drifting away from it. */
+  .progress-pct {
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
   }
 
   /* Opacity only. The 8px translateY these two carried is what made the
