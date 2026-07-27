@@ -33,6 +33,8 @@ def decompress(input_path: str, save_output: bool = False):
 
 if __name__ == "__main__":
 
-    test_file = "games/0_0_lines/library/publish_files/books_base.jsonl.zst"
+    # Repointed 2026-07-28 (TR-088): the sample game this named was removed.
+    # Read-only utility, so pointing it at the shipping package is safe.
+    test_file = "games/future_spinner/library/publish_files/books_base.jsonl.zst"
     decompress(test_file, save_output=True)
     print(f"Decompressed file: {test_file}\nNo errors parsing JSON.")

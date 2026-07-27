@@ -29,6 +29,7 @@ def run(game: str, mode: str):
 
 if __name__ == "__main__":
 
-    game_id = "0_0_lines"
+    # Repointed 2026-07-28 (TR-088): the sample game this named was removed.
+    game_id = "future_spinner"
     game_mode = "base"
     run(game_id, game_mode)

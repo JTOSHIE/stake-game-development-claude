@@ -60,7 +60,11 @@ def run(game_id: str, swap_key: str, mode_cost: float, plot_overlay=False, overr
 
 if __name__ == "__main__":
 
-    GAME_ID = "0_0_lines_feature_match"
+    # TR-088, 2026-07-28. This named a sample game that has been removed, and it
+    # is deliberately NOT repointed at future_spinner: run() WRITES merged lookup
+    # tables, and that package is locked with frozen published tables. Set this
+    # explicitly to whatever you are actually merging, having read run() first.
+    GAME_ID = ""  # set me
     BASE_COST = 1.0
     FREEGAME_KEY = "freegame"
 

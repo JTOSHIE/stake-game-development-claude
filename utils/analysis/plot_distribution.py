@@ -56,5 +56,6 @@ if __name__ == "__main__":
     parser.add_argument("-o", dest="optimized", nargs="+")
     args = parser.parse_args()
 
-    # run("0_0_scatter", "bonus", [1, 2])
+    # Repointed 2026-07-28 (TR-088): the sample game this named was removed.
+    # run("future_spinner", "bonus", [1, 2])
     run(args.gameid, args.mode, args.optimized)

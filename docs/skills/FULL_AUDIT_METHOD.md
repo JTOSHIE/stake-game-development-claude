@@ -155,6 +155,19 @@ nothing. The framework set the title through `<svelte:head>`, which never mentio
 `document.title`. The finding was real; the severity was wrong. **The grep was the wrong
 instrument.** When a search returns nothing, ask whether it could have returned something.
 
+**And it happened AGAIN, in the session that wrote this document, which is the strongest
+argument for the rule.** Before deleting nine directories, a reference check searched **three
+of the nine names** and reported clean. The deletion went ahead. A wider check completing
+afterwards found **six developer utilities whose example defaults named the other six**, four
+of them executable defaults that would have failed on first run. Nothing shipped was
+affected, and the fix was small, but the deletion had been called safe on a search that could
+not have found the answer.
+
+**Two rules follow, and the second is the cheap one.** For a DESTRUCTIVE action, enumerate the
+full set of names first and search for **every one of them**, not a representative sample. And
+**let the slow check finish before acting**, rather than acting on a faster narrower one: the
+wide search was already running when the narrow one was used to justify the deletion.
+
 ### 2.6 Test your instrument before parking a class
 
 If you cannot fix a class now and intend to PARK it, the park is only honest if its
