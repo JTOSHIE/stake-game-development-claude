@@ -5219,3 +5219,22 @@ still writing into committed evidence) remain open and are both awaiting a rulin
 sentence-case half of the hardcoded-string class is still parked at
 `docs/QUALITY_CHARTER.md` 4.3, whose completeness claim was corrected. Audio, social-mode
 capture, accessibility and animation quality remain unswept, per 5.3.
+
+---
+
+## Rule 10 closing
+
+**Final push `7e9dac2`, run 30277530749, GREEN on both jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30277530749
+
+This one carries every change the session made through the REMOTE runner, including the two
+NEW browser steps for TR-089: the seeded self-test that must reproduce the 141.8px drift
+without the fix, and the gate that must measure 0.00px with it. Both passed on a different
+machine with a different font cache, which is the point of running them there.
+
+**One `cancelled` run, named rather than left to be classified.** Run 30277410570 on `0ff5022`
+shows cancelled: `concurrency: cancel-in-progress` killed it when the session-report commit
+landed seconds later. Its static job had already reported success, and its content is carried
+by the closing run above, which is a descendant. Rule 9's discipline is that an unexplained
+non-green is treated as real, and that is only worth something if the explainable ones are
+explained by name.
