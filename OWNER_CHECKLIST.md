@@ -1,6 +1,7 @@
 # OWNER CHECKLIST
 
-**The anti-forgetting document.** Seven things that are yours, not the build's. Nothing here
+**The anti-forgetting document.** Seven things that are yours, not the build's, plus an item zero that is
+simply a promise about your preview. Nothing here
 can be done by a session; every one needs you, a portal login, a phone camera or a
 conversation.
 
@@ -16,6 +17,22 @@ them change what you are looking for:
 2. USPTO **is** recorded in the repository, as your own attestation from 2026-07-23. What is
    missing is the evidence behind it. Detail in item 5.
 3. ABN, GST and the accountant are **one** register row, not three. Detail in item 7.
+
+---
+
+## 0. Your local preview looks after itself now
+
+**Nothing to do. This is a promise, not a task.** It is item zero because it changes what you
+can assume about the other seven.
+
+**Your preview at `http://192.168.4.92:5173` is now always the latest `main` after any
+session closes.** It is refreshed for you as part of every session's close, per protocol rule
+12, so you never need to pull, rebuild or restart anything to see current work.
+
+**If the SHA printed in the newest session report ever disagrees with what your preview
+shows, tell the builder rather than debugging it yourself.** That disagreement is a fault in
+the mechanism and it is ours to fix; chasing it costs you time and tells us less than simply
+being told.
 
 ---
 

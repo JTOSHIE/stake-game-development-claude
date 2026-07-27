@@ -52,3 +52,8 @@ worktrees/
 # Convention (h.1): proof and gate scripts write here, never into committed
 # evidence directories. See frontend/scripts/lib/evidencePaths.mjs.
 .evidence-scratch/
+
+# The owner's local preview server, per rule 12. Holds the pidfile that lets a
+# run stop exactly the instance the PREVIOUS run started, and that server's log.
+# Machine state, never repository state: it names a pid on one machine.
+.owner-preview/

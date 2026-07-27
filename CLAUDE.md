@@ -371,6 +371,9 @@ lives in `App.svelte` behind `import.meta.env.DEV`; reversible by removing those
 **(a) Session report.** At the end of every session write `reports/SESSION_REPORT.md`
 summarising what ran, what changed, verification results and anything needing owner
 attention. Copy it to `reports/archive/<date>_<topic>.md`. Commit and push both.
+**A session that landed anything on `main` runs `npm run owner:preview` first, per
+rule 12, and pastes the printed version line into the report; if it could not be
+refreshed, the report says so in its own line.**
 
 **(b) Pasted briefs.** When executing a pasted brief, first save it verbatim as its named
 prompt file and include that file in the session's commits. **From 2026-07-25 briefs are
@@ -660,6 +663,32 @@ files of someone else's uncommitted work at risk. That track used a worktree
 instead, unprompted, and reported the gap. Rule 1 made `main` single-writer for
 the BRANCH; it never said anything about the working tree, and a shared working
 tree is a shared mutable resource that rule 1 does not protect. This closes that.
+
+**12. The owner's local preview is always current main** (owner's order,
+2026-07-28, from reports/briefs/FS_OWNER_PREVIEW_RULE_Prompt.md).
+
+The owner's order in his own words: *whenever main changes, the owner's local
+copy is already fresh, never stale, never his job to refresh.*
+
+- **Any session that lands a change on main runs `npm run owner:preview` as part
+  of its close, BEFORE the session report**, and records the printed version
+  line in that report. Before, not after, because the line is evidence and a
+  report written first would be describing an intention.
+- **Track sessions never touch the owner preview.** Single writer applies to it
+  exactly as it applies to `main`: one designated checkout, one server, one
+  session refreshing it. `scripts/owner_preview.mjs` refuses to run in a linked
+  worktree by inspecting the git dir rather than trusting the caller.
+- **If the preview cannot be refreshed, the session report says so in its own
+  line.** Machine constraints, a dirty tree, a failed start: any of them is
+  recorded plainly rather than silently leaving a stale server up. A preview
+  nobody has said is stale is worse than no preview, because the owner trusts it.
+
+The script stops ONLY the instance it previously started, tracked by a pidfile
+under the gitignored `.owner-preview/`, matched on pid AND process start time so
+a recycled pid can never be mistaken for ours. It never guesses at processes.
+It refuses a dirty tree and reports it in full rather than discarding work. It
+leaves nothing half-started: a failure after the server spawns reaps it first.
+
 
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
