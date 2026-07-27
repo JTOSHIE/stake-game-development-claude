@@ -11,8 +11,29 @@
   import { isSocial } from '../stores/socialMode'
   import { locale } from '../stores/gameStore'
   import { t, type GameMode } from '../i18n/translations'
+  import { setModalOpen } from '../stores/modalGuard'
 
   export let show: boolean = false
+
+  // MAX-WIN HOLD (owner's order, 2026-07-28). This overlay is a blocking
+  // surface and now says so itself, like every other one.
+  //
+  // It was the only blocking surface in the build that did NOT register. The
+  // things that suppress themselves during the hold did it by naming `$isWincap`
+  // in a hand-maintained list inside App.svelte, which is exactly the
+  // arrangement modalGuard.ts was created to end: its own header records that a
+  // hand-maintained list in one file cannot see private state in another and was
+  // always going to drift. Registering here inverts the dependency for this
+  // surface too, so anything added tomorrow that honours `anyModalOpen` honours
+  // the max-win hold for free rather than by being told about it.
+  //
+  // NOTHING REGRESSES, checked rather than assumed: `anyModalOpen` has exactly
+  // two production readers. The autoplay scheduler's fire-time re-check re-arms
+  // instead of spinning, which is the wanted behaviour and is strictly safer
+  // here; and the spacebar handler already returned early on `$isWincap`, so
+  // this is belt and braces there and changes nothing.
+  $: setModalOpen('max-win', show)
+  onDestroy(() => setModalOpen('max-win', false))
 
   $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
 
@@ -57,6 +78,22 @@
   function handleKey(e: KeyboardEvent): void {
     if (show && e.key === 'Enter') collect()
   }
+
+  // FOCUS, so ENTER means exactly one thing. The overlay declares
+  // `aria-modal="true"` but the stage behind it is not inert, so whatever the
+  // player last focused stays focused and reachable underneath. ENTER then did
+  // two things at once: this window handler collected, and the browser's own
+  // default activated the focused background control in the same keystroke.
+  //
+  // Moving focus onto COLLECT the moment the overlay raises makes the key
+  // unambiguous and puts the keyboard player on the one control the owner's
+  // rule says can dismiss this. A full focus trap plus `inert` on the stage is
+  // the complete answer and is NOT done here: it is an accessibility change
+  // across a surface this job did not otherwise touch, and the audit method
+  // already names accessibility as an unrun wave. Recorded rather than
+  // half-done.
+  let collectBtn: HTMLButtonElement | null = null
+  $: if (show && collectBtn) collectBtn.focus()
 
   function collect(): void {
     dispatch('collect')
@@ -122,7 +159,7 @@
         <span class="c1-max-betlabel">{t($locale, 'bet', localeMode)}</span>
       </div>
 
-      <button class="c1-collect collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">
+      <button class="c1-collect collect-btn" bind:this={collectBtn} on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">
         {t($locale, 'collect', localeMode)}
       </button>
 

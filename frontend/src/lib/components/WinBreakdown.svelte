@@ -23,6 +23,24 @@
     return SYMBOL_IDS[id] ?? raw
   }
 
+  /**
+   * Stop cycling and stay down. MAX-WIN HOLD (owner's order, 2026-07-28).
+   *
+   * This component cycles its win groups on a 1400ms `setInterval` that has no
+   * natural end: it runs for as long as `activeWins` is non-empty and the reels
+   * are not spinning, and BOTH of those hold for the whole of a max-win hold.
+   * So a capped round left an interval ticking underneath the celebration for
+   * as long as the player looked at it, which is the owner's "nothing
+   * progresses behind it" rule broken by a component the overlay hides.
+   *
+   * The precedent is one line above this component's own mount in App.svelte:
+   * `<WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />` already
+   * carries the comment "Suppress standard celebration while the max-win
+   * overlay is active". WinBreakdown sat next to it and was never given the
+   * same treatment.
+   */
+  export let suppressed = false
+
   let cycleIndex = 0
   let cycleTimer: ReturnType<typeof setInterval> | null = null
   let settleTimer: ReturnType<typeof setTimeout> | null = null
@@ -31,7 +49,7 @@
   $: groups = $activeWins
 
   // Let the plate-bloom/particle burst read first (900ms), then start cycling.
-  $: if (groups.length > 0 && !$isSpinning) {
+  $: if (groups.length > 0 && !$isSpinning && !suppressed) {
     if (!visible && !settleTimer) {
       settleTimer = setTimeout(() => {
         settleTimer = null

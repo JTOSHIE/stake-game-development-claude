@@ -546,6 +546,12 @@ jobs:
             run: node scripts/scrim_coverage_gate.mjs --self-test && node scripts/scrim_coverage_gate.mjs
           - name: "browser: win count-up steady"
             run: node scripts/win_countup_steady_gate.mjs --self-test && node scripts/win_countup_steady_gate.mjs
+          # The slowest leg by design: it holds a real capped round for thirty
+          # seconds, which is the owner's own figure and the whole point of the
+          # assertion. The seeded runs watch for twelve seconds each, because
+          # both seeds fire at four and the detector is what is being proved.
+          - name: "browser: max-win hold"
+            run: node scripts/max_win_hold_gate.mjs --self-test && node scripts/max_win_hold_gate.mjs
 
     steps:
       - name: Check out

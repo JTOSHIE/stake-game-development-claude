@@ -9,7 +9,7 @@
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
-    isMuted, showPaytable, winAmount, winMultiplier, locale,
+    isMuted, showPaytable, winAmount, winMultiplier, locale, isWincap,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
   import {
@@ -320,6 +320,25 @@
     }
   }
 
+  // MAX-WIN HOLD (owner's order, 2026-07-28). A capped round settles and raises
+  // the celebration in the same beat that starts this count-up, so the HUD WIN
+  // figure went on ticking up underneath the overlay. Measured by
+  // `max_win_hold_gate.mjs` before this guard existed: the readout was
+  // "$3,841.92" at the moment the celebration mounted and "$5,000.00" thirty
+  // seconds later. Small, invisible, and still a state transition behind a
+  // surface the owner has said must hold with nothing moving behind it.
+  //
+  // Snapped rather than paused. The figure is already settled; the tween is
+  // presentation of a number that is not in doubt, and there is no player to
+  // show it to while an opaque overlay covers it. Snapping also ends the
+  // requestAnimationFrame loop rather than leaving it running for the length of
+  // a hold that is allowed to last forever.
+  $: if ($isWincap && winCountUpFrame !== null) {
+    cancelAnimationFrame(winCountUpFrame)
+    winCountUpFrame = null
+    displayedWinAmount = $winAmount
+  }
+
   onDestroy(() => {
     if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
     if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
@@ -431,7 +450,7 @@
     <button
       class="p-spin"
       class:spinning={$isSpinning}
-      disabled={$isSpinning ? false : !$canSpin}
+      disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
       on:click={handleSpin}
       aria-label={$tr('spin')}
       data-testid="spin-button"
@@ -585,7 +604,7 @@
     class:spinning={$isSpinning}
     data-testid="spin-button"
     on:click={handleSpin}
-    disabled={$isSpinning ? false : !$canSpin}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
     aria-label={$tr('spin')}
   >
     {#if $isSpinning}
@@ -727,7 +746,7 @@
   <button
     class="c-spin"
     class:spinning={$isSpinning}
-    disabled={$isSpinning ? false : !$canSpin}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
     on:click={handleSpin}
     aria-label={$tr('spin')}
     data-testid="spin-button"
@@ -870,7 +889,7 @@
   <button
     class="fs-spin"
     class:spinning={$isSpinning}
-    disabled={$isSpinning ? false : !$canSpin}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
     on:click={handleSpin}
     aria-label={$tr('spin')}
     data-testid="spin-button"

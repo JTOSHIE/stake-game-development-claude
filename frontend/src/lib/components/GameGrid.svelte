@@ -30,7 +30,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { Application, Graphics } from 'pixi.js'
-  import { boardSymbols, activeWins, isSpinning, isTurbo } from '../stores/gameStore'
+  import { boardSymbols, activeWins, isSpinning, isTurbo, isWincap } from '../stores/gameStore'
   import CellModifier from './CellModifier.svelte'
   import { cellMultipliers } from '../stores/cellMultipliers'
   import { speedTier } from '../stores/speedMode'
@@ -743,7 +743,19 @@
       }
     }
 
-    winBurstTimer = setTimeout(() => {
+    // MAX-WIN HOLD (owner's order, 2026-07-28). This 4000ms teardown strips
+    // win-flash, plate-bloom and loser-dim off every cell, and on a capped
+    // round it landed roughly 1.4 seconds INTO the hold: the celebration raises
+    // 2600ms after the same `activeWins` write that arms this timer. So the
+    // winning board the max-win overlay is layered over was quietly dismantled
+    // underneath it, and a player who dwelt on the celebration for thirty
+    // seconds collected onto a board with no win presentation left on it.
+    //
+    // Re-armed rather than cancelled, so the teardown still happens, just not
+    // while the player is being shown the win it belongs to. Same shape as the
+    // autoplay scheduler's own fire-time re-check.
+    const armWinBurstTeardown = () => setTimeout(() => {
+      if (get(isWincap)) { winBurstTimer = armWinBurstTeardown(); return }
       for (let col = 0; col < REELS; col++) {
         for (let row = 0; row < ROWS; row++) {
           const img     = visImg(col, row)
@@ -755,6 +767,7 @@
         }
       }
     }, 4000)
+    winBurstTimer = armWinBurstTeardown()
   }
 
   function _resetToIdle(): void {

@@ -372,6 +372,28 @@
   // every new spin.
   let lastRoundHadFeature = false
 
+  // MAX-WIN HOLD (owner's order, 2026-07-28). True for the whole of a wincap
+  // round, set the moment the celebration raises and cleared at the top of the
+  // next spin exactly like `lastRoundHadFeature` above.
+  //
+  // WHY IT IS A ROUND-LONG FLAG AND NOT `$isWincap`. The App-level WinBanner's
+  // reactive path fires on `$winMultiplier >= BIG_WIN_THRESHOLD`, and a wincap
+  // is 5,000x, so it fired for every capped round. `lastRoundHadFeature` is
+  // false on the wincap path (its `deferSettle` is false), so nothing suppressed
+  // it: the banner animated its count-up and AUTO-DISMISSED on its own timer
+  // underneath the z150 celebration, which is the owner's "nothing progresses
+  // behind it" rule broken by a component the player cannot even see.
+  //
+  // Suppressing on `$isWincap` alone would have MOVED the defect rather than
+  // fixed it. `handleWincapCollect()` clears `isWincap` before resolving, so the
+  // banner's guard would have gone false the instant the player collected and
+  // the banner would have popped over the walkthrough that follows, with
+  // `lastShownWin` never set to stop it. The round is the correct scope: a
+  // capped round already has TWO celebrations of its own, MaxWinCelebration and
+  // then the total-win summary at the end of the walkthrough, so the generic
+  // big-win banner has nothing left to say at any point in it.
+  let lastRoundWasWincap = false
+
   // ── Wincap flow ────────────────────────────────────────────────────────────
   // MaxWinCelebration shows immediately (reactive to $isWincap, unchanged). On
   // COLLECT, present the complete round sequence through the interpreter (the
@@ -533,10 +555,33 @@
   // below); it must never be assumed to be 'bonus'.
   async function handleBuy(mode: BetMode = 'bonus'): Promise<void> {
     if ($isSpinning || featureActive) return
+    // MAX-WIN HOLD (owner's order, 2026-07-28). THE INVARIANT, guarded at the
+    // action rather than at each control, because the controls only ever
+    // stopped a POINTER.
+    //
+    // `isSpinning` is already FALSE while the celebration holds: GameGrid
+    // clears it when the reels land, well before the 2600ms dwell and before
+    // the settle that raises the overlay. The balance has just been credited a
+    // 5,000x win, so `canSpin` is true, the SPIN button is `disabled=false`,
+    // and it is still tabbable under the z150 scrim. A player who started the
+    // round by clicking SPIN still has it focused, and SPACE or ENTER on a
+    // focused button is activated by the BROWSER. App.svelte's own keydown
+    // handler cannot prevent that, because every one of its guards returns
+    // BEFORE it reaches `e.preventDefault()`.
+    //
+    // MEASURED, not argued. `max_win_hold_gate.mjs` focuses the SPIN button
+    // mid-hold and presses SPACE then ENTER. Before this line it recorded one
+    // /wallet/play and one /wallet/end-round during the hold, the WIN readout
+    // reset from $5,000.00 to $0.00, and the celebration vanished with no
+    // COLLECT: the new round's settle calls `isWincap.set(false)`
+    // unconditionally, and the first round's promise was then left with no
+    // resolver at all, so that round could never finish.
+    if ($isWincap) return
     if ($bettingDisabled) return   // R2: no bet may be placed off a live session
     isSpinning.set(true)
     resetWin()
     lastRoundHadFeature = false
+    lastRoundWasWincap = false
     const bet = $betAmount
     // Route through integer micros before this reaches any balance/telemetry
     // math (CLAUDE.md's zero-float-tolerance rule) - a raw `bet * cost` float
@@ -634,6 +679,7 @@
       // sequence, finishing on the total win summary. Otherwise, the normal
       // (non-capped) feature presentation plays immediately as before.
       if ($isWincap) {
+        lastRoundWasWincap = true
         await waitForWincapCollect()
         if (script) await presentFeature(script)
       } else if (script?.triggered) {
@@ -1267,6 +1313,28 @@
 
   async function handleSpin() {
     if ($isSpinning || featureActive) return
+    // MAX-WIN HOLD (owner's order, 2026-07-28). THE INVARIANT, guarded at the
+    // action rather than at each control, because the controls only ever
+    // stopped a POINTER.
+    //
+    // `isSpinning` is already FALSE while the celebration holds: GameGrid
+    // clears it when the reels land, well before the 2600ms dwell and before
+    // the settle that raises the overlay. The balance has just been credited a
+    // 5,000x win, so `canSpin` is true, the SPIN button is `disabled=false`,
+    // and it is still tabbable under the z150 scrim. A player who started the
+    // round by clicking SPIN still has it focused, and SPACE or ENTER on a
+    // focused button is activated by the BROWSER. App.svelte's own keydown
+    // handler cannot prevent that, because every one of its guards returns
+    // BEFORE it reaches `e.preventDefault()`.
+    //
+    // MEASURED, not argued. `max_win_hold_gate.mjs` focuses the SPIN button
+    // mid-hold and presses SPACE then ENTER. Before this line it recorded one
+    // /wallet/play and one /wallet/end-round during the hold, the WIN readout
+    // reset from $5,000.00 to $0.00, and the celebration vanished with no
+    // COLLECT: the new round's settle calls `isWincap.set(false)`
+    // unconditionally, and the first round's promise was then left with no
+    // resolver at all, so that round could never finish.
+    if ($isWincap) return
     if ($bettingDisabled) return   // R2: no bet may be placed off a live session
 
     if (import.meta.env.DEV && _antDemo) {
@@ -1291,6 +1359,7 @@
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
     lastRoundHadFeature = false
+    lastRoundWasWincap = false
     // This round was not bought, so the result banner carries no price line.
     // Cleared on the next SPIN rather than on banner dismissal: see
     // stores/boughtRound.ts for why the lifetime is tied to the round rather
@@ -1407,6 +1476,7 @@
       if (!deferSettle) settleRound()
 
       if ($isWincap) {
+        lastRoundWasWincap = true
         await waitForWincapCollect()
         if (script) await presentFeature(script)
       } else if (script?.triggered) {
@@ -1428,8 +1498,22 @@
           betMicros: Math.round(bet * CURRENCY_SCALE),
           triggered: !!script?.triggered,
         })
-        // Stop auto-play immediately on wincap, player must manually collect
-        if ($autoPlayCount <= 0 || $isWincap || rg.stop) {
+        // Stop auto-play immediately on wincap, player must manually collect.
+        //
+        // READS `roundIsWincap`, NOT `$isWincap`, and the difference is not
+        // cosmetic. This line runs AFTER `await waitForWincapCollect()` above,
+        // and `handleWincapCollect()` sets `isWincap` false before it resolves
+        // that promise, so `$isWincap` was ALWAYS false by the time it was
+        // tested here. The wincap term was dead from the day it was written.
+        //
+        // It never showed, because a capped round is 5,000x and the `>= 100`
+        // epic branch below stopped autoplay anyway. So this was a correct
+        // outcome reached by an accident, one edit away from becoming a real
+        // defect: anything that lowered the epic threshold, or a jurisdiction
+        // ladder where the cap lands under it, and autoplay would have carried
+        // straight on from a max win. `roundIsWincap` is the round's own fact
+        // and is not mutated by the collect handler.
+        if ($autoPlayCount <= 0 || roundIsWincap || rg.stop) {
           isAutoPlay.set(false)
           autoPlayCount.set(0)
         } else {
@@ -1778,8 +1862,11 @@
           <GameGrid bind:this={gridRef} idleAttract={idleAttractActive} />
           <!-- Suppress standard celebration while the max-win overlay is active -->
           <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
-          <!-- Ways breakdown, cycles group by group after the win burst settles -->
-          <WinBreakdown />
+          <!-- Ways breakdown, cycles group by group after the win burst settles.
+               Suppressed on a capped round for the same reason as the line
+               above: its 1400ms cycle has no natural end and would otherwise
+               tick for the whole of the max-win hold. -->
+          <WinBreakdown suppressed={$isWincap} />
           <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
           <FreeSpinsPresentation
             bind:this={featureRef}
@@ -1800,7 +1887,7 @@
       </div>
 
       <!-- BANNER, full-width neon band, edge to edge across the stage, z100 -->
-      <WinBanner suppressed={lastRoundHadFeature} />
+      <WinBanner suppressed={lastRoundHadFeature || lastRoundWasWincap} />
 
       <!-- FEATURE-END CELEBRATION, WIN BANNER V3 reuse (OWNER AUDIT ROUND 2,
            item 1/2): the exact same component, driven explicitly by

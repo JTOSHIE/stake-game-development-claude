@@ -164,9 +164,14 @@
         featureActive = true
         await new Promise<void>((resolve) => { featureResolve = resolve })
         winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
-        isWincap.set(wincapNow)
+        // MAX-WIN HOLD (owner's order, 2026-07-28): the terminal splash is
+        // raised LAST, after the replay has already finished. Raising it before
+        // the phase change left the overlay sitting over a replay that then
+        // completed underneath it. Same reordering as the ordinary-round branch
+        // below, where the gap was two seconds wide rather than one tick.
         phase = 'complete'
         replayPhase.set('complete')
+        isWincap.set(wincapNow)
         return
       }
 
@@ -217,13 +222,27 @@
       scatterCount.set(base.scatterCount)
       // winAmount drives the derived winMultiplier (winAmount / betAmount)
       winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
-      isWincap.set(wincapNow)
 
       // Let win-line and celebration animations complete
       await new Promise((r) => setTimeout(r, 2000))
 
       phase = 'complete'
       replayPhase.set('complete')
+
+      // MAX-WIN HOLD (owner's order, 2026-07-28). This raise USED TO SIT ABOVE
+      // the two seconds and the phase change, which is the owner's rule broken
+      // on a mandatory approval surface: the celebration came back up after the
+      // player had already collected it once, with nothing awaiting a second
+      // COLLECT, and the replay then ran to completion behind it. A reviewer
+      // watching Bet Replay saw a max-win splash that had quietly become the
+      // end of the round while it was still on screen.
+      //
+      // Raised LAST instead of deleted, because ending a capped replay on the
+      // max-win screen is a reasonable terminal state and this file's own
+      // comment above says the presentation finishes on the summary. Now both
+      // are true: the summary settles, the replay completes, and only then does
+      // the splash come up, with nothing left to run underneath it.
+      isWincap.set(wincapNow)
     } catch (e: any) {
       isSpinning.set(false)
       error = e?.message ?? 'Playback failed.'
