@@ -404,6 +404,57 @@ function scanMoney(files) {
   return out
 }
 
+
+/**
+ * CROSS-SURFACE CASING (sweep class 4), added 2026-07-28 for TR-092.
+ *
+ * The mandate names "capitalisation that changes between two screens showing the
+ * same word". The charter recorded class 4 as only PARTLY covered because it
+ * needs the rendered DOM. This closes the specific, ruled instance statically,
+ * which is the part that can be pinned without a browser.
+ *
+ * THE DEFECT IT PINS: every surface takes its mode name from ONE source,
+ * `modeLabel()` in src/lib/config/fsModes.ts, and the specification spells it
+ * `Cruise`. The HUD badge carried `text-transform: uppercase` at three layout
+ * profiles and the features menu, the paytable row and the buy dialog did not,
+ * so the same mode read `Cruise` on three screens and `CRUISE` on a fourth. One
+ * CSS property, four surfaces, and no gate saw it.
+ *
+ * A transform on a mode badge is therefore forbidden: the source of truth is the
+ * specification's own spelling, and a surface that restyles it is the outlier.
+ */
+const MODE_BADGE_SELECTOR = /\.[a-z-]*mode-badge\b/
+function scanCasingTransforms(files) {
+  const out = []
+  for (const p of files) {
+    let src
+    try { src = readFileSync(p, 'utf-8') } catch { continue }
+    const rel = relative(ROOT, p)
+    const lines = src.split('\n')
+    let inRule = false
+    let ruleLine = 0
+    let selector = ''
+    lines.forEach((line, i) => {
+      if (MODE_BADGE_SELECTOR.test(line) && line.includes('{')) {
+        inRule = true; ruleLine = i + 1; selector = line.trim().replace(/\{.*$/, '').trim()
+      }
+      if (inRule && /text-transform\s*:\s*(uppercase|lowercase|capitalize)/.test(line) && !isComment(line)) {
+        out.push({
+          klass: 'cross-surface-casing',
+          file: rel,
+          line: i + 1,
+          detail: `a mode badge restyles its casing (rule "${selector}" opened at line ${ruleLine}). `
+            + 'Every surface renders the same modeLabel(), so a transform here makes one screen '
+            + 'disagree with three. Remove it and let the specification spelling stand.',
+          text: line.trim().slice(0, 110),
+        })
+      }
+      if (inRule && line.includes('}')) inRule = false
+    })
+  }
+  return out
+}
+
 // ── Reporting ────────────────────────────────────────────────────────────────
 function report(label, findings) {
   if (!findings.length) {
@@ -504,6 +555,13 @@ if (process.argv.includes('--self-test')) {
       why: 'Q-11, player money via .toFixed(), the form ledger row SA-022 reported',
     },
     {
+      name: 'mode-badge-casing.svelte',
+      body: '<style>\n  .fs-mode-badge{\n    font-size:.5rem;\n'
+        + '    letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;\n  }\n</style>\n',
+      run: (p) => scanCasingTransforms([p]),
+      why: 'TR-092, the exact rule that made the HUD badge read CRUISE while three other surfaces read Cruise',
+    },
+    {
       name: 'double-space.svelte',
       body: '<p>All matching symbol positions count,  with no fixed paylines.</p>\n',
       run: (p) => scanDoubleSpaces([p]),
@@ -578,6 +636,12 @@ if (process.argv.includes('--self-test')) {
       why: 'the CANONICAL formatter must call toFixed(); it is the one exempt file',
     },
     {
+      name: 'clean-stat-label.svelte',
+      body: '<style>\n  .p-stat-label {\n    text-transform: uppercase;\n  }\n</style>\n',
+      run: (p) => scanCasingTransforms([p]),
+      why: 'a stat LABEL is not a mode name and may be styled freely; only mode badges are pinned',
+    },
+    {
       name: 'clean-one-form.ts',
       body: "\nconst fr: Translations = {\n  a: 'Ce jeu n’est pas disponible.',\n  b: 'La relecture d’une mise.',\n}\n",
       run: (p) => scanApostrophes(p),
@@ -622,6 +686,7 @@ const srcFindings = [
   ...scanDoubleSpaces(srcFiles),
   ...scanApostrophes(localeTable),
   ...scanMoney(srcFiles),
+  ...scanCasingTransforms(srcFiles),
 ]
 
 const srcOk = report(

@@ -1222,7 +1222,13 @@
   }
   .fs-mode-badge{
     font-family:'Orbitron',system-ui,monospace; font-size:.5rem; font-weight:800;
-    letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+    letter-spacing:.1em; white-space:nowrap;
+    /* text-transform: uppercase REMOVED 2026-07-28 (TR-092). It made the HUD
+       badge render CRUISE while the features menu, the paytable mode row and
+       the buy dialog all render Cruise, from the SAME modeLabel() source. The
+       specification's own spelling is `Cruise` (CLAUDE.md True game facts and
+       fsModes.ts), so the badge was the outlier. OVERBOOST and NITRO OVERDRIVE
+       are unaffected: they are already capitals in the specification. */
     padding:2px 7px; border-radius:999px;
   }
   .fs-mode-badge.overboost{
@@ -1867,7 +1873,12 @@
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
+    /* text-transform: uppercase REMOVED 2026-07-28 (TR-092). It made the HUD
+       badge render CRUISE while the features menu, the paytable mode row and
+       the buy dialog all render Cruise, from the SAME modeLabel() source. The
+       specification's own spelling is `Cruise` (CLAUDE.md True game facts and
+       fsModes.ts), so the badge was the outlier. OVERBOOST and NITRO OVERDRIVE
+       are unaffected: they are already capitals in the specification. */
     white-space: nowrap;
     padding: 2px 8px;
     border-radius: 999px;
@@ -2183,7 +2194,12 @@
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
+    /* text-transform: uppercase REMOVED 2026-07-28 (TR-092). It made the HUD
+       badge render CRUISE while the features menu, the paytable mode row and
+       the buy dialog all render Cruise, from the SAME modeLabel() source. The
+       specification's own spelling is `Cruise` (CLAUDE.md True game facts and
+       fsModes.ts), so the badge was the outlier. OVERBOOST and NITRO OVERDRIVE
+       are unaffected: they are already capitals in the specification. */
     white-space: nowrap;
     padding: 2px 8px;
     border-radius: 999px;
