@@ -198,12 +198,32 @@ contents were already on a pushed branch.
 ### 7b. Next-title template (applies to LUMEN, queued after Future Spinner submits)
 Reuse in order: maths package + validate_math + PAR -> wiring integrity audit pattern -> statelessness/replay evidence -> AssetForge + AudioForge (new seeds/prompts) -> rules/paytable/UI guide conformance -> QA soak + platform conformance suite (all scripts are reusable) -> math self-audit -> compliance watch -> dossier from this register's 3a-3d -> tile layers -> submit. Company layer (section 1) does not repeat; only per-title rows do.
 
+**This section owns the ORDER. `docs/RESKIN_BOUNDARY.md` owns the CONTENT of the fourth
+link**, `AssetForge + AudioForge (new seeds/prompts)`, which is the only link in the chain
+whose inputs are art. Added 2026-07-27. Three things in it qualify the line above, and they
+are pointers rather than restatements:
+
+- **"new seeds/prompts" is true of exactly one family.** Only AudioForge has a seed
+  (`BASE_SEED = 20260707`, `tools/audio_forge/generate.py:36`). AssetForge is
+  deterministic-by-construction with no seed at all, and the brand emblem has no recorded
+  seed, model version or generation date. See `RESKIN_BOUNDARY.md` 2.0, so a next-title
+  session does not go hunting for seeds that were never recorded.
+- **"all scripts are reusable" holds broadly, with named exceptions.** Scope and exceptions:
+  `RESKIN_BOUNDARY.md` Part 3, which lists the gates whose ASSERTIONS are title-specific
+  (`hud_banner_spec_check.mjs` against this title's locked stage coordinates,
+  `fsModes.drift.test.ts` against this title's maths package, and four others).
+- **The cost this one arrow currently hides.** `RESKIN_BOUNDARY.md` Part 4 ranks twelve
+  hard couplings. Read GAP 1 (roughly 400 colour literals across 19 files with no token
+  layer) and GAP 3 (five shipped assets with no master and no generator) BEFORE estimating a
+  next title, because neither is visible from this chain.
+
 ## 8. STANDING ANSWERS
 - User manual: none exists as a separate artefact anywhere on Stake; the in-game rules/paytable/UI guide is the user manual and a review requirement.
 - Technical docs for Stake: nothing beyond the uploaded math package and static frontend; internal evidence (3b) exists to answer reviewer questions and for our own verification discipline.
 - Gambling licence: WRS does not hold operator licences; games publish under Stake's operation via the Stake Engine ToS. Owner to confirm personal/company legal position with a professional (see 1).
 
 ## 9. CHANGE LOG
+- 2026-07-27 (ROUND-THREE PREP, the two unrun tracks executed on main): the prepared `track/quality-sweep` and `track/docs-reskin` briefs were never run as tracks, so their substance was executed on `main` by the integrator. Two new documents. **`docs/QUALITY_CHARTER.md`** is the document `CLAUDE.md`'s standing mandate has cited since it was recorded and which did not exist until now: it carries the mandate verbatim, states the Valkyrie benchmark in seven checkable properties against our own first-party captures of that publisher rather than as an adjective, and holds the nine-class machine-tell sweep list. Its sweep found 35 symbol glyphs shipping in `dist`, 31 of them player-visible, and `<title>future-spinner-frontend</title>`, the Vite starter's own package name, as the browser tab title on the live platform. Twenty-two findings, all dispositioned; enforced going forward by `frontend/scripts/machine_tell_gate.mjs` in the static CI job, whose ten seeded violations are all strings that were really in this repository. One item is parked and extracted per protocol rule 6 rather than half-done: about 35 keys times 16 locales of player-visible English that is still hardcoded, counted and listed in full so the surgical pass needs no rediscovery. **`docs/RESKIN_BOUNDARY.md`** is the engine-versus-skin inventory: a directory-by-directory classification, a nine-family skin register answering where, format and dimensions, pipeline and seed, and which gates must re-run, then twelve honest gaps ranked hardest first for post-submission. Section 7b above gains its pointer, and this row is that document's change-log entry. What `RESKIN_BOUNDARY.md` deliberately does NOT do: it does not schedule, does not restate the maths pipeline, and proposes no fixes for the gaps it names.
 - 2026-07-26 (MULTI-TRACK PROTOCOL V2): new sections 3e and 3f record the owner's multi-track protocol and the retro mechanism, mirroring the authoritative text in `CLAUDE.md`. `main` becomes single-writer with exactly one INTEGRATOR session; every other session works a `track/<name>` branch against a committed manifest at `docs/records/tracks/<name>.manifest` and delivers by pull request. Parallel tracks require provably disjoint scopes, checked by comparing manifests rather than hoped for. Enforced in CI by `scripts/qa/locked_paths_gate.mjs`, which now carries the track scope gate beside the locked-path rule and runs first. Two tracks opened: `track/docs-reskin` and `track/quality-sweep`, with their briefs written as paste-ready prompts in `docs/records/tracks/`. The walkthrough gained its authoritative SECOND VISIT section so the owner's portal visit is unblocked by nothing.
 - 2026-07-13: Document created (Fable). Statuses reflect main at PR #54 with PRs #52/#53 approved and awaiting merge.
 - 2026-07-14: Jobs 1-8 of the 2026-07-13 consolidated work order, and reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md, all merged to main via a full PR sweep (`reports/archive/2026-07-14_pr-merge-sweep.md`). Ten open PRs resolved to zero; locked files, frontend build and math validation all re-verified clean on the final merged main. Sections 3b/3c/3d above updated to reflect landed work. Two real findings surfaced during the sweep and JOB 6/7 prep, both still open: `SUBMISSION_BLURB.md` (repo root) is stale pre-Overdrive text contradicting the shipped game (3a); the provider logo requirement turns out to already be satisfied by the existing `brand_mark.svg` master, pending only a confirmation, not new art (3c). Remaining before submission: JOB 3b (math self-audit), JOB 5b (in-game rules conformance UI), JOB 9b (social-mode string audit), and the JOB 2 addendum's platform-conformance extensions (a-g) - none of these have started. 24 stale merged remote/local branches cleaned up in the same pass, preserving the two deliberately-named reference branches (`claude/collect-prototype`, `claude/gap-analysis`).
