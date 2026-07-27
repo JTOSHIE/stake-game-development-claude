@@ -3,7 +3,7 @@
   // Big wins (10×+) now handled by WinBanner.svelte (compact top banner)
   // Small wins (< 10×) show a brief non-blocking flash below
   import { onDestroy } from 'svelte'
-  import { isSocial } from '../stores/socialMode'
+  import { tr } from '../i18n/tr'
 
   export let winMultiplier: number = 0
 
@@ -29,7 +29,10 @@
 </script>
 
 {#if visible}
-  <div class="small-win-flash">{$isSocial ? 'PRIZE!' : 'WIN!'}</div>
+  <!-- Was the ternary, which did the social swap and dropped the locale swap.
+       `winFlash` is its own key rather than `win` plus an exclamation mark,
+       because the punctuation is not portable. TR-091. -->
+  <div class="small-win-flash">{$tr('winFlash')}</div>
 {/if}
 
 <style>

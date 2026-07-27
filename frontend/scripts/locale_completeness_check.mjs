@@ -122,8 +122,6 @@ const KNOWN_DEBT = new Set([
   'src/lib/components/FeatureMenu.svelte|GET FEATURES',
   'src/lib/components/FeatureMenu.svelte|BET MODES',
   'src/lib/components/FeatureMenu.svelte|PLAY MODES',
-  'src/lib/components/WinCelebration.svelte|WIN!',
-  'src/lib/components/WinCelebration.svelte|PRIZE!',
   // The enhancer toggle state.
   'src/lib/components/FeatureMenu.svelte|OFF',
   // The responsible-gambling session overlay.

@@ -34,6 +34,10 @@ export interface Translations {
   // ── HUD labels ────────────────────────────────────────────────────────────
   balance:              string
   win:                  string
+  /** The brief win flash. Its own key rather than win plus an exclamation mark,
+   *  because the punctuation is not portable: Japanese uses the fullwidth mark and
+   *  Spanish opens with an inverted one. Same convention as bigWin. */
+  winFlash:             string
   loading:              string
   /** Boot-screen flavour line under the brand mark. Sits beside `loading`, which is
    *  the plain form and is currently consumed by nothing. */
@@ -191,6 +195,7 @@ const en: Translations = {
   a11yFeatureMenu:      'Features and bet modes',
   balance:              'BALANCE',
   win:                  'WIN',
+  winFlash:             'WIN!',
   loading:              'Loading…',
   loadingDetail:        'LOADING CYBERNETICS…',
   buyBonus:             'BUY BONUS',
@@ -260,6 +265,7 @@ const ar: Translations = {
   a11yFeatureMenu:      'الميزات وأوضاع الرهان',
   balance:              'الرصيد',
   win:                  'ربح',
+  winFlash:             'ربح!',
   loading:              'جاري التحميل…',
   loadingDetail:        'جارٍ تحميل السيبرنتيك…',
   buyBonus:             'شراء المكافأة',
@@ -329,6 +335,7 @@ const de: Translations = {
   a11yFeatureMenu:      'Features und Einsatzmodi',
   balance:              'GUTHABEN',
   win:                  'GEWINN',
+  winFlash:             'GEWINN!',
   loading:              'Laden…',
   loadingDetail:        'KYBERNETIK WIRD GELADEN…',
   buyBonus:             'BONUS KAUFEN',
@@ -398,6 +405,7 @@ const es: Translations = {
   a11yFeatureMenu:      'Funciones y modos de apuesta',
   balance:              'SALDO',
   win:                  'GANANCIA',
+  winFlash:             '¡GANANCIA!',
   loading:              'Cargando…',
   loadingDetail:        'CARGANDO CIBERNÉTICA…',
   buyBonus:             'COMPRAR BONUS',
@@ -467,6 +475,7 @@ const fi: Translations = {
   a11yFeatureMenu:      'Ominaisuudet ja panostilat',
   balance:              'SALDO',
   win:                  'VOITTO',
+  winFlash:             'VOITTO!',
   loading:              'Ladataan…',
   loadingDetail:        'LADATAAN KYBERNETIIKKAA…',
   buyBonus:             'OSTA BONUS',
@@ -536,6 +545,7 @@ const fr: Translations = {
   a11yFeatureMenu:      'Fonctionnalités et modes de mise',
   balance:              'SOLDE',
   win:                  'GAIN',
+  winFlash:             'GAIN!',
   loading:              'Chargement…',
   loadingDetail:        'CHARGEMENT DE LA CYBERNÉTIQUE…',
   buyBonus:             'ACHETER BONUS',
@@ -605,6 +615,7 @@ const hi: Translations = {
   a11yFeatureMenu:      'फीचर और दांव मोड',
   balance:              'बैलेंस',
   win:                  'जीत',
+  winFlash:             'जीत!',
   loading:              'लोड हो रहा है…',
   loadingDetail:        'साइबरनेटिक्स लोड हो रहा है…',
   buyBonus:             'बोनस खरीदें',
@@ -674,6 +685,7 @@ const id: Translations = {
   a11yFeatureMenu:      'Fitur dan mode taruhan',
   balance:              'SALDO',
   win:                  'MENANG',
+  winFlash:             'MENANG!',
   loading:              'Memuat…',
   loadingDetail:        'MEMUAT SIBERNETIKA…',
   buyBonus:             'BELI BONUS',
@@ -743,6 +755,7 @@ const ja: Translations = {
   a11yFeatureMenu:      '機能とベットモード',
   balance:              '残高',
   win:                  '勝利',
+  winFlash:             '勝利！',
   loading:              '読み込み中…',
   loadingDetail:        'サイバネティクス読み込み中…',
   buyBonus:             'ボーナス購入',
@@ -812,6 +825,7 @@ const ko: Translations = {
   a11yFeatureMenu:      '기능 및 베팅 모드',
   balance:              '잔액',
   win:                  '당첨',
+  winFlash:             '당첨!',
   loading:              '로딩 중…',
   loadingDetail:        '사이버네틱스 로딩 중…',
   buyBonus:             '보너스 구매',
@@ -881,6 +895,7 @@ const pl: Translations = {
   a11yFeatureMenu:      'Funkcje i tryby zakładów',
   balance:              'SALDO',
   win:                  'WYGRANA',
+  winFlash:             'WYGRANA!',
   loading:              'Ładowanie…',
   loadingDetail:        'ŁADOWANIE CYBERNETYKI…',
   buyBonus:             'KUP BONUS',
@@ -950,6 +965,7 @@ const pt: Translations = {
   a11yFeatureMenu:      'Recursos e modos de aposta',
   balance:              'SALDO',
   win:                  'GANHO',
+  winFlash:             'GANHO!',
   loading:              'Carregando…',
   loadingDetail:        'CARREGANDO CIBERNÉTICA…',
   buyBonus:             'COMPRAR BÔNUS',
@@ -1019,6 +1035,7 @@ const ru: Translations = {
   a11yFeatureMenu:      'Функции и режимы ставок',
   balance:              'БАЛАНС',
   win:                  'ВЫИГРЫШ',
+  winFlash:             'ВЫИГРЫШ!',
   loading:              'Загрузка…',
   loadingDetail:        'ЗАГРУЗКА КИБЕРНЕТИКИ…',
   buyBonus:             'КУПИТЬ БОНУС',
@@ -1088,6 +1105,7 @@ const tr: Translations = {
   a11yFeatureMenu:      'Özellikler ve bahis modları',
   balance:              'BAKİYE',
   win:                  'KAZANÇ',
+  winFlash:             'KAZANÇ!',
   loading:              'Yükleniyor…',
   loadingDetail:        'SİBERNETİK YÜKLENİYOR…',
   buyBonus:             'BONUS SATIN AL',
@@ -1157,6 +1175,7 @@ const vi: Translations = {
   a11yFeatureMenu:      'Tính năng và chế độ cược',
   balance:              'SỐ DƯ',
   win:                  'THẮNG',
+  winFlash:             'THẮNG!',
   loading:              'Đang tải…',
   loadingDetail:        'ĐANG TẢI ĐIỀU KHIỂN HỌC…',
   buyBonus:             'MUA BONUS',
@@ -1226,6 +1245,7 @@ const zh: Translations = {
   a11yFeatureMenu:      '功能与投注模式',
   balance:              '余额',
   win:                  '赢奖',
+  winFlash:             '赢奖!',
   loading:              '加载中…',
   loadingDetail:        '正在加载控制论…',
   buyBonus:             '购买奖励',
@@ -1719,6 +1739,7 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
   // Core HUD labels
   spin:    'PLAY',
   win:     'PRIZE',
+  winFlash: 'PRIZE!',
   balance: 'COINS',
   // Bet wording -> play wording
   bet:     'PLAY',
