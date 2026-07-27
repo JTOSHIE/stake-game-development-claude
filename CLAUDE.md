@@ -590,21 +590,26 @@ which means every session reads these numbers, so they belong here:
 | Job | Expected |
 |---|---|
 | `static gates` | about **90 seconds** |
-| `browser gates` | **2 to 7 minutes**, depending on the chromium cache |
+| `browser: <gate>`, seven parallel legs | about **2 to 3 minutes** wall-clock, set by the slowest leg |
 
-Measured across six consecutive runs before the cache existed: static 1.2 to 1.4
-minutes, browser 6.1 to 6.5, a 24-second spread. The chromium download was the
-largest fixed cost and is byte-identical between runs, so it is cached from
-2026-07-28, keyed on the RESOLVED Playwright version from `package-lock.json`
-rather than the range in `package.json`. A cache hit lands near the low end, a
-miss does exactly what the job always did and lands near the high end, and **both
-are normal**. Expect a miss on the first run after a Playwright bump.
+**A correction worth keeping, because the first assumption was wrong.** Caching the
+chromium binary was expected to take the browser job from 6.4 minutes toward 2. It
+did not. Measured on run 30280722398, the cache hit correctly and cut the install
+from about 90 seconds to 12, and **the job still took 6.4 minutes**, because the
+install was never the dominant cost: the gates were, at 314 seconds of a 380 second
+job. Splitting them one-per-job is what actually delivered it. Both changes are
+kept, since the cache is still worth 80 seconds on every leg and there are now
+seven legs.
 
-The browser job is many steps because five of its gates run their convention (p)
-seeded self-test as a separate step before the gate itself. That is deliberate: a
-gate and the proof that it can fail are two results, not one.
+Each leg repeats about 90 seconds of setup, so total runner minutes go UP while
+wall-clock goes down. That is the right trade on a public repository where runner
+minutes are free and a person waiting on a push is not.
 
-THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
+A cache MISS is expected on the first run after a Playwright bump, since the key
+carries the RESOLVED version rather than the range. **Both a hit and a miss are
+normal.**
+
+THE CORRECTED ACCOUNT OF RUNS 117 TO 121THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
 118, 119 and 120 on main all failed at the step "layout fit gate, seven
 presets": layout_fit_gate.mjs and contrast_gate.mjs launch chromium, and they
 had been added to the deliberately browser-free static job, so they crashed at

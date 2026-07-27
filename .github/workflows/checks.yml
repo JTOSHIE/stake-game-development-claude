@@ -36,24 +36,21 @@
 # beside rule 10 in CLAUDE.md, which is where someone reading a red or slow run
 # will look first.
 #
-#   static gates    about 90 seconds
-#   browser gates   2 to 7 minutes, DEPENDING ON THE CHROMIUM CACHE
+#   static gates          about 90 seconds
+#   each browser leg      about 90 seconds of setup plus its own gate
+#   browser wall-clock    about 2 to 3 minutes, set by the SLOWEST leg
 #
-# Measured 2026-07-27 across six consecutive runs BEFORE the cache: static 1.2 to
-# 1.4 minutes, browser 6.1 to 6.5, a 24-second spread. The browser job decomposed
-# as roughly 1.5 min of setup plus 4.5 to 5 min of gates, the gates being many
-# steps because five of them run their convention (p) seeded self-test as its own
-# step before the gate itself.
+# CORRECTED 2026-07-28, and the correction is worth keeping because the first
+# assumption was wrong. Caching chromium was expected to take the browser job
+# from 6.4 minutes toward 2. It did not: measured on run 30280722398 the cache
+# hit correctly and cut the install from about 90 seconds to 12, and the job
+# still took 6.4 minutes, because the install was never the dominant cost. The
+# gates were, at 314 seconds of a 380 second job. Splitting them across a matrix
+# is what actually delivers it. Both changes are kept: the cache is still worth
+# 80 seconds on every leg, and there are now seven legs.
 #
-# The chromium download and unpack was the largest fixed cost and is byte-identical
-# between runs, so it is cached from 2026-07-28. A cache HIT should land the job
-# near the low end; a MISS does exactly what it always did and lands near the high
-# end. Both are normal. A miss is expected on the first run after a Playwright
-# version bump, since the key carries the RESOLVED version.
-#
-# If it ever needs to be faster still, the remaining lever is a job matrix (one
-# gate per job), which would drop wall-clock to roughly the slowest single gate at
-# the cost of more runner minutes. Not worth doing yet.
+# A cache MISS is expected on the first run after a Playwright version bump,
+# since the key carries the RESOLVED version. Both a hit and a miss are normal.
 #
 # A NOTE ON `cancelled` RUNS, because rule 10 says an unexplained non-green is
 # treated as real and that is only worth something if the explainable ones are
@@ -481,10 +478,60 @@ jobs:
   # (4 to 8 minutes) that exits red, which is the level the run-122 note itself
   # argues a hang should be caught at. The job timeout is the last resort, not
   # the first.
+  # ── THE BROWSER GATES, ONE JOB PER GATE ─────────────────────────────────────
+  #
+  # A MATRIX since 2026-07-28, and the reason is a measurement that corrected an
+  # assumption. Caching chromium was expected to be the win; it is worth about 80
+  # seconds and the job stayed at 6.4 minutes, because the chromium install was
+  # never the dominant cost. Per-step timings from run 30280722398:
+  #
+  #   setup (checkout, node, npm ci, cache restore, install-deps, build)   ~60s
+  #   scrim coverage        96s + 8s self-test        = 104s
+  #   splash calm           65s + 29s self-test       =  94s
+  #   paytable card fill    48s + 7s self-test        =  55s
+  #   turbo intensity       17s + 7s self-test        =  24s
+  #   contrast              19s
+  #   layout fit            15s
+  #   win count-up          1s + 2s self-test         =   3s
+  #                                             gates  = 314s, i.e. 5 of the 6.4
+  #
+  # The gates are independent by construction: each spawns its OWN vite preview
+  # on its OWN free port and shares no state. So they parallelise cleanly, and
+  # wall-clock becomes setup plus the SLOWEST gate rather than setup plus the
+  # sum, about 2.7 minutes instead of 6.4.
+  #
+  # THE COST, stated rather than hidden: each leg repeats the ~60s of setup, so
+  # total runner minutes go UP even though wall-clock goes down. That is the
+  # right trade here because this repository is public and runner minutes are
+  # free, while a person waiting on a push is not.
+  #
+  # A leg is named for its gate, so a red check in the list names the failure
+  # without anyone opening the log. Same security posture as the static job: no
+  # secrets, contents:read, pull_request rather than pull_request_target.
   browser:
-    name: browser gates
+    name: ${{ matrix.gate.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
+    strategy:
+      # One failing gate must not cancel the others: a session wants the WHOLE
+      # picture from one run, not the first thing that broke.
+      fail-fast: false
+      matrix:
+        gate:
+          - name: "browser: layout fit"
+            run: node scripts/layout_fit_gate.mjs
+          - name: "browser: contrast"
+            run: node scripts/contrast_gate.mjs
+          - name: "browser: splash calm"
+            run: node scripts/splash_calm_gate.mjs --self-test && node scripts/splash_calm_gate.mjs
+          - name: "browser: turbo intensity"
+            run: node scripts/turbo_intensity_gate.mjs --self-test && node scripts/turbo_intensity_gate.mjs
+          - name: "browser: paytable card fill"
+            run: node scripts/paytable_card_fill_gate.mjs --self-test && node scripts/paytable_card_fill_gate.mjs
+          - name: "browser: scrim coverage"
+            run: node scripts/scrim_coverage_gate.mjs --self-test && node scripts/scrim_coverage_gate.mjs
+          - name: "browser: win count-up steady"
+            run: node scripts/win_countup_steady_gate.mjs --self-test && node scripts/win_countup_steady_gate.mjs
 
     steps:
       - name: Check out
@@ -503,20 +550,12 @@ jobs:
         working-directory: frontend
         run: npm ci --ignore-scripts
 
-      # The one step the static job deliberately lacks: the chromium binary.
-      # No other browser is installed; the gates use chromium.
-      #
-      # CACHED since 2026-07-28. Downloading and unpacking chromium was the
-      # single largest fixed cost in this job, and it is byte-identical between
-      # runs, so it is the obvious thing to cache.
-      #
       # THE KEY IS THE RESOLVED VERSION, NOT THE RANGE. package.json says
-      # `^1.61.1`, which will one day resolve to something else; keying on the
-      # range would then serve a chromium build that no longer matches the
-      # Playwright driver, and the failure mode of THAT is a browser that
-      # launches and behaves subtly differently, which is far worse than a slow
-      # job. The resolved version is read out of package-lock.json, which is the
-      # same file `npm ci` obeys.
+      # `^1.61.1` and package-lock.json already resolves to 1.62.0, so keying on
+      # the range would serve a chromium build against a different driver, and
+      # the failure mode of THAT is a browser that launches and behaves subtly
+      # differently, which is far worse than a slow job. The lockfile is the
+      # same file `npm ci` obeys, so a bump invalidates the key automatically.
       - name: Resolve the Playwright version
         id: pw
         working-directory: frontend
@@ -534,172 +573,32 @@ jobs:
 
       # ON A MISS, do exactly what this job did before the cache existed, so the
       # worst case is the old behaviour rather than a new failure. --with-deps
-      # also installs the OS libraries chromium needs, which do NOT live in the
-      # cached path.
+      # also installs the OS libraries, which do NOT live in the cached path.
       - name: Install chromium (cache miss)
         if: steps.pwcache.outputs.cache-hit != 'true'
         working-directory: frontend
         run: npx playwright install chromium --with-deps
 
       # ON A HIT the binary is restored but the OS libraries are not, because
-      # they install into the system rather than into ~/.cache. This is the
-      # cheap half of the step above and it is why a cache hit is fast rather
-      # than merely faster.
+      # they install into the system rather than into ~/.cache. Measured at 12s
+      # against roughly 90s for the full install, and that gap is the whole
+      # value of the cache. Do not "simplify" these two steps into one.
       - name: Install chromium OS dependencies (cache hit)
         if: steps.pwcache.outputs.cache-hit == 'true'
         working-directory: frontend
         run: npx playwright install-deps chromium
 
-      # Both gates serve dist via vite preview, so the build must exist first.
-      # The static job builds too; duplicating the build here keeps the two
-      # jobs independent, which is the point of the split.
+      # Every gate serves dist via vite preview, so the build must exist first.
+      # The static job builds too; duplicating it keeps the jobs independent,
+      # which is the point of the split.
       - name: production build
         working-directory: frontend
         run: npm run build
 
-      # ── Gate 13c: the frame FITS at all seven platform presets ───────────────
-      # Guideline item 15. Asserts two independent things, because satisfying one
-      # by breaking the other is exactly how this nearly went wrong: the frame
-      # must not scroll, AND every interactive control must lie inside its
-      # clipping ancestor. Changing overflow to hidden would have passed the
-      # first and silently failed the second (TR-069). The seven viewports are
-      # the platform's own, read off the DTT Screen menu. (JOB 3b, TR-065/069/071)
-      - name: layout fit gate, seven presets
+      # The gate itself. Each leg carries its own convention (p) seeded self-test
+      # FIRST where it has one, because a gate and the proof that it can fail are
+      # two results rather than one, and the self-test running first means a
+      # broken gate reports as broken rather than as green.
+      - name: ${{ matrix.gate.name }}
         working-directory: frontend
-        run: node scripts/layout_fit_gate.mjs
-
-      # ── Gate 13d: text contrast, measured on composited pixels ───────────────
-      # TR-070. The portrait FEATURES bar sits over the background art behind a
-      # plate whose gradient starts at 10% opacity, so the contrast a player
-      # experiences is against whatever the art happens to be there. No
-      # stylesheet states that value; only a screenshot knows it. The gate hides
-      # the glyphs, screenshots the exact box, decodes it through the browser's
-      # own canvas and reports the ratio against the WORST pixel rather than the
-      # average, because a player does not read the average. WCAG 2.1 AA, 4.5:1
-      # for normal text; the label is 12px, so that is the applicable figure.
-      # Ships a seeded violation per convention (p). (JOB 3g)
-      - name: contrast gate, portrait presets
-        working-directory: frontend
-        run: node scripts/contrast_gate.mjs
-
-      # ── Gate 13f: the boot screens are CALM ──────────────────────────────────
-      # FS VISUAL FIXPACK JOB 1. The load screen's brand mark rotated because
-      # commit 54544e4 replaced a two-layer rim+blade composite with a single
-      # canonical logo and left the blade's `brand-spin` animation sitting on it.
-      # The artwork is not radially symmetric, so the mark's bounding box swung
-      # 77px at Desktop and 98px at Popout S: the owner's "jumps around and
-      # starts spinning" was one defect, not two.
-      #
-      # A still frame cannot assert this, because a photograph of a rotating
-      # logo looks like a logo. The gate samples geometry every 250ms across ten
-      # seconds at three presets and asserts zero variance, no rotation, no
-      # translation, and no animation writing `transform` on any boot logo. The
-      # permitted gentle pulse animates opacity or filter, which is why it can
-      # assert exactly zero rather than "not much". Self-test first, per
-      # convention (p); it plants the real rotation and must go red on it.
-      - name: splash calm gate, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/splash_calm_gate.mjs --self-test
-
-      - name: splash calm gate, boot logos still
-        working-directory: frontend
-        run: node scripts/splash_calm_gate.mjs
-
-      # ── Gate 13g: the three speeds are distinguishable ───────────────────────
-      # FS VISUAL FIXPACK JOB 2. The owner removed the "1x / 2x / 4x" numeral
-      # from the speed control, so intensity is now the ONLY thing separating
-      # Normal, Turbo and Super Turbo. Before this pass the control lit on a
-      # single boolean and the top two tiers were styled identically, which
-      # means deleting the numeral without measuring would have shipped two
-      # speeds a player cannot tell apart.
-      #
-      # The gate screenshots the real composited control at each speed at all
-      # seven presets, decodes it through the browser's canvas, and asserts the
-      # mean WCAG relative luminance rises monotonically with a real contrast
-      # step between adjacent states, plus that no numeral has come back. The
-      # measured floor on the shipped design is 1.30:1 against a 1.25:1 bar.
-      # Self-test first per convention (p): it flattens Super Turbo back to
-      # Normal (the exact shape of the old boolean) and puts the numeral back.
-      - name: turbo intensity gate, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/turbo_intensity_gate.mjs --self-test
-
-      - name: turbo intensity gate, seven presets
-        working-directory: frontend
-        run: node scripts/turbo_intensity_gate.mjs
-
-      # ── Gate 13h: a card's fill encloses its content ─────────────────────────
-      # FS VISUAL FIXPACK JOB 3. The paytable's card primitive is a chrome FRAME
-      # with a dark FILL child. The frame was a block container, so the fill was
-      # only ever as tall as its own content, and .fs-sym-grid stretches its
-      # items to the row height. On a row with a taller card the frame grew and
-      # the fill did not: WILD showed 23.0px of bare chrome and SCAT 36.9px.
-      # The mode cards had it too, at 15.4px, unreported.
-      #
-      # Asserted in BOTH directions across all sixteen locales, because a fix
-      # can fail either way: the fill must cover the frame (the shipped defect),
-      # AND every text box and image must sit inside the fill (the defect a
-      # fixed-height fill would introduce instead). The locale list is derived
-      # from the shipped Locale union, so a seventeenth locale is covered the day
-      # it lands. Convention (p) --self-test plants both forms, and seed 1
-      # reproduces the shipped numbers to two decimal places.
-      - name: paytable card fill gate, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/paytable_card_fill_gate.mjs --self-test
-
-      - name: paytable card fill gate, all sixteen locales
-        working-directory: frontend
-        run: node scripts/paytable_card_fill_gate.mjs
-
-      # ── Gate 13i: a full-screen scrim covers the full screen ─────────────────
-      # FS VISUAL FIXPACK JOB 4. `.game-wrapper` carries transform: scale on
-      # desktop, and a transform makes an element the containing block for its
-      # position:fixed DESCENDANTS, so every dialog scrim resolved `inset: 0` to
-      # the 1280x720 STAGE rather than the viewport. That is invisible at 16:9,
-      # because then the stage IS the viewport, and leaves the letterbox bands
-      # bare at every other window shape: measured 266.67px uncovered at
-      # 1600x600, 196.88px at 900x900, 180.63px at 1100x980. Exactly the owner's
-      # "at some sizes the corners show through".
-      #
-      # Ten scrims now share ONE implementation, .fs-scrim in src/app.css. The
-      # gate asserts all three of: the shared rule exists and does not shrink
-      # itself by the safe-area insets; no component hand-rolls scrim geometry
-      # (read out of the source, because the point is that it must not be
-      # WRITTEN); and zero uncovered pixels by rect AND by hit-testing forty
-      # points one pixel inside every edge, at seven presets and three swept
-      # sizes. Convention (p) --self-test plants the re-anchored scrim and the
-      # inset-shrunk scrim.
-      - name: scrim coverage gate, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/scrim_coverage_gate.mjs --self-test
-
-      - name: scrim coverage gate, seven presets plus three swept sizes
-        working-directory: frontend
-        run: node scripts/scrim_coverage_gate.mjs
-
-      # ── Gate 13j: the win count-up does not dance ────────────────────────────
-      # TR-089, Fable ruling 3. `.fs-num` carries `font-variant-numeric:
-      # tabular-nums`, which READS as "the digits are all one width" and is
-      # INERT against Orbitron: the property maps to the OpenType `tnum` feature
-      # and the shipped woff has NO GSUB features at all. Real advances are
-      # 834 391 830 826 730 830 820 660 834 828 of 1000, so `1` is less than
-      # half the width of `0` and a total counting up from zero changed width on
-      # almost every frame. The guidelines require multi-win outcomes to count up
-      # incrementally, so a reviewer watches this animation deliberately.
-      #
-      # Per-digit fixed-width boxes at 0.834em, the widest real advance, on the
-      # AMOUNT ONLY. The gate reads that figure OUT of WinBanner.svelte rather
-      # than restating it, so it cannot pass while the component says otherwise.
-      #
-      # Convention (p): the seeded violation is not invented. It renders the same
-      # markup with the rule absent, i.e. exactly what shipped before the fix, and
-      # requires the drift to reproduce. Measured: 249.11px against 419.27px with
-      # 141.8px of character drift unboxed, 407.17px against 407.17px with 0px
-      # drift boxed.
-      - name: win count-up steady gate, seeded-violation self-test
-        working-directory: frontend
-        run: node scripts/win_countup_steady_gate.mjs --self-test
-
-      - name: win count-up steady gate, geometry holds as digits roll
-        working-directory: frontend
-        run: node scripts/win_countup_steady_gate.mjs
+        run: ${{ matrix.gate.run }}
