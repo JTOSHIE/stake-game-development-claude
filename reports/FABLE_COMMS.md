@@ -9,6 +9,112 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 020 - 2026-07-28 - DECISION REQUEST: the verification layer ran, and it found a regression I introduced, five incomplete fixes and a gate that had been passing over the stake.us strings
+
+**Read this one before the repository.** Entry 019 reported six jobs. Everything below
+happened AFTER it, and it is mostly the audit auditing itself. Six decisions at the end.
+
+**What ran.** The 51-agent research workflow was resumed twice after usage limits. The
+discovery layer completed 100 per cent both times; **every failure was an adversarial
+verifier**. The second run rewrote the verify prompt to check the FIXES rather than the
+findings, because the tree had moved: a verifier asking "does this defect still exist"
+against a correctly fixed repository returns "refuted", which reads as "the finding was
+bogus". Thirty-two verdicts, then four more to close the gap: **13 FIX_CONFIRMED, 13
+STILL_PRESENT, 5 FIX_INCOMPLETE, 1 FIX_REGRESSED, 1 NEVER_A_DEFECT.**
+
+**The layer paid for itself immediately, and its first catch was mine.**
+
+- **I introduced a regression on the first screen of the game.** The Q-15 font fix put
+  Orbitron ahead of `'Courier New', monospace` on the boot progress label, and I wrote that
+  the monospace chain stayed behind it for the tabular figures. Wrong twice: a fallback
+  stack does not participate once the leading family loads, and `tabular-nums` is inert
+  against Orbitron because **it ships no OpenType features at all**. Measured on the shipped
+  woff: digit advances 834, 391, 830, 826, 730, 830, 820, 660, 834, 828, so `1` is less than
+  half the width of `0`. The percentage counts 0 to 100 on every launch and now shifted as it
+  counted. **Fixed. Then the verifier caught the fix too**: `min-width: 3ch` does not reserve
+  `100`, because `ch` excludes letter-spacing and the label carries `0.2em`. Now
+  `calc(3ch + 0.6em)`. Two corrections to one six-line fix, both from verification rather
+  than review.
+- **A larger pre-existing one underneath it, TR-089.** All **eighteen** `tabular-nums`
+  declarations in the codebase are inert for the same reason, including `.fs-num` on the
+  **win count-up**, which the guidelines require to count incrementally and which a reviewer
+  watches deliberately. Not ours from this session. Parked with three options, because
+  choosing between a fallback numeric face, per-digit boxes and accepting it is your call.
+
+**Five fixes were incomplete and one finding was simply wrong.** Q-25 to Q-29 in the charter:
+the `WinPod` fix made its own overflow **worse** (routing through `formatBalance` adds a
+symbol and separators into a box still 99px with `nowrap`); the `x` versus `×` sweep missed
+four in `fsModes` blurbs; the Vite scaffold block kept its stock indigo link colours; my
+`index.html` comments ship into `dist`. And the `fsModes` OVERBOOST casing finding was
+**refuted** as a stylised proper noun matching the specification, which was worth more than
+agreement: the refuter then found the **real** class-4 defect beside it, TR-092, where
+`text-transform: uppercase` on the HUD badge and not on three other surfaces makes the same
+mode read `Cruise` and `CRUISE`.
+
+**TR-090, and this one generalises past us.** A read-only research pass silently rewrote five
+committed evidence files. Every agent honoured the instruction; **none used an editing tool.**
+One RAN `social_string_conformance.mjs`, and the script did the writing. That script and its
+sibling still write straight into committed evidence and never import `evidencePaths.mjs`,
+the migration an earlier session left open. Restored from HEAD. The next pass carried a "do
+not run any project script that writes" clause plus a `git status` self-check, and came back
+clean on all four agents. **A read-only instruction constrains an agent's tools, not the side
+effects of software it invokes.** Found while restoring: that evidence is stale anyway,
+recording `MAX WIN 5,000× base bet` where the build renders `MAX WIN 5,000×`.
+
+**TR-091 is the big one, and it is why I stopped.** Widening the locale gate to see inside an
+interpolation found **19 player-visible hardcoded English strings**, and **six are the
+stake.us blockers**: `BUY FEATURES`, `BET MODES`, `BET`, `WIN`. They ARE handled for social
+mode by a hand-rolled ternary, which is exactly why nobody noticed for so long: the social
+swap works, so the surface looks right in both modes anyone tested, while **both branches are
+hardcoded English in all sixteen locales**.
+
+**And the ternary is a second copy of a layer we already have.** `SOCIAL_OVERRIDES` already
+maps `bet` to `PLAY` and `win` to `PRIZE`, and `tr.ts` is already social-aware, so
+`{$isSocial ? 'PLAY' : 'BET'}` **is** `{$tr('bet')}` plus fifteen missing locales. Same for
+the constants: `overdriveFreeSpins` and `totalWin` already exist in all sixteen locales, so
+`HUD_LABEL_FREE_SPINS` is a second copy of a translated string. **The fix is mostly deletion,
+around 96 translated values rather than the 300 I first feared.**
+
+The gate is committed LIVE AND CORRECT with the 19 frozen as file-scoped known debt, so a new
+`BET` tomorrow still fails, the count prints on every run, and a stale entry fails in the
+other direction so the ratchet cannot rust. **Frozen, not excused.**
+
+**Current HEAD `37e43a5`, main green.** Kit version live on the portal still **NOT KNOWN**;
+Front V2 remains the last confirmed publish and six kits sit on the Desktop, so every fix in
+the last three sessions is of unknown liveness. That is owner item 3.
+
+**SIX DECISIONS, numbered for one ruling block.**
+
+1. **TR-091, the 19.** Fix all of them now (roughly 96 values, mostly deleting ternaries in
+   favour of `$tr`), or fix only the stake.us six and defer the rest, or leave frozen and run
+   the whole locale pass as its own session? My recommendation: **all 19**, because the
+   ternary removals make the components simpler and the stake.us six cannot be fixed properly
+   in isolation anyway.
+2. **TR-089, the inert `tabular-nums` on the win count-up.** Fallback numeric face,
+   per-digit fixed-width boxes, or accept and record? Art call.
+3. **TR-092, `Cruise` versus `CRUISE`.** Drop the `text-transform` so the HUD matches the
+   specification's own spelling, or add it to the other three?
+4. **TR-088, the `games/` directory.** A fresh clone shows ten maths packages of which one
+   ships; nine are upstream SDK samples, documented, and all our own forks are untracked. One
+   README line, remove the samples, or leave it?
+5. **SA-002 and SA-007**, still waiting since 2026-07-26: does the COST-column convention
+   need raising with the platform before submission?
+6. **The round-three reviewer prompt** at `docs/records/reviews/round3_reviewer_prompt_DRAFT.md`
+   needs your ratification before it can run. Its section E lists five sub-decisions,
+   including whether disclosing the prior rounds' scores anchors a reviewer.
+
+**Where the detail lives.** `docs/QUALITY_CHARTER.md` sections 4.2b, 4.2c and 4.2d for every
+verdict; TR-086 through TR-092 in the tracker; `reports/screens/polish-review-2026-07-27/`
+for 91 frames at seven presets; `OWNER_CHECKLIST.md` for the owner's seven.
+
+**One process change worth your view.** `CLAUDE.md` gained conventions (q) and (r): resume a
+partially failed workflow before improvising, and size an audit like a job rather than
+squeezing it into what is left. The cost of not resuming was measured, not guessed: the one
+over-claim that reached a committed document was precisely the finding whose verifier had
+died.
+
+---
+
 ## 019 - 2026-07-27 - The two unrun tracks executed on main: 35 machine-tell glyphs were shipping, a scaffold package name was the boot tab title, and the documents now match reality
 
 **What ran.** The prepared `track/quality-sweep` and `track/docs-reskin` briefs had never

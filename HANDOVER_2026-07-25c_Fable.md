@@ -115,3 +115,81 @@ the working-tree relocations completed with nothing discarded (`chore/wip-backgr
 pushed; `claude/fs-super-prototype` already carried the super package byte-identical, so
 the loose 450MB copy was simply removed), and `sideproject/` listed for the owner's
 LUMEN-branch or off-repo call. Full account: `reports/archive/2026-07-26j_replay-blocker.md`.
+
+---
+
+# 2026-07-28: the round-three prep arc, and what verifying it found
+
+Appended per convention (j). The arc that began with the round-three prep brief is
+complete as BUILD work and now waits on a ruling block. `reports/FABLE_COMMS.md`
+entry 020 is the one-screen version with the six numbered decisions; this section
+is the account of how the work went, which entry 020 has no room for.
+
+## The shape of it
+
+Six jobs were briefed and all six shipped, one commit each, main green throughout.
+Then the session audited its own output, and that second pass is where the value
+was. **The build pass produced 22 findings. Verifying it produced 12 more, one of
+which was a regression the build pass had introduced.**
+
+That ratio is the argument for the whole method, and it is worth stating plainly
+because it cuts against instinct: the pass that found the emoji, the scaffold title
+and the French apostrophes felt like the productive one. The pass that checked it
+was cheaper and caught things no amount of re-reading would have.
+
+## What the verification actually changed
+
+**It caught me over-claiming, twice, on the same six lines.** The boot-screen font
+fix was correct and its justification was false, and the correction to the
+justification was itself arithmetically short. Neither was visible by reading; both
+came from a hostile agent opening the shipped font file and the CSS specification.
+
+**It refuted a finding, and that refutation was worth more than a confirmation.**
+The `fsModes` OVERBOOST casing finding was wrong: a stylised proper noun matching
+the specification, not drift. The agent said so, then found the real class-4 defect
+a few lines away that nothing had recorded, where a `text-transform` present on one
+surface and absent on three makes the same mode read `Cruise` and `CRUISE`. A
+verifier that only ever confirms is not verifying.
+
+**It found the gate that had been lying.** TR-091. Widening the locale gate to read
+inside an interpolation surfaced 19 player-visible hardcoded English strings, six of
+them the stake.us blockers. The mechanism is the interesting part: those six ARE
+handled for social mode by a hand-rolled ternary, so the surface looks correct in
+both modes anyone ever tested, while both branches are English in all sixteen
+locales. **A defect hidden behind a partially correct fix is the hardest kind to
+see, and the only thing that found it was widening the instrument and counting.**
+
+## A note on process that is yours to rule on
+
+Three conventions were added on the strength of things that went wrong here:
+
+- **(q) resume a partially failed workflow before improvising.** A usage limit
+  killed 28 of 51 agents; the session judged the audit survivable and pressed on.
+  It was survivable. But the one over-claim that reached a committed document was
+  precisely the finding whose verifier had died, and it survived six commits.
+- **(r) size an audit like a job.** The real numbers are recorded so the next one is
+  planned rather than guessed.
+- **TR-090**, which is the one I would most like your view on as a matter of
+  practice. A read-only research pass rewrote five committed evidence files. Every
+  agent obeyed the instruction; one ran a project script and the script did the
+  writing. The durable control cannot be the prompt.
+
+## What is NOT done, stated because silence reads as coverage
+
+Audio has never been swept and every row of it was model-generated, against a
+platform page that warns about exactly that. Social mode has never been captured.
+Accessibility beyond the prohibited-terms gate has never been examined. Animation
+quality is one of the three axes reviewers most often deduct on and nothing gates
+it. The maths package was out of scope by lock. Those four are the honest remainder,
+and they are listed at `docs/QUALITY_CHARTER.md` 5.3 rather than left to be
+discovered.
+
+## The one thing that is not a builder decision and is now urgent
+
+**Which frontend version is live on the portal is still not known.** Front V2 is the
+last confirmed publish, six kits sit on the Desktop, and four have been built since.
+Every fix in this arc, and in the two before it, is therefore of unknown liveness.
+The owner's instinct to delete and re-upload cleanly is well supported: TR-061 (the
+platform silently stored 104 of 108 files with no error surfaced), TR-062 (the
+published bundle a commit behind) and this all collapse into one known baseline if
+the next upload is a clean one.
