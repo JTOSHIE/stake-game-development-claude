@@ -34,23 +34,34 @@
 #
 # EXPECTED RUN TIMES, so a slow run is knowledge rather than alarm. Also recorded
 # beside rule 10 in CLAUDE.md, which is where someone reading a red or slow run
-# will look first.
+# will look first. MEASURED, not predicted, on run 30281432163:
 #
-#   static gates          about 90 seconds
-#   each browser leg      about 90 seconds of setup plus its own gate
-#   browser wall-clock    about 2 to 3 minutes, set by the SLOWEST leg
+#   static gates                    ~82s
+#   browser: layout fit             ~74s      browser: contrast          ~100s
+#   browser: paytable card fill    ~114s      browser: splash calm       ~154s
+#   browser: win count-up steady   ~170s      browser: turbo intensity   ~217s
+#   browser: scrim coverage        ~276s   <- sets the wall-clock
 #
-# CORRECTED 2026-07-28, and the correction is worth keeping because the first
-# assumption was wrong. Caching chromium was expected to take the browser job
-# from 6.4 minutes toward 2. It did not: measured on run 30280722398 the cache
-# hit correctly and cut the install from about 90 seconds to 12, and the job
-# still took 6.4 minutes, because the install was never the dominant cost. The
-# gates were, at 314 seconds of a 380 second job. Splitting them across a matrix
-# is what actually delivers it. Both changes are kept: the cache is still worth
-# 80 seconds on every leg, and there are now seven legs.
+#   TOTAL WALL-CLOCK: about 4.5 to 5 minutes, down from 6.4.
 #
-# A cache MISS is expected on the first run after a Playwright version bump,
-# since the key carries the RESOLVED version. Both a hit and a miss are normal.
+# TWO ASSUMPTIONS WERE WRONG ON THE WAY HERE AND BOTH ARE KEPT ON THE RECORD,
+# because the useful knowledge is which levers did NOT work.
+#
+#   1. Caching chromium was expected to be the win. The cache hits correctly and
+#      cuts the install from ~90s to 12s, and the job stayed at 6.4 minutes: the
+#      install was never the dominant cost. The gates were, at 314s of 380s.
+#   2. Splitting the gates one-per-job was then predicted to give ~2.7 minutes,
+#      i.e. setup plus the slowest gate. It gave 4.6. Seven concurrent legs
+#      CONTEND for runner resources, so each leg runs slower than it does alone:
+#      turbo intensity measures 24s of gate work and took 217s wall-clock.
+#      Parallelism on shared runners is not free and does not divide cleanly.
+#
+# So the honest figure is 6.4 down to 4.6, a 28 per cent improvement, plus a
+# diagnostic gain that is arguably worth more than the seconds: a red check now
+# NAMES the gate that failed, without anyone opening a log.
+#
+# A cache MISS is expected on the first run after a Playwright bump, since the
+# key carries the RESOLVED version. Both a hit and a miss are normal.
 #
 # A NOTE ON `cancelled` RUNS, because rule 10 says an unexplained non-green is
 # treated as real and that is only worth something if the explainable ones are

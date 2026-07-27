@@ -583,33 +583,37 @@ before closing and records the run link in the session report. Local gate
 results never substitute for the remote run: the remote runner is a different
 machine with a different inventory, which is exactly how this rule was earned.
 
-**EXPECTED RUN TIMES, recorded 2026-07-28 so a slow run is knowledge rather than
-alarm.** Rule 10 asks every session to verify its own final push's remote result,
-which means every session reads these numbers, so they belong here:
+**EXPECTED RUN TIMES, MEASURED 2026-07-28 on run 30281432163, so a slow run is
+knowledge rather than alarm.** Rule 10 asks every session to verify its own final
+push's remote result, so every session reads these:
 
-| Job | Expected |
+| Job | Measured |
 |---|---|
-| `static gates` | about **90 seconds** |
-| `browser: <gate>`, seven parallel legs | about **2 to 3 minutes** wall-clock, set by the slowest leg |
+| `static gates` | about **82 seconds** |
+| `browser: scrim coverage` | about **276 seconds**, the slowest leg, which sets the wall-clock |
+| the other six browser legs | 74 to 217 seconds each, in parallel |
+| **browser wall-clock** | about **4.5 to 5 minutes**, down from 6.4 |
 
-**A correction worth keeping, because the first assumption was wrong.** Caching the
-chromium binary was expected to take the browser job from 6.4 minutes toward 2. It
-did not. Measured on run 30280722398, the cache hit correctly and cut the install
-from about 90 seconds to 12, and **the job still took 6.4 minutes**, because the
-install was never the dominant cost: the gates were, at 314 seconds of a 380 second
-job. Splitting them one-per-job is what actually delivered it. Both changes are
-kept, since the cache is still worth 80 seconds on every leg and there are now
-seven legs.
+**TWO ASSUMPTIONS WERE WRONG ON THE WAY TO THAT, and both are kept here**, because
+the useful knowledge is which levers did not work.
 
-Each leg repeats about 90 seconds of setup, so total runner minutes go UP while
-wall-clock goes down. That is the right trade on a public repository where runner
-minutes are free and a person waiting on a push is not.
+1. **Caching chromium was expected to be the win.** It hits correctly and cuts the
+   install from about 90 seconds to 12, and the job stayed at 6.4 minutes. The
+   install was never the dominant cost; the gates were, at 314 of 380 seconds.
+2. **Splitting the gates one-per-job was then predicted to give about 2.7 minutes**,
+   setup plus the slowest gate. It gave 4.6. **Seven concurrent legs contend for
+   runner resources**, so each runs slower than it does alone: turbo intensity is
+   24 seconds of gate work and took 217 seconds wall-clock. Parallelism on shared
+   runners is not free and does not divide cleanly.
+
+The honest figure is **6.4 down to 4.6**, plus a diagnostic gain that is arguably
+worth more than the seconds: a red check now NAMES the gate that failed without
+anyone opening a log.
 
 A cache MISS is expected on the first run after a Playwright bump, since the key
-carries the RESOLVED version rather than the range. **Both a hit and a miss are
-normal.**
+carries the RESOLVED version. **Both a hit and a miss are normal.**
 
-THE CORRECTED ACCOUNT OF RUNS 117 TO 121THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
+THE CORRECTED ACCOUNT OF RUNS 117 TO 121THE CORRECTED ACCOUNT OF RUNS 117 TO 121THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
 118, 119 and 120 on main all failed at the step "layout fit gate, seven
 presets": layout_fit_gate.mjs and contrast_gate.mjs launch chromium, and they
 had been added to the deliberately browser-free static job, so they crashed at

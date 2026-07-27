@@ -30,26 +30,40 @@ plainly that verbatim reasoning supersedes it if supplied. It also records what 
 NOT mean: the observation stands, the owner-facing page and both document statements stand,
 and if a reviewer raises it the answer is already written.
 
-## JOB 2: the chromium cache, and what a normal run costs
+## JOB 2: the CI work, and two wrong assumptions on the way to it
+
+**The brief asked for the browser job to drop from about six minutes toward two, by
+caching the Playwright install. The cache works and did not achieve that, and the honest
+account of why is worth more than the seconds.**
+
+**Assumption 1, wrong: chromium was the dominant cost.** The cache hits correctly
+(`Cache restored from key: ms-playwright-Linux-1.62.0`, 269 MiB) and cuts the install from
+about 90 seconds to 12. **The job stayed at 6.4 minutes.** Per-step timings said why: the
+gates were 314 seconds of a 380 second job. Caching a 90 second step in a job whose work is
+314 seconds was never going to reach two minutes.
 
 **The key is the RESOLVED version, not the range, and that was not theoretical.**
-`package.json` says `^1.61.1`; `package-lock.json` already resolves to **1.62.0**. Keying on
-the range would have served a chromium build against a different driver from day one, and
-that failure mode is a browser which launches and behaves subtly differently, far worse than
-a slow job.
+`package.json` says `^1.61.1`; the lockfile already resolves to **1.62.0**. Keying on the
+range would have served a chromium build against a different driver from day one, and that
+failure mode is a browser which launches and behaves subtly differently.
 
-On a miss the job does exactly what it did before, so the worst case is the old behaviour. On
-a hit the binary is restored but the OS libraries are not, because those install into the
-system rather than the cached path, which is why the hit path still runs `install-deps`.
+**Assumption 2, also wrong: splitting the gates one-per-job would give about 2.7 minutes.**
+It gave 4.6. **Seven concurrent legs contend for runner resources**, so each runs slower than
+it does alone: turbo intensity is 24 seconds of gate work and took 217 seconds wall-clock.
+Parallelism on shared runners is not free and does not divide cleanly.
 
-**Measured:** the first run after landing it took 6.4 minutes, because a first run is by
-definition the miss that POPULATES the cache. The cache saved as
-`ms-playwright-Linux-1.62.0`, 269 MiB. The hit is proven on the next run, recorded in the
-rule 10 closing below.
+**Measured outcome: 6.4 minutes down to 4.6, a 28 per cent improvement**, plus a diagnostic
+gain that is arguably worth more than the seconds: a red check now NAMES the gate that
+failed without anyone opening a log. Both changes are kept, since the cache is still worth 80
+seconds and there are now seven legs paying that saving each.
 
-Durations are now recorded **beside rule 10 in `CLAUDE.md`** as well as in the workflow
-header, because rule 10 asks every session to check its own remote result, so that is where
-someone reads them: static about 90 seconds, browser 2 to 7 minutes, **both ends normal**.
+**The cost is stated rather than hidden**: each leg repeats about 60 seconds of setup, so
+total runner minutes go UP while wall-clock goes down. The right trade on a public repository
+where runner minutes are free and a person waiting on a push is not.
+
+Durations are recorded **beside rule 10 in `CLAUDE.md`** as well as in the workflow header,
+with **both wrong assumptions kept on the record**, because the useful knowledge is which
+levers did not work.
 
 ## JOB 3: kit V7 and the clean-baseline visit
 
