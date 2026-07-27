@@ -32,23 +32,28 @@
 #   - No auto-merge, no auto-fix, no comment-writing. Those UI options are OFF by
 #     standing policy; this file must not reintroduce them by another route.
 #
-# EXPECTED RUN TIMES, measured 2026-07-27 across six consecutive runs on main so
-# nobody investigates a slow run that is not slow:
+# EXPECTED RUN TIMES, so a slow run is knowledge rather than alarm. Also recorded
+# beside rule 10 in CLAUDE.md, which is where someone reading a red or slow run
+# will look first.
 #
-#   static gates    1.2 to 1.4 minutes
-#   browser gates   6.1 to 6.5 minutes
+#   static gates    about 90 seconds
+#   browser gates   2 to 7 minutes, DEPENDING ON THE CHROMIUM CACHE
 #
-# The variance across six runs was 24 seconds, so these are stable constants.
-# The browser job decomposes as roughly 1.5 min of setup (npm ci, playwright
-# install chromium --with-deps, npm run build) plus 4.5 to 5 min of gates, which
-# is ten steps because five of the six browser gates run their convention (p)
-# seeded self-test as its own step before the gate. Six minutes is therefore the
-# NORMAL cost of a push, not a fault, and it sits well inside the 20-minute
-# timeout.
+# Measured 2026-07-27 across six consecutive runs BEFORE the cache: static 1.2 to
+# 1.4 minutes, browser 6.1 to 6.5, a 24-second spread. The browser job decomposed
+# as roughly 1.5 min of setup plus 4.5 to 5 min of gates, the gates being many
+# steps because five of them run their convention (p) seeded self-test as its own
+# step before the gate itself.
 #
-# If it ever needs to be faster, the lever is a job matrix (one gate per job),
-# which would drop wall-clock to roughly the slowest single gate at the cost of
-# more runner minutes. Not worth doing while six minutes is tolerable.
+# The chromium download and unpack was the largest fixed cost and is byte-identical
+# between runs, so it is cached from 2026-07-28. A cache HIT should land the job
+# near the low end; a MISS does exactly what it always did and lands near the high
+# end. Both are normal. A miss is expected on the first run after a Playwright
+# version bump, since the key carries the RESOLVED version.
+#
+# If it ever needs to be faster still, the remaining lever is a job matrix (one
+# gate per job), which would drop wall-clock to roughly the slowest single gate at
+# the cost of more runner minutes. Not worth doing yet.
 #
 # A NOTE ON `cancelled` RUNS, because rule 10 says an unexplained non-green is
 # treated as real and that is only worth something if the explainable ones are
@@ -499,11 +504,51 @@ jobs:
         run: npm ci --ignore-scripts
 
       # The one step the static job deliberately lacks: the chromium binary.
-      # --with-deps also installs the OS libraries chromium needs on the
-      # runner image. No other browser is installed; the gates use chromium.
-      - name: Install chromium
+      # No other browser is installed; the gates use chromium.
+      #
+      # CACHED since 2026-07-28. Downloading and unpacking chromium was the
+      # single largest fixed cost in this job, and it is byte-identical between
+      # runs, so it is the obvious thing to cache.
+      #
+      # THE KEY IS THE RESOLVED VERSION, NOT THE RANGE. package.json says
+      # `^1.61.1`, which will one day resolve to something else; keying on the
+      # range would then serve a chromium build that no longer matches the
+      # Playwright driver, and the failure mode of THAT is a browser that
+      # launches and behaves subtly differently, which is far worse than a slow
+      # job. The resolved version is read out of package-lock.json, which is the
+      # same file `npm ci` obeys.
+      - name: Resolve the Playwright version
+        id: pw
+        working-directory: frontend
+        run: |
+          V=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Playwright resolved to $V"
+
+      - name: Cache the chromium browser
+        id: pwcache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      # ON A MISS, do exactly what this job did before the cache existed, so the
+      # worst case is the old behaviour rather than a new failure. --with-deps
+      # also installs the OS libraries chromium needs, which do NOT live in the
+      # cached path.
+      - name: Install chromium (cache miss)
+        if: steps.pwcache.outputs.cache-hit != 'true'
         working-directory: frontend
         run: npx playwright install chromium --with-deps
+
+      # ON A HIT the binary is restored but the OS libraries are not, because
+      # they install into the system rather than into ~/.cache. This is the
+      # cheap half of the step above and it is why a cache hit is fast rather
+      # than merely faster.
+      - name: Install chromium OS dependencies (cache hit)
+        if: steps.pwcache.outputs.cache-hit == 'true'
+        working-directory: frontend
+        run: npx playwright install-deps chromium
 
       # Both gates serve dist via vite preview, so the build must exist first.
       # The static job builds too; duplicating the build here keeps the two

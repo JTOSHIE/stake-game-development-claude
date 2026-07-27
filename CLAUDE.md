@@ -583,6 +583,27 @@ before closing and records the run link in the session report. Local gate
 results never substitute for the remote run: the remote runner is a different
 machine with a different inventory, which is exactly how this rule was earned.
 
+**EXPECTED RUN TIMES, recorded 2026-07-28 so a slow run is knowledge rather than
+alarm.** Rule 10 asks every session to verify its own final push's remote result,
+which means every session reads these numbers, so they belong here:
+
+| Job | Expected |
+|---|---|
+| `static gates` | about **90 seconds** |
+| `browser gates` | **2 to 7 minutes**, depending on the chromium cache |
+
+Measured across six consecutive runs before the cache existed: static 1.2 to 1.4
+minutes, browser 6.1 to 6.5, a 24-second spread. The chromium download was the
+largest fixed cost and is byte-identical between runs, so it is cached from
+2026-07-28, keyed on the RESOLVED Playwright version from `package-lock.json`
+rather than the range in `package.json`. A cache hit lands near the low end, a
+miss does exactly what the job always did and lands near the high end, and **both
+are normal**. Expect a miss on the first run after a Playwright bump.
+
+The browser job is many steps because five of its gates run their convention (p)
+seeded self-test as a separate step before the gate itself. That is deliberate: a
+gate and the proof that it can fail are two results, not one.
+
 THE CORRECTED ACCOUNT OF RUNS 117 TO 121, so the history is honest. Runs 117,
 118, 119 and 120 on main all failed at the step "layout fit gate, seven
 presets": layout_fit_gate.mjs and contrast_gate.mjs launch chromium, and they
