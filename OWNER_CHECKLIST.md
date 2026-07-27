@@ -7,7 +7,7 @@ conversation.
 Written to be read on a phone. Each item says **what**, **why in one line**, **what to send
 when it is done**, and **DONE when**.
 
-Australian English, no em dashes or en dashes. Last refreshed 2026-07-27.
+Australian English, no em dashes or en dashes. Last refreshed 2026-07-28.
 
 **Three corrections to what you may have been told before**, stated up front because two of
 them change what you are looking for:
@@ -51,6 +51,25 @@ That is a platform convention, not a fault, and for Cruise at 1.00x the two coin
 which is exactly why the existing single frame cannot separate them.*
 
 ---
+
+## 1b. The build-SHA capture, which permanently answers "which build is live"
+
+**NEW, and it is the highest-value single thing on this list.** Right now the repository
+cannot tell you which frontend version is live: Front V2 is the last confirmed publish and
+five kits have been built since, so **every fix in the last four sessions is of unknown
+liveness**.
+
+**Why.** One screenshot ends that, permanently and for every future version.
+
+**What to do.** It is step 3 of PART 9f in the kit walkthrough. After publishing, open the
+game and read the build commit SHA, either from the DevTools Console boot line on reload or
+from `build-info.json` in the published bundle.
+
+**What to send.** That one screenshot, showing the SHA legibly, plus the portal's sync dialog
+from the import step.
+
+**DONE when** the screenshot shows a commit SHA. Any SHA: the value is that we stop
+inferring.
 
 ## 2. The portal Guidelines ticks, with our self-assessment open beside you
 
@@ -105,20 +124,27 @@ screen. That defect (TR-062) is closed in the build, and the folders themselves 
 re-opening it. Kits are single-use by design; the builder refuses to make one from a dirty
 tree.
 
-**The current kit is `FS_UPLOAD_KIT_V6`**, built from commit `14b6506d` on 2026-07-27. There
-is no V7. Every earlier walkthrough part is explicitly marked SUPERSEDED, DO NOT RUN.
+**The current kit is `FS_UPLOAD_KIT_V7`**, built from a fresh clone at commit `6e9e4739` on
+2026-07-28, 110 files, 15,612,453 bytes, with all dist gates run IN THE CLONE. Every earlier
+walkthrough part is explicitly marked SUPERSEDED, DO NOT RUN; the live one is **PART 9f, the
+clean-baseline visit**.
 
-**What to do.** Delete these four from the Desktop:
+**V7 rather than another V6, deliberately.** V6 was built at `14b6506d` and predates the
+whole locale pass, the count-up fix and the casing fix. Reusing a version name for different
+contents is exactly the stale-artefact confusion TR-062 is about.
+
+**What to do.** Delete these five from the Desktop:
 
 - `FS_UPLOAD_KIT` (dead)
 - `FS_UPLOAD_KIT_V3`
 - `FS_UPLOAD_KIT_V4`
 - `FS_UPLOAD_KIT_V5`
+- `FS_UPLOAD_KIT_V6`
 
-**What to send.** One screenshot of the Desktop showing only `FS_UPLOAD_KIT_V6` remaining.
+**What to send.** One screenshot of the Desktop showing only `FS_UPLOAD_KIT_V7` remaining.
 
 **DONE when** exactly one kit folder is on the Desktop and its `README.md` names the commit
-it was built from. Delete V6 too once you have published from it.
+it was built from. Delete V7 too once you have published from it.
 
 ---
 

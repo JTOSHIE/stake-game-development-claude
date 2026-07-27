@@ -689,7 +689,7 @@ time because they are the two that still have no answer.
 
 ---
 
-# PART 9e: THE V6 VISIT
+# PART 9e: THE V6 VISIT (SUPERSEDED, DO NOT RUN)
 
 **This is the whole visit and it fits on one page.** You do not need to read
 anything above it. PART 9d and everything before it are superseded.
@@ -824,3 +824,76 @@ the Guidelines ticks against
 `docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`. Both are written
 out in full in PART 9d above. They are not repeated here because this visit was
 asked for as a short one, and neither is blocked by anything in V6.
+
+---
+
+# PART 9f: THE CLEAN-BASELINE VISIT (V7)
+
+**This is the whole visit and it fits on one page.** You do not need to read anything above
+it. PART 9e and everything before it are superseded.
+
+**Why this one is different from every visit before it.** Every previous visit added files to
+what was already on the portal. This one **reconciles**, so that afterwards we know exactly
+what is live. Right now we do not: the last frontend version confirmed published anywhere in
+the repository is Front V2, and five kits have been built since, so every fix in the last
+four sessions is of unknown liveness. That is the single most consequential open item in the
+project and this visit closes it permanently.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V7/`. Its `README.md` names the
+commit it was built from. **That is the only kit to use.**
+
+## 1. Import the FULL kit contents, not just changed files
+
+Drag in **everything** in `FS_UPLOAD_KIT_V7/`, not a subset. The portal's sync dialog
+compares what you hand it against what it holds and reports four numbers: Upload, Skip,
+Delete, Move.
+
+**Handing it the full set is what makes the deletions happen.** A partial import can only
+add and replace; it can never remove a file that should no longer be there. Since we do not
+know what accumulated across earlier uploads, only a full reconcile clears it.
+
+**Screenshot the sync dialog before you confirm it.** Those four numbers are the record of
+what the portal actually held, and we have been surprised by them before: the first upload
+handed the portal 108 files and it stored 104, dropping four with no error shown anywhere
+(TR-061). If Delete is greater than zero, that is expected here and is the point.
+
+## 2. Publish
+
+Publish the version as usual.
+
+## 3. THE ONE CAPTURE THAT PERMANENTLY ANSWERS "WHICH BUILD IS LIVE"
+
+**Do not skip this. It is the reason for the visit.**
+
+Open the published game and read the build SHA. Either route works:
+
+- **The console route.** Open DevTools, Console tab, reload the game. The boot line prints
+  the build commit.
+- **The file route.** Open `build-info.json` from the published bundle in a browser tab. It
+  carries `commit`, `builtAt`, the file count and the byte total.
+
+**Screenshot whichever one you used, showing the SHA legibly.**
+
+**What to send.** That one screenshot, plus the sync dialog from step 1.
+
+**DONE when** the screenshot shows a commit SHA. Any SHA. The value is not that it matches a
+particular build; it is that from this moment on the repository knows what is live, instead
+of inferring it. Send it and it gets recorded against the version.
+
+## 4. Delete the kit
+
+Delete `~/Desktop/FS_UPLOAD_KIT_V7/` when you are done, along with every older kit still
+sitting there. Kits are single use. A kit left on the Desktop is a kit that eventually gets
+uploaded when it is out of date, and that has already happened once.
+
+## 5. Then the owner list
+
+Everything else that needs you is in **`OWNER_CHECKLIST.md`** at the repository root, seven
+items, each with what to send and a DONE-when. The two that matter most while you are already
+in the portal:
+
+- the **twenty Cruise spins** bracketed by session panels, still the only open money item;
+- the **Guidelines ticks**, with our self-assessment open beside you.
+
+If the portal's list and our document disagree anywhere, **stop and screenshot it**. A
+disagreement is worth more than a tick.
