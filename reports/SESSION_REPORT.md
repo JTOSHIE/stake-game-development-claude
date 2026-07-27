@@ -5054,3 +5054,30 @@ and its archive copy.
    five decisions listed in its section E.
 7. **Cross-surface capitalisation and button casing** (sweep classes 4 and 7) are review items
    rather than gated ones, and the charter says so rather than implying coverage.
+
+---
+
+## Rule 10 closing
+
+**Final push `0c02cbf`, run 30231843095, GREEN on both jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30231843095
+
+The run that matters more is **30231530987** on `49474c1`, GREEN on both jobs, because it is
+the first run to carry every code change this session made through the REMOTE runner: the new
+`machine_tell_gate.mjs` self-test and both its scans, the locale gate with its new allowlist
+entry, and all six browser gates against a build whose root font stack changed. The closing
+run is documentation only.
+
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30231530987
+
+**Three earlier runs on `main` this session, all accounted for.** 30229993768 on `3e676a1`
+(JOB 1a) green both jobs. 30230730422 on `bea7242` (JOB 5) green both jobs, and it carries
+JOB 2's content since `bea7242` is a descendant of `4345b9e`. 30230552617 on `4345b9e` shows
+**cancelled**, and it is not a red: `concurrency: cancel-in-progress` in `checks.yml` cancels
+a run when a newer commit lands on the same ref, which is what the JOB 5 push did seconds
+later. Named here rather than left for a reader to work out, because rule 9 says an
+unexplained non-green is treated as real and the way to keep that worth something is to
+explain the explainable ones by name.
+
+**And the PR that opened the session:** run 30218099265 on PR #116, green both jobs, which is
+half of the standing approval condition under which it was merged.
