@@ -195,8 +195,13 @@ function versionLabel() {
     const doc = readFileSync(join(REPO, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8')
     const live = [...doc.matchAll(/^# PART 9[a-z]?:([^\n]*)$/gm)]
       .filter((m) => !/SUPERSEDED/i.test(m[1]))
-    const v = live.length === 1 ? /\(V(\d+)\)/.exec(live[0][1]) : null
-    return v ? `Front V${v[1]} line, main` : 'main'
+    // Matches `(V8)` and `v9` alike. The heading style changed from
+    // "THE FIRST PLAYER-VISIBLE VISIT (V8)" to "THE v9 VISIT" and the
+    // parenthesised-only pattern silently degraded the label to a bare "main",
+    // which is the quiet kind of wrong: it still printed a line, and the line
+    // still looked fine.
+    const v = live.length === 1 ? /\bv(\d+)\b/i.exec(live[0][1]) : null
+    return v ? `v${v[1]} line, main` : 'main'
   } catch {
     return 'main'
   }
