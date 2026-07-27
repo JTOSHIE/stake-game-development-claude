@@ -5728,5 +5728,8 @@ lands at 130s, well inside the pack, because the hold overlaps every other leg.
   green**, and no new job was started in between.
 - 30300598617 on `576e276`, GREEN on ten. The closing run.
 
+- 30300914468 on `3635615`, GREEN on ten. This report's own commit, verified after the push
+  rather than assumed, which is what rule 10 actually asks for.
+
 The red is on the record rather than tidied away, because rule 10's whole value is that a red
 run means something.
