@@ -6347,3 +6347,19 @@ the bigger compliance one. Both want a ruling rather than a builder's choice.
 
 **Cheap and worth doing together:** TR-097, TR-098, TR-093, and collapsing the duplicated TR-081
 row.
+
+## Rule 10 closing
+
+**Final push, run 30313843663 on `314e4c7`, GREEN on all eleven jobs.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30313843663
+
+No reds this session.
+
+## Rule 12 closing
+
+```
+OWNER PREVIEW  |  v9 line, main  |  commit 314e4c7  |  built 2026-07-28T09:20:52+10:00  |  started 2026-07-27T23:21:03.103Z  |  http://192.168.4.92:5173
+```
+
+Curled rather than trusted: the address answers **HTTP 200**. Refreshed once more after this
+final push, per rule 12's one-commit-lag clause, so the owner's machine ends on the tip.
