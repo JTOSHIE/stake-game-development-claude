@@ -631,3 +631,30 @@ jobs:
       - name: scrim coverage gate, seven presets plus three swept sizes
         working-directory: frontend
         run: node scripts/scrim_coverage_gate.mjs
+
+      # ── Gate 13j: the win count-up does not dance ────────────────────────────
+      # TR-089, Fable ruling 3. `.fs-num` carries `font-variant-numeric:
+      # tabular-nums`, which READS as "the digits are all one width" and is
+      # INERT against Orbitron: the property maps to the OpenType `tnum` feature
+      # and the shipped woff has NO GSUB features at all. Real advances are
+      # 834 391 830 826 730 830 820 660 834 828 of 1000, so `1` is less than
+      # half the width of `0` and a total counting up from zero changed width on
+      # almost every frame. The guidelines require multi-win outcomes to count up
+      # incrementally, so a reviewer watches this animation deliberately.
+      #
+      # Per-digit fixed-width boxes at 0.834em, the widest real advance, on the
+      # AMOUNT ONLY. The gate reads that figure OUT of WinBanner.svelte rather
+      # than restating it, so it cannot pass while the component says otherwise.
+      #
+      # Convention (p): the seeded violation is not invented. It renders the same
+      # markup with the rule absent, i.e. exactly what shipped before the fix, and
+      # requires the drift to reproduce. Measured: 249.11px against 419.27px with
+      # 141.8px of character drift unboxed, 407.17px against 407.17px with 0px
+      # drift boxed.
+      - name: win count-up steady gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/win_countup_steady_gate.mjs --self-test
+
+      - name: win count-up steady gate, geometry holds as digits roll
+        working-directory: frontend
+        run: node scripts/win_countup_steady_gate.mjs

@@ -196,6 +196,9 @@
     : tier === 'mega' ? ($isSocial ? 'MEGA PRIZE' : 'MEGA WIN')
     : ($isSocial ? 'BIG PRIZE' : 'BIG WIN')
   $: amountLabel = formatBalance(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  // Split for the per-digit boxes below. Derived rather than done in the
+  // template so the character list is computed once per value change.
+  $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))
   $: multLabel = `${Math.round(shownMultiplier)}x`
   // R2R JOB 6 / TR-041. This line rendered "12x BET" unconditionally, in every
   // mode, on the single most prominent surface in the game. "bet" is on the
@@ -282,7 +285,19 @@
         <span class="band-edge band-edge-bottom" aria-hidden="true"></span>
         <div class="fs-face">
           <div class="c1-tier-label">{tierLabel}</div>
-          <div class="c1-amount fs-num" use:autofitText={amountLabel}>{amountLabel}</div>
+          <!-- TR-089. Each DIGIT gets a fixed-width box so the count-up cannot
+               shimmy as it rolls. It needs one because `font-variant-numeric:
+               tabular-nums` on .fs-num is INERT against Orbitron: that property
+               maps to the OpenType `tnum` feature and Orbitron ships no GSUB
+               features at all. Measured on the shipped woff, the digit advances
+               are 834 391 830 826 730 830 820 660 834 828 of 1000, so `1` is
+               less than half the width of `0` and a rolling total visibly
+               danced. Non-digits keep their natural width: only the digits need
+               to be monospaced, and boxing the currency symbol and separators
+               too would space them oddly. -->
+          <div class="c1-amount fs-num" use:autofitText={amountLabel} data-testid="win-amount">
+            {#each amountChars as ch}<span class="c1-ch" class:c1-digit={ch.digit}>{ch.c}</span>{/each}
+          </div>
           <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
           {#if $boughtRound}
             <div class="c1-price fs-num" data-testid="win-feature-price">
@@ -388,6 +403,12 @@
     width: min(46vw, 640px); box-sizing: border-box; text-align: center;
     max-width: min(46vw, 640px); overflow: hidden;
   }
+  /* 0.834em is Orbitron's WIDEST digit advance (834 of its 1000 unitsPerEm,
+     shared by `0` and `8`), measured on the shipped woff rather than guessed, so
+     every digit fits its box and no digit is clipped. Centred, because a digit
+     narrower than the box should sit in the middle of it rather than against one
+     edge. TR-089. */
+  .c1-amount .c1-digit { display: inline-block; width: 0.834em; text-align: center; }
   .tier-big  .c1-amount { font-size: calc(50px * var(--autofit-scale, 1)); }
   .tier-mega .c1-amount { font-size: calc(64px * var(--autofit-scale, 1)); }
   .tier-epic .c1-amount { font-size: calc(80px * var(--autofit-scale, 1)); }
