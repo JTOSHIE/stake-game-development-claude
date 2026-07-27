@@ -95,6 +95,66 @@ const ALLOW = new Set([
   'THEME',
 ])
 
+/**
+ * KNOWN DEBT, TR-091, recorded 2026-07-27, AWAITING FABLE'S RULING.
+ *
+ * These are the 20 the widened reading found on its first run. They are NOT
+ * exempt on their merits: every one is genuinely player-visible hardcoded
+ * English, and six of them are the strings recorded as blocking stake.us. They
+ * are listed here so that the gate can go LIVE AND CORRECT today without main
+ * going red, which rule 10 forbids, while the fix itself is a decision that
+ * changes player-visible strings on compliance-adjacent surfaces and therefore
+ * belongs to Fable rather than to the builder.
+ *
+ * SCOPED BY FILE ON PURPOSE. A bare text allowlist would also excuse a NEW
+ * `BET` written tomorrow in a different component, which would spend the whole
+ * value of widening the gate. Keyed `file|text`, so the debt is frozen exactly
+ * where it stands and anything new still fails.
+ *
+ * THE RATCHET: every entry removed here is one surface fixed. When this list is
+ * empty, delete it and this comment with it.
+ */
+const KNOWN_DEBT = new Set([
+  // The stake.us six. Handled for SOCIAL mode by a hand-rolled ternary, which is
+  // why nobody noticed: the social swap works and the LOCALE swap does not
+  // exist, so both branches are hardcoded English in all sixteen locales.
+  'src/lib/components/FeatureMenu.svelte|BUY FEATURES',
+  'src/lib/components/FeatureMenu.svelte|GET FEATURES',
+  'src/lib/components/FeatureMenu.svelte|BET MODES',
+  'src/lib/components/FeatureMenu.svelte|PLAY MODES',
+  'src/lib/components/FeatureMenu.svelte|BET',
+  'src/lib/components/FeatureMenu.svelte|PLAY',
+  'src/lib/components/MaxWinCelebration.svelte|BET',
+  'src/lib/components/MaxWinCelebration.svelte|PLAY',
+  'src/lib/components/WinCelebration.svelte|WIN!',
+  'src/lib/components/WinCelebration.svelte|PRIZE!',
+  // The enhancer toggle state.
+  'src/lib/components/FeatureMenu.svelte|OFF',
+  // The responsible-gambling session overlay.
+  'src/lib/components/SessionPanel.svelte|NET',
+  // Constants. `overdriveFreeSpins` and `totalWin` ALREADY exist in all sixteen
+  // locales in the feature block, so these two are second copies of translated
+  // strings rather than missing translations.
+  'src/lib/components/BonusInstrumentColumn.svelte|OVERDRIVE FREE SPINS',
+  'src/lib/components/BonusInstrumentColumn.svelte|TOTAL WIN',
+  // Symbol labels, rendered from a local record and from the paytable.
+  'src/lib/components/WinBreakdown.svelte|WILD',
+  'src/lib/components/WinBreakdown.svelte|SCATTER',
+  'src/lib/components/PaytableModal.svelte|WILD',
+  'src/lib/components/PaytableModal.svelte|SCAT',
+])
+
+/**
+ * Dev-only, and exempt on its MERITS rather than as debt: ThemeSelector is
+ * gated behind `import.meta.env.DEV` in App.svelte and is not rendered in
+ * production, the same reason SELECT THEME, BACK and PLAY THIS THEME are in
+ * ALLOW above. It sits here rather than in ALLOW only because it is scoped to
+ * the one dev-only component.
+ */
+const DEV_ONLY = new Set([
+  'src/lib/components/ThemeSelector.svelte|FUTURE SPINNER',
+])
+
 const COMPONENTS = join(ROOT, 'src/lib/components')
 const files = readdirSync(COMPONENTS).filter((f) => f.endsWith('.svelte'))
   .map((f) => ['src/lib/components/' + f, join(COMPONENTS, f)])
@@ -131,18 +191,222 @@ files.push(['src/App.svelte', join(ROOT, 'src/App.svelte')])
  * run rather than four days of reading that finds out.
  */
 const LITERAL_RE = />\s*([A-Z][A-Z0-9 &'.,!?:-]{2,})\s*</g
-const hardcoded = []
 
-for (const [label, path] of files) {
-  const body = readFileSync(path, 'utf-8')
-  const markup = body.split('<style>')[0]
-  for (const m of markup.matchAll(LITERAL_RE)) {
-    const text = m[1].trim()
-    if (!text || ALLOW.has(text)) continue
-    if (text.includes('{') || text.includes('}')) continue  // interpolation, not a literal
-    const line = markup.slice(0, m.index).split('\n').length
-    hardcoded.push({ file: label, line, text })
+/**
+ * WIDENED 2026-07-27 (TR-091). THE FOURTH TIME THIS GATE'S READING FORM WAS
+ * NARROWER THAN THE DEFECT.
+ *
+ * The regex above requires the uppercase run to be the WHOLE text node. Three
+ * shapes therefore escaped it, and they were counted rather than estimated:
+ * 14 render sites of player-visible hardcoded English, of which SIX are the
+ * strings recorded as blocking stake.us.
+ *
+ *   (A) A literal SHARING a node with an interpolation. The `\s*` on both sides
+ *       still cannot span a `{...}`, and the old `text.includes('{')` line then
+ *       discarded whatever did match:
+ *           <span>NET {coinsWord}</span>
+ *
+ *   (B) A literal written INSIDE an interpolation. Never a text node at all, so
+ *       nothing above could ever see it. This is where the stake.us terms live:
+ *           {$isSocial ? 'GET FEATURES' : 'BUY FEATURES'}
+ *       Note these ARE handled for social mode, which is exactly why they were
+ *       never noticed: both branches are hardcoded English, so the social swap
+ *       works and the LOCALE swap does not exist.
+ *
+ *   (C) A literal imported from a `.ts` module. The gate only ever opened
+ *       `.svelte` files, so a constant was unreachable by construction:
+ *           <span class="pm-label">{HUD_LABEL_FREE_SPINS}</span>
+ *       with `export const HUD_LABEL_FREE_SPINS = 'OVERDRIVE FREE SPINS'`.
+ *
+ * SCOPE IS DELIBERATELY UNCHANGED: this still hunts UPPERCASE player strings,
+ * because that is the class this gate has always claimed. Sentence-case prose
+ * stays parked and enumerated in docs/QUALITY_CHARTER.md 4.3, and pretending
+ * otherwise here would make the gate cry wolf across the whole tree. What
+ * changed is the READING, not the class.
+ */
+
+/** Player-facing attributes. A `title` is a tooltip a desktop player reads. */
+const PLAYER_ATTRS = ['aria-label', 'title', 'alt', 'placeholder']
+
+/** An uppercase run that reads as player prose rather than as a code token. */
+const isPlayerCaps = (s) => {
+  const t = (s || '').trim()
+  if (t.length < 3 || ALLOW.has(t)) return false
+  if (!/^[A-Z][A-Z0-9 &'.,!?:%×+-]*$/.test(t)) return false  // caps, digits, punctuation only
+  if (!/[A-Z]{2,}/.test(t)) return false                     // needs a real uppercase word
+  if (/^[0-9 .,%×+-]+$/.test(t)) return false                // pure number or figure
+  return true
+}
+
+/**
+ * Strings that are ARGUMENTS to a translation call are the correct form and
+ * must never be flagged: `{$tr('paytable')}` is the thing we want people to
+ * write. Matched by looking left from the quote for a translate call.
+ */
+const TRANSLATE_CALL = /(?:\$?tr|t)\s*\(\s*$/
+
+/**
+ * The currency-fallback idiom, which is NOT player prose. This codebase writes
+ * `formatBalance(micros, $currencyCode || 'USD')` in a dozen places, and `USD`
+ * is three uppercase letters so it reads as a label to any caps-shaped test.
+ * Excluded by the shape of the call rather than by a list of codes, because a
+ * list would have to grow every time a currency is added and would also have to
+ * exclude `BET`, `NET` and `OFF`, which are the same shape and ARE prose.
+ */
+const CURRENCY_FALLBACK = /(?:currencyCode|currency)\s*(?:\|\||\?\?)\s*$/
+
+/** Split markup into text nodes, keeping interpolations as separators. */
+function textSegments(markup) {
+  const out = []
+  const NODE = />([^<>]+)</g
+  for (const m of markup.matchAll(NODE)) {
+    const raw = m[1]
+    const at = m.index + 1
+    // Split on interpolations so a literal beside one is still seen. Depth
+    // counting, because a ternary can contain nested braces.
+    let buf = '', depth = 0, start = 0
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw[i]
+      if (c === '{') { if (depth === 0) { out.push({ text: buf, at: at + start }); buf = '' } depth++ ; continue }
+      if (c === '}') { depth = Math.max(0, depth - 1); if (depth === 0) start = i + 1; continue }
+      if (depth === 0) buf += c
+    }
+    if (buf) out.push({ text: buf, at: at + start })
   }
+  return out
+}
+
+/** Quoted string literals that sit inside a `{...}` in MARKUP. */
+function interpolatedStrings(markup) {
+  const out = []
+  const BLOCK = /\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g
+  for (const m of markup.matchAll(BLOCK)) {
+    const inner = m[1]
+    for (const s of inner.matchAll(/'([^'\\]*)'|"([^"\\]*)"/g)) {
+      const val = s[1] ?? s[2] ?? ''
+      const before = inner.slice(0, s.index)
+      if (TRANSLATE_CALL.test(before)) continue          // {$tr('key')}, correct
+      if (CURRENCY_FALLBACK.test(before)) continue       // $currencyCode || 'USD'
+      out.push({ text: val, at: m.index })
+    }
+  }
+  return out
+}
+
+/**
+ * `{IDENT}`, `{IDENT[...]}` or `{IDENT[...] ?? x}` rendered in markup, resolved
+ * either to the component's OWN script block or to an imported `.ts` module.
+ *
+ * The local case is not an afterthought: stripping the script block to kill the
+ * false positives above also hid `WinBreakdown`'s own
+ * `const SYMBOL_LABELS = { ..., W: 'WILD', S: 'SCATTER' }`, which IS rendered in
+ * markup. Fixing one blindness opened another, so both are resolved here.
+ */
+function renderedConstants(markup, body, path) {
+  const out = []
+  const rendered = new Set()
+  for (const m of markup.matchAll(/\{\s*([A-Z][A-Z0-9_]{2,})\s*(?:\[[^\]]*\])?/g)) {
+    rendered.add(m[1])
+  }
+  if (!rendered.size) return out
+  const script = body.split('</script>')[0]
+
+  // (i) declared in this component's own script block
+  for (const name of rendered) {
+    const decl = script.match(new RegExp(`const ${name}\\b[^=]*=\\s*([\\s\\S]{0,400})`))
+    if (!decl) continue
+    for (const s of decl[1].matchAll(/'([^'\\]*)'|"([^"\\]*)"/g)) {
+      const val = s[1] ?? s[2] ?? ''
+      if (isPlayerCaps(val)) out.push({ text: val, via: `${name}, declared locally` })
+    }
+  }
+
+  for (const imp of script.matchAll(/import\s*\{([^}]+)\}\s*from\s*'([^']+)'/g)) {
+    const names = imp[1].split(',').map((n) => n.trim().split(/\s+as\s+/)[0].trim())
+    const hit = names.filter((n) => rendered.has(n))
+    if (!hit.length) continue
+    let target = imp[2]
+    if (!target.startsWith('.')) continue
+    const base = join(dirname(path), target)
+    let src = null
+    for (const ext of ['.ts', '.js', '/index.ts']) {
+      try { src = readFileSync(base + ext, 'utf-8'); break } catch { /* next */ }
+    }
+    if (!src) continue
+    for (const name of hit) {
+      const decl = src.match(new RegExp(`export const ${name}\\b[^=]*=\\s*([\\s\\S]{0,400})`))
+      if (!decl) continue
+      for (const s of decl[1].matchAll(/'([^'\\]*)'|"([^"\\]*)"/g)) {
+        const val = s[1] ?? s[2] ?? ''
+        if (isPlayerCaps(val)) out.push({ text: val, via: `${name} (${target})` })
+      }
+    }
+  }
+  return out
+}
+
+/**
+ * THE ONE DETECTION PATH, called by BOTH the real scan and the self-test.
+ *
+ * It is a function for a reason learned the hard way twice this week. A
+ * self-test that RESTATES the rule it is checking proves nothing about the
+ * shipped rule: `machine_tell_gate.mjs`'s first currency control did exactly
+ * that and passed while the real predicate was untested. So the seeds below run
+ * through this, the same code the tree runs through, and a widening that forgets
+ * to wire in a new detector cannot pass its own seeds.
+ */
+function findLiterals(body, path, label = '(seed)') {
+  const hardcoded = []
+  const debt = []
+  // STRIP THE SCRIPT BLOCK, not just the style block. The old regex needed a
+  // literal to be a whole `>text<` node, which almost never matches inside
+  // JavaScript, so `body.split('<style>')[0]` was good enough by accident. The
+  // widened reading looks at `{...}` blocks, and script code is nothing BUT
+  // braces, so the first run reported `INPUT` and `TEXTAREA` from a `tagName`
+  // comparison and six ISO currency codes from an `import { ZERO_DECIMAL }`
+  // line. Player-facing text lives in markup; the script block is code.
+  const markup = body
+    .replace(/<script[\s\S]*?<\/script>/g, (m) => '\n'.repeat((m.match(/\n/g) || []).length))
+    .split('<style>')[0]
+  const seen = new Set()
+  const add = (text, at, note) => {
+    const t = (text || '').trim()
+    if (!isPlayerCaps(t)) return
+    const scoped = label + '|' + t
+    if (DEV_ONLY.has(scoped)) return
+    if (KNOWN_DEBT.has(scoped)) { debt.push({ file: label, text: t }); return }
+    const key = t + '|' + note
+    if (seen.has(key)) return
+    seen.add(key)
+    const line = typeof at === 'number' ? markup.slice(0, at).split('\n').length : 0
+    hardcoded.push({ file: label, line, text: t, note })
+  }
+
+  // (A) whole text nodes, and literals sharing a node with an interpolation
+  for (const seg of textSegments(markup)) add(seg.text, seg.at, 'text node')
+
+  // (B) literals written inside an interpolation, including player attributes
+  for (const s of interpolatedStrings(markup)) add(s.text, s.at, 'inside an interpolation')
+
+  // (B2) player-facing attributes with a static quoted value
+  for (const attr of PLAYER_ATTRS) {
+    const RE = new RegExp(`\\b${attr}="([^"{}]+)"`, 'g')
+    for (const m of markup.matchAll(RE)) add(m[1], m.index, `${attr} attribute`)
+  }
+
+  // (C) uppercase constants imported from a .ts module and rendered
+  for (const c of renderedConstants(markup, body, path)) add(c.text, 0, `constant ${c.via}`)
+
+  hardcoded.debt = debt
+  return hardcoded
+}
+
+const hardcoded = []
+const debtSeen = []
+for (const [label, path] of files) {
+  const found = findLiterals(readFileSync(path, 'utf-8'), path, label)
+  hardcoded.push(...found)
+  debtSeen.push(...(found.debt || []))
 }
 
 if (hardcoded.length) {
@@ -155,6 +419,30 @@ if (hardcoded.length) {
 }
 
 console.log(`HARDCODED SCAN: ${files.length} components, ${hardcoded.length} unexplained literal(s)`)
+// The debt is REPORTED on every run, never silent. A gate that quietly excuses
+// twenty player-visible strings reads, to anyone scanning CI, exactly like a
+// gate with nothing to excuse. TR-091 is awaiting a ruling, not resolved.
+if (debtSeen.length) {
+  console.log(`KNOWN DEBT (TR-091, awaiting ruling): ${debtSeen.length} player-visible literal(s) frozen by file`)
+  const byFile = new Map()
+  for (const d of debtSeen) byFile.set(d.file, [...(byFile.get(d.file) || []), d.text])
+  for (const [f, ts] of byFile) console.log(`    ${f}: ${ts.join(', ')}`)
+}
+// Compare UNIQUE keys, not occurrences: `TOTAL WIN` legitimately renders at two
+// sites in one component, so counting occurrences would make this check pass or
+// fail by coincidence rather than by meaning.
+const debtMatched = new Set(debtSeen.map((d) => d.file + '|' + d.text))
+const debtStale = [...KNOWN_DEBT].filter((k) => !debtMatched.has(k))
+if (debtStale.length) {
+  // The list must describe reality in BOTH directions. An entry that no longer
+  // matches anything is a fix that landed without its allowlist entry being
+  // removed, and the ratchet only works if it cannot rust.
+  failures.push({
+    gate: 'known-debt',
+    detail: `KNOWN_DEBT has ${debtStale.length} entry(ies) matching nothing: ${debtStale.join('; ')}. `
+      + 'That surface is fixed, so remove the entry, per the ratchet note beside the list.',
+  })
+}
 
 // ── SEEDED VIOLATION SELF-TEST, convention (p) ───────────────────────────────
 //
@@ -182,22 +470,43 @@ const SEEDS = [
    '<h1>REACHED!\n</h1>'],
   ['punctuation the old character class excluded',
    '<p>\n  NO WIN, TRY AGAIN\n</p>'],
+  // TR-091 seeds. Every one is a form that WAS really in this repository and
+  // that the pre-2026-07-27 reading could not see. Convention (p) is explicit
+  // that a seed in a form the gate happens to handle teaches nothing, so these
+  // are copied from the real lines rather than invented.
+  ['TR-091 (A): a literal SHARING a text node with an interpolation',
+   '<div class="sp-row"><span>NET {coinsWord}</span></div>'],
+  ['TR-091 (B): a literal written INSIDE an interpolation, the stake.us form',
+   `<div class="fm-section-label">{$isSocial ? 'GET FEATURES' : 'BUY FEATURES'}</div>`],
+  // The same SHAPE in a player-facing attribute. The value is uppercase on
+  // purpose: this gate's declared class is uppercase player strings, and the
+  // real `title={$speedTier === 'normal' ? 'Normal speed' : ...}` is SENTENCE
+  // case, so it is correctly out of scope here and stays in the parked
+  // sentence-case set at docs/QUALITY_CHARTER.md 4.3. Seeding it with its real
+  // sentence-case value made this seed fail, which was the seed being wrong
+  // about the gate's scope rather than the gate being wrong. Recorded because
+  // getting that backwards is how a gate gets widened into crying wolf.
+  ['TR-091 (B): the same shape in a player-facing ATTRIBUTE, which no quoted-value scan sees',
+   `<button title={$isSocial ? 'PLAY MODES' : 'BET MODES'}>x</button>`],
 ]
-const seedResults = SEEDS.map(([why, markup]) => {
-  LITERAL_RE.lastIndex = 0
-  const caught = [...markup.matchAll(LITERAL_RE)]
-    .map((m) => m[1].trim())
-    .some((t) => t && !ALLOW.has(t) && !t.includes('{'))
-  return { why, caught }
-})
-// The negative control. Without it a regex matching everything would "catch"
-// all five seeds and the self-test would certify a gate that fails on clean
-// markup, which is a different way of being useless.
-const CLEAN = '<span>{$tr(\'spin\')}</span>\n<div class="x">{value}</div>\n<p>\n  {label}\n</p>'
-LITERAL_RE.lastIndex = 0
-const cleanIsClean = [...CLEAN.matchAll(LITERAL_RE)]
-  .map((m) => m[1].trim())
-  .every((t) => !t || ALLOW.has(t) || t.includes('{'))
+const seedResults = SEEDS.map(([why, markup]) => ({
+  why,
+  // Through the SHIPPED detection path, not a restatement of one regex.
+  caught: findLiterals(markup, join(ROOT, 'src/lib/components/__seed__.svelte')).length > 0,
+}))
+// The negative control. Without it a detector matching everything would "catch"
+// every seed and the self-test would certify a gate that fails on clean markup,
+// which is a different way of being useless. Each line is a form that MUST pass:
+// the correct translated call, a plain value, a lowercase label, and the
+// currency-fallback idiom that the widening initially flagged by mistake.
+const CLEAN = [
+  `<span>{$tr('spin')}</span>`,
+  `<div class="x">{value}</div>`,
+  `<p>\n  {label}\n</p>`,
+  `<span>{formatBalance(micros, $currencyCode || 'USD')}</span>`,
+  `<span class="lbl">Spins</span>`,
+].join('\n')
+const cleanIsClean = findLiterals(CLEAN, join(ROOT, 'src/lib/components/__clean__.svelte')).length === 0
 
 for (const s of seedResults) {
   console.log(`  ${s.caught ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
