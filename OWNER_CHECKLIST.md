@@ -36,9 +36,28 @@ being told.
 
 ---
 
+## 0b. What is now DONE, with the evidence path
+
+Ticked off so you are not asked again. Each names where the proof lives.
+
+| Item | Status | Evidence |
+|---|---|---|
+| **Twenty Cruise spins** | **DONE 2026-07-28** | `reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. TR-075 CLOSED: the arithmetic resolves to the cent and Cruise debits exactly 1.00x. **This was the only open money item in the project.** |
+| **The V7 and V8 era uploads** | **DONE** | Kit V8 is live on the portal: the boot line at frame `071805` reads build `e0c30611`, which is the V8 kit commit, and the bundle hash matches the kit. |
+| **Which entry is the submission** | **DECIDED: `future-spinner-2`** | Your ruling. A fresh clean upload. The original `future-spinner` entry is superseded and awaits deletion, which is item 3b below. |
+| **The payments model** | **APPEARS CHOSEN, confirm it** | Frame `082628` shows **Profit Share selected, 10% GGR**. Item 6 now only needs you to confirm that is deliberate. |
+
+**If you read one document about money, read `docs/records/MONEY_DISPLAY_EXPLAINED.md`.** It is
+the plain-English account of how every figure on screen relates to what the wallet actually
+does, and it is the answer to most "is that number right" questions before they are asked.
+
+---
+
 ## 1. Twenty Cruise spins, bracketed by session panels
 
-**THE ONLY OPEN MONEY ITEM.** Tracker row TR-075.
+**DONE 2026-07-28. TR-075 is CLOSED.** Kept here for the record rather than deleted, so
+the method is on file if a sixth mode ever needs the same treatment. Evidence:
+`reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. Nothing to do.
 
 **Why.** Four of the five modes have had their wallet debit proven to the cent by
 differencing two balance readouts: base, OVERBOOST, Buy Overdrive and NITRO. **Cruise never
@@ -165,6 +184,19 @@ it was built from. Delete V7 too once you have published from it.
 
 ---
 
+## 3b. Delete the old `future-spinner` entry, once the cooldown allows
+
+**Why.** `future-spinner-2` is the submission entry. The original entry is superseded, and two
+entries for one game is exactly the stale-artefact confusion that has cost this project a star
+before. The platform imposes a cooldown before an entry can be removed.
+
+**What to do.** When the cooldown allows, delete the original `future-spinner` entry. Nothing
+depends on it.
+
+**DONE when** only `future-spinner-2` remains in the team's game list.
+
+---
+
 ## 4. If the red authenticate comes back, one Console screenshot
 
 **Low urgency. Nothing player-visible has failed.** Do this only if you are in DevTools
@@ -219,6 +251,25 @@ valuable than no result, and it is far cheaper to find now than after release.
 
 *Standing caveat, unchanged: this is documented pragmatic clearance, not a formal legal
 opinion. A trademark professional is still needed before any enforcement action.*
+
+---
+
+### What your 2026-07-28 search actually turned up
+
+Committed at `reports/screens/live-portal-2026-07-28/`, frames `082429` and `082546`.
+
+- **"Future Spinner"**: 14,407 results. The two visible marks are both `SPINNER`, IC 028, both
+  **DEAD / CANCELLED**.
+- **"future spin"**: 16,693 results. The first result is **FUTURE SPIN**, serial **88852459**,
+  **Class 041, entertainment services and online games**, owner **LIGHT & WONDER, INC.**,
+  status **DEAD / ABANDONED**.
+
+**That last one is the material find**, and it is why this item exists: a near-identical
+wordmark in our own class, once held by a major supplier, now abandoned.
+
+**This is evidence, not a clearance, and the builder does not give you a view on it.** Whether
+an abandoned mark clears our use is a legal question. Put these two frames in front of whoever
+advises you and let them answer it.
 
 ---
 

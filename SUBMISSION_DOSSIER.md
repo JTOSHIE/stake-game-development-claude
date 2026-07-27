@@ -203,10 +203,34 @@ remember to check.
 Regenerate immediately before staging with a clean `npm run build` from `frontend/` - never
 upload a stale or hand-edited `dist/`.
 
+### 5b0. THE SUBMISSION ENTRY IS `future-spinner-2` (owner's ruling, 2026-07-28)
+
+**Everything in 5b onward targets the game entry `future-spinner-2`.** It is a fresh clean
+upload and it is the entry that will be submitted.
+
+The original `future-spinner` entry is **superseded**. It awaits deletion once the platform's
+cooldown allows, which is `OWNER_CHECKLIST.md` item 3b. Two entries for one game is exactly
+the stale-artefact confusion this dossier exists to prevent, so the distinction is recorded
+here rather than left to memory.
+
+**Evidence that V8 is live on that entry**: `reports/screens/live-portal-2026-07-28/`, frame
+`071805`, whose boot line reads build `e0c30611`, the kit V8 commit, and whose bundle hash
+`index-pDIjyKAp.js` matches the kit's own JS filename.
+
+**One thing on that frame is EXPECTED and is not a fault.** `GET .../approvals/future-spinner-2`
+returns **404 (Not Found)** until Start Approval is pressed. Recorded so a reviewer meeting it
+in a console capture does not read it as a defect.
+
+**A second thing on that frame is diagnosed and closed**: three background files returned 403
+from a path under `scratch/front/`, the platform's unpublished staging area. They are present
+in dist and in the uploaded kit, measured both ways, and they rendered six minutes later with
+no code change. Full reasoning in **TR-102**.
+
 ### 5b. Exact portal upload steps
 
-1. Log in to the Stake Engine developer dashboard (team profile, branding and payment
-   details must already be confirmed one-time - see 5d below).
+1. Log in to the Stake Engine developer dashboard and open the **`future-spinner-2`** entry
+   (team profile, branding and payment details must already be confirmed one-time - see 5d
+   below).
 2. Upload the frontend bundle: the full contents of `frontend/dist/` as produced in 5a,
    for this exact commit.
 3. Upload the maths/publish bundle: the TWELVE files in 5c below, from
