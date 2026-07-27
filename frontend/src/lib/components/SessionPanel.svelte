@@ -68,7 +68,11 @@
   $: cur = $currencyCode || 'USD'
   $: net = $rgNetMicros
   $: netLabel = (net >= 0 ? '+' : '-') + formatBalance(Math.abs(net), cur)
-  $: coinsWord = $isSocial ? 'COINS' : ''
+  // Was `$isSocial ? 'COINS' : ''`, the same duplicated-layer shape TR-091 is
+  // about, hiding in the script block where even the widened gate cannot see it.
+  // SOCIAL_OVERRIDES already maps `balance` to COINS in every locale, so this
+  // asks for it rather than restating it in English.
+  $: coinsWord = $isSocial ? $tr('balance') : ''
 </script>
 
 {#if autoPinned}
@@ -79,7 +83,7 @@
   <div class="sp" role="status" aria-label={$tr('rgSessionTitle')} data-testid="session-panel-pinned">
     <div class="sp-row"><span>{$tr('hudTime')}</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
     <div class="sp-row"><span>{$tr('hudSpins')}</span><span class="sp-val">{$rgSession.spins}</span></div>
-    <div class="sp-row"><span>NET {coinsWord}</span><span class="sp-val" class:neg={net < 0} class:pos={net > 0}>{netLabel}</span></div>
+    <div class="sp-row"><span>{$tr('sessionNet')} {coinsWord}</span><span class="sp-val" class:neg={net < 0} class:pos={net > 0}>{netLabel}</span></div>
   </div>
 {/if}
 

@@ -448,7 +448,7 @@
                       on:click={() => toggleEnhancer(m)}
                       disabled={$isSpinning}
                       data-testid="enhancer-toggle-{m.id}"
-                    >{enhOn ? 'ON' : 'OFF'}</button>
+                    >{enhOn ? $tr('stateOn') : $tr('stateOff')}</button>
                   {/if}
                 </div>
               </div>
@@ -456,7 +456,7 @@
           {/each}
 
           <div class="fm-section-separator" role="separator" aria-hidden="true"></div>
-          <div class="fm-section-label">{$isSocial ? 'GET FEATURES' : 'BUY FEATURES'}</div>
+          <div class="fm-section-label">{$tr('buyFeaturesHeading')}</div>
           {#each buyFeatureCards as m (m.id)}
             <div
               class="fm-card fs-plate tone-{m.kind}"
@@ -506,7 +506,7 @@
         <!-- Footer -->
         <div class="fm-foot">
           <span class="fm-rtp">All modes · RTP {FS_RTP_LABEL}</span>
-          <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">{$isSocial ? 'PLAY MODES' : 'BET MODES'}</button>
+          <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">{$tr('betModesHeading')}</button>
         </div>
 
       </div><!-- /fs-face -->

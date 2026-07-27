@@ -115,25 +115,15 @@ const ALLOW = new Set([
  * empty, delete it and this comment with it.
  */
 const KNOWN_DEBT = new Set([
-  // The stake.us six. Handled for SOCIAL mode by a hand-rolled ternary, which is
-  // why nobody noticed: the social swap works and the LOCALE swap does not
-  // exist, so both branches are hardcoded English in all sixteen locales.
-  'src/lib/components/FeatureMenu.svelte|BUY FEATURES',
-  'src/lib/components/FeatureMenu.svelte|GET FEATURES',
-  'src/lib/components/FeatureMenu.svelte|BET MODES',
-  'src/lib/components/FeatureMenu.svelte|PLAY MODES',
-  // The enhancer toggle state.
-  'src/lib/components/FeatureMenu.svelte|OFF',
-  // The responsible-gambling session overlay.
-  'src/lib/components/SessionPanel.svelte|NET',
-  // Constants. `overdriveFreeSpins` and `totalWin` ALREADY exist in all sixteen
-  // locales in the feature block, so these two are second copies of translated
-  // strings rather than missing translations.
-  // Symbol labels, rendered from a local record and from the paytable.
-  'src/lib/components/WinBreakdown.svelte|WILD',
-  'src/lib/components/WinBreakdown.svelte|SCATTER',
-  'src/lib/components/PaytableModal.svelte|WILD',
-  'src/lib/components/PaytableModal.svelte|SCAT',
+  // EMPTY. Every entry frozen on 2026-07-27 has been burned by the ratchet:
+  // ten fixed by routing through the tr layer or by adding a translated key,
+  // two removed as NOT A DEFECT (Svelte block conditions comparing against
+  // data, which render nothing), and one moved to DEV_ONLY on its merits.
+  //
+  // Per the note above: when this list is empty, delete it and its comment.
+  // It is kept for one release so the ratchet's own history is visible in the
+  // file rather than only in the log, and so the both-directions check below
+  // keeps proving the list describes reality.
 ])
 
 /**
@@ -274,6 +264,13 @@ function interpolatedStrings(markup) {
   const BLOCK = /\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g
   for (const m of markup.matchAll(BLOCK)) {
     const inner = m[1]
+    // SVELTE BLOCK TAGS ARE LOGIC, NOT TEXT. `{#if sym.name === 'SCAT'}` and
+    // `{:else if sym.name === 'WILD'}` compare against DATA and render nothing,
+    // so flagging them reports a branch condition as a player-visible string.
+    // Found by this ratchet: two of the frozen entries turned out to be exactly
+    // that, and freezing a false positive is worse than missing a real one,
+    // because it makes the debt list lie about its own size.
+    if (/^\s*[#:/@]/.test(inner)) continue
     for (const s of inner.matchAll(/'([^'\\]*)'|"([^"\\]*)"/g)) {
       const val = s[1] ?? s[2] ?? ''
       const before = inner.slice(0, s.index)
@@ -508,6 +505,8 @@ const CLEAN = [
   // A comment quoting the defect it replaced must NOT be flagged. Svelte strips
   // comments, so this is not player-visible, and the house style writes them.
   `<!-- Was {$isSocial ? 'PLAY' : 'BET'}, replaced by the tr layer -->`,
+  // A Svelte block CONDITION is logic, not rendered text, and must pass.
+  `{#if sym.name === 'SCAT'}<span>{sym.note}</span>{:else if sym.name === 'WILD'}<span>x</span>{/if}`,
 ].join('\n')
 const cleanIsClean = findLiterals(CLEAN, join(ROOT, 'src/lib/components/__clean__.svelte')).length === 0
 

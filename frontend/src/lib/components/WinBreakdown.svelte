@@ -3,12 +3,24 @@
   // win burst settles, cycle group by group through the interpreter's win
   // events (symbol, count, ways, pay), matching what actually paid.
   import { onDestroy } from 'svelte'
+  import { tr } from '../i18n/tr'
   import { activeWins, isSpinning, currencyCode } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
 
-  const SYMBOL_LABELS: Record<string, string> = {
+  // The tier symbols are IDs, identical in every language, so they stay a plain
+  // map. WILD and SCATTER are words, and they used to sit in this same record as
+  // hardcoded English: being a local constant rather than markup, they were
+  // invisible to the locale gate until TR-091 widened it. They now come from the
+  // tr layer like every other player-visible word.
+  const SYMBOL_IDS: Record<string, string> = {
     H1: 'H1', H2: 'H2', M1: 'M1', M2: 'M2', M3: 'M3',
-    L1: 'L1', L2: 'L2', L3: 'L3', W: 'WILD', S: 'SCATTER',
+    L1: 'L1', L2: 'L2', L3: 'L3',
+  }
+  const symbolLabel = (raw: string, t: (k: 'symbolWild' | 'symbolScatter') => string): string => {
+    const id = (raw || '').toUpperCase()
+    if (id === 'W') return t('symbolWild')
+    if (id === 'S') return t('symbolScatter')
+    return SYMBOL_IDS[id] ?? raw
   }
 
   let cycleIndex = 0
@@ -59,7 +71,7 @@
   <div class="c1-win win-breakdown fs-plate" data-testid="win-breakdown">
     <span class="fs-rail"></span>
     <div class="fs-face">
-      <span class="wb-symbol">{SYMBOL_LABELS[current.symbol.toUpperCase()] ?? current.symbol}</span>
+      <span class="wb-symbol">{symbolLabel(current.symbol, $tr)}</span>
       <span class="wb-count">x{current.kind}</span>
       <span class="wb-ways">{current.ways} ways</span>
       <span class="wb-pay fs-num">{payLabel}</span>

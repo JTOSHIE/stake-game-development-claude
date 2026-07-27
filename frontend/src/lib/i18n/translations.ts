@@ -97,6 +97,16 @@ export interface Translations {
   rules:                string
   paytable:             string
   close:                string
+  // TR-091. Added 2026-07-28 to replace hand-rolled social ternaries and
+  // duplicated constants. Social variants for the two headings live in
+  // SOCIAL_OVERRIDES, so the tr layer does both swaps in one call.
+  stateOn:               string
+  stateOff:              string
+  buyFeaturesHeading:    string
+  betModesHeading:       string
+  sessionNet:            string
+  symbolWild:            string
+  symbolScatter:         string
   settings:             string
   // ── Replay mode ───────────────────────────────────────────────────────────
   replayDisclaimer:     string
@@ -245,6 +255,13 @@ const en: Translations = {
   rules:                'RULES',
   paytable:             'PAYTABLE',
   close:                'CLOSE',
+  stateOn:               'ON',
+  stateOff:              'OFF',
+  buyFeaturesHeading:    'BUY FEATURES',
+  betModesHeading:       'BET MODES',
+  sessionNet:            'NET',
+  symbolWild:            'WILD',
+  symbolScatter:         'SCATTER',
   settings:             'SETTINGS',
   replayDisclaimer:     'This is a replay of a previously completed bet, shown for verification only. No funds are wagered and the outcome cannot be changed.',
 }
@@ -315,6 +332,13 @@ const ar: Translations = {
   rules:                'القواعد',
   paytable:             'جدول الدفع',
   close:                'إغلاق',
+  stateOn:               'تشغيل',
+  stateOff:              'إيقاف',
+  buyFeaturesHeading:    'شراء الميزات',
+  betModesHeading:       'أوضاع الرهان',
+  sessionNet:            'الصافي',
+  symbolWild:            'وايلد',
+  symbolScatter:         'سكاتر',
   settings:             'الإعدادات',
   replayDisclaimer:     'هذه إعادة لرهان مكتمل سابقاً، تُعرض للتحقق فقط. لا تتم المراهنة بأي أموال ولا يمكن تغيير النتيجة.',
 }
@@ -385,6 +409,13 @@ const de: Translations = {
   rules:                'REGELN',
   paytable:             'GEWINNTABELLE',
   close:                'SCHLIESSEN',
+  stateOn:               'AN',
+  stateOff:              'AUS',
+  buyFeaturesHeading:    'FEATURES KAUFEN',
+  betModesHeading:       'EINSATZMODI',
+  sessionNet:            'NETTO',
+  symbolWild:            'WILD',
+  symbolScatter:         'SCATTER',
   settings:             'EINSTELLUNGEN',
   replayDisclaimer:     'Dies ist die Wiederholung eines bereits abgeschlossenen Einsatzes und dient nur zur Überprüfung. Es wird kein Geld eingesetzt und das Ergebnis kann nicht geändert werden.',
 }
@@ -455,6 +486,13 @@ const es: Translations = {
   rules:                'REGLAS',
   paytable:             'TABLA DE PAGOS',
   close:                'CERRAR',
+  stateOn:               'ACTIVADO',
+  stateOff:              'DESACTIVADO',
+  buyFeaturesHeading:    'COMPRAR FUNCIONES',
+  betModesHeading:       'MODOS DE APUESTA',
+  sessionNet:            'NETO',
+  symbolWild:            'COMODÍN',
+  symbolScatter:         'DISPERSIÓN',
   settings:             'CONFIGURACIÓN',
   replayDisclaimer:     'Esta es la repetición de una apuesta ya completada, mostrada solo con fines de verificación. No se apuesta dinero y el resultado no se puede cambiar.',
 }
@@ -525,6 +563,13 @@ const fi: Translations = {
   rules:                'SÄÄNNÖT',
   paytable:             'MAKSUTAULUKKO',
   close:                'SULJE',
+  stateOn:               'PÄÄLLÄ',
+  stateOff:              'POIS',
+  buyFeaturesHeading:    'OSTA OMINAISUUKSIA',
+  betModesHeading:       'PANOSTILAT',
+  sessionNet:            'NETTO',
+  symbolWild:            'JOKERI',
+  symbolScatter:         'HAJOTUS',
   settings:             'ASETUKSET',
   replayDisclaimer:     'Tämä on aiemmin pelatun panoksen toisto, joka näytetään vain vahvistusta varten. Rahaa ei panosteta eikä lopputulosta voi muuttaa.',
 }
@@ -595,6 +640,13 @@ const fr: Translations = {
   rules:                'RÈGLES',
   paytable:             'TABLE DE PAIEMENT',
   close:                'FERMER',
+  stateOn:               'ACTIVÉ',
+  stateOff:              'DÉSACTIVÉ',
+  buyFeaturesHeading:    'ACHETER DES FONCTIONS',
+  betModesHeading:       'MODES DE MISE',
+  sessionNet:            'NET',
+  symbolWild:            'JOKER',
+  symbolScatter:         'SCATTER',
   settings:             'PARAMÈTRES',
   replayDisclaimer:     'Ceci est la relecture d’une mise déjà terminée, affichée à des fins de vérification uniquement. Aucun fonds n’est misé et le résultat ne peut pas être modifié.',
 }
@@ -665,6 +717,13 @@ const hi: Translations = {
   rules:                'नियम',
   paytable:             'पे टेबल',
   close:                'बंद करें',
+  stateOn:               'चालू',
+  stateOff:              'बंद',
+  buyFeaturesHeading:    'फीचर खरीदें',
+  betModesHeading:       'बेट मोड',
+  sessionNet:            'शुद्ध',
+  symbolWild:            'वाइल्ड',
+  symbolScatter:         'स्कैटर',
   settings:             'सेटिंग',
   replayDisclaimer:     'यह पहले पूर्ण किए गए दांव का रीप्ले है, जो केवल सत्यापन के लिए दिखाया गया है। कोई धनराशि दांव पर नहीं लगाई जाती और परिणाम बदला नहीं जा सकता।',
 }
@@ -735,6 +794,13 @@ const id: Translations = {
   rules:                'ATURAN',
   paytable:             'TABEL BAYAR',
   close:                'TUTUP',
+  stateOn:               'AKTIF',
+  stateOff:              'NONAKTIF',
+  buyFeaturesHeading:    'BELI FITUR',
+  betModesHeading:       'MODE TARUHAN',
+  sessionNet:            'BERSIH',
+  symbolWild:            'WILD',
+  symbolScatter:         'SCATTER',
   settings:             'PENGATURAN',
   replayDisclaimer:     'Ini adalah tayangan ulang taruhan yang sudah selesai, ditampilkan hanya untuk verifikasi. Tidak ada dana yang dipertaruhkan dan hasilnya tidak dapat diubah.',
 }
@@ -805,6 +871,13 @@ const ja: Translations = {
   rules:                'ルール',
   paytable:             '配当表',
   close:                '閉じる',
+  stateOn:               'オン',
+  stateOff:              'オフ',
+  buyFeaturesHeading:    'フィーチャー購入',
+  betModesHeading:       'ベットモード',
+  sessionNet:            'ネット',
+  symbolWild:            'ワイルド',
+  symbolScatter:         'スキャッター',
   settings:             '設定',
   replayDisclaimer:     'これは完了済みのベットのリプレイで、確認のみを目的として表示されています。資金は賭けられておらず、結果を変更することはできません。',
 }
@@ -875,6 +948,13 @@ const ko: Translations = {
   rules:                '규칙',
   paytable:             '배당표',
   close:                '닫기',
+  stateOn:               '켜짐',
+  stateOff:              '꺼짐',
+  buyFeaturesHeading:    '피처 구매',
+  betModesHeading:       '베팅 모드',
+  sessionNet:            '순',
+  symbolWild:            '와일드',
+  symbolScatter:         '스캐터',
   settings:             '설정',
   replayDisclaimer:     '이것은 이미 완료된 베팅의 리플레이이며 확인용으로만 표시됩니다. 자금이 베팅되지 않으며 결과를 변경할 수 없습니다.',
 }
@@ -945,6 +1025,13 @@ const pl: Translations = {
   rules:                'ZASADY',
   paytable:             'TABELA WYPŁAT',
   close:                'ZAMKNIJ',
+  stateOn:               'WŁ.',
+  stateOff:              'WYŁ.',
+  buyFeaturesHeading:    'KUP FUNKCJE',
+  betModesHeading:       'TRYBY ZAKŁADU',
+  sessionNet:            'NETTO',
+  symbolWild:            'DZIKI',
+  symbolScatter:         'SCATTER',
   settings:             'USTAWIENIA',
   replayDisclaimer:     'To powtórka wcześniej zakończonego zakładu, pokazana wyłącznie w celu weryfikacji. Nie stawia się żadnych środków, a wyniku nie można zmienić.',
 }
@@ -1015,6 +1102,13 @@ const pt: Translations = {
   rules:                'REGRAS',
   paytable:             'TABELA DE PRÊMIOS',
   close:                'FECHAR',
+  stateOn:               'LIGADO',
+  stateOff:              'DESLIGADO',
+  buyFeaturesHeading:    'COMPRAR RECURSOS',
+  betModesHeading:       'MODOS DE APOSTA',
+  sessionNet:            'LÍQUIDO',
+  symbolWild:            'CORINGA',
+  symbolScatter:         'DISPERSÃO',
   settings:             'CONFIGURAÇÕES',
   replayDisclaimer:     'Esta é a repetição de uma aposta já concluída, exibida apenas para verificação. Nenhum valor é apostado e o resultado não pode ser alterado.',
 }
@@ -1085,6 +1179,13 @@ const ru: Translations = {
   rules:                'ПРАВИЛА',
   paytable:             'ТАБЛИЦА ВЫПЛАТ',
   close:                'ЗАКРЫТЬ',
+  stateOn:               'ВКЛ.',
+  stateOff:              'ВЫКЛ.',
+  buyFeaturesHeading:    'КУПИТЬ ФУНКЦИИ',
+  betModesHeading:       'РЕЖИМЫ СТАВКИ',
+  sessionNet:            'ИТОГ',
+  symbolWild:            'ДИКИЙ',
+  symbolScatter:         'СКАТТЕР',
   settings:             'НАСТРОЙКИ',
   replayDisclaimer:     'Это повтор ранее завершённой ставки, показанный только для проверки. Средства не ставятся, и результат изменить нельзя.',
 }
@@ -1155,6 +1256,13 @@ const tr: Translations = {
   rules:                'KURALLAR',
   paytable:             'ÖDEME TABLOSU',
   close:                'KAPAT',
+  stateOn:               'AÇIK',
+  stateOff:              'KAPALI',
+  buyFeaturesHeading:    'ÖZELLİK SATIN AL',
+  betModesHeading:       'BAHİS MODLARI',
+  sessionNet:            'NET',
+  symbolWild:            'JOKER',
+  symbolScatter:         'SCATTER',
   settings:             'AYARLAR',
   replayDisclaimer:     'Bu, daha önce tamamlanmış bir bahsin yalnızca doğrulama amacıyla gösterilen tekrarıdır. Hiçbir para yatırılmaz ve sonuç değiştirilemez.',
 }
@@ -1225,6 +1333,13 @@ const vi: Translations = {
   rules:                'LUẬT',
   paytable:             'BẢNG THƯỞNG',
   close:                'ĐÓNG',
+  stateOn:               'BẬT',
+  stateOff:              'TẮT',
+  buyFeaturesHeading:    'MUA TÍNH NĂNG',
+  betModesHeading:       'CHẾ ĐỘ CƯỢC',
+  sessionNet:            'RÒNG',
+  symbolWild:            'WILD',
+  symbolScatter:         'SCATTER',
   settings:             'CÀI ĐẶT',
   replayDisclaimer:     'Đây là bản phát lại của một lượt cược đã hoàn tất, chỉ hiển thị để xác minh. Không có khoản tiền nào được đặt cược và kết quả không thể thay đổi.',
 }
@@ -1295,6 +1410,13 @@ const zh: Translations = {
   rules:                '规则',
   paytable:             '赔付表',
   close:                '关闭',
+  stateOn:               '开',
+  stateOff:              '关',
+  buyFeaturesHeading:    '购买功能',
+  betModesHeading:       '投注模式',
+  sessionNet:            '净额',
+  symbolWild:            '百搭',
+  symbolScatter:         '分散',
   settings:             '设置',
   replayDisclaimer:     '这是先前已完成投注的回放，仅用于验证。不会下注任何资金，且结果无法更改。',
 }
@@ -1740,6 +1862,11 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
   spin:    'PLAY',
   win:     'PRIZE',
   winFlash: 'PRIZE!',
+  // TR-091. The two headings the platform's prohibited-term table renames on
+  // stake.us. Supplied here rather than in a component ternary, so the social
+  // swap and the locale swap come from one place.
+  buyFeaturesHeading: 'GET FEATURES',
+  betModesHeading: 'PLAY MODES',
   balance: 'COINS',
   // Bet wording -> play wording
   bet:     'PLAY',
