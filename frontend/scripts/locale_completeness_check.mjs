@@ -122,10 +122,6 @@ const KNOWN_DEBT = new Set([
   'src/lib/components/FeatureMenu.svelte|GET FEATURES',
   'src/lib/components/FeatureMenu.svelte|BET MODES',
   'src/lib/components/FeatureMenu.svelte|PLAY MODES',
-  'src/lib/components/FeatureMenu.svelte|BET',
-  'src/lib/components/FeatureMenu.svelte|PLAY',
-  'src/lib/components/MaxWinCelebration.svelte|BET',
-  'src/lib/components/MaxWinCelebration.svelte|PLAY',
   'src/lib/components/WinCelebration.svelte|WIN!',
   'src/lib/components/WinCelebration.svelte|PRIZE!',
   // The enhancer toggle state.
@@ -365,8 +361,16 @@ function findLiterals(body, path, label = '(seed)') {
   // braces, so the first run reported `INPUT` and `TEXTAREA` from a `tagName`
   // comparison and six ISO currency codes from an `import { ZERO_DECIMAL }`
   // line. Player-facing text lives in markup; the script block is code.
+  // HTML COMMENTS ARE STRIPPED TOO, and that is verified rather than assumed:
+  // Svelte compiles with `preserveComments: false` by default, and `grep` for a
+  // distinctive committed comment string in `dist/assets/*.js` returns 0. So a
+  // `<!-- -->` in a component cannot reach a player. This matters because the
+  // house style explains a fix by QUOTING the code it replaced, and without this
+  // the gate flags the explanation as the defect: burning the first four ratchet
+  // entries did exactly that, on the two lines that had just been FIXED.
   const markup = body
     .replace(/<script[\s\S]*?<\/script>/g, (m) => '\n'.repeat((m.match(/\n/g) || []).length))
+    .replace(/<!--[\s\S]*?-->/g, (m) => '\n'.repeat((m.match(/\n/g) || []).length))
     .split('<style>')[0]
   const seen = new Set()
   const add = (text, at, note) => {
@@ -505,6 +509,9 @@ const CLEAN = [
   `<p>\n  {label}\n</p>`,
   `<span>{formatBalance(micros, $currencyCode || 'USD')}</span>`,
   `<span class="lbl">Spins</span>`,
+  // A comment quoting the defect it replaced must NOT be flagged. Svelte strips
+  // comments, so this is not player-visible, and the house style writes them.
+  `<!-- Was {$isSocial ? 'PLAY' : 'BET'}, replaced by the tr layer -->`,
 ].join('\n')
 const cleanIsClean = findLiterals(CLEAN, join(ROOT, 'src/lib/components/__clean__.svelte')).length === 0
 

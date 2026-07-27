@@ -116,7 +116,10 @@
              carries). Same quantity, two glyphs, two screens: the mandate's
              "decimal or currency formats that disagree". QUALITY_CHARTER.md Q-12. -->
         <span class="c1-max-mult fs-num">5,000</span><span class="c1-max-x">×</span>
-        <span class="c1-max-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
+        <!-- Was `{$isSocial ? 'PLAY' : 'BET'}`. Same duplicated layer as
+             FeatureMenu's: `t()` consults SOCIAL_OVERRIDES first, so this one
+             call does the social swap AND the locale swap. TR-091. -->
+        <span class="c1-max-betlabel">{t($locale, 'bet', localeMode)}</span>
       </div>
 
       <button class="c1-collect collect-btn" on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">

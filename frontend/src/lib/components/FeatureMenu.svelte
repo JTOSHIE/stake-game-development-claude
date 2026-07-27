@@ -332,7 +332,12 @@
         <div class="fm-betbar fs-plate">
           <div class="fs-face">
             <span class="fm-spin-cost" data-testid="current-spin-cost">{$tr('hudSpinCost')} <span class="fs-num">{currentSpinCost}</span></span>
-            <span class="fm-betlabel">{$isSocial ? 'PLAY' : 'BET'}</span>
+            <!-- Was `{$isSocial ? 'PLAY' : 'BET'}`, a hand-rolled copy of a layer
+                 that already exists: SOCIAL_OVERRIDES maps `bet` to PLAY and `tr`
+                 is social-aware, so the ternary reproduced the social swap and
+                 dropped the locale swap. Both branches were English in all
+                 sixteen locales. TR-091. -->
+            <span class="fm-betlabel">{$tr('bet')}</span>
             <button class="fm-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>-</button>
             <span class="fm-betval fs-num" data-testid="feature-menu-bet">{price(1)}</span>
             <button class="fm-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>+</button>
