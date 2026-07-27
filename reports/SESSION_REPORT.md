@@ -3100,6 +3100,38 @@ both still on the Desktop and both dead. Not deleted by this pass, because that 
 owner's machine; PART 9g asks for it at step 7.
 
 
+## What was still running at the end, and why it is on the record
+
+Asked at close: what is still going. The answer for this session's own work is **nothing**,
+and `git status` was clean throughout, so no committed evidence was touched. But auditing it
+found something worth a row.
+
+**Every browser gate leaks its `vite preview` server.** They spawn it detached and reap it
+with a process-GROUP `SIGTERM`, and the group signal does not reliably reach it. Measured at
+close: **seven leaked preview servers, fourteen processes, holding eighteen ports**, plus two
+orphaned chromium groups. Both gates this pass added copied the pattern from the existing
+ones, so it is a defect in the gate FAMILY rather than in any one script.
+
+**The worse half is already documented in the codebase as a symptom without being recognised
+as a cause.** `layout_fit_gate.mjs`'s hard-timeout comment says it exactly: killing the `npx`
+wrapper orphans the real vite child, whose inherited stdout pipe holds the process's event
+loop open. So a gate that FAILS mid-run can hang forever. Found running: a
+`portrait_layout_conformance.mjs` process from a PREVIOUS session, **hung for 1 day 9 hours**
+with five chromium attached, whose log last wrote two days earlier and ends in a
+`TimeoutError`. Dead for two days, still holding a browser.
+
+**This is probably part of the frame-gate noise this pass recorded and could not attribute.**
+`sampleCount` fell from 85 to 36 and `splashFrameGate` flipped between two runs with no code
+change. A gate whose result depends on how many corpses are on the machine reports noise, and
+some of those corpses were ours. TR-101, with the three fix options; serving `dist/` from a
+`node:http` server inside the gate process is the one that removes the class rather than the
+instance.
+
+Cleaned up on the owner's instruction: the hung run, its chromium, every leaked preview and
+the orphaned chromium groups terminated; the two `vite --host` dev servers deliberately left
+alone. Nothing in the repository changed.
+
+
 ## Rule 10 closing link
 
 This session's final push, BOTH JOBS GREEN:
