@@ -35,6 +35,40 @@ Evidence `reports/screens/screenshot-analyst-2026-07-26/01_hud_bet_1250_overboos
 
 ## SA-002  ANOMALY  severity MEDIUM  THE ANTELITE QUESTION, part 2, the surface
 
+**RULING, 2026-07-28: DECLINED. The convention is not raised with the platform before
+submission.** Relayed by the owner as Fable's ruling on comms 020 decision 5.
+
+**A note on how this is recorded, per convention (l.7).** The verbatim ruling text was not
+supplied to this session, so what follows is NOT a quotation of Fable and is not presented as
+one. It is the case the repository's own evidence makes for the decision, written so a future
+reader can see the decision was supported rather than merely asserted. If the verbatim
+reasoning is supplied later, it supersedes this paragraph.
+
+**What the evidence supports.**
+
+1. **It is not our defect to report.** The COST column carries the bet level for every studio
+   and every mode on the platform, and the platform publishes `costMultiplier` as its own
+   separate field in the authenticate response. Ours is one of many games rendering into a
+   convention that predates it.
+2. **Nothing is understated to the player by OUR surfaces**, which is the part that would
+   have made this urgent. The HUD BET plate renders the effective debit, the FEATURES header
+   states `SPIN COST` beside `BET`, each mode card states its own multiplier and cash price,
+   and the buy confirm dialog states the same price the card does. A player is told what a
+   spin costs, in our chrome, before they spend.
+3. **No limit is breached under either reading.** The 5,000x cap is measured against the bet
+   level by both the platform and our own `WINCAP`, so the MULT column reading against the
+   level rather than the spend changes no compliance figure.
+4. **The money path is proven correct independently of the display**: four HUD balances
+   reconciled to the cent across base, 100x and 400x, and three sessions solved for their
+   opening balance twice, once under each competing reading, giving exact round openings under
+   the true per-mode costs and nothing round under the alternative.
+
+**What DECLINED does not mean.** It does not mean the observation was wrong or is discarded.
+`docs/records/MONEY_DISPLAY_EXPLAINED.md` remains the owner-facing page, `GAME_FACTS.md`
+section 3a remains the statement of record, and `SUBMISSION_DOSSIER.md` section 9d carries it
+into the submission documents. If a reviewer raises it, the answer is already written and
+evidenced. The decision is only that we do not open it with the platform first.
+
 **The owner's observation matches the Stake Engine dashboard Bets page, not our
 HUD.** Its COST column reads `$10.00` on every `antelite` row while the true
 debit is `$12.50`. The same column reads `$500.00` on a `bonus` row whose debit
@@ -116,6 +150,40 @@ Evidence `reports/screens/screenshot-analyst-2026-07-26/12_cruise_badge_bet_1000
 `reports/qa/live_stats/2026-07-26b_bets_page_all_modes_126_rows.json`.
 
 ## SA-007  ANOMALY  severity LOW  the platform MULT column is against the bet level
+
+**RULING, 2026-07-28: DECLINED. The convention is not raised with the platform before
+submission.** Relayed by the owner as Fable's ruling on comms 020 decision 5.
+
+**A note on how this is recorded, per convention (l.7).** The verbatim ruling text was not
+supplied to this session, so what follows is NOT a quotation of Fable and is not presented as
+one. It is the case the repository's own evidence makes for the decision, written so a future
+reader can see the decision was supported rather than merely asserted. If the verbatim
+reasoning is supplied later, it supersedes this paragraph.
+
+**What the evidence supports.**
+
+1. **It is not our defect to report.** The COST column carries the bet level for every studio
+   and every mode on the platform, and the platform publishes `costMultiplier` as its own
+   separate field in the authenticate response. Ours is one of many games rendering into a
+   convention that predates it.
+2. **Nothing is understated to the player by OUR surfaces**, which is the part that would
+   have made this urgent. The HUD BET plate renders the effective debit, the FEATURES header
+   states `SPIN COST` beside `BET`, each mode card states its own multiplier and cash price,
+   and the buy confirm dialog states the same price the card does. A player is told what a
+   spin costs, in our chrome, before they spend.
+3. **No limit is breached under either reading.** The 5,000x cap is measured against the bet
+   level by both the platform and our own `WINCAP`, so the MULT column reading against the
+   level rather than the spend changes no compliance figure.
+4. **The money path is proven correct independently of the display**: four HUD balances
+   reconciled to the cent across base, 100x and 400x, and three sessions solved for their
+   opening balance twice, once under each competing reading, giving exact round openings under
+   the true per-mode costs and nothing round under the alternative.
+
+**What DECLINED does not mean.** It does not mean the observation was wrong or is discarded.
+`docs/records/MONEY_DISPLAY_EXPLAINED.md` remains the owner-facing page, `GAME_FACTS.md`
+section 3a remains the statement of record, and `SUBMISSION_DOSSIER.md` section 9d carries it
+into the submission documents. If a reviewer raises it, the answer is already written and
+evidenced. The decision is only that we do not open it with the platform first.
 
 Consequence of SA-002, recorded separately because it is the figure a reviewer
 is most likely to quote. An `antelite` row reading `x91.60` is `x73.28` against

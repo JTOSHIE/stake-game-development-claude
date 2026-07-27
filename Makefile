@@ -1,7 +1,6 @@
 PYTHON := python3
 VENV_DIR := env
 VENV_PY := $(VENV_DIR)/bin/python
-TEST_NAMES = 0_0_cluster 0_0_scatter 0_0_lines 0_0_expwilds 0_0_ways 0_0_lines_feature_match
 
 ifeq ($(OS),Windows_NT)
 	VENV_PY := $(VENV_DIR)\Scripts\python.exe
@@ -42,11 +41,12 @@ test:
 	cd $(CURDIR)
 	pytest tests/
 
-test_run:
-	@for f in $(TEST_NAMES); do \
-		echo "processing $$f"; \
-		$(VENV_PY) games/$$f/run.py; \
-	done
+# test_run REMOVED 2026-07-28 (TR-088). It iterated TEST_NAMES, the six upstream
+# 0_0_* sample games, which were removed with the rest of the SDK samples. It is
+# NOT repointed at games/future_spinner: that package is locked and its run.py
+# regenerates books and lookup tables, so a casual `make test_run` would rewrite
+# published, frozen truth. Use `make run GAME=future_spinner` deliberately, or
+# not at all.
 
 
 clean:
