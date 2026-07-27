@@ -1162,7 +1162,7 @@
     // would have added a request to every session, which is precisely what the
     // ruling has the network-hygiene gate assert against.
     console.info(
-      `Future Spinner build ${__BUILD_COMMIT__.slice(0, 8)}`
+      `Future Spinner ${__BUILD_VERSION__} build ${__BUILD_COMMIT__.slice(0, 8)}`
       + `${__BUILD_CLEAN__ ? '' : ' (uncommitted changes)'} built ${__BUILD_AT__}`,
     )
 

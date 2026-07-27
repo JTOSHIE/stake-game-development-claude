@@ -52,10 +52,26 @@ const REPO = resolve(HERE, '..')
 // kit it makes, and the README inside a V4 folder would have told the owner to
 // confirm "Front V3". One number, read once, used everywhere below.
 //   node scripts/kit_build.mjs --version 5
+//
+// READ FROM THE REPOSITORY-ROOT `VERSION` FILE, owner's order 2026-07-28
+// (JOB 2). One source, shared with `vite.config.ts`, which stamps the same
+// value into `build-info.json` and into the boot line. Two constants that must
+// agree are two constants that eventually will not, and this one already
+// failed that way once: it was hardcoded to V3 while a V4 was built and
+// shipped, so the script and the Desktop disagreed about which kit it makes.
+//
+// `--version <n>` still overrides, for a deliberate one-off. The default is the
+// file, so the ordinary path needs no flag and cannot drift from the bundle.
 const KIT_VERSION = (() => {
   const i = process.argv.indexOf('--version')
-  const v = i >= 0 ? Number(process.argv[i + 1]) : NaN
-  return Number.isInteger(v) && v > 0 ? v : 5
+  const flag = i >= 0 ? Number(process.argv[i + 1]) : NaN
+  if (Number.isInteger(flag) && flag > 0) return flag
+  try {
+    const raw = readFileSync(join(REPO, 'VERSION'), 'utf-8').trim()
+    const n = Number(raw)
+    if (Number.isInteger(n) && n > 0) return n
+  } catch { /* fall through */ }
+  throw new Error('kit build: VERSION is missing or not a positive integer, and no --version given.')
 })()
 const KIT_NAME = `FS_UPLOAD_KIT_V${KIT_VERSION}`
 const KIT = join(homedir(), 'Desktop', KIT_NAME)
@@ -295,8 +311,13 @@ console.log(`walkthrough live section: ${PART}`)
 
 const readme = `# ${KIT_NAME}, frontend only
 
-**Built from commit \`${facts.head}\`** (\`${facts.head.slice(0, 8)}\`), clean tree,
-in a fresh clone, ${info.builtAt}.
+**Version \`v${KIT_VERSION}\`, built from commit \`${facts.head}\`**
+(\`${facts.head.slice(0, 8)}\`), clean tree, in a fresh clone, ${info.builtAt}.
+
+The same \`v${KIT_VERSION}\` is stamped inside the bundle at
+\`02_frontend_upload/build-info.json\` and is the FIRST thing the browser console
+prints on every boot, so the version you confirm on the portal and the version in
+the artefact are the same string rather than two numbers to reconcile.
 
 **${stats.files} files, ${stats.bytes} bytes (${(stats.bytes / 1024 / 1024).toFixed(2)} MB).**
 

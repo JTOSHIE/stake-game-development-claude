@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { rmSync, existsSync, statSync, readdirSync, writeFileSync } from 'node:fs'
+import { rmSync, existsSync, statSync, readdirSync, writeFileSync, readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { resolve, join } from 'node:path'
 
@@ -252,6 +252,7 @@ function pruneLegacyAssets() {
       const measured = measureDist(distRoot, infoPath)
       const info = {
         game: 'future-spinner',
+        version: KIT_VERSION,
         commit: git.commit,
         branch: git.branch,
         cleanTree: git.clean,
@@ -262,7 +263,7 @@ function pruneLegacyAssets() {
           + 'the boot line is inlined at build time. See TR-062.',
       }
       writeFileSync(infoPath, JSON.stringify(info, null, 2) + '\n')
-      console.log(`[build-info] ${git.commit.slice(0, 8)}${git.clean ? '' : ' DIRTY'} `
+      console.log(`[build-info] ${KIT_VERSION} ${git.commit.slice(0, 8)}${git.clean ? '' : ' DIRTY'} `
         + `${measured.files} files, ${measured.bytes} bytes`)
     },
   }
@@ -273,12 +274,33 @@ function pruneLegacyAssets() {
 // request. TR-062's ruling requires the network-hygiene gate to assert exactly
 // that, and a runtime fetch of build-info.json would have been the obvious and
 // wrong way to print it.
+/**
+ * THE HUMAN VERSION, owner's order 2026-07-28 (JOB 2): the owner reads `v9`
+ * rather than a hash.
+ *
+ * ONE SOURCE, the repository-root `VERSION` file, read by the build, by the
+ * boot line, and by `scripts/kit_build.mjs` for the kit name and its README.
+ * It is a file rather than a constant in this config because the kit builder is
+ * a sibling script that must agree with it, and two constants that must agree
+ * are two constants that eventually will not. The kit version was hardcoded to
+ * V3 while a V4 shipped once already, which is the failure this shape removes.
+ */
+const KIT_VERSION = (() => {
+  try {
+    const raw = readFileSync(resolve(import.meta.dirname, '..', 'VERSION'), 'utf-8').trim()
+    return /^\d+$/.test(raw) ? `v${raw}` : 'v0'
+  } catch {
+    return 'v0'
+  }
+})()
+
 const BUILD_GIT = gitFacts()
 
 export default defineConfig({
   plugins: [svelte(), pruneLegacyAssets()],
   base: './',
   define: {
+    __BUILD_VERSION__: JSON.stringify(KIT_VERSION),
     __BUILD_COMMIT__: JSON.stringify(BUILD_GIT.commit),
     __BUILD_CLEAN__: JSON.stringify(BUILD_GIT.clean),
     __BUILD_AT__: JSON.stringify(new Date().toISOString()),

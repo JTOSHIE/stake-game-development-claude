@@ -8,6 +8,13 @@
 // `dist/build-info.json` carries the same facts as a file, for a human or a
 // tool reading the artefact. Nothing in the running game fetches it.
 
+/**
+ * The HUMAN version, `v9` and so on, read from the repository-root `VERSION`
+ * file at build time. It leads the boot line so the owner reads a version
+ * rather than a hash; the SHA beside it stays the exact identity.
+ */
+declare const __BUILD_VERSION__: string
+
 /** Full commit SHA of the tree this bundle was built from, or "unknown". */
 declare const __BUILD_COMMIT__: string
 
