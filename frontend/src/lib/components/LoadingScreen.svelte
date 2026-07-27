@@ -58,6 +58,13 @@
   // geometry variance, no rotation, no translation and no transform-writing
   // animation on any boot logo.
   import { assetLoadProgress } from '../stores/loadingStore'
+  // The boot flavour line was hardcoded English until 2026-07-27, so a Japanese
+  // player read "LOADING CYBERNETICS..." on the first screen of the game. It hid
+  // from locale_completeness_check.mjs because the text and the interpolation
+  // shared one line, and the gate only sees a literal that sits alone between
+  // tags; wrapping the percentage in its own element for Q-23 split them and the
+  // gate immediately found it. QUALITY_CHARTER.md Q-30.
+  import { tr } from '../i18n/tr'
   import { themeAssets } from '../stores/themeStore'
   import RainLayer from './RainLayer.svelte'
 </script>
@@ -107,7 +114,7 @@
          `font-variant-numeric: tabular-nums` below is INERT against it, since
          that property maps to the OpenType `tnum` feature and Orbitron ships no
          GSUB features at all. See QUALITY_CHARTER.md Q-23. -->
-    <p class="progress-label">LOADING CYBERNETICS... <span class="progress-pct">{$assetLoadProgress}</span>%</p>
+    <p class="progress-label">{$tr('loadingDetail')} <span class="progress-pct">{$assetLoadProgress}</span>%</p>
 
   </div>
 </div>
