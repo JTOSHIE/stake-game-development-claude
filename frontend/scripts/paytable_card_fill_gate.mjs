@@ -161,8 +161,18 @@ setTimeout(() => {
  */
 async function openPaytable(page) {
   const clicked = await page.evaluate(() => {
-    const menu = [...document.querySelectorAll('.fs-menu, [data-testid="mini-menu"], .p-round-btn, .c-round-btn, .m-round-btn')]
-      .find((e) => (e.getAttribute('aria-label') || '') === 'Menu')
+    // JOB 2 (2026-07-28). This used to match aria-label === 'Menu', which meant
+    // the gate could only open the paytable in a locale whose word for Menu is
+    // the English one. It passed for four days because the labels WERE English
+    // in all sixteen locales, which is the defect JOB 2 fixed; the moment they
+    // were translated this gate went red in fourteen of them. The comment eight
+    // lines below already knew the rule ("Matching on its label would only work
+    // in English, and this gate runs in sixteen") and it was applied to the menu
+    // ITEM but not to the menu BUTTON. A stable data-testid cannot drift with
+    // the copy, so the hook is now structural in both places.
+    const menu = document.querySelector('[data-testid="hud-menu"]')
+      || [...document.querySelectorAll('.fs-menu, [data-testid="mini-menu"], .p-round-btn, .c-round-btn, .m-round-btn')]
+        .find((e) => (e.getAttribute('aria-label') || '') === 'Menu')
     if (!menu) return false
     menu.click()
     return true

@@ -420,7 +420,7 @@
   <div class="p-controls-row">
     <div class="p-controls-side">
       <div class="p-menu-wrapper">
-        <button class="p-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
+        <button class="p-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="hud-menu">
           <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
         </button>
         {#if showMenu}
@@ -538,7 +538,7 @@
      could. -->
 <div class="m-hud" class:m-hud--overdrive={$overdriveVisual} data-testid="mini-hud">
   <div class="m-menu-wrapper">
-    <button class="m-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="mini-menu">
+    <button class="m-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="hud-menu" data-testid="mini-menu">
       <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
     </button>
     {#if showMenu}
@@ -647,7 +647,7 @@
      are >=44px effective, closing the PR #78 landscape debt table. -->
 <div class="c-hud" class:c-hud--overdrive={$overdriveVisual}>
   <div class="c-menu-wrapper">
-    <button class="c-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
+    <button class="c-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="hud-menu">
       <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
     </button>
     {#if showMenu}
@@ -809,7 +809,7 @@
 
   <!-- Hamburger + menu - fixed at x 344 -->
   <div class="menu-wrapper">
-    <button class="fs-menu" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
+    <button class="fs-menu" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="hud-menu">
       <span class="inset"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
     </button>
     {#if showMenu}
