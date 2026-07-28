@@ -134,8 +134,26 @@ check('the resolved social rules and guide carry no prohibited term', socialHits
 // The win banner must not render a bare BET literal any more.
 checkThat('WinBanner no longer renders an unconditional BET',
   !/\{multLabel\}\s+BET/.test(winBanner))
-checkThat('WinBanner routes its unit label through sv()',
-  /sv\('BET',\s*\$isSocial\)/.test(winBanner))
+// 2026-07-29, TR-117. This asserted `sv('BET', $isSocial)`, i.e. the exact call
+// shape of the old implementation. That pinned the MECHANISM rather than the
+// GUARANTEE, so it went red on a change that strictly improved the line: the
+// unit now routes through `t()`, which consults SOCIAL_OVERRIDES first and so
+// does the social swap AND the locale swap, where `sv()` did only the social
+// one and left all sixteen locales reading English.
+//
+// The replacement is stronger in both directions. It still forbids a bare
+// literal, which is the regression this guard exists for (the line once
+// rendered "12x BET" unconditionally, R2R JOB 6 / TR-041). And it now checks
+// BEHAVIOUR through the shipped path rather than a regex over source: the same
+// key must actually produce the social word and the translated word. A future
+// edit that reverted to `sv()` would pass the old regex and fail the locale
+// assertion below, which is the point.
+checkThat('WinBanner routes its unit label through the keyed layer, not a literal',
+  /multUnitLabel\s*=\s*t\(\$locale,\s*'bet',/.test(winBanner))
+checkThat('the bet key really does swap for social',
+  t('en', 'bet' as never, 'social') === 'PLAY')
+checkThat('the bet key really does swap for locale, which sv() could never do',
+  t('de', 'bet' as never, 'real') === 'EINSATZ' && t('ar', 'bet' as never, 'real') !== 'BET')
 
 // ── 4. Replay first paint ────────────────────────────────────────────────────
 console.log('\nREPLAY FIRST PAINT derives social from the currency too')
