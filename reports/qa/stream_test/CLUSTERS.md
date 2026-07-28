@@ -84,3 +84,85 @@ standard than a panel gives:
 
 The HIGH (183), MEDIUM (242) and LOW (81) tiers are not clustered beyond their counts and
 are not verified. That is the degradation order operating as written, not an omission.
+
+## VERIFICATION, batch A: the eleven multi-instance STREAM clusters
+
+Two-seat adversarial panels per Fable RULING 2, each seat told to REFUTE and to default to
+refuted when uncertain, shared-nothing, 22 verifiers, zero lost. 2,093,785 tokens.
+
+| Panel verdict | Count |
+|---|---|
+| CONFIRMED | 1 (C-07) |
+| **PARTIAL** | **9** |
+| REFUTED | 0 |
+| SPLIT | 1 (C-11) |
+| **REOPENED** | **3** (C-03, C-10, C-11) |
+
+**Nothing was refuted, and almost nothing was confirmed clean.** The defects are real; the
+DIAGNOSES are mostly wrong or incomplete. PARTIAL in this pass means a correct symptom
+attached to a cause that does not survive reading the source, and it is the most useful
+verdict the panel could have returned, because **a fix aimed at the wrong line does not
+work and lands later as a failed fix rather than as a bad diagnosis.**
+
+### C-01, the worked example, and why shipping the shard's fix would have been wrong
+
+Twelve squads saw the reel window go transparent mid-spin. It is real, and the panel found
+it worse than any shard measured: at `007_desktop_transition_reels_accelerating.png` the
+interior probes `(37,56,85)` against an undisputed exterior scene at `(13,57,89)`, so the
+interior is as bright as the exterior and **nothing is in front of it at all**.
+
+But both cited causes were wrong, in different directions:
+
+- **Instance A** cited `GameGrid.svelte:1225-1233`, and that holds for why the hole is
+  SEE-THROUGH. It is not why there is a hole, and the shard never asks. **The geometric
+  cause is one line nobody read**: `const DROP_H = 520` at `GameGrid.svelte:499`. The strip
+  is 7 slots at `TILE = 104`, so 724px, with `REST_Y = -104`; at `startY = -624` its bottom
+  edge sits at y=100 inside a 412px column, leaving **312px, 76 per cent of the reel
+  window, bare by construction on every single drop.**
+- **Instance B's cause is refuted by the source.** It claimed the cells are unpopulated
+  strip slots; all seven are rendered unconditionally at `:1134` and painted at `:497`
+  before the fall starts. **Its proposed fix is therefore a no-op**: it changes nothing in
+  either frame.
+- **Instance A's fix cures the symptom and masks rather than removes**, converting a 312px
+  see-through band into a 312px dead-black band beside fully painted cells. Under the
+  standing mandate's inspection test that is still a player-visible defect.
+
+The sound fix is at `GameGrid.svelte:499` and `:74`: reduce `DROP_H` to at most 208, the
+strip's actual bottom buffer, or widen `STRIP` so it still covers all 412px at `startY`,
+with the opaque `.symbol-col` fill as a backstop. **Noted for whoever takes it: at 0.88
+alpha (`:1259`) even a fully painted board passes 12 per cent of the scene through every
+cell, so an opaque fill changes the look.** That is a design call and was not the panel's
+to make.
+
+### The three reopens are all MY marshalling errors, not bad findings
+
+This is the safeguard earning its place, and the honest reading is that it caught the
+marshal rather than the squads. Fable's RULING 2 attached two representative instances from
+DIFFERENT squads precisely so a cluster could be tested for whether it is one defect. All
+three failures are in the clustering done at JOB 2 by grep in the main loop:
+
+- **C-03: the cluster title is a CONJUNCTION of two defects.** `STL-AR-A-01` is a content
+  and i18n defect on a strip that is fully legible, from which the verifier read `M3`
+  directly. `STT-POPOUTS-3-04` is a legibility defect whose content half cannot be read at
+  any resolution, and whose own shard concedes the strip does not resolve into words even
+  at 2844x1600. Grep matched them on shared words. They are not the same defect.
+- **C-10: two squads read ONE image.** Both entries cite the same frame
+  `272_mobile-m_transition_bigwin_countup_early.png` and the same two figures. **That is
+  one observation reported twice, not a defect seen twice**, so the corroboration weight of
+  2 was inflated.
+- **C-11: the cluster counted a RETRACTION as a corroboration.** `STC-MOBILES-3` does not
+  report this defect. What it contains, in its signed absences, is an item headed
+  `WITHDRAWN DRAFT CLAIM: there is no visible HUD ghost under the max win scrim`. **That is
+  one squad reporting and one squad DENYING, and the 2 in that row was false.**
+
+**The generalisable lesson, and it is going into the method:** grep-level clustering in the
+main loop is cheap and it is the right first pass, but **it cannot tell a report from a
+retraction, and it cannot tell one image read twice from a defect seen twice.** Corroboration
+counts produced that way are provisional until a panel has tested them. Nothing here needed
+an expensive marshal; it needed the safeguard that was already ruled.
+
+### Severity corrections returned by the panels
+
+Verifiers were free to correct severity and did: C-09 down to HIGH and MEDIUM, C-11 to
+HIGH, C-03, C-04, C-05 and C-10 split between seats. The corrected values are carried in
+the run record and are applied when each cluster's disposition is written.
