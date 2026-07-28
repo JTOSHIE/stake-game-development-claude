@@ -66,6 +66,55 @@ Book-to-Lookup Equality Script...`). That is how it arrived and it is preserved 
 It is not a truncated or corrupted ingest. Fable's disposition (a) on this review is
 recorded in `REVIEW_TRACKER.md`.
 
+## Round three (ingested 2026-07-28, JOB 1 of `reports/briefs/FS_FINAL_MILE_Prompt.md`)
+
+| File | Review | Score | SHA-256 |
+|---|---|---|---|
+| `round3_review1.md` | Reviewer 1 | 0.00 | `ff6ba9c1692cc5dcebff1d11c327d1f38151a2b67d21de06b9434e4d747ef97c` |
+| `round3_review2.md` | Reviewer 2 | 1.33 / 3.00 | `ac8ae25bb00d8929bb827d615fd4a5753645d8b9b98837d35fcf06677b5148e9` |
+| `round3_review3.md` | Reviewer 3 | 2.00 / 3.00 | `7123a18cc12eca634f409bc5357c55f2314dbcd9cc695f5c2da0255883992ee7` |
+
+**Reviewers 2 and 3 both name the reviewed commit and it is the same one:**
+`649993cca763650d2e9b0092a1a68987a73ffeee` on `main`, which was `HEAD` when the round
+opened. **Reviewer 1 names no commit, because it reached none**; its own text records the
+repository as "completely inaccessible" inside its container, and its 0.00 is scored
+against that inaccessibility. That distinction is the single most important thing about
+this round's ingest and it is why the three files are not interchangeable evidence.
+
+### Provenance of the round three ingest
+
+- **Source document:** `Stake Engine Approval ReportS.docx`, 66,110 bytes, SHA-256
+  `d7ef5d950e9b41a78f633ac163cf058be7869811cc97b3701a7efa111bdf5f0a`, found at
+  `/Users/jt/Desktop/Stake Engine Approval ReportS.docx`. A Word lock file
+  (`~$ake Engine Approval ReportS.docx`) sits beside it, so the document was open in Word
+  when the brief was written. **All three reviews arrived inside this one document**,
+  unlike round two where the split was also internal but the brief named the file; here
+  the brief named no path at all, so the located path is recorded per convention (m).
+- **Extraction:** `pandoc -f docx -t gfm --wrap=none`, pandoc 3.9.0.2 at
+  `/opt/homebrew/bin/pandoc`, the same tool and flags as the round two ingest so the two
+  rounds are comparable artefacts. A `textutil -convert txt` extraction was taken
+  alongside it as a second parser and agrees on all three boundaries and all three scores.
+  Both parsers read the same `.docx`, so per convention (l.4) this is a check on the
+  PARSER and not independent confirmation of the content.
+- **Split, proved lossless.** The extraction is 611 lines. Review 1 is lines 1 to 207,
+  review 2 is lines 208 to 352, review 3 is lines 353 to 611. The three files concatenated
+  in order are byte-identical to the single extraction
+  (`cat round3_review1.md round3_review2.md round3_review3.md | cmp - r3_full.md`, exit 0),
+  so nothing was dropped, reordered or edited at the split.
+- **The split points are the document's own heading lines**, each of which begins the file
+  it introduces: `**Stake Engine Approval Report: Future Spinner (Resubmission Round Two)**`,
+  `**Stake Engine Approval Report: second iteration or from the second reviewer**` and
+  `**Stake Engine Approval Report: iteration or from the third reviewer**`. Those second
+  and third headings are awkward English and reviewer 2's file then repeats its heading and
+  opens with the model's own aside, `Good, I have full confidence in my findings. Now
+  producing the deliverable.` **All of that is preserved exactly as it arrived.** It is
+  evidence about how the round was run, and tidying it would destroy that evidence for the
+  sake of neatness.
+- **Every reviewer titles this "round two".** Reviewer 1's heading says "Resubmission Round
+  Two" and reviewer 3's says "round-two approval review". It is the project's third round
+  of external review; the reviewers were briefed as reviewing the second SUBMISSION. The
+  numbering in this repository is unchanged and these are the round three files.
+
 ## Convention
 
 Paste each review's full text into its file, unedited, preserving the reviewers' own
