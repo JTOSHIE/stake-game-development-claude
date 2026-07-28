@@ -7374,3 +7374,43 @@ DEGRADE: reopened clusters, then the fix batch, then re-proof, then HIGH tier.
 DONE MEANS: every STREAM cluster dispositioned with a verified diagnosis, and
         every applied fix re-proven from fresh frames.
 ```
+
+## Rule 10 closing, filled
+
+The session's report push (`57fb01e`) ran remote CI as run **30393688459** and it is
+**green**:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30393688459
+
+Green chain this session, every one verified rather than assumed: `df7bf50` run
+30392219665, `57fb01e` run 30393688459. Run 30393549410 on `95026c6` reads `cancelled`
+and is NOT a red: it was superseded by the next push before it finished, under the
+workflow's concurrency group. Recorded because rule 10 only works if a red means
+something, so a non-green result that is not a failure is worth one line now rather than
+an investigation later. No expected-fail runs were declared or needed, per rule 9.
+
+The owner preview was refreshed after the report commit and its line is:
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 57fb01e  |  built 2026-07-29T05:50:29+10:00  |  started 2026-07-28T19:50:49.612Z  |  http://192.168.4.92:5173
+```
+
+It refused once first, correctly, on the dirty tree the report edit itself creates. It is
+run once more as the last action of the close, after this closing's push, per the
+one-commit-lag clause.
+
+## Self-audit before reporting, per convention (l.5)
+
+Re-derived and checked before this report was written, not after:
+
+- **Every agent accounted for**: 28 + 22 + 30 = 80, zero LOST, zero errors, confirmed
+  against each workflow's own usage block.
+- **Locked paths untouched**: no file under `frontend/src/`, `games/future_spinner/` or
+  `.claude/settings.json` was modified this session. `git status` clean at close.
+- **Committed evidence never written to**: the 207 upscaled frames were written to the
+  gitignored `.evidence-scratch/`, and `git status reports/screens/` returned zero
+  throughout, checked at launch and at close.
+- **The measure multiplier is derived from this session's own two runs**, 232k per squad
+  against 131k predicted and 95k per capped verifier, and is not carried from elsewhere.
+- **The six marshalling faults were counted from the panels' own returns**, not estimated.
+- **Fable's rulings were transcribed, not composed.** This session did not receive Fable's
+  longhand and did not invent it; the record says so at the transcription.
