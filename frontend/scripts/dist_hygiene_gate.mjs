@@ -132,6 +132,82 @@ if (info) {
       + `plus itself at ${infoBytes}; disk has ${files.length} files / ${totalBytes} bytes`)
 }
 
+// ── No data: URI assets in shipped CSS or JS, JOB 1 2026-07-28 ──────────────
+//
+// The platform's CSP font-src is 'self', observed live 2026-07-28. A font
+// inlined as a data: URI is refused by that policy and the system font leaks
+// through mid-interface, with nothing in the build log saying so.
+// vite.config.ts sets assetsInlineLimit: 0 so nothing is ever inlined; this is
+// the independent assertion on the artefact, per the same split as the
+// documentation rule above.
+//
+// The predicate has to be sharper than "no data: anywhere", because pixi.js
+// legitimately ships five short data: URI capability probes (tiny avif, webp,
+// png, svg and webm test payloads, longest 711 characters, measured on the
+// shipped chunk). Those are feature detection, not assets, and they must
+// survive. So the rule is three-part:
+//   1. any data: URI in a shipped CSS file fails, at any size (fonts inline
+//      into CSS url(), and our CSS carries none legitimately);
+//   2. any data:font/* or data:application/font* in CSS or JS fails, at any
+//      size, because fonts are the class the CSP blocks;
+//   3. any base64 data: URI in a shipped JS file with a payload of 2048
+//      characters or more fails, which is the shape of an inlined asset and
+//      roughly three times the largest legitimate probe.
+// Residual, stated rather than hidden: a sub-2KB non-font asset inlined into
+// JS would pass rule 3. assetsInlineLimit: 0 means Vite writes no such thing,
+// and the regression this gate exists to catch, the limit creeping back up and
+// re-inlining fonts and small images, produces payloads far past the line.
+const FONT_MIME_RE = /^data:(font\/|application\/font|application\/x-font)/i
+const BASE64_PAYLOAD_LIMIT = 2048
+
+function dataUriViolations(text, isCss) {
+  const found = []
+  const re = /data:[a-z0-9.+-]+\/[a-z0-9.+-]+[;,][^"'`)\s\\]*/gi
+  let m
+  while ((m = re.exec(text))) {
+    const uri = m[0]
+    if (isCss) { found.push({ uri: uri.slice(0, 64), rule: 'css carries no data: URIs' }); continue }
+    if (FONT_MIME_RE.test(uri)) { found.push({ uri: uri.slice(0, 64), rule: 'no font data: URI anywhere' }); continue }
+    const b64 = uri.indexOf('base64,')
+    if (b64 !== -1 && uri.length - (b64 + 7) >= BASE64_PAYLOAD_LIMIT) {
+      found.push({ uri: uri.slice(0, 64), rule: `base64 payload >= ${BASE64_PAYLOAD_LIMIT} chars in js` })
+    }
+  }
+  return found
+}
+
+const codeFiles = files.filter((f) => /\.(js|css)$/i.test(f))
+const uriViolations = []
+for (const f of codeFiles) {
+  const isCss = f.toLowerCase().endsWith('.css')
+  for (const v of dataUriViolations(readFileSync(f, 'utf-8'), isCss)) {
+    uriViolations.push({ file: relative(DIST, f), ...v })
+  }
+}
+check('no data: URI assets ship in CSS or JS', uriViolations.length === 0,
+  uriViolations.map((v) => `${v.file}: ${v.uri}... (${v.rule})`).join('; '))
+
+// Seeded per convention (p): the forms Vite really emits when inlining.
+const longB64 = 'A'.repeat(2200)
+const URI_SEEDS = [
+  ['a woff2 inlined into CSS url(), the exact CSP-blocked form',
+   true, `@font-face{src:url(data:font/woff2;base64,${longB64}) format("woff2")}`],
+  ['any data: URI in CSS, even a small image',
+   true, `.x{background:url(data:image/png;base64,iVBORw0KGgo=)}`],
+  ['a font data: URI in JS, below the size line',
+   false, `const f="data:font/woff2;base64,d09GMgABAAAAA";`],
+  ['a large inlined image asset in JS',
+   false, `export default "data:image/png;base64,${longB64}"`],
+]
+const uriSeeded = URI_SEEDS.map(([why, isCss, text]) => ({ why, caught: dataUriViolations(text, isCss).length > 0 }))
+// Negative control: the real shipped JS, pixi probes included, must survive.
+const uriControlClean = codeFiles.every((f) =>
+  f.toLowerCase().endsWith('.css') || dataUriViolations(readFileSync(f, 'utf-8'), false).length === 0)
+for (const s of uriSeeded) console.log(`  ${s.caught ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+console.log(`  ${uriControlClean ? 'clean ' : 'FALSE+'}  seeded: negative control, shipped JS with its pixi probes must survive`)
+check('the data: URI scan can actually fail',
+  uriSeeded.every((s) => s.caught) && uriControlClean)
+
 // ── SEEDED VIOLATION, convention (p) ─────────────────────────────────────────
 //
 // This gate claims the shipped-documentation class is closed, so it must be
@@ -169,6 +245,8 @@ writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({
   documentationFound: docs,
   buildStamp: info,
   seeded, negativeControl: controlClean,
+  dataUriViolations: uriViolations,
+  dataUriSeeded: uriSeeded, dataUriNegativeControl: uriControlClean,
   pass: failures.length === 0,
   failures,
 }, null, 2))

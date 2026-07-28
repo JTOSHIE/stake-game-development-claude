@@ -307,6 +307,19 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
+    // FONT SHIPPING SAFETY, owner's order 2026-07-28 (FS_POLISH_PUNCH_AND_R3
+    // JOB 1). The platform serves the game under a CSP whose font-src is
+    // 'self', observed live 2026-07-28: a font delivered as a data: URI is
+    // BLOCKED by that policy, silently, and the browser falls through to the
+    // system font mid-interface. Vite's default inlines any asset under 4096
+    // bytes as a data: URI, so a future small woff2 subset would ship in a
+    // form the platform refuses to render. Zero disables inlining outright:
+    // every asset ships as a file reachable under 'self'. The current bundle
+    // inlines nothing (verified before this change, so the delta is zero);
+    // this exists so that stays true. scripts/dist_hygiene_gate.mjs asserts
+    // the property on the built dist, which is the half that survives someone
+    // editing this file.
+    assetsInlineLimit: 0,
     rollupOptions: {
       output: {
         manualChunks: {
