@@ -192,6 +192,55 @@ With cluster verification, `V = 0.075`, the all in cost per discovery agent fall
 
 ---
 
+## 4.3 The MEASURE multiplier, and why verification always costs more than the estimate
+
+**Added 2026-07-29, measured twice in one session.**
+
+The cost equation in section 2.1 was calibrated on agents told to LOOK. An agent told to
+MEASURE costs about **1.8 times** as much, and the difference is not the measuring, it is
+the extra tool calls the measuring needs.
+
+| | Look agent | Measure agent |
+|---|---|---|
+| Calls per agent | artefacts x 2 | artefacts x 3.4 |
+| Tokens per call | ~2,500 | ~4,000 |
+| Marginal per artefact | 4,700 | **~8,500** |
+
+Measured: the sight gate re-run gave squads 17 upscaled frames each and invited pixel
+figures. Predicted 131k per agent on the LOOK equation; **actual 232k**, 77 per cent over,
+at 57.7 calls against 34 predicted. The squads used shell probing to sample luminance,
+which is exactly what was asked for and exactly what the estimate did not price.
+
+**Verification is inherently a measure task**, which is the real reason the verification
+multiplier in section 4 bites harder than a naive estimate. Two corrections follow:
+
+- **Price verifiers on the measure equation**, not the look one.
+- **Cap the tool calls in the prompt.** Telling verifiers to work in about 25 calls and to
+  probe only where a claim genuinely turns on a sub-pixel measurement held them to 17.6
+  calls and 95k each, against 232k for uncapped measuring squads. **The cap cost nothing
+  in quality: those 52 verifiers overturned six clusters and refuted a STREAM finding.**
+
+So: `tokens = 15,000 + artefacts x 4,700` for a LOOK agent, `x 8,500` for an uncapped
+MEASURE agent, and back toward the LOOK figure for a measure agent with a call cap.
+
+## 4.4 Grep-level clustering is provisional until a panel tests it
+
+**Added 2026-07-29.** Clustering a findings ledger by text similarity in the main loop is
+cheap, fast and the right first pass. It is also **wrong about roughly a quarter of its
+clusters**, and it fails in four specific ways that a reader will not notice:
+
+1. **It fuses unrelated defects** that share vocabulary.
+2. **It counts one observation twice** when two agents read the same image.
+3. **It cannot tell a report from a RETRACTION.** A shard's signed absence headed
+   `WITHDRAWN DRAFT CLAIM` was counted as a corroborating instance.
+4. **It HIDES corroboration when clustering runs one severity tier at a time**, because
+   two squads will tier the same defect differently and the filter drops one of them.
+   **Cluster across all tiers first, filter by severity afterwards.**
+
+Measured: 6 of 26 clusters, 23 per cent, carried one of these faults. Every one was found
+by the two-instances-from-different-squads safeguard. **The corroboration count in a
+grep-built cluster map is a hypothesis, not evidence, and should be labelled as one.**
+
 ## 5. Agent classes and standard timings
 
 Use these as the menu when writing a work order. Duration assumes 20 agents in flight.
