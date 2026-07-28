@@ -1,0 +1,104 @@
+{
+  "generated": "2026-07-28",
+  "job": "FS_POLISH_PUNCH_AND_R3 JOB 3, composition",
+  "finding": "The briefed +3.4 percent Popout L offset does not reproduce on current main: frame and grid measure exactly 50.0 percent of viewport width at Desktop, Laptop and Popout L. No change made. Most probable source of the reported figure is the live build of unknown version (owner item 3); re-measure after the V10 upload.",
+  "measurements": {
+    "Desktop": {
+      "vw": 1200,
+      "frame": {
+        "x": 300,
+        "y": 78.8,
+        "w": 600,
+        "h": 438.8,
+        "cx": 600
+      },
+      "grid": {
+        "x": 355.3,
+        "y": 134.5,
+        "w": 489.4,
+        "h": 327.2,
+        "cx": 600
+      },
+      "rail": {
+        "x": 905.6,
+        "y": 223.1,
+        "w": 134.4,
+        "h": 41.3,
+        "cx": 972.81
+      }
+    },
+    "Laptop": {
+      "vw": 1024,
+      "frame": {
+        "x": 256,
+        "y": 67.2,
+        "w": 512,
+        "h": 374.4,
+        "cx": 512
+      },
+      "grid": {
+        "x": 303.2,
+        "y": 114.8,
+        "w": 417.6,
+        "h": 279.2,
+        "cx": 512
+      },
+      "rail": {
+        "x": 772.8,
+        "y": 190.4,
+        "w": 114.7,
+        "h": 35.2,
+        "cx": 830.13
+      }
+    },
+    "Popout L": {
+      "vw": 800,
+      "frame": {
+        "x": 233.8,
+        "y": 43.6,
+        "w": 332.4,
+        "h": 243.1,
+        "cx": 400
+      },
+      "grid": {
+        "x": 264.4,
+        "y": 74.5,
+        "w": 271.2,
+        "h": 181.3,
+        "cx": 400
+      },
+      "rail": {
+        "x": 0,
+        "y": 388,
+        "w": 48,
+        "h": 48,
+        "cx": 24
+      }
+    },
+    "Desktop optically centred": {
+      "vw": 1200,
+      "frame": {
+        "x": 202.4,
+        "y": 78.8,
+        "w": 600,
+        "h": 438.8,
+        "cx": 502.36
+      },
+      "grid": {
+        "x": 257.7,
+        "y": 134.5,
+        "w": 489.4,
+        "h": 327.2,
+        "cx": 502.36
+      },
+      "rail": {
+        "x": 808,
+        "y": 223.1,
+        "w": 134.4,
+        "h": 41.3,
+        "cx": 875.17
+      },
+      "appliedShiftPx": -97.65
+    }
+  }
+}
