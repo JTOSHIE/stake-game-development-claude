@@ -1012,10 +1012,11 @@ disagreement is worth more than a tick.
 
 ---
 
-# PART 9h: THE v9 VISIT
+# PART 9h: THE v9 VISIT (SUPERSEDED, DO NOT RUN)
 
-**This is the whole visit and it fits on one page.** You do not need to read anything above
-it. PART 9g and everything before it are superseded.
+**Superseded by PART 9i below.** No V9 upload was ever confirmed (the checklist item stayed
+open); V10 replaces it and the destination entry changed to `future-spinner-3`. If you never
+ran this visit, that is fine: PART 9i does everything this one did.
 
 **Two things are different this time.**
 
@@ -1094,3 +1095,76 @@ entry so only `future-spinner-2` remains.
 `OWNER_CHECKLIST.md` at the repository root. Item 0b now says what is already done and where
 the proof is, so you are not asked twice. What is left needs you: the Guidelines ticks on
 `future-spinner-2`, the USPTO position, confirming the payments model, and the accountant.
+
+---
+
+# PART 9i: THE v10 VISIT
+
+**This is the whole visit and it fits on one page.** You do not need to read anything above
+it. PART 9h and everything before it are superseded.
+
+**Two things are different this time.**
+
+1. **The version is v10.** You will see `v10` in the kit folder's README, inside the bundle's
+   `build-info.json`, and as the first thing the browser console prints. If anything on the
+   portal still says `v9` or shows a bare hash, that is the screenshot we want.
+2. **You are uploading to `future-spinner-3`.** This is the clean-baseline entry: one upload,
+   one publish, and then which build is live is a known fact rather than owner item 3.
+
+**What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V10/`. Delete every older kit,
+including V9, which was never confirmed uploaded. Kits are single use.
+
+## 1. Import the FULL kit contents to `future-spinner-3`
+
+Drag in **everything** in `FS_UPLOAD_KIT_V10/`, not a subset. The portal's sync dialog
+compares what you hand it against what it holds and reports four numbers: Upload, Skip,
+Delete, Move.
+
+**Handing it the full set is what makes the deletions happen.** A partial import can only add
+and replace; it can never remove a file that should no longer be there.
+
+**Screenshot the sync dialog before you confirm it.** Those four numbers are the record of
+what the portal actually held, and we have been surprised by them before: an early upload
+handed the portal 108 files and it stored 104, dropping four with no error shown (TR-061).
+
+## 2. Publish
+
+The maths package stays at V1 and is NOT re-uploaded. Do NOT press Start Approval.
+
+## 3. THE ONE SCREENSHOT THIS VISIT IS FOR
+
+Open the published game with the browser console open, and screenshot the first console line.
+It reads:
+
+```
+Future Spinner v10 build <sha> built <timestamp>
+```
+
+**That single line does three jobs at once**, which is why it is the one capture that matters:
+
+- it tells us **v10** is what is live, in words rather than a hash, which closes owner item 3
+  for good;
+- it carries the **SHA**, which is the exact identity;
+- and **if the city background, the car and the rain are all on screen behind it, it proves
+  the background files served** on a clean upload to a clean entry.
+
+**If any background is missing, screenshot the console with the red rows expanded.** That
+would be new information and we would want it.
+
+## 4. One glance at the paytable hero
+
+Open the paytable and look at the hero once: it should read **1,024 WAYS TO WIN**, in
+uppercase, in the brand face, with the number and the words styled together. Anything else
+there, screenshot it. That is the whole check; close the paytable and move on.
+
+## 5. Delete the kit, and the old entries
+
+Delete `~/Desktop/FS_UPLOAD_KIT_V10/` when you are done, along with every older kit. Kits are
+single use. Then, once the platform's cooldown allows, delete the superseded entries so only
+`future-spinner-3` remains.
+
+## 6. Then the owner list
+
+`OWNER_CHECKLIST.md` at the repository root. What is left needs you: the Guidelines ticks,
+the USPTO position, confirming the payments model, and the accountant. Round three runs with
+the ratified prompt once this visit is done.

@@ -58,19 +58,22 @@ model chosen, wallet configured, address verified.
 
 ---
 
-## 3. Upload kit V9 and screenshot the v9 console line
+## 3. Upload kit V10 and screenshot the v10 console line
 
-**The kit is built and waiting:** `~/Desktop/FS_UPLOAD_KIT_V9/`. Follow **PART 9h** in the
-walkthrough inside it. Upload to `future-spinner-2`.
+**The kit is built and waiting:** `~/Desktop/FS_UPLOAD_KIT_V10/`. Follow **PART 9i** in the
+walkthrough inside it. Upload to `future-spinner-3`. Delete every older kit, including V9,
+which was never confirmed uploaded; kits are single use.
 
 **The one screenshot:** open the published game with the browser console open and capture the
-first line. It reads `Future Spinner v9 build <sha> built <timestamp>`.
+first line. It reads `Future Spinner v10 build <sha> built <timestamp>`.
 
-That single line does three jobs: it names **v9** in words rather than a hash, it carries the
-**SHA** as the exact identity, and **if the city, the car and the rain are on screen behind it,
-it proves the background files served.** Three of them returned 403 last visit from the
-platform's unpublished area. They were never missing and they came good six minutes later, but
-this is the frame that confirms it on a clean upload.
+That single line does three jobs: it names **v10** in words rather than a hash, which closes
+which-build-is-live for good; it carries the **SHA** as the exact identity; and **if the city,
+the car and the rain are on screen behind it, it proves the background files served** on a
+clean upload to a clean entry.
+
+**While the paytable is open on that visit, one glance at the hero:** it should read
+**1,024 WAYS TO WIN**, uppercase, in the brand face. Anything else there is a screenshot.
 
 **DONE when** you have sent that one screenshot.
 
