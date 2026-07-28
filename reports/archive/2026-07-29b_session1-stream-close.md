@@ -251,3 +251,32 @@ anything at the destination is tracked and refuses if so, requiring an explicit
 `--regenerate`. Seeded per convention (p): run against the real defect form, the actual
 directory with the actual hardcoded date, it goes RED and names the 521 tracked files. The
 negative control is the capture that produced the proof frames.
+
+### The red, and the recovery, per rule 10
+
+**`63dcdc9` went RED on main** at static gates, step `social vocabulary`. Rule 10 stops
+the line, so it was triaged before anything else and no new work was started.
+
+The cause is `FULL_AUDIT_METHOD.md` 2.2's fourth question, **did the fix break anything,
+in its named form: a test asserting something untrue.** The gate asserted
+`sv('BET', $isSocial)`, the exact call shape TR-041 shipped. TR-117 replaced that call
+with `t($locale, 'bet', ...)`, which does the social swap AND the locale swap.
+**The gate went red on a change that strictly improved the line it guards.** The
+guarantee was never violated; the assertion had been written against the mechanism.
+
+**The guard was strengthened rather than relaxed.** It still forbids a bare literal, which
+is the real regression (this line once rendered `12x BET` unconditionally). It now also
+checks behaviour through the shipped path rather than a regex over source: the `bet` key
+must resolve to `PLAY` in social, `EINSATZ` in German, and not `BET` in Arabic. An edit
+reverting to `sv()` would satisfy the old regex and fail the new assertion.
+
+Seeded per convention (p) in the form the defect really takes: the line was reverted to
+`sv('BET', $isSocial)`, the gate went **RED** naming the assertion, the file was restored
+and verified clean against HEAD, and the gate returned PASS.
+
+**Main is green again at `9602728`, run 30398189558.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30398189558
+
+Recorded rather than quietly fixed, because a red on main is exactly what rule 10 exists
+to make visible, and because the lesson generalises past this gate: **a gate that pins a
+call shape will go red on an improvement, and the fix is to assert the guarantee instead.**
