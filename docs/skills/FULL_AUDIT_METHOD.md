@@ -251,6 +251,67 @@ judged survivable and the session pressed on. It WAS survivable. But **the one o
 that reached a committed document was precisely the finding whose verifier had died**, and it
 survived six commits. Resume is same-session only, so the decision cannot be deferred.
 
+### 4.1 A mass agent wave runs in the workflow CONTAINER, with per-agent retry. Chat-spawned
+squads are for small counts only.
+
+**Added 2026-07-28 by the stream test, and paid for twice in one arc.**
+
+Convention (q) says a partial workflow is resumed. That rule assumes there is something to
+resume, and **a chat-spawned fan-out gives you nothing to resume.** Agents launched from the
+conversation carry no run id, no persisted script, and no per-agent cache. When the wave dies
+the work is gone, and the only recovery is to re-run every agent including the ones that had
+already finished.
+
+The stream test measured the difference. Wave 1 (capture) ran in the container and survived.
+The Wave 2 discovery fan-out was chat-spawned; the session hit its allowance mid-wave, and
+**of the squads deployed, exactly one shard reached disk.** Everything the others had read was
+unrecoverable, because there was no cache to replay and no script to resume from. The next
+session began by inventorying wreckage rather than by resuming, which is precisely the cost
+convention (q) exists to prevent.
+
+So the rule is now structural rather than a matter of care:
+
+- **Any wave of more than about four agents runs through the workflow container.** It persists
+  the script, returns a run id, and caches each completed agent, so a partial failure costs
+  only the agents that actually failed.
+- **Each agent carries its own retry.** Wrap the call so a transient failure is retried a
+  small fixed number of times before the squad is given up on. This is the cheap half and it
+  is what stops a wave being decided by one flaky call.
+- **A lost agent is reported as LOST, never omitted.** This is the half that matters most.
+  A squad that dies silently and a squad that swept its surface and found nothing produce the
+  same output, which is no output, and the marshal cannot tell them apart. An audit that
+  cannot distinguish "clean" from "never ran" is producing a coverage claim it has not earned.
+  Return an explicit lost marker and carry it into the index.
+- **Chat-spawned agents remain correct for small counts**, where the whole wave can be
+  re-issued for less than the cost of authoring a script.
+
+The general form, for any project: **the container is not a performance optimisation, it is
+the durability layer.** A fan-out whose intermediate results cannot outlive the conversation
+is a fan-out that has to succeed on the first attempt.
+
+### 4.2 A session renames its own regeneratable scratch aside, it does not delete it
+
+**Added 2026-07-28 by the stream test.**
+
+Sessions accumulate regeneratable scratch: preview state, evidence scratch, a stale capture
+directory being replaced by a fresh one. The instinct is to `rm` it, and that instinct is
+wrong twice over.
+
+- **A delete is irreversible, so the safety layer has to stop and ask.** That interrupt lands
+  in the middle of a long autonomous run, which is exactly where it is least useful, and it
+  spends an owner's attention on a decision that did not need one.
+- **A delete is also the action that section 2.5 warns about**, where a destructive step was
+  taken on a reference check that could not have found the answer. The cost of being wrong
+  about "this is regeneratable" is total.
+
+**Rename it aside instead.** `mv <path> <path>.superseded-<context>` is reversible, needs no
+confirmation because nothing is destroyed, and leaves the evidence in place if the judgement
+turns out to have been wrong. The tidy-up is then a separate, cheap, deliberate act rather
+than a risk taken mid-flight.
+
+This is the same principle as the frozen-debt ratchet in 3.1 and as convention (h.1): **prefer
+the reversible operation, and make the irreversible one a decision somebody takes on purpose.**
+
 ---
 
 ## 5. The waves, and where this title stands
@@ -286,6 +347,8 @@ wants its own audit pass with its own sanction.
       the shipped path, plus negative controls
 - [ ] Self-audit done BEFORE writing up, and any claim it corrected is RECORDED, not erased
 - [ ] Surfaces NOT swept are named explicitly
+- [ ] Every agent in every wave is accounted for as COMPLETED or LOST, and no squad's silence
+      was read as a clean sweep
 - [ ] Parked items are enumerated completely enough to need no rediscovery, and the
       instrument that enumerated them was tested
 - [ ] `git status` clean, and no committed evidence was rewritten

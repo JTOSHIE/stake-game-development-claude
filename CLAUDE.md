@@ -889,6 +889,17 @@ TWO THINGS THE RESUME MUST GET RIGHT, both learned in the same session:
 2. **Resume is same-session only.** So the decision cannot be deferred to the next session,
    which is precisely why it belongs at the top of the list rather than in a follow-up.
 
+**AMENDED 2026-07-28 by the stream test: this rule has a precondition, and the stream test
+paid for finding it.** A resume needs something to resume from, and **a chat-spawned fan-out
+leaves nothing**: no run id, no persisted script, no per-agent cache. The Wave 2 discovery
+fan-out was spawned from chat, the session hit its allowance mid-wave, and exactly one shard
+of the wave reached disk while everything the other squads had read was unrecoverable. So
+**any wave of more than about four agents runs through the workflow container, each agent
+carries its own retry, and a lost agent is reported as LOST rather than omitted**, because a
+squad that died silently and a squad that found nothing produce identical output and the
+marshal cannot tell them apart. Written up in full at `docs/skills/FULL_AUDIT_METHOD.md` 4.1,
+with the scratch-rename rule beside it at 4.2.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 
