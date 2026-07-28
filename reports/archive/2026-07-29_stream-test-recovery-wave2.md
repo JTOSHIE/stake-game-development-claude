@@ -233,3 +233,27 @@ preview that refuses and says why is the rule working.
      accessibility, animation timing) schedule on the fresh allowance, per
      `FULL_AUDIT_METHOD.md` section 5.
   5. **TR-104's remaining half is fix-ready**, one line, verified first-hand.
+
+## Rule 10 closing, filled
+
+The session's final push (`5b92ce0`) ran remote CI as run **30372198000** and it
+is **green**:
+https://github.com/JTOSHIE/stake-game-development-claude.git/actions/runs/30372198000
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30372198000
+
+**Three intermediate runs on this session's own pushes read `cancelled`, and
+they are not reds.** Runs 30371675418 (`157669e`), 30371882218 (`e0fd0b6`) and
+30371982058 (`905592c`) were superseded by the next push before they finished
+and were cancelled by the workflow's concurrency group. Recorded explicitly
+because rule 10 turns on a red meaning something, and a reader scanning this
+history later would otherwise have to work out for themselves whether three
+non-green results were failures. They were not: the pushes came faster than a
+2.9 to 4.6 minute run could complete, and the last one in the chain is the one
+that matters and is green. The earlier pushes this session each ran to
+completion and were green in their own right: 30356364645 (`bd15d42`),
+30356669605 (`0274d02`) and 30357022525 (`6283bef`).
+
+No expected-fail runs were declared or needed this session, per rule 9.
+
+The owner preview was refreshed once more as the last action of the close,
+after this closing's push, per the one-commit-lag clause in rule 12.
