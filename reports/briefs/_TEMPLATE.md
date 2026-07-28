@@ -107,6 +107,87 @@ than after three of them died.*
 
 ---
 
+## THE PLAN OF RECORD, posted before anything expensive is launched
+
+*The session writes this block, once, after reading the brief and before the first wave.
+It is the moment the arithmetic can still prevent waste, and it is the only moment.*
+
+```
+PLAN OF RECORD
+  budget seen        : [X]M, [H] hours
+  waves planned      : [n] x [count] agents at [artefacts] artefacts
+  discovery cost     : [N x tokens] = [total]
+  expected findings  : [count x Y] = [total]
+  verification cost  : [findings x V x 70k] = [total]     <- compute this NOW
+  fixes and re-proof : [total]
+  main loop          : [total]
+  TOTAL              : [sum]  against [budget minus reserve]
+  VERDICT            : FITS / DOES NOT FIT
+  if DOES NOT FIT    : [which DEGRADE tier is dropped, or which policy changes]
+```
+
+**This works whether or not anyone is awake.** If the owner is present they can correct it
+in one line. If the session is running unattended it applies the DEGRADE order and
+proceeds, and the block is written into the session report as a commitment the close is
+graded against. Either way the calculation has happened.
+
+*Why this is not overcomplicating it. The stream test recovery would have printed:
+discovery 6.7M, expected findings 540, verification 37.8M, total 44M against a 16M budget,
+VERDICT DOES NOT FIT. That is one block, visible in ten seconds, and it would have changed
+the whole session. It was never computed, so a wave that could not be verified was launched
+anyway.*
+
+**Restate one line of it at every wave boundary**, because that is where drift happens:
+
+```
+BOUNDARY [n]: spent [X]M of [Y]M, [Z] min to stop line, next wave costs [W]M, GO / DEGRADE
+```
+
+**Division of labour, so this stays a one line handshake and not a meeting.** The owner
+owns the PRIORITY: the budget, the deadline and the DEGRADE order, because only the owner
+knows what actually matters. The session owns the ARITHMETIC: what fits inside it. Do not
+have both parties compute the same sum. Two calculations from the same inputs are not
+independent corroboration, they share the inputs, which convention (l.4) already warns
+about. The owner's check is "is that the right thing to drop first", not "is that
+multiplication correct".
+
+---
+
+## MAIN LOOP DISCIPLINE
+
+*How the session keeps its own context alive across four hours. Measured: the stream test
+recovery ran nearly four hours, delegated 93 agents, and finished with roughly two thirds
+of its context window still free. Nothing was compressed. These five rules are why.*
+
+1. **An agent is a disposable context, and on a long session that is its PRIMARY value.**
+   Parallelism is secondary. The stream test's squads ingested about 570,000 tokens of
+   frame images; the main loop opened six frames. The reading happened, the reasoning
+   happened, and the context was thrown away. **Whenever a job requires INGESTING a lot of
+   material, that is an argument for delegation even when you do not need the speed.**
+
+2. **Never read an agent's output in full.** 540 findings across 47 shards were marshalled
+   with `grep -c`, `grep -oE` and one `head -40`. The shards were never read into the main
+   loop at all. Findings belong on disk, where they are useful, not in context, where they
+   are dead weight the session carries to the end.
+
+3. **Bounded reads, always.** `sed -n '205,225p'`, `grep -n`, `head -c 600`, `ls | grep`.
+   Reading a whole file is a decision, not a default. One file was read end to end across
+   the entire stream test session, and it was 34 lines long.
+
+4. **Write, do not read back.** Large documents go out through Write and do not come back
+   in. The tool confirms the write succeeded; re-reading to check spends context to learn
+   nothing.
+
+5. **The main loop's job is decide, dispatch, commit.** The moment it starts doing the
+   reading itself, the session acquires a ceiling measured in hours. A session that
+   manages can run until the budget ends; a session that does the heavy lifting stops when
+   its context does, and that is usually far sooner.
+
+*The corollary for planning: context headroom is not a constraint you have to design
+around if you delegate properly. Budget in tokens and hours, not in context.*
+
+---
+
 ## PRE-FLIGHT, run before EVERY wave
 
 *Three gates. They cost under two minutes combined and would have saved about 9.6M tokens

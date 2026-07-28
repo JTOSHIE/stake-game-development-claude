@@ -9,6 +9,62 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 022 - 2026-07-29 - DECISION REQUEST: Wave 2 discovery is complete and deliberately unverified, 540 findings, and four items need your ruling
+
+The stream test resumed after your session's allowance ran out mid-checkpoint. First, the
+premise correction: **the 220MB push had not failed.** `git ls-remote` returned the same
+SHA as local and that push's CI was green, so the capture set was never at risk and was
+not re-run per convention (q). What was actually lost was the Wave 2 discovery wave, all
+but one shard, because the squads were chat-spawned and a chat-spawned fan-out leaves no
+run id, no persisted script and no cache to resume from. Recorded as
+`FULL_AUDIT_METHOD.md` 4.1 and an amendment to convention (q).
+
+**Discovery is now complete: 47 shards, every one of the 519 frames read by at least one
+lens, 540 findings (43 STREAM, 160 HIGH, 228 MEDIUM, 106 LOW), zero squads lost.**
+`reports/qa/stream_test/LEDGER.md`. **Nothing in it is verified and the ledger says so in
+its first paragraph.** The adversarial pass did not run: the session hit its wave boundary
+with the allowance largely spent and stopped there per rule 13, because convention (r) and
+your own method's section 4 both say a half checked list is worse than an unchecked one.
+Cross-squad agreement is recorded instead, and it is strong: the reel window going
+transparent mid-spin was reported independently by **eleven squads across two lenses and
+seven viewports**.
+
+**Four items are yours.** (1) **MID-01's fix direction**: the win banner and the HUD WIN
+pod run two independent count-ups over one figure, 1400 ms against 528 ms, so they display
+different dollar amounts at once and the HUD reveals the number the celebration exists to
+reveal. Derived before measuring; the closed form predicted the pod at $15.96 and frame
+013 reads $15.95. Hold the pod, share a clock, or accept it: an art call, parked. (2)
+**Cluster verification as the default**, a change to the method you ratified: 540 findings
+verified individually is about 37.8M tokens, the ~40 clusters about 2.8M, and the trade is
+that a cluster verdict covers instances its verifier did not personally open. (3) **The
+model roster question is FRAMED, not ruled**, and the reason is recorded: the difference
+visible in this arc is orchestration discipline rather than model quality, your session
+lost its wave to a missing durability layer rather than to judgement, and your one
+surviving shard is among the best of the 47. (4) **Whether the mobile sections need
+re-running before they are trusted**, below.
+
+**One thing to go back on, and it is this session's error not yours.** Your run upscaled
+the 102 mobile frames to 1600px before judging them. This session did not, so its mobile
+squads read 320x568 frames at about 240 image tokens where fine detail is not resolvable,
+and signed coverage anyway. The mobile sections of the ledger are thinner than the desktop
+sections. Recommend re-running six mobile squads on upscaled frames, about 700k, before
+anyone acts on that part. The upscale step is credited to your session in the new work
+order template and is now a pre-flight check.
+
+**Two disposition corrections, both verified first-hand.** TR-104 is half fixed: the tier
+label is locale routed (frames 430 and 482 prove it) and only the unit remains at
+`WinBanner.svelte:210`, a one line change using a `bet` key that exists in all sixteen
+locales and that `MaxWinCelebration.svelte:159` already calls. `KNOWN_OPEN` sizes it as
+larger than small; it is not. And charter Q-26, which exists to record that the Q-12 glyph
+sweep was incomplete, is itself incomplete: `WinBanner.svelte:205` is a fifth survivor, in
+a component rather than config, rendering on 60 of 519 frames.
+
+Full account: `HANDOVER_2026-07-25c_Fable.md`, section 2026-07-29, and
+`reports/archive/2026-07-29_stream-test-recovery-wave2.md`. Cost model and work order
+template: `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md`, `reports/briefs/_TEMPLATE.md`.
+
+---
+
 ## 021 - 2026-07-28 - The polish punch shipped, the prompt is ratified, kit V10 waits on the Desktop, and one briefed defect did not reproduce
 
 Six jobs, one commit each, main green on every push. Fonts can never ship as data: URIs
