@@ -132,7 +132,7 @@
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
     background: linear-gradient(160deg, color-mix(in srgb, var(--sig) 12%, transparent), transparent 44%), linear-gradient(180deg, #111a2b, #070b16);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.07), inset 0 -8px 18px rgba(0,0,0,.6);
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 0.7rem; font-weight: 700; color: #fff;
   }
   .fs-rail {

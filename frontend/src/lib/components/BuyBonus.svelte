@@ -156,7 +156,7 @@
     background: linear-gradient(160deg, #2a0d3a, #12071e);
     border: 1px solid var(--theme-secondary, #ff2ec4);
     color: var(--theme-secondary, #ff2ec4);
-    font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 1px;
+    font-family: var(--fs-font-display); font-weight: 700; letter-spacing: 1px;
     box-shadow: 0 0 12px rgba(255, 46, 196, 0.35);
   }
   .buy-btn:disabled { opacity: 0.5; cursor: default; }
@@ -176,7 +176,7 @@
     background: linear-gradient(160deg, #0c0c22, #08081a);
     border: 1px solid var(--theme-secondary, #ff2ec4);
     box-shadow: 0 0 34px rgba(255, 46, 196, 0.5), 0 0 70px rgba(138, 92, 255, 0.22);
-    color: #fff; font-family: 'Orbitron', sans-serif;
+    color: #fff; font-family: var(--fs-font-display);
     animation: buy-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   @keyframes buy-pop { from { opacity: 0; transform: scale(0.86); } to { opacity: 1; transform: scale(1); } }
@@ -245,7 +245,7 @@
   }
   .buy-warn { color: #ff6b6b; font-size: 0.8rem; }
   .buy-actions { display: flex; gap: 10px; margin-top: 16px; }
-  .buy-cancel, .buy-confirm { flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: 700; }
+  .buy-cancel, .buy-confirm { flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-family: var(--fs-font-display); font-weight: 700; }
   .buy-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; }
   .buy-confirm { background: var(--theme-secondary, #ff2ec4); border: none; color: #12071e; }
   .buy-confirm:disabled { opacity: 0.5; cursor: default; }

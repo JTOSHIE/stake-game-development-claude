@@ -277,7 +277,7 @@
 
   /* ── Headline ───────────────────────────────────────────────────────────── */
   .c1-max-headline {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 900;
     font-size: 82px;
     line-height: 0.95;
@@ -299,7 +299,7 @@
     margin-top: 4px;
   }
   .c1-max-mult {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 900;
     font-size: 96px;
     color: var(--sig-gold);
@@ -307,14 +307,14 @@
     text-shadow: 0 0 3px #fff, 0 0 16px color-mix(in srgb, var(--sig-gold) 80%, transparent);
   }
   .c1-max-x {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 46px;
     color: var(--sig-orange);
     align-self: flex-end;
     padding-bottom: 0.12em;
   }
   .c1-max-betlabel {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 22px;
     letter-spacing: 0.2em;
     color: color-mix(in srgb, var(--sig-orange) 72%, transparent);
@@ -326,7 +326,7 @@
   .c1-collect {
     margin-top: 16px;
     padding: 14px 48px;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 900;
     font-size: 18px;
     letter-spacing: 0.22em;

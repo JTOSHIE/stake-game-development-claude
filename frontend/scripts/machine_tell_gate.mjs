@@ -455,6 +455,89 @@ function scanCasingTransforms(files) {
   return out
 }
 
+/**
+ * THIRD FONT STACK (sweep class, added 2026-07-28, FS_POLISH_PUNCH_AND_R3
+ * JOB 2).
+ *
+ * Exactly two font stacks exist, as tokens in src/app.css: --fs-font-display
+ * and --fs-font-numeric. Before the tokens there were EIGHT hand-typed variant
+ * stacks plus seven bare 'Courier New' sites, and each variant fell back to a
+ * DIFFERENT face while Orbitron loaded or wherever it failed. The tokens close
+ * the class only if nothing can spell a stack by hand again, so:
+ *
+ *   1. every font-family declaration must be `inherit` or one of the two
+ *      tokens; a literal family name anywhere else is the defect;
+ *   2. the only lines allowed to spell a literal stack are the two token
+ *      DEFINITIONS, and only in src/app.css; a third --fs-font-* token, or a
+ *      redefinition elsewhere, fails;
+ *   3. a `fontFamily:` key in script (the PixiJS form, which cannot read CSS
+ *      custom properties) is flagged outright: there are zero today, and a new
+ *      one would be a literal stack the CSS rule cannot see.
+ *
+ * Single-line declarations only, which is every declaration in this tree; the
+ * `font:` shorthand appears once as `font: inherit`, which carries no family.
+ */
+const TOKEN_DEF = /--fs-font-([a-z0-9-]+)\s*:/
+const FONT_FAMILY_DECL = /font-family\s*:\s*([^;}]+)/
+const CANONICAL_TOKEN_FILE = 'src/app.css'
+const CANONICAL_TOKENS = new Set(['display', 'numeric'])
+
+function scanFontStacks(files) {
+  const out = []
+  for (const p of files) {
+    let src
+    try { src = readFileSync(p, 'utf-8') } catch { continue }
+    const rel = relative(ROOT, p)
+    const isTokenFile = rel.replace(/\\/g, '/').endsWith(CANONICAL_TOKEN_FILE)
+    src.split('\n').forEach((line, i) => {
+      if (isComment(line)) return
+      const def = line.match(TOKEN_DEF)
+      if (def && (!CANONICAL_TOKENS.has(def[1]) || !isTokenFile)) {
+        out.push({
+          klass: 'third-font-stack',
+          file: rel,
+          line: i + 1,
+          detail: CANONICAL_TOKENS.has(def[1])
+            ? `the token --fs-font-${def[1]} is redefined outside ${CANONICAL_TOKEN_FILE}`
+            : `a third font token --fs-font-${def[1]} is defined. Exactly two exist: display and numeric.`,
+          text: line.trim().slice(0, 110),
+        })
+        return
+      }
+      const decl = line.match(FONT_FAMILY_DECL)
+      if (decl) {
+        const value = decl[1].trim()
+        const canonical = value === 'inherit'
+          || value === 'var(--fs-font-display)'
+          || value === 'var(--fs-font-numeric)'
+        // The two definition lines in app.css legitimately spell literal stacks.
+        if (!canonical && !(isTokenFile && TOKEN_DEF.test(line))) {
+          out.push({
+            klass: 'third-font-stack',
+            file: rel,
+            line: i + 1,
+            detail: `a literal font stack "${value.slice(0, 60)}". Use var(--fs-font-display) or `
+              + 'var(--fs-font-numeric); the only literal stacks live in src/app.css as the token definitions.',
+            text: line.trim().slice(0, 110),
+          })
+        }
+      }
+      if (/\bfontFamily\s*:/.test(line)) {
+        out.push({
+          klass: 'third-font-stack',
+          file: rel,
+          line: i + 1,
+          detail: 'a script-side fontFamily (the PixiJS form). Canvas text cannot read the CSS tokens, '
+            + 'so this is a literal stack the CSS rule cannot see; resolve the token value explicitly '
+            + 'and record why, rather than spelling a family here.',
+          text: line.trim().slice(0, 110),
+        })
+      }
+    })
+  }
+  return out
+}
+
 // ── Reporting ────────────────────────────────────────────────────────────────
 function report(label, findings) {
   if (!findings.length) {
@@ -567,6 +650,30 @@ if (process.argv.includes('--self-test')) {
       run: (p) => scanDoubleSpaces([p]),
       why: 'a double space inside markup prose',
     },
+    {
+      name: 'variant-stack.svelte',
+      body: "<style>\n  .fs-label {\n    font-family: 'Orbitron', system-ui, sans-serif;\n  }\n</style>\n",
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, a hand-typed variant stack, the exact form 25 sites carried before the tokens',
+    },
+    {
+      name: 'bare-courier.svelte',
+      body: "<style>\n  .ts-note { font-family: 'Courier New', monospace; font-size: 0.7rem; }\n</style>\n",
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, a bare Courier New site, the form ThemeSelector carried seven of',
+    },
+    {
+      name: 'third-token.css',
+      body: ':root {\n  --fs-font-heading: \'Impact\', sans-serif;\n}\n',
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, a THIRD token defined, which the literal-stack rule alone would bless',
+    },
+    {
+      name: 'pixi-fontfamily.ts',
+      body: "const style = new TextStyle({\n  fontFamily: 'Arial',\n  fontSize: 24,\n})\n",
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, a script-side PixiJS fontFamily, which no CSS scan would see',
+    },
   ]
 
   let allRed = true
@@ -642,6 +749,24 @@ if (process.argv.includes('--self-test')) {
       why: 'a stat LABEL is not a mode name and may be styled freely; only mode badges are pinned',
     },
     {
+      name: 'clean-token-usage.svelte',
+      body: '<style>\n  .fs-money { font-family: var(--fs-font-numeric); }\n'
+        + '  .fs-title { font-family: var(--fs-font-display); }\n'
+        + '  .fs-input { font-family: inherit; }\n</style>\n',
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, the two tokens and inherit are the only legitimate values and must pass',
+    },
+    {
+      // Written at a path that really ends in src/app.css, so the shipped
+      // isTokenFile predicate is exercised rather than restated.
+      name: 'src/app.css',
+      body: ":root {\n  --fs-font-display: 'Orbitron', system-ui, sans-serif;\n"
+        + "  --fs-font-numeric: 'Orbitron', 'Courier New', monospace;\n"
+        + '  font-family: var(--fs-font-display);\n}\n',
+      run: (p) => scanFontStacks([p]),
+      why: 'JOB 2, the canonical token definitions in app.css are the one place literal stacks live',
+    },
+    {
       name: 'clean-one-form.ts',
       body: "\nconst fr: Translations = {\n  a: 'Ce jeu n’est pas disponible.',\n  b: 'La relecture d’une mise.',\n}\n",
       run: (p) => scanApostrophes(p),
@@ -687,6 +812,7 @@ const srcFindings = [
   ...scanApostrophes(localeTable),
   ...scanMoney(srcFiles),
   ...scanCasingTransforms(srcFiles),
+  ...scanFontStacks([...srcFiles, indexHtml]),
 ]
 
 const srcOk = report(

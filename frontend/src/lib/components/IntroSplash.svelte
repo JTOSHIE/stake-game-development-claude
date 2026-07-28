@@ -80,7 +80,7 @@
   }
 
   .intro-title {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 1.2rem;
     font-weight: 900;
     letter-spacing: 0.14em;
@@ -132,7 +132,7 @@
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-weight: 900;
     letter-spacing: 0.12em;
     font-size: 0.9rem;

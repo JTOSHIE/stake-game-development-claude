@@ -115,7 +115,7 @@
       0 0 12px rgba(255, 0, 255, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-weight: 900;
     transition: filter 0.3s;
     display: flex;
@@ -138,7 +138,7 @@
 
   /* ── Amount ──────────────────────────────────────────────────────────────── */
   .win-amount {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 1.1rem;
     font-weight: 900;
     color: #FF00FF;

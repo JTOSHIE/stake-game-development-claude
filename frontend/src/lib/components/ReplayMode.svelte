@@ -368,7 +368,7 @@
     padding: 2rem 1rem;
     box-sizing: border-box;
     background: #060610;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     color: #00FFFF;
   }
 
@@ -405,7 +405,7 @@
   .replay-btn {
     background: linear-gradient(135deg, #00FFFF, #FF00FF);
     color: #060610;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 700;
     border: none;
     border-radius: 12px;
@@ -448,7 +448,7 @@
   }
 
   .replay-status {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 1.25rem;
     text-align: center;
   }

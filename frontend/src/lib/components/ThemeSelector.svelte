@@ -89,13 +89,13 @@
   }
   header { text-align: center; margin-bottom: 1.5rem; }
   .title {
-    font-family: 'Courier New', monospace; font-size: clamp(1.2rem,3vw,2rem);
+    font-family: var(--fs-font-numeric); font-size: clamp(1.2rem,3vw,2rem);
     font-weight: 900; letter-spacing: 0.3em;
     color: #00ffff; text-shadow: 0 0 20px rgba(0,255,255,0.5);
     margin: 0 0 0.3rem;
   }
   .sub {
-    font-family: 'Courier New', monospace; font-size: 0.7rem;
+    font-family: var(--fs-font-numeric); font-size: 0.7rem;
     letter-spacing: 0.25em; color: rgba(255,255,255,0.4); margin: 0;
   }
   .grid {
@@ -134,7 +134,7 @@
   .badge {
     position: absolute; top: 8px; right: 8px;
     background: rgba(0,0,0,0.75); color: rgba(255,255,255,0.55);
-    font-family: 'Courier New', monospace; font-size: 0.5rem;
+    font-family: var(--fs-font-numeric); font-size: 0.5rem;
     font-weight: 700; letter-spacing: 0.15em; padding: 3px 8px;
     border-radius: 4px; border: 1px solid rgba(255,255,255,0.15);
   }
@@ -149,18 +149,18 @@
   }
   .card-body { padding: 0.65rem; }
   .card-name {
-    font-family: 'Courier New', monospace; font-size: 0.75rem;
+    font-family: var(--fs-font-numeric); font-size: 0.75rem;
     font-weight: 900; letter-spacing: 0.2em; margin: 0 0 0.35rem;
   }
   .card-desc {
-    font-family: 'Courier New', monospace; font-size: 0.6rem;
+    font-family: var(--fs-font-numeric); font-size: 0.6rem;
     color: rgba(255,255,255,0.5); margin: 0; line-height: 1.5;
   }
   footer { display: flex; gap: 0.75rem; justify-content: flex-end; }
   .btn-cancel {
     background: transparent; border: 1px solid rgba(255,255,255,0.15);
     color: rgba(255,255,255,0.45); padding: 0.7rem 1.5rem;
-    border-radius: 8px; font-family: 'Courier New', monospace;
+    border-radius: 8px; font-family: var(--fs-font-numeric);
     font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em;
     cursor: pointer; transition: all 0.15s;
   }
@@ -168,7 +168,7 @@
   .btn-confirm {
     background: transparent; border: 2px solid var(--p);
     color: var(--p); padding: 0.7rem 2rem; border-radius: 8px;
-    font-family: 'Courier New', monospace; font-size: 0.75rem;
+    font-family: var(--fs-font-numeric); font-size: 0.75rem;
     font-weight: 900; letter-spacing: 0.2em; cursor: pointer;
     box-shadow: 0 0 12px color-mix(in srgb, var(--p) 25%, transparent);
     transition: all 0.15s;

@@ -140,7 +140,7 @@
   .rc-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .rc-stop {
     padding: 9px 18px; border-radius: 8px; cursor: pointer;
-    font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 0.04em;
+    font-family: var(--fs-font-numeric); font-size: 12px; letter-spacing: 0.04em;
     background: rgba(30, 8, 12, 0.9); color: #ffd9d9;
     border: 1px solid rgba(255, 90, 90, 0.55);
   }
@@ -152,7 +152,7 @@
     right: calc(1rem + env(safe-area-inset-right, 0px));
     z-index: 56;
     display: flex; flex-direction: column; gap: 3px; min-width: 128px;
-    padding: 8px 12px; border-radius: 9px; font-family: 'Orbitron', monospace;
+    padding: 8px 12px; border-radius: 9px; font-family: var(--fs-font-numeric);
     background: rgba(6, 12, 22, 0.9); border: 1px solid rgba(0, 255, 255, 0.25); color: #cde;
   }
   /* 2026-07-14c: bumped from 0.6rem (9.6px, under the 11px legibility floor
@@ -164,7 +164,7 @@
   .sp-val.neg { color: #ff6b6b; }
   .sp-val.pos { color: #58e; }
   .rc-backdrop { z-index: 130; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); }
-  .rc-modal { width: min(90vw, 360px); padding: 22px; border-radius: 14px; text-align: center; font-family: 'Orbitron', sans-serif; color: #fff; background: linear-gradient(160deg, #0c0c22, #08081a); border: 1px solid rgba(0,255,255,0.4); }
+  .rc-modal { width: min(90vw, 360px); padding: 22px; border-radius: 14px; text-align: center; font-family: var(--fs-font-display); color: #fff; background: linear-gradient(160deg, #0c0c22, #08081a); border: 1px solid rgba(0,255,255,0.4); }
   .rc-modal h2 { color: #00ffff; font-size: 1.1rem; margin: 0 0 12px; }
   .rc-modal p { font-size: 0.85rem; opacity: 0.9; margin: 0 0 8px; }
   .rc-ok { margin-top: 14px; padding: 10px 26px; border: none; border-radius: 8px; background: #00ffff; color: #06121a; font-weight: 800; cursor: pointer; }
@@ -179,7 +179,7 @@
     width: min(90vw, 360px);
     padding: 20px 22px;
     border-radius: 14px;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--fs-font-numeric);
     color: #cde;
     background: linear-gradient(160deg, #0c0c22, #08081a);
     border: 1px solid rgba(0, 255, 255, 0.4);

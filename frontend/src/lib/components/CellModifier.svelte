@@ -37,7 +37,7 @@
     animation: cm-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .cell-mod-label {
-    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-family: var(--fs-font-display); font-weight: 900;
     font-size: 0.9rem; padding: 2px 7px; margin-bottom: 6px; border-radius: 8px;
     color: #06121a;
   }

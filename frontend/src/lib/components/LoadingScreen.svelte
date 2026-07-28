@@ -139,7 +139,7 @@
   }
 
   .wordmark {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-weight: 900;
     font-size: clamp(1rem, 3.2vw, 1.6rem);
     letter-spacing: 0.32em;
@@ -221,7 +221,7 @@
        the only thing keeping these digits steady, which is why the percentage
        now sits in its own fixed-width box in the markup. QUALITY_CHARTER.md
        Q-23. */
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     color: rgba(0, 255, 255, 0.5);

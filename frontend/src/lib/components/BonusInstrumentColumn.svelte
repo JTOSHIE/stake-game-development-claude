@@ -193,14 +193,14 @@
   .plate-label,
   .plate-value { position: relative; z-index: 1; }
   .plate-label {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 12px;
     letter-spacing: 0.16em;
     color: rgba(180, 240, 255, 0.72);
     text-transform: uppercase;
   }
   .plate-value {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 30px;
     font-weight: 900;
     color: #ffd54a;
@@ -245,7 +245,7 @@
     box-shadow: 0 0 10px rgba(255, 46, 196, 0.2);
   }
   .pm-label {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -259,7 +259,7 @@
     text-align: center;
   }
   .pm-value {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 15px;
     font-weight: 800;
     white-space: nowrap;

@@ -425,7 +425,7 @@
     font-size: 11px;
     line-height: 1.4;
     color: rgba(190, 214, 230, 0.72);
-    font-family: 'Orbitron', monospace;
+    font-family: var(--fs-font-numeric);
     letter-spacing: 0.02em;
   }
 
@@ -456,7 +456,7 @@
     justify-content: center;
     background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(3px);
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
   }
 
   /* Swappable schemes, identical token set to the HUD (template layer). */
@@ -768,7 +768,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.3rem 0.6rem;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 0.68rem;
     font-weight: 900;
     letter-spacing: 0.08em;

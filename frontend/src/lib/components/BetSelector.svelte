@@ -239,7 +239,7 @@
     margin-bottom: 12px;
   }
   .bs-title {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 900;
     font-size: 14px;
     letter-spacing: 0.18em;
@@ -275,7 +275,7 @@
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.045);
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     transition: border-color 0.12s, background 0.12s, transform 0.08s;
   }
   .bs-level:hover { border-color: color-mix(in srgb, var(--sig-cyan) 60%, transparent); background: rgba(255, 255, 255, 0.08); }
@@ -319,7 +319,7 @@
     margin-top: 14px;
     padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
   }
   .bs-foot-label {
     font-size: 10px;

@@ -543,7 +543,7 @@
     position: absolute; inset: 0; z-index: 80;
     display: flex; align-items: center; justify-content: center;
     background: radial-gradient(circle at center, rgba(8,8,26,0.72), rgba(4,4,14,0.92));
-    font-family: 'Orbitron', sans-serif; color: #fff; text-align: center;
+    font-family: var(--fs-font-display); color: #fff; text-align: center;
   }
   .fs-entry, .fs-end { display: flex; flex-direction: column; gap: 10px; }
 
@@ -683,7 +683,7 @@
        portrait ones, which is why the audit that found it only sees it
        sometimes. */
     min-height: 96px; padding: 0 28px;
-    font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.12em;
+    font-family: var(--fs-font-display); font-size: 1rem; font-weight: 900; letter-spacing: 0.12em;
     color: #0a0614; background: linear-gradient(180deg, #ffe98a, #ffd700 60%, #d9a81e);
     border: none; border-radius: 999px; cursor: pointer;
     box-shadow: 0 0 18px rgba(255, 215, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.6);
@@ -764,7 +764,7 @@
   .fs-spin-win {
     position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
     z-index: 5; pointer-events: none;
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 2.1rem; font-weight: 900; color: #ffd54a;
     text-shadow: 0 0 14px rgba(255, 180, 0, 0.95), 0 2px 5px rgba(0, 0, 0, 0.9);
     padding: 0.15em 0.5em; border-radius: 10px;

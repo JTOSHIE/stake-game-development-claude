@@ -1077,7 +1077,7 @@
     flex: 1 1 auto; min-width: 0; height: 44px; padding: 0 4px 0 2px;
     background: linear-gradient(180deg, rgba(10, 14, 26, 0.94), rgba(6, 8, 18, 0.98));
     border-top: 1px solid rgba(0, 255, 255, 0.22);
-    font-family: 'Orbitron', monospace;
+    font-family: var(--fs-font-numeric);
     /* THE MENU BUTTON'S ICON WAS INVISIBLE HERE. Found 2026-07-26 while
        comparing the rebuilt Popout S against the owner's live capture, where
        the second control reads as an empty dark box in both.
@@ -1324,12 +1324,12 @@
   .fs-bet.overboost-pulse { animation: overboost-bet-pulse-landscape 0.7s ease-out; }
 
   .fs-label{
-    font-family:'Orbitron',system-ui,monospace;font-size:.52rem;font-weight:700;
+    font-family: var(--fs-font-numeric);font-size:.52rem;font-weight:700;
     letter-spacing:.18em;text-transform:uppercase;color:rgba(190,232,255,.62);
     position:relative;z-index:1;
   }
   .fs-value{
-    font-family:'Orbitron',system-ui,monospace;
+    font-family: var(--fs-font-numeric);
     font-size:calc(1.02rem * var(--autofit-scale, 1));
     font-weight:700;
     letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
@@ -1351,7 +1351,7 @@
     z-index:61; display:flex; justify-content:flex-end; pointer-events:none;
   }
   .fs-mode-badge{
-    font-family:'Orbitron',system-ui,monospace; font-size:.5rem; font-weight:800;
+    font-family: var(--fs-font-numeric); font-size:.5rem; font-weight:800;
     letter-spacing:.1em; white-space:nowrap;
     /* text-transform: uppercase REMOVED 2026-07-28 (TR-092). It made the HUD
        badge render CRUISE while the features menu, the paytable mode row and
@@ -1414,7 +1414,7 @@
     box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
     display:flex;align-items:center;justify-content:center;}
   .fs-max .cap{
-    font-family:'Orbitron',monospace;font-size:.62rem;font-weight:800;letter-spacing:.02em;
+    font-family: var(--fs-font-numeric);font-size:.62rem;font-weight:800;letter-spacing:.02em;
     color:#ffe58a;text-shadow:0 0 6px var(--sig-gold);
   }
   .fs-max:hover:not(:disabled){filter:brightness(1.2);}
@@ -1507,7 +1507,7 @@
   .fs-auto .fs-face{gap:0;}
   .fs-auto svg{width:20px;height:20px;}
   .fs-auto svg path{fill:none;stroke:rgba(200,236,255,.7);stroke-width:5;}
-  .fs-auto .count{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:800;
+  .fs-auto .count{font-family: var(--fs-font-numeric);font-size:.9rem;font-weight:800;
     color:var(--acc);font-variant-numeric:tabular-nums;text-shadow:0 0 8px var(--acc);}
   .fs-auto:disabled{opacity:.4;cursor:not-allowed;}
   .fs-auto.active{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--acc) 75%,transparent));
@@ -1539,7 +1539,7 @@
   .fs-spin .glyph.arrows path{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;
     filter:drop-shadow(0 0 6px var(--acc));}
   .fs-spin .txt{position:absolute;bottom:14px;left:0;right:0;text-align:center;
-    font-family:'Orbitron',monospace;font-size:.46rem;font-weight:800;letter-spacing:.14em;
+    font-family: var(--fs-font-numeric);font-size:.46rem;font-weight:800;letter-spacing:.14em;
     color:var(--acc);text-shadow:0 0 6px var(--acc);}
   .fs-spin:hover:not(:disabled){transform:scale(1.05);
     box-shadow:0 4px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),0 0 30px var(--acc);}
@@ -1695,7 +1695,7 @@
   }
   .audio-label {
     flex: 0 0 42px;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -1832,7 +1832,7 @@
     min-height: 44px;
     padding: 8px 10px;
     font-size: 0.95rem;
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--fs-font-display);
     color: #fff;
     background: rgba(0, 255, 255, 0.1);
     border: 1px solid rgba(0, 255, 255, 0.4);
@@ -1883,7 +1883,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
   }
   .p-hud--overdrive { --p-acc: var(--p-pink); }
@@ -2172,7 +2172,7 @@
     height: 100%;
     box-sizing: border-box;
     padding: 8px 12px 8px 8px;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
   }
   .c-hud--overdrive { --c-acc: var(--c-pink); }

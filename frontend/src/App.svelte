@@ -2104,7 +2104,7 @@
   .live-guard-banner {
     position: fixed; left: 0; right: 0; top: 0; z-index: 9000;
     padding: 14px 18px; text-align: center;
-    font-family: 'Orbitron', monospace; font-size: 13px; line-height: 1.45;
+    font-family: var(--fs-font-numeric); font-size: 13px; line-height: 1.45;
     color: #ffe6e6; background: rgba(96, 10, 16, 0.97);
     border-bottom: 2px solid rgba(255, 90, 90, 0.75);
     text-wrap: balance;
@@ -2118,7 +2118,7 @@
     position: fixed; left: 0; right: 0; top: 0; z-index: 9000;
     display: flex; align-items: center; justify-content: center; gap: 14px;
     padding: 14px 18px; text-align: center;
-    font-family: 'Orbitron', monospace; font-size: 13px; line-height: 1.45;
+    font-family: var(--fs-font-numeric); font-size: 13px; line-height: 1.45;
     color: #dffbff; background: rgba(6, 46, 58, 0.97);
     border-bottom: 2px solid rgba(0, 255, 255, 0.55);
     text-wrap: balance;
@@ -2149,7 +2149,7 @@
        rule styled one operating system deliberately and every other one by
        accident. The brand face leads now, matching src/app.css's root stack.
        QUALITY_CHARTER.md Q-14. */
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     overflow: hidden;
     height: 100dvh;
   }
@@ -2446,7 +2446,7 @@
   }
   /* Fallback only - shown if the lockup image fails to load. */
   .portrait-wordmark-text {
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.14em;
@@ -2473,7 +2473,7 @@
   .logo-text {
     /* The fallback for a failed brand mark should still be the brand face.
        Courier New was the scaffold-era placeholder. QUALITY_CHARTER.md Q-15. */
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 1.6rem;
     font-weight: 900;
     letter-spacing: 0.18em;
@@ -2672,7 +2672,7 @@
     border-color: color-mix(in srgb, var(--theme-primary, #00ffff) 45%, transparent);
   }
   .reel-mode-label {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 0.08em;

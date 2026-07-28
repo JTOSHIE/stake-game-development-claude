@@ -71,15 +71,32 @@ html, body {
 }
 
 :root {
-  /* The brand face leads the root stack. This read
-     `system-ui, Avenir, Helvetica, Arial, sans-serif`, the Vite starter's own
-     default, from the scaffold commit until 2026-07-27: it named no brand face
-     at all, so every surface that did not declare one inherited the operating
-     system's UI font, and which font that was depended on the player's device.
-     Orbitron is self-hosted via @fontsource (see src/main.ts) and is Latin-only
-     by design, so the fallbacks behind it still carry the non-Latin locales.
-     QUALITY_CHARTER.md Q-13. */
-  font-family: 'Orbitron', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* THE TWO CANONICAL FONT STACKS, owner's order 2026-07-28
+     (FS_POLISH_PUNCH_AND_R3 JOB 2). Before this there were EIGHT variant
+     stacks across the tree plus seven bare 'Courier New' sites, every one a
+     hand-typed near-copy of one of these two. Eight stacks that must agree are
+     eight stacks that eventually will not, and the difference only shows in
+     the worst moment: while Orbitron is still loading, or on the machine where
+     it fails, each variant falls back to a DIFFERENT face. Exactly two stacks
+     exist now, as tokens, and machine_tell_gate.mjs fails the build if a third
+     ever appears.
+
+     DISPLAY carries labels, headings and prose. NUMERIC carries money and
+     counters: its fallback chain is monospace so that if Orbitron is absent
+     the digits at least hold steady widths (Orbitron itself ships no OpenType
+     features, TR-089, so the fallback is the only tabular behaviour there is).
+     With Orbitron loaded the two render identically, which is why adopting the
+     tokens changes no shipped pixel.
+
+     The old root stack read 'Orbitron', system-ui, Avenir, Helvetica, Arial,
+     sans-serif; Avenir/Helvetica/Arial were the Vite starter's Latin faces,
+     redundant behind system-ui and ahead of the same terminal keyword, so the
+     root now uses the display token. Orbitron is self-hosted via @fontsource
+     (see src/main.ts) and is Latin-only by design, so the fallbacks behind it
+     still carry the non-Latin locales. QUALITY_CHARTER.md Q-13. */
+  --fs-font-display: 'Orbitron', system-ui, sans-serif;
+  --fs-font-numeric: 'Orbitron', 'Courier New', monospace;
+  font-family: var(--fs-font-display);
   line-height: 1.5;
   font-weight: 400;
 

@@ -84,7 +84,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 1.8rem;
     font-weight: 900;
     color: #00FFFF;
@@ -104,7 +104,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 1.4rem;
     font-weight: 900;
     color: #FF00FF;

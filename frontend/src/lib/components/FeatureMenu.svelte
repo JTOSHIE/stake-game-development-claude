@@ -635,7 +635,7 @@
       inset 0 0 10px color-mix(in srgb, var(--sig-pink) 14%, transparent);
     color: color-mix(in srgb, var(--sig-pink) 25%, #fff);
     cursor: pointer;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     white-space: nowrap;
     transition: filter 0.15s ease;
   }
@@ -661,7 +661,7 @@
     color: color-mix(in srgb, var(--sig-orange) 25%, #fff);
   }
   .fm-entry-label {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
     text-transform: uppercase;
     white-space: nowrap;
@@ -670,7 +670,7 @@
      for Cruise (cost unchanged), a clearly-labelled persistent pill for
      OVERBOOST (real per-spin cost change while ON). */
   .fm-entry-active {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
     text-transform: uppercase; white-space: nowrap;
     padding: 2px 8px; border-radius: 999px;
@@ -695,7 +695,7 @@
     justify-content: center;
     background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(3px);
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     animation: fm-fade 0.18s ease;
   }
   @keyframes fm-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -884,7 +884,7 @@
      FEATURES - the first label sits flush at the top of the scroll area
      (no extra top margin), the second is preceded by a visual rule. */
   .fm-section-label {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.66rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
     color: color-mix(in srgb, var(--sig-gold) 45%, #fff);
     text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 40%, transparent);
@@ -1061,7 +1061,7 @@
       inset 0 0 10px color-mix(in srgb, var(--sig-pink, #ff2ec4) 14%, transparent);
     color: color-mix(in srgb, var(--sig-pink, #ff2ec4) 25%, #fff);
     cursor: pointer;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
   }
   .p-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
   .p-fm-entry svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }

@@ -132,7 +132,7 @@
   }
 
   .press-prompt {
-    font-family: 'Orbitron', 'Courier New', monospace;
+    font-family: var(--fs-font-numeric);
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.22em;

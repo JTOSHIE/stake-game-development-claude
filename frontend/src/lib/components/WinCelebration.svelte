@@ -53,7 +53,7 @@
     transform: translate(-50%, -50%);
     z-index: 20;
     pointer-events: none;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: clamp(2rem, 6vw, 3.5rem);
     font-weight: 900;
     color: #f4fbff;

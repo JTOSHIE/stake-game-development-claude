@@ -92,7 +92,7 @@
 
   .ro-title {
     display: block;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 900;
     font-size: 15px;
     letter-spacing: 0.16em;
@@ -100,7 +100,7 @@
   }
   .ro-body {
     margin: 10px 0 16px;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-size: 12px;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.76);
@@ -112,7 +112,7 @@
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     font-weight: 800;
     font-size: 12px;
     letter-spacing: 0.14em;

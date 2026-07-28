@@ -387,7 +387,7 @@
   .tier-mega .fs-plate { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig) 40%, transparent), 0 0 55px color-mix(in srgb, #a855f7 28%, transparent); }
   .tier-epic .fs-plate { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), 0 0 130px color-mix(in srgb, var(--sig-pink) 20%, transparent); }
 
-  .c1-tier-label { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 900; letter-spacing: .18em; color: var(--acc); text-shadow: 0 0 12px color-mix(in srgb, var(--acc) 70%, transparent); text-transform: uppercase; white-space: nowrap; }
+  .c1-tier-label { font-family: var(--fs-font-display); font-weight: 900; letter-spacing: .18em; color: var(--acc); text-shadow: 0 0 12px color-mix(in srgb, var(--acc) 70%, transparent); text-transform: uppercase; white-space: nowrap; }
   .tier-big  .c1-tier-label { font-size: 22px; }
   .tier-mega .c1-tier-label { font-size: 28px; }
   .tier-epic .c1-tier-label { font-size: 36px; }
@@ -398,7 +398,7 @@
      band instead of overflowing/truncating. Fixed max-width (not 100% of a
      flex row) since the band now lays tier/amount/mult out horizontally. */
   .c1-amount {
-    font-family: 'Orbitron', system-ui, sans-serif; font-weight: 900; color: #f4fbff;
+    font-family: var(--fs-font-display); font-weight: 900; color: #f4fbff;
     text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; white-space: nowrap;
     width: min(46vw, 640px); box-sizing: border-box; text-align: center;
     max-width: min(46vw, 640px); overflow: hidden;
@@ -412,7 +412,7 @@
   .tier-big  .c1-amount { font-size: calc(50px * var(--autofit-scale, 1)); }
   .tier-mega .c1-amount { font-size: calc(64px * var(--autofit-scale, 1)); }
   .tier-epic .c1-amount { font-size: calc(80px * var(--autofit-scale, 1)); }
-  .c1-mult { font-family: 'Orbitron', system-ui, sans-serif; font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; }
+  .c1-mult { font-family: var(--fs-font-display); font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; }
   /* SECONDARY by design, TR-068. Deliberately quieter than the amount and the
      multiplier above it: the ruling retains the gross WIN as the headline, and
      a price line competing with it for attention would be option (b), the net
@@ -421,7 +421,7 @@
   .c1-price {
     display: flex; align-items: baseline; justify-content: center; gap: 8px;
     margin-top: 4px;
-    font-family: 'Orbitron', system-ui, sans-serif;
+    font-family: var(--fs-font-display);
     white-space: nowrap;
   }
   .c1-price-label {

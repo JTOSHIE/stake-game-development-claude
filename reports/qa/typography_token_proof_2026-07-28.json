@@ -1,0 +1,21 @@
+{
+  "generated": "2026-07-28",
+  "job": "FS_POLISH_PUNCH_AND_R3 JOB 2, typography tokens, zero visual change",
+  "viewport": {
+    "width": 1200,
+    "height": 675
+  },
+  "method": "animations disabled, canvases masked, per-pixel RGBA equality",
+  "results": {
+    "splash": {
+      "differing": 0,
+      "total": 810000
+    },
+    "hud": {
+      "differing": 0,
+      "total": 810000
+    }
+  },
+  "pass": true,
+  "failures": []
+}
