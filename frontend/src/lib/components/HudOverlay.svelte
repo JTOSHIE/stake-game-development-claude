@@ -538,7 +538,7 @@
      could. -->
 <div class="m-hud" class:m-hud--overdrive={$overdriveVisual} data-testid="mini-hud">
   <div class="m-menu-wrapper">
-    <button class="m-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="hud-menu" data-testid="mini-menu">
+    <button class="m-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="mini-menu">
       <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
     </button>
     {#if showMenu}

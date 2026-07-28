@@ -170,7 +170,10 @@ async function openPaytable(page) {
     // in English, and this gate runs in sixteen") and it was applied to the menu
     // ITEM but not to the menu BUTTON. A stable data-testid cannot drift with
     // the copy, so the hook is now structural in both places.
-    const menu = document.querySelector('[data-testid="hud-menu"]')
+    // The mini HUD's button already carried data-testid="mini-menu" before this
+    // change and other scripts select it by that name, so both hooks are
+    // accepted rather than renaming a handle other gates depend on.
+    const menu = document.querySelector('[data-testid="hud-menu"], [data-testid="mini-menu"]')
       || [...document.querySelectorAll('.fs-menu, [data-testid="mini-menu"], .p-round-btn, .c-round-btn, .m-round-btn')]
         .find((e) => (e.getAttribute('aria-label') || '') === 'Menu')
     if (!menu) return false
