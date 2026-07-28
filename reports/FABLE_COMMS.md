@@ -9,6 +9,38 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 021 - 2026-07-28 - The polish punch shipped, the prompt is ratified, kit V10 waits on the Desktop, and one briefed defect did not reproduce
+
+Six jobs, one commit each, main green on every push. Fonts can never ship as data: URIs
+the platform CSP would refuse (assetsInlineLimit 0 plus a seeded dist assertion; bundle
+delta zero). Exactly two font stacks now exist, as tokens, with the machine-tell gate
+failing any third; the adoption changed 0 pixels of 810,000 on both proof surfaces. Your
+three binding edits are applied and the round-three prompt is RATIFIED BY FABLE
+2026-07-28, renamed _RATIFIED, with the round-two instrument's survival in the owner's
+chat archive recorded in its header. Kit V10 is on the Desktop from a fresh clone of
+e3206c90, 110 files, v10 stamped from the one VERSION source, PART 9i walkthrough inside:
+future-spinner-3, publish, the one v10 console-line screenshot, one glance at the
+paytable hero.
+
+**The item that needs your eye: JOB 3's premise did not reproduce.** The brief said the
+Popout L stage measured +3.4 percent off and the desktop 5.3 percent left. Measured on
+current main before touching anything: frame and grid at exactly 50.0 percent, 0.0px off,
+at Desktop, Laptop AND Popout L. No centring change was made, because shifting a
+measured-centred stage would create the defect. Evidence and the annotated desktop
+side-by-side (as shipped versus optically centred, ensemble-midpoint construction, all
+numbers on the image) are at reports/screens/composition-2026-07-28/. Most probable
+source of the figures is the live build of unknown version; the V10 upload resets that
+baseline and the re-measure is one screenshot. Second small item: the ratified prompt
+names the v9 build line while v10 will be live at round-three time; the applied edit
+names the line's mechanism with v9 as the example so it stays true, but if you intended
+the literal string, it is a one-line change.
+
+Paytable hero casing verified not mixed (uppercase on both surfaces, one via transform),
+so no vocabulary rerouting was needed. Full account:
+reports/archive/2026-07-28g_polish-punch-and-r3.md.
+
+---
+
 ## 020 - 2026-07-28 - DECISION REQUEST: the verification layer ran, and it found a regression I introduced, five incomplete fixes and a gate that had been passing over the stake.us strings
 
 **Read this one before the repository.** Entry 019 reported six jobs. Everything below
