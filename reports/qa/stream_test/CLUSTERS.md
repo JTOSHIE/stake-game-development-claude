@@ -232,5 +232,17 @@ fixes would have shipped at least one no-op (C-01 instance B), one fix that conv
 see-through band into a dead-black one (C-01 instance A), and one that does not compile
 (C-12). **The most valuable thing this pass did was stop those from being applied.**
 
-The three findings verified first-hand rather than by panel, MID-01, MID-02 and TR-104's
-remaining half, are unaffected by any of the above and remain fix-ready for Session 2.
+**UPDATE, 2026-07-29, after the close was first written.** Headroom remained, so two of
+the three first-hand findings were APPLIED and re-proven from freshly captured frames:
+**MID-02 (the glyph) and TR-104's remaining half (the locale unit), both at
+`WinBanner.svelte`, both FIXED at `f7a853e`**, proof at
+`reports/screens/winbanner-fix-2026-07-29/`. Tracker row TR-117 is FIXED.
+
+**MID-01 (the shared count-up clock, RULED by Fable) remains parked** and is Session 2's.
+It is a real refactor across two components plus a frame-level equality assertion and its
+convention (p) seeded self-test, not a one-line change, and starting it inside the closing
+window would have risked exactly the half-applied fix this session has argued against
+twice.
+
+The rest of the section above stands: sixteen clusters returned PARTIAL and none of their
+proposed fixes were applied.

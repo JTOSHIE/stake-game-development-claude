@@ -206,3 +206,48 @@ Re-derived and checked before this report was written, not after:
 - **The six marshalling faults were counted from the panels' own returns**, not estimated.
 - **Fable's rulings were transcribed, not composed.** This session did not receive Fable's
   longhand and did not invent it; the record says so at the transcription.
+
+## ADDENDUM, 2026-07-29: the parked fix batch, partly unparked
+
+The owner reported the session allowance at 69 per cent used with 1 hour 9 minutes
+remaining, materially more headroom than this session's conservative accounting against
+the brief's 14.5M had assumed. The gap is worth naming for future planning: **the brief's
+budget was a figure the owner set, and the account meter is the truth.** A session should
+reconcile the two rather than trust its own derived number, which here was pessimistic by
+enough to have parked deliverable work.
+
+Two of the three first-hand findings were applied and re-proven:
+
+- **MID-02**, the ASCII `x` on the multiplier, now U+00D7.
+- **TR-104's remaining half**, the unit now routed through `t($locale, 'bet', ...)`.
+
+Both at `WinBanner.svelte`, both one line, both re-proven from **freshly captured frames**
+rather than from the old ledger: `16x BET` becomes `16× BET` on English, and
+`GROSSER GEWINN` + `16x BET` becomes `GROSSER GEWINN` + `16× EINSATZ` on German. Proof at
+`reports/screens/winbanner-fix-2026-07-29/`. Tracker TR-117 FIXED. `npm run check` 0
+errors, dash gate PASS.
+
+**MID-01 stays parked**, and deliberately: the shared count-up clock is a refactor across
+two components plus a frame-level equality assertion and its convention (p) seeded
+self-test. Starting that inside the closing window would have risked the half-applied fix
+this session twice argued against.
+
+### The harness defect found on the way, which matters more than the fix
+
+`stream_test_capture.mjs` had `DATE` hardcoded to `'2026-07-28'`, so **any re-run wrote
+into the committed evidence directory and overwrote all 519 frames.** That is exactly the
+failure convention (h.1) is written against.
+
+**It was found the hard way, and the honest account is that this session caused it before
+catching it.** The first fix used `toISOString()`, which is UTC; at 06:03 AEST the UTC date
+is still the previous day, so it resolved to the very directory it was written to protect
+and overwrote 53 frames. They were restored from HEAD immediately, verified byte identical
+at 519 files with an empty diff, and nothing was lost.
+
+The lesson is the one `FULL_AUDIT_METHOD.md` 2.3 already states and this session had to
+learn again: **a prompt is a request; a path is a guarantee.** A date is a guess about
+where output lands, and it was wrong twice in one file. The script now asks git whether
+anything at the destination is tracked and refuses if so, requiring an explicit
+`--regenerate`. Seeded per convention (p): run against the real defect form, the actual
+directory with the actual hardcoded date, it goes RED and names the 521 tracked files. The
+negative control is the capture that produced the proof frames.
