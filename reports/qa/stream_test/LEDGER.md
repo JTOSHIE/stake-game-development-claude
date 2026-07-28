@@ -85,6 +85,38 @@ on, and section 4 is explicit that a half verified list is worse than an
 unverified one. This is an unverified list, labelled as one, and it is handed
 over in that state deliberately rather than partly checked.
 
+### PROVISIONAL sections, per FABLE RULING 4 (2026-07-29)
+
+**The small-viewport sections of this ledger are PROVISIONAL and do not count as swept.**
+Fable's ruling 4, transcribed at `reports/FABLE_COMMS.md` entry 022: the mobile ledger is
+provisional pending the upscaled re-run. This session widened the scope on its own
+evidence and records the reason here rather than in a commit message alone.
+
+The discovery wave judged every frame at its NATIVE resolution. For the small viewports
+that is thumbnail scale, and a lens cannot report what it cannot resolve:
+
+| Session | Pixels | Approx image tokens | State |
+|---|---|---|---|
+| `popout-s` | 90,000 | ~120 | **PROVISIONAL**, re-run in progress |
+| `mobile-s` | 181,760 | ~242 | **PROVISIONAL**, re-run in progress |
+| `mobile-m` | 250,125 | ~334 | **PROVISIONAL**, re-run in progress |
+| `mobile-l` | 345,100 | ~460 | **PROVISIONAL**, re-run in progress |
+| `popout-l` | 360,000 | ~480 | left at native, stated rather than silent |
+| `laptop` | 589,824 | ~786 | stands |
+| `desktop` | 810,000 | ~1,080 | stands |
+| `stretch` | 1,536,000 | ~1,365 capped | stands |
+
+**`popout-s` is the worst affected frame set in the whole capture** at half the pixels of
+`mobile-s` and one ninth of `desktop`, and it is not a mobile session, so ruling 4's plain
+wording would have missed it. It is included.
+
+**The re-run is not only additive.** Each re-run squad reconciles against its superseded
+native shard and marks every prior finding CONFIRMED, REFINED or REFUTED, because a
+thumbnail can make a correctly aligned element look wrong as easily as it can hide a real
+defect. A native-resolution claim that does not survive at full resolution is a false
+positive, and removing one is worth as much as adding a finding. Superseded shards are
+retained at `shards/superseded/` rather than deleted.
+
 ### Coverage
 
 46 shards, 43 of them written by this session's squads. Zero squads lost.

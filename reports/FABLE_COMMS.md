@@ -65,6 +65,47 @@ template: `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md`, `reports/briefs/_TEMPLAT
 
 ---
 
+**FABLE RULINGS 2026-07-29, transcribed into the record by the session.** Fable
+operates READ-ONLY against this repository by design: it fetches files and rules, and it
+never writes. Rulings therefore enter the record solely by a session transcribing them,
+which is why entry 022 stood unanswered in the repository while the rulings themselves
+already existed. The mechanism is now named in the session report so the gap is never
+again read as silence. Transcribed from `reports/briefs/FS_SESSION1_ADDENDUM_Prompt.md`,
+2026-07-29, as relayed by the owner. **Where the wording below is not marked as a
+quotation it is the addendum's own summary text, transcribed exactly and not expanded**:
+this session did not receive Fable's longhand and has not invented it, per convention
+(l.7).
+
+- **RULING 1, MID-01: shared clock.** The win banner and the HUD WIN pod are to be driven
+  from one shared count-up source, with frame-level equality asserted. This is option (b)
+  of the three the session put up, and it settles the divergence rather than hiding it.
+  Tracker row **TR-116**, RULED.
+- **RULING 2, cluster verification: ADOPTED**, with three safeguards attached, which are
+  the substance of the ruling and not decoration: two representative instances drawn from
+  DIFFERENT squads per cluster; two-verifier panels on every STREAM cluster; and any
+  divergence between instances REOPENS its cluster. The safeguards answer the objection
+  the session raised, that a cluster verdict otherwise covers instances no verifier
+  opened.
+- **RULING 3, the roster: TASK-SHAPED.** Model choice follows the task rather than a
+  standing ranking, which is the same answer protocol rule 5 already gives. Two things
+  are invariant regardless of model: **container orchestration always**, and **the sight
+  gate universal**. This closes the roster question the session declined to rule on, and
+  it closes it the way the session's evidence pointed: the difference on show was
+  orchestration discipline, so orchestration is what gets mandated.
+- **RULING 4, the mobile ledger: PROVISIONAL** pending the upscaled re-run. The mobile
+  sections of `reports/qa/stream_test/LEDGER.md` do not count as swept until the sight
+  gate has been applied to them.
+
+**COMMS-ACK.** Receipt of FABLE RULINGS 2026-07-29 recorded. Entry 022's four decision
+requests are closed. Rule 15 is added to the multi-track protocol under the same
+addendum. The session widened ruling 4's scope on its own evidence and says so here:
+popout-s is 90,000 pixels against mobile-s at 181,760, so it is the frame set worst
+affected by the sight gate and it is not a mobile session. The re-run covers twenty
+shards, the fifteen mobile plus the five popout-s, and popout-l and mobile-l are left at
+about 470 image tokens with that stated rather than silent.
+
+---
+
 ## 021 - 2026-07-28 - The polish punch shipped, the prompt is ratified, kit V10 waits on the Desktop, and one briefed defect did not reproduce
 
 Six jobs, one commit each, main green on every push. Fonts can never ship as data: URIs

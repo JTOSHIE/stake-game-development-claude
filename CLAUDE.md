@@ -784,6 +784,39 @@ Playwright with installed browsers, the full gate family, the local RGS
 harness, tesseract, and the analyst catalogue pattern. Sessions optimise their
 own workflow within the brief rather than serialising by habit.
 
+**15. Every work order carries a budget, and the session is graded against its
+own plan** (owner's order, 2026-07-29, `reports/briefs/FS_SESSION1_ADDENDUM_Prompt.md`,
+transcribed from Fable).
+
+- **Every work order carries the budget header from `reports/briefs/_TEMPLATE.md`**:
+  budget, scale, tool inventory, stop lines, degradation order, and a DONE MEANS stated
+  as an end state rather than an activity.
+- **The session posts a PLAN OF RECORD before its first expensive spend**, and is graded
+  against it at close. The plan states the wave costs, the expected findings, **the
+  verification cost computed at launch rather than discovered afterwards**, and a verdict
+  of FITS or DOES NOT FIT.
+- **Priority and the degradation order belong to the OWNER. The arithmetic belongs to the
+  SESSION.** The two do not compute the same sum: two calculations from shared inputs are
+  not independent corroboration, they share the inputs, which convention (l.4) already
+  warns about. The owner's check is whether the right thing is being dropped first, never
+  whether the multiplication is correct.
+
+WHERE THIS CAME FROM, because the cost was measured rather than argued. The stream test
+recovery session spent roughly 58 per cent of its agent budget producing nothing, across
+two orchestration errors, and could not run the verification pass its brief required. The
+accounting is in `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md` section 10. **It was not
+short of budget. It was short of a budget it could see.** Had it computed the plan of
+record before its first wave it would have printed, in one block: discovery 6.7M, expected
+findings 540, verification 37.8M, total 44M against a 16M budget, VERDICT DOES NOT FIT.
+That block takes ten seconds to read and would have changed the whole session. It was
+never computed, so a wave that could not be verified was launched anyway.
+
+**Two invariants ride with this rule, from the same ruling** (RULING 3, the roster is
+task-shaped): **container orchestration always**, per convention (q) and
+`docs/skills/FULL_AUDIT_METHOD.md` 4.1, and **the sight gate universal**, meaning no squad
+judges an image at a resolution where the defect class it is hunting is not resolvable.
+Model choice follows the task; these two do not.
+
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
 slot's originally intended content (expected-fail declarations, above). Rules

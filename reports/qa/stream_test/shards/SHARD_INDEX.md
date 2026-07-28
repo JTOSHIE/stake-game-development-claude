@@ -12,6 +12,13 @@ Australian English, no em dashes or en dashes.
 findings, none of them verified.** The adversarial pass did not run; see
 `../LEDGER.md` for why that was a deliberate stop rather than an omission.
 
+## PROVISIONAL: the small-viewport shards, per FABLE RULING 4 (2026-07-29)
+
+The 20 shards covering `popout-s`, `mobile-l`, `mobile-m` and `mobile-s` were judged at
+native resolution and are **PROVISIONAL**. They are moved to `superseded/` and replaced by
+28 re-run shards reading the same frames upscaled to 1600px, thirds per squad, each
+reconciling its predecessor's findings as CONFIRMED, REFINED or REFUTED. See `../LEDGER.md`.
+
 ## Squad status
 
 | Squad group | Lens | Shards | State | Coverage |
