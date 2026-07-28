@@ -1,13 +1,32 @@
 # ROUND THREE REVIEWER PROMPT
 
-# DRAFT FOR FABLE'S RATIFICATION. NOT FOR USE UNTIL HE RULES.
+# RATIFIED BY FABLE 2026-07-28. READY TO RUN.
 
-**Do not paste this at a reviewer yet.** It is a scaffold prepared so that ratifying it is a
-reading job rather than an authoring job. Fable owns the reviewer-prompt instrument; this
-session prepared it and does not adopt it.
+Ratified with three binding edits, applied in this document by the polish-punch session
+(reports/briefs/FS_POLISH_PUNCH_AND_R3_Prompt.md, JOB 4) and listed here so the delta from
+the draft is auditable:
 
-Written 2026-07-27 by the round-three prep session. Australian English, no em dashes or en
-dashes.
+1. **No prior scores anywhere in reviewer-facing text.** The findings are disclosed, the
+   scores are not: sections C and D no longer state any round-one or round-two score, so
+   the prompt cannot anchor a reviewer high or low. This takes the alternative that
+   section E decision 2 recorded. The scores remain on the record in section B, which is
+   studio-side context and is not pasted at a reviewer.
+2. **The game entry and the build line are named.** Sections C and D name the platform
+   entry `future-spinner-3` and the boot build line (the v9 build line, printed from the
+   repository-root `VERSION` file), so the reviewer can verify WHICH build they are
+   reviewing rather than assume it.
+3. **The live confirmations are added as verifiable.** Stage 4 now lists the specific
+   live confirmations as items the reviewer verifies from the committed captures rather
+   than accepts as claimed.
+
+**On the round-two instrument:** the round-two reviewer prompt survives in the owner's
+chat archive. It may be committed later for lineage; its absence from the repository does
+not affect this document's validity, which stands on the ratification above. Section A's
+account of what this draft was built from is retained unchanged as the honest record of
+authorship.
+
+Written 2026-07-27 by the round-three prep session; ratified and finalised 2026-07-28.
+Australian English, no em dashes or en dashes.
 
 ---
 
@@ -103,9 +122,9 @@ would let a reviewer excuse themselves from evidence that exists.
 > be convinced this game belongs beside the best studios on the platform.
 >
 > **THIS IS THE THIRD REVIEW ROUND.** Two prior rounds have been conducted and their full
-> texts are committed in the repository at `docs/records/reviews/sources/`. Scores were 0.67,
-> no-score and 2.00 in round one; 2.00, 1.67 and 0.67 in round two. **You are not the first
-> person to look at this game, and your primary value is not in finding new things.** It is
+> texts are committed in the repository at `docs/records/reviews/sources/`. **You are not
+> the first person to look at this game, and your primary value is not in finding new
+> things.** It is
 > in establishing whether the studio's claimed remediation is real. Read the prior reviews
 > before you begin, treat their findings as a checklist, and expect the studio to have
 > written confidently about fixes that do not survive inspection. That is the specific
@@ -152,9 +171,15 @@ would let a reviewer excuse themselves from evidence that exists.
 >
 > **You cannot launch and play the build, but this limitation is now PARTIAL rather than
 > total, and you must not overstate it.** The game is published on the platform's Developer
-> Testing Tool and the studio has committed live-platform capture sets, including the
-> platform's own ACP maths screen, live network payloads, and a Bet Replay of a 5,000x cap
-> round through to its celebration. Review the playable experience through those and through
+> Testing Tool under the entry `future-spinner-3`, and the build identifies itself: the
+> boot console prints a build line (the v9 build line, for example `v9 <commit>`) whose
+> version is read at build time from the repository-root `VERSION` file and whose commit
+> hash ties the served bundle to a commit, with the same facts recorded in the bundle's
+> `build-info.json`. Verify that the live line, the `VERSION` file and the commit agree
+> before attributing anything you see on the platform to the repository you are reading.
+> The studio has committed live-platform capture sets, including the platform's own ACP
+> maths screen, live network payloads, and a Bet Replay of a 5,000x cap round through to
+> its celebration. Review the playable experience through those and through
 > the committed proof sequences; verify the artefacts are current and mutually consistent
 > rather than stale; and maintain an explicit list titled UNVERIFIABLE WITHOUT PLAY covering
 > only what genuinely remains uncovered (feel, timing, audio mix in context, real-device
@@ -213,8 +238,9 @@ would let a reviewer excuse themselves from evidence that exists.
 > file's SHA-256 and how the three-way splits were proved lossless. Build your own list of
 > every finding those six raised. This list, not the studio's tracker, is your control: the
 > tracker tells you what the studio believes it did about each one, and you will test that in
-> stage 5. Note the score spread in both rounds, which is wide, and form your own view of
-> which reviewer was closest to right.
+> stage 5. The three reviewers in each round disagreed substantially with each other; form
+> your own view of which reviewer's FINDINGS were closest to right, on the evidence rather
+> than on any number they attached.
 >
 > **Stage 1, orientation without trust.** Read the repository top level:
 > `SUBMISSION_DOSSIER.md` (note that section 8 is a dated snapshot and section 9 is the
@@ -260,6 +286,22 @@ would let a reviewer excuse themselves from evidence that exists.
 > internal consistency and dates, and note that the studio itself records that which frontend
 > version was live at the time of some captures is not known.
 >
+> **The live confirmations, each VERIFIABLE from a committed artefact rather than accepted
+> as claimed.** For each, open the artefact and state whether it supports the claim:
+>
+> - the game is published on the Developer Testing Tool as `future-spinner-3`;
+> - the served build prints the versioned build line in the boot console (read from the
+>   repository-root `VERSION` file at build time) and ships the matching
+>   `build-info.json`, so which build is live is checkable rather than asserted;
+> - the RGS payload shapes for `authenticate`, `play` and `end-round` were read off the
+>   live wire and are quoted in `SUBMISSION_DOSSIER.md` section 9b;
+> - the platform's ACP Math Distribution and Summary screen was captured
+>   (`reports/qa/dtt_live_session_2026-07-26.md`, frames under
+>   `reports/screens/dtt-live-2026-07-26/`);
+> - Bet Replay was confirmed working live on a buy-tier cap round through to its
+>   celebration and COLLECT (capture sets under `reports/screens/`, replay proof at
+>   `frontend/scripts/replay_blocker_proof.mjs` with its committed evidence).
+>
 > **Stage 5, remediation verification.** Take your stage 0 list. For each finding, locate its
 > row in `docs/records/reviews/REVIEW_TRACKER.md`, read the claimed disposition and evidence,
 > and check it against the artefact rather than the prose. Give particular weight to: rows
@@ -290,6 +332,10 @@ would let a reviewer excuse themselves from evidence that exists.
 ---
 
 ## E. NOTES FOR FABLE, not part of the prompt
+
+RESOLVED BY THE 2026-07-28 RATIFICATION: decision 2 was taken as "disclose the findings
+without the scores" (binding edit 1); the remaining four were confirmed as drafted. The
+five are retained below as the record of what was decided.
 
 Five decisions this draft made that are yours to confirm or reverse.
 
