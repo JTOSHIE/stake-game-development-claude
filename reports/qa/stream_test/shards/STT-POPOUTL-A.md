@@ -484,3 +484,40 @@ other 34 are other squads' shards and are not mine. Verbatim:
 ?? reports/qa/stream_test/shards/STT-STRETCH-A.md
 ?? reports/qa/stream_test/shards/STV-REST.md
 ```
+
+**ADDENDUM, SECOND READING, AND IT IS NOT CLEAN. SAYING SO LOUDLY, AS INSTRUCTED.**
+I ran `git status --porcelain` a second time a few minutes later and the tree had
+changed underneath me. That reading was:
+
+```
+ M reports/qa/stream_test/LEDGER.md
+ M reports/qa/stream_test/shards/SHARD_INDEX.md
+ M reports/qa/stream_test/shards/STT-MOBILES-B.md
+ M reports/qa/stream_test/shards/STT-POPOUTL-A.md
+```
+
+Four MODIFIED entries where the first reading had none, and one of them is this
+shard. A third reading, at 01:08:55, returned a single line,
+` M reports/qa/stream_test/shards/STT-MOBILES-B.md`.
+
+**What happened, established from `git log` rather than guessed.** The marshal
+committed the shard set as `e0fd0b6 test(stream): marshal the 47 shards to one
+ledger, discovery complete` **while discovery squads were still running**. That
+commit turned every shard from untracked to tracked, which is why the untracked
+rows vanished and modified rows appeared. This shard went into it intact:
+`git diff HEAD` against
+`reports/qa/stream_test/shards/STT-POPOUTL-A.md` is empty, and the committed copy
+carries the full tree_after block above.
+
+**I did not write to LEDGER.md, to SHARD_INDEX.md or to STT-MOBILES-B.md.** The
+only file this squad wrote at any point is
+`reports/qa/stream_test/shards/STT-POPOUTL-A.md`. The remaining ` M` on
+`STT-MOBILES-B.md` is another squad still writing its own shard.
+
+**The thing worth the marshal's attention** is not the dirty tree, which resolves
+itself, but that a consolidation commit landed with squads still in flight. Per
+convention (q) a squad that dies silently and a squad that found nothing produce
+identical output, and a marshal that consolidates before the wave closes cannot
+tell either from a squad that simply had not written yet. This shard was already
+on disk when `e0fd0b6` ran, so it is in the ledger; a slower squad's would not
+have been.

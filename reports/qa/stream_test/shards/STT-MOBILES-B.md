@@ -410,7 +410,53 @@ The check that lets me say so is stated.
   shows the mode card reading `Cruise` in Title Case. The HUD badge that reads
   `CRUISE` is not in my frame range, so this evidences one side of the row only.
 
-tree_after: transcribed verbatim in the structured return for this squad. At the
-time of writing, the only entry attributable to this squad is its own untracked
-shard at `reports/qa/stream_test/shards/STT-MOBILES-B.md`; no tracked file was
-modified or deleted by this run.
+## Epoch check
+
+`git diff --stat d9bdf22..HEAD -- frontend/src` is EMPTY, so `frontend/src` is
+byte identical between the build the frames were captured against and the tree
+this squad read its `file:line` values from. Every citation above is valid
+against the captured build. The commits between the two touch only `CLAUDE.md`,
+`docs/skills/FULL_AUDIT_METHOD.md`, `frontend/scripts/stream_test_capture.mjs`,
+the briefs and `reports/qa/stream_test/**`.
+
+tree_after:
+
+```
+ M reports/SESSION_REPORT.md
+ M reports/qa/stream_test/shards/STT-MOBILES-B.md
+ M reports/qa/stream_test/shards/STT-POPOUTL-A.md
+```
+
+ALL THREE ENTRIES READ AS MODIFIED, NOT UNTRACKED, AND THAT IS SAID LOUDLY
+BECAUSE THE BRIEF ASKED FOR IT. Neither is a lost file. The cause is that an external
+session is committing shards as they land rather than at the end of the wave, so
+a shard is already tracked by the time its own squad rewrites it at step three.
+The evidence: HEAD is now `905592c`, `test(stream): STT-MOBILES-B step three
+enrichment, file:line values filled in`, timed 01:09:33, which is THIS squad's
+own step three write, committed by a session other than this one. The wave's
+earlier commits `157669e` and `e0fd0b6` did the same for the step two shards.
+
+The reading moved three times during the close, and all three are recorded so
+the sequence is checkable rather than a single snapshot to be trusted:
+
+1. ` M reports/qa/stream_test/shards/STT-MOBILES-B.md` alone, after the step
+   three rewrite landed on top of the committed step two version;
+2. EMPTY, once the external session committed that rewrite as `905592c`;
+3. the three lines above, after this squad appended the epoch check and this
+   section, after `STT-POPOUTL-A` was rewritten by its own squad, and after the
+   marshal began writing `reports/SESSION_REPORT.md`.
+
+The tree is LIVE under concurrent sessions, so any `git status` reading is a
+snapshot at an instant and not a stable fact; the three readings above are given
+with their order for that reason. This squad's own line is present in the final
+reading because writing this very section modified the file.
+
+`STT-POPOUTL-A.md` and `reports/SESSION_REPORT.md` belong to other sessions, are
+not this squad's to touch, and were not touched. The only file this squad wrote
+anywhere in the repository is
+`reports/qa/stream_test/shards/STT-MOBILES-B.md`. No project script was run at
+any point; scripts and gates were neither invoked nor read.
+
+NOTHING WAS MODIFIED OR DELETED BY THIS SQUAD OTHER THAN ITS OWN SHARD. No
+tracked file outside `reports/qa/stream_test/shards/STT-MOBILES-B.md` was
+written, and no project script was run.
