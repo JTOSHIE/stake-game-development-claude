@@ -101,3 +101,14 @@ is refreshed once more as the last action of the close, after the final push.
   inventory per rule 14, and the final-mile JOBs 3 to 6 handed over by the
   previous session are candidates for a multi-wave session under the new
   rule 4 default.
+
+## Rule 10 closing, filled
+
+The session's report push (`42840ab`) ran remote CI as run **30342387685** and
+it is **green**, all eleven jobs success, 2.9 minutes wall clock, inside the
+recorded range:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30342387685
+Both pushes this session were green on their own runs (30341480373 the work
+push, 30342387685 the report push). No reds this session, expected or
+otherwise. The owner preview was refreshed once more as the last action of the
+close, after this closing's push, per the one-commit-lag clause.
