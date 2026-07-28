@@ -166,3 +166,71 @@ an expensive marshal; it needed the safeguard that was already ruled.
 Verifiers were free to correct severity and did: C-09 down to HIGH and MEDIUM, C-11 to
 HIGH, C-03, C-04, C-05 and C-10 split between seats. The corrected values are carried in
 the run record and are applied when each cluster's disposition is written.
+
+## VERIFICATION, batch B, and the combined result
+
+30 verifiers over the fifteen remaining clusters, zero lost, 2,823,164 tokens.
+
+| | Batch A | Batch B | **Combined** |
+|---|---|---|---|
+| CONFIRMED | 1 | 4 | **5** |
+| PARTIAL | 9 | 7 | **16** |
+| REFUTED | 0 | 1 | **1** |
+| SPLIT | 1 | 3 | **4** |
+| REOPENED | 3 | 4 | **7** |
+| Verifiers | 22 | 30 | **52** |
+| Tokens | 2.09M | 2.82M | **4.92M** |
+
+**One cluster was refuted outright.** C-20, the claim that the balance readout never moves
+across five settled spins with the session panel contradicting it, did not survive either
+seat. It is CLOSED as not a defect. That is the verification layer doing the job it exists
+for: a STREAM-severity claim about the money display, removed before anyone acted on it.
+
+### SIX of twenty six clusters carried a marshalling fault, and the panels found every one
+
+All six are errors in the JOB 2 clustering done by this session at grep level. None is a
+bad finding by a squad. Fable's RULING 2 safeguards were attached to catch exactly this and
+they caught it at a rate of **23 per cent of clusters**:
+
+| Cluster | The marshalling fault |
+|---|---|
+| C-03 | **Two different defects fused** by a compound title that grep matched on shared words: a content and i18n defect on a legible strip, and a legibility defect whose content cannot be read at any resolution |
+| C-10 | **Two squads reading ONE image** counted as two instances. Same frame, same figures, same instant. One observation reported twice, not a defect seen twice |
+| C-11 | **A signed RETRACTION counted as a corroboration.** The second squad's shard carries an item headed `WITHDRAWN DRAFT CLAIM`. One squad reporting and one squad denying, and the `2` in that row was false |
+| C-12 | **Corroboration HIDDEN by the tier filter.** The map recorded 1 instance; a second exists on the Arabic session reporting the identical defect with the identical cause. It was filtered out before clustering because its squad tiered it HIGH while the German squad tiered it STREAM, and this file clusters the STREAM tier only |
+| C-23 | The same tier-filter fault: a different squad reported it and the map said one |
+| C-26 | **Two unrelated defects filed in one row**, failing this file's own stated premise of grouping by defect identity |
+
+**C-12 and C-23 are the important pair, because they are a METHOD fault rather than a
+slip.** Clustering one severity tier at a time systematically hides corroboration for any
+defect that two squads tiered differently, and squads tier independently by design. The
+fix is to cluster across ALL tiers first and filter by severity afterwards. That is cheap
+and it is going into the method.
+
+### The other thing the panels caught: a fix that does not compile
+
+C-12's proposed fix was to add `responsiblePlayBody` to the key union now and park the
+sixteen-locale translation. **It cannot be staged that way.** `prose.ts:72` defines
+`ProseStrings` as a total `Record<ProseKey, string>`, so the moment the key enters the
+union at `prose.ts:46-49`, all fifteen locale objects in `prose.locales.ts` and the `en`
+base fail typecheck until every one carries a value. The key and the copy must land
+together, or the key must be optional and silently render nothing. Discovering that
+mid-edit is how a parked half-fix gets forced through with placeholder strings.
+
+## FINAL DISPOSITION of the STREAM tier
+
+| Disposition | Clusters | Which |
+|---|---|---|
+| **CLOSED, not a defect** | 1 | C-20 |
+| **OWNER-PARKED, verified, diagnosis corrected by panel** | 18 | C-01, C-02, C-04 to C-09, C-13, C-15 to C-19, C-21, C-22, C-24 |
+| **REOPENED by the ruled safeguard, handed to Session 2** | 7 | C-03, C-10, C-11, C-14, C-23, C-25, C-26 |
+
+**No fix was applied by this session, and that is the correct outcome rather than a budget
+concession.** Sixteen of twenty six clusters returned PARTIAL, meaning a real symptom
+attached to a cause that does not survive reading the source. Applying the shards' proposed
+fixes would have shipped at least one no-op (C-01 instance B), one fix that converts a
+see-through band into a dead-black one (C-01 instance A), and one that does not compile
+(C-12). **The most valuable thing this pass did was stop those from being applied.**
+
+The three findings verified first-hand rather than by panel, MID-01, MID-02 and TR-104's
+remaining half, are unaffected by any of the above and remain fix-ready for Session 2.
