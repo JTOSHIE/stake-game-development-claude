@@ -441,4 +441,46 @@ fold them back under Q-27, but with the severity these frames establish.
 - KNOWN(Q-27): `reports/screens/stream-test-2026-07-28/128_popout-l_paytable_04_rules.png` and `reports/screens/stream-test-2026-07-28/119_popout-l_bigwin_settled.png` are the first frames to show the Vite scaffold `text-align: center` at `frontend/src/app.css:143` reaching a player surface. The row's stated condition, "visible only if any link or unstyled surface reaches a frame", is wrong: it is inherited application-wide and drives STT-POPOUTL-A-01 and STT-POPOUTL-A-08. The row needs re-rating from "small" to at least HIGH.
 - KNOWN(Q-16 park): the parked hardcoded-English strings visible in this range are `Session` and `Mute` on `121` (`HudOverlay.svelte:429` and siblings), the `<th>Scatters</th>` column header on `129` (`PaytableModal.svelte:258`), and the `ways` unit on `118` (`WinBreakdown.svelte:94`). Recorded so the de and ar squads' visibility list has an `en` cross-check; the park's urgency is unchanged by an `en` session.
 
-tree_after: see the shard's owning session; run at close, recorded in the structured return.
+tree_after: `git status --porcelain` at close returned 35 lines, every one of them a
+`??` untracked shard under `reports/qa/stream_test/shards/`. **Nothing is MODIFIED
+and nothing is DELETED**, so no committed file in the repository was touched by
+this squad. My own row is `?? reports/qa/stream_test/shards/STT-POPOUTL-A.md`. The
+other 34 are other squads' shards and are not mine. Verbatim:
+
+```
+?? reports/qa/stream_test/shards/STC-MOBILEL-B.md
+?? reports/qa/stream_test/shards/STC-MOBILEM-A.md
+?? reports/qa/stream_test/shards/STC-MOBILEM-B.md
+?? reports/qa/stream_test/shards/STC-MOBILES-A.md
+?? reports/qa/stream_test/shards/STC-MOBILES-B.md
+?? reports/qa/stream_test/shards/STC-STRETCH-A.md
+?? reports/qa/stream_test/shards/STC-STRETCH-B.md
+?? reports/qa/stream_test/shards/STL-AR-A.md
+?? reports/qa/stream_test/shards/STL-AR-B.md
+?? reports/qa/stream_test/shards/STL-DE-A.md
+?? reports/qa/stream_test/shards/STL-DE-B.md
+?? reports/qa/stream_test/shards/STM-DESKTOP.md
+?? reports/qa/stream_test/shards/STM-LAPTOP.md
+?? reports/qa/stream_test/shards/STM-MOBILEL.md
+?? reports/qa/stream_test/shards/STM-MOBILEM.md
+?? reports/qa/stream_test/shards/STM-MOBILES.md
+?? reports/qa/stream_test/shards/STM-POPOUTL.md
+?? reports/qa/stream_test/shards/STM-POPOUTS.md
+?? reports/qa/stream_test/shards/STM-STRETCH.md
+?? reports/qa/stream_test/shards/STT-DESKTOP-A.md
+?? reports/qa/stream_test/shards/STT-DESKTOP-B.md
+?? reports/qa/stream_test/shards/STT-LAPTOP-A.md
+?? reports/qa/stream_test/shards/STT-LAPTOP-B.md
+?? reports/qa/stream_test/shards/STT-MOBILEL-A.md
+?? reports/qa/stream_test/shards/STT-MOBILEL-B.md
+?? reports/qa/stream_test/shards/STT-MOBILEM-A.md
+?? reports/qa/stream_test/shards/STT-MOBILEM-B.md
+?? reports/qa/stream_test/shards/STT-MOBILES-A.md
+?? reports/qa/stream_test/shards/STT-MOBILES-B.md
+?? reports/qa/stream_test/shards/STT-POPOUTL-A.md
+?? reports/qa/stream_test/shards/STT-POPOUTL-B.md
+?? reports/qa/stream_test/shards/STT-POPOUTS-A.md
+?? reports/qa/stream_test/shards/STT-POPOUTS-B.md
+?? reports/qa/stream_test/shards/STT-STRETCH-A.md
+?? reports/qa/stream_test/shards/STV-REST.md
+```

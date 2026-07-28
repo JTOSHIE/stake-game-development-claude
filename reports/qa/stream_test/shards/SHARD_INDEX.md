@@ -1,85 +1,53 @@
 # Wave 2 shard index
 
-What each discovery squad covered, what it did not, and where the remaining
-surfaces are. Written by the recovery session (2026-07-28) as JOB 2 of
-`reports/briefs/FS_STREAM_TEST_RECOVERY_Prompt.md`, before any new discovery
-ran, so the resume state is committed rather than remembered.
+What each discovery squad covered and what state it is in. Rewritten at the
+close of the recovery session (2026-07-29, `reports/briefs/FS_STREAM_TEST_RECOVERY_Prompt.md`)
+to record the finished state rather than the salvage state it opened with.
 
 Australian English, no em dashes or en dashes.
 
-## The honest note on the roster
+## Status: discovery COMPLETE, verification NOT RUN
 
-**The prior session's squad roster is not recoverable from disk.** Only one
-shard reached the working tree, and the only surviving record of any squad's
-assignment is `STV.md`'s own `scope:` line. The roster below is therefore
-DEFINED by this session from the five channels the brief names
-(`reports/briefs/FS_STREAM_TEST_Prompt.md`, WAVE 2: composition, typography,
-motion residue, localisation, voice), not reconstructed from a record. The
-`ST<lens-initial>` prefix scheme is inferred from `STV` and is the one thing
-here the prior session did fix.
-
-Stating this rather than presenting a tidy roster is the point: an invented
-roster presented as a recovered one would make every coverage figure below
-unverifiable.
-
-## Frame set
-
-519 frames, ten sessions, catalogued in
-`reports/screens/stream-test-2026-07-28/MANIFEST.json`.
-
-| Session slug | Viewport | Lang | Frames |
-|---|---|---|---|
-| `desktop` | 1200x675 | en | 52 |
-| `laptop` | 1024x576 | en | 52 |
-| `popout-l` | 800x450 | en | 52 |
-| `popout-s` | 400x225 | en | 51 |
-| `mobile-l` | 425x812 | en | 52 |
-| `mobile-m` | 375x667 | en | 52 |
-| `mobile-s` | 320x568 | en | 52 |
-| `stretch` | 1920x800 | en | 52 |
-| `de-desktop` | 1200x675 | de | 52 |
-| `ar-desktop` | 1200x675 | ar | 52 |
+47 shards. Every one of the 519 frames is read by at least one lens. **540
+findings, none of them verified.** The adversarial pass did not run; see
+`../LEDGER.md` for why that was a deliberate stop rather than an omission.
 
 ## Squad status
 
-| Squad | Lens | Shard | State | Last known coverage |
+| Squad group | Lens | Shards | State | Coverage |
 |---|---|---|---|---|
-| **STV** | Voice: strings judged as written prose | `shards/STV.md`, 20,358 bytes | **PARTIAL** | `desktop` (en) text surfaces only. 27 frames read of 519. 15 findings (STV-01 to STV-15), four KNOWN matches, explicit signed absences. Nine other sessions unread by this lens. |
-| **STC** | Composition: off-balance, cramped or dead space | none | **PARTIAL, zero coverage** | No shard on disk. No frame read. |
-| **STT** | Typography: case, weight, spacing, family, numbers that shimmy or clip | none | **PARTIAL, zero coverage** | No shard on disk. No frame read. |
-| **STM** | Motion residue: wrong overlap, pops, elements caught mid-teleport | none | **PARTIAL, zero coverage** | No shard on disk. No frame read. The 208 `transition_` frames are this lens's primary material and are entirely unread. |
-| **STL** | Localisation: English words and LTR artefacts on localised frames | none | **PARTIAL, zero coverage** | No shard on disk. `de-desktop` and `ar-desktop`, 104 frames, entirely unread. |
+| `STC-*-A` / `STC-*-B` | Composition | 16 | **COMPLETE** | All eight en sessions, both halves, 26 frames each. 236 findings. |
+| `STT-*-A` / `STT-*-B` | Typography | 16 | **COMPLETE** | All eight en sessions, both halves. 163 findings. |
+| `STM-*` | Motion residue | 8 | **COMPLETE** | The 18 `transition_` frames of every en session, judged against their settled endpoints. 77 findings. |
+| `STL-DE-*` / `STL-AR-*` | Localisation, all five channels | 4 | **COMPLETE** | `de-desktop` and `ar-desktop`, both halves. 42 findings. |
+| `STV` | Voice, desktop modal and menu text | 1 | **COMPLETE** | The trial session's shard. 27 frames, 15 findings. |
+| `STV-REST` | Voice, desktop in-play text | 1 | **COMPLETE** | The roughly 25 desktop frames `STV` did not read. 7 findings. |
 
-**Aggregate: 27 of 519 frames read by any lens, 5.2 per cent.** One lens of
-five is part-run; four have not started.
+Sessions: `desktop` 001 to 052, `laptop` 053 to 104, `popout-l` 105 to 156,
+`popout-s` 157 to 207, `mobile-l` 208 to 259, `mobile-m` 260 to 311,
+`mobile-s` 312 to 363, `stretch` 364 to 415, `de-desktop` 416 to 467,
+`ar-desktop` 468 to 519.
 
-## What STV's coverage note tells the resuming squads
+## What the next session picks up
 
-Read `shards/STV.md` before auditing any `desktop` frame. Its scope line names
-the exact surfaces it read and its closing section signs two explicit
-absences (the mode-name casing, and the `H1`/`M3`/`L2` symbol ids) that are
-deliberate and must not be re-reported as findings. Its KNOWN matches already
-attach frame evidence to `Q-26`, `Q-16 park`, `Q-34` and `Q-07`, so those rows
-want fresh evidence from OTHER sessions rather than a repeat from `desktop`.
+1. **The verification pass**, which is the whole of what remains before any
+   fix is applied. 540 findings, shared-nothing, one adversarial verifier per
+   finding told to REFUTE, defaulting to refuted when uncertain. Size it per
+   convention (r): the recorded figure is about 3.1M subagent tokens for 41
+   verifiers, so this is a job of its own and not a tail end.
+2. **Start with the five clusters in `../LEDGER.md`.** Cluster 1 is reported by
+   eleven independent squads across two lenses and seven viewports, so it is
+   both the most likely to be real and the cheapest to settle first.
+3. **`TR-104`'s remaining half is fix-ready** and was verified first-hand by
+   the recovery session rather than by an agent. One line, one existing key.
+   Details in `../LEDGER.md`.
+4. **Do not re-run anything above**, per convention (q). All 47 shards are
+   committed.
 
-STV also leaves a note the localisation squads are the only ones who can
-answer: several strings it recorded under the Q-16 park now have keys in
-`prose.ts`, and an en-only session cannot tell a keyed string from a hardcoded
-one. That question is assigned to STL.
+## The honest note on the roster
 
-## Remaining work, as JOB 3 will run it
-
-Twelve discovery squads under workflow-container orchestration, one coherent
-surface each per convention (r), each reading this index and the existing
-shard's coverage notes first and auditing only what remains:
-
-| Squad | Sessions |
-|---|---|
-| `STC-DESK`, `STT-DESK`, `STM-DESK` | `desktop`, `laptop`, `stretch` |
-| `STC-POP`, `STT-POP`, `STM-POP` | `popout-l`, `popout-s` |
-| `STC-MOB`, `STT-MOB`, `STM-MOB` | `mobile-l`, `mobile-m`, `mobile-s` |
-| `STL-DE` | `de-desktop` |
-| `STL-AR` | `ar-desktop` |
-| `STV-REST` | the seven en sessions STV did not read |
-
-Consolidation target for every shard: `reports/qa/stream_test/LEDGER.md`.
+The trial session's squad roster was never recoverable from disk; only `STV.md`'s
+own scope line survived. The roster above was DEFINED by the recovery session
+from the five channels the original brief names, not reconstructed from a
+record. This note is kept because the coverage figures are only checkable if the
+reader knows which parts are evidence and which are this session's design.

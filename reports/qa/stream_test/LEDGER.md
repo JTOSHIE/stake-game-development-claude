@@ -76,5 +76,115 @@ conflated.
 
 ## Consolidated shard findings
 
-Not yet populated. JOB 4 consolidates `shards/*.md` into this section after the
-JOB 3 discovery squads complete.
+**READ THIS FIRST: NOTHING BELOW HAS BEEN VERIFIED.** The discovery wave
+completed. The adversarial verification pass did not run. Every figure and every
+claim below is a squad's own report of its own work, and no agent has yet been
+asked to refute any of it. `docs/skills/FULL_AUDIT_METHOD.md` section 1.2 is
+explicit that a finding which has only ever been asserted is not worth acting
+on, and section 4 is explicit that a half verified list is worse than an
+unverified one. This is an unverified list, labelled as one, and it is handed
+over in that state deliberately rather than partly checked.
+
+### Coverage
+
+46 shards, 43 of them written by this session's squads. Zero squads lost.
+
+| Lens | Shards | Sessions covered | Findings |
+|---|---|---|---|
+| Composition (`STC`) | 16 | all eight en sessions, both halves | 236 |
+| Typography (`STT`) | 16 | all eight en sessions, both halves | 163 |
+| Motion residue (`STM`) | 8 | the 18 transition frames of every en session | 77 |
+| Localisation (`STL`) | 4 | `de-desktop` and `ar-desktop`, both halves | 42 |
+| Voice (`STV`) | 2 | desktop modals (trial session) plus desktop in-play surfaces | 22 |
+
+**540 findings: 43 STREAM, 160 HIGH, 228 MEDIUM, 106 LOW.** Zero squads lost.
+
+**Surfaces NOT swept, named explicitly per the closing checklist:** none of the
+five lenses has a gap. Every one of the 519 frames is covered by at least one
+lens, and the eight English sessions are covered by composition, typography and
+motion residue in full. What is NOT covered is a lens this brief did not name:
+the composition, typography and motion lenses were run over the English
+sessions only, so `de-desktop` and `ar-desktop` are covered by the localisation
+lens (which reads all five channels) and not by three dedicated single-lens
+squads each. Audio, social-mode capture, accessibility and animation timing
+remain never swept, per `docs/skills/FULL_AUDIT_METHOD.md` section 5.
+
+### The five clusters, and why cross-squad agreement matters here
+
+Verification did not run, but the squads were shared-nothing: none could see
+another's shard, and each was given one lens and one half session. Where many of
+them independently report the same defect, that is corroboration from genuinely
+independent inputs in the sense convention (l.4) requires, and it is the
+strongest signal this ledger carries. It is not a substitute for adversarial
+verification, because agreement establishes that the thing was SEEN, not that
+the diagnosis or the proposed fix is right.
+
+**Cluster 1. The reel window goes transparent mid-spin and the scene shows
+through the board. Eleven squads, two different lenses, seven viewports.**
+`STC-DESKTOP-A-01`, `STC-LAPTOP-A-02`, `STC-MOBILEL-A-01`, `STC-MOBILES-A-01`,
+`STC-STRETCH-A-01`, `STM-DESKTOP-01`, `STM-LAPTOP-01`, `STM-MOBILEL-01`,
+`STM-MOBILES-01`, `STM-POPOUTL-01`, `STM-STRETCH-01`. This is the most heavily
+corroborated finding in the set and it is on the surface a viewer watches for
+the whole session.
+
+**Cluster 2. The buy confirm dialog presents a price with no reachable CONFIRM
+or CANCEL. Six squads, two lenses, four viewports.** `STC-LAPTOP-B-01`,
+`STC-MOBILES-B-01`, `STC-POPOUTL-B-01`, `STC-POPOUTS-B-01`, `STT-LAPTOP-B-01`,
+`STT-POPOUTS-B-01`. Several squads note the same mechanism: a sticky stats strip
+consuming the scroll box and pushing the action row below the fold.
+
+**Cluster 3. Scrolling panels slice text through the middle of its glyphs with
+no scroll affordance, and nothing in the tree has a mask.** `STC-POPOUTS-A-02`,
+`STC-POPOUTL-B-02`, `STC-MOBILEL-B-05`, `STT-POPOUTS-B-01` and siblings.
+`STC-MOBILEL-B-05` records that `grep -rn "mask-image" frontend/src/` returns
+nothing, so this is a class rather than an instance.
+
+**Cluster 4. The max win collect leaves residue on the board.** `STM-DESKTOP-02`,
+`STM-POPOUTL-02`, `STM-POPOUTS-02`: win lines and celebration glow still painted
+over an emptied or partly faded reel window after COLLECT.
+
+**Cluster 5. The intro rules `Continue` button is drawn over its own body copy.**
+`STC-POPOUTS-A-01`, `STM-POPOUTS-01`, `STT-POPOUTS-A-01`. Three lenses, one
+viewport, the first interactive screen of the game.
+
+### The localisation shards, which no English session could produce
+
+Four findings that only a localised session can see, all STREAM:
+
+- `STL-DE-B-01`: the entire Responsible Play paragraph renders in **English under
+  a German heading** on the German paytable.
+- `STL-DE-A-01`: the German paytable states the max win twice in one view with
+  two different thousands separators, so one line reads as `5` and the other as
+  `5000`.
+- `STL-DE-B-02`: `5,000×EINSATZ` on the max win hero, unit collided with
+  multiplier, no separating space.
+- `STL-AR-B-01`: the Arabic max win overlay prints multiplier and unit in LTR
+  order, so the biggest moment in the game reads backwards.
+
+`STL-AR-A-01` additionally reports the win-line detail strip rendering the
+English word `ways`, a raw internal symbol code and an ASCII `x` under the reels
+for the whole of every win, which independently reaches the same surface as
+`STV-01` and `MID-02` from a different direction.
+
+### Disposition
+
+**None.** Every finding here is awaiting the verification pass. No fix was
+applied by this session, deliberately: applying fixes would have moved the tree
+epoch under an unverified list, which is the trap
+`docs/skills/FULL_AUDIT_METHOD.md` section 2.2 exists to name, and the brief's
+own JOB 4 requires re-proof from fresh frames that this session had no allowance
+left to capture.
+
+One item is fix-ready and verified first-hand by this session rather than by an
+agent, and it is recorded here so the next session does not re-derive it:
+**KNOWN_OPEN's TR-104 is half fixed and its remaining half is a one-line
+change.** The tier label is already locale routed, proven by frame
+`430_de-desktop_bigwin_settled.png` reading `GROSSER GEWINN` and
+`482_ar-desktop_bigwin_settled.png` reading Arabic. Only the unit is still
+hardcoded, at `frontend/src/lib/components/WinBanner.svelte:210`,
+`sv('BET', $isSocial)`. The fix is `t($locale, 'bet', $isSocial ? 'social' :
+'real')`: the `bet` key already exists in all sixteen locales in the correct
+ALL-CAPS shape (`EINSATZ`, `رهان`, `ベット`, `投注`, and the rest) plus the social
+override `PLAY`, and `MaxWinCelebration.svelte:159` already makes exactly that
+call for exactly that word under TR-091. KNOWN_OPEN sizes TR-104 as "larger than
+small, sized like TR-091"; on this evidence the remaining half is neither.
