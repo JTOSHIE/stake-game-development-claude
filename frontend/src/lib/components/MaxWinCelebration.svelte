@@ -103,7 +103,7 @@
 <svelte:window on:keydown={handleKey} />
 
 {#if show}
-  <div class="c1-win c1-win--overdrive max-win-overlay c1-max fs-scrim" role="dialog" aria-modal="true" aria-label="Max Win reached">
+  <div class="c1-win c1-win--overdrive max-win-overlay c1-max fs-scrim" role="dialog" aria-modal="true" aria-label={t($locale, 'a11yMaxWinReached', localeMode)}>
 
     <!-- Rotating halo ring behind everything -->
     <div class="c1-halo halo-ring" aria-hidden="true"></div>
@@ -159,11 +159,11 @@
         <span class="c1-max-betlabel">{t($locale, 'bet', localeMode)}</span>
       </div>
 
-      <button class="c1-collect collect-btn" bind:this={collectBtn} on:click={collect} aria-label={$isSocial ? 'Collect max prize' : 'Collect max win'} data-testid="max-win-collect">
+      <button class="c1-collect collect-btn" bind:this={collectBtn} on:click={collect} aria-label={t($locale, 'a11yCollectMaxWin', localeMode)} data-testid="max-win-collect">
         {t($locale, 'collect', localeMode)}
       </button>
 
-      <p class="c1-hint hint" aria-live="polite">Press COLLECT or hit Enter to continue</p>
+      <p class="c1-hint hint" aria-live="polite">{t($locale, 'maxWinHint', localeMode)}</p>
 
     </div>
   </div>

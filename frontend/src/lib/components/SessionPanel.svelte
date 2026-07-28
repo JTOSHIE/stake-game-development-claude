@@ -103,7 +103,7 @@
              different affordances, and it spent the same glyph the paytable and
              the mode cards use to mean "times". One drawn cross now, matching
              PaytableModal and FeatureMenu. QUALITY_CHARTER.md Q-05. -->
-        <button class="sp-sheet-close" on:click={closeSheet} aria-label="Close">
+        <button class="sp-sheet-close" on:click={closeSheet} aria-label={$tr('a11yClose')}>
           <svg class="sp-close-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
         </button>
       </div>

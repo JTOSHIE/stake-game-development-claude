@@ -28,28 +28,37 @@ export type FsModeId = 'normal' | 'cruise' | 'overboost' | 'bonus' | 'super'
 export type FsModeKind = 'standing' | 'enhancer' | 'buy'
 
 /** The maths mode ids the RGS understands (server prices the debit). */
+import { t, type Locale } from '../i18n/translations'
+import type { ProseKey } from '../i18n/prose'
+
 export type FsServerMode = 'base' | 'bonus' | 'cruise' | 'antelite' | 'super'
 
 export interface FsMode {
   /** Stable UI id - must stay in sync with the FsModeId union. */
   id: FsModeId
-  /** Human-readable name shown on cards and the info page. */
-  label: string
+  /** Prose key for the name shown on cards and the info page. Resolved through
+   *  `t()` so the label is localised in all sixteen locales and picks up its
+   *  social variant from the same table as every other string. Was a literal
+   *  English `label` until JOB 2 (2026-07-28); round three reviewer 3 cited
+   *  `config/fsModes.ts:59-115` by name as English-only mode descriptions. */
+  labelKey: ProseKey
   /** UI behaviour class (see FsModeKind). */
   kind: FsModeKind
   /** Cost as a multiple of the base bet (server applies this). */
   cost: number
   /** Volatility tag shown on the card. */
   volatility: 'Low' | 'High' | 'Very High' | 'Extreme'
-  /** One-line description for the card and the BET MODES info page. */
-  blurb: string
-  /** Social-casino (stake.us) override for `label`, per Fable's wording
-   *  ruling (2026-07-14b, ITEM C). Omit when the real-money label has no
-   *  prohibited-term conflict - the base label is used in social mode too. */
-  socialLabel?: string
-  /** Social-casino (stake.us) override for `blurb`, per the same ruling.
-   *  Real-money `blurb` is never changed; consumers branch on `isSocial`. */
-  socialBlurb?: string
+  /** Prose key for the one-line description on the card and the BET MODES info
+   *  page. Same treatment as `labelKey`. */
+  blurbKey: ProseKey
+  //
+  // `socialLabel` and `socialBlurb` are GONE. They were a second social
+  // mechanism living beside `SOCIAL_OVERRIDES`, and a second mechanism is a
+  // second thing to forget: these five modes were the only strings in the game
+  // whose social variant did NOT come from the i18n layer, and they were also
+  // English-only in all sixteen locales. Both facts had the same cause. The
+  // social variants now live in `PROSE_SOCIAL` beside every other social
+  // string, keyed by the same `blurbKey`/`labelKey`.
   /** false = maths not shipped yet; render dimmed + "coming soon", non-interactive. */
   available: boolean
   /** Maths mode id sent to the RGS (via the selectedBetMode store). */
@@ -59,56 +68,51 @@ export interface FsMode {
 export const FS_MODES: FsMode[] = [
   {
     id: 'normal',
-    label: 'Normal',
+    labelKey: 'modeNormalLabel',
     kind: 'standing',
     cost: 1.0,
     volatility: 'High',
-    blurb: 'Standard play. Overdrive Free Spins trigger on 3+ scatters.',
+    blurbKey: 'modeNormalBlurb',
     available: true,
     serverMode: 'base',
   },
   {
     id: 'cruise',
-    label: 'Cruise',
+    labelKey: 'modeCruiseLabel',
     kind: 'standing',
     cost: 1.0,
     volatility: 'Low',
-    blurb: 'A smoother ride: more frequent smaller wins, same 96.35% RTP.',
-    socialBlurb: 'A smoother ride: more frequent smaller prizes, same 96.35% RTP.',
+    blurbKey: 'modeCruiseBlurb',
     available: true,
     serverMode: 'cruise',
   },
   {
     id: 'overboost',
-    label: 'OVERBOOST',
+    labelKey: 'modeOverboostLabel',
     kind: 'enhancer',
     cost: 1.25,
     volatility: 'High',
-    blurb: 'Double-chance: about 1.6x the feature trigger rate. Debits 1.25x every spin while ON.',
-    socialBlurb: 'Double-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.',
+    blurbKey: 'modeOverboostBlurb',
     available: true,
     serverMode: 'antelite',
   },
   {
     id: 'bonus',
-    label: 'Buy Overdrive',
+    labelKey: 'modeBonusLabel',
     kind: 'buy',
     cost: 100,
     volatility: 'Very High',
-    blurb: 'Buy a guaranteed Overdrive Free Spins entry.',
-    socialLabel: 'Get Overdrive',
-    socialBlurb: 'Get a guaranteed Overdrive Free Spins entry.',
+    blurbKey: 'modeBonusBlurb',
     available: true,
     serverMode: 'bonus',
   },
   {
     id: 'super',
-    label: 'NITRO OVERDRIVE',
+    labelKey: 'modeSuperLabel',
     kind: 'buy',
     cost: 400,
     volatility: 'Extreme',
-    blurb: 'Buy a rich entry with the Overdrive meter pre-revved to 5x.',
-    socialBlurb: 'Get a rich entry with the Overdrive meter pre-revved to 5x.',
+    blurbKey: 'modeSuperBlurb',
     available: true,
     serverMode: 'super',
   },
@@ -204,9 +208,9 @@ export function maxWinFootnote(social: boolean): string {
  * branch on `isSocial`, so the two consumers can never drift out of sync.
  * Real-money strings (`label`/`blurb`) are always the fallback; the social
  * override is used only when one exists AND social mode is active. */
-export function modeLabel(m: FsMode, social: boolean): string {
-  return social && m.socialLabel ? m.socialLabel : m.label
+export function modeLabel(m: FsMode, social: boolean, locale: Locale): string {
+  return t(locale, m.labelKey, social ? 'social' : 'real')
 }
-export function modeBlurb(m: FsMode, social: boolean): string {
-  return social && m.socialBlurb ? m.socialBlurb : m.blurb
+export function modeBlurb(m: FsMode, social: boolean, locale: Locale): string {
+  return t(locale, m.blurbKey, social ? 'social' : 'real')
 }

@@ -15,7 +15,7 @@
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel } from '../config/fsModes'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -50,8 +50,8 @@
   // NITRO's own "meter pre-revved to 5x" line comes along for free since
   // it's already in fsModes.ts's blurb for 'super'.
   $: buyModeEntry = FS_MODES.find((m) => m.serverMode === buyMode) ?? FS_MODES.find((m) => m.id === 'bonus')
-  $: featureName = buyModeEntry ? modeLabel(buyModeEntry, $isSocial) : t($locale, 'buyConfirmTitle', localeMode)
-  $: featureBlurb = buyModeEntry ? modeBlurb(buyModeEntry, $isSocial) : ''
+  $: featureName = buyModeEntry ? t($locale, buyModeEntry.labelKey, localeMode) : t($locale, 'buyConfirmTitle', localeMode)
+  $: featureBlurb = buyModeEntry ? t($locale, buyModeEntry.blurbKey, localeMode) : ''
 
   function open(mode: BetMode = 'bonus') {
     if ($isSpinning) return

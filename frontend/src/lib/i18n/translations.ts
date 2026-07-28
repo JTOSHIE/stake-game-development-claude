@@ -840,7 +840,7 @@ const id: Translations = {
   wincap:               'KEMENANGAN MAKS, 5.000×!',
   bigWin:               'MENANG BESAR!',
   hugeWin:              'MENANG LUAR BIASA!!',
-  megaWin:              'MEGA WIN!!!',
+  megaWin:              'MENANG MEGA!!!',
   error:                'Kesalahan koneksi. Coba lagi.',
   errSessionUnavailable: 'Permainan tidak tersedia. Sesi Anda tidak dapat diverifikasi. Silakan muat ulang atau hubungi dukungan.',
   insufficientBalance:  'Saldo tidak cukup. Tambahkan dana.',
@@ -1421,7 +1421,7 @@ const vi: Translations = {
   wincap:               'THẮNG TỐI ĐA, 5.000×!',
   bigWin:               'THẮNG LỚN!',
   hugeWin:              'THẮNG KHỔNG LỒ!!',
-  megaWin:              'MEGA WIN!!!',
+  megaWin:              'THẮNG CỰC LỚN!!!',
   error:                'Lỗi kết nối. Vui lòng thử lại.',
   errSessionUnavailable: 'Trò chơi không khả dụng. Không thể xác minh phiên của bạn. Vui lòng tải lại hoặc liên hệ hỗ trợ.',
   insufficientBalance:  'Số dư không đủ. Vui lòng nạp tiền.',
@@ -2031,12 +2031,64 @@ export const SOCIAL_OVERRIDES: Partial<Record<keyof Translations, string>> = {
     'Base game and Feature Play both return 96.35% RTP. Maximum prize 5,000× your play.',
 }
 
+// ── The social table is ENGLISH ONLY, and that is a platform requirement ─────
+//
+// RECORDED BECAUSE THIS SESSION GOT IT WRONG FIRST, and the record is worth
+// more than a quiet correction.
+//
+// JOB 2 observed that `t()` consults the flat English `SOCIAL_OVERRIDES` before
+// the locale table, so `t('de', 'balance', 'social')` returns "COINS" and not
+// "MUENZEN", and treated that as the root cause of round three's most-cited
+// finding. Per-locale social tables were built for all fifteen languages before
+// the specification was checked.
+//
+// The specification says the current behaviour is correct. Stake Engine testing
+// guideline item 46, quoted verbatim from the dated mirror in
+// `stores/socialLocale.ts`: "English is the only supported language in Social
+// Mode". `resolveLaunchLocale()` checks social FIRST and returns `en`
+// regardless of the `lang` parameter, and `enforceSocialEnglish()` covers the
+// late-arriving route. **A social session is always locale `en`**, so
+// `t(<non-en>, key, 'social')` is a call the running app cannot make. The
+// English social table is not a bug being stepped over; it is the only table a
+// social session can reach.
+//
+// So the per-locale social tables were deleted rather than shipped. Fifteen
+// languages of unreachable wording would have been dead weight contradicting an
+// enforcement two files away, which is exactly the kind of thing a reviewer
+// finds and cannot explain.
+//
+// This is convention (l.2) exactly: the measurement disagreed with the
+// specification, and the measurement was the broken one. The real defect round
+// three reported was always the other one, FORM A in
+// `scripts/locale_prose_conformance.mjs`: sentence-case prose that never went
+// through `t()` at all, in REAL MONEY sessions. Both frames the reviewers cited
+// are real money, `lang=de` and `lang=ar`. That is what `prose.ts` fixes.
+
+import { proseI18n, type ProseKey, PROSE_SOCIAL } from './prose'
+
+/** Any key `t()` can resolve, across all three string layers. */
+export type AnyKey = keyof Translations | FeatureKey | ProseKey
+
+/** The sixteen codes, in one place, so a new locale cannot be added to the
+ *  type and forgotten by a table that enumerates them by hand. */
+export const LOCALE_CODES: Locale[] = [
+  'en', 'ar', 'de', 'es', 'fi', 'fr', 'hi', 'id',
+  'ja', 'ko', 'pl', 'pt', 'ru', 'tr', 'vi', 'zh',
+]
+
+/** The one social table, English, merged with the social variants of the prose
+ *  keys. Social mode renders in English, so one table is all there can be. */
+export const SOCIAL_I18N: Partial<Record<AnyKey, string>> = {
+  ...SOCIAL_OVERRIDES,
+  ...PROSE_SOCIAL,
+}
+
 // ── t(), translate a key ─────────────────────────────────────────────────────
 
 /**
  * Look up a translation key for the given locale and optional game mode.
  * Falls back to English if the locale or key is missing.
- * In 'social' mode, spin/win/balance are remapped to play/prize/coins.
+ * In 'social' mode the locale's own social table is consulted first.
  */
 function interpolate(str: string, params?: Record<string, string | number>): string {
   if (!params) return str
@@ -2045,19 +2097,33 @@ function interpolate(str: string, params?: Record<string, string | number>): str
 
 export function t(
   locale: Locale,
-  key:    keyof Translations,
+  key:    AnyKey,
   mode:   GameMode = 'real',
   params?: Record<string, string | number>,
 ): string {
-  if (mode === 'social' && key in SOCIAL_OVERRIDES) {
-    return interpolate(SOCIAL_OVERRIDES[key as keyof typeof SOCIAL_OVERRIDES]!, params)
+  if (mode === 'social') {
+    const social = SOCIAL_I18N[key]
+    if (social !== undefined) return interpolate(social, params)
+    // DELIBERATE FALL-THROUGH, and the direction matters. If a locale's social
+    // table is missing a key we drop to that locale's own REAL-MONEY string,
+    // which is translated, rather than to the English social string, which is
+    // not. The prohibited-term table the social wording exists to satisfy is a
+    // list of ENGLISH words binding an English-language jurisdiction, so a
+    // translated real-money term is compliant where an English social term is
+    // merely the old bug wearing a fallback. `locale_completeness_check` asserts
+    // the tables are complete, so this path should never run; it is the safe
+    // direction to fail in if it ever does.
   }
   // Base locale strings first.
-  const base = locales[locale]?.[key]
+  const base = locales[locale]?.[key as keyof Translations]
   if (base !== undefined) return interpolate(base, params)
+  // Sentence-case prose layer (all 16 locales), falling back to English.
+  const pk = key as ProseKey
+  const prose = proseI18n[locale]?.[pk] ?? proseI18n.en[pk]
+  if (prose !== undefined) return interpolate(prose, params)
   // Overdrive feature-string layer (all 16 locales), falling back to English.
   const fk = key as FeatureKey
   const feat = featureI18n[locale]?.[fk] ?? featureI18n.en[fk]
   if (feat !== undefined) return interpolate(feat, params)
-  return interpolate(locales.en[key] ?? '', params)
+  return interpolate(locales.en[key as keyof Translations] ?? '', params)
 }

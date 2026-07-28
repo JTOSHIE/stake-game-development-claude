@@ -1,0 +1,108 @@
+{
+  "gate": "locale_prose_conformance",
+  "generated": "2026-07-28T07:31:47.496Z",
+  "locales": 16,
+  "modes": [
+    "real",
+    "social"
+  ],
+  "parts": {
+    "completeness": 0,
+    "resolver": 0,
+    "rendered": 0
+  },
+  "surfaces": [
+    {
+      "locale": "ar",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "de",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "es",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "fi",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "fr",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "hi",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "id",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "ja",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "ko",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "pl",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "pt",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "ru",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "tr",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "vi",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    },
+    {
+      "locale": "zh",
+      "mode": "real",
+      "harvested": 89,
+      "hits": 0
+    }
+  ],
+  "failures": [],
+  "pass": true
+}

@@ -40,6 +40,7 @@
 
   // i18n, replay supports the ?lang= param; the disclaimer must follow it.
   import { t, type Locale, type GameMode } from '../i18n/translations'
+  import { tr } from '../i18n/tr'
 
   // Resolve the locale/mode eagerly so the disclaimer renders correctly even
   // during the initial loading phase (before onMount assigns `params`).
@@ -96,7 +97,7 @@
       phase = 'ready'
       replayPhase.set('ready')
     } catch (e: any) {
-      error = e?.message ?? 'Failed to load replay.'
+      error = e?.message ?? $tr('replayLoadError')
       phase = 'error'
       replayPhase.set('error')
       replayError.set(error)
@@ -245,7 +246,7 @@
       isWincap.set(wincapNow)
     } catch (e: any) {
       isSpinning.set(false)
-      error = e?.message ?? 'Playback failed.'
+      error = e?.message ?? $tr('replayPlaybackError')
       phase = 'error'
       replayPhase.set('error')
       replayError.set(error)
@@ -285,10 +286,10 @@
   <MaxWinCelebration show={$isWincap} on:collect={handleWincapCollect} />
 
   {#if phase === 'loading'}
-    <div class="replay-status loading">Loading replay…</div>
+    <div class="replay-status loading">{$tr('replayLoading')}</div>
   {:else if phase === 'error'}
     <div class="replay-status error">
-      <div class="error-title">Replay failed to load</div>
+      <div class="error-title">{$tr('replayFailed')}</div>
       <div class="error-detail">{error}</div>
     </div>
   {:else if params && response}
@@ -325,7 +326,7 @@
           </div>
         </button>
       {:else if phase === 'playing'}
-        <div class="replay-status playing">Replaying round…</div>
+        <div class="replay-status playing">{$tr('replayingRound')}</div>
       {:else if phase === 'complete'}
         <button class="replay-btn play-again" on:click={playAgain}>
           {t(params.lang as Locale, 'replayAgain', mode)}

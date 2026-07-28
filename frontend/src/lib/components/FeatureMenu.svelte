@@ -17,7 +17,7 @@
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
   import { tr } from '../i18n/tr'
-  import { FS_MODES, FS_RTP_LABEL, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
@@ -299,7 +299,7 @@
     class="fm fs-scrim"
     role="dialog"
     aria-modal="true"
-    aria-label="Features"
+    aria-label={$tr('a11yFeatures')}
     tabindex="-1"
     on:click|self={close}
   >
@@ -318,7 +318,7 @@
         <!-- Header -->
         <div class="fm-head">
           <h2 class="fm-title">{$tr('hudFeatures')}</h2>
-          <button class="fm-close fs-knob" on:click={close} aria-label="Close" data-testid="feature-menu-close">
+          <button class="fm-close fs-knob" on:click={close} aria-label={$tr('a11yClose')} data-testid="feature-menu-close">
             <!-- Was `✕`, U+2715, absent from the Orbitron subset. Same glyph and
                  same fix as PaytableModal's close. QUALITY_CHARTER.md Q-05. -->
             <span class="fs-face"><svg class="fm-close-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></span>
@@ -365,9 +365,9 @@
                   <div class="fm-paired-opt" class:active>
                     <div class="fm-name-row">
                       <span class="fm-radio" class:checked={active} aria-hidden="true"></span>
-                      <span class="fm-name">{modeLabel(m, $isSocial)}</span>
+                      <span class="fm-name">{$tr(m.labelKey)}</span>
                     </div>
-                    <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                    <p class="fm-blurb">{$tr(m.blurbKey)}</p>
                     <div class="fm-action">
                       <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
                       {#if active}
@@ -406,14 +406,14 @@
                            glance, not just "the card with slightly more glow." -->
                       <span class="fm-radio" class:checked={active} aria-hidden="true"></span>
                     {/if}
-                    <span class="fm-name">{modeLabel(m, $isSocial)}</span>
+                    <span class="fm-name">{$tr(m.labelKey)}</span>
                     {#if !m.available}
                       <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
                       <span class="fm-vol">{m.volatility}</span>
                     {/if}
                   </div>
-                  <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                  <p class="fm-blurb">{$tr(m.blurbKey)}</p>
                   {#if m.kind === 'enhancer'}
                     <!-- OWNER AUDIT REMEDIATION B3: OVERBOOST's own effect
                          and live resolved cost inline, not just the bare
@@ -466,14 +466,14 @@
               <div class="fs-face">
                 <div class="fm-card-main">
                   <div class="fm-name-row">
-                    <span class="fm-name">{modeLabel(m, $isSocial)}</span>
+                    <span class="fm-name">{$tr(m.labelKey)}</span>
                     {#if !m.available}
                       <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
                       <span class="fm-vol">{m.volatility}</span>
                     {/if}
                   </div>
-                  <p class="fm-blurb">{modeBlurb(m, $isSocial)}</p>
+                  <p class="fm-blurb">{$tr(m.blurbKey)}</p>
                 </div>
 
                 <div class="fm-action">

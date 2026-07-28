@@ -40,7 +40,7 @@
   import { setModalOpen } from '../stores/modalGuard'
   import BetSelector from './BetSelector.svelte'
   import { standingMode } from '../stores/betMode'
-  import { FS_MODES, modeLabel } from '../config/fsModes'
+  import { FS_MODES } from '../config/fsModes'
   import { spinCostMicros } from '../stores/buyAffordability'
   import { jurisdictionFlags } from '../stores/jurisdiction'
 
@@ -261,8 +261,8 @@
   // and 'Cruise' - the two had ALREADY diverged in case, which is the duplicated-concept
   // class the fresh-eyes review flagged. modeLabel() also applies the social override,
   // so the badges follow social mode for free. Uppercasing stays in CSS where it was.
-  $: overboostLabel = modeLabel(FS_MODES.find((m) => m.serverMode === 'antelite')!, $isSocial)
-  $: cruiseLabel    = modeLabel(FS_MODES.find((m) => m.serverMode === 'cruise')!, $isSocial)
+  $: overboostLabel = $tr(FS_MODES.find((m) => m.serverMode === 'antelite')!.labelKey)
+  $: cruiseLabel    = $tr(FS_MODES.find((m) => m.serverMode === 'cruise')!.labelKey)
 
   // NEON LIFT (2026-07-15, item 3): a brief glow pulse on the bet figure the
   // moment OVERBOOST toggles ON (the effective cost jumping to 1.25x is
@@ -420,7 +420,7 @@
   <div class="p-controls-row">
     <div class="p-controls-side">
       <div class="p-menu-wrapper">
-        <button class="p-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+        <button class="p-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
           <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
         </button>
         {#if showMenu}
@@ -441,12 +441,12 @@
               </button>
               <div class="audio-row">
                 <span class="audio-label">{$tr('hudMusic')}</span>
-                <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
+                <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label={$tr('a11yMusicVolume')} />
                 <span class="audio-pct">{musicPct}%</span>
               </div>
               <div class="audio-row">
                 <span class="audio-label">{$tr('hudSound')}</span>
-                <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
+                <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label={$tr('a11ySfxVolume')} />
                 <span class="audio-pct">{sfxPct}%</span>
               </div>
             </div>
@@ -459,7 +459,7 @@
         data-testid="hud-turbo"
         on:click={toggleTurbo}
         disabled={$isSpinning || $rgJurisdiction.turboDisabled}
-        aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+        aria-label={$tr('a11yCycleSpeed')}
         title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
       >
         <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
@@ -500,13 +500,13 @@
           </button>
           {#if showAutoMenu}
             <div class="auto-menu p-auto-menu" role="menu">
-              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
-              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> {$tr('stopOnWin')}</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> {$tr('singleWinLimit')}</label>
               {#if singleWinLimitOn}
                 <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
               {/if}
-              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
-              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
+              <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
               {#if lossLimitOn}
                 <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
               {/if}
@@ -538,7 +538,7 @@
      could. -->
 <div class="m-hud" class:m-hud--overdrive={$overdriveVisual} data-testid="mini-hud">
   <div class="m-menu-wrapper">
-    <button class="m-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu} data-testid="mini-menu">
+    <button class="m-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu} data-testid="mini-menu">
       <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
     </button>
     {#if showMenu}
@@ -647,7 +647,7 @@
      are >=44px effective, closing the PR #78 landscape debt table. -->
 <div class="c-hud" class:c-hud--overdrive={$overdriveVisual}>
   <div class="c-menu-wrapper">
-    <button class="c-round-btn" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+    <button class="c-round-btn" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
       <span class="p-hamburger"><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span><span class="p-hamburger-bar"></span></span>
     </button>
     {#if showMenu}
@@ -668,12 +668,12 @@
           </button>
           <div class="audio-row">
             <span class="audio-label">{$tr('hudMusic')}</span>
-            <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label="Music volume" />
+            <input class="audio-slider" type="range" min="0" max="100" value={musicPct} on:input={setMusicVol} aria-label={$tr('a11yMusicVolume')} />
             <span class="audio-pct">{musicPct}%</span>
           </div>
           <div class="audio-row">
             <span class="audio-label">{$tr('hudSound')}</span>
-            <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label="Sound effects volume" />
+            <input class="audio-slider" type="range" min="0" max="100" value={sfxPct} on:input={setSfxVol} aria-label={$tr('a11ySfxVolume')} />
             <span class="audio-pct">{sfxPct}%</span>
           </div>
         </div>
@@ -713,7 +713,7 @@
     data-testid="hud-turbo"
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
-    aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+    aria-label={$tr('a11yCycleSpeed')}
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
     <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
@@ -736,13 +736,13 @@
       </button>
       {#if showAutoMenu}
         <div class="auto-menu c-auto-menu" role="menu">
-          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
-          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> {$tr('stopOnWin')}</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> {$tr('singleWinLimit')}</label>
           {#if singleWinLimitOn}
             <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
           {/if}
-          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
-          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
+          <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
           {#if lossLimitOn}
             <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
           {/if}
@@ -790,7 +790,7 @@
     data-testid="hud-turbo"
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
-    aria-label="Cycle speed (Normal / Turbo / Super Turbo)"
+    aria-label={$tr('a11yCycleSpeed')}
     title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
   >
     <span class="fs-face">
@@ -809,7 +809,7 @@
 
   <!-- Hamburger + menu - fixed at x 344 -->
   <div class="menu-wrapper">
-    <button class="fs-menu" on:click={toggleMenu} aria-label="Menu" aria-expanded={showMenu}>
+    <button class="fs-menu" on:click={toggleMenu} aria-label={$tr('a11yMenu')} aria-expanded={showMenu}>
       <span class="inset"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
     </button>
     {#if showMenu}
@@ -835,7 +835,7 @@
               type="range" min="0" max="100"
               value={musicPct}
               on:input={setMusicVol}
-              aria-label="Music volume"
+              aria-label={$tr('a11yMusicVolume')}
             />
             <span class="audio-pct">{musicPct}%</span>
           </div>
@@ -846,7 +846,7 @@
               type="range" min="0" max="100"
               value={sfxPct}
               on:input={setSfxVol}
-              aria-label="Sound effects volume"
+              aria-label={$tr('a11ySfxVolume')}
             />
             <span class="audio-pct">{sfxPct}%</span>
           </div>
@@ -942,13 +942,13 @@
     </button>
     {#if showAutoMenu}
       <div class="auto-menu" role="menu">
-        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> Stop on win</label>
-        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> Single win limit</label>
+        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnWin} /> {$tr('stopOnWin')}</label>
+        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={singleWinLimitOn} /> {$tr('singleWinLimit')}</label>
         {#if singleWinLimitOn}
           <label class="auto-menu-amount">&times;<input type="number" min="1" step="1" bind:value={singleWinLimitMult} class="auto-menu-input" data-testid="single-win-limit-input" /></label>
         {/if}
-        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> Stop on feature</label>
-        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> Loss limit</label>
+        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
+        <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
         {#if lossLimitOn}
           <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
         {/if}

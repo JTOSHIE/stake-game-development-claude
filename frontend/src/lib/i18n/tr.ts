@@ -9,7 +9,7 @@
 import { derived } from 'svelte/store'
 import { locale } from '../stores/gameStore'
 import { isSocial } from '../stores/socialMode'
-import { t, type Translations } from './translations'
+import { t, type AnyKey } from './translations'
 
 // `params` added 2026-07-28 (TR-099). `t()` has always interpolated `{name}`
 // placeholders and this store simply never passed them through, so any string
@@ -19,6 +19,6 @@ import { t, type Translations } from './translations'
 export const tr = derived(
   [locale, isSocial],
   ([$locale, $social]) =>
-    (key: keyof Translations, params?: Record<string, string | number>): string =>
+    (key: AnyKey, params?: Record<string, string | number>): string =>
       t($locale, key, $social ? 'social' : 'real', params),
 )

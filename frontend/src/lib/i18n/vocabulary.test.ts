@@ -16,6 +16,7 @@
 //      from the SHIPPED component source rather than from a copy of it.
 
 import { readFileSync } from 'node:fs'
+import { t } from './translations'
 import {
   sv, scanProhibited, PROHIBITED_TERMS, NOT_SUBSTITUTED, TERM_TABLE_SOURCE,
 } from './vocabulary.ts'
@@ -91,31 +92,44 @@ const winBanner = readFileSync('src/lib/components/WinBanner.svelte', 'utf8')
 checkThat('PaytableModal imports the vocabulary layer', /from '\.\.\/i18n\/vocabulary'/.test(paytable))
 checkThat('WinBanner imports the vocabulary layer', /from '\.\.\/i18n\/vocabulary'/.test(winBanner))
 
-// The social rules block must no longer carry "pays". Extracted by finding the
-// social branch of rulesList, which is the array literal before the `: [`.
-const socialRulesBlock = paytable.match(/\$: rulesList = \$isSocial\s*\?\s*\[([\s\S]*?)\]\s*:/)?.[1] ?? ''
-// Only the STRING LITERALS. Comments in this block legitimately name the
-// restricted words while explaining why they were removed, and failing on a
-// comment would push the next author to stop explaining themselves.
-const socialRuleStrings = [...socialRulesBlock.matchAll(/'([^']+)'/g)].map((m) => m[1])
-checkThat('the social rules block is found in the source', socialRuleStrings.length >= 6)
-const socialRuleHits = socialRuleStrings.flatMap((s) => scanProhibited(s).map((p) => `${p} in "${s.slice(0, 60)}"`))
-check('the social rules carry no prohibited term', socialRuleHits, [])
+// ── The rules and the interface guide moved to the locale layer, JOB 2 ───────
+//
+// These three assertions used to read the SOURCE of PaytableModal, because the
+// social wording lived there as two branches of English literals mapped through
+// sv(). JOB 2 (2026-07-28) moved both blocks into the locale layer, so the
+// literals are gone from the component and reading the source can no longer
+// prove anything about them.
+//
+// The obligation did not change and is if anything stronger: the SOCIAL wording
+// a player actually sees must carry no prohibited term. So these now assert
+// against the RESOLVED strings, which is what ships, in every one of the
+// sixteen locales rather than only in the English source.
 
-// The interface guide is now mapped through sv(), so its literals may still
-// contain the real-money words; what must be true is that the mapping exists.
-checkThat('the interface guide is routed through sv()',
+checkThat('the rules block is routed through the locale layer',
+  /\$: rulesList = \[\s*\$tr\('rulesWaysPay'\)/.test(paytable))
+
+checkThat('the interface guide is routed through the locale layer',
   /INTERFACE_GUIDE\s*=\s*INTERFACE_GUIDE_RAW\.map/.test(paytable) &&
-  /name:\s*sv\(row\.name,\s*\$isSocial\)/.test(paytable) &&
-  /desc:\s*sv\(row\.desc,\s*\$isSocial\)/.test(paytable))
+  /name:\s*\$tr\(row\.nameKey\)/.test(paytable) &&
+  /desc:\s*\$tr\(row\.descKey\)/.test(paytable))
 
-// And that its rows do in fact produce compliant text when mapped.
-const guideRows = [...paytable.matchAll(/name:\s*'([^']+)',\s*desc:\s*'([^']+)'/g)]
-checkThat('the interface guide rows were located', guideRows.length >= 8)
-for (const [, name, desc] of guideRows) {
-  const hits = [...scanProhibited(sv(name, true)), ...scanProhibited(sv(desc, true))]
-  check(`guide row "${name}" is compliant once socialised`, hits, [])
-}
+const RULE_KEYS = ['rulesWaysPay', 'rulesSymbolValues', 'rulesWildSub', 'rulesScatterMult', 'rulesMaxWin', 'rulesMalfunction']
+const GUIDE_KEYS = ['guideSpinName', 'guideSpinDesc', 'guideBetPlusName', 'guideBetPlusDesc',
+  'guideBetMinusName', 'guideBetMinusDesc', 'guideFeaturesName', 'guideFeaturesDesc',
+  'guideAutoplayName', 'guideAutoplayDesc', 'guideMenuName', 'guideMenuDesc',
+  'guideTurboName', 'guideTurboDesc', 'guideMaxName', 'guideMaxDesc']
+
+checkThat('the rules block still has its six lines', RULE_KEYS.length === 6)
+checkThat('the interface guide still has its eight rows', GUIDE_KEYS.length === 16)
+
+// The English social wording is the one the prohibited-term table binds, because
+// social mode renders in English (testing guideline item 46). Checking the other
+// fifteen would be checking a page that cannot exist.
+const socialHits = [...RULE_KEYS, ...GUIDE_KEYS].flatMap((k) => {
+  const v = t('en', k as never, 'social')
+  return scanProhibited(v).map((pt) => `${pt} in ${k} = "${v.slice(0, 60)}"`)
+})
+check('the resolved social rules and guide carry no prohibited term', socialHits, [])
 
 // The win banner must not render a bare BET literal any more.
 checkThat('WinBanner no longer renders an unconditional BET',

@@ -20,7 +20,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel, maxWinStatLabel, maxWinFootnote, modeLabel, modeBlurb } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel, maxWinStatLabel, maxWinFootnote } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -34,39 +34,34 @@
   // Social-aware prose. In social mode, gambling framing (win/wins/winnings,
   // bet) switches to social framing (prize/prizes, play), keeping the seven
   // disclaimer points intact.
-  $: waysLabel = $isSocial ? 'WAYS' : 'WAYS TO WIN'
+  $: waysLabel = $tr('waysLabel')
 
-  $: rulesList = $isSocial
-    ? [
-        // R2R JOB 6 / TR-041, found by the new full-DOM scan and not by the old
-        // narrow one: "pay" is itself a restricted phrase (replacement: "win"),
-        // and it survived here because the previous rewrite of this block only
-        // changed "Wins" to "Prizes" at the front of the sentence. "Prizes win
-        // left to right" is not English, so this is authored rather than
-        // mechanically substituted.
-        'Prizes are awarded left to right on adjacent reels starting from reel 1.',
-        'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
-        'WILD substitutes for all symbols except SCATTER.',
-        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total play prize.',
-        'Maximum prize per play is capped at 5,000× your total play.',
-        // R2R JOB 6 / TR-041: this line read "Malfunctions void all pays and
-        // plays." in BOTH branches. "pays" is on the platform's restricted list
-        // (replacement: "wins"), so the social branch was carrying a prohibited
-        // term in the one place a reviewer is guaranteed to look, the rules.
-        'Malfunctions void all wins and plays.',
-      ]
-    : [
-        'Wins pay left to right on adjacent reels starting from reel 1.',
-        'Symbol values shown are per matching way; the total is that value times the number of ways times your bet.',
-        'WILD substitutes for all symbols except SCATTER.',
-        '3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.',
-        'Maximum win per spin is capped at 5,000× your total bet.',
-        'Malfunctions void all pays and plays.',
-      ]
+  // JOB 2, 2026-07-28. Was two parallel arrays of English literals, branched on
+  // $isSocial in the component. That did the social swap and never the locale
+  // swap, so the RULES, the one block an approval reviewer is guaranteed to
+  // open, read English in all sixteen locales. Both swaps now come from the
+  // locale layer through one $tr call per line, and the social wording rulings
+  // recorded here (TR-041: "pay" and "pays" are themselves restricted terms,
+  // so the social lines are authored rather than mechanically substituted)
+  // survive as the social variants of these same keys in prose.ts PROSE_SOCIAL.
+  $: rulesList = [
+    $tr('rulesWaysPay'),
+    $tr('rulesSymbolValues'),
+    $tr('rulesWildSub'),
+    $tr('rulesScatterMult'),
+    $tr('rulesMaxWin'),
+    $tr('rulesMalfunction'),
+  ]
 
-  $: disclaimerText = $isSocial
-    ? 'Malfunction voids all prizes and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Prizes are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
-    : 'Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Winnings are settled according to the result returned by the Remote Game Server, not from events shown in the web browser. Future Spinner™ and We Roll Spinners™ are trademarks of We Roll Spinners. © 2026 We Roll Spinners. All rights reserved.'
+  // JOB 2, 2026-07-28. The body is now one key in all sixteen locales. The
+  // TRADEMARK SENTENCE is deliberately NOT translated and is appended here: it
+  // names the marks as registered and the copyright line is a legal notice,
+  // both of which are asserted in the language they were filed in. Translating
+  // a trademark notice weakens it, so this split is intentional rather than a
+  // string that was missed.
+  $: disclaimerText = $tr('disclaimerBody')
+    + ' Future Spinner\u2122 and We Roll Spinners\u2122 are trademarks of We Roll Spinners.'
+    + ' \u00A9 2026 We Roll Spinners. All rights reserved.'
 
   // Symbol pay table, per-way multipliers, matching the validated maths in
   // games/future_spinner/game_config.py exactly. Final payout = paytable value
@@ -115,12 +110,12 @@
   // control now needs three. Every other row carries a one-item list rather
   // than a second optional shape, so the markup has one branch and not two.
   const INTERFACE_GUIDE_RAW = [
-    { kind: 'img',  files: ['spin_button.png'],    name: 'Spin',         desc: 'Start a spin at the current bet.' },
-    { kind: 'img',  files: ['btn_bet_plus.png'],   name: 'Increase Bet', desc: 'Raise your bet to the next level.' },
-    { kind: 'img',  files: ['btn_bet_minus.png'],  name: 'Decrease Bet', desc: 'Lower your bet to the previous level.' },
-    { kind: 'img',  files: ['feature_button.png'], name: 'Features',     desc: 'Open the FEATURES menu to pick a bet mode or buy the feature.' },
-    { kind: 'img',  files: ['btn_autoplay.png'],   name: 'Autoplay',     desc: 'Spin automatically with optional loss and win limits.' },
-    { kind: 'img',  files: ['btn_menu.png'],       name: 'Menu',         desc: 'Open the menu for the paytable and sound settings.' },
+    { kind: 'img',  files: ['spin_button.png'],    nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
+    { kind: 'img',  files: ['btn_bet_plus.png'],   nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
+    { kind: 'img',  files: ['btn_bet_minus.png'],  nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
+    { kind: 'img',  files: ['feature_button.png'], nameKey: 'guideFeaturesName',  descKey: 'guideFeaturesDesc' },
+    { kind: 'img',  files: ['btn_autoplay.png'],   nameKey: 'guideAutoplayName',  descKey: 'guideAutoplayDesc' },
+    { kind: 'img',  files: ['btn_menu.png'],       nameKey: 'guideMenuName',      descKey: 'guideMenuDesc' },
     // OWNER AUDIT ROUND 3, item 5: Turbo and Max were text pills with no
     // captured icon at all - now real live-component captures (each its own
     // distinct selector, see regen_interface_guide_icons.mjs), consistent
@@ -134,14 +129,17 @@
     // (regen_interface_guide_icons.mjs cycles it between captures), so the
     // guide cannot drift from the button the way a hand-drawn icon would.
     { kind: 'img',  files: ['btn_turbo.png', 'btn_turbo_2.png', 'btn_turbo_3.png'],
-      name: 'Turbo', desc: 'Speed up spins. The bolt brightens at each of the three speeds: normal, turbo, super turbo.' },
-    { kind: 'img',  files: ['btn_max.png'],        name: 'Max Bet',      desc: 'Bet the maximum.' },
+      nameKey: 'guideTurboName', descKey: 'guideTurboDesc' },
+    { kind: 'img',  files: ['btn_max.png'],        nameKey: 'guideMaxName',       descKey: 'guideMaxDesc' },
   ] as const
 
+  // JOB 2, 2026-07-28. Was English literals run through `sv()`, so the social
+  // swap happened and the LOCALE swap never did: sixteen locales read this
+  // guide in English. Both swaps now come from the one table via `$tr`.
   $: INTERFACE_GUIDE = INTERFACE_GUIDE_RAW.map((row) => ({
     ...row,
-    name: sv(row.name, $isSocial),
-    desc: sv(row.desc, $isSocial),
+    name: $tr(row.nameKey),
+    desc: $tr(row.descKey),
   }))
 
   // Buy price, 100x current bet, only meaningful where the buy is not disabled.
@@ -188,8 +186,8 @@
         <!-- How-to-win banner + ways callout -->
         <div class="fs-htw fs-plate">
           <div class="fs-face">
-            <h4>Match symbols on adjacent reels starting from reel 1 (left to right).</h4>
-            <p>All matching symbol positions count, with no fixed paylines.</p>
+            <h4>{$tr('waysHeading')}</h4>
+            <p>{$tr('waysBody')}</p>
             <div class="fs-ways-callout fs-plate">
               <div class="fs-face">
                 <span class="fs-ways-num fs-num">1,024</span>
@@ -202,7 +200,7 @@
         <!-- WAYS TO WIN, adjacent-reels diagram, reads left to right from reel 1 -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">{waysLabel}</h3>
-          <div class="fs-ways-diagram fs-plate" role="img" aria-label="A matching way reads left to right across adjacent reels, starting from reel 1">
+          <div class="fs-ways-diagram fs-plate" role="img" aria-label={$tr('a11yWaysDiagram')}>
             <div class="fs-face">
               {#each [1, 2, 3, 4, 5] as reelNum, i}
                 <div style="display:flex;align-items:center;">
@@ -214,12 +212,12 @@
               {/each}
             </div>
           </div>
-          <p class="fs-caption">Reels 1, 2 and 3 hold the same symbol (highlighted), which is a match read left to right from reel 1. Reels 4 and 5 are not required.</p>
+          <p class="fs-caption">{$tr('waysDiagramCaption')}</p>
         </div>
 
         <!-- Symbol payouts -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:10px;">Symbol Payouts</h3>
+          <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('symbolPayoutsHeading')}</h3>
           <div class="fs-sym-grid">
             {#each SYMBOLS as sym}
               <div class="fs-sym-card fs-plate {TIER_CLASS[sym.name]}">
@@ -227,9 +225,9 @@
                   <img src="{$themeAssets.assetBase}/symbols/{sym.file}.png" alt={sym.name} />
                   <span class="fs-sym-name">{sym.name}</span>
                   {#if sym.name === 'SCAT'}
-                    <span class="fs-sym-note">3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins</span>
+                    <span class="fs-sym-note">{$tr('scatterSummary')}</span>
                   {:else if sym.name === 'WILD'}
-                    <span class="fs-sym-note">Substitutes for all symbols except SCATTER</span>
+                    <span class="fs-sym-note">{$tr('wildSubstitutes')}</span>
                   {:else}
                     <div class="fs-pay-rows">
                       <div class="fs-pay-row"><span class="fs-pay-count">3×</span><span class="fs-pay-val fs-num">{sym.pays[2] ?? '-'}</span></div>
@@ -256,9 +254,9 @@
         <!-- Overdrive Free Spins feature -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('rulesOverdriveTitle')}</h3>
-          <table class="fs-trig" aria-label="Overdrive trigger table">
+          <table class="fs-trig" aria-label={$tr('a11yOverdriveTable')}>
             <thead>
-              <tr><th>Scatters</th><th>Free Spins</th><th>Instant Award</th></tr>
+              <tr><th>Scatters</th><th>{$tr('colFreeSpins')}</th><th>{$tr('colInstantAward')}</th></tr>
             </thead>
             <tbody>
               {#each TRIGGER_TABLE as row}
@@ -307,14 +305,14 @@
               <div class="fs-mode-card fs-plate tone-{m.kind}" class:soon={!m.available}>
                 <div class="fs-face">
                   <div class="fs-mode-card-name-row">
-                    <span class="fs-mode-name">{modeLabel(m, $isSocial)}</span>
+                    <span class="fs-mode-name">{$tr(m.labelKey)}</span>
                     {#if !m.available}
-                      <span class="fs-mode-soon">coming soon</span>
+                      <span class="fs-mode-soon">{$tr('comingSoonLower')}</span>
                     {/if}
                   </div>
                   <div class="fs-mode-card-stats">
                     <div class="fs-mode-stat">
-                      <span class="fs-mode-stat-label">Cost</span>
+                      <span class="fs-mode-stat-label">{$tr('costLabel')}</span>
                       <!-- Stacked, not "1.25x · $1.25" on one line - the
                          100x/400x buy tiers' dollar figures truncated with
                          an ellipsis in the 3-column card grid's narrow cost
@@ -340,7 +338,7 @@
                       <span class="fs-mode-stat-value fs-num">{FS_MAX_WIN_LABEL}</span>
                     </div>
                   </div>
-                  <p class="fs-mode-blurb">{modeBlurb(m, $isSocial)}</p>
+                  <p class="fs-mode-blurb">{$tr(m.blurbKey)}</p>
                 </div>
               </div>
             {/each}
@@ -351,7 +349,7 @@
         <div data-testid="interface-guide">
           <p class="fs-mode-footnote">{maxWinFootnote($isSocial)}</p>
 
-          <h3 class="fs-heading" style="margin-bottom:10px;">Interface Guide</h3>
+          <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('interfaceGuideHeading')}</h3>
           <div class="fs-guide-list">
             {#each INTERFACE_GUIDE as g}
               <div class="fs-guide-row">
@@ -387,15 +385,15 @@
 
         <!-- RTP, identical across all five modes (0.5% cross-mode rule) + max win -->
         <div class="fs-rtp">
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">RTP (All 5 Modes)</span><span class="fs-rtp-val fs-num">{FS_RTP_LABEL}</span></div></div>
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">Max Win</span><span class="fs-rtp-val fs-num">{FS_MAX_WIN_LABEL}</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('rtpAllModes')}</span><span class="fs-rtp-val fs-num">{FS_RTP_LABEL}</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('maxWinLabel')}</span><span class="fs-rtp-val fs-num">{FS_MAX_WIN_LABEL}</span></div></div>
         </div>
 
         <!-- Responsible play, the autoplay stop-conditions actually available
              in the HUD's auto-menu (HudOverlay.svelte's startAuto()). Kept
              factual and scoped to what the player can actually set here. -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:6px;">Responsible Play</h3>
+          <h3 class="fs-heading" style="margin-bottom:6px;">{$tr('responsiblePlayHeading')}</h3>
           <p class="fs-disc">
             Autoplay can be set to stop automatically on any win, when the
             Overdrive feature triggers, or once a loss limit you choose is
@@ -407,7 +405,7 @@
 
         <!-- Disclaimer (Stake Engine seven-point requirement) -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:6px;">Disclaimer</h3>
+          <h3 class="fs-heading" style="margin-bottom:6px;">{$tr('disclaimerHeading')}</h3>
           <p class="fs-disc">{disclaimerText}</p>
         </div>
 

@@ -192,9 +192,12 @@
     if (countUpFrame) cancelAnimationFrame(countUpFrame)
   })
 
-  $: tierLabel = tier === 'epic' ? (($isSocial ? 'EPIC PRIZE' : 'EPIC WIN'))
-    : tier === 'mega' ? ($isSocial ? 'MEGA PRIZE' : 'MEGA WIN')
-    : ($isSocial ? 'BIG PRIZE' : 'BIG WIN')
+  // JOB 2, 2026-07-28. Was three hardcoded English pairs in a component-script
+  // ternary, which reviewer 3 cited at WinBanner.svelte:195-207 and which the
+  // Arabic live frame 085921_frame.png shows rendering "BIG WIN" over an Arabic
+  // HUD. The social swap now comes from the same table as the locale swap, so
+  // the most prominent surface in the game is keyed like everything else.
+  $: tierLabel = t($locale, tier === 'epic' ? 'tierEpicWin' : tier === 'mega' ? 'tierMegaWin' : 'tierBigWin', $isSocial ? 'social' : 'real')
   $: amountLabel = formatBalance(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD')
   // Split for the per-digit boxes below. Derived rather than done in the
   // template so the character list is computed once per value change.
