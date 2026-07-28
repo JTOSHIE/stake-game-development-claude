@@ -49,7 +49,8 @@
 // USAGE   node scripts/stream_test_capture.mjs [--only <slug>[,<slug>...]]
 //
 import { chromium } from 'playwright'
-import { mkdirSync, writeFileSync, readFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro, waitSpinDone, waitFeatureDrained } from './lib/dismissOverlays.mjs'
@@ -59,7 +60,24 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const REPO = join(ROOT, '..')
 
-const DATE = '2026-07-28'
+// 2026-07-29: this was hardcoded to '2026-07-28', which meant ANY re-run of
+// this harness wrote straight into `reports/screens/stream-test-2026-07-28/`
+// and silently overwrote all 519 committed evidence frames. That is exactly
+// the failure convention (h.1) is written against, and the failure
+// FULL_AUDIT_METHOD.md 2.3 records as having already cost this project five
+// committed files: the instruction says read-only, the SCRIPT does the writing.
+// Found by the Session 1 re-proof. The first attempt at this fix used
+// `toISOString()`, which is UTC, and at 06:03 AEST the UTC date is still
+// yesterday, so it resolved to the very directory it was written to protect
+// and overwrote 53 frames anyway. They were restored from HEAD, byte
+// identical, and the lesson is recorded here rather than in a commit message
+// alone: a DATE is a guess about where the output lands. The guard below is
+// not a guess.
+const DATE = process.env.STREAM_TEST_DATE || (() => {
+  const d = new Date()
+  const p = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+})()
 const OUT = join(REPO, 'reports', 'screens', `stream-test-${DATE}`)
 
 // The whole run is ten full sessions, several with a 60 to 90 second feature
@@ -461,6 +479,32 @@ async function captureSession(browser, base, session) {
     return i > -1 ? process.argv[i + 1].split(',') : null
   })()
   const sessions = [...PRESETS, ...LOCALE_SESSIONS].filter((s) => !only || only.includes(s.slug))
+
+  // ── THE GUARD, per convention (h.1) and FULL_AUDIT_METHOD.md 2.3 ───────────
+  //
+  // "The durable fix is upstream of the prompt: the SCRIPTS should be incapable
+  // of dirtying committed evidence. A prompt is a request; a path is a
+  // guarantee." This is that guarantee. A date is a guess about where output
+  // lands and it has now been wrong twice in this file, once hardcoded and once
+  // via a UTC/local mismatch. So the script no longer trusts the date: it asks
+  // git whether anything at the destination is already tracked, and refuses if
+  // so. Overwriting committed evidence now requires saying so out loud with
+  // --regenerate, which is exactly the "job whose brief says that is what it is
+  // doing" that (h.1) requires.
+  if (existsSync(OUT)) {
+    const tracked = execSync(`git ls-files -- "${OUT}"`, { cwd: REPO, encoding: 'utf8' }).trim()
+    if (tracked && !process.argv.includes('--regenerate')) {
+      const n = tracked.split('\n').length
+      console.error(`\nSTREAM CAPTURE REFUSED.\n`)
+      console.error(`  ${OUT}`)
+      console.error(`  already holds ${n} file(s) TRACKED IN GIT, and writing here would`)
+      console.error(`  overwrite committed evidence. Convention (h.1): evidence directories`)
+      console.error(`  are write-once outside a job that explicitly regenerates them.\n`)
+      console.error(`  Capture somewhere else:   STREAM_TEST_DATE=$(date +%F) node scripts/stream_test_capture.mjs`)
+      console.error(`  Or say it out loud:       node scripts/stream_test_capture.mjs --regenerate\n`)
+      process.exit(1)
+    }
+  }
 
   mkdirSync(OUT, { recursive: true })
   const server = await startStaticServer(join(ROOT, 'dist'))

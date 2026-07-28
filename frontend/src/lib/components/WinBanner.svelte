@@ -202,12 +202,23 @@
   // Split for the per-digit boxes below. Derived rather than done in the
   // template so the character list is computed once per value change.
   $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))
-  $: multLabel = `${Math.round(shownMultiplier)}x`
-  // R2R JOB 6 / TR-041. This line rendered "12x BET" unconditionally, in every
-  // mode, on the single most prominent surface in the game. "bet" is on the
-  // platform's restricted list (replacement: "play"), and `sv` preserves the
-  // ALL-CAPS shape so social reads "12x PLAY" rather than "12x play".
-  $: multUnitLabel = sv('BET', $isSocial)
+  // TR-117 glyph half / ledger MID-02, 2026-07-29. This was an ASCII letter `x`
+  // (U+0078) on 60 of the 519 stream-test frames, while the paytable, the mode
+  // cards, the feature menu and MaxWinCelebration all write the multiplication
+  // sign. Charter Q-26 exists to record that the Q-12 glyph sweep was
+  // incomplete and enumerates four survivors, all in `fsModes.ts`; this was a
+  // fifth, in a component, which is why a config-and-prose search missed it.
+  $: multLabel = `${Math.round(shownMultiplier)}×`
+  // R2R JOB 6 / TR-041 gave this line its social swap. TR-117 locale half /
+  // TR-104, 2026-07-29, gives it the LOCALE swap it never had: `sv()` swapped
+  // BET for PLAY and left every one of the sixteen locales reading English, so
+  // frames 430 and 482 show a correctly localised `GROSSER GEWINN` and
+  // `فوز كبير` beside an English `16x BET`. `t()` consults SOCIAL_OVERRIDES
+  // first, so this one call does the social swap AND the locale swap, exactly
+  // as MaxWinCelebration.svelte:159 already does for the same word under
+  // TR-091. The `bet` key already existed in all sixteen locales in the
+  // ALL-CAPS shape, so no new key and no translation work was needed.
+  $: multUnitLabel = t($locale, 'bet', $isSocial ? 'social' : 'real')
 
   // ── FEATURE PRICE, JOB 3(f) / TR-068 ───────────────────────────────────────
   //
