@@ -7177,10 +7177,15 @@ preview that refuses and says why is the rule working.
 
 ## Rule 10 closing, filled
 
-The session's final push (`5b92ce0`) ran remote CI as run **30372198000** and it
-is **green**:
-https://github.com/JTOSHIE/stake-game-development-claude.git/actions/runs/30372198000
-https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30372198000
+The session's final work push (`b411f71`) ran remote CI as run **30372959577**
+and it is **green**:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30372959577
+
+The full green chain at the close, every one verified rather than assumed:
+`5b92ce0` run 30372198000, `2fe6543` run 30372591934, `b411f71` run
+30372959577. This closing commit is itself one behind that tip, which is the
+same one-commit lag rule 12 names for the preview and is unavoidable for the
+same reason: the closing is a commit, so it cannot cite its own run.
 
 **Three intermediate runs on this session's own pushes read `cancelled`, and
 they are not reds.** Runs 30371675418 (`157669e`), 30371882218 (`e0fd0b6`) and
