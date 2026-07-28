@@ -545,12 +545,24 @@ survived, button casing that drifts, iconography from two different families,
 and the system default font leaking through where the brand face should be. The
 sweep list and the repeatable gate live in `docs/QUALITY_CHARTER.md`.
 
-## THE MULTI-TRACK PROTOCOL (owner's order, 2026-07-26, standing)
+## THE MULTI-TRACK PROTOCOL (owner's order, 2026-07-26, standing; amended 2026-07-28, the capacity amendment)
 
 Until now this project has had exactly one writer working one job at a time on
 `main`. That is why the record is coherent, and nothing below weakens it. What
 changes is that more than one session may now work at once, and the protocol
 exists so that concurrency cannot cost what single-writer discipline bought.
+
+**AMENDED 2026-07-28 (V3, the capacity amendment,
+`reports/briefs/FS_PROTOCOL_V3_CAPACITY_Prompt.md`).** Rule 4 is replaced and
+rules 13 and 14 are added. The recorded reason is the owner's capacity change:
+sessions now run under a large allowance, so the scarcity the original rule 4
+rationed, judgement thinning as a long session fills its context, is no longer
+the binding constraint, and the protocol now says what to do with capacity
+rather than only how to ration it. The replaced rule 4 read *"One job per
+session by default, in a fresh context"*, with a multi-job session justifying
+itself in its session report; its concern survives in rule 13's wave-boundary
+stop and in the serial carve-out rule 4 keeps for locked-file surgery and the
+money path.
 
 **1. `main` is single-writer.** Exactly one session at a time holds the
 INTEGRATOR role, and only the integrator merges or pushes `main`. Every other
@@ -568,10 +580,15 @@ the same path, they do not run in parallel, they run in sequence. This is the
 rule that keeps merges mechanical, and it is cheaper than any merge-conflict
 policy could be.
 
-**4. One job per session by default, in a fresh context.** A session that runs
-several jobs is not forbidden, but it justifies itself in its session report,
-because the failure mode is real: judgement degrades late in a long session and
-the last job of six gets the least of it.
+**4. Under a large allowance, multi-wave sessions running parallel agent squads
+per `docs/skills/FULL_AUDIT_METHOD.md` are the DEFAULT for audit, verification,
+capture, documentation and sweep work.** (Replaced 2026-07-28 by the capacity
+amendment; the original one-job text and its reason are preserved in the
+amendment note above.) Squads are sized per convention (r), one coherent
+surface each, writing to ledger shards consolidated by a marshal, with the
+session as sole committer. Sequential single-job sessions remain mandatory only
+for locked-file surgery and for any change to the money path, where serial care
+outranks parallel speed.
 
 **5. Model policy.** Sonnet at High for mechanical and suite work; Opus for
 judgement work; xHigh and above reserved for a single hard bounded problem in a
@@ -746,6 +763,26 @@ to the parent and it was spawned through an `npm` wrapper that was not the serve
 A green log said it had worked. **Curl the owner's actual address before believing
 the line**, which the close now does.
 
+**13. The completion mandate** (owner's order, 2026-07-28, the capacity
+amendment, `reports/briefs/FS_PROTOCOL_V3_CAPACITY_Prompt.md`). In the owner's
+words:
+
+> a session that accepts a brief under open capacity finishes it; honest stops
+> remain lawful only at wave boundaries with the resume state written, and a
+> session that stops must state which resource actually ran out, since context
+> no longer will.
+
+What this changes in practice: "context" is no longer a lawful explanation for
+a stop. A stop is honest only at a wave boundary, with the resume state
+committed, and the stopping session's report names the resource that was
+actually exhausted.
+
+**14. The effectiveness mandate** (owner's order, 2026-07-28, the capacity
+amendment). Every brief states the agent scale expected and the tool inventory
+available: parallel task agents, web fetch of the platform mirror sources,
+Playwright with installed browsers, the full gate family, the local RGS
+harness, tesseract, and the analyst catalogue pattern. Sessions optimise their
+own workflow within the brief rather than serialising by habit.
 
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
