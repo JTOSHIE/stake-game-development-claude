@@ -6523,8 +6523,8 @@ updated to match.
 
 ## Rule 10 and rule 12 closings
 
-Filled by the closing commit after the final push's remote result is read; see the
-closing section appended below.
+Filled by the closing commit after the final push's remote result was read; the
+closing section is appended at the end of this report.
 
 ## FOR THE NEXT SESSION
 
@@ -6556,3 +6556,20 @@ closing section appended below.
   three's quality findings; the JOB 3 premise reconciliation and the v9-versus-v10
   prompt wording are the two waiting-on-a-word items above; the composition re-measure
   on the portal after the V10 upload closes the loop on the owner's figures.
+
+## Rule 10 and rule 12 closings, filled
+
+**Rule 10.** The session's report push (`f2f1ef4`) ran remote CI as run
+**30326922866** and it is **green**:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30326922866
+Every earlier push this session was green on its own run (30325530938 JOB 1,
+30326057767 JOB 2, 30326529342 JOB 4, 30326703254 JOB 5); the two runs marked
+cancelled (30325407524, 30326397510) were superseded by the next push under the
+workflow's concurrency rule, not failures, and their commits' gates all ran green in
+the runs that replaced them. No reds this session, expected or otherwise.
+
+**Rule 12.** The owner preview was refreshed BEFORE this report was written and the
+line pasted above; the address was curled and answered HTTP 200 with the Future
+Spinner title. Per the one-commit-lag clause, the preview is refreshed once more as
+the last action of the close, after this commit's push, so the owner's machine ends
+on the true tip.
