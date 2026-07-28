@@ -1,0 +1,4745 @@
+{
+  "date": "2026-07-28",
+  "brief": "reports/briefs/FS_STREAM_TEST_Prompt.md",
+  "build": {
+    "game": "future-spinner",
+    "version": "v10",
+    "commit": "d9bdf22a4812474721b4a589c88f1056dca8e4db",
+    "branch": "main",
+    "cleanTree": true,
+    "builtAt": "2026-07-28T08:48:30.040Z",
+    "bundleFilesExcludingThisFile": 109,
+    "bundleBytesExcludingThisFile": 15716589,
+    "note": "Provenance only. Nothing in the running game fetches this file; the boot line is inlined at build time. See TR-062."
+  },
+  "sessions": [
+    {
+      "name": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en"
+    },
+    {
+      "name": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en"
+    },
+    {
+      "name": "Popout L",
+      "viewport": "800x450",
+      "lang": "en"
+    },
+    {
+      "name": "Popout S",
+      "viewport": "400x225",
+      "lang": "en"
+    },
+    {
+      "name": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en"
+    },
+    {
+      "name": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en"
+    },
+    {
+      "name": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en"
+    },
+    {
+      "name": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en"
+    },
+    {
+      "name": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de"
+    },
+    {
+      "name": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar"
+    }
+  ],
+  "walletCalls": {
+    "authenticate": 40,
+    "play": 70,
+    "endRound": 70
+  },
+  "captures": [
+    {
+      "file": "001_desktop_transition_splash_entrance.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "002_desktop_splash.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "003_desktop_transition_splash_to_rules.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "004_desktop_intro_rules.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "005_desktop_transition_rules_to_base.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "006_desktop_base_idle.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "007_desktop_transition_reels_accelerating.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "008_desktop_transition_reels_full_speed.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "009_desktop_dead_spin_1_settled.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "010_desktop_dead_spin_2_settled.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "011_desktop_dead_spin_3_settled.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "012_desktop_win_presentation.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "013_desktop_transition_bigwin_countup_early.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "014_desktop_transition_bigwin_countup_late.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "015_desktop_bigwin_settled.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "016_desktop_transition_menu_opening.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "017_desktop_hud_menu.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "018_desktop_session_panel.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "019_desktop_transition_paytable_opening.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "020_desktop_paytable_top.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "021_desktop_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "022_desktop_paytable_02_ways_to_win.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "023_desktop_paytable_03_symbol_payouts.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "024_desktop_paytable_04_rules.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "025_desktop_paytable_05_overdrive_free_spins.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "026_desktop_paytable_06_bet_modes.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "027_desktop_paytable_07_interface_guide.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "028_desktop_paytable_08_responsible_play.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "029_desktop_paytable_09_disclaimer.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "030_desktop_transition_paytable_closing.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "031_desktop_autoplay_menu.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "032_desktop_transition_features_menu_opening.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "033_desktop_features_menu.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "034_desktop_transition_dialog_buy_overdrive_opening.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "035_desktop_dialog_buy_overdrive.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "036_desktop_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "037_desktop_dialog_nitro_overdrive.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "038_desktop_transition_feature_entry_fade.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "039_desktop_feature_entry_card.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "040_desktop_transition_feature_starting.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "041_desktop_feature_run_1.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "042_desktop_feature_run_2.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "043_desktop_feature_run_3.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "044_desktop_feature_run_4.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "045_desktop_feature_run_5.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "046_desktop_feature_run_6.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "047_desktop_transition_feature_exit.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "048_desktop_post_feature_base.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "049_desktop_transition_maxwin_overlay_fade.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "050_desktop_maxwin_celebration.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "051_desktop_transition_maxwin_collect_fade.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "052_desktop_post_collect_base.png",
+      "session": "Desktop",
+      "viewport": "1200x675",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "053_laptop_transition_splash_entrance.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "054_laptop_splash.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "055_laptop_transition_splash_to_rules.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "056_laptop_intro_rules.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "057_laptop_transition_rules_to_base.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "058_laptop_base_idle.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "059_laptop_transition_reels_accelerating.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "060_laptop_transition_reels_full_speed.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "061_laptop_dead_spin_1_settled.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "062_laptop_dead_spin_2_settled.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "063_laptop_dead_spin_3_settled.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "064_laptop_win_presentation.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "065_laptop_transition_bigwin_countup_early.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "066_laptop_transition_bigwin_countup_late.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "067_laptop_bigwin_settled.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "068_laptop_transition_menu_opening.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "069_laptop_hud_menu.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "070_laptop_session_panel.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "071_laptop_transition_paytable_opening.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "072_laptop_paytable_top.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "073_laptop_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "074_laptop_paytable_02_ways_to_win.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "075_laptop_paytable_03_symbol_payouts.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "076_laptop_paytable_04_rules.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "077_laptop_paytable_05_overdrive_free_spins.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "078_laptop_paytable_06_bet_modes.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "079_laptop_paytable_07_interface_guide.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "080_laptop_paytable_08_responsible_play.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "081_laptop_paytable_09_disclaimer.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "082_laptop_transition_paytable_closing.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "083_laptop_autoplay_menu.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "084_laptop_transition_features_menu_opening.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "085_laptop_features_menu.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "086_laptop_transition_dialog_buy_overdrive_opening.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "087_laptop_dialog_buy_overdrive.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "088_laptop_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "089_laptop_dialog_nitro_overdrive.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "090_laptop_transition_feature_entry_fade.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "091_laptop_feature_entry_card.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "092_laptop_transition_feature_starting.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "093_laptop_feature_run_1.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "094_laptop_feature_run_2.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "095_laptop_feature_run_3.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "096_laptop_feature_run_4.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "097_laptop_feature_run_5.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "098_laptop_feature_run_6.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "099_laptop_transition_feature_exit.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "100_laptop_post_feature_base.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "101_laptop_transition_maxwin_overlay_fade.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "102_laptop_maxwin_celebration.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "103_laptop_transition_maxwin_collect_fade.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "104_laptop_post_collect_base.png",
+      "session": "Laptop",
+      "viewport": "1024x576",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "105_popout-l_transition_splash_entrance.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "106_popout-l_splash.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "107_popout-l_transition_splash_to_rules.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "108_popout-l_intro_rules.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "109_popout-l_transition_rules_to_base.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "110_popout-l_base_idle.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "111_popout-l_transition_reels_accelerating.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "112_popout-l_transition_reels_full_speed.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "113_popout-l_dead_spin_1_settled.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "114_popout-l_dead_spin_2_settled.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "115_popout-l_dead_spin_3_settled.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "116_popout-l_win_presentation.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "117_popout-l_transition_bigwin_countup_early.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "118_popout-l_transition_bigwin_countup_late.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "119_popout-l_bigwin_settled.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "120_popout-l_transition_menu_opening.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "121_popout-l_hud_menu.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "122_popout-l_session_panel.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "123_popout-l_transition_paytable_opening.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "124_popout-l_paytable_top.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "125_popout-l_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "126_popout-l_paytable_02_ways_to_win.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "127_popout-l_paytable_03_symbol_payouts.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "128_popout-l_paytable_04_rules.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "129_popout-l_paytable_05_overdrive_free_spins.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "130_popout-l_paytable_06_bet_modes.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "131_popout-l_paytable_07_interface_guide.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "132_popout-l_paytable_08_responsible_play.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "133_popout-l_paytable_09_disclaimer.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "134_popout-l_transition_paytable_closing.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "135_popout-l_autoplay_menu.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "136_popout-l_transition_features_menu_opening.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "137_popout-l_features_menu.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "138_popout-l_transition_dialog_buy_overdrive_opening.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "139_popout-l_dialog_buy_overdrive.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "140_popout-l_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "141_popout-l_dialog_nitro_overdrive.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "142_popout-l_transition_feature_entry_fade.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "143_popout-l_feature_entry_card.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "144_popout-l_transition_feature_starting.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "145_popout-l_feature_run_1.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "146_popout-l_feature_run_2.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "147_popout-l_feature_run_3.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "148_popout-l_feature_run_4.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "149_popout-l_feature_run_5.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "150_popout-l_feature_run_6.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "151_popout-l_transition_feature_exit.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "152_popout-l_post_feature_base.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "153_popout-l_transition_maxwin_overlay_fade.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "154_popout-l_maxwin_celebration.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "155_popout-l_transition_maxwin_collect_fade.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "156_popout-l_post_collect_base.png",
+      "session": "Popout L",
+      "viewport": "800x450",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "157_popout-s_transition_splash_entrance.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "158_popout-s_splash.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "159_popout-s_transition_splash_to_rules.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "160_popout-s_intro_rules.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "161_popout-s_transition_rules_to_base.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "162_popout-s_base_idle.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "163_popout-s_transition_reels_accelerating.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "164_popout-s_transition_reels_full_speed.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "165_popout-s_dead_spin_1_settled.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "166_popout-s_dead_spin_2_settled.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "167_popout-s_dead_spin_3_settled.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "168_popout-s_win_presentation.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "169_popout-s_transition_bigwin_countup_early.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "170_popout-s_transition_bigwin_countup_late.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "171_popout-s_bigwin_settled.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "172_popout-s_transition_menu_opening.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "173_popout-s_hud_menu.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "174_popout-s_session_panel.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "175_popout-s_transition_paytable_opening.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "176_popout-s_paytable_top.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "177_popout-s_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "178_popout-s_paytable_02_ways_to_win.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "179_popout-s_paytable_03_symbol_payouts.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "180_popout-s_paytable_04_rules.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "181_popout-s_paytable_05_overdrive_free_spins.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "182_popout-s_paytable_06_bet_modes.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "183_popout-s_paytable_07_interface_guide.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "184_popout-s_paytable_08_responsible_play.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "185_popout-s_paytable_09_disclaimer.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "186_popout-s_transition_paytable_closing.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "187_popout-s_transition_features_menu_opening.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "188_popout-s_features_menu.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "189_popout-s_transition_dialog_buy_overdrive_opening.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "190_popout-s_dialog_buy_overdrive.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "191_popout-s_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "192_popout-s_dialog_nitro_overdrive.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "193_popout-s_transition_feature_entry_fade.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "194_popout-s_feature_entry_card.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "195_popout-s_transition_feature_starting.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "196_popout-s_feature_run_1.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "197_popout-s_feature_run_2.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "198_popout-s_feature_run_3.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "199_popout-s_feature_run_4.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "200_popout-s_feature_run_5.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "201_popout-s_feature_run_6.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "202_popout-s_transition_feature_exit.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "203_popout-s_post_feature_base.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "204_popout-s_transition_maxwin_overlay_fade.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "205_popout-s_maxwin_celebration.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "206_popout-s_transition_maxwin_collect_fade.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "207_popout-s_post_collect_base.png",
+      "session": "Popout S",
+      "viewport": "400x225",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "208_mobile-l_transition_splash_entrance.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "209_mobile-l_splash.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "210_mobile-l_transition_splash_to_rules.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "211_mobile-l_intro_rules.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "212_mobile-l_transition_rules_to_base.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "213_mobile-l_base_idle.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "214_mobile-l_transition_reels_accelerating.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "215_mobile-l_transition_reels_full_speed.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "216_mobile-l_dead_spin_1_settled.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "217_mobile-l_dead_spin_2_settled.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "218_mobile-l_dead_spin_3_settled.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "219_mobile-l_win_presentation.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "220_mobile-l_transition_bigwin_countup_early.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "221_mobile-l_transition_bigwin_countup_late.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "222_mobile-l_bigwin_settled.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "223_mobile-l_transition_menu_opening.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "224_mobile-l_hud_menu.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "225_mobile-l_session_panel.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "226_mobile-l_transition_paytable_opening.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "227_mobile-l_paytable_top.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "228_mobile-l_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "229_mobile-l_paytable_02_ways_to_win.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "230_mobile-l_paytable_03_symbol_payouts.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "231_mobile-l_paytable_04_rules.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "232_mobile-l_paytable_05_overdrive_free_spins.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "233_mobile-l_paytable_06_bet_modes.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "234_mobile-l_paytable_07_interface_guide.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "235_mobile-l_paytable_08_responsible_play.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "236_mobile-l_paytable_09_disclaimer.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "237_mobile-l_transition_paytable_closing.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "238_mobile-l_autoplay_menu.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "239_mobile-l_transition_features_menu_opening.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "240_mobile-l_features_menu.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "241_mobile-l_transition_dialog_buy_overdrive_opening.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "242_mobile-l_dialog_buy_overdrive.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "243_mobile-l_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "244_mobile-l_dialog_nitro_overdrive.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "245_mobile-l_transition_feature_entry_fade.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "246_mobile-l_feature_entry_card.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "247_mobile-l_transition_feature_starting.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "248_mobile-l_feature_run_1.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "249_mobile-l_feature_run_2.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "250_mobile-l_feature_run_3.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "251_mobile-l_feature_run_4.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "252_mobile-l_feature_run_5.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "253_mobile-l_feature_run_6.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "254_mobile-l_transition_feature_exit.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "255_mobile-l_post_feature_base.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "256_mobile-l_transition_maxwin_overlay_fade.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "257_mobile-l_maxwin_celebration.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "258_mobile-l_transition_maxwin_collect_fade.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "259_mobile-l_post_collect_base.png",
+      "session": "Mobile L",
+      "viewport": "425x812",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "260_mobile-m_transition_splash_entrance.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "261_mobile-m_splash.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "262_mobile-m_transition_splash_to_rules.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "263_mobile-m_intro_rules.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "264_mobile-m_transition_rules_to_base.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "265_mobile-m_base_idle.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "266_mobile-m_transition_reels_accelerating.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "267_mobile-m_transition_reels_full_speed.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "268_mobile-m_dead_spin_1_settled.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "269_mobile-m_dead_spin_2_settled.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "270_mobile-m_dead_spin_3_settled.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "271_mobile-m_win_presentation.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "272_mobile-m_transition_bigwin_countup_early.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "273_mobile-m_transition_bigwin_countup_late.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "274_mobile-m_bigwin_settled.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "275_mobile-m_transition_menu_opening.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "276_mobile-m_hud_menu.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "277_mobile-m_session_panel.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "278_mobile-m_transition_paytable_opening.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "279_mobile-m_paytable_top.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "280_mobile-m_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "281_mobile-m_paytable_02_ways_to_win.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "282_mobile-m_paytable_03_symbol_payouts.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "283_mobile-m_paytable_04_rules.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "284_mobile-m_paytable_05_overdrive_free_spins.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "285_mobile-m_paytable_06_bet_modes.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "286_mobile-m_paytable_07_interface_guide.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "287_mobile-m_paytable_08_responsible_play.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "288_mobile-m_paytable_09_disclaimer.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "289_mobile-m_transition_paytable_closing.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "290_mobile-m_autoplay_menu.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "291_mobile-m_transition_features_menu_opening.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "292_mobile-m_features_menu.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "293_mobile-m_transition_dialog_buy_overdrive_opening.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "294_mobile-m_dialog_buy_overdrive.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "295_mobile-m_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "296_mobile-m_dialog_nitro_overdrive.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "297_mobile-m_transition_feature_entry_fade.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "298_mobile-m_feature_entry_card.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "299_mobile-m_transition_feature_starting.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "300_mobile-m_feature_run_1.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "301_mobile-m_feature_run_2.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "302_mobile-m_feature_run_3.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "303_mobile-m_feature_run_4.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "304_mobile-m_feature_run_5.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "305_mobile-m_feature_run_6.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "306_mobile-m_transition_feature_exit.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "307_mobile-m_post_feature_base.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "308_mobile-m_transition_maxwin_overlay_fade.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "309_mobile-m_maxwin_celebration.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "310_mobile-m_transition_maxwin_collect_fade.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "311_mobile-m_post_collect_base.png",
+      "session": "Mobile M",
+      "viewport": "375x667",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "312_mobile-s_transition_splash_entrance.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "313_mobile-s_splash.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "314_mobile-s_transition_splash_to_rules.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "315_mobile-s_intro_rules.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "316_mobile-s_transition_rules_to_base.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "317_mobile-s_base_idle.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "318_mobile-s_transition_reels_accelerating.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "319_mobile-s_transition_reels_full_speed.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "320_mobile-s_dead_spin_1_settled.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "321_mobile-s_dead_spin_2_settled.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "322_mobile-s_dead_spin_3_settled.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "323_mobile-s_win_presentation.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "324_mobile-s_transition_bigwin_countup_early.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "325_mobile-s_transition_bigwin_countup_late.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "326_mobile-s_bigwin_settled.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "327_mobile-s_transition_menu_opening.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "328_mobile-s_hud_menu.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "329_mobile-s_session_panel.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "330_mobile-s_transition_paytable_opening.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "331_mobile-s_paytable_top.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "332_mobile-s_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "333_mobile-s_paytable_02_ways_to_win.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "334_mobile-s_paytable_03_symbol_payouts.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "335_mobile-s_paytable_04_rules.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "336_mobile-s_paytable_05_overdrive_free_spins.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "337_mobile-s_paytable_06_bet_modes.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "338_mobile-s_paytable_07_interface_guide.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "339_mobile-s_paytable_08_responsible_play.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "340_mobile-s_paytable_09_disclaimer.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "341_mobile-s_transition_paytable_closing.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "342_mobile-s_autoplay_menu.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "343_mobile-s_transition_features_menu_opening.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "344_mobile-s_features_menu.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "345_mobile-s_transition_dialog_buy_overdrive_opening.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "346_mobile-s_dialog_buy_overdrive.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "347_mobile-s_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "348_mobile-s_dialog_nitro_overdrive.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "349_mobile-s_transition_feature_entry_fade.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "350_mobile-s_feature_entry_card.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "351_mobile-s_transition_feature_starting.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "352_mobile-s_feature_run_1.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "353_mobile-s_feature_run_2.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "354_mobile-s_feature_run_3.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "355_mobile-s_feature_run_4.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "356_mobile-s_feature_run_5.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "357_mobile-s_feature_run_6.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "358_mobile-s_transition_feature_exit.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "359_mobile-s_post_feature_base.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "360_mobile-s_transition_maxwin_overlay_fade.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "361_mobile-s_maxwin_celebration.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "362_mobile-s_transition_maxwin_collect_fade.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "363_mobile-s_post_collect_base.png",
+      "session": "Mobile S",
+      "viewport": "320x568",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "364_stretch_transition_splash_entrance.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "365_stretch_splash.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "366_stretch_transition_splash_to_rules.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "367_stretch_intro_rules.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "368_stretch_transition_rules_to_base.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "369_stretch_base_idle.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "370_stretch_transition_reels_accelerating.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "371_stretch_transition_reels_full_speed.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "372_stretch_dead_spin_1_settled.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "373_stretch_dead_spin_2_settled.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "374_stretch_dead_spin_3_settled.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "375_stretch_win_presentation.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "376_stretch_transition_bigwin_countup_early.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "377_stretch_transition_bigwin_countup_late.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "378_stretch_bigwin_settled.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "379_stretch_transition_menu_opening.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "380_stretch_hud_menu.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "381_stretch_session_panel.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "382_stretch_transition_paytable_opening.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "383_stretch_paytable_top.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "384_stretch_paytable_01_match_symbols_on_adjacent_reels_st.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_01_match_symbols_on_adjacent_reels_st",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "385_stretch_paytable_02_ways_to_win.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_02_ways_to_win",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "386_stretch_paytable_03_symbol_payouts.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_03_symbol_payouts",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "387_stretch_paytable_04_rules.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_04_rules",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "388_stretch_paytable_05_overdrive_free_spins.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_05_overdrive_free_spins",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "389_stretch_paytable_06_bet_modes.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "390_stretch_paytable_07_interface_guide.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_07_interface_guide",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "391_stretch_paytable_08_responsible_play.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_08_responsible_play",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "392_stretch_paytable_09_disclaimer.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "paytable_09_disclaimer",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "393_stretch_transition_paytable_closing.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "394_stretch_autoplay_menu.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "395_stretch_transition_features_menu_opening.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "396_stretch_features_menu.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "397_stretch_transition_dialog_buy_overdrive_opening.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "398_stretch_dialog_buy_overdrive.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "399_stretch_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "400_stretch_dialog_nitro_overdrive.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "401_stretch_transition_feature_entry_fade.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "402_stretch_feature_entry_card.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "403_stretch_transition_feature_starting.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "404_stretch_feature_run_1.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "405_stretch_feature_run_2.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "406_stretch_feature_run_3.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "407_stretch_feature_run_4.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "408_stretch_feature_run_5.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "409_stretch_feature_run_6.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "410_stretch_transition_feature_exit.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "411_stretch_post_feature_base.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "412_stretch_transition_maxwin_overlay_fade.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "413_stretch_maxwin_celebration.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "414_stretch_transition_maxwin_collect_fade.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "415_stretch_post_collect_base.png",
+      "session": "Stretch",
+      "viewport": "1920x800",
+      "lang": "en",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "416_de-desktop_transition_splash_entrance.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "417_de-desktop_splash.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "418_de-desktop_transition_splash_to_rules.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "419_de-desktop_intro_rules.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "420_de-desktop_transition_rules_to_base.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "421_de-desktop_base_idle.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "422_de-desktop_transition_reels_accelerating.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "423_de-desktop_transition_reels_full_speed.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "424_de-desktop_dead_spin_1_settled.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "425_de-desktop_dead_spin_2_settled.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "426_de-desktop_dead_spin_3_settled.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "427_de-desktop_win_presentation.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "428_de-desktop_transition_bigwin_countup_early.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "429_de-desktop_transition_bigwin_countup_late.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "430_de-desktop_bigwin_settled.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "431_de-desktop_transition_menu_opening.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "432_de-desktop_hud_menu.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "433_de-desktop_session_panel.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "434_de-desktop_transition_paytable_opening.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "435_de-desktop_paytable_top.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "436_de-desktop_paytable_01_kombiniere_gleiche_symbole_auf_ben.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_01_kombiniere_gleiche_symbole_auf_ben",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "437_de-desktop_paytable_02_gewinnwege.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_02_gewinnwege",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "438_de-desktop_paytable_03_symbolauszahlungen.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_03_symbolauszahlungen",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "439_de-desktop_paytable_04_regeln.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_04_regeln",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "440_de-desktop_paytable_05_overdrive_freispiele.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_05_overdrive_freispiele",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "441_de-desktop_paytable_06_bet_modes.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "442_de-desktop_paytable_07_bedienelemente.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_07_bedienelemente",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "443_de-desktop_paytable_08_verantwortungsvolles_spielen.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_08_verantwortungsvolles_spielen",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "444_de-desktop_paytable_09_haftungsausschluss.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "paytable_09_haftungsausschluss",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "445_de-desktop_transition_paytable_closing.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "446_de-desktop_autoplay_menu.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "447_de-desktop_transition_features_menu_opening.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "448_de-desktop_features_menu.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "449_de-desktop_transition_dialog_buy_overdrive_opening.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "450_de-desktop_dialog_buy_overdrive.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "451_de-desktop_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "452_de-desktop_dialog_nitro_overdrive.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "453_de-desktop_transition_feature_entry_fade.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "454_de-desktop_feature_entry_card.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "455_de-desktop_transition_feature_starting.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "456_de-desktop_feature_run_1.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "457_de-desktop_feature_run_2.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "458_de-desktop_feature_run_3.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "459_de-desktop_feature_run_4.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "460_de-desktop_feature_run_5.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "461_de-desktop_feature_run_6.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "462_de-desktop_transition_feature_exit.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "463_de-desktop_post_feature_base.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "464_de-desktop_transition_maxwin_overlay_fade.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "465_de-desktop_maxwin_celebration.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "466_de-desktop_transition_maxwin_collect_fade.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "467_de-desktop_post_collect_base.png",
+      "session": "Desktop de",
+      "viewport": "1200x675",
+      "lang": "de",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    },
+    {
+      "file": "468_ar-desktop_transition_splash_entrance.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_splash_entrance",
+      "phase": "transition",
+      "note": "Splash mid-entrance, about 600ms after load"
+    },
+    {
+      "file": "469_ar-desktop_splash.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "splash",
+      "phase": "state",
+      "note": "Hero splash, first surface a viewer sees"
+    },
+    {
+      "file": "470_ar-desktop_transition_splash_to_rules.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_splash_to_rules",
+      "phase": "transition",
+      "note": "Mid-fade between splash and rules card"
+    },
+    {
+      "file": "471_ar-desktop_intro_rules.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "intro_rules",
+      "phase": "state",
+      "note": "Rules card, gated before first spin"
+    },
+    {
+      "file": "472_ar-desktop_transition_rules_to_base.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_rules_to_base",
+      "phase": "transition",
+      "note": "Mid-fade between rules and base game"
+    },
+    {
+      "file": "473_ar-desktop_base_idle.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "base_idle",
+      "phase": "state",
+      "note": "Base game at rest, full HUD"
+    },
+    {
+      "file": "474_ar-desktop_transition_reels_accelerating.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_reels_accelerating",
+      "phase": "transition",
+      "note": "Reels accelerating, about 250ms after spin press"
+    },
+    {
+      "file": "475_ar-desktop_transition_reels_full_speed.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_reels_full_speed",
+      "phase": "transition",
+      "note": "Reels at full speed"
+    },
+    {
+      "file": "476_ar-desktop_dead_spin_1_settled.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "dead_spin_1_settled",
+      "phase": "state",
+      "note": "Dead spin 1 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "477_ar-desktop_dead_spin_2_settled.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "dead_spin_2_settled",
+      "phase": "state",
+      "note": "Dead spin 2 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "478_ar-desktop_dead_spin_3_settled.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "dead_spin_3_settled",
+      "phase": "state",
+      "note": "Dead spin 3 of 3 settled, zero win, HUD readouts at rest"
+    },
+    {
+      "file": "479_ar-desktop_win_presentation.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "win_presentation",
+      "phase": "state",
+      "note": "Standard win presentation"
+    },
+    {
+      "file": "480_ar-desktop_transition_bigwin_countup_early.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_bigwin_countup_early",
+      "phase": "transition",
+      "note": "Big win count-up, early digits"
+    },
+    {
+      "file": "481_ar-desktop_transition_bigwin_countup_late.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_bigwin_countup_late",
+      "phase": "transition",
+      "note": "Big win count-up, later digits"
+    },
+    {
+      "file": "482_ar-desktop_bigwin_settled.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "bigwin_settled",
+      "phase": "state",
+      "note": "Big win presentation settled"
+    },
+    {
+      "file": "483_ar-desktop_transition_menu_opening.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_menu_opening",
+      "phase": "transition",
+      "note": "HUD menu mid-open"
+    },
+    {
+      "file": "484_ar-desktop_hud_menu.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "hud_menu",
+      "phase": "state",
+      "note": "HUD menu open, audio controls and menu items"
+    },
+    {
+      "file": "485_ar-desktop_session_panel.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "session_panel",
+      "phase": "state",
+      "note": "Session information panel"
+    },
+    {
+      "file": "486_ar-desktop_transition_paytable_opening.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_paytable_opening",
+      "phase": "transition",
+      "note": "Paytable mid-open"
+    },
+    {
+      "file": "487_ar-desktop_paytable_top.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_top",
+      "phase": "state",
+      "note": "Paytable, opening view"
+    },
+    {
+      "file": "488_ar-desktop_paytable_01__1_.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_01__1_",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "489_ar-desktop_paytable_02__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_02__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "490_ar-desktop_paytable_03__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_03__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "491_ar-desktop_paytable_04__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_04__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "492_ar-desktop_paytable_05__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_05__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "493_ar-desktop_paytable_06_bet_modes.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_06_bet_modes",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "494_ar-desktop_paytable_07__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_07__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "495_ar-desktop_paytable_08__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_08__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "496_ar-desktop_paytable_09__.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "paytable_09__",
+      "phase": "state",
+      "note": "Paytable section"
+    },
+    {
+      "file": "497_ar-desktop_transition_paytable_closing.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_paytable_closing",
+      "phase": "transition",
+      "note": "Paytable mid-close"
+    },
+    {
+      "file": "498_ar-desktop_autoplay_menu.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "autoplay_menu",
+      "phase": "state",
+      "note": "Autoplay menu, stop conditions and loss limit"
+    },
+    {
+      "file": "499_ar-desktop_transition_features_menu_opening.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_features_menu_opening",
+      "phase": "transition",
+      "note": "FEATURES menu mid-open"
+    },
+    {
+      "file": "500_ar-desktop_features_menu.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "features_menu",
+      "phase": "state",
+      "note": "FEATURES menu, all five modes and their prices"
+    },
+    {
+      "file": "501_ar-desktop_transition_dialog_buy_overdrive_opening.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_dialog_buy_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "502_ar-desktop_dialog_buy_overdrive.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "dialog_buy_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "503_ar-desktop_transition_dialog_nitro_overdrive_opening.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_dialog_nitro_overdrive_opening",
+      "phase": "transition",
+      "note": "Buy confirm dialog mid-open"
+    },
+    {
+      "file": "504_ar-desktop_dialog_nitro_overdrive.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "dialog_nitro_overdrive",
+      "phase": "state",
+      "note": "Buy confirm dialog, price stated up front"
+    },
+    {
+      "file": "505_ar-desktop_transition_feature_entry_fade.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_feature_entry_fade",
+      "phase": "transition",
+      "note": "Feature entry overlay mid-fade"
+    },
+    {
+      "file": "506_ar-desktop_feature_entry_card.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_entry_card",
+      "phase": "state",
+      "note": "Free spins entry, explicit continue gate"
+    },
+    {
+      "file": "507_ar-desktop_transition_feature_starting.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_feature_starting",
+      "phase": "transition",
+      "note": "Feature starting, entry card dismissing"
+    },
+    {
+      "file": "508_ar-desktop_feature_run_1.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_1",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 1 of 6"
+    },
+    {
+      "file": "509_ar-desktop_feature_run_2.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_2",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 2 of 6"
+    },
+    {
+      "file": "510_ar-desktop_feature_run_3.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_3",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 3 of 6"
+    },
+    {
+      "file": "511_ar-desktop_feature_run_4.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_4",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 4 of 6"
+    },
+    {
+      "file": "512_ar-desktop_feature_run_5.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_5",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 5 of 6"
+    },
+    {
+      "file": "513_ar-desktop_feature_run_6.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "feature_run_6",
+      "phase": "state",
+      "note": "Overdrive free spins in flight, interval frame 6 of 6"
+    },
+    {
+      "file": "514_ar-desktop_transition_feature_exit.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_feature_exit",
+      "phase": "transition",
+      "note": "Feature exiting toward base"
+    },
+    {
+      "file": "515_ar-desktop_post_feature_base.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "post_feature_base",
+      "phase": "state",
+      "note": "Back to base after the feature, totals settled"
+    },
+    {
+      "file": "516_ar-desktop_transition_maxwin_overlay_fade.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_maxwin_overlay_fade",
+      "phase": "transition",
+      "note": "Max win overlay mid-fade-in"
+    },
+    {
+      "file": "517_ar-desktop_maxwin_celebration.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "maxwin_celebration",
+      "phase": "state",
+      "note": "MAX WIN celebration, the 5,000x cap, held"
+    },
+    {
+      "file": "518_ar-desktop_transition_maxwin_collect_fade.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "transition_maxwin_collect_fade",
+      "phase": "transition",
+      "note": "Collect pressed, overlay mid-fade-out"
+    },
+    {
+      "file": "519_ar-desktop_post_collect_base.png",
+      "session": "Desktop ar",
+      "viewport": "1200x675",
+      "lang": "ar",
+      "surface": "post_collect_base",
+      "phase": "state",
+      "note": "Back to base after collect, balance settled"
+    }
+  ]
+}
