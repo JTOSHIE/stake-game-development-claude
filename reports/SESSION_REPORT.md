@@ -7051,15 +7051,19 @@ line for agent accounting.
 **Agents deployed: 93 transcripts across 8 workflow runs.** Waves completed:
 capture (trial session) and discovery (this session). Verification: not run.
 
-Burn figures, cited rather than estimated. Two of the four completed runs
-reported usage and are quoted; the others did not report and are recorded as not
-known rather than guessed, per convention (l.3):
+Burn figures, cited rather than estimated. The three completed runs of the final
+design all reported usage and are quoted exactly. The two abandoned attempts
+were stopped rather than completed, so no usage was reported for them and none
+is estimated here, per convention (l.3). The reported total is therefore a floor
+on this session's agent burn, not the whole of it, and it is labelled as such
+rather than presented as a clean figure:
 
 | Run | Agents | Subagent tokens | Tool uses | Wall clock |
 |---|---|---|---|---|
 | Composition remainder | 7 | 1,318,122 | 457 | 54.6 min |
 | Motion, localisation, voice | 13 | 2,371,525 | 905 | 80.8 min |
-| Typography | 16 | not reported | not reported | about 90 min |
+| Typography | 16 | 2,912,044 | 1,288 | 91.8 min |
+| **Reported total** | **36** | **6,601,691** | **2,650** | |
 | Two abandoned attempts | 44 launched | not reported | not reported | about 75 min |
 
 **Self-caught errors: two, both orchestration, both caught by reading agent
