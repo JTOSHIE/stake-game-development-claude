@@ -245,6 +245,23 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/config/fsModes.drift.test.ts
 
+      # M08 of reports/qa/session3/MECHANISMS.md. What the player is SHOWN must
+      # be what the maths actually PAYS: every paid combination, the scatter
+      # awards, and the max win figure printed in the rules, per mode, against
+      # game_config.py and the published lookup tables.
+      #
+      # REQ-040 is held here because nothing else held it. Session 3's survey put
+      # 79 requirements to seven squads and REQ-040 reached none of them: it was
+      # in no mechanism and in no unreachable list, and was found by counting
+      # rather than by reading. HIGH severity, player visible.
+      - name: paytable parity, seeded-violation self-test
+        working-directory: frontend
+        run: npx tsx src/lib/config/paytable_parity.test.ts --self-test
+
+      - name: paytable parity against the shipped maths
+        working-directory: frontend
+        run: npx tsx src/lib/config/paytable_parity.test.ts
+
       # ── Gate 6: locale completeness ──────────────────────────────────────────
       # Every required key in all 16 locales, and no unexplained hardcoded
       # player-facing literal in any component. Kills the class where 18 strings
