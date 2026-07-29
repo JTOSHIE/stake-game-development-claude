@@ -1,0 +1,16 @@
+currency table gate: 49 published codes x 8 magnitude rungs, against docs/stake-engine-live/2026-07-29/rgs.md
+
+CLASS A, the wrong-currency cases, 8 codes, reported first:
+  ok    CAD  CA$10.00      bare $ reads as United States dollars
+  ok    CNY  CN¥10.00      ¥ is the Japanese yen sign
+  ok    MXN  MX$10.00      bare $ reads as United States dollars
+  ok    CLP  10 CLP        bare $ reads as United States dollars
+  ok    ARS  10.00 ARS     bare $ reads as United States dollars
+  ok    TWD  NT$10.00      bare $ reads as United States dollars
+  ok    SGD  SG$10.00      bare $ reads as United States dollars
+  ok    NZD  NZ$10.00      bare $ reads as United States dollars
+
+Intl fallback reached by: no supported code (asserted by instrumenting the constructor)
+controls: 10 of 10 passed
+
+currency table gate PASS: 589 assertions, all 49 codes render the platform's published form.

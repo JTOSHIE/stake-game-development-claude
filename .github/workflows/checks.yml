@@ -551,6 +551,35 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/utils/currency.test.ts
 
+      # ── Gate 12b: the currency TABLE against the platform mirror ─────────────
+      # Until 2026-07-29 fiat symbols were derived from Intl. Measured against
+      # the platform's own published Example column, 34 of 49 supported codes
+      # rendered something else, and eight of them showed the player A DIFFERENT
+      # CURRENCY'S SYMBOL: a bare `$` on CAD, MXN, SGD, TWD, CLP, ARS and NZD
+      # balances, and `¥`, the Japanese yen sign, on CNY. The fix was a written
+      # table (currency.ts PLATFORM_CURRENCIES); this gate is what stops it
+      # drifting from the platform again.
+      #
+      # It parses docs/stake-engine-live/2026-07-29/rgs.md at run time rather
+      # than restating the platform's numbers, so the gate's input and the
+      # implementation's input are independent per convention (l.4). A gate
+      # holding its own copy of the 49 rows would agree with the table by
+      # construction and prove nothing.
+      #
+      # THE SELF-TEST IS ITS OWN STEP AND RUNS FIRST, per convention (p) and the
+      # ordering the brief specifies. Six seeded defects, each a real edit to a
+      # real copy of the module imported through the real path, the first of
+      # which (`CAD: '$'`) is byte-for-byte what actually shipped. Plus a paired
+      # positive for the whole set and one for every negative control, because a
+      # control that can never fire is indistinguishable from one that passes.
+      - name: currency table, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/currency_table_gate.mjs --self-test
+
+      - name: currency table against the platform mirror
+        working-directory: frontend
+        run: node scripts/currency_table_gate.mjs
+
       # ── Gate 12a: social mode forces English ─────────────────────────────────
       # Stake Engine testing guideline item 46, quoted: "English is the only
       # supported language in Social Mode". It is written as a requirement on

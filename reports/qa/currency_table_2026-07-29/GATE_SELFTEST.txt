@@ -1,0 +1,25 @@
+  PASS  paired positive: the unmutated module is green over 589 checks
+  PASS  seed 1, the defect that actually shipped: CAD renders a bare $
+          gate went red: CAD symbol is "$", capture says "CA$" | CAD renders "$10.00", platform Example column says "CA$10.00" | CAD at
+  PASS  seed 2, symbol on the wrong side, the form the platform CurrencyMeta gets wrong
+          gate went red: PEN symbolAfter is true, capture says false | PEN renders "10.00 S/", platform Example column says "S/10.00" |
+  PASS  seed 3, wrong decimal count, the KWD three-decimal form
+          gate went red: KWD decimals is 3, capture says 2 | KWD renders "KD10.000", platform Example column says "KD10.00" | KWD at ze
+  PASS  seed 4, a row deleted, so the code falls through to Intl (proves check D)
+          gate went red: MYR published by the platform, absent from PLATFORM_CURRENCIES, so it falls through to Intl | MYR renders "RM 
+  PASS  seed 5, a row invented that the platform does not publish
+          gate went red: ZWL in PLATFORM_CURRENCIES but not in the platform capture, so it is an invention rather than a transcription
+  PASS  seed 6, leading symbol given a space, the "RM 10.00" form that shipped
+          gate went red: CAD renders "CA$ 10.00", platform Example column says "CA$10.00" | CNY renders "CN¥ 10.00", platform Example c
+  PASS  control: GBP, unpublished by the platform, is absent from the table
+  PASS  control: GBP still renders a usable string via the Intl fallback
+  PASS  control: 'SC' and 'GC' replay aliases are not in the platform table
+  PASS  control: 'SC' alias still renders the symbol and never the raw code
+  PASS  control: session display metadata still overrides the table
+  PASS  control: absent metadata, the table wins for the same code
+  PASS  control: an unknown code renders rather than throwing
+  PASS  control: a known code does not render its raw code to the player
+  PASS  control: a lowercase code still resolves through the table
+  PASS  control: the compact form uses the table symbol, not Intl
+
+currency table gate self-test: 17 checks passed, 6 seeded defects all caught.

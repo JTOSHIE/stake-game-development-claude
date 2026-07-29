@@ -717,12 +717,6 @@
     {
       "cls": "DEAD_SYMBOL",
       "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "CurrencyMeta @ frontend/src/lib/utils/currency.ts",
-      "detail": "CurrencyMeta does not appear in frontend/src/lib/utils/currency.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
       "text": "enforceSocialEnglish @ frontend/src/lib/i18n/tr.ts",
       "detail": "enforceSocialEnglish does not appear in frontend/src/lib/i18n/tr.ts"
     },
