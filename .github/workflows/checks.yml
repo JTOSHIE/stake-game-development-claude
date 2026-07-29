@@ -20,7 +20,11 @@
 # audit: they take tens of minutes and their value is in a real environment
 # rather than in a CI container.
 #
-# SECURITY POSTURE. This repository is PUBLIC.
+# SECURITY POSTURE. This repository is PRIVATE as of 2026-07-29 (it was public until
+# then, and the licence that sat at its root for that whole period is dealt with at
+# THIRD_PARTY_LICENSES.md). The posture below is UNCHANGED and deliberately so: a
+# workflow that needs no secrets should not acquire them because the repository got
+# less exposed.
 #   - This workflow receives NO secrets. There is no `secrets:` usage anywhere in
 #     it, and nothing here needs credentials. Do not add any.
 #   - `permissions` is contents:read only. It cannot write to the repository,
@@ -101,6 +105,73 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ── WHAT CHANGED, added 2026-07-29 ────────────────────────────────────────
+  #
+  # The repository went private, so Actions minutes are metered. A push bills
+  # 24.1 MINUTES across 12 parallel jobs while taking 3.3 minutes of wall
+  # clock, because each job bills separately. Most pushes here are documents
+  # and touch no rendering code at all.
+  #
+  # THE OBVIOUS FIX IS THE WRONG ONE. A workflow-level `paths-ignore` would
+  # skip the STATIC job too, and that job carries the document currency gate,
+  # the dash gate and the locked-paths gate. Filtering out documents would
+  # disable precisely the gates whose job is to check documents. So the static
+  # job is NEVER gated, and only the browser matrix is.
+  #
+  # IT FAILS OPEN, ALWAYS. No base, an unknown base, a first push, a git error:
+  # every one of those runs the full matrix. The cost of skipping a gate that
+  # should have run is invisible, and this project has already shipped three
+  # gates that printed PASS over live defects. Burning minutes is the cheaper
+  # mistake and it is the one this is biased towards.
+  changes:
+    name: what changed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      browser_needed: ${{ steps.filter.outputs.browser_needed }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decide whether the browser matrix is needed
+        id: filter
+        run: |
+          set -u
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+
+          # Fail open on anything unexpected.
+          if [ -z "${BASE}" ] \
+             || [ "${BASE}" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            echo "no usable base ref, running the full matrix"
+            echo "browser_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only "${BASE}" "${{ github.sha }}") || {
+            echo "git diff failed, running the full matrix"
+            echo "browser_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          echo "changed files:"
+          echo "${CHANGED}"
+
+          # Anything that can alter what RENDERS, what SHIPS, or how a gate is
+          # run. scripts/ is included because the gates themselves live there.
+          if echo "${CHANGED}" | grep -qE '^(frontend/|games/|design-system/|scripts/|\.github/workflows/|package\.json|package-lock\.json)'; then
+            echo "browser_needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "documents only, skipping the browser matrix"
+            echo "browser_needed=false" >> "$GITHUB_OUTPUT"
+          fi
+
   static:
     name: static gates
     runs-on: ubuntu-latest
@@ -616,6 +687,11 @@ jobs:
   # secrets, contents:read, pull_request rather than pull_request_target.
   browser:
     name: ${{ matrix.gate.name }}
+    needs: changes
+    # Skipped only when `changes` proved the push touches no rendering, shipping
+    # or gate code. That job fails open, so a skip here is a positive result and
+    # never an accident.
+    if: needs.changes.outputs.browser_needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
