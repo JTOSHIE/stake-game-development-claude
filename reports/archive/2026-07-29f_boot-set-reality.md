@@ -306,3 +306,32 @@ recount it against. Flagged UNVERIFIED, not confirmed.
 `reports/qa/compliance_register/REGISTER.md`. The verifier recomputed every headline count
 from the underlying data, including the 254 raw rows reconciling exactly against seven shard
 footers (61+53+50+26+24+1+39), and found nothing wrong.
+
+## THE CLOSE
+
+**Rule 12, owner preview.** Refreshed before this report was written and again as the last
+action after the final push, per the one-commit-lag clause. The line, verbatim:
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 1004403  |  built 2026-07-29T23:53:08+10:00  |  started 2026-07-29T13:53:26.759Z  |  http://192.168.4.92:5173
+```
+
+**And the address was CURLED, because printing a URL is not evidence it works:** HTTP 200.
+
+**Rule 10, remote CI, checked and not assumed.**
+
+| Push | Run | Result |
+|---|---|---|
+| `25b80cb`, the audit and the gate change | [30456963726](https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30456963726) | **SUCCESS.** Full matrix, because it touched gate code |
+| `1004403`, the verifier corrections | [30458121628](https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30458121628) | **SUCCESS** |
+
+**The one-commit lag applies here exactly as it does to rule 12**, and this project already
+named it: recording a run link is itself a commit, which starts another run, so a session that
+insists on committing the result of its own last push never terminates. The runs above are the
+verified results of the pushes that carried the work. This commit is documents-only; its own
+result is verified and reported to the owner in the close message rather than committed, which
+is where the chain stops.
+
+**`git status` clean. No committed evidence rewritten.** No locked path touched by any commit
+in this session, so none carries a LOCK-SANCTION token. `docs/records/reviews/REVIEW_TRACKER.md`
+untouched, as the brief required.
