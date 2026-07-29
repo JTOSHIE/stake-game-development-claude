@@ -374,6 +374,32 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/i18n/vocabulary.test.ts
 
+      # ── Gate 6c: the disclaimer, sixteen locales, both modes ─────────────────
+      # M02 of reports/qa/session3/MECHANISMS.md. SEVEN platform requirements
+      # (REQ-010 to REQ-015 and REQ-038) had no proof path and all seven are
+      # properties of one artefact: the disclaimer prose.
+      #
+      # Nothing mechanical can check that sixteen translations convey six
+      # meanings, so this asserts the STRUCTURAL invariants the real defect
+      # breaks and which hold in any script: six sentences per locale (a dropped
+      # clause drops the count) and the untranslated "Remote Game Server"
+      # anchor. Meaning is checked in English only, against the platform's own
+      # template read from the dated mirror at runtime, so a platform rewrite
+      # goes red rather than being silently checked against a stale memory.
+      #
+      # REQ-016 is deliberately NOT held: it asks whether the template's closing
+      # TM line is mandatory, NO_PROOF_SET.tsv records it UNKNOWN and says it
+      # should be ruled, and it sits against the no-Stake-branding rule. A gate
+      # cannot settle that. Self-test first, per convention (p): ten seeds, five
+      # paired controls.
+      - name: disclaimer conformance, seeded-violation self-test
+        working-directory: frontend
+        run: npx tsx src/lib/i18n/disclaimer_conformance.test.ts --self-test
+
+      - name: disclaimer conformance, sixteen locales
+        working-directory: frontend
+        run: npx tsx src/lib/i18n/disclaimer_conformance.test.ts
+
       # ── Gate 7: no em or en dashes anywhere that can reach a player ──────────
       # Replaces player_string_dash_check.mjs, which passed twice while broken
       # (TR-060, then TR-063). The self-test runs FIRST and plants the four real
