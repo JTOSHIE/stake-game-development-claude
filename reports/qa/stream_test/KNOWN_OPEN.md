@@ -17,7 +17,7 @@ Australian English, no em dashes or en dashes.
 | **TR-114** | The replay ghost pod. Replay surfaces are outside the watched session; ignore unless a frame shows it. | OPEN, mapped to JOB 4. |
 | **TR-112** | Repo hygiene (unreferenced sounds, npm check warnings). Not player-visible; not frame-auditable. | OPEN, LOW. |
 | **Q-16 park** (charter 4.3) | Hardcoded English on all localised frames: autoplay panel labels (`Stop on win`, `Loss limit`, `Spins`, `Session`), paytable section headers (`Symbol Payouts`, `Interface Guide`, `Responsible Play`, `Disclaimer` and siblings), `Press COLLECT or hit Enter to continue` on the max win overlay, `Mute`/`Unmute`, plus aria labels. About 35 keys, about 560 translated values. | OWNER-PARKED, extracted per protocol rule 6. The de and ar squads must list which parked strings are VISIBLE on stream frames, because that changes the park's urgency, but the rows stay parked. |
-| **Q-26** | Multiplication sign as letter `x` while other surfaces use `×`. | **PARTIALLY CLOSED 2026-07-29.** The win banner instance is FIXED (TR-117). **The row's enumeration was itself incomplete**, listing four survivors all in `fsModes.ts` when a fifth sat in a component: the instrument that built it searched config and prose and not components. The four prose and config instances (`1.6x`, `1.25x` twice, `5x`, now in `prose.ts`) REMAIN OPEN. Re-enumerate across the whole tree, not two files. |
+| **Q-26** | Multiplication sign as letter `x` while other surfaces use `×`. | **PARTIALLY CLOSED 2026-07-29.** The win banner instance is FIXED (TR-117): its remaining `10x`/`30x`/`100x` hits are comments at `WinBanner.svelte:7`, `:50` and `:216`, none rendered. **RE-ENUMERATED 2026-07-29 by the boot-set audit, as this row itself demanded, and the answer is 51 not four.** This row previously said "The four prose and config instances REMAIN OPEN". The real surviving set is **51 player-visible instances**: 6 in the English prose, at `frontend/src/lib/i18n/prose.ts:90` and `frontend/src/lib/i18n/prose.ts:189` (the Overboost blurb, carrying `1.6x` and `1.25x`) and `frontend/src/lib/i18n/prose.ts:94` and `frontend/src/lib/i18n/prose.ts:192` (the Super blurb, carrying `5x`), across the real-money and social variants; and **45 across `frontend/src/lib/i18n/prose.locales.ts:1`, which is 15 locales nobody had counted**. `frontend/src/lib/config/fsModes.ts` contains none of them, so `docs/QUALITY_CHARTER.md`'s Q-26 row named the wrong file as well as the wrong count; corrected there too. The same files already use `×` correctly 116 times. **No gate covers this class**, so it cannot regress noisily. OPEN. |
 | **Q-27** | Vite scaffold CSS remnants in `app.css`. | **OPEN and WIDER than recorded.** Session 1 added a player-visible instance the row did not have: `app.css:160-162` styles `button:focus` with Chrome's own `-webkit-focus-ring-color` `rgb(0, 95, 204)`, so a stock browser blue ring sits on the last-touched control through spin, win and COLLECT on a cyan and magenta game. Also still open: stock indigo link colours, `background-color: #242424`, scaffold body centring, and `#app { text-align: center }` which strands paytable bullet markers (cluster C-07, the one cluster both panel seats CONFIRMED outright). |
 | **Q-28** | Explanatory HTML comments shipping in `dist/index.html`. Not frame-visible. | OPEN, small. |
 | **Q-34** | The same mode reads `Cruise` on the features menu, paytable and buy dialog and `CRUISE` on the HUD badge, via `text-transform: uppercase` present on one surface class and absent on three. | OPEN, one-property fix in either direction; the direction is an art call. |
@@ -38,10 +38,25 @@ Australian English, no em dashes or en dashes.
 Session 1 of the stream close ran the sight gate, the cluster marshal and the verification
 panels. What a squad on ANY later audit needs to know before reporting:
 
-- **The stream test ledger is at `reports/qa/stream_test/LEDGER.md`, its clusters at
-  `CLUSTERS.md`, and it holds 571 findings of which 506 are HIGH, MEDIUM or LOW and are
-  UNCLUSTERED AND UNVERIFIED.** If you find something on a rendered surface, check there
-  before opening a new id. Most of it is already recorded.
+- **The stream test findings live in the 54 shards at `reports/qa/stream_test/shards/`,
+  counted and tiered in `CLUSTERS.md`. There are 566, of which 506 are HIGH, MEDIUM or LOW
+  and are UNCLUSTERED AND UNVERIFIED.** If you find something on a rendered surface, check
+  there before opening a new id. Most of it is already recorded.
+
+  > **CORRECTED 2026-07-29 by the boot-set audit, and it was wrong in two ways that would
+  > have cost a reader real time.** It read: *"The stream test ledger is at
+  > `reports/qa/stream_test/LEDGER.md`, its clusters at `CLUSTERS.md`, and it holds 571
+  > findings."*
+  >
+  > **First, the wrong FILE.** `LEDGER.md` does not hold the findings. Its own text says so:
+  > *"this ledger holds only the two entries below"*. A session following this instruction
+  > would have opened the ledger, found two rows, and concluded the corpus did not exist.
+  > The findings are in the shards; `CLUSTERS.md` counts and tiers them.
+  >
+  > **Second, the wrong TOTAL.** 566, not 571, counted from the shard headings.
+  > `CLUSTERS.md` carried the same overcount and is corrected there with the derivation.
+  > The "506 HIGH, MEDIUM or LOW" in this sentence was always right, and 60 STREAM plus 506
+  > is 566, so this document contained the evidence against its own total.
 - **26 STREAM clusters are dispositioned**: 1 CLOSED as not a defect (C-20, the balance
   readout claim, refuted by both panel seats), 18 owner-parked with a panel-corrected
   diagnosis, 7 REOPENED for re-clustering.

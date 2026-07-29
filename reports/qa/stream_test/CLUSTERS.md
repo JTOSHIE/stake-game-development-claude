@@ -4,15 +4,31 @@ JOB 2 of `reports/briefs/FS_SESSION1_STREAM_CLOSE_Prompt.md`. The ledger's findi
 grouped by DEFECT IDENTITY rather than by squad, so verification can settle a defect once
 instead of settling every report of it.
 
-Marshalled in the main loop at grep level, 2026-07-29, over 55 active shards.
+Marshalled in the main loop at grep level, 2026-07-29, over **54** active shards.
 
 Australian English, no em dashes or en dashes.
 
 ## Scale
 
-**571 active findings: 60 STREAM, 183 HIGH, 242 MEDIUM, 81 LOW.** Superseded native
+**566 active findings: 60 STREAM, 183 HIGH, 242 MEDIUM, 81 LOW.** Superseded native
 shards at `shards/superseded/` are excluded; their content was re-judged by the sight
 gate re-run and their surviving claims live in the re-run shards.
+
+> **CORRECTED 2026-07-29 by the boot-set audit. This line read "571 active findings" and
+> "over 55 active shards".** The four tier figures were and are exactly right; only the
+> total was wrong, by 5.
+>
+> **Derived, not estimated.** Counting the finding headings in the 54 active shard files,
+> `grep -cE "^## [A-Za-z0-9-]+ (STREAM|HIGH|MEDIUM|LOW) "`, gives STREAM 60, HIGH 183,
+> MEDIUM 242, LOW 81, total **566**. The components already summed to 566 in this document's
+> own sentence, so the error was visible on its face and survived anyway. It is also
+> corroborated from the other side: `KNOWN_OPEN.md` independently recorded "506 are HIGH,
+> MEDIUM or LOW", and 60 plus 506 is 566.
+>
+> **Why this one mattered.** 571 was quoted onward into `KNOWN_OPEN.md`, which briefs boot
+> from, and a total nobody can reproduce is the shape of claim that makes a whole register
+> untrustworthy. The shard count was 54 files, not 55: the 55th `.md` in that directory is
+> `SHARD_INDEX.md`, which is the index rather than a shard.
 
 This file clusters the **STREAM** tier, which is what `DONE MEANS` turns on. The HIGH,
 MEDIUM and LOW tiers are clustered only to a count here and are parked for Session 2.

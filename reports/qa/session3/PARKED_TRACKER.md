@@ -15,14 +15,25 @@ Australian English, no em dashes or en dashes.
 which built M02 and M03. The counts below are the CURRENT ones; Session 3's figures are kept
 in the right-hand column so the movement is visible rather than overwritten.
 
-| | Count | Session 3 left it at |
-|---|---|---|
-| Requirements with no proof path | **79** | 79 |
-| **HELD by a gate that has been seen to fail** | **29** | 14 |
-| PARKED with a stated reason | **50** | 65 |
-| of which BLOCKED on a Fable ruling rather than on budget | 5 | 5 |
-| of which genuinely unreachable by any mechanical proof | 6 | 6 |
-| of which awaiting an owner ruling on player money display | 1 | 0 |
+**AMENDED AGAIN 2026-07-29 by the currency-table session (`FS_CURRENCY_SERIAL_Prompt.md`) and
+confirmed by the boot-set audit (`FS_BOOT_SET_REALITY_Prompt.md`), which built M04 and found
+this table stale within a day.** REQ-108 moved from PARKED to HELD.
+
+| | Count | Session 4a left it at | Session 3 left it at |
+|---|---|---|---|
+| Requirements with no proof path | **79** | 79 | 79 |
+| **HELD by a gate that has been seen to fail** | **30** | 29 | 14 |
+| PARKED with a stated reason | **49** | 50 | 65 |
+| of which BLOCKED on a Fable ruling rather than on budget | 5 | 5 | 5 |
+| of which genuinely unreachable by any mechanical proof | 6 | 6 | 6 |
+| of which awaiting an owner ruling on player money display | **0** | 1 | 0 |
+
+The last row went back to 0 because the one requirement in it was REQ-108, and its ruling was
+obtained and applied: the platform's published table is authoritative over `Intl`. **A
+successor money-display question is open and is deliberately NOT counted here**, because it
+is a question about a platform contradiction rather than an unguarded requirement: the
+platform's own `CurrencyMeta` reference disagrees with its own Example column for 14 codes.
+It is tracked as `reports/FABLE_COMMS.md` entry 028.
 
 **What moved: 15 requirements, across two gates.**
 
@@ -45,7 +56,13 @@ NOT the same claim and are never merged here:
 - **PARKED, unreachable.** No mechanical proof exists and inventing a proxy would be the
   wrongly-solved failure convention (l.6) names.
 
-## HELD, 29 requirements now defended by a gate that has been seen to fail
+## HELD, 30 requirements now defended by a gate that has been seen to fail
+
+### Held by the currency-table session, 2026-07-29 (1)
+
+| REQ | Sev | Mechanism | Gate that would fail if it were broken |
+|---|---|---|---|
+| REQ-108 | STREAM | M04 currency-display-table | `frontend/scripts/currency_table_gate.mjs`, 589 assertions over 49 published codes crossed with 8 magnitude rungs, parsing the platform mirror at run time rather than restating it. Six seeded defects, the first being `CAD` rendering a bare `$`, which is byte-for-byte what shipped until 2026-07-29 |
 
 ### Held by Session 4a, 2026-07-29 (15)
 
@@ -129,9 +146,22 @@ with their trade-offs are set out in the evidence document. All five requirement
 parked; REQ-108 is now known to be **currently unmet** rather than merely unguarded, which is
 a different and more useful park than the one it had.
 
+> **AMENDED 2026-07-29 by the currency-table session and confirmed by the boot-set audit.
+> REQ-108 IS NO LONGER PARKED. It is MET and HELD**, so it moves out of this family and the
+> counts above move with it: **HELD 29 to 30, PARKED 50 to 49.** The four requirements below
+> it stay parked and their reason is unchanged.
+>
+> The paragraphs above are the Session 4a measurement and are left standing as the dated
+> record that produced the fix. Two of their figures are superseded: the divergence was **34
+> of 49**, not 23 of 36, because the 2026-07-29 capture publishes 13 more codes than the one
+> Session 4a measured; and **NZD does have a platform row**, `NZ$10.00`, so it is a Class A
+> defect rather than a scope exclusion, taking Class A from seven codes to eight. Gate:
+> `frontend/scripts/currency_table_gate.mjs`, 589 assertions, six seeded defects, wired in
+> CI with its self-test as its own step.
+
 | REQ | Sev | Requirement | Reason, where it differs from the family |
 |---|---|---|---|
-| REQ-108 | STREAM | The table at lines 51 to 100 is the display specification for every supported currency: fo | **CURRENTLY UNMET**, 23 of 36 measured |
+| REQ-108 | STREAM | The table at lines 51 to 100 is the display specification for every supported currency: fo | **MET AND HELD 2026-07-29.** 0 of 49 diverge, gated by `frontend/scripts/currency_table_gate.mjs` |
 | REQ-125 | STREAM | Determine the game's minimum win multiplier and render win amounts with 3 decimal places i | as above |
 | REQ-127 | STREAM | In-game win readouts must show the exact win amount with no rounding; the balance readout  | as above |
 | REQ-119 | MEDIUM | Keep currency out of round logic, bet arithmetic and outcome selection; it may change only | as above |

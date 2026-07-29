@@ -653,10 +653,62 @@ function scanTree(root) {
 
 const keyOf = (f) => `${f.cls}\u0000${f.file}\u0000${f.text}`
 
+/**
+ * The baseline's own HEADER must agree with its own BODY.
+ *
+ * `frozen_count` and `by_class` are written by `--freeze` and then never read
+ * again: every count this gate prints is recomputed from the `frozen` array. So
+ * they are decorative, and a decorative number inside a checked file is exactly
+ * the defect class this project keeps paying for.
+ *
+ * They drifted within 24 hours of being correct. The currency-table session
+ * burned one DEAD_SYMBOL entry from the array, which is precisely what the
+ * ratchet requires, and left the header saying 334 and 51 where the body held
+ * 333 and 50. Nobody was careless: the header is simply not something a person
+ * edits when they burn an entry, because nothing ever made them.
+ *
+ * So it is checked rather than trusted. Same argument as the both-directions
+ * rust check below: a number that cannot go wrong noisily will go wrong quietly,
+ * and this one is the number a reader quotes.
+ */
+export function baselineHeaderProblems(raw, entries) {
+  const problems = []
+  if (raw.frozen_count !== undefined && raw.frozen_count !== entries.length) {
+    problems.push(`frozen_count says ${raw.frozen_count}, the frozen array holds ${entries.length}`)
+  }
+  if (raw.by_class) {
+    const actual = {}
+    for (const e of entries) actual[e.cls] = (actual[e.cls] || 0) + 1
+    for (const cls of [...new Set([...Object.keys(raw.by_class), ...Object.keys(actual)])].sort()) {
+      if ((raw.by_class[cls] || 0) !== (actual[cls] || 0)) {
+        problems.push(`by_class.${cls} says ${raw.by_class[cls] ?? 0}, the array holds ${actual[cls] ?? 0}`)
+      }
+    }
+  }
+  return problems
+}
+
+/** Exit-on-failure wrapper. Kept separate so the self-test can drive the pure
+ *  predicate above without `process.exit` taking the harness with it. */
+function assertBaselineHeaderMatchesBody(raw, entries) {
+  const problems = baselineHeaderProblems(raw, entries)
+  if (!problems.length) return
+  console.error('DOC CURRENCY GATE: FAIL, the baseline disagrees with itself')
+  console.error('')
+  for (const p of problems) console.error(`  ${p}`)
+  console.error('')
+  console.error('An entry was burned or added without the header being recomputed. Either')
+  console.error('rerun  node scripts/qa/doc_currency_gate.mjs --freeze  or correct the header')
+  console.error('by hand. Do not skip it: the header is the only number in that file which')
+  console.error('nothing else checks, and it is the one a reader quotes.')
+  process.exit(1)
+}
+
 function loadBaseline() {
   if (!existsSync(BASELINE_PATH)) return { entries: [], keys: new Set() }
   const raw = JSON.parse(readFileSync(BASELINE_PATH, 'utf-8'))
   const entries = raw.frozen || []
+  assertBaselineHeaderMatchesBody(raw, entries)
   return { entries, keys: new Set(entries.map((e) => `${e.cls}\u0000${e.file}\u0000${e.text}`)), meta: raw }
 }
 
@@ -876,6 +928,41 @@ function selfTest() {
     commit('docs: the malformed predicate control')
     run('CONTROL 6  a malformed predicate is REPORTED, not skipped', 1,
       () => findingsFor('BADPRED.md', 'BAD_PREDICATE').length)
+
+    // ── SEED 7, THE BASELINE'S HEADER AGAINST ITS OWN BODY.
+    //
+    // Seeded in the form it really occurred, which is the whole of convention
+    // (p). On 2026-07-29 the currency-table session burned one DEAD_SYMBOL entry
+    // from the frozen array, exactly as the ratchet requires, and the header
+    // kept saying 334 and 51 while the body held 333 and 50. It survived a full
+    // green CI run, because every count the gate prints is recomputed from the
+    // array and nothing ever read the header. So the numbers a HUMAN quotes were
+    // the only numbers in the file that nothing checked.
+    //
+    // The seed is that exact off-by-one, not a dramatic one, because an
+    // off-by-one is what burning a single entry produces.
+    const body3 = [
+      { cls: 'DEAD_PATH', file: 'A.md', text: 'x' },
+      { cls: 'DEAD_PATH', file: 'B.md', text: 'y' },
+      { cls: 'DEAD_SYMBOL', file: 'C.md', text: 'z' },
+    ]
+    run('SEED 7a   frozen_count one ahead of the array, the burned-entry form', 1,
+      () => baselineHeaderProblems({ frozen_count: 4 }, body3).length)
+    run('SEED 7b   by_class disagreeing on one class', 1,
+      () => baselineHeaderProblems(
+        { by_class: { DEAD_PATH: 2, DEAD_SYMBOL: 2 } }, body3).length)
+    run('SEED 7c   a class present in the body and absent from the header', 1,
+      () => baselineHeaderProblems({ by_class: { DEAD_PATH: 2 } }, body3).length)
+
+    // PAIRED POSITIVES. A check that only ever says no is not a check, and this
+    // one guards a file that must stay editable by hand.
+    run('CONTROL 7a a header agreeing with its body is silent', 0,
+      () => baselineHeaderProblems(
+        { frozen_count: 3, by_class: { DEAD_PATH: 2, DEAD_SYMBOL: 1 } }, body3).length)
+    run('CONTROL 7b a baseline predating the header fields is not failed', 0,
+      () => baselineHeaderProblems({}, body3).length)
+    run('CONTROL 7c an empty baseline with an honest header is silent', 0,
+      () => baselineHeaderProblems({ frozen_count: 0, by_class: {} }, []).length)
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }

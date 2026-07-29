@@ -204,8 +204,16 @@ Stated so the gate is not oversold, per the standing habit of naming what is not
   dead reference, in the form "component-name dot svelte no longer exists", is flagged as
   though it CLAIMED the path exists. Found the honest way: writing up a provenance failure in `WAYS_OF_WORKING.md`
   made the gate fail on its own author. **This is not a small class.**
-  `docs/records/reviews/REVIEW_TRACKER.md` is the largest baseline contributor at 59
-  entries and carries 44 negation phrases. The structural fix is a negation-aware check,
+  `docs/records/reviews/REVIEW_TRACKER.md` is the largest baseline contributor at **58**
+  entries and carries 44 negation phrases. **CORRECTED 2026-07-29 by the boot-set audit: this
+  read 59 and was right when written.** One `DEAD_SYMBOL` entry, `CurrencyMeta @
+  frontend/src/lib/utils/currency.ts`, was burned on 2026-07-29 when the currency-table
+  session named that symbol in a comment and the finding stopped firing. The entry went, the
+  sentence did not, and the number was stale inside a day. **That is this document describing
+  its own subject matter**, so it is corrected in place rather than quietly, and the
+  provenance is kept: a count in prose is a claim with no predicate holding it, which is the
+  argument for section 4's annotation convention stated against this page's own text. The
+  structural fix is a negation-aware check,
   treating a report of absence as distinct from a claim of presence, and it is Session 3
   follow-up rather than something to bolt onto a gate that runs first in CI.
 - **A backticked GLOB reads as a path.** Found while amending this very section: a pattern

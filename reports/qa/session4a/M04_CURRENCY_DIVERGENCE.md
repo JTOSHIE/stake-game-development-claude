@@ -5,6 +5,23 @@
 M04 was ranked 4th by coverage and was the third gate this session intended to build. It
 was **stopped before it was built**, on a measurement, and this file is that measurement.
 
+> **SUPERSEDED 2026-07-29 AS A STATEMENT OF CURRENT STATE. Still valid as a dated
+> measurement, which is what it is.** Read it as evidence of what was true on the
+> 2026-07-04 capture, never as a description of HEAD.
+>
+> | This file says | Current, verified 2026-07-29 |
+> |---|---|
+> | 36 supported codes | **49.** The 2026-07-29 capture adds 13 |
+> | 23 diverge | **34 of 49 did.** The 23 here are confirmed exactly; 11 of the 13 new codes also diverged |
+> | Class A is 7 codes | **8.** NZD joins it, see the correction below |
+> | NZD has no platform row | **It has one**, `NZ$10.00` |
+> | REQ-108 PARKED, currently unmet | **MET and GATED.** 0 of 49 diverge |
+>
+> Nothing here was wrong when written. The platform's table grew. The fix, the gate and the
+> full reconciliation are in `reports/qa/currency_table_2026-07-29/` and
+> `frontend/scripts/currency_table_gate.mjs`; the recount is in `reports/FABLE_COMMS.md`
+> entry 028.
+
 Australian English, no em dashes or en dashes.
 
 ---
@@ -49,6 +66,26 @@ recount changes the answer:
 `currency.ts:25`'s supported list but has no row in the platform's Supported Currencies
 table, so REQ-108 states no display specification for it. It cannot diverge from a
 specification that does not exist. That is not a defect; it is a scope correction.
+
+> **CORRECTED 2026-07-29 by the boot-set audit. THE PARAGRAPH ABOVE IS FALSE AGAINST THE
+> CURRENT CAPTURE, and it inverted a disposition.** It is left standing because this is a
+> dated measurement record and rewriting it would destroy the evidence, but it must not be
+> read as current.
+>
+> **NZD has a row.** `docs/stake-engine-live/2026-07-29/rgs.md:130` publishes
+> `New Zealand Dollar	NZD	NZ$	NZ$10.00`. The paragraph was true against the 2026-07-04
+> capture this file measured, and the 2026-07-29 full capture adds 13 codes including NZD.
+> So NZD is not a scope exclusion, it is a **Class A defect**: the game rendered a bare `$`
+> on a New Zealand balance, which a player reads as United States dollars. Fixed and gated
+> 2026-07-29, see `frontend/scripts/currency_table_gate.mjs`.
+>
+> **The second citation in the same paragraph is also stale.** `currency.ts:25` no longer
+> holds a supported-currency list; that line is now part of the file's header comment. The
+> list it referred to was replaced by `PLATFORM_CURRENCIES`.
+>
+> **The lesson is the one this file itself argues.** A measurement against a dated capture
+> is only as current as the capture, and nothing here said which capture it used until the
+> line below was read carefully. The table it measured has since grown by 13 rows.
 
 ---
 

@@ -12,6 +12,20 @@ Australian English, no em dashes or en dashes.
 findings, none of them verified.** The adversarial pass did not run; see
 `../LEDGER.md` for why that was a deliberate stop rather than an omission.
 
+> **AUDITED 2026-07-29 by the boot-set audit. `519 frames` CONFIRMED. `47 shards` is
+> UNKNOWN and is left standing rather than changed, because it cannot be settled from the
+> tree and guessing at it would be worse than saying so.**
+>
+> The derivation, so nobody repeats it: 20 shards are in `superseded/` and 28 re-run shards
+> replaced them, leaving 26 active shards that predate the re-run. 26 plus 20 is **46 shard
+> files**, and `git log --diff-filter=D` over this directory shows **none was ever deleted**.
+> So either one squad returned no file at all, which `FULL_AUDIT_METHOD.md` 4.1 requires to
+> be reported as LOST rather than omitted, or 47 is an overcount by one.
+>
+> **Not load-bearing**, which is why it is marked and not chased: no brief instructs
+> anything on the shard count, and the finding totals are counted from the files themselves.
+> The CURRENT active count is 54 shards, which is what `CLUSTERS.md` marshals.
+
 ## PROVISIONAL: the small-viewport shards, per FABLE RULING 4 (2026-07-29)
 
 The 20 shards covering `popout-s`, `mobile-l`, `mobile-m` and `mobile-s` were judged at

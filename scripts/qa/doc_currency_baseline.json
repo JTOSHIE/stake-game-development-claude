@@ -9,12 +9,12 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 334,
+  "frozen_count": 333,
   "by_class": {
     "DEAD_DOCREF": 12,
     "DEAD_PATH": 250,
     "STALE_LINE": 10,
-    "DEAD_SYMBOL": 51,
+    "DEAD_SYMBOL": 50,
     "DEAD_COMMIT": 11
   },
   "frozen": [
