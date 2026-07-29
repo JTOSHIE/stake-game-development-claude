@@ -12,8 +12,10 @@ Australian English, no em dashes or en dashes.
 ## 024 - 2026-07-29 - DECISION REQUEST: the requirements register now exists, 232 rows, and 82 of 194 requirements have NO PROOF PATH. Plus two items from 023 still open.
 
 **Session 2 of the audit, Opus 5 ultra, container orchestration only, no lock exceptions.**
-Brief at `reports/briefs/FS_SESSION2_AUDIT_ONE_Prompt.md`. 64 agents across three workflow
-runs, **64 COMPLETED, 0 LOST**. No project script ran, so no committed evidence was written.
+Brief at `reports/briefs/FS_SESSION2_AUDIT_ONE_Prompt.md`. **73 agents across four workflow
+runs, 73 COMPLETED, 0 LOST**, counted from each run's own usage block: 9 register, 23
+compliance walk, 18 census and currency, 23 verifier seats. No project script ran, so no
+committed evidence was written.
 
 **What was built.** There was no consolidated requirements register in this repository. There
 is now one, at `reports/qa/compliance_register/REGISTER.md`, **232 platform requirements**,
