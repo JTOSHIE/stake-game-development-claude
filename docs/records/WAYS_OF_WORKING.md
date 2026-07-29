@@ -9,6 +9,21 @@ something that has already either saved a session or cost one.
 
 Australian English, no em dashes or en dashes.
 
+**PRECEDENCE, and it is a condition of this document's acceptance.** Fable accepted this
+document on 2026-07-29 on the standing condition that it CROSS-REFERENCES `CLAUDE.md`
+rather than duplicating it, and that **any conflict resolves to `CLAUDE.md`**, which
+remains the single source of truth for builder conduct. That condition is discharged here
+and binds every future edit: if a rule belongs in `CLAUDE.md`, this document points at it
+and does not restate it. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins
+and this document is the one that is wrong.
+
+Rules cited here and OWNED elsewhere, so nobody edits the copy instead of the original:
+protocol rules 1 to 15 and conventions (a) to (r) live in `CLAUDE.md`; the cost model lives
+in `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md`; audit method lives in
+`docs/skills/FULL_AUDIT_METHOD.md`. **This document owns only the role split, the three
+ceremonies, Definition of Ready and Done, and the transcription step.** Everything else in
+it is a pointer.
+
 Companion documents. This one owns WHO does what and WHEN.
 `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md` owns what it costs.
 `docs/skills/FULL_AUDIT_METHOD.md` owns how an audit is done.

@@ -128,8 +128,27 @@ exceptions. Do not allowlist a false positive that can be fixed structurally.
 
 ## 6. Scope, wiring and the ratchet
 
-- **Scan**: all tracked `.md` outside `reports/archive/` and `docs/stake-engine-live/`.
-  Upstream captures are verbatim third-party text and are not ours to keep current.
+- **Scan**: all tracked `.md` outside the epoch-trapped classes below.
+
+  **AMENDED 2026-07-29, after the build session raised the contradiction this spec
+  contained.** Section 4 above says dated records are not to be kept current, because
+  re-checking them against a moved HEAD is the epoch trap. This line originally excluded
+  only two paths, which did not carry that reasoning through. **Section 4 is the one that
+  is right.** Five exclusions, and the reason each one is not optional:
+
+  | Excluded | Why |
+  |---|---|
+  | `reports/archive/` | Dated records of what was true then |
+  | `docs/stake-engine-live/` | Verbatim third-party captures, not ours to keep current |
+  | `reports/briefs/` | **Convention (f) forbids editing a brief.** A finding here is FORBIDDEN TO FIX, and a gate demanding an impossible action is broken, not strict |
+  | `reports/SESSION_REPORT.md` | `reports/archive/` holds per-session EXTRACTS of this file, so the same sentences were excluded in one path and scanned in another |
+  | any path segment `shards` (see the gate's OUT_OF_SCOPE_SEGMENTS) | Dated signed squad evidence. Was being flagged FOR CORRECTLY REPORTING a dead path |
+
+  **Still scanned, deliberately**: ledgers, dispositions, trackers, `CLAUDE.md`, the specs,
+  every live working document. A stale citation there misleads someone about to act, which
+  is the whole point. 341 of the original 492 frozen claims are in this class and all are
+  held. Implemented at `scripts/qa/doc_currency_gate.mjs`, seeded with three controls plus
+  a paired positive seed proving the exclusions are a narrowing and not a retreat.
 - **Wire**: a static-gate step in `checks.yml`, after `locked_paths_gate.mjs`.
 - **Expect a large first count.** Session 2 found 63 stale claims in a sample, so the true
   figure across every document will be higher. **Use the frozen-debt ratchet**
@@ -168,6 +187,19 @@ Stated so the gate is not oversold, per the standing habit of naming what is not
   checkable but disagree with each other, unless both carry predicates. The payments case is
   caught because one side is checkable against a path, not because the gate understands the
   disagreement.
+- **It reads a citation, never the sentence around it.** A live document that REPORTS a
+  dead reference, in the form "component-name dot svelte no longer exists", is flagged as
+  though it CLAIMED the path exists. Found the honest way: writing up a provenance failure in `WAYS_OF_WORKING.md`
+  made the gate fail on its own author. **This is not a small class.**
+  `docs/records/reviews/REVIEW_TRACKER.md` is the largest baseline contributor at 59
+  entries and carries 44 negation phrases. The structural fix is a negation-aware check,
+  treating a report of absence as distinct from a claim of presence, and it is Session 3
+  follow-up rather than something to bolt onto a gate that runs first in CI.
+- **A backticked GLOB reads as a path.** Found while amending this very section: a pattern
+  in a table cell was reported dead because no literal file is named that. Globs inside
+  fenced blocks are safe, since fences are excluded, so this only bites in running prose
+  and tables. Same root as the item above, and the same fix: judge the token by what the
+  document is DOING with it, not by its shape alone.
 - **It does not judge whether a document should exist.** That is the file census.
 - **It does not make the docs mirror current.** That is convention (d), and Session 2 showed
   the live site is only reachable under headless chromium, never plain fetch.
