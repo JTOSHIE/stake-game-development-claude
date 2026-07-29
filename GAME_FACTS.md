@@ -48,6 +48,14 @@ verified against the books.
 | Wincap frequency | 1 in 100,000 (0.001%) |
 | RTP split | Base ways 53.3500% + Overdrive free-spin rounds 38.0000% + wincap rounds 5.0000% = 96.3500% |
 
+**The hard cap and the grid are checked against the maths package itself on every CI run,
+not restated from memory here.** These two are annotated ahead of the prettier figures on
+purpose: convention (l.1) says derive from the specification first, and the worked example
+that produced that convention was a scatter count reported from measurement when
+`num_reels = 5` was one line of specification away.
+<!--CHECK: grep "_WINCAP = 5000.0" games/future_spinner/game_config.py-->
+<!--CHECK: grep "self.num_reels = 5" games/future_spinner/game_config.py-->
+
 ### Bonus buy mode (cost 100.0x)
 
 | Metric | Value |

@@ -115,8 +115,13 @@ const UNRESOLVABLE_PREFIXES = [
 // package's generated outputs are reported UNRESOLVABLE rather than dead. They
 // exist on a machine that has run the simulation and nowhere else, and this gate
 // reads git.
+// VERIFIED against the tree rather than copied from `.gitignore`, because the
+// two disagree: `**/library/**` is ignored, and nine files under it are tracked
+// anyway, `publish_files/` among them. Those nine ARE the submission artefact
+// set, which makes it the worst possible place for the gate to be blind, so
+// `library` is deliberately absent from this list.
 const UNRESOLVABLE_SEGMENTS = new Set([
-  'books', 'books_compressed', 'lookup_tables', 'library', 'configs', 'forces',
+  'books', 'books_compressed', 'lookup_tables', 'configs', 'forces',
   'optimization_files', 'node_modules', '__pycache__', 'site', 'target',
 ])
 

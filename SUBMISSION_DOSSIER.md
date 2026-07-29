@@ -261,6 +261,15 @@ the artefacts, was the defect.
 | **REPO-COMMITTED** | `index.json`, `game_metadata.json`, and the five `lookUpTable_<mode>_0.csv` files. **Seven files.** | This repository |
 | **LOCAL UPLOAD SET** | Those seven **plus** the five `books_<mode>.jsonl.zst`. **Eleven files.** | The build machine, plus an owner-held **Google Drive** copy of the full `games` directory (2026-07-28). Sharing scope is an owner-controlled setting and is tracked in `COMPLIANCE_WATCH.md`; the link itself is deliberately not recorded in this public repository. |
 
+**The repository-committed set is seven files, and the five lookup tables are five, and
+both counts are now machine-checked on every CI run rather than asserted here.** This is
+the exact claim whose earlier wording said "all eleven now present", which was true of the
+build machine and false of this repository, and which three external reviewers cloned and
+correctly raised as a BLOCKER. A count that is written down is a count that goes stale; a
+count that is checked cannot.
+<!--CHECK: count=7 games/future_spinner/library/publish_files/*-->
+<!--CHECK: count=5 games/future_spinner/library/publish_files/lookUpTable_*_0.csv-->
+
 **The upload set is what goes to the ACP. The books are deliberately NOT in the
 repository** and never will be, per the Fable ruling of 2026-07-28: LFS bandwidth on a
 public repo, no platform requirement to commit them, and decisively, the books are the

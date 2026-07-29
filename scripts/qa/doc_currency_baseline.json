@@ -9,10 +9,10 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 482,
+  "frozen_count": 485,
   "by_class": {
     "DEAD_DOCREF": 26,
-    "DEAD_PATH": 357,
+    "DEAD_PATH": 360,
     "STALE_LINE": 22,
     "DEAD_SYMBOL": 63,
     "DEAD_COMMIT": 13,
@@ -345,6 +345,12 @@
     },
     {
       "cls": "DEAD_PATH",
+      "file": "docs/math_docs/overview_section/game_format.md",
+      "text": "game/library/",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
       "file": "docs/math_docs/overview_section/game_struct.md",
       "text": "config_fe.json",
       "detail": "does not exist at HEAD"
@@ -401,6 +407,12 @@
       "cls": "DEAD_PATH",
       "file": "docs/math_docs/source_section/file_info.md",
       "text": "force.json",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "docs/math_docs/source_section/file_info.md",
+      "text": "game/library/",
       "detail": "does not exist at HEAD"
     },
     {
@@ -1367,6 +1379,12 @@
       "cls": "DEAD_DOCREF",
       "file": "REPLAY_TEST_EVENTS.md",
       "text": "games/future_spinner_collect/COLLECT_PROTOTYPE_FINDINGS.md",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/briefs/FS_GAP_CURRENCY_GATE_Prompt.md",
+      "text": "census.mjs",
       "detail": "does not exist at HEAD"
     },
     {
