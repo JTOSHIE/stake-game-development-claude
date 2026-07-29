@@ -161,5 +161,54 @@ checkThat('interpretEvents is called exactly once, for every round',
 checkThat('the interpreter call is NOT gated on freeSpinTrigger',
   !/freeSpinTrigger[\s\S]{0,200}interpretEvents\(/.test(src))
 
+// ── Gate 13b: bookEvents are consumed in the ORDER THE BOOK SUPPLIES ─────────
+// REQ-132, mechanism M01 of reports/qa/session3/MECHANISMS.md.
+//
+// WHY THIS ASSERTION LIVES HERE RATHER THAN IN THE BROWSER GATE, recorded
+// because the wrong home was tried first and cost three attempts.
+// `replay_contract_gate.mjs` covers the other ten requirements of M01 by driving
+// the built bundle, and the obvious move was to cover this one the same way: run
+// a round, reorder its events, watch the rendered total change. It does not
+// change, and the reason is not a defect. The rendered `.win-area` is the win
+// PRESENTATION, several transforms downstream of the value that actually depends
+// on order, so the browser is simply the wrong instrument: it can see that a
+// total was rendered, never which event decided it.
+//
+// The order dependence is exact and it is right here, two lines of interpreter:
+//   roundInterpreter.ts:274-279  scans BACKWARDS for the last `finalWin`
+//   roundInterpreter.ts:211-213  `running = Number(ev.amount ?? running)`
+// so the LAST `setTotalWin` in array order decides the running total. Asserting
+// it at this level is direct, cheap and cannot be confounded by presentation.
+console.log('\nEVENT ORDER: the supplied order decides the outcome')
+{
+  const ordered = (fixtures as any).base.win.events
+  const trunk = ordered.filter((e: any) => e.type !== 'setTotalWin' && e.type !== 'finalWin')
+  const stw = (amount: number) => ({ index: 0, type: 'setTotalWin', amount })
+  const fin = (amount: number) => ({ index: 0, type: 'finalWin', amount })
+
+  // A pure ORDER SWAP: identical events, opposite sequence. Nothing else differs,
+  // so any difference in the interpreted result is attributable to order alone.
+  const aThenB = interpretEvents([...trunk, stw(390), stw(777), fin(777)] as any)
+  const bThenA = interpretEvents([...trunk, stw(777), stw(390), fin(777)] as any)
+  const lastOf = (s: { baseSpin: { runningTotalCentibets: number } }) => s.baseSpin.runningTotalCentibets
+  checkThat('swapping two setTotalWin events changes the interpreted running total',
+    lastOf(aThenB) !== lastOf(bThenA))
+  check('the LAST setTotalWin in the supplied array decides the total', lastOf(aThenB), 777)
+  check('and swapping them settles on the other value', lastOf(bThenA), 390)
+
+  // The backward finalWin scan, asserted rather than assumed. Two finalWin
+  // events: the LAST one in array order must win. A client that took the first,
+  // or that sorted by the events' own `index` field, fails here.
+  const twoFinals = interpretEvents([...trunk, stw(390), fin(111), fin(222)] as any)
+  check('with two finalWin events the LAST supplied one decides the payout',
+    twoFinals.totalWinCentibets, 222)
+
+  // NEGATIVE CONTROL: the unmodified fixture must still interpret as it did, so
+  // this block cannot go green by breaking the interpreter it is testing.
+  const untouched = interpretEvents(ordered as any)
+  check('NEGATIVE CONTROL: the real round still interprets to its book payout',
+    untouched.totalWinCentibets, 390)
+}
+
 if (failures) { console.error(`\nREPLAY ROUNDS: FAIL (${failures})`); process.exit(1) }
 console.log('\nREPLAY ROUNDS: PASS')

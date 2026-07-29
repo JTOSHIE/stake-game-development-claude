@@ -627,6 +627,15 @@ jobs:
           # that the post-run assertion goes RED on a seeded leaked child.
           - name: "browser: preview server"
             run: node scripts/preview_server_gate.mjs --self-test && node scripts/preview_server_gate.mjs
+          # M01 of reports/qa/session3/MECHANISMS.md. ELEVEN platform
+          # requirements had no proof path and ten of them are properties of one
+          # observable: what the shipped bundle DOES at a replay URL. Bet Replay
+          # is mandatory, so this is the highest-consequence gap Session 2 found.
+          # The eleventh, REQ-132 event ordering, is asserted on the interpreter
+          # in the wired "replay rounds" step instead, because the browser can
+          # see that a total was rendered but never which event decided it.
+          - name: "browser: replay contract"
+            run: node scripts/replay_contract_gate.mjs --self-test && node scripts/replay_contract_gate.mjs
 
     steps:
       - name: Check out
