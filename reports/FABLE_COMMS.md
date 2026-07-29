@@ -9,6 +9,59 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 027 - 2026-07-29 - DECISION REQUEST: 23 of 36 currencies diverge from the platform's published display table, nothing regressed, and the proof that passed tested four codes
+
+**Player money display, so convention (l.8) sends it to you and the owner rather than to a
+builder.** Session 4a measured it, escalated it, and did not touch it. Full evidence at
+`reports/qa/session4a/M04_CURRENCY_DIVERGENCE.md`.
+
+**THE FINDING.** `formatBalance()` output was compared against the Example column of the
+platform's own Supported Currencies table for all 36 supported codes. **23 diverge.** Seven
+of those show the player **a different currency's symbol**: CAD, MXN, SGD, TWD, CLP and ARS
+render a bare `$`, which a Canadian or Mexican player reads as United States dollars, and
+CNY renders `¥`, the Japanese yen sign. Nine more put the symbol on the wrong side of the
+number, seven differ in symbol form or spacing.
+
+**THE PLATFORM SPECIFICATION IS CURRENT, VERIFIED ON TWO INDEPENDENT CAPTURES.** The
+measurement used the 2026-07-04 mirror. The 2026-07-29 full capture, taken three weeks later
+by a different session with a different script, carries the identical table: `CAD CA$10.00`,
+`CNY CN¥10.00`, `MXN MX$10.00`, `TWD NT$10.00`, `SGD SG$10.00`, `CLP 10 CLP`,
+`ARS 10.00 ARS`. Per convention (l.4) those are genuinely independent inputs, so the
+specification is not in doubt.
+
+**NOTHING REGRESSED, AND THIS IS THE PART THAT DECIDES THE RULING.** The owner's recollection
+that the currency work was passing is correct. `reports/qa/currency_conformance_2026-07-25.json`
+records a PASS, and its `dom` block tested **exactly four codes: USD, JPY, XSC, XGC.** All
+four still pass today. The 23 divergences are all in codes that proof never examined. **This
+has been shipping in this state throughout; it is a coverage gap, not a breakage.**
+
+**IT IS ALSO THIS PROJECT'S OWN RECORDED FAILURE MODE, FOR AT LEAST THE FIFTH TIME:** a proof
+whose scope was a handful of hand-picked cases, reporting PASS over a class it never looked
+at. Identical in shape to TR-060's dash gate whose `FILES` list was two files, to the social
+conformance script, and to `build_diet_verify.mjs`. Convention (p) exists because of this
+pattern, and a currency proof covering 4 of 36 codes is the same defect wearing different
+clothes.
+
+**THE DIAGNOSIS IS ONE LINE.** `frontend/src/lib/utils/currency.ts` derives fiat symbols from
+`Intl`, which renders a LOCALE CONVENTION, where the requirement binds a PUBLISHED DISPLAY
+SPECIFICATION. The tell is in what passes: **XGC and XSC are correct, and they are the only
+two the project wrote its own table for.** Every failure is a fiat code delegated to `Intl`;
+every pass among the virtual currencies is a row somebody wrote down.
+
+**WHAT WE NEED FROM YOU.** (1) **Is the platform's published Supported Currencies table
+authoritative over `Intl` for display?** If yes the fix shape follows directly: table the
+fiat codes exactly as XGC and XSC already are. (2) **Scope**, all 23 in one pass or Class A's
+seven wrong-currency cases first. (3) Confirmation that this runs as a **serial money-path
+session** per protocol rule 4, with a gate covering **all 36 codes rather than a sample**,
+since sampling is what produced this.
+
+Two smaller items from the same session also await a ruling: **REQ-016's TM line**, which
+conflicts with the standing no-Stake-branding rule, and **REQ-124's $0.10 floor** at
+`games/future_spinner/game_config.py:106`, which is locked and needs a sanction request
+rather than an edit.
+
+---
+
 ## 026 - 2026-07-29 - TRANSCRIPTION: your five rulings are now in the record and in the protocol, plus a DECISION REQUEST on four unacknowledged entries
 
 **The rule you made to stop premise decay had itself decayed before it landed.** Issued
