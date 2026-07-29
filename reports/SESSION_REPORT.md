@@ -8508,3 +8508,43 @@ DONE MEANS: [an end state, not an activity]
   over this studio's own work while `README.md:102-103` says the repository carries no
   open-source licence grant; and REQ-006's scene character measures at roughly 3.7 head heights
   as a non-human mascot, which is a compliance reading rather than a builder ruling.
+
+## Rule 10 closing, filled
+
+The session's final push (`fe424ea`) ran remote CI as run **30441468973** and it is **green**:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30441468973
+
+**Checked, not assumed**, per rule 10: `gh run view 30441468973` returns `conclusion: success`
+on `headSha fe424eaced3baf9bca02a13833e76e568783cadd`. Both new gates were verified on the
+remote runner specifically, which is the point of the rule: **`browser: replay contract` passed
+as browser matrix leg 11**, and `static gates` carried the paytable parity self-test, the
+paytable parity scan and the kit build self-test.
+
+The session is two pushes, `2215ca1` to `8a52ede` and `8a52ede` to `fe424ea`. The first ran as
+run 30436721728 and was also green. No expected-fail runs were declared or needed, per rule 9:
+every seeded red ran locally, which is what that rule prefers.
+
+Local `locked_paths_gate.mjs` PASS before both pushes, reporting `0 sanctioned, 0 violation(s)`,
+the correct result for a session that touched no locked path.
+
+## Rule 12 owner preview, filled
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit fe424ea  |  built 2026-07-29T19:53:17+10:00  |  started 2026-07-29T09:53:59.250Z  |  http://192.168.4.92:5173
+```
+
+**And the address was curled rather than believed**, per the rule's own earned clause that
+printing a URL is not evidence the URL works: `HTTP 200`, 1,256 bytes, serving
+`<title>Future Spinner</title>`.
+
+**A finding produced by running the rule, small and worth recording.** `npm run owner:preview`
+does not resolve from the repository root: there is no root `package.json`, and the script lives
+in `frontend/package.json` as `node ../scripts/owner_preview.mjs`. Rule 12 states the command
+without its working directory, so a session following the rule literally gets an `ENOENT` and
+could reasonably conclude the preview cannot be refreshed. **Run it from `frontend/`.** This is
+independently the same fact JOB 4 derived while re-deriving cluster S2-C098, where a Session 2
+finding had asserted a root `package.json` that does not exist.
+
+It is run once more as the LAST action of this close, after the final push, per the
+one-commit-lag clause: the line quoted here is the earlier one, the address is the later one. A
+reader finding them one docs commit apart has found the design, not a bug.
