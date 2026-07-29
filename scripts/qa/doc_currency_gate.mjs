@@ -101,7 +101,47 @@ const REPO_ROOT = resolve(new URL('../..', import.meta.url).pathname)
 const BASELINE_PATH = join(REPO_ROOT, 'scripts', 'qa', 'doc_currency_baseline.json')
 
 // Dated records and verbatim upstream captures. Prefix match on the repo-relative path.
-const OUT_OF_SCOPE = ['reports/archive/', 'docs/stake-engine-live/']
+//
+// WIDENED 2026-07-29 by the Head of Engineering, on the scope question the gate's
+// own build session raised and correctly refused to decide for itself. Recorded
+// here rather than in a commit message alone, because a scope narrowing that
+// shrinks a frozen baseline must carry its reason where the next reader will
+// find it.
+//
+// THE SPEC CONTRADICTED ITSELF. `DOC_CURRENCY_GATE_SPEC.md` section 4 says dated
+// records are not to be kept current, because re-checking them against a moved
+// HEAD is the epoch trap (`FULL_AUDIT_METHOD.md` 2.2). Section 6's scan scope
+// then excluded only `reports/archive/`. Section 4 is the one that is right, and
+// three more classes belong under it:
+//
+//   1. `reports/briefs/`. THE DECISIVE CASE, and it is one entry. Convention (f)
+//      says a brief is saved verbatim and is NEVER tidied or corrected, because
+//      it is the evidence for every claim its session makes. The gate froze a
+//      dead reference inside a brief, so it was holding a finding that is
+//      FORBIDDEN TO FIX. A gate that demands an impossible action is broken, not
+//      strict.
+//   2. `reports/SESSION_REPORT.md`. The exclusion was already incoherent:
+//      `reports/archive/` holds per-session EXTRACTS of this very file, so the
+//      same sentences were excluded in one path and scanned in another.
+//   3. `**/shards/`. Dated, signed squad evidence from one epoch. A shard
+//      reporting "orphan: x.png does not exist" was being flagged FOR CORRECTLY
+//      REPORTING A DEAD PATH, which penalises accurate findings.
+//
+// WHAT IS DELIBERATELY STILL SCANNED, so this is a narrowing and not a retreat:
+// ledgers, dispositions, trackers, CLAUDE.md, the specs and every other LIVE
+// working document. A stale citation in those misleads someone about to act, and
+// that is the whole point of the gate. 341 of the 492 frozen claims were in this
+// class and every one of them is still held.
+const OUT_OF_SCOPE = [
+  'reports/archive/',
+  'docs/stake-engine-live/',
+  'reports/briefs/',
+  'reports/SESSION_REPORT.md',
+]
+
+// Path SEGMENT match rather than prefix, since shards live at
+// `reports/qa/<topic>/shards/`. Same epoch-trap reasoning as above.
+const OUT_OF_SCOPE_SEGMENTS = ['/shards/']
 
 // Gitignored trees that legitimately exist without being tracked. A reference
 // into one of these cannot be judged from git, so it is reported UNRESOLVABLE
@@ -174,7 +214,10 @@ function commitResolves(sha, cwd = REPO_ROOT) {
 
 // ── the scope question, asked once ───────────────────────────────────────────
 
-const inScope = (f) => f.endsWith('.md') && !OUT_OF_SCOPE.some((p) => f.startsWith(p))
+const inScope = (f) =>
+  f.endsWith('.md')
+  && !OUT_OF_SCOPE.some((p) => f.startsWith(p))
+  && !OUT_OF_SCOPE_SEGMENTS.some((s) => f.includes(s))
 
 // ── glob matching, shared by the path classes and the phase 2 predicates ─────
 //
@@ -746,6 +789,35 @@ function selfTest() {
       () => findingsFor('reports/archive/2026-07-01_old.md').length)
     run('CONTROL 2  a verbatim upstream capture is NOT flagged', 0,
       () => findingsFor('docs/stake-engine-live/general/capture.md').length)
+
+    // ── NEGATIVE CONTROLS 2b to 2d. The three epoch-trapped classes widened
+    // into OUT_OF_SCOPE on 2026-07-29. Seeded because a scope change that
+    // SHRINKS a frozen baseline must be provable, not asserted: each of these
+    // carries every defect the gate knows and must be silent.
+    write('reports/briefs/FS_SOME_Prompt.md', everyDefect)
+    write('reports/SESSION_REPORT.md', everyDefect)
+    write('reports/qa/some_topic/shards/S01.md', everyDefect)
+    run('CONTROL 2b a brief, which convention (f) forbids editing, is NOT flagged', 0,
+      () => findingsFor('reports/briefs/FS_SOME_Prompt.md').length)
+    run('CONTROL 2c the living session report is NOT flagged', 0,
+      () => findingsFor('reports/SESSION_REPORT.md').length)
+    run('CONTROL 2d a dated signed squad shard is NOT flagged', 0,
+      () => findingsFor('reports/qa/some_topic/shards/S01.md').length)
+
+    // ── SEED 9. THE OTHER HALF OF THAT CHANGE, and the one that stops it being
+    // a retreat. The SAME defects in a LIVE working document must still fail.
+    // Without this, CONTROL 2b to 2d could be satisfied by a gate that had
+    // simply stopped working.
+    write('reports/qa/some_topic/LEDGER.md', everyDefect)
+    // COMMIT before asserting. `write` only touches disk and `scanTree` reads
+    // TRACKED files, so an uncommitted seed is not scanned at all. Learned here
+    // the useful way: without this line CONTROL 2b to 2d passed for the WRONG
+    // REASON, silent because untracked rather than silent because excluded, and
+    // SEED 9 is what exposed it. That is precisely the job a paired positive
+    // seed does for a negative control.
+    commit('docs: the scope controls and their live-document counterpart')
+    run('SEED 9  a LIVE ledger carrying the same defects IS still flagged', 5,
+      () => findingsFor('reports/qa/some_topic/LEDGER.md').length)
 
     // ── NEGATIVE CONTROL 3. Every defect above, inside a FENCED CODE BLOCK, in
     //    an in-scope document. This is the blind spot the header declares, and
