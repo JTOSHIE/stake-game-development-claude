@@ -652,6 +652,34 @@ jobs:
         working-directory: frontend
         run: node scripts/dist_hygiene_gate.mjs
 
+      # ── Gate 13f: the submission delivery set ────────────────────────────────
+      # M03 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
+      # (REQ-164, 169, 170, 171, 172, 173, 174, 176) with no proof path, all of
+      # them properties of one read-only walk of design-system/brand/delivery/
+      # plus the kit payload layout.
+      #
+      # It DECODES the PNG alpha plane rather than reading the header, because
+      # "a genuine alpha channel" is not a colour type: a PNG can be RGBA with
+      # every alpha byte at 255, which is an opaque image wearing an alpha
+      # channel and is exactly what "save as PNG" from a flattened composite
+      # produces. That file passes any header check and then covers the
+      # background at the platform. IHDR, IDAT, one inflate and the five
+      # scanline filters, about sixty lines, no image dependency in CI.
+      #
+      # REQ-174 is measured as alpha COVERAGE RETENTION at tile size, which is
+      # the mechanism behind the requirement's own stated concern about thin
+      # strokes, and the gate says plainly that this is not a legibility score.
+      # Measured on the shipped mark: 100.1% retention against a 50% floor.
+      #
+      # AFTER the production build, deliberately: the REQ-176 half reads dist,
+      # and its negative control proves an ABSENT dist is not reported as a
+      # breach, so the placement is checked rather than assumed.
+      - name: delivery set, seeded-violation self-test
+        run: node scripts/qa/delivery_set_gate.mjs --self-test
+
+      - name: delivery set conformance
+        run: node scripts/qa/delivery_set_gate.mjs
+
       # ── Gate 14: the books verifier fails closed ─────────────────────────────
       # Run at HEAD with the private books absent, the verifier produced five
       # `zstd: can't stat` errors, processed zero rounds, made zero assertions
