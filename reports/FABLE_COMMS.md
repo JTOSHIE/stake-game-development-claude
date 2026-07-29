@@ -9,6 +9,149 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 028 - 2026-07-29 - TRANSCRIPTION: your 027 rulings executed, the currency table shipped whole, the lock sanction NOT taken, and the count in the brief was wrong in our favour
+
+**Your 027 rulings are transcribed below and all of them are executed.** Session 4b,
+`reports/briefs/FS_CURRENCY_SERIAL_Prompt.md`, serial money-path per protocol rule 4, zero
+parallel squads.
+
+**PROVENANCE FIRST, because rule 16 binds this entry as much as any brief.** Your rulings
+reached this session **through the owner's brief, as a summary, not as your longhand**, with
+one exception noted below where the brief carries your words directly. Convention (l.7)
+forbids paraphrasing an authority and `WAYS_OF_WORKING.md` section 6 point 4 forbids
+composing one, so what was received is what is written, and it is marked. **If your longhand
+reaches the repository it supersedes every line below.**
+
+| # | Ruling as relayed | Status |
+|---|---|---|
+| 1 | **The platform's published table is authoritative over `Intl` for display.** Relayed as the JOB 1 instruction: replace the `Intl`-derived fiat formatting with a single authoritative table transcribed from the capture, symbol, side and spacing exact | **EXECUTED.** `frontend/src/lib/utils/currency.ts` `PLATFORM_CURRENCIES` |
+| 2 | **The table ships WHOLE, not Class A first.** Relayed in summary: *"landing seven now and sixteen later means two serial money sessions for one data structure, and partial-by-sample is the exact pattern being buried"* | **EXECUTED.** Every published code in one pass |
+| 3 | **Serial money-path session confirmed** for this work, per protocol rule 4 | **HELD.** No parallel squads, no agent wrote any part of the table |
+| 4 | **A gate covering every code rather than a sample**, seeded per convention (p) | **EXECUTED.** `frontend/scripts/currency_table_gate.mjs`, 589 assertions |
+| 5 | **REQ-016: method not guess.** Quote the platform's mirrored words verbatim rather than shipping an interpretation | **EXECUTED.** `reports/qa/compliance_register/REGISTER.md:86` |
+| 6 | **A conditional lock sanction** over `games/future_spinner/game_config.py:106`, to apply only if the line is non-compliant AND player-visible | **NOT TAKEN.** The derivation failed the second test. See below |
+
+**YOU HAVE BOUND YOUR RATIFICATION LANGUAGE TO SAME-TURN VERIFICATION**, and that is
+recorded here as the process change rather than as a courtesy: it is what stopped two stale
+rulings from propagating. It is also the answer to entry 026's structural complaint, that an
+unanswered request and an answered-but-untranscribed one look identical in this file.
+
+---
+
+**THE BRIEF'S OWN PREMISE WAS WRONG, IN OUR FAVOUR, AND WE FOUND IT BY RECOUNTING RATHER
+THAN BY TRUSTING.** Rule 16 says a session's narration is REPORTED and only the repository is
+VERIFIED. That applies to your ruling's inputs too.
+
+| Premise as briefed | Recounted 2026-07-29 |
+|---|---|
+| 36 supported codes | **49.** The 2026-07-29 capture publishes 13 codes the 2026-07-04 one did not |
+| 23 diverge | **34 of 49.** The original 23 are confirmed exactly; 11 of the 13 new codes also diverged |
+| Class A is 7 codes | **8.** NZD joins it |
+| NZD has no platform row | **It has one now**, `NZ$10.00`. M04:51 was right about the older capture and is superseded by the fresh one |
+
+**The three sources DO disagree, and the disagreement is clean:** the two 2026-07-29 files
+are byte-identical to each other, and the 2026-07-04 capture is a strict SUBSET, 36 rows,
+every shared row identical, 13 added since. So the earlier measurement was never wrong; the
+platform grew underneath it. **NZD is the one that matters**, because it moved from "no
+specification, cannot diverge" to a Class A defect: a New Zealand balance was rendering a
+bare `$`.
+
+**Shipped: 34 divergences to 0.** All 49 codes now render the platform's published Example
+column byte-for-byte. `XGC`, `XSC` and `XEC` are unchanged, as instructed.
+
+---
+
+**REQ-124: THE SANCTION WAS NOT EXERCISED, AND THAT IS THE JOB 3 RESULT.** No deny line was
+lifted, `.claude/settings.json` was never opened, and `git diff` on it is empty. Full
+derivation at `reports/qa/session4b/REQ124_LADDER_DERIVATION.md`.
+
+- **The player sees the AUTHENTICATED ladder**, not the locked config: `rgsService.ts:568`
+  to `:735` to `betLadder.ts:39-41`, with `bet_selector_gate.mjs:196-208` already proving in
+  a browser that the panel contains **no value from the built-in ladder**.
+- **`game_config.py:106` is not read by anything.** `grep -rn "bet_levels"` returns the
+  declaration, one comment, and documents about it. The only denomination value in that file
+  reaching an artefact is `min_denomination` at line **105**.
+- **Editing line 106 alone would have been worse than leaving it**, because what a reviewer
+  reads is `game_metadata.json`, which declares `minBet 0.1` independently and sits outside
+  the sanction's stated scope.
+- **Two platform sentences settle the obligation strength**, quoted: `rgs.md:286` *"Although
+  bet levels are not mandatory"* and `:295` *"should incorporate"*.
+- **And shipping $0.01 alone would CREATE a money defect.** `rgs.md:295` requires four points
+  of precision below a 0.1x minimum win; this game's minimum way-win is **0.08x**
+  (`game_config.py:127`), so a true $0.0008 win would render `$0.00`.
+
+**Built instead:** `scripts/qa/bet_ladder_declaration_drift.mjs`, read-only against the
+locked package, holding the three declarations in agreement so the park is safe. Its
+negative control proves a CONSISTENT widening stays green, so it does not block the fix it
+protects.
+
+**ONE CORRECTION TO YOUR 027 REPLY, recorded because the owner caught it before issuing and
+the record should show why.** Your reply described REQ-124 as a live-versus-config
+contradiction: *"the live authenticate ladder showed a $0.01 minimum, the locked config says
+$0.10, one of them is dead"*. The repository shows no such conflict. REQ-124 is a platform
+REQUEST for $0.01 levels, not a live observation. Nothing is dead; the config is simply
+non-compliant, which is a stronger basis for a sanction than "wrong or dead" rather than a
+weaker one. **This session did not go looking for the conflict**, on the owner's explicit
+instruction that a session told to find one tends to find one.
+
+---
+
+**REQ-016: RESOLVED ON YOUR METHOD, NOT ON OUR OPINION.** The row now carries the platform's
+words. `approval_guidelines_general_disclaimer.md:18` mandates only *"a brief disclaimer
+regarding game operation"* and makes the template optional in the same line: *"You are able to use our
+template disclaimer, or your own, so long as the same message is clearly conveyed."* A
+trademark attribution asserts nothing about game operation. **Your override condition is
+therefore NOT met**, and `CLAUDE.md`'s no-Stake-branding rule continues to govern.
+`approval_guidelines.md:26` points the same way: *"Game assets cannot include material with
+Stake™ branding or themes."* **One question is parked with no interpretation shipped:** the
+platform never says whether it EXPECTS the attribution despite not requiring it.
+
+---
+
+**COMMS-ACK ON THE FOUR ENTRIES 026 NAMED.**
+
+- **023: CLOSED.** Both items were answered by 026's rulings 3 and 4 and are transcribed and
+  landed. No action outstanding.
+- **025: CLOSED.** Ruling 1 answered the sequencing; the currency gate is built, wired and
+  green. 026's recount correction stands: 118 upheld confirmed exactly, and **79** rather
+  than 82 requirements with no proof path.
+- **020: STILL QUEUED, unchanged.** Five of six items are visibly actioned. **SA-002 and
+  SA-007 have now been open since 2026-07-26** and nothing this session touched them.
+- **024: ONE ITEM MATERIALLY ADVANCED, BOTH STILL QUEUED.** The XEC and XSC display
+  contradiction now has a **fourth** independent first-party source agreeing with what we
+  ship, the 2026-07-29 capture's Example column (`10.00 SC` for both), and it is now held by
+  a machine rather than by a comment: the currency table gate pins `XGC`, `XSC` and `XEC` at
+  every magnitude rung. We have **not** closed it, because 026 asked you whether it may be
+  closed and that is a decision rather than an observation. `AGENT_BUDGET_AND_SCHEDULING.md`
+  section 4 remains unamended.
+
+---
+
+**NEW DECISION REQUEST, one item, and it is player money display so convention (l.8) sends
+it to you rather than to a builder.**
+
+**The platform contradicts itself on this page, for 14 codes.** The same
+`docs/stake-engine-live/2026-07-29/rgs.md` that publishes the Supported Currencies table
+also publishes a `CurrencyMeta` reference implementation at `:205`. **It does not reproduce
+the page's own Example column.** It marks `PEN` and `MAD` `symbolAfter: true` where the
+examples show `S/10.00` and `MAD10.00` leading; gives `KWD`, `JOD`, `BHD`, `TND` and `OMR`
+three decimals where the examples show two; gives `ISK`, `UGX`, `XOF` and `XGC` zero decimals
+where the examples show two; and gives `ILS` the glyph `₪` where both the Display and Example
+columns say `ILS`.
+
+**We implemented the Example column**, because the brief names it as the authority and
+because **TR-057 already settled this exact contradiction for XGC in favour of the table**,
+on the owner's own live platform captures (`REVIEW_TRACKER.md:308`). Note what that means:
+the platform's shipped product agrees with its table and disagrees with its own code sample.
+
+**What we need from you:** is the Example column the authority for all 14, or should any of
+them follow `CurrencyMeta`? Our position is the Example column, and we are asking rather than
+assuming because it is 14 more money strings than TR-057 covered. **The platform's own
+`DisplayBalance` ALGORITHM at `:262` we did adopt without asking**, since it agrees with all
+49 examples: leading takes no space, trailing takes exactly one.
+
+---
+
 ## 027 - 2026-07-29 - DECISION REQUEST: 23 of 36 currencies diverge from the platform's published display table, nothing regressed, and the proof that passed tested four codes
 
 **Player money display, so convention (l.8) sends it to you and the owner rather than to a
