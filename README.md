@@ -101,3 +101,11 @@ We Roll Spinners. The visual and audio assets are produced in-house from vector 
 
 No Stake branding appears in any shipped asset or string. The repository carries no
 open-source licence grant: it is published for platform review and audit, not for reuse.
+See `LICENSE`, which grants nothing over that original work.
+
+**Third party components.** This repository was created from the Stake Engine math SDK,
+which its authors publish under the MIT licence so that studios can build titles on it.
+Those components remain MIT licensed and their notice is retained verbatim at
+`THIRD_PARTY_LICENSES.md`, which lists exactly which paths they cover. That grant reaches
+the SDK and nothing else. Note that `games/future_spinner/` is We Roll Spinners' own maths
+package despite sitting inside a directory the SDK defines.

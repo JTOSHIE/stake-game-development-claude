@@ -1,21 +1,27 @@
-MIT License
+Copyright (c) 2025-2026 We Roll Spinners. All rights reserved.
 
-Copyright (c) 2025 Stake Engine
+NO LICENCE IS GRANTED.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The game design, artwork, audio, frontend, maths package and documentation in this
+repository are original works of We Roll Spinners. They are published here for platform
+review and audit only. No permission is granted to use, copy, modify, merge, publish,
+distribute, sublicense or sell any part of them.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+THIRD PARTY COMPONENTS
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This repository was created from the Stake Engine math SDK, which its authors publish
+under the MIT licence so that studios can build titles on it. Those components remain
+under the MIT licence and their notice is retained, in full and verbatim, at
+THIRD_PARTY_LICENSES.md, which also lists exactly which paths they are.
+
+That MIT grant covers the SDK components and nothing else. It does not extend to the
+original work described above, which sits alongside them in this tree.
+
+NOTE ON THE HISTORY, kept because the record should be honest
+
+Until 2026-07-29 this file contained the SDK's MIT licence verbatim, naming Stake Engine
+as the copyright holder. It arrived with the SDK when this repository was created and was
+never revisited, so a maximally permissive grant sat at the root of a tree that had come
+to hold an entire original commercial title, contradicting README.md, which stated that
+the repository carried no open-source licence grant. The contradiction is resolved here in
+favour of what README.md always said.
