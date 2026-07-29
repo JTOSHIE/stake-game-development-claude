@@ -207,6 +207,12 @@ call: do not launch wave B while wave A is unchecked.*
 - [ ] **SMOKE TEST.** Wait two minutes after launch, then confirm the running agents carry
       the ids you expect. *This one check would have caught a 3.55M error in under two
       minutes.*
+- [ ] **Every factual citation checked against the REPOSITORY, not against narration.**
+      A tool, file or figure learned from what a session SAID is REPORTED until an `ls` or
+      `grep` confirms it. This has now failed twice: a stale compliance line that reached a
+      brief as a VERIFIED premise, and a script named in narration that was never
+      committed and does not exist. **Both would have died on one command.** Applies to
+      the Head of Engineering's own briefs above all, per `WAYS_OF_WORKING.md` 3.1
 - [ ] **Can the model physically SEE it?** For any image work, check the source resolution
       before judging. Upscale small viewports first. *A 320x568 frame is about 240 image
       tokens and fine detail is not resolvable in it; a lens that judges it anyway is

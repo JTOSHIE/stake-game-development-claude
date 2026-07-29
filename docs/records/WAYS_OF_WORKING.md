@@ -75,6 +75,32 @@ The Plan of Record and the Product Owner's rulings are checks on the Head of Eng
 not on the fleet, and they should be read that way. Be suspicious when the session says
 something is fine without showing the arithmetic.
 
+### 3.1 The Head of Engineering's own provenance rule, earned twice
+
+Fable's PREMISE PROVENANCE rule binds every brief. It binds the briefs the Head of
+Engineering WRITES most of all, and the pattern is recorded because it has now happened
+twice with the same shape:
+
+- **The payments line.** A stale claim in `COMPLIANCE_WATCH.md` was read, treated as
+  evidence, and written into a work order as an instruction.
+- **`census.mjs`.** A script named in a session's NARRATION was cited in the next brief as
+  the tool that had done the work. It had been written to scratch and never committed. It
+  does not exist. The gate found it in the brief that commissioned the gate.
+
+**The common cause is not carelessness, it is a category error: treating what a session
+SAID as equivalent to what the repository HOLDS.** A session's narration is REPORTED. Only
+the repository is VERIFIED.
+
+So the standing rule for this role: **every factual citation in a brief is checked against
+the repository before the brief is issued, and a citation that came from narration rather
+than from a file is REPORTED until checked.** The check is a `ls` or a `grep`. It costs
+seconds. Both failures above would have died on one command.
+
+The corollary for the owner, and it saves effort: **do not paste session narration for the
+Head of Engineering to work from.** The artefacts are in git and git is authoritative. If
+something important exists only in narration and not in a commit, that absence is itself
+the finding.
+
 ---
 
 ## 4. The three ceremonies
