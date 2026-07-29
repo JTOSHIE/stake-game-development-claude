@@ -9,10 +9,10 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 485,
+  "frozen_count": 492,
   "by_class": {
     "DEAD_DOCREF": 26,
-    "DEAD_PATH": 360,
+    "DEAD_PATH": 367,
     "STALE_LINE": 22,
     "DEAD_SYMBOL": 63,
     "DEAD_COMMIT": 13,
@@ -2632,6 +2632,12 @@
     {
       "cls": "DEAD_PATH",
       "file": "reports/SESSION_REPORT.md",
+      "text": "BalanceDisplay.svelte",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
       "text": "bg_highquality_1920x1080.jpg",
       "detail": "does not exist at HEAD"
     },
@@ -2692,6 +2698,12 @@
     {
       "cls": "DEAD_PATH",
       "file": "reports/SESSION_REPORT.md",
+      "text": "census.mjs",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
       "text": "claude/",
       "detail": "does not exist at HEAD"
     },
@@ -2699,6 +2711,18 @@
       "cls": "DEAD_PATH",
       "file": "reports/SESSION_REPORT.md",
       "text": "client.ts",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
+      "text": "ControlBar.svelte",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
+      "text": "Counter.svelte",
       "detail": "does not exist at HEAD"
     },
     {
@@ -2771,6 +2795,24 @@
       "cls": "DEAD_PATH",
       "file": "reports/SESSION_REPORT.md",
       "text": "math/HASHES.txt",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
+      "text": "OverdriveMeter.svelte",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
+      "text": "PayTable.svelte",
+      "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "DEAD_PATH",
+      "file": "reports/SESSION_REPORT.md",
+      "text": "player_string_dash_check.mjs",
       "detail": "does not exist at HEAD"
     },
     {
