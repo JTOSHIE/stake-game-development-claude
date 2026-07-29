@@ -53,11 +53,29 @@
 //
 // SCOPE
 // -----
-// Every tracked `.md` EXCEPT `reports/archive/` and `docs/stake-engine-live/`.
-// The first are dated records of what was true then, and re-checking them
-// against a moved HEAD is exactly the epoch trap (`FULL_AUDIT_METHOD.md` 2.2).
-// The second are verbatim third-party captures and are not ours to keep current.
-// Both remain valid TARGETS: a reference INTO them resolves normally.
+// Every tracked `.md` EXCEPT FIVE classes, enumerated at OUT_OF_SCOPE and
+// OUT_OF_SCOPE_SEGMENTS below, which is the authority. Restated here only
+// because a reader meets this comment first:
+//
+//   reports/archive/            dated records of what was true then
+//   docs/stake-engine-live/     verbatim third-party captures, not ours to keep current
+//   reports/briefs/             convention (f) forbids editing a brief, so a finding
+//                               here is FORBIDDEN TO FIX
+//   reports/SESSION_REPORT.md   the same dated records, copied verbatim into
+//                               reports/archive/, so the identical sentences were
+//                               excluded in one path and scanned in another
+//   any path segment `shards`   dated signed squad evidence
+//
+// Re-checking a dated record against a moved HEAD is exactly the epoch trap
+// (`FULL_AUDIT_METHOD.md` 2.2). All five remain valid TARGETS: a reference INTO
+// any of them resolves normally.
+//
+// THIS COMMENT WAS ITSELF STALE, and it is worth recording rather than quietly
+// correcting. It named TWO exclusions against a code list of five, from the
+// 2026-07-29 scope amendment that added three and never updated the prose eighty
+// lines above it. Found by reading, in Session 3's JOB 5, because the gate reads
+// citations and never the prose around them, so **it cannot check its own
+// header**. That blind spot is declared below and this is what it costs.
 //
 // THE FROZEN-DEBT RATCHET, per `FULL_AUDIT_METHOD.md` 3.1
 // -------------------------------------------------------
