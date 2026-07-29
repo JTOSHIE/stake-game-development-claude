@@ -431,10 +431,25 @@ Quoted: **"the required math range for all modes must fall within the range 90.0
 all five modes, inside the band with 0.35pp of headroom. Already the ceiling this project
 has been building to.
 
-### 5. New payments documentation page. NOT YET MIRRORED.
+### 5. New payments documentation page. SUPERSEDED BY ENTRY 7 BELOW, 2026-07-29.
 
 `https://stake-engine.com/docs/payments`. Named here so the docs-refresh pass fetches it
 rather than discovering it late.
+
+**STRUCK 2026-07-29. This entry said NOT YET MIRRORED and was already false when written.**
+The page was mirrored to `docs/stake-engine-live/2026-07-25/payments.md` in commit `b440145`
+at 17:22 on 2026-07-25, **thirty four minutes after** commit `d1b5b83` wrote this line at
+16:48 the same day. Entry 7 below records the mirror correctly. The two entries then sat
+thirteen lines apart contradicting each other for four days.
+
+Kept rather than deleted, because the failure is the useful part: **entry 7 was added without
+striking entry 5**, and a document that contradicts itself is worse than one that is merely
+stale, since a reader has no way to tell which half to trust. The cost was real and
+measurable: this stale line was carried forward into
+`reports/briefs/FS_SESSION2_AUDIT_ONE_Prompt.md` as a VERIFIED premise, instructing a session
+to treat the payments page as a known corpus gap and to name it as missing. It is not
+missing. **When adding an entry that resolves an earlier one, strike the earlier one in the
+same edit.**
 
 ### 6. Roadmap, recorded for awareness rather than action.
 
@@ -594,3 +609,99 @@ of the maths, and it is stated that way per convention (l.4).
 
 All five modes COMPLIANT, all at 96.35%, all 5,000x max win, BASE 6 of 6 with cross-mode
 RTP variance 0.00%.
+
+---
+
+## DOCS WATCH, 2026-07-29: the first COMPLETE capture, and two real deltas
+
+Convention (d) run as JOB 1a of `reports/briefs/FS_SESSION2_AUDIT_ONE_Prompt.md`. Full note
+at `docs/stake-engine-live/2026-07-29/DELTA_NOTES.md`.
+
+**64 pages, all 64 rendered**, being every page the live docs navigation exposes. The
+repository previously held four PARTIAL captures totalling 603 prose lines across 8 files with
+newest content dated 2026-07-04. Committed at `docs/stake-engine-live/2026-07-29/`.
+
+**The capture selector is `document.querySelector('main')`, and this matters.** A first pass
+read `document.body.innerText` and every overlapping page came back larger by a near identical
++1020 characters. That was the navigation sidebar, not content. Reading `main` returns 872
+characters for `general-disclaimer`, **byte identical to the 2026-07-04 capture**, and eight of
+the ten overlapping approval-guidelines pages match on sha256 across two different sessions
+running two different scripts. That is corroboration with genuinely independent inputs per
+convention (l.4), and it is what licenses the two differences below to be read as real.
+
+### Delta 1. `math-verification`: a NEW file size restriction, and 3-star exposure doubled
+
+Quoted verbatim:
+
+> In order to limit RGS instability caused by large file downloads:
+>
+> No single events file (.jsonl.zst) can exceed 4.2GB
+> No game mode can contain more than 10,000,000 events
+>
+> Files/modes exceeding this size will fail on publish.
+
+**COMPLIANT on both, measured rather than assumed:**
+
+| Limit | Published | Ours | Margin |
+|---|---|---|---|
+| Single events file | 4.2GB | **146MB**, largest of the five | about 29x under |
+| Events per mode | 10,000,000 | **100,000 rows**, every mode | 100x under |
+
+The 10,000,000 figure is section 3 of the 2026-07-25 platform delta above, relayed from
+Discord and already verified compliant. What is new is that it now appears in the **official
+documentation**, and that it arrives beside a file size cap the project had no record of at all.
+
+**3-star Maximum Exposure moved from `$25,000,000` to `$50,000,000`.** Payout multiplier
+(`100,000x`) and bet cost (`$500,000`) unchanged; the 2-star tier unchanged at `$10,000,000`.
+A raised ceiling owes no build work; recorded so any submission-facing number is the current one.
+
+### Delta 2. `rgs-communication`: 13 new currencies, and XEC SETTLES THE OPEN CONTRADICTION
+
+Added: PKR, EGP, NZD, BOB, GHS, KES, MAD, BAM, ISK, TZS, UGX, XOF and **XEC**.
+
+Section 2 of the 2026-07-25 platform delta above is headed *"CONTRADICTION: SC display format.
+NEEDS A RULING, affects XSC as well as XEC."* The platform currency reference now carries both
+rows. Quoted verbatim, tab separated as upstream renders them:
+
+```
+Stake Cash	XSC	SC	10.00 SC
+Stake Euro Cash	XEC	SC	10.00 SC
+```
+
+**Both TRAILING.** We ship trailing, `1,000.00 SC`, under Fable ruling 2 of 2026-07-26, which
+rested on the currency reference documenting `symbolAfter: true` and on the official
+`StakeEngine/ts-client` SDK (`XSC: { symbol: 'SC', decimals: 2, symbolAfter: true }`). The
+Discord announcement's *"displayed using the SC format (e.g. SC 1,000)"*, which is leading and
+which created the contradiction, is now contradicted by the platform's own current documentation
+for both currencies.
+
+**A third independent first-party source, agreeing with what we ship.** Recorded as evidence
+for the ruling and NOT as the ruling: convention (l.8) leaves a player-money display question
+with the owner and Fable. What the builder can state is that this capture indicates no change
+to shipped behaviour. Carried into `reports/FABLE_COMMS.md` for closure.
+
+### What did not change, and one page that no longer exists
+
+Eight of ten overlapping pages byte identical on sha256: `approval-guidelines`,
+`front-end-communication`, `game-quality-rankings`, `game-replay-requirements`,
+`game-tile-requirements`, `general-disclaimer`, `jurisdiction-requirements`,
+`submission-checklist`. The RTP band is among them and is unchanged, quoted with the platform's
+own en dash: *"The calculated Return to Player (RTP) must be within 90.0%–96.70%. For multiple
+modes, all must fall within a 0.5% variation"*. Future Spinner is 96.35% in all five modes, so
+the 0.5% cross-mode clause is satisfied by construction at 0.00% spread.
+
+**The `changelog` slug is gone.** It resolved to `https://stake-engine.com/docs/updates`, absent
+from the current navigation. Its 2026-07-04 capture was already 88 characters and already
+recorded `looks_real: false`, so nothing was lost, but it should not be carried forward as a
+live page.
+
+**Not captured, named so silence is not read as coverage:**
+`https://stake-engine.com/docs-content/distribution_optimization.pdf`, linked from the docs
+navigation, is a binary rather than a rendered page.
+
+### The 35 maths SDK pages are captured but OUT OF SCOPE
+
+They carry 161 of the corpus's 466 candidate normative statements. Excluded from the
+requirements register per `docs/skills/FULL_AUDIT_METHOD.md` section 5: the maths package is
+locked and wants its own audit pass with its own sanction. Captured and committed regardless, so
+that pass does not begin by re-fetching them.

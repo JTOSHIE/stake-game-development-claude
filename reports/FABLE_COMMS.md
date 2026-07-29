@@ -9,6 +9,97 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 024 - 2026-07-29 - DECISION REQUEST: the requirements register now exists, 232 rows, and 82 of 194 requirements have NO PROOF PATH. Plus two items from 023 still open.
+
+**Session 2 of the audit, Opus 5 ultra, container orchestration only, no lock exceptions.**
+Brief at `reports/briefs/FS_SESSION2_AUDIT_ONE_Prompt.md`. 64 agents across three workflow
+runs, **64 COMPLETED, 0 LOST**. No project script ran, so no committed evidence was written.
+
+**What was built.** There was no consolidated requirements register in this repository. There
+is now one, at `reports/qa/compliance_register/REGISTER.md`, **232 platform requirements**,
+assembled from the first COMPLETE capture of the live docs: **64 of 64 pages rendered**,
+committed at `docs/stake-engine-live/2026-07-29/`. The repository previously held four partial
+captures, 603 prose lines, newest content dated 2026-07-04.
+
+**THE HEADLINE, and it is the proof column rather than the implementation column.** All 194
+in-scope requirements were walked to an implementation path AND a proof path, each opened and
+quoted:
+
+| | |
+|---|---|
+| SATISFIED, implementation and real proof both quoted | 89 |
+| **NO_PROOF**, implemented but nothing would fail if broken | **71** |
+| NOT_MET | 26 |
+| UNKNOWN, honestly unresolved | 7 |
+| N_A | 1 |
+
+**82 of 194 requirements have no proof path** (65 with nothing at all, 17 defended only by a
+script that is not wired into CI). Correct code with nothing defending it is one careless edit
+from being incorrect code. Verification upheld 118 of 126 clusters, struck 7.
+
+**1. FOR RULING: the XEC and XSC display format contradiction is now settled by the platform
+itself, in our favour.** Entry 022 and `COMPLIANCE_WATCH.md` carried this as NEEDS A RULING.
+The `rgs-communication` page captured today adds 13 currencies and carries both rows, quoted
+verbatim, tab separated as upstream renders them:
+
+```
+Stake Cash	XSC	SC	10.00 SC
+Stake Euro Cash	XEC	SC	10.00 SC
+```
+
+**Both TRAILING**, which is what we ship under your ruling 2 of 2026-07-26. The Discord
+announcement's leading *"SC 1,000"* is now contradicted by the platform's own current
+documentation. This is a third independent first-party source agreeing with the build.
+Convention (l.8) puts a player-money display question with you rather than the builder, so:
+**may the contradiction be closed as resolved, no build change?** Nothing has been changed
+unilaterally.
+
+**2. FOR AWARENESS, no action owed: a new platform limit we had no record of.**
+`math-verification` gained *"No single events file (.jsonl.zst) can exceed 4.2GB"* and
+*"No game mode can contain more than 10,000,000 events"*. **Compliant with margin, measured:**
+largest shipped events file 146MB (about 29x under), every mode 100,000 rows (100x under).
+3-star Maximum Exposure also rose from `$25,000,000` to `$50,000,000`.
+
+**3. A METHOD CORRECTION worth your view, because it contradicts our own method document.**
+`AGENT_BUDGET_AND_SCHEDULING.md` section 4 recommends per-cluster verification as "the
+default", on the strength of Session 1 reducing 540 findings to about 40 clusters. **That 13x
+reduction came from OVERLAP**: 26 squads read the same 26 frames through different lenses.
+This session partitioned 41 squads into DISJOINT scopes, so cross-squad corroboration is
+**zero** and 315 findings collapsed to only 311 clusters. Per-cluster verification would have
+cost **29.5M against about 5.0M available**. Batching several findings per verifier cost
+**2.2M**. So: **clustering is cheap only when discovery OVERLAPPED; for a partitioned wave the
+lever is batching, and the two are different mechanisms that do not compose.** Recommend
+section 4 be amended to say so.
+
+**4. STILL OPEN FROM 023, neither answered, carried rather than lapsed.**
+
+- **(a) Whether 19 per cent diagnosis soundness changes the method.** This session has a
+  partial answer and it is measured. Its confirmation rate is far higher, 118 of 126 upheld,
+  **but not because the squads were better**: most findings here are "no proof path exists",
+  which is a checkable FACT, whereas Session 1 verified DIAGNOSES, which are inferences. The
+  control group proves it: the **27 clusters that did assert a cause** came back
+  CONFIRMED_WRONG_CAUSE, close to Session 1's rate. **A claim-a-path task verifies far better
+  than a diagnose-a-defect task and the two should be trusted differently.** The builder's
+  provisional UNKNOWN rule stands until you rule otherwise.
+- **(b) Acceptance or amendment of `docs/records/WAYS_OF_WORKING.md`**, particularly section 6
+  (the transcription step) and section 9 (what was deliberately stripped). Unchanged and
+  unaccepted since 023.
+
+**5. A FAULT OF MINE, recorded rather than smoothed.** The brief's own premises named the
+payments page as an unmirrored corpus gap. **It was not missing**: it was mirrored on
+2026-07-25, thirty four minutes after `COMPLIANCE_WATCH.md:434` said it had not been.
+Entry 7 recorded the mirror correctly and **entry 5 was never struck**, so the document
+contradicted itself thirteen lines apart for four days and the stale half was carried into a
+brief as a VERIFIED premise. Now struck, with the lesson recorded: when an entry resolves an
+earlier one, strike the earlier one in the same edit.
+
+**Evidence.** `reports/qa/compliance_register/` (REGISTER, PROJECT_CLAIMS, 9 register shards,
+23 walk shards); `reports/qa/session2_audit/` (LEDGER, DISPOSITIONS, 23 verifier shards);
+`reports/qa/file_census/`; `reports/qa/doc_currency/`; `docs/stake-engine-live/2026-07-29/`.
+
+**Next.** 185 MEDIUM and LOW clusters are parked with resume state. Session 3 takes the four
+never-swept waves: audio, social-mode capture, accessibility, animation timing.
+
 ## 023 - 2026-07-29 - DECISION REQUEST: Session 1 closed, 26 STREAM clusters verified, only 19 per cent of diagnoses survived, and a delivery structure for your acceptance
 
 Session 1 of the stream close ran to its DONE MEANS and closed green. 80 agents, zero
