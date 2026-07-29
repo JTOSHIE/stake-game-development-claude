@@ -11,13 +11,30 @@ Australian English, no em dashes or en dashes.
 
 ## Counts
 
-| | Count |
-|---|---|
-| Requirements with no proof path | **79** |
-| **HELD by a gate built this session** | **14** |
-| PARKED with a stated reason | 65 |
-| of which BLOCKED on a Fable ruling rather than on budget | 5 |
-| of which genuinely unreachable by any mechanical proof | 6 |
+**AMENDED 2026-07-29 by Session 4a** (`reports/briefs/FS_SESSION4A_MECHANISMS_Prompt.md`),
+which built M02 and M03. The counts below are the CURRENT ones; Session 3's figures are kept
+in the right-hand column so the movement is visible rather than overwritten.
+
+| | Count | Session 3 left it at |
+|---|---|---|
+| Requirements with no proof path | **79** | 79 |
+| **HELD by a gate that has been seen to fail** | **29** | 14 |
+| PARKED with a stated reason | **50** | 65 |
+| of which BLOCKED on a Fable ruling rather than on budget | 5 | 5 |
+| of which genuinely unreachable by any mechanical proof | 6 | 6 |
+| of which awaiting an owner ruling on player money display | 1 | 0 |
+
+**What moved: 15 requirements, across two gates.**
+
+| Gate | Mechanism | Requirements held | Wired as |
+|---|---|---|---|
+| `frontend/src/lib/i18n/disclaimer_conformance.test.ts` | M02 | 7 of 8 | `disclaimer conformance` |
+| `scripts/qa/delivery_set_gate.mjs` | M03 | 8 of 8 | `delivery set conformance` |
+
+REQ-016 is the one M02 did not take, and it is parked deliberately rather than missed: it
+asks whether the platform template's closing TM line is itself mandatory, `NO_PROOF_SET.tsv`
+records it UNKNOWN and says in terms that it should be ruled, and it sits against this
+project's own no-Stake-branding rule. A gate cannot settle that.
 
 **A park is a complete answer, not a failure**, per the brief. But the three kinds of park are
 NOT the same claim and are never merged here:
@@ -28,7 +45,29 @@ NOT the same claim and are never merged here:
 - **PARKED, unreachable.** No mechanical proof exists and inventing a proxy would be the
   wrongly-solved failure convention (l.6) names.
 
-## HELD, 14 requirements now defended by a gate that has been seen to fail
+## HELD, 29 requirements now defended by a gate that has been seen to fail
+
+### Held by Session 4a, 2026-07-29 (15)
+
+| REQ | Sev | Mechanism | Gate that would fail if it were broken |
+|---|---|---|---|
+| REQ-038 | STREAM | M02 disclaimer-conformance | social disclaimer scanned with `includeNeverRewrite`, which is what puts "currency" in scope |
+| REQ-010 | HIGH | M02 disclaimer-conformance | English concept match, plus six-sentence parity in all sixteen locales |
+| REQ-011 | HIGH | M02 disclaimer-conformance | as above |
+| REQ-012 | HIGH | M02 disclaimer-conformance | as above; the seeded defect is this clause dropped from `de` |
+| REQ-013 | HIGH | M02 disclaimer-conformance | as above |
+| REQ-014 | HIGH | M02 disclaimer-conformance | as above |
+| REQ-015 | HIGH | M02 disclaimer-conformance | as above, plus the untranslated `Remote Game Server` anchor in all sixteen |
+| REQ-174 | HIGH | M03 delivery-set | alpha coverage retention at tile size, 100.1% measured against a 50% floor |
+| REQ-164 | MEDIUM | M03 delivery-set | background plus foreground byte sum against the 3MB ceiling, logo excluded |
+| REQ-169 | MEDIUM | M03 delivery-set | decoded alpha plane, not the IHDR colour type |
+| REQ-170 | MEDIUM | M03 delivery-set | `<GameTitle>-FG.png` by name |
+| REQ-171 | MEDIUM | M03 delivery-set | logo hash against every other delivered file |
+| REQ-172 | MEDIUM | M03 delivery-set | decoded alpha plane, same class as the foreground |
+| REQ-173 | MEDIUM | M03 delivery-set | `<ProviderName>-Logo.png`, provider name first |
+| REQ-176 | MEDIUM | M03 delivery-set | `dist/index.html` at the dist root, and the kit copies dist into the payload |
+
+### Held by Session 3, 2026-07-29 (14)
 
 | REQ | Sev | Mechanism | Requirement |
 |---|---|---|---|
@@ -47,51 +86,52 @@ NOT the same claim and are never merged here:
 | REQ-140 | HIGH | M08 paytable-maths-parity | What the player sees on the reels, in win presentation and on the paytable must be the same eve |
 | REQ-091 | MEDIUM | M01 replay-contract-driven-session | A visible loading indicator covers the fetch window. |
 
-## PARKED, 65 requirements with an owner-facing reason
+## PARKED, 50 requirements with an owner-facing reason
 
-### M02: disclaimer-and-social-vocabulary-conformance (8 requirements)
+### M02: BUILT by Session 4a. 7 of 8 held; REQ-016 remains parked
 
-**Instrument:** string-set assertion over the i18n prose layer in all sixteen locales
+**Gate:** `frontend/src/lib/i18n/disclaimer_conformance.test.ts`, wired as `disclaimer
+conformance` with its self-test as its own step before the scan. Ten seeds, five paired
+controls.
 
-**Why parked:** NOT BUILT, budget. Ranked 2nd by coverage. The instrument is real and the assets exist (locale_prose_conformance.mjs plus the wired social vocabulary step). The expensive half is the social-branch literal scan, priced by its own squad at 350k alone.
-
-| REQ | Sev | Requirement | Reason, where it differs from the family |
+| REQ | Sev | Requirement | Status |
 |---|---|---|---|
-| REQ-038 | STREAM | In social mode, never render "currency"; use "token". | as above |
-| REQ-010 | HIGH | The disclaimer must convey that a malfunction voids all wins and plays. | as above |
-| REQ-011 | HIGH | The disclaimer must convey that a consistent internet connection is required. | as above |
-| REQ-012 | HIGH | The disclaimer must tell the player to reload the game after a disconnection to finish inc | as above |
-| REQ-013 | HIGH | The disclaimer must convey that expected return is a long-run figure. | as above |
-| REQ-014 | HIGH | The disclaimer must convey that the display is illustrative and models no physical machine | as above |
-| REQ-015 | HIGH | The disclaimer must convey that the RGS response, not the frontend, settles winnings. | as above |
-| REQ-016 | MEDIUM | Present in the platform's template disclaimer as its closing line. Whether this line is it | as above |
+| REQ-016 | MEDIUM | Present in the platform's template disclaimer as its closing line. Whether this line is it | **PARKED, needs a ruling.** `NO_PROOF_SET.tsv` records it UNKNOWN and says in terms that it "should be ruled". It also sits against this project's own no-Stake-branding rule, so the two candidate answers are in direct tension. A gate cannot settle it and asserting either answer would be inventing a ruling. The checkable half, that no Stake branding reaches a shipped disclaimer, IS asserted by the gate. |
 
-### M03: delivery-set-and-kit-payload-conformance (8 requirements)
+### M03: BUILT by Session 4a. 8 of 8 held
 
-**Instrument:** one read-only walk of design-system/brand/delivery/ and the kit copy manifest: names, PNG alpha, dimensions, hashes, size caps
-
-**Why parked:** NOT BUILT, budget. Ranked 3rd. One read-only walk of design-system/brand/delivery/ covers all eight. The four delivery files and their hashes are already committed and verified by the panel, so this is the cheapest large win left.
-
-| REQ | Sev | Requirement | Reason, where it differs from the family |
-|---|---|---|---|
-| REQ-174 | HIGH | The provider logo must stay readable when scaled down to tile size, so thin strokes and sm | as above |
-| REQ-164 | MEDIUM | Background plus foreground must total 3MB or less as a pair; the provider logo is not name | as above |
-| REQ-169 | MEDIUM | Foreground is delivered as a high resolution PNG with a genuine alpha channel; JPG is not  | as above |
-| REQ-170 | MEDIUM | Name the foreground file `<GameTitle>-FG.png`. | as above |
-| REQ-171 | MEDIUM | Supply the studio's official provider logo, not the game logo or a wordmark variant. | as above |
-| REQ-172 | MEDIUM | Provider logo is delivered as a high resolution PNG with a genuine alpha channel (same cla | as above |
-| REQ-173 | MEDIUM | Name the logo file `<ProviderName>-Logo.png`, provider name first, `-Logo` suffix. | as above |
-| REQ-176 | MEDIUM | At submission, upload the contents of dist/ (not the folder itself) into the platform's fr | as above |
+**Gate:** `scripts/qa/delivery_set_gate.mjs`, wired as `delivery set conformance` after the
+production build. Eleven seeds, five paired controls. Nothing remains parked here.
 
 ### M04: currency-display-table-conformance (5 requirements)
 
 **Instrument:** table-driven unit run of formatBalance against the platform Supported Currencies table
 
-**Why parked:** NOT BUILT, budget. The panel confirmed the seeds are real: CAD, MXN, SGD, NZD and TWD all render a bare $10.00 against the platform table. NOTE REQ-126 has no reachable state at HEAD, since no bet below $0.10 is selectable, so half of it cannot be witnessed until the ladder floor changes.
+**Why parked, REWRITTEN 2026-07-29 by Session 4a, which STOPPED this gate on a measurement
+rather than on budget.** The full evidence is at
+`reports/qa/session4a/M04_CURRENCY_DIVERGENCE.md`.
+
+The panel's premise was recounted per rule 16 and it was wrong in size. It reported five
+currencies rendering a bare `$10.00`. **Measured: 23 of 36 diverge from the platform's
+published display specification**, and one of the five it named, NZD, has no row in the
+platform table at all and therefore cannot diverge from it.
+
+**The cause is one design decision with 23 symptoms, not 23 bugs.** `currency.ts:15` derives
+fiat symbols from `Intl`, which renders a currency the way a LOCALE conventionally writes it.
+The platform's table is not a locale convention; it is a display specification REQ-108 makes
+binding. Where they disagree `Intl` is right about typography and wrong about the
+requirement. Seven currencies show a player the WRONG CURRENCY'S symbol: CAD, MXN, SGD, TWD,
+CLP and ARS all render a bare `$`, and CNY renders the Japanese `¥`.
+
+**It was not built because convention (l.8) forbids this session ruling on it.** Player money
+display escalates to the owner and Fable as a question with evidence attached. Three options
+with their trade-offs are set out in the evidence document. All five requirements stay
+parked; REQ-108 is now known to be **currently unmet** rather than merely unguarded, which is
+a different and more useful park than the one it had.
 
 | REQ | Sev | Requirement | Reason, where it differs from the family |
 |---|---|---|---|
-| REQ-108 | STREAM | The table at lines 51 to 100 is the display specification for every supported currency: fo | as above |
+| REQ-108 | STREAM | The table at lines 51 to 100 is the display specification for every supported currency: fo | **CURRENTLY UNMET**, 23 of 36 measured |
 | REQ-125 | STREAM | Determine the game's minimum win multiplier and render win amounts with 3 decimal places i | as above |
 | REQ-127 | STREAM | In-game win readouts must show the exact win amount with no rounding; the balance readout  | as above |
 | REQ-119 | MEDIUM | Keep currency out of round logic, bet arithmetic and outcome selection; it may change only | as above |

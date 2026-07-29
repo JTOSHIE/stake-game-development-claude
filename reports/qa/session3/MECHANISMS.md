@@ -72,16 +72,20 @@ not a failure.
 Ranked by requirements covered, ties broken by worst severity. `cum` is cumulative coverage of
 the 79.
 
+**BUILD STATUS, amended 2026-07-29 by Session 4a
+(`reports/briefs/FS_SESSION4A_MECHANISMS_Prompt.md`).** Four mechanisms are now BUILT and
+wired: M01 and M08 by Session 3, M02 and M03 by Session 4a. **29 of 79 held, 50 outstanding.**
+
 | Rank | Covers | Cum | Worst sev | Id | Mechanism | Kind |
 |---|---|---|---|---|---|---|
-| 1 | **11** | 11 | STREAM | M01 | replay contract, one driven session | WIRE EXISTING |
-| 2 | **8** | 19 | STREAM | M02 | disclaimer and social vocabulary conformance | EXTEND |
-| 3 | **8** | 27 | HIGH | M03 | delivery set and kit payload conformance | NEW |
-| 4 | 5 | 32 | STREAM | M04 | currency display table conformance | EXTEND |
+| 1 | **11** | 11 | STREAM | M01 | replay contract, one driven session | WIRE EXISTING, **BUILT S3** |
+| 2 | **8** | 19 | STREAM | M02 | disclaimer and social vocabulary conformance | EXTEND, **BUILT S4a, 7 of 8** |
+| 3 | **8** | 27 | HIGH | M03 | delivery set and kit payload conformance | NEW, **BUILT S4a, 8 of 8** |
+| 4 | 5 | 32 | STREAM | M04 | currency display table conformance | EXTEND, **STOPPED S4a, see below** |
 | 5 | 5 | 37 | HIGH | M05 | money readout and wager bounds, live | EXTEND |
 | 6 | 5 | 42 | HIGH | M09 | doc claim predicate annotations | EXTEND, **BLOCKED** |
 | 7 | 4 | 46 | STREAM | M07 | shipped asset provenance manifest | NEW |
-| 8 | 3 | 49 | HIGH | M08 | paytable and maths parity | EXTEND |
+| 8 | 3 | 49 | HIGH | M08 | paytable and maths parity | EXTEND, **BUILT S3** |
 | 9 | 2 | 51 | STREAM | M13 | prohibited content lexicon | EXTEND |
 | 10 | 2 | 53 | HIGH | M10 | shipped artefact external origin | EXTEND |
 | 11 | 2 | 55 | HIGH | M11 | dependency licence and advisory | NEW |
@@ -101,6 +105,26 @@ the 79.
 document currency gate, and **Fable's ruling 5 caps phase 2 at two named documents**. The brief
 forbids widening phase 2 without a fresh ruling. Its five requirements are parked with that
 reason, and the ruling is requested rather than assumed.
+
+### AMENDMENT, 2026-07-29, Session 4a: M09 IS NOT THE ONLY ONE THAT CANNOT SIMPLY BE BUILT
+
+Session 4a set out to build in strict rank order and found that the rank order alone does not
+say what is buildable, because **this register's own panel findings are recorded against the
+mechanisms rather than against the ranking.** Read together they say:
+
+| Id | Rank | Why it is not a build today |
+|---|---|---|
+| M04 | 4 | **STOPPED on a measurement, not on budget.** Building it means changing player money display, which convention (l.8) escalates rather than decides. `reports/qa/session4a/M04_CURRENCY_DIVERGENCE.md` |
+| M05 | 5 | **2 PANEL FATALs.** And REQ-124 binds `games/future_spinner/game_config.py:106`, a LOCKED path, so it needs a named sanction before it can go green |
+| M09 | 6 | BLOCKED on a Fable ruling |
+| M07 | 7 | PANEL: the corpus is stated twice and differently, so the gate has no defined failure condition until it is settled |
+| M13 | 9 | PANEL: the platform clause is a four-part CATEGORY definition and a token scan is the wrong instrument; needs a ruling that a word list is the agreed proxy |
+
+**So the next session's cheapest real coverage is M10 and M11**, both recorded here with no
+panel objection, both static, four requirements between them. That is a smaller prize than
+the rank order suggests, and knowing it before the session starts is the point of writing it
+down. **The rank order is a coverage ranking, not a build queue**, and this register did not
+previously say so anywhere a booting session would read it.
 
 ---
 
