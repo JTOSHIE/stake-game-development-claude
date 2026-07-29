@@ -238,8 +238,29 @@ mid-edit is how a parked half-fix gets forced through with placeholder strings.
 | Disposition | Clusters | Which |
 |---|---|---|
 | **CLOSED, not a defect** | 1 | C-20 |
-| **OWNER-PARKED, verified, diagnosis corrected by panel** | 18 | C-01, C-02, C-04 to C-09, C-13, C-15 to C-19, C-21, C-22, C-24 |
+| **OWNER-PARKED, verified, diagnosis corrected by panel** | **17** | C-01, C-02, C-04 to C-09, C-13, C-15 to C-19, C-21, C-22, C-24 |
 | **REOPENED by the ruled safeguard, handed to Session 2** | 7 | C-03, C-10, C-11, C-14, C-23, C-25, C-26 |
+| **UNDISPOSITIONED** | **1** | **C-12** |
+
+> **CORRECTED 2026-07-29 by the boot-set audit, and this table did not add up.** The
+> OWNER-PARKED row said **18** and its own cell names **17** ids when the two ranges are
+> expanded. 1 plus 17 plus 7 is **25 clusters against the 26** this document defines at
+> C-01 to C-26. **C-12 appears in none of the three rows.**
+>
+> **C-12 is not a clerical ghost.** It is defined at line 64 of this file, *"The German
+> Responsible Play paragraph renders in English under a German heading"*, and it is
+> discussed at length at `:216` as one of the six marshalling faults, *"Corroboration HIDDEN
+> by the tier filter"*, with its proposed fix separately flagged at `:228` as one that
+> cannot be staged as written.
+>
+> **Its disposition is NOT decided here**, because that is a judgement and this pass corrects
+> arithmetic. It is recorded as UNDISPOSITIONED so it stops being invisible. **The evidence a
+> dispositioner will want:** C-12 is paired with C-23 in this document's own words as *"a
+> METHOD fault rather than"* a defect fault, and C-23 was sent to REOPENED. That is an
+> argument for REOPENED, not a ruling.
+>
+> **This propagated.** `KNOWN_OPEN.md` told every booting session that "26 STREAM clusters
+> are dispositioned". 25 are.
 
 **No fix was applied by this session, and that is the correct outcome rather than a budget
 concession.** Sixteen of twenty six clusters returned PARTIAL, meaning a real symptom

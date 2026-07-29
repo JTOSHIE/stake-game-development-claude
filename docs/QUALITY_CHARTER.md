@@ -475,6 +475,25 @@ coverage.
 | **Repo presentation** | Recorded 2026-07-27 as TR-088, see below. | What a reviewer concludes from browsing the repository, as distinct from playing the game. |
 | **The maths package** | Out of scope by design: `games/future_spinner/**` is locked and no sanction was held. | Wants its own audit pass with its own sanction. |
 
+> **RESOLVED 2026-07-28 by TR-088, and this paragraph is the pre-fix description. CORRECTED
+> 2026-07-29 by the boot-set audit's adversarial verifier, which caught it after the audit's
+> own first pass had touched this very file and missed it.**
+>
+> **A fresh clone now shows TWO entries under `games/`**: `README.md` and `future_spinner/`.
+> The nine upstream sample packages were deleted by commit `1e5f903`, *"chore(JOB 1): the SDK
+> samples leave games/"*, on 2026-07-28. `git ls-files games/` is the check.
+>
+> The paragraph below is left standing because it is the finding that produced the fix and it
+> records the reasoning, including the part worth keeping: the nine were **checked before
+> being called a defect**, and five of the names it lists were untracked local directories
+> that could never have reached a clone. But it is written in the present tense about a
+> directory that no longer looks like that, so it must not be read as current.
+>
+> **Why the audit's first pass missed it:** the pass was hunting counts and enumerations and
+> found this file's Q-26 row, then moved on. A present-tense sentence describing a directory
+> is the same class and did not match the shapes being grepped for. The instrument was too
+> narrow, which is `FULL_AUDIT_METHOD.md` 2.5 turned on the audit itself.
+
 **A finding from the stock-take itself, recorded here and as TR-088.** A fresh clone shows
 **ten entries under `games/`**, of which exactly one ships. The other nine are the upstream
 `math-sdk`'s sample games and template, and they ARE documented as such in

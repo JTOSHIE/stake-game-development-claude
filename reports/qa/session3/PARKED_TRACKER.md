@@ -103,7 +103,13 @@ NOT the same claim and are never merged here:
 | REQ-140 | HIGH | M08 paytable-maths-parity | What the player sees on the reels, in win presentation and on the paytable must be the same eve |
 | REQ-091 | MEDIUM | M01 replay-contract-driven-session | A visible loading indicator covers the fetch window. |
 
-## PARKED, 50 requirements with an owner-facing reason
+## PARKED, 49 requirements with an owner-facing reason
+
+**This heading read 50 and was corrected on 2026-07-29 by the boot-set audit's adversarial
+verifier, which caught what the audit's own first pass missed.** The counts table above was
+updated for REQ-108 moving to HELD and this heading was not, so the document disagreed with
+itself by one for the length of a single commit. Recorded rather than silently fixed, because
+it is the same defect class the pass exists to find, committed by the pass itself.
 
 ### M02: BUILT by Session 4a. 7 of 8 held; REQ-016 remains parked
 

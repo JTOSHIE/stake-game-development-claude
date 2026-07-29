@@ -8884,12 +8884,14 @@ Australian English, no em dashes or en dashes.
 
 ## THE MEASUREMENT, which is the point of the session
 
-**47 factual claims checked across the boot set. 9 wrong. 1 UNKNOWN. A drift rate of 19 per
-cent.** Nothing in the budget model recorded how fast this project's documents go stale, and
+**52 factual claims checked across the boot set. 13 wrong. 1 UNKNOWN. A drift rate of 25 per
+cent.** The main loop checked 48 and found 9; the adversarial verifier found 4 more, one of
+them committed by this pass itself. **The single-reader figure understated the drift by a
+quarter**, which is what convention (l.4) predicts and is the argument for JOB 4 existing. Nothing in the budget model recorded how fast this project's documents go stale, and
 now something does.
 
 **The class is not the one the gate freezes.** `doc_currency_baseline.json` holds 333 frozen
-DEAD REFERENCES and **not one of the 9 is among them**, because they are WRONG ASSERTIONS
+DEAD REFERENCES and **not one of the 13 is among them**, because they are WRONG ASSERTIONS
 rather than dead paths. The brief's REPORTED premise, that the wrong-assertion class is
 invisible to the current gate, is **CONFIRMED**.
 
@@ -9116,8 +9118,67 @@ reproducible by the command named beside it.**
 5. **`REVIEW_TRACKER.md` is unaudited**, 58 baseline entries and 44 negation phrases, and is
    the correct next target once the negation check exists.
 6. **`PROJECT_CLAIMS.md` and `session3/MECHANISMS.md` were not reached.**
+7. **C-12 is UNDISPOSITIONED**, found by the verifier. `CLUSTERS.md`'s table named 25 of 26
+   clusters and C-12 was in none of the three rows. The arithmetic is corrected; the
+   disposition is deliberately left open with its evidence recorded.
+8. **`WAYS_OF_WORKING.md`'s "80 of 80 agents" is UNVERIFIED**, not confirmed. There is no
+   consolidated agent ledger to recount it against, and the verifier said so rather than
+   guessing.
 
 **The true fixdown is the next programme, and the ledgers it reads are now audited**, with the
 exception of `REVIEW_TRACKER.md` named above. **Re-verify the table of counts at boot anyway**:
 this session found that two of the numbers it was handed had gone stale inside 24 hours, and
 the whole argument of the pass is that a number nobody checks is a number that drifts.
+
+## JOB 4: THE ADVERSARIAL VERIFIER, AND IT EARNED ITS KEEP
+
+One agent, shared-nothing, instructed to REFUTE. **COMPLETED, none LOST.** 260k tokens,
+82 tool calls.
+
+**It confirmed all six corrections independently**, recomputing each rather than reading it:
+566 across the four tiers, 54 shards, two entries in `LEDGER.md`, the 51 instances, the
+30-plus-49 arithmetic, and the baseline header against its body. On the 51 it went further
+than asked and swept every `.ts` and `.svelte` file under `frontend/src`, confirming every
+hit outside the two prose files is inside a comment, including all seven in `fsModes.ts`.
+
+**And it found four claims the single-reader pass missed. All four were verified again here
+before being accepted, and all four were real.**
+
+| # | Miss | Verified how |
+|---|---|---|
+| A | `PARKED_TRACKER.md:106` heading still said "PARKED, **50** requirements" while the counts table above it said 49 | **This was MY miss, made in this session.** I updated the table and not the heading, so the document disagreed with itself for one commit |
+| B | `CLUSTERS.md` disposition table: the OWNER-PARKED row claimed **18** and its cell names **17**. 1 plus 17 plus 7 is **25 against 26 clusters**, and **C-12 is in none of the three rows** | Recomputed by expanding both ranges programmatically. C-12 is real, defined at `CLUSTERS.md:64` |
+| C | `docs/QUALITY_CHARTER.md:479`: "A fresh clone shows **ten entries under `games/`**", present tense | `git ls-files games/` returns **two**. Commit `1e5f903` deleted the nine on 2026-07-28 under TR-088 |
+| D | `SUBMISSION_DOSSIER.md:787`: "Current kit is **V6**" | `frontend/dist/build-info.json` stamps **v10** |
+
+**Miss C is the one worth learning from, and it is the strongest argument in this report for
+the verification pass being mandatory.** The audit's own first pass edited that exact file, in
+the Q-26 row, and walked past a stale present-tense sentence twenty lines away. The reason is
+`FULL_AUDIT_METHOD.md` 2.5 turned on the audit itself: **the instrument was grepping for
+counts and enumerations, and "A fresh clone shows ten entries" is a status claim about a
+directory, which did not match the shapes being searched for.** A search that could not have
+returned the answer.
+
+**C-12's disposition was NOT invented.** The arithmetic is corrected and the cluster is
+recorded as UNDISPOSITIONED, with the evidence a dispositioner will want: this document pairs
+C-12 with C-23 as "a METHOD fault rather than" a defect fault, and C-23 was sent to REOPENED.
+That is an argument, not a ruling, and it is left as one.
+
+**Miss D was corrected by removing the moving target rather than by chasing it.** A bundle
+size changes on every build, so restating today's bytes would be stale tomorrow. The row now
+points at `frontend/dist/build-info.json`, which stamps version, commit and byte count on
+every build, and is named as the authority.
+
+**Revised measurement: 48 claims checked by the main loop plus 4 misses found by the
+verifier, 13 wrong out of 52. A drift rate of 25 per cent, not 19.** The single-reader figure
+understated it by a quarter, which is exactly what convention (l.4) predicts of a pass that
+reads the same documents with the same eyes all the way through.
+
+**One claim the verifier could not settle, and it said so rather than guessing:**
+`WAYS_OF_WORKING.md`'s "80 of 80 agents" completion figure has no consolidated agent ledger to
+recount it against. Flagged UNVERIFIED, not confirmed.
+
+**One document came back clean and it is worth naming:**
+`reports/qa/compliance_register/REGISTER.md`. The verifier recomputed every headline count
+from the underlying data, including the 254 raw rows reconciling exactly against seven shard
+footers (61+53+50+26+24+1+39), and found nothing wrong.

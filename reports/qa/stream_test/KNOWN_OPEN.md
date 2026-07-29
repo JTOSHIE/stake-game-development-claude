@@ -57,9 +57,16 @@ panels. What a squad on ANY later audit needs to know before reporting:
   > `CLUSTERS.md` carried the same overcount and is corrected there with the derivation.
   > The "506 HIGH, MEDIUM or LOW" in this sentence was always right, and 60 STREAM plus 506
   > is 566, so this document contained the evidence against its own total.
-- **26 STREAM clusters are dispositioned**: 1 CLOSED as not a defect (C-20, the balance
-  readout claim, refuted by both panel seats), 18 owner-parked with a panel-corrected
-  diagnosis, 7 REOPENED for re-clustering.
+- **25 of the 26 STREAM clusters are dispositioned**: 1 CLOSED as not a defect (C-20, the
+  balance readout claim, refuted by both panel seats), **17** owner-parked with a
+  panel-corrected diagnosis, 7 REOPENED for re-clustering. **C-12 is UNDISPOSITIONED.**
+
+  > **CORRECTED 2026-07-29 by the boot-set audit's adversarial verifier.** This read "26
+  > STREAM clusters are dispositioned ... 18 owner-parked". `CLUSTERS.md`'s disposition table
+  > claimed 18 in that row while naming 17 ids, so 1 plus 17 plus 7 is 25, and **C-12 appears
+  > in none of the three rows**. C-12 is real, defined at `CLUSTERS.md:64`, the German
+  > Responsible Play paragraph rendering in English under a German heading. Its disposition
+  > is left open rather than invented, with the evidence recorded at `CLUSTERS.md`.
 - **Only 5 of 26 clusters had a cause that survived a hostile read.** Treat any recorded
   "Where fixable" in a shard as a hypothesis, not a citation, unless a panel confirmed it.
 - **C-01's real cause is `GameGrid.svelte:499`, `DROP_H = 520`**, not the CSS both shards
