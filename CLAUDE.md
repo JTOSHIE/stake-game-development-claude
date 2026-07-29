@@ -667,6 +667,29 @@ push's remote result, so every session reads these:
 | the other six browser legs | 74 to 217 seconds each, in parallel |
 | **browser wall-clock** | **2.9 to 4.6 minutes** across two runs, down from 6.4 |
 
+**BILLED MINUTES ARE NOT WALL CLOCK, and from 2026-07-29 they cost money.** The table
+above is WALL CLOCK, which is what a session waits for. The repository went private on
+2026-07-29, so Actions minutes are now metered, and the number that bills is the SUM of
+the parallel jobs rather than the elapsed time:
+
+| | Measured 2026-07-29 |
+|---|---|
+| Wall clock, slowest job sets it | **3.3 min** |
+| **BILLED, sum of 12 parallel jobs** | **24.1 min** |
+| Free tier | 2,000 min per month, about **83 pushes** |
+
+The eleven browser legs are 22.7 of those 24.1 minutes. **So the two-job split that bought
+the wall-clock win and the per-gate naming is also what makes a push expensive**, and both
+facts are true at once.
+
+**The mitigation, and the trap inside it.** `checks.yml` now gates the BROWSER MATRIX on
+whether a push touched rendering, shipping or gate code, via a `changes` job. **The static
+job is never gated**, because it carries the document currency gate, the dash gate and the
+locked-paths gate: filtering documents out of the run would have disabled exactly the gates
+whose purpose is checking documents, and silently. It fails open on every uncertainty, so a
+skip is a positive result rather than an accident. **A documents-only push now bills about
+1.4 minutes instead of 24.1.**
+
 **TWO ASSUMPTIONS WERE WRONG ON THE WAY TO THAT, and both are kept here**, because
 the useful knowledge is which levers did not work.
 
