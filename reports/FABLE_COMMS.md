@@ -9,6 +9,48 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 025 - 2026-07-29 - DECISION REQUEST: Session 2 produced 118 upheld findings and 82 requirements with no proof path, and nothing schedules the remediation
+
+Session 2 closed green and its register is the best artefact this programme has produced.
+Raising three things that are yours rather than the builder's, plus one spec ready to build.
+
+**1. THE SEQUENCING QUESTION, and it is the one that matters.** Session 2 leaves
+**118 upheld findings** (78 clean, 27 upheld with an UNSOUND CAUSE, 13 with an INCOMPLETE
+ENUMERATION), **185 parked and never verified**, and **82 of 194 walked requirements with no
+proof path that would fail if someone broke them** (65 with nothing at all, 17 defended only
+by a script not wired into CI). Session 3 as mapped is the four gaps: audio, social,
+accessibility, animation. **That is more discovery on top of an unremediated backlog.** The
+builder's engineering view, offered as input and not as a decision: the 82 missing proof
+paths are a submission risk, and the stale-claim class is corrupting work orders right now,
+so both are cheaper to fix than to keep auditing around. **Priority is yours. Please rule on
+whether remediation and repo currency come before the four gaps or after.**
+
+**2. A STALE LINE IN A COMMITTED DOCUMENT CORRUPTED A WORK ORDER, and the builder was a link
+in the chain rather than the one who caught it.** `COMPLIANCE_WATCH.md:434` said the payments
+page was NOT YET MIRRORED; `:447` said it was, written 34 minutes later; entry 5 was never
+struck. It survived four days. **The Head of Engineering then read line 434 while reviewing
+your Session 2 brief, treated it as evidence, and wrote it into the brief as an
+instruction**, where it reached the session's boot as a VERIFIED premise. Session 2 caught it
+only by checking commit timestamps. Three consecutive readers trusted the document. The line
+is now struck, and `docs/records/DOC_CURRENCY_GATE_SPEC.md` specifies the gate that would
+have caught it mechanically, about 1.2M in the main loop with no agents, against the roughly
+2.3M of agent budget Session 2 spent finding this class by hand into a snapshot that starts
+going stale on landing. **Ready to build on your word.**
+
+**3. TWO ITEMS FROM ENTRY 023 ARE STILL UNANSWERED** and are carried rather than allowed to
+lapse: whether 19 per cent diagnosis soundness changes the method, and acceptance or
+amendment of `docs/records/WAYS_OF_WORKING.md`, particularly section 6, the transcription
+step, and section 9, what was deliberately stripped from a normal Scrum setup.
+
+**A NOTE ON THE TWO CONFIRMATION RATES, because comparing them naively misleads.** Session 1
+upheld 5 of 26; Session 2 upheld 118 of 126. **The squads were not better.** Session 2's
+findings are mostly CHECKABLE FACTS ("no CI step asserts this"), while Session 1's were
+DIAGNOSES. The control group is inside Session 2's own numbers: **the 27 rows that asserted a
+CAUSE failed at close to Session 1's rate.** Do not act on the recorded cause of those 27
+without re-deriving it. The lesson holds and it is not softened by the headline figure.
+
+---
+
 ## 024 - 2026-07-29 - DECISION REQUEST: the requirements register now exists, 232 rows, and 82 of 194 requirements have NO PROOF PATH. Plus two items from 023 still open.
 
 **Session 2 of the audit, Opus 5 ultra, container orchestration only, no lock exceptions.**
