@@ -8548,3 +8548,38 @@ finding had asserted a root `package.json` that does not exist.
 It is run once more as the LAST action of this close, after the final push, per the
 one-commit-lag clause: the line quoted here is the earlier one, the address is the later one. A
 reader finding them one docs commit apart has found the design, not a bug.
+
+## ADDENDUM: REMOTE CI AND OWNER PREVIEW, per rule 10 and rule 12
+
+**Run link:** https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30447461123
+**Result: SUCCESS, all 13 jobs green.** Checked, not assumed.
+
+**The four new steps were confirmed to have RUN on the remote runner, not merely to have been
+wired**, which is the failure mode this project has shipped four times and the reason the
+self-test is its own step:
+
+```
+disclaimer conformance, seeded-violation self-test
+  DISCLAIMER CONFORMANCE SELF-TEST: PASS (10 seeds, 5 paired controls)
+disclaimer conformance, sixteen locales
+  DISCLAIMER CONFORMANCE: PASS
+delivery set, seeded-violation self-test
+  DELIVERY SET SELF-TEST: PASS (11 seeds, 5 paired controls)
+delivery set conformance
+  provider logo coverage retention at 96px: 100.1% (floor 50%)
+  provider logo transparent share: 49.3%
+  DELIVERY SET: PASS
+```
+
+The retention and transparency figures are reproduced by the remote runner from the committed
+PNGs, so the REQ-174 measurement is not a local artefact.
+
+**Owner preview**, per rule 12, run before this report section was written:
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit a2c04ed  |  built 2026-07-29T21:24:20+10:00  |  started 2026-07-29T11:29:22.891Z  |  http://192.168.4.92:5173
+```
+
+It is run once more as the LAST action of this close, after the final push, per the
+one-commit-lag clause: the line quoted here is the earlier one and the address is the later
+one. A reader finding them one docs commit apart has found the design, not a bug.
