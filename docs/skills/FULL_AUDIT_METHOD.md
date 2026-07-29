@@ -178,6 +178,52 @@ On Future Spinner both the project's own gate and the audit's scanner had the sa
 spot from different directions: neither could see a literal written inside an interpolation.
 The resulting parked list called itself "the complete list" and was not.
 
+### 2.7 THE CLAIM-TYPE SPLIT: an observation and a diagnosis are different claims and are never blended
+
+**Fable's ruling, 2026-07-29, transcribed by Session 3.** Recorded here because the brief
+that carried it required the caution to be written into this document rather than only into
+the comms log.
+
+**TRANSCRIBED FROM A SUMMARY, NOT FROM FABLE'S LONGHAND.** The summary reached this session
+through the owner in `reports/briefs/FS_SESSION3_REMEDIATION_Prompt.md`. Convention (l.7)
+forbids paraphrasing an authority and section 6 of `docs/records/WAYS_OF_WORKING.md` says it
+equally forbids composing one, so what was received is what is written and its status is
+stated here rather than left to be assumed.
+
+**The ruling.** An OBSERVATION ("no CI step asserts this requirement") and a DIAGNOSIS
+("this is broken BECAUSE the parser reads the wrong field") are different kinds of claim
+with different reliability, and they are **permanently split**:
+
+- **They are never blended in a ledger.** A row states which kind it is.
+- **They are never blended in a confirmation rate.** A single percentage over both kinds is
+  not a measure of anything, because the two verify at completely different rates.
+- **They are never blended in a headline.**
+- **Discovery squads emit diagnoses as HYPOTHESES**, never as findings.
+- **Only REPRODUCTION or SOURCE DERIVATION promotes a hypothesis to a finding.** A second
+  squad agreeing does not, and neither does a confident tone.
+
+**THE MEASURED REASON, and it is the control group inside this project's own numbers.**
+Session 1 verified DIAGNOSES of visual defects and **5 of 26 clusters survived a hostile
+read, 19 per cent.** Session 2 verified mostly OBSERVATIONS of the form "no proof path
+exists", which a verifier settles by opening `checks.yml` and either finding the assertion
+or not, and **118 of 126 were upheld, 94 per cent.**
+
+**The squads were not better.** The task was different. And the proof is that Session 2's
+own rows split the same way: **the 27 rows that did assert a CAUSE came back
+CONFIRMED_WRONG_CAUSE, close to Session 1's rate**, while the rows asserting a checkable
+fact came back upheld. A single blended figure across those two populations would have
+reported roughly 94 per cent confidence in a body of work of which one substantial part was
+about as reliable as coin flipping.
+
+**THE CAUTION, which is the operational half.** Where a row reads UPHELD, CAUSE UNSOUND, the
+defect is real and the recorded cause is not. **Do not act on the recorded cause. Re-derive
+it from source first.** Acting on an unsound cause is how a session ships a fix that is a
+no-op, or worse, one that changes behaviour for a reason that was never true. Session 1
+produced exactly that: a cluster seen by twelve shared-nothing squads whose cited cause was
+refuted by the source, whose proposed fix was a no-op, and whose alternative fix would have
+converted a see-through band into a dead-black one. The sound cause was one constant on one
+line that nobody had read.
+
 ---
 
 ## 3. Two patterns worth reusing by name

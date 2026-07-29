@@ -166,6 +166,22 @@ orchestration always, and the sight gate universal. The measured reason is at
 rule spent about 58 per cent of its agent budget producing nothing and was not short of
 budget, it was short of a budget it could see. Authoritative text in `CLAUDE.md`.
 
+**Rule 16, PREMISE PROVENANCE: every factual premise a work order imports carries its
+provenance, and anything below VERIFIED is treated as a question and never as an
+instruction** (Fable's ruling, 2026-07-29, transcribed by Session 3 from the owner's
+summary in `reports/briefs/FS_SESSION3_REMEDIATION_Prompt.md`; **a summary and not Fable's
+longhand, recorded as such** per convention (l.7) and `docs/records/WAYS_OF_WORKING.md`
+section 6 point 4). Every premise carries **VERIFIED** with the date it was checked and
+the method used, **REPORTED** with the source named specifically, or **UNKNOWN**. A REPORTED
+premise tells a session what to CHECK FIRST; it never tells a session what is TRUE, and
+acting on one without recounting it converts somebody's narration into an order. The
+operable test: **a session's narration is REPORTED; only the repository is VERIFIED.**
+Earned by the `COMPLIANCE_WATCH.md` payments line, which contradicted itself thirteen lines
+apart for four days and was carried into a work order as evidence by three consecutive
+readers. **The rule then decayed before it landed**: issued 2026-07-29, untranscribed, and
+cited in the next brief as applying while pointing at nothing a booting session could read.
+Authoritative text in `CLAUDE.md`.
+
 ### 3f. Process protocol: THE RETRO MECHANISM (owner's order, 2026-07-26, standing)
 
 **After the owner's second portal visit, Fable's benchmark polish review nominates

@@ -829,6 +829,57 @@ task-shaped): **container orchestration always**, per convention (q) and
 judges an image at a resolution where the defect class it is hunting is not resolvable.
 Model choice follows the task; these two do not.
 
+**16. PREMISE PROVENANCE. Every factual premise a work order imports carries its
+provenance, and anything below VERIFIED is treated as a question and never as an
+instruction** (Fable's ruling, 2026-07-29, transcribed by Session 3).
+
+**TRANSCRIBED FROM A SUMMARY, NOT FROM FABLE'S LONGHAND, and that is recorded rather
+than smoothed over.** Convention (l.7) forbids paraphrasing an authority, and
+`docs/records/WAYS_OF_WORKING.md` section 6 point 4 says it equally forbids composing
+one. The summary reached this session through the owner in
+`reports/briefs/FS_SESSION3_REMEDIATION_Prompt.md`. What was received is what is written
+here, and its status is stated. If Fable's longhand later reaches the repository it
+supersedes this text.
+
+Every factual premise carries exactly one of three markers:
+
+- **VERIFIED**, with the DATE it was checked AND the METHOD used. "by direct read",
+  "by `git log` against the file", "by running the gate". A date without a method is not
+  VERIFIED, because the reader cannot tell what was actually done.
+- **REPORTED**, with the SOURCE that reported it, named specifically: which session,
+  which squad, which document, which line.
+- **UNKNOWN**.
+
+**Anything below VERIFIED is treated as a QUESTION and never as an INSTRUCTION.** A
+REPORTED premise tells the session what to CHECK FIRST. It does not tell the session what
+is TRUE. A session that acts on a REPORTED premise without recounting it has converted
+somebody's narration into an order, and the recount is usually one command.
+
+**The test that makes this operable**, from `WAYS_OF_WORKING.md` 3.1: **a session's
+narration is REPORTED; only the repository is VERIFIED.** Treating what a session SAID as
+equivalent to what the repository HOLDS is a category error, and it is the common cause of
+both failures recorded there.
+
+WHERE THIS CAME FROM, and the chain is the argument, because every link is a different
+reader trusting the same document. `COMPLIANCE_WATCH.md:434` recorded the platform
+payments page as NOT YET MIRRORED. `COMPLIANCE_WATCH.md:447` recorded it as MIRRORED,
+written 34 minutes later the same day, and entry 5 was never struck. The stale line
+survived four days. The Head of Engineering then read line 434 while reviewing a brief,
+treated it as evidence, and wrote it into the Session 2 brief as an instruction, where it
+reached that session's boot as a VERIFIED premise. **Three consecutive readers trusted the
+document and the document was wrong.** Session 2 caught it only by checking commit
+timestamps against the file's own claim.
+
+**AND THE RULE DECAYED BEFORE IT LANDED, which is the part worth keeping.** Fable issued
+this ruling on 2026-07-29. It was not transcribed. The next brief was written saying
+"PREMISE PROVENANCE applies" and pointed at nothing a booting session could read, because
+`CLAUDE.md` carried no such rule and `reports/FABLE_COMMS.md`'s newest entry was the
+request rather than the reply. **The rule created to stop premise decay had itself decayed
+into an unbacked citation inside four days**, exactly the failure it describes. That is the
+strongest available argument for `WAYS_OF_WORKING.md` section 6: the Product Owner is
+read-only, so a ruling enters the record only when a session transcribes it, and an
+untranscribed ruling and an unissued one are indistinguishable to every later reader.
+
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
 slot's originally intended content (expected-fail declarations, above). Rules

@@ -1,0 +1,7 @@
+req	verdict	proof_kind	severity	class	player_visible	source	text
+REQ-048	SATISFIED	CI_GATE	MEDIUM	ARTEFACT	YES	`approval_guidelines_game_quality_rankings.md:44`	3-star rating only: verify rendering across a range of devices and screen sizes, with no lag and no low-quality audio.
+REQ-050	NO_PROOF	EVIDENCE	HIGH	ARTEFACT	YES	`approval_guidelines_game_quality_rankings.md:46`	3-star rating only: animations and art must be clean, cohesive and professionally executed.
+REQ-053	NOT_MET	CI_GATE	STREAM	ARTEFACT	YES	`approval_guidelines_front_end_communication.md:23`	No broken or missing textures, sprites, fonts or animation states in any reachable game state.
+REQ-095	NOT_MET	CI_GATE	STREAM	ARTEFACT	YES	`approval_guidelines_game_replay_requirements.md:133`	Replay drives the complete animation and audio pipeline, not a reduced or static presentation. Restated upstream at line 108.
+REQ-102	NO_PROOF	CI_GATE	MEDIUM	ARTEFACT	YES	`approval_guidelines_rgs_communication.md:22`	Plus/minus stepping and any typed or slider bet value must land on multiples permitted by `minStep` from the authenticate config.
+REQ-159	NO_PROOF	CI_GATE	HIGH	PROCESS	NO	`approval_guidelines_game_quality_rankings.md:31`	A 1-star outcome blocks publication and forces a rework and resubmission cycle, so the submission must clear 1 star to ship at all.

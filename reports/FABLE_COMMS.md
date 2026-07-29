@@ -9,6 +9,77 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 026 - 2026-07-29 - TRANSCRIPTION: your five rulings are now in the record and in the protocol, plus a DECISION REQUEST on four unacknowledged entries
+
+**The rule you made to stop premise decay had itself decayed before it landed.** Issued
+2026-07-29, never transcribed, and then cited in the next work order as applying while
+`CLAUDE.md` carried no such rule and this file's newest entry was the request rather than the
+reply. Session 3 was ordered to fix that before anything else. It is fixed.
+
+**ALL FIVE ARE TRANSCRIBED FROM THE OWNER'S SUMMARY, NOT FROM YOUR LONGHAND, and each says so
+where it lands.** The summary reached this session through
+`reports/briefs/FS_SESSION3_REMEDIATION_Prompt.md`. Convention (l.7) forbids paraphrasing an
+authority, and `docs/records/WAYS_OF_WORKING.md` section 6 point 4 says it equally forbids
+composing one, so what was received is what is written. **If your longhand reaches the
+repository it supersedes every paragraph below.**
+
+| # | Ruling | Landed at |
+|---|---|---|
+| 1 | **The sequencing amendment.** Remediation before discovery: Session 3 remediation, Session 4 the four gaps, Session 5 consolidation and kit | This entry; Session 3's brief is written to it |
+| 2 | **PREMISE PROVENANCE.** Every factual premise a work order imports carries VERIFIED with date AND method, REPORTED with the source named, or UNKNOWN. Anything below VERIFIED is a QUESTION and never an INSTRUCTION | **`CLAUDE.md` protocol rule 16**, mirrored in `WRS_MASTER_DOCUMENT.md` 3e |
+| 3 | **The permanent claim-type split.** Observations and diagnoses are never blended in a ledger, a confirmation rate or a headline. Discovery squads emit diagnoses as HYPOTHESES; only reproduction or source derivation promotes one | **`docs/skills/FULL_AUDIT_METHOD.md` 2.7**, with the caution written in as ordered |
+| 4 | **`WAYS_OF_WORKING.md` accepted**, on the standing condition that it cross-references `CLAUDE.md` rather than duplicating it and that any conflict resolves to `CLAUDE.md` | `docs/records/WAYS_OF_WORKING.md`, condition **confirmed discharged** |
+| 5 | **The gate approvals**, with currency-gate phase 2 capped at a named list | `docs/records/DOC_CURRENCY_GATE_SPEC.md`; the cap holds at two documents |
+
+**Ruling 4's condition was CHECKED rather than assumed, and the check earned itself
+immediately.** The document's own pointer read "protocol rules 1 to 15" while `CLAUDE.md` now
+carries a rule 16, so the cross-reference was stale inside the same day it was written.
+Corrected, and the correction recorded rather than made silently, because a cross-reference
+that quietly drifts is exactly what the condition exists to prevent.
+
+**Ruling 5's cap is intact and was verified, not assumed.** Phase 2 remains at
+`SUBMISSION_DOSSIER.md` and `GAME_FACTS.md`. The pilot's adoption verdict is NOT PROVEN,
+recorded with its reasoning, and this session neither re-ran it nor widened it.
+
+---
+
+**THE DECISION REQUEST, and it is short: four entries carry no COMMS-ACK, and I cannot tell an
+unanswered request from an untranscribed answer. Only you can.**
+
+That ambiguity is structural rather than accidental. You are read-only by design, so a ruling
+enters the record only when a session transcribes it, and **an unanswered request and an
+answered-but-untranscribed one look identical in this file.** Here is what the repository shows
+for each, so you are ruling on evidence rather than on my memory:
+
+| Entry | What it asked | What the repository shows | My reading |
+|---|---|---|---|
+| **020** (2026-07-28) | Six numbered decisions: TR-091 the 19 locale sites, TR-089 inert `tabular-nums`, TR-092 `Cruise` versus `CRUISE`, TR-088 the `games/` directory, SA-002 and SA-007 on the COST column, and ratification of the round-three reviewer prompt | **Five of six are visibly actioned.** TR-088 CLOSED RESOLVED 2026-07-28, TR-089 RESOLVED IN PART 2026-07-28, TR-091 CLOSED RESOLVED 2026-07-28, TR-092 CLOSED FIXED 2026-07-28; the prompt now exists as `round3_reviewer_prompt_RATIFIED.md`; `games/` holds six entries, not ten | **ANSWERED AND UNTRANSCRIBED**, except SA-002 and SA-007, which I cannot find resolved anywhere |
+| **023** (2026-07-29) | Four items, of which two were carried into 024 as still open: whether 19 per cent diagnosis soundness changes the method, and acceptance of `WAYS_OF_WORKING.md` | Ruling 3 above answers the first and ruling 4 the second | **ANSWERED**, now transcribed above |
+| **024** (2026-07-29) | The XEC/XSC display contradiction for closure; a method correction to `AGENT_BUDGET_AND_SCHEDULING.md` section 4; plus 023's two carried items | Nothing in the tree closes the XEC/XSC contradiction, and section 4 is unamended | **GENUINELY OPEN**, both |
+| **025** (2026-07-29) | The sequencing question, and approval to build the currency gate | Ruling 1 answers the sequencing; the gate is built, wired and green | **ANSWERED**, now transcribed above |
+
+**I have deliberately not guessed.** That an action landed is an OBSERVATION; that you ruled it
+is a DIAGNOSIS, and your own ruling 3 above says I must not promote one to the other without
+reproduction or source derivation. I have neither. So:
+
+1. **Entry 020: confirm the five actioned items reflect your rulings**, so a COMMS-ACK can be
+   appended honestly rather than inferred. **And SA-002 and SA-007 have now been open since
+   2026-07-26**: does the COST-column convention need raising with the platform before
+   submission, or is it closed?
+2. **Entry 024's two live items**, neither touched: may the **XEC and XSC display contradiction
+   be closed as resolved with no build change** (three independent first-party sources now
+   agree with what we ship), and **should `AGENT_BUDGET_AND_SCHEDULING.md` section 4 be amended**
+   to record that clustering is cheap only when discovery OVERLAPPED, while a partitioned wave's
+   lever is BATCHING?
+
+**One correction to entry 025's own numbers, since Session 3 was ordered to recount them.**
+The 118 upheld findings are **confirmed exactly**, 78 plus 27 plus 13. The 82 requirements with
+no proof path are **79**, not 82: 61 with nothing at all and 18 defended only by an unwired
+script, counted from the 23 walk shards rather than from the summary. Enumerated at
+`reports/qa/session3/NO_PROOF_SET.tsv`. The correction does not change the shape of anything.
+
+---
+
 ## 025 - 2026-07-29 - DECISION REQUEST: Session 2 produced 118 upheld findings and 82 requirements with no proof path, and nothing schedules the remediation
 
 Session 2 closed green and its register is the best artefact this programme has produced.

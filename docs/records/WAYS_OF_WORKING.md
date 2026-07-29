@@ -17,8 +17,18 @@ and binds every future edit: if a rule belongs in `CLAUDE.md`, this document poi
 and does not restate it. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins
 and this document is the one that is wrong.
 
+**CONDITION CONFIRMED DISCHARGED, 2026-07-29, by Session 3 (`reports/briefs/FS_SESSION3_REMEDIATION_Prompt.md`,
+JOB 1).** Fable's acceptance was conditional and the condition was checked rather than
+assumed: every rule this document cites is checked to be OWNED elsewhere and pointed at
+rather than restated, and the precedence line above resolves any conflict to `CLAUDE.md`.
+The check found one thing to correct, which is the point of running it: the pointer below
+read "rules 1 to 15" and `CLAUDE.md` now carries a rule 16, so the pointer was stale within
+the same day it was written. It is corrected below and the correction is recorded rather
+than made silently, because a cross-reference that quietly drifts is the failure this
+condition exists to prevent.
+
 Rules cited here and OWNED elsewhere, so nobody edits the copy instead of the original:
-protocol rules 1 to 15 and conventions (a) to (r) live in `CLAUDE.md`; the cost model lives
+protocol rules 1 to 16 and conventions (a) to (r) live in `CLAUDE.md`; the cost model lives
 in `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md`; audit method lives in
 `docs/skills/FULL_AUDIT_METHOD.md`. **This document owns only the role split, the three
 ceremonies, Definition of Ready and Done, and the transcription step.** Everything else in
