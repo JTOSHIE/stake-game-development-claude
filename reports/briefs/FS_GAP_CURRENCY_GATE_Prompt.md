@@ -1,0 +1,32 @@
+FS_GAP_CURRENCY_GATE_Prompt.md. Save this verbatim to reports/briefs/ and commit it with the work. Fresh Opus Ultra session on main, drafted per reports/briefs/_TEMPLATE.md, no lock exceptions, explicit paths, no em or en dashes. Boot: CLAUDE.md, docs/records/DOC_CURRENCY_GATE_SPEC.md (the approved spec, build to it), docs/records/WAYS_OF_WORKING.md, FULL_AUDIT_METHOD.md sections 2.6 and 3.1, AGENT_BUDGET_AND_SCHEDULING.md.
+
+WHY THIS SESSION EXISTS, so the scope is not widened: Fable approved the currency gate phase 1 for immediate build. It is tier 2 of Session 3's degradation order, so building it now means Session 3 spends its whole budget on the 82 unguarded requirements, which is the count Fable said it will be watching fall to zero. It is also the safest possible use of an awkward window: additive tooling, no player-visible code touched, so no stopping point can leave anything half-applied.
+
+BUDGET: 8.0M usable, 1h45 hard wall. Reserve 1.0M. Main loop 5.5M. Agents 1.5M.
+**THIS IS A MAIN-LOOP SESSION. The default is ZERO agents.** Deterministic classification over about 3,600 tracked files is script work, not squad work: Session 2 classified the whole tree with `census.mjs` for near-zero cost while ten squads grepping would have cost about 1.5M. Spend the agent budget only on the triage of the first real run, and only if the finding count makes hand triage the slower path. Post the Plan of Record before any spend.
+
+STOP LINES: no new work items at 45 minutes remaining or 2.5M left; close at 25 minutes remaining or 1.0M left, whichever comes first.
+
+DEGRADATION ORDER: the checker with its seeded self-test, then the first real run and the frozen baseline, then CI wiring, then the phase 2 pilot annotations. **A gate that is not seeded does not ship**: if the seeds are not passing at a stop line, revert the gate rather than wire an unproven one, because a gate that has never been seen to fail is a script that prints PASS.
+
+DONE MEANS: the phase 1 checker exists, its seeded self-test goes RED on all five planted forms and green on the negative controls, its first real run is triaged into a frozen baseline keyed by file AND text, it is wired into CI, and main is green with the frozen count printed on every run.
+
+PREMISE PROVENANCE, per Fable's new rule:
+- VERIFIED 2026-07-29 by direct read: `docs/records/DOC_CURRENCY_GATE_SPEC.md` exists and is the approved design. Build to it rather than re-deriving it.
+- VERIFIED 2026-07-29 by direct read: the dash gate scans `src/` and `dist/` only and never `docs/`, so upstream captures carrying en dashes are not a CI risk. Confirm this still holds before wiring anything new that scans `docs/`.
+- REPORTED by Session 2, VERIFY BEFORE PLANNING: 63 stale claims, 36 contradictions and 10 dead references were found by sampling. **These are a sample, not a census.** The real first-run count across every tracked document will be higher, possibly much higher, and the frozen baseline must be sized from the actual run rather than from these numbers.
+- UNKNOWN: whether any existing gate already covers part of this class. Check `frontend/scripts/` and `.github/workflows/checks.yml` before writing a line, and extend an existing gate rather than adding a script if one fits, per the standing preference.
+
+JOB 1, THE CHECKER, phase 1 only, exactly the five classes the spec approves: dead path references, stale line citations, dead symbol citations, dead commit references, dead cross-document references. Scan all tracked `.md` EXCEPT `reports/archive/` and `docs/stake-engine-live/`, which are dated records and verbatim third-party captures respectively and are not ours to keep current. **Do not implement phase 2 predicates in this job.**
+
+JOB 2, THE SEEDED SELF-TEST, per convention (p) and non-negotiable. Five seeds, each planted in a throwaway copy, each required to make the gate go RED, and **seed number one is the form that actually shipped**: a line reading NOT YET MIRRORED about a path that exists, which is the defect that corrupted a work order and survived three readers. Plus negative controls: the repository as it stands must pass once the baseline is frozen, and a document legitimately describing a past state inside a dated archive must not be flagged. **Expect the first real run to correct the gate.** Both previous gates here produced false positives on their first run and both were design flaws rather than exceptions. Fix structurally; do not allowlist a false positive you can fix.
+
+JOB 3, THE FIRST REAL RUN AND THE FROZEN BASELINE, per FULL_AUDIT_METHOD 3.1. Key the freeze by file AND text so a new instance elsewhere still fails. Print the frozen count on every run, because a gate quietly excusing a hundred claims reads exactly like a gate with nothing to excuse. Check the list in BOTH directions so an entry matching nothing fails too. **Report the true first-run count plainly even if it is embarrassing**, and hand the baseline to Session 3's JOB 4 as its burn-down target, which is what makes that purge measurable rather than open ended.
+
+JOB 4, CI WIRING: a static-gate step in `.github/workflows/checks.yml` after `locked_paths_gate.mjs`, with the self-test running as its own step BEFORE the scan, so a gate that has lost the ability to fail is caught by CI rather than by a reviewer four days later.
+
+JOB 5, PHASE 2 PILOT, only if the stop lines allow and only on the two documents Fable approved: `SUBMISSION_DOSSIER.md` and `GAME_FACTS.md`, nothing else. Four predicates only: `exists`, `!exists`, `count=N`, `grep` and `!grep`. Extend the gate to check them. **Record an adoption verdict for Fable**: did annotating two real documents prove the habit, or did it prove the spec's own warning that a predicate nobody writes checks nothing. An honest NOT PROVEN is a complete answer and is more useful than a forced yes.
+
+JOB 6, close per rule 10 with the run link, Plan of Record graded, and FOR THE NEXT SESSION confirming that Session 3's brief stands with its tier 2 now complete, so its Plan of Record can move that budget to the 82 proof paths.
+
+WHAT THIS SESSION MUST NOT DO, stated so scope creep has a name: do not fix any finding the gate reports, beyond striking claims that are trivially and verifiably dead. The burn-down is Session 3's JOB 4 and doing it here would leave that session with an unmeasurable target. Do not touch player-visible frontend code. Do not implement MID-01. Do not widen phase 2 beyond the two approved documents.

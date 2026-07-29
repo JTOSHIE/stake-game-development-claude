@@ -176,6 +176,35 @@ jobs:
           GITHUB_REF_NAME: ${{ github.ref_name }}
         run: node scripts/qa/locked_paths_gate.mjs
 
+      # DOCUMENT CURRENCY, built 2026-07-29 to docs/records/DOC_CURRENCY_GATE_SPEC.md.
+      #
+      # A committed document may not make a claim that is no longer true of HEAD.
+      # A stale line in COMPLIANCE_WATCH.md was read as evidence by the Head of
+      # Engineering, written into a brief as an instruction, and reached the next
+      # session's boot as a VERIFIED premise. Three readers trusted the document
+      # and the document was wrong. A reader has no cheap way to know a prose line
+      # is stale; this does.
+      #
+      # THE SELF-TEST RUNS FIRST, AS ITS OWN STEP, and that ordering is the point.
+      # A gate that has lost the ability to fail is a script that prints PASS, and
+      # this project has produced that failure four separate times with a green
+      # gate sitting over it. Running the seeds here means CI catches it rather
+      # than a reviewer reading the regex four days later.
+      #
+      # It needs the full history that fetch-depth: 0 above already provides: the
+      # dead-commit class asks git to resolve every SHA the documents cite, and on
+      # a shallow clone every one of them would read as dead.
+      - name: document currency, seeded-violation self-test
+        run: node scripts/qa/doc_currency_gate.mjs --self-test
+
+      # The scan honours scripts/qa/doc_currency_baseline.json, the frozen debt
+      # that existed when the gate went live (FULL_AUDIT_METHOD.md 3.1). The
+      # frozen count PRINTS on every run, because a gate quietly excusing several
+      # hundred claims reads exactly like a gate with nothing to excuse. The list
+      # is checked in both directions, so an entry that stops matching fails too.
+      - name: document currency scan
+        run: node scripts/qa/doc_currency_gate.mjs
+
       - name: Install frontend dependencies
         working-directory: frontend
         # `npm ci` is reproducible and fails if the lockfile is out of sync.
