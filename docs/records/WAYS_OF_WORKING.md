@@ -83,9 +83,25 @@ twice with the same shape:
 
 - **The payments line.** A stale claim in `COMPLIANCE_WATCH.md` was read, treated as
   evidence, and written into a work order as an instruction.
-- **`census.mjs`.** A script named in a session's NARRATION was cited in the next brief as
-  the tool that had done the work. It had been written to scratch and never committed. It
-  does not exist. The gate found it in the brief that commissioned the gate.
+- **A script named in a session's NARRATION** was cited in the next brief as the tool that
+  had done the work. It had been written to scratch and never committed, so it does not
+  exist. The currency gate found it in the brief that commissioned the currency gate. The
+  name is left unbackticked here on purpose, because a backticked dead filename in a live
+  document is itself a gate finding, which is the blind spot recorded below:
+
+```
+the script:  census.mjs   (never committed, exists nowhere in the tree)
+```
+
+  **That is not evasion, it is the form matching the meaning.** A fenced illustrative
+  example is exactly what the gate excludes and exactly what this is. **But note the wider
+  problem it exposes**, because it is not confined to this paragraph: any live document that
+  REPORTS a dead reference trips the DEAD_PATH class, since the gate checks whether a cited
+  path exists and never what the surrounding sentence says about it. Ledgers, dispositions
+  and the review tracker are full of exactly that shape. A negation-aware check (treating
+  "does not exist", "was deleted", "no longer exists" as a report of absence rather than a
+  claim of presence) is the structural fix and is recorded as follow-up rather than bolted
+  on at the end of a window.
 
 **The common cause is not carelessness, it is a category error: treating what a session
 SAID as equivalent to what the repository HOLDS.** A session's narration is REPORTED. Only
