@@ -159,10 +159,44 @@ that gate is reverted rather than wired unproven.
 
 ---
 
-## 4. THE MEASURED MECHANISM COUNT
+## 4. THE MEASURED MECHANISM COUNT, filled 2026-07-29 before any gate was written
 
-*This section is filled by JOB 2 before JOB 3 begins. It is empty on posting, deliberately: a
-plan that guessed the number would be pre-empting the survey that exists to measure it.*
+**21 mechanisms.** Twenty gates, one tracker-row family, six requirements genuinely
+unreachable. Full register with the evidence at `reports/qa/session3/MECHANISMS.md`.
+
+**Section 2.1's conditional resolves to DOES NOT FIT.** The plan said seven or fewer fits and
+more than seven does not. The measurement is 21, so the degradation order decides.
+
+| Basis for the cost of all 20 gates | Total | Against 3.0M |
+|---|---|---|
+| The squads' own estimates, 116k average | 2.32M | would fit |
+| **The measured floor, 0.4M per gate (the currency gate)** | **8.0M** | **2.7x over** |
+
+**The squads' figure is not used.** It is 3.4x to 6x optimistic against the only seeded-gate
+cost this project has measured, and the adversarial panel returned 5 FATAL and 21
+NEEDS_REDESIGN across the 40 proposals, which says the redesign is where the money goes.
+
+### 4.1 What is therefore built, and what is parked
+
+Gates are built in coverage order, highest first, until the JOB 3 allocation is spent.
+
+**M09 is skipped despite ranking sixth**, because it is a phase 2 widening of the document
+currency gate and **Fable's ruling 5 caps phase 2 at two named documents**. The brief forbids
+widening it without a fresh ruling. Its five requirements are parked with that reason and the
+ruling is requested rather than assumed.
+
+**Every requirement below the line gets an owner-parked tracker row naming why**, which the
+brief states plainly is a complete answer and not a failure.
+
+### 4.2 Two corrections to this plan's own arithmetic, recorded rather than smoothed
+
+1. **The survey cost 1.63M against 1.25M planned, plus 30 per cent.** The overspend is entirely
+   in the verification panel, which was told to read the repository rather than reason from the
+   proposals. It bought the REQ-040 catch and all five FATALs, so it is a purchase and the next
+   survey should budget for it rather than trim it.
+2. **The main-loop plan for JOB 3 was 3.0M and the real figure available is nearer 2.5M**, once
+   JOB 4, JOB 5 and JOB 6 are held back at their planned 1.0M, 0.8M and 0.5M. At the measured
+   0.4M per gate that is about six gates, not seven.
 
 ---
 

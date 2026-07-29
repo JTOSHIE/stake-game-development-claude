@@ -1,0 +1,428 @@
+{
+ "FAMILIES": [
+  {
+   "id": "M01",
+   "name": "replay-contract-driven-session",
+   "instrument": "Playwright over the BUILT bundle at a six-parameter replay URL, capturing every request and asserting the rendered lifecycle",
+   "covers": [
+    "REQ-077",
+    "REQ-079",
+    "REQ-080",
+    "REQ-083",
+    "REQ-085",
+    "REQ-090",
+    "REQ-091",
+    "REQ-094",
+    "REQ-098",
+    "REQ-099",
+    "REQ-132"
+   ],
+   "from": [
+    "replay-request-and-network-isolation",
+    "replay-fetch-lifecycle-states",
+    "replay-optional-params-applied-on-surface",
+    "replay-mode-real-money-isolation-static",
+    "book-event-order-playback"
+   ],
+   "kind": "WIRE_EXISTING_SCRIPT",
+   "asset": "frontend/scripts/replay_blocker_proof.mjs (exists, UNWIRED)",
+   "cost": 150000,
+   "risk": "the existing glob route must become an exact-URL assertion first, or the seeds stay green"
+  },
+  {
+   "id": "M02",
+   "name": "disclaimer-and-social-vocabulary-conformance",
+   "instrument": "string-set assertion over the i18n prose layer in all sixteen locales",
+   "covers": [
+    "REQ-010",
+    "REQ-011",
+    "REQ-012",
+    "REQ-013",
+    "REQ-014",
+    "REQ-015",
+    "REQ-016",
+    "REQ-038"
+   ],
+   "from": [
+    "disclaimer-message-conformance",
+    "social-branch-literal-scan"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/scripts/locale_prose_conformance.mjs + the wired \"social vocabulary\" step",
+   "cost": 200000,
+   "risk": "social-branch-literal-scan was priced at 350k alone; the merged form is cheaper but the literal-scan half is the expensive one"
+  },
+  {
+   "id": "M03",
+   "name": "delivery-set-and-kit-payload-conformance",
+   "instrument": "one read-only walk of design-system/brand/delivery/ and the kit copy manifest: names, PNG alpha, dimensions, hashes, size caps",
+   "covers": [
+    "REQ-164",
+    "REQ-169",
+    "REQ-170",
+    "REQ-171",
+    "REQ-172",
+    "REQ-173",
+    "REQ-174",
+    "REQ-176"
+   ],
+   "from": [
+    "delivery-set-conformance",
+    "kit-build-check-wired-in-ci",
+    "provider-mark-small-size-legibility-floor"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "read-only sibling of frontend/scripts/tile_delivery_build.mjs",
+   "cost": 170000,
+   "risk": "REQ-174 legibility is an image measurement and may need to split back out"
+  },
+  {
+   "id": "M04",
+   "name": "currency-display-table-conformance",
+   "instrument": "table-driven unit run of formatBalance against the platform Supported Currencies table",
+   "covers": [
+    "REQ-108",
+    "REQ-119",
+    "REQ-125",
+    "REQ-126",
+    "REQ-127"
+   ],
+   "from": [
+    "currency-display-table-conformance",
+    "win-precision-and-exactness",
+    "currency-isolation-from-round-logic"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/src/lib/utils/currency.test.ts + the wired \"currency static assertions\" step",
+   "cost": 120000,
+   "risk": "REQ-126 has no reachable state at HEAD (no bet below $0.10 is selectable), so half the requirement cannot be witnessed"
+  },
+  {
+   "id": "M05",
+   "name": "money-readout-and-wager-bounds-live",
+   "instrument": "driven browser session asserting the balance and win readouts are present and live, and that no submittable wager escapes the authenticated bounds",
+   "covers": [
+    "REQ-041",
+    "REQ-067",
+    "REQ-068",
+    "REQ-121",
+    "REQ-124"
+   ],
+   "from": [
+    "money-readout-liveness",
+    "submittable-wager-bounds",
+    "small-denomination-ladder-floor"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/scripts/bet_selector_gate.mjs (wired) + currency_conformance.mjs (UNWIRED)",
+   "cost": 140000,
+   "risk": "PANEL FATAL: bet_selector_gate ODD_LADDER tops at 90,000 units so the bound assertion is red before seeding; and REQ-124 binds the MATHS package ladder, not the frontend fallback"
+  },
+  {
+   "id": "M06",
+   "name": "commercial-obligation-tracker-rows",
+   "instrument": "not a gate: a completeness assertion over owner-parked tracker rows",
+   "covers": [
+    "REQ-178",
+    "REQ-181",
+    "REQ-186",
+    "REQ-187",
+    "REQ-188",
+    "REQ-189",
+    "REQ-190",
+    "REQ-194"
+   ],
+   "from": [
+    "commercial-obligation-row-completeness",
+    "repository-access-grant"
+   ],
+   "kind": "TRACKER_ROWS",
+   "asset": "OWNER_CHECKLIST.md",
+   "cost": 90000,
+   "risk": "PANEL: asserting a row EXISTS is not asserting the obligation is MET. This is a park, correctly labelled"
+  },
+  {
+   "id": "M07",
+   "name": "shipped-asset-provenance-manifest",
+   "instrument": "manifest of every shipped binary against committed generation records, by hash",
+   "covers": [
+    "REQ-052",
+    "REQ-138",
+    "REQ-141",
+    "REQ-147"
+   ],
+   "from": [
+    "shipped-asset-provenance-manifest-gate"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "design-system/brand/GENERATION_NOTE_*.md",
+   "cost": 250000,
+   "risk": "PANEL NEEDS_REDESIGN: corpus stated twice and differently (dist 107 files vs public 1,015), and the rights-basis field is not machine-derivable"
+  },
+  {
+   "id": "M08",
+   "name": "paytable-maths-parity",
+   "instrument": "numeric equality between frontend display constants and the shipped maths package",
+   "covers": [
+    "REQ-040",
+    "REQ-074",
+    "REQ-140"
+   ],
+   "from": [
+    "paytable-rules-parity-drift"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/src/lib/config/fsModes.drift.test.ts (wired)",
+   "cost": 70000,
+   "risk": "none named. REQ-040 was UNASSIGNED by every squad and is folded in here on the panel’s finding"
+  },
+  {
+   "id": "M09",
+   "name": "doc-claim-predicate-annotations",
+   "instrument": "doc_currency_gate phase 2 predicates on designated documents",
+   "covers": [
+    "REQ-135",
+    "REQ-150",
+    "REQ-175",
+    "REQ-180",
+    "REQ-183"
+   ],
+   "from": [
+    "doc-claim-predicate-annotations",
+    "tile-geometry-attribution-doc-check",
+    "no-unbacked-acceptance-claim"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "scripts/qa/doc_currency_gate.mjs (wired, first in CI)",
+   "cost": 110000,
+   "risk": "BLOCKED: Fable ruling 5 caps phase 2 at two named documents. Widening needs a fresh ruling. Also PANEL: the load-bearing ratchet half has no predicate that can distinguish a runtime fact from any other number"
+  },
+  {
+   "id": "M10",
+   "name": "shipped-artefact-external-origin",
+   "instrument": "driven session over the built bundle asserting every request resolves to the serving origin, plus a dist byte-scan for telemetry sinks",
+   "covers": [
+    "REQ-104",
+    "REQ-146"
+   ],
+   "from": [
+    "shipped-artefact-external-origin-assertion"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/scripts/build_diet_verify.mjs + platform_conformance_item2.mjs sameOriginSweep",
+   "cost": 60000,
+   "risk": "none named"
+  },
+  {
+   "id": "M11",
+   "name": "dependency-licence-and-advisory",
+   "instrument": "one lockfile walk yielding licence field, advisory query and git-pin check",
+   "covers": [
+    "REQ-139",
+    "REQ-143"
+   ],
+   "from": [
+    "dependency-licence-inventory-and-copyleft-gate",
+    "dependency-advisory-scan-recorded"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "frontend/package-lock.json",
+   "cost": 155000,
+   "risk": "none named; panel merged these and priced the pair"
+  },
+  {
+   "id": "M12",
+   "name": "entry-eligibility-clock",
+   "instrument": "date and step assertions against the competition deadline",
+   "covers": [
+    "REQ-191",
+    "REQ-192"
+   ],
+   "from": [
+    "entry-eligibility-clock"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "OWNER_CHECKLIST.md",
+   "cost": 60000,
+   "risk": "none named"
+  },
+  {
+   "id": "M13",
+   "name": "prohibited-content-lexicon",
+   "instrument": "token scan of shipped strings and asset names",
+   "covers": [
+    "REQ-137",
+    "REQ-142"
+   ],
+   "from": [
+    "prohibited-content-and-brand-token-lexicon-scan"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/src/lib/i18n/vocabulary.ts",
+   "cost": 140000,
+   "risk": "PANEL NEEDS_REDESIGN: the platform clause is a four-part CATEGORY definition, not a lexicon. A token scan cannot assert the category"
+  },
+  {
+   "id": "M14",
+   "name": "prohibited-mechanic-control-inventory",
+   "instrument": "assertion that no jackpot, gamble, continuation or cashout control exists",
+   "covers": [
+    "REQ-002"
+   ],
+   "from": [
+    "prohibited-mechanic-control-inventory"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "frontend/src/lib/config/fsModes.ts",
+   "cost": 90000,
+   "risk": "none named"
+  },
+  {
+   "id": "M15",
+   "name": "autoplay-single-confirmed-start-path",
+   "instrument": "caller-reachability analysis over Svelte components",
+   "covers": [
+    "REQ-072"
+   ],
+   "from": [
+    "autoplay-single-confirmed-start-path"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "frontend/scripts/check_autoplay_confirm_gate.mjs (exists but only counts occurrences)",
+   "cost": 120000,
+   "risk": "PANEL: relabelled from WIRE_EXISTING_SCRIPT. All three seeds pass green against the existing script"
+  },
+  {
+   "id": "M16",
+   "name": "cross-os-cross-browser-matrix",
+   "instrument": "widen the browser matrix beyond one runner OS and chromium",
+   "covers": [
+    "REQ-185"
+   ],
+   "from": [
+    "cross-os-cross-browser-matrix"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": ".github/workflows/checks.yml:598-630",
+   "cost": 250000,
+   "risk": "PANEL NEEDS_REDESIGN: the assertion and its own wall-clock negative control cannot both hold"
+  },
+  {
+   "id": "M17",
+   "name": "books-publish-cap-blocker",
+   "instrument": "size and event-count caps on the publish files",
+   "covers": [
+    "REQ-157"
+   ],
+   "from": [
+    "books-publish-cap-blocker"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "scripts/validate_math.py",
+   "cost": 45000,
+   "risk": "PANEL NEEDS_REDESIGN: .gitignore:9 excludes **/library/**, so the books are absent from every clone and runner. Only synthetic fixtures are measurable"
+  },
+  {
+   "id": "M18",
+   "name": "nonzero-payout-count-in-evidence",
+   "instrument": "assert the submitted maths evidence carries the payout count",
+   "covers": [
+    "REQ-158"
+   ],
+   "from": [
+    "nonzero-payout-count-in-submitted-evidence"
+   ],
+   "kind": "WIRE_EXISTING_SCRIPT",
+   "asset": "scripts/validate_math.py:163 (exists, UNWIRED)",
+   "cost": 45000,
+   "risk": "none named"
+  },
+  {
+   "id": "M19",
+   "name": "submitted-version-pair-binding",
+   "instrument": "the submission record names one frontend and one maths version, both matching the artefacts",
+   "covers": [
+    "REQ-149"
+   ],
+   "from": [
+    "submitted-version-pair-binding"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/dist/build-info.json + dist_hygiene_gate.mjs",
+   "cost": 55000,
+   "risk": "PANEL FATAL on the commit half: vite derives the stamp from git rev-parse HEAD at build time, so the check is circular"
+  },
+  {
+   "id": "M20",
+   "name": "guidelines-58-clearance",
+   "instrument": "every item of the platform 58-item checklist carries a disposition",
+   "covers": [
+    "REQ-153"
+   ],
+   "from": [
+    "guidelines-58-clearance"
+   ],
+   "kind": "NEW_SCRIPT",
+   "asset": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
+   "cost": 70000,
+   "risk": "none named"
+  },
+  {
+   "id": "M21",
+   "name": "relative-emitted-reference-shape",
+   "instrument": "every reference emitted into dist/index.html is relative",
+   "covers": [
+    "REQ-131"
+   ],
+   "from": [
+    "relative-emitted-reference-shape"
+   ],
+   "kind": "EXTEND_EXISTING_GATE",
+   "asset": "frontend/scripts/dist_hygiene_gate.mjs (wired)",
+   "cost": 22000,
+   "risk": "none named"
+  },
+  {
+   "id": "PARK",
+   "name": "genuinely-unreachable",
+   "instrument": "no mechanical proof exists; owner-parked tracker row",
+   "covers": [
+    "REQ-001",
+    "REQ-043",
+    "REQ-044",
+    "REQ-151",
+    "REQ-156",
+    "REQ-179"
+   ],
+   "from": [
+    "(survey unreachable list, panel confirmed 4 of 6 and reclassified 2)"
+   ],
+   "kind": "OWNER_PARKED",
+   "asset": "n/a",
+   "cost": 0,
+   "risk": "PANEL: REQ-151 and REQ-179 were proposed as coverable and are FATAL as proposed (CI cannot observe either refusal), so they move here"
+  }
+ ],
+ "ordered": [
+  "M01",
+  "M02",
+  "M03",
+  "M04",
+  "M05",
+  "M09",
+  "M07",
+  "M08",
+  "M13",
+  "M10",
+  "M11",
+  "M12",
+  "M14",
+  "M15",
+  "M16",
+  "M19",
+  "M20",
+  "M17",
+  "M18",
+  "M21"
+ ]
+}
