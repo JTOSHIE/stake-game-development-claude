@@ -9,6 +9,83 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 029 - 2026-07-29 - DECISION REQUEST: the boot set audited, 9 wrong assertions found, and only 3 of them are expressible in the 4 predicates you capped
+
+**The measurement you would want first: 47 factual claims checked across the boot set, 9
+wrong. A drift rate of 19 per cent.** Nothing in the budget model recorded how fast this
+project's documents go stale, and now something does.
+
+**THE CLASS IS NOT THE ONE THE GATE FREEZES.** `doc_currency_baseline.json` holds 333 frozen
+DEAD REFERENCES. **Not one of the 9 is in it**, because they are WRONG ASSERTIONS rather than
+dead paths: a count, an enumeration, a file attribution, a status. A dead path is visible to
+a machine. A wrong number is not, unless somebody wrote it in a checkable form, which is
+exactly what your phase 2 cap is about.
+
+**A CORRECTIVE TO THE FRAMING WE ARRIVED WITH, because it changes where to aim.** Frozen
+entry count is NOT a proxy for staleness. `docs/records/upload-kit/00_READ_ME_FIRST.md` is
+the second largest baseline contributor at 23 entries and is **factually current**: it carries
+a live `PART 9i: THE v10 VISIT` and marks every earlier part "(SUPERSEDED, DO NOT RUN)". Its
+23 entries are dead paths to deleted kit directories that it correctly reports as gone. The
+documents that were WRONG were mostly not the ones with the most frozen entries.
+
+### The 9, and which a predicate would have caught
+
+| # | The wrong assertion | Would an existing predicate have caught it? |
+|---|---|---|
+| 1 | `QUALITY_CHARTER` Q-26: four instances "in `fsModes.ts`". The file contains none; the real set is 51 across 16 locales | **PARTLY.** `!grep` would have caught the wrong FILE. The count of 51 is not expressible |
+| 2 | `M04:48`: NZD "is not in the platform table at all". It is | **YES.** A `grep` against the capture |
+| 3 | `M04:48`: cites `currency.ts:25` for a list no longer there | **YES**, already covered by phase 1 STALE_LINE |
+| 4 | `KNOWN_OPEN`: "the ledger holds 571 findings". It holds 2 | **NO** |
+| 5 | `KNOWN_OPEN` and `CLUSTERS`: 571 findings. It is 566 | **NO** |
+| 6 | `CLUSTERS`: "over 55 active shards". It is 54 | **YES.** `count=54` over the shard glob |
+| 7 | `doc_currency_baseline.json`: header said 334 and 51, body held 333 and 50 | **NO.** Fixed with a gate assertion instead |
+| 8 | `DOC_CURRENCY_GATE_SPEC:207`: `REVIEW_TRACKER.md` at 59 entries. It is 58 | **NO** |
+| 9 | `PARKED_TRACKER`: REQ-108 "CURRENTLY UNMET". Met and gated the day before | **YES.** `!exists` against the gate file |
+
+**4 of 9 catchable with what exists, 1 partly, 4 not at all.**
+
+### The request, and it is narrow
+
+**1. May phase 2 be widened beyond `SUBMISSION_DOSSIER.md` and `GAME_FACTS.md`?** The
+evidence you asked for, rather than an assertion:
+
+- **Cost measured, not estimated: one line per claim, and no measurable run-time cost.** The
+  four annotations now live evaluate in the same pass that already walks every tracked `.md`.
+- **The pattern works where it was piloted.** `SUBMISSION_DOSSIER.md:270` claims `count=7`
+  publish files; the filesystem shows 12 and the predicate correctly counts the 7 TRACKED
+  ones, the 5 book archives being deliberately gitignored. That document already argues this
+  session's whole thesis in its own words: *"A count that is written down is a count that
+  goes stale; a count that is checked cannot."*
+- **The candidates, if you widen:** `reports/qa/stream_test/KNOWN_OPEN.md` and
+  `reports/qa/stream_test/CLUSTERS.md`, which briefs boot from and which produced findings
+  4, 5 and 6 above.
+
+**2. A FIFTH PREDICATE, and it is the one that would have caught the worst finding.** All
+four existing forms count or match FILES. Findings 4, 5, 7 and 8 are counts of MATCHES or of
+records inside a file, which no current form can express. Proposed, in the same deliberately
+small vocabulary:
+
+```
+<!--CHECK: grepcount=566 "^## [A-Za-z0-9-]+ (STREAM|HIGH|MEDIUM|LOW) " reports/qa/stream_test/shards/ST*.md-->
+```
+
+That single predicate would have failed the moment 571 was written, and 571 was quoted
+onward into a document every brief boots from.
+
+**3. A PRE-EXISTING BREACH OF YOUR CAP, reported and NOT removed, because the cap is yours to
+rule on.** `reports/qa/session3/JOB4_CAUSE_REDERIVATION.md:281` carries a live predicate
+outside the two named documents. It is a working check in a document that should probably not
+have one. Remove it, or let it stand as a third adopted document.
+
+**Disclosure, because it is the same rule applied to ourselves:** while correcting
+`KNOWN_OPEN.md` and `CLUSTERS.md` this session annotated both with predicates, which is a
+breach of your cap. It was caught in self-audit and both were removed before commit. The gate
+would not have stopped it: it evaluates predicates in any tracked `.md`, so the cap is policy
+and nothing enforces it. **If you keep the cap, it should be enforced by the gate rather than
+by good intentions**, and that is a fourth thing we can build on your word.
+
+---
+
 ## 028 - 2026-07-29 - TRANSCRIPTION: your 027 rulings executed, the currency table shipped whole, the lock sanction NOT taken, and the count in the brief was wrong in our favour
 
 **Your 027 rulings are transcribed below and all of them are executed.** Session 4b,
