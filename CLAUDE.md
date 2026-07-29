@@ -667,10 +667,9 @@ push's remote result, so every session reads these:
 | the other six browser legs | 74 to 217 seconds each, in parallel |
 | **browser wall-clock** | **2.9 to 4.6 minutes** across two runs, down from 6.4 |
 
-**BILLED MINUTES ARE NOT WALL CLOCK, and from 2026-07-29 they cost money.** The table
-above is WALL CLOCK, which is what a session waits for. The repository went private on
-2026-07-29, so Actions minutes are now metered, and the number that bills is the SUM of
-the parallel jobs rather than the elapsed time:
+**BILLED MINUTES ARE NOT WALL CLOCK.** The table above is WALL CLOCK, which is what a
+session waits for. The number that BILLS is the SUM of the parallel jobs rather than the
+elapsed time, and the two differ by about sevenfold here:
 
 | | Measured 2026-07-29 |
 |---|---|
@@ -681,6 +680,13 @@ the parallel jobs rather than the elapsed time:
 The eleven browser legs are 22.7 of those 24.1 minutes. **So the two-job split that bought
 the wall-clock win and the per-gate naming is also what makes a push expensive**, and both
 facts are true at once.
+
+**Public repositories get unlimited Actions minutes, so this bites only while private.**
+The repository was private for a few hours on 2026-07-29 while its root licence was
+corrected, which is when this was measured, and it is public again. **The gating below is
+kept regardless**, because a documents-only push has no business running eleven browser
+gates whoever is paying: it returns a result in a fifth of the time and a red check means
+something rather than being buried in eleven greens.
 
 **The mitigation, and the trap inside it.** `checks.yml` now gates the BROWSER MATRIX on
 whether a push touched rendering, shipping or gate code, via a `changes` job. **The static

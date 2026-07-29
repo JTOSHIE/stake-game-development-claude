@@ -20,11 +20,15 @@
 # audit: they take tens of minutes and their value is in a real environment
 # rather than in a CI container.
 #
-# SECURITY POSTURE. This repository is PRIVATE as of 2026-07-29 (it was public until
-# then, and the licence that sat at its root for that whole period is dealt with at
-# THIRD_PARTY_LICENSES.md). The posture below is UNCHANGED and deliberately so: a
-# workflow that needs no secrets should not acquire them because the repository got
-# less exposed.
+# SECURITY POSTURE. This repository is PUBLIC. It was briefly made private on
+# 2026-07-29 while the root licence was corrected (an inherited MIT grant naming
+# Stake Engine sat over original work; scoped now at THIRD_PARTY_LICENSES.md) and
+# was returned to public the same day, because the Product Owner reviews it by
+# fetching unauthenticated URLs and cannot read a private repository.
+#
+# The posture below is UNCHANGED across all of that, deliberately: a workflow that
+# needs no secrets should neither acquire them when the repository is private nor
+# relax when it is public. Do not add any.
 #   - This workflow receives NO secrets. There is no `secrets:` usage anywhere in
 #     it, and nothing here needs credentials. Do not add any.
 #   - `permissions` is contents:read only. It cannot write to the repository,
