@@ -9,6 +9,59 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 023 - 2026-07-29 - DECISION REQUEST: Session 1 closed, 26 STREAM clusters verified, only 19 per cent of diagnoses survived, and a delivery structure for your acceptance
+
+Session 1 of the stream close ran to its DONE MEANS and closed green. 80 agents, zero
+lost, about 12.4M of a 14.5M budget, plan variance plus 3.8 per cent. Full account in
+`reports/SESSION_REPORT.md` and `reports/qa/stream_test/CLUSTERS.md`.
+
+**Your RULING 4 was applied and widened on evidence.** The sight gate re-judged four small
+viewport sessions on 1600px frames, 28 squads. **172 of 261 findings were NEW AT 1600PX**,
+so two thirds of that wave was invisible at the resolution the earlier pass signed coverage
+over. It also **refuted 42 native claims**, including a signed absence that did not survive
+and a "two font families" claim that was simply wrong. The widening: popout-s is 90,000
+pixels against mobile-s at 181,760, so it is the worst affected set and is not a mobile
+session, which your ruling's plain wording would have missed.
+
+**Your RULING 2 was applied and it earned itself immediately.** 52 adversarial seats over
+26 STREAM clusters: CONFIRMED 5, PARTIAL 16, REFUTED 1, SPLIT 4, REOPENED 7. **The defects
+are real; the diagnoses are mostly wrong.** C-01, seen by twelve shared-nothing squads,
+is real and worse than measured, but one cited cause is refuted by the source, **its
+proposed fix is a no-op**, and the other cited fix converts a see-through band into a
+dead-black one. The sound cause is `GameGrid.svelte:499`, `DROP_H = 520`, which nobody read.
+
+**The safeguards you attached caught SIX of twenty six clusters carrying a marshalling
+fault, and all six were mine**, from grep-level clustering: two fused unrelated defects,
+one counted two squads reading a single image as two instances, one **counted a signed
+WITHDRAWN DRAFT CLAIM as a corroboration**, and two had corroboration hidden because
+clustering ran one severity tier at a time. That last pair is a method fault and is fixed:
+cluster across all tiers first, filter by severity after.
+
+**No fix was applied from the sixteen PARTIAL clusters, deliberately.** Two first-hand
+findings were applied and re-proven from fresh frames: **TR-117 both halves**, so `16x BET`
+becomes `16× BET` and German reads `GROSSER GEWINN` + `16× EINSATZ`. TR-104 was sized as
+larger than small; it was one line. **MID-01 stays parked**: your shared-clock ruling needs
+a refactor plus a seeded equality assertion, not a one-liner.
+
+**Two defects found in our own tooling.** The capture harness had its output date
+hardcoded, so **any re-run would have overwritten all 519 committed evidence frames**; it
+now asks git and refuses without an explicit flag, seeded per convention (p). And a gate
+went red on an improvement because it asserted a **call shape** rather than the guarantee;
+it now checks behaviour through the shipped path. Main is green at `9602728`.
+
+**FOUR THINGS FOR YOU.** (1) Accept TR-117 and the no-fix decision on the PARTIAL sixteen.
+(2) **Does 19 per cent diagnosis soundness change the method?** Finding a defect is cheap
+and reliable; explaining it is neither, and squads may be over-claiming causes where
+UNKNOWN is the honest answer. (3) **Session 2's parameters**: your map was cited in the
+brief and does not exist in the repository, named per convention (m) rather than
+reconstructed. (4) **`docs/records/WAYS_OF_WORKING.md`**, one page, for your acceptance as
+Product Owner. Note section 6 especially: **you are read-only by design, so a ruling only
+enters the record when a session transcribes it**, which failed silently once already.
+Section 9 records what was deliberately stripped from a normal Scrum setup and is the part
+most likely to deserve your pushback.
+
+---
+
 ## 022 - 2026-07-29 - DECISION REQUEST: Wave 2 discovery is complete and deliberately unverified, 540 findings, and four items need your ruling
 
 The stream test resumed after your session's allowance ran out mid-checkpoint. First, the
