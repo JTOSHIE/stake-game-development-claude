@@ -580,6 +580,30 @@ jobs:
         working-directory: frontend
         run: node scripts/currency_table_gate.mjs
 
+      # ── Gate 12c: the bet ladder is declared once, in three places ───────────
+      # This game declares its bet ladder three times, in three languages:
+      # game_config.py's bet_levels, the PUBLISHED game_metadata.json, and the
+      # frontend BET_LEVELS fallback. Two of the three are inside a locked path,
+      # so the cheapest edit is the unlocked one and it is the wrong one: a
+      # reviewer reads the published metadata, not the Svelte constant.
+      #
+      # REQ-124 (offer levels from $0.01) is PARKED at a 0.10 floor, derivation
+      # at reports/qa/session4b/REQ124_LADDER_DERIVATION.md. This gate is what
+      # makes that park safe: it goes red on any ONE-SIDED widening, including
+      # the exact edit the 2026-07-29 lock sanction would have produced had the
+      # derivation warranted taking it. Its negative control proves a CONSISTENT
+      # widening across all three stays green, so the gate does not block the fix
+      # it exists to protect.
+      #
+      # READ-ONLY against the locked package: both locked files are parsed as
+      # text and JSON, exactly as currency_scale_drift.test.mjs already parses
+      # the locked rgsService.ts. No lock sanction is needed to run it.
+      - name: bet ladder declaration drift, seeded-violation self-test
+        run: node scripts/qa/bet_ladder_declaration_drift.mjs --self-test
+
+      - name: bet ladder declaration drift
+        run: node scripts/qa/bet_ladder_declaration_drift.mjs
+
       # ── Gate 12a: social mode forces English ─────────────────────────────────
       # Stake Engine testing guideline item 46, quoted: "English is the only
       # supported language in Social Mode". It is written as a requirement on
