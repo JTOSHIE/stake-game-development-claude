@@ -8859,3 +8859,15 @@ output byte-identical to `reports/qa/currency_table_2026-07-29/GATE.txt`.
 
 **`git status` clean, no committed evidence rewritten.** The 16 evidence files that two
 conformance gates dirtied during their re-runs were all restored from HEAD and verified.
+
+**Final push, run `30453697686`, commit `d521c01`, conclusion SUCCESS.**
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30453697686
+
+**RULE 10 HAS THE SAME ONE-COMMIT LAG RULE 12 NAMES, and it is named here rather than
+chased.** Recording a run link is itself a commit, which starts another run, so a session
+that insists on committing the result of its own last push never terminates. The line above
+is the verified result of the push that carried this report. **This commit, which adds that
+line, is documents-only**, so per the `checks.yml` `changes` gating it runs the static job
+alone at about 1.4 minutes rather than the full matrix. Its result is verified and reported
+to the owner in the session close message rather than committed, which is where the chain
+stops.
