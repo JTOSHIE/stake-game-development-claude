@@ -59,11 +59,21 @@ silently and often. **Build this first; it is most of the value for a fraction o
 
 | Class | Pattern in prose | Check |
 |---|---|---|
-| **Dead path reference** | A backticked path, `frontend/src/lib/x.ts` | Does the path exist at HEAD |
-| **Stale line citation** | `file.ts:123` or `file.ts:120-140` | Does the file exist AND have at least that many lines |
-| **Dead symbol citation** | `` `functionName()` at `file:line` `` | Does that identifier still appear in that file |
+| **Dead path reference** | A backticked path | Does the path exist at HEAD |
+| **Stale line citation** | A backticked file with a line or line range after a colon | Does the file exist AND have at least that many lines |
+| **Dead symbol citation** | A backticked identifier with a file and line beside it | Does that identifier still appear in that file |
 | **Dead commit reference** | A 7 to 40 character hex SHA | Does `git cat-file -e` resolve it |
-| **Dead cross-document reference** | A backticked `.md` path, or `DOC.md` section N | Does the file exist, and the heading if named |
+| **Dead cross-document reference** | A backticked markdown path, or a document and section number | Does the file exist, and the heading if named |
+
+**THE EXAMPLES IN THIS TABLE ARE DESCRIBED RATHER THAN SHOWN, on purpose, and the reason is
+the gate itself.** Every cell above once carried a specimen in backticks, and the gate
+correctly read all five as live citations to files that do not exist, because that is exactly
+what they look like. A specification of a path-checker cannot show specimen paths in the form
+the checker hunts, in a document the checker scans. Fenced blocks are excluded and remain the
+right home for a worked example; a table cell is not, so the cells describe the shape in words.
+Corrected in Session 3's JOB 5, and it is a fix rather than a workaround: the form now matches
+the meaning, which is the same reasoning `docs/records/WAYS_OF_WORKING.md` 3.1 applies to a
+dead filename it deliberately leaves unbackticked.
 
 Session 2's own numbers say Phase 1 alone would have caught **at least the 10 DEAD_REFERENCE
 findings** and a share of the 26 STALE_NUMBER ones, mechanically and on every push.
@@ -112,10 +122,10 @@ Seeds, each planted in a throwaway copy and each required to go RED:
 1. **The real one.** A line reading `NOT YET MIRRORED` about a path that exists. This is the
    defect that actually cost this project a corrupted work order, and it is the seed that
    matters most.
-2. A `file.ts:9999` citation against a 200 line file.
+2. A line citation pointing past the end of a 200 line file.
 3. A backticked path that was deleted.
 4. A commit SHA that does not resolve.
-5. A `<!--CHECK: count=519-->` against a directory holding 518.
+5. A count predicate asserting 519 against a directory holding 518.
 
 Plus **negative controls**: the repository as it stands must pass, and a document
 legitimately describing a past state inside a dated archive must not be flagged.
@@ -162,8 +172,11 @@ exceptions. Do not allowlist a false positive that can be fixed structurally.
 ## 7. Sizing
 
 Phase 1 is a main-loop job, not an agent job. It is deterministic classification over about
-3,600 tracked files, which is exactly the work Session 2 did for near-zero cost with
-`census.mjs` rather than with ten squads.
+3,600 tracked files, which is exactly the work Session 2 did for near-zero cost with a
+one-off census script rather than with ten squads. (That script was written to scratch and
+never committed, so it exists nowhere in the tree and is deliberately not named in backticks
+here. Naming a dead file as though it were live is the provenance failure recorded at
+`docs/records/WAYS_OF_WORKING.md` 3.1, and this document is where the currency gate found it.)
 
 | Item | Estimate |
 |---|---|

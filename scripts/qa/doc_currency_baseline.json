@@ -9,14 +9,13 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 341,
+  "frozen_count": 334,
   "by_class": {
-    "DEAD_DOCREF": 13,
-    "DEAD_PATH": 252,
-    "STALE_LINE": 13,
+    "DEAD_DOCREF": 12,
+    "DEAD_PATH": 250,
+    "STALE_LINE": 10,
     "DEAD_SYMBOL": 51,
-    "DEAD_COMMIT": 11,
-    "BAD_PREDICATE": 1
+    "DEAD_COMMIT": 11
   },
   "frozen": [
     {
@@ -480,48 +479,6 @@
       "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
       "text": "FS_RTP_LABEL @ frontend/src/lib/i18n/translations.ts",
       "detail": "FS_RTP_LABEL does not appear in frontend/src/lib/i18n/translations.ts"
-    },
-    {
-      "cls": "BAD_PREDICATE",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "count=519",
-      "detail": "not one of exists, !exists, count=N, grep, !grep"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "DOC.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "census.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "frontend/src/lib/x.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "file.ts:120-140",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "file.ts:123",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/DOC_CURRENCY_GATE_SPEC.md",
-      "text": "file.ts:9999",
-      "detail": "the cited file does not exist at HEAD"
     },
     {
       "cls": "DEAD_PATH",
