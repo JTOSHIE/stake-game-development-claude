@@ -241,6 +241,29 @@ if (cloneHead !== facts.head) {
   process.exit(1)
 }
 
+// RESOLVE THE LIVE WALKTHROUGH SECTION HERE, BEFORE ANYTHING IS BUILT OR DELETED.
+//
+// This used to sit far below, after `rmSync(KIT)` had already deleted the existing
+// kit and after 02_frontend_upload/ and 03_branding/ had been populated. livePart()
+// THROWS by design when the walkthrough does not name exactly one unsuperseded
+// `# PART 9x:` heading, and its own doc comment says why: a kit whose README cannot
+// name the visit it belongs to is worse than no kit. But throwing at that point
+// PRODUCED precisely that: a Desktop folder holding the full bundle with no
+// README.md and no BUILD_INFO.json, so no commit SHA and none of the SINGLE USE
+// warnings. An unlabelled stale kit on the owner's Desktop is the TR-062 shape this
+// script exists to prevent, and the tmpdir clone leaked too, because the cleanup
+// below the throw was never reached.
+//
+// The trigger is an ordinary docs commit, not an exotic one: adding a new PART 9x
+// heading without marking the previous one SUPERSEDED gives two live parts. TR-100
+// records that exact mistake already shipping once, with kit_build writing a stale
+// `PART 9e` across three kit versions.
+//
+// Derived from source in Session 3's JOB 4, re-deriving cluster S2-C098's cause,
+// whose recorded cause pointed somewhere else entirely.
+const PART = livePart(readFileSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8'))
+console.log(`walkthrough live section: ${PART}`)
+
 const fe = join(clone, 'frontend')
 console.log('npm ci in the clone')
 execSync('npm ci --ignore-scripts', { cwd: fe, stdio: 'inherit' })
@@ -306,8 +329,8 @@ for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners
   cpSync(join(clone, 'design-system/brand/delivery', f), join(KIT, '03_branding', f))
 }
 
-const PART = livePart(readFileSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8'))
-console.log(`walkthrough live section: ${PART}`)
+// PART was resolved above, before the build and before rmSync(KIT), so a throw
+// costs nothing and destroys nothing. See the note there.
 
 const readme = `# ${KIT_NAME}, frontend only
 

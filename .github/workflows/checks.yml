@@ -197,6 +197,16 @@ jobs:
       - name: document currency, seeded-violation self-test
         run: node scripts/qa/doc_currency_gate.mjs --self-test
 
+      # Session 3 JOB 4, cluster S2-C098. kit_build.mjs already ships a seeded
+      # self-test and nothing ran it, while sixteen other gates run theirs. It is
+      # CI-safe by construction: the --self-test branch exits before treeFacts(),
+      # so it never reaches the two tree refusals, which cannot fire in CI at all
+      # (a checkout is always clean, and a pull request HEAD is a synthetic merge
+      # commit on no remote branch). Only the self-test is wired, deliberately:
+      # wiring --check would ship a step that can only print PASS.
+      - name: kit build, seeded-violation self-test
+        run: node scripts/kit_build.mjs --self-test
+
       # The scan honours scripts/qa/doc_currency_baseline.json, the frozen debt
       # that existed when the gate went live (FULL_AUDIT_METHOD.md 3.1). The
       # frozen count PRINTS on every run, because a gate quietly excusing several
