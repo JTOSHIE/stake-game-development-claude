@@ -22,6 +22,18 @@ document.** v6's own header says so, and its sections 4 and 6 are a dated snapsh
 than current status. The tracker, the session report and the living handover are state;
 these two files are frame.
 
+## Ways of working (roles, ceremonies, ready and done)
+
+**`docs/records/WAYS_OF_WORKING.md`** records who does what and when: the four roles, the
+three ceremonies that survive, Definition of Ready and Definition of Done, and the
+transcription step by which a read-only Product Owner's rulings actually reach the
+repository. One page. Read it at session start alongside this file.
+
+The two things in it that change a session's behaviour rather than describing it: **the
+fleet has no memory, so the documentation IS the team's competence and Definition of Ready
+is the delivery mechanism**; and **the meter is the burndown and is authoritative over any
+derived figure**, including the session's own arithmetic.
+
 ## Locked files (do not modify)
 
 These are also machine-enforced by the `deny` rules in `.claude/settings.json`:
