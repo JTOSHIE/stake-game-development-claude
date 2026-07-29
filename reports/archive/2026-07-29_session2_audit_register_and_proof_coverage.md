@@ -320,3 +320,38 @@ DEGRADE: audio, then accessibility, then animation, then social capture.
 DONE MEANS: each of the four gap waves has a swept surface with findings
         tiered, verified and dispositioned, or is explicitly not started.
 ```
+
+## Rule 10 closing, filled
+
+The session's work push (`834e126`) ran remote CI as run **30426121318** and it is **green**:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30426121318
+
+**Checked, not assumed**, per rule 10: `gh run view 30426121318` returns
+`status: completed`, `conclusion: success`, `headSha: 834e126dd9b91363bb54912f6eb510b5d8156f9d`.
+Wall clock 177 seconds, inside the measured 2.9 to 4.6 minute range recorded in `CLAUDE.md`, so
+this run is knowledge rather than alarm.
+
+The chain this session is a single push of six commits from `9496d5b` to `834e126`. No
+expected-fail runs were declared or needed, per rule 9. Local `locked_paths_gate.mjs` PASS
+before the push, and it reports `0 sanctioned, 0 violation(s)`, which is the correct result for
+a session that touched no locked path.
+
+## Rule 12 owner preview, filled
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 834e126  |  built 2026-07-29T15:47:20+10:00  |  started 2026-07-29T05:48:12.521Z  |  http://192.168.4.92:5173
+```
+
+**And the address was curled rather than believed**, per the rule's own earned clause that
+printing a URL is not evidence the URL works: `HTTP 200`, 1,256 bytes, serving
+`<title>Future Spinner</title>`.
+
+**A sequencing miss of mine, recorded because the rule is explicit about the order.** Rule 12
+asks that the preview run BEFORE the session report so the line is evidence rather than an
+intention. It ran after the report body was written, so this section is an append rather than an
+inline line. The line above is real and verified; the ordering was mine to get right and I did
+not. The rule's one-commit-lag clause is honoured below.
+
+It is run once more as the LAST action of this close, after the final push, per the
+one-commit-lag clause: the line quoted here is the earlier one, the address is the later one. A
+reader finding them one docs commit apart has found the design, not a bug.
