@@ -38,13 +38,18 @@ they are one thing.
 | The claim | What was treated as evidence |
 |---|---|
 | A page was "not yet mirrored" | **A document.** A line was read and called verified. It had been mirrored 34 minutes after that line was written |
-| `census.mjs` was the tool a session used | **A narration.** It was written to scratch and never committed |
+| a script named census dot mjs was the tool a session used | **A narration.** It was written to scratch and never committed, and exists nowhere in the tree |
 | "36 currency codes" | **A sample.** Seven rows were checked and a count was reported. The capture published 49 |
 | A baseline header of 334/51 | **Unchecked arithmetic** over a body of 333/50 |
 
 **In every case a SECONDARY source was treated as a primary one.** A document is a claim,
 not evidence. A narration is not a repository. A sample is not a count. Arithmetic nobody
 ran is not arithmetic.
+
+**The name in row two is deliberately not backticked.** A dead filename written as a path,
+in a live document, is itself a gate finding, and this row was flagged by the currency gate
+within a minute of being written. Matching the form to the meaning is the fix; an allowlist
+entry would not be.
 
 **The test, applicable in the moment:** *am I looking at the thing, or at something that
 describes the thing?* If it is the second, it is REPORTED, whatever it says about itself.
