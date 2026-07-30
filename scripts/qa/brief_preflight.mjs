@@ -84,6 +84,22 @@ const VERIFIED_RE = /\*\*VERIFIED\b[^*]*\*\*/i
 // FULL_AUDIT_METHOD 3.2 predicts. Fixed structurally rather than allowlisted.
 const ABSENCE_RE = /\b(not yet mirrored|does not exist|no longer exists?|was deleted|is missing|is absent|does not currently exist|exists nowhere)\b/i
 
+// DECLARED ARTEFACTS. A brief is REQUIRED by reports/briefs/_TEMPLATE.md to name
+// the artefacts it expects and to say whether to create them, precisely so a
+// session does not invent a path that the next session cannot find. Such a path
+// does NOT exist at HEAD by definition, and flagging it as a dead reference
+// punishes a brief for following the template.
+//
+// Found on this gate's first run against a real draft, which is the third gate in
+// this project corrected by its own first real run. Fixed structurally rather
+// than allowlisted, per the role charter: the form now has to carry the meaning,
+// so a brief must SAY it is creating the path, on the same line.
+//
+// Deliberately narrow. It reads the line the path sits on and nothing wider,
+// because a marker three lines away would let any dead path launder itself
+// through a nearby CREATE in an unrelated sentence.
+const DECLARES_CREATION = /\b(creates?\s+(it|this|if\s+absent)|create\s+if\s+absent|to be created|will create|session\s+creates?|CREATES?)\b/i
+
 const REQUIRED_HEADER = [
   { key: 'BUDGET', re: /\bBUDGET\s*:/ },
   { key: 'STOP LINES', re: /\bSTOP LINES?\s*:/i },
@@ -127,6 +143,7 @@ export function checkBrief(src, ctx, file = 'DRAFT') {
     // flagged for mentioning it, which is the blind spot the currency gate
     // records at DOC_CURRENCY_GATE_SPEC.md section 8.
     const claimsAbsence = ABSENCE_RE.test(line)
+    const declaresCreation = DECLARES_CREATION.test(line)
 
     for (const span of inlineSpans(line)) {
       const t = span.text
@@ -160,7 +177,9 @@ export function checkBrief(src, ctx, file = 'DRAFT') {
         continue
       }
       if (!hit.exists) {
-        findings.push({ cls: 'DEAD_PATH', line: n, text: t, why: 'does not exist at HEAD' })
+        if (!declaresCreation) {
+          findings.push({ cls: 'DEAD_PATH', line: n, text: t, why: 'does not exist at HEAD' })
+        }
       }
     }
 
@@ -237,6 +256,11 @@ function selfTest() {
     'See `short.md:97` for the header.\n', 'STALE_LINE')
   run('THIN HEADER  a brief with no stop lines', 1,
     'BUDGET: 7M\nDEGRADATION ORDER: x\nDONE MEANS: y\n', 'THIN_HEADER', true)
+  // The create-if-absent exemption must not become a laundry. A dead path on a
+  // line with no creation marker is still dead, and a marker on a DIFFERENT line
+  // must not reach across, which is why the check is line-local.
+  run('LAUNDRY  a dead path near a creation marker on ANOTHER line is still flagged', 1,
+    'CREATE the ledger.\nThe tool is `scripts/qa/census.mjs`.\n', 'DEAD_PATH')
 
   console.log('')
   const controls = [
@@ -245,6 +269,12 @@ function selfTest() {
     ['CONTROL 3  a true absence is not flagged', 'There is no `scripts/qa/nope.mjs` in the tree; it does not exist.\n'],
     ['CONTROL 4  a fenced example is not resolved', '```\nnode scripts/qa/census.mjs --run\n```\n'],
     ['CONTROL 5  a valid line citation passes', 'See `short.md:2`.\n'],
+    ['CONTROL 6  an artefact the brief says to CREATE is not a dead reference',
+     '- `reports/qa/session9/RESUME.md`: **CREATE IT.** One line per row.\n'],
+    ['CONTROL 7  the create-if-absent wording the template itself uses passes',
+     'Artefacts: `reports/qa/newthing/LEDGER.md`, create if absent.\n'],
+    ['CONTROL 8  the plural, which is what a brief author actually writes',
+     'One line appended to `reports/qa/session9/RESUME.md`, which this session CREATES.\n'],
   ]
   for (const [label, body] of controls) run(label, 0, body)
 
