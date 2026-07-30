@@ -30,4 +30,5 @@ shape of these numbers and not from their precision.
 
 | # | Job | Row | Commit | Context estimate at commit | State |
 |---|---|---|---|---|---|
-| 1 | JOB 1 | Eight ruling-blocked rows into one comms entry | (this commit) | about 80k of 740k | **DONE.** Entry 034 appended, newest first. Doc currency gate 0 new, dash gate PASS |
+| 1 | JOB 1 | Eight ruling-blocked rows into one comms entry | `f60ac3c` | about 80k of 740k | **DONE.** Entry 034 appended, newest first. Doc currency gate 0 new, dash gate PASS |
+| 2 | JOB 2 | Seed-scoring hole in the replay gate | (this commit) | about 150k of 740k | **DONE.** UNAPPLIED is now a third scoring class, exit 3. Self-test 6/6 caught, 0 missed, 0 unapplied, 10/10 assertions, exit 0. Real run 15/15, exit 0 |

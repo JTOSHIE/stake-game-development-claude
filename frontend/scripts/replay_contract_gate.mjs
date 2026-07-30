@@ -55,6 +55,22 @@
 // per FULL_AUDIT_METHOD.md 2.6: a parked limitation is only honestly parked if
 // its enumeration is honest.
 //
+// A SEED IS SCORED IN THREE CLASSES, NOT TWO (added 2026-07-30)
+// ---------------------------------------------------------------------------
+// CAUGHT, MISSED, and UNAPPLIED. The third exists because the first two could
+// not tell each other apart when a seed's target string was absent: the server
+// answered 500, the app never booted, every assertion in the run failed, and
+// the seed scored CAUGHT on a defect that had never been planted. **A seed that
+// never applied was indistinguishable from a seed that worked.**
+//
+// That is convention (p)'s own failure mode occurring inside the mechanism
+// built to enforce it, and it was live rather than theoretical: any bundle
+// rename, minifier change or markup edit under a seeded target would have
+// blinded this gate while it printed a full house. An UNAPPLIED seed now exits
+// 3, distinct from 1 (a real miss) and 2 (the template locator failed), because
+// the fixes differ: a miss means the gate is blind, an unapplied means its
+// score is UNKNOWN and re-running changes nothing until the locator is fixed.
+//
 // Usage, from frontend/, after `npm run build`:
 //   node scripts/replay_contract_gate.mjs              the contract assertions
 //   node scripts/replay_contract_gate.mjs --self-test  convention (p): seeds must go RED
@@ -132,6 +148,25 @@ function findBundleWithTemplate() {
   return null
 }
 
+// UNAPPLIED SEED TARGETS, recorded rather than only signalled down the wire.
+//
+// THE HOLE THIS CLOSES, and it made every seed score unreliable. A seed whose
+// target string was absent used to produce only an HTTP 500. A 500 on the bundle
+// means the app never boots, so every assertion in the seeded run fails, so
+// `caught` came out TRUE and the seed printed `caught`. **A seed that never
+// applied was indistinguishable from a seed that worked**, and the gate read
+// 6/6 either way.
+//
+// That is the exact failure convention (p) exists to prevent, reproduced inside
+// the mechanism built to enforce it: a bundle rename, a minifier change or a
+// markup edit under any seeded target would silently blind the gate while it
+// still printed a full house.
+//
+// So the miss is now RECORDED, and a recorded miss is its own failure class.
+// The 500 is kept because it is still the right thing to put on the wire; what
+// was missing was the evidence that it happened.
+const seedTargetMisses = []
+
 /**
  * Serve dist, optionally with byte patches applied to named files.
  * `patches` is { '<url path>': (body) => newBody }.
@@ -146,9 +181,10 @@ function serve(patches = {}) {
     if (patches[p]) {
       const patched = patches[p](body.toString('utf8'))
       if (patched === null) {
-        // The seed's target string was not found. Fail loudly: a seed that
-        // silently no-ops turns a red run green, which is the failure this
-        // whole convention exists to prevent.
+        // The seed's target string was not found. Record it as its own failure
+        // class, then fail loudly on the wire. Recording is the half that
+        // matters: the 500 alone read as a caught seed.
+        seedTargetMisses.push({ path: p, at: new Date().toISOString() })
         res.writeHead(500); res.end('SEED TARGET NOT FOUND'); return
       }
       body = Buffer.from(patched, 'utf8')
@@ -167,6 +203,9 @@ async function driveReplay(browser, {
   qs = {}, patches = {}, respond = 'ok', round = FIX.super.cap, costMultiplier = 400.0,
   settleMs = 2500, play = false,
 } = {}) {
+  // Snapshot the miss ledger so this drive reports only its OWN unapplied
+  // targets. Drives are strictly sequential, so an index is sufficient.
+  const missMark = seedTargetMisses.length
   const srv = await serve(patches)
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
   const requests = []
@@ -219,7 +258,7 @@ async function driveReplay(browser, {
 
   await page.close()
   await new Promise((r) => srv.close(r))
-  return { requests, observed }
+  return { requests, observed, unapplied: seedTargetMisses.slice(missMark) }
 }
 
 const offOrigin = (reqs) => reqs.filter((r) => !r.url.startsWith(`http://localhost:${PORT}`))
@@ -399,13 +438,27 @@ async function main() {
       const seed = async (name, why, opts, expectFail, assertFn = assertContract) => {
         const r = await driveReplay(browser, opts)
         const before = results.length
+
+        // A SEED THAT DID NOT APPLY HAS PROVED NOTHING, and it must never be
+        // scored as a catch. An absent target string 500s, the app never boots,
+        // every assertion in the run fails, and `caught` would come out TRUE on
+        // a defect that was never planted. Its own class, never a catch and
+        // never a miss, because calling it a miss would be equally false.
+        if (r.unapplied.length) {
+          results.length = before
+          seeds.push({ name, caught: false, applied: false, why })
+          console.log(`  UNAPPLIED  SEED ${name}: target absent at ${r.unapplied.map((u) => u.path).join(', ')}`)
+          console.log('             this seed proved NOTHING: not a catch, not a miss')
+          return
+        }
+
         assertFn(r, `[seed ${name}] `)
         const failed = results.slice(before).filter((x) => !x.pass)
         const caught = failed.some((f) => expectFail.test(f.name))
         // The seeded run's own failures are expected, so they are removed from
         // the tally: what is being scored is whether the gate NOTICED.
         results.length = before
-        seeds.push({ name, caught, why })
+        seeds.push({ name, caught, applied: true, why })
         console.log(`  ${caught ? 'caught' : 'MISSED'}  SEED ${name}: ${why}`)
         if (!caught) console.log(`           the gate stayed green on a planted defect`)
       }
@@ -482,9 +535,18 @@ async function main() {
             ? b.replace('</head>', '<style>.replay-status.error{display:none !important}</style></head>')
             : null },
         })
-        const caught = !r.observed.errorVisible
-        seeds.push({ name: 'suppressed-error-branch', caught, why: 'a failed fetch renders no error state' })
-        console.log(`  ${caught ? 'caught' : 'MISSED'}  SEED suppressed-error-branch: a failed fetch renders no error state`)
+        const why = 'a failed fetch renders no error state'
+        if (r.unapplied.length) {
+          // Same rule as the helper above. This seed is planted inline rather
+          // than through seed(), so it carries the check itself.
+          seeds.push({ name: 'suppressed-error-branch', caught: false, applied: false, why })
+          console.log(`  UNAPPLIED  SEED suppressed-error-branch: target absent at ${r.unapplied.map((u) => u.path).join(', ')}`)
+          console.log('             this seed proved NOTHING: not a catch, not a miss')
+        } else {
+          const caught = !r.observed.errorVisible
+          seeds.push({ name: 'suppressed-error-branch', caught, applied: true, why })
+          console.log(`  ${caught ? 'caught' : 'MISSED'}  SEED suppressed-error-branch: ${why}`)
+        }
       }
 
       // CONTROLS. The gate must be GREEN on a healthy tree, or it cannot go from
@@ -500,8 +562,48 @@ async function main() {
       check(!!call && call.url.startsWith('https://'), '[control] scheme-less rgs_url resolves to https',
         call?.url, 'the scheme-less host did not resolve to an https URL')
 
-      const missed = seeds.filter((s) => !s.caught)
-      console.log(`\nSEEDS: ${seeds.length - missed.length}/${seeds.length} caught`)
+      // CONVENTION (p) FOR THIS FILE'S OWN SCORING. The class being closed is
+      // "a seed that never applied scores as CAUGHT", so the seeded violation
+      // is a target string that is deliberately absent, and the control proves
+      // the detector fires on it. Without this, the fix above would itself be a
+      // gate nobody has watched go red.
+      console.log('\nUNAPPLIED-SEED DETECTOR, the class this gate used to score wrongly:')
+      {
+        const probe = await driveReplay(browser, { patches: { '/index.html': () => null } })
+        check(probe.unapplied.length === 1,
+          '[control] an unapplied seed target is RECORDED',
+          `recorded at ${probe.unapplied.map((u) => u.path).join(', ') || 'nowhere'}`,
+          'a seed target that could not be found went unrecorded, so the gate is blind to it again')
+
+        // The second half is what makes the first worth having: prove the run
+        // really would have read as CAUGHT under the old rule, so this control
+        // demonstrates a defect that was LIVE rather than one that was theorised.
+        const before = results.length
+        assertContract(probe, '[unapplied-probe] ')
+        const wouldHaveScoredCaught = results.slice(before).some((x) => !x.pass)
+        results.length = before
+        check(wouldHaveScoredCaught,
+          '[control] and under the OLD rule it would have scored CAUGHT',
+          'the 500 fails every assertion in the run, which is exactly why it read as a catch',
+          'the probe did not fail its assertions, so this control no longer demonstrates the defect')
+      }
+
+      // THREE CLASSES, not two, because they need different fixes. A MISS means
+      // the gate is blind to a real defect. An UNAPPLIED means no defect was
+      // ever planted, so the gate's score against that seed is UNKNOWN rather
+      // than bad, and re-running changes nothing until the locator is fixed.
+      const unapplied = seeds.filter((s) => s.applied === false)
+      const missed = seeds.filter((s) => s.applied !== false && !s.caught)
+      const caughtCount = seeds.length - missed.length - unapplied.length
+      console.log(`\nSEEDS: ${caughtCount}/${seeds.length} caught, ${missed.length} missed, ${unapplied.length} unapplied`)
+
+      if (unapplied.length) {
+        console.log('\nSELF-TEST FAILED: a seed never applied, so this gate cannot claim a score.')
+        console.log('An unapplied seed used to read as CAUGHT, because the 500 stops the app booting')
+        console.log('and every assertion then fails. Fix the seed locator; re-running changes nothing.')
+        unapplied.forEach((u) => console.log(`  UNAPPLIED ${u.name}: ${u.why}`))
+        process.exit(3)
+      }
       if (missed.length) {
         console.log('SELF-TEST FAILED: the gate stayed green on a planted defect.')
         missed.forEach((m) => console.log(`  MISSED ${m.name}: ${m.why}`))
