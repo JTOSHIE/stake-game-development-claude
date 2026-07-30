@@ -142,6 +142,30 @@ Head of Engineering to work from.** The artefacts are in git and git is authorit
 something important exists only in narration and not in a commit, that absence is itself
 the finding.
 
+### 3.2 The pre-flight, because the Head of Engineering had no gate on its own output
+
+Every other actor in this system is gated. Sessions have CI, seeded self-tests, a currency
+gate and adversarial verifiers. **The Head of Engineering had its own diligence, and its own
+diligence failed four times in one arc.**
+
+`scripts/qa/brief_preflight.mjs` closes that. It runs on a DRAFT brief before it is issued,
+never on a committed one, because convention (f) means a brief cannot be corrected after the
+fact. **A document that can never be fixed afterwards is the one that most needs checking
+before it lands**, and the exclusion that created the gap was written by the same role it
+now guards.
+
+```
+node scripts/qa/brief_preflight.mjs <draft.md>
+```
+
+**This is a required step, not a courtesy.** A brief goes out only after it passes, or after
+each finding is answered in writing. It is seeded with the four real failures per convention
+(p), and it found a fifth in a real brief on its first run.
+
+**What it cannot check, so nobody mistakes a PASS for a warrant:** whether the prose around a
+citation is true, whether a judgement is sound, and whether the PLAN is any good. It checks
+facts. **The strategy is still the owner's to judge and the Product Owner's to accept.**
+
 ---
 
 ## 4. The three ceremonies
