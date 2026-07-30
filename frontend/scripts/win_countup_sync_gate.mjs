@@ -41,6 +41,27 @@
 // A gate that has never been seen to fail is not evidence. It is a script that
 // prints PASS.
 //
+// WHAT THIS GATE DOES NOT PROVE, stated because every other browser gate in
+// checks.yml proves the opposite thing and a reader will reasonably assume this
+// one matches them.
+//
+// The others serve the BUILT dist through lib/previewServer.mjs, so they test
+// what ships. This one starts a VITE DEV SERVER, because the only way to drive a
+// deterministic 16x, 40x and 150x win is the `window.__testStores` hook, and that
+// hook is `import.meta.env.DEV` only and is absent from a production build by
+// design (HudOverlay.svelte:78-88). So:
+//
+//   - what IS proven is the WIRING: one shared source, both surfaces reading it,
+//     the durations the tier rule produces. That wiring is identical in both
+//     builds, because it is plain module code with no DEV branch anywhere in
+//     stores/winCountUp.ts;
+//   - what is NOT proven is that the SHIPPED bundle renders the same frames. No
+//     production build is exercised here.
+//
+// Closing that gap needs a deterministic win in a production build, which means
+// either a mock RGS fixture or a replay URL, and that is a bigger piece of work
+// than this gate. Recorded rather than left for someone to assume.
+//
 // USAGE
 //   node scripts/win_countup_sync_gate.mjs
 //   node scripts/win_countup_sync_gate.mjs --self-test
