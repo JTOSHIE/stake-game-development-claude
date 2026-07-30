@@ -152,13 +152,20 @@ const SAMPLE = `(durationMs) => new Promise((resolve) => {
   }
   const samples = []
   const t0 = performance.now()
-  function tick() {
+  // setTimeout, NOT requestAnimationFrame. A headless CI renderer can throttle or
+  // suspend rAF on a page it treats as hidden, and an rAF-driven sampler then
+  // never resolves and hangs the whole job to its timeout, which is what happened
+  // on runs 30512502477 and 30513335033. setTimeout is not throttled the same way.
+  // The cost is honest and small: this samples at about 60Hz rather than exactly
+  // once per painted frame, which is ample against a defect that diverged for
+  // hundreds of milliseconds.
+  const tick = () => {
     const t = performance.now() - t0
-    samples.push({ t, banner: visibleText('[data-testid="win-amount"]'), hud: visibleText('[data-testid="hud-win"]') })
-    if (t < durationMs) requestAnimationFrame(tick)
+    samples.push({ t, banner: visibleText('[data-testid=\"win-amount\"]'), hud: visibleText('[data-testid=\"hud-win\"]') })
+    if (t < durationMs) setTimeout(tick, 16)
     else resolve(samples)
   }
-  requestAnimationFrame(tick)
+  setTimeout(tick, 0)
 })`
 
 // The HUD pod renders a label above the value ("WIN\\n$1,234.00"), so compare on
@@ -201,7 +208,18 @@ async function runtimeSamples() {
       // page.evaluate with a STRING evaluates it as an expression rather than
       // calling it with the argument, so the call is written out explicitly.
       // (Same trap win_countup_steady_gate.mjs:147-148 records.)
-      const samples = await page.evaluate(`(${SAMPLE})(${tier.expectMs + 400})`)
+      // A WATCHDOG, because this gate has already burned two 15 minute CI jobs by
+      // hanging inside the page rather than failing. Anything that stalls in there
+      // now surfaces as a FAILED gate in seconds instead of a cancelled job a
+      // quarter of an hour later, and a cancelled job teaches nobody anything.
+      const budgetMs = tier.expectMs + 400
+      const samples = await Promise.race([
+        page.evaluate(`(${SAMPLE})(${budgetMs})`),
+        new Promise((_, rej) => setTimeout(
+          () => rej(new Error(`in-page sampler did not return within ${budgetMs + 15000}ms for the `
+            + `${tier.name} tier. The page stalled; this is a gate failure, not a slow runner.`)),
+          budgetMs + 15000)),
+      ])
       out.push({ tier, samples })
     }
   } finally {
