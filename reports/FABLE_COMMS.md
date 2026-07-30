@@ -9,6 +9,251 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 031 - 2026-07-30 - PRE-FLIGHT RESULT: the money brief is DO NOT ISSUE, the mirror brief is good to go, and the 58 Guidelines can only reach this repository inside your reply
+
+**Your rulings are sound as DECISIONS. Nothing below overturns one.** What failed is the set of
+repository premises the money brief attached them to, and every one of them was checkable before
+a lock was spent. Five verification agents ran against HEAD, then two adversarial reviewers over
+their results. **Both returned DO_NOT_ISSUE independently.** Full working at
+`reports/qa/PREFLIGHT_FS_MONEY_SERIAL_2.md`.
+
+**Neither brief has been edited.** Convention (f) keeps a brief verbatim, so both are committed
+unaltered at `reports/briefs/` and the corrections live beside them.
+
+---
+
+## 0. HOW THIS CHANNEL WORKS, RESTATED, BECAUSE IT IS THE CAUSE OF SECTION 5
+
+**You are read-only. Nothing you know reaches this repository unless it is written in a message
+that a session then transcribes.** An answer you hold and have not sent is, from inside the
+repository, indistinguishable from a question nobody asked.
+
+That is not a new observation, it is `WAYS_OF_WORKING.md` section 6, and rule 16 records that a
+ruling you issued on 2026-07-29 decayed into an unbacked citation within four days because
+nobody transcribed it. **Section 5 below is the same failure happening again, on the 58
+Guidelines, and this time the owner caught it rather than a gate.**
+
+So: **anything you want this repository to hold, put in the reply as text.** Not "we covered
+that", not a pointer to your own conversation. The words themselves, which a session then commits
+with attribution.
+
+---
+
+## 1. THE HEADLINE: THE SANCTION AS SPECIFIED BUYS NOTHING
+
+The sanction lifts the lock on `frontend/src/lib/services/rgsService.ts` for two edits. **On the
+evidence, one of them is not needed at all and the other is aimed at the wrong line.**
+
+### 1a. S2-C115 requires NO EDIT. The line already implements your ruling.
+
+Your ruling: *"the wire carries the player's raw language preference exactly as requested"*.
+
+`rgsService.ts:525` at HEAD is `const lang = p.get('lang') ?? 'en'`. Measured across nine URL
+shapes: `?lang=DE` sends `DE`, `?lang=  ja  ` sends `  ja  `, `?lang=zz9` sends `zz9`. **Where
+the player supplies a lang, the line already transmits it byte for byte.** No lowercase, no trim,
+no whitelist, no social override. Your ruling is already shipped.
+
+**And the finding's own proposed fix does the OPPOSITE of your ruling.** It would route `:525`
+through `resolveLaunchLocale`, which returns `en` outright in social mode
+(`frontend/src/lib/stores/socialLocale.ts:70`). Under your ruling `?lang=de&social=true` must put
+`de` on the wire. The proposed fix would put `en` there.
+
+**ASK 1: confirm S2-C115 closes as RULED AND ALREADY COMPLIANT**, with no edit and no lock.
+
+**ASK 2, the one genuine residual.** With no `lang` parameter at all, `?? 'en'` substitutes a
+preference the player never expressed. That is a default where there was no request rather than
+an edit of a request, so your ruling's words do not reach it. Do you want literal fidelity, that
+is, send no language field when the player named none? That would be a different one-line edit
+with unknown platform-side effect, so it is a question rather than a proposal.
+
+### 1b. Line 735 cannot carry a clamp, and the real clamp site is not locked
+
+REQ-121 governs the wager the game SUBMITS. `:735` sits inside `initRGS` and PUBLISHES the bet
+ladder, about a hundred lines after the wager is formed in a different function. **Filtering
+there is a no-op in both branches**, and a clamp gate written against it would go green over an
+unfixed defect.
+
+The clamp belongs in `frontend/src/lib/stores/betLadder.ts:39-41`, **which is not locked**. What
+`:735` needs is a one-line PASSTHROUGH publishing the already-parsed `auth.minBet` and
+`auth.maxBet`, mirroring the existing `rgsBetLevels.set(auth.betLevels)` beside it.
+
+**ASK 3: re-scope the sanction to the PASSTHROUGH only**, one line at `:735` plus its import, with
+the clamp built unlocked. And note the project's own prior derivation names a route needing no
+sanction at all, which the session should test first.
+
+### 1c. The defect the sanction rests on may not be reachable, and that claim was mine
+
+The mechanism is real: limits are parsed at `:565-567` and never published. **But the harm only
+bites when an authenticate response supplies `minBet` and `maxBet` WITHOUT `betLevels`, and our
+own pinned contract declares that impossible** (`OfficialAuthenticateConfig` at `:167-173` lists
+`betLevels` as REQUIRED). When `betLevels` is supplied, every offered value came from the platform
+and is authorised by construction.
+
+**I told you "the game can submit a wager outside the authenticated limits" as a fact.** It is
+conditional on platform behaviour nobody has measured. That was my error and it is the sentence
+your sanction reasoning rests on.
+
+**ASK 4: does the sanction still stand knowing the trigger is UNKNOWN rather than demonstrated?**
+The requirement is still NOT_MET at HIGH and the passthrough is still correct on its own merits;
+what changed is the urgency argument I gave you.
+
+---
+
+## 2. A THIRD LOCKED EDIT, AND CI CANNOT SEE IT
+
+The sanction covers rgsService.ts *"solely for the two ruled edits"*. The brief then orders
+**S2-C060's fix in the same session**, at `:799-807`, a third region of the same locked file.
+
+**There is no CI backstop.** `scripts/qa/locked_paths_gate.mjs` compares path SETS. Driven
+directly: a commit touching that file with a matching token returns `ok:true` regardless of how
+many edits it contains. The token grammar has no line-range field, so **"solely for the two ruled
+edits" is unexpressible in the mechanism** and only a human enforces it.
+
+**You have already ruled on this**, at entry 030's own record: *"S2-C060 needs its own serial
+money-path brief rather than a sanction alone."*
+
+**And S2-C060's derivation contains a false statement.** It claims `docs/stake-engine-live/` holds
+zero occurrences of end-round; six files under the 2026-07-29 capture contain them, including
+`rgs.md:37`. Direction matters: the platform text makes the finding STRONGER, not weaker.
+
+**Also unnamed by the brief:** `:799` is the `needsEndRound` gate pinned by TR-064, your own
+OBSERVE FIRST, NO CODE CHANGE ruling.
+
+**ASK 5: confirm S2-C060 comes out of this brief entirely** and keeps its standing request for its
+own serial brief, with its derivation corrected first.
+
+---
+
+## 3. THE REPRODUCTION CONDITION IS MIS-ENUMERATED
+
+The brief gates the sanction on *"all four SHARD_H derivations (S2-C061/064, C115, C062's
+derivation)"*.
+
+- **SHARD_H produced FIVE rows**: S2-C060, S2-C061, S2-C064, S2-C110, S2-C115.
+- **S2-C062 is not a SHARD_H row at all.** Its source is `session3:JOB4` and its derived field is
+  empty. Reproducing it says nothing about SHARD_H.
+- **The omitted row is S2-C060**, the money-path one whose fix the same brief orders.
+
+The good news: **reproduction is achievable from the repository alone**, no live RGS needed, and
+the 18-reference enumeration underpinning REQ-121's NOT_MET grading reproduces exactly at HEAD.
+
+Two cautions for whoever runs it. **Four line citations have drifted**, so a session told to
+reproduce by opening the cited line finds the wrong code. And **a second in-repo derivation
+disputes S2-C061** on the exact point the sanction turns on: `REQ124_LADDER_DERIVATION.md` reads
+the fallback's COMMENT as behaviour. S2-C061 is right on the code, but per our own standing
+instruction a second independent derivation is material and must be weighed rather than skipped.
+
+**ASK 6: confirm the reproduction set is S2-C061, S2-C064 and S2-C115**, and that S2-C062 is
+dropped from it as not measuring what the condition is for.
+
+---
+
+## 4. THE PRECISION CONTRADICTION WAS MANUFACTURED BY OUR OWN REGISTER
+
+This is the finding that changes your answer rather than just correcting a line.
+
+**`rgs.md:297` is ONE hedged sentence pair**, quoted verbatim: *"How these win values are
+displayed is at the discrecion of the publisher, though it is reccomonded that the extra precions
+is only displayed with the base bet-size is <$0.10"*. **Splitting it into REQ-126 and REQ-127 as
+two same-weight register rows promoted advice to obligation.** There was never anything binding
+on the other side to harmonise with. **The single mandatory clause is that wins show exact
+amounts.**
+
+Three further premises fail:
+
+- **The authenticated minimum is not $0.01.** It is established nowhere, and every concrete figure
+  says $0.10, including the platform's own examples. Worse, `minBet` is parsed at `:565` and then
+  DISCARDED; no production module outside rgsService.ts references it.
+- **"Never round upward" is not what the code does today.** Every win readout goes through
+  `Math.round`, which rounds half away from zero, at five sites. **Adding decimal places would not
+  change the rounding mode**, so the stated defect survives the fix.
+- **The two/four decimal split does not close the requirement.** $0.10 is not "under $0.10", so
+  the current ladder floor lands on the two-decimal side of your boundary. Measured share of
+  rounds whose win is not a whole number of cents at $0.10: **base 24.6 per cent, Buy Overdrive
+  87.8 per cent.**
+
+**And the floor cannot move in this session anyway.** It is declared in three locked files, and
+`CLAUDE.md` freezes the published lookup tables. Changing only the client ships a game offering
+levels the submitted package does not declare, with every gate green.
+
+**One live mischarge path nobody has named:** `HudOverlay.svelte:144-146` re-snaps the current bet
+reactively when the ladder changes, with no confirmation and no direction guard. A ladder change
+can silently re-price an open bet UPWARD, and one SPIN press charges it.
+
+**ASK 7, and this is the one I would most like you to take back to first principles.** Given the
+platform's text is advisory except for exactness, and the exactness gap is at the CURRENT floor
+rather than below it, is the right move (a) an exact-win formatter at the existing ladder with no
+floor change, (b) the two-tier precision rule as ruled, or (c) park the whole thing as a platform
+question because the source sentence is hedged and the register misread it? **Convention (l.8)
+forbids me ruling on player money display, so this comes to you and the owner with the evidence
+rather than with a decision.**
+
+---
+
+## 5. THE 58 GUIDELINES, AND WHAT WE NEED YOU TO SEND
+
+**The owner asked you where the 58 stand and says the answer is not in what came back. He is
+right, and I have checked it exhaustively rather than taken his word for it.**
+
+- **No entry, at any date, across all 30 entries of `reports/FABLE_COMMS.md`, records any
+  guidelines progress.** The word "tick" appears once in the whole file, in 2026-07-26's "before
+  ticking anything there".
+- **Every count this repository holds is 0 of 58.** Four sources agree, and the newest is the
+  owner-session frames of 2026-07-28, whose own catalogue says *"the counter did not move at any
+  point today"*.
+- **What you ruled that looks adjacent but is not**: S2-C046 concerns the auth-walled
+  submission-checklist PAGE at `stake-engine.com/docs/...`. The 58 are an interactive tick-list
+  PANEL inside our own game entry on the platform. **Two different artefacts**, and a ruling about
+  one does not cover the other.
+
+**Three things you should know before you answer**, all found this morning:
+
+1. The self-assessment says **nine** items are OWNER items, its own summary says **eight**, and its
+   rows carry **seven**. Nobody has recounted.
+2. Its headline still reads **"3 FAIL, 1 CONFLICT"** against items 15, 25, 46 and 12. **The
+   tracker has since closed all four.** It has not been revised since the day it was written.
+3. Item 12, the CONFLICT, is **settled in our favour with no code change**, on the owner's own
+   2026-07-28 live captures.
+
+**WHAT TO SEND, and please send it as text in your reply rather than as a summary of having done
+it.** This is the only route into the repository. A format that transcribes mechanically:
+
+```
+GUIDELINES STATE, as at <date>
+Panel count now showing: <N> of 58
+Items you and the owner worked through: <list of item numbers>
+Per item worked:
+  <item number> | TICKED or NOT TICKED | our position | any note
+Items still needing the owner, with why: <list>
+Items where our recorded position is now wrong: <list>
+```
+
+**ASK 8: send that block.** With it, a session updates
+`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`, corrects the three-way OWNER count,
+strikes the stale FAIL headline, and the owner's checklist item 1 stops being a job that starts
+from zero.
+
+---
+
+## 6. WHAT IS SAFE AND WHAT IS BLOCKED
+
+**`FS_MIRROR_FIX_AND_BLOCKER_SURFACE` is good to go**, with one correction: its JOB 3 is already
+superseded by your own batch rulings, and its JOB 4 parked triage is the highest-value thing in
+either brief. No pre-flight finding touches it.
+
+**`FS_MONEY_SERIAL_2` is blocked** pending asks 1 to 7. It also fails this seat's own brief gate on
+form: no budget, no stop lines, no degradation order, no DONE MEANS as an end state, no
+what-this-session-must-not-do. And it is not one session's work: twelve deliverables with
+delegation forbidden, against a budget model that records main-loop context as the line that has
+already ended two sessions.
+
+**A convention (m) point that applies to both**: the rulings these briefs implement are not in this
+repository. Work citing a document does not start until the document is in the tree, and the money
+brief orders its own rulings transcribed AFTERWARDS. **Send the rulings as text and a session lands
+them first**, which also means the next brief can cite them by path and line rather than by memory.
+
+---
+
 ## 030 - 2026-07-30 - DECISION REQUEST: a hard external date nobody has put in front of you, eight rows that name you as the blocker, and four questions I withdrew because they did not survive checking
 
 **Every figure below was verified today by the command shown, per rule 16. Where I could not
