@@ -417,6 +417,21 @@ jobs:
         working-directory: frontend
         run: node scripts/dash_gate.mjs --source
 
+      # ── Gate 6d: the multiplication sign ─────────────────────────────────────
+      # Charter row Q-26, closed 2026-07-30. Same family as the dash gate and for
+      # the same reason: one glyph written two ways across surfaces a player sees
+      # together is the machine-tell the standing mandate names. The class had no
+      # gate until now, and its parked row undercounted itself by an order of
+      # magnitude (four recorded, 51 real), so the self-test plants the defect in
+      # prose.locales.ts, which is the file the old count never searched.
+      - name: multiplication sign gate, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/multiplication_sign_gate.mjs --self-test
+
+      - name: multiplication sign gate, prose scan
+        working-directory: frontend
+        run: node scripts/multiplication_sign_gate.mjs
+
       # ── Gate 7a: the machine-tell gate ───────────────────────────────────────
       # The second gate of the dash gate's family, added 2026-07-27 by the
       # quality sweep. CLAUDE.md's STANDING MANDATE ends "Nothing player-visible

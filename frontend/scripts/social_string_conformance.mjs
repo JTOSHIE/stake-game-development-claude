@@ -26,8 +26,8 @@ mkdirSync(SCREENS_DIR, { recursive: true })
 
 const EXPECTED_SOCIAL = {
   bonus: { label: 'Get Overdrive', blurb: 'Get a guaranteed Overdrive Free Spins entry.' },
-  super: { blurb: 'Get a rich entry with the Overdrive meter pre-revved to 5x.' },
-  overboost: { blurb: 'Double-chance: about 1.6x the feature trigger rate. Costs 1.25x every spin while ON.' },
+  super: { blurb: 'Get a rich entry with the Overdrive meter pre-revved to 5×.' },
+  overboost: { blurb: 'Double-chance: about 1.6× the feature trigger rate. Costs 1.25× every spin while ON.' },
   cruise: { blurb: 'A smoother ride: more frequent smaller prizes, same 96.35% RTP.' },
 }
 const PROHIBITED_TERMS = ['Buy', 'Debits']
@@ -146,7 +146,7 @@ async function run() {
   // in real-money mode (catches an accidental edit to the base strings while
   // adding social variants, not just a missing social override).
   checks['realMoney.bonusLabelUnchanged'] = { pass: combinedRealText.includes('Buy Overdrive') }
-  checks['realMoney.overboostBlurbUnchanged'] = { pass: combinedRealText.includes('Debits 1.25x every spin while ON') }
+  checks['realMoney.overboostBlurbUnchanged'] = { pass: combinedRealText.includes('Debits 1.25× every spin while ON') }
   // Prohibited terms must NOT appear anywhere in the social-mode render.
   for (const term of PROHIBITED_TERMS) {
     const found = new RegExp(`\\b${term}\\b`).test(combinedSocialText)
