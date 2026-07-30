@@ -63,8 +63,13 @@ function getFreePort() {
 
 function startDevServer(port) {
   return new Promise((res, rej) => {
+    // detached: true puts vite in its OWN PROCESS GROUP. `npx` is a wrapper: killing
+    // the pid it returns leaves the real vite process and its esbuild child alive,
+    // and the node process then never exits. That is what held this gate open for
+    // fourteen minutes AFTER it printed PASS on run 30513908277, whose cleanup
+    // logged `Terminate orphan process: node, node, esbuild`. Same class as TR-101.
     const proc = spawn('npx', ['vite', '--port', String(port), '--strictPort'], {
-      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], detached: true,
     })
     let done = false
     const onData = (d) => { if (!done && /Local/.test(d.toString())) { done = true; res(proc) } }
@@ -130,7 +135,9 @@ const money = (t) => (t ? (t.match(/[^\s]*\d[\d.,]*[^\s]*/g) || []).pop() : null
     }
   } finally {
     await browser.close().catch(() => {})
-    try { server.kill('SIGTERM') } catch { /* already gone */ }
+    // Kill the GROUP (negative pid), not just the npx wrapper.
+    try { process.kill(-server.pid, 'SIGTERM') } catch { /* already gone */ }
+    try { server.kill('SIGKILL') } catch { /* already gone */ }
   }
 
   const allAgree = record.every((r) => r.midCountUp.agree)
