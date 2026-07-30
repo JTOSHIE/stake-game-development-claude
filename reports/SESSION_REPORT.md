@@ -9468,3 +9468,48 @@ mind and stopped one step short.
    three sessions of history is an owner call, not a builder's.
 7. **The stale paytable evidence** at `social_string_conformance_2026-07-14b.json`,
    and migrating that script's five write-once outputs to scratch paths.
+
+## ADDENDUM: the close, and a fourth thing that went wrong
+
+**Final remote CI: GREEN.** Run
+`https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30514717576`,
+all 14 jobs success, including `browser: win count-up sync` on its first clean
+run. Rule 10 satisfied against the final push.
+
+**Getting there took four red or cancelled runs and the diagnosis was wrong
+twice.** Recorded in full because the wrong turns are the useful part.
+
+1. **`document currency scan` went red**, correctly. The sanction-request table
+   named a store module that does not exist at HEAD and paired a symbol with the
+   file it is only PROPOSED to be added to. The gate cannot tell a proposal from a
+   claim, and it was right to say so. Reworded rather than baselined, because the
+   gate's own message says a baseline entry is not a fix.
+2. **`browser: win count-up sync` was CANCELLED at the 15 minute job timeout,
+   three times.** Diagnosis one: `waitUntil: 'networkidle'` against a vite dev
+   server that holds an HMR socket open. Real, fixed, not the cause. Diagnosis
+   two: `requestAnimationFrame` throttling in a headless renderer stalling the
+   in-page sampler. Plausible, fixed with a `setTimeout` sampler and a node-side
+   watchdog, and also not the cause.
+3. **The actual cause was visible only in the completed job log.** The gate had
+   PASSED at 04:28:54 with every assertion green, and the job sat until 04:42:50.
+   The runner's cleanup section says why: `Terminate orphan process: node, node,
+   esbuild`. `npx` is a wrapper, so killing the pid it returns leaves the real
+   vite process and its esbuild child alive, and those held the event loop open.
+   Same class as TR-101. Fixed by spawning detached, killing the process GROUP,
+   and exiting explicitly. The run now takes 10.2 seconds and leaves zero
+   survivors.
+
+**THE LESSON, and it cost three runs to learn: a cancelled job hides its own
+evidence.** `gh run view --log` refuses while a run is in progress, and cancelling
+a hung job to save minutes destroys the log that would have named the cause. Both
+wrong diagnoses came from reasoning about a job I had not let finish. The third
+came from reading one.
+
+**A gate that can HANG is worse than a gate that can FAIL.** A failure names a
+defect; a cancellation reads as infrastructure noise and stops the line under rule
+10 without telling anyone why. Both fixes stay in: the watchdog is not redundant
+now that the orphan is fixed, it is what makes the next unknown stall report
+itself in seconds.
+
+**Owner preview** was run as the last action of the close, after the final push,
+per rule 12 and its one-commit-lag note.
