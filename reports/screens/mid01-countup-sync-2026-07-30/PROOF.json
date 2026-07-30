@@ -1,0 +1,65 @@
+{
+  "pass": "MID-01, one shared win count-up source",
+  "captured": "2026-07-30",
+  "method": "live dev build, bet=1 so winAmount is the bet multiple, sampled mid count-up where the two former clocks were furthest apart",
+  "allAgree": true,
+  "record": [
+    {
+      "tier": "big",
+      "multiplier": 16,
+      "tierMs": 1400,
+      "sampledAtMs": 700,
+      "midCountUp": {
+        "banner": "$13.98",
+        "hud": "$13.98",
+        "agree": true
+      },
+      "settled": {
+        "banner": "$16.00",
+        "hud": "$16.00"
+      },
+      "frames": [
+        "big_mid_countup.png",
+        "big_settled.png"
+      ]
+    },
+    {
+      "tier": "mega",
+      "multiplier": 40,
+      "tierMs": 2000,
+      "sampledAtMs": 1000,
+      "midCountUp": {
+        "banner": "$34.93",
+        "hud": "$34.93",
+        "agree": true
+      },
+      "settled": {
+        "banner": "$40.00",
+        "hud": "$40.00"
+      },
+      "frames": [
+        "mega_mid_countup.png",
+        "mega_settled.png"
+      ]
+    },
+    {
+      "tier": "epic",
+      "multiplier": 150,
+      "tierMs": 2800,
+      "sampledAtMs": 1200,
+      "midCountUp": {
+        "banner": "$121.88",
+        "hud": "$121.88",
+        "agree": true
+      },
+      "settled": {
+        "banner": "$150.00",
+        "hud": "$150.00"
+      },
+      "frames": [
+        "epic_mid_countup.png",
+        "epic_settled.png"
+      ]
+    }
+  ]
+}

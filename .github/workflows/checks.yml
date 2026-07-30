@@ -825,6 +825,14 @@ jobs:
             run: node scripts/scrim_coverage_gate.mjs --self-test && node scripts/scrim_coverage_gate.mjs
           - name: "browser: win count-up steady"
             run: node scripts/win_countup_steady_gate.mjs --self-test && node scripts/win_countup_steady_gate.mjs
+          # MID-01, Fable's ruling: the banner and the WIN pod are driven from one
+          # shared count-up source with frame-level equality asserted. This is a
+          # DIFFERENT claim from the steady gate above, which is about the GEOMETRY
+          # of the digits as they roll; this one is about the VALUE the two
+          # surfaces show at the same instant, and about the celebration not being
+          # beaten to its own reveal by the HUD.
+          - name: "browser: win count-up sync"
+            run: node scripts/win_countup_sync_gate.mjs --self-test && node scripts/win_countup_sync_gate.mjs
           # The slowest leg by design: it holds a real capped round for thirty
           # seconds, which is the owner's own figure and the whole point of the
           # assertion. The seeded runs watch for twelve seconds each, because

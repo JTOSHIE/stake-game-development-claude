@@ -1,0 +1,33 @@
+SEEDED VIOLATION 1: the two clocks as they shipped before MID-01
+  banner rule (shipped, read from source): 1400ms at 16x
+  HUD rule (pre-fix):                      528ms at 16x
+  ok    big: banner and HUD were both visible for 113 sampled frames
+  FAIL  big: banner and HUD agree on EVERY frame (first divergence at 16ms: banner $0.54 vs HUD $1.41, 81 frames)
+  FAIL  big: the HUD does not reveal the total before the celebration (HUD settled 496ms, banner 1312ms, HUD early by 816ms)
+  ok    big: the count-up actually runs its tier length (settled 1312ms against a 1400ms tier, floor 770ms)
+  ok    mega: banner and HUD were both visible for 151 sampled frames
+  FAIL  mega: banner and HUD agree on EVERY frame (first divergence at 16ms: banner $0.95 vs HUD $2.61, 118 frames)
+  FAIL  mega: the HUD does not reveal the total before the celebration (HUD settled 688ms, banner 1904ms, HUD early by 1216ms)
+  ok    mega: the count-up actually runs its tier length (settled 1904ms against a 2000ms tier, floor 1100ms)
+  ok    epic: banner and HUD were both visible for 201 sampled frames
+  FAIL  epic: banner and HUD agree on EVERY frame (first divergence at 16ms: banner $2.56 vs HUD $8.82, 169 frames)
+  FAIL  epic: the HUD does not reveal the total before the celebration (HUD settled 784ms, banner 2720ms, HUD early by 1936ms)
+  ok    epic: the count-up actually runs its tier length (settled 2720ms against a 2800ms tier, floor 1540ms)
+  caught  6 judgements went red on the pre-fix pair
+
+SEEDED VIOLATION 2: a second win count-up frame loop planted in a component
+  note  1 frozen count-up loop(s) excused, each keyed by file:
+          src/lib/components/WinDisplay.svelte  (replay-only surface, mutually exclusive with the HUD; third duration rule recorded as MID-01b)
+  FAIL  no win count-up frame loop outside the shared one and the frozen list (found: src/lib/components/SeededSecondClock.svelte)
+  ok    the shared count-up loop exists at src/lib/stores/winCountUp.ts
+  ok    every frozen entry still matches something (stale entries: none)
+  caught  the planted second loop was reported
+
+NEGATIVE CONTROL: the real tree must still pass the source scan
+  note  1 frozen count-up loop(s) excused, each keyed by file:
+          src/lib/components/WinDisplay.svelte  (replay-only surface, mutually exclusive with the HUD; third duration rule recorded as MID-01b)
+  ok    no win count-up frame loop outside the shared one and the frozen list (found: none)
+  ok    the shared count-up loop exists at src/lib/stores/winCountUp.ts
+  ok    every frozen entry still matches something (stale entries: none)
+
+WIN COUNTUP SYNC GATE SELF-TEST: PASS (both defects reproduce, clean input passes)

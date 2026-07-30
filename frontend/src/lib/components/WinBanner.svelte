@@ -28,12 +28,16 @@
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { themeAssets } from '../stores/themeStore'
   import { autofitText } from '../actions/autofitText'
+  // MID-01: the ONE win count-up clock and the ONE duration rule, shared with
+  // HudOverlay.svelte. The thresholds and TIER_COUNT_UP_MS were declared here
+  // and are now imported, so there is exactly one declaration of each.
+  import {
+    BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD, EPIC_WIN_THRESHOLD,
+    TIER_COUNT_UP_MS, createWinCountUp, sharedWinCountUp,
+    type WinTier,
+  } from '../stores/winCountUp'
 
-  const BIG_WIN_THRESHOLD  = 10
-  const MEGA_WIN_THRESHOLD = 30
-  const EPIC_WIN_THRESHOLD = 100
-
-  type Tier = 'big' | 'mega' | 'epic'
+  type Tier = WinTier
 
   // OWNER AUDIT ROUND 2, item 1: suppresses the reactive (base-game) trigger
   // for one round - set true by App.svelte for the single settlement that
@@ -76,16 +80,23 @@
     epic: ['#ffd700', '#ffec80', '#00ffff', '#ff00ff', '#ffffff'],
   }
   const TIER_PARTICLE_COUNT: Record<Tier, number> = { big: 14, mega: 28, epic: 48 }
-  const TIER_COUNT_UP_MS:    Record<Tier, number> = { big: 1400, mega: 2000, epic: 2800 }
 
   let visible = false
   let tier: Tier = 'big'
-  let displayAmount = 0
   let particles: Particle[] = []
   let coins: Coin[] = []
   let dismissTimer: ReturnType<typeof setTimeout> | null = null
-  let countUpFrame: number | null = null
   let lastShownWin = 0
+
+  // MID-01. The reactive (base-game) path READS the shared count-up, which the
+  // HUD WIN pod also reads, so the two cannot show different dollar amounts on
+  // any frame. The explicit-trigger path animates a DIFFERENT figure by design
+  // (FreeSpinsPresentation's own settled feature total, while `$winAmount` is
+  // still deliberately un-settled), so it gets its own instance from the same
+  // factory: one clock implementation and one duration rule, two values only
+  // where two values are the point.
+  const ownCountUp = createWinCountUp()
+  $: displayAmount = amount === null ? $sharedWinCountUp : $ownCountUp
   let lastTrigger = 0
   // Shown multiplier for the "Nx BET" line - the explicit-trigger path
   // passes its own bet-multiple in (independent of $winMultiplier, which the
@@ -117,7 +128,6 @@
 
   $: if (amount === null && $isSpinning) {
     visible = false
-    displayAmount = 0
     lastShownWin = 0
     particles = []
     coins = []
@@ -152,44 +162,48 @@
 
   function showBanner(winDollars: number, t: Tier, mult: number): void {
     if (dismissTimer) clearTimeout(dismissTimer)
-    if (countUpFrame) cancelAnimationFrame(countUpFrame)
 
     tier = t
     shownMultiplier = mult
-    displayAmount = 0
     visible = true
     particles = makeParticles(TIER_PARTICLE_COUNT[t], TIER_COLORS[t])
     coins = t === 'epic' && !reduced ? makeCoins() : []
 
-    // Staged count-up - duration escalates with tier.
-    const startTime = performance.now()
-    const duration = TIER_COUNT_UP_MS[t]
-
-    function countUp(): void {
-      const elapsed = Math.min(performance.now() - startTime, duration)
-      const progress = elapsed / duration
-      displayAmount = winDollars * (1 - Math.pow(1 - progress, 3))
-      if (progress < 1) {
-        countUpFrame = requestAnimationFrame(countUp)
-      } else {
-        displayAmount = winDollars
-        countUpFrame = null
-      }
+    // MID-01. Staged count-up, duration escalating with tier, now from the ONE
+    // rule in `stores/winCountUp.ts` rather than a constant table declared here.
+    //
+    // On the REACTIVE path the shared instance is already counting: the store
+    // module drives it from `$winAmount`, so this banner and the HUD WIN pod are
+    // reading the same number, and starting a second tween here is exactly the
+    // defect being removed. Only the explicit-trigger path owns a clock, because
+    // only it is animating a figure the HUD is not showing.
+    //
+    // The tier, not the multiplier, sets the length here: the explicit path
+    // floors at 'big' for any feature outcome, so a 3x feature-end banner still
+    // runs the full 1400ms rather than the 424ms its multiplier would imply.
+    // On the reactive path the tier and the multiplier agree by construction,
+    // because both derive from the same three thresholds.
+    const explicitTrigger = amount !== null
+    if (explicitTrigger) {
+      ownCountUp.snap(0)
+      ownCountUp.to(winDollars, mult, TIER_COUNT_UP_MS[t])
     }
-    countUpFrame = requestAnimationFrame(countUp)
 
     dismissTimer = setTimeout(() => {
       visible = false
-      displayAmount = 0
       particles = []
       coins = []
+      // Zero this instance's OWN figure only. The shared value belongs to the
+      // HUD too, and the WIN pod must keep showing the win after the
+      // celebration dismisses.
+      if (explicitTrigger) ownCountUp.snap(0)
       dispatch('dismissed')
-    }, duration + 2200)
+    }, TIER_COUNT_UP_MS[t] + 2200)
   }
 
   onDestroy(() => {
     if (dismissTimer) clearTimeout(dismissTimer)
-    if (countUpFrame) cancelAnimationFrame(countUpFrame)
+    ownCountUp.cancel()
   })
 
   // JOB 2, 2026-07-28. Was three hardcoded English pairs in a component-script

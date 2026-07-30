@@ -9,9 +9,11 @@
   import {
     betAmount, balance, canSpin, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
-    isMuted, showPaytable, winAmount, winMultiplier, locale, isWincap,
+    isMuted, showPaytable, winAmount, locale, isWincap,
   } from '../stores/gameStore'
   import { rgsBetLevels } from '../stores/rgsBetLevels'
+  // MID-01: the ONE win count-up clock, shared with WinBanner.svelte.
+  import { sharedWinCountUp } from '../stores/winCountUp'
   import {
     activeBetLevels, canIncreaseBetLevel, canDecreaseBetLevel, canSetMaxBetLevel,
     increaseBetLevel, decreaseBetLevel, setMaxBetLevel, snapBetToLadder,
@@ -292,79 +294,34 @@
   $: balanceCompact = formatBalanceCompact(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
 
   // HUD win count-up (2026-07-14b, ITEM B): every win ticks the HUD figure up
-  // incrementally rather than jumping straight to the final value, the same
-  // rAF/cubic-ease approach WinBanner.svelte already uses for its own (>=10x
-  // only) celebration overlay - this is the same behaviour applied to the
-  // HUD figure that's visible for every win, not just the big ones. Duration
-  // scales with win size: a 400ms floor for small wins up to an 800ms
-  // ceiling, saturating at 50x bet so huge wins don't drag the HUD out.
-  // Resets (new spin zeroing winAmount) snap instantly - only increases tween.
-  const WIN_COUNTUP_MIN_MS = 400
-  const WIN_COUNTUP_MAX_MS = 800
-  let displayedWinAmount = 0
-  let winCountUpFrame: number | null = null
-  let lastWinAmountSeen = 0
-
-  function startWinCountUp(target: number, multiplier: number): void {
-    if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
-    const start = displayedWinAmount
-    const startTime = performance.now()
-    const duration = Math.min(
-      WIN_COUNTUP_MAX_MS,
-      WIN_COUNTUP_MIN_MS + Math.min(WIN_COUNTUP_MAX_MS - WIN_COUNTUP_MIN_MS, multiplier * 8),
-    )
-    function tick(now: number): void {
-      const progress = Math.min((now - startTime) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      displayedWinAmount = start + (target - start) * eased
-      if (progress < 1) {
-        winCountUpFrame = requestAnimationFrame(tick)
-      } else {
-        displayedWinAmount = target
-        winCountUpFrame = null
-      }
-    }
-    winCountUpFrame = requestAnimationFrame(tick)
-  }
-
-  $: if ($winAmount !== lastWinAmountSeen) {
-    const previous = lastWinAmountSeen
-    lastWinAmountSeen = $winAmount
-    if ($winAmount > previous) {
-      startWinCountUp($winAmount, $winMultiplier)
-    } else {
-      if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
-      winCountUpFrame = null
-      displayedWinAmount = $winAmount
-    }
-  }
-
-  // MAX-WIN HOLD (owner's order, 2026-07-28). A capped round settles and raises
-  // the celebration in the same beat that starts this count-up, so the HUD WIN
-  // figure went on ticking up underneath the overlay. Measured by
-  // `max_win_hold_gate.mjs` before this guard existed: the readout was
-  // "$3,841.92" at the moment the celebration mounted and "$5,000.00" thirty
-  // seconds later. Small, invisible, and still a state transition behind a
-  // surface the owner has said must hold with nothing moving behind it.
+  // incrementally rather than jumping straight to the final value.
   //
-  // Snapped rather than paused. The figure is already settled; the tween is
-  // presentation of a number that is not in doubt, and there is no player to
-  // show it to while an opaque overlay covers it. Snapping also ends the
-  // requestAnimationFrame loop rather than leaving it running for the length of
-  // a hold that is allowed to last forever.
-  $: if ($isWincap && winCountUpFrame !== null) {
-    cancelAnimationFrame(winCountUpFrame)
-    winCountUpFrame = null
-    displayedWinAmount = $winAmount
-  }
+  // MID-01, 2026-07-30. This component no longer owns a clock. It previously
+  // ran its own requestAnimationFrame loop over its own duration rule, against
+  // WinBanner.svelte's separate loop over its separate rule, and the two
+  // animated the SAME `$winAmount` at different lengths with the same easing.
+  // At 16x the HUD finished 872ms before the banner; at the epic tier, two full
+  // seconds before it. So the WIN pod revealed the total the celebration exists
+  // to reveal, every time.
+  //
+  // Both surfaces now READ `sharedWinCountUp`, which is one value produced by
+  // one loop and driven from `$winAmount` by the store module itself. Equality
+  // between the pod and the banner is therefore structural rather than
+  // asserted between two implementations: there is only one number to show.
+  // Held by `win_countup_sync_gate.mjs`, whose seeded self-test restores the
+  // two-clock shape and requires it to go red.
+  //
+  // The duration rule, the reset-snaps-instantly behaviour and the MAX-WIN HOLD
+  // snap all moved into `stores/winCountUp.ts` unchanged. Below the big-win
+  // threshold the HUD's own 400ms-to-800ms curve still governs, so ordinary
+  // wins tick exactly as they did.
 
   onDestroy(() => {
-    if (winCountUpFrame) cancelAnimationFrame(winCountUpFrame)
     if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
   })
 
-  $: winLabel = formatBalance(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: winCompact = formatBalanceCompact(Math.round(displayedWinAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: winLabel = formatBalance(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: winCompact = formatBalanceCompact(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 
 {#if portrait}

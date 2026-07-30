@@ -1,0 +1,219 @@
+// winCountUp.ts: ONE count-up clock for the win figure.
+//
+// MID-01, ruled by Fable and carried by `reports/briefs/FS_TRUE_FIXDOWN_Prompt.md`:
+// "banner and WIN pod driven from one shared count-up source, with frame-level
+// equality asserted".
+//
+// WHAT WAS WRONG, measured at HEAD before this module existed.
+// -----------------------------------------------------------
+// Two components animated the SAME number, `$winAmount`, on two independent
+// requestAnimationFrame loops with two independent duration rules and identical
+// easing:
+//
+//   WinBanner.svelte:79   TIER_COUNT_UP_MS = { big: 1400, mega: 2000, epic: 2800 }
+//   HudOverlay.svelte:312 min(800, 400 + min(400, multiplier * 8))
+//
+// Both eased on `1 - (1 - p)^3`, so the curves had the same SHAPE and different
+// LENGTHS, which is the worst case: the two readouts diverge smoothly rather
+// than obviously, and every frame in between shows a player two different
+// dollar amounts for one win.
+//
+// The worked instance in the brief is a big-tier win at 16x: the banner runs
+// 1400ms, the HUD runs 400 + 16*8 = 528ms. The HUD therefore settles on the
+// final figure 872ms before the celebration reaches it. At the epic tier it is
+// far wider: the banner runs 2800ms against a HUD saturated at its 800ms
+// ceiling, so the HUD reveals the number a full two seconds early.
+//
+// THE PLAYER-VISIBLE HARM is not the disagreement, it is the ORDER. The HUD WIN
+// pod finishes first and reveals the total the celebration exists to reveal, so
+// the banner counts up to a number the player has already read.
+//
+// THE FIX, and why it is shaped this way.
+// ---------------------------------------
+// Equality is made STRUCTURAL rather than asserted between two implementations.
+// There is one tween engine (`createWinCountUp`), one duration rule
+// (`countUpDurationMs`), and one shared instance (`sharedWinCountUp`) driven
+// from `$winAmount` by this module rather than by either component. Both the
+// App-level WinBanner and the HUD WIN pod are pure READERS of that instance, so
+// they cannot disagree on any frame: there is only one number.
+//
+// THE ONE FIGURE THAT IS DELIBERATELY NOT SHARED. App.svelte mounts a SECOND
+// WinBanner for the feature-end celebration (App.svelte:1956) driven by
+// FreeSpinsPresentation's own settled total, `liveEndBannerAmount`, precisely
+// because `$winAmount` is still un-settled for the whole feature (see
+// App.svelte's settleRound() deferral). That banner animates a DIFFERENT number
+// from the HUD by design, and forcing it onto the shared instance would have
+// made the HUD show a feature total it is deliberately withholding. It gets its
+// own instance from the same factory, so it shares the engine and the duration
+// rule while keeping its own value. One clock IMPLEMENTATION, one duration
+// RULE, two values only where the two values are the point.
+//
+// Duration below the big-win threshold is the HUD's existing curve, unchanged,
+// so ordinary wins tick exactly as they did. At and above it, the celebration's
+// tier duration governs both surfaces, which is the half that closes the defect.
+
+import { get, writable, type Readable } from 'svelte/store'
+import { winAmount, betAmount, isWincap } from './gameStore'
+
+// Tier thresholds, in multiples of total bet. These were duplicated in
+// WinBanner.svelte:32-34; this is now the single declaration and WinBanner
+// imports them. soundService.ts:406 refers to them by name in a comment.
+export const BIG_WIN_THRESHOLD = 10
+export const MEGA_WIN_THRESHOLD = 30
+export const EPIC_WIN_THRESHOLD = 100
+
+export type WinTier = 'big' | 'mega' | 'epic'
+
+/** Celebration tier for a bet multiple at or above BIG_WIN_THRESHOLD. */
+export function winCountUpTier(multiplier: number): WinTier {
+  if (multiplier >= EPIC_WIN_THRESHOLD) return 'epic'
+  if (multiplier >= MEGA_WIN_THRESHOLD) return 'mega'
+  return 'big'
+}
+
+/** Celebration count-up lengths, previously WinBanner.svelte:79. */
+export const TIER_COUNT_UP_MS: Record<WinTier, number> = { big: 1400, mega: 2000, epic: 2800 }
+
+// The HUD's own curve for ordinary sub-10x wins, previously HudOverlay.svelte:302-303.
+// A 400ms floor rising to an 800ms ceiling, saturating at 50x so a large win
+// does not drag the readout out.
+const HUD_COUNTUP_MIN_MS = 400
+const HUD_COUNTUP_MAX_MS = 800
+
+/**
+ * THE single duration rule for the win count-up, in milliseconds.
+ *
+ * At or above BIG_WIN_THRESHOLD the celebration's tier length governs, so the
+ * HUD trails the banner instead of pre-empting it. Below it, the HUD's own
+ * curve is unchanged: no banner is raised there, so there is nothing to match.
+ */
+export function countUpDurationMs(multiplier: number): number {
+  if (multiplier >= BIG_WIN_THRESHOLD) return TIER_COUNT_UP_MS[winCountUpTier(multiplier)]
+  return Math.min(
+    HUD_COUNTUP_MAX_MS,
+    HUD_COUNTUP_MIN_MS + Math.min(HUD_COUNTUP_MAX_MS - HUD_COUNTUP_MIN_MS, multiplier * 8),
+  )
+}
+
+/** The shared easing. Cubic ease-out, as both former loops used. */
+export function easeOutCubic(progress: number): number {
+  return 1 - Math.pow(1 - progress, 3)
+}
+
+export interface WinCountUp extends Readable<number> {
+  /**
+   * Tween up to `target` over the duration `multiplier` implies, or over
+   * `durationOverrideMs` when the caller's tier is not derivable from the
+   * multiplier.
+   *
+   * The override exists for exactly one caller and it is not a convenience.
+   * WinBanner's explicit-trigger path floors its tier at 'big' for ANY feature
+   * outcome, including one under 10x, so that a modest feature still gets a
+   * real celebration. Deriving its duration from the multiplier would have run
+   * a 3x feature-end banner at 424ms instead of 1400ms and dismissed it a
+   * second early. The tier governs there; the multiplier governs everywhere else.
+   */
+  to(target: number, multiplier: number, durationOverrideMs?: number): void
+  /** Cancel any tween and show `value` immediately. */
+  snap(value: number): void
+  /** Cancel any tween, leaving the current value in place. */
+  cancel(): void
+}
+
+/**
+ * One tween engine. Every animated win figure in the game comes from here, so
+ * there is exactly one easing and one frame loop in the codebase.
+ *
+ * Falls back to snapping where requestAnimationFrame does not exist, so the
+ * module is safe to import under tsx and any non-browser context.
+ */
+export function createWinCountUp(): WinCountUp {
+  const value = writable(0)
+  let frame: number | null = null
+
+  function cancel(): void {
+    if (frame !== null && typeof cancelAnimationFrame !== 'undefined') cancelAnimationFrame(frame)
+    frame = null
+  }
+
+  function snap(next: number): void {
+    cancel()
+    value.set(next)
+  }
+
+  function to(target: number, multiplier: number, durationOverrideMs?: number): void {
+    cancel()
+    if (typeof requestAnimationFrame === 'undefined' || typeof performance === 'undefined') {
+      value.set(target)
+      return
+    }
+    const start = get(value)
+    const startTime = performance.now()
+    const duration = durationOverrideMs ?? countUpDurationMs(multiplier)
+
+    function tick(now: number): void {
+      const progress = Math.min((now - startTime) / duration, 1)
+      value.set(start + (target - start) * easeOutCubic(progress))
+      if (progress < 1) {
+        frame = requestAnimationFrame(tick)
+      } else {
+        value.set(target)
+        frame = null
+      }
+    }
+    frame = requestAnimationFrame(tick)
+  }
+
+  return { subscribe: value.subscribe, to, snap, cancel }
+}
+
+/**
+ * THE shared instance, for the `$winAmount` figure.
+ *
+ * Driven here rather than by either component, so no component owns the clock
+ * and no two components can start it differently. HudOverlay's WIN pod and the
+ * App-level WinBanner both read it.
+ */
+export const sharedWinCountUp = createWinCountUp()
+
+// Reset snaps, increases tween. Carried unchanged from HudOverlay.svelte:330-340:
+// a new spin zeroes `$winAmount`, and zeroing should be instant rather than a
+// count DOWN through the previous win.
+//
+// THE BET MULTIPLE IS COMPUTED HERE RATHER THAN READ FROM `winMultiplier`, and
+// that is not a style preference. `winMultiplier` is a DERIVED store
+// (gameStore.ts:82-85, `$bet > 0 ? $win / $bet : 0`), and a derived store is not
+// guaranteed to have recomputed at the instant this subscriber runs: whether it
+// has depends on subscription order, which depends on which components happen to
+// be mounted. Reading it here returned a STALE multiplier of 0 on the first run
+// of `win_countup_sync_gate.mjs`, so every tier ran the 400ms floor instead of
+// its tier length: the two surfaces agreed perfectly, on the wrong duration.
+//
+// `betAmount` is a plain writable, so `get()` on it is always current, and
+// `next / bet` is the same closed form gameStore.ts:84 declares. The gate now
+// asserts the observed duration against the tier, so this cannot regress quietly.
+let lastWinAmountSeen = 0
+winAmount.subscribe((next) => {
+  const previous = lastWinAmountSeen
+  lastWinAmountSeen = next
+  if (next > previous) {
+    const bet = get(betAmount)
+    sharedWinCountUp.to(next, bet > 0 ? next / bet : 0)
+  } else {
+    sharedWinCountUp.snap(next)
+  }
+})
+
+// MAX-WIN HOLD (owner's order, 2026-07-28), carried unchanged from
+// HudOverlay.svelte:355-359 and its reasoning kept because it is not obvious.
+// A capped round settles and raises the celebration in the same beat that
+// starts this count-up, so the figure went on ticking underneath an opaque
+// overlay the owner has ruled must hold with nothing moving behind it.
+//
+// Snapped rather than paused: the figure is already settled, the tween is
+// presentation of a number that is not in doubt, and there is no player to show
+// it to while the overlay covers it. Snapping also ends the frame loop rather
+// than leaving it running for a hold that is allowed to last forever.
+isWincap.subscribe((capped) => {
+  if (capped) sharedWinCountUp.snap(get(winAmount))
+})
