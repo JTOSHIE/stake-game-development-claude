@@ -51,6 +51,18 @@ in a live document, is itself a gate finding, and this row was flagged by the cu
 within a minute of being written. Matching the form to the meaning is the fix; an allowlist
 entry would not be.
 
+**A COMMAND PROVES WHAT IT MEASURES, NOT WHAT YOU MEANT.** Added 2026-07-30, because a
+command-backed figure was still wrong. The true fixdown brief stated "three rows touch
+locked paths", verified by `awk` over the ledger's path column. The command was correct and
+the answer was not: the column records where a finding was OBSERVED, not where its fix
+LANDS. The real answer was four sanction requests, and one of the three named did not need
+one.
+
+So running a command is necessary and is not sufficient. **Before quoting a figure, state
+what the command actually measured and check that it is the question being asked.** The
+gap between "rows whose recorded file is locked" and "findings whose fix touches a locked
+path" is invisible in the output and decisive in the brief.
+
 **The test, applicable in the moment:** *am I looking at the thing, or at something that
 describes the thing?* If it is the second, it is REPORTED, whatever it says about itself.
 

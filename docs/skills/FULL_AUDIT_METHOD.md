@@ -69,6 +69,44 @@ verifier refuted its finding outright, correctly, **and then found a real defect
 class a few lines away that nothing had recorded**. Budget for refutations and read them: the
 ground around a false positive is where the true one hides.
 
+### 1.3 A BLIND CONTROL CANNOT EXIST WHERE THE ANSWER IS COMMITTED
+
+**Added 2026-07-30, after one was designed, run, and correctly voided by the squad that
+ran it.**
+
+The true fixdown planted a blind control: a finding whose cause a previous session had
+already derived, given to a fresh squad to derive independently, so that agreement would
+measure the wave's quality.
+
+**The squad found the previous session's answer in the repository, read it, and said so.**
+It behaved exactly right. The design was wrong.
+
+**In a repository that records its own conclusions, there is no such thing as a blind
+agent.** Every prior verdict, ledger and session report is readable, and an agent told to
+derive something will find them, because finding relevant material is what it is for.
+Agreement reached that way SHARES AN INPUT with the thing it was meant to check, and
+convention (l.4) is explicit that two methods sharing an input share its flaws.
+
+**So the control measured nothing, and the honest disposition is VOIDED rather than
+passed.** A control reported as passing when it could not have failed is worse than no
+control, because it launders an unmeasured wave as a measured one.
+
+**What to do instead. Use a different LENS, not a hidden answer.** Independence here comes
+from asking a different question of the same evidence, never from withholding what is
+already committed:
+
+- **Perspective diversity**: one agent derives from the source, another from the rendered
+  artefact, a third from the specification. They can all read everything; they cannot all
+  make the same mistake.
+- **Reproduction rather than agreement**: require the finding to be reproduced from a
+  stated procedure, which a prior verdict cannot supply.
+- **Adversarial framing**: instruct to REFUTE. A prior verdict read by a refuter is
+  material to attack, not an answer to copy.
+
+**The one blind control that does work** is a SEEDED defect that exists nowhere in the
+record: plant it, and see whether the method finds it. That is convention (p), and it works
+precisely because the answer was never written down.
+
 ---
 
 ## 2. The rules that stop an audit producing confident wrong answers

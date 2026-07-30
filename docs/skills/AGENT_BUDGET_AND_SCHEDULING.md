@@ -241,6 +241,46 @@ Measured: 6 of 26 clusters, 23 per cent, carried one of these faults. Every one 
 by the two-instances-from-different-squads safeguard. **The corroboration count in a
 grep-built cluster map is a hypothesis, not evidence, and should be labelled as one.**
 
+## 4.5 MAIN LOOP CONTEXT IS A THIRD BUDGET LINE, and it has stopped two sessions
+
+**Added 2026-07-30, after it became the binding constraint twice while tokens were not.**
+
+This document has priced two resources: tokens and wall clock. There is a third, and it
+is the one that actually ended the true fixdown session: **the main loop's own context
+window.**
+
+That session finished with **5.5M of its 7.0M agent line unspent** and its wave B, costed
+at 0.6M and comfortably affordable, never ran. It did not run out of tokens or clock. **It
+ran out of room to think in.**
+
+**What consumes it**, in rough order: reading files, writing scripts and documents in the
+main loop, marshalling agent returns, and the accumulated transcript of a long session.
+None of those are mistakes; they are the main loop doing its job. But they are not free
+and they were not budgeted.
+
+**The signal to watch for.** If a session is main-loop heavy, meaning it constructs rather
+than delegates, its binding constraint is CONTEXT and not tokens. Construction sessions
+build gates, write tables and marshal ledgers, and all three are main-loop work. Discovery
+sessions push their reading into disposable agent contexts and stay light.
+
+**The lever, and it is the one already recorded at `_TEMPLATE.md`'s MAIN LOOP DISCIPLINE:**
+an agent is a disposable context, and on a long session that is its PRIMARY value rather
+than parallelism. Where a job needs INGESTING rather than deciding, delegate it even when
+speed is not the reason. Where the main loop must do the work itself, plan for a shorter
+session and hand over at a boundary rather than pushing to exhaustion.
+
+**Two figures, so this is measured rather than asserted.** Session 2 ran to about 39 per
+cent of a 1M context against roughly 9.4M tokens, and its main loop wrote nine scripts.
+The true fixdown exhausted its context in about two hours on 16 per cent of an allowance.
+**The ratio of context to tokens is not fixed; it is set by how much the main loop does
+itself.**
+
+**No equation is offered, deliberately.** Two data points do not make a constant, and this
+document's own standing is that a measured figure beats a plausible one. What is offered
+is the constraint's existence, its signal, and its lever. **A session that names context as
+a budget line in its Plan of Record will notice it approaching; one that prices only tokens
+will hit it at speed**, which is exactly what happened.
+
 ## 5. Agent classes and standard timings
 
 Use these as the menu when writing a work order. Duration assumes 20 agents in flight.
