@@ -196,7 +196,7 @@ const UNRESOLVABLE_SEGMENTS = new Set([
 // tracked tree is not judged. `books_base.jsonl.zst` is the live example, and it
 // is gitignored anyway, so the gate could not have judged it either way.
 let TRACKED_EXTENSIONS = null
-function extensionsOf(tracked) {
+export function extensionsOf(tracked) {
   const set = new Set()
   for (const f of tracked) {
     const m = f.match(/\.([A-Za-z0-9]+)$/)
@@ -219,7 +219,7 @@ const CODE_EXTENSIONS = new Set([
 const git = (args, cwd = REPO_ROOT) =>
   execFileSync('git', args, { cwd, encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 })
 
-function trackedFiles(cwd = REPO_ROOT) {
+export function trackedFiles(cwd = REPO_ROOT) {
   return git(['ls-files'], cwd).split('\n').map((f) => f.trim()).filter(Boolean)
 }
 
@@ -274,7 +274,7 @@ function globToRegExp(glob) {
 // tracked file the reference EXISTS but has no unique target, so a line-count or
 // symbol check against it is skipped and counted rather than charged to an
 // arbitrary one of the matches.
-function resolvePath(p, ctx, fromFile) {
+export function resolvePath(p, ctx, fromFile) {
   // A reference written RELATIVE to the citing document, `../LEDGER.md`, is
   // resolved against that document's own directory, which is the only reading
   // that can be correct. Without this the gate reported every sibling and parent
@@ -315,7 +315,7 @@ const isUnresolvable = (p) =>
 // numbers stay true for reporting while fenced content is invisible to every
 // class. Blanking rather than dropping is what keeps `file.md:120` citations
 // meaningful in the gate's own output.
-function readableLines(src) {
+export function readableLines(src) {
   const lines = src.split('\n')
   let fence = null
   return lines.map((line) => {
@@ -331,7 +331,7 @@ function readableLines(src) {
 
 // Inline code spans, `like this`. Backtick runs are matched by length, per
 // CommonMark, so `` `a` `` inside a double-tick span does not split it.
-function inlineSpans(line) {
+export function inlineSpans(line) {
   const out = []
   const re = /(`+)([^`]|[^`].*?[^`])\1(?!`)/g
   let m
@@ -344,7 +344,7 @@ function inlineSpans(line) {
 // A backticked span is a PATH claim only if it looks like one. This predicate is
 // where the false positives live, so every exclusion below is a structural
 // answer to a real shape seen in this repository rather than an allowlist entry.
-function looksLikePath(s) {
+export function looksLikePath(s) {
   if (!s || s.length > 200) return false
   if (/\s/.test(s)) return false                       // a command, not a path
   if (/[<>{}$|"'\\]/.test(s)) return false             // <name>, ${var}, a template
@@ -573,7 +573,7 @@ function scanDocument(file, src, ctx) {
 // A malformed predicate is a FINDING, never a skip. The failure mode this is
 // written against is a predicate that quietly evaluates to nothing and reads,
 // in a green run, exactly like a predicate that passed.
-function evaluatePredicate(text, ctx) {
+export function evaluatePredicate(text, ctx) {
   const matches = (glob) => {
     const re = globToRegExp(glob)
     const direct = ctx.tracked.filter((f) => re.test(f))
@@ -615,7 +615,7 @@ function evaluatePredicate(text, ctx) {
 
 // ── the scan, over a tree ────────────────────────────────────────────────────
 
-function scanTree(root) {
+export function scanTree(root) {
   const tracked = trackedFiles(root)
   const trackedSet = new Set(tracked)
   TRACKED_EXTENSIONS = extensionsOf(tracked)
@@ -646,7 +646,7 @@ function scanTree(root) {
     try { src = readFileSync(join(root, f), 'utf-8') } catch { continue }
     findings.push(...scanDocument(f, src, ctx))
   }
-  return { findings, docs, tracked, unresolvable: ctx.unresolvable }
+  return { ctx, findings, docs, tracked, unresolvable: ctx.unresolvable }
 }
 
 // ── the frozen-debt ratchet ──────────────────────────────────────────────────
@@ -978,6 +978,23 @@ function selfTest() {
 }
 
 // ── entry point ──────────────────────────────────────────────────────────────
+//
+// GUARDED, 2026-07-30. Everything below is top-level and used to run on IMPORT,
+// so `brief_preflight.mjs` importing the resolver silently ran the whole gate
+// and inherited its argv: a `--self-test` on the importer executed the gate's
+// self-test instead. Found on the importer's first run.
+//
+// The lesson is the one FULL_AUDIT_METHOD 2.3 already records in a different
+// costume: an instruction constrains the agent, not the side effects of the
+// software it invokes. A module that DOES something on import is that hazard
+// in library form, and the fix is a path guarantee rather than a convention
+// about who may import what.
+const IS_ENTRY = process.argv[1]
+  && resolve(process.argv[1]) === resolve(new URL(import.meta.url).pathname)
+
+if (!IS_ENTRY) {
+  // Imported as a library. Export surface only, no side effects, no exit.
+} else {
 
 const argv = process.argv.slice(2)
 
@@ -1039,3 +1056,5 @@ if (rusted.length) {
 
 if (fresh.length || rusted.length) process.exit(1)
 console.log(`\nDOC CURRENCY GATE: PASS (${baseline.entries.length} frozen claim(s) still outstanding)`)
+
+} // end entry point guard
