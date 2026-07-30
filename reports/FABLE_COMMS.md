@@ -9,6 +9,139 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 032 - 2026-07-30 - TRANSCRIBED: Fable's merged 58-item guidelines sheet, the answer to ask 8
+
+**The channel worked.** Entry 031 asked for the guidelines state as text rather than as
+confirmation that the work had happened, and it arrived as text, in the requested format, merged
+by Fable from the committed 58-row self-assessment plus every ruling and fix landed since it was
+written. **This entry is that reply, verbatim.**
+
+Fable's own framing, quoted: *"You are right that the answers exist, but they live in two places
+that need merging: the 58-row self-assessment in the repo, and the rulings scattered through our
+conversation since it was written. Rather than reconstruct from memory and risk inventing a tick,
+let me read the actual document and merge the record properly."*
+
+**STATUS: REPORTED, per rule 16.** It is Fable's merged position, not a measurement of the
+platform. What it becomes VERIFIED against is stated below the sheet.
+
+---
+
+## THE SHEET, VERBATIM
+
+```
+GUIDELINES STATE, as at 2026-07-30 (merged: self-assessment + all subsequent rulings and fixes)
+Panel count now showing: <read from your panel; this sheet supports 49 ticks today>
+Items you and the owner worked through: 1-58 complete walkthrough
+
+Per item worked:
+  1  | TICK | PASS | live auth, 143 settled rounds
+  2  | TICK | PASS | live-guard hard-disables on auth failure; the one red authenticate degraded correctly, observed-once
+  3  | TICK | PASS | live Bets panel, per-round Event IDs
+  4  | TICK | PASS | trademark searches closed, AU and USPTO recorded
+  5  | TICK | PASS | in-house and owner-supplied art, provenance committed
+  6  | TICK | PASS | original IP, no Stake branding in-game
+  7  | TICK | PASS | tile composed in the Tile Editor, meets the 408x546 grammar
+  8  | TICK | PASS | ladder driven from authenticate, proven live
+  9  | NOT TICKED | resume-and-settle unit-proven | needs your one live mid-round reload (DTT residual 5)
+  10 | TICK | PASS | 49-code table shipped and gated, 589 assertions
+  11 | NOT TICKED | harmonised precision ruling in flight | tick when FS_MONEY_SERIAL_2 lands the exact-win formatter
+  12 | TICK | PASS | conflict resolved by live observation, zero-win rounds arrive settled, TR-064 closed
+  13 | TICK | PASS | two independent guards
+  14 | TICK | PASS | spacebar bound through the same guard
+  15 | TICK | PASS | TR-065 fixed, frame fits all presets, gate-held
+  16 | TICK | PASS | RTP and max win stated, all locales
+  17 | TICK | PASS | per-symbol grid captured
+  18 | TICK | PASS | ways panel plus adjacency diagram
+  19 | TICK | PASS | mode cards keyed in all 16 locales since the locale completion pass
+  20 | TICK | PASS | scatter and retrigger conditions stated
+  21 | TICK | PASS | responsible play and full disclaimer captured live, TM line included
+  22 | TICK | PASS | desktop and laptop captured clean
+  23 | TICK | PASS | popouts clean since the recomposition, scrollbar defect fixed with 15
+  24 | TICK | PASS | mobiles clean since the recomposition
+  25 | TICK | PASS | TR-066 fixed, touch-action manipulation
+  26 | NOT TICKED | records disagree | assessment says autoplay starts on count select, earlier gate asserts explicit confirm; one 60-second check settles it, do not tick until checked
+  27 | TICK | PASS | buy confirm dialog proven
+  28 | TICK | PASS | Interface Guide shipped in the paytable, captured
+  29 | TICK | PASS | mute plus separate sliders in all HUDs
+  30 | TICK | PASS | English default, fully keyed
+  31 | TICK | PASS | Danish fallback proven live, clean English degrade
+  32 | TICK | OWNER satisfied | all five modes played and wallet-reconciled to the cent in your sessions
+  33 | TICK | N/A | no Mystery Mode
+  34-45 | TICK all twelve | PASS | social vocabulary layer, full-DOM scans, XSC/XGC and SC/GC pinned, per-mode social labels, replay social phrasing
+  46 | TICK | PASS | TR-067 fixed, social forces English before first paint, tested
+  47 | TICK | PASS | replay confirmed live post-fix, celebration presents
+  48 | TICK | PASS | parameters parsed and observed live (currency, amount, mode in the overlay)
+  49 | TICK | PASS | PLAY AGAIN present and observed in your replay frames
+  50 | TICK | PASS | cost and multiplier displayed, platform row agrees
+  51 | NOT TICKED | replay and mini HUD each proven separately | needs one screenshot of a replay at Popout S
+  52 | TICK | PASS | platform's own validator: up to 1000x, green
+  53 | TICK | OWNER | Replay demonstrably working; no Provably Fair toggle exists on the portal, recorded as satisfied by mechanism
+  54 | NOT TICKED | is the approval itself | ticks when Start Approval is pressed
+  55 | NOT TICKED | post-approval channel post
+  56 | NOT TICKED | only DTT emulation so far | your call: one real handset test, or tick on emulation with the note recorded
+  57 | NOT TICKED | post-release housekeeping
+  58 | NOT TICKED | the release itself
+
+Items still needing the owner, with why: 9 (one mid-round reload), 26 (one autoplay check), 51 (one Popout S replay screenshot), 56 (real-device call), then 54/55/57/58 which are the approval and release sequence itself
+Items where our recorded position is now wrong: 12 (CONFLICT, now resolved-PASS), 15/25/46 (FAIL, now fixed-PASS), 19 (English-only caveat, now all locales), 21/23/24/28/31 (OBSERVE, now proven), 2/48/49 (OBSERVE, now observed live)
+```
+
+---
+
+## WHAT THIS SESSION CHECKED BEFORE COMMITTING IT
+
+**The arithmetic, VERIFIED by counting the rows.** 49 TICK against 9 NOT TICKED, which are items
+9, 11, 26, 51, 54, 55, 56, 57 and 58. **49 plus 9 is 58, with every item numbered once.** That
+matters because a header figure nobody checked has burned this project before.
+
+**THE PANEL COUNT IS STILL NOT RECORDED, and the distinction is the whole point of this entry.**
+Fable left it as a placeholder, correctly, because he cannot see the panel either. **This sheet is
+what we BELIEVE can be ticked. It is not what IS ticked.** Every count this repository holds is
+still **0 of 58**, the newest from the owner-session frames of 2026-07-28. The sheet becomes a
+measurement only when the owner ticks and sends one screenshot of the panel, which is checklist
+item 1.
+
+**A verification pass is in flight** over the repo-checkable ticks, and its findings land in their
+own entry rather than being folded into Fable's words here. **Convention (f)'s principle applies to
+a transcription as much as to a brief: what Fable sent is what is recorded, and any correction is
+visibly ours.**
+
+---
+
+## THE THREE THINGS IN THE SHEET WORTH THE OWNER'S ATTENTION
+
+**Item 26 is a genuine contradiction that Fable surfaced rather than smoothed**, and it is the
+right instinct: the self-assessment says autoplay starts on count select, an earlier gate asserts
+an explicit confirm, and both cannot be true. He says do not tick until checked. **This session is
+testing whether the repository settles it**, in which case the owner's sixty seconds are not
+needed.
+
+**Item 53 contradicts `OWNER_CHECKLIST.md`.** The checklist says the Provably Fair toggle is among
+the owner items and *"the one to look at hardest, because it is a platform setting rather than
+anything in our build"*. Fable's sheet says no such toggle exists on the portal and records the
+item satisfied by mechanism. **Both cannot be right**, and the checklist line is ours.
+
+**Item 11's tick is gated on a brief that is currently blocked.** The sheet says tick it when
+`FS_MONEY_SERIAL_2` lands the exact-win formatter. Entry 031 blocked that brief and challenged the
+premises the harmonised precision reading rests on. **So item 11 is waiting on something that may
+not happen in that form**, and it should not be read as nearly-done.
+
+---
+
+## WHAT IS OWED, AND BY WHOM
+
+**Fable is owed nothing on this item.** He answered ask 8 in full and in the requested shape.
+
+**The owner:** tick the panel to this sheet, then one screenshot, which is the artefact that turns
+this from REPORTED into a measurement. Then the three short observations Fable names, plus the
+real-device call on item 56.
+
+**Still outstanding from entry 031, unrelated to this sheet:** asks 1 to 7, the money-brief
+pre-flight corrections. And from Fable's own list, the owner's Q4 letter and the Blurb B
+confirmation.
+
+---
+
 ## 031 - 2026-07-30 - PRE-FLIGHT RESULT: the money brief is DO NOT ISSUE, the mirror brief is good to go, and the 58 Guidelines can only reach this repository inside your reply
 
 **Your rulings are sound as DECISIONS. Nothing below overturns one.** What failed is the set of
