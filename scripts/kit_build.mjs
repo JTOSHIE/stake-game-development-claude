@@ -347,9 +347,15 @@ function selfTest() {
      brandingFiles(['README.md']).length === 0],
     ['seeded: .DS_Store does not ship, the file this project already stripped from a bundle once',
      brandingFiles(['.DS_Store', 'FutureSpinner-BG.jpg']).join() === 'FutureSpinner-BG.jpg'],
-    ['seeded: the OLD hand-written list would FAIL this, which is what makes the case above real',
-     !['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png']
-       .includes('FutureSpinner-Tile.png')],
+    // REWRITTEN 2026-07-31. This compared three string literals against a fourth
+    // and could not fail whatever brandingFiles did, so it was a comment dressed
+    // as a case while being counted in the tally. It now drives the real function
+    // against a delivery set carrying a NEW file the old hand-written list could
+    // not have known about, which is the defect that actually occurred.
+    ['seeded: a newly added delivery image is picked up, which a hand-written list could not do',
+     brandingFiles(['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png',
+       'FutureSpinner-Tile.png', 'FutureSpinner-Promo.png', 'README.md'])
+       .includes('FutureSpinner-Promo.png')],
   ]
   for (const [label, good] of brandCases) {
     ok &&= good

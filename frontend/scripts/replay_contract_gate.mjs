@@ -291,6 +291,26 @@ async function driveReplay(browser, {
     observed.figuresAfterPlay = await page.locator('.replay-figures').isVisible().catch(() => false)
     observed.figuresTextAfterPlay = observed.figuresAfterPlay
       ? (await page.locator('.replay-figures').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
+    // OCCLUSION, which isVisible() does NOT test. Playwright calls an element
+    // visible when it has a non-empty box and is not display:none, so a figures
+    // row sitting under a full-viewport splash reads as visible. Added
+    // 2026-07-31 after an audit measured exactly that: with the old cap fixture
+    // the element was covered by the max-win overlay and the assertion passed.
+    observed.figuresOccludedBy = await page.evaluate(() => {
+      const el = document.querySelector('.replay-figures')
+      if (!el) return 'absent'
+      // SCROLL IT INTO VIEW FIRST, then ask what is on top of it. The first
+      // version of this check did not, and reported "off-viewport" on a page
+      // that now scrolls, which is a normal reachable state rather than a
+      // defect. Being scrolled past and being COVERED are different failures
+      // and only the second is what this assertion is for.
+      el.scrollIntoView({ block: 'center' })
+      const r = el.getBoundingClientRect()
+      if (r.bottom <= 0 || r.top >= document.documentElement.clientHeight) return 'unreachable-by-scroll'
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+      if (!hit) return null
+      return (hit === el || el.contains(hit) || hit.contains(el)) ? null : (hit.className || hit.tagName)
+    }).catch(() => null)
   }
 
   await page.close()
@@ -411,6 +431,11 @@ async function main() {
     // interaction-free so REQ-085 can assert the fetch needs no click.
     const assertFiguresPersist = (r, tag = '') => {
       const txt = (r.observed.figuresTextAfterPlay ?? '').replace(/\s+/g, ' ').trim()
+      check(!r.observed.figuresOccludedBy,
+        `${tag}the after-replay figures are not covered by another element`,
+        'nothing paints over the figures row once the round has played out',
+        `the figures row is covered by "${r.observed.figuresOccludedBy}". Playwright's `
+          + 'isVisible() does not test occlusion, so a covered readout would otherwise pass')
       check(r.observed.figuresAfterPlay && /\d/.test(txt),
         `${tag}the bet cost survives the replay playing out (guideline item 50)`,
         `after-replay state renders "${txt}"`,
@@ -474,7 +499,14 @@ async function main() {
       // is the state the platform's wording is actually about. Driven at 1.0x
       // for the same reason as the line above: it is the boundary value, so a
       // single drive covers both the suppression case and the persistence case.
-      assertFiguresPersist(await driveReplay(browser, { costMultiplier: 1.0, play: true }))
+      // SUB-CAP ROUND, deliberately. The gate's default is FIX.super.cap at 500000x
+      // against WINCAP 5000, which raises the max-win splash and waits for a
+      // COLLECT nobody clicks, so the drive stalled in the PLAYING phase and the
+      // assertion read an element behind the overlay. FIX.base.win is 390x, so the
+      // round actually completes and this reads the phase the platform requirement
+      // is about. Also reclaims about 50 seconds of dead wait per CI run.
+      assertFiguresPersist(await driveReplay(browser,
+        { costMultiplier: 1.0, play: true, round: FIX.base.win }))
 
       // S2-C009, driven as its own session because `social` is a launch
       // parameter and cannot be toggled on a live page.
@@ -628,7 +660,7 @@ async function main() {
       // would therefore prove nothing about the assertion added with it.
       await seed('figures-lost-after-play',
         'the bet cost and multiplier vanish once the replay plays, leaving item 50 unmet after the round',
-        { costMultiplier: 1.0, play: true, patches: { '/index.html': (b) => {
+        { costMultiplier: 1.0, play: true, round: FIX.base.win, patches: { '/index.html': (b) => {
           if (!b.includes('</head>')) return null
           return b.replace('</head>',
             '<script>addEventListener("click",function(e){'
