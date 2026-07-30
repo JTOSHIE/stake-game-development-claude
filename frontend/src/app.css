@@ -157,9 +157,35 @@ button {
 button:hover {
   border-color: #646cff;
 }
-button:focus,
+/* S2-C017, REQ-045. This was the ONLY rule in the tree matching a plain
+   `:focus`, and every component focus style is `:focus-visible` only, which does
+   not match mouse-driven focus. So all of roughly ninety buttons showed the user
+   agent's own default ring after a click.
+
+   THE RECORDED CAUSE WAS WRONG AND IS CORRECTED HERE RATHER THAN COPIED. The
+   finding described a stock blue `rgb(0, 95, 204)` to be recoloured. It is not
+   ours to recolour: `outline-style: auto` means the user agent paints its own
+   ring and IGNORES the declared width and colour, so changing them is inert.
+   The fix is to stop matching plain `:focus` at all, not to restyle it.
+
+   The designed `:focus-visible` states in HudOverlay, BetSelector, ResumeOffer
+   and FreeSpinsPresentation still win on keyboard focus. This mirrors the
+   precedent already set at ResumeOffer.svelte:125.
+
+   THE TOKEN IS `--theme-primary` AND NOT `--sig-cyan`, which the precedent uses,
+   and the difference matters HERE in a way it does not there. `--sig-cyan` is
+   declared inside three components (ResumeOffer, WinBanner, FeatureMenu) and
+   nowhere globally, so a rule in this file naming it would silently fall through
+   to the literal for roughly ninety buttons while READING as though it were
+   themed. `--theme-primary` is the real global, set from the active theme at
+   App.svelte:1703, so it cascades to every button in the tree and follows a
+   theme change. The literal stays as the fallback for anything outside it. */
+button:focus {
+  outline: none;
+}
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid var(--theme-primary, #00FFFF);
+  outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: light) {
