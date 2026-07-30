@@ -7346,6 +7346,15 @@ session's own handover and should be read as such until the map lands.
 
 ### What Session 2 picks up, in order
 
+> **DATED NOTE, added 2026-07-30.** Everything under this heading was written as a
+> forward INSTRUCTION to Session 2, and Session 2 has long since run. These lines are
+> now a RECORD of what was planned at the time, not a live work order, and nothing in
+> them should be picked up as a current instruction. They are left exactly as written
+> rather than rewritten, because a dated record cannot go stale and a silent edit would
+> destroy the evidence of what was actually planned. Convention (s): history does not go
+> stale, instructions do. For the current state of this work see
+> `reports/qa/session5/RESUME.md` and the newest entry of `reports/FABLE_COMMS.md`.
+
 1. **The seven REOPENED clusters** (C-03, C-10, C-11, C-14, C-23, C-25, C-26). Six carry a
    known marshalling fault with the fault named; re-cluster those correctly rather than
    re-verifying them as they stand. **Re-cluster across ALL severity tiers first**, per

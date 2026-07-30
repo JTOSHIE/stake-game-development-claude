@@ -35,4 +35,25 @@ shape of these numbers and not from their precision.
 | 3 | JOB 3 | S2-C006, replay figures persist past the ready phase | `d1cd0c3` | about 300k of 740k | **DONE.** Figures hoisted out of the phase branch. Two new assertions plus the `figures-lost-after-play` seed. 12 before and after frames committed. Self-test 7/7 caught 0 missed 0 unapplied, real run 17/17, exit 0. **Found and recorded a PRE-EXISTING defect this did not cause and does not fix: `frontend/src/app.css:125` puts the replay compliance disclaimer above the fold at six of eight presets. See the commit body.** |
 | 4 | JOB 4 | S2-C009, the social leg on the replay gate | `df78a31` | about 360k of 740k | **DONE.** Social assertion plus its real-money control plus the `social-label-not-swapped` seed. Self-test 8/8 caught 0 missed 0 unapplied, real run 19/19, exit 0. Social renders `Token: EUR`, real money `Currency: EUR` |
 | 5 | JOB 5 | S2-C017, the focus ring matched mouse focus | `4e8cfb5` | about 460k of 740k | **DONE.** `button:focus` no longer paints; `button:focus-visible` carries a designed ring. Proven by computed style, not by reading CSS. Layout fit gate PASS |
-| 6 | JOB 6 | S2-C092, the upload kit omitted the composed tile master | (this commit) | about 500k of 740k | **DONE.** Branding set now READ from the directory, not listed by hand. Six new convention (p) cases in the existing selfTest, including a control proving the old hand-written list fails. Self-test PASS exit 0. Dossier corrected from three to four. Kit build NEVER run without a flag |
+| 6 | JOB 6 | S2-C092, the upload kit omitted the composed tile master | `2219f77` | about 500k of 740k | **DONE.** Branding set now READ from the directory, not listed by hand. Six new convention (p) cases in the existing selfTest, including a control proving the old hand-written list fails. Self-test PASS exit 0. Dossier corrected from three to four. Kit build NEVER run without a flag |
+| 7 | JOB 7 | Prose corrections and the two record closures | (this commit) | about 540k of 740k | **DONE.** Five corrections plus two strikes. Doc currency gate 0 new |
+| 8 | JOB 8 | Guidelines self-assessment reconciliation | NOT STARTED | n/a | **PARKED ENTIRELY, per the brief's own stop line.** It must not start below 250k remaining and this session is at its close reserve. It is all-or-nothing by instruction: recount every one of the 58 rows and the Summary in one sitting or none, because a half-reconciled register is worse than a stale one. **Item 50 now has a real answer to record**: PASS in the ready phase AND in the playing and complete phases, because JOB 3 landed (`d1cd0c3`) and is held by two assertions and a seed. Item 53 stays DO NOT TICK, reason already in the file. |
+
+## THE TWO ROWS THAT CLOSE AS STRIKES, NOT FIXES
+
+Recorded here rather than in the ledger, because the brief forbade opening the ledger and
+these need no edit to any source file. Both were recounted against HEAD rather than accepted
+from the brief, per rule 16.
+
+- **S2-C098, ALREADY CLOSED AT HEAD. No edit.** `livePart(...)` resolves at
+  `scripts/kit_build.mjs:420`, which is before every destructive step: `rmSync(STAGING)` at
+  `:473` and `rmSync(KIT)` at `:574`. So a throw costs nothing and destroys nothing, which
+  is the property the row asked for. Its seeded self-test is CI-wired at
+  `.github/workflows/checks.yml:283`.
+- **S2-C115, NEEDS NO EDIT, and its recorded fix would VIOLATE the owner's ruling.**
+  `frontend/src/lib/services/rgsService.ts:525` reads `const lang = p.get('lang') ?? 'en'`,
+  so the player's raw language preference is transmitted when present, which is what was
+  ruled. The recorded fix routed it through `resolveLaunchLocale`, which does the opposite.
+  **DO NOT read this closure as settling the `?? 'en'` default**: that is a separate and
+  still-open owner question, ask 2 of entry 031, because a default substitutes a preference
+  the player never expressed. This row is closed; that question is not.

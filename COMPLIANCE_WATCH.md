@@ -145,11 +145,24 @@ build, not carried forward from an earlier pass.
   `scheduleAutoSpin()` after the turbo/super speed-tier factor, so the jurisdiction floor
   always wins even under fast-play multipliers.
 - **Autoplay explicit-confirm gate:** confirmed structural, not a single named function -
-  `isAutoPlay.set(true)` has exactly two call sites in the whole codebase, both inside
-  `startAuto(count)` in `ControlBar.svelte:57-63` and its `HudOverlay.svelte` duplicate,
-  each only reachable via two explicit clicks (open the autoplay menu, then click a
-  specific spin-count option). Never called on mount, from restored state, or from a URL
-  param.
+  `isAutoPlay.set(true)` has exactly ONE call site in the whole codebase, inside
+  `startAuto(count)` at `HudOverlay.svelte:194`, reachable only via two explicit clicks
+  (open the autoplay menu, then click a specific spin-count option). Never called on
+  mount, from restored state, or from a URL param.
+  **CORRECTED 2026-07-30.** This line previously claimed TWO call sites, "both inside
+  `startAuto(count)` in `ControlBar.svelte:57-63` and its `HudOverlay.svelte` duplicate".
+  It was wrong in two ways at once, and the second is the one that would have misled a
+  reader: not only was the COUNT wrong, the file it NAMED FIRST no longer exists. The
+  ControlBar component (deliberately not written as a backticked path, because a dead
+  filename written as a live path is itself a gate finding, and the document currency
+  gate flagged exactly that when this correction was first drafted) was deleted on
+  2026-07-08 in commit `56c0403`, the dead-components hygiene pass, and the duplicate
+  went with it. Recounted here by
+  `grep -rn "isAutoPlay.set(true)" frontend/src`, which returns exactly one line.
+  **The compliance conclusion is unchanged and is in fact stronger**: one guarded call
+  site is a narrower surface than two, so the explicit-confirm property still holds. What
+  was stale was the evidence, not the finding, which is why this is a correction and not
+  a reopening.
 - **Provably-fair determinism test:** re-ran fresh today
   (`npx tsx src/lib/services/roundInterpreter.determinism.test.ts`) - **PASS, 58/58**
   sample books reconstruct identically across 5 runs each, plus a static source-text
