@@ -412,8 +412,21 @@ async function main() {
       // differing only in currency and language must render differently. A
       // single-load assertion cannot see a hardcoded value whenever the one test
       // URL happens to match it, which is exactly how the dash gate failed.
-      const eur = healthy.observed.startText
-      const jpy = (await driveReplay(browser, { qs: { currency: 'JPY', lang: 'ja', amountMicros: '1000000000' } })).observed.startText
+      // REPOINTED 2026-07-30 from `startText` to `figuresText`, after a
+      // post-session audit found this assertion had been gutted without going
+      // red. The money used to live in the START REPLAY button, so reading its
+      // text compared the rendered currency and amount across two loads. Commit
+      // d1cd0c3 hoisted the figures OUT of that button into `.replay-figures`,
+      // and this line was left pointing at the button.
+      //
+      // What it then compared was the translated LABEL: "START REPLAY Mode:
+      // super" against the Japanese equivalent. Those differ for any two
+      // languages, so the check passed while proving nothing about currency or
+      // amount, and the gate went on printing "11 requirements held". A build
+      // that hardcoded the currency and ignored the query string would have
+      // passed it, which is the exact defect REQ-077 exists to catch.
+      const eur = healthy.observed.figuresText
+      const jpy = (await driveReplay(browser, { qs: { currency: 'JPY', lang: 'ja', amountMicros: '1000000000' } })).observed.figuresText
       check(eur !== jpy && eur.length > 0 && jpy.length > 0,
         'optional query parameters are applied, not defaulted',
         `EUR renders "${eur}", JPY/ja renders "${jpy}"`,

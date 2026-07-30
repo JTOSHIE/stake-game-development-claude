@@ -188,6 +188,33 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* PROGRAMMATIC FOCUS STILL NEEDS A RING, and the rule above cannot give it one.
+   Added 2026-07-30 after a post-session audit found this regressed.
+
+   The rule this replaced matched `button:focus, button:focus-visible` together,
+   so a button the APP focused was indicated. Suppressing plain `:focus` fixed
+   the mouse-click ring and silently took the indicator away from every button
+   focused by script, because `:focus-visible` is a user-agent heuristic about
+   the last INPUT: after a click it does not match, however the focus arrived.
+
+   Two buttons are focused on open rather than by the user, both in modals the
+   player has to dismiss:
+     MaxWinCelebration.svelte:96   `$: if (show && collectBtn) collectBtn.focus()`
+     ResumeOffer.svelte:37         `$: if (open && resumeBtn) resumeBtn.focus()`
+   The max-win one matters most: the owner's own hold rule is that the splash
+   waits indefinitely for COLLECT, so a player who cannot see where focus sits is
+   stuck on the one screen designed to wait for them.
+
+   BetSelector's `focusables[next]?.focus()` is NOT listed here on purpose. It is
+   driven by arrow, Home and End keys, so the last input really is a keyboard and
+   `:focus-visible` matches it correctly. Adding it would restore a ring the
+   original finding was right to remove. */
+.c1-collect:focus,
+.ro-btn:focus {
+  outline: 2px solid var(--theme-primary, #00FFFF);
+  outline-offset: 2px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
