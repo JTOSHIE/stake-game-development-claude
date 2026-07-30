@@ -195,6 +195,14 @@
   }
   enforceSocialEnglish()
 
+  // Mark the replay route on body so the scroll override in this file's style
+  // block can find it. In the component script body rather than onMount, so it
+  // lands before first paint exactly as the locale set above does: `isReplay` is
+  // resolved from the URL at instance creation, so there is nothing to wait for.
+  if (isReplay && typeof document !== 'undefined') {
+    document.body.classList.add('replay-route')
+  }
+
   if (import.meta.env.DEV) {
     const buf: TelemetryEvent[] = []
     ;(window as unknown as { __telemetry: unknown[] }).__telemetry = buf
@@ -2163,6 +2171,31 @@
     font-family: var(--fs-font-display);
     overflow: hidden;
     height: 100dvh;
+  }
+
+  /* THE REPLAY ROUTE MUST SCROLL. Added 2026-07-31.
+
+     The rule above is right for the GAME: a viewport-locked stage that must
+     never grow a scrollbar. It is wrong for REPLAY, which is a document-shaped
+     page whose content is genuinely taller than the viewport: measured at
+     1024x576 the replay container is 819px tall.
+
+     With `overflow: hidden` and no scroll, SOMETHING is always off screen and no
+     choice of alignment fixes it, only moves which thing is lost. Measured on
+     dist at eight presets: centred, the compliance disclaimer was cut off the
+     top at 5 of 8; top-aligned, the disclaimer came back and the START REPLAY
+     BUTTON went off screen at 4 of 8, which is worse, because a reviewer then
+     cannot start the replay at all. That trade is the whole finding.
+
+     Scoped by a class on body rather than by putting this in ReplayMode's own
+     style block: Svelte emits a component's `:global()` selectors into the
+     bundle unscoped at LOAD time, not at mount, so a bare `:global(body)` there
+     would apply to the game route too. The class is set from `isReplay`, which
+     is resolved at instance creation before first paint. */
+  :global(body.replay-route) {
+    overflow: auto;
+    height: auto;
+    min-height: 100dvh;
   }
 
   /* Viewport-locked stage: clips overflow and centres the scaled 1280x720

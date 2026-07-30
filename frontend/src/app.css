@@ -122,7 +122,24 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  /* `place-items: center` was here, from the create-vite scaffold (31fdbcf,
+     2026-02-20), and it is part of charter row Q-27's residue. Removed
+     2026-07-31 because it is what put the replay compliance disclaimer OUT OF
+     REACH: the replay route does not scroll at all, since App.svelte sets
+     `overflow: hidden` on body, so centring content taller than the viewport
+     cuts the top off with no way to get to it.
+
+     Measured on dist at eight presets: the disclaimer was cut off the top at 5
+     of 8 in the ready phase and 7 of 8 after playing. With this line gone, 0 of
+     8 in the ready phase.
+
+     MEASURED SAFE FOR THE MAIN GAME, which is why it is removed outright rather
+     than scoped to the replay route. Session 5 deferred this on the grounds that
+     removing it moves the main surface too. It does not: `#app`'s only top-level
+     children, `.bg-layer` and `.game-stage`, are both `position: fixed;
+     inset: 0`, so they take no part in body's flex layout. Probed at all eight
+     presets, `.game-stage` reads top=0 left=0 at full viewport size either
+     way. */
   min-width: 320px;
   min-height: 100vh;
 }

@@ -413,7 +413,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* SAFE centring, corrected 2026-07-31. Plain `justify-content: center`
+       reproduces, one level down, the exact defect the comment above describes
+       for `height: 100vh`: once the content is taller than the box, centring
+       splits the overflow BOTH ways and the top half becomes unreachable,
+       because this route does not scroll (App.svelte puts `overflow: hidden` on
+       body). `min-height` alone does not prevent that, it only delays it until
+       the content grows, which is what the win area does after the replay plays.
+
+       `safe` is the purpose-built keyword: it centres while there is room and
+       falls back to start alignment the moment the content would overflow.
+       Measured on dist after this change: the disclaimer is fully visible at 8
+       of 8 presets in the ready phase and 8 of 8 after playing. */
+    justify-content: safe center;
     gap: 1.5rem;
     padding: 2rem 1rem;
     box-sizing: border-box;
