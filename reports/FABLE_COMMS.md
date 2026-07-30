@@ -9,6 +9,289 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 030 - 2026-07-30 - DECISION REQUEST: a hard external date nobody has put in front of you, eight rows that name you as the blocker, and four questions I withdrew because they did not survive checking
+
+**Every figure below was verified today by the command shown, per rule 16. Where I could not
+verify something I have said so rather than smoothing it. Twelve verification agents ran over
+this message before it was sent, and they killed four of the six questions I had drafted.**
+
+---
+
+## 1. THE DATE, FIRST, BECAUSE IT REORDERS EVERYTHING BELOW IT
+
+**The Stake Engine 3 Star Game Challenge closes at 11:59pm AEDT on 1 August 2026.**
+
+VERIFIED 2026-07-30 by direct read of `docs/stake-engine-live/2026-07-29/giveaway_terms.md:25`.
+The same file defines a Qualifying Entry as *"a game submitted via Stake Engine during the
+Competition Period that achieves a minimum 3-star rating under clause 4(c)"*. **So the date
+binds submission AND a rating outcome, not submission alone.** Clause at `:30` lets the
+promoter move the date by publishing an updated one, so it can shift, but nothing says it has.
+
+**This has never appeared in any of the twenty-nine entries above this one.** It appears in no
+driving document either: `grep -n August OWNER_CHECKLIST.md` returns nothing, and the same
+grep over `SUBMISSION_DOSSIER.md`, `WRS_MASTER_DOCUMENT.md` and `COMPLIANCE_WATCH.md` also
+returns nothing. It exists only in the platform mirror and in our own audit paperwork.
+
+**How it got lost is a mechanism, not an oversight, and it will happen again.** The page
+arrived on 2026-07-29 inside a 64-page capture. Convention (d) reports DIFFERENCES between
+captures, and a page captured for the first time has no prior version to differ from, so
+roughly 56 new pages produced no delta and every obligation new to them entered the tree
+silently. Session 3 diagnosed this exactly and specified the fix. **The fix was never
+applied.**
+
+Two owner items gate the entry and both are open: `OWNER_CHECKLIST.md` item 1, the 58
+Guidelines on `future-spinner-2`, still at 0/58 with nine of them owner-only; and item 3,
+upload kit V10.
+
+**I am not asking you to rule on the calendar.** I am asking you to read every question below
+against roughly two days rather than an open horizon, and to tell me if that changes your
+answers.
+
+---
+
+## 2. WHERE WE ACTUALLY ARE
+
+The true fixdown closed yesterday. All 118 upheld findings now carry a disposition, which
+they did not before.
+
+| | Count | Command |
+|---|---|---|
+| Findings dispositioned | **118** | `awk -F'\t' 'NR>1' reports/qa/session4b/DISPOSITIONS.tsv \| wc -l` |
+| FIXED with re-proof | **2** | `awk -F'\t' 'NR>1 && $3=="FIXED"'` |
+| STRUCK, not real | **19** | `awk -F'\t' 'NR>1 && $3=="STRUCK"'` |
+| PARKED with a named reason | **97** | `awk -F'\t' 'NR>1 && $3=="PARKED"'` |
+| Severity | 20 STREAM, 68 HIGH, 27 MEDIUM, 3 LOW | `awk -F'\t' 'NR>1 {print $2}' \| sort \| uniq -c` |
+
+Seven gates have landed since the mechanism register was written, all CI-wired with seeded
+self-tests: `replay_contract_gate.mjs` (M01, 11 requirements), `paytable_parity.test.ts` (M08),
+`disclaimer_conformance.test.ts` (M02), `delivery_set_gate.mjs` (M03), `currency_table_gate.mjs`
+(M04), plus `win_countup_sync_gate.mjs` and `multiplication_sign_gate.mjs` yesterday.
+
+**Requirements with no proof path: 79 surveyed, 30 now held by a gate, 49 still parked.**
+Verified from `reports/qa/session3/PARKED_TRACKER.md` counts table, amended 2026-07-29 23:53.
+**Ignore the figure 82**, which is Session 2's superseded summary, and ignore **50**, which is
+`MECHANISMS.md`'s figure from two and a half hours earlier the same evening.
+
+---
+
+## 3. WHAT I WITHDREW FROM THIS MESSAGE, AND WHY
+
+I had drafted six questions. **Four did not survive verification.** They are recorded here
+rather than deleted, because you were nearly asked to rule on them and the reasons are the
+useful part.
+
+**WITHDRAWN 1, the row-merge question.** I was going to ask whether S2-C002, C003, C004 and
+C007 should be merged as one finding described four times. **They are four different platform
+requirements**: REQ-079 replay works with no session, REQ-083 the request path shape, REQ-085
+fetch on load with no click, REQ-098 a user-facing error state. They are closed by four
+separate assertion blocks inside one gate file. **Sharing an instrument is not being one
+fact.** I would also have told you merging shrinks the burndown: it does not, since all the
+rows involved are already STRUCK, so the open count of 97 does not move by a single row.
+
+**WITHDRAWN 2, S2-C084 being misfiled under CURRENCY.** In this ledger CURRENCY means DOCUMENT
+currency, meaning up-to-dateness, not money. All ten CURRENCY-family rows are document
+staleness findings. It is filed exactly where it belongs. **I made the error of reading a
+column label instead of checking what the column holds**, which is the same error this seat
+recorded against itself two days ago.
+
+**WITHDRAWN 3, M09 as its own question.** M09 is blocked on exactly one thing, widening the
+document currency gate's phase 2, which is already question 4 below. Asking twice would invite
+two rulings on one subject. It also **names no candidate documents anywhere**, so a ruling
+would be a blank cheque, and lifting the cap would not unblock it regardless because its
+load-bearing requirement has no expressible predicate. **And the pointer in our own tracker is
+wrong**: it cites entry 026 as where the request was made, and entry 026 contains no such
+request.
+
+**WITHDRAWN 4, "is the backlog trustworthy".** That judgement is mine and I have already made
+it: `reports/qa/session4b/LEDGER.md:130` instructs that a wave-A derivation is a HYPOTHESIS
+until reproduced. **Asking you to re-render a judgement I have already recorded is outsourcing
+a call that is mine**, and it invites a ruling that contradicts our own standing instruction.
+What is genuinely yours is the money and the sequencing, which is question 4.
+
+**One correction to a figure I have used with you before.** I have said 81 parked rows carry
+an unreproduced agent-derived cause. **The correct figure is 71.** 81 counts something else,
+rows whose fix was not applied because the batch closed, which includes 24 rows derived by an
+earlier session and omits 14 wave-A rows sorted into other buckets. The two overlap on 57 rows
+and neither contains the other.
+
+---
+
+## 4. THE QUESTIONS
+
+### Q1. The eight rows that name YOU as the blocker, and which nothing has ever enumerated
+
+`reports/qa/session4b/LEDGER.md:31` counts "PARKED, owner decision: 8" and then never lists
+them. **Every one carries symptom YES at head, meaning the defect is live.** These are the
+only rows in the entire 118 whose recorded blocker is a Product Owner ruling. Everything else
+is blocked on capacity, a lock sanction or a brief.
+
+| Row | Sev | What it needs from you |
+|---|---|---|
+| **S2-C015** | STREAM | **A live money-display defect.** The smallest real win this game can pay is L3 three-of-a-kind at 0.08x, which at the 0.10 minimum bet is **$0.008 and renders as $0.01**, overstating the player's win by 25 per cent. Verified at `games/future_spinner/game_config.py:105` and `:127`. Build a separate exact-win formatter now, or accept two-decimal rounding with a recorded reason? **Convention (l.8) forbids me ruling on player money display.** |
+| **S2-C014** | STREAM | The bet ladder. The platform asks for levels from $0.01; we ship a $0.10 floor. As registered, **REQ-125 demands four decimal places and REQ-126 says never show them above a $0.10 base bet, so the pair is unsatisfiable** until you rule. This is upstream of S2-C062 and of the sanction surface in Q2. |
+| **S2-C046** | HIGH | The platform's submission-checklist page is **auth-walled**; every capture attempt has stored the login wall rather than the criteria. No repository change can produce it. Direct an owner-authenticated capture, or accept `STAKE_GUIDELINES_SELF_ASSESSMENT.md` as the standing surrogate? |
+| **S2-C062** | HIGH | The bet ladder inside the locked maths package. **Its own derivation is headed "Fix (PARK, NEEDS LOCK SANCTION)"** and names two further locked paths beyond the ones in Q2. |
+| **S2-C076** | HIGH | The licence contradiction. **I believe this is already resolved** by commit `ddca4b1` on 2026-07-29, which replaced the root MIT grant. Confirm it can be struck. |
+| **S2-C097** | MEDIUM | **"Blurb B" is submission text and no artefact in the repository defines it.** `SUBMISSION_DOSSIER.md` carries three contradictory status markers on it at `:39`, `:41` and `:490`. The fact needed to close this does not exist here, so no session can close it without inventing it. Supply or confirm the approved text, and say whether it includes the soundtrack sentence. |
+| **S2-C120 / S2-C121** | MEDIUM | REQ-043 and REQ-044, **unreachable by any mechanical instrument by construction**. REQ-044 is also in direct tension with the platform's own privacy clause at `terms.md:15.2`, *"The Developer shall not process any personal data of Players"*. Confirm a permanent owner-park for both, and say whether the requirement-versus-privacy tension gets raised with the platform as its own item. |
+
+**Two of these are STREAM severity, both are money, and the message I nearly sent contained no
+money question at all.** That absence would have read as "the money surface is clear". It is
+not.
+
+### Q2. The lock sanctions, restated correctly after checking
+
+I was going to tell you "three one-line changes in `rgsService.ts` plus one larger". **That was
+wrong in three ways** and I would rather you ruled on the real shape.
+
+- **Only S2-C115 is graded ONE_LINE, and it is the least severe of the three at MEDIUM.**
+  S2-C061 and S2-C064 are graded SMALL and both are **HIGH**. The one-liner framing put the
+  smallest and least urgent item at the front.
+- **S2-C061 and S2-C064 are the same line**, `rgsService.ts:735`. Our own raw data says
+  *"Identical root and identical fix to S2-C061, which is why these should be one row"*. So
+  three requests need **two** distinct locked lines, not three.
+- **Each locked edit also needs an import line inside the locked file**, so no edit is truly a
+  single line.
+
+**What refusing costs, stated plainly, because the conservative answer here is not the safe
+one.** S2-C061 and S2-C064 are the remediation for **REQ-121, graded NOT_MET at HIGH**
+(`reports/qa/session3/NO_PROOF_SET.tsv:34`), whose platform wording at `rgs.md:288` is *"Clamp
+every wager the game can submit to the authenticated minBet and maxBet, not to a hardcoded
+ladder."* The service parses those limits and drops them, confirmed by complete enumeration of
+18 production references. In plain terms: **the shipped bet ladder is not clamped to the
+limits the platform authenticates, so the game can submit a wager outside them.** That is a
+compliance requirement, unmet, at HIGH, on the money path.
+
+Three things I need in the ruling that our own ledger does not mention:
+
+1. **The commit token, not just the deny lift.** A sanction is two-part. Lifting the
+   `.claude/settings.json` deny lines lets the editor write; `scripts/qa/locked_paths_gate.mjs`
+   **separately fails the commit** unless its message carries `LOCK-SANCTION: <date> <path>`
+   naming exactly the paths touched, checked in both directions. `grep -c LOCK-SANCTION` over
+   the fixdown ledger returns **0**. A ruling that grants only the deny lift produces a change
+   that lands locally and goes red in CI.
+2. **The direction of the S2-C115 fix, which is still open.** Its own record says the direction
+   *"is a judgement call worth putting to the owner: aligning the wire to the screen tells the
+   platform what we render ... the alternative reading is that `language` is a player
+   preference the platform should receive raw. The mirror does not settle it."* Granting the
+   sanction without ruling the direction spends a lock on an edit whose content is undecided.
+3. **All four came from one squad, SHARD_H, and none has been reproduced.** A single wrong
+   squad makes all four wrong at once. Do you want any reproduced before a lock is spent, given
+   our own standing instruction to treat a wave-A derivation as a hypothesis?
+
+And note **S2-C060 needs its own serial money-path brief** rather than a sanction alone.
+
+### Q3. The currency contradiction: ratify what shipped, or overturn it
+
+I was going to escalate this as an open question. **That would have been dishonest framing,
+because we have already shipped an answer.**
+
+The platform's Supported Currencies table and the `CurrencyMeta` TypeScript sample lower on the
+same page disagree with each other. **The count is 15 codes, not the 14 in entry 028, and entry
+028 enumerates only 12.** The three affected codes named nowhere are **NOK, XSC and XEC**.
+
+**We resolved it in favour of the published Example column for all 49 codes, shipped it, and
+gated it**: `node frontend/scripts/currency_table_gate.mjs` exits green with 589 assertions.
+So the real question is **ratify or overturn**, and overturning changes the table, the gate and
+the player-facing money display.
+
+Two things to know before you answer. **XSC and XEC you already ruled on** (ruling 2,
+2026-07-26, trailing), so this is not 15 fresh codes. And **the supported-code count is 49, not
+36**; the 2026-07-29 capture publishes 13 codes the 2026-07-04 one did not.
+
+### Q4. Which backlog comes first, and what will you buy
+
+**This is the one question in this message only you can answer, and none of my original six
+asked it.**
+
+There are two backlogs and nothing states which has priority: **97 parked findings**, and **49
+requirements still with no proof path**. Re-grounding the 71 unreproduced wave-A causes costs
+roughly **5.0M tokens** at our own measured verifier rate of 70k each. Against roughly two days
+before the competition closes, the options are:
+
+- **(a)** Buy the re-grounding. Safest, and it will not finish before 1 August.
+- **(b)** Buy a sample, enough to measure the wave's error rate, then decide.
+- **(c)** Accept the 97 as a hypothesis list, and spend everything on submission readiness and
+  the 49 unguarded requirements.
+- **(d)** Something narrower: work only the rows that block a 3-star rating.
+
+**My recommendation is (d) then (c)**, on the grounds that the date binds a rating outcome and
+not merely a submission.
+
+### Q5. The docs-watch mechanism that lost the deadline
+
+Convention (d) reports differences between captures, so a page captured for the first time
+produces no delta and enters the tree silently. **That is how a hard external date sat unread
+for a day.** Session 3 specified the fix and it was never applied. Do you ratify amending
+convention (d) so that a page with no prior capture is reported IN FULL as NEW, in its own
+section, separately from changed pages?
+
+### Q6. The queue, which has four unanswered entries
+
+Entries **020, 024, 028 and 029** carry no acknowledgement. Entry 029 asked four things and this
+message re-raises three; **the fourth is a live predicate sitting outside the two-document cap**
+at `JOB4_CAUSE_REDERIVATION.md:281`, deliberately left in place pending your ruling. Remove it,
+or let it stand as a third adopted document?
+
+**And a contradiction only you can settle.** Two documents record *"RULING, 2026-07-28:
+DECLINED"* for SA-002 and SA-007; four others record them as still awaiting a ruling. Did you
+rule on those, or not? This is the same structural ambiguity entry 026 raised: **an unanswered
+request and an answered-but-untranscribed one look identical from inside the repository.**
+
+---
+
+## 5. READ THESE FRESH, AND WHAT TO LOOK FOR
+
+Please open these at HEAD rather than trusting this message, including where it contradicts
+them. **Where I know a file is stale I have said so.**
+
+| File | Why fresh | Look for |
+|---|---|---|
+| `docs/stake-engine-live/2026-07-29/giveaway_terms.md` | The primary source for the date. Nothing else in the repository carries it | Lines 25 and 30: the Closing Date, the Qualifying Entry definition, and the promoter's right to move it |
+| `reports/qa/session4b/DISPOSITIONS.tsv` | The finding ledger. **Machine-readable, 118 rows, 9 columns** | Column 7 `PARK` gives Q1's eight rows. Column 9 gives the sanction rows |
+| `reports/qa/session4b/LEDGER.md` | The fixdown's reasoning. **Long** | Section on sanction requests, and line 130 on treating derivations as hypotheses |
+| `OWNER_CHECKLIST.md` | The two items gating the competition entry | Items 1 and 3. **STALE: carries no date anywhere** |
+| `reports/qa/session3/PARKED_TRACKER.md` | The current 79 / 30 / 49 counts | The counts table near the top. **STALE at line 224**, which cites entry 026 for a request that is in 029 |
+| `reports/qa/session3/MECHANISMS.md` | The 21 mechanisms and the DOES NOT FIT verdict | The verdict arithmetic. **STALE: still records M04 as STOPPED, and it was built on 2026-07-29 at 22:31** |
+| `reports/qa/compliance_register/REGISTER.md` | REQ-016, REQ-043, REQ-044, REQ-124 to REQ-126 | The unsatisfiable REQ-125 / REQ-126 pair |
+| `SUBMISSION_DOSSIER.md` | The submission text itself | Lines 39, 41, 61 to 63 and 490, the three contradictory Blurb B markers |
+| `docs/stake-engine-live/2026-07-29/rgs.md` | The currency contradiction, both artefacts | Lines 93 to 142, the table; lines 207 to 257, the `CurrencyMeta` sample that disagrees with it |
+| `reports/FABLE_COMMS.md` | Your own queue | Entries 020, 024, 028, 029, none acknowledged |
+| `docs/records/ROLE_HEAD_OF_ENGINEERING.md` | **New.** The operating discipline for this seat | Section 2, the four false claims and the command lesson, since it explains section 3 above |
+
+---
+
+## 6. THINGS THAT MIGHT NEED EXPLAINING
+
+**"symptom at head" is a self-report, not a measurement.** It is copied through from whichever
+agent originally derived the finding. No session has re-run a check at HEAD to produce it. So
+when the ledger says 78 rows are live, that is 78 agents saying so. I have been careful not to
+present it as a measurement, and you should not read it as one.
+
+**"Wave A" means the fixdown's parallel discovery squads.** Their causes are derivations from
+reading source, not reproductions. Our own instruction is to treat them as hypotheses. Of the
+97 parked rows, **71 carry a wave-A cause and 26 carry one from an earlier session.**
+
+**A lock sanction is two-part.** The deny-line lift is a working-tree edit that is never
+committed. The commit-message token is what CI reads. Both are required and they are checked by
+different mechanisms.
+
+**"Larger than small" is a real disposition here.** It means the change needs its own brief
+rather than being absorbed into a fix batch. Five rows carry it, though our own table says
+four, because S2-C060 is counted under sanctions instead.
+
+**Why this message contradicts earlier ones.** Entry 028 said 36 currency codes and 14
+contradictions; both are wrong, and 49 and 15 are right. Entry 028 also placed
+`AGENT_BUDGET_AND_SCHEDULING.md` under `docs/records/`; it is at `docs/skills/`. I have not
+edited those entries, because entries are the record of what was actually said.
+
+**What I did to this message before sending it.** Twelve agents verified every premise against
+the repository in parallel, then three more attacked the question set from completeness,
+adversarial and submission-readiness angles. **They killed four of my six questions and found
+the date.** The full working is in the session transcript if you want it.
+
+---
+
 ## 029 - 2026-07-29 - DECISION REQUEST: the boot set audited, 9 wrong assertions found, and only 3 of them are expressible in the 4 predicates you capped
 
 **The measurement you would want first: 47 factual claims checked across the boot set, 9
