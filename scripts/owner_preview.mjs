@@ -297,6 +297,37 @@ function statusLine(sha, commitDate, startedAt) {
     process.exit(1)
   }
 
+  // 2b. REFUSE UNPUSHED COMMITS. Added 2026-07-30 after this script DESTROYED
+  // FOUR COMMITTED-BUT-UNPUSHED COMMITS, recovered only from the reflog.
+  //
+  // The dirty-tree guard above was written believing "committed" meant "safe".
+  // It does not. Step 3 runs `git reset --hard origin/main`, and a commit that
+  // exists only locally is discarded by that just as surely as an uncommitted
+  // edit, while passing the check above in silence.
+  //
+  // Rule 12 makes every session run this at close, so the one command the
+  // protocol MANDATES at the most dangerous moment of a session was the one
+  // that could eat its work.
+  //
+  // The comparison is made deliberately BEFORE the fetch, against the last
+  // known origin/main: a remote that has moved ahead cannot then mask local
+  // commits, and being wrong in the direction of refusing is free while being
+  // wrong the other way costs work.
+  //
+  // The fix is a guard rather than a line in the protocol telling people to
+  // push first. A prompt is a request; a path is a guarantee.
+  const unpushed = git(['rev-list', 'origin/main..HEAD'])
+  if (unpushed) {
+    const shas = unpushed.split('\n').filter(Boolean)
+    loud(`OWNER PREVIEW REFUSED: ${shas.length} commit(s) here are not on origin/main.\n\n`
+      + 'The sync below is `git reset --hard origin/main`, which would DESTROY them.\n'
+      + 'They are committed rather than dirty, so the check above cannot see them.\n\n'
+      + shas.map((sha) => '    ' + git(['log', '-1', '--oneline', sha])).join('\n')
+      + '\n\nPush first, then run it again. If you meant to discard them, do that\n'
+      + 'explicitly with git rather than through a preview script.')
+    process.exit(1)
+  }
+
   // 3. FETCH and hard-sync to origin/main.
   const before = git(['rev-parse', 'HEAD'])
   const beforeLock = lockHash()
