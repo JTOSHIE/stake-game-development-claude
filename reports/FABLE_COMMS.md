@@ -9,6 +9,160 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 033 - 2026-07-30 - VERIFICATION of entry 032's sheet: 47 ticks are safe, TWO ARE NOT, and one owner job is cancelled
+
+**Four verification agents over the repo-checkable ticks, then two adversaries: one playing a
+platform reviewer, one hunting ticks no gate holds. Both returned COMMIT_WITH_CORRECTIONS, and
+both independently named the same two items as unsafe to tick.**
+
+**This entry corrects nothing in Fable's words.** Entry 032 holds his sheet verbatim, per the
+principle behind convention (f). Everything below is ours.
+
+**The sheet is sound in substance.** Of 49 claimed ticks, **47 survive**. What failed most often
+is not the tick but its STATED BASIS, and that distinction matters because the basis is what a
+reviewer checks.
+
+---
+
+## 1. TWO TICKS THAT MUST NOT BE TICKED
+
+### Item 50, CONTRADICTED. Our replay UI hides the multiplier on the modes a reviewer will open.
+
+`frontend/src/lib/components/ReplayMode.svelte:271` is
+`$: showCostMultiplier = response ? response.costMultiplier !== 1.0 : false`, and the multiplier
+line at `:322-325` sits inside that branch. **Base and cruise are both 1.0x**, so the branch is
+dead for exactly the two modes a reviewer is most likely to replay.
+
+**The committed capture shows it happening.** In
+`reports/screens/dtt-live-2026-07-26/37_REPLAY_WORKING_event_52121_with_disclaimer.png`, the
+platform's Bets panel reads *"Cost multiplier x1.00"* and our overlay beside it, in the same
+viewport, says nothing.
+
+**The sheet's justification names the wrong surface.** *"Platform row agrees"* is the platform's
+panel; the guideline addresses OUR UI. This is the fastest disproof available to a reviewer and
+needs no setup.
+
+**Nothing gates it either**: `replay_contract_gate.mjs` fixtures `costMultiplier = 400.0`, the
+case that works, so the 1.0x suppression cannot be caught.
+
+### Item 53, CONTRADICTED. The Provably Fair half is unproven in either direction.
+
+The sheet says *"no Provably Fair toggle exists on the portal"*. **`grep -rn -iE "provably" over
+every capture pack returns zero hits.** No committed frame shows the portal surface where such a
+setting would live, so the claim is supported by no artefact.
+
+**And three committed documents record the opposite disposition**, including
+`OWNER_CHECKLIST.md:52` calling it *"the one to look at hardest"*.
+
+**The Replay half is genuinely proven.** The Provably Fair half is not. **The fix is one look and
+one frame**: if there is no toggle, capture the screen that shows there is none. That is the
+artefact the claim needs, and it takes a minute on a visit the owner is making anyway.
+
+---
+
+## 2. ONE OWNER JOB IS CANCELLED, AND THIS IS THE GOOD NEWS
+
+**Item 26: the records do not disagree, so the sixty-second check is not needed.**
+
+Fable flagged a contradiction between the self-assessment and an earlier gate and said do not tick
+until checked. **The instinct was right and the premise was wrong.**
+`frontend/scripts/check_autoplay_confirm_gate.mjs:5-11` says in its own header: *"This repo has no
+separate AutoPlayModal confirm step, the spin-count button in the HUD's auto-menu IS the explicit
+confirm."* `COMPLIANCE_WATCH.md:145-151` says the same. And the code agrees:
+`HudOverlay.svelte:181-198` starts autoplay directly from the count button with no dialog, and
+`isAutoPlay.set(true)` appears exactly once in the tree.
+
+**All three records agree with each other and with the code.** Selecting a count starts autoplay
+immediately.
+
+**What is actually open is a RULING, not an observation**: whether a reviewer accepts a two-tap
+menu as a confirmation step. **A live look at our own build cannot produce that answer.** Item 26
+stays NOT TICKED, but it should stop being described as one observation away.
+
+---
+
+## 3. THE OTHER TWO OWNER JOBS, CORRECTED
+
+**Item 9's live reload will not test what the guideline asks.** Guideline 9's literal words are
+*"Active rounds restore the BET AMOUNT from authenticate"*, and **nothing does that**. `betAmount`
+is set from the default ladder, from ladder snapping and from replay params, never from the
+recovered round's amount. Our design SETTLES the round rather than resuming the bet, which may
+well be the right answer, but the reload exercises resume-and-settle rather than bet-amount
+restoration. **The sheet also understates the existing evidence**: there is already a browser proof
+against a production build, not just a unit test.
+
+**Item 51 is confirmed as genuinely needing the screenshot.** No committed frame covers a replay at
+the small viewport.
+
+**Item 56's second option should not be taken quietly.** Ticking *"works on older mobile devices"*
+on viewport emulation puts a claim on the platform panel that no artefact here supports, and the
+note would live in this repository rather than beside the tick a reviewer sees. If the owner takes
+it, **it is recorded as his deliberate claim rather than as something the build evidence backs.**
+
+---
+
+## 4. RIGHT TICK, WRONG REASON, and the sharpest is the paytable in fifteen languages
+
+These ticks survive on the requirement. **Their stated basis does not.**
+
+| Item | The sheet says | What is actually true |
+|---|---|---|
+| **16, 19, 30** | mode cards keyed in all 16 locales, fully keyed, all locales | **Four English literals render in fifteen locales.** `PaytableModal.svelte:302` hardcodes the `Bet Modes` heading, `:337` renders `Max Win` on all five mode cards, `:350` the max-win footnote, and `:397-403` is a five-line English Responsible Play paragraph with **no key at all** |
+| **34 to 45** | full-DOM scans, per-mode social labels | Two of the four named holds do not exist. **The DOM scan is not in CI**, its artefact predates 58 frontend commits, and it has never opened three of the twelve items' surfaces. **`socialLabel`/`socialBlurb` were DELETED**; the sheet and the self-assessment both cite them |
+| **46** | forces English before first paint | True of the URL route, **false of the authenticate route**. A `?lang=de` session the platform flags social paints German chrome, then flips |
+| **15** | gate-held | The gate is CI-wired and measures the right property, but **has no seeded self-test**, which convention (p) says means its PASS does not yet count. It also carries open defect TR-098 |
+| **21** | TM line included | True of a TM line, but **the studio's own, not the platform's**. REQ-016 is deliberately unheld pending a ruling |
+| **2** | the one red authenticate degraded correctly | The mechanism is real and CI-held. **The observation cited is recorded here as never having been made.** Tick it on the mechanism |
+| **29** | mute plus separate sliders in all HUDs | **The mini-player profile has the mute toggle and no sliders.** Requirement still met |
+| **47** | replay confirmed live post-fix | The frame that closed the prior defect **exposed TR-114, still OPEN at HIGH, on this mandatory approval surface** |
+
+**The paytable one is the one to fix before submission.** A reviewer testing items 30 and 31
+switches the language menu to German and opens the paytable, which is the one block they are
+guaranteed to open. They see *"Bet Modes"* heading five correctly translated German mode cards,
+each stat-labelled *"Max Win"*, under an English footnote and an English Responsible Play
+paragraph. **The heading is the sharpest, because the identical string is already keyed as
+`betModesHeading` and translated to `EINSATZMODI`, and the FEATURE MENU renders it from the key
+while the PAYTABLE hardcodes it.**
+
+---
+
+## 5. THE DURABILITY RISK, WHICH IS THE REAL OUTPUT OF THIS PASS
+
+**The owner ticks once. The code keeps moving.** These ticked items are true today and held by no
+CI gate, so they can go false silently:
+
+- **Item 25**, double-tap zoom. The whole compliance is **one line**, `app.css:16`. Zero gates
+  reference `touch-action`. Deleting it leaves every check green.
+- **Item 6**, no Stake branding in shipped assets or text. **No gate scans the bundle at all.**
+- **Item 12**, zero-win end-round. Compliance is **contingent on server behaviour**, not enforced
+  by our code: we send end-round whenever the RGS reports `active: true`. If the RGS ever holds a
+  zero-win round open, we breach it and nothing here notices.
+- **Items 16, 19, 30**, all-locale prose. The gate written for this class,
+  `locale_prose_conformance.mjs`, **is not wired into CI**, and the one that is hunts UPPERCASE
+  literals only by design. Every sentence-case English literal in the paytable is invisible to it.
+- **Items 39, 40, 41, 44, 45**, social strings. `vocabulary.test.ts` scans **22 keys only**. Every
+  mode label, every blurb and every buy-confirm string sits outside that set.
+- **Items 13, 14, 27, 29, 49, 50**, each held partly or not at all.
+
+**That list, not the tick count, is what should shape the next build session.**
+
+---
+
+## 6. THE CORRECTED POSITION
+
+**47 ticks are safe today**, being Fable's 49 minus items 50 and 53.
+
+**Items 50 and 53 are two different problems.** 50 is a real defect in our replay UI and needs a
+one-line change plus a gate. 53 needs one look at the portal and one frame, and may then tick
+immediately.
+
+**Nothing here changes what Fable ruled.** He merged the record correctly and flagged item 26
+himself; the sheet's failures are almost all inherited from the self-assessment it was built on,
+which had not been revised since the day it was written. **The instrument was stale, not the
+judgement.**
+
+---
+
 ## 032 - 2026-07-30 - TRANSCRIBED: Fable's merged 58-item guidelines sheet, the answer to ask 8
 
 **The channel worked.** Entry 031 asked for the guidelines state as text rather than as

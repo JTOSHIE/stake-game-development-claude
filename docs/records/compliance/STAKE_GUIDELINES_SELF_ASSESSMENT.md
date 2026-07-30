@@ -20,6 +20,13 @@ row carries the evidence a reviewer could check, per (l.3).
 | **CONFLICT** | Our implementation follows a first-party source that contradicts this guideline. Needs a ruling, not a fix. |
 | **OWNER** | Not a build item. Portal, process or business action. |
 
+**SUPERSEDED HEADLINE, kept because it dates the rest of this document. All four are CLOSED.**
+**Items 15, 25 and 46 were fixed (TR-065, TR-066, TR-067) and item 12's conflict was settled in our
+favour on the owner's 2026-07-28 live captures (TR-064), with no code change.** The current
+position is `reports/FABLE_COMMS.md` entry 032, Fable's merged sheet, as corrected by entry 033.
+**Two of its ticks did NOT survive verification: item 50 and item 53. Read entry 033 before
+ticking anything.** The original headline read:
+
 **Headline: 3 FAIL, 1 CONFLICT, and they are all cheap.** Nothing here threatens the maths
 or the architecture.
 
@@ -151,7 +158,7 @@ or the architecture.
 | # | Item | Status | Evidence |
 |---|---|---|---|
 | 52 | Bet-level templates applied | **PASS** | Maths page: Bet Level Validator returns "Up to 1000x". |
-| 53 | Provably Fair and Replay enabled | **OWNER** | Replay is demonstrably working; the Provably Fair toggle is a portal setting. |
+| 53 | Provably Fair and Replay enabled | **OWNER, and DO NOT TICK YET** | Replay is demonstrably working. **The Provably Fair half is unproven in EITHER direction**: `grep -rn -iE "provably" reports/screens/` returns zero, so no committed frame shows the portal surface where such a setting would live. Entry 032's sheet claims no toggle exists; no artefact here supports that. **One look at the entry and one frame settles it**, including a frame showing there is none. |
 | 54 | Front and Math requests approved | **OWNER** | Not started. Requires Start Approval. |
 | 55 | Posted in the stake-engine-game-approved channel | **OWNER** | Post-approval. |
 | 56 | Works on older mobile devices (Android and iOS) | **OBSERVE** | Only DTT viewport emulation so far, which is not a real device. |
@@ -166,7 +173,7 @@ or the architecture.
 |---|---|
 | PASS | 31 |
 | OBSERVE | 14 |
-| OWNER | 8 |
+| OWNER | **7 by the rows, not 8.** The rows carry OWNER on items 7, 53, 54, 55, 57, 58 plus item 32 as OWNER/OBSERVE. This summary said 8 and `OWNER_CHECKLIST.md` said 9; **all three figures disagreed and none had been recounted.** Corrected 2026-07-30 by counting the rows. |
 | **FAIL** | **3** (items 15, 25, 46) |
 | **CONFLICT** | **1** (item 12) |
 | N/A | 1 |
