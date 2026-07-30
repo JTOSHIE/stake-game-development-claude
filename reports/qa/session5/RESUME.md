@@ -36,7 +36,7 @@ shape of these numbers and not from their precision.
 | 4 | JOB 4 | S2-C009, the social leg on the replay gate | `df78a31` | about 360k of 740k | **DONE.** Social assertion plus its real-money control plus the `social-label-not-swapped` seed. Self-test 8/8 caught 0 missed 0 unapplied, real run 19/19, exit 0. Social renders `Token: EUR`, real money `Currency: EUR` |
 | 5 | JOB 5 | S2-C017, the focus ring matched mouse focus | `4e8cfb5` | about 460k of 740k | **DONE.** `button:focus` no longer paints; `button:focus-visible` carries a designed ring. Proven by computed style, not by reading CSS. Layout fit gate PASS |
 | 6 | JOB 6 | S2-C092, the upload kit omitted the composed tile master | `2219f77` | about 500k of 740k | **DONE.** Branding set now READ from the directory, not listed by hand. Six new convention (p) cases in the existing selfTest, including a control proving the old hand-written list fails. Self-test PASS exit 0. Dossier corrected from three to four. Kit build NEVER run without a flag |
-| 7 | JOB 7 | Prose corrections and the two record closures | (this commit) | about 540k of 740k | **DONE.** Five corrections plus two strikes. Doc currency gate 0 new |
+| 7 | JOB 7 | Prose corrections and the two record closures | `0c397e1` | about 540k of 740k | **DONE.** Five corrections plus two strikes. Doc currency gate 0 new |
 | 8 | JOB 8 | Guidelines self-assessment reconciliation | NOT STARTED | n/a | **PARKED ENTIRELY, per the brief's own stop line.** It must not start below 250k remaining and this session is at its close reserve. It is all-or-nothing by instruction: recount every one of the 58 rows and the Summary in one sitting or none, because a half-reconciled register is worse than a stale one. **Item 50 now has a real answer to record**: PASS in the ready phase AND in the playing and complete phases, because JOB 3 landed (`d1cd0c3`) and is held by two assertions and a seed. Item 53 stays DO NOT TICK, reason already in the file. |
 
 ## THE TWO ROWS THAT CLOSE AS STRIKES, NOT FIXES
@@ -57,3 +57,11 @@ from the brief, per rule 16.
   **DO NOT read this closure as settling the `?? 'en'` default**: that is a separate and
   still-open owner question, ask 2 of entry 031, because a default substitutes a preference
   the player never expressed. This row is closed; that question is not.
+
+## CLOSE
+
+Rule 10: remote run **30544720646 SUCCESS** over `0c397e1`, browser matrix RAN (not skipped),
+all twelve legs green. Rule 12: owner preview refreshed and CURLED, HTTP 200.
+Session report at `reports/SESSION_REPORT.md` and `reports/archive/2026-07-30c_atomic-pass.md`.
+**The resource that ran out was CONTEXT, not tokens and not clock**, which is the answer rule 13
+asks a stopping session for.
