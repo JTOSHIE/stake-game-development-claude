@@ -20,7 +20,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel, maxWinStatLabel, maxWinFootnote } from '../config/fsModes'
+  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -299,7 +299,7 @@
              left-justified row list into centred mode cards (name, cost,
              RTP, max win) - rest of the paytable is unchanged. -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:10px;">{$isSocial ? 'Play Modes' : 'Bet Modes'}</h3>
+          <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('betModesHeading')}</h3>
           <div class="fs-mode-cards">
             {#each FS_MODES as m (m.id)}
               <div class="fs-mode-card fs-plate tone-{m.kind}" class:soon={!m.available}>
@@ -334,7 +334,7 @@
                            value. Rendering "5,000x base bet" as the value clipped
                            it to "5,000x ba..." on every card, hiding the very
                            figure the platform requires to be displayed. -->
-                      <span class="fs-mode-stat-label">{maxWinStatLabel()}</span>
+                      <span class="fs-mode-stat-label">{$tr('maxWinLabel')}</span>
                       <span class="fs-mode-stat-value fs-num">{FS_MAX_WIN_LABEL}</span>
                     </div>
                   </div>
@@ -347,7 +347,7 @@
 
         <!-- ── Interface Guide, every game control explained ────────────── -->
         <div data-testid="interface-guide">
-          <p class="fs-mode-footnote">{maxWinFootnote($isSocial)}</p>
+          <p class="fs-mode-footnote">{$tr('maxWinFootnote')}</p>
 
           <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('interfaceGuideHeading')}</h3>
           <div class="fs-guide-list">

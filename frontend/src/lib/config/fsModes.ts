@@ -171,9 +171,6 @@ export function maxWinVsBaseBetLabel(social: boolean): string {
  * through one place so the pair cannot drift, which is why this is a function
  * rather than a literal in the component.
  */
-export function maxWinStatLabel(): string {
-  return 'Max Win'
-}
 
 /**
  * The qualifier as a single footnote under the mode grid, rather than repeated
@@ -185,11 +182,6 @@ export function maxWinStatLabel(): string {
  * qualified label, and repeating the same six words five times was never the
  * right shape anyway. One footnote reads better and cannot clip.
  */
-export function maxWinFootnote(social: boolean): string {
-  return social
-    ? 'Max win is quoted against the base play amount.'
-    : 'Max win is quoted against the base bet.'
-}
 
 /** OWNER AUDIT ROUND 3, item 2 (naming uniformity): the single source of
  * truth for the in-feature HUD field labels, so portrait/compact-landscape/

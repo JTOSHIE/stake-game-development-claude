@@ -31,6 +31,10 @@ export type ProseKey =
   //    WinBanner.svelte:195-207 and which no regex gate could see. ────────────
   | 'tierBigWin' | 'tierMegaWin' | 'tierEpicWin'
   | 'maxWinHint'
+  // The qualifier that stops 5,000x reading as a multiple of the 400x buy COST.
+  // It was an English literal in config/fsModes.ts, so the disambiguation the
+  // owner's ROUND 4 ruling made mandatory did not exist in fifteen locales.
+  | 'maxWinFootnote'
   // ── Mode labels and blurbs. Previously English-only literals in
   //    config/fsModes.ts:59-115, a config file no locale gate read. ───────────
   | 'modeNormalLabel'    | 'modeNormalBlurb'
@@ -81,6 +85,7 @@ export const en: ProseStrings = {
   tierMegaWin: 'MEGA WIN',
   tierEpicWin: 'EPIC WIN',
   maxWinHint:  'Press COLLECT or hit Enter to continue',
+  maxWinFootnote: 'Max win is quoted against the base bet.',
 
   modeNormalLabel:    'Normal',
   modeNormalBlurb:    'Standard play. Overdrive Free Spins trigger on 3+ scatters.',
@@ -196,6 +201,7 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   rulesMaxWin: 'Maximum prize per play is capped at 5,000× your total play.',
   rulesMalfunction: 'Malfunctions void all wins and plays.',
   maxWinLabel: 'Max Prize',
+  maxWinFootnote: 'Max win is quoted against the base play amount.',
   guideSpinDesc: 'Start a play at the current play level.',
   guideBetPlusName: 'Increase Play',
   guideBetPlusDesc: 'Raise your play to the next level.',

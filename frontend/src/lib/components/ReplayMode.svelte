@@ -268,7 +268,22 @@
   $: totalSpent = params && response
     ? microsToDisplay(totalBetSpentMicros(params.amount, response.costMultiplier))
     : 0
-  $: showCostMultiplier = response ? response.costMultiplier !== 1.0 : false
+  // THE MULTIPLIER IS ALWAYS SHOWN, including at 1.0x. Guideline item 50 asks the
+  // UI to display the bet cost AND the applied multiplier, and this used to read
+  // `response.costMultiplier !== 1.0`, which made the branch DEAD for base and
+  // cruise, the two 1.0x modes and the two a reviewer is most likely to replay.
+  //
+  // The committed capture at reports/screens/dtt-live-2026-07-26/ shows the cost
+  // of that: the platform's own Bets panel reads "Cost multiplier x1.00" while our
+  // overlay beside it, in the same viewport, said nothing. Suppressing a value the
+  // platform displays next to us is the fastest way to fail an item we otherwise
+  // meet.
+  //
+  // Rendered raw, as it always was. A two-decimal form would read closer to the
+  // platform's own "x1.00", but machine_tell_gate correctly refuses toFixed() on
+  // anything money-adjacent and a cosmetic match is not worth an allowlist entry.
+  // The defect here was the SUPPRESSION, not the format.
+  $: showCostMultiplier = response !== null
 
   // Disclaimer text, prefer parsed params once available, else the eager values.
   $: locale = (params?.lang ?? initialLang) as Locale

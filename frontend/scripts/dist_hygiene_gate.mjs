@@ -208,6 +208,100 @@ console.log(`  ${uriControlClean ? 'clean ' : 'FALSE+'}  seeded: negative contro
 check('the data: URI scan can actually fail',
   uriSeeded.every((s) => s.caught) && uriControlClean)
 
+// ── GUIDELINE ITEM 6: NO STAKE BRANDING SHIPS ────────────────────────────────
+//
+// Added 2026-07-30. CLAUDE.md's compliance section has required this since the
+// project began, `STAKE_GUIDELINES_SELF_ASSESSMENT.md` ticks it, and a 2026-07-30
+// verification pass found NO GATE ANYWHERE SCANNED THE BUNDLE FOR IT. The tick
+// was true and held by nothing, which is the class convention (p) exists to close.
+//
+// THE HARD PART IS THAT "stake" IS NOT ALWAYS BRANDING, and a naive scan would
+// either false-positive forever or be quietly disabled. Measured against the real
+// bundle, `stake` occurs exactly twice and BOTH are the social vocabulary layer
+// doing its job: the phrase table that rewrites the gambling term "stake" to
+// "play amount", and its own annotation calling stake a brand name that is
+// scanned and never rewritten. Those are the compliance MECHANISM, not a breach.
+//
+// So the rule is narrow and stated: flag Stake used as a BRAND, being the
+// platform's product names and any "Powered by" attribution, and leave the
+// lower-case gambling noun to the vocabulary layer that owns it.
+function stakeBrandingViolations(text) {
+  const out = []
+  const RULES = [
+    [/Stake\s*\.?\s*(com|us|Originals?)\b/gi, 'a Stake product or domain name'],
+    [/Powered\s+by\s+Stake/gi, 'a Stake attribution line'],
+    [/\bStake\s+(Engine\s+)?(Casino|Games?|Studios?)\b/gi, 'a Stake brand lockup'],
+  ]
+  for (const [re, why] of RULES) {
+    for (const m of text.matchAll(re)) out.push({ hit: m[0], why })
+  }
+  return out
+}
+const brandFiles = [...codeFiles, ...files.filter((f) => /\.html?$/i.test(f))]
+const brandViolations = []
+for (const f of brandFiles) {
+  for (const v of stakeBrandingViolations(readFileSync(f, 'utf-8'))) {
+    brandViolations.push({ file: f.replace(DIST, 'dist'), ...v })
+  }
+}
+check('no Stake branding ships in the bundle', brandViolations.length === 0,
+  brandViolations.map((v) => `${v.file}: "${v.hit}" (${v.why})`).join('; '))
+
+// Seeded per convention (p), in the forms branding really arrives: a footer
+// attribution, a product name in prose, and a domain in a link. Paired with the
+// two negative controls that MUST survive, which are the real strings shipping
+// in the bundle today.
+const BRAND_SEEDS = [
+  ['a Powered by Stake footer, the form an attribution really takes', true,
+   '<footer>Powered by Stake Engine</footer>'],
+  ['a Stake Originals product name in player prose', true,
+   'const s="Play more Stake Originals games";'],
+  ['a stake.com domain in a link', true,
+   '<a href="https://stake.com/casino">more</a>'],
+  ['NEGATIVE CONTROL: the social vocabulary phrase table must survive', false,
+   '{phrase:"stake",replacement:"play amount"}'],
+  ['NEGATIVE CONTROL: the vocabulary annotation must survive', false,
+   '{stake:"brand and platform name; scanned, never rewritten"}'],
+]
+const brandSeeded = BRAND_SEEDS.map(([why, shouldFlag, text]) => ({
+  why, ok: (stakeBrandingViolations(text).length > 0) === shouldFlag,
+}))
+for (const s of brandSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+check('the Stake branding scan can actually fail', brandSeeded.every((s) => s.ok))
+
+// ── GUIDELINE ITEM 25: DOUBLE-TAP ZOOM STAYS DISABLED ────────────────────────
+//
+// Added 2026-07-30, same pass, same reason. The whole of item 25's compliance is
+// ONE CSS declaration, `touch-action: manipulation` at src/app.css, and nothing
+// anywhere referenced it: deleting that line left every check in this repository
+// green while double-tap zoom came back on every handset.
+//
+// It is asserted against DIST rather than source deliberately. The source is what
+// an author edits, but the bundle is what a player loads, and TR-066 chose this
+// mechanism precisely because the viewport-meta route is ignored by iOS Safari.
+// A rule that survives in src and is dropped by a build change would be the same
+// silent failure one step later.
+const cssText = codeFiles.filter((f) => /\.css$/i.test(f))
+  .map((f) => readFileSync(f, 'utf-8')).join('\n')
+const TOUCH_RE = /touch-action\s*:\s*manipulation/i
+check('double-tap zoom stays disabled in the shipped CSS (guideline item 25)',
+  TOUCH_RE.test(cssText),
+  'no `touch-action: manipulation` in any shipped stylesheet. TR-066 chose this over '
+    + 'the viewport meta because iOS Safari has ignored maximum-scale since v10, so losing '
+    + 'it silently restores double-tap zoom on every handset')
+
+const TOUCH_SEEDS = [
+  ['the declaration deleted outright, which is how it would really be lost', false, 'html,body{margin:0}'],
+  ['the value changed to auto, which reads as deliberate and is not', false, 'html,body{touch-action:auto}'],
+  ['NEGATIVE CONTROL: the real shipped declaration must pass', true, 'html,body{touch-action:manipulation}'],
+  ['NEGATIVE CONTROL: whitespace and casing variants must pass', true, 'body{ TOUCH-ACTION : manipulation }'],
+]
+const touchSeeded = TOUCH_SEEDS.map(([why, shouldPass, text]) => ({
+  why, ok: TOUCH_RE.test(text) === shouldPass,
+}))
+for (const s of touchSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+check('the touch-action scan can actually fail', touchSeeded.every((s) => s.ok))
+
 // ── SEEDED VIOLATION, convention (p) ─────────────────────────────────────────
 //
 // This gate claims the shipped-documentation class is closed, so it must be

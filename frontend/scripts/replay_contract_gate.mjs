@@ -293,6 +293,18 @@ async function main() {
 
   const browser = await chromium.launch()
   try {
+    // Extracted so the SEED can run the same assertion. A check that lives only
+    // in the real-run branch cannot be seeded, and an unseedable assertion is
+    // exactly what convention (p) says does not count.
+    const assertFlatMultiplier = (r, tag = '') => {
+      const txt = r.observed.startText.replace(/\s+/g, ' ').trim()
+      check(/×\s*1\b/.test(txt),
+        `${tag}the applied multiplier is displayed at 1.0x (guideline item 50)`,
+        `base-mode replay renders "${txt}"`,
+        `a 1.0x replay rendered no multiplier: "${txt}". The platform shows `
+          + '"Cost multiplier x1.00" beside this, so suppressing it fails an item we otherwise meet')
+    }
+
     if (!SELF_TEST) {
       console.log('\nTHE CONTRACT, one healthy session at the live six-parameter shape:')
       const healthy = await driveReplay(browser)
@@ -310,6 +322,21 @@ async function main() {
         `both loads rendered identically ("${eur}"), so currency and lang are not being read from the query string`)
       check(!/NaN/.test(eur + jpy), 'no NaN in the rendered money figure',
         'both loads format cleanly', `NaN present: EUR "${eur}" JPY "${jpy}"`)
+
+      // GUIDELINE ITEM 50, added 2026-07-30: the applied multiplier is displayed
+      // AT 1.0x, which is the case this gate could not previously see.
+      //
+      // Every fixture here defaults to costMultiplier 400.0, so the gate only
+      // ever exercised the branch that worked. The shipped UI read
+      // `costMultiplier !== 1.0`, making the display DEAD for base and cruise,
+      // the two 1.0x modes and the two a reviewer is most likely to replay. The
+      // committed capture at reports/screens/dtt-live-2026-07-26/ shows the
+      // platform's own Bets panel reading "Cost multiplier x1.00" beside our
+      // overlay saying nothing.
+      //
+      // A gate whose fixture only covers the passing case is the shape convention
+      // (p) exists to stop, so this asserts the boundary value specifically.
+      assertFlatMultiplier(await driveReplay(browser, { costMultiplier: 1.0 }))
 
       // REQ-091: a visible loading indicator covers the fetch window.
       const held = await driveReplay(browser, { respond: 'hang', settleMs: 1500 })
@@ -369,10 +396,10 @@ async function main() {
       // and the gate MUST go red. A green seed fails the whole gate.
       // -------------------------------------------------------------------
       const seeds = []
-      const seed = async (name, why, opts, expectFail) => {
+      const seed = async (name, why, opts, expectFail, assertFn = assertContract) => {
         const r = await driveReplay(browser, opts)
         const before = results.length
-        assertContract(r, `[seed ${name}]`)
+        assertFn(r, `[seed ${name}] `)
         const failed = results.slice(before).filter((x) => !x.pass)
         const caught = failed.some((f) => expectFail.test(f.name))
         // The seeded run's own failures are expected, so they are removed from
@@ -392,6 +419,32 @@ async function main() {
           if (!m) return null
           return b.replace(m[0], `bet/replay/\${${m[1]}.game}/\${${m[1]}.version}/base`)
         } } }, /replay URL is exact/)
+
+      // SEED 1b, THE DEFECT THIS GATE SHIPPED WITH, seeded at the OBSERVATION
+      // BOUNDARY per the practice declared in this file's header.
+      //
+      // The shipped defect was `response.costMultiplier !== 1.0` guarding the
+      // display, which made it DEAD for base and cruise. The gate was GREEN over
+      // it for as long as it existed, because every fixture used 400.0 and the
+      // dead branch was never exercised.
+      //
+      // The BRANCH is not safely targetable: Svelte 5 minifies reactive
+      // statements into mangled identifiers, and a generic `x = y !== null`
+      // pattern matches many unrelated sites in the bundle. A first attempt did
+      // exactly that, patched something else, and the seed read MISSED. So this
+      // reproduces the defect's OBSERVABLE instead, which is what this gate
+      // actually reads: the multiplier absent from the rendered start button.
+      //
+      // The target is anchored on two literals that come from our own template,
+      // so it cannot drift onto unrelated code, and a miss is a hard 500 rather
+      // than a silent no-op.
+      await seed('multiplier-suppressed-at-1x',
+        'the replay UI hides the applied multiplier when it is 1.0x, which is base and cruise',
+        { costMultiplier: 1.0, patches: { [bundle.file]: (b) => {
+          const m = b.match(/`× \$\{[\s\S]*?cost ="\} `/)
+          if (!m) return null
+          return b.replace(m[0], '``')
+        } } }, /multiplier is displayed at 1\.0x/, assertFlatMultiplier)
 
       // SEED 2: two segments transposed. The old glob-based harness is green on
       // this, which is the whole reason this gate exists.
