@@ -238,10 +238,14 @@ no code change. Full reasoning in **TR-102**.
    modes and their file references), then each mode's `books_*.jsonl.zst` and
    `lookUpTable_*_0.csv`, then `game_metadata.json`.
 4. Compose the game tile in the dashboard Tile Editor from the background image,
-   foreground hero and provider logo. **All three are delivered** under the platform's
+   foreground hero and provider logo. **All four are delivered** under the platform's
    naming convention in `design-system/brand/delivery/`: `FutureSpinner-BG.jpg`,
-   `FutureSpinner-FG.png` and `WeRollSpinners-Logo.png`. The provider logo is a separate
-   one-time upload in Team Settings Branding rather than in the Tile Editor. See
+   `FutureSpinner-FG.png`, `WeRollSpinners-Logo.png` and `FutureSpinner-Tile.png`.
+   **The fourth is the COMPOSED TILE MASTER, 408x546 flat**, so if the Tile Editor
+   accepts a finished tile there is nothing to compose. It was omitted from this
+   list and from the upload kit until 2026-07-30 (S2-C092). The provider logo is a
+   separate one-time upload in Team Settings Branding rather than in the Tile
+   Editor. See
    `design-system/brand/delivery/README.md` for hashes and `DTT_PROTOCOL.md` for the
    owner-action checklist.
 5. Enter the submission blurb (section 3) - **only once the draft soundtrack sentence has

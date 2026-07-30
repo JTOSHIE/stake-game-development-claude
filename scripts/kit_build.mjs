@@ -233,6 +233,28 @@ export function livePart(walkthrough) {
   return live[0]
 }
 
+// THE BRANDING SET IS READ FROM THE DIRECTORY, NOT LISTED BY HAND. S2-C092.
+//
+// The three names used to be written out in the copy loop. `design-system/brand/
+// delivery/` holds FOUR deliverables, and the one the hand-written list missed is
+// `FutureSpinner-Tile.png`, the COMPOSED TILE MASTER. That directory's own README
+// calls itself the SUBMISSION SET, so the kit was shipping the submission set
+// minus one, on the owner's own upload path.
+//
+// Adding a fourth literal would have fixed the instance and left the design
+// alone, and the design is the fault: a list written by hand in one file has to
+// track a directory in another, and convention (s) is exactly about not making
+// two places track one fact. Reading the directory makes the next delivered file
+// ship without anyone remembering this script exists.
+//
+// README.md is the one entry that must NOT ship: it is instructions to us about
+// how the set was built, not an asset for the owner to upload. Dotfiles are
+// excluded because .DS_Store is the file this project has already had to strip
+// out of a bundle once.
+function brandingFiles(entries) {
+  return entries.filter((f) => f !== 'README.md' && !f.startsWith('.')).sort()
+}
+
 function selfTest() {
   const cases = [
     ['an unpushed HEAD is REFUSED, the case that produced TR-062',
@@ -301,6 +323,37 @@ function selfTest() {
     const good = actual === expected
     ok &&= good
     console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}  (expected ${expected}, got ${actual})`)
+  }
+
+  // THE BRANDING SET, seeded in the form the defect really took, per convention
+  // (p). The existing cases here cover tree refusal and Desktop state; none of
+  // them looked at what actually goes INTO the kit, which is how a missing file
+  // survived on the owner's own upload path.
+  //
+  // The first case is the REAL delivery directory rather than a fixture, because
+  // the defect was a disagreement between a hand-written list and the real
+  // directory, and a fixture on both sides could not have caught it.
+  const realDelivery = readdirSync(join(REPO, 'design-system/brand/delivery'))
+  const realShipped = brandingFiles(realDelivery)
+  const brandCases = [
+    ['the real delivery set ships the COMPOSED TILE, the file the old hand-written list dropped',
+     realShipped.includes('FutureSpinner-Tile.png')],
+    ['the real delivery set ships every deliverable it holds, not a subset',
+     realShipped.length === realDelivery.filter((f) => f !== 'README.md' && !f.startsWith('.')).length],
+    ['seeded: a file delivered tomorrow ships without editing this script',
+     brandingFiles(['FutureSpinner-BG.jpg', 'README.md', 'FutureSpinner-Square.png'])
+       .join() === 'FutureSpinner-BG.jpg,FutureSpinner-Square.png'],
+    ['seeded: the README is instructions to us and must NOT ship',
+     brandingFiles(['README.md']).length === 0],
+    ['seeded: .DS_Store does not ship, the file this project already stripped from a bundle once',
+     brandingFiles(['.DS_Store', 'FutureSpinner-BG.jpg']).join() === 'FutureSpinner-BG.jpg'],
+    ['seeded: the OLD hand-written list would FAIL this, which is what makes the case above real',
+     !['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png']
+       .includes('FutureSpinner-Tile.png')],
+  ]
+  for (const [label, good] of brandCases) {
+    ok &&= good
+    console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}`)
   }
 
   console.log(ok ? '\nKIT BUILD SELF-TEST: PASS' : '\nKIT BUILD SELF-TEST: FAIL')
@@ -440,8 +493,9 @@ if (copied.files !== stats.files || copied.bytes !== stats.bytes) {
 cpSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'),
   join(STAGING, '00_READ_ME_FIRST_SECOND_VISIT.md'))
 mkdirSync(join(STAGING, '03_branding'), { recursive: true })
-for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png']) {
-  cpSync(join(clone, 'design-system/brand/delivery', f), join(STAGING, '03_branding', f))
+const brandDir = join(clone, 'design-system/brand/delivery')
+for (const f of brandingFiles(readdirSync(brandDir))) {
+  cpSync(join(brandDir, f), join(STAGING, '03_branding', f))
 }
 
 // PART was resolved above, before the build and before anything is written, so a
