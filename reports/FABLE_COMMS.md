@@ -17,35 +17,29 @@ this message before it was sent, and they killed four of the six questions I had
 
 ---
 
-## 1. THE DATE, FIRST, BECAUSE IT REORDERS EVERYTHING BELOW IT
+## 1. THE DATE, AND THE OWNER HAS ALREADY RULED ON IT
 
 **The Stake Engine 3 Star Game Challenge closes at 11:59pm AEDT on 1 August 2026.**
 
 VERIFIED 2026-07-30 by direct read of `docs/stake-engine-live/2026-07-29/giveaway_terms.md:25`.
 The same file defines a Qualifying Entry as *"a game submitted via Stake Engine during the
-Competition Period that achieves a minimum 3-star rating under clause 4(c)"*. **So the date
-binds submission AND a rating outcome, not submission alone.** Clause at `:30` lets the
-promoter move the date by publishing an updated one, so it can shift, but nothing says it has.
+Competition Period that achieves a minimum 3-star rating under clause 4(c)"*, so it binds a
+rating outcome and not submission alone. Clause `:30` lets the promoter move it.
 
-**This has never appeared in any of the twenty-nine entries above this one.** It appears in no
-driving document either: `grep -n August OWNER_CHECKLIST.md` returns nothing, and the same
-grep over `SUBMISSION_DOSSIER.md`, `WRS_MASTER_DOCUMENT.md` and `COMPLIANCE_WATCH.md` also
-returns nothing. It exists only in the platform mirror and in our own audit paperwork.
+**THE OWNER HAS RULED: WE ARE NOT CHASING IT.** In his words, being ready in two days would
+mean rushing, and he does not want to go down that path. His instruction for planning is
+**ready when it is right, no date at all**. So nothing below should be answered against a
+clock, and a ruling that trades quality for speed is not the ruling wanted.
 
-**How it got lost is a mechanism, not an oversight, and it will happen again.** The page
-arrived on 2026-07-29 inside a 64-page capture. Convention (d) reports DIFFERENCES between
-captures, and a page captured for the first time has no prior version to differ from, so
-roughly 56 new pages produced no delta and every obligation new to them entered the tree
-silently. Session 3 diagnosed this exactly and specified the fix. **The fix was never
-applied.**
-
-Two owner items gate the entry and both are open: `OWNER_CHECKLIST.md` item 1, the 58
-Guidelines on `future-spinner-2`, still at 0/58 with nine of them owner-only; and item 3,
-upload kit V10.
-
-**I am not asking you to rule on the calendar.** I am asking you to read every question below
-against roughly two days rather than an open horizon, and to tell me if that changes your
-answers.
+**It is recorded here anyway, because it was never surfaced and the mechanism that lost it is
+still live.** The date appears in none of the twenty-nine entries above this one and in no
+driving document: `grep -n August OWNER_CHECKLIST.md` returns nothing, and the same grep over
+`SUBMISSION_DOSSIER.md`, `WRS_MASTER_DOCUMENT.md` and `COMPLIANCE_WATCH.md` also returns
+nothing. It reached the repository on 2026-07-29 inside a 64-page capture and propagated
+nowhere, because convention (d) reports DIFFERENCES and a page captured for the first time has
+no prior version to differ from, so roughly 56 new pages produced no delta. Session 3 diagnosed
+this exactly and specified the fix; the fix was never applied. **That is question 5, and it is
+now the part of this section that still needs a ruling.**
 
 ---
 
@@ -206,17 +200,20 @@ asked it.**
 
 There are two backlogs and nothing states which has priority: **97 parked findings**, and **49
 requirements still with no proof path**. Re-grounding the 71 unreproduced wave-A causes costs
-roughly **5.0M tokens** at our own measured verifier rate of 70k each. Against roughly two days
-before the competition closes, the options are:
+roughly **5.0M tokens** at our own measured verifier rate of 70k each. The owner has ruled out
+working to a date, so the trade is quality against budget rather than against a clock:
 
-- **(a)** Buy the re-grounding. Safest, and it will not finish before 1 August.
+- **(a)** Buy the re-grounding in full. Safest and most expensive.
 - **(b)** Buy a sample, enough to measure the wave's error rate, then decide.
 - **(c)** Accept the 97 as a hypothesis list, and spend everything on submission readiness and
   the 49 unguarded requirements.
 - **(d)** Something narrower: work only the rows that block a 3-star rating.
 
-**My recommendation is (d) then (c)**, on the grounds that the date binds a rating outcome and
-not merely a submission.
+**My recommendation is now (b) then (d).** It was (d) then (c) while a two-day date was in
+view. With the date ruled out, a sample first is better value: it MEASURES the wave's error
+rate for a fraction of 5.0M, and that measurement decides whether the remaining 71 need
+re-deriving at all. Buying the full pass without knowing the error rate is paying for an
+answer we could cheaply estimate.
 
 ### Q5. The docs-watch mechanism that lost the deadline
 
