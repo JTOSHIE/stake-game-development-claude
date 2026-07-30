@@ -864,6 +864,25 @@ jobs:
           # that the post-run assertion goes RED on a seeded leaked child.
           - name: "browser: preview server"
             run: node scripts/preview_server_gate.mjs --self-test && node scripts/preview_server_gate.mjs
+          # TR-111. The network-hygiene gate the SUBMISSION DOSSIER cites at its
+          # section 5a, and which two external reviews graded a requirement PASS
+          # on. It was never a CI step, and it had been throwing at
+          # `preview.kill()` in its own finally block since the TR-101 migration,
+          # so it reached none of its assertions and had been seen neither to
+          # pass NOR to fail. Wiring it without the self-test would have carried
+          # that forward; the self-test's NEGATIVE control is the half that
+          # catches a gate which throws, because it demands the real PASS line
+          # rather than merely exit 0.
+          #
+          # THIS LEG IS THREE GATE RUNS, not two: `--self-test` drives a clean
+          # browser session and a seeded one before the real run. Measured at
+          # 18.4 seconds for all three together on the development machine,
+          # 2026-07-31, by `time` over this exact command. That is cheap enough
+          # that it is not expected to set the wall clock, but judge it against
+          # the range in CLAUDE.md protocol rule 10 rather than against 18.4:
+          # runner contention is what moves these figures, not the gate.
+          - name: "browser: build diet network hygiene"
+            run: node scripts/build_diet_verify.mjs --self-test && node scripts/build_diet_verify.mjs
           # M01 of reports/qa/session3/MECHANISMS.md. ELEVEN platform
           # requirements had no proof path and ten of them are properties of one
           # observable: what the shipped bundle DOES at a replay URL. Bet Replay

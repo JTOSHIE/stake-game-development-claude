@@ -1,23 +1,30 @@
-// build_diet_verify.mjs — Build Diet v2 network-hygiene gate.
+// build_diet_verify.mjs: Build Diet v2 network-hygiene gate.
 //
-// Serves the ACTUAL pruned dist/ (via `vite preview`, not the dev server —
+// Serves the ACTUAL pruned dist/ (via `vite preview`, not the dev server,
 // the dev server serves public/ unpruned) and drives a headless session
 // (base spins plus a bonus buy) capturing every network request, asserting
 // zero 404s and zero requests into any pruned legacy path. Also asserts the
 // built dist/ directory's total size stays under the 25MB budget (JOB 4,
 // 2026-07-13 - the audio-bearing bundle's first re-verification).
 //
-// Run (from frontend/, after `npm run build`): npx tsx scripts/build_diet_verify.mjs
+// Run (from frontend/, after `npm run build`):
+//   node scripts/build_diet_verify.mjs              the gate
+//   node scripts/build_diet_verify.mjs --self-test  the convention (p) seeded proof
+//
+// TR-111, 2026-07-31. This line used to say `npx tsx`. Plain node runs it, which
+// is what CI does, and a run instruction that names a tool the pipeline does not
+// use is the kind of drift that lets a script rot unnoticed. It rotted for ten
+// days: see the note in the finally block of run().
 
 import { chromium } from 'playwright'
-import { spawn } from 'node:child_process'
-import { mkdirSync, writeFileSync, existsSync, statSync, readdirSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { cpSync, existsSync, mkdtempSync, readFileSync, writeFileSync, statSync, readdirSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { createServer } from 'node:net'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
-import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
+import { startStaticServer } from './lib/previewServer.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // CONVENTION (h.1), migrated 2026-07-27. This wrote straight into committed
@@ -30,7 +37,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = evidenceDir('reports', 'qa')
 announceEvidenceMode('build_diet_verify')
 
-const DIST_DIR = join(__dirname, '..', 'dist')
+// FS_DIST_DIR exists for the seeded self-test at the bottom of this file, which
+// serves a THROWAWAY COPY of dist under the OS temp directory so it can plant a
+// real violation in it. Unset, which is every ordinary run and every CI run,
+// this is the real build output and nothing about the gate changes.
+const DIST_DIR = process.env.FS_DIST_DIR || join(__dirname, '..', 'dist')
 
 // ── TR-101: the server runs IN THIS PROCESS now ──────────────────────────────
 // Fable's ruling 2026-07-28, option (c). See lib/previewServer.mjs. The three
@@ -57,7 +68,7 @@ function getDirSizeBytes(dir) {
   return total
 }
 
-// Paths pruned from dist by vite.config.ts's pruneLegacyAssets — a request
+// Paths pruned from dist by vite.config.ts's pruneLegacyAssets, and a request
 // whose path starts with any of these is a hard failure.
 const PRUNED_PREFIXES = [
   'assets/symbols/', 'assets/frames/', 'assets/videos/',
@@ -118,7 +129,7 @@ async function run() {
     await dismissIntro(page)
     await page.waitForTimeout(200)
 
-    // A bonus buy first (balance must cover the 100x cost) — production
+    // A bonus buy first (balance must cover the 100x cost). Production
     // preview has no live RGS / curated mock-round data (see reports/qa
     // notes), so this exercises the buy request/response path and whatever
     // DOES render, not necessarily the full Overdrive walkthrough; that full
@@ -203,7 +214,21 @@ async function run() {
     await rmPage.close()
     await browser.close()
   } finally {
-    preview.kill()
+    // TR-111. This read `preview.kill()` for ten days and killed the whole gate.
+    //
+    // The TR-101 migration to an in-process node:net server changed what this
+    // handle IS: startStaticServer resolves { url, port, close }, and there has
+    // never been a `kill` on it. So every run threw TypeError HERE, in the
+    // finally, which meant the assertions at the bottom of run() were never
+    // reached and this gate had been seen neither to pass NOR to fail.
+    //
+    // WORTH KNOWING WHY IT WAS INVISIBLE: a throw from a `finally` REPLACES any
+    // exception already travelling out of the `try`. So this one line both broke
+    // the gate and hid whatever else might have been wrong underneath it, and
+    // the top-level catch still exited 1, which reads exactly like a gate that
+    // ran and failed. The seeded self-test below is what distinguishes the two,
+    // because its NEGATIVE control demands a real PASS line rather than exit 0.
+    await killPreview()
   }
 
   const distSizeBytes = getDirSizeBytes(DIST_DIR)
@@ -263,7 +288,129 @@ async function run() {
     `reduced-motion CSS present + spin clean)`)
 }
 
-run().catch((err) => {
+// ── CONVENTION (p): the seeded self-test ─────────────────────────────────────
+//
+// "A gate that has never been seen to fail is not evidence. It is a script that
+// prints PASS." This gate could not even do that: see the note in the finally
+// block above. So the requirement here is sharper than "prove it can go red",
+// because after TR-111 EVERY run went red, with exit code 1, from the top-level
+// catch. Exit status alone cannot tell a working gate from a dead one.
+//
+// Hence the pairing, and the asymmetry in what each half asserts:
+//
+//   NEGATIVE CONTROL: the unmodified bundle must produce the real PASS LINE.
+//       This is the half that catches the dead gate. A thrown TypeError exits 1
+//       and never prints that line, so this control fails on a broken gate even
+//       though a naive exit-code check would have called it fine.
+//
+//   POSITIVE CONTROL: a seeded bundle must produce the real FAILURES DETECTED
+//       line AND name the seeded path in its summary. Not merely exit 1: an
+//       exit-1 assertion would have been satisfied by the very defect this row
+//       exists to fix, which is the trap convention (p) was written about.
+//
+// WHAT IS SEEDED, and why this form. Convention (p): "plant the exact defect the
+// gate exists to catch, in the form it really occurs". The form it really occurs
+// in is a live reference to an asset that vite.config.ts's pruneLegacyAssets
+// strips from dist, which is TR-047's actual history. That reference does NOT
+// show up as a 404, because previewServer.mjs answers an unknown path with
+// index.html at status 200 the way a single-page app must. It is invisible to
+// every 404 check and visible only to the pruned-prefix test, which is exactly
+// why that test exists as a separate assertion. Seeding a 404 instead would have
+// proved a different assertion and learned nothing about this one.
+async function selfTest() {
+  const SEEDED_PATH = 'assets/symbols/tr111_seeded_violation.png'
+  const scratchRoot = mkdtempSync(join(tmpdir(), 'build-diet-selftest-'))
+  console.log(`SELF-TEST: scratch root ${scratchRoot}`)
+  console.log('SELF-TEST: the repository working tree is never written to by this mode.')
+
+  const realDist = join(__dirname, '..', 'dist')
+  if (!existsSync(realDist)) {
+    console.error(`SELF-TEST: ${realDist} does not exist. Run \`npm run build\` first.`)
+    process.exit(1)
+  }
+
+  /** Run THIS script, unmodified, as a child against the given dist copy. */
+  function runGateAgainst(distDir) {
+    const res = spawnSync(process.execPath, [fileURLToPath(import.meta.url)], {
+      env: { ...process.env, FS_DIST_DIR: distDir, FS_WRITE_EVIDENCE: '' },
+      encoding: 'utf8',
+      timeout: 10 * 60 * 1000,
+    })
+    return { code: res.status, out: (res.stdout || '') + (res.stderr || '') }
+  }
+
+  const problems = []
+
+  // ── NEGATIVE CONTROL ───────────────────────────────────────────────────────
+  const cleanDist = join(scratchRoot, 'clean')
+  cpSync(realDist, cleanDist, { recursive: true })
+  console.log('\nSELF-TEST negative control: unmodified bundle, expecting a real PASS.')
+  const clean = runGateAgainst(cleanDist)
+  if (!/BUILD DIET VERIFY: ALL CHECKS PASS/.test(clean.out)) {
+    problems.push(
+      'NEGATIVE CONTROL FAILED: the unmodified bundle did not print the PASS line. '
+      + `Exit code ${clean.code}. This is the control that catches a gate which throws `
+      + 'before reaching its assertions, so read the output below as a live gate defect '
+      + 'rather than as a bundle defect.\n' + tail(clean.out),
+    )
+  } else {
+    console.log('SELF-TEST negative control: PASS line present, so the gate reaches its assertions.')
+  }
+
+  // ── POSITIVE CONTROL ───────────────────────────────────────────────────────
+  const seededDist = join(scratchRoot, 'seeded')
+  cpSync(realDist, seededDist, { recursive: true })
+  const indexPath = join(seededDist, 'index.html')
+  const html = readFileSync(indexPath, 'utf8')
+  if (!html.includes('</body>')) {
+    console.error('SELF-TEST: seeded copy has no </body> to inject before. Aborting rather than guessing.')
+    process.exit(1)
+  }
+  // Off-screen rather than display:none, so there is no argument about whether
+  // the browser elects to fetch it. It is fetched, and that fetch is the seed.
+  const seed = `<img src="${SEEDED_PATH}" alt="" `
+    + `style="position:absolute;left:-9999px;top:0;width:1px;height:1px">`
+  writeFileSync(indexPath, html.replace('</body>', `${seed}</body>`))
+  console.log(`\nSELF-TEST positive control: seeded ${SEEDED_PATH}, expecting a real RED.`)
+  const seeded = runGateAgainst(seededDist)
+  if (!/BUILD DIET VERIFY: FAILURES DETECTED/.test(seeded.out)) {
+    problems.push(
+      'POSITIVE CONTROL FAILED: the seeded bundle did not print the FAILURES DETECTED line. '
+      + `Exit code ${seeded.code}. Exit status alone is NOT accepted here, because the TR-111 `
+      + 'defect exited 1 on every run without ever asserting anything.\n' + tail(seeded.out),
+    )
+  } else if (!seeded.out.includes(SEEDED_PATH)) {
+    problems.push(
+      'POSITIVE CONTROL FAILED: the gate went red but its summary never names the seeded path '
+      + `${SEEDED_PATH}, so it went red for some OTHER reason and this run proves nothing about `
+      + 'the pruned-path assertion.\n' + tail(seeded.out),
+    )
+  } else if (!/request into pruned path/.test(seeded.out)) {
+    problems.push(
+      'POSITIVE CONTROL FAILED: the gate went red and named the seeded path, but not via the '
+      + 'pruned-path reason. The assertion under test is the pruned-prefix one; a 404 or a '
+      + 'console error passing for it would be the exact substitution convention (p) forbids.\n'
+      + tail(seeded.out),
+    )
+  } else {
+    console.log('SELF-TEST positive control: RED, and attributed to the pruned-path assertion by name.')
+  }
+
+  if (problems.length > 0) {
+    console.error('\nBUILD DIET VERIFY SELF-TEST: FAILED')
+    for (const p of problems) console.error('\n  ' + p)
+    process.exit(1)
+  }
+  console.log('\nBUILD DIET VERIFY SELF-TEST: PASS '
+    + '(clean bundle asserts and passes; seeded pruned-path reference is caught by name)')
+}
+
+function tail(s, n = 40) {
+  return s.split('\n').slice(-n).map((l) => '      | ' + l).join('\n')
+}
+
+const main = process.argv.includes('--self-test') ? selfTest : run
+main().catch((err) => {
   console.error(err)
   process.exit(1)
 })
