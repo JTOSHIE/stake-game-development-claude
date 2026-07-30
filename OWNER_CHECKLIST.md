@@ -186,6 +186,7 @@ asked twice and every claim can be checked.
 | Item | Finished | Evidence |
 |---|---|---|
 | **Twenty Cruise spins, bracketed** | 2026-07-28 | `reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. **TR-075 CLOSED.** 1000.00 minus 1.00 = 999.00, and 1000.00 minus 5.00 plus 0.84 = 995.84, both matching the HUD to the cent, at exactly 1.00x. **The last open money item in the project**, and the fifth and final mode to be proven. |
+| **Kit V10 uploaded** | 2026-07-30, reported | **REPORTED by the owner in conversation, not verified here.** His words: *"yes, version 10 was uploaded"*. No screenshot, entry name or console line has reached the repository, so what is LIVE is not answerable from any artefact and the row below still records the newest capture. Item 3 above stays open until the console line arrives. |
 | **The build-SHA capture** | 2026-07-28 | Frame `071805`: the boot line reads build `e0c30611`, the kit V8 commit, so what is live is answerable from the artefact rather than inferred. |
 | **Which entry is the submission** | 2026-07-28 | Your ruling that day: `future-spinner-2`. Recorded in `SUBMISSION_DOSSIER.md` section 5b0. **Superseded 2026-07-30**: you have since confirmed the numbered entries are interchangeable working handles, so no document names one and the choice is yours at upload time. Kept because it dates the evidence rows below it. |
 | **The payments model** | 2026-07-28 | Frame `082628`: **Profit Share, 10 percent GGR**, selected against Guaranteed at 7.5 percent. |
