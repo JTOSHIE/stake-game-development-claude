@@ -251,6 +251,11 @@ async function driveReplay(browser, {
   observed.figuresVisible = await page.locator('.replay-figures').isVisible().catch(() => false)
   observed.figuresText = observed.figuresVisible
     ? (await page.locator('.replay-figures').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
+  // S2-C009. The label switches to Token in social mode, because "currency" is
+  // itself on the stake.us prohibited-terms table.
+  observed.currencyVisible = await page.locator('.currency-display').isVisible().catch(() => false)
+  observed.currencyText = observed.currencyVisible
+    ? (await page.locator('.currency-display').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
   observed.bodyText = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
 
   // Playing the round is OPT IN, because the default session must stay
@@ -357,6 +362,24 @@ async function main() {
           + '"Cost multiplier x1.00" beside this, so suppressing it fails an item we otherwise meet')
     }
 
+    // S2-C009. The social leg. The source has rendered Token rather than
+    // Currency in social mode since 2026-07-25 and NOTHING ASSERTED IT, which is
+    // precisely the state convention (p) calls an unverified claim: a
+    // requirement that is met today and held by nobody tomorrow.
+    //
+    // "currency" is on the stake.us prohibited-terms table, so this is a
+    // jurisdiction requirement rather than a wording preference, and the failure
+    // is silent: a social player would simply be shown a word we are not
+    // permitted to show them.
+    const assertSocialToken = (r, tag = '') => {
+      const txt = r.observed.currencyText.replace(/\s+/g, ' ').trim()
+      check(/\bToken\b/.test(txt) && !/\bcurrenc(y|ies)\b/i.test(txt),
+        `${tag}social mode labels the value Token, never Currency (stake.us prohibited terms)`,
+        `social replay renders "${txt}"`,
+        `a social replay rendered "${txt}". The word "currency" is on the stake.us `
+          + 'prohibited-terms table, so this is a jurisdiction failure, not a wording choice')
+    }
+
     // S2-C006. The half of item 50 that the ready phase cannot prove, and the
     // reason two verification agents reached OPPOSITE conclusions about the
     // item: it PASSED in the ready phase and was satisfied by nothing at all
@@ -420,6 +443,22 @@ async function main() {
       // for the same reason as the line above: it is the boundary value, so a
       // single drive covers both the suppression case and the persistence case.
       assertFiguresPersist(await driveReplay(browser, { costMultiplier: 1.0, play: true }))
+
+      // S2-C009, driven as its own session because `social` is a launch
+      // parameter and cannot be toggled on a live page.
+      const socialRun = await driveReplay(browser, { qs: { social: 'true' } })
+      assertSocialToken(socialRun)
+
+      // AND ITS CONTROL, which is what stops the assertion above being
+      // one-sided. A build that printed Token unconditionally would satisfy
+      // assertSocialToken and be wrong in real-money mode, where the label must
+      // read Currency. Asserting only the social half would not notice.
+      const realTxt = healthy.observed.currencyText.replace(/\s+/g, ' ').trim()
+      check(/\bCurrency\b/.test(realTxt) && !/\bToken\b/.test(realTxt),
+        'real-money mode still labels the value Currency, so the swap is conditional',
+        `real-money replay renders "${realTxt}"`,
+        `a real-money replay rendered "${realTxt}". If social and real render the same `
+          + 'word then the mode swap is not happening and one of the two is wrong')
 
       // REQ-091: a visible loading indicator covers the fetch window.
       const held = await driveReplay(browser, { respond: 'hang', settleMs: 1500 })
@@ -565,6 +604,26 @@ async function main() {
             + 'var f=document.querySelector(".replay-figures");if(f)f.style.display="none"}'
             + '},true)</script></head>')
         } } }, /survives the replay playing out/, assertFiguresPersist)
+
+      // SEED 1d, S2-C009. Seeded in the BUNDLE rather than at the observation
+      // boundary, because unlike 1b and 1c this target is safely anchorable: the
+      // two literals come from our own template and the minifier leaves them
+      // intact, so the match cannot drift onto unrelated code however the
+      // surrounding identifiers are mangled. Verified as exactly one occurrence
+      // in the shipped bundle before this was written.
+      //
+      // The defect is planted in THE FORM IT REALLY TAKES, which convention (p)
+      // is explicit about: the shape that has shipped in this project four times
+      // is the social swap simply not existing, leaving one branch for both
+      // modes. TR-091 and TR-104 are both that shape. So the seed collapses the
+      // ternary onto its real-money branch rather than, say, deleting the label.
+      await seed('social-label-not-swapped',
+        'social mode shows the word Currency, which is on the stake.us prohibited-terms table',
+        { qs: { social: 'true' }, patches: { [bundle.file]: (b) => {
+          const m = b.match(/"social"\?"Token":"Currency"/)
+          if (!m) return null
+          return b.replace(m[0], '"social"?"Currency":"Currency"')
+        } } }, /labels the value Token/, assertSocialToken)
 
       // SEED 2: two segments transposed. The old glob-based harness is green on
       // this, which is the whole reason this gate exists.
