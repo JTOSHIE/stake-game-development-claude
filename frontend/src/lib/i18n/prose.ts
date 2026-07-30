@@ -31,7 +31,7 @@ export type ProseKey =
   //    WinBanner.svelte:195-207 and which no regex gate could see. ────────────
   | 'tierBigWin' | 'tierMegaWin' | 'tierEpicWin'
   | 'maxWinHint'
-  // The qualifier that stops 5,000x reading as a multiple of the 400x buy COST.
+  // The qualifier that stops 5,000× reading as a multiple of the 400× buy COST.
   // It was an English literal in config/fsModes.ts, so the disambiguation the
   // owner's ROUND 4 ruling made mandatory did not exist in fifteen locales.
   | 'maxWinFootnote'
