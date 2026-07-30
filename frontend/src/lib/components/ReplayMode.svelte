@@ -332,13 +332,6 @@
         <button class="replay-btn start-replay" on:click={startReplay}>
           <div class="btn-line-1">{t(params.lang as Locale, 'hudStartReplay', mode)}</div>
           <div class="btn-line-2">Mode: <strong>{params.mode}</strong></div>
-          <div class="btn-line-3">
-            {mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
-            {#if showCostMultiplier}
-              × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
-              <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
-            {/if}
-          </div>
         </button>
       {:else if phase === 'playing'}
         <div class="replay-status playing">{$tr('replayingRound')}</div>
@@ -348,6 +341,36 @@
         </button>
       {/if}
     </div>
+
+    <!-- THE REPLAY FIGURES, and they are deliberately OUTSIDE every phase branch.
+         S2-C006. These lived inside `{#if phase === 'ready'}` as the start
+         button's third line, so the moment a reviewer pressed Start they
+         vanished and never came back. The platform asks for them in the state
+         AFTER the replay has run, not only before it:
+           approval_guidelines_game_replay_requirements.md:134
+             "Show results - Display bet cost, payout, and win amount"
+           approval_guidelines_game_replay_requirements.md:113
+             "Display final results - Keep the win amount and outcome visible"
+         So guideline item 50 was satisfied in the ready phase and by nothing at
+         all in the playing and complete phases, which is exactly the phase a
+         reviewer looks at when they check the result against the Bets panel.
+
+         Hoisted here beside the currency display, which is already
+         phase-independent for the same reason. The button is left as the
+         button. Commit ae40604's rule that the multiplier shows even at 1.0x
+         is unchanged and still carried by showCostMultiplier below. -->
+    <!-- Grouped so the new row costs one tight inner gap instead of a second
+         1.5rem container gap. The figures and the currency line are read
+         together anyway: they are the money facts a reviewer checks against the
+         platform's own Bets panel. -->
+    <div class="replay-meta">
+      <div class="replay-figures">
+        {mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
+        {#if showCostMultiplier}
+          × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
+          <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
+        {/if}
+      </div>
 
     <!-- Currency display. The replay spec's UI Simplification table lists
          "Currency display" under Keep/Show, so this stays. Two constraints
@@ -362,6 +385,7 @@
       <strong>{isVirtualCurrency(params.currency)
         ? currencySymbol(params.currency, params.lang)
         : params.currency}</strong>
+      </div>
     </div>
   {/if}
 </div>
@@ -375,7 +399,17 @@
     position: relative;
     z-index: 2;
     width: 100%;
-    height: 100vh;
+    /* MIN-height, not height. With `height: 100vh` and `justify-content:
+       center`, content taller than the viewport overflows BOTH ways, and the
+       top half is permanently unreadable because scrollTop cannot go negative.
+       That put the compliance disclaimer out of reach at 1024x576 and below,
+       and adding the S2-C006 figures row would have done the same at 1280x720.
+       Measured, not reasoned: reports/screens/replay-figures/ carries the
+       frames and the fit ledger is quoted in the commit.
+       With min-height the container grows to its content, centring still
+       applies whenever there is spare room, and every overflow goes downward
+       where a scroll can reach it. */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -449,8 +483,10 @@
     letter-spacing: 0.1em;
   }
 
-  .btn-line-2,
-  .btn-line-3 {
+  /* .btn-line-3 was removed with the figures it carried. Svelte prunes unused
+     selectors and warns on them, so the rule goes with the markup rather than
+     being left behind as a dead selector. */
+  .btn-line-2 {
     font-size: 0.875rem;
     font-weight: 400;
     margin-top: 0.25rem;
@@ -493,6 +529,29 @@
     font-weight: 400;
     opacity: 0.85;
     max-width: 480px;
+  }
+
+  /* One tight group rather than two container-gap children. The container gap
+     is 1.5rem, so adding the figures as a sibling would have cost 24px of gap
+     on top of the row itself, on a surface already overflowing at four of the
+     eight required presets. */
+  .replay-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  /* The figures a reviewer checks against the platform's own Bets panel. Sized
+     and weighted a step above the currency line because this is the required
+     content of guideline item 50, not a supporting label, and it now has to
+     read on its own rather than as the third line of a large button. */
+  .replay-figures {
+    font-family: var(--fs-font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-align: center;
   }
 
   .currency-display {

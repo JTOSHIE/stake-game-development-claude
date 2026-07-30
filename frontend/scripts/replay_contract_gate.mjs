@@ -245,6 +245,12 @@ async function driveReplay(browser, {
   observed.startVisible = await page.locator('.start-replay').isVisible().catch(() => false)
   observed.startText = observed.startVisible
     ? (await page.locator('.start-replay').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
+  // The bet cost and applied multiplier. Read from `.replay-figures` rather than
+  // from the start button, because S2-C006 moved them OUT of the button on
+  // purpose: inside it they existed only in the ready phase.
+  observed.figuresVisible = await page.locator('.replay-figures').isVisible().catch(() => false)
+  observed.figuresText = observed.figuresVisible
+    ? (await page.locator('.replay-figures').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
   observed.bodyText = (await page.locator('body').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
 
   // Playing the round is OPT IN, because the default session must stay
@@ -254,6 +260,13 @@ async function driveReplay(browser, {
     await page.locator('.start-replay').click({ timeout: 5000 }).catch(() => {})
     await page.locator('.play-again').waitFor({ timeout: 25000 }).catch(() => {})
     observed.finalWin = (await page.locator('.win-area').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
+    // THE STATE THE PLATFORM ACTUALLY ASKS ABOUT. Everything above is read in
+    // the ready phase, which is the phase that was already compliant. These two
+    // are read AFTER the round has played out, which is where item 50 was
+    // satisfied by nothing at all before S2-C006.
+    observed.figuresAfterPlay = await page.locator('.replay-figures').isVisible().catch(() => false)
+    observed.figuresTextAfterPlay = observed.figuresAfterPlay
+      ? (await page.locator('.replay-figures').innerText().catch(() => '')).replace(/\s+/g, ' ').trim() : ''
   }
 
   await page.close()
@@ -336,12 +349,35 @@ async function main() {
     // in the real-run branch cannot be seeded, and an unseedable assertion is
     // exactly what convention (p) says does not count.
     const assertFlatMultiplier = (r, tag = '') => {
-      const txt = r.observed.startText.replace(/\s+/g, ' ').trim()
+      const txt = r.observed.figuresText.replace(/\s+/g, ' ').trim()
       check(/×\s*1\b/.test(txt),
         `${tag}the applied multiplier is displayed at 1.0x (guideline item 50)`,
         `base-mode replay renders "${txt}"`,
         `a 1.0x replay rendered no multiplier: "${txt}". The platform shows `
           + '"Cost multiplier x1.00" beside this, so suppressing it fails an item we otherwise meet')
+    }
+
+    // S2-C006. The half of item 50 that the ready phase cannot prove, and the
+    // reason two verification agents reached OPPOSITE conclusions about the
+    // item: it PASSED in the ready phase and was satisfied by nothing at all
+    // once the replay had run. The platform asks for these figures in the
+    // after-replay state, at approval_guidelines_game_replay_requirements.md
+    // :134 ("Show results - Display bet cost, payout, and win amount") and :113.
+    //
+    // Read after `play`, which is why this assertion needs its own drive rather
+    // than riding on the healthy session: the default session is deliberately
+    // interaction-free so REQ-085 can assert the fetch needs no click.
+    const assertFiguresPersist = (r, tag = '') => {
+      const txt = (r.observed.figuresTextAfterPlay ?? '').replace(/\s+/g, ' ').trim()
+      check(r.observed.figuresAfterPlay && /\d/.test(txt),
+        `${tag}the bet cost survives the replay playing out (guideline item 50)`,
+        `after-replay state renders "${txt}"`,
+        `the bet cost vanished once the replay played: "${txt}". It rendered in the ready `
+          + 'phase only, so a reviewer checking the result against the Bets panel sees nothing')
+      check(/×\s*[\d.]+/.test(txt),
+        `${tag}the applied multiplier survives the replay playing out (guideline item 50)`,
+        `after-replay state renders "${txt}"`,
+        `the applied multiplier vanished once the replay played: "${txt}"`)
     }
 
     if (!SELF_TEST) {
@@ -376,6 +412,14 @@ async function main() {
       // A gate whose fixture only covers the passing case is the shape convention
       // (p) exists to stop, so this asserts the boundary value specifically.
       assertFlatMultiplier(await driveReplay(browser, { costMultiplier: 1.0 }))
+
+      // S2-C006, the OTHER half of item 50, and the half no assertion held
+      // before. The line above proves the figures render at 1.0x; it proves
+      // nothing about whether they still exist once the round has played, which
+      // is the state the platform's wording is actually about. Driven at 1.0x
+      // for the same reason as the line above: it is the boundary value, so a
+      // single drive covers both the suppression case and the persistence case.
+      assertFiguresPersist(await driveReplay(browser, { costMultiplier: 1.0, play: true }))
 
       // REQ-091: a visible loading indicator covers the fetch window.
       const held = await driveReplay(browser, { respond: 'hang', settleMs: 1500 })
@@ -498,6 +542,29 @@ async function main() {
           if (!m) return null
           return b.replace(m[0], '``')
         } } }, /multiplier is displayed at 1\.0x/, assertFlatMultiplier)
+
+      // SEED 1c, S2-C006. Seeded at the OBSERVATION BOUNDARY for the same reason
+      // as 1b: the phase branch is not safely targetable in a minified Svelte
+      // bundle, and a seed that patched the wrong site would read MISSED while
+      // proving nothing.
+      //
+      // This reproduces the shipped defect's observable EXACTLY rather than
+      // approximately, which is the distinction convention (p) turns on: the
+      // figures are present in the ready phase and gone the instant Start is
+      // pressed, which is precisely what `{#if phase === 'ready'}` did to them.
+      // A seed that simply hid `.replay-figures` outright would be a DIFFERENT
+      // defect, catchable by the ready-phase assertion that already existed, and
+      // would therefore prove nothing about the assertion added with it.
+      await seed('figures-lost-after-play',
+        'the bet cost and multiplier vanish once the replay plays, leaving item 50 unmet after the round',
+        { costMultiplier: 1.0, play: true, patches: { '/index.html': (b) => {
+          if (!b.includes('</head>')) return null
+          return b.replace('</head>',
+            '<script>addEventListener("click",function(e){'
+            + 'if(e.target&&e.target.closest&&e.target.closest(".start-replay")){'
+            + 'var f=document.querySelector(".replay-figures");if(f)f.style.display="none"}'
+            + '},true)</script></head>')
+        } } }, /survives the replay playing out/, assertFiguresPersist)
 
       // SEED 2: two segments transposed. The old glob-based harness is green on
       // this, which is the whole reason this gate exists.
