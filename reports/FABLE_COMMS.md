@@ -9,6 +9,176 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 034 - 2026-07-30 - EIGHT LEDGER ROWS BLOCKED ON A RULING, gathered so they can be answered in one sitting
+
+**Eight wave-A rows carry the identical ledger disposition: `PARKED`, `fix_size=PARK`, and a
+`why` of the form "owner decision required".** No engineering work unblocks any of them. They
+have been sitting inside a 351kB artefact that no session opens, which is why they have never
+been put as questions. Each row below is one finding, one question, and its evidence path.
+
+**Nothing here is answered on the Product Owner's behalf and nothing here is a recommendation.**
+Where the repository has moved underneath a row since it was written, that is stated as a
+correction to the PREMISE, because rule 16 makes a stale premise a question rather than a fact.
+It is not an answer to the row.
+
+**READ THE OVERLAP BLOCK FIRST.** Three of these eight are already inside entry 031's seven
+outstanding asks. Answering them twice would produce two records of one decision, which is the
+shape convention (s) exists to prevent.
+
+---
+
+## 1. THE OVERLAP WITH ENTRY 031's SEVEN ASKS, so nothing is answered twice
+
+| Row | Relationship to the seven asks already owed |
+|---|---|
+| S2-C014 | **Inside ask 7.** The sub-dime ladder is ask 7's option (a) and (b) seen from the requirements side |
+| S2-C015 | **Inside ask 7.** This IS the precision question, stated from the defect rather than from first principles |
+| S2-C062 | **Touches ask 6.** Ask 6 drops S2-C062 from the reproduction set; this row is the underlying ladder decision that survives that drop |
+| S2-C046, S2-C076, S2-C097, S2-C120, S2-C121 | **NEW.** Not covered by any of the seven |
+
+**So the true count of open questions is twelve and not fifteen**: the seven asks, plus the five
+new rows below. S2-C014, S2-C015 and S2-C062 are recorded here for completeness and are answered
+by ask 7 and ask 6.
+
+**S2-C014, S2-C015 and S2-C062 are also three faces of one decision.** The bet ladder and the win
+precision cannot be settled separately: a $0.01 bet at the 0.08x minimum multiplier renders a true
+$0.0008 win, and what that displays as depends on both answers at once. They are put together for
+that reason.
+
+---
+
+## 2. THE FIVE NEW QUESTIONS
+
+### S2-C046, the submission checklist has never been captured
+
+**FINDING.** The platform's submission-checklist criteria sit behind an authentication wall, and
+every headless capture has stored the login wall instead of the content. No repository change can
+produce it. Confirmed at `docs/stake-engine-live/submission-checklist.md:22` and `:24`, and at
+`docs/stake-engine-live/2026-07-29/approval_guidelines_submission_checklist.md:26` and `:28`,
+both of which read "Login required".
+
+**QUESTION.** Will you perform the authenticated portal capture already booked as
+`OWNER_CHECKLIST.md` item 1, and until that happens, do you accept
+`docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md` standing in as the surrogate?
+
+**EVIDENCE.** `COMPLIANCE_WATCH.md:62-63`, verified verbatim at HEAD.
+
+**NOT PURELY A RULING.** The blocker here is an owner ACTION rather than a decision. The row also
+carries a small mechanical cross-link edit that needs no ruling at all and can be done by any
+session.
+
+### S2-C076, no register row owns the outbound licence
+
+**FINDING, AND ITS PREMISE IS FALSIFIED AT HEAD.** The row records that the repository's only
+licence file was the upstream Stake Engine MIT grant sitting over We Roll Spinners' original work,
+contradicting `README.md:102-103`. **That is no longer true.** `LICENSE` at HEAD reads
+"Copyright (c) 2025-2026 We Roll Spinners. All rights reserved. NO LICENCE IS GRANTED", and
+`README.md:102-103` now agrees with it. `reports/FABLE_COMMS.md:660` already records the fix, at
+commit `ddca4b1`. What survives is narrower: `WRS_MASTER_DOCUMENT.md:28`'s licence archive row is
+scoped to INBOUND tool licences only, and no row owns the repository's OUTBOUND position.
+
+**QUESTION.** Does the `WRS_MASTER_DOCUMENT.md` section 1 register need a row that owns the
+repository's outbound licence position, and can this ledger row now be struck as resolved?
+
+**EVIDENCE.** `WRS_MASTER_DOCUMENT.md:28`; derivation at
+`reports/qa/session3/JOB4_CAUSE_REDERIVATION.md:259`.
+
+### S2-C097, the dossier declares a blurb that does not exist by that name
+
+**FINDING.** `SUBMISSION_DOSSIER.md` states that Blurb B is FINAL, but no artefact named Blurb B
+exists in the repository. "Blurb A" has zero occurrences repo-wide and "Blurb B" appears only as
+references, never as a definition. Section 3's heading still reads DRAFT, PENDING OWNER APPROVAL
+at `:39`, and a `[DRAFT ...]` marker sits inside the blurb body, so an owner following the upload
+instructions would paste an editorial marker into a customer-facing field.
+
+**QUESTION.** Is Blurb B the section 3 text at `SUBMISSION_DOSSIER.md:52-68`, and does it include
+the soundtrack sentence, given that sentence's "ships only if audio ships" condition is now
+satisfied because audio shipped?
+
+**EVIDENCE.** `SUBMISSION_DOSSIER.md:39`, `:41`, `:52-68`, `:63`, `:488-492`. All verified
+verbatim at HEAD except the ledger's own `:481`, which is a blank line; the intended anchor is
+`:488-492`.
+
+### S2-C120, REQ-043 is a rater judgement with no possible instrument
+
+**FINDING.** REQ-043 is the two-star "considerable creativity or originality" band. It is scored
+by a human rater against a subjective description, so it is unreachable by any mechanical
+instrument by construction rather than by omission. The ledger's cited path,
+`frontend/src/lib/config/fsModes.ts:68-119`, is the bet-mode inventory and carries no originality
+property, so a fix aimed there would be aimed at nothing.
+
+**QUESTION.** Do you confirm REQ-043 stays permanently parked as a rater judgement with an
+evidence dossier attached, rather than having a gate built for it?
+
+**EVIDENCE.** `reports/qa/session3/PARKED_TRACKER.md:365`, verified as the REQ-043 park row.
+
+### S2-C121, REQ-044 is defined over data the platform forbids us to hold
+
+**FINDING.** REQ-044 measures gameplay depth by whether players keep betting. That is player
+behaviour, and the platform's own terms forbid the studio from processing it:
+`docs/stake-engine-live/2026-07-29/terms.md:666` is clause 15.2, "The Developer shall not process
+any personal data of Players of the Game". The requirement and the clause are in direct tension,
+so no instrument can exist on our side of it.
+
+**QUESTION.** Do you accept REQ-044 as permanently unprovable, and do you want the requirement
+versus privacy tension escalated to the platform as its own comms item?
+
+**EVIDENCE.** `reports/qa/session3/PARKED_TRACKER.md:366`;
+`docs/stake-engine-live/2026-07-29/terms.md:666`.
+
+**NOT PURELY A RULING.** This row also has an engineering half that needs no decision: its
+recorded CI citation is stale. `.github/workflows/checks.yml:215-217` is a comment block about the
+locked-paths gate, not the drift step the row means, which is at `:329-331`. The stale string is
+still live in `reports/qa/session2_audit/LEDGER.md:193` and
+`reports/qa/session2_audit/DISPOSITIONS.md:179`.
+
+---
+
+## 3. THE THREE ALREADY COVERED BY ASK 6 AND ASK 7
+
+Recorded so the set is complete. **No separate answer is sought for these.**
+
+- **S2-C014.** REQ-125 requires four decimal places of win precision because the minimum win
+  multiplier is 0.08x, while REQ-126 says show extra precision only when the base bet is under
+  $0.10, and the game ships a $0.10 floor with no sub-dime rung. No code path can produce three or
+  four places, so REQ-125 is unimplemented rather than merely untested.
+  Evidence: `games/future_spinner/game_config.py:127`, verified as `(3, "L3"): 0.08`.
+- **S2-C015.** Win amounts are quantised twice, once by `WinPod.svelte:14-15` rounding to whole
+  micros and again by the formatter rounding to two places, so an $0.008 win displays as $0.01 and
+  is overstated by 25 per cent. Evidence: `frontend/src/lib/components/WinPod.svelte:14-15`,
+  verified verbatim at HEAD.
+- **S2-C062.** No sub-$0.10 bet level exists anywhere in the tree and the decision was never
+  taken. Evidence: `frontend/src/lib/stores/gameStore.ts:7`, verified as the `BET_LEVELS` ladder;
+  derivation at `reports/qa/session3/JOB4_CAUSE_REDERIVATION.md:203`.
+
+---
+
+## 4. FOUR STALE LEDGER CITATIONS FOUND WHILE EXTRACTING THESE
+
+Recorded here because whoever implements a ruling will otherwise chase them, and because the
+ledger is the artefact sessions are told not to open.
+
+| Row | Stale citation | Correct anchor at HEAD |
+|---|---|---|
+| S2-C014, S2-C015 | `frontend/src/lib/utils/currency.ts:211` | `:211` is now the VND table row. The clause meant is at `:343` and `:375` |
+| S2-C076 | The MIT grant premise | Falsified. `LICENSE` at HEAD grants nothing |
+| S2-C097 | `SUBMISSION_DOSSIER.md:481` | Blank line. Intended anchor is `:488-492` |
+| S2-C121 | `.github/workflows/checks.yml:215-217` | The drift step is at `:329-331` |
+
+**And one contradiction between two ledgers**, left for the record rather than resolved here:
+`reports/qa/session4b/LEDGER.md:70` records that S2-C062 does NOT need a sanction, which
+contradicts an earlier brief's premise that it does.
+
+---
+
+**METHOD.** Extracted by one delegated agent reading `reports/qa/session4b/DISPOSITIONS.tsv` and
+`waveA_raw.json` so the main loop never opened them, per the extracting session's own budget rule.
+Every anchor quoted above was then re-resolved against HEAD `a2e2509` by direct read. Where the
+agent's report and the repository disagreed, the repository won, per rule 16 and
+`docs/records/WAYS_OF_WORKING.md` 3.1.
+
+---
+
 ## 033 - 2026-07-30 - VERIFICATION of entry 032's sheet: 47 ticks are safe, TWO ARE NOT, and one owner job is cancelled
 
 **Four verification agents over the repo-checkable ticks, then two adversaries: one playing a
