@@ -30,7 +30,7 @@ screen is more useful than a guess. Nothing breaks by pausing.
 |---|---|---|
 | `01_maths_upload/` | 12 files: the game's maths | The game's **Files** page |
 | `02_frontend_upload/` | the game itself | The game's **Files** page |
-| `03_branding/` | 3 images | Two different pages, see below |
+| `03_branding/` | 4 images | Two different pages, see below. The fourth is the composed tile master, for the Design Thumbnail step; it is not uploaded as Front End. Corrected 2026-07-31: the kit began shipping four at 2219f77 and this row still said three, and this file is the one that physically reaches the Desktop. |
 
 The two `HASHES.txt` files sit in the kit root, NOT inside the upload folders. That is
 deliberate, and it was a correction: they were originally inside, and the first upload

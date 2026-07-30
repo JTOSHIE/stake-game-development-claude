@@ -64,9 +64,14 @@
 // never applied was indistinguishable from a seed that worked.**
 //
 // That is convention (p)'s own failure mode occurring inside the mechanism
-// built to enforce it, and it was live rather than theoretical: any bundle
-// rename, minifier change or markup edit under a seeded target would have
-// blinded this gate while it printed a full house. An UNAPPLIED seed now exits
+// built to enforce it. **CORRECTED 2026-07-31**, because the original wording
+// here overstated it twice and a header is read as fact: it was NOT a full house
+// either way (replayed against the pre-fix code, three of the six seeds then
+// present would have printed MISSED and exited 1, since the failing assertion
+// names with a dead app do not match their expectations), and a bundle RENAME is
+// the one case `findBundleWithTemplate` below is explicitly built to survive.
+// The real trigger is narrower: an inner patch regex that stops matching after a
+// minifier or markup change. An UNAPPLIED seed now exits
 // 3, distinct from 1 (a real miss) and 2 (the template locator failed), because
 // the fixes differ: a miss means the gate is blind, an unapplied means its
 // score is UNKNOWN and re-running changes nothing until the locator is fixed.
@@ -158,9 +163,23 @@ function findBundleWithTemplate() {
 // 6/6 either way.
 //
 // That is the exact failure convention (p) exists to prevent, reproduced inside
-// the mechanism built to enforce it: a bundle rename, a minifier change or a
-// markup edit under any seeded target would silently blind the gate while it
-// still printed a full house.
+// the mechanism built to enforce it.
+//
+// TWO CORRECTIONS TO THE PARAGRAPH ABOVE, made 2026-07-31 after a post-session
+// audit measured it, because the original overstated the defect in a file that
+// will be read as fact.
+//
+// 1. NOT 6/6 EITHER WAY. It depended on WHICH seed lost its target. Replayed
+//    against the pre-fix code, three of the six seeds then present would have
+//    printed MISSED and exited 1, because with the app dead the only failing
+//    assertion names are the request checks, and hardcoded-mode,
+//    transposed-segments and leaked-authenticated-call do not match those. The
+//    silent-CAUGHT direction was real for the other three.
+// 2. NOT A BUNDLE RENAME. findBundleWithTemplate below content-searches
+//    dist/assets for the template every run precisely so a rename cannot
+//    disable a seed, and the comment above it says so. The real trigger is
+//    narrower: an inner patch regex that stops matching after a minifier or
+//    markup change. No instance has been shown to have occurred.
 //
 // So the miss is now RECORDED, and a recorded miss is its own failure class.
 // The 500 is kept because it is still the right thing to put on the wire; what
@@ -719,12 +738,21 @@ async function main() {
         // demonstrates a defect that was LIVE rather than one that was theorised.
         const before = results.length
         assertContract(probe, '[unapplied-probe] ')
-        const wouldHaveScoredCaught = results.slice(before).some((x) => !x.pass)
+        // CORRECTED 2026-07-31. This read `.some((x) => !x.pass)`, which is
+        // "at least one assertion failed", and was labelled as proving the old
+        // RULE would have scored CAUGHT. The old rule was per-seed NAME
+        // matching, `failed.some((f) => expectFail.test(f.name))`, which is a
+        // narrower thing: on this probe only one of the four assertContract
+        // seeds would actually have matched. Substituting loudness for the
+        // specific evidence is the same move this gate exists to stop, so the
+        // control now applies the real old predicate.
+        const failedNames = results.slice(before).filter((x) => !x.pass).map((x) => x.name)
         results.length = before
-        check(wouldHaveScoredCaught,
-          '[control] and under the OLD rule it would have scored CAUGHT',
-          'the 500 fails every assertion in the run, which is exactly why it read as a catch',
-          'the probe did not fail its assertions, so this control no longer demonstrates the defect')
+        const OLD_RULE = /exactly one replay request|no authenticated RGS call/
+        check(failedNames.some((n) => OLD_RULE.test(n)),
+          '[control] under the OLD per-seed rule this probe would have scored CAUGHT',
+          `failing assertions were: ${failedNames.join('; ') || 'none'}`,
+          'no failing assertion matched a seed expectation, so the old rule would have read MISSED here')
       }
 
       // THREE CLASSES, not two, because they need different fixes. A MISS means

@@ -660,12 +660,28 @@ machine with a different inventory, which is exactly how this rule was earned.
 knowledge rather than alarm.** Rule 10 asks every session to verify its own final
 push's remote result, so every session reads these:
 
+**RECOUNTED 2026-07-31, and the SHAPE was what had gone stale rather than the
+numbers.** The table described a seven-leg matrix. The matrix is now TWELVE
+browser legs across 14 jobs, so "the other six" had not matched reality for some
+time. And naming one job as the wall-clock setter is the wrong form: across three
+consecutive full-matrix runs the slowest leg was paytable card fill, then scrim
+coverage, then paytable card fill again. **Judge a run against the range; do not
+expect a particular job to be the setter.**
+
 | Job | Measured |
 |---|---|
 | `static gates` | about **82 seconds** |
-| `browser: scrim coverage` | about **276 seconds**, the slowest leg, which sets the wall-clock |
-| the other six browser legs | 74 to 217 seconds each, in parallel |
-| **browser wall-clock** | **2.9 to 4.6 minutes** across two runs, down from 6.4 |
+| the twelve browser legs | roughly **150 to 190 seconds** each, in parallel |
+| the slowest leg | **varies by run**, typically 160 to 190 seconds |
+| **browser wall-clock** | **3.4 to 3.7 minutes** on clean runs |
+
+**ONE OUTLIER IS RECORDED SO IT IS NOT MISTAKEN FOR A GATE GETTING SLOWER.** Run
+30544720646 took 9m24s and its slowest leg read 438 seconds. That was not gate
+work: on that job the `Install frontend dependencies` step alone ran 320 seconds
+against 9 to 22 seconds on the other twelve jobs of the same run, while the gate
+step itself ran 51 seconds against 53 and 54 on neighbouring runs. **A slow run
+is an npm or runner incident until the per-step timings say otherwise**, and the
+way to tell is to read the step breakdown rather than the job total.
 
 **BILLED MINUTES ARE NOT WALL CLOCK.** The table above is WALL CLOCK, which is what a
 session waits for. The number that BILLS is the SUM of the parallel jobs rather than the
