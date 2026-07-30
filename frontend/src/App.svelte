@@ -2627,7 +2627,12 @@
     background: rgba(0, 0, 0, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: rgba(255, 255, 255, 0.72);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* The brand numeric face, not a literal stack. The machine-tell gate caught
+       a hand-written ui-monospace list here and it was right to: a third font
+       stack in the tree is exactly the drift it exists to stop, and dev-only is
+       not an exemption, because the gate scans source and a rule with a quiet
+       exception is a rule that erodes. */
+    font-family: var(--fs-font-numeric);
     font-size: 0.7rem;
     letter-spacing: 0.02em;
     pointer-events: none;
