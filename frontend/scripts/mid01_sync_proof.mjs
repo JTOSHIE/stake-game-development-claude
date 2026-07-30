@@ -84,7 +84,11 @@ const money = (t) => (t ? (t.match(/[^\s]*\d[\d.,]*[^\s]*/g) || []).pop() : null
   const record = []
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
-    await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle' })
+    // domcontentloaded, NOT networkidle. A vite dev server holds an HMR websocket
+    // open, so networkidle never fires and the run hangs until the job timeout.
+    // That is what cancelled this gate at 15 minutes on run 30512502477; both
+    // sibling gates already use domcontentloaded for the same reason.
+    await page.goto(`http://localhost:${port}/`, { waitUntil: 'domcontentloaded' })
     await page.waitForSelector('[data-testid="spin-button"]', { timeout: 20000 })
     await page.waitForFunction(() => window.__testStores?.winAmount, { timeout: 10000 })
     await dismissIntro(page)
