@@ -53,9 +53,24 @@ carries our position on every one of the 58, so most are a read-and-tick.
 is among those nine** and is the one to look at hardest, because it is a platform setting
 rather than anything in our build.
 
-**You and Fable have already worked through a number of these.** That progress lives in your
-conversation with Fable and not in this repository, so this document cannot tell you where the
-count stands. Getting it transcribed here is a live request to Fable, comms entry 030.
+**You and Fable have already worked through a number of these, and that progress is recorded
+nowhere.** Checked 2026-07-30 across all 30 entries of `reports/FABLE_COMMS.md`: no entry at
+any date records any guidelines progress. Every count this repository holds is **0 of 58**,
+the newest from the owner-session frames of 2026-07-28, whose own catalogue says *"the counter
+did not move at any point today"*.
+
+**A correction, because this line previously claimed otherwise.** It said getting the state
+transcribed was a live request to Fable in comms entry 030. **Entry 030 contains no such
+request**: its six questions concern the eight owner-blocked rows, the sanctions, the currency
+contradiction, the backlog spend, the docs-watch mechanism and the unanswered queue. The
+request was never made, and this document asserted it had been. That is the same failure this
+seat is on record for, a document treated as evidence for something nobody did.
+
+**Two further cautions before you sit down to this.** The self-assessment beside you says nine
+items are OWNER items; its own summary says eight and its rows carry seven, so three figures
+disagree and none has been recounted. And its headline still reads *"3 FAIL, 1 CONFLICT"*
+against items 15, 25, 46 and 12, **all four of which the tracker has since closed**. It has
+not been revised since the day it was written.
 
 **What to send:** a screenshot of the Guidelines panel once the count moves off 0/58.
 
