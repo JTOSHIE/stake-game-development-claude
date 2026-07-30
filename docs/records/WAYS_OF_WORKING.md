@@ -35,6 +35,8 @@ ceremonies, Definition of Ready and Done, and the transcription step.** Everythi
 it is a pointer.
 
 Companion documents. This one owns WHO does what and WHEN.
+`docs/records/ROLE_HEAD_OF_ENGINEERING.md` owns the operating detail of ONE role, because
+that seat accumulated enough earned discipline to stop fitting on a shared page.
 `docs/skills/AGENT_BUDGET_AND_SCHEDULING.md` owns what it costs.
 `docs/skills/FULL_AUDIT_METHOD.md` owns how an audit is done.
 `reports/briefs/_TEMPLATE.md` is the work order shape.
@@ -100,71 +102,23 @@ The Plan of Record and the Product Owner's rulings are checks on the Head of Eng
 not on the fleet, and they should be read that way. Be suspicious when the session says
 something is fine without showing the arithmetic.
 
-### 3.1 The Head of Engineering's own provenance rule, earned twice
+### 3.1 The seat that had no gate, and now has one
 
-Fable's PREMISE PROVENANCE rule binds every brief. It binds the briefs the Head of
-Engineering WRITES most of all, and the pattern is recorded because it has now happened
-twice with the same shape:
+The detail lives at `docs/records/ROLE_HEAD_OF_ENGINEERING.md` and is not restated here.
+Two things from it belong in this overview because they change what everyone else should
+expect:
 
-- **The payments line.** A stale claim in `COMPLIANCE_WATCH.md` was read, treated as
-  evidence, and written into a work order as an instruction.
-- **A script named in a session's NARRATION** was cited in the next brief as the tool that
-  had done the work. It had been written to scratch and never committed, so it does not
-  exist. The currency gate found it in the brief that commissioned the currency gate. The
-  name is left unbackticked here on purpose, because a backticked dead filename in a live
-  document is itself a gate finding, which is the blind spot recorded below:
+- **The failure mode has a name.** Four false claims reached work orders in one arc, all
+  from this seat, all one shape: **a SECONDARY source treated as a primary one.** A document
+  is a claim, not evidence. A narration is not a repository. A sample is not a count.
+- **The gate is mandatory.** `node scripts/qa/brief_preflight.mjs <draft.md>` runs on every
+  draft brief, and **a brief is issued only after it passes or after each finding is answered
+  in writing.** Every other actor here is gated; this seat was not, and its own diligence
+  failed four times.
 
-```
-the script:  census.mjs   (never committed, exists nowhere in the tree)
-```
-
-  **That is not evasion, it is the form matching the meaning.** A fenced illustrative
-  example is exactly what the gate excludes and exactly what this is. **But note the wider
-  problem it exposes**, because it is not confined to this paragraph: any live document that
-  REPORTS a dead reference trips the DEAD_PATH class, since the gate checks whether a cited
-  path exists and never what the surrounding sentence says about it. Ledgers, dispositions
-  and the review tracker are full of exactly that shape. A negation-aware check (treating
-  "does not exist", "was deleted", "no longer exists" as a report of absence rather than a
-  claim of presence) is the structural fix and is recorded as follow-up rather than bolted
-  on at the end of a window.
-
-**The common cause is not carelessness, it is a category error: treating what a session
-SAID as equivalent to what the repository HOLDS.** A session's narration is REPORTED. Only
-the repository is VERIFIED.
-
-So the standing rule for this role: **every factual citation in a brief is checked against
-the repository before the brief is issued, and a citation that came from narration rather
-than from a file is REPORTED until checked.** The check is a `ls` or a `grep`. It costs
-seconds. Both failures above would have died on one command.
-
-The corollary for the owner, and it saves effort: **do not paste session narration for the
-Head of Engineering to work from.** The artefacts are in git and git is authoritative. If
-something important exists only in narration and not in a commit, that absence is itself
-the finding.
-
-### 3.2 The pre-flight, because the Head of Engineering had no gate on its own output
-
-Every other actor in this system is gated. Sessions have CI, seeded self-tests, a currency
-gate and adversarial verifiers. **The Head of Engineering had its own diligence, and its own
-diligence failed four times in one arc.**
-
-`scripts/qa/brief_preflight.mjs` closes that. It runs on a DRAFT brief before it is issued,
-never on a committed one, because convention (f) means a brief cannot be corrected after the
-fact. **A document that can never be fixed afterwards is the one that most needs checking
-before it lands**, and the exclusion that created the gap was written by the same role it
-now guards.
-
-```
-node scripts/qa/brief_preflight.mjs <draft.md>
-```
-
-**This is a required step, not a courtesy.** A brief goes out only after it passes, or after
-each finding is answered in writing. It is seeded with the four real failures per convention
-(p), and it found a fifth in a real brief on its first run.
-
-**What it cannot check, so nobody mistakes a PASS for a warrant:** whether the prose around a
-citation is true, whether a judgement is sound, and whether the PLAN is any good. It checks
-facts. **The strategy is still the owner's to judge and the Product Owner's to accept.**
+**What this means for the owner in practice:** do not paste session narration for this seat
+to work from. Git is authoritative, and anything important that exists only in narration and
+not in a commit is itself the finding.
 
 ---
 
