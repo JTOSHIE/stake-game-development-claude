@@ -281,5 +281,41 @@ convention (p) seeded self-test, not a one-line change, and starting it inside t
 window would have risked exactly the half-applied fix this session has argued against
 twice.
 
+> **MID-01 IS NOW CLOSED, 2026-07-30, by the true fixdown**
+> (`reports/briefs/FS_TRUE_FIXDOWN_Prompt.md`, JOB 3). The sizing above was right: it was
+> a real refactor, and it took the lead slot of a session rather than the tail of one.
+>
+> **What shipped.** One shared source at `frontend/src/lib/stores/winCountUp.ts`, holding
+> one tween engine, one duration rule and one instance driven from `$winAmount` by the
+> store module itself. `WinBanner.svelte` and `HudOverlay.svelte` are now pure readers, so
+> frame-level equality is STRUCTURAL rather than asserted between two implementations:
+> there is only one number. The feature-end banner keeps its own instance from the same
+> factory, deliberately, because it animates a settled feature total while `$winAmount` is
+> still un-settled.
+>
+> **Measured before and after.** Before: at a big-tier 16x win the HUD reached the total
+> 872ms before the celebration, and at the epic tier 1936ms before it. After: exact
+> agreement on every sampled frame at big, mega and epic, 0ms early, with durations
+> 1306/1400, 1906/2000 and 2723/2800.
+>
+> **THREE THINGS THE PASS FOUND THAT THIS FILE DID NOT KNOW**, all recorded at
+> `reports/qa/session4b/LEDGER.md`:
+> 1. **There were THREE clocks, not two.** `WinDisplay.svelte:50` carries a third, on the
+>    replay surface. Not a MID-01 instance (mutually exclusive branches), frozen by file in
+>    the new gate and recorded as MID-01b.
+> 2. **The fix introduced a bug and the gate caught it.** The driver first read the DERIVED
+>    `winMultiplier`, which had not recomputed when the subscriber ran, so every tier ran
+>    the 400ms floor: the two surfaces agreed perfectly on the WRONG duration, and both the
+>    equality and the ordering assertions passed while saying nothing. The gate now asserts
+>    the observed duration against the tier.
+> 3. **This file's own advice held.** Sixteen of twenty six clusters returned PARTIAL here,
+>    and the fixdown's re-derivation of the other ledger found only 10 of 92 recorded causes
+>    correct as written. Treating a recorded cause as a hypothesis is now measured three
+>    times over.
+>
+> Gate `frontend/scripts/win_countup_sync_gate.mjs`, seeded per convention (p) with both the
+> pre-fix pair and a planted second loop. Fresh frames at
+> `reports/screens/mid01-countup-sync-2026-07-30/`. Commit `9ac424b`.
+
 The rest of the section above stands: sixteen clusters returned PARTIAL and none of their
 proposed fixes were applied.
