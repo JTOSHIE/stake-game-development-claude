@@ -40,7 +40,7 @@
 //   node scripts/kit_build.mjs --self-test     # convention (p)
 
 import { execFileSync, execSync } from 'node:child_process'
-import { existsSync, mkdirSync, rmSync, cpSync, writeFileSync, readdirSync, statSync, readFileSync, mkdtempSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync, cpSync, writeFileSync, readdirSync, statSync, readFileSync, mkdtempSync, renameSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve, relative } from 'node:path'
 import { tmpdir, homedir } from 'node:os'
@@ -73,8 +73,34 @@ const KIT_VERSION = (() => {
   } catch { /* fall through */ }
   throw new Error('kit build: VERSION is missing or not a positive integer, and no --version given.')
 })()
-const KIT_NAME = `FS_UPLOAD_KIT_V${KIT_VERSION}`
+// ONE FIXED PATH, owner's order 2026-07-30. The version is NOT in the directory
+// name, and that is the whole point.
+//
+// It used to be, as `FS_UPLOAD_KIT_V${KIT_VERSION}`, and the version number was
+// already single-sourced from the VERSION file above. The number was correct and
+// the DESIGN was wrong: interpolating it into a PATH turns one fact into N
+// directories on the owner's Desktop, and once N exist, every document that
+// mentions them has to say which to keep. Those documents are written at
+// different times, so they disagree. OWNER_CHECKLIST.md item 3 said "delete every
+// older kit, including V9" while item 5 of the SAME FILE said "keep V9 only", and
+// both were true on the day each was written. Five kit folders were on the
+// Desktop when this was found.
+//
+// No amount of proofreading fixes that. A design that requires two documents to
+// independently track a moving number produces contradictions at a steady rate,
+// and the rate has nothing to do with anyone's care. So the number comes out of
+// the name and lives INSIDE the kit instead: in BUILD_INFO.json, in README.md,
+// and in the boot console line. "Upload the kit on your Desktop" is then
+// permanently true and needs no maintenance.
+const KIT_NAME = 'FS_UPLOAD_KIT'
 const KIT = join(homedir(), 'Desktop', KIT_NAME)
+
+// THE STAGING PATH, and it must be on the SAME FILESYSTEM as KIT.
+//
+// rename(2) is only atomic within a filesystem, so staging in tmpdir would give a
+// copy rather than a swap and would reintroduce exactly the window this closes.
+// Hence ~/Desktop and not os.tmpdir().
+const STAGING = join(homedir(), 'Desktop', '.FS_UPLOAD_KIT.staging')
 
 const git = (args, cwd = REPO) => execFileSync('git', args, { cwd, encoding: 'utf-8' }).trim()
 
@@ -101,6 +127,49 @@ export function judgeTree({ headOnRemote, frontendDirty, otherDirty }) {
       + `${otherDirty.length > 10 ? ', ...' : ''}`)
   }
   return { refuse, warn }
+}
+
+/**
+ * THE DESKTOP REFUSAL, which is what keeps the fixed name honest.
+ *
+ * Once the version leaves the directory name, "upload the kit on your Desktop"
+ * is only unambiguous while exactly one kit folder exists. This is what makes
+ * that true, and it is a REFUSAL rather than a cleanup on purpose: nothing here
+ * deletes anything on the owner's Desktop. The owner bins them, this refuses
+ * until they have.
+ *
+ * The unversioned path is NOT free ground. `~/Desktop/FS_UPLOAD_KIT/` already
+ * held a pre-TR-062 kit dated 2026-07-26 containing `01_maths_upload/`, the
+ * MATHS PACKAGE, which must never be uploaded. Rewriting the documents to say
+ * "the kit on your Desktop" before that folder was gone would have pointed the
+ * owner's phone at the one folder in this project that must never go up. Hence
+ * the second check: a directory at the fixed path carrying a maths payload is
+ * refused, not silently overwritten, because overwriting it would destroy the
+ * evidence of what was there.
+ *
+ * Pure enough to self-test: it takes the directory listing, not the Desktop.
+ *
+ * @param {string[]} entries   basenames present beside the kit, e.g. from readdirSync
+ * @param {string[]} atFixed   basenames INSIDE the fixed-path kit, empty if absent
+ * @returns {{refuse: string[]}}
+ */
+export function judgeDesktop(entries, atFixed = []) {
+  const refuse = []
+  const stale = entries.filter((e) => /^FS_UPLOAD_KIT_V\d+$/.test(e)).sort()
+  if (stale.length) {
+    refuse.push(`${stale.length} versioned kit folder(s) remain on the Desktop: `
+      + `${stale.join(', ')}. The kit no longer carries its version in its name, so more `
+      + `than one folder makes "upload the kit on your Desktop" ambiguous, which is the `
+      + `defect this change exists to remove. Bin them, then build. Nothing here will `
+      + `delete them for you.`)
+  }
+  if (atFixed.some((e) => /^01_maths/.test(e))) {
+    refuse.push(`${KIT_NAME}/ already exists and contains a MATHS payload `
+      + `(${atFixed.filter((e) => /^01_maths/.test(e)).join(', ')}). That is the pre-TR-062 `
+      + `kit, and the maths package must never be uploaded. It is refused rather than `
+      + `overwritten so the evidence survives. Bin it deliberately, then build.`)
+  }
+  return { refuse }
 }
 
 function treeFacts() {
@@ -207,6 +276,33 @@ function selfTest() {
     console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}  (got ${got})`)
   }
 
+  // THE DESKTOP REFUSAL, seeded in the form it really occurred, per convention (p).
+  // The first case is the actual Desktop as found on 2026-07-30: five kit folders,
+  // one of them the pre-TR-062 maths kit. A gate that has never been seen to fail
+  // is a script that prints PASS, so both refusals are planted and both negative
+  // controls are paired with them.
+  const deskCases = [
+    ['seeded, the real 2026-07-30 Desktop: four versioned kits are REFUSED',
+     ['FS_UPLOAD_KIT', 'FS_UPLOAD_KIT_V7', 'FS_UPLOAD_KIT_V8', 'FS_UPLOAD_KIT_V9',
+      'FS_UPLOAD_KIT_V10', 'Screenshot.png'], [], 'refuse'],
+    ['seeded, the maths kit at the fixed path is REFUSED rather than overwritten',
+     ['FS_UPLOAD_KIT'], ['00_READ_ME_FIRST.md', '01_maths_upload', '02_frontend_upload'], 'refuse'],
+    ['seeded, ONE stale versioned folder is still ambiguous and is REFUSED',
+     ['FS_UPLOAD_KIT_V10'], [], 'refuse'],
+    ['negative control: a clean Desktop with no kit at all builds',
+     ['Screenshot.png', 'notes.txt'], [], 'ok'],
+    ['negative control: a proper frontend-only kit at the fixed path is OVERWRITTEN, not refused',
+     ['FS_UPLOAD_KIT'], ['README.md', 'BUILD_INFO.json', '02_frontend_upload', '03_branding'], 'ok'],
+    ['negative control: a lookalike name is not a kit and does not refuse',
+     ['FS_UPLOAD_KIT_OLD', 'FS_UPLOAD_KIT_V'], [], 'ok'],
+  ]
+  for (const [label, entries, atFixed, expected] of deskCases) {
+    const actual = judgeDesktop(entries, atFixed).refuse.length ? 'refuse' : 'ok'
+    const good = actual === expected
+    ok &&= good
+    console.log(`  ${good ? 'caught' : 'MISSED'}  ${label}  (expected ${expected}, got ${actual})`)
+  }
+
   console.log(ok ? '\nKIT BUILD SELF-TEST: PASS' : '\nKIT BUILD SELF-TEST: FAIL')
   return ok
 }
@@ -217,6 +313,13 @@ if (argv.includes('--self-test')) process.exit(selfTest() ? 0 : 1)
 // ── The refusals, against the real tree ──────────────────────────────────────
 const facts = treeFacts()
 const { refuse, warn } = judgeTree(facts)
+// The Desktop refusal runs in the SAME block, so a build that would be ambiguous
+// is refused before the clone, the install and the gates rather than after them.
+const desk = join(homedir(), 'Desktop')
+refuse.push(...judgeDesktop(
+  existsSync(desk) ? readdirSync(desk) : [],
+  existsSync(KIT) ? readdirSync(KIT) : [],
+).refuse)
 console.log(`kit build: HEAD ${facts.head.slice(0, 8)}, on remote: ${facts.headOnRemote}`)
 for (const w of warn) console.log(`  warning: ${w}`)
 if (refuse.length) {
@@ -300,10 +403,24 @@ const dist = join(fe, 'dist')
 const stats = dirStats(dist)
 const info = JSON.parse(readFileSync(join(dist, 'build-info.json'), 'utf-8'))
 
-rmSync(KIT, { recursive: true, force: true })
-mkdirSync(join(KIT, '02_frontend_upload'), { recursive: true })
-cpSync(dist, join(KIT, '02_frontend_upload'), { recursive: true })
-const copied = dirStats(join(KIT, '02_frontend_upload'))
+// ASSEMBLE INTO STAGING, SWAP AT THE END. Never write to KIT until the kit is
+// whole.
+//
+// This used to be `rmSync(KIT)` followed by the assembly below, and under a
+// VERSIONED name that was survivable: a build that died halfway left junk in a
+// new folder beside the good kit, and the folder's own name said which version
+// it claimed to be. Under a FIXED name the same code is destructive, because a
+// half-failed build would delete the good kit and leave a partial, unidentifiable
+// payload at the exact path every document tells the owner to upload. There are
+// at least four ways to stop between here and the last write.
+//
+// So the destructive step is the LAST step, and it is a rename rather than a
+// copy. Everything below assembles into STAGING; the swap is two statements at
+// the bottom of this file.
+rmSync(STAGING, { recursive: true, force: true })
+mkdirSync(join(STAGING, '02_frontend_upload'), { recursive: true })
+cpSync(dist, join(STAGING, '02_frontend_upload'), { recursive: true })
+const copied = dirStats(join(STAGING, '02_frontend_upload'))
 if (copied.files !== stats.files || copied.bytes !== stats.bytes) {
   console.error(`KIT BUILD: the copy does not match the build `
     + `(${copied.files}/${copied.bytes} against ${stats.files}/${stats.bytes})`)
@@ -317,22 +434,20 @@ if (copied.files !== stats.files || copied.bytes !== stats.bytes) {
 // The walkthrough, because the owner needs Part 9 beside the files they are
 // uploading, not in a repository they are not reading at the time. The tile
 // images, because the Design Thumbnail step is part of the same visit and the
-// only other copy sits inside ~/Desktop/FS_UPLOAD_KIT/, which is DEAD and which
-// the walkthrough tells the owner to bin. Pointing at a folder we have just told
-// them to delete is how the wrong thing gets uploaded.
+// kit is the only copy the owner has to hand.
 //
 // 03_branding is NOT uploaded as Front End, and the README says so twice.
 cpSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'),
-  join(KIT, '00_READ_ME_FIRST_SECOND_VISIT.md'))
-mkdirSync(join(KIT, '03_branding'), { recursive: true })
+  join(STAGING, '00_READ_ME_FIRST_SECOND_VISIT.md'))
+mkdirSync(join(STAGING, '03_branding'), { recursive: true })
 for (const f of ['FutureSpinner-BG.jpg', 'FutureSpinner-FG.png', 'WeRollSpinners-Logo.png']) {
-  cpSync(join(clone, 'design-system/brand/delivery', f), join(KIT, '03_branding', f))
+  cpSync(join(clone, 'design-system/brand/delivery', f), join(STAGING, '03_branding', f))
 }
 
-// PART was resolved above, before the build and before rmSync(KIT), so a throw
-// costs nothing and destroys nothing. See the note there.
+// PART was resolved above, before the build and before anything is written, so a
+// throw costs nothing and destroys nothing. See the note there.
 
-const readme = `# ${KIT_NAME}, frontend only
+const readme = `# ${KIT_NAME} \`v${KIT_VERSION}\`, frontend only
 
 **Version \`v${KIT_VERSION}\`, built from commit \`${facts.head}\`**
 (\`${facts.head.slice(0, 8)}\`), clean tree, in a fresh clone, ${info.builtAt}.
@@ -368,27 +483,44 @@ composed, and the maths is not being touched.
 on this visit you should not need it at all. **Nothing in it is uploaded as Front
 End.**
 
-## This kit is SINGLE USE
+## This kit is SINGLE USE, and the way you check is that it is GONE
 
-Delete it after uploading. TR-062: a stale kit sat on the Desktop and re-uploading it
-would have restored one fixed defect while re-shipping another. Kits are regenerated per
-upload, from a clone, by \`scripts/kit_build.mjs\`, which refuses a dirty \`frontend/\` or an
+**Upload it, then bin it.** The job is done when there is no \`${KIT_NAME}\` folder on
+your Desktop at all. That is checkable at a glance, it never goes stale, and it needs
+no version number: a folder that IS there means you have not uploaded it yet.
+
+This folder is rebuilt from scratch on every kit build, so whatever was here before has
+been replaced. TR-062: a stale kit sat on the Desktop and re-uploading it would have
+restored one fixed defect while re-shipping another. Kits are regenerated per upload,
+from a clone, by \`scripts/kit_build.mjs\`, which refuses a dirty \`frontend/\` or an
 unpushed HEAD.
-
-\`~/Desktop/FS_UPLOAD_KIT/\` is DEAD and must not be uploaded again.
 
 ## Gates run IN THE CLONE
 
 ${Object.entries(gateResults).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
 `
-writeFileSync(join(KIT, 'README.md'), readme)
+writeFileSync(join(STAGING, 'README.md'), readme)
 
-writeFileSync(join(KIT, 'BUILD_INFO.json'), JSON.stringify({
+// `version` is in here because BUILD_INFO.json is the loudest file in the kit and
+// it could not previously answer which version this is: its keys were commit,
+// builtAt, files, bytes and gates. That mattered little while the folder NAME
+// carried the version and matters a great deal now that it does not.
+writeFileSync(join(STAGING, 'BUILD_INFO.json'), JSON.stringify({
+  version: `v${KIT_VERSION}`,
   commit: facts.head, builtAt: info.builtAt,
   files: stats.files, bytes: stats.bytes, gates: gateResults,
 }, null, 2) + '\n')
 
+// ── THE SWAP, and it is deliberately the last thing that happens ─────────────
+// Two statements, nothing between them. Every way this build can fail has now
+// been passed, so the only window where the owner's Desktop holds no good kit is
+// the gap between these two lines, which is a directory-entry update rather than
+// a 15MB copy. rename(2) is atomic within a filesystem, and STAGING was chosen
+// on ~/Desktop for exactly that reason.
+rmSync(KIT, { recursive: true, force: true })
+renameSync(STAGING, KIT)
+
 rmSync(work, { recursive: true, force: true })
 console.log(`\nKIT BUILD: PASS`)
-console.log(`  ${KIT}`)
+console.log(`  ${KIT}  (v${KIT_VERSION}, ${facts.head.slice(0, 8)})`)
 console.log(`  commit ${facts.head.slice(0, 8)}, ${stats.files} files, ${stats.bytes} bytes`)

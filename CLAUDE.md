@@ -1025,6 +1025,54 @@ squad that died silently and a squad that found nothing produce identical output
 marshal cannot tell them apart. Written up in full at `docs/skills/FULL_AUDIT_METHOD.md` 4.1,
 with the scratch-rename rule beside it at 4.2.
 
+**(s) A value that changes is never written into an instruction. Owner's order, 2026-07-30,
+after the same contradiction was produced twice in one document.**
+
+An INSTRUCTION tells a reader what to do now. A RECORD says what was true then. **History does
+not go stale; instructions do**, and the fix is to keep changing values out of the first and
+leave them in the second.
+
+Concretely: an instruction is phrased against a name that does not move, or against a value
+derived at read time from its single source. A dated record names the version, the entry, the
+SHA and the count freely, in the past tense, because a statement anchored to a date cannot
+become false.
+
+**THE WORKED EXAMPLE, and the point is that nobody was careless.** `OWNER_CHECKLIST.md` item 3
+said *"delete every older kit, including V9"*. Item 5 of the same file said *"keep V9 only"*.
+Both were true on the day each was written. The cause was upstream of both: `kit_build.mjs`
+interpolated the version into the kit's DIRECTORY NAME, so one fact became five folders on the
+owner's Desktop, and two instructions then had to independently track which of the five
+mattered. **A design that requires two documents to track a moving number produces
+contradictions at a steady rate, and the rate has nothing to do with anyone's care.**
+
+The version number was already single-sourced from the root `VERSION` file, with a comment
+above it recording that two constants which must agree eventually will not. **The number was
+right and the design was wrong.** Single-sourcing a value does not help if the value is then
+copied into a name, a path, a heading or a sentence.
+
+The repairs, as the shape to copy:
+
+- **The kit is one fixed path**, `~/Desktop/FS_UPLOAD_KIT`, and the version lives INSIDE it, in
+  the kit's own BUILD_INFO.json, its README and the boot line. There is no older kit to
+  argue about. Those three are files in the kit folder on the owner's Desktop rather than
+  repository paths, so they are deliberately not written as backticked paths here.
+- **The DONE condition became the folder's ABSENCE.** Upload it, then bin it; done when it is
+  gone. That is checkable at a glance, needs no version, and makes single use structural rather
+  than a rule to remember.
+- **The build REFUSES rather than tidying.** It exits non-zero while any other kit folder sits
+  beside it, and deletes nothing on the owner's machine.
+- **`owner_preview.mjs` stopped deriving its version banner by regexing a walkthrough
+  HEADING** and reads `VERSION` instead. Its own comment already recorded that derivation
+  silently degrading to a bare `main` once. The instance had been fixed; the design had not.
+
+**The test, applicable while writing:** *would this sentence still be true after the next
+build, the next upload, the next rename?* If not, either it belongs in a dated record instead,
+or the thing it names should be given a stable name.
+
+**Where this is impractical, say so rather than pretending.** Some instructions genuinely need
+a specific artefact, and a dated record with an explicit capture date is the honest form for
+those. What is forbidden is the undated present-tense claim about a moving value.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 

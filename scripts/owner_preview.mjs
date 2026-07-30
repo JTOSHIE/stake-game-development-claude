@@ -191,17 +191,23 @@ function stopTracked() {
  * asked to compare against the session report.
  */
 function versionLabel() {
+  // READ THE `VERSION` FILE, corrected 2026-07-30. This used to regex a version
+  // number out of the walkthrough's live PART 9 HEADING, which is prose, and it
+  // is the exact defect the same day's kit-naming change was made to remove: a
+  // value that changes, derived from a place that is not its source.
+  //
+  // Its own comment already recorded the failure mode. When the heading style
+  // moved from "THE FIRST PLAYER-VISIBLE VISIT (V8)" to "THE v9 VISIT", the
+  // pattern silently degraded the label to a bare "main", and the quiet kind of
+  // wrong is the dangerous kind: it still printed a line and the line still
+  // looked fine. Widening the regex fixed that instance and left the design.
+  //
+  // `VERSION` is the same source `kit_build.mjs` and `vite.config.ts` read, so
+  // the banner, the kit and the boot line cannot now disagree. Restructuring the
+  // walkthrough can no longer change what the owner's preview claims to be.
   try {
-    const doc = readFileSync(join(REPO, 'docs/records/upload-kit/00_READ_ME_FIRST.md'), 'utf-8')
-    const live = [...doc.matchAll(/^# PART 9[a-z]?:([^\n]*)$/gm)]
-      .filter((m) => !/SUPERSEDED/i.test(m[1]))
-    // Matches `(V8)` and `v9` alike. The heading style changed from
-    // "THE FIRST PLAYER-VISIBLE VISIT (V8)" to "THE v9 VISIT" and the
-    // parenthesised-only pattern silently degraded the label to a bare "main",
-    // which is the quiet kind of wrong: it still printed a line, and the line
-    // still looked fine.
-    const v = live.length === 1 ? /\bv(\d+)\b/i.exec(live[0][1]) : null
-    return v ? `v${v[1]} line, main` : 'main'
+    const n = Number(readFileSync(join(REPO, 'VERSION'), 'utf-8').trim())
+    return Number.isInteger(n) && n > 0 ? `v${n} line, main` : 'main'
   } catch {
     return 'main'
   }

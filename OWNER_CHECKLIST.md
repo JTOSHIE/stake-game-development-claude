@@ -22,9 +22,29 @@ Nothing to do. This is a pointer, not a task.
 
 ---
 
+# HOW THIS DOCUMENT NAMES THINGS, rewritten 2026-07-30 on the owner's order
+
+**Instructions never name a kit version or a portal entry. The dated record below does.**
+
+This document used to contradict itself, and the contradiction was structural rather than
+careless. Item 3 said *"delete every older kit, including V9"* while item 5 said *"keep V9
+only"*, and **both were true on the day each was written.** The cause was that the kit build
+put the version number in the FOLDER NAME, so one fact became five folders on the Desktop, and
+then two instructions had to independently track which one mattered. They drifted, as any two
+documents tracking a moving number eventually will.
+
+So the rule now is: **history does not go stale, instructions do.** The DONE table at the
+bottom names versions and entries in the past tense, at the moment each became true, and it
+keeps them forever. The five items below name neither, and therefore cannot rot.
+
+The kit itself is now always at **`~/Desktop/FS_UPLOAD_KIT`**, one folder, rebuilt in place,
+and the build **refuses to run while any older kit folder is beside it.**
+
+---
+
 # THE FIVE OUTSTANDING ITEMS
 
-## 1. Tick the 58 Guidelines on `future-spinner-2`
+## 1. Tick the 58 Guidelines on the entry you are submitting
 
 **With `docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md` open beside you.** It
 carries our position on every one of the 58, so most are a read-and-tick.
@@ -33,9 +53,13 @@ carries our position on every one of the 58, so most are a read-and-tick.
 is among those nine** and is the one to look at hardest, because it is a platform setting
 rather than anything in our build.
 
+**You and Fable have already worked through a number of these.** That progress lives in your
+conversation with Fable and not in this repository, so this document cannot tell you where the
+count stands. Getting it transcribed here is a live request to Fable, comms entry 030.
+
 **What to send:** a screenshot of the Guidelines panel once the count moves off 0/58.
 
-**DONE when** all 58 are ticked on `future-spinner-2`.
+**DONE when** all 58 are ticked on the entry you are submitting.
 
 ---
 
@@ -58,24 +82,43 @@ model chosen, wallet configured, address verified.
 
 ---
 
-## 3. Upload kit V10 and screenshot the v10 console line
+## 3. Upload the kit and screenshot the console line
 
-**The kit is built and waiting:** `~/Desktop/FS_UPLOAD_KIT_V10/`. Follow **PART 9i** in the
-walkthrough inside it. Upload to `future-spinner-3`. Delete every older kit, including V9,
-which was never confirmed uploaded; kits are single use.
+**BEFORE THIS, ONCE: bin every kit folder on your Desktop.** Five are there, and one of them,
+the unversioned `FS_UPLOAD_KIT` dated 26 July, **holds the maths package and must never be
+uploaded.** Run `ls -d ~/Desktop/FS_UPLOAD_KIT*` and delete everything it lists. This is a
+one-time tidy-up: from here the build makes exactly one folder and refuses to run while others
+exist, so it cannot recur. Nothing deletes them for you, deliberately.
+
+**Then build a fresh kit and upload it.** `node scripts/kit_build.mjs` puts it at
+`~/Desktop/FS_UPLOAD_KIT`. Follow the walkthrough inside the folder; it is copied in with the
+kit, and its live section is the only PART 9 heading not marked SUPERSEDED. **Upload to the
+portal.** Which entry is yours to choose; this document does not name one, because naming one
+is what made it go stale.
+
+**Do not upload a kit you did not just build.** The one on your Desktop right now is from an
+older commit.
 
 **The one screenshot:** open the published game with the browser console open and capture the
-first line. It reads `Future Spinner v10 build <sha> built <timestamp>`.
+first line. It reads `Future Spinner v<n> build <sha> built <timestamp>`, and the same version
+and commit are in the BUILD_INFO.json file inside the kit folder, if you want to check before
+uploading.
 
-That single line does three jobs: it names **v10** in words rather than a hash, which closes
-which-build-is-live for good; it carries the **SHA** as the exact identity; and **if the city,
-the car and the rain are on screen behind it, it proves the background files served** on a
-clean upload to a clean entry.
+**Your local preview shows the same two values on screen now**, bottom left, so you can compare
+what you are about to upload against what you have been looking at without opening a console.
+
+That single line does three jobs: it names the **version in words** rather than a hash, which
+closes which-build-is-live for good; it carries the **SHA** as the exact identity; and **if the
+city, the car and the rain are on screen behind it, it proves the background files served** on
+a clean upload.
 
 **While the paytable is open on that visit, one glance at the hero:** it should read
 **1,024 WAYS TO WIN**, uppercase, in the brand face. Anything else there is a screenshot.
 
-**DONE when** you have sent that one screenshot.
+**DONE when** you have sent that one screenshot **and there is no `FS_UPLOAD_KIT` folder on
+your Desktop.** Bin it after uploading. That is the whole single-use rule and it is now
+checkable at a glance rather than by remembering a version number: **a kit folder that is
+there means you have not uploaded it yet.**
 
 ---
 
@@ -99,18 +142,20 @@ None of these can be failed. Anything that looks wrong is worth a screenshot.
 
 ---
 
-## 5. Delete the old `future-spinner` entry, once the cooldown allows
+## 5. Delete the superseded portal entries, once the cooldown allows
 
-`future-spinner-2` is the submission entry. The original is superseded, and two entries for one
-game is exactly the stale-artefact confusion that has cost this project a star before.
+**Keep one entry for this game and delete the rest.** Two entries for one game is exactly the
+stale-artefact confusion that has cost this project a star before.
 
-**While you are there, bin the old kits.** `~/Desktop/` currently holds `FS_UPLOAD_KIT`,
-`FS_UPLOAD_KIT_V7`, `FS_UPLOAD_KIT_V8` and `FS_UPLOAD_KIT_V9`. **Keep V9 only.** Kits are single
-use, and a stale kit on the Desktop is one that eventually gets uploaded when it is out of date,
-which has already happened once (TR-062).
+**Which one survives is your call**, and the DONE table below records which entry each piece of
+evidence came from, so you can tell them apart. You have said the numbered entries are working
+handles you swap between while building; that is fine, and it is precisely why no instruction
+in this document names one.
 
-**DONE when** only `future-spinner-2` remains in the team's game list and only `V9` remains on
-the Desktop.
+The Desktop kit tidy-up that used to live here has moved into item 3, because it has to happen
+before the next upload rather than after it.
+
+**DONE when** one entry remains in the team's game list.
 
 ---
 
@@ -142,7 +187,7 @@ asked twice and every claim can be checked.
 |---|---|---|
 | **Twenty Cruise spins, bracketed** | 2026-07-28 | `reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. **TR-075 CLOSED.** 1000.00 minus 1.00 = 999.00, and 1000.00 minus 5.00 plus 0.84 = 995.84, both matching the HUD to the cent, at exactly 1.00x. **The last open money item in the project**, and the fifth and final mode to be proven. |
 | **The build-SHA capture** | 2026-07-28 | Frame `071805`: the boot line reads build `e0c30611`, the kit V8 commit, so what is live is answerable from the artefact rather than inferred. |
-| **Which entry is the submission** | 2026-07-28 | Your ruling: `future-spinner-2`. Recorded in `SUBMISSION_DOSSIER.md` section 5b0. |
+| **Which entry is the submission** | 2026-07-28 | Your ruling that day: `future-spinner-2`. Recorded in `SUBMISSION_DOSSIER.md` section 5b0. **Superseded 2026-07-30**: you have since confirmed the numbered entries are interchangeable working handles, so no document names one and the choice is yours at upload time. Kept because it dates the evidence rows below it. |
 | **The payments model** | 2026-07-28 | Frame `082628`: **Profit Share, 10 percent GGR**, selected against Guaranteed at 7.5 percent. |
 | **The payout wallet, configured** | 2026-07-28 | Configured on the platform, ERC-20 USDT. Address held offline only and deliberately never recorded here. Verifying it is item 2 above. |
 | **Business name registration** | 2026-07-27 | **We Roll Spinners**, ASIC, registered 27 July 2026, **renewal due 28 July 2027**. Diarise the renewal. |
@@ -150,7 +195,7 @@ asked twice and every claim can be checked.
 | **USPTO wordmark searches** | 2026-07-28 | Frames `082429` and `082546`. Summary above; the register row now reads searches complete, evidence summarised, gate satisfied. |
 | **The game tile** | 2026-07-28 | Frame `085752`: the composed tile in the Tile Editor on `future-spinner-2`. |
 | **Your local preview** | 2026-07-28 | `http://192.168.4.92:5173` is refreshed to latest `main` at the close of every session that changes it, per protocol rule 12. Nothing for you to do. If the SHA there ever disagrees with the newest session report, tell us rather than debugging it. |
-| **The stale Desktop kits** | partly | V7 and V8 are still there. Folded into item 5 above rather than kept as a separate item. |
+| **The stale Desktop kits** | not done | Five kit folders are on the Desktop, including the 26 July unversioned one that holds the MATHS package. Folded into item 3, because it must happen before the next upload. `ls -d ~/Desktop/FS_UPLOAD_KIT*` is the current list; do not trust this row for it. |
 
 ---
 
@@ -159,5 +204,5 @@ asked twice and every claim can be checked.
 - Money and wallet proofs: `docs/records/reviews/REVIEW_TRACKER.md`, rows TR-075 and TR-102.
 - Compliance and the 58: `docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md`.
 - Company, trademark, payments: `WRS_MASTER_DOCUMENT.md` section 1.
-- Upload and staging: `SUBMISSION_DOSSIER.md` section 5, and PART 9h in the kit's walkthrough.
+- Upload and staging: `SUBMISSION_DOSSIER.md` section 5, and the one PART 9 section in the kit's walkthrough that is NOT marked SUPERSEDED. The build refuses unless exactly one is live, so there is never a choice to make.
 - Capture evidence: `reports/screens/live-portal-2026-07-28/CATALOGUE.md`.

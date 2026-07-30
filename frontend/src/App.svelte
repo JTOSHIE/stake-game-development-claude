@@ -2041,6 +2041,17 @@
        and its popover contents alike. Reversible: remove these
        import.meta.env.DEV guards. -->
   {#if import.meta.env.DEV}
+    <!-- THE BUILD LINE, ON SCREEN, DEV ONLY. Owner's order 2026-07-30.
+         The same two values the console prints at boot. It is here because the
+         owner reads the preview on a phone, where a console line is unreachable,
+         and the question it answers is whether the preview matches the kit he is
+         about to upload. Both come from the same commit by construction: the
+         preview serves current main and kit_build refuses an unpushed HEAD.
+         Gated on import.meta.env.DEV exactly like the theme selector, so it
+         cannot reach a player. -->
+    <div class="dev-build-line" data-dev="true" data-testid="dev-build-line">
+      {__BUILD_VERSION__} {__BUILD_COMMIT__.slice(0, 8)}{__BUILD_CLEAN__ ? '' : ' dirty'}
+    </div>
     <div class="dev-chip-wrapper">
       <button
         class="util-btn dev-chip"
@@ -2603,6 +2614,24 @@
     bottom: 1rem;
     right: 1rem;
     z-index: 50;
+  }
+  /* Bottom LEFT, so it never sits under the dev chip or its panel. Deliberately
+     quiet: this is a reference the owner glances at, not a control. */
+  .dev-build-line {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 50;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.72);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    user-select: none;
   }
   .util-btn.dev-chip {
     background: rgba(0, 0, 0, 0.55);
