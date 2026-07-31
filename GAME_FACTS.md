@@ -19,7 +19,7 @@ display-name reconciliation and integrity statement is in `docs/PAR_NAMING_ADDEN
 | Min / max bet | $0.10 / $100.00 | `FUTURE_SPINNER_PAR_SHEET.md` §1 |
 | Simulation basis | 100,000 rounds per mode, Stake Engine SDK v1 | `FUTURE_SPINNER_PAR_SHEET.md` (header) |
 | Optimiser | PigFarm (Rust); all five modes converged to 96.3500% RTP | `FUTURE_SPINNER_PAR_SHEET.md` (header) |
-| Version | v1.2.0 (FeatureMath v2, five modes) | `FUTURE_SPINNER_PAR_SHEET.md` §12 footer |
+| Version | v1.2.0 (FeatureMath v2, five modes). **Corrected 2026-07-31**: the PAR sheet's own footer reads `Future Spinner v1.2`, not v1.2.0, and that file has fourteen `##` sections rather than a numbered §12. A derived record must not out-precise its source. | `FUTURE_SPINNER_PAR_SHEET.md` footer |
 
 Note (2026-07-07): the "Verified mathematics" section below (§2) was compiled before
 FeatureMath v2 and documents `base`/`bonus` only. Cruise/antelite/super's independently
@@ -265,7 +265,7 @@ live is exactly 5,000.00x on the wincap round itself.
   variant is DERIVED from it rather than graded from a second video frame, so the two can
   never be of two different cities: `App.svelte` crossfades them.
 - **Speed tiers:** three, Normal, Turbo and Super Turbo, scaling every reel-motion duration
-  (`design-system/LAYOUT_SPEC.md` "Reel feel requirements"; implemented in
+  (the reel-feel requirements, whose exact heading is NOT in `design-system/LAYOUT_SPEC.md`; corrected 2026-07-31, the three tiers are declared at `frontend/src/lib/stores/speedMode.ts:15`; implemented in
   `frontend/src/lib/stores/speedMode.ts`, verified in
   `reports/archive/2026-07-04_motion-polish-v2.md`). Autoplay honours the active tier.
 - **Layout system:** a single 1280x720 design surface scaled by one factor `S` so the whole
