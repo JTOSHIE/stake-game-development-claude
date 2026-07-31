@@ -1,4 +1,32 @@
-// build_diet_verify.mjs: Build Diet v2 network-hygiene gate.
+// build_diet_verify.mjs: Build Diet v2 pruned-path, budget and console gate.
+//
+// WHAT THIS GATE DOES NOT TEST, stated first because its old name said otherwise.
+// It does NOT test request ORIGIN. Line 110 computes `rel` by splitting the
+// response URL on the base URL, so for any off-origin URL `rel` is undefined and
+// the pruned-path block is skipped entirely. The only checks that see an
+// off-origin request are the 404 branch and the requestfailed handler, so a
+// SUCCESSFUL external load (status 200) is invisible here.
+//
+// MEASURED 2026-07-31, not argued: injecting the exact historical TR-001 defect,
+// a `fonts.googleapis.com` stylesheet link, into a scratch copy of dist and
+// running this gate unmodified returns exit 0 and ALL CHECKS PASS, while the
+// gate's own network log records the two off-origin 200s it declined to flag.
+//
+// This matters because SUBMISSION_DOSSIER.md section 5a and two external reviews
+// have graded an external-resource-loading requirement on this gate's output.
+// The substance is TRUE at HEAD (nothing external is loaded), so this is an
+// UNGUARDED REGRESSION rather than a live falsehood. The correct origin
+// assertion already exists at frontend/scripts/platform_conformance_item2.mjs,
+// which compares `new URL(u).origin` properly and is NOT wired into CI. Whether
+// to wire that, or add an origin check here, is escalated per convention (l.8)
+// and is not this file's to decide.
+//
+// AND THE REQUIREMENT ITSELF IS A PARAPHRASE. The platform text at
+// docs/stake-engine-live/2026-07-29/approval_guidelines_front_end_communication.md:26
+// reads "All images and fonts must be loaded from the Stake Engine Content
+// Delivery Network (CDN)." That is narrower than "no external resource loading",
+// and the broad form is literally false of any shipped game, which must reach
+// the RGS. Per convention (l.7) the verbatim text governs.
 //
 // Serves the ACTUAL pruned dist/ (via `vite preview`, not the dev server,
 // the dev server serves public/ unpruned) and drives a headless session

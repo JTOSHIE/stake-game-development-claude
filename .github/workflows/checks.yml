@@ -881,7 +881,13 @@ jobs:
           # that it is not expected to set the wall clock, but judge it against
           # the range in CLAUDE.md protocol rule 10 rather than against 18.4:
           # runner contention is what moves these figures, not the gate.
-          - name: "browser: build diet network hygiene"
+          # RENAMED 2026-07-31. It was "browser: build diet network hygiene", which
+          # asserted by its name the one capability Session 6 proved this gate lacks.
+          # A green leg with that name is stronger false assurance than the stale
+          # hand-run log it replaced, so wiring it under the old name made the
+          # exposure larger rather than neutral. It does NOT test request origin:
+          # a successful off-origin 200 is exempt. See the gate's own header.
+          - name: "browser: build diet, pruned paths and budget"
             run: node scripts/build_diet_verify.mjs --self-test && node scripts/build_diet_verify.mjs
           # M01 of reports/qa/session3/MECHANISMS.md. ELEVEN platform
           # requirements had no proof path and ten of them are properties of one

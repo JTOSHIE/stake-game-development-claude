@@ -63,8 +63,42 @@ what the command actually measured and check that it is the question being asked
 gap between "rows whose recorded file is locked" and "findings whose fix touches a locked
 path" is invisible in the output and decisive in the brief.
 
+**A SEED INSTRUCTION ASSERTS WHAT THE GATE MEASURES, SO IT IS A PREMISE.** Added
+2026-07-31, and it is the same failure in a new place: a claim about an instrument, made
+without opening the instrument.
+
+`FS_RECORD_TRUTH` instructed a session to *"plant a genuine external network request in a
+scratch copy of `dist` and prove the gate goes RED"*. **The gate cannot detect a successful
+external request.** Its pruned-path check runs only after a same-origin filter, so an
+off-origin 200 is invisible to it. The session traced that, refused the instruction, seeded
+the form the gate actually asserts, and reported the divergence. **It was right and the
+brief was wrong.** Confirmed afterwards by measurement rather than argument: the instructed
+seed, injected into a scratch bundle, returns ALL CHECKS PASS.
+
+The brief marked five premises scrupulously under rule 16 and never marked this one,
+because it was never noticed as a premise. **It arrived inside the word "network-hygiene
+gate", which is what the file called itself.** A name is a description, and a description
+is REPORTED.
+
+Worse, the brief coupled the unsatisfiable seed to a ship-nothing time box, so **literal
+obedience had no good exit**: either ship a permanently red CI leg, or declare the job
+unfinishable and hand on a defect that was one line from fixed.
+
+**The rule this leaves.** Before writing a seed into a brief, read the gate and state what
+it asserts. If that has not been done, the instruction is not "seed X", it is **"establish
+what this gate asserts, then seed the form it really catches"**, and the premise carries an
+UNKNOWN marker. **A brief must never make a mandatory instruction contingent on an
+unverified claim about an instrument.**
+
+**And the second-order lesson, which is the more useful one.** Wiring that gate under a
+name asserting the capability it lacks made the exposure LARGER, not neutral: a green CI leg
+called network hygiene is stronger false assurance than the stale hand-run log it replaced.
+**When a limitation is escalated rather than fixed, the limitation goes where the reader
+looks** (the file, the CI step name), not only into the escalation.
+
 **The test, applicable in the moment:** *am I looking at the thing, or at something that
 describes the thing?* If it is the second, it is REPORTED, whatever it says about itself.
+**A file's own name counts as something that describes the thing.**
 
 **The corollary for the owner, which saves effort:** do not paste session narration for this
 seat to work from. The artefacts are in git and git is authoritative. **Anything important
