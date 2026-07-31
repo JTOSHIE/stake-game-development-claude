@@ -150,11 +150,22 @@ The uploaded frontend artefact is `frontend/dist/` after `npm run build` - a sta
 self-contained bundle (HTML/CSS/JS + the theme's asset tree), no server-side component.
 Production chain: `vite build` (Svelte compile + bundle), then `vite.config.ts`'s
 `pruneLegacyAssets` plugin strips every non-shipping theme/legacy asset from the output
-(confirmed empty of pruned-path requests and under the 25MB budget by
-`frontend/scripts/build_diet_verify.mjs` - see JOB 4, `reports/qa/build-diet-network-log.json`).
-Current measured size: **14.80MB** (108 files, 15,515,125 bytes) against the 25MB budget,
-measured on the artefact that ships: the JOB 5 kit V3 build, from a fresh clone at commit
-`7dd83e6a`, clean tree, 2026-07-26. Supersedes both the 13.59MB recorded at JOB 4 on
+. `frontend/scripts/build_diet_verify.mjs` asserts that the served bundle makes no
+pruned-path request and sits under the 25MB budget, and **since 2026-07-31 (TR-111, commit
+`de2fa23`) it is a BROWSER matrix leg of `.github/workflows/checks.yml`, run behind its own
+seeded-violation self-test**, so the property is enforced on every push that reaches the
+browser matrix rather than confirmed by hand. **It does NOT test request ORIGIN**, which is
+declared in its own header and escalated per convention (l.8).
+`reports/qa/build-diet-network-log.json` is a DATED sample of the JOB 4 run of 2026-07-26, not
+a statement about the current build: read the current verdict from the CI leg.
+**Measured at 14.80MB (108 files, 15,515,125 bytes) against the 25MB budget on 2026-07-26**,
+on the artefact that shipped then: the JOB 5 kit V3 build, from a fresh clone at commit
+`7dd83e6a`, clean tree. That is a dated record and not a current figure, because the byte
+total and the file count move on every build: **read the current size from
+`frontend/dist/build-info.json`, which stamps the version, the commit and the byte count on
+every build**, exactly as section 9e already directs. A figure built on a working machine is
+not the same claim as one built from a fresh clone (convention (o)), so any figure recorded
+here states which it was. Supersedes both the 13.59MB recorded at JOB 4 on
 2026-07-13 and the 21.87MB measured earlier on 2026-07-26.
 
 The 108th file is `build-info.json` itself, the JOB 4 provenance stamp, which records the
@@ -177,9 +188,13 @@ measurement is not its size now. Per convention (l.3) a figure is either cited o
 known: the current figure is computed and cited below, and a difference decomposed across
 two trees would be an estimate wearing a decimal point.
 
-The figure above is computed by `frontend/scripts/dist_hygiene_gate.mjs` on the build it
-describes and written to `reports/qa/dist_hygiene_2026-07-26.json`, so it is re-derivable
-rather than carried forward. That gate also asserts the 25MB budget and that no
+`frontend/scripts/dist_hygiene_gate.mjs` recomputes this figure on whatever build is in front
+of it, so it is re-derivable rather than carried forward. **The committed sample at
+`reports/qa/dist_hygiene_2026-07-26.json` is NOT the build described above**: read on
+2026-07-31 it records 108 files and 15,515,148 bytes, with a build stamp naming commit
+`a1ff78bb` and `cleanTree: false`, so it is a working-machine run of the same date rather
+than the fresh-clone kit V3 build. Per convention (o) those are two different claims and
+neither substitutes for the other. That gate also asserts the 25MB budget and that no
 documentation file is present.
 
 **That property is reproducible, and it was verified rather than asserted.** A clean clone
@@ -209,7 +224,7 @@ upload a stale or hand-edited `dist/`.
 upload and it is the entry that will be submitted.
 
 The original `future-spinner` entry is **superseded**. It awaits deletion once the platform's
-cooldown allows, which is `OWNER_CHECKLIST.md` item 3b. Two entries for one game is exactly
+cooldown allows, which is `OWNER_CHECKLIST.md` section 5, "Delete the superseded portal entries, once the cooldown allows" (checked 2026-07-31; that file carries no item 3b). Two entries for one game is exactly
 the stale-artefact confusion this dossier exists to prevent, so the distinction is recorded
 here rather than left to memory.
 
@@ -789,5 +804,5 @@ convention should be raised with the platform before submission. Waiting since 2
 | §8h lists four things the DTT session will settle | Two are settled: TR-035b is resolved and the CVaR figure has been displayed. **XEC live behaviour and the currency display metadata remain genuinely unobserved** and are the only two that should still be listed. |
 | §5c maths file hashes | **Verified NOT stale**, so the next session need not re-derive them: all seven repo-committed maths files hash exactly to the §5c table, and `git ls-files` returns exactly those seven. |
 | Bundle figure in §5 | Superseded. **As at 2026-07-27 the kit was V6, built from a fresh clone, 110 files, 15,601,767 bytes (14.88 MB)**; the two files added since V5 were the two speed-control captures. **CORRECTED 2026-07-29 by the boot-set audit: this row said "Current kit is V6" in the present tense and the kit is now V10.** The byte figure is deliberately NOT restated, because a bundle size changes on every build and a number chased today is stale tomorrow: **read it from `frontend/dist/build-info.json`, which stamps the version, the commit and the byte count on every build**, rather than from any sentence in this document. That file is the authority; this row is a dated note. |
-| §2 item 10, "live docs refreshed 2026-07-04" | Dated mirrors now exist at `docs/stake-engine-live/2026-07-25/`, `2026-07-25b/`, `2026-07-26/` and `2026-07-28/`. |
+| §2 item 10, "live docs refreshed 2026-07-04" | Dated mirrors exist under `docs/stake-engine-live/`, five of them as at 2026-07-31 (`2026-07-25/`, `2026-07-25b/`, `2026-07-26/`, `2026-07-28/`, `2026-07-29/`). |
 | §6 and §2 item 13, which read as though the portal has never been entered | The game is published and the owner has run at least four live portal sessions. The two URLs §6 asks to capture are recorded in `COMPLIANCE_WATCH.md` as wrong and erroring. |
