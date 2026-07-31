@@ -9,6 +9,83 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 039 - 2026-07-31 - OWNER DECISIONS: the Q4 backlog letter, and TR-096 amended on the corrected mechanism
+
+**Two of entry 038's questions were put to the owner directly and answered. Two he referred to
+Fable, which confirms them as Fable's rather than his and leaves entry 038's questions 1 and 2
+standing exactly as written.**
+
+Recorded here because an owner ruling needs transcribing on the same discipline as a Product
+Owner ruling: it is not in the repository until a session writes it down.
+
+---
+
+## THE Q4 BACKLOG LETTER: **(b)**
+
+**The owner's answer: buy a measured sample first.** Reproduce roughly fifteen of the 71
+unreproduced wave-A causes, about 1M, and let the measured error rate decide between full
+re-grounding and accepting the rest.
+
+**This matches Fable's own recommendation** and it is this project's standing method: measure
+before spending. It has been outstanding since entry 030, across four sessions.
+
+**What it unblocks, and it is the first genuinely unblocked substantial work in some days.** A
+sampling pass is DISCOVERY-shaped, so it pushes its reading into agent contexts and does not
+bind on main-loop context the way the last three construction sessions did. It needs no lock, no
+sanction and no further ruling.
+
+**What it must NOT become**: a re-run of the fixdown. The sample measures the ERROR RATE of a
+derivation method; it does not fix rows and does not re-open dispositions. Fifteen rows,
+reproduced or refuted from source, and a rate.
+
+## TR-096: **AMENDED. INFINITE AUTOPLAY STAYS.**
+
+**Fable ruled it fails closed, and invited the owner to countersign or amend with one word. The
+owner has AMENDED**, on the corrected mechanism that was not in front of Fable when he ruled.
+
+**The reasoning, recorded because the amendment reverses a compliance ruling and that should
+never be silent.** Fable's clause 2 removes every autoplay option above a jurisdiction maximum.
+**There is no jurisdiction maximum.** The field the tracker row names is not one of the
+platform's thirteen official jurisdiction flags; our own contract test asserts the surfaced
+flags carry no such invented key; and the responsible-gambling store holds it at a permissive
+value permanently with the reason recorded beside it.
+
+So *"flags absent"* is not an edge case, it is **the permanent and only state**, and clause 3
+applied literally would have removed infinite autoplay from the game outright on the strength of
+a field that does not exist.
+
+**The amendment: infinite autoplay stays offered. Nothing is failing open, because there is no
+cap to ignore.**
+
+**The residual, recorded rather than dropped**: if the platform ever adds an autoplay-cap field,
+this code will not read it, and Fable's clauses 1 and 3 become the right design at that point.
+That is a forward risk on a contract change, not a current defect, and it belongs in the row.
+
+---
+
+## WHAT THE OWNER REFERRED TO FABLE, unchanged in entry 038
+
+**Question 1, does the ladder floor move off $0.10**, and **question 2, whether S2-C060 runs
+inside the money brief or takes its own**. Both stand as put.
+
+**One consequence worth stating plainly**: while question 1 is open, the exact-win formatter
+cannot start, because the number of decimal places it must render follows from the floor. That
+is the only piece of the precision work that is unblocked and non-locked, so it is the cheapest
+thing waiting on a single word.
+
+---
+
+## THE STATE AFTER THIS ENTRY
+
+| | Count |
+|---|---|
+| Questions to Fable, entry 038 | **10** |
+| Answered by the owner this turn | **2** |
+| Still owed by the owner | Blurb B text, the park-class signature, the panel tick |
+| Unblocked work this seat can start now | **the measured sample, per (b)** |
+
+---
+
 ## 038 - 2026-07-31 - THE CONSOLIDATED ASK: ten questions, each answerable in one line
 
 **This entry supersedes the question lists in entries 035 and 037 as the single place to answer
