@@ -9,13 +9,13 @@ Australian English, metric, no em dashes or en dashes.
 **Created 2026-07-27** by the round-three prep session, executing the substance of the
 prepared but never-run `track/quality-sweep` brief
 (`docs/records/tracks/quality-sweep_BRIEF.md`, JOB A). Until this file existed,
-`CLAUDE.md:502` cited a document that was not in the repository.
+`CLAUDE.md`'s inspection test cited a document that was not in the repository.
 
 ---
 
 ## 1. The standing mandate
 
-Quoted verbatim from `CLAUDE.md:483` to `CLAUDE.md:487`, which records it as the owner's
+Quoted verbatim from `CLAUDE.md`, the standing mandate, which records it as the owner's
 order of 2026-07-26, binding to submission.
 
 > this title is the studio's flagship and the template for every future build.
@@ -25,7 +25,7 @@ order of 2026-07-26, binding to submission.
 > concludes this was made by a professional outfit adhering to industry
 > conventions. Nothing player-visible may read as machine-generated.
 
-**What it changes in practice**, restated from `CLAUDE.md:489` to `CLAUDE.md:493`:
+**What it changes in practice**, restated from `CLAUDE.md`'s standing mandate:
 "minor" is not a disposition. A finding is FIXED, or it is OWNER-PARKED with a written
 reason. Severity decides ORDER, never whether something gets done. A tracker row cannot
 be closed by arguing the defect is small.
@@ -66,7 +66,7 @@ a named command. Where the figure is ours, it is cited to the file it comes from
 | B1 | **Tile geometry** | The published tile is exactly 408x546, the geometry 93.1% of a 87-tile decoded sample uses (`docs/stake-engine-live/2026-07-26/published-tile-geometry.md`). | MET. `design-system/brand/tile/tile_composed_master.png` is exactly 408x546, byte-checked in that same document. |
 | B2 | **Publisher name is set as type, not as a logo drop** | Lokis Vault renders `VALKYRIE` as letterspaced capitals on the tile (`published-tile-geometry.md:58`). A supplied logo image is used elsewhere, not composited into the tile. | MET. Recorded in `design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md`, which builds its size ladder from labelled anchors rather than an unobserved rendered size. |
 | B3 | **Iteration depth is visible in the version number** | Lokis Vault is at `"version":746` with two versions active, 746 and 789 (`fair-catalogue.md:40,49`). A published Valkyrie title has been revised hundreds of times. | NOT MET, and correctly so: we are pre-submission at version 0. The checkable form of this line is that a first submission is not expected to look like a 746th revision, and the finish gap that remains is therefore the thing to close by inspection rather than by iteration count. |
-| B4 | **Simulation depth per mode** | Valkyrie publishes 3,600,000 events for base and ante and 240,000 for bonus (`fair-catalogue.md:49`). | BELOW. Ours is 100,000 per mode (`CLAUDE.md:250`). Within the platform cap of 10,000,000 (`COMPLIANCE_WATCH.md`, 2026-07-25 section), and not a finish question, but it is the honest comparison and it is recorded rather than omitted. |
+| B4 | **Simulation depth per mode** | Valkyrie publishes 3,600,000 events for base and ante and 240,000 for bonus (`fair-catalogue.md:49`). | BELOW. Ours is 100,000 per mode (`CLAUDE.md`, "True game facts"). Within the platform cap of 10,000,000 (`COMPLIANCE_WATCH.md`, 2026-07-25 section), and not a finish question, but it is the honest comparison and it is recorded rather than omitted. |
 | B5 | **No machine-tell survives on any player-visible surface** | The sweep list in section 3 is the operational form of this. It is enforced by `frontend/scripts/machine_tell_gate.mjs` for the sweepable subset. | Section 4 is this pass's ledger. |
 | B6 | **Iconography is one drawn family** | Every icon on a player-visible surface is a drawn vector in one geometric family, positioned by the layout rather than typeset in a text run. | Enforced by the gate's `glyph-iconography` class. Before this pass, 35 font glyphs and OS emoji were being typeset as icons; see section 4. |
 | B7 | **The brand face carries every player-visible text run** | No player-visible text run resolves to an operating-system font. | Partly enforced. The gate catches glyphs outside the Orbitron subset; declared font stacks that name no brand face are listed in section 4 with their dispositions. |
@@ -74,7 +74,7 @@ a named command. Where the figure is ours, it is cited to the file it comes from
 ### 2.3 The inspection test, restated
 
 Before any surface is called done, ask what a rival studio's art director would conclude
-from that surface alone (`CLAUDE.md:495`). The specific failure the mandate names is
+from that surface alone (`CLAUDE.md`, the inspection test). The specific failure the mandate names is
 machine-tells, and section 3 is the enumerated list.
 
 **The test that decides an argument about a machine-tell**: would the same defect appear
@@ -87,7 +87,7 @@ different one in the next are all things that only happen when nobody looked. Th
 
 ## 3. The machine-tell sweep list
 
-The nine classes named in `CLAUDE.md:496` to `CLAUDE.md:502`, each with the form it really
+The nine classes named in `CLAUDE.md`, the inspection test, each with the form it really
 takes in this codebase, and whether the gate enforces it.
 
 | Class | What it looks like here | Gated |
@@ -178,7 +178,7 @@ Every symbol codepoint present in `frontend/dist/assets/*.js`, `dist/index.html`
 | Q-16 | hardcoded-string | Player-visible English not routed through the translation function, invisible to `locale_completeness_check.mjs` because that gate scans ALL-CAPS literals only. Counted rather than estimated: **27 static player-facing attributes and 48 markup text nodes**, listed in full in 4.3. TR-059 estimated "roughly thirty keys times sixteen locales"; the count confirms it. | **OWNER-PARKED, EXTRACTED**, per protocol rule 6. See 4.3 for the reasoning and the full list. |
 | Q-17 | scaffold-residue | `frontend/src/assets/svelte.svg` is the Vite starter's Svelte logo, dated to the scaffold commit, imported by nothing (`grep -rn "svelte.svg" frontend/src frontend/index.html` returns nothing) and absent from dist. Committed surface, not player-visible. | **FIXED**, deleted |
 | Q-18 | placeholder | `PaytableModal.svelte:309` renders the string `coming soon` for any mode with `available: false`. **NOT A DEFECT today**: all five modes are `available: true` (`frontend/src/lib/config/fsModes.ts:67,78,89,101,112`), so the branch is unreachable and no player can see it. Recorded rather than silently passed, per the brief. | **NOT A DEFECT**, reasoning recorded; string routed through a locale key anyway so it cannot ship untranslated if a mode is ever gated |
-| Q-19 | placeholder | `ThemeSelector.svelte:48` renders `COMING SOON`. **NOT A DEFECT**: the theme selector is dev-only and not rendered in production (`CLAUDE.md:345`). | **NOT A DEFECT**, reasoning recorded |
+| Q-19 | placeholder | `ThemeSelector.svelte:48` renders `COMING SOON`. **NOT A DEFECT**: the theme selector is dev-only and not rendered in production (`CLAUDE.md`, the assets section). | **NOT A DEFECT**, reasoning recorded |
 | Q-20 | mixed-apostrophe | `frontend/src/lib/i18n/vocabulary.ts:73` carries `’` inside a prohibited-phrase entry. **NOT A DEFECT on the phrase side**: convention (l.7) requires compliance text quoted verbatim, and the phrase is the platform's own wording. The replacement side is ours and is normalised with it. | **NOT A DEFECT** for the quoted phrase; replacement normalised |
 | Q-21 | dead-key | `translations.ts` `locationRestricted` exists in all sixteen locales and is rendered by no component. Dead weight in the bundle today; a live defect the moment a region gate is wired to it. Out of this pass's scope to decide which. | **OWNER-PARKED**: recorded here and raised as a comms item. Options are (a) wire it to the jurisdiction flags already published by `rgsService`, or (b) delete all sixteen values. Not the builder's call, because it is a jurisdiction-behaviour question. |
 | Q-22 | dev-residue-in-bundle | The four DEV-gated glyphs in 4.1 (`🎨`, `⬇`, `⇅`, `✓`) survive tree-shaking into the production bundle as string literals. Not player-visible: the render is `import.meta.env.DEV` gated and that is statically false in production. In scope because "committed surface" is, and because a reviewer unpacking dist would find dev tooling. | **FIXED**. `⬇`/`⇅` deleted (the adjacent `{$reelMode}` label already says which mode it is), `🎨` replaced by the word THEME, `✓` replaced by a drawn tick. Cheaper than the restructuring first assumed, so it was done rather than parked. |
@@ -306,7 +306,7 @@ verification rather than by review.**
 ### 4.3 The hardcoded-string set: why it is PARKED and not half-done
 
 **This is the one item in the sweep that is not closed, and the reason is protocol rule 6,
-not convenience.** `CLAUDE.md:540` says it plainly: "When a job turns out to contain a
+not convenience.** `CLAUDE.md`, multi-track rule 6, says it plainly: "When a job turns out to contain a
 genuinely hard bounded problem, it is written up as its own surgical brief and handed back,
 rather than absorbed into the session that found it. A hard problem solved in the margins
 of another job gets the attention that was left over."
@@ -416,7 +416,7 @@ authored.
 
 ### 5.1 Convention (p) is satisfied by seeding the forms that really shipped
 
-`CLAUDE.md:470` states the requirement exactly: "plant the exact defect the gate exists to
+`CLAUDE.md`, convention (p), states the requirement exactly: "plant the exact defect the gate exists to
 catch, in the form it really occurs, and prove the gate goes red." A seed in a form the
 gate happens to handle, while the real defect occurs in another form, teaches nothing.
 That is how `player_string_dash_check.mjs` passed twice while blind.
@@ -452,7 +452,7 @@ Stated so a future reader does not mistake silence for coverage.
   Those need the rendered DOM at a given viewport, which is a browser gate's job. They stay
   review items and are named as such rather than being quietly claimed.
 - **It does not read locked files as authority.** `gameStore.ts` carries four em dashes in
-  comments, recorded under LOCKED_FILE_DEBTS (`CLAUDE.md:181`). They are comments, they
+  comments, recorded under LOCKED_FILE_DEBTS (`CLAUDE.md`, the locked-files section). They are comments, they
   never reach dist, and they are not this gate's to fix.
 
 ---

@@ -33,8 +33,12 @@ Australian English, no em dashes or en dashes.
 
 - **Portal Developer Testing Tool:** to be used after uploading the bundle to the Stake
   Engine portal, before requesting review (authenticate, play, end-round against staging).
-- **Upcoming platform features to track:** provably fair, and stateful games. Neither is
-  required for our current stateless submission; note for future roadmap only.
+- **Platform features to track:** stateful games remain deferred by the platform and are not
+  required for our stateless submission. **Provably fair is NO LONGER UPCOMING**, corrected
+  2026-07-31: the 2026-07-28 Watch entry below records the FAIR API as live, public and
+  unauthenticated, and the mirror at `docs/stake-engine-live/2026-07-28/fair-api.md` quotes the
+  platform as having implemented Provably Fair across all stateless games built on Stake
+  Engine. That entry records that no build work is owed.
 
 ## Watch log
 
@@ -345,6 +349,8 @@ assumed:
   (base 1,125,899,906,813,400). Our tables are conventional, not anomalous.
 - **Our 100,000 events per mode is at the LOW end of the published field.** Others run
   1,000,000 to 10,000,000 (Obey The Reptillians sits at exactly 10,000,000, the cap).
+  **Corrected 2026-07-31**: the captured excerpt holds nineteen modes and FOUR of them sit
+  between 100,000 and 1,000,000, so the range as written omits the band immediately above ours.
   We remain inside the platform minimum of 100,000 and two orders below the 10,000,000
   ceiling, so this is compliant, but it is a visible differentiator in a public
   catalogue and worth an owner decision at some point.
@@ -662,7 +668,10 @@ Quoted verbatim:
 
 The 10,000,000 figure is section 3 of the 2026-07-25 platform delta above, relayed from
 Discord and already verified compliant. What is new is that it now appears in the **official
-documentation**, and that it arrives beside a file size cap the project had no record of at all.
+documentation**, and that it appears beside a file size cap this file HAD already recorded:
+  corrected 2026-07-31, the 4.2GB limit was mirrored to
+  `docs/stake-engine-live/2026-07-25/math-verification.md` in commit `25bc4d5` on 2026-07-25
+  and written into the 2026-07-25 entry above on the same day.
 
 **3-star Maximum Exposure moved from `$25,000,000` to `$50,000,000`.** Payout multiplier
 (`100,000x`) and bet cost (`$500,000`) unchanged; the 2-star tier unchanged at `$10,000,000`.
