@@ -107,6 +107,70 @@ already committed:
 record: plant it, and see whether the method finds it. That is convention (p), and it works
 precisely because the answer was never written down.
 
+### 1.3a IT WAS MEASURED, AND BLIND RE-DERIVATION IS UNPURCHASABLE HERE AT ANY BUDGET
+
+Section 1.3 was reasoning. **On 2026-07-31 the owner funded the experiment and it settled
+the question harder than the reasoning did.** Fifteen wave-A cause derivations were re-run
+by shared-nothing agents given the OBSERVATION only, no row id, no recorded cause, and no
+hint that a prior derivation existed. Every ledger path was forbidden.
+
+**Thirteen of fifteen came back contaminated.** On the design's own exclusion rule that left
+three usable rows, so no rate was reportable, and the session correctly declined to report
+one.
+
+**THE SOURCE OF THE CONTAMINATION IS THE FINDING, AND IT GENERALISES.** Only five rows were
+spoiled by the QA ledger the design guarded against. **Seven were spoiled by the project's
+ordinary documentation**: `CLAUDE.md` conventions, the review tracker, the fix list, the PAR
+sheet, the submission dossier, and commit messages explaining WHY a change was made.
+
+**So the contamination surface is not a set of files that can be closed. It is the habit of
+recording reasoning**, which this project is deliberately good at and should stay good at.
+A repository disciplined enough to be auditable is, by the same property, one in which no
+agent can be kept ignorant of a conclusion it already holds.
+
+**The rule that follows, and it is a costing rule rather than a design rule.** Any method
+whose validity depends on an agent NOT knowing something already written down should be
+**costed as impossible before launch, not discovered after**. If the answer is in the tree,
+assume the agent will find it, and design for reproduction or adversarial attack instead.
+
+**THE SECOND MEASUREMENT MATTERS MORE THAN THE FIRST, and it survived the contamination.**
+Across the thirteen adjudicated rows the recorded cause was better supported by source in
+six, the fresh derivation in six, and neither in one. Of the three outright disagreements
+**the original won two**, and the one it lost was the row already carrying a committed
+second derivation.
+
+That inference is available even though the sample was spoiled, because **contamination
+biases an agent toward AGREEING with the committed answer; it cannot manufacture a fresh
+derivation that disagreed and then lost on the source.**
+
+**So re-derivation is not merely unpurchasable, it is not worth purchasing.** A second
+opinion measured no better than the first. **Where a cause is doubted, reproduce the defect
+rather than re-reason about it**: a gate that can go red is a claim a prior verdict cannot
+supply, and convention (p) proves the instrument before its verdict counts.
+
+### 1.3b AN UNKNOWN RATE OF ZERO IS A CONTAMINATION SIGNAL, NOT A SIGN OF EASY ROWS
+
+Same experiment. Every agent was told, in its own prompt, that **UNKNOWN was a complete and
+often correct answer**, and the brief said so twice more.
+
+**Zero of fifteen returned UNKNOWN.**
+
+Cause derivation from source is hard and a genuinely blind pass should fail on some rows.
+A perfect strike rate means the answers were available, not that the questions were easy.
+**Read a zero UNKNOWN rate as evidence to distrust the pass**, and check the contamination
+instrument before believing any figure it produced.
+
+**A related instrument note, earned the same day.** Self-report alone would have missed it:
+the session also audited what each agent actually opened, and where the two disagreed the
+transcript won. **Any pass that depends on agents not reading something must measure what
+they read, not ask them.**
+
+**And a design trap worth one line.** That session co-located each agent's payload with the
+recorded cause in one directory, so a single `ls` revealed that recorded answers existed.
+No agent read one, verified across every transcript, but the blinding was weakened by the
+FILE LAYOUT rather than by any instruction. **Keep the answer out of the room, not merely
+out of the prompt.**
+
 ---
 
 ## 2. The rules that stop an audit producing confident wrong answers
