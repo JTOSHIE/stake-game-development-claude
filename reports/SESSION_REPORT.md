@@ -10129,3 +10129,26 @@ No fixes, no disposition changes, nothing moved from PARKED, the ledger not edit
    unpurchasable.** Any future design that depends on an agent not knowing something already
    written down should be costed as impossible and replaced with reproduction or adversarial
    framing before it is launched, not after.
+
+## CLOSE, per rule 10 and rule 12
+
+**Owner preview, rule 12**, printed line pasted rather than described:
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 96e9d4e  |  built 2026-07-31T18:02:20+10:00  |  started 2026-07-31T08:03:15.285Z  |  http://192.168.4.92:5173
+```
+
+**Remote CI, rule 10**, checked rather than assumed:
+
+- Run: https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30614899329
+- Head SHA `96e9d4e`, which is this session's push. **Conclusion: success.**
+- **Stated honestly rather than as a full green:** the run executed **3 jobs, 2 success and
+  1 skipped**. `static gates` and `what changed` ran; **`matrix.gate.name`, the twelve
+  browser legs, was SKIPPED** because this session's diff is documentation only and the
+  `what changed` job gates the matrix on it. So main is green, and this session did not
+  exercise the browser matrix, because it changed no code. Nothing here should be read as
+  the twelve legs having passed on this commit; they last passed on `59c1056`, run
+  30610828622.
+
+`.claude/settings.json` diff verified empty. `git status` clean. No committed evidence
+rewritten.
