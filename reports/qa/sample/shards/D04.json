@@ -1,0 +1,29 @@
+{
+  "agent": "D04",
+  "derived_cause": "FS_MODES (frontend/src/lib/config/fsModes.ts:68-119) holds exactly five entries, all of them price/distribution variants of one stateless base game, and it structurally cannot hold a gamble, jackpot, collect or early-cashout mode. Mechanism, in closed form: (1) The platform's key restriction is that games are strictly stateless and 'cannot include jackpots, gamble features, continuation, or early cashout options' (docs/stake-engine-live/approval-guidelines.md:20). (2) The frontend's mode table is type-closed to the RGS mode ids: FsModeId admits only 'normal'|'cruise'|'overboost'|'bonus'|'super' (fsModes.ts:21) and FsServerMode only 'base'|'bonus'|'cruise'|'antelite'|'super' (fsModes.ts:34), the same closed five as the selectedBetMode store (frontend/src/lib/stores/betMode.ts:17). A mode id for a gamble/jackpot/collect/cashout feature is not expressible without widening those unions. (3) Every entry's serverMode must be a BetMode the locked maths package prices, and the file's own promotion procedure makes that ordering mandatory: ship the BetMode in games/future_spinner first, widen betMode.ts, only then flip available (fsModes.ts:12-19). The five entries map one-for-one onto games/future_spinner/game_config.py's bet_modes list with identical costs: base 1.0 (game_config.py:284-285 vs fsModes.ts:70-77), cruise 1.0 (game_config.py:346-347 vs fsModes.ts:80-87), antelite 1.25 (game_config.py:384-385 vs fsModes.ts:90-97), bonus 100.0 (game_config.py:318-319 vs fsModes.ts:100-107), super 400.0 (game_config.py:410-411 vs fsModes.ts:110-117). (4) Those five BetModes differ only in cost and in distribution quotas over the SAME single-round Overdrive Free Spins feature (game_config.py:281-430); even NITRO OVERDRIVE's 5x pre-rev is a per-round feature-start initialisation reset every round (FUTURE_SPINNER_PAR_SHEET.md:53-59), so no mode carries state across rounds and none adds a second mechanic. All five are therefore stateless by construction (FUTURE_SPINNER_PAR_SHEET.md:347-353). (5) FS_MODES is the sole feed for both bet-mode surfaces, the FEATURES menu (FeatureMenu.svelte:20,84) and the paytable BET MODES page (PaytableModal.svelte:23,304), per the file header (fsModes.ts:1-6), so a prohibited mode could not reach a player without first appearing in this array. The observed shape, five entries with those exact costs and serverMode ids and nothing resembling a prohibited feature, is thus a consequence of the closed type unions plus the maths-package-first promotion rule, not an incidental property of the current edit.",
+  "is_unknown": false,
+  "citations": [
+    "frontend/src/lib/config/fsModes.ts:1-6",
+    "frontend/src/lib/config/fsModes.ts:12-19",
+    "frontend/src/lib/config/fsModes.ts:21",
+    "frontend/src/lib/config/fsModes.ts:34",
+    "frontend/src/lib/config/fsModes.ts:62-65",
+    "frontend/src/lib/config/fsModes.ts:68-119",
+    "frontend/src/lib/stores/betMode.ts:17",
+    "games/future_spinner/game_config.py:281",
+    "games/future_spinner/game_config.py:284-285",
+    "games/future_spinner/game_config.py:318-319",
+    "games/future_spinner/game_config.py:346-347",
+    "games/future_spinner/game_config.py:384-385",
+    "games/future_spinner/game_config.py:410-411",
+    "games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md:53-59",
+    "games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md:347-353",
+    "docs/stake-engine-live/approval-guidelines.md:20",
+    "frontend/src/lib/components/FeatureMenu.svelte:20",
+    "frontend/src/lib/components/FeatureMenu.svelte:84",
+    "frontend/src/lib/components/PaytableModal.svelte:23",
+    "frontend/src/lib/components/PaytableModal.svelte:304"
+  ],
+  "confidence": "HIGH",
+  "reasoning": "Worked spec-first per convention (l.1). The platform restriction that the evidence's parenthetical mirrors ('no gamble, jackpot, collect or cash[out]') is approval-guidelines.md:20. The five-mode table was then checked against the locked maths package rather than assumed: every serverMode id and every cost multiplier in fsModes.ts:68-119 has an exact counterpart in game_config.py's bet_modes list (1.0/1.0/1.25/100.0/400.0), so the frontend table is a mirror of what the RGS prices, and the file's promotion procedure (fsModes.ts:12-19) makes maths-first the required order. The closed FsModeId/FsServerMode unions plus the identical union in betMode.ts:17 are what make a prohibited-feature mode inexpressible here. Statelessness of all five, including super's pre-revved meter, is stated and evidenced in the PAR sheet. One framing caveat, recorded rather than smoothed: the observation record is quoted only in truncated form, so I derived the mechanism behind the file's observed content (why exactly these five and no prohibited-feature mode) rather than assuming a defect claim; no defect is derivable at fsModes.ts:71-117 itself, since costs, ids and availability all reconcile with the specification. An adjacent asymmetry was noticed but is out of the cited range and is NOT claimed as this observation's cause: FeatureMenu.svelte:84 hides buy cards when buyFeatureDisabled, while PaytableModal.svelte:304 iterates FS_MODES unfiltered."
+}

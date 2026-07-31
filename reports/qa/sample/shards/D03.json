@@ -1,0 +1,28 @@
+{
+  "agent": "D03",
+  "derived_cause": "frontend/src/app.css is still, below its two project-authored blocks, the create-vite starter sheet adopted verbatim at scaffold (the file dates itself to commit 31fdbcf, 2026-02-20, at app.css:125-127). It has never been rewritten as a FILE; it has only ever been edited one named declaration at a time, because every instrument that has touched it is finding-scoped rather than file-scoped. Q-13 (docs/QUALITY_CHARTER.md:175) is classed font-leak and its finding text names exactly one declaration, ':root { font-family: system-ui, Avenir, Helvetica, Arial, sans-serif }' at app.css:74. A row that names one declaration produces a fix that changes one declaration: app.css:97-99 substituted the two font tokens for the font-family line and the fix's own comment (app.css:91-96) narrates only the root stack. The scaffold declarations sitting INSIDE THE SAME brace pair were never in that row's scope and so survived a fix applied within their own block: color-scheme: light dark (app.css:103), color: rgba(255,255,255,0.87) (app.css:104), background-color: #242424 (app.css:105). The same shape then repeated twice on the same sheet, each edit again removing only the declaration its own row named: the scaffold button:focus rule (app.css:177-206, S2-C017) and body's place-items: center (app.css:125-142). Everything nobody's row named is still there: a { color: #646cff } / a:hover { #535bf2 } (app.css:113-120), h1 (147-150), .card (152-154), #app's max-width/margin/padding/text-align (156-161), button's #1a1a1a and 8px radius (163-173), and the whole @media (prefers-color-scheme: light) block (235-246). SECOND HALF OF THE MECHANISM, why nothing mechanical closes the gap: the only gate that reads app.css at all is frontend/scripts/machine_tell_gate.mjs, and its app.css contract is exclusively fonts. app.css is whitelisted there as the one file licensed to spell literal font stacks (machine_tell_gate.mjs:482, and the seeded case at :760-767); it asserts nothing about colours, color-scheme, or #app geometry. Scaffold-default CSS is therefore a class with no detector, so the only route to finding the remainder is another human read of the file, which is exactly how it surfaced (an audit row, not a build). CONSEQUENCE, derived and split by reachability. (1) The link colours are DEAD selectors in the shipped app: grep for '<a[ >]' and for href across frontend/src returns nothing and dist/index.html contains no anchor, so they ship as bytes in dist/assets/index-DoEcQT36.css and paint nothing. (2) The colour residue IS live: app.css:103-105 together with the scaffold's @media (prefers-color-scheme: light) at app.css:235-246 are the ONLY prefers-color-scheme rule anywhere in the frontend source, and body declares no background of its own (app.css:122-145), so the document canvas and the inherited text colour of a dark-themed game are decided by the player's operating system light/dark setting (#ffffff canvas and #213547 text in light mode). (3) #app's box properties do not move the app, because its only top-level children .bg-layer and .game-stage are position: fixed; inset: 0 (App.svelte:2561-2565, App.svelte:2219-2227, recorded at app.css:136-142), but text-align: center is an INHERITED property and inheritance follows the DOM tree irrespective of positioning, so the scaffold's centring cascades into the whole component tree.",
+  "is_unknown": false,
+  "citations": [
+    "frontend/src/app.css:73",
+    "frontend/src/app.css:91-96",
+    "frontend/src/app.css:97-99",
+    "frontend/src/app.css:103-105",
+    "frontend/src/app.css:113-120",
+    "frontend/src/app.css:122-145",
+    "frontend/src/app.css:125-127",
+    "frontend/src/app.css:136-142",
+    "frontend/src/app.css:147-161",
+    "frontend/src/app.css:163-206",
+    "frontend/src/app.css:235-246",
+    "docs/QUALITY_CHARTER.md:175",
+    "frontend/scripts/machine_tell_gate.mjs:458-478",
+    "frontend/scripts/machine_tell_gate.mjs:482",
+    "frontend/scripts/machine_tell_gate.mjs:760-767",
+    "frontend/src/App.svelte:2219-2227",
+    "frontend/src/App.svelte:2561-2565",
+    "frontend/index.html:19-25",
+    "frontend/dist/assets/index-DoEcQT36.css"
+  ],
+  "confidence": "HIGH",
+  "reasoning": "Read the specification-side documents first (QUALITY_CHARTER row Q-13 at :175, which is the row whose fix is under discussion), then the cited source. The persistence mechanism is fully determined by two facts readable in source: the remediation rows are declaration-scoped (Q-13's finding text names one declaration and the fix comment in app.css narrates only that declaration), and the single gate that reads app.css scopes its app.css contract to font stacks only. The reachability findings are exact: zero anchor elements and zero href occurrences in frontend/src, so the link colours cannot paint; the light-scheme media query is the only prefers-color-scheme rule in the frontend, so nothing overrides it; the residue is present verbatim in the built dist stylesheet, confirming it ships. Confidence HIGH on persistence and on shipping; the light-mode canvas consequence is derived from CSS cascade semantics plus the absence of any competing declaration rather than from a rendered measurement."
+}

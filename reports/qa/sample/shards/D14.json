@@ -1,0 +1,25 @@
+{
+  "agent": "D14",
+  "derived_cause": "The dossier's per-update checklist demands an identity the build pipeline cannot supply, so 'the exact new commit' / 'the exact uploaded versions' is unsatisfiable by construction rather than merely unmet. Three independent facts compose. (1) THE LABEL IS MANY-TO-ONE. The only version identity that reaches the artefact and the portal is KIT_VERSION, derived at build time from the repository-root VERSION file (frontend/vite.config.ts:288-295, VERSION currently '10'), and stamped as build-info.json's 'version' (frontend/vite.config.ts:255) and the inlined boot line (frontend/vite.config.ts:303). VERSION last moved at e3206c9 on 2026-07-28; 151 commits have landed on main since without a bump, so the single label 'v10' names 151+ distinct trees. Requesting review for 'the exact uploaded version' therefore pins nothing: v10 is not a commit. (2) THE COMMIT STAMP IS BUILD-TIME-ONLY, UNCOMMITTED AND UNCHECKED. build-info.json's 'commit' is git HEAD captured inside closeBundle at the instant of the build (frontend/vite.config.ts:251,256), it lives in frontend/dist/ which is gitignored (frontend/.gitignore:11), so nothing in the repository records what was built or uploaded, and no gate ever compares it to HEAD: dist_hygiene_gate.mjs only asserts the stamp exists, matches /^[0-9a-f]{40}$/ and reconciles its own byte/file totals (frontend/scripts/dist_hygiene_gate.mjs:123-132). A dist stamped days ago therefore passes every gate while main runs away from it. That is precisely the observed state: the stamp read v10 / f0b7784 (2026-07-29, 'docs(session): the red on 63dcdc9'), while HEAD had advanced 111 commits to 3c5062e; the file was only re-stamped to 59c1056 when a build was next run (builtAt 2026-07-31T06:52:10Z). (3) THE CHECKLIST'S OWN ORDERING GUARANTEES THE LAG. The bundle is uploaded at 5b step 2 'for this exact commit' (SUBMISSION_DOSSIER.md:250), and the mandated steps BETWEEN upload and review request each commit to the repository: 5f step 3 commits screenshots to reports/screens/acp-math-summary/<date>/ and step 4 a dated note under reports/qa/ and step 5 an update to COMPLIANCE_WATCH.md (SUBMISSION_DOSSIER.md:413-418), 5g step 2 writes a new dated capture under docs/stake-engine-live/ and step 4 logs to reports/FABLE_COMMS.md (SUBMISSION_DOSSIER.md:454-459), both are hard gates ahead of step 7 (SUBMISSION_DOSSIER.md:386-389), and convention (a) plus multi-track rule 12's explicitly named ONE-COMMIT LAG (CLAUDE.md, convention (a) and rule 12) add the session-report commit. So at the moment step 7 runs, main's HEAD is necessarily strictly ahead of the commit inside the uploaded bundle. The compliance consequence: the review request asserts a correspondence between the uploaded artefact and the repository that (a) no artefact in the repository can evidence, (b) the version label cannot express, and (c) the mandated sequence makes false. OWNER_CHECKLIST.md:204 is the live instance of the same mechanism, recording the V10 upload as owner-REPORTED with 'what is LIVE is not answerable from any artefact'. The fix shape is structural, not procedural: the identity used in the request must be the commit (or a version bumped per upload), and the stamp of what was uploaded must be committed to the repository rather than left in a gitignored dist/.",
+  "is_unknown": false,
+  "citations": [
+    "SUBMISSION_DOSSIER.md:371",
+    "SUBMISSION_DOSSIER.md:389",
+    "SUBMISSION_DOSSIER.md:250",
+    "SUBMISSION_DOSSIER.md:369",
+    "SUBMISSION_DOSSIER.md:386-388",
+    "SUBMISSION_DOSSIER.md:413-418",
+    "SUBMISSION_DOSSIER.md:454-459",
+    "SUBMISSION_DOSSIER.md:164-166",
+    "frontend/vite.config.ts:249-267",
+    "frontend/vite.config.ts:288-295",
+    "frontend/vite.config.ts:303-304",
+    "frontend/.gitignore:11",
+    "frontend/scripts/dist_hygiene_gate.mjs:123-132",
+    "VERSION:1",
+    "OWNER_CHECKLIST.md:204",
+    "frontend/dist/build-info.json:1-10"
+  ],
+  "confidence": "HIGH",
+  "reasoning": "Specification first per convention (l.1): the dossier states the requirement at :250, :371 and :389; the build stamp's construction is fully determined by frontend/vite.config.ts closeBundle; the version label's source is the root VERSION file. Exactly calculable rather than measured: git log -- VERSION shows the last bump at e3206c9 (2026-07-28) and git rev-list --count e3206c9..HEAD = 151, so one label spans 151 commits; git rev-list --count f0b7784..HEAD = 111 for the observed stamp against HEAD 3c5062e. dist is gitignored (frontend/.gitignore:11) so nothing about the upload is recorded in-repo, and the only gate reading the stamp checks shape and byte reconciliation, never currency. The ordering argument is read directly off the dossier's own hard gates 5f and 5g, which mandate repository commits between the upload and the review request."
+}

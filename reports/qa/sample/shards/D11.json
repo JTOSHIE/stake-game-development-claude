@@ -1,0 +1,42 @@
+{
+  "agent": "D11",
+  "derived_cause": "The wallet leg of a round and the on-screen money leg sit on opposite sides of the presentation, and `deferSettle` stretches the gap to the length of the whole feature. (1) The complete wallet round finishes before a single frame is drawn: `spin()` -> `_rgsSpinReal` posts `/wallet/play`, then `/wallet/end-round` when the round is still active, and returns the post-credit authoritative balance (frontend/src/lib/services/rgsService.ts:778-806), awaited at App.svelte:1422. (2) In normal play the ONLY writer of the displayed `balance` and `winAmount` is `recordSpinResult` (frontend/src/lib/stores/gameStore.ts:151-158), reachable only through `settleRound()` (App.svelte:1502-1529); `resetWin()` has already zeroed the WIN pod at App.svelte:1408 (gameStore.ts:167-172). (3) `settleRound()` is invoked only AFTER `if (gridRef) await gridRef.animateSpin(result.board)` (App.svelte:1453) and, when `const deferSettle = !roundIsWincap && !!script?.triggered` is true (App.svelte:1531-1532), not until after `await presentFeature(script)` has played the entire Overdrive sequence (App.svelte:1538-1545). So on every round the HUD BALANCE (`$balance`, HudOverlay.svelte:289,344-346) keeps the previous round's figure for the whole reel spin although the RGS has already taken the stake; and on a triggered round it holds that stale figure, with WIN reading $0.00 (HudOverlay.svelte:348), for the entire free-spins presentation of 8/12/16 spins plus +5 per retrigger (games/future_spinner/game_config.py:149-165), while BonusInstrumentColumn shows a climbing running total beside it (App.svelte:1979-1985). The instant scatter award the maths spec pays 'on the spin the scatters land' (game_config.py:139-145) is therefore never shown on that spin. The wincap branch inverts the same fault: `roundIsWincap` forces `deferSettle` false, so the full 5,000x total and the credited balance are written BEFORE `await waitForWincapCollect()` and before the feature is presented at all (App.svelte:1534-1537). ROOT CAUSE: `recordSpinResult` writes `winAmount`, `balance` and session stats in one indivisible call and gameStore.ts is a locked file (CLAUDE.md, locked-files section), so the spoiler fix could only be applied by moving that single call past the presentation; there is no way to credit the balance without also revealing the round total. The coupling inside `recordSpinResult`, plus the lock that forbids giving it a feature-aware guard, is what makes the balance readout go stale rather than merely the win readout. Measured against docs/stake-engine-live/front-end-communication.md:35 ('The player's current balance must be displayed'), :36 ('Final win amounts must be clearly shown for non-zero payout results') and :37 (incremental payout update).",
+  "is_unknown": false,
+  "citations": [
+    "frontend/src/App.svelte:1408",
+    "frontend/src/App.svelte:1422",
+    "frontend/src/App.svelte:1453",
+    "frontend/src/App.svelte:1502",
+    "frontend/src/App.svelte:1503",
+    "frontend/src/App.svelte:1531",
+    "frontend/src/App.svelte:1532",
+    "frontend/src/App.svelte:1534",
+    "frontend/src/App.svelte:1537",
+    "frontend/src/App.svelte:1542",
+    "frontend/src/App.svelte:1544",
+    "frontend/src/App.svelte:1979",
+    "frontend/src/lib/services/rgsService.ts:778",
+    "frontend/src/lib/services/rgsService.ts:799",
+    "frontend/src/lib/services/rgsService.ts:801",
+    "frontend/src/lib/services/rgsService.ts:806",
+    "frontend/src/lib/stores/gameStore.ts:151",
+    "frontend/src/lib/stores/gameStore.ts:153",
+    "frontend/src/lib/stores/gameStore.ts:158",
+    "frontend/src/lib/stores/gameStore.ts:167",
+    "frontend/src/lib/components/HudOverlay.svelte:289",
+    "frontend/src/lib/components/HudOverlay.svelte:344",
+    "frontend/src/lib/components/HudOverlay.svelte:348",
+    "games/future_spinner/game_config.py:139",
+    "games/future_spinner/game_config.py:149",
+    "docs/stake-engine-live/front-end-communication.md:35",
+    "docs/stake-engine-live/front-end-communication.md:36",
+    "docs/stake-engine-live/front-end-communication.md:37"
+  ],
+  "confidence": "MEDIUM",
+  "reasoning": "Derived from specification first (game_config.py trigger/award table, front-end-communication.md requirements), then from the cited source and its dependencies. Verified by exhaustive search that `balance` and `winAmount` have no writer in the normal-play path other than `recordSpinResult` (grep for balance.set/balance.update/winAmount.set across frontend/src returned only gameStore.ts:151-155, rgsService.ts:733 at authenticate, sessionRecovery.ts:263, ReplayMode.svelte and App.svelte:595 on the recovery path), so the deferral of settleRound() freezes both readouts for its whole duration. Verified that HudOverlay is rendered unconditionally, not gated on featureActive (App.svelte:1996-1998 and the native-hud-slot branch), so both stale readouts remain on screen throughout the feature. Verified that _parsePlayResponse maps the BASE spin board and BASE spin wins (rgsService.ts:845-861), so the animateSpin call is showing the correct board; the fault is in the money timing, not the board. Confidence MEDIUM rather than HIGH because the payload's observed evidence is truncated to three code quotes with no symptom sentence: the mechanism of the cited code is derived firmly, but I cannot confirm from source which of its two visible consequences (stale balance/WIN during the feature, or the wincap pre-reveal) the record was written against; both fall out of the same closed form stated above.",
+  "contamination_encountered": true,
+  "contamination_sources": [
+    "frontend/src/App.svelte:1488-1501",
+    "frontend/src/App.svelte:682-688"
+  ]
+}

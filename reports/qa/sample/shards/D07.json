@@ -1,0 +1,25 @@
+{
+  "agent": "D07",
+  "derived_cause": "The census's zero-reference predicate is a static literal-token search for a file's repo-relative path or basename in source, and this repository addresses three whole classes of file without ever emitting such a literal, so the candidate set degenerates from scattered dead files into complete directories -- which is why the 550-headline is followed by a table whose rows are directories (frontend/public, design-system/brand, docs/assets, docs/reference, frontend/scripts, frontend/screens, tests/win_calculations, utils/...) rather than files. (1) RUNTIME-COMPOSED PATHS: every frontend asset is fetched as a string built at run time -- GameGrid.svelte:81 sets SYMBOL_BASE = `${_assetBase}/symbols` and :114-116 returns `${SYMBOL_BASE}/${fname}.png`, with the same pattern at FreeSpinsPresentation.svelte:412 and App.svelte:1231 -- so no basename of the 906 files under frontend/public/assets/themes ever appears literally in source. (2) ROOT-RELATIVE PATHS: the literal that IS written is relative to a tool root, not to the repo, so the repo-relative prefix never exists as a token -- themes.ts:34 stores assetBase 'assets/themes/future-spinner' (relative to vite publicDir = frontend/public) and mkdocs.yml:4-5 name 'assets/favicon.png' and 'assets/logo_stake_eng_white.png' (relative to docs_dir = docs/). A scan matching 'frontend/public/assets/...' or 'docs/assets/...' finds zero hits for correctly wired, shipping files. (3) FILES REACHED BY CONVENTION OR PRODUCED AS OUTPUT: generator scripts name only their output DIRECTORY and compose the filename (tools/brand/build_vector_mark.py:22, OUT_DIR = join(REPO_ROOT, 'design-system/brand/vector_mark')), so each generated artefact under design-system/brand carries no inbound literal; pytest collects tests/win_calculations by convention, its only inbound imports being intra-package (test_clusterpay.py:4), so nothing outside the directory references it; frontend/screens holds generated screenshots, which are outputs and have no inbound reference by construction. Because each class covers an entire tree, zero-reference is a property of the ADDRESSING STYLE of a directory, not of the liveness of its files: 550 is a count of files for which no inbound literal exists, not a count of dead files, and a directory-granular table is the natural shape of that result.",
+  "is_unknown": false,
+  "citations": [
+    "/Users/jt/math-sdk/frontend/src/lib/components/GameGrid.svelte:81",
+    "/Users/jt/math-sdk/frontend/src/lib/components/GameGrid.svelte:114-116",
+    "/Users/jt/math-sdk/frontend/src/lib/components/FreeSpinsPresentation.svelte:412",
+    "/Users/jt/math-sdk/frontend/src/App.svelte:1231",
+    "/Users/jt/math-sdk/frontend/src/lib/config/themes.ts:34",
+    "/Users/jt/math-sdk/mkdocs.yml:4-5",
+    "/Users/jt/math-sdk/tools/brand/build_vector_mark.py:22",
+    "/Users/jt/math-sdk/tests/win_calculations/test_clusterpay.py:4",
+    "/Users/jt/math-sdk/docs/records/DOC_CURRENCY_GATE_SPEC.md:176-179",
+    "/Users/jt/math-sdk/docs/records/ROLE_HEAD_OF_ENGINEERING.md:41"
+  ],
+  "confidence": "MEDIUM",
+  "reasoning": "The generator itself is NOT derivable: DOC_CURRENCY_GATE_SPEC.md:176-179 and ROLE_HEAD_OF_ENGINEERING.md:41 both record that the census script was written to scratch, never committed, and exists nowhere in the tree, so its exact predicate cannot be read. RULE ONE also barred reading CENSUS_MECHANICAL.md:60-89 and orphan_candidates.txt, so I could not confirm the table's exact semantics (directory rollup of 550 file-level rows, versus 24 directory-level candidates). What IS derivable from source, and what I verified first hand, is the repository-side property that forces any literal-reference scan to produce directory-granular zero-reference results: runtime-composed asset URLs, tool-root-relative rather than repo-relative literals, and generated/convention-collected trees whose files carry no inbound token. That property is a closed-form explanation for a candidate list whose members are whole directories, and for a 550 count that cannot be read as 550 dead files. Confidence is MEDIUM rather than HIGH because the artefacts were unreadable to me and the generator is absent from the tree, so the mapping from this mechanism to the exact 550/24 figures is inferred, not checked.",
+  "contamination_encountered": true,
+  "contamination_sources": [
+    "git commit f4d03cb message body (reports/qa/file_census commit): states 'symbols are loaded by composed filename at GameGrid.svelte:116, which a basename scan cannot see in principle' and 'without them a 550-entry candidate list reads as 550 dead files'",
+    "/Users/jt/math-sdk/docs/records/DOC_CURRENCY_GATE_SPEC.md:176-179",
+    "/Users/jt/math-sdk/docs/records/ROLE_HEAD_OF_ENGINEERING.md:41"
+  ]
+}
