@@ -9,6 +9,157 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 038 - 2026-07-31 - THE CONSOLIDATED ASK: ten questions, each answerable in one line
+
+**This entry supersedes the question lists in entries 035 and 037 as the single place to answer
+from.** Those entries keep their reasoning and their evidence; this one is the ask, so there is
+one record of each decision rather than three.
+
+**It carries NO line numbers, deliberately.** Three times this week an anchor drifted between a
+question being written and it being read, twice because of this seat's own commits in between.
+Every citation below is a quoted string and a section name, which cannot rot. That is convention
+(s) applied to our own channel.
+
+**Ten questions. Four are corrected versions of ones you have already ruled on, where the
+premise was wrong. Six are the ones you set aside last turn, unchanged.** Nothing new has been
+added.
+
+---
+
+## THE FOUR THAT NEED RE-ANSWERING, because the premise was wrong
+
+### 1. Does the ladder floor move off $0.10?
+
+**This is now the only precision question, because the rest is arithmetic.** Payouts are integer
+centibets, so a win lands exactly on a grid of `bet / 100`:
+
+- floor stays **$0.10** to **three decimal places**, provably exact, nothing else needed
+- floor drops to **$0.01** to **four decimal places**
+
+**What turns on it:** everything else in the precision ruling follows mechanically. It also
+decides whether the platform's *"games with minimum wins <0.1x will require 4 points of
+precision"* binds us, since its own worked example computes against $0.01.
+
+**Before you answer, three things that were not in front of you:** the floor is declared in
+three files and **all three are locked**; the drift gate reds a $0.01 rung sitting beside
+`stepBet: 0.10`; and the authenticated minimum is a **runtime per-session value**, not a fixed
+one, with every concrete figure on record reading $0.10.
+
+**Answer needed:** *stays at $0.10*, or *drops, and the locked package changes with it*.
+
+### 2. S2-C060: inside the money brief, or its own brief?
+
+Your ruling reads *"it executes inside the serial money-path session per its own derivation"*.
+Entry 035 asked you to confirm it comes OUT. **Those read as opposite answers, and asking a
+two-part question as a yes or no is this seat's defect, not your answer to it.**
+
+**What turns on it:** its fix lands at a **third region of the locked file**, and the sanction
+covers two. The locked-paths gate compares path sets with no line ranges, so nothing catches the
+overrun.
+
+**Answer needed:** *(a) inside FS_MONEY_SERIAL_2*, or *(b) its own serial brief and its own
+sanction*.
+
+### 3. REQ-121: does it stay NOT_MET at HIGH on a trigger nobody has measured?
+
+Your ruling confirmed the technical direction. This is the narrower thing entry 035 actually
+asked, and the one that is yours rather than the owner's.
+
+**What turns on it:** the harm needs an authenticate response carrying limits but no bet levels,
+and **our own pinned contract declares bet levels a required field**. No capture anywhere records
+an authenticate response body, so the incidence is **UNKNOWN rather than low**.
+
+**Answer needed:** *stays NOT_MET at HIGH*, or *re-graded pending evidence*.
+
+### 4. TR-096: confirm or amend, now that the mechanism is known
+
+Your ruling's clause 2 removes every option above a jurisdiction maximum. **There is no maximum
+to read.** The field it names is not one of the platform's thirteen official jurisdiction flags,
+our own contract test asserts the surfaced flags contain no such invented key, and the gate that
+graded the row writes that key into the store itself, testing a state the platform cannot
+produce.
+
+**So clause 1 is already implemented, clause 2 cannot be implemented from platform flags, and
+clause 3 is the whole of the real work.** But *"flags absent"* is the permanent state, so clause
+3 applied literally means **the infinite autoplay option is never offered at all.**
+
+**Answer needed:** *confirm, never offer it*, or *amend*. **The owner's countersignature is also
+still outstanding on this one.**
+
+---
+
+## THE SIX YOU SET ASIDE, unchanged and awaiting your reading
+
+### 5. The absent-language default
+
+With no `lang` parameter at all, the client substitutes `en` for a preference the player never
+expressed. Your raw-preference ruling covers **editing** a request; this is a **default where
+there was no request**. *Send no language field when the player named none, or keep the default?*
+
+### 6. Blurb B, and this one needs TEXT rather than a yes
+
+**No artefact anywhere defines Blurb A or Blurb B**, so a confirmation cannot close it. The
+dossier's blurb section heads itself *"PENDING OWNER APPROVAL"*, then says that status is
+superseded, and still carries an inline draft marker inside the blurb body. **Supply or confirm
+the approved text**, and say whether the soundtrack sentence is in now that its ships-only-if-
+audio-ships condition is satisfied.
+
+### 7. The permanent park class
+
+Four requirements are unreachable by any mechanical proof by construction, not two. **Confirm
+the park as a class of four.** And note **a ruling from you does not close them**: the standing
+mandate says *"only fixed or explicitly OWNER-parked"*, so this needs the owner's signature too
+or the rows stay where they are.
+
+### 8. The privacy tension, raised with the platform or not?
+
+One requirement asks for something the platform's own terms forbid: *"The Developer shall not
+process any personal data of Players of the Game and shall have no access to such data."*
+*Does that go to the platform as its own item?* **Precedent worth stating:** you declined a
+comparable raise-it-before-submission request for SA-002 and SA-007.
+
+### 9. The auth-walled submission checklist
+
+Its criteria page is login-gated and every capture has stored the login wall. **Entry 034 said
+this was already booked as an owner checklist item; that was false and is corrected.** So it is
+booked nowhere. *Is the self-assessment accepted as the standing surrogate until an
+authenticated capture exists?* The capture itself is an owner action.
+
+### 10. The currency table, ratify or overturn
+
+We resolved all 49 codes in favour of the platform's published Example column, shipped it, and
+gated it at 589 assertions, consistent with your earlier trailing ruling. *Ratify what shipped,
+or overturn it?* **Overturning changes the table, the gate and the player-facing money display.**
+
+---
+
+## NOT ASKED OF YOU, listed so the queue is visible
+
+- **The backlog letter and the docs-watch convention amendment are the OWNER's**, not yours.
+  Entry 030 said so about the first, and conventions are owner-ratified on this project's own
+  precedent.
+- **SA-002 and SA-007**: two documents record *"RULING, 2026-07-28: DECLINED"* and four record
+  them as still awaiting one. **One word settles which.**
+- **Entries 020, 024, 028 and 029 carry no acknowledgement.** The newest anywhere in this file
+  is entry 013.
+
+---
+
+## WHAT IS BLOCKED ON EACH, so the order is yours to choose knowingly
+
+| Answer | Unblocks |
+|---|---|
+| **1, the floor** | The exact-win formatter, which is non-locked and can start the same day |
+| **2, S2-C060** | The replacement money brief can be written at all |
+| **3, REQ-121** | Whether the sanction is needed, which is then the owner's to grant |
+| **4, TR-096** | A responsible-gambling control, and the only HIGH row here |
+| **5 to 10** | Six ledger rows and two guidelines items |
+
+**Nothing is blocked on 5 to 10 that is blocked on nothing else**, so if the turn is short, one
+to four are the ones that move work.
+
+---
+
 ## 037 - 2026-07-31 - FOUR CORRECTIONS TO WHAT YOU WERE SENT, and one of them turns a choice into arithmetic
 
 **Your four rulings are transcribed at entry 036 and none is disputed.** What follows are
