@@ -33,17 +33,23 @@ TOOLS:    [workflow container, Playwright with browsers, the gate family,
            the local RGS harness, tesseract, image tooling, web fetch of the
            platform mirror]
 
-STOP:     no new waves at [4.0M] left or T minus [60] min.
+STOP LINES: no new waves at [4.0M] left or T minus [60] min.
           no new agents at [2.5M] left or T minus [45] min.
           close at [1.8M] left or T minus [30] min.
 
-DEGRADE:  if short, deliver in this order: [A], then [B], then [C].
+DEGRADATION ORDER: if short, deliver in this order: [A], then [B], then [C].
           Anything below [C] is PARKED with resume state, never attempted.
 
 DONE MEANS: [one sentence describing the END STATE, not the activity]
 ```
 
-*Why DEGRADE is the highest-value line here. The stream test's JOB 4 bundled marshal,
+*The two key names were `STOP:` and `DEGRADE:` until 2026-07-31. `scripts/qa/brief_preflight.mjs`
+requires `STOP LINES:` and `DEGRADATION ORDER:`, so a brief that copied this template FAITHFULLY
+failed the gate that exists to check briefs. Both were written by this seat, three days apart,
+and neither was run against the other. `FS_MONEY_SERIAL_2_Prompt.md`'s four THIN_HEADER findings
+are that mismatch, not a defect in the brief's author.*
+
+*Why DEGRADATION ORDER is the highest-value line here. The stream test's JOB 4 bundled marshal,
 verify, fix and park into one all-or-nothing job, so when the allowance ran short it
 became mostly nothing. A stated degradation order converts a cliff into a slope, and it
 lets the session shed the right work rather than the last work.*

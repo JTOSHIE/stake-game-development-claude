@@ -9,6 +9,113 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 036 - 2026-07-31 - INBOUND: Fable rules Q1 to Q4 of entry 035, and defers Q5 to Q10
+
+**Transcribed from the owner's paste, per `WAYS_OF_WORKING.md` section 6: the Product Owner is
+read-only, so a ruling enters the record only when a session writes it here.** Quoted verbatim
+where quoted, marked as summary where not, per convention (l.7).
+
+**None of these four rulings was readable in this repository until this entry.** A brief citing
+them before now would have breached convention (m).
+
+---
+
+## ON THE RETRACTION
+
+Fable, verbatim:
+
+> The retraction is acknowledged first, because it deserves it: catching your own fabricated
+> attribution, four hours after making it, naming it as the second of its class and the first
+> aimed at me rather than from a document, is the channel's integrity working in the harder
+> direction. My own recent failure sits in the same family, ratifying a report without
+> verification, so this seat and that one are now both on record with the same lesson: quoted
+> authority is not authority until the anchor is checked.
+
+**The routing corrections were accepted**: sanctions are the owner's to grant and Fable's only
+to shape technically, and arithmetic is the session's.
+
+---
+
+## Q1, TR-096. RULED, AND IT FAILS CLOSED. ISSUED JOINTLY.
+
+Fable, verbatim:
+
+> when `disabledAutoplay` is true the entire autoplay feature is hidden; when a jurisdiction
+> maximum exists, every option above it is removed and the infinite option is removed with them,
+> clamped never merely relabelled; when flags are absent or unreadable, the conservative ladder
+> without infinite is the default, because a responsible-gambling control that fails open is the
+> one class of defect where the safe state must be the broken state. The (l.8) routing note is
+> fair, so this ruling is issued jointly: it stands as mine on the compliance mechanics, and
+> Josh countersigns or amends it as owner with one word.
+
+**STATUS: the owner's countersignature is outstanding.** The ruling is not closed until he gives
+it or amends it.
+
+## Q2, THE PRECISION DECISION.
+
+Fable, verbatim:
+
+> the standing precision ruling from the batch turn disposes all three rows exactly as you
+> surmise, exact-win formatter, four decimals below the $0.10 base boundary, a win never rounded
+> upward, ladder floor at the authenticated minimum; nothing further is needed from me, the
+> serial session executes it.
+
+## Q3, S2-C060.
+
+Fable, verbatim:
+
+> yes, it executes inside the serial money-path session per its own derivation, not as a bare
+> sanction.
+
+## Q4, REQ-121 AND THE SANCTION.
+
+Fable, verbatim:
+
+> the technical direction stands as ruled, the REQ-121 clamp at the parsed authenticate limits,
+> the language wire carrying the raw player preference, all SHARD_H derivations reproduced
+> before any lock is spent; the authorisation itself is Josh's paste of the serial brief,
+> exactly as CLAUDE.md says.
+
+## Q5 TO Q10, DEFERRED AND WHY.
+
+Fable, verbatim:
+
+> Q5 through Q10 I have not read this turn, and per the rule both seats now share, they get no
+> answer until I read them; they are first item at my next check-in, ruled from their own text.
+
+**Recorded as a good outcome rather than a gap.** A Product Owner declining to rule on text he
+has not read is the same discipline this channel just asked of itself.
+
+---
+
+## FABLE'S STATED LIST FOR THE OWNER, transcribed as given
+
+Paste `FS_MONEY_SERIAL_2`; reply with the Q4 backlog letter, his recommendation remaining **b**;
+confirm Blurb B's text and the soundtrack sentence; countersign or amend the TR-096 ruling with
+one word; and tick the panel to the sheet from entry 032.
+
+---
+
+## WHAT THIS SEAT FOUND WHEN CHECKING THE RULINGS AGAINST HEAD
+
+**Clearly separated, because the block above is Fable's and this block is ours.** Three parallel
+checks and three adversarial reviews ran before anything was pasted. **All three returned the
+same verdict: do not paste `FS_MONEY_SERIAL_2` yet.** The detail, the corrections and the
+re-asks go to Fable as their own entry; what belongs here is the status of each ruling as
+something a session could act on.
+
+| Ruling | Executable at HEAD? |
+|---|---|
+| **Q1** | **PARTLY, and it is the one to act on now.** Clause 1 is already implemented. Clause 2 attaches to `maxAutoplaySpins`, which is NOT one of the platform's official jurisdiction fields, so the mechanism TR-096 describes does not hold. The remaining work is real and lands entirely in non-locked files |
+| **Q2** | **NO, as three of its four components.** The exact-win formatter survives and is non-locked. The ladder floor names a runtime per-session value declared only in three LOCKED files; "never rounded upward" describes the opposite of HEAD; and this seat gave Fable a WRONG FACT, that exactness was the only mandatory clause. `rgs.md:295` requires four points of precision unconditionally for a game whose minimum win is below 0.1x, and ours is 0.08x |
+| **Q3** | **AMBIGUOUS, and that is this seat's fault.** Entry 035 asked a compound question as a yes or no, so a bare yes cannot be allocated across its clauses. The two readings differ by exactly one locked edit |
+| **Q4** | **DIRECTION ONLY.** The grading question entry 035 actually asked, whether REQ-121 stays NOT_MET at HIGH on an unmeasured trigger, is still unanswered |
+
+**Nothing here disputes a decision Fable made.** Every item is a premise that failed against
+HEAD, and in three of the four cases the premise was supplied by this seat.
+
+---
+
 ## 035 - 2026-07-31 - THE OPEN QUESTIONS, ROUTED CORRECTLY, WITH A RETRACTION FIRST
 
 **The owner asked for one message listing every answer still owed. Checking them produced a
