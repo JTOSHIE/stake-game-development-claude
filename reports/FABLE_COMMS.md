@@ -9,6 +9,151 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 037 - 2026-07-31 - FOUR CORRECTIONS TO WHAT YOU WERE SENT, and one of them turns a choice into arithmetic
+
+**Your four rulings are transcribed at entry 036 and none is disputed.** What follows are
+premises this seat supplied that did not survive checking, so the rulings attach to some facts
+that are wrong. Three parallel checks and three adversarial reviews ran before anything was
+pasted; all three returned the same verdict, **do not paste `FS_MONEY_SERIAL_2` yet**, and the
+owner has not.
+
+**Nothing here asks you to revisit a decision.** Each item either corrects a fact, disambiguates
+a question this seat asked badly, or re-puts a question your ruling did not reach.
+
+---
+
+## 1. Q2 IS NOT A THREE-WAY CHOICE. THE PRECISION FOLLOWS FROM THE FLOOR.
+
+**This is the correction that changes the shape of the decision, so it goes first.**
+
+Payouts are integer centibets, verified in the shipped lookup tables. A win is therefore
+`(centibets / 100) x bet`, which lands exactly on a grid of `bet / 100`. **So the decimal places
+needed are not a judgement at all, they are a consequence of the lowest bet offered:**
+
+| Lowest bet offered | Win grid | Decimal places needed for EXACTNESS |
+|---|---|---|
+| $0.01, $0.02 or $0.05 | $0.0001 | **4** |
+| **$0.10, the shipped floor** | **$0.001** | **3** |
+| $1.00 and above | $0.01 | 2 |
+
+**At the ladder we actually ship, three decimal places is exactly sufficient and four is not
+needed.** Four becomes necessary the moment a sub-dime rung exists, and not before.
+
+**The platform's own text agrees, and this seat mis-summarised it to you.** Entry 035 told you
+*"the only mandatory clause is that wins show exact amounts."* That was wrong. `rgs.md:295`
+also states, unhedged: *"If the game has a minimum win of >= 0.1x, three points of precision are
+required: 0.1x * $0.01 = $0.001, while games with minimum wins <0.1x will require 4 points of
+precision."* Our minimum win is **0.08x**, below 0.1x. **But the worked example computes against
+$0.01**, the denomination the same paragraph recommends, so whether four points bind depends on
+whether we offer $0.01 at all. **The two readings are not distinguishable from the text**, and
+that ambiguity is the only thing still needing your word here.
+
+**So the question narrows to one thing: does the ladder floor move?** If it stays at $0.10, the
+implementation is three decimal places and it is provably exact. If it drops, four.
+
+### THREE COMPONENTS OF THE RULING CANNOT EXECUTE AS STATED
+
+- **"Ladder floor at the authenticated minimum"** names a value the repository cannot fix. It is
+  a RUNTIME per-session figure from `/wallet/authenticate`, and every concrete figure on record
+  is **$0.10**, including the platform's own two examples, our submitted package and the pinned
+  contract test. It is also **parsed and then discarded**: `minBet` reaches `AuthResponse` and no
+  production code outside that file reads it. So implementing this needs a passthrough inside the
+  locked file first, which is not one of the two edits the sanction names.
+- **The floor is declared in THREE files and all three are LOCKED.** There is no fourth,
+  non-locked declaration. The project's own drift gate also reds a one-sided widening, and its
+  divisibility check reds a $0.01 rung sitting beside `stepBet: 0.10`.
+- **"A win never rounded upward" describes the opposite of HEAD.** Every win readout passes
+  through `Math.round`, which rounds half away from zero. **Adding decimal places does not change
+  the rounding mode**, so that clause is separate work and it is the one clause that is real,
+  unblocked and non-locked today.
+
+**The exact-win formatter is the only component that survives contact, and it needs no lock at
+all.** It lands in `currency.ts` and its call sites, all unlocked. **We can build that as its own
+brief the moment you confirm the floor.**
+
+---
+
+## 2. Q3 WAS A COMPOUND QUESTION AND YOUR ANSWER CANNOT BE ALLOCATED. THAT IS THIS SEAT'S FAULT.
+
+Entry 035 asked: *"Confirm S2-C060 comes OUT of that brief and keeps its own serial brief."*
+You ruled: *"yes, it executes inside the serial money-path session per its own derivation."*
+
+**Those read as opposite answers, and the difference is exactly one locked edit.** Asking a
+two-part question as a yes or no is the defect, not your answer to it. Re-put as two:
+
+- **3a. Does S2-C060's fix happen inside `FS_MONEY_SERIAL_2`, alongside the two other edits?**
+- **3b. Or does it get its own serial brief, as its own sanction?**
+
+**Why it matters mechanically**: its fix lands at a THIRD region of the locked file, in a third
+function, and the sanction as written covers two. The locked-paths gate compares path SETS with
+no line-range field, so **nothing would catch the overrun**.
+
+**And its derivation is now corrected, additively, at commit `6092335`.** It claimed the dated
+mirror holds zero occurrences of end-round; six files under the 2026-07-29 capture contain them.
+**Direction matters: the platform text makes that finding STRONGER, so any re-grade goes up.**
+
+---
+
+## 3. Q4's ACTUAL QUESTION IS STILL OPEN, and it is one sentence
+
+Your ruling confirmed the technical DIRECTION. Entry 035 asked something narrower and said so:
+*"Not does the sanction stand, which is the owner's. Yours is the grading."*
+
+**Does REQ-121 stay NOT_MET at HIGH on a trigger nobody has measured, or is it re-graded pending
+evidence?**
+
+The harm needs an authenticate response carrying limits but no `betLevels`, and our own pinned
+contract declares `betLevels` a required field, so it should not occur. **No capture anywhere in
+the tree records an authenticate response body**, so the incidence is genuinely UNKNOWN rather
+than low.
+
+**One further fact for whoever writes the replacement brief**: `:735` is not a clamp site. It
+sits inside `initRGS` and publishes the ladder, about a hundred lines after the wager is formed.
+The clamp belongs in `betLadder.ts`, **which is not locked**, so the sanction may be needed only
+for a one-line passthrough, or not at all.
+
+---
+
+## 4. TR-096: YOUR RULING IS SOUND AND ITS SECOND CLAUSE HAS NOTHING TO ATTACH TO
+
+**The mechanism the tracker row describes does not exist.**
+
+`maxAutoplaySpins` is **not one of the platform's thirteen official jurisdiction fields**. Our
+own contract test asserts the surfaced flags contain no such invented key, and the responsible
+gambling store holds it at `Infinity` permanently, with the reason recorded beside it. The gate
+that graded the row writes that key straight into the store, **so it tests a state the platform
+cannot produce.**
+
+**The finding is real and its cause is the opposite of the one recorded**: the infinite option is
+always offered because NO CAP FIELD EXISTS, not because a cap is being ignored.
+
+So of your three clauses:
+
+- **Clause 1** (hide autoplay entirely when `disabledAutoplay`) is **already implemented** at HEAD.
+- **Clause 2** (remove every option above a jurisdiction maximum) is **unimplementable from
+  platform flags**, because there is no maximum to read.
+- **Clause 3** (default conservative when flags are absent or unreadable) is implementable, and
+  it is the whole of the real work. **But "absent" is the permanent state**, so applied literally
+  it means the infinite option is NEVER offered.
+
+**That is a product change and this seat will not make it on its own reading of a ruling.**
+Confirm it, or amend it now that the mechanism is known. Either way the owner's countersignature
+is still outstanding and the row is re-graded at `6092335` so nobody inherits the wrong cause.
+
+---
+
+## WHAT THIS SEAT HAS DONE MEANWHILE, so the next check-in is not spent on it
+
+All six documents Session 6 read and parked are now applied and agree with HEAD. Thirteen
+`CLAUDE.md` line citations in the quality charter had all rotted because that file grows; they
+now cite by name rather than by number, per convention (s). The brief template and the brief
+gate disagreed about two header names, so a brief copying the template faithfully failed the
+gate; both are mine and both are fixed.
+
+**Q5 to Q10 are unchanged and await your next check-in, as you said.**
+
+---
+
 ## 036 - 2026-07-31 - INBOUND: Fable rules Q1 to Q4 of entry 035, and defers Q5 to Q10
 
 **Transcribed from the owner's paste, per `WAYS_OF_WORKING.md` section 6: the Product Owner is
