@@ -122,9 +122,14 @@ arrive without levels should not occur. **Nobody has measured whether it can.** 
 the tree records an authenticate response.
 
 **Does REQ-121 stay NOT_MET at HIGH on an unmeasured trigger, or is it re-graded pending
-evidence?** And note the non-locked route: `sessionRecovery.ts:201` already receives `minBet`,
-`maxBet` and `stepBet` on every production boot, and that file is not locked. **So the sanction
-may buy nothing at all**, which is a question for the owner once you have graded the requirement.
+evidence?** And note that a non-locked route may exist: `frontend/src/lib/stores/sessionRecovery.ts:201`
+calls `platform.authenticate(params)` on every production boot, in a file that is NOT locked,
+and the authenticate response is what carries the limits. **Corrected before sending**: an
+earlier draft of this entry said that file "already receives minBet, maxBet and stepBet", and
+our own document currency gate caught it. It does not. Those fields appear nowhere in it; the
+call that returns them is there and nothing reads them. **So the sanction may buy nothing at
+all, and establishing that is a derivation nobody has done**, which is a question for the owner
+once you have graded the requirement.
 
 ### Q5. The `?? 'en'` default
 
