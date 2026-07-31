@@ -10152,3 +10152,10 @@ OWNER PREVIEW  |  v10 line, main  |  commit 96e9d4e  |  built 2026-07-31T18:02:2
 
 `.claude/settings.json` diff verified empty. `git status` clean. No committed evidence
 rewritten.
+
+**Final push verification, rule 10.** The close commit `13a4c20` was itself pushed and its
+remote run checked: https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/30615074278,
+**conclusion success**, same three-job documentation-only shape with the browser matrix
+skipped. **The one-commit-lag clause applies to the line you are reading**: the commit that
+records this link cannot contain its own run id, so the last verified run for this session
+is 30615074278 and any commit after it is the next session's to verify.
