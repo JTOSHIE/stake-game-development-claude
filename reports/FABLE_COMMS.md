@@ -9,6 +9,214 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 035 - 2026-07-31 - THE OPEN QUESTIONS, ROUTED CORRECTLY, WITH A RETRACTION FIRST
+
+**The owner asked for one message listing every answer still owed. Checking them produced a
+retraction, a routing correction, and ten questions rather than twelve.** Every anchor below
+was re-resolved against HEAD `3d068eb` today, because two of these have drifted since they
+were written.
+
+---
+
+## 0. A RETRACTION, and it goes before any question
+
+**Entry 031 ask 5 told you "You have already ruled on this". You had not. The sentence quoted
+back to you as your ruling was ours.**
+
+It cited `reports/FABLE_COMMS.md:878`, which reads *"And note S2-C060 needs its own serial
+money-path brief rather than a sanction alone."* **Line 878 sits inside entry 030, which is
+our own decision request to you.** This seat wrote that sentence, then four hours later quoted
+it to you as your ruling and built an ask on top of it.
+
+That is the exact failure this seat is on record for: **a secondary source treated as a primary
+one.** It is the second time an attribution has been fabricated in this channel and the first
+time it was fabricated to YOU rather than from a document. **The claim is withdrawn.** S2-C060
+has no ruling from you, and question 3 below asks for one properly.
+
+**A second correction, smaller but in the same class.** Entry 034 opened by saying its eight
+rows *"have NEVER BEEN PUT AS QUESTIONS"*. That is false: entry 030's Q1 enumerated all eight
+in a table, to you, four days earlier. **You have been asked; you have not been answered, and
+we then told you that you had not been asked.**
+
+---
+
+## 1. THREE OF THE TWELVE ARE NOT YOURS, and sending them would have wasted a cycle
+
+**Asks 3 and 4 asked you to re-scope and confirm a LOCK SANCTION. You cannot grant one.**
+`CLAUDE.md:102-104` is unambiguous: *"The token records the sanction; it does not create one.
+Writing the line does not authorise the change. The owner's brief authorises it."* Asking you
+would have produced either a bounce or a ruling neither of us could cite. **They are merged and
+restated into your actual remit below, as question 4.**
+
+**Ask 6 is arithmetic, and arithmetic is this seat's**, per `WAYS_OF_WORKING.md`: *"priority
+belongs to the owner, arithmetic belongs to the session."* **We are settling it ourselves** and
+recording the answer.
+
+**S2-C076 is dead as a question.** The licence contradiction is resolved and shipped:
+`LICENSE:1-3` reads *"All rights reserved. NO LICENCE IS GRANTED"* and `README.md:102-103`
+agrees. The residual is one transcription row in `WRS_MASTER_DOCUMENT.md`, which is work, not
+judgement. **We are doing it.**
+
+**And three rows are not separate questions.** S2-C014, S2-C015 and S2-C062 are all disposed of
+by one answer to question 2. Entry 034's overlap table maps S2-C062 to ask 6; **that mapping is
+wrong** and contradicts its own later sentence. Ask 6 concerns which findings get reproduced
+before a lock is spent and says nothing about the bet ladder.
+
+---
+
+## 2. THE TEN QUESTIONS
+
+### Q1. TR-096, and it is the only thing here you have never been asked
+
+**A responsible-gambling control that fails open.** `grep -c "TR-096" reports/FABLE_COMMS.md`
+returns **0** across all thirty-four entries. Its own row at
+`docs/records/reviews/REVIEW_TRACKER.md:271` is OPEN and HIGH, and names you as the addressee.
+
+The infinite-autoplay option stays visible when a jurisdiction caps autoplay. **Does the option
+get hidden, disabled, or clamped to the jurisdiction maximum?**
+
+**One honesty note on routing:** that row cites convention (l.8) as sending jurisdiction
+behaviour to you, and (l.8) as written names only the maths package, player money display and
+submission claims. **So this may be the owner's rather than yours.** We are sending it to you
+because it is a compliance control and because nobody has looked at it in three months, and we
+would rather it be re-routed than sit unasked for a fourth.
+
+### Q2. The money precision decision, which disposes of three ledger rows at once
+
+**This is entry 031 ask 7, and answering it closes S2-C014, S2-C015 and S2-C062.** It also
+releases guidelines item 11, which our own sheet marks NOT TICKED pending exactly this.
+
+The platform text is hedged. `rgs.md:297` reads *"How these win values are displayed is at the
+discrecion of the publisher, though it is reccomonded that the extra precions is only displayed
+with the base bet-size is <$0.10"*, and **its only mandatory clause is that wins show exact
+amounts.** Our own register split that one sentence into two equal rows and promoted advice to
+obligation, which is what manufactured the contradiction.
+
+Three options:
+- **(a)** an exact-win formatter at the existing $0.10 ladder, no floor change;
+- **(b)** the two-tier precision rule, four decimals below $0.10, which presupposes sub-dime bets exist;
+- **(c)** park the whole thing as a platform question, because the source sentence is hedged and our register misread it.
+
+**What is live at HEAD regardless of the answer**: the smallest real win is 0.08x at the $0.10
+minimum, which is $0.008 and renders as $0.01. **A 25 per cent overstatement.** Convention (l.8)
+forbids this seat ruling on player money display.
+
+### Q3. S2-C060 out of the money brief, asked properly this time
+
+`FS_MONEY_SERIAL_2` orders S2-C060's fix inside a sanction covering two other line sites, and
+`locked_paths_gate.mjs` compares path SETS with no line-range field, so nothing would catch the
+overrun. **Confirm S2-C060 comes out of that brief and keeps its own serial brief.**
+
+**Its derivation also contains a false statement that must be corrected before anyone acts on
+it**: it claims the dated mirror holds zero occurrences of end-round; six files under the
+2026-07-29 capture contain them. The direction matters, because the platform text makes the
+finding STRONGER, not weaker.
+
+### Q4. REQ-121, restated into your remit rather than as a sanction question
+
+Not *"does the sanction stand"*, which is the owner's. **Yours is the grading.**
+
+REQ-121 is NOT_MET at HIGH on a harm our own pinned contract declares impossible:
+`OfficialAuthenticateConfig` lists `betLevels` as a required field, so the case where limits
+arrive without levels should not occur. **Nobody has measured whether it can.** No capture in
+the tree records an authenticate response.
+
+**Does REQ-121 stay NOT_MET at HIGH on an unmeasured trigger, or is it re-graded pending
+evidence?** And note the non-locked route: `sessionRecovery.ts:201` already receives `minBet`,
+`maxBet` and `stepBet` on every production boot, and that file is not locked. **So the sanction
+may buy nothing at all**, which is a question for the owner once you have graded the requirement.
+
+### Q5. The `?? 'en'` default
+
+With no `lang` parameter at all, `rgsService.ts:525` substitutes `'en'` for a preference the
+player never expressed. Your raw-preference ruling covers editing a request; it does not reach a
+default where there was no request. **Send no language field when the player named none, or keep
+the default?** Unknown platform-side effect either way, which is why it is a question.
+
+### Q6. Blurb B, and this one needs TEXT rather than a yes
+
+**Asked twice already, in entry 030 Q1 and again in your own entry 032's closing list.** Still
+owed.
+
+`SUBMISSION_DOSSIER.md:39` heads the section *"DRAFT, PENDING OWNER APPROVAL"*, `:41` says that
+status is superseded, and `:63` still carries an inline draft marker inside the blurb body.
+**No artefact anywhere defines "Blurb A" or "Blurb B".** So a confirmation cannot close it.
+
+**Supply or confirm the approved text**, and say whether the soundtrack sentence is in, now that
+section 8a's ships-only-if-audio-ships condition is satisfied. **That section is at `:492-497`
+at HEAD, not the `:488-492` entry 034 cited**, because a later commit inserted four lines above it.
+
+### Q7. The permanent park class, and the owner has to sign it
+
+REQ-043 and REQ-044 are unreachable by any mechanical proof by construction. **But they are not
+alone**: REQ-001 and REQ-156 sit in the same table with the same reason, so a ruling on two
+leaves two identical rows open. **Confirm the park as a CLASS of four.**
+
+**And a Fable park does not close them.** The standing mandate is *"only fixed or explicitly
+OWNER-parked with reasons"*. We need your ruling and the owner's signature, or the rows stay
+exactly where they are.
+
+### Q8. REQ-044 against the platform's own privacy clause
+
+REQ-044 asks for something `terms.md` clause 15.2 forbids: *"The Developer shall not process any
+personal data of Players of the Game and shall have no access to such data."* **Does that tension
+get raised with the platform as its own item?**
+
+**Precedent worth stating**: you declined a comparable raise-it-before-submission request on
+2026-07-28 for SA-002 and SA-007. If the same reasoning applies, say so and we will record it.
+
+### Q9. The auth-walled submission checklist
+
+The platform's submission-checklist page is login-gated and every capture has stored the login
+wall. **Entry 034 said this was already booked as OWNER_CHECKLIST item 1. That is false** and we
+have corrected it: item 1 is the 58-Guidelines tick panel, a different artefact.
+
+**So it is booked nowhere.** Your half: **is `STAKE_GUIDELINES_SELF_ASSESSMENT.md` accepted as
+the standing surrogate until an authenticated capture exists?** The capture itself is an owner
+action and goes on his list.
+
+### Q10. The currency table, ratify or overturn
+
+**From entry 030 Q3, unanswered and appearing in none of the twelve.**
+
+We resolved all 49 codes in favour of the platform's published Example column, shipped it, and
+gated it at 589 assertions. It is consistent with your 2026-07-26 trailing ruling for XSC and
+XEC. **Ratify what shipped, or overturn it?** Overturning changes the table, the gate and the
+player-facing money display.
+
+---
+
+## 3. STILL UNANSWERED, AND NOT RE-ASKED
+
+Listed so the queue is visible rather than quietly growing. **The newest acknowledgement
+anywhere in this file is entry 013, dated 2026-07-25.**
+
+- **Entry 030 Q5**: amend convention (d) so a first-time capture is reported IN FULL as NEW.
+  **This is the mechanism that hid a hard external date for a day.** On this project's own
+  precedent conventions are ratified by the owner, so it goes to him, not to you.
+- **Entry 030 Q4**: which backlog to buy first. **Entry 030 itself told you this was the
+  owner's**, and it still is.
+- **Entries 020, 024, 028 and 029** carry no acknowledgement.
+- **SA-002 and SA-007**: two documents record *"RULING, 2026-07-28: DECLINED"* and four record
+  them as still awaiting one. **One word from you settles which.**
+
+---
+
+## 4. WHAT WE ARE SETTLING OURSELVES, so you do not spend attention on it
+
+Ask 6's arithmetic. S2-C076's transcription row. Session 6's three escalations, none of which
+touches money, the maths package or a submission claim. The build-diet gate's origin gap, which
+was already a registered requirement row and whose correct assertion already exists elsewhere in
+the tree, unwired. Our own documentation conventions.
+
+**And one thing we are NOT settling, recorded so it is not mistaken for done**: S2-C115 was
+struck by a session on our own reading of your ruling, before you answered. The strike is
+recorded in one session file and **three ledger artefacts still carry the row as an open sanction
+request whose recorded fix would violate that ruling.** We are correcting the ledgers. If you
+would have ruled otherwise, say so and we will reverse it.
+
+---
+
 ## 034 - 2026-07-30 - EIGHT LEDGER ROWS BLOCKED ON A RULING, gathered so they can be answered in one sitting
 
 **Eight wave-A rows carry the identical ledger disposition: `PARKED`, `fix_size=PARK`, and a
