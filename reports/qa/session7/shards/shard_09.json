@@ -1,0 +1,37 @@
+[
+  {
+    "id": "S2-C077",
+    "verdict": "STILL_OPEN",
+    "evidence": "(a) SUBMISSION_DOSSIER.md:161 still reads \"**Measured at 14.80MB (108 files, 15,515,125 bytes) against the 25MB budget on 2026-07-26**\". The committed JSON reports/qa/dist_hygiene_2026-07-26.json:5-6 reads \"\\\"files\\\": 108, \\\"bytes\\\": 15515148\". 15,515,125 != 15,515,148, so the prose figure has not been restated. No CHECK anchor was added: `grep -n \"CHECK:\" SUBMISSION_DOSSIER.md` returns only lines 289 and 290 (count=7 publish_files, count=5 lookUpTable_*_0.csv) -- there is no `<!--CHECK: grep \"15515148\" ...-->`. (b) frontend/scripts/dist_hygiene_gate.mjs:333 still writes to the literal filename: `writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({` with `generated: '2026-07-26'` on :334. The name is not derived from the run date or the stamp commit. (The row records this as :239; the write is now at :333, the only writeFileSync of that report in the file.)",
+    "remaining": "Restate SUBMISSION_DOSSIER.md:161 as 14.80MB (108 files, 15,515,148 bytes); add the `<!--CHECK: grep \"15515148\" reports/qa/dist_hygiene_2026-07-26.json-->` anchor; and change the report filename at frontend/scripts/dist_hygiene_gate.mjs:333 to be derived from the run date or the stamp commit rather than the literal '2026-07-26'.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C078",
+    "verdict": "STILL_OPEN",
+    "evidence": "SUBMISSION_DOSSIER.md:171-173 still reads \"The 108th file is `build-info.json` itself, the JOB 4 provenance stamp, which records the other 107 files and 15,514,744 bytes and is excluded from its own total for want of a fixed point. 15,514,744 plus the stamp's own 381 bytes is 15,515,125\". The committed JSON reports/qa/dist_hygiene_2026-07-26.json:29-30 reads \"\\\"bundleFilesExcludingThisFile\\\": 107, \\\"bundleBytesExcludingThisFile\\\": 15514766\". The prose still carries 15,514,744 / 381 / 15,515,125 instead of 15,514,766 / 382 / 15,515,148. No CHECK anchor for 15514766 exists: `grep -n \"CHECK:\" SUBMISSION_DOSSIER.md` returns only lines 289-290. The :163 claim about the gate (now :173, \"`dist_hygiene_gate.mjs` asserts exactly that reconciliation on every build\") is indeed backed by frontend/scripts/dist_hygiene_gate.mjs:128-131, which checks `info.bundleBytesExcludingThisFile + infoBytes === totalBytes && info.bundleFilesExcludingThisFile + 1 === files.length` -- untouched, as the row directs.",
+    "remaining": "Restate the three figures at SUBMISSION_DOSSIER.md:172-173 as 15,514,766 / 382 / 15,515,148, add the `<!--CHECK: grep \"15514766\" reports/qa/dist_hygiene_2026-07-26.json-->` anchor, and reconcile with the S2-C077 figure at :161 in the same commit.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C079",
+    "verdict": "STILL_OPEN",
+    "evidence": "(a) SUBMISSION_DOSSIER.md:161-163 still describes a build no committed file records: \"...on the artefact that shipped then: the JOB 5 kit V3 build, from a fresh clone at commit `7dd83e6a`, clean tree.\" The only committed hygiene evidence is reports/qa/dist_hygiene_2026-07-26.json (`ls reports/qa/ | grep -i hygiene` returns exactly one file), whose buildStamp at :25-27 reads commit \"a1ff78bbe5fcc85ee0d32278a1e63c880c46f5ed\", \"cleanTree\": false. No fresh-clone JSON has been committed and the prose has not been restated. (b) frontend/scripts/dist_hygiene_gate.mjs:333 still writes the literal `dist_hygiene_2026-07-26.json`, and `grep -n \"cleanTree\" frontend/scripts/dist_hygiene_gate.mjs` returns no matches at all -- the `info.cleanTree === true` assertion proposed under S2-C044 is absent, so a dirty-tree run is still silently recorded rather than refused.",
+    "remaining": "Either restate SUBMISSION_DOSSIER.md:161-163 to describe the a1ff78bb / cleanTree:false run the committed JSON actually holds, or commit a genuine fresh-clone gate run and quote that; and at frontend/scripts/dist_hygiene_gate.mjs:333 derive the report filename from the stamp commit or run date plus add the `info.cleanTree === true` assertion.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C082",
+    "verdict": "STILL_OPEN",
+    "evidence": "SUBMISSION_DOSSIER.md:114 still ends the independent-verification paragraph with \"all Stake checks pass (reports/archive/superseded/MATH_VALIDATION.md).\" The successors the row names are not cited there -- `grep -n \"verify_books_lookup_equality\" SUBMISSION_DOSSIER.md` produces no hit anywhere near :107-115, and the paragraph is unchanged. The same superseded citation also survives at :34. For the class-closing half: `grep -n \"superseded\" scripts/qa/doc_currency_gate.mjs` returns exit status 1, no matches -- the gate has no rule that reports a path under reports/archive/superseded/ in a scanned document, and no convention-(p) seed for this case. The gate's only archive handling is the opposite direction: :154 lists 'reports/archive/' in OUT_OF_SCOPE and :847-859 is a negative control asserting a dated archive file is NOT flagged.",
+    "remaining": "Replace the reports/archive/superseded/MATH_VALIDATION.md citation at SUBMISSION_DOSSIER.md:114 with the successors (tools/verify_books_lookup_equality.py plus the equality proof at :497-501) or a freshly committed five-mode scripts/validate_math.py run, and add a superseded-path rule with a seeded case to scripts/qa/doc_currency_gate.mjs.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C083",
+    "verdict": "STILL_OPEN",
+    "evidence": "SUBMISSION_DOSSIER.md:558-562 still carries the announcement-versus-page sentence verbatim: \"Both the RTP band and the outcome cap come from the **first-party platform announcement of 2026-07-25**, quoted verbatim with its date in `COMPLIANCE_WATCH.md`. As at the 5g sweep of the same date they are **not yet on the published approval-guidelines page**; the announcement said the RTP range takes effect \\\"shortly with the next deploy\\\". Cited as an announcement rather than as a page, so the citation is checkable.\" The page citation the row asks for is available and unused: docs/stake-engine-live/2026-07-29/approval_guidelines_math_verification.md:30 reads \"The calculated Return to Player (RTP) must be within 90.0%-96.70%...\" and :22 reads \"No game mode can contain more than 10,000,000 events\". Neither CHECK anchor exists -- `grep -n \"CHECK:\" SUBMISSION_DOSSIER.md` returns only lines 289-290, and `grep -n \"approval_guidelines\" SUBMISSION_DOSSIER.md` returns no hit in the 8c section.",
+    "remaining": "Replace SUBMISSION_DOSSIER.md:558-562 with the page citation (approval_guidelines_math_verification.md:30 for the band, :22 for the cap), note the 2026-07-04 mirror carriage per docs/stake-engine-live/2026-07-25/DELTA_NOTES.md:34, and add both CHECK anchors.",
+    "self_verifying": "YES"
+  }
+]

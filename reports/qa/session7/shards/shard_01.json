@@ -1,0 +1,37 @@
+[
+  {
+    "id": "S2-C005",
+    "verdict": "STILL_OPEN",
+    "evidence": "frontend/src/lib/components/ReplayMode.svelte has no audio wiring at all at HEAD (df04d8c). `grep -n \"soundService|playWin|playBGM|warmUpAudio\" frontend/src/lib/components/ReplayMode.svelte` returns nothing (NO AUDIO REFS). The onMount block at :84-105 ends `replayParams.set(p)` (:92) -> `fetchReplay` -> `phase = 'ready'` with no playBGM() and no pointerdown/keydown warmUpAudio() listener. Both winAmount.set sites in startReplay are bare: :167 `winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))` in the feature branch and :225 the identical line in the ordinary-round branch, with no playWin() after either. The live counterparts still exist and are still exported: frontend/src/App.svelte:56 `import { playBGM, playWin, warmUpAudio } from './lib/services/soundService'`, App.svelte:1220 playBGM(), :1247 warmUpAudio(), :1484 `playWin(bet > 0 ? win / bet : 0)`; frontend/src/lib/services/soundService.ts:210 warmUpAudio, :226 playBGM, :417 playWin.",
+    "remaining": "All of it: import playBGM/playWin/warmUpAudio from '../services/soundService' into ReplayMode.svelte, call playBGM() plus install the one-shot pointerdown/keydown warmUpAudio() listener in onMount after replayParams.set(p) (:92), and call playWin(response.payoutMultiplier) immediately after winAmount.set at :167 and at :225.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C006",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "The figures are now rendered outside every phase branch. frontend/src/lib/components/ReplayMode.svelte:366-374 sits directly inside the `{:else if params && response}` block (grid-area at :311-318, win-area guarded by `{#if phase === 'complete' || phase === 'playing'}`, replay-controls after it, then): `<div class=\"replay-meta\">` :366, `<div class=\"replay-figures\">` :367 rendering `{mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), ...)}</strong>` and, under `{#if showCostMultiplier}` :369, `× {response.costMultiplier} ... <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), ...)}</strong>`. `.currency-display` at :383 is grouped with it in the same phase-independent `.replay-meta` wrapper. The Play button at the `{#if phase === 'ready'}` branch now carries only its own two label lines (btn-line-1 / btn-line-2, no bet-cost third line), `.win-area` is unmoved and still gated from 'playing' onward, and `showCostMultiplier` is still `response !== null` (multiplier shown at 1.0x). Styles for the new members exist at :550 (.replay-meta) and :561 (.replay-figures).",
+    "remaining": "",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C012",
+    "verdict": "STILL_OPEN",
+    "evidence": "frontend/src/app.css:156-161 at HEAD is verbatim `#app {\\n  max-width: 1280px;\\n  margin: 0 auto;\\n  padding: 2rem;\\n  text-align: center;\\n}` — all three of the declarations the row asks to drop (max-width :157, padding :159, text-align :160) are present; the recorded fix line (text-align at old :143) has only shifted to :160 because `body` above it grew a comment. The dead members are also still there: `a { font-weight: 500; color: #646cff; text-decoration: inherit }` at :113-117 and `a:hover { color: #535bf2 }` at :118-120, and the light-scheme `a:hover { color: #747bff }` at :240-242. Nothing in :113-120 or the light-scheme block has been deleted. (`h1` :147-150 and `.card` :152-154 are untouched, consistent with the row's correction that they must not be deleted unverified; the S2-C017 block at :200-206 has been replaced, not removed bare.)",
+    "remaining": "Replace #app (:156-161) with `#app { width: 100%; height: 100% }`, and delete the dead `a` / `a:hover` rules at :113-120 and the light-scheme `a:hover` at :240-242. The h1 line-height:1.1 (:148) override question flagged in the row's correction is also still unverified in-tree.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C013",
+    "verdict": "STILL_OPEN",
+    "evidence": "No trailing accessor exists: `grep -rn \"currencySymbolTrailing\" frontend/src/` returns nothing (NO currencySymbolTrailing ANYWHERE). frontend/src/lib/utils/currency.ts:286 `currencySymbolFor` is unchanged and is followed by formatBalance's docblock at :296+ — no new export was added after it. frontend/src/lib/components/HudOverlay.svelte:288 still reads `$: lossLimitTrailing = isVirtualCurrency($currencyCode || 'USD') && VIRTUAL_SYMBOL_TRAILING`, i.e. it consults only the virtual-currency flag and never PLATFORM_CURRENCIES[code].symbolAfter, while that table still marks trailing codes at currency.ts:209-229 (DKK :209, PLN :210, VND :211, CLP :213, ARS :214, SAR :217, ILS :218, AED :219, TND :225, OMR :228, QAR :229). formatBalance honours the same field at :270 `return meta.symbolAfter ? ...`, so the HUD loss-limit input and every other money readout still disagree for those codes. The three markup sites at HudOverlay.svelte:468, :704 and :910 do branch on `lossLimitTrailing` as recorded and are unchanged.",
+    "remaining": "Add the `currencySymbolTrailing(currencyCode)` export after currency.ts:311 and repoint HudOverlay.svelte:288 at it (plus add it to the currency import list at HudOverlay.svelte:36).",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C017",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "frontend/src/app.css:200-206 now reads `button:focus {\\n  outline: none;\\n}\\nbutton:focus-visible {\\n  outline: 2px solid var(--theme-primary, #00FFFF);\\n  outline-offset: 2px;\\n}` — the block was replaced rather than recoloured, and both pseudo-classes are matched, so no button is left to the user agent's `outline-style: auto` ring on mouse focus. `grep -n outline frontend/src/app.css` shows the only other outline declarations are :231-232, a companion `.c1-collect:focus, .ro-btn:focus { outline: 2px solid var(--theme-primary, #00FFFF); outline-offset: 2px }` restoring a ring for the two programmatically focused modal buttons. Factual divergence from the row's text, recorded without judging it: the token used is `var(--theme-primary, #00FFFF)`, not the `var(--sig-cyan, #00FFFF)` the row specifies; the shape, offset and literal fallback match.",
+    "remaining": "",
+    "self_verifying": "YES"
+  }
+]

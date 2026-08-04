@@ -1,0 +1,37 @@
+[
+  {
+    "id": "S2-C067",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "The recorded defect (COMPLIANCE_WATCH.md:149 asserting TWO `isAutoPlay.set(true)` call sites and naming the deleted `ControlBar.svelte:57-63` first) is gone. COMPLIANCE_WATCH.md:151-155 now reads: \"- **Autoplay explicit-confirm gate:** confirmed structural, not a single named function - `isAutoPlay.set(true)` has exactly ONE call site in the whole codebase, inside `startAuto(count)` at `HudOverlay.svelte:194`, reachable only via two explicit clicks (open the autoplay menu, then click a specific spin-count option). Never called on mount, from restored state, or from a URL param.\" and :156-169 carry the in-place correction block, including \"was deleted on 2026-07-08 in commit `56c0403`\". The ONE-call-site claim is true at HEAD: `grep -rn \"isAutoPlay.set(true)\" frontend/src` returns exactly one line, `frontend/src/lib/components/HudOverlay.svelte:194:    isAutoPlay.set(true)`. NOTE, not part of the recorded defect: the row's explicitly-labelled \"second, optional SMALL fix\" is NOT done. frontend/scripts/check_autoplay_confirm_gate.mjs:27 still reads `const files = globSync(join(SRC_DIR, '**', '*.svelte')).filter(` (no .ts/.mjs coverage); the file has no --self-test branch (read all 98 lines); and `grep -rn \"check_autoplay_confirm_gate\" .github/workflows/checks.yml` returns zero hits, so the gate is still unwired (checks.yml:477 `- name: responsible gambling enforcement` runs `npx tsx src/lib/stores/responsibleGambling.test.ts` only). The doc text also does not name the gate as the holder, as the row's suggested wording would have.",
+    "remaining": "",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C070",
+    "verdict": "STILL_OPEN",
+    "evidence": "reports/qa/file_census/CENSUS_MECHANICAL.md:60-63 at HEAD:\n60\t## Zero-reference candidates: 550\n61\t(blank)\n62\t| directory | candidates |\n63\t|---|---|\nNeither requested edit is present. `grep -rn \"orphan_candidates\" reports/qa/file_census/CENSUS_MECHANICAL.md` returns nothing, so the file never points a reader at the artefact that enumerates the 550 (which does exist: `wc -l reports/qa/file_census/orphan_candidates.txt` = 550). The column header at :62 is still the word `directory`, while keys such as `optimization_program/run_script.py` (:79), `uploads/aws_classes.py` (:82), `uploads/aws_constants.py` (:83), `uploads/aws_upload.py` (:84), `utils/rgs_verification.py` (:86) and `utils/swap_lookups.py` (:88) are files, not directories. The file is untouched since it was created: `git log --oneline -3 -- reports/qa/file_census/CENSUS_MECHANICAL.md` returns only `f4d03cb audit: JOBS 1b, 2 and 3 discovery, 41 squads, 0 LOST, no script ran`.",
+    "remaining": "Add, after :60, the sentence stating the 550 individual paths are enumerated in full in `orphan_candidates.txt` in the same directory; and change the `directory` column header at :62 to `path prefix (first two segments)`. No counts change.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C071",
+    "verdict": "STILL_OPEN",
+    "evidence": "reports/qa/file_census/CENSUS_MECHANICAL.md:20 still reads `**Total tracked files: 3630.**`, and :21 is blank with :22 being the next heading `## The 27 the rules refused to guess at` - no correction block was appended after :20. The underlying discrepancy is still live: the class counts at :13-18 are 1556+1249+534+173+91+27 = 3630 (they partition the stated total exactly), while `git ls-tree -r --name-only f4d03cb^ | wc -l` returns 3664, a shortfall of 34. The file is untouched since creation: `git log --oneline -3 -- reports/qa/file_census/CENSUS_MECHANICAL.md` returns only `f4d03cb`. No census generator script is committed under reports/qa/file_census/ (the directory contains only CENSUS_MECHANICAL.md, orphan_candidates.txt and shards/).",
+    "remaining": "Append the in-place correction block immediately after :20 (3630 is 34 short of the 3664 tracked at f4d03cb^; the class counts sum exactly so the loss is in the input list, not the arithmetic; the 34 cannot be named because no generator is committed). Do not overwrite 3630 with 3664. The durable fix, committing a census generator, is also not done.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C073",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "The LOCAL UPLOAD SET cell now says twelve. SUBMISSION_DOSSIER.md:281 (the row's :262 has shifted down; :262 at HEAD is unrelated prose about the provider logo upload): \"| **LOCAL UPLOAD SET** | Those seven **plus** the five `books_<mode>.jsonl.zst`. **Twelve files.** | The build machine, ...\". `grep -rn \"Eleven files\\|eleven files\\|(11 files)\\|11 files\" SUBMISSION_DOSSIER.md` returns exactly one hit, SUBMISSION_DOSSIER.md:304, and that hit is the deliberate historical quotation inside the existing correction paragraph at :303-310 (\"**TWELVE files, and the count was wrong here until 2026-07-26.** This heading said \\\"the eleven files `index.json` declares\\\", which is wrong twice...\"), not a live claim. The contents description in the same cell is \"Those seven **plus** the five\", as the row said it should already be.",
+    "remaining": "",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C074",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "BOOKS_MANIFEST.md:32 now reads \"| **Local upload set** | The 7 above **plus** 5 x `books_<mode>.jsonl.zst` (12 files) | The build machine, and an owner-held **private** Google Drive copy ... | This manifest's hashes |\". `grep -rn \"(11 files)\\|11 files\\|eleven\" BOOKS_MANIFEST.md` returns no hits. The arithmetic checks out against the sibling row at :31 (`index.json`, `game_metadata.json`, 5 x lookUpTable = 7 files) plus the five books listed at :43-47. The optional inline reason the row suggested appending (\"index.json and game_metadata.json are uploaded but not declared by the index, see SUBMISSION_DOSSIER.md:284-288\") was NOT added, but that equivalent explanation does exist in the other document at SUBMISSION_DOSSIER.md:303-310.",
+    "remaining": "",
+    "self_verifying": "YES"
+  }
+]

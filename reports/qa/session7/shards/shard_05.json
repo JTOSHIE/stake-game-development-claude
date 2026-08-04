@@ -1,0 +1,37 @@
+[
+  {
+    "id": "S2-C059",
+    "verdict": "STILL_OPEN",
+    "evidence": "design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md:7 still reads verbatim: '**Verdict: candidate F wins at 32px, 3 of 3 measures.**' and :95 is still the ranking row '| 32 | 3 | 0 | **f** |'. Neither carries an admissibility qualifier. `grep -n -i 'admissib|ceiling' design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md frontend/scripts/provider_logo_derivation.mjs` returns no hits at all (only 'margin' hits at .mjs:221,237 and .md:99,103, which are the head-to-head ratio, not a ceiling). frontend/scripts/provider_logo_derivation.mjs:216-231 computes verdictAt() as a pure two-candidate vote (`winner: gw >= 2 ? 'g' : 'f'`) with no absolute threshold anywhere; the only process.exit calls in the script are :113 (missing master file) and :303 (delivery hash mismatch), so there is no non-zero exit for an inadmissible winner. No re-wording was done either: the doc's caveat section, '## 7. What this derivation does not settle' at :130-136, disclaims design judgement only ('They are not a judgement of which mark is the better piece of design'), not the absolute legibility claim.",
+    "remaining": "Either add the absolute admissibility check (32px invisibleInk against a stated derived ceiling, non-zero exit when no candidate is admissible, ceiling and margin emitted into the record so :7 reads 'admissible AND wins'), or take the cheap alternative and re-word :7 and :95 to state that the verdict is a head-to-head ranking against one alternative and carries no absolute legibility claim.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C069",
+    "verdict": "STILL_OPEN",
+    "evidence": "The divergence is measurably still there: `shasum -a 256` gives 97ed2fe0abe14a4244872b89ebab07935156a0df78a3de9859d72a7017a094a6 for frontend/public/assets/themes/future-spinner/ui/hero_icon_96.png against 2affa2250bcb4a14d923424ac6576e79f0d7b9ab51b5ca38c9b197b81691de20 for design-system/brand/hero_icon/hero_icon_96.png, and `ls -l` gives 23135 bytes shipped against 24547 bytes master. Neither remedy has landed. scripts/assets/manifest.json:121 still carries `\"palette_colors\": 256` for this entry (option b not taken), and the note at :123 still reads only 'OWNER AUDIT ROUND 3, item 1 (logo canonicalisation). The hero icon (tools/brand/derive_hero_icon.py) is a tight circular crop of the hero emblem's wheel-and-reel core, transparent outside the circle - LoadingScreen.svelte's spinning brand-mark pod now rotates this single icon instead of the retired brand_mark_base/brand_mark_spin two-layer composite.' - no mention of PA-mode quantisation, no statement that the shipped copy is not byte- or pixel-identical, no measured deviation (option a not taken). Contrast the sibling entry at :116, which does disclose its compression ('Palette-compressed bundle copy of the locked studio master ... ~124KB vs the 417KB master').",
+    "remaining": "Either extend the note at scripts/assets/manifest.json:123 to record the 256-colour PA-mode quantisation and the measured deviation, or drop/raise `palette_colors` at :121 and re-run the export so the shipped icon is byte-identical to the master (the preferred option, since the whole file is ~23 KB).",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C075",
+    "verdict": "STILL_OPEN",
+    "evidence": ".github/workflows/publish-stake-engine.yml:71 is unchanged and still reads: `test -f \"$MATH_PATH/index.json\" || { echo \"::error::$MATH_PATH/index.json missing\"; exit 1; }`, followed at :72 by `echo \"math bundle OK: $MATH_PATH\"; ls -1 \"$MATH_PATH\" | head`. The whole 'Validate bundles exist' step is :68-77 and contains no parse of index.json, no iteration over its `events` or `weights` paths, and no per-file existence test - the only other check in the step is `test -d \"$FRONT_PATH\"` at :75. So existence of index.json alone still stands in for the bundle being complete.",
+    "remaining": "Replace the single `test -f` at :71 with a validation that parses index.json and tests every `events` and every `weights` path it names, failing with the list of missing files. (Separate, owner's call, not part of this defect: how the five books files reach the runner.)",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C080",
+    "verdict": "STILL_OPEN",
+    "evidence": "The artefact write block is now at frontend/scripts/dist_hygiene_gate.mjs:333-346 (the recorded :239-240 has shifted; :239-240 today are the close of stakeBrandingViolations and the `brandFiles` const). It still reads `writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({` at :333 and `generated: '2026-07-26',` at :334 - both literals. `grep -n \"generated|measuredAt|dist_hygiene\" frontend/scripts/dist_hygiene_gate.mjs` returns only :1, :30, :41, :333, :334; there is no `new Date()` anywhere in the write, and no `measuredAt` or any sibling field carrying the tree the run measured. The keys emitted at :334-345 are generated, job, dist, budgetBytes, filesByExtension, documentationFound, buildStamp, seeded, negativeControl, dataUriViolations, dataUriSeeded, dataUriNegativeControl, pass, failures. So any re-run still stamps 2026-07-26 regardless of when it ran, and two committed copies remain indistinguishable. The single artefact reports/qa/dist_hygiene_2026-07-26.json is still the only such file on disk.",
+    "remaining": "Replace the `generated: '2026-07-26'` literal at :334 with a run-derived value (`new Date().toISOString().slice(0, 10)`) and add a sibling field (e.g. `measuredAt: new Date().toISOString()`) so two committed copies are distinguishable. The filename literal at :333 can stay per the row's own preference.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C092",
+    "verdict": "ALREADY_CLOSED",
+    "evidence": "The hand-written array is gone; the kit now reads the delivery directory, which is the better option the row named. scripts/kit_build.mjs:502-505 is the production copy path: `const brandDir = join(clone, 'design-system/brand/delivery')` then `for (const f of brandingFiles(readdirSync(brandDir))) { cpSync(join(brandDir, f), join(STAGING, '03_branding', f)) }`. The filter at :254-256 is `function brandingFiles(entries) { return entries.filter((f) => f !== 'README.md' && !f.startsWith('.')).sort() }`, i.e. exactly 'everything in the directory except README.md and dotfiles'. `ls design-system/brand/delivery/` returns FutureSpinner-BG.jpg, FutureSpinner-FG.png, FutureSpinner-Tile.png, README.md, WeRollSpinners-Logo.png, so all four deliverables - including FutureSpinner-Tile.png, the one the old list dropped - now ship. The self-test at :336-345 asserts it against the real directory rather than a fixture: `const realDelivery = readdirSync(join(REPO, 'design-system/brand/delivery'))`, `realShipped.includes('FutureSpinner-Tile.png')`, and `realShipped.length === realDelivery.filter((f) => f !== 'README.md' && !f.startsWith('.')).length`, plus a seeded case at :343-345 for a file delivered tomorrow.",
+    "remaining": "",
+    "self_verifying": "YES"
+  }
+]

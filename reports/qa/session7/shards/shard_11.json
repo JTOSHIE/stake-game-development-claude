@@ -1,0 +1,30 @@
+[
+  {
+    "id": "S2-C090",
+    "verdict": "STILL_OPEN",
+    "evidence": "reports/qa/stream_test/shards/SHARD_INDEX.md:9 still reads '## Status: discovery COMPLETE, verification NOT RUN', and :11-13 still read '47 shards. Every one of the 519 frames is read by at least one lens. **540 findings, none of them verified.** The adversarial pass did not run; see `../LEDGER.md` for why that was a deliberate stop rather than an omission.' The only block after :13 is the pre-existing AUDITED note at :15-27 (the one the row names as the style model), then '## PROVISIONAL...' at :29. `grep -n \"CLUSTERS.md:236|SESSION_REPORT.md:7264|verification RUN|STREAM tier\" reports/qa/stream_test/shards/SHARD_INDEX.md` returns no matches, and `grep -n \"CORRECT|Corrected|2026-08|2026-07-3\"` over the same 74-line file returns no matches. No dated correction block exists anywhere in the file. (Note: HEAD in this working tree is 563c695, not the df04d8c named in the task.)",
+    "remaining": "Amend the :9 heading to 'discovery COMPLETE, verification RUN for the STREAM tier' and append a dated correction block after :13 in the style of the AUDITED block at :15-27, citing CLUSTERS.md:236 (FINAL DISPOSITION of the STREAM tier, 26 clusters) and SESSION_REPORT.md:7264 (JOB 3, 52 adversarial seats), and noting that HIGH/MEDIUM/LOW remain unverified so the 540 figure is not wholly superseded. Lines 11-13 stay in place.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C103",
+    "verdict": "STILL_OPEN",
+    "evidence": "docs/records/upload-kit/00_READ_ME_FIRST.md:18-20 still reads, with no provenance marker of any kind: '**3. \"Publish\" does not mean publish.** The portal has a green **Publish Game** button. On this platform that means *make my uploads runnable so I can test them*. It does not put anything in front of players.' `grep -n \"REPORTED|COMPLIANCE_WATCH|frame|owner's observation\" docs/records/upload-kit/00_READ_ME_FIRST.md` returns only unrelated hits at :581, :716, :1063 (all about screen frames in later sections, none at :18-21). By contrast the same file already carries an in-place dated correction at :33 ('Corrected 2026-07-31: ...'), so the convention exists in the file but has not been applied to :18. Supporting material for the fix does exist at HEAD: reports/screens/live-portal-2026-07-28/ contains frames (071744_frame.png onward) and COMPLIANCE_WATCH.md:62-63 is present.",
+    "remaining": "Add the provenance marker at :18 — either an inline citation to a committed owner frame in reports/screens/live-portal-2026-07-28/ showing the post-Publish state (with frame number and date), or the REPORTED marker per CLAUDE.md rule 16 naming the owner's observation and the auth-walled submission-checklist page with the COMPLIANCE_WATCH.md:62-63 pointer. The guidance text itself is unchanged either way.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C106",
+    "verdict": "STILL_OPEN",
+    "evidence": "SUBMISSION_DOSSIER.md:34 (row 10 of the DOSSIER INVENTORY at :22-37) still reads in part: 'maths independently VERIFIED + CI-gated (scripts/validate_math.py, reports/archive/superseded/MATH_VALIDATION.md); ... live docs refreshed 2026-07-04.' Neither edit has been made: the superseded citation is intact, the date is still 2026-07-04, and `grep -n \"CHECK:\" SUBMISSION_DOSSIER.md` returns only :289 and :290 (publish_files counts) — there is no CHECK anchor on :34. The successor evidence the row wants cited does exist elsewhere in the file (tools/verify_books_lookup_equality.py is cited at SUBMISSION_DOSSIER.md:519, near the recorded :497-501 which has drifted), and docs/stake-engine-live/2026-07-29/ exists in the tree, so both halves of the fix are actionable.",
+    "remaining": "(a) In the :34 cell, replace the reports/archive/superseded/MATH_VALIDATION.md citation with tools/verify_books_lookup_equality.py and the 500,000-round / 4,455,829-assertion equality proof (now around SUBMISSION_DOSSIER.md:519, was :497-501), matching the S2-C082 cell. (b) Change 'live docs refreshed 2026-07-04' to docs/stake-engine-live/2026-07-29/ and add `<!--CHECK: exists docs/stake-engine-live/2026-07-29/*-->`.",
+    "self_verifying": "YES"
+  },
+  {
+    "id": "S2-C108",
+    "verdict": "STILL_OPEN",
+    "evidence": "Both halves are unamended. reports/qa/math_bet_level_compliance_2026-07-25.md:3-6 still reads: 'Two-computer verification. Fable pre-computed every figure independently from the shipped lookup tables. This document is the second computer: figures below were produced by `scripts/qa/bet_level_compliance.py`, written for this pass without reference to Fable's working, then reconciled.' — no 'two independent IMPLEMENTATIONS over one shared input' restatement and no 'does not corroborate the tables' caveat, even though :8-9 of the same file names the single shared input (`lookUpTable_<mode>_0.csv`, the frozen publish set). WRS_MASTER_DOCUMENT.md:53 still reads '... Independently recomputed from the shipped tables in `reports/qa/math_bet_level_compliance_2026-07-25.md`', unqualified. The books-recomputation successor is not named in either place, and no reference to REVIEW_TRACKER.md:291 / TR-110 appears at either site. On the anchor: WRS_MASTER_DOCUMENT.md:36 is '- Review model: 3 anonymous reviewers, fractional scores (0 to 3 in ~0.33 steps), rounded average; ...', which carries no independence claim, so the :36 half of the recorded anchor is still uncorrected as well.",
+    "remaining": "Restate reports/qa/math_bet_level_compliance_2026-07-25.md:3-6 and WRS_MASTER_DOCUMENT.md:53 as two independent implementations over one shared input (agreement confirms arithmetic, not the tables, per CLAUDE.md l.4); name recomputation from `books_<mode>.jsonl.zst` as the genuinely independent second input, cross-referencing REVIEW_TRACKER.md:291 (TR-110); and delete or correct the `:36` half of the anchor.",
+    "self_verifying": "YES"
+  }
+]
