@@ -114,10 +114,27 @@ export const NOT_SUBSTITUTED: Record<string, string> = {
   // it. It is scanned for and reported, and every occurrence in this codebase
   // is in a brand or platform context rather than a wagering one.
   stake: 'brand and platform name; scanned, never rewritten',
-  // 'currency' and 'fund' appear only in code identifiers and comments here,
-  // never in a player-visible string. Rewriting them would corrupt the ISO code
-  // labels the platform itself requires.
-  currency: 'appears only in code identifiers, never player-visible',
+  // 'currency' IS player-visible, and the earlier claim that it was not was
+  // false. ReplayMode.svelte renders the literal word in `.currency-display`
+  // as `{mode === 'social' ? 'Token' : 'Currency'}`, so a real-money replay
+  // shows a player the word "Currency" on purpose.
+  //
+  // It stays unrewritten anyway, for a different reason than the one first
+  // given: a blanket rewrite would corrupt the ISO code labels the platform
+  // itself requires. The jurisdiction case is handled at the render site
+  // instead, because 'currency' is on the stake.us prohibited-terms table and
+  // social mode must never show it.
+  //
+  // THAT SWAP IS PROVED RATHER THAN ASSERTED. frontend/scripts/replay_contract_gate.mjs
+  // drives a social replay and a real-money replay against the shipped bundle
+  // and fails if the social leg renders 'currenc*' or the real-money leg
+  // renders 'Token', and its seed collapses the ternary onto the real-money
+  // branch to prove that assertion can go red. It is the only instrument that
+  // FAILS on this: social_dom_conformance.mjs does not visit a replay URL, and
+  // reports the NOT_SUBSTITUTED terms rather than failing on them.
+  currency: 'player-visible on the replay surface; swap proved by replay_contract_gate.mjs',
+  // 'fund' is a SEPARATE claim from 'currency' above and is recorded as it was
+  // found. It was not re-verified by the pass that corrected 'currency'.
   fund: 'appears only in code identifiers, never player-visible',
 }
 const NEVER_REWRITE = new Set(Object.keys(NOT_SUBSTITUTED))

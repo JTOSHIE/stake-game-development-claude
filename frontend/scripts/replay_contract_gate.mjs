@@ -220,7 +220,7 @@ function serve(patches = {}) {
  */
 async function driveReplay(browser, {
   qs = {}, patches = {}, respond = 'ok', round = FIX.super.cap, costMultiplier = 400.0,
-  settleMs = 2500, play = false,
+  settleMs = 2500, play = false, keys = false,
 } = {}) {
   // Snapshot the miss ledger so this drive reports only its OWN unapplied
   // targets. Drives are strictly sequential, so an index is sufficient.
@@ -311,6 +311,40 @@ async function driveReplay(browser, {
       if (!hit) return null
       return (hit === el || el.contains(hit) || hit.contains(el)) ? null : (hit.className || hit.tagName)
     }).catch(() => null)
+
+    // S2-C008. THE KEYBOARD LEG, and it is OPT IN for the same reason `play` is.
+    //
+    // The defect this exists for is measured and shipped, recorded at
+    // App.svelte:1373-1384: SPACE or ENTER on a focused button is activated by
+    // the BROWSER, and App.svelte's own keydown handler cannot prevent it
+    // because every one of its guards returns BEFORE it reaches
+    // e.preventDefault(). max_win_hold_gate.mjs found exactly that shape by
+    // focusing the SPIN button mid-hold and pressing SPACE then ENTER: it
+    // recorded one /wallet/play and one /wallet/end-round during the hold.
+    //
+    // So the press is aimed at a FOCUSED CONTROL rather than at the document,
+    // because native activation of a focused button is the mechanism, and a
+    // press with nothing focused would be seeding a form that does not ship.
+    //
+    // WHY NOT IN THE DEFAULT DRIVE, which is what the row's wording implies:
+    // two live assertions read this same log and both would become false.
+    // `exactly one replay request` and REQ-085's `fetch is issued with no
+    // interaction` are true only of an untouched session, and REQ-085's whole
+    // point is that the ABSENCE of a click is the assertion. A keyboard leg in
+    // the default drive would quietly convert that proof into a lie, so the
+    // interacted session is a SEPARATE drive with the money-path predicate run
+    // over it on its own.
+    if (keys) {
+      const target = page.locator('.play-again').or(page.locator('.start-replay')).first()
+      await target.focus({ timeout: 5000 }).catch(() => {})
+      await page.keyboard.press('Space')
+      await page.waitForTimeout(400)
+      await page.keyboard.press('Enter')
+      // Settle long enough for a provoked request to reach the wire. A press
+      // that put money on the wire and a press that did nothing are
+      // indistinguishable until the network has had time to show it.
+      await page.waitForTimeout(1500)
+    }
   }
 
   await page.close()
@@ -327,6 +361,25 @@ const results = []
 const ok = (name, note) => { results.push({ name, pass: true, note }); console.log(`  pass  ${name}${note ? ': ' + note : ''}`) }
 const bad = (name, why) => { results.push({ name, pass: false, why }); console.log(`  FAIL  ${name}: ${why}`) }
 const check = (cond, name, note, why) => (cond ? ok(name, note) : bad(name, why))
+
+/**
+ * REQ-094, REQ-099: replay never touches the money path.
+ *
+ * EXTRACTED for S2-C008 so it can run over a drive that assertContract must not
+ * be run over. An interacted session breaks two of assertContract's other
+ * assertions by design (`exactly one replay request` and REQ-085's `issued with
+ * no interaction`), but the money-path rule holds on EVERY session, touched or
+ * not, and is the only one that does. Keeping it as one predicate called from
+ * both places means the keyboard leg is judged by the same rule as the boot, so
+ * there is no second statement of the rule to drift.
+ */
+function assertNoMoneyPath(off, pre = '') {
+  const authed = off.filter((r) => AUTHED_ROUTE.test(new URL(r.url).pathname))
+  check(authed.length === 0, `${pre}no authenticated RGS call in replay`,
+    'no authenticate, play, end-round, wallet or balance request',
+    `replay issued ${authed.length} authenticated call(s): ${authed.map((r) => r.url).join(', ')}`)
+  return authed
+}
 
 /** The contract, asserted against one healthy session. Returns pass/fail counts. */
 function assertContract({ requests, observed }, label = '') {
@@ -367,10 +420,7 @@ function assertContract({ requests, observed }, label = '') {
     'no replay request was issued without interaction')
 
   // REQ-094, REQ-099: replay never touches the money path.
-  const authed = off.filter((r) => AUTHED_ROUTE.test(new URL(r.url).pathname))
-  check(authed.length === 0, `${pre}no authenticated RGS call in replay`,
-    'no authenticate, play, end-round, wallet or balance request',
-    `replay issued ${authed.length} authenticated call(s): ${authed.map((r) => r.url).join(', ')}`)
+  assertNoMoneyPath(off, pre)
 
   return { call, off }
 }
@@ -507,6 +557,21 @@ async function main() {
       // is about. Also reclaims about 50 seconds of dead wait per CI run.
       assertFiguresPersist(await driveReplay(browser,
         { costMultiplier: 1.0, play: true, round: FIX.base.win }))
+
+      // S2-C008. THE KEYBOARD SESSION, driven separately and judged by the
+      // money-path rule alone.
+      //
+      // Before this, EVERY assertContract call in this file ran over a drive
+      // with `play` false and `keys` false, so the money-path rule had only
+      // ever been asserted about a session nobody had touched. The rule it is
+      // meant to enforce is that replay never puts money on the wire, and the
+      // way this project has actually broken that rule is a key press: a
+      // focused button activated natively by the browser, past a handler whose
+      // guards all return before preventDefault. That path was completely
+      // unobserved here.
+      const keyed = await driveReplay(browser,
+        { costMultiplier: 1.0, play: true, keys: true, round: FIX.base.win })
+      assertNoMoneyPath(offOrigin(keyed.requests), '[keyboard] ')
 
       // S2-C009, driven as its own session because `social` is a launch
       // parameter and cannot be toggled on a live page.
@@ -706,6 +771,39 @@ async function main() {
           return b.replace('</head>',
             `<script>fetch('https://${P.rgsHost}/wallet/authenticate',{method:'POST'}).catch(()=>{})</script></head>`)
         } } }, /no authenticated RGS call/)
+
+      // SEED 3b, S2-C008: a KEY PRESS puts money on the wire.
+      //
+      // WHY THIS IS AN OBSERVATION-BOUNDARY SEED AND NOT A SOURCE ONE, stated
+      // because the row asked for the source form and the source form cannot be
+      // planted here. The real guard is App.svelte's `if (isReplay) return` in
+      // handleKeydown, which compiles into the bundle, so index.html cannot
+      // reach it. Stripping it in the bundle would also prove nothing: on the
+      // replay surface `canSpin` is permanently false, because isLoading starts
+      // true and its only clear lives in initRGS, which replay mode skips. So a
+      // bundle strip would emit no request at all and the seed would score
+      // MISSED on a gate that is working correctly, which is the precise
+      // failure convention (p) exists to prevent.
+      //
+      // What is planted instead is the OBSERVABLE, in the shape the defect
+      // really takes on the wire: a focused control, a Space press, and an
+      // authenticated call leaving the page. That is the same practice this
+      // file's header already declares for SEED 3 and SEED 5, and it is what
+      // makes the keyboard leg's own assertion provably able to fail. Without
+      // it the leg would be two key presses nobody had ever seen catch
+      // anything, which is a script that prints PASS.
+      await seed('keypress-puts-money-on-the-wire',
+        'a Space press on a focused replay control issues an authenticated call',
+        { costMultiplier: 1.0, play: true, keys: true, round: FIX.base.win,
+          patches: { '/index.html': (b) => {
+            if (!b.includes('</head>')) return null
+            return b.replace('</head>',
+              '<script>addEventListener("keydown",function(e){if(e.code==="Space")'
+              + `fetch('https://${P.rgsHost}/wallet/play',{method:'POST'}).catch(()=>{})},true)`
+              + '</script></head>')
+          } } },
+        /no authenticated RGS call/,
+        (r, pre) => assertNoMoneyPath(offOrigin(r.requests), pre))
 
       // SEED 4: a second replay request. Catches a retry loop or a double mount,
       // both of which have shipped in this project's history on other surfaces.
