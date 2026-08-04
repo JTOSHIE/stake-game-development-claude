@@ -30,6 +30,7 @@
 // Run (from frontend/, after `npm run build`): node scripts/dist_hygiene_gate.mjs
 
 import { readdirSync, statSync, existsSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, relative } from 'node:path'
 import { evidenceDir, announceEvidenceMode } from './lib/evidencePaths.mjs'
@@ -121,6 +122,46 @@ if (existsSync(infoPath)) {
   try { info = JSON.parse(readFileSync(infoPath, 'utf-8')) } catch { info = null }
 }
 check('dist carries a build stamp', info !== null, 'build-info.json missing or unparseable')
+
+// ── S2-C044: the stamp describes THIS commit, built clean ───────────────────
+//
+// The checks above prove the stamp is WELL FORMED and that its byte figures
+// reconcile with what is on disk. Neither of them can tell you the bundle is
+// the one this working tree describes. A dist built three commits ago
+// reconciles with itself perfectly: its figures are internally consistent, its
+// commit is forty hex characters, and every assertion here was green while the
+// artefact under test was stale. That is the gap.
+//
+// It is not hypothetical. On the run that introduced this check, HEAD was
+// 370b2f1 and dist/build-info.json read 8e2bd1a, so the gate went red on the
+// real tree the first time it was asked, before any seed was planted.
+//
+// cleanTree matters for the same reason convention (o) requires the staging
+// bundle to come from a fresh clone: a bundle built over uncommitted edits
+// contains something nobody else can reproduce, and the recorded byte figure
+// is then a number nobody can check.
+function buildStampViolations(info, headSha) {
+  const out = []
+  if (!/^[0-9a-f]{40}$/.test(headSha || '')) {
+    return [{ field: 'HEAD', why: `could not resolve HEAD to a sha, got "${headSha}"` }]
+  }
+  if (!info) return [{ field: 'build-info.json', why: 'absent or unparseable' }]
+  if (info.commit !== headSha) {
+    out.push({ field: 'commit', why: `stamp says ${info.commit}, HEAD is ${headSha}` })
+  }
+  if (info.cleanTree !== true) {
+    out.push({ field: 'cleanTree', why: `stamp says ${JSON.stringify(info.cleanTree)}, expected true` })
+  }
+  return out
+}
+
+let headSha = ''
+try {
+  headSha = execSync('git rev-parse HEAD', { cwd: ROOT, encoding: 'utf-8' }).trim()
+} catch {
+  headSha = ''
+}
+
 if (info) {
   const infoBytes = statSync(infoPath).size
   check('the build stamp names a commit',
@@ -131,6 +172,32 @@ if (info) {
     `stamp says ${info.bundleFilesExcludingThisFile} files / ${info.bundleBytesExcludingThisFile} bytes `
       + `plus itself at ${infoBytes}; disk has ${files.length} files / ${totalBytes} bytes`)
 }
+
+const stampViolations = buildStampViolations(info, headSha)
+check('the build stamp is THIS commit, built from a clean tree',
+  stampViolations.length === 0,
+  stampViolations.map((v) => `${v.field}: ${v.why}`).join('; '))
+
+// Seeded per convention (p), in the two forms the defect really takes. The
+// polarity idiom is brandSeeded's at the Stake branding block below: one array
+// carrying both directions, so the negative control cannot drift away from the
+// positives.
+const STAMP_SEEDS = [
+  ['THE STALE COMMIT: a bundle built at an earlier commit, which is the form '
+    + 'that really ships and the exact state this gate found on its first run',
+   true, { commit: 'a'.repeat(40), cleanTree: true }],
+  ['a dirty-tree build, the form a working-machine build really takes',
+   true, { commit: headSha, cleanTree: false }],
+  ['cleanTree absent entirely, the form a producer regression really takes',
+   true, { commit: headSha }],
+  ['NEGATIVE CONTROL: this commit, built clean, must survive',
+   false, { commit: headSha, cleanTree: true }],
+]
+const stampSeeded = STAMP_SEEDS.map(([why, shouldFlag, stamp]) => ({
+  why, ok: (buildStampViolations(stamp, headSha).length > 0) === shouldFlag,
+}))
+for (const s of stampSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+check('the build stamp scan can actually fail', stampSeeded.every((s) => s.ok))
 
 // ── No data: URI assets in shipped CSS or JS, JOB 1 2026-07-28 ──────────────
 //
@@ -269,6 +336,94 @@ const brandSeeded = BRAND_SEEDS.map(([why, shouldFlag, text]) => ({
 for (const s of brandSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
 check('the Stake branding scan can actually fail', brandSeeded.every((s) => s.ok))
 
+// ── S2-C052: NO DEVELOPMENT-ONLY HOOK SHIPS ──────────────────────────────────
+//
+// App.svelte:206 opens `if (import.meta.env.DEV) {` and inside it installs two
+// things a production player must never have: the telemetry buffer at
+// `window.__telemetry` (:208) and the `?mockCurrency=` override (:218) that
+// sets any currency code from the query string. Vite replaces import.meta.env.DEV
+// with false for a production build and the whole block is eliminated. Nothing
+// asserted that. Hoisting either line one brace outward ships it, and the build
+// log would say nothing at all.
+//
+// TWO PARTS OF THIS ROW ARE REFUSED RATHER THAN SHIPPED WEAK, and both refusals
+// were measured against the real bundle rather than argued.
+//
+// (1) NOT `setTelemetrySink`. The row asked for it and it CANNOT WORK. No
+//     build.minify is configured, so Vite's default esbuild minifier applies,
+//     and esbuild renames every bundle-scope function identifier. Measured on
+//     the shipped bundle: `configureTelemetry` is called unconditionally at
+//     App.svelte:155 so it certainly ships, and `grep -c configureTelemetry
+//     dist/assets/index-*.js` returns 0. So do setTelemetrySink, bufferSink and
+//     winTier. A scan for that token could never fire, hoisted or not, and would
+//     be a gate that prints PASS. This is the build_diet_verify.mjs class
+//     exactly, caught before it shipped rather than ten days after.
+//
+//     What IS scanned instead survives minification for reasons that hold:
+//     `__telemetry` is a PROPERTY name and esbuild does not mangle property
+//     names without an opt-in, and `mockCurrency` is a STRING LITERAL argument
+//     to .get(). Both are 0 in the bundle today and both would be present if
+//     their guard were dropped, so the seed below plants a form that can really
+//     arrive.
+//
+// (2) NOT the "absolute http(s) origin that is not the RGS host" clause. It
+//     would be PERMANENTLY RED on a correct bundle: 20 absolute origins ship
+//     legitimately today, being Svelte 5 runtime error links (https://svelte.dev/e/...),
+//     XML namespace identifiers (http://www.w3.org/2000/svg) which are names
+//     rather than network destinations, and a pixi shader credit. And there is
+//     no RGS host to allowlist against: it arrives at RUNTIME from the launch
+//     URL's rgs_url parameter, so the literal appears nowhere in src or dist.
+//     A string scan cannot tell an error-message URL from a fetch target. The
+//     instrument that can is frontend/scripts/platform_conformance_item2.mjs,
+//     which compares new URL(u).origin over REAL requests in a browser session.
+//     That clause belongs to S2-C058 and is left there, unwired, rather than
+//     answered here with a scan that cannot mean what it says.
+function devHookViolations(text) {
+  const out = []
+  const HOOKS = [
+    [/__telemetry/g, 'the DEV telemetry buffer hook (App.svelte:208)'],
+    [/mockCurrency/g, 'the DEV-only currency override (App.svelte:218)'],
+  ]
+  for (const [re, why] of HOOKS) {
+    for (const m of text.matchAll(re)) out.push({ hit: m[0], why })
+  }
+  return out
+}
+
+const jsFiles = codeFiles.filter((f) => /\.js$/i.test(f))
+const devHookViolationsFound = []
+for (const f of jsFiles) {
+  for (const v of devHookViolations(readFileSync(f, 'utf-8'))) {
+    devHookViolationsFound.push({ file: relative(DIST, f), ...v })
+  }
+}
+check('no development-only hook ships in the bundle', devHookViolationsFound.length === 0,
+  devHookViolationsFound.map((v) => `${v.file}: "${v.hit}" (${v.why})`).join('; '))
+
+// Seeded per convention (p), in the MINIFIED forms these really arrive in: the
+// identifiers around them are renamed, the property name and the string literal
+// are not, which is the whole reason these two tokens were chosen over the
+// function names the row named.
+const DEV_HOOK_SEEDS = [
+  ['the telemetry buffer hoisted out of its import.meta.env.DEV guard, which is '
+    + 'the form the defect really ships', true,
+   'const c=[];window.__telemetry=c;Ft(jt(c));'],
+  ['the DEV-only currency override hoisted out of the same guard', true,
+   'const q=new URLSearchParams(window.location.search).get("mockCurrency");q&&Ne(q.toUpperCase())'],
+  ['NEGATIVE CONTROL: an ordinary telemetry call with no dev hook must survive',
+   false, 'const e={name:"spin",at:Date.now()};Ft(e)'],
+]
+const devHookSeeded = DEV_HOOK_SEEDS.map(([why, shouldFlag, text]) => ({
+  why, ok: (devHookViolations(text).length > 0) === shouldFlag,
+}))
+// Negative control on the REAL artefact, the strongest of the controls here
+// because it reads the shipped bundle rather than a hand-written string.
+const devHookControlClean = jsFiles.every((f) => devHookViolations(readFileSync(f, 'utf-8')).length === 0)
+for (const s of devHookSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+console.log(`  ${devHookControlClean ? 'clean ' : 'FALSE+'}  seeded: negative control, the real shipped JS must survive`)
+check('the development-hook scan can actually fail',
+  devHookSeeded.every((s) => s.ok) && devHookControlClean)
+
 // ── GUIDELINE ITEM 25: DOUBLE-TAP ZOOM STAYS DISABLED ────────────────────────
 //
 // Added 2026-07-30, same pass, same reason. The whole of item 25's compliance is
@@ -330,8 +485,29 @@ console.log(`  ${controlClean ? 'clean ' : 'FALSE+'}  seeded: negative control, 
 check('the documentation scan can actually fail',
   seeded.every((s) => s.caught) && controlClean)
 
+// S2-C080, convention (s). `generated` was the frozen literal '2026-07-26',
+// which is a value that changes written down as though it does not: every run
+// since that date has stamped a report with the date of a different run, and
+// two committed copies of this file were indistinguishable no matter how far
+// apart they were produced.
+//
+// `measuredAt` is the sibling that makes them distinguishable. `generated`
+// keeps its name and its YYYY-MM-DD shape so existing readers are unaffected,
+// and is now derived from the same instant rather than typed in.
+//
+// THE COUPLING, recorded rather than acted on. The FILENAME below still carries
+// a frozen 2026-07-26, and that is the same defect one level up: a value copied
+// into a name, which is the worked example convention (s) is built on. It is
+// NOT fixed here. The filename is S2-C077 part (b) and S2-C079, both
+// documentation-tier rows, and renaming it would move an artefact that
+// SUBMISSION_DOSSIER.md and the audit ledgers cite by name. Changing the
+// `generated` KEY is inert by comparison: no gate, document or ledger in this
+// repository reads it, which is why the two halves are separable at all.
+const measuredAt = new Date().toISOString()
+
 writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({
-  generated: '2026-07-26',
+  generated: measuredAt.slice(0, 10),
+  measuredAt,
   job: 'JOB 3(i), no documentation ships',
   dist: { files: files.length, bytes: totalBytes, megabytes: +(totalBytes / 1024 / 1024).toFixed(2) },
   budgetBytes: BUDGET_BYTES,
