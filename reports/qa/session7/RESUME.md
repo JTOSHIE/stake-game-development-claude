@@ -11,3 +11,7 @@ Format: `<sha>  <row ids or scope>  <what landed>  <proof>  <main loop context a
 
 ---
 
+`563c695`  session setup  Brief saved verbatim to `reports/briefs/FS_SELF_VERIFYING_Prompt.md`; this ledger opened.  Proof: convention (b) and (f) satisfied by the file existing at its named path.  Main loop about 90k.
+
+`8970f0d`  JOB 1, all 57 rows  `reports/qa/session7/RECONCILED.tsv` plus `RECONCILED_NOTES.md` and twelve agent shards. Verdicts: 50 STILL OPEN, 7 ALREADY CLOSED, 0 UNKNOWN, 0 LOST.  Proof: each verdict carries a file and line at HEAD; four ALREADY CLOSED verdicts independently spot-checked from the main loop before the count was believed.  Main loop about 175k.
+
