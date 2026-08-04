@@ -59,7 +59,12 @@ decides; the rules will not.
 
 ## Zero-reference candidates: 550
 
-| directory | candidates |
+The individual paths are enumerated in full in `orphan_candidates.txt`, one per line, in
+this directory. The table below groups them and is not the record of which files they are.
+
+<!--CHECK: exists reports/qa/file_census/orphan_candidates.txt-->
+
+| path prefix (first two segments) | candidates |
 |---|---|
 | `frontend/public` | 439 |
 | `design-system/brand` | 33 |
