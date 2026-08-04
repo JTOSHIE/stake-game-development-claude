@@ -171,3 +171,39 @@ were asked to report miscluster. They found real ones:
 
 These are recorded rather than actioned: merging ledger rows changes finding
 identity across three sessions of history, and that is an owner call.
+
+## RECONCILIATION AGAINST HEAD, 2026-08-04, session 7
+
+**CORRECTION, 2026-08-04, and it is a correction to the COUNT rather than to any
+derivation.** All 57 unlocked, ONE_LINE or SMALL, concretely located candidates among the
+71 PARKED wave-A rows were reconciled against HEAD `563c695` by twelve shared-nothing
+agents. **Fifty are STILL OPEN, seven are ALREADY CLOSED, none returned UNKNOWN and none
+was lost.**
+
+The seven already closed at HEAD, which this ledger had continued to record as PARKED:
+**S2-C006, S2-C017, S2-C067, S2-C073, S2-C074, S2-C087, S2-C092.**
+
+**The backlog was inflated by seven rows, not by the large unknown amount the work order
+feared.** Six of the eight rows that order suspected were confirmed closed against source.
+The two that were not, S2-C009 and S2-C012, are exactly the two it flagged as having been
+believed closed by inference from a commit message rather than from source, and both are
+STILL OPEN.
+
+Recorded additively, following the `correction_2026_07_31` pattern established above and
+never by rewriting the wave-A text:
+
+- `waveA_raw.json`: each of the 57 rows gains a `reconciled_2026_08_04` key holding the
+  verdict, the evidence at HEAD and what remains. Every pre-existing key and value is
+  byte-identical, verified by comparing the parsed old and new documents key by key.
+- `DISPOSITIONS.tsv`: one appended column, `reconciled_2026_08_04`. Every pre-existing
+  cell is byte-identical, asserted by the script that wrote it. Rows outside the candidate
+  set read `not_in_session7_candidate_set` rather than being left blank, so an empty cell
+  can never be mistaken for an unreconciled row.
+- Full detail, the method, and two caveats a future session must not skip:
+  `reports/qa/session7/RECONCILED.tsv` and `reports/qa/session7/RECONCILED_NOTES.md`.
+
+**THE `self_verifying` COLUMN IN THAT TSV IS NOT A LICENCE.** Fifty-six of 57 rows carry
+YES, and that near-unanimity is an artefact of how the first ten shards were prompted. The
+two shards asked a strict form of the same question immediately returned a NO. The column
+records what the agents said; it did not decide what session 7 touched, and it must not
+decide what a later session touches. `RECONCILED_NOTES.md` gives the worked reasoning.
