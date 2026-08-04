@@ -19,3 +19,5 @@ Format: `<sha>  <row ids or scope>  <what landed>  <proof>  <main loop context a
   PARKED this pass: S2-C056, needs the owner to confirm the `future-spinner-3` destination before a sentence attributed to an owner ruling is rewritten.
   OUTSTANDING: S2-C077 part (b), the gate report filename, belongs to the gate tier with S2-C079 and is coupled to the two new CHECK anchors.
 
+`dce952b`  S2-C070  `reports/qa/file_census/CENSUS_MECHANICAL.md`: names `orphan_candidates.txt` as the enumeration and relabels the table column `path prefix (first two segments)`.  Proof: the file has exactly 550 lines and grouping it by first two segments reproduces 439 / 33 / 19, the table's own figures; CHECK anchor added; doc currency gate PASS.  Main loop about 225k.
+
