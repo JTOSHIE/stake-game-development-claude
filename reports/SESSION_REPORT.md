@@ -10326,3 +10326,10 @@ depend on the recorded cause.
 6. Unchanged from the brief: the reviewers' named blocker, money-display integrity and
    localisation completeness, which the owner has ruled comes next and which no session has
    yet scoped; and the ten questions of entry 038.
+
+**FINAL PUSH VERIFIED, per rule 10 and the one-commit-lag clause.** Run
+`30889554608` on `53f5f2d`: **success**, "what changed" and "static gates" green,
+browser matrix `skipped`. The qualification above still stands and is the point: this
+green does not speak for the browser matrix, which has not been seen fully green since
+run `30600681036` on `3d068eb`. This recording commit is itself the lag rule 12 names,
+and the owner preview is refreshed once more after it.

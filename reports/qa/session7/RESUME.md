@@ -26,3 +26,5 @@ Format: `<sha>  <row ids or scope>  <what landed>  <proof>  <main loop context a
 `FINAL`  JOB 5 close  Session report appended to `reports/SESSION_REPORT.md` and archived to `reports/archive/2026-08-04_self_verifying_fixes.md`.  Proof: CI run 30889187583 on `c1225e1` success with the browser matrix skipped by design; owner preview refreshed and curled HTTP 200.  Main loop about 275k.
   SESSION ENDED at a commit boundary with 47 of the 57 rows still open, 19 of them JOB 3 gate rows that are entirely unstarted. The resource that ran out is MAIN LOOP CONTEXT, per rule 13's requirement to name it.
 
+`FINAL+1`  rule 10 record  Final push run `30889554608` on `53f5f2d` verified success, browser matrix skipped by design.  Proof: `gh run view` job list quoted in the session report.  Main loop about 285k.
+
