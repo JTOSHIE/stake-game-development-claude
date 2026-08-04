@@ -158,7 +158,7 @@ browser matrix rather than confirmed by hand. **It does NOT test request ORIGIN*
 declared in its own header and escalated per convention (l.8).
 `reports/qa/build-diet-network-log.json` is a DATED sample of the JOB 4 run of 2026-07-26, not
 a statement about the current build: read the current verdict from the CI leg.
-**Measured at 14.80MB (108 files, 15,515,125 bytes) against the 25MB budget on 2026-07-26**,
+**Measured at 14.80MB (108 files, 15,515,148 bytes) against the 25MB budget on 2026-07-26**,
 on the artefact that shipped then: the JOB 5 kit V3 build, from a fresh clone at commit
 `7dd83e6a`, clean tree. That is a dated record and not a current figure, because the byte
 total and the file count move on every build: **read the current size from
@@ -169,9 +169,12 @@ here states which it was. Supersedes both the 13.59MB recorded at JOB 4 on
 2026-07-13 and the 21.87MB measured earlier on 2026-07-26.
 
 The 108th file is `build-info.json` itself, the JOB 4 provenance stamp, which records the
-other 107 files and 15,514,744 bytes and is excluded from its own total for want of a
-fixed point. 15,514,744 plus the stamp's own 381 bytes is 15,515,125, and
+other 107 files and 15,514,766 bytes and is excluded from its own total for want of a
+fixed point. 15,514,766 plus the stamp's own 382 bytes is 15,515,148, and
 `dist_hygiene_gate.mjs` asserts exactly that reconciliation on every build.
+
+<!--CHECK: grep "15515148" reports/qa/dist_hygiene_2026-07-26.json-->
+<!--CHECK: grep "15514766" reports/qa/dist_hygiene_2026-07-26.json-->
 
 **The earlier 108-file / 15,510,083-byte figure is superseded, and both movements are
 accounted for.** JOB 3(i) removed one file, `assets/themes/future-spinner/sounds/README.md`,
