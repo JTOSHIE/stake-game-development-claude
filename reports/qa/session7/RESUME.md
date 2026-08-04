@@ -23,3 +23,6 @@ Format: `<sha>  <row ids or scope>  <what landed>  <proof>  <main loop context a
 
 `7d3bccd`  JOB 4, all 57 rows  Ledger made true additively: `reconciled_2026_08_04` key in `reports/qa/session4b/waveA_raw.json`, appended column in `reports/qa/session4b/DISPOSITIONS.tsv`, dated CORRECTION block in `reports/qa/session4b/LEDGER.md`.  Proof: old and new JSON compared key by key, no pre-existing content altered; TSV writer asserts byte-identical pre-existing cells; doc currency gate PASS.  Main loop about 250k.
 
+`FINAL`  JOB 5 close  Session report appended to `reports/SESSION_REPORT.md` and archived to `reports/archive/2026-08-04_self_verifying_fixes.md`.  Proof: CI run 30889187583 on `c1225e1` success with the browser matrix skipped by design; owner preview refreshed and curled HTTP 200.  Main loop about 275k.
+  SESSION ENDED at a commit boundary with 47 of the 57 rows still open, 19 of them JOB 3 gate rows that are entirely unstarted. The resource that ran out is MAIN LOOP CONTEXT, per rule 13's requirement to name it.
+
