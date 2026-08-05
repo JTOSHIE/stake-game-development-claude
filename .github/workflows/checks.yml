@@ -741,6 +741,28 @@ jobs:
         working-directory: frontend
         run: node scripts/dist_hygiene_gate.mjs
 
+      # ── S2-C010: no Stake brand token in any FILE NAME ──────────────────────
+      # The companion to dist_hygiene_gate.mjs's Stake branding block, which
+      # scans file CONTENT in dist. This scans file NAMES across dist, the
+      # frontend source and the brand design system. Two sessions disagreed over
+      # whether the row was already covered; it was covered by half. Its token
+      # rules are stated independently of the content scan's, per convention
+      # (l.4), because two predicates sharing one list corroborate nothing and
+      # because a file name has no vocabulary layer around it: the filename trap
+      # is that `stake` is a substring of mistake and stakeholder, so the match
+      # is whole-token.
+      #
+      # AFTER the production build, deliberately, for the same reason the asset
+      # reference pair above is: dist is one of its three roots and a missing
+      # root exits non-zero rather than skipping.
+      - name: brand tokens in file names, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/brand_token_gate.mjs --self-test
+
+      - name: no Stake brand token in any shipped or source file name
+        working-directory: frontend
+        run: node scripts/brand_token_gate.mjs
+
       # ── Gate 13f: the submission delivery set ────────────────────────────────
       # M03 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
       # (REQ-164, 169, 170, 171, 172, 173, 174, 176) with no proof path, all of
