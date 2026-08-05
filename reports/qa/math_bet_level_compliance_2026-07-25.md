@@ -1,9 +1,28 @@
 # Bet-level compliance verification, Future Spinner, 2026-07-25
 
-Two-computer verification. Fable pre-computed every figure independently from the
-shipped lookup tables. This document is the second computer: figures below were
-produced by `scripts/qa/bet_level_compliance.py`, written for this pass without
-reference to Fable's working, then reconciled.
+Two-computer verification, and **CORRECTED 2026-08-05 to say what that does and does
+not establish**. Fable pre-computed every figure from the shipped lookup tables. This
+document is the second computer: figures below were produced by
+`scripts/qa/bet_level_compliance.py`, written for this pass without reference to
+Fable's working, then reconciled.
+
+**THE TWO COMPUTERS ARE TWO INDEPENDENT IMPLEMENTATIONS OVER ONE SHARED INPUT.** Both
+read the same `lookUpTable_<mode>_0.csv` files. Convention (l.4) is explicit that
+agreement means nothing where an input is shared, because the flaw is shared with it:
+**this pass confirms the ARITHMETIC, and it cannot confirm the TABLES.** If a published
+lookup table were itself wrong, both computers would agree on the same wrong figure and
+this document would read exactly as it does.
+
+**The genuinely independent second input is the books**, `books_<mode>.jsonl.zst`, from
+which those tables were derived. `tools/verify_books_lookup_equality.py` walks precisely
+that bridge and reports a 500,000-round, 4,455,829-assertion equality PASS.
+
+**But it is not yet approval-grade corroboration, and saying so is the point of this
+note.** `REVIEW_TRACKER.md` row TR-110 is OPEN against that result's PROVENANCE rather
+than the tool's soundness: the committed JSON carries no verifier commit, no input
+hashes and no run timestamp binding it to the books named in `BOOKS_MANIFEST.md`.
+Neither reviewer claims the books are wrong. Until TR-110 closes, the honest statement
+is that the arithmetic is doubly confirmed and the tables rest on a single chain.
 
 - **Source tables:** `games/future_spinner/library/publish_files/lookUpTable_<mode>_0.csv`,
   the frozen publish set, read-only throughout. 100,000 rows per mode, five modes.
