@@ -7,6 +7,28 @@
 
 # Published tile geometry, measured
 
+**TWO CORRECTIONS, 2026-08-05, S2-C217.**
+
+**1. This is OUR SURVEY, not a third-party capture, and it is filed in the wrong place.**
+Its own front matter says so: `rendered_via: direct HTTP, PNG headers only`. It is the only
+file in this dated directory, and everything else under the mirror root is a verbatim
+upstream capture that is deliberately NOT kept current and NOT scanned by
+`scripts/qa/doc_currency_gate.mjs`. **So this measurement of ours is excluded from the gate
+by where it sits.** Moving it is a rename that touches every citation of it, so it is
+reported here rather than done in passing.
+
+**2. 408x546 was described as the platform's PUBLISHED geometry across six live documents.**
+The platform publishes no tile dimension at all. It is a DE FACTO convention that we
+measured from published games. All six now say so, and the anchors below hold the wording:
+
+**The anchors that hold this wording live in `design-system/brand/delivery/README.md`,
+NOT here.** They were written here first and PROVED INERT: seeding the old phrase back into
+`CLAUDE.md` left the gate green, because this directory is excluded from scanning. That is
+the same defect as correction 1 above, found by testing the anchor instead of trusting it.
+
+The dated ledgers under `reports/qa/session2_audit/` and the walk shards keep the old
+wording, because they are records of what was written then.
+
 ## Why this capture exists
 
 **The platform publishes no pixel dimensions for the game tile.**
@@ -45,7 +67,11 @@ this reads headers rather than downloading the platform's artwork.
 | 1024x1024 | 1 | 1.1% |
 | 1012x933 | 1 | 1.1% |
 
-**408x546 is the platform's published tile geometry**, at 93.1% of the decoded sample.
+**408x546 is the DE FACTO tile geometry of published games**, at 93.1% of the decoded
+sample: 81 of 87 decoded assets in an even 120-game sample. **The platform states no
+dimension anywhere**, so this is MEASURED and is not a published requirement. Corrected
+2026-08-05: this line previously called it "the platform's published tile geometry", which
+attributes to the platform a number it has never published.
 It is portrait. The stragglers are a handful of odd sizes and a small number of animated
 tiles delivered as MP4 rather than as a still image, which is itself worth knowing and is
 not something the requirements page mentions either.

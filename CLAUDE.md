@@ -348,7 +348,8 @@ does rather than leaving the record at odds with itself:
 - **The published tile** (`design-system/brand/tile/tile_composed_master.png`, 2026-07-26).
   Its own generation record states the origin as *"Externally generated, commissioned by
   the owner"*. It is not an enhancement of anything: nothing portrait existed to enhance,
-  and it landed byte-identical at 408x546, the platform's own published tile geometry.
+  and it landed byte-identical at 408x546, the DE FACTO tile geometry of published games,
+  measured rather than published: the platform states no dimension anywhere.
 - **The scene background** (`bg_base.jpg`, this ruling). Measured at Pearson r 0.3850
   against the background it replaced, with a declared enhancement scoring 0.9966 as the
   control, so it is unambiguously a new design and was adopted as one.

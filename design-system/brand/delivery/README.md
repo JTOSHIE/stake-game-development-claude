@@ -40,9 +40,17 @@ carries both, and the owner uses whichever the editor asks for.
 | separate layers | `FutureSpinner-BG.jpg` and `FutureSpinner-FG.png` |
 
 `FutureSpinner-Tile.png` is the owner's composed artwork, byte-identical, at
-**408x546**. That is the platform's own published tile geometry, measured across a
+**408x546**. That is the DE FACTO tile geometry of published games, measured across a
 live sample of published assets rather than read off the docs, which give no
-dimensions at all: see `docs/stake-engine-live/2026-07-26/published-tile-geometry.md`.
+dimensions at all. **The platform publishes no tile dimension**, so this is a convention
+we measured and not a requirement we were given:
+
+<!--CHECK: !grep "platform's published tile geometry" CLAUDE.md-->
+<!--CHECK: !grep "platform's own published tile geometry" CLAUDE.md-->
+<!--CHECK: !grep "platform's own published tile geometry" design-system/brand/tile/GENERATION_NOTE_composed_master.md-->
+<!--CHECK: !grep "platform's published tile geometry" design-system/brand/tile/TILE_LAYER_DERIVATION.md-->
+<!--CHECK: !grep "platform's own published tile geometry" WRS_MASTER_DOCUMENT.md-->
+ see `docs/stake-engine-live/2026-07-26/published-tile-geometry.md`.
 It is also the first portrait tile asset the project has held; BG and FG are both
 landscape.
 

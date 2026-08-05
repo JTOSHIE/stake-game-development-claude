@@ -82,7 +82,8 @@ Recorded plainly, because this is the part that reaches a human:
 
 1. **If the Design Thumbnail editor accepts a single composed image**, use
    `FutureSpinner-Tile.png`. It is the owner's own artwork at 408x546, which is the
-   platform's published tile geometry measured across a live sample, and it has been
+   de facto tile geometry of published games, measured across a live sample because the
+   platform publishes none, and it has been
    through no resampling or recompression here.
 2. **If it requires background and foreground layers**, use the existing
    `FutureSpinner-BG.jpg` and `FutureSpinner-FG.png`, and use the composed master as the

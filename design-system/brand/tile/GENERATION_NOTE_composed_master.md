@@ -30,7 +30,8 @@ than assumed.
 
 ## Why the dimensions are the finding
 
-**408x546 is the platform's own published tile geometry.** That is not inferred from
+**408x546 is the DE FACTO tile geometry of published games, measured and not published.**
+The platform states no dimension anywhere. That is not inferred from
 the docs, which give no pixel dimensions for the tile anywhere. It was measured against
 the platform's live published assets: see
 `docs/stake-engine-live/2026-07-26/published-tile-geometry.md`, where a sample of live
