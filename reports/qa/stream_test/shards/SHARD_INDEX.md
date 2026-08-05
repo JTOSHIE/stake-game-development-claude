@@ -6,11 +6,30 @@ to record the finished state rather than the salvage state it opened with.
 
 Australian English, no em dashes or en dashes.
 
-## Status: discovery COMPLETE, verification NOT RUN
+## Status: discovery COMPLETE, verification RUN for the STREAM tier only
 
 47 shards. Every one of the 519 frames is read by at least one lens. **540
 findings, none of them verified.** The adversarial pass did not run; see
 `../LEDGER.md` for why that was a deliberate stop rather than an omission.
+
+> **CORRECTED 2026-08-05, S2-C217's sibling row S2-C090. The heading above said
+> "verification NOT RUN" and the sentence above says "none of them verified". BOTH WERE
+> TRUE WHEN WRITTEN AND ARE NOW PARTLY FALSE.**
+>
+> The adversarial pass DID subsequently run, for the STREAM tier: `../CLUSTERS.md` carries a
+> FINAL DISPOSITION of the STREAM tier over 26 clusters, and `reports/SESSION_REPORT.md`
+> records that pass as JOB 3, 52 adversarial seats over 26 clusters. So the STREAM findings
+> are verified, dispositioned, and in several cases had their diagnosis corrected by the
+> panel rather than merely confirmed.
+>
+> **HIGH, MEDIUM and LOW remain unverified**, which is why the 540 figure above is left
+> standing rather than struck: it is not wholly superseded, only partly. A reader wanting
+> the current state of the STREAM tier reads `../CLUSTERS.md`; a reader wanting the state
+> of everything below STREAM is still looking at an unverified discovery set.
+>
+> Corrected additively, in the style of the AUDITED block below, rather than by rewriting
+> the original sentences, because this file is a dated record of what the recovery session
+> found.
 
 > **AUDITED 2026-07-29 by the boot-set audit. `519 frames` CONFIRMED. `47 shards` is
 > UNKNOWN and is left standing rather than changed, because it cannot be settled from the
