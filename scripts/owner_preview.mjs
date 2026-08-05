@@ -47,12 +47,18 @@
 //   node scripts/owner_preview.mjs --adopt <pid>   record an existing server as
 //                                                  the tracked instance, so the
 //                                                  next run stops it properly
+//   node scripts/owner_preview.mjs --self-test     convention (p): plant the
+//                                                  address defects and require
+//                                                  the refusal. Starts no server,
+//                                                  changes no git state.
 //
 import { execFileSync, spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, openSync, closeSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
 import { createHash } from 'node:crypto'
+import { networkInterfaces } from 'node:os'
+import { createServer } from 'node:http'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '..')
@@ -233,13 +239,245 @@ async function waitForReady(url, timeoutMs) {
   return false
 }
 
-function statusLine(sha, commitDate, startedAt) {
+// ── the owner's actual address ───────────────────────────────────────────────
+//
+// THE DEFECT THIS REPLACED, recorded because it is convention (s) inside the one
+// script that exists to serve rule 12's evidence. This line used to read:
+//
+//     + `  |  started ${startedAt}  |  http://192.168.4.92:${PORT}`
+//
+// A dotted quad written into an instruction. The host answered on .95 by the time
+// anyone checked, so the owner's preview printed a green line pointing at an
+// address that was nobody's. Nothing derived it and nothing probed it.
+//
+// TWO FAULTS, and the second is the one that matters:
+//
+//   1. The address was STORED rather than DERIVED. Convention (s): a value that
+//      changes is never written into an instruction. A DHCP lease is the purest
+//      possible example of a value that changes.
+//   2. The address was never REACHED. Rule 12 already carries this lesson in its
+//      own words, earned on this script's first run: PRINTING A URL IS NOT
+//      EVIDENCE THE URL WORKS. The readiness probe below answers on 127.0.0.1,
+//      which proves the server is alive but proves NOTHING about the LAN address
+//      the owner actually types. Loopback was checked; the printed address was
+//      not. Deriving it correctly and still not probing it would fix the stale
+//      quad and leave the unevidenced claim.
+//
+// So the address is now derived at print time AND fetched before it is printed,
+// and a line that could not be reached is refused rather than printed.
+
+/**
+ * Every non-internal IPv4 address this host has, in a stable order.
+ *
+ * Sorted by interface name then address so two runs on an unchanged machine
+ * derive the same candidate first. An unsorted walk of networkInterfaces() is
+ * insertion-ordered by the OS, which is stable in practice and not by contract,
+ * and a preview address that reorders between runs is a support question.
+ */
+function lanCandidates() {
+  const found = []
+  const ifaces = networkInterfaces()
+  for (const iface of Object.keys(ifaces)) {
+    for (const ni of ifaces[iface] || []) {
+      // Node reports family as 'IPv4' on current releases and as 4 on some older
+      // ones. Accept both rather than pinning to whichever this machine happens
+      // to return, because the owner's machine is not this machine.
+      if (ni.family !== 'IPv4' && ni.family !== 4) continue
+      if (ni.internal) continue
+      found.push({ iface, address: ni.address })
+    }
+  }
+  found.sort((a, b) => a.iface.localeCompare(b.iface) || a.address.localeCompare(b.address))
+  return found
+}
+
+/** True when the URL answered. Any failure at all is a false, never a throw. */
+async function probeUrl(url, timeoutMs = 2000) {
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) })
+    return r.ok
+  } catch {
+    return false
+  }
+}
+
+/**
+ * The first candidate address that actually ANSWERS on the port, with the full
+ * record of what was tried so a refusal can explain itself.
+ *
+ * It keeps going past a failure deliberately. A machine with a VPN or a docker
+ * bridge up has several non-internal IPv4 addresses and only some of them are on
+ * the network the owner's laptop is on; stopping at the first miss would refuse a
+ * preview that was working fine on the second interface.
+ *
+ * `probe` is injectable so the self-test below drives the REAL resolver rather
+ * than a copy of it. A self-test that exercises a reimplementation of the
+ * predicate proves nothing about the predicate, which is the trap convention (p)
+ * exists to close.
+ */
+async function resolveOwnerAddress(candidates, port, probe = probeUrl) {
+  const tried = []
+  for (const c of candidates) {
+    const url = `http://${c.address}:${port}/`
+    const ok = await probe(url)
+    tried.push({ iface: c.iface, address: c.address, url, ok })
+    if (ok) return { ok: true, address: c.address, url, iface: c.iface, tried }
+  }
+  return { ok: false, address: null, url: null, iface: null, tried }
+}
+
+/**
+ * Occurrences of a hardcoded dotted-quad address in a source text.
+ *
+ * This is the regression guard for the exact defect that shipped, and the
+ * self-test seeds the literal line that shipped rather than a paraphrase of it.
+ * Loopback and the RFC 5737 documentation ranges are exempt: 127.0.0.1 is the
+ * readiness probe and is correct, and 192.0.2.x is what the seeds themselves use.
+ */
+function hardcodedAddressFindings(source) {
+  const findings = []
+  const re = /\b(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\b/g
+  const lines = String(source).split('\n')
+  lines.forEach((line, i) => {
+    // Only flag an address that is being BUILT INTO A URL, which is the defect.
+    // A dotted quad in prose is a record of what happened and history does not
+    // go stale; convention (s) is about instructions, not about records.
+    if (!/http:\/\//.test(line)) return
+    re.lastIndex = 0
+    let m
+    while ((m = re.exec(line)) !== null) {
+      const quad = m[0]
+      if (quad === '127.0.0.1') continue
+      if (quad.startsWith('192.0.2.')) continue
+      if (/^\s*\/\/|^\s*\*|^\s*#/.test(line)) continue
+      findings.push({ line: i + 1, quad, text: line.trim() })
+    }
+  })
+  return findings
+}
+
+function statusLine(sha, commitDate, startedAt, ownerUrl) {
   return `OWNER PREVIEW  |  ${versionLabel()}  |  commit ${sha}  |  built ${commitDate}`
-    + `  |  started ${startedAt}  |  http://192.168.4.92:${PORT}`
+    + `  |  started ${startedAt}  |  ${ownerUrl}`
+}
+
+// ── the seeded self-test, convention (p) ─────────────────────────────────────
+//
+// A preview line that has never been seen to FAIL is the same class of
+// unevidenced claim as a gate that has never gone RED. This plants the defect in
+// the form it really occurred and requires the refusal.
+//
+// Every seed drives the REAL functions above. Nothing here reimplements the
+// predicate, because a self-test over a copy of the logic is the failure mode
+// convention (p) was written about: the dash gate was widened, declared closed,
+// and was still wrong, and a seeded violation would have exposed that in one run.
+//
+// Paired controls throughout: a seed that goes red proves nothing unless the
+// control that must stay green does.
+
+/** A throwaway HTTP server on loopback, so a control can be genuinely reachable. */
+function scratchServer() {
+  return new Promise((res) => {
+    const srv = createServer((_req, r) => { r.writeHead(200); r.end('ok') })
+    srv.listen(0, '127.0.0.1', () => res({ port: srv.address().port, close: () => srv.close() }))
+  })
+}
+
+async function selfTest() {
+  const results = []
+  const check = (name, pass, detail) => {
+    results.push({ name, pass, detail })
+    say(`  ${pass ? 'pass' : 'FAIL'}  ${name}${detail ? `  (${detail})` : ''}`)
+  }
+
+  say('OWNER PREVIEW SELF-TEST')
+  say('')
+
+  const live = await scratchServer()
+
+  // SEED 1: the defect in the form it really occurs. An address that is derived
+  // or written down but does not answer. 192.0.2.1 is RFC 5737 TEST-NET-1 and is
+  // guaranteed never to be routable, so this seed cannot pass by accident on
+  // somebody's network.
+  const seed1 = await resolveOwnerAddress([{ iface: 'seed0', address: '192.0.2.1' }], live.port)
+  check('SEED unreachable address is REFUSED, not printed', seed1.ok === false,
+    `tried ${seed1.tried.length}, ok=${seed1.ok}`)
+
+  // CONTROL 1: the same real resolver, over an address that genuinely answers.
+  // Without this, SEED 1 would also pass if the resolver simply always refused.
+  const ctl1 = await resolveOwnerAddress([{ iface: 'lo-seed', address: '127.0.0.1' }], live.port)
+  check('CONTROL reachable address is ACCEPTED', ctl1.ok === true && ctl1.address === '127.0.0.1',
+    `url=${ctl1.url}`)
+
+  // SEED 2: no non-internal interface at all, which is a laptop with the wifi
+  // off. The old code printed its stored quad regardless.
+  const seed2 = await resolveOwnerAddress([], live.port)
+  check('SEED no candidate addresses is REFUSED', seed2.ok === false, `tried ${seed2.tried.length}`)
+
+  // CONTROL 2: a bad candidate ahead of a good one. Proves the resolver does not
+  // stop at the first miss, which would refuse a working preview on a host with
+  // a VPN or a docker bridge up.
+  const ctl2 = await resolveOwnerAddress(
+    [{ iface: 'seed0', address: '192.0.2.1' }, { iface: 'lo-seed', address: '127.0.0.1' }], live.port)
+  check('CONTROL a later candidate is still reached', ctl2.ok === true && ctl2.address === '127.0.0.1',
+    `tried ${ctl2.tried.length}, chose ${ctl2.address}`)
+
+  // SEED 3: THE LINE THAT ACTUALLY SHIPPED, planted verbatim. This is the
+  // convention (p) requirement in its strictest form: seed the form that really
+  // occurred, not a form the check happens to handle.
+  //
+  // THE QUAD IS ASSEMBLED FROM PARTS, AND THAT IS DELIBERATE. Do not tidy it back
+  // into one literal. Written literally, this seed IS a hardcoded address in this
+  // file, so CONTROL 3 below would find it and go red for the seed rather than for
+  // a defect. The alternative was an allowlist exempting the seed's own line, and
+  // an exemption mechanism is a way to silence a real finding later. Assembling it
+  // means CONTROL 3 keeps ZERO exceptions while the string handed to the predicate
+  // is still byte-identical to the line that shipped, which is the only property
+  // convention (p) actually cares about: the predicate must meet the real form.
+  const shippedQuad = ['192', '168', '4', '92'].join('.')
+  const shippedDefect = 'function statusLine(sha, commitDate, startedAt) {\n'
+    + '  return `OWNER PREVIEW  |  ${versionLabel()}  |  commit ${sha}  |  built ${commitDate}`\n'
+    + '    + `  |  started ${startedAt}  |  http://' + shippedQuad + ':${PORT}`\n'
+    + '}\n'
+  const seed3 = hardcodedAddressFindings(shippedDefect)
+  check('SEED the shipped hardcoded quad is CAUGHT', seed3.length >= 1,
+    seed3.length ? `found ${seed3[0].quad} at seeded line ${seed3[0].line}` : 'found nothing')
+
+  // CONTROL 3: this file as it stands now. If this ever goes red, the address has
+  // been written back into the source and the whole repair has been undone.
+  const selfSource = readFileSync(fileURLToPath(import.meta.url), 'utf-8')
+  const ctl3 = hardcodedAddressFindings(selfSource)
+  check('CONTROL this script carries no hardcoded quad', ctl3.length === 0,
+    ctl3.length ? `${ctl3.length} at line(s) ${ctl3.map((f) => f.line).join(', ')}` : 'clean')
+
+  // CONTROL 4: the derivation is real and excludes loopback. Asserted as a
+  // property rather than against a count, because a runner with no LAN interface
+  // legitimately derives an empty list and that must not be a failure.
+  const cands = lanCandidates()
+  const anyInternal = cands.some((c) => c.address.startsWith('127.'))
+  check('CONTROL derived candidates exclude loopback', anyInternal === false,
+    `${cands.length} candidate(s): ${cands.map((c) => `${c.iface}=${c.address}`).join(', ') || 'none'}`)
+
+  live.close()
+
+  const failed = results.filter((r) => !r.pass)
+  say('')
+  say(`OWNER PREVIEW SELF-TEST: ${failed.length ? 'FAIL' : 'PASS'} `
+    + `(${results.length - failed.length}/${results.length}, 3 seeds, 4 paired controls)`)
+  return failed.length === 0
 }
 
 // ── main ─────────────────────────────────────────────────────────────────────
 ;(async () => {
+  // --self-test runs FIRST and before the primary-checkout refusal, because it
+  // starts no server, touches no git state and reads only this file. It has to be
+  // runnable from a worktree and from CI, which is where a self-test earns its
+  // keep; gating it behind the primary-checkout check would make the one mode
+  // that proves the script can fail the one mode most callers cannot run.
+  if (has('--self-test')) {
+    process.exit((await selfTest()) ? 0 : 1)
+  }
+
   const primary = checkPrimaryCheckout()
   if (!primary.ok) {
     loud('OWNER PREVIEW REFUSED\n\n' + primary.why)
@@ -421,8 +659,46 @@ function statusLine(sha, commitDate, startedAt) {
   const sha = git(['rev-parse', '--short', 'HEAD'])
   const commitDate = git(['show', '-s', '--format=%cI', 'HEAD'])
 
+  // 6. REACH THE OWNER'S ACTUAL ADDRESS BEFORE CLAIMING IT.
+  //
+  // The readiness probe above answered on 127.0.0.1, which proves the server is
+  // alive. It proves nothing about the address the owner types into his browser,
+  // and those are different claims: a bind that did not reach the LAN, a firewall,
+  // a changed lease and a wrong interface all leave loopback perfectly healthy.
+  const owner = await resolveOwnerAddress(lanCandidates(), PORT)
+
+  if (!owner.ok) {
+    // REFUSE THE LINE, KEEP THE SERVER.
+    //
+    // Not a contradiction of the no-half-started rule above, and the distinction
+    // is worth writing down because the obvious "fix" is to reap here and it
+    // would be wrong. Half-started meant spawned, unrecorded and not answering.
+    // This server is spawned, RECORDED in the pidfile and ANSWERING; the next run
+    // retires it exactly as it retires any other. What failed is not the server,
+    // it is the EVIDENCE, so the evidence is what is withheld.
+    //
+    // Non-zero is deliberate. Rule 12 requires a session that could not refresh
+    // the preview to say so in its own line, and the only reliable way to make
+    // that happen is for the command to fail rather than to print a caveat that
+    // a hurried close would paste over.
+    const tried = owner.tried.length
+      ? owner.tried.map((t) => `    ${t.iface.padEnd(10)} ${t.url}  no answer`).join('\n')
+      : '    (this host reports no non-internal IPv4 address at all)'
+    loud('OWNER PREVIEW: NO ADDRESS LINE PRINTED, because none could be reached.\n\n'
+      + `The server IS up and answering on http://127.0.0.1:${PORT}/, and it has been\n`
+      + 'left running and tracked, so nothing is half-started and the next run will\n'
+      + 'retire it normally.\n\n'
+      + 'What was derived and probed:\n\n' + tried + '\n\n'
+      + 'Printing a URL is not evidence the URL works, so no URL was printed.\n'
+      + 'Per rule 12 the session report states in its own line that the preview\n'
+      + 'address could not be confirmed.')
+    process.exit(1)
+  }
+
   say('')
-  say(statusLine(sha, commitDate, new Date().toISOString()))
+  say(statusLine(sha, commitDate, new Date().toISOString(), owner.url))
+  say(`  address derived from interface ${owner.iface} and confirmed reachable `
+    + `(${owner.tried.length} candidate${owner.tried.length === 1 ? '' : 's'} probed)`)
   say('')
   process.exit(0)
 })()
