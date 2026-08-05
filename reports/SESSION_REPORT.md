@@ -7357,7 +7357,26 @@ session's own handover and should be read as such until the map lands.
 
 1. **The seven REOPENED clusters** (C-03, C-10, C-11, C-14, C-23, C-25, C-26). Six carry a
    known marshalling fault with the fault named; re-cluster those correctly rather than
-   re-verifying them as they stand. **Re-cluster across ALL severity tiers first**, per
+   re-verifying them as they stand.
+
+   > **CORRECTION, 2026-08-05, S2-C089. "Six" is wrong here, and it is FIVE.** Added
+   > additively, in the idiom of the dated note above, because this section is a record of
+   > what was planned and a silent edit would destroy the evidence of what was actually
+   > written.
+   >
+   > Derived from `reports/qa/stream_test/CLUSTERS.md`, whose marshalling-fault table names
+   > the six as **C-03, C-10, C-11, C-12, C-23 and C-26**. Intersect that with the seven
+   > reopened clusters listed above and **five** are in both: C-03, C-10, C-11, C-23, C-26.
+   > **C-14 and C-25 were reopened carrying NO marshalling fault**, and **C-12 carries the
+   > sixth fault but was never reopened**; it is the single UNDISPOSITIONED cluster in that
+   > file's final disposition table.
+   >
+   > **The three sibling sentences elsewhere in this report are CORRECT and are deliberately
+   > left alone.** "Six of twenty six clusters carried a marshalling fault" is a statement
+   > about the whole 26-cluster set, and it is true. Only this line attributes all six to the
+   > reopened seven, which silently drops C-12 out of the accounting: the one cluster with a
+   > named fault and no disposition is exactly the one a reader would most want not to lose.
+ **Re-cluster across ALL severity tiers first**, per
    4.4, because two of the seven exist only because the tier filter hid their corroboration.
 2. **The fix batch, with C-01's corrected diagnosis.** The sound fix is `GameGrid.svelte:499`
    `DROP_H` to at most 208, or widen `STRIP`, with an opaque `.symbol-col` fill as backstop.

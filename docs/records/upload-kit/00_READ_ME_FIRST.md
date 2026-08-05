@@ -19,6 +19,26 @@ If you upload the wrong file, upload the right one over it.
 this platform that means *make my uploads runnable so I can test them*. It does not put
 anything in front of players.
 
+> **PROVENANCE, added 2026-08-05 per protocol rule 16, because this is the single most
+> load-bearing sentence in this document and it carried no source at all.** A reader acts on
+> it by pressing a button they have been told is irreversible everywhere else.
+>
+> **REPORTED**, by the owner, from his own observation of the portal. **Not VERIFIED**, and
+> the reason it cannot be is itself recorded: the platform's full submission criteria page is
+> **login-gated**, noted under the `submission-checklist` bullet in `COMPLIANCE_WATCH.md`,
+> and every capture attempt has stored the login wall rather than the page. Capturing the
+> authenticated version is an owner action on his next portal login.
+>
+> **PARTLY CORROBORATED, and only partly.** The live-portal frame catalogue at
+> `reports/screens/live-portal-2026-07-28/CATALOGUE.md` establishes that the platform serves
+> uploaded assets from a remote staging prefix it spells scratch/front, described there as
+> "the platform's unpublished staging area". That is a path on the PLATFORM's server and
+> not one in this repository, so it is deliberately not written as a backticked path. That is independent evidence that an upload lands somewhere unpublished. **It
+> is not evidence of what the Publish button itself does**, and it is not offered as such.
+>
+> **The guidance above is unchanged.** Nothing here says it is wrong; it says what it rests
+> on, so a later reader can weigh it rather than inherit it.
+
 **4. If something looks wrong, stop and take a screenshot.** A screenshot of a confusing
 screen is more useful than a guess. Nothing breaks by pausing.
 
