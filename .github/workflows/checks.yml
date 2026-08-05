@@ -296,6 +296,23 @@ jobs:
         # Playwright browsers are NOT installed: no suite here needs one.
         run: npm ci --ignore-scripts
 
+      # ── Gate 0b: the supply chain, S2-C049, S2-C051, part of S2-C048 ─────────
+      # Runs against the RESOLVED lockfile, immediately after `npm ci` so the
+      # tree it describes is the tree that was just installed. The self-test
+      # runs first, per the house shape: a gate that has never been seen to fail
+      # is a script that prints PASS.
+      #
+      # The advisory half needs the registry and fails closed without it, which
+      # is the correct behaviour for a vulnerability scan and is why it sits
+      # beside the step that already reaches the registry.
+      - name: supply chain, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/supply_chain_gate.mjs --self-test
+
+      - name: supply chain, licences, install hooks, integrity and advisories
+        working-directory: frontend
+        run: node scripts/supply_chain_gate.mjs
+
       # ── Gate 1: type safety, regression-only ─────────────────────────────────
       # Fails if the error or warning count rises above the committed baseline.
       # See scripts/typecheck_baseline.mjs for why the baseline is not zero.

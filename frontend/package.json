@@ -10,6 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "assets": "../scripts/assets/.venv/bin/python ../scripts/assets/build.py && ../scripts/assets/.venv/bin/python ../scripts/assets/flame_jets.py && ../scripts/assets/.venv/bin/python ../scripts/assets/symbol_fx.py",
     "qa:soak": "node scripts/qa_soak.mjs",
+    "scan": "npm audit --omit=dev --audit-level=high",
     "owner:preview": "node ../scripts/owner_preview.mjs"
   },
   "devDependencies": {
