@@ -39,8 +39,8 @@ are never merged. The same three are used here:
 - **PARKED, unreachable.** No mechanical proof exists, and inventing a proxy would be the
   wrongly-solved failure convention (l.6) names.
 
-**PROPOSALS 1 to 4 are PARKED, unreachable. PROPOSALS 5 and 6 are PARKED, BLOCKED.** None
-of the six is short of budget.
+**PROPOSALS 1 to 4 are PARKED, unreachable. PROPOSALS 5 and 6 are PARKED, BLOCKED.
+PROPOSAL 7 is PARKED, BUDGET, and is the only one of the seven that is.**
 
 The first four are each a case where the specified instrument cannot produce an honest red,
 and the common shape is worth stating once because it is the tier's real lesson: **a step
@@ -309,6 +309,71 @@ the platform itself prints.**
 
 ---
 
+---
+
+## PROPOSAL 7: S2-C069, the hero icon that diverges from its master
+
+**Status: PROPOSED OWNER-PARK, BUDGET. The instrument is real and buildable and this
+session ran out of allocation. It is NOT unreachable and it is NOT blocked on a ruling.**
+
+**This is the one row of the eight that this session did not dispose of with a proven red
+or a refutation of its premise, and it is named here rather than left silent.**
+
+**The divergence is real, re-measured in the main loop this session:**
+
+```
+  97ed2fe0abe14a4244872b89ebab07935156a0df78a3de9859d72a7017a094a6  frontend/public/assets/themes/future-spinner/ui/hero_icon_96.png   23,135 bytes
+  2affa2250bcb4a14d923424ac6576e79f0d7b9ab51b5ca38c9b197b81691de20  design-system/brand/hero_icon/hero_icon_96.png                    24,547 bytes
+```
+
+**BOTH OF THE ROW'S OPTIONS ARE IMPOSSIBLE AS WRITTEN, and this is the finding worth
+carrying forward, because it would otherwise cost the next session the same hour.** The row
+says to "drop/raise `palette_colors` at :121 and re-run the export so the shipped icon is
+byte-identical to the master (the preferred option)". Verified by direct read of
+`scripts/assets/build.py:270-274`:
+
+```python
+    colors = spec.get("palette_colors", 256)
+    if keep_alpha:
+        img = Image.open(src_path).convert("RGBA")
+        out_img = img.convert("PA", palette=Image.ADAPTIVE, colors=colors).convert("RGBA")
+```
+
+- **"Drop `palette_colors`" is a NO-OP.** The default is already 256, so removing the key
+  changes nothing about the output.
+- **"Raise `palette_colors`" is IMPOSSIBLE.** PIL's `P` and `PA` palette modes cap at 256
+  colours; there is no higher value to raise it to.
+- **So the divergence is not caused by the VALUE 256 being wrong.** It is caused by the
+  PA-mode quantisation happening at all, and the conversion is unconditional for this
+  entry. Making the shipped file byte-identical to its master means bypassing quantisation
+  entirely, which is a different change from the one the row prescribes.
+- **And "re-run the export" is not safely available regardless.** `main()` has no selective
+  mode and rewrites 83 tracked assets, plus two further generators' output via
+  `npm run assets`. That is a convention (h.1) hazard of the largest kind in this
+  repository, and it would be run to fix a 23KB file.
+
+**The row's cheap option is available but would NOT close the row**, under the brief's own
+two conditions. Extending the manifest note at `:123` to record the quantisation and the
+measured deviation would be TRUE, but it cannot be GATED: `manifest.json` is JSON and the
+CHECK anchor convention that `scripts/qa/doc_currency_gate.mjs` enforces covers tracked
+`.md` files only. A re-wording nothing watches is a claim waiting to go stale, so it was
+not taken.
+
+**THE OPTION THAT SURVIVES IS ONE THE ROW DOES NOT NAME**, and it is the reason this is a
+BUDGET park rather than an unreachable one: **an asset-provenance gate** that decodes both
+PNGs and asserts the shipped file against its master within a DECLARED deviation bound,
+going red when a shipped asset drifts from its master with no record. It is write-free by
+construction, so unlike the re-run it carries no (h.1) hazard, and
+`scripts/qa/delivery_set_gate.mjs:26-38` already decodes PNG IHDR and IDAT with node's zlib
+and no image dependency, so the pattern to copy exists.
+
+Its seed, in the real defect form, is a scratch re-export at a lower palette depth, with a
+paired negative control on the unmodified HEAD pair and a second seed flattening the
+master's transparent ring to prove the alpha invariant. **Sized as a small instrument, not
+a session's work**, and it would close this row properly with a red that can be quoted.
+
+---
+
 ## THE OWNER'S DECISION, in one block
 
 | # | Row | Refused half | Proposed | Signature |
@@ -319,6 +384,7 @@ the platform itself prints.**
 | 4 | S2-C051 | pinned licence text fetch | PARK, unreachable; NOT assigned by the brief, strike if out of scope | |
 | 5 | S2-C075 | how the five books files reach the runner | CHOOSE one of four options; the mechanical half already shipped and will go red until then | |
 | 6 | S2-C122 | what "10,000,000 events" counts | PARK the definition until the first upload prints the platform's own figure; two modes may sit at about 70 per cent of the cap | |
+| 7 | S2-C069 | hero icon diverges from its master | PARK on BUDGET only. Both options the row names are impossible; the surviving one is a small asset-provenance gate, specified and sized | |
 
 **Nothing above is closed by this document.** Each row stays open in
 `reports/qa/session7/RECONCILED.tsv` until the owner signs, and this file is the record of
