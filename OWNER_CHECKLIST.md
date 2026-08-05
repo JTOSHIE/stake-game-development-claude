@@ -195,8 +195,17 @@ than as something we verified.
 
 # DONE, with evidence
 
-Everything below was on this list and is finished. Kept rather than deleted, so nothing is
-asked twice and every claim can be checked.
+Kept rather than deleted, so nothing is asked twice and every claim can be checked.
+
+**CORRECTED 2026-08-05, S2-C055. This heading used to read "Everything below was on this
+list and is finished", and the table below contradicts it in two rows.** "The stale Desktop
+kits" reads **not done** and is FOLDED INTO ITEM 3 rather than finished. "Kit V10 uploaded"
+is REPORTED by the owner in conversation and explicitly not verified here, and its own cell
+says item 3 stays open until the console line arrives.
+
+**So this table is what has been DEALT WITH, which is not the same as finished.** A row here
+is closed, folded into a live item, or recorded as reported; each row says which. Read the
+Finished column and the evidence, not the heading.
 
 | Item | Finished | Evidence |
 |---|---|---|
@@ -207,10 +216,10 @@ asked twice and every claim can be checked.
 | **The payments model** | 2026-07-28 | Frame `082628`: **Profit Share, 10 percent GGR**, selected against Guaranteed at 7.5 percent. |
 | **The payout wallet, configured** | 2026-07-28 | Configured on the platform, ERC-20 USDT. Address held offline only and deliberately never recorded here. Verifying it is item 2 above. |
 | **Business name registration** | 2026-07-27 | **We Roll Spinners**, ASIC, registered 27 July 2026, **renewal due 28 July 2027**. Diarise the renewal. |
-| **Domain** | done | `werollspinners.com` live. |
+| **Domain** | recorded live 2026-07-28 | `werollspinners.com` live. **The Finished column read "done" where every other row carries a date.** No registration date is on file anywhere in this repository, so the date given is when this row was RECORDED, not when the domain was registered; it is a dated observation and deliberately not a claim about the registrar. |
 | **USPTO wordmark searches** | 2026-07-28 | Frames `082429` and `082546`. Summary above; the register row now reads searches complete, evidence summarised, gate satisfied. |
 | **The game tile** | 2026-07-28 | Frame `085752`: the composed tile in the Tile Editor on `future-spinner-2`. |
-| **Your local preview** | 2026-07-28 | `http://192.168.4.92:5173` is refreshed to latest `main` at the close of every session that changes it, per protocol rule 12. Nothing for you to do. If the SHA there ever disagrees with the newest session report, tell us rather than debugging it. |
+| **Your local preview** | 2026-07-28 | Your local preview is refreshed to latest `main` at the close of every session that changes it, per protocol rule 12. Nothing for you to do. If the SHA there ever disagrees with the newest session report, tell us rather than debugging it. **The address is deliberately NOT written here any more, per convention (s).** This row carried `192.168.4.92`, which stopped being this machine's address and answered nothing; `scripts/owner_preview.mjs` carried the same literal and was corrected on 2026-08-05 to derive the address and to refuse to print one it cannot reach. **Read the address from the line that script prints.** |
 | **The stale Desktop kits** | not done | Five kit folders are on the Desktop, including the 26 July unversioned one that holds the MATHS package. Folded into item 3, because it must happen before the next upload. `ls -d ~/Desktop/FS_UPLOAD_KIT*` is the current list; do not trust this row for it. |
 
 ---
