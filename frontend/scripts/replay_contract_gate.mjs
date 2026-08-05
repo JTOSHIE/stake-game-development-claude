@@ -469,6 +469,27 @@ async function main() {
           + 'prohibited-terms table, so this is a jurisdiction failure, not a wording choice')
     }
 
+    // S2-C028. Defined HERE, beside the other shared assertions, rather than
+    // where the sweepstakes drive is set up. The real-run drives live in a
+    // branch the self-test does not execute, so a predicate defined there is
+    // undefined by the time a seed reaches for it. Same reason
+    // assertFlatMultiplier and assertSocialToken are extracted above.
+    //
+    // THE SUBSTRING TRAP THIS CLOSES: 'SC' IS A SUBSTRING OF 'XSC'. Written as
+    // /SC/.test(txt) this assertion would be GREEN on the exact defect it
+    // exists to catch, because the raw code contains the symbol. So the raw
+    // code's ABSENCE is asserted explicitly rather than inferred from the
+    // symbol's presence, and SEED 3c below is what proves that distinction is
+    // real rather than argued.
+    const assertSweepstakesSymbol = (r, tag = '') => {
+      const txt = r.observed.currencyText.replace(/\s+/g, ' ').trim()
+      check(!/XSC/.test(txt) && /\bSC\b/.test(txt),
+        `${tag}a sweepstakes currency renders its player symbol, never the raw platform code`,
+        `XSC renders "${txt}"`,
+        `a sweepstakes replay rendered "${txt}". The raw platform code reaching a player is `
+          + 'the jurisdiction failure currency.ts:105 records having already shipped once')
+    }
+
     // S2-C006. The half of item 50 that the ready phase cannot prove, and the
     // reason two verification agents reached OPPOSITE conclusions about the
     // item: it PASSED in the ready phase and was satisfied by nothing at all
@@ -527,6 +548,54 @@ async function main() {
         `both loads rendered identically ("${eur}"), so currency and lang are not being read from the query string`)
       check(!/NaN/.test(eur + jpy), 'no NaN in the rendered money figure',
         'both loads format cleanly', `NaN present: EUR "${eur}" JPY "${jpy}"`)
+
+      // ── S2-C028: the query string's HOSTILE values, not just its happy ones ──
+      //
+      // The block above proves the optional parameters are READ rather than
+      // defaulted. It uses EUR and JPY, both well formed. Nothing here drove a
+      // sweepstakes code, a malformed amount, or a missing mode, and those are
+      // the three shapes that actually arrive from a platform launch URL.
+
+      // (a) THE SWEEPSTAKES CODE. The defect is recorded in this repo's own
+      // source, currency.ts:105: "replay table knew 'SC' but not 'XSC', so a
+      // real sweepstakes session printed" the raw platform code at a player.
+      // Printing XSC at a player is what the jurisdiction rules prohibit.
+      //
+      // THE PREDICATE HAS TO ASSERT AN ABSENCE, and this is the trap in the
+      // row: 'SC' IS A SUBSTRING OF 'XSC'. A check written as /SC/.test(txt) is
+      // GREEN on the exact defect it exists to catch. So the raw code's absence
+      // is asserted explicitly rather than inferred from the symbol's presence.
+      //
+      // Scoped to `.currency-display` deliberately. Whether the figures row
+      // also resolves an SC symbol through PLATFORM_CURRENCIES in the seeded
+      // state was NOT verified, and asserting an unverified second surface
+      // would be claiming more than was measured.
+      assertSweepstakesSymbol(await driveReplay(browser, { qs: { currency: 'XSC', social: 'false' } }))
+
+      // (b) MALFORMED AMOUNTS. amountMicros arrives from a URL, so it arrives
+      // as whatever the platform put there. Both a non-numeric value and a
+      // negative one must fall back rather than render NaN or a negative bet.
+      const badAmounts = []
+      for (const amountMicros of ['abc', '-5']) {
+        const r = await driveReplay(browser, { qs: { amountMicros }, settleMs: 1500 })
+        badAmounts.push({ amountMicros, text: r.observed.figuresText.replace(/\s+/g, ' ').trim() })
+      }
+      check(badAmounts.every((b) => b.text.length > 0 && !/NaN|-\d/.test(b.text)),
+        'a malformed amountMicros falls back rather than rendering NaN or a negative bet',
+        badAmounts.map((b) => `${b.amountMicros} renders "${b.text}"`).join('; '),
+        `malformed amounts rendered: ${badAmounts.map((b) => `${b.amountMicros} -> "${b.text}"`).join('; ')}`)
+
+      // (c) THE MISSING MODE. assertContract is deliberately NOT run on this
+      // drive: with no mode no replay request is issued at all, so `exactly one
+      // replay request` and `replay URL is exact` would both fail for the right
+      // reason and score as noise. The only thing asserted is that the player
+      // is TOLD, rather than left on a blank surface.
+      const noMode = await driveReplay(browser, { qs: { mode: '' }, settleMs: 500 })
+      check(noMode.observed.errorVisible && noMode.observed.errorText.length > 0,
+        'a launch with no mode renders a visible error rather than a blank surface',
+        `error reads "${noMode.observed.errorText}"`,
+        'a replay launched with no mode rendered no visible error state, so the player is left '
+          + 'looking at a surface that never explains itself')
 
       // GUIDELINE ITEM 50, added 2026-07-30: the applied multiplier is displayed
       // AT 1.0x, which is the case this gate could not previously see.
@@ -804,6 +873,30 @@ async function main() {
           } } },
         /no authenticated RGS call/,
         (r, pre) => assertNoMoneyPath(offOrigin(r.requests), pre))
+
+      // SEED 3c, S2-C028: the sweepstakes lookup loses its XSC key and the raw
+      // platform code reaches the player.
+      //
+      // THE FORM IS THE ONE THAT REALLY SHIPPED, recorded in this repo's own
+      // source at currency.ts:105: "replay table knew 'SC' but not 'XSC', so a
+      // real sweepstakes session printed" the raw code. The seed deletes that
+      // one table entry rather than, say, rewriting the label, because losing
+      // the key is how it happened.
+      //
+      // This is also the seed that proves the substring trap is closed. With
+      // the key gone the display renders "XSC", which CONTAINS "SC", so a
+      // predicate written as /SC/.test(txt) would score this seed as green. It
+      // goes red only because the assertion demands the raw code's ABSENCE.
+      await seed('sweepstakes-raw-code-leaks',
+        'the currency table loses XSC and a sweepstakes player is shown the raw platform code',
+        { qs: { currency: 'XSC', social: 'false' },
+          patches: { [bundle.file]: (b) => {
+            const anchor = 'XSC:{symbol:"SC",decimals:2},'
+            if (!b.includes(anchor)) return null
+            return b.replace(anchor, '')
+          } } },
+        /raw platform code/,
+        (r, pre) => assertSweepstakesSymbol(r, pre))
 
       // SEED 4: a second replay request. Catches a retry loop or a double mount,
       // both of which have shipped in this project's history on other surfaces.
