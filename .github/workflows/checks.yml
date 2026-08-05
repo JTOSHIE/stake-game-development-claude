@@ -583,6 +583,26 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/utils/currency.test.ts
 
+      # ── S2-C116: a round's SHAPE must not depend on the wallet ──────────────
+      # Placed beside the currency gates so a red check names the concern, but
+      # it is a different claim from all of them: those assert that money is
+      # DISPLAYED correctly, this asserts that round-shaping logic never READS
+      # currency at all. A branch that behaves differently for XSC than for EUR
+      # is a fairness defect rather than a display one.
+      #
+      # The property already holds, so this gate is a regression guard and its
+      # whole value is the seed. It strips comments and string literals before
+      # it looks, because sessionRecovery.ts names currency once in a comment
+      # and a naive scan flags that; the real run ships that line as a negative
+      # control.
+      - name: round logic currency, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/round_logic_currency_gate.mjs --self-test
+
+      - name: round-shaping logic never reads currency
+        working-directory: frontend
+        run: node scripts/round_logic_currency_gate.mjs
+
       # ── Gate 12b: the currency TABLE against the platform mirror ─────────────
       # Until 2026-07-29 fiat symbols were derived from Intl. Measured against
       # the platform's own published Example column, 34 of 49 supported codes
