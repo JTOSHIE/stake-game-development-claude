@@ -10740,6 +10740,14 @@ withheld on 2026-07-31 until the origin assertion behind it existed. **`CLAUDE.m
 a twelve-leg matrix; it is thirteen**, and has been since the build diet leg landed under
 TR-111.
 
+**The final push `57a4eef` is documentation-only**, so run **`30971249301`** gated the
+browser matrix out by design: `what changed` success, `static gates` success,
+`matrix.gate.name` **skipped**, conclusion **success**. That skip is a positive result
+rather than a gap, and it is safe to close on for the reason Session 8's was not: **every
+gate change this session made was already proven on a COMPLETED 15 of 15 matrix at
+`1fc6d0d`**, with the two legs that exercise the changed files named and green. A
+documents-only push has no business running thirteen browser gates.
+
 **This is the check Session 8's close missed.** Its final push was documentation-only so
 the matrix skipped, and the leg exercising the file it had changed had been cancelled in
 both runs that carried the change. Here the pushes that changed gate code produced
