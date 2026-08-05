@@ -63,19 +63,35 @@ The game fetches `GET {rgs_url}/bet/replay/{game}/{version}/{mode}/{event}`; our
 
 | Scenario | Base (dev) | Cruise (dev) | Antelite (dev) | Bonus (dev) | Super (dev) |
 |----------|------------|--------------|-----------------|-------------|-------------|
-| Loss | `?mockCategory=base_loss` | n/a - no curated sample yet | n/a - no curated sample yet | n/a | n/a |
-| Normal win | `?mockCategory=base_win_small` / `base_win_mid` | n/a - no curated sample yet | n/a - no curated sample yet | `?mockCategory=bonus_win_small` (bonus buy) | n/a - no curated sample yet |
-| Big win | `?mockCategory=base_win_large` | n/a - no curated sample yet | n/a - no curated sample yet | `?mockCategory=bonus_win_large` | n/a - no curated sample yet |
-| Win cap | `?mockCategory=wincap` | n/a - no curated sample yet | n/a - no curated sample yet | `?mockCategory=wincap` (bonus buy) | n/a - no curated sample yet |
-| Bonus trigger | `?mockCategory=trigger_3` / `trigger_4` / `trigger_5` | n/a - no curated sample yet | n/a - no curated sample yet | inherent (bonus buy) | inherent (super buy) |
-| Retrigger / high meter | `?mockCategory=retrigger` / `high_meter` | n/a - no curated sample yet | n/a - no curated sample yet | `?mockCategory=retrigger` / `high_meter` | n/a - no curated sample yet |
+| Loss | `?mockCategory=base_loss` | `?mockCategory=cruise_loss` | `?mockCategory=antelite_loss` | n/a, a buy always triggers | n/a, a buy always triggers |
+| Normal win | `?mockCategory=base_win_small` / `base_win_mid` | `?mockCategory=cruise_win_small` / `cruise_win_mid` | `?mockCategory=antelite_win_small` / `antelite_win_mid` | `?mockCategory=bonus_win_small` / `bonus_win_mid` | `?mockCategory=super_win_small` / `super_win_mid` |
+| Big win | `?mockCategory=base_win_large` | `?mockCategory=cruise_win_large` | `?mockCategory=antelite_win_large` | `?mockCategory=bonus_win_large` | `?mockCategory=super_win_large` |
+| Win cap | `?mockCategory=wincap` | not curated | not curated | `?mockCategory=wincap` (bonus buy) | `?mockCategory=super_wincap`, and `super_cap_adjacent` |
+| Bonus trigger | `?mockCategory=trigger_3` / `trigger_4` / `trigger_5` | the same three | the same three | inherent (bonus buy) | inherent (super buy) |
+| Retrigger / high meter | `?mockCategory=retrigger` / `high_meter` | not curated | not curated | `?mockCategory=retrigger` / `high_meter` | `?mockCategory=super_retrigger` / `super_high_meter` |
 
-Cruise/antelite/super have no curated entries in `sample_rounds.json` yet (a known,
-previously-flagged limitation - see `games/future_spinner_collect/COLLECT_PROTOTYPE_FINDINGS.md`
-for the same pattern noted elsewhere); in dev/mock mode these three modes correctly price
-and label their spins but fall back to `_mockSpin`'s generic random board rather than a
-curated feature demo. This does not affect the real RGS replay path above, which is
-per-mode from the actual shipped books regardless of what the local dev mock curates.
+**CORRECTED 2026-08-05, S2-C084. This paragraph used to say cruise, antelite and super had
+no curated entries at all, and the table above carried sixteen cells reading "n/a - no
+curated sample yet". That has not been true for some time: all five modes are curated.**
+
+Counted from `frontend/src/lib/mock/sample_rounds.json` at HEAD, grouping its records by
+their own `mode` and `category` fields: cruise and antelite each carry loss, small, mid and
+large wins plus all three trigger depths, and super carries small, mid and large wins, a
+wincap, a cap-adjacent round, a retrigger and a high-meter round.
+
+**What is genuinely still missing is narrower, and naming it is the point.** Cruise and
+antelite have **no wincap sample and no retrigger or high-meter sample**; those four cells
+above are the only ones that still read as uncurated. Everything else the old paragraph
+disclaimed now exists.
+
+Where a cell is uncurated, dev and mock mode still prices and labels the spin correctly and
+falls back to `_mockSpin`'s generic random board rather than a curated feature demo. **This
+never affected the real RGS replay path above**, which is per-mode from the actual shipped
+books regardless of what the local dev mock curates.
+
+**No record or category totals are written here, per convention (s):** both grow whenever a
+sample is authored, which is exactly what made the old paragraph false. Read them from the
+file.
 
 ## Populate + review checklist
 

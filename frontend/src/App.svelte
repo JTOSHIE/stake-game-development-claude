@@ -660,11 +660,13 @@
       // Live rgsService publishes the round events; in mock, serve a sample.
       // A dev-only ?mockCategory= override lets headless verification force a
       // specific curated round (e.g. the wincap sample) deterministically.
-      // NOTE: sample_rounds.json currently only curates 'base'/'bonus' category
-      // samples; cruise/antelite/super fall back to serveMockRound's generic
-      // random board (still correctly priced/labelled, just not a curated
-      // feature demo) until matching samples are authored - flagged as a
-      // follow-up, not a regression (the real RGS path is unaffected).
+      // NOTE, corrected 2026-08-05 (S2-C084): this used to say only
+      // 'base'/'bonus' were curated and that cruise/antelite/super fell back to
+      // a generic board. All five modes are curated now. The remaining gap is
+      // cruise and antelite having no wincap and no retrigger or high-meter
+      // sample; those fall back to serveMockRound's generic random board, still
+      // correctly priced and labelled, just not a curated feature demo. The real
+      // RGS path was never affected either way.
       let servedTotalWin: number | null = null
       if (import.meta.env.DEV && !get(lastRoundEvents)) {
         const { serveMockRound, serveCategory } = await import('./lib/mock/roundProvider')
