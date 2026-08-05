@@ -86,6 +86,70 @@ if (!existsSync(join(DIST, 'index.html'))) {
   process.exit(2)
 }
 
+// ── S2-C118: every reference in the BUILT index.html is relative ─────────────
+//
+// The platform serves the game from a path it chooses, not from a domain root.
+// An absolute `/assets/...` reference resolves against the SERVING origin
+// rather than against the game directory, so every chunk 404s and the player
+// gets a blank screen. Nothing here asserted it: the check above this one only
+// proved index.html EXISTS.
+//
+// One Vite config line produces it. `base` defaults to '/', and this project
+// sets it to './' precisely so the bundle is relocatable. Anyone who changes,
+// removes or overrides that line ships a bundle that works on every local
+// preview and fails on the platform, and the build log says nothing at all.
+//
+// THE FORM IT REALLY TAKES IS NARROWER THAN "ALL FIVE REFERENCES", and the
+// seed below reflects that. Under `--base=/` exactly the FOUR VITE-EMITTED
+// references flip to '/assets/'. The favicon href is hand-written markup in
+// frontend/index.html that Vite leaves alone in either base, so it stays './'.
+// A seed that flipped the favicon would be planting a form that does not ship,
+// which is the dash-gate mistake: seeding what the gate can handle rather than
+// what actually breaks.
+function relativeRefViolations(html) {
+  const out = []
+  const re = /\b(src|href)\s*=\s*"([^"]*)"/gi
+  let m
+  while ((m = re.exec(html))) {
+    const [, attr, value] = m
+    if (value.startsWith('./')) continue
+    out.push({ attr, value })
+  }
+  return out
+}
+
+const indexHtml = readFileSync(join(DIST, 'index.html'), 'utf-8')
+const refViolations = relativeRefViolations(indexHtml)
+check('every src and href in the built index.html is relative', refViolations.length === 0,
+  refViolations.map((v) => `${v.attr}="${v.value}"`).join('; '))
+
+// Seeded per convention (p). THE SEED IS REAL BUILD OUTPUT, captured from an
+// actual `npx vite build --base=/` run rather than typed by hand, which is what
+// the row asked for. Running a second build inside the gate would add a full
+// production build to every CI run; capturing what that build really emits
+// gives the same evidence at no recurring cost, and the end-to-end red was
+// observed once against a genuine absolute-base build before this was written.
+const REF_SEEDS = [
+  ['the four Vite-emitted references under an absolute base, captured verbatim from a real '
+    + '`vite build --base=/` output, which is the whole of how this defect ships',
+   true,
+   '<script type="module" crossorigin src="/assets/index-BrXme-pp.js"></script>\n'
+     + '<link rel="modulepreload" crossorigin href="/assets/svelte-Dqw5zo1U.js">\n'
+     + '<link rel="modulepreload" crossorigin href="/assets/pixi-CNN18upR.js">\n'
+     + '<link rel="stylesheet" crossorigin href="/assets/index-BAQ0Tcc6.css">'],
+  ['a protocol-relative reference, which resolves off-origin and is never what this bundle wants',
+   true, '<script src="//cdn.example.com/x.js"></script>'],
+  ['an absolute external reference, the CDN-only compliance failure',
+   true, '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron">'],
+  ['NEGATIVE CONTROL: the hand-written favicon, which is relative in EITHER base and must survive',
+   false, '<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />'],
+]
+const refSeeded = REF_SEEDS.map(([why, shouldFlag, html]) => ({
+  why, ok: (relativeRefViolations(html).length > 0) === shouldFlag,
+}))
+for (const s of refSeeded) console.log(`  ${s.ok ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+check('the relative-reference scan can actually fail', refSeeded.every((s) => s.ok))
+
 const files = walk(DIST)
 const docs = files.filter((f) => isDoc(f.split('/').pop())).map((f) => relative(DIST, f))
 const totalBytes = files.reduce((n, f) => n + statSync(f).size, 0)
