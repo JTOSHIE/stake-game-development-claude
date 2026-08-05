@@ -102,14 +102,33 @@ export function setMaxBetLevel(): void {
 /**
  * Set the bet to a level the player picked out of the denomination panel.
  *
- * THE ONLY WAY A LEVEL CAN BE SET DIRECTLY, and it refuses anything that is not
- * ON the active ladder. That refusal is what makes the platform's `minStep`
- * hold without this module ever reading `minStep`: every value the panel can
- * offer came out of `activeBetLevels`, which is the authenticate response's own
- * `betLevels` (or the built-in ladder in mock and dev), so a selection is by
- * construction a value the platform authorised. Nothing here synthesises an
- * amount, rounds one, or interpolates between two levels, which are the three
- * ways a stepper normally produces an off-ladder bet.
+ * The only way a level is set directly BY THE PLAYER, and it refuses anything
+ * that is not ON the active ladder. Nothing here synthesises an amount, rounds
+ * one, or interpolates between two levels, which are the three ways a stepper
+ * normally produces an off-ladder bet.
+ *
+ * QUALIFIED, S2-C110. This used to claim it was THE ONLY WAY a level can be set
+ * directly, full stop. It is not: `ReplayMode.svelte` calls `betAmount.set()`
+ * itself so playback amounts format correctly, bypassing this module entirely.
+ * That is not a defect here, because a replay amount comes from a settled round
+ * rather than from a player choosing a bet, but the unqualified claim would have
+ * been read as an invariant and it is not one. See S2-C061 and S2-C064 for the
+ * replay-side treatment; they are not restated here.
+ *
+ * AND THE minStep GUARANTEE IS CONDITIONAL, which the old parenthetical hid by
+ * calling the fallback "the built-in ladder in mock and dev". The real condition
+ * is that `activeBetLevels` uses `rgsBetLevels` only while it is NON-EMPTY, and
+ * falls back to the built-in `BET_LEVELS` whenever it is empty. `rgsService.ts`
+ * builds that array as `(config.betLevels ?? []).map(microsToDisplay)`, so an
+ * authenticate response that simply omits `betLevels` yields an empty array and
+ * takes the fallback IN PRODUCTION, not only in mock and dev.
+ *
+ * So: while the platform supplies levels, every value the panel offers came out
+ * of the authenticate response and a selection is by construction a value the
+ * platform authorised, which is what makes `minStep` hold without this module
+ * ever reading `minStep`. **On the empty-response path the ladder is OURS**, the
+ * one declared in `games/future_spinner/library/publish_files/game_metadata.json`
+ * as `betLevels`, and `minStep` is NOT guaranteed by construction in that case.
  *
  * Affordability is deliberately NOT enforced here. The `+` arrow refuses to
  * climb past what the balance covers, because holding a key should not walk a
