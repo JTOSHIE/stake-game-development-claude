@@ -39,10 +39,18 @@ are never merged. The same three are used here:
 - **PARKED, unreachable.** No mechanical proof exists, and inventing a proxy would be the
   wrongly-solved failure convention (l.6) names.
 
-**All four proposals below are PARKED, unreachable.** None of them is short of budget. Each
-one is a case where the specified instrument cannot produce an honest red, and the common
-shape is worth stating once because it is the tier's real lesson: **a step that cannot fail
-is not a cheap gate, it is a false compliance claim with a green tick on it.**
+**PROPOSALS 1 to 4 are PARKED, unreachable. PROPOSALS 5 and 6 are PARKED, BLOCKED.** None
+of the six is short of budget.
+
+The first four are each a case where the specified instrument cannot produce an honest red,
+and the common shape is worth stating once because it is the tier's real lesson: **a step
+that cannot fail is not a cheap gate, it is a false compliance claim with a green tick on
+it.**
+
+The last two are a different animal and were added by this session's own work rather than
+inherited from Session 8. In both, the MECHANICAL half is built, seeded and proven; what is
+blocked is a decision only the owner can take, and in both cases the row that named it had
+called that decision "separate" when the measurement shows it is a precondition.
 
 ---
 
@@ -244,6 +252,63 @@ with the evidence attached rather than being ruled on by the builder.
 
 ---
 
+---
+
+## PROPOSAL 6: S2-C122, what the platform's "10,000,000 events" actually counts
+
+**Status: PROPOSED OWNER-PARK, BLOCKED on a definition. Maths-adjacent, so it escalates
+to the owner and Fable per convention (l.8) rather than being ruled on by the builder.**
+
+**The limit is quoted, not paraphrased**, per convention (l.7), from
+`docs/stake-engine-live/2026-07-25/math-verification.md:19-20`, a capture whose own header
+says the body is a verbatim upstream capture, re-captured with identical wording at
+`docs/stake-engine-live/2026-07-29/approval_guidelines_math_verification.md:21-22`:
+
+> No single events file (.jsonl.zst) can exceed 4.2GB
+> No game mode can contain more than 10,000,000 events
+
+**The ambiguity.** "Events" can mean the per-mode simulation ROW count or a sum of the
+event OBJECTS inside those rows, and the two readings differ by about seventy times here.
+
+**The reading this session shipped, and why.** The platform's own FAIR catalogue publishes
+a per-mode `events` field, captured at
+`docs/stake-engine-live/2026-07-28/fair-catalogue.md:45-49`. Every published value but one
+is a round simulation count, and the exception is decisive rather than awkward:
+**Scrollkeeper reports an identical irregular 1,410,986 across three modes with different
+RTPs and different weight ranges**, which a sum of variable-length event arrays could not
+produce. So the field reads as a row count, and `scripts/validate_math.py` now checks
+`MAX_EVENTS_PER_MODE` against rows. Under that reading our 100,000 per mode is correct and
+the recorded "roughly two orders of magnitude inside the cap" is correct.
+
+**Why it is still parked, and this is the uncomfortable part.**
+
+- **REPORTED**, by this session's reconnaissance agent and **NOT re-measured in the main
+  loop**: under the strict event-object reading, **bonus is 6,995,822 and super is
+  6,850,638**, which is **69.96% and 68.51% of the 10,000,000 cap**. The method it reports
+  is a decompression pass over the books files. It was not recounted here because that is a
+  4.04GB pass, and rule 16 requires the status to be stated rather than upgraded: **treat
+  these two figures as a question, not as fact, and recount them before anything depends
+  on them.**
+- If the platform's publish-time check ever counts event objects rather than rows, two of
+  our five modes sit within about 1.43x of a hard publish failure, and any increase in
+  simulation count or in free-spin length breaches it.
+- The recorded position in `WRS_MASTER_DOCUMENT.md:52`, "roughly two orders of magnitude
+  inside the cap", is true under the row reading and false under the other.
+
+**THE ROW'S OWN PRESCRIPTION TO "CORRECT" THAT CELL WAS REFUSED**, and the refusal is the
+point. It asked to restate the cell as the measured EVENT total. Doing that would replace a
+figure the published FAIR evidence supports with an unsourced reinterpretation of a
+compliance limit, which is exactly what convention (l.7) forbids. The honest disposition is
+to record both readings with their measured figures and park the definition.
+
+**What would unpark it.** The ACP Math Distribution screen reports the platform's own
+`events` value at upload. That settles the definition empirically in one observation,
+costs nothing, and is the same procedural resolution already used in the same document for
+the open CVaR definition. **Recommended: park until the first upload, then read the number
+the platform itself prints.**
+
+---
+
 ## THE OWNER'S DECISION, in one block
 
 | # | Row | Refused half | Proposed | Signature |
@@ -253,6 +318,7 @@ with the evidence attached rather than being ruled on by the builder.
 | 3 | S2-C052 | absolute-origin static clause | PARK the STATIC form; read beside S2-C058 | |
 | 4 | S2-C051 | pinned licence text fetch | PARK, unreachable; NOT assigned by the brief, strike if out of scope | |
 | 5 | S2-C075 | how the five books files reach the runner | CHOOSE one of four options; the mechanical half already shipped and will go red until then | |
+| 6 | S2-C122 | what "10,000,000 events" counts | PARK the definition until the first upload prints the platform's own figure; two modes may sit at about 70 per cent of the cap | |
 
 **Nothing above is closed by this document.** Each row stays open in
 `reports/qa/session7/RECONCILED.tsv` until the owner signs, and this file is the record of

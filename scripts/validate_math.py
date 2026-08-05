@@ -53,6 +53,31 @@ CROSS_MODE_MAX = 0.005           # all modes within 0.5% of each other
 BASE_HIT_MIN = 0.05              # non-zero win hit rate must be >= 1 in 20
 BASE_HIT_MAX = 0.40              # sanity upper bound (not a doc limit; warn-ish)
 MIN_ROWS = 100_000              # 100k-1M simulations
+# S2-C122. The publish-time HARD limits, quoted verbatim per convention (l.7) from
+# the dated mirror docs/stake-engine-live/2026-07-25/math-verification.md:19-20
+# (fetched 2026-07-25, capture_note "body below is a VERBATIM upstream capture"),
+# re-captured with identical wording at
+# docs/stake-engine-live/2026-07-29/approval_guidelines_math_verification.md:21-22:
+#
+#     No single events file (.jsonl.zst) can exceed 4.2GB
+#     No game mode can contain more than 10,000,000 events
+#
+# These are publish-time failures rather than review opinions, so they are checked
+# rather than trusted. Both figures are sourced, so hardcoding them here is not
+# inventing a limit.
+#
+# WHICH READING OF "events" THIS CHECKS, stated because it is genuinely ambiguous
+# and the ambiguity is PARKED rather than silently resolved. The platform's own
+# FAIR catalogue publishes a per-mode `events` field that reads as a simulation
+# ROW count (docs/stake-engine-live/2026-07-28/fair-catalogue.md:45-49: Scrollkeeper
+# reports an identical irregular 1,410,986 across three modes with different RTPs
+# and weight ranges, which a sum of variable-length event arrays could not be). This
+# check therefore tests ROWS, which is the reading the published evidence supports.
+# The stricter reading, counting event OBJECTS, is a real open question with a
+# measured answer that is NOT comfortable, and it is recorded as PROPOSAL 6 of
+# reports/qa/session9/OWNER_PARK_PROPOSALS.md rather than being decided here.
+MAX_EVENTS_PER_MODE = 10_000_000
+MAX_EVENTS_FILE_BYTES = 4_200_000_000
 MIN_UNIQUE_PAYOUTS = 10
 MAX_ZERO_RATE = 0.90            # >90% non-paying may be grounds for rejection
 MAX_WIN_ACHIEVABLE_ONE_IN = 10_000_000  # max win typically more frequent than 1 in 10M
@@ -127,6 +152,79 @@ def analyse(mode: str, cost: float, weights_file: str) -> dict:
     )
 
 
+def publish_limit_findings(name, rows, events_bytes=None):
+    """
+    The two publish-time hard limits, as a pure predicate.
+
+    Extracted rather than written inline so the convention (p) self-test can drive
+    the REAL check instead of a copy of it. `events_bytes` is passed in rather than
+    stat()ed here for the same reason: seeding a 4.2GB file to prove the size limit
+    fires is not possible, and a self-test over a reimplementation of the predicate
+    proves nothing about the predicate.
+
+    `events_bytes=None` means the file is not on this machine. That is the NORMAL
+    state on a CI runner, because .gitignore:9 (`**/library/**`) keeps the books out
+    of the repository, and it is deliberately NOT a failure here: whether the runner
+    should have them is S2-C075's question and is parked with the owner. Treating
+    absence as a breach would make this check red for a reason it is not about.
+    """
+    out = []
+    if rows > MAX_EVENTS_PER_MODE:
+        out.append(f"{name}: {rows:,} rows (> {MAX_EVENTS_PER_MODE:,} per-mode publish cap)")
+    if events_bytes is not None and events_bytes > MAX_EVENTS_FILE_BYTES:
+        out.append(
+            f"{name}: events file {events_bytes:,} bytes "
+            f"(> {MAX_EVENTS_FILE_BYTES:,} publish cap)"
+        )
+    return out
+
+
+def self_test() -> int:
+    """Convention (p): plant each limit breach and require the predicate to fire."""
+    results = []
+
+    def check(label, passed, detail=""):
+        results.append(passed)
+        print(f"  {'pass' if passed else 'FAIL'}  {label}" + (f"  ({detail})" if detail else ""))
+
+    print("VALIDATE MATH SELF-TEST (publish limits)")
+    print()
+
+    # CONTROL first. A predicate that always fires would catch every seed below.
+    ok = publish_limit_findings("base", 100_000, 28_678_793)
+    check("CONTROL the shipped shape reports nothing", ok == [], f"{len(ok)} finding(s)")
+
+    # SEED 1: one row over the per-mode cap. Exactly at the cap must stay clean,
+    # because the platform's wording is "more than 10,000,000".
+    at_cap = publish_limit_findings("bonus", MAX_EVENTS_PER_MODE, None)
+    check("CONTROL exactly at the cap is NOT a breach", at_cap == [], "10,000,000 rows")
+    over = publish_limit_findings("bonus", MAX_EVENTS_PER_MODE + 1, None)
+    check("SEED one row over the per-mode cap is CAUGHT", len(over) == 1, over[0] if over else "not caught")
+
+    # SEED 2: an oversized events file. Size is injected because a real 4.2GB
+    # fixture is not writable in a test.
+    big = publish_limit_findings("super", 100_000, MAX_EVENTS_FILE_BYTES + 1)
+    check("SEED an events file over 4.2GB is CAUGHT", len(big) == 1, big[0] if big else "not caught")
+    at_size = publish_limit_findings("super", 100_000, MAX_EVENTS_FILE_BYTES)
+    check("CONTROL exactly at the file cap is NOT a breach", at_size == [], "4,200,000,000 bytes")
+
+    # SEED 3: both at once must produce both findings, not stop at the first.
+    both = publish_limit_findings("x", MAX_EVENTS_PER_MODE + 1, MAX_EVENTS_FILE_BYTES + 1)
+    check("SEED both breaches report BOTH", len(both) == 2, f"{len(both)} finding(s)")
+
+    # CONTROL: an absent events file is not a breach. This is the CI runner's
+    # normal state and treating it as a failure would make the check about
+    # S2-C075's parked question instead of about the publish limits.
+    absent = publish_limit_findings("base", 100_000, None)
+    check("CONTROL an absent events file is NOT a breach", absent == [], "events_bytes=None")
+
+    failed = results.count(False)
+    print()
+    print(f"VALIDATE MATH SELF-TEST: {'FAIL' if failed else 'PASS'} "
+          f"({len(results) - failed}/{len(results)}, 4 seeds, 4 paired controls)")
+    return 1 if failed else 0
+
+
 def main() -> int:
     index = json.loads((PUB / "index.json").read_text())
     modes = index["modes"]
@@ -160,6 +258,17 @@ def main() -> int:
         # --- compliance rubric ---
         check(RTP_MIN <= r["rtp"] <= RTP_MAX, f"{name}: RTP {r['rtp']*100:.4f}% outside {RTP_MIN*100:g}-{RTP_MAX*100:g}%")
         check(r["rows"] >= MIN_ROWS, f"{name}: only {r['rows']:,} rows (< {MIN_ROWS:,})")
+        # S2-C122: the publish-time hard limits. MIN_ROWS guarded the floor and
+        # nothing guarded the ceiling, so a future decision to raise simulation
+        # counts had no instrument telling it where the wall is.
+        events_file = PUB / next((m["events"] for m in modes if m["name"] == name), "")
+        events_bytes = events_file.stat().st_size if events_file.is_file() else None
+        for finding in publish_limit_findings(name, r["rows"], events_bytes):
+            check(False, finding)
+        if events_bytes is None:
+            print(f"  events file    not on this machine, size limit not checked (see S2-C075)")
+        else:
+            print(f"  events file    {events_bytes:,} bytes (cap {MAX_EVENTS_FILE_BYTES:,})")
         check(r["unique_payouts"] >= MIN_UNIQUE_PAYOUTS, f"{name}: {r['unique_payouts']} unique payouts (< {MIN_UNIQUE_PAYOUTS})")
         check(r["zero_rate"] <= MAX_ZERO_RATE, f"{name}: zero-payout {r['zero_rate']*100:.1f}% (> {MAX_ZERO_RATE*100:g}%)")
         check(r["wincap_one_in"] <= MAX_WIN_ACHIEVABLE_ONE_IN, f"{name}: max win odds 1 in {r['wincap_one_in']:,.0f} (> 1 in {MAX_WIN_ACHIEVABLE_ONE_IN:,})")
@@ -226,4 +335,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # --self-test reads no books and needs no bundle, so it runs anywhere,
+    # including a CI runner that does not carry the publish files.
+    sys.exit(self_test() if "--self-test" in sys.argv[1:] else main())
