@@ -77,6 +77,17 @@ const PROVIDER_NAME = 'WeRollSpinners'
 const PAIR_CEILING = 3 * 1024 * 1024
 
 /**
+ * S2-C113. The provider mark master, which the delivered logo must BE.
+ *
+ * Named as a PATH rather than as a recorded hash, per convention (s): a hash
+ * written into this file is a value that changes captured in an instruction,
+ * and it would go stale the first time the mark is legitimately re-exported.
+ * Deriving it from the single source at read time cannot go stale.
+ */
+const PROVIDER_MASTER = join(ROOT,
+  'design-system/brand/provider_mark/provider_mark_f-owner-transparent_master_1024.png')
+
+/**
  * The width a provider logo occupies on a tile. The published tile geometry is
  * 408x546 (docs/stake-engine-live/2026-07-26/published-tile-geometry.md,
  * measured across live published assets); a provider mark sits at roughly a
@@ -227,7 +238,7 @@ const sha256 = (buf) => createHash('sha256').update(buf).digest('hex')
  * @param kitSrc   the text of scripts/kit_build.mjs
  * @param distRoot { hasIndexAtRoot: boolean, present: boolean }
  */
-export function auditDelivery(files, kitSrc, distRoot) {
+export function auditDelivery(files, kitSrc, distRoot, providerMasterPath = PROVIDER_MASTER) {
   const out = []
   const add = (req, klass, detail) => out.push({ req, klass, detail })
 
@@ -279,12 +290,41 @@ export function auditDelivery(files, kitSrc, distRoot) {
     }
   }
 
-  // REQ-171: the PROVIDER logo, not the game logo or the tile. Checked by hash
-  // against the other delivered files, because "is it the right artwork" is
-  // otherwise a judgement. Identity with any other delivery file means the
-  // wrong file was copied into the slot, which is the real defect.
+  // REQ-171: the PROVIDER logo, not the game logo or the tile.
+  //
+  // S2-C113. THIS CHECK USED TO BE ONLY THE NEGATIVE HALF BELOW, AND THE
+  // NEGATIVE HALF IS BLIND TO THE DEFECT IT IS NAMED FOR. It fires only when
+  // the logo is byte-identical to ANOTHER FILE IN THE SAME DELIVERY, so it
+  // catches "the same file was copied into two slots" and nothing else. Drop
+  // the GAME logo into the provider slot, which is the defect REQ-171 exists
+  // to catch, and if no sibling happens to match it the audit returns clean.
+  // Measured, not argued: substituting frontend/public/assets/ui/
+  // logo_future_spinner.png into the logo slot produced ZERO findings, from
+  // this check and from every other check in this file.
+  //
+  // The positive assertion is what closes it. The delivered provider logo must
+  // BE the provider mark master, byte for byte. That is decidable rather than
+  // a judgement, and unlike the sibling comparison it does not depend on what
+  // else happens to be in the delivery.
   if (files[logoName]) {
     const logoHash = sha256(files[logoName])
+
+    if (!existsSync(providerMasterPath)) {
+      add('REQ-171', 'MASTER_ABSENT',
+        `the provider mark master is absent at ${providerMasterPath}, so the delivered logo `
+          + 'cannot be checked against it and this gate cannot honestly claim REQ-171')
+    } else {
+      const masterHash = sha256(readFileSync(providerMasterPath))
+      if (logoHash !== masterHash) {
+        add('REQ-171', 'WRONG_ARTWORK',
+          `the delivered provider logo is not the provider mark master: delivery is ${logoHash.slice(0, 16)}, `
+            + `master ${masterHash.slice(0, 16)}. The slot holds something other than the studio's mark`)
+      }
+    }
+
+    // The original negative half, kept. It catches a different failure, two
+    // slots holding one file, and convention (l.4) is the reason to keep both:
+    // they read different inputs, so one cannot inherit the other's blind spot.
     for (const [name, buf] of Object.entries(files)) {
       if (name === logoName) continue
       if (sha256(buf) === logoHash) {
@@ -344,13 +384,21 @@ function liveDistRoot() {
 
 function selfTest() {
   let failures = 0
+  let seedCount = 0
+  let controlCount = 0
   const clean = liveFiles()
   const kitSrc = liveKitSrc()
   const distRoot = { present: true, hasIndexAtRoot: true }
 
-  const run = (name, expect, build) => {
+  // Counted rather than recited. The summary line used to carry the literal
+  // "11 seeds, 5 paired controls", and adding two seeds made it false the
+  // moment they landed. Convention (s): a value that changes is never written
+  // into a sentence, it is derived from its single source at read time.
+  const run = (name, expect, build, masterPath = PROVIDER_MASTER) => {
+    if (/^SEED/.test(name)) seedCount++
+    else if (/^CONTROL/.test(name)) controlCount++
     const [f, k, d] = build()
-    const found = auditDelivery(f, k, d)
+    const found = auditDelivery(f, k, d, masterPath)
     const ok = expect === 0 ? found.length === 0 : found.length >= expect
     if (ok) console.log(`  ok   ${name}`)
     else {
@@ -434,6 +482,32 @@ function selfTest() {
     return [f, kitSrc, distRoot]
   })
 
+  // S2-C113. THE SEED THAT USED TO RETURN CLEAN. The GAME logo dropped into the
+  // PROVIDER slot is the defect REQ-171 is named for, and before the positive
+  // master comparison was added this produced ZERO findings from the whole
+  // file: the old sibling-identity check only fires when the logo matches
+  // ANOTHER DELIVERED FILE, and the game logo matches none of them.
+  //
+  // The artwork is a real file from this repository rather than a synthesised
+  // PNG, because the defect is a real file being copied into the wrong slot and
+  // a generated image would not exercise the comparison the same way.
+  run('SEED 12 the GAME logo in the PROVIDER slot is caught', 1, () => {
+    const f = copy()
+    const gameLogo = join(ROOT, 'frontend', 'public', 'assets', 'ui', 'logo_future_spinner.png')
+    if (!existsSync(gameLogo)) {
+      throw new Error(`SEED 12 ANCHOR LOST: ${gameLogo} is absent, so this seed would prove nothing`)
+    }
+    f[`${PROVIDER_NAME}-Logo.png`] = readFileSync(gameLogo)
+    return [f, kitSrc, distRoot]
+  })
+
+  // Paired with SEED 12: the check must depend on the master actually being
+  // there. A comparison against an absent file that quietly passes would be the
+  // same blindness one level up.
+  run('SEED 13 an absent provider mark master is REPORTED, not skipped', 1, () => [
+    copy(), kitSrc, distRoot,
+  ], join(ROOT, 'design-system', 'brand', 'provider_mark', 'does-not-exist.png'))
+
   console.log('\nNEGATIVE CONTROLS, each PAIRED with a seed above')
 
   // CONTROL 1, paired with every seed. Without it, all eleven above are
@@ -480,7 +554,7 @@ function selfTest() {
     [copy(), kitSrc, { present: false, hasIndexAtRoot: false }])
 
   if (failures) { console.error(`\nDELIVERY SET SELF-TEST: FAIL (${failures})`); process.exit(1) }
-  console.log('\nDELIVERY SET SELF-TEST: PASS (11 seeds, 5 paired controls)')
+  console.log(`\nDELIVERY SET SELF-TEST: PASS (${seedCount} seeds, ${controlCount} paired controls)`)
 }
 
 /** Build a real, inflate-able RGBA PNG so seeds exercise the decoder. */
