@@ -469,9 +469,23 @@ case: frontend/scripts/anticipation_proof.mjs screenshots straight into the comm
 four committed evidence PNGs in the working tree. Evidence that a casual re-run can overwrite
 is not evidence. The four files were restored from HEAD; a script that regenerates committed
 evidence must do so only in a job whose brief says that is what it is doing. The same session
-observed the pattern twice more: layout_fit_gate.mjs and contrast_gate.mjs rewrite their
+observed the pattern twice more: layout_fit_gate.mjs and contrast_gate.mjs THEN rewrote their
 committed reports/qa JSON and contrast-2026-07-26 screenshots on every run, so a plain local
-re-run dirties committed evidence. Migrating the gate writers to scratch paths is open work.
+re-run dirtied committed evidence.
+
+**MIGRATED, and this paragraph recorded it as open work for far too long.** Both gates now
+route every write through `evidenceDir()` in `frontend/scripts/lib/evidencePaths.mjs`, which
+resolves to a gitignored scratch root unless FS_WRITE_EVIDENCE is set, so a plain local re-run
+no longer touches committed evidence.
+<!--CHECK: grep "evidencePaths" frontend/scripts/layout_fit_gate.mjs-->
+<!--CHECK: grep "evidencePaths" frontend/scripts/contrast_gate.mjs-->
+
+**WHY THE STALE SENTENCE IS RECORDED RATHER THAN QUIETLY DELETED, 2026-08-05.** It read
+"Migrating the gate writers to scratch paths is open work" after the migration had already
+landed. A work order then imported that sentence as a VERIFIED premise under rule 16 and sent
+a session hunting a hazard that no longer existed. **The boot document every session reads
+first is exactly where a stale status claim does the most damage**, and the two anchors above
+exist so this one cannot go stale again without a gate saying so.
 
 **(i) Handover block.** Every session report ends with a FOR THE NEXT SESSION section stating
 the model and effort used, the approach taken, alternatives tried and rejected, files touched,
@@ -661,17 +675,22 @@ knowledge rather than alarm.** Rule 10 asks every session to verify its own fina
 push's remote result, so every session reads these:
 
 **RECOUNTED 2026-07-31, and the SHAPE was what had gone stale rather than the
-numbers.** The table described a seven-leg matrix. The matrix is now TWELVE
-browser legs across 14 jobs, so "the other six" had not matched reality for some
-time. And naming one job as the wall-clock setter is the wrong form: across three
-consecutive full-matrix runs the slowest leg was paytable card fill, then scrim
-coverage, then paytable card fill again. **Judge a run against the range; do not
-expect a particular job to be the setter.**
+numbers.** The table described a seven-leg matrix, so "the other six" had not
+matched reality for some time. And naming one job as the wall-clock setter is the
+wrong form: across three consecutive full-matrix runs the slowest leg was paytable
+card fill, then scrim coverage, then paytable card fill again. **Judge a run
+against the range; do not expect a particular job to be the setter.**
+
+**THE LEG COUNT IS DELIBERATELY NOT WRITTEN HERE, per convention (s).** It changes
+whenever a gate is added, and it has: it was seven, then twelve, and run
+30970938613 on 2026-08-05 carried thirteen. **Read the count from the matrix in
+`.github/workflows/checks.yml`, or from the job list of any full run.** Those
+three figures are a dated record of the growth, not a current claim.
 
 | Job | Measured |
 |---|---|
 | `static gates` | about **82 seconds** |
-| the twelve browser legs | roughly **150 to 190 seconds** each, in parallel |
+| each browser leg | roughly **150 to 190 seconds**, in parallel |
 | the slowest leg | **varies by run**, typically 160 to 190 seconds |
 | **browser wall-clock** | **3.4 to 3.7 minutes** on clean runs |
 
