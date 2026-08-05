@@ -376,6 +376,51 @@ a session's work**, and it would close this row properly with a red that can be 
 
 ---
 
+---
+
+## PROPOSAL 8: S2-C005, replay audio, and the row's fix would BREACH a compliance requirement
+
+**Status: PROPOSED OWNER-PARK, REFUSED as specified. Added 2026-08-05.**
+
+**The row is right about the observation and wrong about the fix.** `ReplayMode.svelte`
+genuinely has no audio wiring at all: `grep -n "soundService|playWin|playBGM|warmUpAudio"`
+returns nothing. The row concludes this is an omission and asks for `playBGM()`, a one-shot
+gesture warm-up listener, and `playWin()` at both `winAmount.set` sites.
+
+**IMPLEMENTING THAT WOULD SHIP SOUND ON A SURFACE WITH NO WAY TO TURN IT OFF**, and that is
+measured rather than argued:
+
+- `App.svelte` branches `{#if isReplay}` to `<ReplayMode />` INSTEAD of the game tree, so
+  `HudOverlay.svelte` is not rendered on the replay route at all.
+- **The mute control lives inside `HudOverlay.svelte`**, as the `audio-panel` block with its
+  Mute and Unmute button and the `isMuted` store.
+- Therefore a replay player would get background music and win sounds with **no control of
+  any kind** to silence them.
+
+`CLAUDE.md`'s Compliance section lists **working sound disable** among the properties that
+must not regress. The row's fix regresses it.
+
+**AND THE EXCLUSION LOOKS DELIBERATE RATHER THAN FORGOTTEN.** `App.svelte` carries
+`let warmMount = !isReplay`, so the replay route is explicitly opted out of the warm mount
+path, and the branch's own comment enumerates what replay deliberately drops. Whoever built
+the route made a choice here; the row read that choice as an oversight.
+
+**What a correct fix would require, so the option is on the table rather than merely
+refused:** render a mute control inside `ReplayMode.svelte` FIRST, wired to the same
+`isMuted` store, and only then add `playBGM()` and `playWin()` behind it. That is a
+player-visible change to a compliance surface, which is the owner's and Fable's call rather
+than a builder's, per convention (l.8).
+
+**A second question rides with it, and it is genuinely open.** Bet Replay is a dispute and
+verification surface, often opened by an operator rather than by a player. **Whether it
+should make noise at all is a product decision nobody has taken.** Silent replay may well be
+correct, in which case the row closes as NOT A DEFECT and `ReplayMode.svelte` should carry a
+comment saying so, so the next audit does not re-raise it.
+
+**Recommended: PARK, and answer the product question first.** If the answer is "replay stays
+silent", the cheapest durable close is one comment in the component. If it is "replay gets
+audio", the mute control is a prerequisite and not an extra.
+
 ## THE OWNER'S DECISION, in one block
 
 | # | Row | Refused half | Proposed | Signature |
@@ -387,6 +432,7 @@ a session's work**, and it would close this row properly with a red that can be 
 | 5 | S2-C075 | how the five books files reach the runner | CHOOSE one of four options; the mechanical half already shipped and will go red until then | |
 | 6 | S2-C122 | what "10,000,000 events" counts | PARK the definition until the first upload prints the platform's own figure; two modes may sit at about 70 per cent of the cap | |
 | 7 | S2-C069 | hero icon diverges from its master | PARK on BUDGET only. Both options the row names are impossible; the surviving one is a small asset-provenance gate, specified and sized | |
+| 8 | S2-C005 | replay audio | REFUSED as specified: the fix ships sound with no mute control and regresses working sound disable. Answer the product question first, silent replay or audio plus a mute control | |
 
 **Nothing above is closed by this document.** Each row stays open in
 `reports/qa/session7/RECONCILED.tsv` until the owner signs, and this file is the record of
