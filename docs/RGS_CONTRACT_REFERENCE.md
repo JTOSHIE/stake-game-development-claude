@@ -1,14 +1,48 @@
 # Stake Engine RGS wire-contract reference
 
-An on-file reference for the Stake Engine RGS contract, extracted from the community
-**stake-dev-tool** source (the closest available spec of the wire protocol - it implements
-the contract in Rust and serves real math-sdk output), and **cross-checked against our own
-`rgsService.ts`** so our development setup provably aligns. `rgsService.ts` is a locked file;
-this document is reference/verification only, no code change. Australian English, no em
+An on-file reference for the Stake Engine RGS contract. `rgsService.ts` is a locked file;
+this document is reference and verification only, no code change. Australian English, no em
 dashes or en dashes.
 
-Reference source: `github.com/simnJS/stake-dev-tool` (`crates/lgs/src/{routes,types,replay,math_engine}.rs`).
-Verified 2026-07-04 against `frontend/src/lib/services/rgsService.ts`.
+**HEADER REWRITTEN 2026-08-05, S2-C053, because it inverted its own provenance.** It used to
+open by saying this reference was extracted from the community **stake-dev-tool** source,
+called that "the closest available spec of the wire protocol", and claimed our setup
+"provably aligns". All three were wrong or overstated by the time anyone read them.
+
+**THE AUTHORITY IS THE FIRST-PARTY CAPTURE, and it is in this repository.** The platform's
+own RGS documentation is mirrored at `docs/stake-engine-live/2026-07-29/rgs.md`, with the
+same material at `docs/stake-engine-live/2026-07-29/approval_guidelines_rgs_communication.md`.
+Where this document and those captures disagree, **the captures win** and this document is
+the thing that is wrong.
+<!--CHECK: exists docs/stake-engine-live/2026-07-29/rgs.md-->
+<!--CHECK: exists docs/stake-engine-live/2026-07-29/approval_guidelines_rgs_communication.md-->
+
+**stake-dev-tool is a CORROBORATING COMMUNITY IMPLEMENTATION, not a spec.**
+`github.com/simnJS/stake-dev-tool`, `crates/lgs/src/{routes,types,replay,math_engine}.rs`.
+It implements the contract in Rust and serves real math-sdk output, which makes it useful
+evidence about how the contract behaves in practice and makes it worth keeping. It is not
+first-party and does not bind us. Per convention (l.4) it is a genuinely independent input
+from the platform's own text, which is exactly why it is worth citing beside them rather
+than instead of them.
+
+**"PROVABLY ALIGNS" IS REPLACED BY THE THING THAT ACTUALLY CHECKS.** The alignment that
+exists is a CI job named **`rgs parse alignment`** in `.github/workflows/checks.yml`, running
+`frontend/src/lib/services/rgsService.parse.test.ts` against real decoded book rows. That is
+a test on every push, not a proof, and it covers the PARSER rather than the whole contract.
+Named rather than line-cited, per convention (s): the row that produced this correction cited
+its line number and the number had already drifted.
+<!--CHECK: grep "rgs parse alignment" .github/workflows/checks.yml-->
+
+**PROVENANCE OF THE BODY BELOW, per protocol rule 16: REPORTED, not VERIFIED.** It was
+verified on **2026-07-04** against `frontend/src/lib/services/rgsService.ts`. **That file has
+changed three times since**, and one of those changes is not incidental: `e2b84a5` and
+`da4826f` on 2026-07-25, the sanctioned locked pass of PR #103, whose own message reads
+"rewrite the wallet layer to the pinned official contract", and `6ef8a89` on 2026-07-26.
+
+**So the 2026-07-04 date predates a rewrite of the very file it was checked against**, and
+nothing below has been re-checked at this correction's date. Treat every statement in this
+document as REPORTED as at 2026-07-04 until someone re-derives it. **This note is not a
+re-verification and must not be read as one.**
 
 ## Endpoints
 
