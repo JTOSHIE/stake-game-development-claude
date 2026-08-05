@@ -149,3 +149,32 @@ e's ring, reel windows and 7s are large and read cleanly at 48, which is more th
 earlier candidate managed. The owner may reasonably want the wordmark present at 512 and
 accept it going to texture at 48. The true-size strip exists so that call is made on real
 pixels.
+
+## The derivation's verdict is a RANKING, and that is gated here (S2-C059, 2026-08-05)
+
+`PROVIDER_LOGO_DERIVATION.md` used to say **"candidate F wins at 32px, 3 of 3 measures"**
+with no qualifier, and a reader takes that as an absolute legibility finding. It is not
+one. `frontend/scripts/provider_logo_derivation.mjs`'s `verdictAt()` is a pure
+two-candidate vote: every comparison has the other candidate on its right-hand side, the
+winner is decided by `gw >= 2`, and there is **no absolute threshold anywhere in the
+decision path**. A field of two can be won by something illegible.
+
+The record now states that scope. **The mechanism was NOT made rigorous**, and the reason
+is recorded rather than glossed: an admissibility check needs an absolute ceiling, nothing
+measured in that script derives one, and inventing a threshold is a judgement the builder
+does not get to make alone. That half is an owner question, not a coding task.
+
+**The anchor below is what stops the wording rotting back.** It greps the generator for the
+two-candidate vote rule. If somebody adds a real absolute admissibility check, the rule
+changes, the anchor goes STALE_CLAIM, `scripts/qa/doc_currency_gate.mjs` fails in CI, and
+whoever did the work is told to re-word the claim this file is defending.
+
+**Why the anchor lives HERE and not in the derivation record**, which is the obvious place
+and is wrong: that record is regenerated in full by the generator at its final
+`writeFileSync`, so an anchor placed in it would also live in the generator's own source as
+a string literal. The doc currency gate's grep is a whole-file literal substring test, so
+it cannot tell code from an anchor quoting code: a positive anchor would satisfy itself
+forever and a negated one would fail itself immediately. Either way it would measure
+itself. This README is hand-maintained and no script writes it.
+
+<!--CHECK: grep "gw >= 2 ? 'g' : 'f'" frontend/scripts/provider_logo_derivation.mjs-->

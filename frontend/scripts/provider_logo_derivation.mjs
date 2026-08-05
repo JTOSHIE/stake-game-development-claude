@@ -317,8 +317,29 @@ const lines = [
   'the delivery goes to whichever candidate is measurably more legible at the smallest size',
   'the platform renders. Produced by `frontend/scripts/provider_logo_derivation.mjs`.',
   '',
+  // S2-C059. THE SCOPE OF THE CLAIM IS NOW STATED IN THE CLAIM.
+  //
+  // This read "Verdict: candidate F wins at 32px, 3 of 3 measures", which a reader
+  // takes as an absolute legibility finding. It is not one. verdictAt() is a pure
+  // TWO-CANDIDATE vote: every comparison has the other candidate on its right-hand
+  // side (g > f, g < f), gw >= 2 picks the winner, and there is no absolute
+  // threshold anywhere in the decision path. "Wins" means "beat the one
+  // alternative", and a field of two can be won by something illegible.
+  //
+  // The qualifier is emitted HERE, in the generator, and not hand-edited into the
+  // record, because :451 regenerates that document IN FULL on every run: a
+  // hand-edited document that a script rewrites is not corrected, it is doomed.
   `**Verdict: candidate ${WINNER.key.charAt(0).toUpperCase()} wins at ${DECISION_SIZE}px, ` +
-    `${Math.max(gWins, 3 - gWins)} of 3 measures.**`,
+    `${Math.max(gWins, 3 - gWins)} of 3 measures, against candidate ` +
+    `${LOSER.key.charAt(0).toUpperCase()} alone.**`,
+  '',
+  '**This is a head-to-head ranking, not an absolute legibility claim.** The measurement',
+  'below compares exactly two candidates against each other on three measures and takes the',
+  'majority. It carries NO absolute floor: nothing here asserts that the winner is legible at',
+  `${DECISION_SIZE}px, only that it is the more legible of the two. An admissibility check`,
+  'against a stated ceiling would be a different instrument and would need a ceiling nobody',
+  'has yet derived. See design-system/brand/provider_mark/README.md, which gates this',
+  'sentence against the vote rule in the generator.',
   '',
   '## 1. What size does the platform actually render?',
   '',

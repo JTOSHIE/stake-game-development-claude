@@ -4,7 +4,15 @@
 the delivery goes to whichever candidate is measurably more legible at the smallest size
 the platform renders. Produced by `frontend/scripts/provider_logo_derivation.mjs`.
 
-**Verdict: candidate F wins at 32px, 3 of 3 measures.**
+**Verdict: candidate F wins at 32px, 3 of 3 measures, against candidate G alone.**
+
+**This is a head-to-head ranking, not an absolute legibility claim.** The measurement
+below compares exactly two candidates against each other on three measures and takes the
+majority. It carries NO absolute floor: nothing here asserts that the winner is legible at
+32px, only that it is the more legible of the two. An admissibility check against a stated
+ceiling would be a different instrument and would need a ceiling nobody has yet derived.
+See design-system/brand/provider_mark/README.md, which gates this sentence against the vote
+rule in the generator.
 
 ## 1. What size does the platform actually render?
 
