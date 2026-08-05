@@ -783,6 +783,29 @@ jobs:
         working-directory: frontend
         run: node scripts/brand_token_gate.mjs
 
+      # ── S2-C037: a Stake mark EMBEDDED IN THE BYTES of a shipped asset ──────
+      # The third member of the brand family and the only one that reads binary.
+      # brand_token_gate reads file NAMES; dist_hygiene reads shipped TEXT; this
+      # reads the bytes of images and audio, where an export tool's PNG tEXt
+      # chunk, JPEG EXIF field or MP3 ID3 tag can carry a studio or platform
+      # name that no text scan of source or bundle can ever see, and that a
+      # reviewer unzipping the upload would.
+      #
+      # The row also asked for a source-side TEXT scan. That was REFUSED with
+      # two measurements recorded in the gate's own header: player strings reach
+      # the bundle, so dist_hygiene already sees them, and stripping comments
+      # from src leaves zero brand hits because all eight are correct prose
+      # about the stake.us jurisdiction rules.
+      #
+      # AFTER the production build, like its siblings: dist is its only root.
+      - name: embedded stake marks, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/stake_mark_gate.mjs --self-test
+
+      - name: no Stake mark embedded in any shipped asset
+        working-directory: frontend
+        run: node scripts/stake_mark_gate.mjs
+
       # ── Gate 13f: the submission delivery set ────────────────────────────────
       # M03 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
       # (REQ-164, 169, 170, 171, 172, 173, 174, 176) with no proof path, all of
