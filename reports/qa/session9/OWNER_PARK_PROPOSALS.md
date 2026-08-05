@@ -47,10 +47,12 @@ and the common shape is worth stating once because it is the tier's real lesson:
 that cannot fail is not a cheap gate, it is a false compliance claim with a green tick on
 it.**
 
-The last two are a different animal and were added by this session's own work rather than
-inherited from Session 8. In both, the MECHANICAL half is built, seeded and proven; what is
-blocked is a decision only the owner can take, and in both cases the row that named it had
-called that decision "separate" when the measurement shows it is a precondition.
+The last three were added by this session's own work rather than inherited from Session 8.
+In 5 and 6 the MECHANICAL half is built, seeded and proven and only a decision the owner can
+take is outstanding, and in both cases the row that named that decision called it "separate"
+when the measurement shows it is a precondition. PROPOSAL 7 is the odd one out and is
+labelled honestly: nothing about it is impossible, the work simply did not fit, and it is
+specified and sized so the next session can pick it up cold.
 
 ---
 
