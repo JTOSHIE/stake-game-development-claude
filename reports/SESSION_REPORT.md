@@ -10333,3 +10333,218 @@ browser matrix `skipped`. The qualification above still stands and is the point:
 green does not speak for the browser matrix, which has not been seen fully green since
 run `30600681036` on `3d068eb`. This recording commit is itself the lag rule 12 names,
 and the owner preview is refreshed once more after it.
+
+---
+
+# SESSION 8: THE GATE AND CI TIER (FS_GATE_TIER), 2026-08-04 to 2026-08-05
+
+Brief: `reports/briefs/FS_GATE_TIER_Prompt.md`, saved verbatim per convention (b).
+Base HEAD `8e2bd1a`, main. Resume ledger: `reports/qa/session8/RESUME.md`.
+
+## WHAT THIS SESSION ACTUALLY FOUND, AND IT CHANGES THE TIER'S REPUTATION
+
+The brief's premise was that the gate tier's 19 rows are self-verifying, because
+convention (p) supplies the proof directly. That held. What did NOT hold is the
+assumption underneath the row set: that the rows describe fixes that can be built as
+written.
+
+**JOB 1 delegated six shared-nothing reconnaissance agents, one per cluster, read-only.
+All six returned, zero errors, about 796k of agent tokens. Only 4 of the 19 rows came
+back with the verdict that the gate's predicate can SEE the defect the row names.**
+
+That is the headline. The tier is not a list of edits waiting to be typed. Nine rows
+carry a specified fix that is impossible, permanently red, or blind as written, and each
+one was measured rather than argued. Delegating that reading is what made the tier
+affordable: the same finding reached from the main loop would have cost the session.
+
+## THE NINE ROWS CLOSED, EACH WITH A RED OBSERVED AND QUOTED
+
+| Row | Severity | Instrument | The proof |
+|---|---|---|---|
+| S2-C008 | STREAM | `replay_contract_gate.mjs` | `SEEDS: 9/9 caught`, was 8/8 |
+| S2-C009 | STREAM | `vocabulary.ts` | prose only, and it says so |
+| S2-C028 | HIGH | `replay_contract_gate.mjs` | `SEEDS: 10/10 caught` |
+| S2-C044 | HIGH | `dist_hygiene_gate.mjs` | RED on the real tree with NO seed |
+| S2-C048 | HIGH | `supply_chain_gate.mjs` | partial, anti-malware half refused |
+| S2-C049 | HIGH | `supply_chain_gate.mjs` | RED end to end, real lockfile mutation |
+| S2-C051 | HIGH | `supply_chain_gate.mjs` | partial, licence-text half refused |
+| S2-C052 | HIGH | `dist_hygiene_gate.mjs` | partial, RED via a REAL BUILD |
+| S2-C080 | HIGH | `dist_hygiene_gate.mjs` | convention (s), inert by design |
+| S2-C113 | MEDIUM | `delivery_set_gate.mjs` | old check returned 0 findings, proven |
+| S2-C118 | MEDIUM | `dist_hygiene_gate.mjs` | RED against a real `--base=/` build |
+
+Eleven rows touched, of which three closed only in part and say so in their commits.
+
+## THE FOUR REFUSALS, WHICH ARE THE SUBSTANCE RATHER THAN THE SHORTFALL
+
+The brief named one worked failure this session must not repeat: a previous brief ordered
+a seed that its target gate could not observe. Four more of the same class were found
+BEFORE anything was written.
+
+1. **S2-C052's `setTelemetrySink` scan cannot exist.** esbuild renames every bundle-scope
+   function identifier. `configureTelemetry` is called unconditionally so it certainly
+   ships, and `grep -c` over the shipped bundle returns 0 for it. A scan on that token
+   could never fire. What shipped instead scans `__telemetry`, a property name, and
+   `mockCurrency`, a string literal, both of which survive minification for stated
+   reasons, and the red was then proved with a real build rather than a string.
+
+2. **S2-C052's origin clause would be permanently red.** Twenty absolute origins ship
+   legitimately today: Svelte runtime error links, W3C XML namespace identifiers which
+   are names rather than destinations, and a pixi shader credit. And there is no RGS host
+   to allowlist, because it arrives at runtime from the launch URL.
+
+3. **S2-C048's anti-malware pass has no honest seed.** For a real anti-malware step the
+   seed is EICAR observed detected. There is no scanner on the runner, so nothing could
+   detect it, and a walk that matches nothing and prints PASS would put a false
+   compliance claim into a submission record.
+
+4. **S2-C051's pinned licence text does not exist.** All four candidate paths 404 at the
+   pinned commit, GitHub reports the repository licence as null, and the repo already
+   recorded it at `docs/records/tooling/TOOL_VETTING_2026-07.md:15`. The pin is asserted
+   instead, which is the defect in the form it can actually occur.
+
+**And one trap was closed at the point of writing rather than four days later.** S2-C028's
+assertion had to prove a sweepstakes symbol renders without the raw code. `SC` IS A
+SUBSTRING OF `XSC`, so a predicate written as `/SC/.test(txt)` is GREEN on the exact
+defect it exists to catch. The seed renders `"Token: XSC"`, which contains `SC`, and it
+goes red only because the assertion demands the raw code's ABSENCE. That is the dash-gate
+failure caught before shipping.
+
+## THE ROW THE BRIEF FORGOT
+
+**S2-C028 is one of the nineteen and the brief assigned it to no job.** JOB 2 names
+S2-C008 and S2-C009; the singleton list names five others; the jobs total eighteen. It
+was closed here because it lands in the same file as JOB 2 and cost one commit rather
+than two. Worth noting for whoever drafts the next brief from the same TSV.
+
+## THE BROWSER MATRIX, WHICH THE BRIEF ASKED TO BE REPORTED
+
+**Twelve browser legs, 15 of 15 jobs, green.** Run `30893455434` on `a7933a1`. This is the
+first full matrix seen green since `3d068eb`, and it was re-exercised on every subsequent
+push because gate files are matrix-triggering paths. Run `30965206778` on `a93357e` also
+15 of 15, with both new supply-chain steps green on the remote runner.
+
+The leg count actually observed is therefore **12 browser legs across 15 jobs**, matching
+the table at rule 10 rather than the stale seven-leg shape.
+
+## OWNER PREVIEW, RULE 12, AND A DEFECT IT SURFACED
+
+Printed line, pasted per convention (a):
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 65e4db4  |  built 2026-08-05T11:15:41+10:00  |  started 2026-08-05T01:16:06.067Z  |  http://192.168.4.92:5173
+```
+
+**THE PRINTED ADDRESS DOES NOT WORK, AND RULE 12'S OWN CURL CLAUSE IS WHAT CAUGHT IT.**
+Measured: `http://192.168.4.92:5173` returns HTTP 000. `http://localhost:5173` and
+`http://127.0.0.1:5173` both return HTTP 200, so the server is genuinely up and serving
+current main. The machine's actual LAN address is now **192.168.4.95**, and
+`http://192.168.4.95:5173` returns **HTTP 200**.
+
+The cause is at `scripts/owner_preview.mjs:238`, which hardcodes the address into the
+line it prints. That is convention (s) in the rule-12 machinery itself: a DHCP lease
+written into an instruction. **It is NOT fixed here**, because the brief forbids
+extending the row set, and it is raised for the owner instead. The preview IS refreshed
+and IS current; only the address printed beside it is stale.
+
+## WHAT WAS NOT STARTED, AND WHY
+
+The brief's stop line forbids starting a new gate below 300k of remaining main loop.
+These were left untouched and are recorded as not started rather than half-built:
+
+- **S2-C010**, the new `brand_token_gate.mjs`. Recon specified it fully: about 150 to 190
+  lines in the `asset_reference_gate.mjs` shape, three walk roots totalling 323 paths, and
+  it should restate its token list independently per convention (l.4) rather than share a
+  source. Ready to build; not begun.
+- **S2-C024 and S2-C025**, both `NEW_PREDICATE_REQUIRED`. Recon found S2-C024's currency
+  clause cannot work as specified in two independent ways: the layout gate only ever
+  renders USD, and `readouts[].text` resolves to a label or an empty decorative span on
+  six of seven presets. Needs a redesign, not an edit.
+- **S2-C058**. The brief's override to wire `platform_conformance_item2.mjs` is the more
+  expensive path: it is unwired, has no self-test, and writes committed evidence
+  unconditionally. Recon recommends porting its four-line origin predicate into
+  `build_diet_verify.mjs`, which the row's own remainder permits.
+- **S2-C059**, **S2-C069**, **S2-C075**, **S2-C122**. Each has a recorded reason. S2-C122
+  additionally cannot be done as specified: its seed would land on a LOCKED PATH, and
+  `validate_math.py` is stdlib-only with no decoder on the runner.
+
+**S2-C069 and S2-C075 were deliberately not half-done.** Both have an owner-facing half,
+and both mechanical halves are edits with no gate behind them, so neither could carry a
+proven red. The brief's own rule is that such a row is left untouched and recorded, which
+is what happened. The owner questions are in the handover below.
+
+## VERIFICATION
+
+- `npm run check`: 502 files, **0 errors**, 36 pre-existing warnings.
+- `replay_contract_gate.mjs`: `24/24 assertions passed`; self-test `10/10 caught, 0 missed, 0 unapplied`.
+- `dist_hygiene_gate.mjs`: `DIST HYGIENE: PASS` on a clean tree at HEAD.
+- `supply_chain_gate.mjs`: `PASS (67 production entries)`; self-test all seeds caught.
+- `delivery_set_gate.mjs`: `DELIVERY SET: PASS`; self-test `13 seeds, 5 paired controls`.
+- **Convention (h.1) held throughout.** Every gate run announced its evidence mode, and
+  `git status --porcelain` was checked after each; no committed evidence was written.
+  `layout_fit_gate.mjs` and `contrast_gate.mjs` were never executed.
+- **No locked path was touched. No money-path edit was made.**
+
+## FOR THE NEXT SESSION, per convention (i)
+
+**Model and effort.** Opus 5, high effort, one session, 2026-08-04 to 2026-08-05.
+
+**Approach taken.** Delegate the reading, keep the observing. Six reconnaissance agents
+read one gate cluster each and returned the insertion point, the predicate as it actually
+is, and a ruling on whether that predicate can SEE the defect. Every edit and every seeded
+red was then made and watched from the main loop. That split is what made the tier
+affordable, and the agents' single most valuable output was nine rulings of "this cannot
+work as written, here is the measurement, here is what can".
+
+**Alternatives tried and rejected.**
+- Seeding S2-C008 as the row specified, by stripping the replay guard from the served
+  `index.html`. Rejected on evidence: the guard compiles into the bundle so `index.html`
+  cannot reach it, and even stripped, `canSpin` is permanently false on the replay
+  surface, so the seed would emit no request and score MISSED on a working gate. An
+  observation-boundary seed was used instead, which this file's header already declares.
+- Putting the keyboard leg in the DEFAULT replay drive, which is what the row's wording
+  implies. Rejected: two live assertions read that same log and both would become false,
+  including REQ-085, whose whole point is that the absence of a click is the assertion.
+- Wiring `platform_conformance_item2.mjs` into the matrix for S2-C058, as the brief
+  directed. Deferred rather than done: it is unwired, has no self-test, and writes
+  committed evidence unconditionally, so it is the more expensive of two permitted routes.
+- Scanning `dist` inside `supply_chain_gate.mjs`. Rejected to avoid shipping two dist
+  walkers; `dist_hygiene_gate.mjs` owns that surface.
+
+**Files touched.** `frontend/scripts/replay_contract_gate.mjs`,
+`frontend/scripts/dist_hygiene_gate.mjs`, `frontend/scripts/supply_chain_gate.mjs` (new),
+`frontend/src/lib/i18n/vocabulary.ts`, `frontend/package.json`,
+`.github/workflows/checks.yml`, `scripts/qa/delivery_set_gate.mjs`,
+`reports/briefs/FS_GATE_TIER_Prompt.md` (new), `reports/qa/session8/RESUME.md` (new).
+
+**Open threads, in the order they should be picked up.**
+
+1. **Eight gate rows remain**: S2-C010, S2-C024, S2-C025, S2-C058, S2-C059, S2-C069,
+   S2-C075, S2-C122, plus the refused halves of S2-C048, S2-C051 and S2-C052. The
+   reconnaissance notes for all of them are reproducible from the workflow journal; a
+   session picking these up should re-run JOB 1's recon for its own clusters rather than
+   trust this paragraph, because each ruling was measured against a HEAD that has moved.
+2. **THE ROW SET NEEDS A RECOUNT BEFORE THE NEXT BRIEF.** S2-C028 was in the nineteen and
+   assigned to no job. Whoever drafts from `RECONCILED.tsv` should reconcile the job
+   assignments against the row count, not just the row count against the TSV.
+3. **`scripts/owner_preview.mjs:238` hardcodes a LAN address that is already stale.** The
+   owner is being given a URL that returns HTTP 000. Small fix, real impact, and it sits
+   inside the machinery rule 12 exists to protect.
+4. **Two owner questions, both parked deliberately and neither answered here.**
+   - **S2-C069**: do you want the shipped hero icon byte-identical to its 24,547-byte
+     master, which costs about 1.4 KB of bundle plus a lossless passthrough path added to
+     `build.py` and a re-run of the whole asset build; or is the 256-colour quantisation
+     kept and simply recorded as intentional? Note the row's preferred option cannot work
+     as literally written: dropping `palette_colors` changes nothing because 256 is
+     already the default, and PIL's palette mode caps there.
+   - **S2-C075**: how should the five books files reach the runner? Today they do not:
+     they are gitignored and untracked, there is no artefact download and no LFS, so the
+     job's completeness check can only ever be run locally before dispatch.
+5. **Unchanged and still ahead of all of this**: the 19 documentation rows, one of which
+   (S2-C056) is parked on the `future-spinner-3` destination; the 6 component and 3 other
+   rows, which no brief has yet assigned a job; the reviewers' named blocker, money-display
+   integrity and localisation completeness; and the ten questions of entry 038.
+
+**What ran out.** Main loop context, per rule 13's requirement to name the resource. The
+session stopped at a commit boundary with the resume ledger written, having deliberately
+declined to start rows the stop lines put out of reach.
