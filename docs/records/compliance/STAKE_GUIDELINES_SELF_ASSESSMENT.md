@@ -5,6 +5,20 @@ captured and transcribed by the owner on 2026-07-26. The platform shows it as a 
 tick-list at **0 of 58**; nothing on the platform is ticked yet, and ticking it there is the
 owner's action, not ours.
 
+> **PROVENANCE, added 2026-08-05 per protocol rule 16. The 58 item texts below are
+> REPORTED, not VERIFIED, and there is no mirror of them anywhere in this repository.**
+> Their single source is the owner's transcription of 2026-07-26. **No capture exists and
+> none can be made by this seat**: the criteria page is login-gated, recorded under the
+> `submission-checklist` bullet of `COMPLIANCE_WATCH.md`, and every capture attempt has
+> stored the login wall instead of the page.
+>
+> **What that does and does not put in doubt.** The EVIDENCE column is ours and is verified
+> or observed as each row says. What rests on a single unmirrored source is the WORDING of
+> each requirement. If a guideline was transcribed loosely, a row could be assessed against
+> a requirement the platform did not write, and nothing in this repository would catch it.
+> Capturing the authenticated page is an owner action on his next portal login, and it is
+> the only thing that upgrades this block to VERIFIED.
+
 **Why this document exists.** Owner instruction, 2026-07-26: *"we should be working against
 [these guidelines] as well, should be completing those guidelines prior to completing them
 on stake engine"*. So this is our internal pass, run before the owner ticks anything. Each
@@ -72,7 +86,7 @@ or the architecture.
 
 | # | Item | Status | Evidence |
 |---|---|---|---|
-| 12 | **Zero-win bets do not send an end-round request** | **CONFLICT** | See TR-064. `rgsService.ts:797` reads `playResp.round ? playResp.active : playResp.winMicros > 0`. That gate was **deliberately changed** from `winMicros > 0` to the round's `active` flag under the JOB 4 sanction, on the official client's own instruction: *"Only call this API if Play() has returned an Active result"*. If the RGS returns `active: true` on a zero-win round we will send end-round and breach this guideline; if it returns `active: false` we comply and the guideline and the client agree. **The client documentation and this checklist cannot both be followed until we observe which it is.** One network capture on a zero-win spin settles it. |
+| 12 | **Zero-win bets do not send an end-round request** | **PASS** | **Re-derived 2026-08-05: CLOSED by observation, no code change, TR-064 in `REVIEW_TRACKER.md` is CLOSED.** The owner's live captures of 2026-07-28 settle it as a matched pair: `reports/screens/owner-session-2026-07-28/152145_frame.png` shows the Network tab filtered on wallet across eight consecutive settled zero-win rounds with nine rows, every one `play` and no `end-round`; `152225_frame.png` from the same session forty seconds later interleaves four `end-round` rows, proving the filter does show them when emitted. So the RGS returns `active: false` on a zero-win round, the gate does not fire, and the guideline is met by the code as it stands. **The two first-party sources never actually conflicted in practice.** Retained for the record: `rgsService.ts:799` reads `playResp.round ? playResp.active : playResp.winMicros > 0`. That gate was **deliberately changed** from `winMicros > 0` to the round's `active` flag under the JOB 4 sanction, on the official client's own instruction: *"Only call this API if Play() has returned an Active result"*. If the RGS returns `active: true` on a zero-win round we will send end-round and breach this guideline; if it returns `active: false` we comply and the guideline and the client agree. **The client documentation and this checklist cannot both be followed until we observe which it is.** One network capture on a zero-win spin settles it. |
 | 13 | Insufficient balance bets do not send a play request | **PASS** | Two independent guards: the `canSpin` derived store, and `App.svelte:1003` `if (cost > bet && $balance < cost) return` for the per-tier buy cost. |
 
 ## Frontend Requirements
@@ -80,7 +94,7 @@ or the architecture.
 | # | Item | Status | Evidence |
 |---|---|---|---|
 | 14 | Space bar bound to the bet button | **PASS** | `App.svelte:1175` handles `Space`, routes through `handleSpin` and the same `canSpin` guard, is inert in replay mode and while a modal is open, and respects the jurisdiction `disabledSpacebar` flag. |
-| 15 | **Main game frame should not be scrollable** | **FAIL** | See TR-065. `:global(body)` is correctly `overflow: hidden`, but `App.svelte:1821` gives `.game-wrapper.portrait`, `.game-wrapper.compact-landscape` and `.game-wrapper.mini-player` `overflow-y: auto`. A scrollbar is visible in the owner's captures at mobile portrait, Mobile S and Popout S, and is absent on desktop, which is exactly the class list. Confirmed from code and corroborated by three captures at three sizes. |
+| 15 | **Main game frame should not be scrollable** | **FAIL** | See TR-065. `:global(body)` is correctly `overflow: hidden`, but `App.svelte:2311` gives `.game-wrapper.portrait`, `.game-wrapper.compact-landscape` and `.game-wrapper.mini-player` `overflow-y: auto`. A scrollbar is visible in the owner's captures at mobile portrait, Mobile S and Popout S, and is absent on desktop, which is exactly the class list. Confirmed from code and corroborated by three captures at three sizes. **RE-DERIVED 2026-08-05 AND STILL FAILING**: the `overflow-y: auto` is unchanged at `App.svelte:2311`, inside the rule that opens on the three wrapper classes. The line reference is corrected here from `:1821`, which had drifted; the row that asked for this correction proposed `:2265`, which is also wrong. |
 
 ## Game Rules
 
@@ -100,7 +114,7 @@ or the architecture.
 | 22 | Functions correctly on Desktop/Laptop | **PASS** | Captures at Desktop 1200x675 and Laptop 1024x576: full HUD, correct balance, no clipping. |
 | 23 | Functions correctly on Popout S/L | **PASS with a defect** | Both captured. Popout L renders the full landscape HUD; Popout S renders the mini strip with all seven controls. **The mini strip's WIN readout is clipped mid-glyph** in the capture, and item 15's scrollbar is present. See TR-065 and TR-066. |
 | 24 | Functions correctly on Mobile | **PASS with a defect** | Mobile portrait and Mobile S captured and playable. Same scrollbar defect. |
-| 25 | **Double tap to zoom is disabled on mobile** | **FAIL** | See TR-066. `frontend/index.html` viewport meta is `width=device-width, initial-scale=1.0, viewport-fit=cover` with no `maximum-scale` or `user-scalable=no`, and `touch-action` appears nowhere in `frontend/src`. Nothing disables double-tap zoom. |
+| 25 | **Double tap to zoom is disabled on mobile** | **PASS** | **Re-derived 2026-08-05: FIXED.** `frontend/src/app.css` now sets `touch-action: manipulation`, under a header naming this guideline item and JOB 3(c) as the pass that closed it. Its comment records why that is the correct instrument rather than the obvious one: a `maximum-scale` or `user-scalable=no` viewport meta is ignored by mobile Safari, so a gate reading the meta tag would show green while a player could still double-tap the reels and zoom the board. `manipulation` removes the double-tap-to-zoom delay while leaving panning and PINCH zoom intact, so a player who needs to magnify the paytable still can. The old FAIL text described `frontend/index.html`'s viewport meta, which is unchanged and is deliberately not the fix. |
 
 ## Auto Play
 
@@ -141,7 +155,7 @@ or the architecture.
 | 43 | Currency values do not display a "$" prefix | **PASS** | `formatBalance(1000 * S, 'XSC', 'en')` returns `1,000.00 SC`, trailing, no prefix. Tested. |
 | 44 | Game mode naming follows Social Mode terminology | **PASS** | Per-mode `socialLabel` and `socialBlurb`. |
 | 45 | Replay window free of restricted words | **PASS** | Replay disclaimer has a dedicated social phrasing (`translations.ts:1622`). |
-| 46 | **English is the only supported language in Social Mode** | **FAIL** | See TR-067. `i18n/tr.ts:14` derives from `[locale, isSocial]` and uses `$locale` regardless: social mode switches the *vocabulary*, never the *language*. A social session launched with `lang=de` would render German. Nothing forces English. |
+| 46 | **English is the only supported language in Social Mode** | **FAIL** | See TR-067. `i18n/tr.ts:14` derives from `[locale, isSocial]` and uses `$locale` regardless: social mode switches the *vocabulary*, never the *language*. A social session launched with `lang=de` would render German. Nothing forces English. **RE-DERIVED 2026-08-05 AND STILL FAILING**: `tr.ts` still reads `derived([locale, isSocial], ([$locale, $social]) => t($locale, key, $social ? 'social' : 'real', params))`. The social flag still selects the VOCABULARY argument only, and `$locale` is still passed through untouched. |
 
 ## Replay Support
 
@@ -169,14 +183,32 @@ or the architecture.
 
 ## Summary
 
-| Status | Count |
-|---|---|
-| PASS | 31 |
-| OBSERVE | 14 |
-| OWNER | **7 by the rows, not 8.** The rows carry OWNER on items 7, 53, 54, 55, 57, 58 plus item 32 as OWNER/OBSERVE. This summary said 8 and `OWNER_CHECKLIST.md` said 9; **all three figures disagreed and none had been recounted.** Corrected 2026-07-30 by counting the rows. |
-| **FAIL** | **3** (items 15, 25, 46) |
-| **CONFLICT** | **1** (item 12) |
-| N/A | 1 |
+**RECOUNTED 2026-08-05, S2-C045, AND THE COUNTING RULE IS NOW WRITTEN DOWN**, because the
+old figures could not be reproduced from the rows by any stated rule and summed to 57
+against 58 items.
+
+**The rule: count each row by the FIRST word of its Status cell.** Seven rows carry a
+qualified status and are listed below so nothing hides inside a bucket.
+
+| Status | Count | Which |
+|---|---|---|
+| PASS | **38** | 31 plain, plus items 19, 23, 24, 34 and 48 whose status begins PASS with a qualifier, plus items 12 and 25 promoted by this pass |
+| OBSERVE | **10** | plain OBSERVE only; item 32 counts under OWNER and item 48 under PASS, by the first-word rule |
+| OWNER | **7** | items 7, 53, 54, 55, 57, 58, plus item 32 as OWNER/OBSERVE. Recounted 2026-07-30 against a summary saying 8 and an `OWNER_CHECKLIST.md` saying 9. **S2-C045 asked for this to be restated as 8; that was checked against the rows and refused, because 7 is what the rows say.** |
+| **FAIL** | **2** | items **15** and **46**. Item 25 is closed. |
+| CONFLICT | **0** | item 12 is closed by observation |
+| N/A | 1 | |
+
+**38 + 10 + 7 + 2 + 0 + 1 = 58**, which is the number of items. The previous figures did
+not reconcile and that is why they were replaced rather than adjusted.
+
+**THE ROW THAT ASKED FOR THIS WANTED FAIL 0 AND CONFLICT 0. TWO ITEMS STILL FAIL**, both
+re-derived from source today and both recorded above: item 15's `overflow-y: auto` is
+unchanged, and item 46 still passes `$locale` through regardless of social mode. Escalated
+per convention (l.8) rather than restated as closed.
+
+**The seven qualified rows**, so the first-word rule is auditable: 19, 23, 24, 32, 34, 48,
+53.
 
 **The three failures are all small, self-contained frontend changes**: one CSS rule, one
 meta tag plus a `touch-action`, and one locale-forcing line in a derived store. None touches
