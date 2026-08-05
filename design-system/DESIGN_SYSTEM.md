@@ -5,8 +5,31 @@ design capital. A session with only this directory and the repository can
 regenerate every pending brief.
 
 ## SYSTEM LAWS
-- One design output: every visual asset derives from vector masters in this
-  directory. No external generation (Manus retired July 2026).
+
+**AMENDED 2026-08-05 to carry two owner rulings this document had never absorbed.**
+The first law below read absolutely, with no qualification, while `CLAUDE.md`'s Assets
+section had already permitted owner-commissioned external scene and marketing art twice.
+Read that section for the governing text and the three conditions; this is its
+design-system statement, not a second authority.
+
+- One design output, and it is TWO rules rather than one:
+  **Symbols, frames and anything the animation pipeline positions or animates derive
+  from vector masters in this directory and are NEVER externally designed.** No
+  exception, and no measurement changes that answer (Manus retired July 2026).
+  **Owner-commissioned SCENE, TILE and MARKETING art may come from outside**, because
+  it is flat, terminal, and animates nothing. It is permitted only where the owner
+  commissioned it, it does not enter the animation pipeline, and its provenance is
+  recorded and MEASURED against what it replaces before it ships.
+  Unrequested external art remains prohibited whatever its quality.
+- Every such exception carries a generation note or provenance record beside the asset,
+  giving source path, source hash, shipped hash, dimensions, what the supplier claimed
+  and what the measurement found. The background and the composed tile are the worked
+  examples of the shape.
+  <!--CHECK: exists design-system/brand/GENERATION_NOTE_background.md-->
+  <!--CHECK: exists design-system/brand/tile/GENERATION_NOTE_composed_master.md-->
+  **No count is written here on purpose, per convention (s):** the number of records
+  grows every time art is commissioned, so a figure in this sentence would be false by
+  the next one. Read the set from the brand directory.
 - Front facing, always. No perspective angles on symbols or UI objects.
 - Text free artwork. Localised labels render in CSS Orbitron. Single exception:
   the machined W emblem inside the Wild.
@@ -15,9 +38,14 @@ regenerate every pending brief.
   on deep navy #060610. Key light upper left. Rich saturation, never pastel.
 - Masters are 1024x1024 SVG, filter free: glows are baked as layered stroke
   stacks so rendering is deterministic in any rasteriser (cairosvg or browser).
+  **This law scopes to the in-house pipeline**, meaning symbols, frames and UI. The
+  commissioned scene and marketing art permitted above is raster and has no SVG master,
+  which is why its provenance record carries the measurement instead.
 - Exports are rendered at exact display sizes from a manifest (npm run assets in
   AssetForge v2). Layered export planned: symbol part groups (spokes, needle,
   neon rings) export separately so the engine animates parts independently.
+  **Same scope**: commissioned flat art ships as delivered and measured, and is not
+  re-exported through the manifest, because there is no master to render from.
 - Every symbol must read at 120x100 px, one reel cell.
 - Signature colour identity per symbol: H1 cyan and magenta duo, H2 crimson
   #ff2d3d, M1 neon orange #ff9a2e, M2 neon violet #8a5cff, M3 acid green
