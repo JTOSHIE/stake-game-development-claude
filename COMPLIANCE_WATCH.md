@@ -16,8 +16,19 @@ Australian English, no em dashes or en dashes.
 - **Feature:** Overdrive Free Spins with a progressive multiplier, plus two buy tiers
   (Buy Overdrive 100x, NITRO OVERDRIVE 400x). All five modes stateless and capped at
   5,000x, all at 96.3500% RTP.
-- **Original IP:** verified. Original designs, produced in-house from vector masters.
-  No pre-purchased or third-party licensed content.
+- **Original IP:** verified, and **QUALIFIED 2026-08-05 because the flat claim was no longer
+  true of what ships.** Symbols, frames and UI are original designs produced in-house from
+  vector masters, never externally designed. Owner-commissioned SCENE, TILE and MARKETING art
+  is adopted from outside under the Assets rulings in `CLAUDE.md`, each carrying a generation
+  note or provenance record beside the asset giving source, hashes, dimensions and the
+  measurement against what it replaced. The hero emblem is a Google Gemini generation and
+  carries SynthID, governed by the licence capture at `docs/licences/google-gemini/2026-07-15/`.
+  <!--CHECK: exists docs/licences/google-gemini/2026-07-15/*-->
+  <!--CHECK: exists design-system/brand/hero_emblem/GENERATION_NOTE.md-->
+  No pre-purchased content, and no third-party licensed content beyond that generation and
+  its recorded licence. **The number of provenance records is deliberately not written here**,
+  per convention (s): it grows whenever art is commissioned. Read the set from the brand
+  directory.
 - **No Stake branding:** verified. No Stake trademark or themes in any shipped asset or text.
 - **No underage appeal:** verified. No child or child-like characters.
 - **Social/jurisdiction:** social mode present; prohibited-term overrides applied for

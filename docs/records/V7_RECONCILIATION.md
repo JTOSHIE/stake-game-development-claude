@@ -17,9 +17,21 @@ Read this section and stop. Everything not listed here is in the kit on your des
 
 ### The one sentence that matters
 
-**Nothing player-facing has changed since V7 was built.** `git diff --name-only 6e9e4739..HEAD`
-returns fifteen files and **not one of them is under `frontend/`**. So every player-visible fix
-this repository knows about is in the kit you are holding, and the "fixed since V7" column has
+**CORRECTED 2026-08-05, and the correction is the more useful record.** This sentence was
+written against a MOVING range, `6e9e4739..HEAD`, so it began decaying the moment it landed
+and both of its halves are now false: run today the range returns 1,169 files, 84 of them
+under `frontend/`. That is convention (s) in its purest form, and it matters more here than
+in most places, because the claim is submission-adjacent.
+
+**What was true, stated as a dated record so it cannot go stale.** As at `7d1c6b1` on
+2026-07-28, the commit that wrote this ledger, `git diff --name-only 6e9e4739..7d1c6b1`
+returned **18 files, none of them under `frontend/`**. The count in the original sentence
+read fifteen and was wrong even then; the load-bearing half, that nothing under `frontend/`
+had moved, did hold.
+
+**Nothing player-facing had changed since V7 was built, as at that pinned commit.** So every
+player-visible fix this repository knew about then was in the kit you were holding, and the
+"fixed since V7" column has
 exactly one entry, which is a developer utility that no player and no reviewer ever sees.
 
 ### FIXED POST-V7, ships in the next kit: one item

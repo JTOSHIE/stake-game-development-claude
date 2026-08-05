@@ -19,6 +19,18 @@ Australian English, no em dashes or en dashes.
 
 **Total tracked files: 3630.**
 
+**CORRECTION, 2026-08-05, appended rather than overwritten because the discrepancy is the
+finding.** 3630 is **34 short** of the 3664 files tracked at `f4d03cb^`, the state this census
+was taken against. The class counts above **sum exactly to 3630**, so the arithmetic is sound
+and the loss is in the INPUT LIST rather than in the tabulation. **The 34 cannot be named**,
+because no census generator is committed: the list was produced once and the producer was not
+kept, so there is nothing to re-run and diff against. 3630 is therefore left standing as what
+was actually counted, and is not silently replaced by 3664, which would assert a coverage this
+census never had.
+
+**The durable fix is to commit the generator**, so a later reader can reproduce the list rather
+than trust it. That is open work and is not done here.
+
 ## The 27 the rules refused to guess at
 
 These are handed over UNCLASSIFIED deliberately rather than forced into a class:
