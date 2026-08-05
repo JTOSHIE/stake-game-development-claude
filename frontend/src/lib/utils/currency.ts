@@ -334,8 +334,32 @@ export function currencySymbolTrailing(currencyCode: string): boolean {
   const platform = PLATFORM_CURRENCIES[code]
   if (platform) return platform.symbolAfter === true
 
-  // Unknown code: leading, which is what formatBalance falls back to.
-  return false
+  // NOT in either table. Ask Intl, exactly as currencySymbolFor does one branch
+  // further up, because the two must not resolve placement from different rules.
+  // GBP is the case that proves this branch is needed: it is absent from the
+  // platform table, Intl formats it "£10.00", and a bare default would have
+  // called it trailing.
+  try {
+    const parts = new Intl.NumberFormat(undefined, {
+      style:           'currency',
+      currency:        code,
+      currencyDisplay: 'narrowSymbol',
+    }).formatToParts(0)
+    const ci = parts.findIndex((p) => p.type === 'currency')
+    const ni = parts.findIndex((p) => p.type === 'integer')
+    if (ci !== -1 && ni !== -1) return ci > ni
+  } catch {
+    /* fall through to the platform's own unknown-currency default */
+  }
+
+  // Intl cannot format it either, which is precisely when formatBalance's catch
+  // clause fires. The platform's reference falls back to
+  // `{ symbol: balance.currency, decimals: 2, symbolAfter: true }` for a code its
+  // own table does not carry, and its symbolAfter branch renders amount first.
+  // So this returns TRUE, and formatBalance's catch was flipped to match in the
+  // same commit. S2-C218. The two disagreeing is the S2-C013 defect that this
+  // accessor exists to prevent, so they only ever move together.
+  return true
 }
 
 /**
@@ -411,8 +435,13 @@ export function formatBalance(
       maximumFractionDigits: decimals,
     }).format(amount)
   } catch {
-    // Unknown or unsupported currency code - plain fallback
-    return `${code} ${amount.toFixed(decimals)}`
+    // Unknown or unsupported currency code. Amount FIRST, per the platform's own
+    // reference: its CurrencyMeta lookup falls back to
+    // `{ symbol: balance.currency, decimals: 2, symbolAfter: true }` for a code it
+    // does not know, and its symbolAfter branch renders
+    // `${formattedAmount} ${meta.symbol}`. So an unknown code trails, and the
+    // symbol IS the code. S2-C218, from the 2026-07-29 rgs.md capture.
+    return `${amount.toFixed(decimals)} ${code}`
   }
 }
 
@@ -521,6 +550,7 @@ export function formatBalanceCompact(
       ...compact,
     }).format(amount)
   } catch {
-    return `${code} ${amount.toLocaleString(localeTag, compact)}`
+    // Amount FIRST, same platform reference as the sibling fallback above.
+    return `${amount.toLocaleString(localeTag, compact)} ${code}`
   }
 }

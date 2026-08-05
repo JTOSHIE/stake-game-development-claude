@@ -231,10 +231,27 @@ for (const code of ['XSC', 'XGC', 'XEC']) {
     currencySymbolTrailing(code) === VIRTUAL_SYMBOL_TRAILING)
 }
 
-ok('an unknown code leads, matching formatBalance fallback',
-  currencySymbolTrailing('ZZZ') === false)
-ok('an empty code does not throw and leads',
-  currencySymbolTrailing('') === false)
+// S2-C218. These two used to assert a DIRECTION and both were wrong, because the
+// direction was copied from formatBalance's own fallback and that fallback
+// disagreed with the platform. They now assert the INVARIANT instead, which is
+// what actually protects a player: whatever the placement is, the accessor and
+// the formatter must agree on it. A direction can be wrong; an agreement cannot
+// silently diverge.
+for (const code of ['ZZZ', '', 'NOT_A_CODE']) {
+  const rendered = formatBalance(10 * S, code)
+  const trailing = currencySymbolTrailing(code)
+  const amountFirst = /^\s*[\d.,]/.test(rendered)
+  ok(`unresolvable code ${JSON.stringify(code)}: accessor and formatter agree on placement`,
+    trailing === amountFirst,
+    `rendered ${JSON.stringify(rendered)}, currencySymbolTrailing said ${trailing}`)
+}
+
+// And the platform's own unknown-currency default is pinned, quoted from
+// docs/stake-engine-live/2026-07-29/rgs.md: CurrencyMeta falls back to
+// `{ symbol: balance.currency, decimals: 2, symbolAfter: true }`, so a code the
+// platform's table does not carry AND Intl cannot format renders amount first.
+ok('a code neither table nor Intl can resolve trails, per the platform reference',
+  currencySymbolTrailing('NOT_A_CODE') === true)
 
 // Placement and symbol must come from ONE rule, so the two accessors agree on
 // every platform code rather than being independently maintained.
