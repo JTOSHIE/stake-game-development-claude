@@ -806,6 +806,29 @@ jobs:
         working-directory: frontend
         run: node scripts/stake_mark_gate.mjs
 
+      # ── S2-C035: no prohibited mechanic ships ───────────────────────────────
+      # CLAUDE.md's Compliance section claims the game is stateless with "no
+      # jackpot, gamble, continuation, early cashout, cross-round state". That
+      # claim reaches a reviewer in the dossier and was held by nothing.
+      #
+      # Three assertions, because a prohibited mechanic arrives by three doors:
+      # the MODE SET (fsModes serverMode against game_config.py BetModes, which
+      # is a different pair from the existing fsModes/index.json drift gate and
+      # makes the agreement three-way), shipped player TEXT, and the CONTROL
+      # inventory in source.
+      #
+      # The gamble rule is deliberately narrow. Its first draft flagged
+      # `gamblingLimitReached`, which is REQUIRED responsible-gambling wording,
+      # and a gate that pressures someone to delete a mandatory disclaimer is
+      # worse than no gate. That message ships as a negative control.
+      - name: prohibited mechanics, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/prohibited_mechanic_gate.mjs --self-test
+
+      - name: no prohibited mechanic ships
+        working-directory: frontend
+        run: node scripts/prohibited_mechanic_gate.mjs
+
       # ── Gate 13f: the submission delivery set ────────────────────────────────
       # M03 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
       # (REQ-164, 169, 170, 171, 172, 173, 174, 176) with no proof path, all of
