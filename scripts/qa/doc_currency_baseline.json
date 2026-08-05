@@ -9,13 +9,14 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 332,
+  "frozen_count": 339,
   "by_class": {
     "DEAD_DOCREF": 12,
     "DEAD_PATH": 250,
     "STALE_LINE": 10,
     "DEAD_SYMBOL": 49,
-    "DEAD_COMMIT": 11
+    "DEAD_COMMIT": 11,
+    "SUPERSEDED_CITED": 7
   },
   "frozen": [
     {
@@ -137,6 +138,12 @@
       "file": "CLAUDE.md",
       "text": "player_string_dash_check.mjs",
       "detail": "does not exist at HEAD"
+    },
+    {
+      "cls": "SUPERSEDED_CITED",
+      "file": "CLAUDE.md",
+      "text": "reports/archive/superseded/FUTURE_SPINNER_PROJECT_STATUS.md",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
     },
     {
       "cls": "STALE_LINE",
@@ -1357,6 +1364,18 @@
       "detail": "KNOWN_OPEN does not appear in frontend/src/lib/components/MaxWinCelebration.svelte"
     },
     {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/FABLE_COMMS.md",
+      "text": "reports/archive/superseded/AUDIT_PACK_INDEX.md",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+    },
+    {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/FABLE_COMMS.md",
+      "text": "reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+    },
+    {
       "cls": "DEAD_SYMBOL",
       "file": "reports/qa/compliance_register/walk_shards/W02.md",
       "text": "rulesScatterMult @ frontend/src/lib/i18n/translations.ts",
@@ -1409,6 +1428,12 @@
       "file": "reports/qa/compliance_register/walk_shards/W10.md",
       "text": "hudSpinCost @ frontend/src/lib/i18n/vocabulary.ts",
       "detail": "hudSpinCost does not appear in frontend/src/lib/i18n/vocabulary.ts"
+    },
+    {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/qa/compliance_register/walk_shards/W11.md",
+      "text": "reports/archive/superseded/INDEX.md:16",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
     },
     {
       "cls": "DEAD_PATH",
@@ -1645,6 +1670,12 @@
       "detail": "the cited file does not exist at HEAD"
     },
     {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/qa/session2_audit/DISPOSITIONS.md",
+      "text": "reports/archive/superseded/INDEX.md:16",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+    },
+    {
       "cls": "DEAD_PATH",
       "file": "reports/qa/session2_audit/LEDGER.md",
       "text": "_512.png",
@@ -1715,6 +1746,12 @@
       "file": "reports/qa/session2_audit/LEDGER.md",
       "text": "ControlBar.svelte:57-63",
       "detail": "the cited file does not exist at HEAD"
+    },
+    {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/qa/session2_audit/LEDGER.md",
+      "text": "reports/archive/superseded/INDEX.md:16",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
     },
     {
       "cls": "DEAD_SYMBOL",
@@ -1835,6 +1872,12 @@
       "file": "reports/qa/session2_audit/verify/V06.md",
       "text": "isReplay @ frontend/src/lib/services/replayRounds.test.ts",
       "detail": "isReplay does not appear in frontend/src/lib/services/replayRounds.test.ts"
+    },
+    {
+      "cls": "SUPERSEDED_CITED",
+      "file": "reports/qa/session2_audit/verify/V16.md",
+      "text": "reports/archive/superseded/INDEX.md:16",
+      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
     },
     {
       "cls": "DEAD_PATH",

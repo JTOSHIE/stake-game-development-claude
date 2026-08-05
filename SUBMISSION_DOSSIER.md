@@ -31,7 +31,7 @@ checklist in the docs must be satisfied.
 | 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Owner-supplied, externally commissioned | **DELIVERED and ADOPTED** (candidate f, 2026-07-26) as `design-system/brand/delivery/WeRollSpinners-Logo.png`, 1024x1024 RGBA, real alpha, 39KB | Owner uploads once in Team Settings Branding |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
-| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, reports/archive/superseded/MATH_VALIDATION.md); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs refreshed 2026-07-04. Remaining items are deploy-dependent only. | Complete pre-deploy |
+| 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, plus the semantic equality proof in section 8b via tools/verify_books_lookup_equality.py); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs mirrored under docs/stake-engine-live/, most recently 2026-07-29. <!--CHECK: exists docs/stake-engine-live/2026-07-29/*--> Remaining items are deploy-dependent only. | Complete pre-deploy |
 | 11 | High resolution asset link (Drive or Dropbox, public) | Owner | Pending | Pre-submission |
 | 12 | Trademark position | Owner | Knockout search clear | Done for submission |
 | 13 | Team profile, branding upload, payment details in portal | Owner, one-time | Confirm on next portal login | Pre-submission |
@@ -111,7 +111,10 @@ variation 0.0000%, base hit 29.11% (SD 17.28x), cruise SD 11.29x, antelite
 (OVERBOOST) SD 20.32x, bonus SD 206.63x, super (NITRO OVERDRIVE) SD 539.16x,
 max 5,000x every mode, wincap base 1-in-100k / cruise 1-in-250k / antelite
 1-in-80k / bonus 1-in-1k / super 1-in-250, all Stake checks pass
-(reports/archive/superseded/MATH_VALIDATION.md). The RGS wire contract is documented and our client
+(re-derivable by rerunning that script; the semantic equality proof is section 8b of this
+document, `tools/verify_books_lookup_equality.py` read-only against the locked package).
+**The superseded `MATH_VALIDATION.md` is no longer cited here as evidence**, per the rule
+below. The RGS wire contract is documented and our client
 verified aligned in docs/RGS_CONTRACT_REFERENCE.md. Community tooling assessed
 in docs/TOOLING_REVIEW.md.
 
@@ -558,11 +561,30 @@ equivalence, not merely identity and integrity.
 | Outcomes per mode | max 10,000,000 | **100,000** per mode |
 | Max win | 5,000x cap | 5,000x, every table |
 
-Both the RTP band and the outcome cap come from the **first-party platform announcement of
-2026-07-25**, quoted verbatim with its date in `COMPLIANCE_WATCH.md`. As at the 5g sweep of
-the same date they are **not yet on the published approval-guidelines page**; the
-announcement said the RTP range takes effect "shortly with the next deploy". Cited as an
-announcement rather than as a page, so the citation is checkable.
+**CORRECTED 2026-08-05. Both limits are now ON the published page, so the announcement is
+no longer the best citation and this paragraph no longer says it is.** The 2026-07-29 mirror
+of the platform's own approval-guidelines math-verification page carries the RTP band as
+"The calculated Return to Player (RTP) must be within 90.0% to 96.70%", rendered upstream
+with a dash glyph rather than the word, and the outcome cap as "No game mode can contain
+more than 10,000,000 events".
+
+<!--CHECK: grep "96.70" docs/stake-engine-live/2026-07-29/approval_guidelines_math_verification.md-->
+<!--CHECK: grep "10,000,000 events" docs/stake-engine-live/2026-07-29/approval_guidelines_math_verification.md-->
+
+The earlier text said they were "not yet on the published approval-guidelines page", which
+was true at the 5g sweep of 2026-07-25 and had not been revisited since. **The ceiling was
+never new to us in any case**: `docs/stake-engine-live/2026-07-25/DELTA_NOTES.md` records
+that our 2026-07-04 mirror already carried 96.70, and that the change was new only relative
+to the public repository, which has never been updated. The first-party announcement of
+2026-07-25 remains quoted with its date in `COMPLIANCE_WATCH.md` as the provenance of when
+we learned it, which is a different claim from where it is published now.
+
+**On the outcome cap, one thing is deliberately not asserted here**: whether the platform's
+10,000,000 counts simulation ROWS or event OBJECTS. Our 100,000 per mode is two orders of
+magnitude inside it under the row reading and about 69 per cent of it under the other. The
+definition is parked for the owner and Fable at
+`reports/qa/session9/OWNER_PARK_PROPOSALS.md`, and is settled empirically by the first
+upload, which prints the platform's own figure.
 
 ### 8d. Currency: XSC, XGC and XEC, with one gap named
 

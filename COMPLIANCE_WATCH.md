@@ -82,7 +82,7 @@ Source snapshots saved under `docs/stake-engine-live/` (rendered via headless Ch
 
 - **approval-guidelines:** captured. Confirms strictly stateless; no jackpots, gamble,
   continuation or early cashout; original designs only; no Stake branding; no underage
-  appeal; a short promotional blurb must accompany the submission (we have `reports/archive/superseded/PROMO_BLURB.md`).
+  appeal; a short promotional blurb must accompany the submission (blurb B, FINAL, in `SUBMISSION_DOSSIER.md` section 8a).
   Post-release, only minor visual updates are allowed once approved: no math or new-mode
   changes. No conflict with our build.
 - **jurisdiction-requirements:** captured. Prohibited-terms table for stake.us with

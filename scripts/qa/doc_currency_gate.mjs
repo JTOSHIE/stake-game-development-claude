@@ -32,13 +32,22 @@
 // seeded with the form that really shipped. A gate whose self-test cannot plant
 // its own founding defect has not been tested against it.
 //
-// THE FIVE PHASE 1 CLASSES
-// ------------------------
-//   DEAD_PATH      a backticked path that does not exist at HEAD
-//   STALE_LINE     `file.ts:123`, where the file is gone or has fewer lines
-//   DEAD_SYMBOL    `symbol()` cited at `file:line`, absent from that file
-//   DEAD_COMMIT    a 7 to 40 character SHA that `git cat-file` cannot resolve
-//   DEAD_DOCREF    a backticked `.md` path, or `DOC.md` section N, that is gone
+// THE PHASE 1 CLASSES
+// -------------------
+//   DEAD_PATH         a backticked path that does not exist at HEAD
+//   STALE_LINE        `file.ts:123`, where the file is gone or has fewer lines
+//   DEAD_SYMBOL       `symbol()` cited at `file:line`, absent from that file
+//   DEAD_COMMIT       a 7 to 40 character SHA that `git cat-file` cannot resolve
+//   DEAD_DOCREF       a backticked `.md` path, or `DOC.md` section N, that is gone
+//   SUPERSEDED_CITED  a LIVE document citing reports/archive/superseded/, added
+//                     2026-08-05 by S2-C082. The file EXISTS, which is the whole
+//                     point: DEAD_PATH cannot fire, the citation resolves
+//                     perfectly, and it is still wrong.
+//
+// The count is deliberately not written into this heading, per convention (s).
+// It was "THE FIVE" while the code listed five, and adding a sixth would have
+// made the heading false the moment it landed. This header has already been
+// stale once, recorded below; that is not repeated here.
 //
 // THE FOUR PHASE 2 PREDICATES, kept deliberately small
 // ----------------------------------------------------
@@ -515,6 +524,32 @@ function scanDocument(file, src, ctx) {
       add(cls, s, lineNo, 'does not exist at HEAD')
     }
 
+    // ── SUPERSEDED_CITED. S2-C010's sibling problem, added 2026-08-05 by S2-C082.
+    //
+    // A live document citing something under reports/archive/superseded/ as
+    // EVIDENCE. The whole point of this class is that the file EXISTS, so
+    // DEAD_PATH above cannot fire and never will: the citation resolves
+    // perfectly and is still wrong, because the document it points at has been
+    // superseded and the reader is being sent to retired material.
+    //
+    // SUBMISSION_DOSSIER.md carried two of these, in its section 2 inventory
+    // cell and its compliance narrative, both pointing at MATH_VALIDATION.md as
+    // the evidence for the five-mode re-validation. A reviewer following either
+    // one landed in reports/archive/superseded/.
+    //
+    // Documents INSIDE the archive may cite their neighbours freely, and a live
+    // document that genuinely needs to name a retired file historically has the
+    // same escape as every other class here: the finding freezes into the
+    // baseline with its reason, and the ratchet stops the NEXT one. This is a
+    // new-citation gate, not a purge.
+    for (const span of spans) {
+      const s = span.text
+      if (!s.startsWith('reports/archive/superseded/')) continue
+      if (file.startsWith('reports/archive/')) continue
+      add('SUPERSEDED_CITED', s, lineNo,
+        'is superseded, so citing it sends a reader to retired material; cite the successor')
+    }
+
     // ── DEAD_DOCREF, the section half. `DOC.md` 3.1, or `DOC.md` section 4.
     //    Only fires where the target document actually uses numbered headings,
     //    which is what keeps a trailing year or a table figure from reading as
@@ -816,6 +851,19 @@ function selfTest() {
     commit('docs: seed 3')
     run('SEED 3  a backticked path that does not exist', 1,
       () => findingsFor('PATHS.md', 'DEAD_PATH').length)
+
+    // ── SEED 3b. A LIVE document citing a superseded file that EXISTS. The
+    //    point of the seed is the negative control beside it: the same citation
+    //    from inside the archive must survive, or the class would forbid the
+    //    archive from describing itself.
+    write('reports/archive/superseded/OLD.md', 'Retired.\n')
+    write('LIVE.md', 'Maths verified in `reports/archive/superseded/OLD.md`.\n')
+    write('reports/archive/NOTE.md', 'See `reports/archive/superseded/OLD.md` for the retired pass.\n')
+    commit('docs: seed 3b')
+    run('SEED 3b  a live document cites a superseded file that EXISTS', 1,
+      () => findingsFor('LIVE.md', 'SUPERSEDED_CITED').length)
+    run('CONTROL 3b  the same citation from inside the archive is NOT flagged', 0,
+      () => findingsFor('reports/archive/NOTE.md', 'SUPERSEDED_CITED').length)
 
     // ── SEED 4. A commit SHA that does not resolve, in a git context.
     write('SHAS.md', `Merged at commit \`deadbee1234\`, and the real tip is \`${rootSha.slice(0, 9)}\`.\n`)

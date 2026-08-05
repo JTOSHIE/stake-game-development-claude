@@ -84,8 +84,8 @@ Discovered through `index.json` (filenames are not hardcoded):
   by the `"id"` field, not the line index. This is the likely +1 offset between a lookup-table
   `sim_id` and the deployed replay `event` id (flagged in `REPLAY_TEST_EVENTS.md`).
 
-Our published bundle matches this schema exactly (see `reports/archive/superseded/MATH_VALIDATION.md` /
-`scripts/validate_math.py`), so a real RGS (or the stake-dev-tool mock) can serve our
+Our published bundle matches this schema exactly (see `scripts/validate_math.py`, and the
+semantic equality proof in `SUBMISSION_DOSSIER.md` section 8b), so a real RGS (or the stake-dev-tool mock) can serve our
 `games/future_spinner/library/publish_files` unchanged.
 
 ## Alignment summary
