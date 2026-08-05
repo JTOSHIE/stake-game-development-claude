@@ -65,11 +65,37 @@ jobs:
           npm run build
           test -f dist/index.html || { echo "::error::frontend/dist/index.html missing after build"; exit 1; }
 
+      # S2-C075. This step used to be `test -f "$MATH_PATH/index.json"`, so the
+      # EXISTENCE of the index stood in for the bundle being COMPLETE, and the
+      # upload step below then handed the directory to stakecli regardless.
+      #
+      # That is not a theoretical gap. .gitignore:9 is `**/library/**`, and
+      # `git ls-files` over the bundle returns index.json, game_metadata.json and
+      # the five lookUpTable CSVs but NONE of the five books_*.jsonl.zst. So on a
+      # fresh checkout, which is exactly what this runner has, index.json promises
+      # five modes and ships none of their events files. Measured against that
+      # inventory: the old check exits 0 and prints "math bundle OK"; the gate
+      # below exits 1 and names all five.
+      #
+      # EXPECT THIS STEP TO GO RED ON THE RUNNER UNTIL THE BOOKS DELIVERY IS
+      # SETTLED, and that red is CORRECT rather than a fault to route around. The
+      # five files total 387.4MB and two of them exceed GitHub's 100MB per-file
+      # push limit, so committing them is not available without LFS. The options
+      # (LFS, a release-asset download step, a runner-side create_books
+      # regeneration, or accepting that this workflow only runs from a machine
+      # holding the books) carry real and different costs, so the choice is the
+      # owner's and is recorded as PROPOSAL 5 of
+      # reports/qa/session9/OWNER_PARK_PROPOSALS.md.
+      #
+      # This workflow is workflow_dispatch only and defaults to do_upload=false,
+      # so a red here blocks nothing that runs on a push. It blocks publishing an
+      # incomplete bundle, which is the entire point.
       - name: Validate bundles exist
         run: |
           if [ "${{ inputs.target }}" != "front" ]; then
-            test -f "$MATH_PATH/index.json" || { echo "::error::$MATH_PATH/index.json missing"; exit 1; }
-            echo "math bundle OK: $MATH_PATH"; ls -1 "$MATH_PATH" | head
+            node scripts/qa/publish_bundle_gate.mjs --self-test
+            node scripts/qa/publish_bundle_gate.mjs "$MATH_PATH"
+            ls -1 "$MATH_PATH" | head
           fi
           if [ "${{ inputs.target }}" != "math" ]; then
             test -d "$FRONT_PATH" || { echo "::error::$FRONT_PATH missing"; exit 1; }

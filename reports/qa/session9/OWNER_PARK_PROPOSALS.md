@@ -183,6 +183,67 @@ record would be the reconstruction convention (m) forbids in terms.
 
 ---
 
+---
+
+## PROPOSAL 5: S2-C075, how the five books files reach the runner
+
+**Status: PROPOSED OWNER-PARK, BLOCKED on an owner decision with real cost attached.
+Awaiting the owner's choice, not merely a signature.**
+
+**This one is different from the four above.** It is not a refusal from Session 8, and it
+is not unreachable. The MECHANICAL half shipped in this session:
+`scripts/qa/publish_bundle_gate.mjs` parses `index.json` and requires every `events` and
+every `weights` path it names to exist and be non-empty, with a seeded self-test at
+**8 of 8, 6 seeds and 2 paired controls**. What is parked is the half the row itself
+flagged as separate, and the session's own measurement is that it is not separate at all:
+it is the PRECONDITION for the mechanical half to be shippable.
+
+**The measurement, taken this session.**
+
+- `.gitignore:9` is `**/library/**`, so the bundle directory is ignored wholesale.
+- `git ls-files games/future_spinner/library/publish_files/` returns seven files:
+  `index.json`, `game_metadata.json` and the five `lookUpTable_*.csv`. **None of the five
+  `books_*.jsonl.zst` is tracked.**
+- Against that inventory, reproduced in a scratch directory from `git ls-files` alone:
+
+```
+  OLD CHECK (test -f index.json) => exit 0, would print: math bundle OK
+  gate exit on runner inventory   = 1
+  ::error::math bundle incomplete: 5 file(s) named by index.json are missing
+    mode base       events   books_base.jsonl.zst         not found
+    mode cruise     events   books_cruise.jsonl.zst       not found
+    mode antelite   events   books_antelite.jsonl.zst     not found
+    mode bonus      events   books_bonus.jsonl.zst        not found
+    mode super      events   books_super.jsonl.zst        not found
+```
+
+**So the publish workflow will go RED on the runner until this is answered, and that red
+is correct.** It is `workflow_dispatch` only and defaults to `do_upload=false`, so nothing
+that runs on a push is blocked. What is blocked is publishing a bundle whose `index.json`
+promises five modes it does not ship.
+
+**Why this cannot be settled by the builder.** The five files total **387.4MB**, and
+`books_bonus.jsonl.zst` (151.9MB) and `books_super.jsonl.zst` (149.3MB) each exceed
+**GitHub's 100MB per-file push limit**, so "commit them" is not available without LFS. The
+four options carry real and different costs:
+
+1. **Git LFS.** Bandwidth and storage quota, and every clone pays.
+2. **A release-asset download step** in the workflow. Keeps the repository small; adds a
+   fetch and a place for the artefacts to drift from the maths package.
+3. **A runner-side `create_books` regeneration step.** `create_books` IS deterministic per
+   `CLAUDE.md`, so this is genuinely reproducible; but it is minutes of runner time, and
+   `CLAUDE.md` also records that the separate weight-fitting optimiser is NOT
+   bit-reproducible, so the boundary would need stating carefully.
+4. **Accept that this workflow only ever runs from a machine holding the books.** Cheapest,
+   and it means the dispatch is not usable from CI at all, which should then be said out
+   loud in the workflow rather than discovered.
+
+**No recommendation is offered here**, deliberately. This touches the maths package and a
+submission artefact, so per convention (l.8) it goes to the owner and Fable as a question
+with the evidence attached rather than being ruled on by the builder.
+
+---
+
 ## THE OWNER'S DECISION, in one block
 
 | # | Row | Refused half | Proposed | Signature |
@@ -191,6 +252,7 @@ record would be the reconstruction convention (m) forbids in terms.
 | 2 | S2-C052 | `setTelemetrySink` token scan | PARK, unreachable; capability already gated by other tokens | |
 | 3 | S2-C052 | absolute-origin static clause | PARK the STATIC form; read beside S2-C058 | |
 | 4 | S2-C051 | pinned licence text fetch | PARK, unreachable; NOT assigned by the brief, strike if out of scope | |
+| 5 | S2-C075 | how the five books files reach the runner | CHOOSE one of four options; the mechanical half already shipped and will go red until then | |
 
 **Nothing above is closed by this document.** Each row stays open in
 `reports/qa/session7/RECONCILED.tsv` until the owner signs, and this file is the record of
