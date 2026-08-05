@@ -32,7 +32,7 @@
     // owner's own live sessions were EUR, so a euro player set a loss limit
     // labelled in dollars. Same class as the XSC leak PR #89 fixed: a second,
     // divergent idea of what the currency is. QUALITY_CHARTER.md Q-10.
-    currencySymbolFor, isVirtualCurrency, VIRTUAL_SYMBOL_TRAILING,
+    currencySymbolFor, currencySymbolTrailing,
   } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import {
@@ -285,7 +285,7 @@
   // Derived from the session's currency, and placed on the side that currency
   // places it, exactly as formatBalance() does for every other money readout.
   $: lossLimitSymbol   = currencySymbolFor($currencyCode || 'USD')
-  $: lossLimitTrailing = isVirtualCurrency($currencyCode || 'USD') && VIRTUAL_SYMBOL_TRAILING
+  $: lossLimitTrailing = currencySymbolTrailing($currencyCode || 'USD')
   $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
   $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
   // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed

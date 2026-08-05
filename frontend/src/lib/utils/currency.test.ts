@@ -20,6 +20,7 @@ import {
   formatBalance,
   formatBalanceCompact,
   currencySymbolFor,
+  currencySymbolTrailing,
   isVirtualCurrency,
   type CurrencyDisplay,
 } from './currency.ts'
@@ -199,6 +200,50 @@ for (const loc of ['en', 'de', 'es', 'fr', 'pt', 'pl', 'ru', 'tr', 'id', 'vi', '
   ok(`compact form carries no prohibited term in ${loc}`,
     scanProhibited(text, { includeNeverRewrite: true }).length === 0,
     `${text} -> ${scanProhibited(text, { includeNeverRewrite: true }).join(', ')}`)
+}
+
+// ── currencySymbolTrailing, S2-C013 ──────────────────────────────────────────
+//
+// THE DEFECT THIS PINS, stated so the test cannot be weakened without noticing.
+// HudOverlay computed the loss-limit readout's symbol placement as
+// `isVirtualCurrency(code) && VIRTUAL_SYMBOL_TRAILING`. That is correct for the
+// virtual codes and WRONG for every platform code the published table marks
+// `symbolAfter: true`. On a Danish session formatBalance rendered the balance
+// "10.00 KR" while the loss limit beside it rendered "KR10.00": two money
+// figures on one screen disagreeing about their own currency.
+//
+// The old expression is written out below as the CONTROL, so this test fails if
+// anyone repoints the consumer back at it.
+for (const code of ['DKK', 'PLN', 'VND', 'CLP', 'ARS', 'SAR', 'ILS', 'AED']) {
+  ok(`${code} trails its symbol, per the platform table`,
+    currencySymbolTrailing(code) === true,
+    `currencySymbolTrailing(${code}) returned ${currencySymbolTrailing(code)}`)
+  ok(`CONTROL: the OLD expression gets ${code} wrong, which is why the accessor exists`,
+    (isVirtualCurrency(code) && VIRTUAL_SYMBOL_TRAILING) === false)
+}
+
+for (const code of ['USD', 'EUR', 'GBP', 'CAD', 'JPY']) {
+  ok(`${code} leads its symbol`, currencySymbolTrailing(code) === false)
+}
+
+for (const code of ['XSC', 'XGC', 'XEC']) {
+  ok(`virtual ${code} still trails, so the accessor did not regress the case that worked`,
+    currencySymbolTrailing(code) === VIRTUAL_SYMBOL_TRAILING)
+}
+
+ok('an unknown code leads, matching formatBalance fallback',
+  currencySymbolTrailing('ZZZ') === false)
+ok('an empty code does not throw and leads',
+  currencySymbolTrailing('') === false)
+
+// Placement and symbol must come from ONE rule, so the two accessors agree on
+// every platform code rather than being independently maintained.
+for (const code of ['DKK', 'USD', 'XSC', 'VND']) {
+  const rendered = formatBalance(10 * S, code)
+  const sym = currencySymbolFor(code)
+  ok(`${code}: formatBalance agrees with currencySymbolTrailing on placement`,
+    currencySymbolTrailing(code) ? rendered.trimEnd().endsWith(sym) : rendered.startsWith(sym),
+    `rendered "${rendered}", symbol "${sym}", trailing ${currencySymbolTrailing(code)}`)
 }
 
 console.log(`currency static assertions: ${pass} passed, ${failures.length} failed`)

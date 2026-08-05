@@ -311,6 +311,34 @@ export function currencySymbolFor(currencyCode: string, localeTag?: string): str
 }
 
 /**
+ * Does this currency render its symbol AFTER the amount?
+ *
+ * The companion to currencySymbolFor above, and it exists for the same reason
+ * that one does. Before this, HudOverlay computed placement as
+ * `isVirtualCurrency(code) && VIRTUAL_SYMBOL_TRAILING`, which is right for the
+ * virtual codes and wrong for every platform code the table marks
+ * `symbolAfter: true`. Fourteen of them are: DKK, PLN, VND, CLP, ARS, SAR, ILS,
+ * AED and the rest. On a Danish session the balance read "10.00 KR" from
+ * formatBalance while the loss-limit readout beside it read "KR10.00", so two
+ * money figures on one screen disagreed about their own currency.
+ *
+ * The precedence deliberately mirrors currencySymbolFor's, virtual then
+ * platform then default, so the symbol and its placement can never be resolved
+ * from two different rules.
+ */
+export function currencySymbolTrailing(currencyCode: string): boolean {
+  const code = (currencyCode || '').toUpperCase()
+
+  if (VIRTUAL_CURRENCIES[code]) return VIRTUAL_SYMBOL_TRAILING
+
+  const platform = PLATFORM_CURRENCIES[code]
+  if (platform) return platform.symbolAfter === true
+
+  // Unknown code: leading, which is what formatBalance falls back to.
+  return false
+}
+
+/**
  * Format a micros amount as a human-readable currency string.
  *
  * @param micros       - Amount in micros (integer, from the RGS API)
