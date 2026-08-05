@@ -42,6 +42,7 @@ const P = {
   paytableModal: resolve(REPO, 'frontend/src/lib/components/PaytableModal.svelte'),
   fsModes: resolve(REPO, 'frontend/src/lib/config/fsModes.ts'),
   prose: resolve(REPO, 'frontend/src/lib/i18n/prose.ts'),
+  proseLocales: resolve(REPO, 'frontend/src/lib/i18n/prose.locales.ts'),
   gameConfig: resolve(REPO, 'games/future_spinner/game_config.py'),
   publishDir: resolve(REPO, 'games/future_spinner/library/publish_files'),
 }
@@ -112,12 +113,32 @@ function displayedMaxWin(src: string): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-/** The scatter multipliers the rules prose states, from rulesScatterMult. */
-function proseScatter(src: string): number[] | null {
-  const m = src.match(/rulesScatterMult:\s*'([^']+)'/)
-  if (!m) return null
-  const nums = [...m[1].matchAll(/([0-9]+)×/g)].map((x) => Number(x[1]))
-  return nums.length ? nums : null
+/**
+ * The scatter multipliers stated by EVERY rules-prose string, in every locale.
+ *
+ * S2-C050. This used to be a single `src.match` against prose.ts, so it read the
+ * FIRST English string and nothing else. Fifteen localised strings and the
+ * English social variant stated the same multipliers to a player and none of
+ * them was checked. A translator writing 5x, 15x, 50x, which are the values this
+ * game shipped BEFORE FeatureMath v2 and which CLAUDE.md still records as the
+ * wrong ones, would have passed this gate.
+ *
+ * The literal pattern allows ESCAPED apostrophes, and that was not theoretical.
+ * French reads "n\'importe ou", and a naive single-quote pattern terminates on
+ * that escaped quote and captures a fragment carrying no multipliers at all.
+ * The first version of this parser did exactly that and reported the French
+ * line as stating none, which read as a live defect and was a parser bug.
+ */
+function proseScatterAll(src: string): { at: number; nums: number[] }[] {
+  return [...src.matchAll(/rulesScatterMult:\s*'((?:[^'\\]|\\.)*)'/g)].map((m) => ({
+    at: m.index ?? 0,
+    nums: [...m[1].matchAll(/([0-9]+)×/g)].map((x) => Number(x[1])),
+  }))
+}
+
+/** Top-level locale keys in prose.locales.ts, so coverage is derived and not a literal. */
+function localeKeys(src: string): string[] {
+  return [...src.matchAll(/^ {2}([a-z]{2}): \{/gm)].map((m) => m[1])
 }
 
 /** Highest payout in a published lookup table, in bet multiples. */
@@ -146,7 +167,9 @@ function assertParity(src: {
   const scatMaths = mathsScatter(src.gameConfig)
   const cap = mathsWincap(src.gameConfig)
   const shown = displayedMaxWin(src.fsModes)
-  const scatProse = proseScatter(src.prose)
+  const scatEn = proseScatterAll(src.prose)
+  const scatLoc = proseScatterAll(src.proseLocales)
+  const scatProse = scatEn.length ? scatEn[0].nums : null
 
   if (!fe || !ma || !scatMaths || cap === null || shown === null || !scatProse) {
     fail(`${p}every operand parses`,
@@ -156,6 +179,28 @@ function assertParity(src: {
     return
   }
   ok(`${p}every operand parses`)
+
+  // S2-C050. EVERY rules-prose string, in every locale, states the same scatter
+  // multipliers as the maths. Two assertions, because coverage and correctness
+  // fail differently: a locale can carry a WRONG figure, or carry NONE at all,
+  // and only checking the ones that exist would miss the second.
+  {
+    const keys = localeKeys(src.proseLocales)
+    checkThat(`${p}every locale carries a scatter-multiplier line`,
+      keys.length > 0 && scatLoc.length === keys.length,
+      `${keys.length} locale(s) in prose.locales.ts, ${scatLoc.length} scatter line(s)`)
+
+    // scatMaths is keyed by SCATTER COUNT (3, 4, 5); the prose states the
+    // multipliers in that order, so compare against its values.
+    const want = JSON.stringify(Object.values(scatMaths))
+    const wrong = [...scatEn, ...scatLoc].filter((o) => JSON.stringify(o.nums) !== want)
+    checkThat(`${p}all ${scatEn.length + scatLoc.length} prose strings state the maths multipliers`,
+      wrong.length === 0,
+      wrong.length
+        ? `${wrong.length} disagree, first at offset ${wrong[0].at} stating `
+          + `${JSON.stringify(wrong[0].nums)} against ${want}`
+        : undefined)
+  }
 
   // REQ-074 and REQ-140: displayed pays equal the maths, symbol by symbol.
   // The maths is the AUTHORITY: it is the locked, validated package, and the
@@ -207,6 +252,7 @@ function readAll() {
     paytableModal: readFileSync(P.paytableModal, 'utf8'),
     fsModes: readFileSync(P.fsModes, 'utf8'),
     prose: readFileSync(P.prose, 'utf8'),
+    proseLocales: readFileSync(P.proseLocales, 'utf8'),
     gameConfig: readFileSync(P.gameConfig, 'utf8'),
     tables,
   }
@@ -255,6 +301,26 @@ if (!SELF_TEST) {
   // REQ-040 exactly, and it is the one nothing held before this gate.
   seed('the printed max win drifts from the maths cap', (s) => ({
     ...s, fsModes: s.fsModes.replace("FS_MAX_WIN_LABEL = '5,000×'", "FS_MAX_WIN_LABEL = '10,000×'"),
+  }))
+  // S2-C050 SEED 1. The real defect form for the locale half: a TRANSLATED
+  // string carrying the pre-FeatureMath-v2 multipliers. English stays correct,
+  // which is exactly why the old single-match parser could not see this.
+  seed('a LOCALISED scatter line states the old 5x/15x/50x multipliers', (s) => ({
+    ...s,
+    proseLocales: s.proseLocales.replace(
+      '1×, 3× oder 10×',
+      '5×, 15× oder 50×',
+    ),
+  }))
+  // S2-C050 SEED 2. Coverage rather than correctness: a locale that carries no
+  // scatter line at all. A check that only reads the lines it finds scores this
+  // as clean, because there is nothing wrong with the ones that exist.
+  seed('a locale carries NO scatter line at all', (s) => ({
+    ...s,
+    proseLocales: s.proseLocales.replace(
+      /\n\s*rulesScatterMult: '3, 4 oder 5 SCATTER[^\n]*\n/,
+      '\n',
+    ),
   }))
   // A scatter award restated wrongly in the player-facing rules.
   seed('a scatter award in the rules drifts', (s) => ({
