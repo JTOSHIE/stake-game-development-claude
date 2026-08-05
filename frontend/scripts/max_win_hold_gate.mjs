@@ -306,8 +306,28 @@ async function routeWallet(page, counters) {
 
 
 
+// S2-C025. THE SENTINEL IS KEPT AND THE ROW'S OWN PRESCRIPTION IS REFUSED, with
+// the reason, because the recorded remainder is a hypothesis about the fix and
+// this one is wrong.
+//
+// The row said to replace the .catch with a hard throw. A throw here escapes
+// runtime() through its finally, reaches the top-level IIFE which has no .catch,
+// and becomes an unhandled rejection. That is technically non-zero and it is the
+// wrong red twice over: the self-test's accounting shape is
+// `const failures = await runtime(kind)` followed by a `caught` / `MISSED` line,
+// so a throw means runtime() never returns and the seeded run CRASHES instead of
+// printing `caught`; and convention (p) asks for a gate seen to go red with a
+// NAMED finding, not a stack trace. It would also discard the diagnostic, since
+// '<absent>' inside the ok() message is what tells a reader which readout went.
+//
+// So the sentinel stays and the assertion moves to the caller, where it can name
+// what it found. The explicit 2s timeout is not cosmetic: innerText() defaults to
+// 30s, this file sets no default, and four readout calls on a seeded run would
+// pay about 120s of pure waiting against the 5 minute HARD_TIMEOUT_MS watchdog
+// that guards the whole --self-test process. 2s is generous for an element the
+// harness has already waited 45s for max-win-collect to appear beside.
 const readout = (page, id) =>
-  page.locator(`[data-testid="${id}"]`).first().innerText().catch(() => '<absent>')
+  page.locator(`[data-testid="${id}"]`).first().innerText({ timeout: 2000 }).catch(() => '<absent>')
 
 async function runtime(seedKind) {
   const holdMs = seedKind ? SEED_HOLD_MS : HOLD_MS
@@ -397,12 +417,43 @@ async function runtime(seedKind) {
           if (btn) btn.click()
         }, 4000)
       })
+    } else if (seedKind === 'readout') {
+      // S2-C025, and it has to be a PARTIAL absence to be the real form.
+      //
+      // A total HudOverlay non-mount never reaches the swallow: spin-button
+      // lives in the same component and :337 already waits 45s for it, so the
+      // run goes red loudly and early for a different reason. Seeding that would
+      // be seeding a form the gate already catches by accident.
+      //
+      // The uncovered case is the readouts gone while the spin button survives,
+      // which is what a refactor actually does: HudOverlay carries four copies of
+      // each testid, one per profile branch, and this gate's 1280x720 viewport
+      // selects the fullscreen branch alone.
+      await page.evaluate(() => {
+        document.querySelector('[data-testid="hud-balance"]')?.remove()
+        document.querySelector('[data-testid="hud-win"]')?.remove()
+      })
     }
 
     const playAtHold = counters.play
     const endAtHold = counters.endRound
     const balance0 = await readout(page, 'hud-balance')
     const win0 = await readout(page, 'hud-win')
+
+    // S2-C025: THE PRECONDITION THAT MAKES THE EQUALITY CHECKS MEAN SOMETHING.
+    //
+    // Without this, an absent readout made both endpoint reads '<absent>', and
+    // the two assertions below compared '<absent>' === '<absent>', printed ok,
+    // and pushed nothing. The hold's balance and win checks were vacuous exactly
+    // when the HUD was broken, which is the only time they mattered.
+    //
+    // Asserted at the t+0 endpoint ONLY, deliberately. A readout that vanishes
+    // MID-hold is already caught, because a real value is not equal to
+    // '<absent>' and the equality assertions go red on their own. The single
+    // uncovered case was both endpoints absent, and this closes exactly that
+    // without a second assertion that could only ever duplicate one.
+    ok(/[0-9]/.test(balance0), `the BALANCE readout is present and carries a value ("${balance0}")`)
+    ok(/[0-9]/.test(win0), `the WIN readout is present and carries a value ("${win0}")`)
 
     // Sample across the whole hold, because a banner that appears and dismisses
     // between two endpoint reads is invisible to an endpoint comparison, and
@@ -503,9 +554,23 @@ async function runtime(seedKind) {
     const caughtDismiss = dismissFailures.some((f) => f.startsWith('the celebration is still mounted'))
     console.log(`  ${caughtDismiss ? 'caught' : 'MISSED'}  the runtime detector goes red on an auto-dismiss`)
 
+    console.log('')
+    console.log('SEEDED VIOLATION, runtime: the balance and win readouts are removed while the spin button')
+    console.log('survives, so both endpoint reads return the same sentinel and the equality checks pass vacuously')
+    const readoutFailures = await runtime('readout')
+    const caughtReadout = readoutFailures.some((f) => f.startsWith('the WIN readout is present'))
+    // A PAIRED CONTROL, because the seed must go red for the RIGHT reason. If the
+    // equality assertions also fired, the readouts were absent at only one
+    // endpoint and this would be the old check catching it, not the new one.
+    const equalityStayedQuiet = !readoutFailures.some((f) => f.startsWith('WIN unchanged'))
+    console.log(`  ${caughtReadout ? 'caught' : 'MISSED'}  the runtime detector goes red on an absent readout`)
+    console.log(`  ${equalityStayedQuiet ? 'ok    ' : 'CHECK '}  and it is the new precondition that caught it, `
+      + 'not the equality assertion')
+
     const problems = [...missed]
     if (!caughtBanner) problems.push('SEED NOT CAUGHT: a banner behind the hold did not fail the gate')
     if (!caughtDismiss) problems.push('SEED NOT CAUGHT: an auto-dismiss did not fail the gate')
+    if (!caughtReadout) problems.push('SEED NOT CAUGHT: absent balance and win readouts did not fail the gate')
     console.log('')
     if (problems.length) {
       for (const p of problems) console.error(`  ${p}`)

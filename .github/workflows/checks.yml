@@ -844,7 +844,11 @@ jobs:
       matrix:
         gate:
           - name: "browser: layout fit"
-            run: node scripts/layout_fit_gate.mjs
+            # S2-C024: this leg ran BARE until 2026-08-05, alone with contrast
+            # among the twelve, because the gate had no self-test to run. It now
+            # seeds a renamed testid and a display:none readout into a scratch
+            # copy of the real dist and requires both reds.
+            run: node scripts/layout_fit_gate.mjs --self-test && node scripts/layout_fit_gate.mjs
           - name: "browser: contrast"
             run: node scripts/contrast_gate.mjs
           - name: "browser: splash calm"
