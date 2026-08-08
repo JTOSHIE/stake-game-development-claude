@@ -2308,7 +2308,16 @@
     transform: none;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    /* Guideline item 15, "Main game frame should not be scrollable". This was
+       overflow-y: auto, which makes the frame scrollable IN PRINCIPLE even when
+       nothing currently overflows, and the owner's captures showed a scrollbar
+       at mobile portrait, Mobile S and Popout S. Measured before changing:
+       scrollHeight equals clientHeight at every preset except Popout S, where
+       it exceeds it by ONE pixel, which is exactly enough for a scrollbar.
+       Safe to hide because layout_fit_gate asserts offscreen=0 and clipped=0
+       with every control reachable at all seven presets, so nothing is being
+       put out of reach. S2-C045 item 15. */
+    overflow-y: hidden;
     overflow-x: hidden;
     padding-top: env(safe-area-inset-top, 0px);
     padding-left: env(safe-area-inset-left, 0px);

@@ -94,7 +94,7 @@ or the architecture.
 | # | Item | Status | Evidence |
 |---|---|---|---|
 | 14 | Space bar bound to the bet button | **PASS** | `App.svelte:1175` handles `Space`, routes through `handleSpin` and the same `canSpin` guard, is inert in replay mode and while a modal is open, and respects the jurisdiction `disabledSpacebar` flag. |
-| 15 | **Main game frame should not be scrollable** | **FAIL** | See TR-065. `:global(body)` is correctly `overflow: hidden`, but `App.svelte:2311` gives `.game-wrapper.portrait`, `.game-wrapper.compact-landscape` and `.game-wrapper.mini-player` `overflow-y: auto`. A scrollbar is visible in the owner's captures at mobile portrait, Mobile S and Popout S, and is absent on desktop, which is exactly the class list. Confirmed from code and corroborated by three captures at three sizes. **RE-DERIVED 2026-08-05 AND STILL FAILING**: the `overflow-y: auto` is unchanged at `App.svelte:2311`, inside the rule that opens on the three wrapper classes. The line reference is corrected here from `:1821`, which had drifted; the row that asked for this correction proposed `:2265`, which is also wrong. |
+| 15 | **Main game frame should not be scrollable** | **PASS** | **FIXED 2026-08-05.** `App.svelte`'s wrapper rule now sets `overflow-y: hidden` on `.game-wrapper.portrait`, `.compact-landscape` and `.mini-player`. Measured before changing rather than assumed: the wrapper's scrollHeight equals its clientHeight at every preset except Popout S, where it exceeded it by ONE pixel, which is exactly enough for `auto` to render a scrollbar. Safe to hide because `layout_fit_gate.mjs` reports offscreen 0, clipped 0 and every control reachable at all seven presets both before and after, so nothing was put out of reach. Re-measured after: `overflow-y` reads `hidden` at all four affected presets and the gate still passes. ORIGINAL FINDING, retained: | See TR-065. `:global(body)` is correctly `overflow: hidden`, but `App.svelte:2311` gives `.game-wrapper.portrait`, `.game-wrapper.compact-landscape` and `.game-wrapper.mini-player` `overflow-y: auto`. A scrollbar is visible in the owner's captures at mobile portrait, Mobile S and Popout S, and is absent on desktop, which is exactly the class list. Confirmed from code and corroborated by three captures at three sizes. **RE-DERIVED 2026-08-05 AND STILL FAILING**: the `overflow-y: auto` is unchanged at `App.svelte:2311`, inside the rule that opens on the three wrapper classes. The line reference is corrected here from `:1821`, which had drifted; the row that asked for this correction proposed `:2265`, which is also wrong. |
 
 ## Game Rules
 
@@ -155,7 +155,7 @@ or the architecture.
 | 43 | Currency values do not display a "$" prefix | **PASS** | `formatBalance(1000 * S, 'XSC', 'en')` returns `1,000.00 SC`, trailing, no prefix. Tested. |
 | 44 | Game mode naming follows Social Mode terminology | **PASS** | Per-mode `socialLabel` and `socialBlurb`. |
 | 45 | Replay window free of restricted words | **PASS** | Replay disclaimer has a dedicated social phrasing (`translations.ts:1622`). |
-| 46 | **English is the only supported language in Social Mode** | **FAIL** | See TR-067. `i18n/tr.ts:14` derives from `[locale, isSocial]` and uses `$locale` regardless: social mode switches the *vocabulary*, never the *language*. A social session launched with `lang=de` would render German. Nothing forces English. **RE-DERIVED 2026-08-05 AND STILL FAILING**: `tr.ts` still reads `derived([locale, isSocial], ([$locale, $social]) => t($locale, key, $social ? 'social' : 'real', params))`. The social flag still selects the VOCABULARY argument only, and `$locale` is still passed through untouched. |
+| 46 | **English is the only supported language in Social Mode** | **PASS** | **THE FAIL VERDICT WAS WRONG, AND SO WAS THE RE-DERIVATION OF 2026-08-05 THAT UPHELD IT.** Both looked at `i18n/tr.ts`, saw `$locale` passed through untouched, and concluded nothing forces English. That is the wrong LAYER. `tr.ts` translates into whatever locale is set; the enforcement sits upstream at the locale store. Two routes, both in `frontend/src/lib/stores/socialLocale.ts`: its launch resolver checks social FIRST, so the URL route cannot produce a non-English social session before first paint; and its social-English enforcer, called from `frontend/src/App.svelte`, subscribes to the social store and sets the locale to English whenever social turns on, which covers the authenticate route where social arrives after paint. `REVIEW_TRACKER.md` TR-067 already reads CLOSED. **PROVEN EMPIRICALLY 2026-08-05 against a real build rather than by reading**: `?lang=de` renders German ("Spiel nicht verfuegbar"), while `?lang=de&social=true`, `?lang=fr&social=true` and `?lang=ja&social=true` all render English ("Game unavailable"), with the social vocabulary also applied (COINS rather than BALANCE). ORIGINAL FINDING, retained because the correction is the record: | See TR-067. `i18n/tr.ts:14` derives from `[locale, isSocial]` and uses `$locale` regardless: social mode switches the *vocabulary*, never the *language*. A social session launched with `lang=de` would render German. Nothing forces English. **RE-DERIVED 2026-08-05 AND STILL FAILING**: `tr.ts` still reads `derived([locale, isSocial], ([$locale, $social]) => t($locale, key, $social ? 'social' : 'real', params))`. The social flag still selects the VOCABULARY argument only, and `$locale` is still passed through untouched. |
 
 ## Replay Support
 
@@ -192,14 +192,14 @@ qualified status and are listed below so nothing hides inside a bucket.
 
 | Status | Count | Which |
 |---|---|---|
-| PASS | **38** | 31 plain, plus items 19, 23, 24, 34 and 48 whose status begins PASS with a qualifier, plus items 12 and 25 promoted by this pass |
+| PASS | **40** | 31 plain, plus items 19, 23, 24, 34 and 48 whose status begins PASS with a qualifier, plus items 12, 15, 25 and 46 promoted by this pass |
 | OBSERVE | **10** | plain OBSERVE only; item 32 counts under OWNER and item 48 under PASS, by the first-word rule |
 | OWNER | **7** | items 7, 53, 54, 55, 57, 58, plus item 32 as OWNER/OBSERVE. Recounted 2026-07-30 against a summary saying 8 and an `OWNER_CHECKLIST.md` saying 9. **S2-C045 asked for this to be restated as 8; that was checked against the rows and refused, because 7 is what the rows say.** |
-| **FAIL** | **2** | items **15** and **46**. Item 25 is closed. |
+| **FAIL** | **0** | **Items 15 and 46 both closed 2026-08-05.** 15 was a real defect and is fixed; 46 was never a defect and the FAIL verdict is corrected, with the empirical proof in the row. |
 | CONFLICT | **0** | item 12 is closed by observation |
 | N/A | 1 | |
 
-**38 + 10 + 7 + 2 + 0 + 1 = 58**, which is the number of items. The previous figures did
+**40 + 10 + 7 + 0 + 0 + 1 = 58**, which is the number of items. The previous figures did
 not reconcile and that is why they were replaced rather than adjusted.
 
 **THE ROW THAT ASKED FOR THIS WANTED FAIL 0 AND CONFLICT 0. TWO ITEMS STILL FAIL**, both
