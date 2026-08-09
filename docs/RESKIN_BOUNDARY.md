@@ -203,7 +203,10 @@ rather than merely checked**, `interface_guide_icon_proof.mjs`, `layout_fit_gate
 masters under `design-system/brand/hero_emblem/` and `hero_icon/`; `frontend/public/favicon-32.png`.
 
 **(b)** `hero_emblem_512.png` PNG 512x512 **mode P (256-colour palette, no alpha)**;
-`hero_icon_96.png` 96x96 RGBA; `brand_mark.png` 512x512 RGBA; `brand_mark_glyph.png` 192x192
+`hero_icon_96.png` 96x96 RGBA. The two bespoke marks recorded beside it here,
+brand_mark.png at 512x512 RGBA and brand_mark_glyph.png at 192x192, were DELETED on
+2026-08-09: the hero icon replaced them, this file's own note at 2.4 already said so,
+and they were still shipping 314KB into the bundle for a component that no longer renders
 RGBA. Masters `master_1024.png` 1024x1024 **RGB**, plus 512/192/96/48 derivatives.
 `favicon-32.png` 32x32 RGBA, 3,268 bytes.
 
@@ -227,7 +230,9 @@ exists to be about 124 KB rather than the 417 KB master), `tools/brand/gate_vect
 ### 2.5 Audio
 
 **(a)** `frontend/public/assets/themes/future-spinner/sounds/` (16 files), plus a superseded
-legacy set at `frontend/public/assets/sounds/`.
+legacy set formerly at frontend/public/assets/sounds/, DELETED 2026-08-09. Audio
+resolves under the THEME base (`frontend/src/lib/stores/themeStore.ts` builds every
+path as `${b}/sounds/...`), so that root tree was 1.9MB nothing could reach.
 
 **(b)** MP3 for all twelve shipped rows, plus WebM/Opus encodes for the three loop beds only
 (`bgm_loop`, `bgm_tension`, `anticipation_build`). Largest `bgm_loop.mp3` 932.9 KB, smallest

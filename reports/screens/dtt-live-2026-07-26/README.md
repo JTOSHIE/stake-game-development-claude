@@ -36,7 +36,7 @@ Nothing in this folder is edited or cropped; filenames were assigned from conten
 | File | What it proves |
 |---|---|
 | `20_RESOLVED_sync_upload_4_skip_104_names_the_same_four.png` | **`Upload 4 Files, Skip 104 Files`.** The portal independently names the same four files the diff named. Resolves TR-061 and settles its cause. |
-| `21_sync_dialog_detail_four_filenames.png` | The four filenames legible: `bgm_loop.mp3`, `scene_character.png`, `brand_mark_base.png`, `frame-1.png`. |
+| `21_sync_dialog_detail_four_filenames.png` | The four filenames legible: `bgm_loop.mp3`, `scene_character.png`, brand_mark_base.png, `frame-1.png`. |
 | `22_FIXED_hero_pilot_rendering_front_v2.png` | The pilot renders. `Front (Current V2)`, `Math (Current V1)`. |
 | `23_mobile_portrait_TR065_scrollbar.png` | Mobile portrait, playable. Scrollbar on the game frame: TR-065. |
 | `24_mobile_s_320x568_TR065_scrollbar.png` | Mobile S, same scrollbar. |

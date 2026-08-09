@@ -44,9 +44,9 @@ absent from the kit, so no stray file went up; the traffic is one way.
 | Missing file | Bytes | Live reference in the source |
 |---|---|---|
 | `assets/themes/future-spinner/ui/scene_character.png` | 629,245 | **YES**, `SceneGroup.svelte:71` |
-| `assets/sounds/bgm_loop.mp3` | 955,254 | none |
+| assets/sounds/bgm_loop.mp3 | 955,254 | none |
 | `assets/themes/future-spinner/frames/frame-1.png` | 169,689 | none |
-| `assets/themes/future-spinner/ui/brand_mark_base.png` | 107,674 | none |
+| assets/themes/future-spinner/ui/brand_mark_base.png | 107,674 | none |
 
 **Corroboration by a second route.** The four total 1,861,862 bytes.
 15,510,083 minus 1,861,862 is 13,648,221 bytes, which is 13.015 MB, and the portal's
@@ -70,10 +70,10 @@ and that file's own comment at line 12 describes the asset as "the pilot as a FE
 HERO". An `<img>` with a 404 source and `alt=""` renders exactly the placeholder seen.
 
 The other three missing files have no live reader, verified by grep across
-`frontend/src`: the root-level `assets/sounds/bgm_loop.mp3` is shadowed by the themed copy
+`frontend/src`: the root-level assets/sounds/bgm_loop.mp3 is shadowed by the themed copy
 at `assets/themes/future-spinner/sounds/bgm_loop.mp3`, which did upload and is what
 `themeStore.ts:71` resolves to, so audio is unaffected; `frame-1.png` was superseded by
-`frame-2.png` at `themeStore.ts:57`; `brand_mark_base.png` was superseded by
+`frame-2.png` at `themeStore.ts:57`; brand_mark_base.png was superseded by
 `hero_icon_96.png` at `LoadingScreen.svelte:22`.
 
 ### 1.3 Cause: not determined, and not guessable
@@ -372,7 +372,7 @@ The owner re-dragged the same kit folder. The sync dialog, captured this time, r
 
 > **Upload 4 Files. Skip 104 Files. Delete 0 Files. Move 0 Files.**
 >
-> `upload bgm_loop.mp3` / `upload scene_character.png` / `upload brand_mark_base.png` /
+> `upload bgm_loop.mp3` / `upload scene_character.png` / upload brand_mark_base.png /
 > `upload frame-1.png` / `skip win_pod_v3_idle.png` / `skip win_pod_v3_active.png` / ...
 
 **The portal independently identified exactly the four files I identified by diff.** That is

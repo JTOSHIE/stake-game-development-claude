@@ -34,6 +34,12 @@ model's licence, not this repo's), see `tools/audio_forge/LICENSE.md` and
 
 ## Legacy files
 
-`scatter.mp3` and `win.mp3` in this directory are unreferenced leftovers from an earlier
-sound-tier refactor (predate the current `scatterLand`/`playWin`-with-tiers API), not
-part of this manifest, left in place rather than removed as out of scope for this pass.
+NONE, as of 2026-08-09. This section used to say that scatter.mp3 and win.mp3 were
+unreferenced leftovers from an earlier sound-tier refactor, "left in place rather than
+removed as out of scope for this pass". They were removed from THIS directory some time
+ago, and the paragraph was never updated.
+
+It kept resolving only because copies survived in the ROOT frontend/public/assets/sounds/
+tree, which was a full duplicate nothing could reach: audio paths are built under the theme
+base in `frontend/src/lib/stores/themeStore.ts`. That root tree was deleted on 2026-08-09,
+1,955,845 bytes across 14 files, which is what finally made this claim fail out loud.
