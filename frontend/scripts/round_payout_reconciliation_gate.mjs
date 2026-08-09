@@ -59,6 +59,20 @@
 //     published book, and the gate FAILS if that ever stops being true rather
 //     than silently ignoring a field it does not model.
 //
+// THIS GATE CANNOT RUN IN CI, and the reason is structural rather than fixable.
+// It reads the published books, and `.gitignore:9` excludes `**/library/**`:
+// 380MB of book files are LOCAL ONLY, with just the lookup tables, index.json
+// and game_metadata.json tracked. A CI runner checks out a tree with no books,
+// every mode reports "a skipped mode is not a pass", and the run is red for a
+// reason that has nothing to do with the game.
+//
+// That was learned by adding it to CI and watching it fail on 2026-08-09; the
+// step was removed the same day. It belongs with qa_soak and the other suites
+// checks.yml deliberately keeps local: RUN IT BEFORE A SUBMISSION, from a
+// machine that has the books, and record the result. The SELF-TEST is
+// CI-safe, since its fixtures are inline, but a self-test alone asserts nothing
+// about the artefact and is not worth a job on its own.
+//
 // Convention (p):
 //   node scripts/round_payout_reconciliation_gate.mjs --self-test
 //   node scripts/round_payout_reconciliation_gate.mjs
