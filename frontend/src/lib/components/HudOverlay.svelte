@@ -383,7 +383,7 @@
         {#if showMenu}
           <div class="hud-menu p-hud-menu" role="menu">
             <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-            <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
+            <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
             <div class="audio-panel" class:muted={$isMuted}>
               <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
                 {$isMuted ? 'Unmute' : 'Mute'}
@@ -467,7 +467,7 @@
               {#if lossLimitOn}
                 <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
               {/if}
-              <div class="auto-menu-sep">Spins</div>
+              <div class="auto-menu-sep">{$tr('hudSpins')}</div>
               {#each allowedAutoOptions as n}
                 <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
               {/each}
@@ -501,7 +501,7 @@
     {#if showMenu}
       <div class="hud-menu m-hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <!-- The three controls that left the row. They are reachable, labelled,
              and at full menu-item size, which they were not when crammed into
              the strip as icons. -->
@@ -610,7 +610,7 @@
     {#if showMenu}
       <div class="hud-menu c-hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
             {$isMuted ? 'Unmute' : 'Mute'}
@@ -703,7 +703,7 @@
           {#if lossLimitOn}
             <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
           {/if}
-          <div class="auto-menu-sep">Spins</div>
+          <div class="auto-menu-sep">{$tr('hudSpins')}</div>
           {#each allowedAutoOptions as n}
             <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
           {/each}
@@ -772,7 +772,7 @@
     {#if showMenu}
       <div class="hud-menu" role="menu">
         <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
-        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">Session</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
             {$isMuted ? 'Unmute' : 'Mute'}
@@ -909,7 +909,7 @@
         {#if lossLimitOn}
           <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
         {/if}
-        <div class="auto-menu-sep">Spins</div>
+        <div class="auto-menu-sep">{$tr('hudSpins')}</div>
         {#each allowedAutoOptions as n}
           <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
         {/each}
