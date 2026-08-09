@@ -250,6 +250,15 @@
     opacity: 0;
   }
   .press-prompt.is-ready {
+    /* VISIBLE THE MOMENT IT IS TRUE, not 1.4s later. Corrected 2026-08-10.
+       This rule used to add ONLY the animation, and that animation carries a
+       1.4s delay, during which the base rule's opacity: 0 still applied. So the
+       screen's only instruction was invisible for the 1800ms boot floor PLUS
+       1400ms of delay. Measured before the fix: opacity 0 at every sample to
+       3200ms, first non-zero at 3200ms. The keyframes start and end at 0.35, so
+       setting that here is the animation's own resting value and the pulse
+       layers on top without a jump. */
+    opacity: 0.35;
     animation: press-pulse 1.8s ease-in-out 1.4s infinite;
   }
   @keyframes press-pulse {
@@ -261,10 +270,16 @@
      staging). The only remaining motion on this screen is the press-prompt
      pulse, which reduced motion still stills. */
   .hero-splash.reduced .ring-glow { animation: none; opacity: 0.3; }
-  .hero-splash.reduced .press-prompt { animation: none; opacity: 0.75; }
+  /* SCOPED TO .is-ready, both here and in the media query below. These rules
+     were unscoped, and being more specific than the base rule they won even
+     before ready: under reduced motion the prompt read TAP TO CONTINUE from
+     400ms while the game was still loading, inviting a tap the splash would
+     hold until ready. Measured before the fix: opacity 0.75 at every sample
+     from 400ms, with is-ready not set until 2000ms. */
+  .hero-splash.reduced .press-prompt.is-ready { animation: none; opacity: 0.75; }
 
   @media (prefers-reduced-motion: reduce) {
     .ring-glow { animation: none; opacity: 0.3; }
-    .press-prompt { animation: none; opacity: 0.75; }
+    .press-prompt.is-ready { animation: none; opacity: 0.75; }
   }
 </style>
