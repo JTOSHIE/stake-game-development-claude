@@ -681,6 +681,26 @@
     // price charged to disagree.
     const costMicros = spinCostMicros(bet, mode)
     const cost = costMicros / CURRENCY_SCALE
+    // DEBIT THE PRICE IMMEDIATELY, 2026-08-09, owner-reported.
+    //
+    // The balance used to move exactly ONCE, when the round resolved, because
+    // recordSpinResult applies `-bet +win` in a single step (gameStore.ts:155)
+    // or takes the authoritative RGS figure (:153). On a normal spin that is a
+    // one-second lag on a one-unit change. On a BUY at 100x or 400x the player
+    // agrees to a large price, watches the whole feature play out, and sees
+    // nothing leave the wallet until the end. It reads as though the purchase
+    // never happened.
+    //
+    // gameStore.ts is LOCKED, so this is done here through the store's public
+    // `.update()` API, which is the same route replay already uses. It is a
+    // DISPLAY-ORDER change and deliberately not an arithmetic one: the amount
+    // is handed back before recordSpinResult runs, so that function still sees
+    // exactly the balance it always did and its own maths is untouched. Live
+    // sessions then overwrite it with the authoritative figure regardless.
+    let optimisticDebit = 0
+    balance.update((b) => b - cost)
+    optimisticDebit = cost
+
     try {
       selectedBetMode.set(mode)
       // Recorded BEFORE the wallet call, so a round that resolves fast cannot
@@ -728,6 +748,10 @@
       // Defer until the feature has actually finished playing (wincap keeps
       // its existing immediate reveal via MaxWinCelebration, unaffected).
       const settleRound = () => {
+        // Hand the optimistic debit back BEFORE settling, so recordSpinResult
+        // sees the balance it has always seen and applies its own maths once.
+        if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
+
         if (result.newBalance !== undefined) {
           // Live: RGS balance is authoritative (already reflects the mode's cost).
           recordSpinResult(result.totalWin, cost, result.newBalance, result.isWincap)
@@ -783,6 +807,10 @@
     } catch (err) {
       console.error('[Buy error]', err)
     } finally {
+      // Only fires when the settle point above was never reached: a throw, or an
+      // early return. Without it a failed purchase would leave the player's
+      // balance visibly reduced for a round that never happened.
+      if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
       selectedBetMode.set('base')
       isSpinning.set(false)
     }
@@ -1488,6 +1516,16 @@
 
     track({ type: 'spin', costMicros })
 
+    // DEBIT THE STAKE IMMEDIATELY, same reasoning as handleBuy above. The
+    // balance moved exactly once, at settlement, so the stake appeared to leave
+    // the wallet only when the round finished. Unwound inside settleRound so the
+    // deferred-settlement path (a triggered feature holds the figure back until
+    // the presentation ends) does not bounce the balance up and down, and
+    // unwound in `finally` only when settleRound never ran at all.
+    let optimisticDebit = 0
+    balance.update((b) => b - cost)
+    optimisticDebit = cost
+
     try {
       const result: SpinResult = await spin({ betAmount: bet, mode: 'base' })
 
@@ -1570,6 +1608,9 @@
       // by this deferral. Wincap already has its own dedicated immediate
       // reveal (MaxWinCelebration) and is unaffected.
       const settleRound = () => {
+        // Hand the optimistic debit back so recordSpinResult sees the balance it
+        // has always seen and applies its own single-step maths untouched.
+        if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
         recordSpinResult(win, cost, result.newBalance, roundIsWincap)
         rgRecordSpin(Math.round(cost * CURRENCY_SCALE), Math.round(win * CURRENCY_SCALE))
         if (!roundIsWincap) playWin(bet > 0 ? win / bet : 0)
@@ -1662,6 +1703,10 @@
     } catch (err) {
       console.error('[Spin error]', err)
     } finally {
+      // Fires only when settleRound never ran: a throw, or an early return. A
+      // failed spin must not leave the stake visibly gone for a round that
+      // never resolved.
+      if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
       // B1 fix: always release the spin lock, even if animateSpin early-returns
       // (assets not ready) or throws, so the game can never deadlock after a spin.
       isSpinning.set(false)
