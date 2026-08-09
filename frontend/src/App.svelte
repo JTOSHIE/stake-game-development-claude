@@ -1995,7 +1995,22 @@
         </div>
       {/if}
 
-      {#if $errorMessage}
+      <!-- SUPPRESSED WHILE THE SESSION IS TERMINALLY BLOCKED, 2026-08-09.
+           These are two independent banners and both conditions are true after a
+           failed authenticate, so the player saw BOTH: this one carrying
+           rgsService's ERR_GEN string, "A temporary error occurred. Retrying…",
+           and the live-guard banner below it. That pairing is wrong twice over.
+           It promises a retry that cannot happen, because authenticate is the one
+           wallet call NOT wrapped in _withRetry (play and endRound are), and the
+           ERROR_MESSAGES map is hardcoded English, so a German session read one
+           German banner beside one English one.
+           The live-guard banner immediately below says the true thing, is keyed,
+           and ships in all sixteen locales. rgsService.ts is locked, so this is
+           fixed where it renders rather than where the string is built: when the
+           session is blocked, the accurate translated banner is the only one
+           shown. Transient errors during normal play, which DO retry, are
+           unaffected. -->
+      {#if $errorMessage && !$bettingDisabled}
         <div class="error-banner">{errorDisplay}</div>
       {/if}
 
