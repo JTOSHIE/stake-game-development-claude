@@ -105,6 +105,38 @@ was already corrected the same way.
 
 ---
 
+## A3. A blocked-settle banner reuses a message whose middle sentence is false
+
+Added 2026-08-10, and it is a wording call rather than a defect.
+
+When a recovered round is presented and its `end-round` then fails, the game now
+engages the live guard: every bet route is blocked and the existing translated
+banner is shown. Before this it was SILENT, which was strictly worse: the player
+saw their winning round, the balance never moved, nothing said so, and SPIN could
+place a real bet on top of a round the platform was still holding open.
+
+The banner reuses `errSessionUnavailable`, the only keyed message of its kind and
+the only one that ships in all sixteen locales:
+
+> Game unavailable. Your session could not be verified. Please reload or contact support.
+
+Sentences one and three are true and are the correct instruction: reloading
+re-runs recovery, and `end-round` is idempotent on the session's active round, so
+a reload really can settle it. **Sentence two is false in this case.** The session
+authenticated perfectly well; what failed was the settle.
+
+It was shipped anyway, deliberately, because the alternative was continuing to
+say nothing at all, and because inventing a new sentence in fifteen locales is
+exactly what convention forbids a builder from doing. But under (l.3) and the
+standing mandate that nothing player-visible may read as machine-generated, a
+wrong explanation is a real defect and it is recorded here rather than left in a
+commit message.
+
+**The ruling needed:** whether to author a distinct message for this state, in
+which case it joins the translation list in section B, or to accept the reuse.
+
+---
+
 ## C. One thing that cannot be settled from this repository at all
 
 `rgsService.ts` maps a platform error to a player-facing message by reading a

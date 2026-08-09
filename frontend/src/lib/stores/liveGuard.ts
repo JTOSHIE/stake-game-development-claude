@@ -28,7 +28,15 @@
 
 import { writable, derived } from 'svelte/store'
 
-export type LiveGuardReason = null | 'missing-params' | 'auth-failed'
+/**
+ * `settle-failed` is set by sessionRecovery, never by evaluateLiveGuard: it is
+ * discovered AFTER the boot decision, when a recovered round's end-round call
+ * fails. The session authenticated fine, so the guard's own inputs say nothing
+ * is wrong. What IS wrong is that the platform is still holding an open round
+ * this client could not close, and betting on top of that is exactly what the
+ * other two reasons already prohibit. 2026-08-10.
+ */
+export type LiveGuardReason = null | 'missing-params' | 'auth-failed' | 'settle-failed'
 
 /** Why betting is disabled, or null when it is not. */
 export const liveGuardReason = writable<LiveGuardReason>(null)

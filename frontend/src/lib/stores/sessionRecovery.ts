@@ -91,6 +91,7 @@ import { CURRENCY_SCALE } from '../utils/currency'
 import {
   readCheckpoint, clearCheckpoint, validateCheckpoint, type CheckpointRejection,
 } from './presentationCheckpoint'
+import { liveGuardReason } from './liveGuard'
 
 /**
  * The official round, narrowed to the three fields recovery reads. Named
@@ -113,6 +114,10 @@ export type RecoveryOutcome =
       /** TR-099. Why a stored cursor was not used, when one was rejected. */
       checkpointRejection?: CheckpointRejection | null }
   | { kind: 'failed'; error: string }
+  /** Presented, then end-round failed. The platform still holds the round and
+   *  the win was never credited. Distinct from 'failed' because the player has
+   *  ALREADY BEEN SHOWN the round, so silence is not an available option. */
+  | { kind: 'settle-failed'; betID: number; error: string }
 
 /** The round the RGS says is still in progress, or null. */
 export const activeRound = writable<ActiveRound | null>(null)
@@ -328,7 +333,39 @@ export async function recoverSession(
     // 4. SETTLE. This runs whether or not the replay ran. A round we cannot
     //    present is still a round the platform is holding open, and leaving it
     //    open to avoid an unexplained balance change is the worse failure.
-    const resp = await platform.endRound(params, String(round.betID))
+    //
+    //    A SETTLE THAT FAILS IS NOT THE SAME FAILURE AS ONE BEFORE IT.
+    //
+    //    Everything above resolves into the outer catch, which records
+    //    `{kind:'failed'}` on `lastRecovery`, a store NO PRODUCTION CODE READS.
+    //    So the player was shown their winning round, the balance never moved,
+    //    and nothing on the page said so: no banner, no error text, no
+    //    role=alert. Then SPIN placed a real bet on top of a round the platform
+    //    was still holding open.
+    //
+    //    This one call therefore gets its own catch. It does not swallow the
+    //    failure: it engages the LIVE GUARD, which is the mechanism that already
+    //    exists for "we cannot establish that betting is safe". That blocks every
+    //    bet route and renders the non-dismissible translated banner without
+    //    inventing a string.
+    //
+    //    The round and the checkpoint are deliberately NOT cleared: the platform
+    //    still holds the round, so a reload must be able to recover and settle it
+    //    again, and end-round is idempotent on the session's active round.
+    //    2026-08-10.
+    let resp: Awaited<ReturnType<typeof platform.endRound>>
+    try {
+      resp = await platform.endRound(params, String(round.betID))
+    } catch (err) {
+      liveGuardReason.set('settle-failed')
+      const out: RecoveryOutcome = {
+        kind: 'settle-failed',
+        betID: round.betID,
+        error: err instanceof Error ? err.message : String(err),
+      }
+      lastRecovery.set(out)
+      return out
+    }
     balance.set(resp.balance)
     activeRound.set(null)
     // TR-099. The round is closed, so the cursor is dead. Cleared here as well

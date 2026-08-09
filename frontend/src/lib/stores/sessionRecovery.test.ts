@@ -41,6 +41,7 @@ import {
 import { balance, betAmount } from './gameStore.ts'
 import { rgsBetConfig } from './rgsBetConfig.ts'
 import { publishedNothing } from './authShape.ts'
+import { liveGuardReason, bettingDisabled } from './liveGuard.ts'
 import { CURRENCY_SCALE } from '../utils/currency.ts'
 import type { PresentationScript } from '../services/roundInterpreter.ts'
 
@@ -370,6 +371,55 @@ checkThat('and renders exactly one recovery banner',
   // A negative balance or a NaN must not read as a session.
   check('a NaN balance is not a session',
     publishedNothing({ minBet: NaN, maxBet: 0, betLevels: [], balance: NaN, round: null }), true)
+}
+
+// ---------------------------------------------------------------------------
+// A SETTLE THAT FAILS MUST NOT BE SILENT, 2026-08-10.
+//
+// Before this, an end-round rejection fell into the outer catch and wrote
+// {kind:'failed'} to `lastRecovery`, which NO production code reads. The player
+// was shown their winning round, the balance never moved, and nothing said so,
+// and then SPIN could place a real bet on top of a round the platform was still
+// holding open. It now engages the live guard, which blocks every bet route and
+// renders the existing translated banner.
+{
+  reset()
+  liveGuardReason.set(null)
+  betAmount.set(1.00)
+  balance.set(100)
+  authRound = { betID: 55, active: true, mode: 'base', amount: CURRENCY_SCALE,
+    state: { events: ORDINARY_EVENTS } }
+  const boom = new Error('ERR_GLE')
+  const failingStub = {
+    ...(stub as unknown as Record<string, unknown>),
+    parseSessionParams: () => ({ sessionID: 's', rgs_url: 'https://x' }),
+    authenticate: async () => authResult(),
+    endRound: async () => { throw boom },
+  } as unknown as Parameters<typeof recoverSession>[1]
+
+  const out = await recoverSession(false, failingStub, present)
+  check('the outcome names the settle, not a generic failure', out.kind, 'settle-failed')
+  check('and carries the betID the platform still holds',
+    (out as { betID?: number }).betID, 55)
+  check('the live guard is engaged, so every bet route is blocked',
+    get(liveGuardReason), 'settle-failed')
+  check('betting is disabled', get(bettingDisabled), true)
+  // The round must NOT be cleared: the platform still holds it, and a reload has
+  // to be able to recover and settle it again.
+  check('the active round is left in place for a retry',
+    get(activeRound) !== null, true)
+  // And the balance must not be invented.
+  check('the balance is untouched, because nothing was credited', get(balance), 100)
+
+  // NEGATIVE CONTROL: a settle that SUCCEEDS must leave the guard alone.
+  reset()
+  liveGuardReason.set(null)
+  balance.set(100)
+  authRound = { betID: 56, active: true, mode: 'base', amount: CURRENCY_SCALE,
+    state: { events: ORDINARY_EVENTS } }
+  const ok = await recoverSession(false, stub, present)
+  check('a successful settle does not engage the guard', get(liveGuardReason), null)
+  check('and reports its own kind', ok.kind !== 'settle-failed', true)
 }
 
 if (failures) { console.error(`\nSESSION RECOVERY: FAIL (${failures})`); process.exit(1) }
