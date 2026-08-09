@@ -1745,7 +1745,21 @@
     // it. That is the R7/TR-015 shape reproduced, and this is the reader it was
     // missing. Nothing else changes: the spin BUTTON stays available, because
     // the flag bans the key, not the bet.
-    if ($rgJurisdiction.spacebarDisabled) return
+    if ($rgJurisdiction.spacebarDisabled) {
+      // PREVENT THE DEFAULT, do not merely decline to act. Corrected 2026-08-09.
+      //
+      // Returning bare left the KEY banned and the BET not. A focused button is
+      // activated by Space by the browser itself, so one mouse click on SPIN,
+      // which focuses it, and every subsequent Space span the reels in exactly
+      // the markets that ban the spacebar. Measured with the flag set: Space
+      // with nothing focused did nothing, Space with SPIN focused spun.
+      //
+      // preventDefault suppresses that synthesised activation. It is safe here
+      // because the two guards above have already returned for text fields, so
+      // this cannot swallow a space a player is typing.
+      e.preventDefault()
+      return
+    }
     if ($anyModalOpen) return
     if ($showPaytable || showThemeSelector || $isWincap || featureActive || showIntroSplash || showHeroSplash) return
 

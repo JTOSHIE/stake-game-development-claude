@@ -108,6 +108,43 @@ result.cases.minSpin2500 = { ...(await speedState()) }
 await setFlags({ maxAutoplaySpins: 25 })
 result.cases.autoplayNoOfficialCap = { autoplayOffered: await readAutoMenu() }
 
+// SPACEBAR BAN, INCLUDING THE FOCUSED-BUTTON ROUTE. Added 2026-08-09.
+//
+// disabledSpacebar was enforced by returning from the keydown handler, which
+// bans the KEY and not the BET: a focused <button> is activated by Space by the
+// browser itself, so one mouse click on SPIN and every later Space span the
+// reels in exactly the markets that ban it. The handler now calls
+// preventDefault, and this asserts BOTH routes plus the negative control, since
+// a fix that bans the spacebar for everyone would be worse than the defect.
+{
+  const spinning = () => page.evaluate(() => {
+    let v; window.__testStores.isSpinning.subscribe((x) => { v = x })(); return v
+  })
+  const focusSpin = () => page.evaluate(() => {
+    const b = [...document.querySelectorAll('[data-testid="spin-button"]')]
+      .filter((x) => x.offsetParent !== null && !x.disabled)
+    if (b.length) b[0].focus()
+    return document.activeElement?.getAttribute('data-testid') ?? null
+  })
+
+  await setFlags({ disabledSpacebar: true })
+  await page.keyboard.press('Space'); await page.waitForTimeout(700)
+  const unfocused = await spinning()
+  const focusedOn = await focusSpin()
+  await page.keyboard.press('Space'); await page.waitForTimeout(900)
+  const focused = await spinning()
+
+  await setFlags({})
+  await page.waitForTimeout(300)
+  await page.keyboard.press('Space'); await page.waitForTimeout(900)
+  const allowed = await spinning()
+
+  result.cases.spacebarBanned = {
+    spunUnfocused: unfocused, focusedElement: focusedOn, spunWhileFocused: focused,
+    spunWhenAllowed: allowed,
+  }
+}
+
 const c = result.cases
 result.pass =
   c.unrestricted.tier === 'turbo' && c.unrestricted.allDisabled === false &&
@@ -117,7 +154,12 @@ result.pass =
   c.unrestricted.autoplayOffered.includes('∞') &&
   // No official cap flag exists, so the full menu is correct here. The
   // capping logic itself is pinned in responsibleGambling.test.ts.
-  c.autoplayNoOfficialCap.autoplayOffered.filter((t) => /^[0-9∞]+$/.test(t)).length >= 4
+  c.autoplayNoOfficialCap.autoplayOffered.filter((t) => /^[0-9∞]+$/.test(t)).length >= 4 &&
+  // the ban holds by key AND by focused-button activation, and lifts when absent
+  c.spacebarBanned.spunUnfocused === false &&
+  c.spacebarBanned.focusedElement === 'spin-button' &&
+  c.spacebarBanned.spunWhileFocused === false &&
+  c.spacebarBanned.spunWhenAllowed === true
 
 writeFileSync(join(OUT, 'rg_enforcement_proof_2026-07-25.json'), JSON.stringify(result, null, 2))
 console.log(JSON.stringify(result, null, 2))
