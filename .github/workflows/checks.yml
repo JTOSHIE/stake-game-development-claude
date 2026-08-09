@@ -1038,6 +1038,18 @@ jobs:
           - name: "browser: replay contract"
             run: node scripts/replay_contract_gate.mjs --self-test && node scripts/replay_contract_gate.mjs
 
+          # layout_fit_gate measures the GAME route at seven presets and never
+          # touched the REPLAY route, because App.svelte branches to ReplayMode
+          # INSTEAD of the game tree. At Popout S the replay grid therefore
+          # shipped at its natural 616px inside a 400px viewport, 64.9 per cent
+          # visible, centred, so no scroll position showed all five reels. This
+          # measures the same seven presets on the other route, and asserts the
+          # replay can actually be STARTED at each of them. It serves its own
+          # canned round because the grid only mounts once a replay loads: a
+          # probe with no RGS behind it reports a clean run over nothing.
+          - name: "browser: replay fit"
+            run: node scripts/replay_fit_gate.mjs --self-test && node scripts/replay_fit_gate.mjs
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
