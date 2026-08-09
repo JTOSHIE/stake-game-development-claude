@@ -85,6 +85,7 @@ import {
 import type { OfficialRound } from '../services/rgsService'
 import { interpretEvents, type PresentationScript } from '../services/roundInterpreter'
 import { balance, betAmount } from './gameStore'
+import { rgsBetConfig, openingBet } from './rgsBetConfig'
 import { CURRENCY_SCALE } from '../utils/currency'
 import {
   readCheckpoint, clearCheckpoint, validateCheckpoint, type CheckpointRejection,
@@ -201,6 +202,41 @@ export async function recoverSession(
     const params = platform.parseSessionParams()
     const auth = await platform.authenticate(params)
     const round: OfficialRound | null = auth.round ?? null
+
+    // PUBLISH THE REST OF THE BETTING PARAMETERS, 2026-08-09.
+    //
+    // Published item: "Game dynamically uses ALL betting parameters from the
+    // authenticate response". betLevels was consumed; minBet, maxBet, stepBet
+    // and defaultBetLevel were parsed and dropped. Measured against a stubbed
+    // platform: with defaultBetLevel 100 the game opened on 20, the bottom rung,
+    // because the only thing that moved the bet was HudOverlay's snap from the
+    // hardcoded 1.00 default.
+    //
+    // WHY HERE RATHER THAN IN THE SERVICE. initRGS is the obvious home and it is
+    // inside rgsService.ts, which is LOCKED. This function already calls
+    // authenticate on every launch and already holds the whole response, so
+    // publishing from here needs no lock exception and adds no network call.
+    // The owner sanctioned a locked edit for this; it turned out not to be
+    // needed, and an unnecessary locked edit is worse than none.
+    rgsBetConfig.set({
+      minBet:          auth.minBet ?? 0,
+      maxBet:          auth.maxBet ?? 0,
+      stepBet:         auth.stepBet ?? 0,
+      defaultBetLevel: auth.defaultBetLevel ?? 0,
+    })
+
+    // Open on the operator's chosen bet. Suppressed when a round is active,
+    // because the stake actually at risk is restored below from round.amount and
+    // that is the higher-priority truth for a resumed session.
+    const opening = openingBet(
+      {
+        minBet: auth.minBet ?? 0, maxBet: auth.maxBet ?? 0,
+        stepBet: auth.stepBet ?? 0, defaultBetLevel: auth.defaultBetLevel ?? 0,
+      },
+      auth.betLevels ?? [],
+      round?.active === true,
+    )
+    if (opening !== null) betAmount.set(opening)
 
     // `active: false` is a round the platform has already closed. It is
     // reported in the authenticate response as history, not as work, and

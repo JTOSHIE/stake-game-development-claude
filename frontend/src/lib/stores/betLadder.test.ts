@@ -10,6 +10,7 @@
 import { get } from 'svelte/store'
 import { betAmount, balance, BET_LEVELS } from './gameStore'
 import { rgsBetLevels } from './rgsBetLevels'
+import { rgsBetConfig } from './rgsBetConfig'
 import {
   activeBetLevels, betLevelIndex, canIncreaseBetLevel, canDecreaseBetLevel,
   canSetMaxBetLevel, maxAffordableLevel, increaseBetLevel, decreaseBetLevel,
@@ -91,6 +92,42 @@ balance.set(1000)
 betAmount.set(1.00)
 increaseBetLevel()
 check('fallback ladder still steps correctly', get(betAmount), 2.00)
+
+// ---------------------------------------------------------------------------
+// THE FALLBACK LADDER RESPECTS THE PLATFORM ENVELOPE, 2026-08-09.
+//
+// When the authenticate response omits betLevels, the built-in ladder stands in.
+// It is OUR ladder, and the platform may still have declared minBet/maxBet.
+// Measured against a stubbed platform sending minBet 20 with no betLevels: seven
+// of the ten fallback rungs were below the minimum, selectable, and the real
+// play() put an amount on the wire under the platform's own declared floor.
+{
+  rgsBetLevels.set([])
+  rgsBetConfig.set({ minBet: 20, maxBet: 2000, stepBet: 20, defaultBetLevel: 100 })
+  const levels = get(activeBetLevels)
+  check('no fallback rung sits below the platform minimum',
+    levels.filter((l) => l < 20).length, 0)
+  check('and none above the maximum', levels.filter((l) => l > 2000).length, 0)
+
+  // NEGATIVE CONTROL 1. An authenticated ladder is used verbatim and is NEVER
+  // filtered: the platform's own levels are authoritative even if they look odd.
+  rgsBetLevels.set([0.01, 5000])
+  check('an authenticated ladder is never filtered', get(activeBetLevels).length, 2)
+
+  // NEGATIVE CONTROL 2. No envelope declared means no filtering.
+  rgsBetLevels.set([])
+  rgsBetConfig.set({ minBet: 0, maxBet: 0, stepBet: 0, defaultBetLevel: 0 })
+  check('with no envelope the fallback is untouched', get(activeBetLevels), BET_LEVELS)
+
+  // NEGATIVE CONTROL 3. An envelope that excludes everything must not leave the
+  // player with NO selectable bet, which would be worse than the defect.
+  rgsBetConfig.set({ minBet: 9e9, maxBet: 9e9, stepBet: 0, defaultBetLevel: 0 })
+  check('an impossible envelope keeps the fallback rather than emptying it',
+    get(activeBetLevels), BET_LEVELS)
+
+  rgsBetLevels.set([])
+  rgsBetConfig.set({ minBet: 0, maxBet: 0, stepBet: 0, defaultBetLevel: 0 })
+}
 
 if (failures) { console.error(`\nBET LADDER: FAIL (${failures})`); process.exit(1) }
 console.log('\nBET LADDER: PASS')

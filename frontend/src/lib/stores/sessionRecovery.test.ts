@@ -39,6 +39,7 @@ import {
   recoveryBannerVisible, dismissRecoveryBanner,
 } from './sessionRecovery.ts'
 import { balance, betAmount } from './gameStore.ts'
+import { rgsBetConfig } from './rgsBetConfig.ts'
 import { CURRENCY_SCALE } from '../utils/currency.ts'
 import type { PresentationScript } from '../services/roundInterpreter.ts'
 
@@ -47,9 +48,10 @@ let authRound: unknown = null
 let authThrows: Error | null = null
 const endRoundBalance = 250
 
+let authConfig: Record<string, unknown> | null = null
 const authResult = () => ({
   balance: 100, minBet: 0.1, maxBet: 100, stepBet: 0.1, betLevels: [1],
-  defaultBetLevel: 1, currency: 'USD', round: authRound,
+  defaultBetLevel: 1, ...(authConfig ?? {}), currency: 'USD', round: authRound,
   jurisdictionFlags: {
     socialCasino: false, disabledFullscreen: false, disabledTurbo: false,
     disabledSuperTurbo: false, disabledAutoplay: false, disabledSlamstop: false,
@@ -127,6 +129,7 @@ const FEATURE_EVENTS = [
 ]
 
 const reset = () => {
+  authConfig = null
   resetSessionRecovery(); seq.length = 0; presented = null; authThrows = null; balance.set(0)
 }
 
@@ -295,6 +298,46 @@ checkThat('and renders exactly one recovery banner',
   authRound = { betID: 79, active: true, mode: 'base', amount: 0, state: { events: ORDINARY_EVENTS } }
   await recoverSession(false, stub, present)
   check('a zero round.amount leaves the current bet untouched', get(betAmount), 2.50)
+}
+
+// ---------------------------------------------------------------------------
+// ALL BETTING PARAMETERS ARE CONSUMED, not just betLevels. 2026-08-09.
+//
+// The published item names ALL of them. minBet, maxBet, stepBet and
+// defaultBetLevel were parsed and dropped, so a session opened on the bottom
+// rung instead of the operator's configured default.
+{
+  reset()
+  betAmount.set(1.00)
+  authRound = null
+  authConfig = {
+    minBet: 20, maxBet: 2000, stepBet: 20, defaultBetLevel: 100,
+    betLevels: [20, 40, 60, 100, 200, 400, 1000, 2000],
+  }
+  await recoverSession(false, stub, present)
+  const cfg = get(rgsBetConfig)
+  check('minBet is published', cfg.minBet, 20)
+  check('maxBet is published', cfg.maxBet, 2000)
+  check('stepBet is published', cfg.stepBet, 20)
+  check('defaultBetLevel is published', cfg.defaultBetLevel, 100)
+  check('and the session OPENS on the operator default, not the bottom rung',
+    get(betAmount), 100)
+
+  // NEGATIVE CONTROL 1. A default that is not on the reachable ladder is not
+  // applied: the arrows could never return to it and the snap would move it.
+  reset(); betAmount.set(1.00); authRound = null
+  authConfig = { minBet: 20, maxBet: 2000, stepBet: 20, defaultBetLevel: 77, betLevels: [20, 40, 100] }
+  await recoverSession(false, stub, present)
+  check('an off-ladder default is ignored', get(betAmount), 1.00)
+
+  // NEGATIVE CONTROL 2, the one that matters. An ACTIVE round wins: the stake
+  // at risk is the truth for a resumed session, not the opening preference.
+  reset(); betAmount.set(1.00)
+  authConfig = { minBet: 20, maxBet: 2000, stepBet: 20, defaultBetLevel: 100, betLevels: [20, 100] }
+  authRound = { betID: 90, active: true, mode: 'base', amount: 20 * CURRENCY_SCALE,
+    state: { events: ORDINARY_EVENTS } }
+  await recoverSession(false, stub, present)
+  check('a recovered stake beats the operator default', get(betAmount), 20)
 }
 
 if (failures) { console.error(`\nSESSION RECOVERY: FAIL (${failures})`); process.exit(1) }

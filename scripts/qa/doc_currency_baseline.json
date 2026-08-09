@@ -9,12 +9,12 @@
     "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
     "the gate, and the list visibly empties. Do not add to this file to make a run green."
   ],
-  "frozen_count": 338,
+  "frozen_count": 337,
   "by_class": {
     "DEAD_DOCREF": 11,
     "DEAD_PATH": 250,
     "STALE_LINE": 10,
-    "DEAD_SYMBOL": 49,
+    "DEAD_SYMBOL": 48,
     "DEAD_COMMIT": 11,
     "SUPERSEDED_CITED": 7
   },
@@ -1482,12 +1482,6 @@
       "file": "reports/qa/compliance_register/walk_shards/W20.md",
       "text": "02_frontend_upload/",
       "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "reports/qa/compliance_register/walk_shards/W20.md",
-      "text": "betLevels @ frontend/src/lib/stores/betLadder.test.ts",
-      "detail": "betLevels does not appear in frontend/src/lib/stores/betLadder.test.ts"
     },
     {
       "cls": "DEAD_COMMIT",

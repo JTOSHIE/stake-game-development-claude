@@ -31,13 +31,38 @@
 import { derived, get } from 'svelte/store'
 import { betAmount, balance, BET_LEVELS } from './gameStore'
 import { rgsBetLevels } from './rgsBetLevels'
+import { rgsBetConfig } from './rgsBetConfig'
 
 /**
  * The ladder in force: what the platform authenticated us with, or the built-in
  * ladder when the RGS supplied none (mock and dev runs). Never a third source.
  */
-export const activeBetLevels = derived(rgsBetLevels, ($levels) =>
-  $levels.length > 0 ? $levels : BET_LEVELS,
+export const activeBetLevels = derived(
+  [rgsBetLevels, rgsBetConfig],
+  ([$levels, $config]) => {
+    if ($levels.length > 0) return $levels
+
+    // NO AUTHENTICATED LADDER. The built-in one is the fallback, but it is OUR
+    // ladder and the platform may still have told us its envelope. Measured
+    // against a stubbed platform that sent minBet/maxBet but omitted betLevels:
+    // seven of the ten fallback rungs sat BELOW a minBet of 20, the player could
+    // select them, and driving the real play() at the bottom rung put an amount
+    // on the wire under the platform's own declared minimum.
+    //
+    // Filtering to the envelope is a COMPARISON, which is safe. Snapping to
+    // stepBet multiples is ARITHMETIC on display-unit floats, which is the
+    // hazard the integer-micros rule exists to prevent, and it was reviewed and
+    // left undone rather than half-applied. Recorded in rgsBetConfig.ts.
+    const { minBet, maxBet } = $config
+    if (minBet <= 0 && maxBet <= 0) return BET_LEVELS
+    const within = BET_LEVELS.filter(
+      (l) => (minBet <= 0 || l >= minBet) && (maxBet <= 0 || l <= maxBet),
+    )
+    // Never hand back an EMPTY ladder: a player with no selectable bet cannot
+    // play at all, which is worse than an out-of-envelope one. If the envelope
+    // excludes everything we ship, keep the fallback and let the platform reject.
+    return within.length > 0 ? within : BET_LEVELS
+  },
 )
 
 /** Closest ladder level to an arbitrary value, used to snap an off-ladder bet. */
