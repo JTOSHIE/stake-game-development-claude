@@ -100,7 +100,22 @@
       phase = 'ready'
       replayPhase.set('ready')
     } catch (e: any) {
-      error = e?.message ?? $tr('replayLoadError')
+      // THE PLAYER-FACING STRING IS ALWAYS THE KEYED ONE, 2026-08-09.
+      //
+      // This used to paint `e.message` straight into .error-detail. That message
+      // is built in replayService.fetchReplay as
+      //   `Replay fetch failed (404 Not Found). URL: https://.../bet/replay/...`
+      // so on any non-2xx the replay window showed a raw RGS URL, untranslated
+      // and never vocabulary-scanned, whose path carries the segment `/bet/`.
+      // In StakeUS social mode that put a restricted word on screen directly
+      // beneath a carefully compliant disclaimer, against the published item
+      // "Replay window does not contain restricted words". The social scan
+      // covers KEYED strings, so a raw thrown message is invisible to it by
+      // construction.
+      //
+      // The raw text is still available to a developer, just not to a player.
+      if (import.meta.env.DEV) console.error('[replay] load failed:', e)
+      error = $tr('replayLoadError')
       phase = 'error'
       replayPhase.set('error')
       replayError.set(error)
