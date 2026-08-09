@@ -194,6 +194,29 @@
   }
   enforceSocialEnglish()
 
+  // THE DOCUMENT'S OWN LANGUAGE, 2026-08-09.
+  //
+  // index.html ships `<html lang="en">` and nothing ever changed it, so all
+  // sixteen locales served a document that declared itself English. That is not
+  // cosmetic: a screen reader picks its voice and its pronunciation rules from
+  // this attribute, so a German or Japanese player got English phonetics read
+  // over correctly translated text, and Arabic rendered inside an LTR document
+  // because `dir` was never set at all.
+  //
+  // REACTIVE rather than set once at boot. `enforceSocialEnglish` can flip the
+  // locale to English AFTER boot, when social mode arrives with the authenticate
+  // response rather than in the URL, and a one-shot assignment would leave the
+  // document declaring a language the game had stopped rendering.
+  //
+  // `ar` is the only right-to-left locale in the shipped sixteen (en, ar, de,
+  // es, fi, fr, hi, id, ja, ko, pl, pt, ru, tr, vi, zh). Named as a set rather
+  // than compared inline so adding he/fa/ur later is one edit in one place.
+  const RTL_LOCALES = new Set(['ar'])
+  $: if (typeof document !== 'undefined') {
+    document.documentElement.lang = $locale
+    document.documentElement.dir = RTL_LOCALES.has($locale) ? 'rtl' : 'ltr'
+  }
+
   // Mark the replay route on body so the scroll override in this file's style
   // block can find it. In the component script body rather than onMount, so it
   // lands before first paint exactly as the locale set above does: `isReplay` is

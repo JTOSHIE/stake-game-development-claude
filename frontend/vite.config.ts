@@ -156,6 +156,38 @@ function measureDist(root: string, exclude: string): { files: number; bytes: num
   return { files, bytes }
 }
 
+/**
+ * Strip HTML comments from the EMITTED index.html.
+ *
+ * The source file carries two long explanatory comments, and they are worth
+ * keeping there: they record why the Vite starter favicon was replaced and what
+ * the pre-hydration tab title is for. They were also being shipped verbatim, so
+ * anyone viewing source on the submitted game read an internal ticket reference
+ * ("R12") and an internal repository path
+ * ("design-system/brand/hero_icon/hero_icon_32.png").
+ *
+ * That is the standing mandate's inspection test failing on the very first file
+ * a reviewer can open: internal commentary in shipped markup does not read as a
+ * professional outfit. The comments stay in the repository and leave the build.
+ *
+ * Conditional comments are deliberately preserved: they are IE-era conditional
+ * markup rather than prose, and stripping one would change behaviour rather than
+ * remove a note. Nothing here ships any today; the guard is so that adding one
+ * later is not silently broken by this plugin.
+ */
+function stripHtmlComments() {
+  return {
+    name: 'strip-html-comments',
+    enforce: 'post' as const,
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(html: string) {
+        return html.replace(/<!--(?!\[if)[\s\S]*?-->/g, '')
+      },
+    },
+  }
+}
+
 function pruneLegacyAssets() {
   const LEGACY_DIRS = [
     'assets/symbols', 'assets/frames', 'assets/videos',
@@ -297,7 +329,7 @@ const KIT_VERSION = (() => {
 const BUILD_GIT = gitFacts()
 
 export default defineConfig({
-  plugins: [svelte(), pruneLegacyAssets()],
+  plugins: [svelte(), pruneLegacyAssets(), stripHtmlComments()],
   base: './',
   define: {
     __BUILD_VERSION__: JSON.stringify(KIT_VERSION),

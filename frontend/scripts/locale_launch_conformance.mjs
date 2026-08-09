@@ -97,6 +97,23 @@ async function run() {
       check(`${code}: renders its own SPIN string`, spinText === expected,
         `rendered ${JSON.stringify(spinText)}, expected ${JSON.stringify(expected)}`)
       check(`${code}: no page errors`, errs.length === 0, errs.slice(0, 2).join(' | '))
+
+      // THE DOCUMENT MUST DECLARE THE LANGUAGE IT IS RENDERING. index.html
+      // ships `<html lang="en">` and nothing changed it, so every locale served
+      // a document claiming to be English: a screen reader picked English
+      // phonetics for correctly translated text, and Arabic rendered inside an
+      // LTR document because dir was never set. Added 2026-08-09.
+      const doc = await page.evaluate(() => ({
+        lang: document.documentElement.lang,
+        dir: document.documentElement.dir,
+      }))
+      results.locales[code].documentLang = doc.lang
+      results.locales[code].documentDir = doc.dir
+      check(`${code}: document lang matches the rendered locale`, doc.lang === code,
+        `html lang is ${JSON.stringify(doc.lang)}`)
+      check(`${code}: document direction is correct`,
+        doc.dir === (code === 'ar' ? 'rtl' : 'ltr'),
+        `html dir is ${JSON.stringify(doc.dir)} for ${code}`)
       if (code === 'ja' || code === 'ar') {
         await page.screenshot({ path: join(SHOTS, `locale-${code}.png`) })
       }
