@@ -282,8 +282,8 @@
   // places it, exactly as formatBalance() does for every other money readout.
   $: lossLimitSymbol   = currencySymbolFor($currencyCode || 'USD')
   $: lossLimitTrailing = currencySymbolTrailing($currencyCode || 'USD')
-  $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: balanceLabel = formatWin(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: betLabel     = formatWin(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
   // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed
   // here rather than inside the action so both forms come from the one currency
   // module and cannot disagree about the symbol, the locale or the code.

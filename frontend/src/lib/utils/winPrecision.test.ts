@@ -31,7 +31,7 @@
 //
 // Run: npx tsx src/lib/utils/winPrecision.test.ts
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import {
   formatBalance, formatWin, winFractionDigits, CURRENCY_SCALE,
 } from './currency.ts'
@@ -97,6 +97,11 @@ const files: Array<[string, string]> = [
   ['WinPod', 'src/lib/components/WinPod.svelte'],
   ['WinBreakdown', 'src/lib/components/WinBreakdown.svelte'],
   ['BonusInstrumentColumn', 'src/lib/components/BonusInstrumentColumn.svelte'],
+  // ADDED 2026-08-09. The per-spin free-spin win pop was MISSED by the first
+  // pass, which grepped for readouts named like wins; this one is called fmt().
+  // It rendered "$0.00" at a 1 cent bet for a spin that really paid $0.004,
+  // beside a running total in the SAME frame that already used formatWin.
+  ['FreeSpinsPresentation', 'src/lib/components/FreeSpinsPresentation.svelte'],
 ]
 for (const [name, path] of files) {
   check(`${name} renders wins through formatWin`, /formatWin\(/.test(readFileSync(path, 'utf8')), true)
@@ -105,6 +110,34 @@ for (const [name, path] of files) {
 for (const [name, path] of files.slice(0, 3)) {
   check(`${name} pins the digit count from the settled win`,
     /winFractionDigits\(/.test(readFileSync(path, 'utf8')), true)
+}
+
+// 8. NO MONEY READOUT MAY BE LEFT ON THE ROUNDING FORMATTER. Enumerated rather
+//    than pattern-matched, because pattern-matching on names is exactly how the
+//    free-spins pop was missed: it is called fmt(), not anything with "win" in
+//    it. Every remaining formatBalance call site in a component must be a value
+//    that CANNOT be sub-unit, and each is named here so adding a new one is a
+//    deliberate act rather than an oversight.
+{
+  const ALLOWED_ROUNDING = new Set([
+    'BetSelector.svelte',        // bet ladder rungs, exact by construction
+    'BuyBonus.svelte',           // buy price
+    'FeatureMenu.svelte',        // mode costs and the insufficient-balance figure
+    'ReplayMode.svelte',         // replay bet cost and total spent
+    'PaytableModal.svelte',      // advertised buy prices
+    'WinBanner.svelte',          // the bought-round PRICE line, not a win
+    'SessionPanel.svelte',       // wagered/won rows already carry $locale
+  ])
+  const dir = 'src/lib/components'
+  const offenders: string[] = []
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.svelte')) continue
+    const src = readFileSync(`${dir}/${f}`, 'utf8')
+    const uses = src.split('\n').some((l) => /formatBalance\(/.test(l) && !/^\s*(\/\/|\*)/.test(l) && !/^import /.test(l))
+    if (uses && !ALLOWED_ROUNDING.has(f)) offenders.push(f)
+  }
+  check('no component outside the named list still rounds money',
+    offenders.join(',') || 'none', 'none')
 }
 
 if (failures) { console.error(`\nWIN PRECISION: FAIL (${failures})`); process.exit(1) }

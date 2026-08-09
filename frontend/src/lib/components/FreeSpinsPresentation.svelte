@@ -9,7 +9,7 @@
   import { get } from 'svelte/store'
   import { betAmount, currencyCode, isTurbo, locale } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
   import { themeAssets } from '../stores/themeStore'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
@@ -128,7 +128,13 @@
     return Math.round((cb / 100) * $betAmount * CURRENCY_SCALE)
   }
   function fmt(cb: number): string {
-    return formatBalance(centibetsToMicros(cb), $currencyCode || 'USD')
+    // formatWin, NOT formatBalance. This is a WIN, and the running total painted
+    // in the same frame by BonusInstrumentColumn already uses formatWin, so the
+    // two disagreed: at a 1 cent bet a spin paying 0.40x rendered "$0.00" while
+    // the total beside it moved by $0.004. Missed in the first sub-cent pass
+    // because that pass grepped for readouts NAMED like wins and this one is
+    // called fmt(). 2026-08-09.
+    return formatWin(centibetsToMicros(cb), $currencyCode || 'USD')
   }
 
   function clear() {

@@ -41,7 +41,7 @@
   }
   import { currencyCode } from '../stores/gameStore'
   import { isSocial } from '../stores/socialMode'
-  import { formatBalance } from '../utils/currency'
+  import { formatBalance, formatWin } from '../utils/currency'
 
   $: autoPinned = $rgJurisdiction.mandatorySessionDisplay
 
@@ -67,7 +67,7 @@
   $: ss = String(elapsedS % 60).padStart(2, '0')
   $: cur = $currencyCode || 'USD'
   $: net = $rgNetMicros
-  $: netLabel = (net >= 0 ? '+' : '-') + formatBalance(Math.abs(net), cur)
+  $: netLabel = (net >= 0 ? '+' : '-') + formatWin(Math.abs(net), cur, $locale)
   // Was `$isSocial ? 'COINS' : ''`, the same duplicated-layer shape TR-091 is
   // about, hiding in the script block where even the widened gate cannot see it.
   // SOCIAL_OVERRIDES already maps `balance` to COINS in every locale, so this
