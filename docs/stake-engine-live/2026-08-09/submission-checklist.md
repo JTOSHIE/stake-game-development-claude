@@ -123,3 +123,30 @@ gameplay and math compliance. Ratings stay hidden until all three are in.
 
 The page states the review "can be as quick as a couple of hours" and that an incomplete or
 non-compliant submission "blows out that timeline and can take weeks".
+
+## THE PRE-SUBMISSION GATE, captured the same day and NOT part of the 51
+
+The approval screen runs its own five automated checks before it will let a submission start.
+All five were green on 2026-08-09:
+
+- **Game thumbnail**, "Thumbnail is set."
+- **Front version published**, "Latest front version: v4"
+- **Math version published**, "Latest math version: v1"
+- **Math validation**, "All modes passed validation."
+- **Betlevel validation**, "Valid betlevel template found."
+
+**TWO CONSTRAINTS ON THE SAME SCREEN THAT CHANGE HOW A SUBMISSION SHOULD BE TIMED**, quoted
+because they are the kind of thing that is expensive to learn late:
+
+> "First-time publishers are limited to one active review until their first game goes live on
+> Stake. This ensures any feedback from your initial review can be applied across future
+> submissions before they enter the queue. Once approved, the limit increases to five
+> concurrent reviews."
+
+> "The review queue is shared across all teams. Submissions that fail basic checks take
+> reviewer time away from other games and may result in your request being deprioritised."
+
+**So there is exactly ONE attempt available, and a failed basic check costs queue position as
+well as the slot.** The five gates above are necessary and not sufficient: they prove files
+exist and validate, not that the RIGHT files were published. **Confirm the live build's console
+line names the intended commit before starting a submission**, per OWNER_CHECKLIST item 3.

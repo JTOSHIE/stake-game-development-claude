@@ -66,7 +66,7 @@ or the architecture.
 
 | # | Item | Status | Evidence |
 |---|---|---|---|
-| 7 | Thumbnail meets Stake artwork guidelines | **OWNER** | Composed in the Tile Editor from `03_branding/FutureSpinner-BG.jpg` and `-FG.png`. The portal still shows a "Design Thumbnail" placeholder in every capture, so this is **not yet done**. |
+| 7 | Thumbnail meets Stake artwork guidelines | **PASS** | **CLOSED 2026-08-09 by the platform's own assertion, which is better evidence than a visual read.** The pre-submission checklist at the approval screen reports **"Thumbnail is set"** with a green tick. The Tile Editor separately shows the composed tile rendering: robot, FUTURE SPINNER, WE ROLL SPINNERS on the neon city background. **A note on what the platform actually stores:** the Tile Editor composes from SEPARATE layers, a background image, a foreground element, a gradient and a game title, rather than from our single pre-composed master. So `design-system/brand/delivery/FutureSpinner-Tile.png` at 408x546 is the reference and the record of geometry, not necessarily the bytes the portal holds. The old text said the portal still showed a Design Thumbnail placeholder in every capture; that predates the tile rework and is superseded. ORIGINAL FINDING, retained: | Composed in the Tile Editor from `03_branding/FutureSpinner-BG.jpg` and `-FG.png`. The portal still shows a "Design Thumbnail" placeholder in every capture, so this is **not yet done**. |
 
 ## RGS Requirements: Bet Levels
 
