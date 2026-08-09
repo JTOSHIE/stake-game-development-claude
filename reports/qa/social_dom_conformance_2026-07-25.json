@@ -14,6 +14,7 @@
     "fund"
   ],
   "surfacesCovered": [
+    "boot-overlays",
     "first-paint",
     "features-menu",
     "paytable",
@@ -23,8 +24,8 @@
     "win-banner"
   ],
   "stringsHarvested": {
-    "real": 4289,
-    "social": 3242
+    "real": 3552,
+    "social": 3249
   },
   "checks": {
     "social.zeroProhibitedTerms": {
@@ -39,6 +40,7 @@
     "coverage.surfaces": {
       "pass": true,
       "surfaces": [
+        "boot-overlays",
         "first-paint",
         "features-menu",
         "paytable",
@@ -50,7 +52,7 @@
     },
     "coverage.stringsHarvested": {
       "pass": true,
-      "count": 3242
+      "count": 3249
     },
     "social.noHarvestErrors": {
       "pass": true,

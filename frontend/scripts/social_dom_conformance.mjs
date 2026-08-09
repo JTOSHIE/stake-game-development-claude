@@ -120,6 +120,12 @@ const HARVEST = `(() => {
 async function harvest(page, surface, bag) {
   const items = await page.evaluate(HARVEST)
   for (const it of items) bag.push({ ...it, surface })
+  // Per-surface counts are PRINTED, not just totalled. A surface that harvests
+  // zero looks identical to one that harvested clean strings in the total, and
+  // that is exactly how the intro rules modal went unscanned: it was dismissed
+  // before the first harvest, so it contributed nothing and nothing said so.
+  console.log(`  .. harvest ${surface}: ${items.length} string(s)`)
+  return items.length
 }
 
 // Progress goes to stdout as it happens. The first run of this script was piped
@@ -257,10 +263,28 @@ async function run() {
       console.log(`[${label}] loading ${baseUrl}`)
       await page.goto(social ? `${baseUrl}/?social=true` : baseUrl, { waitUntil: 'domcontentloaded' })
       await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30000 })
+
+      // HARVEST THE BOOT OVERLAYS BEFORE DISMISSING THEM, 2026-08-09.
+      //
+      // This scan used to call dismissIntro() FIRST and take its first-paint
+      // harvest afterwards, so every string on the intro rules modal was gone
+      // from the DOM before anything read it. That modal is the first thing a
+      // reviewer opening a social session actually reads, and it was the one
+      // surface this gate could not see. The strings on it are compliant today,
+      // checked by hand, so this closes a COVERAGE gap rather than a defect: the
+      // gate was passing on a surface it never inspected.
+      //
+      // Deliberately tolerant. The overlays are timing-dependent, and the boot
+      // splash is only dismissible once the game is ready, so a slow load can
+      // reach here with nothing mounted yet. An empty pre-dismiss harvest is a
+      // legitimate outcome and must not fail the run; what matters is that the
+      // strings are READ when they are present, not that they always are.
+      const bag = []
+      await harvest(page, 'boot-overlays', bag)
+
       await dismissIntro(page)
       console.log(`[${label}] loaded, walking surfaces`)
 
-      const bag = []
       await openSurfaces(page, social, bag)
       modes[label] = { strings: bag, consoleErrors }
       await page.close()
