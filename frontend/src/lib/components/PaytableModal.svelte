@@ -143,6 +143,16 @@
   }))
 
   // Buy price, 100x current bet, only meaningful where the buy is not disabled.
+  // THE RULES MUST NOT ADVERTISE WHAT THE JURISDICTION FORBIDS. 2026-08-09.
+  //
+  // FeatureMenu already filters buy tiers out of its cards when the flag is set
+  // (FeatureMenu.svelte:82). This modal iterated FS_MODES unfiltered, so with
+  // disabledBuyFeature a player read a rules screen offering Buy Overdrive at
+  // 100x and NITRO at 400x, went to the FEATURES menu, and found neither. The
+  // same expression is used deliberately, so the two surfaces cannot drift into
+  // disagreeing about what this session offers.
+  $: visibleModes = FS_MODES.filter((m) => m.kind !== 'buy' || !$buyFeatureDisabled)
+
   $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 
   // Bet Modes section, every mode priced against the current bet, straight from
@@ -301,7 +311,7 @@
         <div>
           <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('betModesHeading')}</h3>
           <div class="fs-mode-cards">
-            {#each FS_MODES as m (m.id)}
+            {#each visibleModes as m (m.id)}
               <div class="fs-mode-card fs-plate tone-{m.kind}" class:soon={!m.available}>
                 <div class="fs-face">
                   <div class="fs-mode-card-name-row">
