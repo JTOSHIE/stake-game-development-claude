@@ -72,6 +72,17 @@
   export function openConfirm(mode: BetMode = 'bonus'): void { open(mode) }
 </script>
 
+<!-- Escape closes the dialog. On the backdrop element this did nothing, because
+     a keydown handler only fires for the focused element and the backdrop never
+     holds focus; measured closedByEscape=false at all seven presets before this
+     moved to the window. Gated on showConfirm so it is inert the rest of the
+     time, and it stops propagation so the same key does not also reach another
+     overlay's handler. -->
+<svelte:window on:keydown={(e: KeyboardEvent) => {
+  if (showConfirm && e.key === 'Escape') { e.stopPropagation(); cancel() }
+}} />
+
+
 {#if !$buyFeatureDisabled}
   {#if showTrigger}
     <button
@@ -87,7 +98,17 @@
   {/if}
 
   {#if showConfirm}
-    <div class="buy-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={featureName}>
+    <!-- DISMISSIBLE, 2026-08-09. This dialog could only be closed by its own
+         CANCEL control: Escape did nothing and the backdrop swallowed clicks.
+         A modal a player cannot escape is a trap, and a reviewer tries both
+         before finding the button. `cancel` is the SAME handler CANCEL calls,
+         so there is one exit path and no second copy of the tidy-up. The
+         backdrop check compares currentTarget with target so a click inside
+         the modal does not close it. -->
+    <div class="buy-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={featureName}
+         on:click={(e) => { if (e.target === e.currentTarget) cancel() }}
+         on:keydown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); cancel() } }}
+         tabindex="-1">
       <div class="buy-modal">
         <!-- Grille art carries the header (LAYOUT_SPEC feature accent) -->
         <img class="buy-header-art" src="{base}/ui/feature_button.png" alt="" draggable="false" />
@@ -228,7 +249,8 @@
     clip-path: polygon(0 12%, 3% 0, 97% 0, 100% 12%, 100% 100%, 3% 100%, 0 88%);
     box-shadow: inset 0 0 0 1.5px rgba(255, 43, 214, 0.85), 0 0 12px rgba(255, 43, 214, 0.25);
     position: sticky;
-    bottom: 0;
+    /* Sits directly above the sticky actions rather than under them. */
+    bottom: 58px;
     z-index: 2;
   }
   .buy-stat {
@@ -244,7 +266,25 @@
     .buy-backdrop, .buy-modal { animation: none; }
   }
   .buy-warn { color: #ff6b6b; font-size: 0.8rem; }
-  .buy-actions { display: flex; gap: 10px; margin-top: 16px; }
+  /* THE BUTTONS MUST BE ON SCREEN, not merely reachable. Measured before this
+     change, opening the dialog at the seven presets: CONFIRM was below the fold
+     at FOUR of them, and at Popout S it sat 365px under a 225px viewport, inside
+     the modal's own scroll box. A previous pass made `.buy-stats-row` sticky so
+     the price disclosure stayed visible, and left the controls underneath it
+     scrolling away.
+
+     Both are now pinned to the bottom of the scroll box: the actions at the
+     very bottom, the stats row directly above them. The offset is the actions'
+     own height (10px padding x2, ~22px of button, 16px margin-top) and is stated
+     as one value here rather than being repeated. */
+  .buy-actions {
+    display: flex; gap: 10px; margin-top: 16px;
+    position: sticky; bottom: 0; z-index: 3;
+    /* Opaque, or the content scrolling underneath shows through the gap
+       between the two buttons. Matches the modal's own gradient foot. */
+    background: #08081a;
+    padding-bottom: 2px;
+  }
   .buy-cancel, .buy-confirm { flex: 1; padding: 10px; border-radius: 8px; cursor: pointer; font-family: var(--fs-font-display); font-weight: 700; }
   .buy-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; }
   .buy-confirm { background: var(--theme-secondary, #ff2ec4); border: none; color: #12071e; }
