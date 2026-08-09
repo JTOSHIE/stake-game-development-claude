@@ -25,15 +25,11 @@
   import { speedTier, cycleSpeed } from '../stores/speedMode'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
-  import {
-    formatBalance, formatBalanceCompact, CURRENCY_SCALE,
-    // The autoplay loss limit rendered a hardcoded `$` beside its input at three
+  import { formatBalance, formatBalanceCompact, CURRENCY_SCALE, // The autoplay loss limit rendered a hardcoded `$` beside its input at three
     // layout profiles. The game runs in EUR, XEC and SC among others, and the
     // owner's own live sessions were EUR, so a euro player set a loss limit
-    // labelled in dollars. Same class as the XSC leak PR #89 fixed: a second,
-    // divergent idea of what the currency is. QUALITY_CHARTER.md Q-10.
-    currencySymbolFor, currencySymbolTrailing,
-  } from '../utils/currency'
+    // labelled in dollars. Same class as the XSC leak PR #89 fixed: a second, // divergent idea of what the currency is. QUALITY_CHARTER.md Q-10.
+    currencySymbolFor, currencySymbolTrailing, formatWin, winFractionDigits } from '../utils/currency'
   import { playClick } from '../services/soundService'
   import {
     autoplayLimits, rgJurisdiction, showSessionPanel,
@@ -320,7 +316,11 @@
     if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
   })
 
-  $: winLabel = formatBalance(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD')
+  // Digits come from the SETTLED $winAmount, not from the eased frame value.
+  // Deriving per frame makes the readout flicker between two and four places for
+  // the whole count-up; measured before this landed.
+  $: winDigits = winFractionDigits(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: winLabel = formatWin(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD', undefined, null, winDigits)
   $: winCompact = formatBalanceCompact(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD')
 </script>
 

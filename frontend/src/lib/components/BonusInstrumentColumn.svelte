@@ -19,7 +19,7 @@
   import { tr } from '../i18n/tr'
   import { betAmount, currencyCode } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
 
   export let multiplier = 1
   export let spinsRemaining = 0
@@ -49,7 +49,7 @@
   // running hot - same tier language the rest of the HUD uses.
   $: needleGlow = multiplier >= 10 ? '#ff2ec4' : multiplier >= 4 ? '#16f2e0' : '#4eff91'
 
-  $: totalWinLabel = formatBalance(
+  $: totalWinLabel = formatWin(
     Math.round((runningTotalCentibets / 100) * $betAmount * CURRENCY_SCALE),
     $currencyCode || 'USD',
   )

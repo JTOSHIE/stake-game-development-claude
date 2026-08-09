@@ -696,6 +696,16 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/services/replayLocale.test.ts
 
+      # Published item "Game displays sub-cent payouts correctly". Our smallest
+      # paying combination is 0.08x, under the 0.1x threshold in rgs.md:295, so
+      # four points of precision are required. At the 1 cent minimum bet that
+      # combination pays $0.0008 and used to render "$0.00". Guards three things
+      # at once: sub-cent exactness, ordinary wins NOT gaining decimals, and the
+      # trailing-symbol placement surviving the widening. (2026-08-09)
+      - name: win precision, sub-cent payouts
+        working-directory: frontend
+        run: npx tsx src/lib/utils/winPrecision.test.ts
+
       # ── Gate 1a: the COMPLETE type-check, not just the Svelte half ───────────
       # R2R3 finding 9 / TR-046: "npm run check reports 0 Svelte errors, 36
       # warnings and vite.config.ts:33 TS7006. CI runs only the Svelte baseline,

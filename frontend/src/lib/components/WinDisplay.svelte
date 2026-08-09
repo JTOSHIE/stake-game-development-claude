@@ -1,7 +1,7 @@
 <script lang="ts">
   import { winAmount, betAmount, isWincap, scatterCount, currencyCode } from '../stores/gameStore'
   import { tr } from '../i18n/tr'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { onDestroy } from 'svelte'
 
 
@@ -20,6 +20,10 @@
     targetValue  = 0
     displayValue = 0
   }
+
+  // Digits pinned from the SETTLED targetValue rather than the eased
+  // displayValue, so the readout keeps a stable width while counting.
+  $: winDigits = winFractionDigits(Math.round(targetValue * CURRENCY_SCALE), $currencyCode || 'USD')
 
   // Derive tier from targetValue (not the derived $winMultiplier store) so
   // colour/label stays correct for the full duration of the count-up animation,
@@ -85,7 +89,7 @@
 
     <!-- Count-up amount -->
     <div class="win-amount">
-      {formatBalance(Math.round(displayValue * CURRENCY_SCALE), $currencyCode)}
+      {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, undefined, null, winDigits)}
     </div>
 
   </div>

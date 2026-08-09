@@ -381,9 +381,18 @@ export function formatBalance(
   currencyCode: string,
   localeTag?: string,
   display?: CurrencyDisplay | null,
+  /**
+   * Floor on the fraction digits, for sub-cent WIN amounts. Never lowers a
+   * currency's own precision, only raises it, so every existing caller that
+   * omits it renders byte-identically. See `formatWin` for why it exists.
+   */
+  minFractionDigits?: number,
 ): string {
   const amount = micros / CURRENCY_SCALE
   const code = (currencyCode || '').toUpperCase()
+  /** Applied in EVERY branch below, so no currency route can miss it. */
+  const widen = (d: number): number =>
+    minFractionDigits === undefined ? d : Math.max(d, minFractionDigits)
 
   // Platform-provided display information wins over anything we hold locally,
   // for ANY code including fiat. This is the TR-012c resolution: we render what
@@ -395,8 +404,8 @@ export function formatBalance(
     const decimals = display.decimals ?? local?.decimals ?? (ZERO_DECIMAL.has(code) ? 0 : 2)
     const trailing = display.symbolAfter ?? (local ? VIRTUAL_SYMBOL_TRAILING : false)
     const formatted = amount.toLocaleString(localeTag, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
+      minimumFractionDigits: widen(decimals),
+      maximumFractionDigits: widen(decimals),
     })
     return trailing ? `${formatted} ${symbol}` : `${symbol} ${formatted}`
   }
@@ -406,8 +415,8 @@ export function formatBalance(
   const virtual = VIRTUAL_CURRENCIES[code]
   if (virtual) {
     const formatted = amount.toLocaleString(localeTag, {
-      minimumFractionDigits: virtual.decimals,
-      maximumFractionDigits: virtual.decimals,
+      minimumFractionDigits: widen(virtual.decimals),
+      maximumFractionDigits: widen(virtual.decimals),
     })
     return VIRTUAL_SYMBOL_TRAILING
       ? `${formatted} ${virtual.symbol}`
@@ -417,7 +426,12 @@ export function formatBalance(
   // The platform's published table. This is the authority for every supported
   // code and it is checked before Intl, not after.
   const platform = PLATFORM_CURRENCIES[code]
-  if (platform) return formatFromTable(amount, platform, localeTag)
+  if (platform) {
+    return formatFromTable(amount, platform, localeTag, {
+      minimumFractionDigits: widen(platform.decimals),
+      maximumFractionDigits: widen(platform.decimals),
+    })
+  }
 
   // UNREACHABLE FOR ANY SUPPORTED CODE, and that is asserted rather than
   // asserted-in-a-comment: `scripts/qa/currency_table_gate.mjs` proves no code in
@@ -431,8 +445,8 @@ export function formatBalance(
       style:                 'currency',
       currency:              code,
       currencyDisplay:       'narrowSymbol',
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
+      minimumFractionDigits: widen(decimals),
+      maximumFractionDigits: widen(decimals),
     }).format(amount)
   } catch {
     // Unknown or unsupported currency code. Amount FIRST, per the platform's own
@@ -441,8 +455,83 @@ export function formatBalance(
     // does not know, and its symbolAfter branch renders
     // `${formattedAmount} ${meta.symbol}`. So an unknown code trails, and the
     // symbol IS the code. S2-C218, from the 2026-07-29 rgs.md capture.
-    return `${amount.toFixed(decimals)} ${code}`
+    return `${amount.toFixed(widen(decimals))} ${code}`
   }
+}
+
+/**
+ * How many fraction digits a WIN readout needs, decided by the VALUE.
+ *
+ * THE REQUIREMENT, quoted from the platform's own rgs.md:295: "If the game has a
+ * minimum win of >= 0.1x, three points of precision are required: 0.1x * $0.01 =
+ * $0.001, while games with minimum wins <0.1x will require 4 points of
+ * precision." rgs.md:297 makes the display a requirement rather than a
+ * suggestion: "it is only a requirement that wins in-game show exact win
+ * amounts."
+ *
+ * Our minimum paying combination is L3 three-of-a-kind on one way, 0.08x, which
+ * is below 0.1x, so four points is our band. At the platform's 1 cent minimum
+ * bet that combination pays 0.08 x $0.01 = $0.0008, and at two decimals it
+ * rendered "$0.00": a win the wallet paid and the screen denied. Higher up the
+ * same band, a $0.10 bet pays $0.008 and rendered "$0.01", which is not the
+ * number that moved the wallet either.
+ *
+ * KEYED ON THE VALUE, NOT ON A CONSTANT, deliberately. Hardcoding "always four"
+ * would render every ordinary win as "$12.3400", which is worse than the defect:
+ * it makes the common case unreadable to fix the rare one. So the currency's own
+ * precision is the floor, and digits are added ONLY while the value still has
+ * something to say below it, capped at four.
+ *
+ * ROUNDING IS DELIBERATELY NOT USED TO DECIDE. `toFixed` on a float can report a
+ * trailing zero for a value that is genuinely non-zero further down, so the test
+ * is done on the INTEGER micros, which is what the wallet actually moved.
+ */
+export function winFractionDigits(
+  micros: number,
+  currencyCode: string,
+  display?: CurrencyDisplay | null,
+  maxDigits = 4,
+): number {
+  const code = (currencyCode || '').toUpperCase()
+  const base = display?.decimals
+    ?? VIRTUAL_CURRENCIES[code]?.decimals
+    ?? PLATFORM_CURRENCIES[code]?.decimals
+    ?? (ZERO_DECIMAL.has(code) ? 0 : 2)
+
+  const whole = Math.abs(Math.round(micros))
+  let digits = base
+  while (digits < maxDigits) {
+    // Units of the smallest amount representable at `digits` places.
+    const unit = CURRENCY_SCALE / Math.pow(10, digits)
+    if (whole % Math.round(unit) === 0) break // nothing left below this place
+    digits += 1
+  }
+  return digits
+}
+
+/**
+ * Format a WIN. Same rendering as `formatBalance` in every respect except that
+ * sub-unit amounts keep their real precision.
+ *
+ * `fractionDigits` exists for the COUNT-UP, and it is the whole reason this is a
+ * separate parameter rather than something the formatter works out per call.
+ * Three win readouts render an EASED FLOAT that changes every frame; deciding
+ * the digit count from each frame's value would make the readout grow and shrink
+ * digits continuously while counting. The caller computes the count ONCE from
+ * the settled win and passes it in, so the width is stable for the whole
+ * animation.
+ */
+export function formatWin(
+  micros: number,
+  currencyCode: string,
+  localeTag?: string,
+  display?: CurrencyDisplay | null,
+  fractionDigits?: number,
+): string {
+  return formatBalance(
+    micros, currencyCode, localeTag, display,
+    fractionDigits ?? winFractionDigits(micros, currencyCode, display),
+  )
 }
 
 /**

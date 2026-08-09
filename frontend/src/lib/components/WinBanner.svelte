@@ -18,7 +18,7 @@
    */
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { isSocial } from '../stores/socialMode'
   import { boughtRound } from '../stores/boughtRound'
   import { locale } from '../stores/gameStore'
@@ -212,7 +212,11 @@
   // HUD. The social swap now comes from the same table as the locale swap, so
   // the most prominent surface in the game is keyed like everything else.
   $: tierLabel = t($locale, tier === 'epic' ? 'tierEpicWin' : tier === 'mega' ? 'tierMegaWin' : 'tierBigWin', $isSocial ? 'social' : 'real')
-  $: amountLabel = formatBalance(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  // Pinned from the settled target (`amount` when this banner owns its count-up,
+  // otherwise the shared $winAmount), never from the eased frame. See HudOverlay.
+  $: settledAmount = amount === null ? $winAmount : amount
+  $: amountDigits = winFractionDigits(Math.round(settledAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: amountLabel = formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', undefined, null, amountDigits)
   // Split for the per-digit boxes below. Derived rather than done in the
   // template so the character list is computed once per value change.
   $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))

@@ -5,7 +5,7 @@
   import { onDestroy } from 'svelte'
   import { tr } from '../i18n/tr'
   import { activeWins, isSpinning, currencyCode } from '../stores/gameStore'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
 
   // The tier symbols are IDs, identical in every language, so they stay a plain
   // map. WILD and SCATTER are words, and they used to sit in this same record as
@@ -79,7 +79,7 @@
 
   $: current = groups[cycleIndex] ?? null
   $: payLabel = current
-    ? formatBalance(Math.round(current.payout * CURRENCY_SCALE), $currencyCode || 'USD')
+    ? formatWin(Math.round(current.payout * CURRENCY_SCALE), $currencyCode || 'USD')
     : ''
 
   onDestroy(stopAll)
