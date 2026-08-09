@@ -120,6 +120,7 @@
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
   import { anyModalOpen, setGameBlocked, gameInert } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
+  import { authPublishedNothing } from './lib/stores/authShape'
   import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound } from './lib/stores/sessionRecovery'
   import ResumeOffer from './lib/components/ResumeOffer.svelte'
   import SessionPanel from './lib/components/SessionPanel.svelte'
@@ -1322,6 +1323,33 @@
       // outcome, then settled, then one plain banner. presentRecoveredRound is
       // the playback driver; there is no forfeit path.
       await recoverSession(import.meta.env.DEV, undefined, presentRecoveredRound, offerResume)
+    }
+
+    // A 200 THAT CARRIED NO SESSION. Re-evaluated AFTER recovery, deliberately.
+    //
+    // authenticate defaults every missing field to zero, so a platform
+    // answering 200 with `{}` produced a game with a $0.00 balance, a disabled
+    // spin control and NO BANNER: nothing on screen said why. Measured on the
+    // shipped build before this landed.
+    //
+    // The obvious fix, folding the shape test into the authErrored argument
+    // above, would have STRANDED PLAYER MONEY: that flag raises bettingDisabled,
+    // and bettingDisabled is what gates the recovery call directly above, which
+    // settles an open round and credits its payout. A player who staked their
+    // last funds authenticates with balance 0, and on a platform that sends no
+    // ladder with an empty betLevels too, which is indistinguishable from `{}`
+    // on the fields the guard can see. Measured: that session settles today and
+    // is credited, and must keep doing so.
+    //
+    // So the judgement is made in sessionRecovery, which holds the whole
+    // response including minBet, and applied HERE, after settlement has already
+    // run. 2026-08-10.
+    if (get(authPublishedNothing)) {
+      evaluateLiveGuard(
+        (params.get('sessionID') !== null || params.get('session') !== null) && params.get('rgs_url') !== null,
+        true,
+        import.meta.env.DEV,
+      )
     }
     playBGM()
 

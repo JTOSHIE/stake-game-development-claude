@@ -40,6 +40,7 @@ import {
 } from './sessionRecovery.ts'
 import { balance, betAmount } from './gameStore.ts'
 import { rgsBetConfig } from './rgsBetConfig.ts'
+import { publishedNothing } from './authShape.ts'
 import { CURRENCY_SCALE } from '../utils/currency.ts'
 import type { PresentationScript } from '../services/roundInterpreter.ts'
 
@@ -338,6 +339,37 @@ checkThat('and renders exactly one recovery banner',
     state: { events: ORDINARY_EVENTS } }
   await recoverSession(false, stub, present)
   check('a recovered stake beats the operator default', get(betAmount), 20)
+}
+
+// ---------------------------------------------------------------------------
+// A 200 THAT CARRIED NO SESSION IS DISTINGUISHED FROM A BROKE PLAYER.
+//
+// authenticate defaults every missing field to zero, so `{}` produced a game
+// with a $0.00 balance, a disabled spin and NO banner. The fix must NOT simply
+// treat "balance 0" as broken: a player who staked their last funds is a valid
+// live session, and on a platform that sends no ladder their response is
+// indistinguishable from `{}` on every field except minBet. Getting this wrong
+// strands their money, because bettingDisabled gates the settlement path.
+{
+  check('an empty 200 published nothing', publishedNothing({}), true)
+  check('null published nothing', publishedNothing(null), true)
+
+  // NEGATIVE CONTROLS: every one of these is a REAL session that must keep
+  // settlement, and each is carried by a different single field.
+  check('a broke player with a real bet envelope is a session',
+    publishedNothing({ minBet: 0.1, maxBet: 100, betLevels: [], balance: 0, round: null }), false)
+  check('a ladder alone is a session',
+    publishedNothing({ minBet: 0, maxBet: 0, betLevels: [1, 2], balance: 0, round: null }), false)
+  check('a balance alone is a session',
+    publishedNothing({ minBet: 0, maxBet: 0, betLevels: [], balance: 25, round: null }), false)
+  check('an OPEN ROUND alone is a session, which is the money case',
+    publishedNothing({ minBet: 0, maxBet: 0, betLevels: [], balance: 0, round: { betID: 1 } }), false)
+  check('maxBet alone is a session',
+    publishedNothing({ minBet: 0, maxBet: 100, betLevels: [], balance: 0, round: null }), false)
+
+  // A negative balance or a NaN must not read as a session.
+  check('a NaN balance is not a session',
+    publishedNothing({ minBet: NaN, maxBet: 0, betLevels: [], balance: NaN, round: null }), true)
 }
 
 if (failures) { console.error(`\nSESSION RECOVERY: FAIL (${failures})`); process.exit(1) }

@@ -86,6 +86,7 @@ import type { OfficialRound } from '../services/rgsService'
 import { interpretEvents, type PresentationScript } from '../services/roundInterpreter'
 import { balance, betAmount } from './gameStore'
 import { rgsBetConfig, openingBet } from './rgsBetConfig'
+import { authPublishedNothing, publishedNothing } from './authShape'
 import { CURRENCY_SCALE } from '../utils/currency'
 import {
   readCheckpoint, clearCheckpoint, validateCheckpoint, type CheckpointRejection,
@@ -202,6 +203,12 @@ export async function recoverSession(
     const params = platform.parseSessionParams()
     const auth = await platform.authenticate(params)
     const round: OfficialRound | null = auth.round ?? null
+
+    // DID THE PLATFORM ACTUALLY SEND A SESSION? See stores/authShape.ts for why
+    // this judgement is made HERE and not folded into the live guard's
+    // authErrored flag: that flag also gates this very function, and this
+    // function is what settles an open round and credits its payout.
+    authPublishedNothing.set(publishedNothing(auth))
 
     // PUBLISH THE REST OF THE BETTING PARAMETERS, 2026-08-09.
     //
