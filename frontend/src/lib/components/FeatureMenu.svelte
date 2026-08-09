@@ -934,7 +934,22 @@
     padding: 0 12px; text-align: left;
   }
   .fm-paired-opt:first-child { border-right: 1px solid rgba(255, 255, 255, 0.12); }
-  .fm-paired-opt .fm-action { flex-direction: row; align-items: center; justify-content: space-between; margin-top: auto; }
+  /* At 320px each paired column carries about 86px of content, and neither
+     child of this row can shrink: .fm-cost is white-space:nowrap so its
+     min-content is its full text, and the control beside it is one unbreakable
+     token. In Finnish the row wants 115px (cost 28.6 + gap 6.4 + AKTIIVINEN
+     80.0) in an 85px box, so it overflowed 30px and laid the ACTIVE tag 5.3px
+     across the neighbouring Cruise cost line. In EVERY locale the same row
+     pushed SELECT 10.3px past the card face, whose clip-path clipped both the
+     button's paint AND its hit area. Wrapping is a no-op wherever the row
+     already fits, measured byte-identical at 425, 800, 1024 and 1200 and in the
+     Popout S mini profile, where .fm-action is flex:0 0 auto and sizes to
+     max-content. NOTE the similar rule for .fm-panel--mini is NOT this one and
+     must stay as it is. 2026-08-10. */
+  .fm-paired-opt .fm-action {
+    flex-direction: row; align-items: center; justify-content: space-between;
+    margin-top: auto; flex-wrap: wrap; row-gap: 4px;
+  }
 
   .fm-card-main { flex: 1; min-width: 0; text-align: left; }
   .fm-name-row { display: flex; align-items: center; gap: 0.5rem; }

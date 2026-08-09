@@ -140,6 +140,21 @@
     ? $errorMessage
         .replace(/\bInsufficient balance\b/gi, 'Insufficient coins')
         .replace(/\bbalance\b/gi, 'coins')
+        // 'fund' is row N of the platform's own prohibited-terms table in
+        // i18n/vocabulary.ts, with replacement 'balance'. rgsService's ERR_IPB
+        // reads "Insufficient balance. Please add funds to continue playing.",
+        // and that file is LOCKED, so the term is scrubbed here where the
+        // message renders. The chain already rewrote "Insufficient balance" and
+        // "balance", and left the rest of the sentence verbatim, so a social
+        // player hitting an insufficient balance read "add funds" on screen.
+        //
+        // 'coins' rather than the table's 'balance' because this chain's own
+        // established social rendering of 'balance' IS 'coins', one line above.
+        // So this is the composition fund -> balance -> coins, not a new choice,
+        // and it lands on wording already in the tree: SOCIAL_OVERRIDES carries
+        // `insufficientBalance: 'Insufficient coins. Please add coins.'`
+        // 2026-08-10.
+        .replace(/\bfunds?\b/gi, (m) => scrubCase(m, 'Coins', 'coins'))
         .replace(/\bbets?\b/gi, (m) => scrubCase(m, 'Play', 'play'))
         .replace(/\bpurchases?\b/gi, (m) => scrubCase(m, 'Request', 'request'))
         .replace(/\bbuy\b/gi, (m) => scrubCase(m, 'Get', 'get'))
