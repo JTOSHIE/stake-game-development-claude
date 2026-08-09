@@ -79,13 +79,34 @@ result.cases.unrestricted = { ...(await speedState()), autoplayOffered: await re
 await setFlags({ disabledTurbo: true })
 result.cases.turboBanned = { ...(await speedState()) }
 
-// UKGC-shaped: a minimum spin duration implies the fast-play ban.
-await setFlags({ minSpinMs: 2500 })
+// UKGC-shaped: a minimum round duration implies the fast-play ban.
+//
+// CORRECTED 2026-08-09. This used to inject `minSpinMs`, which is the name of
+// the DERIVED store's field, not the official flag. setFlags writes
+// `jurisdictionFlags`, the OFFICIAL contract, where the field is
+// `minimumRoundDuration`; the derived store maps one to the other. Injecting the
+// derived name therefore set nothing at all, and this proof had been reporting
+// pass:false against a game that was behaving correctly.
+await setFlags({ minimumRoundDuration: 2500 })
 result.cases.minSpin2500 = { ...(await speedState()) }
 
-// Autoplay capped at 25.
+// AUTOPLAY CAP: THERE IS NO OFFICIAL FLAG FOR IT, and asserting one is what made
+// this proof wrong for a second reason.
+//
+// responsibleGambling.ts states it at the field: "maxAutoplaySpins: no official
+// flag at the pin; always Infinity". TR-042 removed the invented flag name this
+// case was written against. Injecting `maxAutoplaySpins: 25` into the official
+// store does nothing, the cap stays Infinity, and every option is correctly
+// offered. The old assertion demanded ['10','25'] and so failed on correct
+// behaviour.
+//
+// The capping LOGIC is still live and still worth holding, so it is asserted
+// where it can actually be driven: rgAllowedAutoplayCounts takes an explicit cap
+// and is pinned in src/lib/stores/responsibleGambling.test.ts. What is asserted
+// HERE is the honest thing this page can observe: with no cap in the contract,
+// the full menu is offered.
 await setFlags({ maxAutoplaySpins: 25 })
-result.cases.autoplayCapped25 = { autoplayOffered: await readAutoMenu() }
+result.cases.autoplayNoOfficialCap = { autoplayOffered: await readAutoMenu() }
 
 const c = result.cases
 result.pass =
@@ -94,7 +115,9 @@ result.pass =
   c.minSpin2500.tier === 'normal' && c.minSpin2500.allDisabled === true &&
   c.unrestricted.autoplayOffered.includes('100') &&
   c.unrestricted.autoplayOffered.includes('∞') &&
-  JSON.stringify(c.autoplayCapped25.autoplayOffered.filter((t) => /^[0-9∞]+$/.test(t))) === JSON.stringify(['10', '25'])
+  // No official cap flag exists, so the full menu is correct here. The
+  // capping logic itself is pinned in responsibleGambling.test.ts.
+  c.autoplayNoOfficialCap.autoplayOffered.filter((t) => /^[0-9∞]+$/.test(t)).length >= 4
 
 writeFileSync(join(OUT, 'rg_enforcement_proof_2026-07-25.json'), JSON.stringify(result, null, 2))
 console.log(JSON.stringify(result, null, 2))

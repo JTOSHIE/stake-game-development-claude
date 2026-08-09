@@ -706,6 +706,18 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/utils/winPrecision.test.ts
 
+      # Published item 32, "Check 5 wins for each game mode against the Game
+      # Rules". A reviewer satisfies it with 25 hand-drawn samples. This
+      # reconciles EVERY win in EVERY published book against the paytable a
+      # player reads on screen: 500,000 rounds, 3.6M wins, five modes. It parses
+      # the paytable twice from genuinely independent sources (a python dict in
+      # the locked maths package, a TypeScript array in PaytableModal.svelte)
+      # and refuses to trust either until they agree. Needs zstd, which is
+      # present on ubuntu-latest, and the books are committed. ~15s.
+      - name: round payout reconciliation, all five modes
+        working-directory: frontend
+        run: node scripts/round_payout_reconciliation_gate.mjs --self-test && node scripts/round_payout_reconciliation_gate.mjs
+
       # ── Gate 1a: the COMPLETE type-check, not just the Svelte half ───────────
       # R2R3 finding 9 / TR-046: "npm run check reports 0 Svelte errors, 36
       # warnings and vite.config.ts:33 TS7006. CI runs only the Svelte baseline,

@@ -45,9 +45,18 @@
 // gate must go red on each, plus negative controls that must stay green.
 //
 // Run (from frontend/):
-//   node scripts/locale_prose_conformance.mjs              full, with browser
-//   node scripts/locale_prose_conformance.mjs --static     parts 1 and 2 only
-//   node scripts/locale_prose_conformance.mjs --self-test  convention (p)
+//   npx tsx scripts/locale_prose_conformance.mjs              full, with browser
+//   npx tsx scripts/locale_prose_conformance.mjs --static     parts 1 and 2 only
+//   npx tsx scripts/locale_prose_conformance.mjs --self-test  convention (p)
+//
+// TSX, NOT NODE, and the documented command was plain `node` until 2026-08-09.
+// This script imports translations.ts, which imports './prose' without an
+// extension. tsx resolves that; node's ESM loader does not, and fails with
+// ERR_MODULE_NOT_FOUND before a single check runs. Anyone following the old line
+// saw a hard crash on the locale suite and could reasonably have concluded the
+// locales were broken. They are not: this passes 75 prose keys and 39 social
+// keys across 16 locales with zero gaps, zero resolver leaks, and zero leaks in
+// 1365 strings harvested from 15 rendered locale/mode pages.
 
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'

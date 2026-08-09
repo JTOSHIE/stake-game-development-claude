@@ -163,11 +163,39 @@ async function run() {
       () => ![...document.querySelectorAll('[data-testid="freespins-overlay"]')].some((el) => !el.closest('.warm-mount')),
       { timeout: 40000 },
     )
-    // HudOverlay's WIN box count-up animates to the settled value (up to
-    // WIN_COUNTUP_MAX_MS=800ms) - give it time to actually finish before
-    // reading the final figure.
-    await page.waitForTimeout(1000)
-    const finalHudWin = await page.locator('[data-testid="hud-win"]').first().innerText()
+    // WAIT FOR THE VALUE TO STOP MOVING, not for a fixed timeout. Corrected
+    // 2026-08-09.
+    //
+    // This used to wait a flat 1000ms, on the stated grounds that the count-up
+    // runs "up to WIN_COUNTUP_MAX_MS=800ms". That is true of an ordinary spin
+    // and NOT of a feature total: the count-up duration is tiered by win size,
+    // so a large feature win keeps counting well past a second. This check had
+    // therefore been FAILING on a correct game, reading the HUD mid-animation
+    // and reporting the intermediate figure as the settled one.
+    //
+    // Instrumented before changing it, sampling every 500ms after the overlay
+    // left, on the same round the check drives:
+    //   t+500ms $163.20   t+1000ms $270.50   t+1500ms $330.52
+    //   t+2000ms $357.44  t+2500ms $363.69   t+3000ms $363.89
+    // and $363.89 from there to t+10000ms, which is the true total. Nothing was
+    // wrong except the wait.
+    //
+    // Polling for stability rather than raising the constant, so this cannot go
+    // stale again the next time a tier duration changes.
+    let finalHudWin = ''
+    {
+      const readHud = () => page.locator('[data-testid="hud-win"]').first().innerText()
+      let previous = null
+      let stableFor = 0
+      for (let i = 0; i < 40; i++) {          // 20s ceiling
+        await page.waitForTimeout(500)
+        const now = await readHud()
+        stableFor = now === previous ? stableFor + 1 : 0
+        previous = now
+        if (stableFor >= 2) break             // unchanged across 1s
+      }
+      finalHudWin = previous ?? await readHud()
+    }
     const finalExpected = Math.round((scriptData.totalWinCentibets / 100) * bet * 100) / 100
     assert(
       Math.abs(moneyToNumber(finalHudWin) - finalExpected) < 0.01,
