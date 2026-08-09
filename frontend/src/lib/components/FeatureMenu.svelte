@@ -21,9 +21,7 @@
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
-  import {
-    betAmount, currencyCode, isSpinning, balance, showPaytable,
-  } from '../stores/gameStore'
+  import { betAmount, currencyCode, isSpinning, balance, showPaytable, locale } from '../stores/gameStore'
   // R5/TR-013: the bet arrows here previously used gameStore's actions, which
   // operate on the hardcoded BET_LEVELS rather than the authenticated ladder.
   // Off-ladder, "+" dropped the bet to 0.10 and "-" did nothing. Both surfaces
@@ -66,7 +64,7 @@
 
   $: cur = $currencyCode || 'USD'
   const price = (cost: number) =>
-    formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), cur)
+    formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), cur, $locale)
   // OWNER AUDIT REMEDIATION A3: a persistent, always-visible resolved cost
   // for whatever standing mode is currently active (base/cruise/OVERBOOST -
   // OVERBOOST is itself a standingMode value, not a modifier layered on top,
@@ -77,7 +75,7 @@
   // inside a called function is invisible to it and never re-triggers this
   // line (confirmed the hard way: this exact bug shipped once already,
   // caught by the conformance suite's live-reactivity check, not by eye).
-  $: currentSpinCost = formatBalance(spinCostMicros($betAmount, $standingMode), cur)
+  $: currentSpinCost = formatBalance(spinCostMicros($betAmount, $standingMode), cur, $locale)
 
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.
@@ -492,7 +490,7 @@
                       on:click={() => activateBuy(m)}
                       disabled={$isSpinning || !$canAffordMode(m.serverMode)}
                       title={$shortfallFor(m.serverMode) > 0
-                        ? `${$tr('insufficientBalance')} (${formatBalance(Math.round($shortfallFor(m.serverMode) * CURRENCY_SCALE), $currencyCode || 'USD')})`
+                        ? `${$tr('insufficientBalance')} (${formatBalance(Math.round($shortfallFor(m.serverMode) * CURRENCY_SCALE), $currencyCode || 'USD', $locale)})`
                         : undefined}
                       data-testid="activate-{m.id}"
                     >{$tr('hudActivate')}</button>

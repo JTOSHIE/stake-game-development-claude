@@ -4,7 +4,7 @@
   // events (symbol, count, ways, pay), matching what actually paid.
   import { onDestroy } from 'svelte'
   import { tr } from '../i18n/tr'
-  import { activeWins, isSpinning, currencyCode } from '../stores/gameStore'
+  import { activeWins, isSpinning, currencyCode, locale } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
 
   // The tier symbols are IDs, identical in every language, so they stay a plain
@@ -79,7 +79,7 @@
 
   $: current = groups[cycleIndex] ?? null
   $: payLabel = current
-    ? formatWin(Math.round(current.payout * CURRENCY_SCALE), $currencyCode || 'USD')
+    ? formatWin(Math.round(current.payout * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
     : ''
 
   onDestroy(stopAll)

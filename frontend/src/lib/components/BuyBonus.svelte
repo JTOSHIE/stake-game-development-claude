@@ -41,7 +41,7 @@
   $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
   $: modeCost = modeCostFor(buyMode)
   $: priceMicros = spinCostMicros($betAmount, buyMode)
-  $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD')
+  $: priceLabel = formatBalance(priceMicros, $currencyCode || 'USD', $locale)
   // OWNER AUDIT REMEDIATION B4: the modal's own feature name/description
   // now come straight from FS_MODES (the single source of truth already
   // used by the FEATURES menu cards) instead of a single generic

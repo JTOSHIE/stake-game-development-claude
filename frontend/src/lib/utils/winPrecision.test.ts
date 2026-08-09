@@ -140,5 +140,38 @@ for (const [name, path] of files.slice(0, 3)) {
     offenders.join(',') || 'none', 'none')
 }
 
+// 9. EVERY MONEY FORMATTER CALL PASSES THE LAUNCH LOCALE.
+//
+// formatBalance/formatWin/formatBalanceCompact take the locale as their THIRD
+// argument. Omitting it does not fail loudly: toLocaleString falls back to the
+// runtime default, which is the player's BROWSER locale. So a session launched
+// with lang=en on a German machine rendered an English label beside a German
+// number, "BALANCE $100,00", and the session panel printed the same quantity two
+// ways in adjacent rows because two of its three rows did pass it.
+//
+// Enumerated, for the same reason as check 8: a call site added without the
+// argument is silent, and pattern-matching on names is what let the last one
+// through.
+{
+  const dir = 'src/lib/components'
+  const CALL = /\bformat(?:Balance|Win|BalanceCompact)\s*\(/
+  const offenders: string[] = []
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.svelte')) continue
+    const src = readFileSync(`${dir}/${f}`, 'utf8')
+    // Join wrapped calls so a multi-line call is judged whole.
+    const flat = src.replace(/\(\s*\n\s*/g, '(').replace(/,\s*\n\s*/g, ', ')
+    for (const line of flat.split('\n')) {
+      if (!CALL.test(line)) continue
+      if (/^\s*(\/\/|\*)/.test(line) || /^import /.test(line)) continue
+      // ReplayMode legitimately uses params.lang, its own resolved locale.
+      if (/\$locale|params\.lang|localeTag/.test(line)) continue
+      offenders.push(`${f}: ${line.trim().slice(0, 60)}`)
+    }
+  }
+  check('every money formatter call passes a locale',
+    offenders.join(' | ') || 'none', 'none')
+}
+
 if (failures) { console.error(`\nWIN PRECISION: FAIL (${failures})`); process.exit(1) }
 console.log('\nWIN PRECISION: PASS (sub-cent exact, ordinary unchanged, placement kept, count-up stable)')

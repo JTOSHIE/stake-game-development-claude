@@ -134,7 +134,7 @@
     // the total beside it moved by $0.004. Missed in the first sub-cent pass
     // because that pass grepped for readouts NAMED like wins and this one is
     // called fmt(). 2026-08-09.
-    return formatWin(centibetsToMicros(cb), $currencyCode || 'USD')
+    return formatWin(centibetsToMicros(cb), $currencyCode || 'USD', $locale)
   }
 
   function clear() {

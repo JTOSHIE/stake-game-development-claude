@@ -10,7 +10,7 @@
   // so a new skin is one scheme block; base and Overdrive states are supported.
   // Fonts are the globally self-hosted Orbitron (@fontsource, see main.ts), no
   // external font CDN (Stake Engine compliance).
-  import { showPaytable, betAmount, currencyCode } from '../stores/gameStore'
+  import { showPaytable, betAmount, currencyCode, locale } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
@@ -143,13 +143,13 @@
   }))
 
   // Buy price, 100x current bet, only meaningful where the buy is not disabled.
-  $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 
   // Bet Modes section, every mode priced against the current bet, straight from
   // the single source of truth (config/fsModes.ts). Placeholder modes (maths not
   // yet shipped) are tagged "coming soon"; RTP is the same across all modes.
   $: modePrice = (cost: number) =>
-    formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), $currencyCode || 'USD')
+    formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 </script>
 
 <svelte:window on:keydown={handleKeydown} />

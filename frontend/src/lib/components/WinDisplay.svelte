@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { winAmount, betAmount, isWincap, scatterCount, currencyCode } from '../stores/gameStore'
+  import { winAmount, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { onDestroy } from 'svelte'
@@ -89,7 +89,7 @@
 
     <!-- Count-up amount -->
     <div class="win-amount">
-      {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, undefined, null, winDigits)}
+      {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)}
     </div>
 
   </div>

@@ -17,7 +17,7 @@
   // centrepiece per the brief).
   import { onMount } from 'svelte'
   import { tr } from '../i18n/tr'
-  import { betAmount, currencyCode } from '../stores/gameStore'
+  import { betAmount, currencyCode, locale } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
 
@@ -52,6 +52,7 @@
   $: totalWinLabel = formatWin(
     Math.round((runningTotalCentibets / 100) * $betAmount * CURRENCY_SCALE),
     $currencyCode || 'USD',
+    $locale,
   )
 </script>
 

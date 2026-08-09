@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
+  import { winMultiplier, winAmount, isSpinning, currencyCode, locale } from '../stores/gameStore'
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
 
   $: isActive = $winAmount > 0 && !$isSpinning
@@ -12,7 +12,7 @@
   // is exactly the input that overflows. Now the one canonical formatter, like
   // every other money readout in the build. QUALITY_CHARTER.md Q-11.
   $: amtText  = $winAmount > 0
-    ? formatWin(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
+    ? formatWin(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
     : ''
 </script>
 

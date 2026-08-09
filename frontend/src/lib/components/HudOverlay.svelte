@@ -282,12 +282,12 @@
   // places it, exactly as formatBalance() does for every other money readout.
   $: lossLimitSymbol   = currencySymbolFor($currencyCode || 'USD')
   $: lossLimitTrailing = currencySymbolTrailing($currencyCode || 'USD')
-  $: balanceLabel = formatWin(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: betLabel     = formatWin(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: balanceLabel = formatWin(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+  $: betLabel     = formatWin(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
   // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed
   // here rather than inside the action so both forms come from the one currency
   // module and cannot disagree about the symbol, the locale or the code.
-  $: balanceCompact = formatBalanceCompact(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: balanceCompact = formatBalanceCompact(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 
   // HUD win count-up (2026-07-14b, ITEM B): every win ticks the HUD figure up
   // incrementally rather than jumping straight to the final value.
@@ -320,8 +320,8 @@
   // Deriving per frame makes the readout flicker between two and four places for
   // the whole count-up; measured before this landed.
   $: winDigits = winFractionDigits(Math.round($winAmount * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: winLabel = formatWin(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD', undefined, null, winDigits)
-  $: winCompact = formatBalanceCompact(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD')
+  $: winLabel = formatWin(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD', $locale, null, winDigits)
+  $: winCompact = formatBalanceCompact(Math.round($sharedWinCountUp * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 </script>
 
 {#if portrait}

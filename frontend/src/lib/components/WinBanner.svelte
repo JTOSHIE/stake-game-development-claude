@@ -216,7 +216,7 @@
   // otherwise the shared $winAmount), never from the eased frame. See HudOverlay.
   $: settledAmount = amount === null ? $winAmount : amount
   $: amountDigits = winFractionDigits(Math.round(settledAmount * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: amountLabel = formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', undefined, null, amountDigits)
+  $: amountLabel = formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale, null, amountDigits)
   // Split for the per-digit boxes below. Derived rather than done in the
   // template so the character list is computed once per value change.
   $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))
@@ -263,7 +263,7 @@
     ? sv(t($locale, 'featurePrice', $isSocial ? 'social' : 'real'), $isSocial)
     : ''
   $: featurePriceValue = $boughtRound
-    ? formatBalance($boughtRound.priceMicros, $currencyCode || 'USD')
+    ? formatBalance($boughtRound.priceMicros, $currencyCode || 'USD', $locale)
     : ''
 </script>
 

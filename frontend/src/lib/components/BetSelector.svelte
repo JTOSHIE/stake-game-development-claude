@@ -50,7 +50,7 @@
    * sixteen times in a column.
    */
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import { betAmount, balance, currencyCode } from '../stores/gameStore'
+  import { betAmount, balance, currencyCode, locale } from '../stores/gameStore'
   import { activeBetLevels, setBetLevel } from '../stores/betLadder'
   import { standingMode } from '../stores/betMode'
   import { spinCostMicros } from '../stores/buyAffordability'
@@ -73,9 +73,9 @@
     : 1
   $: anteActive = Math.abs(costMultiplier - 1) > 0.0001
   $: effectiveLabel = formatBalance(
-    Math.round(spinCostMicros($betAmount, $standingMode)), $currencyCode || 'USD')
+    Math.round(spinCostMicros($betAmount, $standingMode)), $currencyCode || 'USD', $locale)
 
-  const money = (v: number) => formatBalance(Math.round(v * CURRENCY_SCALE), $currencyCode || 'USD')
+  const money = (v: number) => formatBalance(Math.round(v * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 
   function choose(level: number): void {
     setBetLevel(level)
