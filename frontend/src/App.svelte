@@ -829,6 +829,12 @@
       playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
       console.error('[Buy error]', err)
+      // Same clear-down as handleSpin: a failed purchase must not leave autoplay
+      // armed with a counter nothing will advance.
+      if ($isAutoPlay) {
+        isAutoPlay.set(false)
+        autoPlayCount.set(0)
+      }
     } finally {
       // Only fires when the settle point above was never reached: a throw, or an
       // early return. Without it a failed purchase would leave the player's
@@ -1725,6 +1731,21 @@
       }
     } catch (err) {
       console.error('[Spin error]', err)
+      // STOP AUTOPLAY ON A FAILED ROUND, 2026-08-09.
+      //
+      // The autoplay continuation that decrements the counter and schedules the
+      // next spin lives inside the try, so a throw skipped it entirely and left
+      // autoplay ARMED with a live, non-zero count and nothing to advance it.
+      // The session did not end, it hung: the counter sat on screen implying
+      // spins were still coming.
+      //
+      // The affordability guard above already does this for the "cannot afford"
+      // path. This is the same clear-down for the "wallet call failed" path,
+      // which is the one a player actually meets when a connection drops.
+      if ($isAutoPlay) {
+        isAutoPlay.set(false)
+        autoPlayCount.set(0)
+      }
     } finally {
       // Fires only when settleRound never ran: a throw, or an early return. A
       // failed spin must not leave the stake visibly gone for a round that

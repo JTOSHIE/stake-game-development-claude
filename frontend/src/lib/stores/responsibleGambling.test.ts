@@ -136,6 +136,31 @@ check('disabledAutoplay: switches the RG layer on', get(rgJurisdiction).rgEnable
 // ── turbo ban ───────────────────────────────────────────────────────────────
 // Previously turboDisabled had ZERO readers: the flag was correct and the
 // control cycled anyway.
+// AUTOPLAY MUST NOT SURVIVE A FAILED ROUND. Added 2026-08-09.
+//
+// The continuation that decrements the counter and schedules the next spin lives
+// INSIDE the try block, so a throw skipped it and left autoplay armed with a
+// live, non-zero count and nothing to advance it. The session did not end, it
+// hung, with the counter still on screen implying spins were coming.
+//
+// ASSERTED AGAINST SOURCE, and the limit is stated rather than glossed: I could
+// not drive a real wallet failure in the harness. Mock mode does not use fetch
+// for the round, so breaking fetch changes nothing, and no other lever forces
+// the throw from outside. The affordability path that shares this clear-down IS
+// proven behaviourally elsewhere. This asserts the reader exists in both
+// handlers, which is the failure mode that actually occurred: it was absent.
+{
+  const app = readFileSync('src/App.svelte', 'utf8')
+  const catches = app.split(/\} catch \(err\) \{/).slice(1)
+  checkThat('both round handlers have a catch', catches.length === 2)
+  checkThat('and each stops autoplay rather than leaving it armed',
+    catches.every((body) => {
+      const upToFinally = body.split('} finally {')[0]
+      return /isAutoPlay\.set\(false\)/.test(upToFinally)
+        && /autoPlayCount\.set\(0\)/.test(upToFinally)
+    }))
+}
+
 jurisdictionFlags.set({})
 forceNormalSpeed()
 cycleSpeed()
