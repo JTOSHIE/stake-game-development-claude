@@ -94,8 +94,8 @@ try {
 } catch (e) {
   console.error('PROOF FAILED:', e)
   if (browser) await browser.close().catch(() => {})
-  server.kill('SIGTERM')
+  server.close()   // startStaticServer returns a server with close(), not a child process
   process.exit(1)
 }
-server.kill('SIGTERM')
+server.close()   // startStaticServer returns a server with close(), not a child process
 process.exit(0)

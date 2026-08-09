@@ -204,7 +204,7 @@ async function run() {
 
     await browser.close()
   } finally {
-    preview.kill()
+    killPreview()   // startPreview returns the shared server; its method is close()
   }
 
   const allPass = Object.values(checks).every((c) => c.pass)

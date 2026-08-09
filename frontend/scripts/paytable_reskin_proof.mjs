@@ -40,19 +40,25 @@ function waitForServer(url, timeoutMs = 20000) {
 }
 
 async function openPaytable(page) {
-  // Primary: HUD hamburger -> Paytable menu item.
-  const burger = page.locator('.hamburger-btn')
-  if (await burger.count() > 0) {
-    await burger.first().click({ timeout: 3000 }).catch(() => {})
-    await page.waitForTimeout(250)
-    const item = page.locator('.hud-menu-item', { hasText: /paytable/i })
-    if (await item.count() > 0) { await item.first().click({ timeout: 3000 }).catch(() => {}) }
-  }
-  if (await page.locator('.fs-pt-body').count() === 0) {
-    // Fallback: any visible control mentioning paytable.
-    const any = page.getByText(/paytable/i)
-    if (await any.count() > 0) await any.first().click({ timeout: 3000 }).catch(() => {})
-  }
+  // STRUCTURAL HOOKS, not a class name that has since been renamed and not an
+  // English label. Corrected 2026-08-10.
+  //
+  // This waited on `.hamburger-btn`, which exists NOWHERE in src: the class was
+  // renamed and the proof was never updated, so the menu never opened and it
+  // timed out 6000ms later on `.fs-pt-body`, a selector that is perfectly valid.
+  // The fallback then matched `/paytable/i` as TEXT, which only works in
+  // English; paytable_card_fill_gate already carries a comment explaining why
+  // that is wrong and uses the testid instead. This is that approach.
+  await page.evaluate(() => {
+    const menu = document.querySelector('[data-testid="hud-menu"], [data-testid="mini-menu"]')
+    if (menu) menu.click()
+  })
+  await page.waitForTimeout(250)
+  await page.evaluate(() => {
+    // The paytable is the FIRST item in every one of these menus.
+    const it = document.querySelector('.hud-menu-item')
+    if (it) it.click()
+  })
   await page.waitForSelector('.fs-pt-body', { timeout: 6000 })
 }
 
@@ -95,8 +101,8 @@ try {
 } catch (e) {
   console.error('PROOF FAILED:', e)
   if (browser) await browser.close().catch(() => {})
-  server.kill('SIGTERM')
+  server.close()   // startStaticServer returns a server with close(), not a child process
   process.exit(1)
 }
-server.kill('SIGTERM')
+server.close()   // startStaticServer returns a server with close(), not a child process
 process.exit(0)

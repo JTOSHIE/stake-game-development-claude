@@ -66,8 +66,15 @@ try {
 
   // 3) Jump to the paytable BET MODES section via the menu's BET MODES button.
   await page.locator('[data-testid="open-bet-modes-info"]').click({ timeout: 4000 })
-  await page.waitForSelector('.fs-modes', { timeout: 6000 })
-  await page.locator('.fs-modes').evaluate((el) => el.scrollIntoView({ block: 'center' }))
+  // `.fs-mode-cards`, not `.fs-modes`. Corrected 2026-08-10.
+  //
+  // The class was renamed in PaytableModal at some point and this proof was
+  // never updated, so it timed out at 6000ms waiting for a selector that no
+  // longer exists ANYWHERE in src. It has been failing since that rename, for a
+  // reason that had nothing to do with the surface it photographs. Confirmed by
+  // grep: zero occurrences of `fs-modes` in any component.
+  await page.waitForSelector('.fs-mode-cards', { timeout: 6000 })
+  await page.locator('.fs-mode-cards').evaluate((el) => el.scrollIntoView({ block: 'center' }))
   await page.waitForTimeout(500)
   await page.screenshot({ path: join(OUT, 'fsmenu_betmodes.png') })
   console.log('captured fsmenu_betmodes.png')
@@ -77,8 +84,8 @@ try {
 } catch (e) {
   console.error('PROOF FAILED:', e)
   if (browser) await browser.close().catch(() => {})
-  server.kill('SIGTERM')
+  server.close()   // startStaticServer returns a server with close(), not a child process with kill()
   process.exit(1)
 }
-server.kill('SIGTERM')
+server.close()   // startStaticServer returns a server with close(), not a child process with kill()
 process.exit(0)

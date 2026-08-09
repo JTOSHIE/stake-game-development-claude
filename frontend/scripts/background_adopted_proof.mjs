@@ -79,13 +79,12 @@ const freePort = () => new Promise((res) => {
 // TR-101, option (c): served in-process, no child to orphan.
 const server = await startStaticServer(join(import.meta.dirname, '..', 'dist'))
 const port = server.port
-await new Promise((res, rej) => {
-  let done = false
-  preview.stdout.on('data', (d) => {
-    if (!done && String(d).includes('Local')) { done = true; res() }
-  })
-  setTimeout(() => { if (!done) rej(new Error('vite preview did not start')) }, 20000)
-})
+// The readiness wait that used to live here watched a SPAWNED vite's stdout for
+// "Local". TR-101 replaced the child process with an in-process server, and the
+// wait was left behind referencing a `preview` that no longer exists, so this
+// script died with `ReferenceError: preview is not defined` before it opened a
+// browser. startStaticServer resolves once it is listening, so there is nothing
+// to wait for. Corrected 2026-08-10.
 
 const browser = await chromium.launch()
 const rows = []
@@ -138,7 +137,7 @@ for (const p of PRESETS) {
 }
 
 await browser.close()
-preview.kill('SIGTERM')
+server.close()   // in-process server: close(), not a child process kill()
 
 const bad = rows.filter((r) => !r.ok)
 writeFileSync(join(QA, 'background_adopted_proof.json'), JSON.stringify({
