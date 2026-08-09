@@ -1437,14 +1437,43 @@
     // Standing mode for normal spins (Normal/Cruise) plus the OVERBOOST
     // enhancer toggle - both live in the one standingMode store (FeatureMenu's
     // selectStanding()/toggleEnhancer() write it; see betMode.ts). The locked
-    // canSpin guard only ever checks affordability of the 1x base bet, so any
-    // >1x mode (OVERBOOST, 1.25x) needs its own affordability guard here,
-    // before the spin lock engages - mirrors handleBuy's per-tier cost.
+    // AFFORDABILITY IS CHECKED AT THE ACTION, UNCONDITIONALLY. Rewritten
+    // 2026-08-09 against the published item "Insufficient balance bets do not
+    // send a play request to the RGS".
+    //
+    // The old line was `if (cost > bet && $balance < cost) return`, which is a
+    // guard that disables ITSELF on the commonest path: for base and cruise the
+    // mode cost is 1.0x, so `cost > bet` is FALSE and the affordability test was
+    // never evaluated at all.
+    //
+    // THE BUTTON SAVED US, AND ONLY THE BUTTON. Measured: with a zero balance
+    // the SPIN control is genuinely disabled and the spacebar route sends
+    // nothing, so a player clicking cannot overdraw. AUTOPLAY does not go
+    // through the button. When a balance runs out mid-autoplay, which is the
+    // ordinary way an autoplay session ends, the next iteration reached the
+    // wallet with an unfunded bet, the RGS answered ERR_IPB, and autoplay froze
+    // holding a non-zero counter.
+    //
+    // Compared in INTEGER MICROS rather than in display floats, per the integer
+    // micros rule: `$balance < cost` on floats can pass a bet the wallet cannot
+    // cover by a rounding unit.
     const mode = $standingMode
     const bet  = $betAmount
     const costMicros = spinCostMicros(bet, mode)
     const cost = costMicros / CURRENCY_SCALE
-    if (cost > bet && $balance < cost) return
+    if (Math.round($balance * CURRENCY_SCALE) < costMicros) {
+      // Autoplay must be STOPPED here, not merely skipped. This early return
+      // bypasses the whole try block, and the `if ($isAutoPlay)` continuation
+      // that decrements the counter and applies the stop conditions lives
+      // inside it, so returning without this left autoplay armed with a
+      // non-zero count and no way to advance: the session hung rather than
+      // ending. Measured before the fix.
+      if ($isAutoPlay) {
+        isAutoPlay.set(false)
+        autoPlayCount.set(0)
+      }
+      return
+    }
     isSpinning.set(true)   // disable spin button immediately, before async work begins
     resetWin()
     lastRoundHadFeature = false

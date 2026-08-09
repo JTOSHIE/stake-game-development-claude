@@ -84,7 +84,8 @@ import {
 } from '../services/rgsService'
 import type { OfficialRound } from '../services/rgsService'
 import { interpretEvents, type PresentationScript } from '../services/roundInterpreter'
-import { balance } from './gameStore'
+import { balance, betAmount } from './gameStore'
+import { CURRENCY_SCALE } from '../utils/currency'
 import {
   readCheckpoint, clearCheckpoint, validateCheckpoint, type CheckpointRejection,
 } from './presentationCheckpoint'
@@ -212,6 +213,31 @@ export async function recoverSession(
     }
 
     activeRound.set({ betID: round.betID, active: round.active, state: round.state })
+
+    // RESTORE THE STAKE BEFORE ANYTHING PRESENTS, 2026-08-09.
+    //
+    // Published checklist item "Active rounds restore the bet amount from the
+    // authenticate response". `round.amount` is the stake in micros and it was
+    // carried all the way here and then never read: a repo-wide search for it
+    // in production code returned nothing.
+    //
+    // THE BET READOUT IS THE SMALL HALF. The presentation converts the round's
+    // centibet awards into MONEY using whatever `betAmount` currently holds, so
+    // a player who reloads mid-round on a $5.00 stake was shown their own round
+    // played back with every figure computed from the $1.00 default: a fifth of
+    // the real amounts, on a round whose outcome was already settled. Restoring
+    // the stake fixes the readout and the arithmetic in one write.
+    //
+    // It must land HERE, before the presentation is built and before the resume
+    // offer is awaited, or the first frames render against the wrong bet.
+    //
+    // Guarded rather than unconditional: `amount` is optional in the pinned
+    // OfficialRound type, and a zero or absent value would silently zero every
+    // figure the presentation derives. Absent means "keep what we have", which
+    // is the current behaviour, not a regression.
+    if (typeof round.amount === 'number' && Number.isFinite(round.amount) && round.amount > 0) {
+      betAmount.set(round.amount / CURRENCY_SCALE)
+    }
 
     // 1. EXTRACT, using the service's own reader rather than a second copy.
     const events = _extractRoundEvents(round.state)

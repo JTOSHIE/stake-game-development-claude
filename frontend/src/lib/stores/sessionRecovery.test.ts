@@ -38,7 +38,8 @@ import {
   recoverSession, activeRound, resetSessionRecovery,
   recoveryBannerVisible, dismissRecoveryBanner,
 } from './sessionRecovery.ts'
-import { balance } from './gameStore.ts'
+import { balance, betAmount } from './gameStore.ts'
+import { CURRENCY_SCALE } from '../utils/currency.ts'
 import type { PresentationScript } from '../services/roundInterpreter.ts'
 
 const seq: string[] = []
@@ -253,6 +254,48 @@ checkThat('and a real resume offer, so the cursor is not silently always decline
   /function offerResume\(/.test(app) && /on:resume=/.test(app) && /on:restart=/.test(app))
 checkThat('and renders exactly one recovery banner',
   (app.match(/data-testid="recovery-banner"/g) ?? []).length === 1)
+
+// ---------------------------------------------------------------------------
+// THE STAKE IS RESTORED FROM THE AUTHENTICATE RESPONSE, 2026-08-09.
+//
+// Published item: "Active rounds restore the bet amount from the authenticate
+// response". `round.amount` was carried into recovery and never read.
+//
+// This asserts on MONEY, not just on the readout, because the readout is the
+// small half: presentRecoveredRound and FreeSpinsPresentation convert the
+// round's centibet awards into currency using whatever betAmount holds, so a
+// $5.00 round recovered against the $1.00 default was played back showing a
+// fifth of the real figures.
+{
+  reset()
+  betAmount.set(1.00)
+  authRound = {
+    betID: 77, active: true, mode: 'base', amount: 5 * CURRENCY_SCALE,
+    state: { events: ORDINARY_EVENTS },
+  }
+  const out = await recoverSession(false, stub, present)
+  check('an active round is recovered', out.kind !== 'none', true)
+  check('the stake is restored from round.amount, not left at the default',
+    get(betAmount), 5)
+  // 390 centibets is 3.90x. At the restored $5.00 stake that is $19.50; at the
+  // $1.00 default it would have rendered $3.90.
+  check('so the presented win resolves to the real money amount',
+    Math.round((390 / 100) * get(betAmount) * 100) / 100, 19.50)
+
+  // NEGATIVE CONTROL. An absent or zero amount must leave the bet alone rather
+  // than zeroing every figure the presentation derives from it.
+  reset()
+  betAmount.set(2.50)
+  authRound = { betID: 78, active: true, mode: 'base', state: { events: ORDINARY_EVENTS } }
+  await recoverSession(false, stub, present)
+  check('an absent round.amount leaves the current bet untouched', get(betAmount), 2.50)
+
+  reset()
+  betAmount.set(2.50)
+  authRound = { betID: 79, active: true, mode: 'base', amount: 0, state: { events: ORDINARY_EVENTS } }
+  await recoverSession(false, stub, present)
+  check('a zero round.amount leaves the current bet untouched', get(betAmount), 2.50)
+}
 
 if (failures) { console.error(`\nSESSION RECOVERY: FAIL (${failures})`); process.exit(1) }
 console.log('\nSESSION RECOVERY: PASS')
