@@ -39,7 +39,7 @@
         >
           <div class="card-img">
             <img
-              src="{theme.assetBase}/backgrounds/bg-1.jpg"
+              src="{theme.assetBase}/backgrounds/bg_base.jpg"
               alt="{theme.name}"
               on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
             />

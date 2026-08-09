@@ -47,7 +47,18 @@ export const themeAssets = derived(activeTheme, ($t) => {
       S:      `${b}/symbols/scatter.png`,
     },
     // Background
-    background:      `${b}/backgrounds/bg-1.jpg`,
+    // REPOINTED 2026-08-09. This derived `bg-1.jpg` for EVERY theme, including
+    // future-spinner, whose real backdrop is the adopted `bg_base.jpg` rendered
+    // directly in App.svelte. So the field named a file the shipping theme never
+    // used, and that file was 886KB of machine-generated cityscape carrying
+    // legible rival casino signage ("JACKPOT CITY", "CYBER JOKER SLOTS",
+    // "NEON REELS") into an artefact uploaded to Stake. It could not render in
+    // production, because the {:else} branch that consumes this field only runs
+    // for non-future-spinner themes and production forces future-spinner, but
+    // "does not contain" is about the bundle rather than about what paints.
+    // Same class as the `branding/` directory deleted under TR-047 and the
+    // dangling `backgroundVideo` removed below.
+    background:      `${b}/backgrounds/bg_base.jpg`,
     // `backgroundVideo` REMOVED 2026-07-28 (asset reference gate, JOB 1). It
     // derived `${b}/backgrounds/bg-1.mp4` for every theme, and
     // `build_diet_verify.mjs` prunes that exact path BY NAME because it is

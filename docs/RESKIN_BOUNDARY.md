@@ -133,9 +133,15 @@ heavier PNGs costing frames), `build_diet_verify.mjs`, `dist_hygiene_gate.mjs`,
 **(a)** `frontend/public/assets/themes/future-spinner/backgrounds/{bg_base.jpg, bg_overdrive.jpg, bg-1.jpg, bg-1.mp4}`.
 
 **(b)** `bg_base.jpg` JPEG 1920x1080 RGB, 266.8 KB. `bg_overdrive.jpg` JPEG 1920x1080 RGB,
-262.9 KB. **`bg-1.jpg` is not a JPEG**: `file` reports `PNG image data, 826 x 461, 8-bit/color
-RGBA`. The name lies about the format. `bg-1.mp4` is retired from the served build
-(`frontend/vite.config.ts:13-15`).
+262.9 KB. `bg-1.mp4` is retired from the served build (`frontend/vite.config.ts:13-15`).
+
+**bg-1.jpg IS GONE, 2026-08-09, and the format lie recorded here was the least of it.** This
+paragraph used to note that the file named .jpg was really a PNG, 826 x 461. True, and it was
+the wrong thing to notice. Nobody had opened the image. It was a machine-generated cityscape
+carrying legible neon signage for rival gambling brands, JACKPOT CITY among them, shipping
+886KB into an artefact uploaded to Stake. It could not paint in production, since the branch
+consuming it runs only for non-default themes, but the published criterion is worded about
+what a submission CONTAINS. Deleted; every theme's background is now named `bg_base.jpg`.
 
 **(c)** Two paths, one current. Historic: `scripts/assets/backgrounds.py` extracted two
 frames from `assets/videos/bg_animated_loop.mp4` at t=22s and t=7s with two absolute grades;
@@ -561,7 +567,8 @@ would mislead anyone bringing new art in. Related: `manifest.json`'s `storefront
 declares slots whose own `_doc` admits the values are provisional defaults rather than a
 platform-published number, and states the block is not read.
 
-Also in this class: `bg-1.jpg` is a PNG (2.2).
+Also in this class: bg-1.jpg was a PNG behind a .jpg name (2.2). That file was deleted on
+2026-08-09 for a much larger reason than its extension; see 2.2.
 
 ---
 
