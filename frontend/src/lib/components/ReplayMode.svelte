@@ -363,13 +363,26 @@
         active={featureActive}
         on:complete={onFeatureComplete}
       />
+      <!-- THE POD BELONGS TO THE GRID BOX. WinPod is position:absolute with
+           `right: -220px; top: 50%`, and its own comment says those resolve
+           against the grid. Rendered inside `.win-area` they did not: that is a
+           200x56 box BELOW the grid, so `right:-220px` put the pod 188px INSIDE
+           the 616px grid's span and `top:50%` centred 320px of pod on 56px of
+           readout. Measured after driving a replay to completion: 188x108 over
+           the reel grid and 46x62 over the whole height of REPLAY AGAIN, and at
+           Popout S it pushed document scrollWidth to 520 against a 400px
+           viewport. replay_fit_gate asserts that overflow but stops at the READY
+           phase, where .win-area is not mounted, so it could not see it.
+           2026-08-10. -->
+      {#if phase === 'complete' || phase === 'playing'}
+        <WinPod />
+      {/if}
     </div>
 
     <!-- Win amount display once replay has played out -->
     {#if phase === 'complete' || phase === 'playing'}
       <div class="win-area">
         <WinDisplay />
-        <WinPod />
       </div>
     {/if}
 

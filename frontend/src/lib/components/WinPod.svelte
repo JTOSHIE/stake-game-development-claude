@@ -36,7 +36,7 @@
 
 <style>
   .win-pod {
-    position: absolute;   /* MUST be absolute relative to .grid-wrapper */
+    position: absolute;   /* containing block: the grid box (.grid-area in ReplayMode) */
     right: -220px;
     top: 50%;
     transform: translateY(-50%);
@@ -59,7 +59,17 @@
      amount is still shown in WinDisplay, and the pod is position:absolute so
      hiding it does not affect the grid centring. It stays visible at the
      landscape popout (400x225, 800x450) and desktop (1200x675) sizes. */
-  @media (orientation: portrait) {
+  /* NARROW LANDSCAPE TOO, not just portrait. The pod sits OUTSIDE the grid's
+     right edge and needs 220px of clear room there. The grid is 616px and
+     centred, so its right edge is viewport/2 + 308 and the pod's is 220px beyond
+     that: it only fits from 1056px up. The cut is 1120px rather than 1056px so a
+     classic non-overlay scrollbar cannot eat the margin; measured on dist, at
+     1120 the pod spans 888..1088 with 32px to spare and at 1119 it is hidden.
+     Below the cut it had nowhere to go but on top of the reel grid and the
+     REPLAY AGAIN button, which is the defect this replaces. Popout S, Popout L
+     and Laptop therefore show the grid and the WinDisplay readout without the
+     pod, which loses no information: the amount is in WinDisplay. 2026-08-10. */
+  @media (orientation: portrait), (max-width: 1119px) {
     .win-pod {
       display: none;
     }
