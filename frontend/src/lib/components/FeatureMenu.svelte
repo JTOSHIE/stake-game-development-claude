@@ -63,7 +63,22 @@
   let open = false
 
   $: cur = $currencyCode || 'USD'
-  const price = (cost: number) =>
+  // REACTIVE, not `const`. Corrected 2026-08-10.
+  //
+  // As a plain const this closure was created ONCE and never recomputed, so the
+  // buy cards quoted a price from whatever the bet happened to be when the menu
+  // first rendered. Measured with real clicks on the in-menu stepper, no store
+  // injection: stepping the bet 1.00 -> 0.50 -> 0.20 -> 0.10 left "Buy Overdrive
+  // 100x · $100.00" unchanged at every step. At 0.10 the real price is $10.00,
+  // so the card overstated the cost of a purchase TENFOLD, on the control the
+  // player clicks to spend.
+  //
+  // A template call site cannot rescue it: Svelte 5.45 compiles `{price(1)}`
+  // against a const to `() => ($.untrack(() => price(1)))`, deliberately
+  // suppressing dependency tracking. The `$:` form compiles with $betAmount,
+  // cur and $locale hoisted into the dependency list, which is why this is the
+  // fix rather than a call-site change.
+  $: price = (cost: number) =>
     formatBalance(Math.round($betAmount * cost * CURRENCY_SCALE), cur, $locale)
   // OWNER AUDIT REMEDIATION A3: a persistent, always-visible resolved cost
   // for whatever standing mode is currently active (base/cruise/OVERBOOST -
