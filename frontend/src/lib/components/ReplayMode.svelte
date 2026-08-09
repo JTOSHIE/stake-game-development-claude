@@ -56,6 +56,29 @@
   // currency at module load, before mount, which closes that frame.
   const initialMode: GameMode = socialAtBoot ? 'social' : 'real'
 
+  // FIT THE GRID TO THE VIEWPORT, 2026-08-09.
+  //
+  // Published item "Supports Replays in Popout S view". GameGrid is a FIXED
+  // 616x412 canvas. The GAME route handles that by scaling a fixed-size wrapper
+  // through `--S`, computed in JS (App.svelte). The replay route never mirrored
+  // it, so at Popout S (400x225) the grid laid out at its natural 616px inside a
+  // 400px viewport: measured left -108, right 508, 64.9 per cent visible, and
+  // because it is centred there is NO scroll position that shows all five reels.
+  //
+  // A CSS-only `min(1, calc(...))` was tried first and is a proven no-op, which
+  // is why this computes the factor in script and why the fix was measured
+  // rather than read.
+  const GRID_W = 616
+  const GRID_H = 412
+  let replayFit = 1
+  function recomputeFit(): void {
+    if (typeof window === 'undefined') return
+    // 2rem of breathing room, matching the container's own padding.
+    const avail = Math.max(0, window.innerWidth - 32)
+    replayFit = Math.min(1, avail / GRID_W)
+  }
+  if (typeof window !== 'undefined') recomputeFit()
+
   let params: ReplayParams | null = null
   let response: ReplayResponse | null = null
   let phase: 'loading' | 'ready' | 'playing' | 'complete' | 'error' = 'loading'
@@ -120,6 +143,12 @@
       replayPhase.set('error')
       replayError.set(error)
     }
+  })
+
+  onMount(() => {
+    recomputeFit()
+    window.addEventListener('resize', recomputeFit)
+    return () => window.removeEventListener('resize', recomputeFit)
   })
 
   async function startReplay() {
@@ -327,7 +356,7 @@
     </div>
   {:else if params && response}
     <!-- Game grid is always shown once data is ready -->
-    <div class="grid-area">
+    <div class="grid-area" style="--replay-S: {replayFit}">
       <GameGrid bind:this={gridRef} />
       <FreeSpinsPresentation
         script={featureScript}
@@ -470,6 +499,19 @@
   .grid-area {
     position: relative;
     flex: 0 0 auto;
+    width: 616px;
+    height: 412px;
+    transform: scale(var(--replay-S, 1));
+    transform-origin: top center;
+    /* A transform does not change the LAID-OUT box, so without these the column
+       still reserves 616x412 and the row still overflows. Negative margins
+       collapse the box to the scaled size: full height removed below, and half
+       the removed width on each side, which keeps `top center` centred.
+       Deliberately NOT `.grid-area > :global(*)`: that also hits .fs-overlay,
+       which is position:absolute inset:0 and would be scaled twice. */
+    margin-bottom: calc((var(--replay-S, 1) - 1) * 412px);
+    margin-left: calc((var(--replay-S, 1) - 1) * 308px);
+    margin-right: calc((var(--replay-S, 1) - 1) * 308px);
   }
 
   .win-area {
