@@ -706,6 +706,17 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/utils/winPrecision.test.ts
 
+      # Sixteen locales ship and locale_prose_conformance proves every KEYED
+      # string resolves in all of them. That says nothing about a literal typed
+      # straight into markup: an unkeyed string is not a missing translation, it
+      # is not a translation at all, and no completeness check can see one.
+      # Eleven were found by hand in the pre-submission hunt. They need real
+      # translation in fifteen locales, so the known set is FROZEN and the gate
+      # fails on anything new, in both directions.
+      - name: hardcoded player-facing strings
+        working-directory: frontend
+        run: node scripts/hardcoded_string_gate.mjs --self-test && node scripts/hardcoded_string_gate.mjs
+
       # ── Gate 1a: the COMPLETE type-check, not just the Svelte half ───────────
       # R2R3 finding 9 / TR-046: "npm run check reports 0 Svelte errors, 36
       # warnings and vite.config.ts:33 TS7006. CI runs only the Svelte baseline,

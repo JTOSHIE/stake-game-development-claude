@@ -1,0 +1,59 @@
+{
+  "_comment": [
+    "FROZEN player-facing English that never reached the translation layer.",
+    "Every entry renders the same English in all sixteen locales.",
+    "Fixing one needs a real translation in fifteen locales, which a builder",
+    "does not invent, so they are frozen and the gate goes live anyway.",
+    "THIS LIST ONLY SHRINKS. A new hardcoded string fails immediately, and an",
+    "entry that matches nothing fails too, so a fix cannot leave its entry",
+    "behind. Regenerate ONLY to record a genuine fix, never to make a new",
+    "string pass."
+  ],
+  "frozen_count": 11,
+  "frozen": [
+    {
+      "file": "FeatureMenu.svelte",
+      "text": "per spin"
+    },
+    {
+      "file": "FeatureMenu.svelte",
+      "text": "bet"
+    },
+    {
+      "file": "FreeSpinsPresentation.svelte",
+      "text": "Overdrive Free Spins"
+    },
+    {
+      "file": "HudOverlay.svelte",
+      "text": "Unmute"
+    },
+    {
+      "file": "HudOverlay.svelte",
+      "text": "Mute"
+    },
+    {
+      "file": "PaytableModal.svelte",
+      "text": "Scatters"
+    },
+    {
+      "file": "ReplayMode.svelte",
+      "text": "Play"
+    },
+    {
+      "file": "ReplayMode.svelte",
+      "text": "Bet"
+    },
+    {
+      "file": "ReplayMode.svelte",
+      "text": "Token"
+    },
+    {
+      "file": "ReplayMode.svelte",
+      "text": "Currency"
+    },
+    {
+      "file": "ReplayMode.svelte",
+      "text": "Mode:"
+    }
+  ]
+}
