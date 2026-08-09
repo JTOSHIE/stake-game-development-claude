@@ -683,6 +683,19 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/services/replayRounds.test.ts
 
+      # The REPLAY route is a separate surface from the game route: App.svelte
+      # branches to ReplayMode instead of the game tree, so the social
+      # English-only enforcement applied at App boot does not reach it. Both
+      # parseReplayParams and ReplayMode's eager first-paint block used to read
+      # `lang` raw. A social replay still rendered an ENGLISH disclaimer, because
+      # that one key carries a social override, which is what made it look
+      # correct; the buttons and money readouts underneath rendered German.
+      # Drives parseReplayParams itself, not the resolver, since the resolver was
+      # never the broken part. (2026-08-09)
+      - name: replay locale, social English only
+        working-directory: frontend
+        run: npx tsx src/lib/services/replayLocale.test.ts
+
       # ── Gate 1a: the COMPLETE type-check, not just the Svelte half ───────────
       # R2R3 finding 9 / TR-046: "npm run check reports 0 Svelte errors, 36
       # warnings and vite.config.ts:33 TS7006. CI runs only the Svelte baseline,

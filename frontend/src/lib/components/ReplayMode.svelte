@@ -41,11 +41,14 @@
   // i18n, replay supports the ?lang= param; the disclaimer must follow it.
   import { t, type Locale, type GameMode } from '../i18n/translations'
   import { tr } from '../i18n/tr'
+  import { resolveLaunchLocale } from '../stores/socialLocale'
 
   // Resolve the locale/mode eagerly so the disclaimer renders correctly even
   // during the initial loading phase (before onMount assigns `params`).
   const search = new URLSearchParams(window.location.search)
-  const initialLang = (search.get('lang') ?? 'en') as Locale
+  // Same validator as the game route and as parseReplayParams, so the eager
+  // first-paint locale cannot disagree with the one that arrives with `params`.
+  const initialLang = resolveLaunchLocale(search.get('lang'), socialAtBoot) as Locale
   // R2R JOB 6 / TR-041. This derived the first-paint mode from the `social`
   // flag ALONE, so a replay URL carrying `currency=XSC` without the flag
   // painted the real-money disclaimer for one frame before the currency store

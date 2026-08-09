@@ -17,6 +17,7 @@
 // locked rgsService.ts copy is recorded in CLAUDE.md's LOCKED_FILE_DEBTS and
 // held to the canonical value by scripts/currency_scale_drift.test.mjs.
 import { currencySymbolFor, CURRENCY_SCALE, isVirtualCurrency } from '../utils/currency'
+import { resolveLaunchLocale } from '../stores/socialLocale'
 
 export interface ReplayParams {
   replay: true
@@ -111,7 +112,15 @@ export function parseReplayParams(): ReplayParams | null {
     rgsUrl,
     currency,
     amount,
-    lang: params.get('lang') ?? 'en',
+    // Routed through the SAME validator the game route uses, rather than taken
+    // raw. Social wins outright inside it, and an unknown or malformed code
+    // degrades to English instead of rendering raw keys. Reading the parameter
+    // directly here left the replay route as the one surface where a social
+    // session could render German: keys carrying an explicit social override
+    // still came out English, which is why this looked correct, but every key
+    // WITHOUT one fell through to the localised string and the money format
+    // followed `lang` too. 2026-08-09.
+    lang: resolveLaunchLocale(params.get('lang'), social),
     device: (params.get('device') ?? 'desktop') as 'mobile' | 'desktop',
     social,
   }
