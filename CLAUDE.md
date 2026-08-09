@@ -208,6 +208,23 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   token, reading what actually landed in git rather than which tool was used. The exclusion-list
   discipline above still stands and is still the first line; the gate is the last one.**
 
+- **`games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md` says "FIVE scatters is the maximum
+  on the visible 5x4 board", and a full pass contradicts it for two modes.** TR-047 corrected
+  that line on 2026-07-26 from an earlier claim that 6+ can appear, re-measuring **20,000
+  rounds** of each of the five books. On 2026-08-09 the payout reconciliation gate ran the
+  FULL population, 100,000 rounds per mode, and found six scatters on the visible grid in
+  `books_bonus` and `books_super`, at round ids 61700 and 98874. Both sit beyond the 20,000
+  window, so the earlier figure was under-sampled rather than wrong, and the base-mode claim
+  in convention (l)'s worked example is exactly right: base carries zero.
+  **Per 100,000 rounds: base 0, cruise 0, antelite 0, bonus 2, super 2.**
+  **The OWNER HAS RULED and the ruling stands: six or seven scatters is the same as five, so
+  nothing player-facing changes and no disclosure is owed.** The award is identical, 10x and
+  16 spins, which `game_config.py`'s own comment beside `freespin_triggers` states. This is
+  recorded only because the PAR is a SUBMISSION-FACING document making a literal claim that
+  the full population contradicts, and the PAR is inside a locked path with no sanction to
+  edit. Ride a one-line correction on the next sanctioned maths-package pass; not worth a
+  pass of its own, and not a defect in the game.
+
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
   read anywhere in production code, verified including `derived()` and `.subscribe()`

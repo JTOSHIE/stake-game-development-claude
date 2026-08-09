@@ -147,10 +147,21 @@ export function scatterAwards() {
  * AND confirmed by the artefact: those wins carry winWithoutMult 1000, i.e. 10x,
  * the 5-scatter amount. Two independent inputs, per convention (l.4).
  *
+ * OWNER RULING, and it was given before this gate existed rather than because of
+ * it: six or seven scatters is the same as five, so nothing player-facing turns
+ * on it. Restated 2026-08-09 when this pass re-raised it. The award IS identical,
+ * 10x and 16 spins, so the rules screen stopping at five is correct about what a
+ * player can win. Do not reopen this.
+ *
  * CLAUDE.md's convention (l) worked example concluded "maximum 5, zero rounds at
- * 6 or 7". That was measured on books_base ALONE, where it is true, and it does
- * not hold for bonus or super. Escalated to the owner rather than settled here,
- * per convention (l.8).
+ * 6 or 7". It says so about books_base, and for books_base it is exactly true:
+ * a full 100,000-round pass finds ZERO. The measurement was never wrong.
+ *
+ * WHAT WAS UNDER-SAMPLED, recorded because it is the only new fact here.
+ * REVIEW_TRACKER TR-047 generalised to all five modes off 20,000 rounds each.
+ * The only rounds that carry six scatters are ids 61700 and 98874, in bonus and
+ * super, both beyond that window. Full pass, per 100,000 rounds: base 0,
+ * cruise 0, antelite 0, bonus 2, super 2.
  */
 export function scatterAwardFor(kind, table) {
   const keys = Object.keys(table).map(Number).sort((x, y) => x - y)
