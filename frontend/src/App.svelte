@@ -118,7 +118,7 @@
   import { CURRENCY_SCALE } from './lib/utils/currency'
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
-  import { anyModalOpen } from './lib/stores/modalGuard'
+  import { anyModalOpen, setGameBlocked, gameInert } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
   import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound } from './lib/stores/sessionRecovery'
   import ResumeOffer from './lib/components/ResumeOffer.svelte'
@@ -394,6 +394,14 @@
   }
   $: idleAttractActive = idleAttract && !$isSpinning && !$showPaytable && !showThemeSelector
     && !$isWincap && !featureActive && !showIntroSplash && !showHeroSplash
+
+  // FOCUS CONTAINMENT. The paytable is the only blocking surface with no
+  // registration of any kind: its open state is `$showPaytable`, which lives in
+  // the LOCKED gameStore, so the only reader was the hand-written list in the
+  // spacebar handler below. It is a full-screen dialog mounted as a SIBLING of
+  // the game containers, so it can make them inert. This registry drives `inert`
+  // only, so `anyModalOpen` is unchanged and autoplay behaves exactly as before.
+  $: setGameBlocked('paytable', $showPaytable)
 
   // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
@@ -1957,6 +1965,7 @@
     class:portrait
     class:compact-landscape={compactLandscape}
     class:mini-player={miniPlayer}
+    inert={$gameInert}
     style={portrait ? '' : miniPlayer ? `height:${miniCrop.cropH * miniCanvasScale}px` : compactLandscape ? `height:${STAGE_H * compactCanvasScale}px` : ''}
   >
     <div
@@ -2193,7 +2202,7 @@
          get a `portrait` or `compactLandscape` prop so their own CSS
          renders the matching native-scale composition instead of the
          LAYOUT_SPEC absolute positions. -->
-    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer}>
+    <div class="native-hud-slot" class:portrait class:compact-landscape={compactLandscape} class:mini-player={miniPlayer} inert={$gameInert}>
       <!-- Portrait Overdrive meter (2026-07-15, item 2): docked between the
            grid (canvas-slot above) and the FEATURES bar - occupies the same
            slot FeatureMenu's trigger would, since that's hidden during the

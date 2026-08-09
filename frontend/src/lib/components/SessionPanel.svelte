@@ -23,7 +23,7 @@
     rgSession, rgNetMicros, rgJurisdiction, realityCheckDue, ackRealityCheck,
     showSessionPanel,
   } from '../stores/responsibleGambling'
-  import { setModalOpen } from '../stores/modalGuard'
+  import { setModalOpen, setGameBlocked } from '../stores/modalGuard'
   import { isAutoPlay, autoPlayCount, locale } from '../stores/gameStore'
 
   // Fable's masters, 2026-07-25: "Stop playing" halts autoplay and returns to
@@ -49,6 +49,8 @@
   // and pause autoplay. The on-demand sheet blocks too while it is open.
   $: setModalOpen('reality-check', $realityCheckDue)
   $: setModalOpen('session-panel', $showSessionPanel)
+  $: setGameBlocked('reality-check', $realityCheckDue)
+  $: setGameBlocked('session-panel', $showSessionPanel)
   function closeSheet(): void { showSessionPanel.set(false) }
 
   let nowMs = perf()

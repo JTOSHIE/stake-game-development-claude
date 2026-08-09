@@ -47,7 +47,48 @@ export const anyModalOpen = derived(openModals, ($s) => $s.size > 0)
 /** The open ids, for diagnostics and for the conformance proof. */
 export const openModalIds = derived(openModals, ($s) => [...$s].sort())
 
+// ── Focus containment ──────────────────────────────────────────────────────
+//
+// A surface that COVERS the game is not a surface that CONTAINS focus.
+// `aria-modal="true"` constrains assistive technology and nothing else: it does
+// not touch the browser's tab order, and it does not stop a focused <button>
+// being activated by Enter or Space. Measured on dist with the paytable open:
+// Enter or Space on a focused SPIN posted a real /wallet/play, with the modal
+// still on screen.
+//
+// A SEPARATE REGISTRY FROM `openModals`, on purpose and for a structural reason.
+// The fix is `inert` on the game's own containers, and FEATURES, the bet
+// selector, the HUD menu, the autoplay menu and the resume banner all render
+// INSIDE `.canvas-slot`. Driving inert from `anyModalOpen` would therefore inert
+// the very dialog that asked for it. Only surfaces mounted as SIBLINGS of the
+// containers register here.
+//
+// `setModalOpen`, `anyModalOpen` and `openModalIds` are deliberately untouched,
+// so the spacebar handler, the autoplay scheduler and modalGuard.test.ts all
+// keep their exact current behaviour. 2026-08-10.
+const gameBlockers = writable<Set<string>>(new Set())
+
+/**
+ * Declare a blocking surface that sits OUTSIDE the game containers, e.g.
+ * `$: setGameBlocked('paytable', $showPaytable)`. Idempotent, like
+ * `setModalOpen`. Drives `inert` ONLY: it changes nothing about the spacebar
+ * handler or the autoplay scheduler.
+ */
+export function setGameBlocked(id: string, open: boolean): void {
+  gameBlockers.update((s) => {
+    if (open === s.has(id)) return s
+    const next = new Set(s)
+    if (open) next.add(id)
+    else next.delete(id)
+    return next
+  })
+}
+
+/** True while the game containers must be inert. */
+export const gameInert = derived(gameBlockers, ($s) => $s.size > 0)
+
 /** Test helper: clear all registrations. Not used by production code. */
 export function resetModalGuard(): void {
   openModals.set(new Set())
+  gameBlockers.set(new Set())
 }

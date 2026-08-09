@@ -9,7 +9,7 @@
   // displayed 400x price. gameStore is locked, so the correct per-tier check
   // lives in this non-locked module, shared with the FEATURES menu.
   import { canAffordMode, modeCostFor, spinCostMicros } from '../stores/buyAffordability'
-  import { setModalOpen } from '../stores/modalGuard'
+  import { setModalOpen, setGameBlocked } from '../stores/modalGuard'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { isSocial } from '../stores/socialMode'
@@ -62,6 +62,8 @@
   // the autoplay scheduler both suppress themselves while it is open. Neither
   // could see `showConfirm` before: it is component-local state.
   $: setModalOpen('buy-confirm', showConfirm)
+  // Sibling of the game containers, so it can also contain focus.
+  $: setGameBlocked('buy-confirm', showConfirm)
 
   function cancel() { showConfirm = false }
   function confirm() {

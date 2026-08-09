@@ -11,7 +11,7 @@
   import { isSocial } from '../stores/socialMode'
   import { locale } from '../stores/gameStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { setModalOpen } from '../stores/modalGuard'
+  import { setModalOpen, setGameBlocked } from '../stores/modalGuard'
 
   export let show: boolean = false
 
@@ -33,7 +33,8 @@
   // here; and the spacebar handler already returned early on `$isWincap`, so
   // this is belt and braces there and changes nothing.
   $: setModalOpen('max-win', show)
-  onDestroy(() => setModalOpen('max-win', false))
+  $: setGameBlocked('max-win', show)
+  onDestroy(() => { setModalOpen('max-win', false); setGameBlocked('max-win', false) })
 
   $: localeMode = ($isSocial ? 'social' : 'real') as GameMode
 
