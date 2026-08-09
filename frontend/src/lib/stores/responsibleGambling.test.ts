@@ -211,8 +211,17 @@ check('a late ban drops 4x to 2x, not to normal', get(speedTier) === 'turbo')
 // assertion can see one of those.
 {
   const app = readFileSync('src/App.svelte', 'utf8')
+  // Matches the READER, not one exact line shape. The original pattern pinned
+  // `... spacebarDisabled) return` and broke on 2026-08-09 when the branch grew
+  // a preventDefault, i.e. it failed on a STRICTER fix. A source assertion that
+  // only accepts one spelling turns any improvement into a red test.
   checkThat('App.svelte reads spacebarDisabled in the key handler',
-    /if \(\$rgJurisdiction\.spacebarDisabled\) return/.test(app))
+    /if \(\$rgJurisdiction\.spacebarDisabled\)/.test(app))
+  // The ban must suppress the BROWSER's own activation too. Returning bare left
+  // a focused SPIN button spinning on Space, which is the whole defect.
+  checkThat('and it prevents the default, so a focused SPIN button cannot be '
+    + 'activated by the browser',
+    /\$rgJurisdiction\.spacebarDisabled\)\s*\{[\s\S]{0,900}?e\.preventDefault\(\)/.test(app))
   checkThat('and it gates the KEY, not the spin button',
     !/spacebarDisabled[\s\S]{0,400}data-testid="spin-button"/.test(app))
 }
