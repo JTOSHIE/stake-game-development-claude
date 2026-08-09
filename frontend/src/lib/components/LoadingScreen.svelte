@@ -270,3 +270,23 @@
     .wordmark, .logo-block { animation: none; }
   }
 </style>
+
+<!--
+  NO LONGER RENDERED, 2026-08-09. The owner ruled the boot down to one surface:
+  the Future Spinner logo, the We Roll Spinners emblem and TAP TO CONTINUE, all
+  on HeroSplash. App.svelte's import and render of this component were removed,
+  so nothing bundles it and it ships zero bytes.
+
+  IT IS KEPT RATHER THAN DELETED, and the reason is not sentiment. Four LIVE
+  working documents cite this file by line: docs/QUALITY_CHARTER.md,
+  docs/records/reviews/REVIEW_TRACKER.md, reports/qa/session2_audit/LEDGER.md and
+  reports/qa/session2_audit/DISPOSITIONS.md. Deleting it points each of them at
+  nothing, which is what the document currency gate said when it went red on the
+  attempt. Removing the file is a real job that owes those documents a sweep; it
+  is not a free tidy-up to ride along on a boot-screen change.
+
+  THIS NOTE IS APPENDED RATHER THAN PREFIXED ON PURPOSE. A header would shift
+  every line below it and silently invalidate the citations it exists to protect,
+  while leaving the gate green, since the gate checks that a cited line EXISTS and
+  never what it says.
+-->

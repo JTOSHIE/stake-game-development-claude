@@ -81,7 +81,12 @@ async function clickViaDom(locator) {
 //
 // Same polling shape as the splash, same reasoning, same 2s ceiling.
 export async function dismissIntro(page) {
-  const splashDeadline = Date.now() + 2000
+  // 6s, not 2s. The boot splash is dismissible only once the game is ready, and
+  // an early click is LATCHED rather than swallowed, so the click lands at once
+  // but the screen leaves at `ready`. 2s left almost no margin over the 1800ms
+  // boot floor and put the scrim, turbo and contrast gates one slow runner away
+  // from measuring the splash instead of the game. 2026-08-09.
+  const splashDeadline = Date.now() + 6000
   while (Date.now() < splashDeadline) {
     const splash = page.locator('[data-testid="hero-splash"]')
     if (await splash.count() > 0 && await splash.isVisible().catch(() => false)) {

@@ -6,7 +6,6 @@
   import SceneGroup      from './lib/components/SceneGroup.svelte'
   import BonusInstrumentColumn from './lib/components/BonusInstrumentColumn.svelte'
   import FlameJets      from './lib/components/FlameJets.svelte'
-  import LoadingScreen    from './lib/components/LoadingScreen.svelte'
   import HeroSplash       from './lib/components/HeroSplash.svelte'
   import RainLayer        from './lib/components/RainLayer.svelte'
   import IntroSplash      from './lib/components/IntroSplash.svelte'
@@ -260,36 +259,50 @@
   let showHeroSplash = false
   let heroSplashHandledForLoad = false
 
-  // THE BOOT SCREEN HELD FOR A MINIMUM, added 2026-08-09 on the owner's call
-  // that it "runs too quickly".
+  // ONE BOOT SCREEN. Owner ruling, 2026-08-09.
   //
-  // `isLoading` is cleared inside initRGS's finally block, and on a warm cache
-  // with a fast RGS that is close to instantaneous. The loading screen then
-  // flashes past faster than it can be read, which reads as a glitch rather
-  // than as a boot sequence: the player sees the title and the mark appear and
-  // vanish in the same eye movement.
+  // The boot used to be TWO surfaces: LoadingScreen, carrying the studio
+  // wordmark, the mark, a game title and a progress readout, handing over to
+  // HeroSplash, carrying the same mark again and the prompt. The owner ruled
+  // that "we're actually overdoing it": all the boot needs is the game title,
+  // the studio emblem below it, and TAP TO CONTINUE.
   //
-  // WHY A FLOOR RATHER THAN A DELAY. This does not add a wait to a slow load.
-  // The screen is shown for AT LEAST this long and for exactly as long as
-  // loading actually takes when loading takes longer, so a slow connection is
-  // never made slower. It is a floor, not a sleep.
+  // So LoadingScreen is REMOVED, the title moved onto the splash, and the
+  // splash now shows from mount rather than after loading. It is the only boot
+  // screen a player ever sees.
   //
-  // rgsService.ts is a LOCKED file, so the floor cannot live where isLoading is
-  // set. It is applied here, at the only two places that read it: the gate that
-  // renders the screen and the trigger that hands over to the splash. Both must
-  // use it or the splash would appear over a loading screen that is still up.
+  // WHAT THIS GIVES UP, recorded because it was a live comms item rather than
+  // an oversight. LoadingScreen carried the only load-progress readout in the
+  // game, and its own comment said removing that "is a product decision, not a
+  // defect fix" and declined to make it on a builder's authority. The owner has
+  // now made it. There is no percentage during boot; the splash simply holds
+  // until the game is ready.
+  //
+  // THE FLOOR SURVIVES, and now governs the splash instead. isLoading clears
+  // inside initRGS's finally block, near instantly on a warm cache, so without
+  // a floor the one remaining screen would flash past exactly as the two-screen
+  // version did. It is a FLOOR, not a sleep: the screen shows for at least this
+  // long, and for exactly as long as loading really takes when that is longer,
+  // so a slow connection is never made slower. rgsService.ts is LOCKED, so the
+  // floor cannot live where isLoading is set and is applied here.
   const BOOT_FLOOR_MS = 1800
   let bootFloorElapsed = false
   onMount(() => {
+    // Shown from mount so it covers the whole boot, not just the tail of it.
+    if ($activeTheme.id === 'future-spinner') showHeroSplash = true
     const id = setTimeout(() => { bootFloorElapsed = true }, BOOT_FLOOR_MS)
     return () => clearTimeout(id)
   })
 
+  // Gates the PROMPT, and the moment a latched early tap is spent. HeroSplash
+  // never drops a gesture: a tap before this goes true is remembered and
+  // dismisses the screen as soon as it does, so the player neither taps into a
+  // dead screen nor lands in a game that is still loading.
+  $: splashReady = !$isLoading && bootFloorElapsed
+
   $: if (!$isLoading && bootFloorElapsed && !heroSplashHandledForLoad) {
     heroSplashHandledForLoad = true
-    if ($activeTheme.id === 'future-spinner') {
-      showHeroSplash = true
-    } else if (!introSeen()) {
+    if ($activeTheme.id !== 'future-spinner' && !introSeen()) {
       showIntroSplash = true
     }
     // If neither splash is going to be shown at all - a returning session on a
@@ -1749,9 +1762,6 @@
     on:collect={handleWincapCollect}
   />
 
-  {#if $isLoading || !bootFloorElapsed}
-    <LoadingScreen />
-  {/if}
 
   <!-- Persistent hidden mount (Task 5): the Overdrive entry subtree is mounted
        once, warm-painted, then kept mounted (visibility hidden) for the session
@@ -1764,7 +1774,7 @@
   {/if}
 
   {#if showHeroSplash}
-    <HeroSplash on:dismiss={handleHeroSplashDismiss} />
+    <HeroSplash ready={splashReady} on:dismiss={handleHeroSplashDismiss} />
   {/if}
 
   {#if showIntroSplash}

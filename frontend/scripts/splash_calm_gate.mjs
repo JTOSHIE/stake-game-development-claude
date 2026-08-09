@@ -137,30 +137,20 @@ const authBody = () => ({
 // LOAD screen is on screen for exactly as long as authenticate takes. Stalling
 // that one response is therefore the only honest way to hold it open for a
 // ten-second measurement; nothing about the screen itself is altered.
+// THE LOAD SCREEN SURFACE WAS REMOVED 2026-08-09, because the screen was.
+//
+// The boot used to be two surfaces, a LoadingScreen handing over to the splash.
+// The owner ruled the boot is ONE screen: the game logo, the studio emblem, and
+// the prompt. LoadingScreen.svelte is no longer rendered, so a surface that
+// waits for `.loading-screen` can only ever time out.
+//
+// THE ASSERTIONS IT CARRIED WERE NOT DELETED, THEY MOVED. Its three targets were
+// the WRS mark, the wordmark and the game logo. The mark and the wordmark went
+// with the screen. The GAME LOGO did not: it is now on the splash, as
+// `.game-logo`, and it is added to that surface's targets below. This gate
+// exists to hold every boot logo still, and dropping a target because its screen
+// moved would quietly narrow the gate while leaving it green.
 const SURFACES = [
-  {
-    id: 'loader',
-    title: 'load screen',
-    root: '.loading-screen',
-    // authenticate is stalled past the sample window so the loader stays up.
-    authDelayMs: WINDOW_MS + 6000,
-    targets: [
-      { sel: '.brand-mark img', label: 'WRS mark' },
-      { sel: '.wordmark', label: 'WE ROLL SPINNERS wordmark' },
-      // 2026-08-09: was '.loading-logo', the <img> that drew a chrome-and-
-      // lightning PNG. The owner called that art archaic and it is now rendered
-      // as text in the brand face, so the element carrying the game title on the
-      // boot screen is '.logo-block'. The ASSERTION is unchanged and deliberately
-      // so: this gate exists to hold the boot logo still, and text can drift just
-      // as easily as an image. Repointed rather than removed, because deleting an
-      // assertion to make a gate green is how a gate stops meaning anything.
-      { sel: '.logo-block', label: 'game logo' },
-    ],
-    seedCss: `
-      @keyframes seeded-brand-spin { to { transform: rotate(360deg); } }
-      .brand-mark img { animation: seeded-brand-spin 2.6s linear infinite; }
-    `,
-  },
   {
     id: 'splash',
     title: 'splash',
@@ -170,6 +160,10 @@ const SURFACES = [
       { sel: '.emblem-full', label: 'hero emblem' },
       { sel: '.ring-glow', label: 'emblem glow' },
       { sel: '.press-prompt', label: 'TAP TO CONTINUE' },
+      // Moved here from the removed load-screen surface, 2026-08-09. It is the
+      // same logo image the game header uses, and the boot screen is where a
+      // reviewer meets it first.
+      { sel: '.game-logo', label: 'game logo' },
     ],
     seedCss: `
       @keyframes seeded-emblem-spin { to { transform: rotate(360deg); } }
