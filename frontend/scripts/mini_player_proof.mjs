@@ -656,7 +656,16 @@ async function run() {
 
     await browser.close()
   } finally {
-    preview.kill()
+    // killPreview(), not preview.kill(). Corrected 2026-08-10.
+    //
+    // startPreview() returns the shared static server, whose method is close().
+    // There is no kill() on it, so this threw a TypeError in the FINALLY block
+    // on every run, after every check had already passed. The script therefore
+    // exited non-zero always, and its real result was never reported by anyone
+    // who read the exit code. The killPreview() helper twelve lines below the
+    // server setup was written for this and the call site was never moved onto
+    // it.
+    killPreview()
   }
 
   const allPass = Object.values(checks).every((c) => c.pass)

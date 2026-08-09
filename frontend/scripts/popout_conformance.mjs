@@ -81,7 +81,26 @@ async function run() {
       // the splash is not what this gate is testing.
       await page.waitForSelector('[data-testid="hero-splash"]', { timeout: 15000 }).catch(() => {})
       await page.locator('[data-testid="hero-splash"]').evaluate((el) => el.click()).catch(() => {})
-      await page.waitForTimeout(900)
+      // WAIT FOR THE SPLASH TO ACTUALLY GO, not for a fixed 900ms. Corrected
+      // 2026-08-10.
+      //
+      // The boot rework of 2026-08-09 made the splash dismissible only once the
+      // game is ready, behind an 1800ms floor, and an early tap is LATCHED and
+      // spent at ready rather than dropped. A click here therefore lands at once
+      // and the screen leaves ~1800ms later, so a flat 900ms probed a DOM where
+      // the splash was still up and IntroSplash did not exist yet. Every
+      // viewport reported "IntroSplash not found" against a game that was fine.
+      //
+      // dismissOverlays.mjs was widened for exactly this on the same day. This
+      // gate has its own inline copy of the dismissal and was missed, which is
+      // the second-path shape this project keeps meeting. Polling for the
+      // element to leave cannot go stale again if the floor changes.
+      for (let i = 0; i < 60; i++) {
+        const still = await page.locator('[data-testid="hero-splash"]').count()
+        if (!still) break
+        await page.waitForTimeout(100)
+      }
+      await page.waitForTimeout(400)   // let IntroSplash mount and settle
 
       const geom = await page.evaluate(() => {
         const btn = document.querySelector('[data-testid="intro-continue"]')

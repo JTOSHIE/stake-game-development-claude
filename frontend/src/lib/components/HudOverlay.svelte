@@ -1070,6 +1070,36 @@
   }
   .m-round-btn::after { content: ''; position: absolute; inset: -4px; }
   .m-hud-menu { bottom: 44px; left: 0; }
+  /* THE MENU IS TALLER THAN THE SPACE ABOVE THIS ROW AT POPOUT S, and the
+     overflow goes UPWARDS, off the top of the viewport, where no scroll position
+     can recover it. Measured at 400x225: the row is 44px and the menu anchors
+     8px above it, leaving 177.5px, while the menu itself is 206.2px in English
+     and 215.2px in Japanese. PAYTABLE rendered 28.7px above the viewport top
+     with 4.3px of its 32px showing and its label cut, and in hi, ja and zh the
+     first item was off screen entirely, where a real pointer click is refused
+     and the paytable cannot be opened from the popout at all. Sixteen of sixteen
+     locales overflowed.
+
+     Two rules, each doing a different job.
+
+     The tighter item padding is the FIX: it puts all six items on screen at
+     once, worst locale 166.4px into the 177.5px available, so nothing has to
+     scroll in any of the sixteen.
+
+     The max-height is the GUARD, not the fix. 52px is the 44px row plus the
+     3.5px the wrapper sits above the viewport bottom, rounded up. If a locale, a
+     jurisdiction flag or a new item ever grows this menu past the space above
+     the row again, it scrolls inside itself instead of going back off the top.
+
+     THE GUARD IS WRITTEN ON `.m-hud .m-hud-menu`, NOT ON `.m-hud-menu`, AND THAT
+     IS LOAD BEARING. The base `.hud-menu` rule carries `overflow: hidden` and
+     the compiler emits it AFTER this one at equal specificity, so `overflow-y:
+     auto` on `.m-hud-menu` alone loses the cascade and computes `hidden`. The
+     cap would then clip the last item with no scrollbar and no way to reach it,
+     which is worse than the defect it replaced. Measured both ways before
+     choosing. 2026-08-10. */
+  .m-hud .m-hud-menu { max-height: calc(100vh - 52px); overflow-y: auto; }
+  .m-hud-menu .hud-menu-item { padding-top: 0.25rem; padding-bottom: 0.25rem; }
 
   /* Stats read INLINE. This is the change that removes the overlap: nothing is
      stacked in 44px, so nothing can collide with the line above it. */
