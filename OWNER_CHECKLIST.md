@@ -66,11 +66,19 @@ contradiction, the backlog spend, the docs-watch mechanism and the unanswered qu
 request was never made, and this document asserted it had been. That is the same failure this
 seat is on record for, a document treated as evidence for something nobody did.
 
-**Two further cautions before you sit down to this.** The self-assessment beside you says nine
-items are OWNER items; its own summary says eight and its rows carry seven, so three figures
-disagree and none has been recounted. And its headline still reads *"3 FAIL, 1 CONFLICT"*
-against items 15, 25, 46 and 12, **all four of which the tracker has since closed**. It has
-not been revised since the day it was written.
+**BOTH CAUTIONS THAT USED TO SIT HERE ARE NOW RESOLVED, 2026-08-08, and the resolution is the
+useful part.** They warned that the self-assessment's OWNER count disagreed across three
+figures, and that its headline still read *"3 FAIL, 1 CONFLICT"* against items that had since
+closed.
+
+**The self-assessment has been recounted from its own rows and the counting rule is written into
+it**, so anyone can reproduce the figures: **PASS 40, OBSERVE 10, OWNER 7, FAIL 0, CONFLICT 0,
+N/A 1**, summing to 58. OWNER is **seven**, not nine and not eight; the rows are items 7, 53,
+54, 55, 57, 58 plus item 32 as OWNER and OBSERVE.
+
+**FAIL is zero for the first time.** Items 12 and 25 closed earlier; item 15 was a real defect
+and was fixed on 2026-08-05; item 46 was never a defect at all and its FAIL verdict was
+corrected after being proven against a real build.
 
 **What to send:** a screenshot of the Guidelines panel once the count moves off 0/58.
 
@@ -99,11 +107,22 @@ model chosen, wallet configured, address verified.
 
 ## 3. Upload the kit and screenshot the console line
 
-**BEFORE THIS, ONCE: bin every kit folder on your Desktop.** Five are there, and one of them,
-the unversioned `FS_UPLOAD_KIT` dated 26 July, **holds the maths package and must never be
-uploaded.** Run `ls -d ~/Desktop/FS_UPLOAD_KIT*` and delete everything it lists. This is a
-one-time tidy-up: from here the build makes exactly one folder and refuses to run while others
-exist, so it cannot recur. Nothing deletes them for you, deliberately.
+**DONE 2026-08-08: the Desktop tidy-up happened.** All five kit folders were binned and a fresh
+kit built at commit `a2805f7`. The build now makes exactly one folder and refuses to run while
+another exists, so the ambiguity cannot recur. Kept here as a dated record rather than deleted,
+because the sentence below it needed correcting and the correction is the useful part.
+
+**A SENTENCE HERE WAS MISLEADING AND THE OWNER CAUGHT IT.** It read that the unversioned
+`FS_UPLOAD_KIT` "holds the maths package and must never be uploaded", which reads as though the
+MATHS must never be uploaded. **The maths absolutely is uploaded, and was, on 2026-08-08: twelve
+files, 380 MB, validated by the platform as Valid.**
+
+**What that warning actually meant.** The 26 July folder was an OLD THREE-PART bundle carrying a
+maths payload, a frontend payload and branding together. The danger was uploading that stale
+bundle, not uploading maths. **Maths and frontend go to SEPARATE slots on the platform** and are
+published separately. The current kit deliberately contains **no maths at all**: only the
+frontend payload and the branding. The maths is already up, it is validated, and it does not
+change between frontend builds, so there is nothing to re-send.
 
 **Then build a fresh kit and upload it.** `node scripts/kit_build.mjs` puts it at
 `~/Desktop/FS_UPLOAD_KIT`. Follow the walkthrough inside the folder; it is copied in with the
@@ -111,13 +130,54 @@ kit, and its live section is the only PART 9 heading not marked SUPERSEDED. **Up
 portal.** Which entry is yours to choose; this document does not name one, because naming one
 is what made it go stale.
 
-**Do not upload a kit you did not just build.** The one on your Desktop right now is from an
-older commit.
+**Do not upload a kit you did not just build.** That is a standing rule and not a comment on
+any particular folder: the version inside a kit tells you what it is, and a kit older than the
+tip is a kit that ships yesterday's fixes.
 
-**The one screenshot:** open the published game with the browser console open and capture the
-first line. It reads `Future Spinner v<n> build <sha> built <timestamp>`, and the same version
-and commit are in the BUILD_INFO.json file inside the kit folder, if you want to check before
-uploading.
+**OPEN IT IN A NEW PRIVATE WINDOW, AND THIS IS NOT OPTIONAL. Added 2026-08-08 after a stale
+page cost an evening and looked exactly like a broken build.**
+
+A private window does two jobs at once: it holds **no cached copy of the previous upload's HTML**,
+and it runs **no browser extensions**. On 2026-08-08 roughly forty of the forty-five console
+errors came from a crypto wallet extension injecting itself into the page, which is noise that
+makes a real error impossible to find.
+
+**THE FAILURE THAT PRODUCED THIS STEP, so it is recognisable rather than mysterious.** After a
+clean upload the game showed a **WHITE SCREEN** and the console showed asset 404s. The page was
+asking for these:
+
+    svelte-BYtsoJ2v.js      index-IEbOMUSR.css      index-DEOd1P6P.js
+
+The kit that had just been uploaded contains these:
+
+    svelte-Dqw5zo1U.js      index-DqeVIwyE.css      index-DiIn163I.js
+
+**Different hashes. So the HTML being executed was not the HTML that was just uploaded**: it was
+an older copy, asking for asset names that no longer existed. The confirming detail is that the
+stylesheet came back with MIME type `text/plain` rather than `text/css`, which is what a 404 page
+looks like when a browser tries to parse it as CSS.
+
+**A white screen from a stale page is indistinguishable from a broken build by eye.** The hash
+comparison is what tells them apart, and it takes ten seconds.
+
+**THE CHECK, in order:**
+
+1. Open the published game in a **new private window**.
+2. **First console line** must read `Future Spinner v<n> build <sha> built <timestamp>`, and the
+   version and SHA must match the BUILD_INFO.json file inside the kit you just uploaded.
+3. **If you see a white screen or asset 404s**, do NOT conclude the build is broken. Compare the
+   hash in the failing request against the ones in the kit's `index.html`. If they differ, the
+   page is stale: close the window, open another private one, and try again.
+4. **Only if the hashes MATCH and it still fails** is it a real problem with the build.
+
+**You do not need to restore a previous version to clear this.** On 2026-08-08 restoring V9 and
+republishing did clear it, but that changed the published version as a side effect, which is a
+heavier action than the situation needed. **Try a fresh private window first.** If a stale page
+survives that, it is the platform's cache rather than yours, and the version round-trip is the
+fallback rather than the first move.
+
+**The one screenshot:** that first console line. The same version and commit are in the
+BUILD_INFO.json file inside the kit folder, if you want to check before uploading.
 
 **Your local preview shows the same two values on screen now**, bottom left, so you can compare
 what you are about to upload against what you have been looking at without opening a console.
