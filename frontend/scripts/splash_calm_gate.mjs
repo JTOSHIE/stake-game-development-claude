@@ -147,7 +147,14 @@ const SURFACES = [
     targets: [
       { sel: '.brand-mark img', label: 'WRS mark' },
       { sel: '.wordmark', label: 'WE ROLL SPINNERS wordmark' },
-      { sel: '.loading-logo', label: 'game logo' },
+      // 2026-08-09: was '.loading-logo', the <img> that drew a chrome-and-
+      // lightning PNG. The owner called that art archaic and it is now rendered
+      // as text in the brand face, so the element carrying the game title on the
+      // boot screen is '.logo-block'. The ASSERTION is unchanged and deliberately
+      // so: this gate exists to hold the boot logo still, and text can drift just
+      // as easily as an image. Repointed rather than removed, because deleting an
+      // assertion to make a gate green is how a gate stops meaning anything.
+      { sel: '.logo-block', label: 'game logo' },
     ],
     seedCss: `
       @keyframes seeded-brand-spin { to { transform: rotate(360deg); } }

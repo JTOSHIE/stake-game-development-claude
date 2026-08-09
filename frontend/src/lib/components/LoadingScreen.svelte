@@ -65,7 +65,7 @@
   // tags; wrapping the percentage in its own element for Q-23 split them and the
   // gate immediately found it. QUALITY_CHARTER.md Q-30.
   import { tr } from '../i18n/tr'
-  import { themeAssets } from '../stores/themeStore'
+  import { themeAssets, activeTheme } from '../stores/themeStore'
   import RainLayer from './RainLayer.svelte'
 </script>
 
@@ -89,14 +89,23 @@
       <img class="brand-still" src="{$themeAssets.assetBase}/ui/hero_icon_96.png" alt="" draggable="false" />
     </div>
 
-    <div class="logo-block">
-      <img
-        src="{$themeAssets.logo}"
-        class="loading-logo"
-        alt=""
-        draggable="false"
-      />
-    </div>
+    <!-- THE GAME TITLE IS TEXT, NOT ART, since 2026-08-09 on the owner's call.
+         It used to draw `$themeAssets.logo`, a 600x120 chrome-and-lightning PNG
+         that the owner called archaic: it is a dated slot aesthetic sitting
+         directly under a wordmark rendered in the brand face, on the first
+         screen of the game, beside a tile that uses none of it.
+
+         Rendering it as text rather than commissioning replacement art is the
+         cheaper AND the more correct fix. The line above it is already text in
+         the same face, so the two now match by construction rather than by
+         somebody keeping a PNG in sync with a font. It also removes an asset
+         from the boot path entirely, and it reads at any size on any preset.
+
+         The name comes from the THEME rather than a literal, so a theme switch
+         cannot leave the loader announcing the wrong game. Opacity-only
+         animation, per splash_calm_gate.mjs, which asserts zero geometry
+         variance and no transform-writing animation on any boot logo. -->
+    <div class="logo-block">{$activeTheme.name}</div>
 
     <!-- Progress bar. This is a readout of real load progress, not decoration,
          so it is the one thing on this screen that changes while the player
@@ -179,12 +188,15 @@
   .logo-block {
     text-align: center;
     animation: fade-in 0.8s 0.15s ease both;
-  }
-  .loading-logo {
-    height: clamp(56px, 10vw, 96px);
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 0.6));
+    font-family: var(--fs-font-numeric);
+    font-weight: 900;
+    font-size: clamp(1.7rem, 6vw, 3rem);
+    letter-spacing: 0.12em;
+    line-height: 1.05;
+    color: #fff;
+    text-shadow:
+      0 0 18px rgba(0, 255, 255, 0.75),
+      0 0 42px rgba(255, 0, 255, 0.45);
   }
 
   /* Progress bar */

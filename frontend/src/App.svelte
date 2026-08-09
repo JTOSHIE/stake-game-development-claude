@@ -259,7 +259,33 @@
   // theme-scoped and the other reference skins have no equivalent mark.
   let showHeroSplash = false
   let heroSplashHandledForLoad = false
-  $: if (!$isLoading && !heroSplashHandledForLoad) {
+
+  // THE BOOT SCREEN HELD FOR A MINIMUM, added 2026-08-09 on the owner's call
+  // that it "runs too quickly".
+  //
+  // `isLoading` is cleared inside initRGS's finally block, and on a warm cache
+  // with a fast RGS that is close to instantaneous. The loading screen then
+  // flashes past faster than it can be read, which reads as a glitch rather
+  // than as a boot sequence: the player sees the title and the mark appear and
+  // vanish in the same eye movement.
+  //
+  // WHY A FLOOR RATHER THAN A DELAY. This does not add a wait to a slow load.
+  // The screen is shown for AT LEAST this long and for exactly as long as
+  // loading actually takes when loading takes longer, so a slow connection is
+  // never made slower. It is a floor, not a sleep.
+  //
+  // rgsService.ts is a LOCKED file, so the floor cannot live where isLoading is
+  // set. It is applied here, at the only two places that read it: the gate that
+  // renders the screen and the trigger that hands over to the splash. Both must
+  // use it or the splash would appear over a loading screen that is still up.
+  const BOOT_FLOOR_MS = 1800
+  let bootFloorElapsed = false
+  onMount(() => {
+    const id = setTimeout(() => { bootFloorElapsed = true }, BOOT_FLOOR_MS)
+    return () => clearTimeout(id)
+  })
+
+  $: if (!$isLoading && bootFloorElapsed && !heroSplashHandledForLoad) {
     heroSplashHandledForLoad = true
     if ($activeTheme.id === 'future-spinner') {
       showHeroSplash = true
@@ -1723,7 +1749,7 @@
     on:collect={handleWincapCollect}
   />
 
-  {#if $isLoading}
+  {#if $isLoading || !bootFloorElapsed}
     <LoadingScreen />
   {/if}
 
