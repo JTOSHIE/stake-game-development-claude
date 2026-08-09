@@ -20,7 +20,7 @@
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, FS_RTP_LABEL, FS_MAX_WIN_LABEL, maxWinVsBaseBetLabel } from '../config/fsModes'
+  import { FS_MODES, fsRtpLabel, fsMaxWinLabel, fsCostLabel, maxWinVsBaseBetLabel } from '../config/fsModes'
 
   function close(): void {
     playClick()
@@ -328,12 +328,12 @@
                          an ellipsis in the 3-column card grid's narrow cost
                          column (caught via a committed screenshot, not
                          assumed from the CSS). -->
-                      <span class="fs-mode-stat-value fs-num">{m.cost}×</span>
+                      <span class="fs-mode-stat-value fs-num">{fsCostLabel(m.cost, $locale)}</span>
                       <span class="fs-mode-stat-subvalue fs-num">{modePrice(m.cost)}</span>
                     </div>
                     <div class="fs-mode-stat">
                       <span class="fs-mode-stat-label">RTP</span>
-                      <span class="fs-mode-stat-value fs-num">{FS_RTP_LABEL}</span>
+                      <span class="fs-mode-stat-value fs-num">{fsRtpLabel($locale)}</span>
                     </div>
                     <div class="fs-mode-stat">
                       <!-- ROUND 4 item 4: per-mode card, quoted against the BASE
@@ -345,7 +345,7 @@
                            it to "5,000x ba..." on every card, hiding the very
                            figure the platform requires to be displayed. -->
                       <span class="fs-mode-stat-label">{$tr('maxWinLabel')}</span>
-                      <span class="fs-mode-stat-value fs-num">{FS_MAX_WIN_LABEL}</span>
+                      <span class="fs-mode-stat-value fs-num">{fsMaxWinLabel($locale)}</span>
                     </div>
                   </div>
                   <p class="fs-mode-blurb">{$tr(m.blurbKey)}</p>
@@ -395,8 +395,8 @@
 
         <!-- RTP, identical across all five modes (0.5% cross-mode rule) + max win -->
         <div class="fs-rtp">
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('rtpAllModes')}</span><span class="fs-rtp-val fs-num">{FS_RTP_LABEL}</span></div></div>
-          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('maxWinLabel')}</span><span class="fs-rtp-val fs-num">{FS_MAX_WIN_LABEL}</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('rtpAllModes')}</span><span class="fs-rtp-val fs-num">{fsRtpLabel($locale)}</span></div></div>
+          <div class="fs-rtp-row fs-plate"><div class="fs-face"><span class="fs-rtp-lbl">{$tr('maxWinLabel')}</span><span class="fs-rtp-val fs-num">{fsMaxWinLabel($locale)}</span></div></div>
         </div>
 
         <!-- Responsible play, the autoplay stop-conditions actually available

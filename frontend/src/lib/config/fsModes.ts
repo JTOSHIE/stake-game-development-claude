@@ -135,8 +135,56 @@ export const MODE_COST = FS_MODES.reduce(
 )
 
 /** Shared RTP + max win, identical across all modes (see game_config.py). */
+
+/**
+ * THE NUMBERS, which are the source of truth. The LABELS below are derived.
+ *
+ * These used to be English-formatted string literals, and that is a maths
+ * disclosure defect rather than a cosmetic one. Measured on the shipped build,
+ * the paytable rendered "5,000×" and "96.35%" IDENTICALLY in all sixteen
+ * locales. In German, French, Spanish, Russian and Turkish the comma is the
+ * DECIMAL separator and the period groups thousands, so a reviewer checking
+ * maths compliance in German read:
+ *
+ *     MAX. GEWINN 5,000×      as a max win of FIVE
+ *     RTP 96.35%              as an RTP of 9,635%
+ *
+ * Both wrong by three orders of magnitude, on the screen whose whole job is
+ * stating the maths. 2026-08-09.
+ */
+export const FS_MAX_WIN = 5000
+export const FS_RTP_PERCENT = 96.35
+
+/**
+ * Locale-aware forms. Callers pass the RESOLVED launch locale, the same value
+ * every money readout now takes, so one session never mixes conventions.
+ *
+ * The English constants are kept because non-localised callers exist (gates,
+ * and the social/real label helper below), and because a bare fallback is
+ * better than a raw number if a caller forgets the locale.
+ */
 export const FS_RTP_LABEL = '96.35%'
 export const FS_MAX_WIN_LABEL = '5,000×'
+
+export function fsRtpLabel(locale?: string): string {
+  return `${FS_RTP_PERCENT.toLocaleString(locale, {
+    minimumFractionDigits: 2, maximumFractionDigits: 2,
+  })}%`
+}
+
+export function fsMaxWinLabel(locale?: string): string {
+  return `${FS_MAX_WIN.toLocaleString(locale)}×`
+}
+
+/**
+ * A mode COST multiplier, locale-aware. Same defect class as the max win: the
+ * OVERBOOST tier is 1.25x and rendered "1.25×" in every locale, which in German
+ * and Turkish reads with the period as a THOUSANDS separator. Up to two decimals
+ * so 1x and 100x stay clean and 1.25x keeps its fraction.
+ */
+export function fsCostLabel(cost: number, locale?: string): string {
+  return `${cost.toLocaleString(locale, { maximumFractionDigits: 2 })}×`
+}
 
 /**
  * OWNER AUDIT ROUND 4, item 4 (market-convention ruling, 2026-07-26).
@@ -154,8 +202,12 @@ export const FS_MAX_WIN_LABEL = '5,000×'
  * "bet" is on the stake.us prohibited-terms table, so the social variant says
  * "base play". Both forms route through here so the pair cannot drift.
  */
-export function maxWinVsBaseBetLabel(social: boolean): string {
-  return social ? `${FS_MAX_WIN_LABEL} base play` : `${FS_MAX_WIN_LABEL} base bet`
+export function maxWinVsBaseBetLabel(social: boolean, locale?: string): string {
+  const n = fsMaxWinLabel(locale)
+  // The trailing words are still hardcoded English and are frozen in
+  // scripts/hardcoded_string_baseline.json's sibling list for translation; the
+  // NUMBER is fixed here because it needs no translation, only a locale.
+  return social ? `${n} base play` : `${n} base bet`
 }
 
 /**

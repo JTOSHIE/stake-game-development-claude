@@ -105,11 +105,20 @@ function mathsWincap(src: string): number | null {
   return m ? Number(m[1]) : null
 }
 
-/** The figure the rules PRINT to the player, from FS_MAX_WIN_LABEL. */
+/**
+ * The figure the rules PRINT to the player.
+ *
+ * READS THE NUMBER, NOT THE LABEL, since 2026-08-09. It used to parse
+ * `FS_MAX_WIN_LABEL = '5,000×'` and strip the punctuation back out. The rendered
+ * figure is now derived from the numeric `FS_MAX_WIN` via toLocaleString, so the
+ * label is no longer what a player sees, and a gate reading it would have passed
+ * happily while FS_MAX_WIN said something else entirely. Parsing the number the
+ * game actually formats is both simpler and strictly stronger.
+ */
 function displayedMaxWin(src: string): number | null {
-  const m = src.match(/FS_MAX_WIN_LABEL\s*=\s*'([^']+)'/)
+  const m = src.match(/FS_MAX_WIN\s*=\s*([0-9_]+)/)
   if (!m) return null
-  const n = Number(m[1].replace(/[^0-9.]/g, ''))
+  const n = Number(m[1].replace(/_/g, ''))
   return Number.isFinite(n) ? n : null
 }
 
@@ -300,7 +309,7 @@ if (!SELF_TEST) {
   // The max win figure printed to the player stops matching the cap. This is
   // REQ-040 exactly, and it is the one nothing held before this gate.
   seed('the printed max win drifts from the maths cap', (s) => ({
-    ...s, fsModes: s.fsModes.replace("FS_MAX_WIN_LABEL = '5,000×'", "FS_MAX_WIN_LABEL = '10,000×'"),
+    ...s, fsModes: s.fsModes.replace('FS_MAX_WIN = 5000', 'FS_MAX_WIN = 10000'),
   }))
   // S2-C050 SEED 1. The real defect form for the locale half: a TRANSLATED
   // string carrying the pre-FeatureMath-v2 multipliers. English stays correct,

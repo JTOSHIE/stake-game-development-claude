@@ -15,7 +15,7 @@
   import { isSocial } from '../stores/socialMode'
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
-  import { FS_MODES, FS_RTP_LABEL, maxWinVsBaseBetLabel } from '../config/fsModes'
+  import { FS_MODES, fsRtpLabel, maxWinVsBaseBetLabel } from '../config/fsModes'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -147,13 +147,13 @@
           </div>
           <div class="buy-stat">
             <span class="buy-stat-label">RTP</span>
-            <span class="buy-stat-val">{FS_RTP_LABEL}</span>
+            <span class="buy-stat-val">{fsRtpLabel($locale)}</span>
           </div>
           <div class="buy-stat">
             <span class="buy-stat-label">{t($locale, 'hudMaxWin', localeMode)}</span>
             <!-- ROUND 4 item 4: quoted against the BASE bet, because this stat
                  sits beside a 100x/400x cost multiplier. -->
-            <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial)}</span>
+            <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial, $locale)}</span>
           </div>
         </div>
         {#if !$canAffordMode(buyMode)}

@@ -17,7 +17,7 @@
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
   import { tr } from '../i18n/tr'
-  import { FS_MODES, FS_RTP_LABEL } from '../config/fsModes'
+  import { FS_MODES, fsRtpLabel, fsCostLabel } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
@@ -367,7 +367,7 @@
                     </div>
                     <p class="fm-blurb">{$tr(m.blurbKey)}</p>
                     <div class="fm-action">
-                      <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
+                      <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {$isSocial ? 'per spin' : 'bet'}</span>
                       {#if active}
                         <span class="fm-active-tag" data-testid="standing-active-{m.id}">{$tr('hudActive')}</span>
                       {:else}
@@ -417,12 +417,12 @@
                          and live resolved cost inline, not just the bare
                          "1.25x bet" the .fm-cost line already showed - reads
                          as "what does turning this on actually cost me". -->
-                    <p class="fm-enh-effect">{m.cost}× per spin while ON · <span class="fs-num">{price(m.cost)}</span></p>
+                    <p class="fm-enh-effect">{fsCostLabel(m.cost, $locale)} per spin while ON · <span class="fs-num">{price(m.cost)}</span></p>
                   {/if}
                 </div>
 
                 <div class="fm-action">
-                  <span class="fm-cost fs-num">{m.cost}× {$isSocial ? 'per spin' : 'bet'}</span>
+                  <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {$isSocial ? 'per spin' : 'bet'}</span>
 
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>
@@ -475,7 +475,7 @@
                 </div>
 
                 <div class="fm-action">
-                  <span class="fm-cost fs-num">{m.cost}× · {price(m.cost)}</span>
+                  <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} · {price(m.cost)}</span>
 
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>
@@ -503,7 +503,7 @@
 
         <!-- Footer -->
         <div class="fm-foot">
-          <span class="fm-rtp">All modes · RTP {FS_RTP_LABEL}</span>
+          <span class="fm-rtp">All modes · RTP {fsRtpLabel($locale)}</span>
           <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">{$tr('betModesHeading')}</button>
         </div>
 
