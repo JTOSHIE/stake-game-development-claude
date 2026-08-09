@@ -34,5 +34,47 @@ evaluateLiveGuard(true, true, false)
 check('a production auth failure blocks every bet route', get(bettingDisabled), true)
 check('and names the reason for the player-facing banner', get(liveGuardReason), 'auth-failed')
 
+// ---------------------------------------------------------------------------
+// A RUNTIME REASON SURVIVES A BOOT RE-EVALUATION, 2026-08-10.
+//
+// evaluateLiveGuard decides from what initRGS reported. It knows nothing about a
+// wallet request that stalled, or a recovered round whose settle failed, and
+// both are set elsewhere and can already be in place when it runs.
+//
+// THIS IS THE DANGEROUS ONE. Letting a boot re-evaluation write null over
+// 'wallet-stalled' re-enables betting on a session whose _rgsMode is false, and
+// spin() then falls through to _mockSpin(): the mock-containment defect this
+// module exists to prevent. The verifying agent measured it with the guard
+// removed, and a spin in that window paid a FABRICATED 12.30 with no wallet
+// request at all.
+{
+  liveGuardReason.set('wallet-stalled')
+  evaluateLiveGuard(true, false, false)   // a boot decision that would say "fine"
+  check('a stall is not cleared by a healthy re-evaluation',
+    get(liveGuardReason), 'wallet-stalled')
+  check('so betting stays blocked', get(bettingDisabled), true)
+
+  liveGuardReason.set('settle-failed')
+  evaluateLiveGuard(true, false, false)
+  check('an unsettled round is not cleared either',
+    get(liveGuardReason), 'settle-failed')
+
+  // NEGATIVE CONTROLS. The stickiness must be NARROW: the two BOOT reasons stay
+  // fully re-evaluable, or a transient auth failure would wedge the game for the
+  // rest of the session.
+  liveGuardReason.set('auth-failed')
+  evaluateLiveGuard(true, false, false)
+  check('a boot reason IS re-evaluable and clears', get(liveGuardReason), null)
+
+  liveGuardReason.set('missing-params')
+  evaluateLiveGuard(true, false, false)
+  check('and so is the other one', get(liveGuardReason), null)
+
+  liveGuardReason.set(null)
+  evaluateLiveGuard(true, true, false)
+  check('a fresh auth failure still blocks', get(liveGuardReason), 'auth-failed')
+  liveGuardReason.set(null)
+}
+
 if (failures) { console.error(`\nLIVE GUARD: FAIL (${failures})`); process.exit(1) }
 console.log('\nLIVE GUARD: PASS')

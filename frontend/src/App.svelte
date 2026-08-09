@@ -863,7 +863,12 @@
       // Only fires when the settle point above was never reached: a throw, or an
       // early return. Without it a failed purchase would leave the player's
       // balance visibly reduced for a round that never happened.
-      if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
+      //
+      // EXCEPT AFTER A WALLET STALL: see the same guard in handleSpin. The
+      // outcome is unknown, so refunding on screen would overstate the wallet.
+      if (optimisticDebit && get(liveGuardReason) !== 'wallet-stalled') {
+        balance.update((b) => b + optimisticDebit); optimisticDebit = 0
+      }
       selectedBetMode.set('base')
       isSpinning.set(false)
     }
@@ -1799,9 +1804,19 @@
       }
     } finally {
       // Fires only when settleRound never ran: a throw, or an early return. A
-      // failed spin must not leave the stake visibly gone for a round that
-      // never resolved.
-      if (optimisticDebit) { balance.update((b) => b + optimisticDebit); optimisticDebit = 0 }
+      // failed spin must not leave the stake visibly gone for a round that never
+      // resolved.
+      //
+      // EXCEPT AFTER A WALLET STALL, where the outcome is UNKNOWN rather than
+      // failed: the deadline in walletTimeout.ts aborts the request, but the RGS
+      // may already have taken the stake and opened a round. Refunding on screen
+      // would then show MORE money than the wallet holds, in the player's
+      // favour, on the one path where we cannot check. The stake stays debited,
+      // betting is blocked by the live guard, and the banner asks for a reload,
+      // which re-authenticates and settles whatever is open. 2026-08-10.
+      if (optimisticDebit && get(liveGuardReason) !== 'wallet-stalled') {
+        balance.update((b) => b + optimisticDebit); optimisticDebit = 0
+      }
       // B1 fix: always release the spin lock, even if animateSpin early-returns
       // (assets not ready) or throws, so the game can never deadlock after a spin.
       isSpinning.set(false)

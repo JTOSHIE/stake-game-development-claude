@@ -26,7 +26,7 @@
 //
 // In a development build the mock is the point, so the guard never engages.
 
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
 /**
  * `settle-failed` is set by sessionRecovery, never by evaluateLiveGuard: it is
@@ -36,7 +36,7 @@ import { writable, derived } from 'svelte/store'
  * this client could not close, and betting on top of that is exactly what the
  * other two reasons already prohibit. 2026-08-10.
  */
-export type LiveGuardReason = null | 'missing-params' | 'auth-failed' | 'settle-failed'
+export type LiveGuardReason = null | 'missing-params' | 'auth-failed' | 'settle-failed' | 'wallet-stalled'
 
 /** Why betting is disabled, or null when it is not. */
 export const liveGuardReason = writable<LiveGuardReason>(null)
@@ -56,6 +56,29 @@ export function evaluateLiveGuard(
   authErrored: boolean,
   isDev: boolean,
 ): LiveGuardReason {
+  // A RUNTIME REASON ALREADY OBSERVED IS NEVER CLEARED HERE.
+  //
+  // This function decides at BOOT from what initRGS reported. It knows nothing
+  // about a wallet request that stalled, or a recovered round whose settle
+  // failed, and both of those are set elsewhere and can already be in place when
+  // it runs.
+  //
+  // Letting it write null over `wallet-stalled` re-enables betting on a session
+  // whose `_rgsMode` is false, and `spin()` then falls through to `_mockSpin()`:
+  // the exact mock-containment defect this module exists to prevent. Measured by
+  // the verifying agent, not assumed: with this guard removed, a stalled
+  // authenticate re-enabled betting for 15s and a spin in that window paid a
+  // FABRICATED 12.30 with no wallet request at all.
+  //
+  // `settle-failed` is included for the same reason: the platform is still
+  // holding a round this client could not close.
+  //
+  // Deliberately narrow. It refuses to clear only the RUNTIME reasons; the two
+  // boot reasons stay fully re-evaluable, which is what liveGuard.test.ts
+  // asserts by calling this repeatedly without a reset in between.
+  const runtime = get(liveGuardReason)
+  if (runtime === 'wallet-stalled' || runtime === 'settle-failed') return runtime
+
   if (isDev) {
     liveGuardReason.set(null)
     return null
