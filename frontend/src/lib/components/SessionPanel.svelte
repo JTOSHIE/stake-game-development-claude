@@ -163,6 +163,45 @@
   .sp-val { color: #fff; font-variant-numeric: tabular-nums; font-size: 13px; }
   .sp-val.neg { color: #ff6b6b; }
   .sp-val.pos { color: #58e; }
+
+  /* SHORT OR NARROW STAGES. This panel is fixed-size chrome over a stage that is
+     not. Desktop escapes only because .game-wrapper carries its own scale(S);
+     App.svelte drops that transform in portrait, compact-landscape and
+     mini-player, so at Popout S the panel rendered at its full 143x83 over a
+     400x225 stage, covering 6 of 20 visible symbol tiles in English and 12 of 20
+     in Indonesian with a real session balance.
+
+     499px, NOT 500. App.svelte:1192 tests `innerHeight < COMPACT_HEIGHT_BREAKPOINT`
+     with the breakpoint at 500, i.e. EXCLUSIVE. CSS max-height is inclusive, so
+     499px is the exact equivalent; an inclusive 500 here would shrink the panel
+     a second time at a height where the wrapper still carries scale(S).
+
+     Scoped `.sp .sp-row` / `.sp .sp-val`, not bare, because the on-demand sheet
+     below reuses those two classes and must keep its 13px values and 12px row
+     gap.
+
+     A HORIZONTAL ROW FORM WAS DESIGNED FOR THIS AND REJECTED, which is worth
+     recording because it looks tighter and is worse. Laying the three rows side
+     by side with `white-space: nowrap` makes the panel's width ADDITIVE, and the
+     NET value comes from the FULL formatter, not the compact one. Driven with
+     real session values in vi/VND and id/IDR the row form ran OFF THE LEFT EDGE
+     of the 400x225 popout and lost content silently: docScrollW stayed 400,
+     nothing reported as clipped. The block form degrades by WRAPPING instead,
+     which is exactly what nowrap removed. 2026-08-10. */
+  @media (max-width: 480px), (max-height: 499px) {
+    .sp {
+      top: calc(0.25rem + env(safe-area-inset-top, 0px));
+      right: calc(0.25rem + env(safe-area-inset-right, 0px));
+      min-width: 0;
+      gap: 0;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+    .sp .sp-row { gap: 6px; line-height: 1.15; }
+    /* 11px, not smaller: the value drops to the label's size and no further,
+       holding the legibility floor the .sp-row comment above records. */
+    .sp .sp-val { font-size: 11px; }
+  }
   .rc-backdrop { z-index: 130; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.65); }
   .rc-modal { width: min(90vw, 360px); padding: 22px; border-radius: 14px; text-align: center; font-family: var(--fs-font-display); color: #fff; background: linear-gradient(160deg, #0c0c22, #08081a); border: 1px solid rgba(0,255,255,0.4); }
   .rc-modal h2 { color: #00ffff; font-size: 1.1rem; margin: 0 0 12px; }
