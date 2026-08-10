@@ -348,31 +348,21 @@ const KNOWN_MIXED_APOSTROPHE = new Map([])
 const COMMA_DECIMAL = new Set(['de', 'es', 'fi', 'fr', 'id', 'pl', 'pt', 'ru', 'tr', 'vi'])
 
 /**
- * FROZEN, ONE KEY, AND IT IS A QUESTION RATHER THAN AN EXEMPTION ON MERIT.
+ * EMPTY, AND THAT IS THE POINT, same as KNOWN_MIXED_APOSTROPHE above. The one
+ * entry this map ever held froze `modeOverboostBlurb`, whose `1.6×` and `1.25×`
+ * R042 TASK A2 had not ruled: converting them unruled would have been a builder
+ * deciding maths-adjacent wording (convention l.8), so they were frozen
+ * visibly and escalated as OWNER_RULINGS section J. R043 PHASE 1b then ruled
+ * the two tokens to the comma-decimal form in the same ten locales, the
+ * committed numeral mechanism applied them, and the entry retired WITH the fix:
+ * the both-directions check below fails a frozen entry that no longer matches,
+ * so a half-fix that converted the strings but kept the exemption, or removed
+ * the exemption without converting, goes red either way.
  *
- * R042 TASK A2 ruled the figure tokens `5,000` and `96.35`. `modeOverboostBlurb`
- * carries TWO MORE in the same file and the same ten locales: "1.6× the feature
- * trigger rate" and "1.25× every spin", both period decimals beside a unit, so
- * in German they read as sixteen and one hundred and twenty five.
- *
- * The scan the ruling asked for catches them, correctly. The ruling's REWRITE
- * did not name them. Converting them anyway would be a builder deciding the
- * wording of a maths-adjacent disclosure, which convention (l.8) forbids, and
- * narrowing the scan to hide them would be worse: a gate written around a defect
- * it can see is the exact self-deception this file exists to stop.
- *
- * So they are frozen HERE, visibly, checked in BOTH directions, and escalated as
- * section J of OWNER_RULINGS_PRESUBMISSION.md. When the ruling lands, the fix
- * removes this entry or the gate fails.
- *
- * Keyed `file|key`, deliberately NOT per locale: the defect is one string in ten
- * locales, and ten entries would read as ten problems.
+ * Keyed `file|key`, deliberately NOT per locale: a defect that is one string in
+ * ten locales is one entry, not ten problems.
  */
-const KNOWN_EN_FORM_FIGURE = new Map([
-  ['src/lib/i18n/prose.locales.ts|modeOverboostBlurb',
-    'R042 TASK A2 ruled the tokens 5,000 and 96.35 only. This string carries 1.6x and 1.25x '
-    + 'in the same ten locales, unruled. Escalated as OWNER_RULINGS section J.'],
-])
+const KNOWN_EN_FORM_FIGURE = new Map([])
 
 /**
  * THE SAME LOCALE ACROSS THE THREE TABLES. R042 A1, found by a render proof.

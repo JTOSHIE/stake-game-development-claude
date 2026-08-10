@@ -1,3 +1,11 @@
+// SUPERSEDED 2026-08-10 by frontend/scripts/r043_verify.mjs, per R043 PHASE 1f.
+// R043 changed strings adjacent to the set this file pins (rulesOverdriveModes,
+// rulesOverdriveTrigger, rulesOverdriveMeter, modeOverboostBlurb); its own A1
+// to A6 checks still passed at the moment of retirement, and it is archived
+// rather than deleted because it is the record of what R042 shipped, moved out
+// of frontend/scripts/ so nobody runs it expecting a verdict on the current
+// tree.
+//
 // r042_verify.mjs
 //
 // ONE COMMAND THAT RE-DERIVES EVERY CLAIM MADE ABOUT R042 BRIEF A.
