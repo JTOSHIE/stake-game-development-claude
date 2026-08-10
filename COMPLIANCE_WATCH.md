@@ -53,6 +53,68 @@ Australian English, no em dashes or en dashes.
 
 ## Watch log
 
+### 2026-08-10: full 66-page mirror re-render (R043 PHASE 6); three pages changed, two STOP flags
+
+The complete 2026-07-29 topic list was re-rendered into
+`docs/stake-engine-live/2026-08-10/` (all 66 pages, render_state rendered; the
+per-file headers record the transport note for this environment). Compared by
+sha256 against 2026-07-29: **61 of 64 shared pages byte-identical**. The three
+deltas, each read in full rather than sampled:
+
+1. **`approval_guidelines_math_verification` REWRITTEN AND EXTENDED (4,558 to
+   8,065 chars). STOP: recorded for owner and Fable, not actioned.** The page
+   now publishes, as tables, what was previously prose or absent:
+   - a new **Betlevel templates** section: the RGS rejects a bet whose total
+     cost exceeds $500,000 USD or whose potential payout exceeds $50,000,000
+     USD, returning 400 "invalid bet amount"; base-bet templates range $1 to
+     $1000 USD.
+   - a new **Critical Tests** table (all must pass before submission): base
+     mode 1.0x and cheapest; base standard deviation >= 0.6; RTP 90.0 to
+     96.7%; cross-mode RTP variation <= 0.5%; max payout multiplier <=
+     500,000x; max cost multiplier <= 2,000x; **non-zero hit rate at least 1
+     in 50 in EVERY mode**; at least one viable bet-level template.
+   - a new **Non-Critical Tests** limits table per rating: Maximum Exposure
+     $15,000,000 (2-Star) / $50,000,000 (3-Star); Maximum Bet Cost $100,000 /
+     $500,000; Maximum Payout Multiplier 50,000x / 100,000x; Maximum Cost
+     Multiplier 1,000x / 2,000x; Maximum Base Std Dev 50.0 / 60.0; **Risk
+     Limit CVaR (per-stake) 700 / 700; CVaR (absolute) 20,000 / 50,000**;
+     Tail Probability P(>=5,000x) 0.010 / 0.050; P(>=10,000x) 0.005 / 0.010.
+   Why the STOP matters twice over: (a) the long-open CVaR ambiguity (FABLE
+   COMMS 001 finding 1 recorded three unresolved axes) now has PUBLISHED
+   figures and needs Fable to re-run the section 5f computation against the
+   published definition; (b) the old 3-Star Maximum Exposure figure in the
+   superseded root mirror ($25,000,000, `math-verification.md:46`) is now
+   $50,000,000, so any document citing the old figure cites a superseded one.
+   First-look posture, derivation not ruling: every CRITICAL test reads as met
+   by the shipped package (base 1.0x cheapest; base SD 17.28 >= 0.6; all five
+   modes 96.35%; cap 5,000x << 500,000x; max cost 400x <= 2,000x; base
+   hit rate 29.11% >> 1 in 50), and the per-mode hit-rate and CVaR figures
+   against the PUBLISHED definitions are for Fable's verification round, per
+   convention (l.8).
+
+2. **`approval_guidelines_submission_checklist` preamble reworded** (1,376 to
+   1,405 chars, one sentence): "reflects the exact criteria your game will be
+   reviewed against" became "is the criteria applied to a NEW TEAM.
+   Requirements may vary once your team builds a track record, so your own
+   review checklist can differ slightly." Bears on how the authenticated
+   2026-08-09 checklist transcription is read (it is the new-team baseline).
+   No shipped behaviour touched.
+
+3. **`terms` counterparty CHANGED. STOP: owner-facing contractual change,
+   recorded, not actioned.** Published date moved from Aug 6, 2025 to Jul 30,
+   2026, and the contracting entity changed THROUGHOUT from Carrot Gaming Pty
+   Ltd (Australia, reg 677 182 553, Melbourne) to **Medium Rare N.V.
+   (Curacao, register 145353, Seru Loraweg 17 B)**. The licence-fee mechanics
+   (10% GGR, USDT, negative rollover) read unchanged; the party the owner
+   contracts with does not. This is the owner's to review; nothing in the
+   repository changes on its account.
+
+No shipped behaviour was changed by this delta, so nothing was actioned;
+the two STOP items above are for the owner and Fable. The 2026-08-09
+authenticated checklist transcription remains the newest capture of the
+REVIEW checklist; today's public checklist page differs from it in scope, not
+in content.
+
 ### 2026-07-04: captured the full approval-guidelines set + rubric findings
 Discovered (via the docs nav) that we were mirroring only 4 of the approval pages and that
 the dossier's `/docs/approval/checklist` + `/docs/approval/game-tile` URLs were wrong (they

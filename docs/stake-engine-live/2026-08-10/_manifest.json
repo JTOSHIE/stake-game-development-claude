@@ -1,0 +1,582 @@
+{
+  "fetched": "2026-08-10",
+  "renderer": "headless chromium via Playwright, querySelector(main), transport via node undici through the environment agent proxy",
+  "pages": [
+    {
+      "slug": "approval_guidelines",
+      "url": "https://stake-engine.com/docs/approval-guidelines",
+      "title": "Approval Guidelines - API Documentation",
+      "chars": 2250,
+      "sha256": "9e2713a17e0752804a2fc4f9db68904c95a1b2eab0fc4d662bdb5e4f7e400555",
+      "note": "rendered",
+      "file": "approval_guidelines.md"
+    },
+    {
+      "slug": "approval_guidelines_front_end_communication",
+      "url": "https://stake-engine.com/docs/approval-guidelines/front-end-communication",
+      "title": "Approval Guidelines Front End Communication - API Documentation",
+      "chars": 2854,
+      "sha256": "362166b9146acf498bf19725e6c69a88157c61e3dc7de2a496054849fee40c82",
+      "note": "rendered",
+      "file": "approval_guidelines_front_end_communication.md"
+    },
+    {
+      "slug": "approval_guidelines_game_quality_rankings",
+      "url": "https://stake-engine.com/docs/approval-guidelines/game-quality-rankings",
+      "title": "Approval Guidelines Game Quality Rankings - API Documentation",
+      "chars": 3245,
+      "sha256": "0454dcc257c08a49717e1cc27a856f5c696aaee02e5009848c60239dba265dcf",
+      "note": "rendered",
+      "file": "approval_guidelines_game_quality_rankings.md"
+    },
+    {
+      "slug": "approval_guidelines_game_replay_requirements",
+      "url": "https://stake-engine.com/docs/approval-guidelines/game-replay-requirements",
+      "title": "",
+      "chars": 5037,
+      "sha256": "789dcfd5ff7bc592582440aae2e098156026bb88f40b2ec75224ad1cb3afa536",
+      "note": "rendered",
+      "file": "approval_guidelines_game_replay_requirements.md"
+    },
+    {
+      "slug": "approval_guidelines_game_tile_requirements",
+      "url": "https://stake-engine.com/docs/approval-guidelines/game-tile-requirements",
+      "title": "Approval Guidelines Game Tile Requirements - API Documentation",
+      "chars": 1341,
+      "sha256": "08f7a9e0b3e2be9210f24fa79b913c9a40e52308b0dea25c321441286624cad4",
+      "note": "rendered",
+      "file": "approval_guidelines_game_tile_requirements.md"
+    },
+    {
+      "slug": "approval_guidelines_general_disclaimer",
+      "url": "https://stake-engine.com/docs/approval-guidelines/general-disclaimer",
+      "title": "Approval Guidelines General Disclaimer - API Documentation",
+      "chars": 872,
+      "sha256": "d83624a4ad8cb4845cb0b4ca9bd3ca252b332bd9fa77b9a3327412a20463c904",
+      "note": "rendered",
+      "file": "approval_guidelines_general_disclaimer.md"
+    },
+    {
+      "slug": "approval_guidelines_jurisdiction_requirements",
+      "url": "https://stake-engine.com/docs/approval-guidelines/jurisdiction-requirements",
+      "title": "Approval Guidelines Jurisdiction Requirements - API Documentation",
+      "chars": 1375,
+      "sha256": "b115c7a10ac126a88c968d9f0038dc42a90781ce5769c4c002f9ce637f65687c",
+      "note": "rendered",
+      "file": "approval_guidelines_jurisdiction_requirements.md"
+    },
+    {
+      "slug": "approval_guidelines_math_verification",
+      "url": "https://stake-engine.com/docs/approval-guidelines/math-verification",
+      "title": "Approval Guidelines Math Verification - API Documentation",
+      "chars": 8065,
+      "sha256": "8e41eeb22d0b8793c52124025fbe1b2a163db0d31df05812d5012c11c939538b",
+      "note": "rendered",
+      "file": "approval_guidelines_math_verification.md"
+    },
+    {
+      "slug": "approval_guidelines_rgs_communication",
+      "url": "https://stake-engine.com/docs/approval-guidelines/rgs-communication",
+      "title": "Approval Guidelines Rgs Communication - API Documentation",
+      "chars": 3165,
+      "sha256": "e3adcfcd886268cc314eef1f77846cabb83852607eddcdaee151eb707086ce0a",
+      "note": "rendered",
+      "file": "approval_guidelines_rgs_communication.md"
+    },
+    {
+      "slug": "approval_guidelines_submission_checklist",
+      "url": "https://stake-engine.com/docs/approval-guidelines/submission-checklist",
+      "title": "Submission Checklist - Approval Guidelines",
+      "chars": 1405,
+      "sha256": "f7e070efc1e96f0cc9debce9978d2e4edd8f8ab41ebeca195d319791f630b8ad",
+      "note": "rendered",
+      "file": "approval_guidelines_submission_checklist.md"
+    },
+    {
+      "slug": "front_end",
+      "url": "https://stake-engine.com/docs/front-end",
+      "title": "Front End - API Documentation",
+      "chars": 571,
+      "sha256": "1f0f3ddc820bf9bfd9378849e34aa762d3187a89d1e1a93427900497880e869e",
+      "note": "rendered",
+      "file": "front_end.md"
+    },
+    {
+      "slug": "front_end_adding_new_events",
+      "url": "https://stake-engine.com/docs/front-end/adding-new-events",
+      "title": "Front End Adding New Events - API Documentation",
+      "chars": 6102,
+      "sha256": "058dd8b15fd76c7eec92b4c4dd964d66d6806345744ab5ca18ff74df78c9fb67",
+      "note": "rendered",
+      "file": "front_end_adding_new_events.md"
+    },
+    {
+      "slug": "front_end_context",
+      "url": "https://stake-engine.com/docs/front-end/context",
+      "title": "Front End Context - API Documentation",
+      "chars": 5324,
+      "sha256": "79f990e2facfb66cb18521aca2e27b40c6fa64fd1131856f138778bff2baeacd",
+      "note": "rendered",
+      "file": "front_end_context.md"
+    },
+    {
+      "slug": "front_end_dependencies",
+      "url": "https://stake-engine.com/docs/front-end/dependencies",
+      "title": "Front End Dependencies - API Documentation",
+      "chars": 829,
+      "sha256": "e53761b1f62d6c1dd6f9ff00b2cf5b95a676e4b33ad3b44228a04d59fd043b5a",
+      "note": "rendered",
+      "file": "front_end_dependencies.md"
+    },
+    {
+      "slug": "front_end_file_structure",
+      "url": "https://stake-engine.com/docs/front-end/file-structure",
+      "title": "Front End File Structure - API Documentation",
+      "chars": 6893,
+      "sha256": "565b1d53368bebba91196876c964e49892613ff3880163cef79e59f44375cc4e",
+      "note": "rendered",
+      "file": "front_end_file_structure.md"
+    },
+    {
+      "slug": "front_end_flowchart",
+      "url": "https://stake-engine.com/docs/front-end/flowchart",
+      "title": "Front End Flowchart - API Documentation",
+      "chars": 8282,
+      "sha256": "7561bbd2ebedadd1c06f749bd85ae12cbf5d701911718cfae36befe412d551cc",
+      "note": "rendered",
+      "file": "front_end_flowchart.md"
+    },
+    {
+      "slug": "front_end_getting_started",
+      "url": "https://stake-engine.com/docs/front-end/getting-started",
+      "title": "Front End Getting Started - API Documentation",
+      "chars": 1446,
+      "sha256": "a71fc8c160c141ee2db9a5ef2ba8f2a431d008760a81be85a653817e95e40018",
+      "note": "rendered",
+      "file": "front_end_getting_started.md"
+    },
+    {
+      "slug": "front_end_storybook",
+      "url": "https://stake-engine.com/docs/front-end/storybook",
+      "title": "Front End Storybook - API Documentation",
+      "chars": 1804,
+      "sha256": "e3d58289b378f27e47f8f154bff8dcf4f34831469578b02f083f8cd73b882bbb",
+      "note": "rendered",
+      "file": "front_end_storybook.md"
+    },
+    {
+      "slug": "front_end_task_breakdown",
+      "url": "https://stake-engine.com/docs/front-end/task-breakdown",
+      "title": "Front End Task Breakdown - API Documentation",
+      "chars": 2841,
+      "sha256": "59becb627d8de0d264ada0ea0030e32436e27cb0f270c398cb1c56a467fdc1a0",
+      "note": "rendered",
+      "file": "front_end_task_breakdown.md"
+    },
+    {
+      "slug": "front_end_ui",
+      "url": "https://stake-engine.com/docs/front-end/ui",
+      "title": "Front End Ui - API Documentation",
+      "chars": 1226,
+      "sha256": "73612c616fd4734fa395c57c9030506e42f4092255e931b15476c6948fa19790",
+      "note": "rendered",
+      "file": "front_end_ui.md"
+    },
+    {
+      "slug": "giveaway_terms",
+      "url": "https://stake-engine.com/docs/giveaway-terms",
+      "title": "3 Star Game Challenge Giveaway - Terms and Conditions",
+      "chars": 11783,
+      "sha256": "b401b2b576daf855eaafc6c7ba30efa9b106d527978c55760b7a60292f90d577",
+      "note": "rendered",
+      "file": "giveaway_terms.md"
+    },
+    {
+      "slug": "index",
+      "url": "https://stake-engine.com/docs",
+      "title": "API Documentation",
+      "chars": 1881,
+      "sha256": "3ab104e083557057f2cc2da4c6358d1f483de92555417d4777bc39493bb303b2",
+      "note": "rendered",
+      "file": "index.md"
+    },
+    {
+      "slug": "math",
+      "url": "https://stake-engine.com/docs/math",
+      "title": "Math - API Documentation",
+      "chars": 3150,
+      "sha256": "d3108ead1b57485c8fac0415927bc0c68559794fcd268a65a4cb4288f9604041",
+      "note": "rendered",
+      "file": "math.md"
+    },
+    {
+      "slug": "math_example_games",
+      "url": "https://stake-engine.com/docs/math/example-games",
+      "title": "Math Example Games - API Documentation",
+      "chars": 5389,
+      "sha256": "781c32f65a3474761a6f14adbb69827a6029db870fcbdffbd5f53a10159481d1",
+      "note": "rendered",
+      "file": "math_example_games.md"
+    },
+    {
+      "slug": "math_game_state_structure",
+      "url": "https://stake-engine.com/docs/math/game-state-structure",
+      "title": "Math Game State Structure Simulation Acceptance - API Documentation",
+      "chars": 3521,
+      "sha256": "075999fbc076983108e1531b0e56d87ff4ff84350c6faa63ba222f59970515b5",
+      "note": "rendered",
+      "file": "math_game_state_structure.md"
+    },
+    {
+      "slug": "math_game_state_structure_board",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/board",
+      "title": "Math Game State Structure Board - API Documentation",
+      "chars": 2272,
+      "sha256": "34c605943cb7771b2972b7cd3fe6c860313a55baffbd09f964449f378143d8ef",
+      "note": "rendered",
+      "file": "math_game_state_structure_board.md"
+    },
+    {
+      "slug": "math_game_state_structure_events",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/events",
+      "title": "Math Game State Structure Events - API Documentation",
+      "chars": 1712,
+      "sha256": "46ae32cc95d14743c6288e8789b7a7f1676b8c1b3442be01ad14ef6606bdaddd",
+      "note": "rendered",
+      "file": "math_game_state_structure_events.md"
+    },
+    {
+      "slug": "math_game_state_structure_force_files",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/force-files",
+      "title": "Math Game State Structure Force Files - API Documentation",
+      "chars": 2540,
+      "sha256": "2fe70dbd91f13e3c6ed8845f3ac5b3260e4e8b70056eef5c748e06f24cdd6674",
+      "note": "rendered",
+      "file": "math_game_state_structure_force_files.md"
+    },
+    {
+      "slug": "math_game_state_structure_setup_betmode",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/setup/betmode",
+      "title": "Math Game State Structure Setup Betmode - API Documentation",
+      "chars": 3034,
+      "sha256": "7633ae35e8cf12789a8e5d9c1f6c64ce7bc8dfe8d74fc0bff17e062c2ffc7bb5",
+      "note": "rendered",
+      "file": "math_game_state_structure_setup_betmode.md"
+    },
+    {
+      "slug": "math_game_state_structure_setup_configs",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/setup/configs",
+      "title": "Math Game State Structure Setup Configs - API Documentation",
+      "chars": 4225,
+      "sha256": "c68895887b0af4e419bc36bb57df765d15293e69d3fe5cd855c23e86164d0768",
+      "note": "rendered",
+      "file": "math_game_state_structure_setup_configs.md"
+    },
+    {
+      "slug": "math_game_state_structure_setup_distribution",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/setup/distribution",
+      "title": "Math Game State Structure Setup Distribution - API Documentation",
+      "chars": 2021,
+      "sha256": "7024d2faba2f216f6f0241735ca01026d3e57dcf40410843869322bbaaad4d2c",
+      "note": "rendered",
+      "file": "math_game_state_structure_setup_distribution.md"
+    },
+    {
+      "slug": "math_game_state_structure_simulation_acceptance",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/simulation-acceptance",
+      "title": "Math Game State Structure Simulation Acceptance - API Documentation",
+      "chars": 3521,
+      "sha256": "075999fbc076983108e1531b0e56d87ff4ff84350c6faa63ba222f59970515b5",
+      "note": "rendered",
+      "file": "math_game_state_structure_simulation_acceptance.md"
+    },
+    {
+      "slug": "math_game_state_structure_symbols",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/symbols",
+      "title": "Math Game State Structure Symbols - API Documentation",
+      "chars": 3543,
+      "sha256": "3243da2519d37b36260630ebeb4d2bab085f34d06ac6e3f6b851af806e36f87b",
+      "note": "rendered",
+      "file": "math_game_state_structure_symbols.md"
+    },
+    {
+      "slug": "math_game_state_structure_wins",
+      "url": "https://stake-engine.com/docs/math/game-state-structure/wins",
+      "title": "Math Game State Structure Wins - API Documentation",
+      "chars": 4131,
+      "sha256": "d6e7ef13639c74ea22cdc794699127b1e3b5710f40b2adfafc465aecac6fe1b0",
+      "note": "rendered",
+      "file": "math_game_state_structure_wins.md"
+    },
+    {
+      "slug": "math_high_level_structure",
+      "url": "https://stake-engine.com/docs/math/high-level-structure",
+      "title": "Math High Level Structure State Machine - API Documentation",
+      "chars": 5517,
+      "sha256": "489dbb2ac7ad70633ba4464d28faed13d16c0409ad9d0b6f016c2b19bbd1b77b",
+      "note": "rendered",
+      "file": "math_high_level_structure.md"
+    },
+    {
+      "slug": "math_high_level_structure_game_format",
+      "url": "https://stake-engine.com/docs/math/high-level-structure/game-format",
+      "title": "Math High Level Structure Game Format - API Documentation",
+      "chars": 8770,
+      "sha256": "3ce60d0acbc968a6d9bb4e56869acfb3cd6b0f43ce8f12b3d08bdecabac2ada7",
+      "note": "rendered",
+      "file": "math_high_level_structure_game_format.md"
+    },
+    {
+      "slug": "math_high_level_structure_game_structure",
+      "url": "https://stake-engine.com/docs/math/high-level-structure/game-structure",
+      "title": "Math High Level Structure Game Structure - API Documentation",
+      "chars": 4599,
+      "sha256": "db97147fb2e6553ee59a4cfffd1d85fa916cc25d5f01601dd19a0fd4ef216274",
+      "note": "rendered",
+      "file": "math_high_level_structure_game_structure.md"
+    },
+    {
+      "slug": "math_high_level_structure_state_machine",
+      "url": "https://stake-engine.com/docs/math/high-level-structure/state-machine",
+      "title": "Math High Level Structure State Machine - API Documentation",
+      "chars": 5517,
+      "sha256": "489dbb2ac7ad70633ba4464d28faed13d16c0409ad9d0b6f016c2b19bbd1b77b",
+      "note": "rendered",
+      "file": "math_high_level_structure_state_machine.md"
+    },
+    {
+      "slug": "math_math_file_format",
+      "url": "https://stake-engine.com/docs/math/math-file-format",
+      "title": "Math Math File Format - API Documentation",
+      "chars": 3113,
+      "sha256": "87ceb156d31869af8d4d577396b8b5d3dd9ee7247db94187a18a33f396499a55",
+      "note": "rendered",
+      "file": "math_math_file_format.md"
+    },
+    {
+      "slug": "math_optimization_algorithm",
+      "url": "https://stake-engine.com/docs/math/optimization-algorithm",
+      "title": "Math Optimization Algorithm - API Documentation",
+      "chars": 3740,
+      "sha256": "d6818b0bdcd85b03afbb46c0252d11d7e1556bc4de5615115883004497c5263d",
+      "note": "rendered",
+      "file": "math_optimization_algorithm.md"
+    },
+    {
+      "slug": "math_quick_start",
+      "url": "https://stake-engine.com/docs/math/quick-start",
+      "title": "Math Quick Start - API Documentation",
+      "chars": 7095,
+      "sha256": "8c74b7a9a5a16e6a20f0a2fbf2c38e847869da1d6de40a8dce1b27396df79820",
+      "note": "rendered",
+      "file": "math_quick_start.md"
+    },
+    {
+      "slug": "math_sdk_directory",
+      "url": "https://stake-engine.com/docs/math/sdk-directory",
+      "title": "Math Sdk Directory - API Documentation",
+      "chars": 3276,
+      "sha256": "dbfae113e7b856699ba31e950d516079dac6796e5bb85fe67ab7971014981cc4",
+      "note": "rendered",
+      "file": "math_sdk_directory.md"
+    },
+    {
+      "slug": "math_setup",
+      "url": "https://stake-engine.com/docs/math/setup",
+      "title": "Math Setup - API Documentation",
+      "chars": 2126,
+      "sha256": "e382817a7f6ec4eec1f8d6c7d08bb55b48537fae593f4a2b2a8dcb5a493afc23",
+      "note": "rendered",
+      "file": "math_setup.md"
+    },
+    {
+      "slug": "math_source_files",
+      "url": "https://stake-engine.com/docs/math/source-files",
+      "title": "Math Source Files Config - API Documentation",
+      "chars": 508,
+      "sha256": "b96f772fe351e9223d5a9e8fca376349e0dd5eb8582ea68915e9a945495e9bca",
+      "note": "rendered",
+      "file": "math_source_files.md"
+    },
+    {
+      "slug": "math_source_files_calculations",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations",
+      "title": "Math Source Files Calculations Board - API Documentation",
+      "chars": 2354,
+      "sha256": "de872a009a67986ebdde0ea912b377db6a0220b0c9064be84262e67d6b330eda",
+      "note": "rendered",
+      "file": "math_source_files_calculations.md"
+    },
+    {
+      "slug": "math_source_files_calculations_board",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/board",
+      "title": "Math Source Files Calculations Board - API Documentation",
+      "chars": 2354,
+      "sha256": "de872a009a67986ebdde0ea912b377db6a0220b0c9064be84262e67d6b330eda",
+      "note": "rendered",
+      "file": "math_source_files_calculations_board.md"
+    },
+    {
+      "slug": "math_source_files_calculations_cluster",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/cluster",
+      "title": "Math Source Files Calculations Cluster - API Documentation",
+      "chars": 1850,
+      "sha256": "dd2c3bb6723ae1de29a10a4b98580444dbe8b1a321370fcc9d88dd87d404607a",
+      "note": "rendered",
+      "file": "math_source_files_calculations_cluster.md"
+    },
+    {
+      "slug": "math_source_files_calculations_lines",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/lines",
+      "title": "Math Source Files Calculations Lines - API Documentation",
+      "chars": 2074,
+      "sha256": "6450e99bb2e5fc9a1c3b539fdcc97fd30742da973e5c542b7535122284d550d6",
+      "note": "rendered",
+      "file": "math_source_files_calculations_lines.md"
+    },
+    {
+      "slug": "math_source_files_calculations_scatter",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/scatter",
+      "title": "Math Source Files Calculations Scatter - API Documentation",
+      "chars": 1824,
+      "sha256": "95ac2aaab5f57af4f723d8dc786d0ef24459c0d6271910bdcdf14c80ec26e7d2",
+      "note": "rendered",
+      "file": "math_source_files_calculations_scatter.md"
+    },
+    {
+      "slug": "math_source_files_calculations_tumble",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/tumble",
+      "title": "Math Source Files Calculations Tumble - API Documentation",
+      "chars": 879,
+      "sha256": "d780ebc36024bc98b4d7c6f7fa88ce785171c3836ca1bafe9d2210cce68e13e7",
+      "note": "rendered",
+      "file": "math_source_files_calculations_tumble.md"
+    },
+    {
+      "slug": "math_source_files_calculations_ways",
+      "url": "https://stake-engine.com/docs/math/source-files/calculations/ways",
+      "title": "Math Source Files Calculations Ways - API Documentation",
+      "chars": 1530,
+      "sha256": "35913f8aae963abde0fe691fd9ce362d997fc1ac87268220daf1ec30e3618fd5",
+      "note": "rendered",
+      "file": "math_source_files_calculations_ways.md"
+    },
+    {
+      "slug": "math_source_files_config",
+      "url": "https://stake-engine.com/docs/math/source-files/config",
+      "title": "Math Source Files Config - API Documentation",
+      "chars": 508,
+      "sha256": "b96f772fe351e9223d5a9e8fca376349e0dd5eb8582ea68915e9a945495e9bca",
+      "note": "rendered",
+      "file": "math_source_files_config.md"
+    },
+    {
+      "slug": "math_source_files_events",
+      "url": "https://stake-engine.com/docs/math/source-files/events",
+      "title": "Math Source Files Events - API Documentation",
+      "chars": 2497,
+      "sha256": "e3a0c20750936263d991e919b284517ba855e7976e1d39160bf621334287a7df",
+      "note": "rendered",
+      "file": "math_source_files_events.md"
+    },
+    {
+      "slug": "math_source_files_executables",
+      "url": "https://stake-engine.com/docs/math/source-files/executables",
+      "title": "Math Source Files Executables - API Documentation",
+      "chars": 3407,
+      "sha256": "046fbf686125054cb27d50216f09bae8410cb9e145ae8b6dbb12f6fd03314090",
+      "note": "rendered",
+      "file": "math_source_files_executables.md"
+    },
+    {
+      "slug": "math_source_files_outputs",
+      "url": "https://stake-engine.com/docs/math/source-files/outputs",
+      "title": "Math Source Files Outputs - API Documentation",
+      "chars": 2719,
+      "sha256": "c86844cf8866d0014907d9b957f44ddb3724e6d20534b6648ebadf48f5dad40a",
+      "note": "rendered",
+      "file": "math_source_files_outputs.md"
+    },
+    {
+      "slug": "math_source_files_state",
+      "url": "https://stake-engine.com/docs/math/source-files/state",
+      "title": "Math Source Files State - API Documentation",
+      "chars": 4049,
+      "sha256": "722c93f99484d261820189c45666fbb9388dca8e0f0ea1a65e23eec87ae8ba65",
+      "note": "rendered",
+      "file": "math_source_files_state.md"
+    },
+    {
+      "slug": "math_source_files_win_manager",
+      "url": "https://stake-engine.com/docs/math/source-files/win-manager",
+      "title": "Math Source Files Win Manager - API Documentation",
+      "chars": 2846,
+      "sha256": "11150305e127726892907782ce3d20494204198fef38ae6439707cf6d7614d5d",
+      "note": "rendered",
+      "file": "math_source_files_win_manager.md"
+    },
+    {
+      "slug": "math_utilities",
+      "url": "https://stake-engine.com/docs/math/utilities",
+      "title": "Math Utilities - API Documentation",
+      "chars": 2347,
+      "sha256": "cdda02cd3ed6a9dd25213a4d96d23d59b6240bab21e3d441253c281cb0c43ffb",
+      "note": "rendered",
+      "file": "math_utilities.md"
+    },
+    {
+      "slug": "payments",
+      "url": "https://stake-engine.com/docs/payments",
+      "title": "Payments - API Documentation",
+      "chars": 3524,
+      "sha256": "d85fa6f0fe12cd5040e315106ed8a71252ab11ed9bf1c05d67b4f71ef33c6937",
+      "note": "rendered",
+      "file": "payments.md"
+    },
+    {
+      "slug": "privacy",
+      "url": "https://stake-engine.com/docs/privacy",
+      "title": "",
+      "chars": 2642,
+      "sha256": "a8ff26c7a115baaf805da934a4eb87c9af50883533953957653e7b87ba875ee6",
+      "note": "rendered",
+      "file": "privacy.md"
+    },
+    {
+      "slug": "rgs",
+      "url": "https://stake-engine.com/docs/rgs",
+      "title": "Rgs - API Documentation",
+      "chars": 12025,
+      "sha256": "cefad0fd2ed1a789e4b50cea9f0a2266d1ab5d0f04428f3d1889531a31a24580",
+      "note": "rendered",
+      "file": "rgs.md"
+    },
+    {
+      "slug": "rgs_example",
+      "url": "https://stake-engine.com/docs/rgs/example",
+      "title": "Rgs Example - API Documentation",
+      "chars": 2273,
+      "sha256": "0abf0a75716b792ae57c9060bd375ded48f4e7bd40d1d918fb32397d3c6c0836",
+      "note": "rendered",
+      "file": "rgs_example.md"
+    },
+    {
+      "slug": "rgs_wallet",
+      "url": "https://stake-engine.com/docs/rgs/wallet",
+      "title": "Rgs Wallet - API Documentation",
+      "chars": 2537,
+      "sha256": "15d774ea4c8781026f62d68848b78f0e8b7d8c89e50216b5af5f89b88c0cc546",
+      "note": "rendered",
+      "file": "rgs_wallet.md"
+    },
+    {
+      "slug": "terms",
+      "url": "https://stake-engine.com/docs/terms",
+      "title": "Terms and Conditions - API Documentation",
+      "chars": 82365,
+      "sha256": "45fb3437159857a6b5c38b1f0213fca570f3e6f9dba2c6906af3bffc95710602",
+      "note": "rendered",
+      "file": "terms.md"
+    }
+  ]
+}
