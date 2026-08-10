@@ -1095,6 +1095,15 @@ jobs:
           - name: "browser: locale prose conformance"
             run: npx tsx scripts/locale_prose_conformance.mjs --self-test && npx tsx scripts/locale_prose_conformance.mjs
 
+          # R043 PHASE 4, blocker B12: a live settle failure fails CLOSED on
+          # money. Stub wallet accepts play and refuses end-round; the proof
+          # asserts no refund on assumption, the settle-failed guard and its
+          # German banner, SPIN blocked at every route, the reload settling
+          # through recovery, and micros-exact per-mode debits. The self-test
+          # seeds the superseded refund-on-rejection source itself.
+          - name: "browser: live settle failure"
+            run: npx tsx scripts/r043_settle_failure_proof.mjs --self-test && npx tsx scripts/r043_settle_failure_proof.mjs
+
     steps:
       - name: Check out
         uses: actions/checkout@v4

@@ -396,6 +396,96 @@ export async function recoverSession(
   }
 }
 
+// ============================================================================
+// RESYNC AFTER A REJECTED LIVE SPIN, R043 PHASE 4, closing blocker B12.
+// ============================================================================
+//
+// THE DEFECT THIS CLOSES. `endRound` throws inside the locked `_rgsSpinReal`,
+// the whole spin rejects, and App.svelte's finally handed the optimistic debit
+// BACK: the displayed balance returned to its pre-bet value while the RGS had
+// already taken the stake and still held the round open with the win
+// uncredited. Nothing engaged, betting stayed enabled, and the next SPIN
+// placed a second stake on top of an open round. The recovery leg got a
+// dedicated settle-failed guard on 2026-08-10; the live-play leg of the same
+// call did not.
+//
+// THE DESIGN, fail-closed on money. From App's side a rejected live spin is
+// ONE opaque failure: the locked service settles inside itself, so "play was
+// refused" and "play succeeded and the settle failed" reject identically, and
+// there are NO client-side validation failures after the debit point that
+// could reject without reaching the wallet (play() posts directly; the
+// affordability guard returns before the debit; the enumerated pre-wallet set
+// is EMPTY). So the displayed balance is never reconstructed by assumption in
+// either direction. This function asks the server:
+//
+//   1. authenticate with the current session and ADOPT the authoritative
+//      balance, which is the one figure that is true whether or not the stake
+//      was taken;
+//   2. if the response carries an ACTIVE round, the platform is still holding
+//      the rejected spin open: engage the settle-failed guard (betting
+//      disabled by every route, the errRoundIncomplete banner renders), and
+//      leave settlement to the reload path, where recoverSession presents the
+//      round and settles it through the idempotent end-round exactly as it
+//      already does for a mid-round reload;
+//   3. if there is no active round, the adopted balance already tells the
+//      truth about the stake, and the session is clear to play;
+//   4. if the probe itself fails, nothing can be established, so it fails
+//      CLOSED: the same guard engages and the same reload instruction renders.
+//
+// MID-SESSION AUTHENTICATE SEMANTICS, DERIVED FROM THE PINNED OFFICIAL CLIENT
+// BEFORE THIS WAS BUILT, as the R043 brief requires. At the pinned ref
+// (package-lock: StakeEngine/ts-client df9e126, node_modules/stake-engine),
+// client.ts:80-141 shows Authenticate is a PURE READ: one fetch, no teardown,
+// no once-only guard (the other four methods all demand authenticate has
+// HAPPENED, never that it happened once), and its active-round flag is set
+// with no else branch, so a repeat call can raise the open-round signal but
+// never clear one. The SDK's own open-round fence sits in Play
+// (client.ts:199-203), not in Authenticate. The platform mirror agrees:
+// "The round returned may represent a currently active or the last completed
+// round. Frontends should continue the round if it remains active"
+// (docs/stake-engine-live/2026-07-29/rgs_wallet.md:26), and rgs.md:41
+// designates the authenticate response's round.event as the resume surface
+// after a disconnect. No first-party source evidences that a repeat
+// authenticate abandons or corrupts an open round, so the R043 conditional
+// lock sanction is NOT triggered and rgsService.ts stays untouched. In-repo
+// precedent: every live launch already authenticates twice (initRGS at
+// rgsService.ts:730, then recoverSession above). Two residual unknowns are
+// DTT observations, not assumptions here: end-round on an ALREADY-SETTLED
+// session is unconfirmed (the pinned client's comment says it errors, our
+// retry comment says no-op; DTT_PROTOCOL.md:151-154 already carries it), and
+// no first-party text covers a third authenticate issued between play and
+// end-round in one page life, which is exactly what this probe does after a
+// rejection.
+export type ResyncOutcome =
+  | { kind: 'clear'; balance: number }
+  | { kind: 'open-round'; betID: number }
+  | { kind: 'probe-failed'; error: string }
+
+export async function resyncAfterSpinRejection(
+  platform: RecoveryPlatform = REAL,
+): Promise<ResyncOutcome> {
+  try {
+    const params = platform.parseSessionParams()
+    const auth = await platform.authenticate(params)
+    // The authoritative figure, adopted before anything else is decided.
+    balance.set(auth.balance)
+    const round: OfficialRound | null = auth.round ?? null
+    if (round && round.active === true) {
+      activeRound.set({ betID: round.betID, active: round.active, state: round.state })
+      liveGuardReason.set('settle-failed')
+      return { kind: 'open-round', betID: round.betID }
+    }
+    return { kind: 'clear', balance: auth.balance }
+  } catch (err) {
+    // Nothing could be established, so nothing is assumed: the stake stays
+    // debited on screen and betting stays blocked until a reload re-reads the
+    // wallet. Overstating the player's balance on the one path where we
+    // cannot check is the failure this branch exists to refuse.
+    liveGuardReason.set('settle-failed')
+    return { kind: 'probe-failed', error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
 /** Test helper. Not used by production code. */
 export function resetSessionRecovery(): void {
   activeRound.set(null)
