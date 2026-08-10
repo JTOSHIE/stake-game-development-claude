@@ -14,9 +14,10 @@ import { chromium, devices } from 'playwright'
 import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'animation-uplift-v1')
+const OUT_DIR = qaTmpDir('screens', 'animation-uplift-v1')
 mkdirSync(OUT_DIR, { recursive: true })
 
 const PORT = process.argv[2] || '57140'

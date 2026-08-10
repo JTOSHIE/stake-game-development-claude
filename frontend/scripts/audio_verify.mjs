@@ -19,9 +19,10 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { dismissIntro, waitSpinDone, waitFeatureDrained, clickAnyPendingGate } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT_DIR = qaTmpDir()
 mkdirSync(OUT_DIR, { recursive: true })
 const OUT_PATH = join(OUT_DIR, 'audio_verify_2026-07-13.json')
 

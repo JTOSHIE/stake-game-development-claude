@@ -322,6 +322,13 @@ jobs:
 
       # ── Gate 2: dead wiring ──────────────────────────────────────────────────
       # The standingMode class: state a control writes that nothing ever reads.
+      # R043 PHASE 3d: readers now count only if their file is REACHABLE from
+      # the shipped entry, and the seeded self-test (a store whose only reader
+      # is a file nothing imports) runs first per convention (p).
+      - name: dead wiring scan, seeded-violation self-test
+        working-directory: frontend
+        run: node scripts/dead_wiring_scan.mjs --self-test
+
       - name: dead wiring scan
         working-directory: frontend
         run: node scripts/dead_wiring_scan.mjs
@@ -1077,6 +1084,16 @@ jobs:
           # probe with no RGS behind it reports a clean run over nothing.
           - name: "browser: replay fit"
             run: node scripts/replay_fit_gate.mjs --self-test && node scripts/replay_fit_gate.mjs
+
+          # R043 PHASE 3c, fresh-context majors 1, 2 and 6. The gate two other
+          # artefacts cited as their proof was RED at HEAD (a broken import
+          # threw at module load) and wired into nothing. Its PART 3 now opens
+          # the real paytable through the HUD menu route before harvesting, so
+          # the rules, the interface guide and the disclaimer, the block its
+          # own comment names, are actually read. tsx, not node: it evaluates
+          # the live TypeScript locale modules.
+          - name: "browser: locale prose conformance"
+            run: npx tsx scripts/locale_prose_conformance.mjs --self-test && npx tsx scripts/locale_prose_conformance.mjs
 
     steps:
       - name: Check out

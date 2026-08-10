@@ -29,10 +29,11 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT = join(__dirname, '..', '..', 'reports', 'qa')
-const SHOTS = join(__dirname, '..', '..', 'reports', 'screens', 'audit-remediation-v1')
+const OUT = qaTmpDir()
+const SHOTS = qaTmpDir('screens', 'audit-remediation-v1')
 mkdirSync(OUT, { recursive: true })
 mkdirSync(SHOTS, { recursive: true })
 

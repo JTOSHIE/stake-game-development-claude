@@ -388,9 +388,22 @@ raw row counts:
 | Third scatter lands on the final reel | 46.2% |
 | Rounds with two scatters on one reel | 0.5% |
 
-Maximum scatters on the visible 5x4 window is **5**, one per reel. The `reveal` event
-carries a six-row board per reel, the visible four plus one padding row at each end; the
-padding is never shown to a player and must not be counted.
+**Scatter maximum on the visible 5x4 window, per mode** (corrected 2026-08-10, R043
+PHASE 3a, fresh-context major 11: this line previously said "maximum is 5, one per
+reel", an under-sampled claim that also sat five rows below this file's own 0.5%
+two-scatters-on-one-reel figure). The BASE trigger is forced to exactly 3/4/5
+distinct-reel scatters, but free-spin draws are natural and scatters can stack, so 6+
+can appear and every count from 3 to the 20-cell maximum is mapped, 6+ awarding the
+5-scatter amount (`games/future_spinner/game_config.py:149-156`). Measured on the FULL
+population, 100,000 rounds per mode (2026-08-09 payout reconciliation pass): rounds
+with six visible scatters are base 0, cruise 0, antelite 0, bonus 2, super 2; the
+first found are bonus round 61700 (quoted verbatim as a seeded case in
+`frontend/scripts/round_payout_reconciliation_gate.mjs`) and super round 98874; none
+reached seven. The award is identical to five scatters, 10x and 16 spins, so nothing
+player-facing changes; the owner has ruled no disclosure is owed (CLAUDE.md
+LOCKED_FILE_DEBTS). The `reveal` event carries a six-row board per reel, the visible
+four plus one padding row at each end; the padding is never shown to a player and must
+not be counted.
 
 ### Currency
 

@@ -14,9 +14,10 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro, waitSpinDone } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'neon-polish-v1', 'nitro-flow')
+const OUT_DIR = qaTmpDir('screens', 'neon-polish-v1', 'nitro-flow')
 mkdirSync(OUT_DIR, { recursive: true })
 
 async function getFreePort() {

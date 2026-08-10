@@ -426,7 +426,7 @@
         </button>
         {#if showMenu}
           <div class="hud-menu p-hud-menu" role="menu">
-            <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+            <button class="hud-menu-item" role="menuitem" on:click={openPaytable} data-testid="open-paytable">{$tr('paytable')}</button>
             <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
             <div class="audio-panel" class:muted={$isMuted}>
               <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
@@ -555,7 +555,7 @@
     </button>
     {#if showMenu}
       <div class="hud-menu m-hud-menu" role="menu">
-        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable} data-testid="open-paytable">{$tr('paytable')}</button>
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <!-- The three controls that left the row. They are reachable, labelled,
              and at full menu-item size, which they were not when crammed into
@@ -664,7 +664,7 @@
     </button>
     {#if showMenu}
       <div class="hud-menu c-hud-menu" role="menu">
-        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable} data-testid="open-paytable">{$tr('paytable')}</button>
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
@@ -837,7 +837,7 @@
     </button>
     {#if showMenu}
       <div class="hud-menu" role="menu">
-        <button class="hud-menu-item" role="menuitem" on:click={openPaytable}>{$tr('paytable')}</button>
+        <button class="hud-menu-item" role="menuitem" on:click={openPaytable} data-testid="open-paytable">{$tr('paytable')}</button>
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>

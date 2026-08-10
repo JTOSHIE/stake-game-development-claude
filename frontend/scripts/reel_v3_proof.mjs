@@ -20,9 +20,10 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'reel-v3')
+const OUT_DIR = qaTmpDir('screens', 'reel-v3')
 mkdirSync(OUT_DIR, { recursive: true })
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 

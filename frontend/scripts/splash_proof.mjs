@@ -8,9 +8,10 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const LABEL = process.argv[2] || 'after'
-const OUT = join(__dirname,'..','..','reports','screens','owner-audit-v4')
+const OUT = qaTmpDir('screens', 'owner-audit-v4')
 mkdirSync(OUT,{recursive:true})
 const port = await new Promise(res=>{const s=createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>res(p))})})
 const proc = spawn('npx',['vite','--port',String(port),'--strictPort'],{cwd:join(__dirname,'..'),stdio:['ignore','pipe','pipe']})

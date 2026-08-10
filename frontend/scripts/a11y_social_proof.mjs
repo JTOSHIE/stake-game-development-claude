@@ -10,9 +10,10 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT_DIR = qaTmpDir()
 mkdirSync(OUT_DIR, { recursive: true })
 
 const RESTRICTED = ['bet', 'bets', 'betting', 'total bet', 'buy', 'cash', 'money', 'wager', 'gamble', 'stake', 'deposit', 'withdraw']

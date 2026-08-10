@@ -16,6 +16,7 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 async function getFreePort() {
   return new Promise((resolvePromise, reject) => {
@@ -38,7 +39,7 @@ function startDevServer(port) {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT_DIR = qaTmpDir()
 mkdirSync(OUT_DIR, { recursive: true })
 
 async function readTestStore(page, name) {

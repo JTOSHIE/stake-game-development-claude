@@ -16,9 +16,10 @@ import { mkdirSync, writeFileSync, statSync, renameSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro, waitFeatureDrained } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'motion-v2')
+const OUT_DIR = qaTmpDir('screens', 'motion-v2')
 mkdirSync(OUT_DIR, { recursive: true })
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
