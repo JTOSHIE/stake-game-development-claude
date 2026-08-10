@@ -125,8 +125,8 @@ scaffold stays armed; the ask to the owner is one paste of that url.
 | 3, hygiene cluster | DONE | run 31393766620 green |
 | 4, settle failure (B12) + ratchet follow-through | DONE | run 31395417437 green, 18 checks including both new legs |
 | 5, Q6 capture | ATTEMPTED, OWNER-GATED (above) | n/a |
-| 6, mirror refresh | DONE: 66 of 66 pages rendered, 61 of 64 shared pages byte-identical, three deltas logged with two STOP flags | verified with this phase's push |
-| 7, closure audit | THIS DOCUMENT | verified with this phase's push |
+| 6, mirror refresh | DONE: 66 of 66 pages rendered, 61 of 64 shared pages byte-identical, three deltas logged with two STOP flags | run 31402346574 green (shared push with phase 7) |
+| 7, closure audit | THIS DOCUMENT | run 31402346574 green, head `22d0599`, 18 of 18 checks success |
 
 ### The platform requirements matrix
 

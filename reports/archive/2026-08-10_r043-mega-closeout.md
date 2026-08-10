@@ -84,7 +84,8 @@ outranks the brief's line per the session's own configuration.
 
 Effort: xhigh throughout, single session, seven phases, one commit series per phase
 with remote CI verified between phases (runs 31386799363, 31390508700, 31391988157,
-31393766620, 31395417437, plus the Phase 6/7 push). Approach: unlocked-first
+31393766620, 31395417437; the Phase 6/7 push verified green at close, run
+31402346574 on head `22d0599`, 18 of 18 checks success, per rule 10). Approach: unlocked-first
 everywhere; derive before measure (the pinned-client derivation for Phase 4, the A3
 table for Phase 1); instruments over assertions (two new CI browser legs, one new
 static gate, three seeded self-tests added or widened). Alternatives tried and
