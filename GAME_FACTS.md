@@ -34,6 +34,15 @@ All figures are from `games/future_spinner/FUTURE_SPINNER_PAR_SHEET.md`, which t
 records as independently recomputed with exact integer arithmetic (`fractions.Fraction`) and
 verified against the books.
 
+**Precision note (2026-08-10, Fable independent audit, finding AF-1, tracker TR-118).**
+The recomputed rational RTPs are not exactly equal to 96.35: they differ from it by
+between 1.1e-9 and 1.5e-7 percentage points per mode (base 96.34999987%, exact fraction
+108480455878185533/112589990681340000; cruise 96.34999995%; antelite 96.34999985%; bonus
+and super 96.35000000% at 8dp). Every displayed figure in this document is correct at its
+quoted precision and the cross-mode spread rounds to 0.0000pp. The standing wording rule:
+an RTP equality claim states its precision, "96.3500% at 4dp", never an unqualified
+"exactly".
+
 ### Base mode (cost 1.0x)
 
 | Metric | Value |
