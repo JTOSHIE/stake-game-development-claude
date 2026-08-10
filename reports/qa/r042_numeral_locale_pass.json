@@ -1,6 +1,6 @@
 {
-  "_what": "R042 TASK A2. Per-locale numeral forms applied to the prose layer.",
-  "_ruling": "reports/briefs/FS_R042A_DISCLOSURE_INTEGRITY_Prompt.md, TASK A2",
+  "_what": "R042 TASK A2 plus R043 PHASE 1b. Per-locale numeral forms applied to the prose layer.",
+  "_ruling": "reports/briefs/FS_R042A_DISCLOSURE_INTEGRITY_Prompt.md TASK A2; reports/briefs/FS_R043_MEGA_CLOSEOUT_Prompt.md PHASE 1b (decimal tokens 1.6 and 1.25)",
   "_unchanged": [
     "en",
     "ar",
@@ -52,127 +52,77 @@
       "percent": "96,35%"
     }
   },
-  "changed": 20,
+  "decimals": [
+    [
+      "1.6",
+      "1,6"
+    ],
+    [
+      "1.25",
+      "1,25"
+    ]
+  ],
+  "changed": 10,
   "changes": [
     {
       "locale": "de",
-      "key": "modeCruiseBlurb",
-      "before": "Ruhigere Fahrt: häufigere kleinere Gewinne, unverändert 96.35% RTP.",
-      "after": "Ruhigere Fahrt: häufigere kleinere Gewinne, unverändert 96,35 % RTP."
-    },
-    {
-      "locale": "de",
-      "key": "rulesMaxWin",
-      "before": "Der Maximalgewinn pro Spielrunde ist auf 5,000× deinen Basiseinsatz begrenzt. Eine Spielrunde umfasst die auslösende Drehung und alle dadurch gewährten Freispiele.",
-      "after": "Der Maximalgewinn pro Spielrunde ist auf 5.000× deinen Basiseinsatz begrenzt. Eine Spielrunde umfasst die auslösende Drehung und alle dadurch gewährten Freispiele."
+      "key": "modeOverboostBlurb",
+      "before": "Doppelte Chance: ca. 1.6× höhere Auslöserate. Zieht 1.25× pro Drehung ab, solange AN.",
+      "after": "Doppelte Chance: ca. 1,6× höhere Auslöserate. Zieht 1,25× pro Drehung ab, solange AN."
     },
     {
       "locale": "es",
-      "key": "modeCruiseBlurb",
-      "before": "Una conducción más suave: ganancias más pequeñas y frecuentes, mismo RTP del 96.35%.",
-      "after": "Una conducción más suave: ganancias más pequeñas y frecuentes, mismo RTP del 96,35 %."
-    },
-    {
-      "locale": "es",
-      "key": "rulesMaxWin",
-      "before": "La ganancia máxima por ronda de juego está limitada a 5,000× tu apuesta base. Una ronda de juego incluye el giro que la activa y todos los giros gratis que otorga.",
-      "after": "La ganancia máxima por ronda de juego está limitada a 5.000× tu apuesta base. Una ronda de juego incluye el giro que la activa y todos los giros gratis que otorga."
+      "key": "modeOverboostBlurb",
+      "before": "Doble oportunidad: aprox. 1.6× la frecuencia de activación de la función. Descuenta 1.25× en cada giro mientras esté activo.",
+      "after": "Doble oportunidad: aprox. 1,6× la frecuencia de activación de la función. Descuenta 1,25× en cada giro mientras esté activo."
     },
     {
       "locale": "fi",
-      "key": "modeCruiseBlurb",
-      "before": "Tasaisempi kyyti: pieniä voittoja useammin, sama 96.35% RTP.",
-      "after": "Tasaisempi kyyti: pieniä voittoja useammin, sama 96,35 % RTP."
-    },
-    {
-      "locale": "fi",
-      "key": "rulesMaxWin",
-      "before": "Maksimivoitto pelikierrosta kohden on 5,000× peruspanoksesi. Pelikierros sisältää sen käynnistäneen pyöräytyksen ja kaikki sen myöntämät ilmaiskierrokset.",
-      "after": "Maksimivoitto pelikierrosta kohden on 5 000× peruspanoksesi. Pelikierros sisältää sen käynnistäneen pyöräytyksen ja kaikki sen myöntämät ilmaiskierrokset."
+      "key": "modeOverboostBlurb",
+      "before": "Tuplamahdollisuus: bonus käynnistyy noin 1.6× useammin. Veloittaa 1.25× joka kierroksella, kun PÄÄLLÄ.",
+      "after": "Tuplamahdollisuus: bonus käynnistyy noin 1,6× useammin. Veloittaa 1,25× joka kierroksella, kun PÄÄLLÄ."
     },
     {
       "locale": "fr",
-      "key": "modeCruiseBlurb",
-      "before": "Conduite plus souple : des gains plus fréquents mais plus petits, même RTP 96.35%.",
-      "after": "Conduite plus souple : des gains plus fréquents mais plus petits, même RTP 96,35 %."
-    },
-    {
-      "locale": "fr",
-      "key": "rulesMaxWin",
-      "before": "Le gain maximum par tour de jeu est plafonné à 5,000× votre mise de base. Un tour de jeu comprend le tour déclencheur et tous les tours gratuits qu\\'il accorde.",
-      "after": "Le gain maximum par tour de jeu est plafonné à 5 000× votre mise de base. Un tour de jeu comprend le tour déclencheur et tous les tours gratuits qu\\'il accorde."
+      "key": "modeOverboostBlurb",
+      "before": "Double chance : environ 1.6× le taux de déclenchement. Débite 1.25× par tour tant que le mode est ON.",
+      "after": "Double chance : environ 1,6× le taux de déclenchement. Débite 1,25× par tour tant que le mode est ON."
     },
     {
       "locale": "id",
-      "key": "modeCruiseBlurb",
-      "before": "Laju lebih halus: kemenangan kecil lebih sering, RTP 96.35% tetap sama.",
-      "after": "Laju lebih halus: kemenangan kecil lebih sering, RTP 96,35% tetap sama."
-    },
-    {
-      "locale": "id",
-      "key": "rulesMaxWin",
-      "before": "Kemenangan maksimum per ronde permainan dibatasi 5,000× taruhan dasar Anda. Satu ronde permainan mencakup putaran pemicunya dan semua putaran gratis yang diberikannya.",
-      "after": "Kemenangan maksimum per ronde permainan dibatasi 5.000× taruhan dasar Anda. Satu ronde permainan mencakup putaran pemicunya dan semua putaran gratis yang diberikannya."
+      "key": "modeOverboostBlurb",
+      "before": "Peluang ganda: sekitar 1.6× laju pemicu fitur. Memotong 1.25× tiap putaran saat AKTIF.",
+      "after": "Peluang ganda: sekitar 1,6× laju pemicu fitur. Memotong 1,25× tiap putaran saat AKTIF."
     },
     {
       "locale": "pl",
-      "key": "modeCruiseBlurb",
-      "before": "Spokojniejsza jazda: częstsze, mniejsze wygrane, to samo RTP 96.35%.",
-      "after": "Spokojniejsza jazda: częstsze, mniejsze wygrane, to samo RTP 96,35%."
-    },
-    {
-      "locale": "pl",
-      "key": "rulesMaxWin",
-      "before": "Maksymalna wygrana na rundę gry jest ograniczona do 5,000× stawki bazowej. Runda gry obejmuje obrót, który ją rozpoczyna, oraz wszystkie przyznane w niej darmowe spiny.",
-      "after": "Maksymalna wygrana na rundę gry jest ograniczona do 5 000× stawki bazowej. Runda gry obejmuje obrót, który ją rozpoczyna, oraz wszystkie przyznane w niej darmowe spiny."
+      "key": "modeOverboostBlurb",
+      "before": "Podwójna szansa: około 1.6× częstsze uruchamianie funkcji. Gdy WŁ., pobiera 1.25× przy każdym obrocie.",
+      "after": "Podwójna szansa: około 1,6× częstsze uruchamianie funkcji. Gdy WŁ., pobiera 1,25× przy każdym obrocie."
     },
     {
       "locale": "pt",
-      "key": "modeCruiseBlurb",
-      "before": "Um trajeto mais suave: ganhos menores com mais frequência, mesmo RTP de 96.35%.",
-      "after": "Um trajeto mais suave: ganhos menores com mais frequência, mesmo RTP de 96,35%."
-    },
-    {
-      "locale": "pt",
-      "key": "rulesMaxWin",
-      "before": "O ganho máximo por rodada de jogo é limitado a 5,000× a sua aposta base. Uma rodada de jogo inclui o giro que a aciona e todos os giros grátis concedidos por ela.",
-      "after": "O ganho máximo por rodada de jogo é limitado a 5.000× a sua aposta base. Uma rodada de jogo inclui o giro que a aciona e todos os giros grátis concedidos por ela."
+      "key": "modeOverboostBlurb",
+      "before": "Chance dupla: cerca de 1.6× a taxa de ativação do recurso. Debita 1.25× a cada giro enquanto estiver ON.",
+      "after": "Chance dupla: cerca de 1,6× a taxa de ativação do recurso. Debita 1,25× a cada giro enquanto estiver ON."
     },
     {
       "locale": "ru",
-      "key": "modeCruiseBlurb",
-      "before": "Плавная езда: выигрыши чаще, но меньше, тот же RTP 96.35%.",
-      "after": "Плавная езда: выигрыши чаще, но меньше, тот же RTP 96,35 %."
-    },
-    {
-      "locale": "ru",
-      "key": "rulesMaxWin",
-      "before": "Максимальный выигрыш за игровой раунд ограничен 5,000× от базовой ставки. Игровой раунд включает запустивший его спин и все полученные в нём фриспины.",
-      "after": "Максимальный выигрыш за игровой раунд ограничен 5 000× от базовой ставки. Игровой раунд включает запустивший его спин и все полученные в нём фриспины."
+      "key": "modeOverboostBlurb",
+      "before": "Двойной шанс: частота запуска функции примерно 1.6×. Списывает 1.25× за каждый спин при ВКЛ.",
+      "after": "Двойной шанс: частота запуска функции примерно 1,6×. Списывает 1,25× за каждый спин при ВКЛ."
     },
     {
       "locale": "tr",
-      "key": "modeCruiseBlurb",
-      "before": "Daha yumuşak bir sürüş: daha sık ve daha küçük kazançlar, aynı 96.35% RTP.",
-      "after": "Daha yumuşak bir sürüş: daha sık ve daha küçük kazançlar, aynı %96,35 RTP."
-    },
-    {
-      "locale": "tr",
-      "key": "rulesMaxWin",
-      "before": "Oyun turu başına maksimum kazanç, temel bahsinizin 5,000× katı ile sınırlıdır. Bir oyun turu, onu başlatan dönüşü ve bu dönüşün kazandırdığı tüm ücretsiz dönüşleri kapsar.",
-      "after": "Oyun turu başına maksimum kazanç, temel bahsinizin 5.000× katı ile sınırlıdır. Bir oyun turu, onu başlatan dönüşü ve bu dönüşün kazandırdığı tüm ücretsiz dönüşleri kapsar."
+      "key": "modeOverboostBlurb",
+      "before": "Çift şans: özellik tetiklenme oranı yaklaşık 1.6×. AÇIKKEN her dönüşte 1.25× düşülür.",
+      "after": "Çift şans: özellik tetiklenme oranı yaklaşık 1,6×. AÇIKKEN her dönüşte 1,25× düşülür."
     },
     {
       "locale": "vi",
-      "key": "modeCruiseBlurb",
-      "before": "Hành trình êm hơn: thắng nhỏ thường xuyên hơn, vẫn RTP 96.35%.",
-      "after": "Hành trình êm hơn: thắng nhỏ thường xuyên hơn, vẫn RTP 96,35%."
-    },
-    {
-      "locale": "vi",
-      "key": "rulesMaxWin",
-      "before": "Mức thắng tối đa mỗi vòng chơi được giới hạn ở 5,000× cược cơ bản. Một vòng chơi bao gồm lượt quay kích hoạt và tất cả các lượt quay miễn phí mà nó trao.",
-      "after": "Mức thắng tối đa mỗi vòng chơi được giới hạn ở 5.000× cược cơ bản. Một vòng chơi bao gồm lượt quay kích hoạt và tất cả các lượt quay miễn phí mà nó trao."
+      "key": "modeOverboostBlurb",
+      "before": "Nhân đôi cơ hội: tỷ lệ kích hoạt tính năng cao gấp khoảng 1.6×. Trừ 1.25× mỗi vòng quay khi BẬT.",
+      "after": "Nhân đôi cơ hội: tỷ lệ kích hoạt tính năng cao gấp khoảng 1,6×. Trừ 1,25× mỗi vòng quay khi BẬT."
     }
   ]
 }

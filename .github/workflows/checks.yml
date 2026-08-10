@@ -757,6 +757,23 @@ jobs:
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs
 
+      # ── Gate 13b3: the kit basis gate (R043 PHASE 1e) ────────────────────────
+      # The discovery method that found OWNER_RULINGS section K, kept as an
+      # instrument: section K's surviving old-basis string was found by grepping
+      # the BUILT kit for the German word the A3 ruling had just removed, not by
+      # any source gate, because a claim's basis is meaning rather than form.
+      # Greps dist (the kit payload) for every superseded per-locale basis
+      # phrase, and evaluates the live tables for en-form figures in the ten
+      # comma-decimal locales, locating any hit in the kit bytes. After the
+      # build, deliberately: dist is what ships.
+      - name: kit basis gate, seeded-violation self-test
+        working-directory: frontend
+        run: npx tsx scripts/kit_basis_gate.mjs --self-test
+
+      - name: kit basis gate, superseded basis words and en-form figures
+        working-directory: frontend
+        run: npx tsx scripts/kit_basis_gate.mjs
+
       # Gates 13c and 13d (layout fit, contrast) live in the "browser gates"
       # job below: they launch chromium, which this job deliberately does not
       # install. See the header for the two-job policy.

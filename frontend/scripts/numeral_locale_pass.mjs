@@ -35,12 +35,18 @@ const LOCALES = join(ROOT, 'src/lib/i18n/prose.locales.ts')
 const REPORT = join(REPO, 'reports/qa/r042_numeral_locale_pass.json')
 
 /**
- * The ruled forms, transcribed from R042 TASK A2. Locales absent from this table
- * are ruled UNCHANGED and keep the English forms: en, ar, hi, ja, ko, zh.
+ * The ruled forms, transcribed from R042 TASK A2, EXTENDED by R043 PHASE 1b
+ * (reports/briefs/FS_R043_MEGA_CLOSEOUT_Prompt.md) to the decimal tokens `1.6`
+ * and `1.25`. Locales absent from this table are ruled UNCHANGED and keep the
+ * English forms: en, ar, hi, ja, ko, zh.
  *
  * `thousands` replaces the bare `5,000` and leaves the following × alone.
  * `percent` replaces the whole `96.35%` token, because Turkish puts the sign in
  * FRONT and a number-only substitution could not express that.
+ *
+ * The R043 decimal tokens render the comma-decimal form in all ten table
+ * locales (`1,6` and `1,25`), so they are shared constants below rather than
+ * ten identical per-locale entries.
  *
  * THE GROUPING SPACES ARE REGULAR U+0020, DELIBERATELY, not U+202F narrow
  * no-break. A narrow no-break space is typographically better and is what the
@@ -66,6 +72,15 @@ const FORMS = {
 const EN_THOUSANDS = '5,000'
 const EN_PERCENT   = '96.35%'
 
+// R043 PHASE 1b: the two decimal tokens section J escalated, ruled to the
+// comma-decimal form in the ten FORMS locales. Period decimals beside a unit
+// read as thousands groups there: in German, `1.25× every spin` is a debit of
+// one hundred and twenty five times the bet.
+const EN_DECIMALS = [
+  ['1.6', '1,6'],
+  ['1.25', '1,25'],
+]
+
 const src = readFileSync(LOCALES, 'utf-8')
 const lines = src.split('\n')
 const changes = []
@@ -81,6 +96,9 @@ for (let i = 0; i < lines.length; i++) {
   let out = raw
   if (out.includes(EN_THOUSANDS)) out = out.split(EN_THOUSANDS).join(FORMS[cur].thousands)
   if (out.includes(EN_PERCENT))   out = out.split(EN_PERCENT).join(FORMS[cur].percent)
+  for (const [from, to] of EN_DECIMALS) {
+    if (out.includes(from)) out = out.split(from).join(to)
+  }
   if (out === raw) continue
   lines[i] = `    ${key}: '${out}',`
   changes.push({ locale: cur, key, before: raw, after: out })
@@ -117,6 +135,9 @@ for (const line of afterLines) {
   if (!m) continue
   if (m[2].includes(EN_THOUSANDS)) problems.push(`${verifying}.${m[1]} still carries ${EN_THOUSANDS}`)
   if (m[2].includes(EN_PERCENT))   problems.push(`${verifying}.${m[1]} still carries ${EN_PERCENT}`)
+  for (const [from] of EN_DECIMALS) {
+    if (m[2].includes(from)) problems.push(`${verifying}.${m[1]} still carries ${from}`)
+  }
 }
 if (problems.length) {
   console.error('\nNUMERAL LOCALE PASS: FAIL after writing:')
@@ -126,11 +147,13 @@ if (problems.length) {
 
 mkdirSync(dirname(REPORT), { recursive: true })
 writeFileSync(REPORT, JSON.stringify({
-  _what: 'R042 TASK A2. Per-locale numeral forms applied to the prose layer.',
-  _ruling: 'reports/briefs/FS_R042A_DISCLOSURE_INTEGRITY_Prompt.md, TASK A2',
+  _what: 'R042 TASK A2 plus R043 PHASE 1b. Per-locale numeral forms applied to the prose layer.',
+  _ruling: 'reports/briefs/FS_R042A_DISCLOSURE_INTEGRITY_Prompt.md TASK A2; '
+    + 'reports/briefs/FS_R043_MEGA_CLOSEOUT_Prompt.md PHASE 1b (decimal tokens 1.6 and 1.25)',
   _unchanged: ['en', 'ar', 'hi', 'ja', 'ko', 'zh'],
   _groupingSpace: 'U+0020, chosen over U+202F deliberately; see the file header',
   forms: FORMS,
+  decimals: EN_DECIMALS,
   changed: changes.length,
   changes,
 }, null, 2) + '\n')
