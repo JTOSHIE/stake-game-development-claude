@@ -9,6 +9,41 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 045 - 2026-08-10 - COMMS-ACK: Fable independent audit at 7f79148 received and transcribed
+
+The audit is saved verbatim at `reports/briefs/FS_FABLE_AUDIT_2026-08-10_Prompt.md` and
+its four new findings are ingested as tracker rows TR-118 to TR-121. Verdict received:
+everything closed to date reproduced first-hand; maths sound at primary-data level; NOT
+submission-ready pending B12, B9, the four ruled wording items (J, K, majors 12 and 13),
+Q6 and the owner gates. The ranked open register in the audit's section 7 is adopted as
+the working order, and it changes nothing already queued: R042-D next, then R043 plus
+Brief C, then the major clusters.
+
+**Actioned this session, documentation only, no code or locked path touched:**
+
+- **AF-2 CLOSED.** `REVIEW_TRACKER.md` now carries the R042 round: an ingest note naming
+  `OWNER_RULINGS_PRESUBMISSION.md` sections A to L as the ruling record, a currency table
+  mapping every R042 item to its state, and the four audit rows. The tracker remains the
+  single register of findings; the alternative (declaring OWNER_RULINGS the register of
+  record) was not taken, because that is an authority change and not the builder's call.
+- **AF-1 recorded, TR-118.** The exact per-mode rationals are now in the tracker row and a
+  dated precision note sits in `GAME_FACTS.md`: equality claims state their precision;
+  the standing form is 96.3500% at 4dp, never "exactly" unqualified. The overstated
+  wordings live in dated records (the 2026-07-07 handover and archives), which stand as
+  history per convention (s) and are not rewritten.
+- **AF-3 recorded, TR-120, with one recount.** No current document says 9.5 MB: the only
+  match is the dated 2026-07-07 archive, and `SUBMISSION_DOSSIER.md` already rules that
+  bundle size is read from `frontend/dist/build-info.json`, never from a sentence. The
+  audit's fresh figure, 77 files, 12,328,647 bytes, is recorded as a dated fact in the row.
+- **AF-4 recorded, TR-121**, kept as a positive row so the artefact-level zero-egress
+  assurance is citable at submission.
+
+**Not actioned, correctly queued:** B12 (R042-D brief), sections J and K and majors 12
+and 13 (R043, wording owed by Fable), B9 (Brief C), Q6 (owner URL), the seventy-major
+triage (next check-ins), owner standing items.
+
+---
+
 ## 044 - 2026-08-10 - COMMS-ACK: R042 BRIEF B executed, blocker B8 closed
 
 Autoplay now takes two deliberate actions. A spin count SELECTS and shows itself selected;
