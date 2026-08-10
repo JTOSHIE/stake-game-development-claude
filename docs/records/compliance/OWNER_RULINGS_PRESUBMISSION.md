@@ -42,10 +42,19 @@ sixteen-spin feature could pay up to sixteen times the cap. It cannot: the whole
 round stops at 5,000x. The current sentence understates the constraint on the one
 figure a maths reviewer checks first.
 
-**The ruling needed:** whether to restate it, and in whose words. A wording that
-matches the maths would be something like "maximum win per round", but the exact
-phrasing is a compliance statement and needs to come from the owner or Fable, in
-all sixteen locales.
+**RULED AND EXECUTED, 2026-08-10, R041 TASK 1.** Fable supplied replacement text
+for all sixteen locales. The English now reads:
+
+> Maximum win per game round is capped at 5,000× your total bet. A game round includes the triggering spin and any free spins it awards.
+
+**The quotes above are the SUPERSEDED text, kept as the evidence for the finding
+rather than as a description of what ships.** What ships is verifiable in one
+command: `cd frontend && npx tsx scripts/r041_verify.mjs` compares all 210 ruled
+strings against the live modules and names any divergence.
+
+**One thing this did NOT fix, and it is now the more serious half:** the figure is
+pinned as the English-grouped `5,000×` in every locale, by explicit instruction
+("keep the figure exactly 5,000× in every locale this pass"). See section F.
 
 ---
 
@@ -72,7 +81,16 @@ independently. It is not a multiplier applied to a win.
 could reasonably read "1x multiplier to your total bet win" as multiplying zero
 and paying nothing. The game pays them 1x their total bet.
 
-**The ruling needed:** the corrected phrasing, in all sixteen locales.
+**RULED AND EXECUTED, 2026-08-10, R041 TASK 2.** Fable supplied replacement text
+for all sixteen locales plus the social variant. The English now reads:
+
+> 3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your total bet, added to any other wins.
+
+**The quote above is the SUPERSEDED text**, kept as the evidence for the finding.
+Verified against the maths a second time while executing: the reconciliation gate
+computes a scatter win with no reference to any other win on the board, and that
+formula reconciles all 3,618,404 wins across the five books. The new wording
+matches what the maths does.
 
 ---
 
@@ -93,6 +111,15 @@ are listed here with their English text so a translator can work from one page.
 | `FreeSpinsPresentation.svelte` | **Overdrive Free Spins** | An `aria-label`, so a screen reader announces English over correctly translated content. |
 | `WinBreakdown.svelte` | **N ways** | No `ways` key exists anywhere. |
 | `fsModes.ts` | **base bet** / **base play** | The trailing words of `maxWinVsBaseBetLabel`. The NUMBER in that label was made locale-aware on 2026-08-10; only these two words remain. |
+
+**RULED AND EXECUTED, 2026-08-10, R041 TASK 4.** All eleven were translated into
+sixteen locales and rewired; the frozen baseline went 11 to 0. **It is back to 1,
+and the new entry is not a regression:** the RESPONSIBLE PLAY paragraph in
+`PaytableModal.svelte` is 281 characters of English rendering to all sixteen
+locales under a translated heading, and the gate could never see it, because rule
+3 excluded newlines and the candidate length was capped at 140 characters. Both
+constraints are now removed and the class is seeded. **That paragraph needs a real
+translation in fifteen locales and is section G below.**
 
 **THE SOCIAL CONDITIONALS ARE NOT THE COMPLIANCE LAYER**, and this is the part
 most likely to be misread by whoever picks this up. `{$isSocial ? 'per spin' :
@@ -132,8 +159,19 @@ standing mandate that nothing player-visible may read as machine-generated, a
 wrong explanation is a real defect and it is recorded here rather than left in a
 commit message.
 
-**The ruling needed:** whether to author a distinct message for this state, in
-which case it joins the translation list in section B, or to accept the reuse.
+**RULED AND EXECUTED, 2026-08-10, R041 TASK 3.** Fable authored a distinct
+message, `errRoundIncomplete`, in all sixteen locales. The English reads:
+
+> Game unavailable. Your last round could not be completed. Please reload or contact support.
+
+`settle-failed` and `wallet-stalled` render it; `auth-failed` and `missing-params`
+keep `errSessionUnavailable`. The map is a derived store in `liveGuard.ts` so it
+is assertable without a browser, and `r041_stall_banner_proof.mjs` hangs a wallet
+for the real fifteen seconds and asserts the German string on screen.
+
+**A LARGER DEFECT OF THE SAME FAMILY WAS FOUND ON 2026-08-10 AND IS NOT FIXED.**
+The guard is engaged when a RECOVERED round fails to settle. It is NOT engaged
+when a settle fails during ORDINARY LIVE PLAY. See section H.
 
 ---
 
@@ -221,6 +259,111 @@ checked, so when this is ruled on the entry must be removed or the gate fails.
 
 The builder did neither, because rewriting ratified compliance text is not a
 builder's call and neither is editing prose outside the ruling.
+
+---
+
+## F. THE MATHS DISCLOSURE IS WRONG BY ORDERS OF MAGNITUDE IN TEN LOCALES
+
+Found 2026-08-10 by a fresh-context review pass, AFTER R041 landed. **This is the
+most serious open item in this document.** It is not a consistency preference; it
+is a published figure that reads as a different number.
+
+**Two figures are written into the prose layer with ENGLISH punctuation and no
+locale awareness at all:**
+
+| Key | Text, every locale | Reads in de, es, fi, fr, id, pl, pt, ru, tr, vi as |
+|---|---|---|
+| `rulesMaxWin` | `5,000×` | **five**, because the comma is the decimal separator |
+| `modeCruiseBlurb` | `96.35%` | **9,635%**, because the period is the thousands separator |
+
+**The second is the worse one.** A Cruise mode card and the BET MODES page tell a
+German or Turkish player the return to player is over nine thousand per cent.
+
+**The same paytable modal already gets it RIGHT elsewhere, which is what makes
+this indefensible rather than merely wrong.** In German, one line of the modal
+reads, verbatim from `translations.ts`:
+
+> Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.
+
+Locale-correct: comma decimal, period thousands. Two lines away, from
+`prose.locales.ts`, the same two quantities appear as `96.35%` and `5,000×`.
+**One screen states the RTP two ways and the max win two ways.**
+
+**How it survived.** A previous pass corrected exactly this class and corrected
+only `translations.ts`; the prose layer was created separately and never had a
+locale-aware numeral. `fsModes.ts` already does it correctly via
+`fsMaxWinLabel(locale)` using `toLocaleString`, so the mechanism exists and is
+proven, it simply was never applied to the prose strings.
+
+**Why the builder has not fixed it.** R041 TASK 1 instructed, verbatim: *"Keep the
+figure exactly 5,000× in every locale this pass"*, and queued
+PROSE_NUMERAL_LOCALE_PASS as a later brief. That instruction was followed. But the
+instruction was given as a CONSISTENCY deferral, and the measurement says it is a
+WRONG NUMBER on a maths disclosure, which convention (l.8) sends to the owner and
+Fable rather than to a builder's judgement.
+
+**The ruling needed:** confirm this is fixed NOW rather than in a later pass, and
+confirm the method. Deriving both figures at render time from one locale-aware
+formatter changes no wording in any locale and adds no new prose, which is why it
+can be executed without new translations once ruled.
+
+---
+
+## G. One player-facing paragraph still renders English to all sixteen locales
+
+Found 2026-08-10, same review. **The gate that exists to catch this could not see
+it**, and that is the interesting part.
+
+`PaytableModal.svelte`, under the correctly translated `responsiblePlayHeading`,
+281 characters, quoted verbatim:
+
+> Autoplay can be set to stop automatically on any win, when the Overdrive feature triggers, or once a loss limit you choose is reached, and can always be stopped manually at any time. A session summary (time played, spins, net result) is available from the menu.
+
+**Two independent constraints hid it**, and R041 TASK 5 removed neither because
+neither was the shape it was aimed at. Rule 3 of `hardcoded_string_gate.mjs`
+excluded `\n`, so a text node was disqualified the moment it WRAPPED; and
+`LABEL_SHAPE` capped candidates at 140 characters, which is a label's length, not
+a paragraph's. **Player-facing prose is precisely the text that wraps and runs
+long**, so the gate was blind to its own subject. Both constraints are removed,
+the class is seeded in the form it really occurs, and the paragraph is frozen as
+the single baseline entry.
+
+**Needed: a real translation in fifteen locales.** A builder does not invent it.
+
+---
+
+## H. The settle-failure guard covers RECOVERY and not ORDINARY PLAY
+
+Found 2026-08-10, same review. A money-path defect, and the guard added on
+2026-08-09 does not reach it.
+
+**What is guarded.** A round recovered at boot whose `end-round` fails sets
+`liveGuardReason` to `settle-failed`, blocks every bet route and shows the new
+banner.
+
+**What is not.** During ordinary live play, `_rgsSpinReal` calls `endRound` INSIDE
+the same `try` as `play` (`rgsService.ts:800-803`). If the settle fails, the whole
+spin rejects, and `App.svelte:1817` hands the optimistic debit BACK:
+
+> `if (optimisticDebit && get(liveGuardReason) !== 'wallet-stalled') { balance.update((b) => b + optimisticDebit) }`
+
+The reason is not `wallet-stalled`, so the refund runs. Nothing sets the guard.
+**The result: the platform has taken the stake and holds an open round, the
+player's displayed balance is restored as though nothing happened, betting is not
+blocked, and the next SPIN places a real bet on top of an unsettled round.** That
+is the same failure the recovery guard was written to prevent, on the commoner
+path.
+
+**Why it is not fixed in this pass.** `rgsService.ts` is LOCKED, so the guard
+cannot be set at the throw site, and the correct seam needs design rather than a
+patch: the client cannot currently tell App which leg failed. Protocol rule 6
+says a genuinely hard bounded problem is extracted as its own surgical brief
+rather than absorbed into the session that found it, and the money path is the one
+place the protocol still mandates serial care.
+
+**Needed: a brief, and a decision on the seam.** The non-locked candidate is
+`walletTimeout.ts`, which already wraps every `/wallet/` fetch and can see that it
+was `end-round` that failed.
 
 ---
 

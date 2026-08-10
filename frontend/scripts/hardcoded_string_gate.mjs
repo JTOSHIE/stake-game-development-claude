@@ -107,8 +107,19 @@ const DEV_ONLY_TEXT = new Map([
  */
 const PROSE_WORD = /\b(the|a|an|your|you|to|of|is|are|and|or|with|per|spin|bet|play|win|coins|balance|mute|unmute|ways|scatter|scatters|session|free|game|feature|cost|currency|token|mode|replay|responsible|total|prize|max|min)\b/i
 
-/** Looks like a sentence or a label, not an identifier or a path. */
-const LABEL_SHAPE = /^[A-Za-z][A-Za-z0-9 ,.'!?:%()×-]{1,140}$/
+/**
+ * Looks like a sentence or a label, not an identifier or a path.
+ *
+ * THE LENGTH CAP WAS 140 AND THAT WAS THE SECOND HALF OF THE SAME BLIND SPOT.
+ * The name gives the assumption away: this was written for LABELS. The
+ * RESPONSIBLE PLAY paragraph in PaytableModal.svelte is 281 characters of
+ * player-facing English rendering to all sixteen locales, so even once rule 3
+ * could see across newlines, this rejected it for being too long to be a label.
+ * A gate hunting untranslated PROSE cannot cap its candidates at label length.
+ * Raised to 600, which comfortably covers the longest paragraph we ship while
+ * still refusing anything that looks like a minified blob.
+ */
+const LABEL_SHAPE = /^[A-Za-z][A-Za-z0-9 ,.'!?:%()×-]{1,600}$/
 
 let failures = 0
 const bad = (n, d) => { failures++; console.error(`  FAIL  ${n}${d ? '\n        ' + d : ''}`) }
@@ -177,7 +188,18 @@ export function findHardcoded(src, file) {
   //    catch it could never have made. A gate that cannot see the commonest
   //    shape of the defect it names is worth less than no gate, because it is
   //    trusted.
-  for (const m of markup.matchAll(/>([^<>\n]{2,300})</g)) {
+  //
+  //    AND THE FIRST WIDENING WAS STILL NOT ENOUGH, which is the more useful
+  //    half of this. It took `{` and `}` out of the class and left `\n` in it,
+  //    so a text node was still disqualified the moment it WRAPPED. The
+  //    RESPONSIBLE PLAY paragraph, a full English sentence rendering to all
+  //    sixteen locales directly under a translated heading, sat in
+  //    PaytableModal.svelte the whole time and this gate returned [] for that
+  //    file. PLAYER-FACING PROSE IS EXACTLY THE TEXT THAT WRAPS, so excluding
+  //    newlines excluded the very class the gate exists for. Found by a review
+  //    pass, not by the gate. Now `s`-flagged, with whitespace normalised in
+  //    the fragments so a wrapped sentence compares as one line.
+  for (const m of markup.matchAll(/>([^<>]{2,600})</gs)) {
     for (const frag of textFragments(m[1])) push(frag)
   }
   return out.map((text) => ({ file, text }))
@@ -210,7 +232,7 @@ export function textFragments(node) {
     if (ch === '}') { if (depth > 0) depth--; continue }
     if (depth === 0) out += ch
   }
-  return out.split(/[ ·•|/]+/).map((s) => s.trim()).filter(Boolean)
+  return out.split(/[ ·•|/]+/).map((s) => s.replace(/\s+/g, ' ').trim()).filter(Boolean)
 }
 
 /**
@@ -304,6 +326,24 @@ function selfTest() {
       + 'which the gate header claimed to catch and never did', true,
       () => findHardcoded(`<script></script>\n<span>{current.ways} ways</span>`, 'X.svelte')
         .some((h) => h.text === 'ways')],
+    // ── The class the FIRST widening still could not see. ───────────────────
+    // Two independent constraints hid it: rule 3 excluded `\n`, so a text node
+    // was disqualified the moment it wrapped; and LABEL_SHAPE capped candidates
+    // at 140 characters, which is a LABEL's length, not a paragraph's. The real
+    // instance is PaytableModal's RESPONSIBLE PLAY text, 281 characters of
+    // English rendering to all sixteen locales under a translated heading, and
+    // this gate returned [] for that file while printing PASS. Seeded in the
+    // form it really occurs: wrapped, long, and between plain tags.
+    ['R041 follow-up: a WRAPPED player-facing paragraph, the form prose actually '
+      + 'takes, which the newline exclusion and the 140-character label cap hid', true,
+      () => findHardcoded(
+        `<script></script>\n<div>\n  <p class="fs-disc">\n    Autoplay can be set to stop automatically on any win, when the\n    Overdrive feature triggers, or once a loss limit you choose is\n    reached, and can always be stopped manually at any time.\n  </p>\n</div>`,
+        'X.svelte').some((h) => h.text.startsWith('Autoplay can be set to stop'))],
+    ['NEGATIVE CONTROL: a wrapped block of pure markup with no prose stays clean, '
+      + 'so widening across newlines does not report the whole component tree', false,
+      () => findHardcoded(
+        `<script></script>\n<div class="a">\n  <span class="b"></span>\n  <i class="c"></i>\n</div>`,
+        'X.svelte').length > 0],
     ['NEGATIVE CONTROL: a text node that is ONLY an interpolation stays clean, '
       + 'so widening rule 3 does not report every expression in the tree', false,
       () => findHardcoded(`<script></script>\n<span>{formatWin(x, c, l)}</span>`, 'X.svelte').length > 0],
