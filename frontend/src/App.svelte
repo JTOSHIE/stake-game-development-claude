@@ -121,7 +121,7 @@
   import { anyModalOpen, setGameBlocked, gameInert } from './lib/stores/modalGuard'
   import { bettingDisabled, liveGuardReason, liveGuardMessageKey, evaluateLiveGuard } from './lib/stores/liveGuard'
   import { authPublishedNothing } from './lib/stores/authShape'
-  import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound } from './lib/stores/sessionRecovery'
+  import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound, resyncAfterSpinRejection } from './lib/stores/sessionRecovery'
   import ResumeOffer from './lib/components/ResumeOffer.svelte'
   import SessionPanel from './lib/components/SessionPanel.svelte'
   // Mock round provider is imported lazily and only in dev, so the sample data
@@ -859,10 +859,20 @@
         isAutoPlay.set(false)
         autoPlayCount.set(0)
       }
+      // B12 / R043 PHASE 4, buy-flow counterpart of the same disposition in
+      // handleSpin: a rejected live buy is the same opaque failure (the locked
+      // service settles inside itself), so the debit is never handed back on
+      // assumption; the display resyncs from server truth and an open round
+      // engages the settle-failed guard. Dev/mock keeps the plain refund.
+      if (!import.meta.env.DEV && optimisticDebit && get(liveGuardReason) !== 'wallet-stalled') {
+        optimisticDebit = 0
+        await resyncAfterSpinRejection()
+      }
     } finally {
       // Only fires when the settle point above was never reached: a throw, or an
       // early return. Without it a failed purchase would leave the player's
-      // balance visibly reduced for a round that never happened.
+      // balance visibly reduced for a round that never happened. In a dev/mock
+      // session only, since R043 PHASE 4; see handleSpin's finally.
       //
       // EXCEPT AFTER A WALLET STALL: see the same guard in handleSpin. The
       // outcome is unknown, so refunding on screen would overstate the wallet.
@@ -1802,10 +1812,33 @@
         isAutoPlay.set(false)
         autoPlayCount.set(0)
       }
+      // B12 / R043 PHASE 4. THE OPTIMISTIC DEBIT IS NEVER HANDED BACK ON
+      // ASSUMPTION. A rejected live spin is opaque from here: the locked
+      // service settles inside itself, so "play refused" and "play succeeded,
+      // settle failed" reject identically, and the enumerated set of
+      // client-side failures that could reject AFTER the debit without
+      // reaching the wallet is EMPTY (play() posts directly, the affordability
+      // guard returns before the debit). Refunding here was the defect: after
+      // a failed settle it restored the pre-bet balance while the RGS held the
+      // stake AND the open round, and the next SPIN staked again on top of it.
+      // Instead the display resyncs from server truth: authenticate, adopt the
+      // authoritative balance, and if the platform still holds a round, the
+      // settle-failed guard blocks every bet route and the reload path settles
+      // it through the idempotent end-round, exactly as recovery already does.
+      // A wallet stall keeps its own fail-closed path (the guard is already
+      // engaged and a probe against a stalled wallet would just stall too).
+      // In dev/mock there is no wallet and no session to probe, so mock play
+      // keeps the plain refund in the finally below.
+      if (!import.meta.env.DEV && optimisticDebit && get(liveGuardReason) !== 'wallet-stalled') {
+        optimisticDebit = 0
+        await resyncAfterSpinRejection()
+      }
     } finally {
       // Fires only when settleRound never ran: a throw, or an early return. A
       // failed spin must not leave the stake visibly gone for a round that never
-      // resolved.
+      // resolved. IN A DEV/MOCK SESSION ONLY, since R043 PHASE 4: a live
+      // rejection resyncs from server truth in the catch above instead, and
+      // this refund is unreachable for it because the resync zeroes the debit.
       //
       // EXCEPT AFTER A WALLET STALL, where the outcome is UNKNOWN rather than
       // failed: the deadline in walletTimeout.ts aborts the request, but the RGS

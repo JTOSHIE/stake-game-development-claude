@@ -36,7 +36,7 @@ import { get } from 'svelte/store'
 import { readFileSync } from 'node:fs'
 import {
   recoverSession, activeRound, resetSessionRecovery,
-  recoveryBannerVisible, dismissRecoveryBanner,
+  recoveryBannerVisible, dismissRecoveryBanner, resyncAfterSpinRejection,
 } from './sessionRecovery.ts'
 import { balance, betAmount } from './gameStore.ts'
 import { rgsBetConfig } from './rgsBetConfig.ts'
@@ -420,6 +420,69 @@ checkThat('and renders exactly one recovery banner',
   const ok = await recoverSession(false, stub, present)
   check('a successful settle does not engage the guard', get(liveGuardReason), null)
   check('and reports its own kind', ok.kind !== 'settle-failed', true)
+}
+
+// ============================================================================
+// RESYNC AFTER A REJECTED LIVE SPIN, R043 PHASE 4 / B12.
+// ============================================================================
+//
+// Three branches, all fail-closed on money:
+//   clear        no open round; the AUTHORITATIVE balance is adopted, the
+//                guard stays disengaged (the stake question is answered by the
+//                server figure, not by a refund);
+//   open-round   the platform still holds the rejected spin; the guard
+//                engages and the round is surfaced for the reload path;
+//   probe-failed nothing could be established; the guard engages anyway.
+{
+  console.log('\nresync after a rejected live spin (B12)')
+
+  // CLEAR: server truth adopted, no guard.
+  resetSessionRecovery()
+  liveGuardReason.set(null)
+  balance.set(498)             // the optimistic post-debit figure App shows
+  authRound = null
+  authThrows = null
+  const clear = await resyncAfterSpinRejection(stub)
+  check('no open round reports clear', clear.kind, 'clear')
+  check('the authoritative balance is adopted, not reconstructed', get(balance), 100)
+  check('the guard stays disengaged', get(liveGuardReason), null)
+
+  // OPEN ROUND: guard engages, round surfaced for the reload path.
+  resetSessionRecovery()
+  liveGuardReason.set(null)
+  balance.set(498)
+  authRound = { betID: 77, active: true, mode: 'base', state: { events: [] } }
+  const open = await resyncAfterSpinRejection(stub)
+  check('an active round reports open-round', open.kind, 'open-round')
+  check('and carries the betID the platform holds',
+    (open as { betID?: number }).betID, 77)
+  check('the settle-failed guard engages', get(liveGuardReason), 'settle-failed')
+  check('betting is disabled by every route', get(bettingDisabled), true)
+  checkThat('the round is surfaced for the reload path to settle',
+    get(activeRound)?.betID === 77)
+  check('the authoritative balance is still adopted first', get(balance), 100)
+
+  // A CLOSED round in the response is history, not work (same discriminator
+  // recoverSession uses): clear, no guard.
+  resetSessionRecovery()
+  liveGuardReason.set(null)
+  authRound = { betID: 78, active: false, mode: 'base', state: {} }
+  const closed = await resyncAfterSpinRejection(stub)
+  check('an inactive round reports clear', closed.kind, 'clear')
+  check('and leaves the guard alone', get(liveGuardReason), null)
+
+  // PROBE FAILED: fail closed.
+  resetSessionRecovery()
+  liveGuardReason.set(null)
+  balance.set(498)
+  authRound = null
+  authThrows = new Error('network down')
+  const failed = await resyncAfterSpinRejection(stub)
+  authThrows = null
+  check('a failed probe reports probe-failed', failed.kind, 'probe-failed')
+  check('and fails CLOSED: the guard engages', get(liveGuardReason), 'settle-failed')
+  check('the debited figure is left standing, never refunded on assumption',
+    get(balance), 498)
 }
 
 if (failures) { console.error(`\nSESSION RECOVERY: FAIL (${failures})`); process.exit(1) }
