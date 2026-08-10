@@ -1,0 +1,16 @@
+{
+  "walletTimeoutMs": 15000,
+  "beforeSpin": {
+    "bannerPresent": false,
+    "bannerText": null
+  },
+  "duringStall": {
+    "atMs": 2000,
+    "bannerText": null,
+    "playCalls": 1
+  },
+  "afterDeadline": {
+    "bannerText": "Spiel nicht verfügbar. Ihre letzte Runde konnte nicht abgeschlossen werden. Bitte neu laden oder den Support kontaktieren.",
+    "playCalls": 1
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "generated": "R041 wording proof",
+  "ledger": [
+    {
+      "capture": "rules-en",
+      "lang": "en",
+      "rulesLists": 2,
+      "rulesText": "Wins pay left to right on adjacent reels starting from reel 1. Symbol values shown are per matching way; the total is that value times the number of ways times your bet. WILD substitutes for all symbols except SCATTER. 3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your total bet, added to any other wins. Maximum win per game round is capped at 5,000× your total bet. A game round includes the triggering spin and any free spins it awards. Malfunctions void all pays and plays. The Overdrive meter starts at 1× and rises +1× after every winning free spin, multiplying all later wins. It never resets during the feature. 3 or more Scatters during free spins award +5 free spins. The scatter build runs shorter on a retrigger than on the entry, because the feature is already secured. Bonus Buy: pay 100× your bet to start the feature immediately. Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet.",
+      "tableHeaders": [
+        "SCATTERS",
+        "FREE SPINS",
+        "INSTANT AWARD"
+      ]
+    },
+    {
+      "capture": "rules-de",
+      "lang": "de",
+      "rulesLists": 2,
+      "rulesText": "Gewinne zahlen von links nach rechts auf benachbarten Walzen ab Walze 1. Die angezeigten Symbolwerte gelten pro passendem Gewinnweg; der Gesamtbetrag ist dieser Wert multipliziert mit der Anzahl der Gewinnwege und deinem Einsatz. WILD ersetzt alle Symbole außer SCATTER. 3, 4 oder 5 SCATTER an beliebiger Position vergeben einen Sofortgewinn von 1×, 3× oder 10× deines Gesamteinsatzes, zusätzlich zu allen anderen Gewinnen. Der Maximalgewinn pro Spielrunde ist auf 5,000× deinen Gesamteinsatz begrenzt. Eine Spielrunde umfasst die auslösende Drehung und alle dadurch gewährten Freispiele. Fehlfunktionen machen alle Auszahlungen und Spiele ungültig. Der Overdrive-Zähler startet bei 1× und steigt nach jedem gewonnenen Freispiel um 1×, was alle folgenden Gewinne multipliziert. Er wird während des Features nie zurückgesetzt. 3 oder mehr Scatter während der Freispiele vergeben 5 zusätzliche Freispiele. Der Scatter-Aufbau läuft bei einem Retrigger kürzer als beim Einstieg, da das Feature bereits gesichert ist. Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten. Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz.",
+      "tableHeaders": [
+        "SCATTER",
+        "FREISPIELE",
+        "SOFORTPRÄMIE"
+      ]
+    },
+    {
+      "capture": "rules-ja",
+      "lang": "ja",
+      "rulesLists": 2,
+      "rulesText": "配当はリール1から隣接するリール上で左から右へ成立します。 表示されているシンボルの配当は、一致したウェイ1つあたりの値です。合計は、その値にウェイ数とベット額を掛けた金額になります。 WILDはSCATTER以外のすべてのシンボルの代わりになります。 SCATTERがリール上のどこかに3個、4個、または5個停止すると、それぞれ合計ベット額の1×、3×、または10×の即時配当が、他の配当とは別に加算されます。 1ゲームラウンドあたりの最大配当は合計ベットの5,000×が上限です。ゲームラウンドには、その契機となるスピンと、そこで獲得したすべてのフリースピンが含まれます。 不具合が発生した場合、すべての配当とプレイは無効となります。 オーバードライブメーターは1倍から始まり、勝利したフリースピンごとに1倍上昇し、以降のすべての配当に乗算されます。フィーチャー中はリセットされません。 フリースピン中にスキャッター3個以上でフリースピンを5回追加します。 リトリガー時のスキャッター演出は、フィーチャーがすでに確定しているため、突入時より短くなります。 ボーナス購入：ベット額の100倍を支払うとフィーチャーがすぐに開始します。 ベースゲームとボーナス購入はどちらもRTP96.35%です。最大配当はベットの5,000倍。",
+      "tableHeaders": [
+        "SCATTER",
+        "フリースピン",
+        "即時配当"
+      ]
+    },
+    {
+      "capture": "rules-zh",
+      "lang": "zh",
+      "rulesLists": 2,
+      "rulesText": "中奖组合从第 1 转轴起，在相邻转轴上由左至右派彩。 所显示的符号数值按每条中奖方式计算；总额为该数值乘以中奖方式数量，再乘以您的投注额。 WILD 可替代除 SCATTER 以外的所有符号。 任意位置出现 3、4 或 5 个 SCATTER，将分别奖励总投注 1×、3× 或 10× 的即时赢额，并与其他任何赢额叠加。 每个游戏回合的最高赢额上限为总投注的 5,000×。一个游戏回合包括触发它的那次旋转以及由此获得的所有免费旋转。 出现故障时，所有派彩与游戏均无效。 超载计量表从 1 倍开始，每次赢得免费旋转后增加 1 倍，乘以之后的所有赢额。功能期间不会重置。 免费旋转期间出现 3 个或以上分散符号可额外获得 5 次免费旋转。 再次触发时的分散符号蓄势比进入时更短，因为该功能已经确定。 购买奖励：支付 100 倍投注即可立即启动功能。 基础游戏和购买奖励的 RTP 均为 96.35%。最高赢额为投注的 5,000 倍。",
+      "tableHeaders": [
+        "SCATTER",
+        "免费旋转",
+        "即时奖励"
+      ]
+    },
+    {
+      "capture": "hud-audio-de",
+      "lang": "de",
+      "muteLabel": "Stummschalten"
+    },
+    {
+      "capture": "replay-real",
+      "mode": "real",
+      "lang": "de",
+      "meta": "Einsatz: $1,00 × 1 cost = $1,00",
+      "line2": "Modus: real"
+    },
+    {
+      "capture": "replay-social",
+      "mode": "social",
+      "lang": "en",
+      "meta": "Play: 1.00 SC × 1 = 1.00 SC",
+      "line2": "Mode: social"
+    }
+  ]
+}

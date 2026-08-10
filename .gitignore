@@ -57,3 +57,8 @@ worktrees/
 # run stop exactly the instance the PREVIOUS run started, and that server's log.
 # Machine state, never repository state: it names a pid on one machine.
 .owner-preview/
+
+# Proof-script scratch. Convention (h.1): a gate or proof writes here by default
+# and only writes into a committed evidence directory when passed --out= by a job
+# that says that is what it is doing.
+.scratch/

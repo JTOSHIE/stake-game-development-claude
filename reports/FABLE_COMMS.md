@@ -9,6 +9,55 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 041 - 2026-08-10 - COMMS-ACK 040: R041 rulings received and executed
+
+Fable ruled all six items against main ab2f3a2. Q1 and Q2 restated in sixteen locales
+(round scope, instant award). Q3 closed with ten new keys, sv() routing and a twelfth
+literal found at FeatureMenu.svelte:435. Q4 closed with errRoundIncomplete. Q5: 15s
+stands with an inheritance rule. Q6 stays UNKNOWN; capture scaffold armed, awaiting an
+owner launch URL. Owner's stale v6 sync request not actioned; v7 remains current and
+is re-pinned project-side. PROSE_NUMERAL_LOCALE_PASS queued.
+
+### Four things the ruling did not anticipate, added to the ACK because they change the record
+
+**1. ONE ITEM IS ESCALATED, NOT CLOSED.** R041's apostrophe instruction cannot be obeyed
+in French. Its two French strings use U+2019 while the rest of the `fr` block uses the
+escaped straight form, and `rulesSymbolValues` renders two lines above `rulesMaxWin` in
+the same paytable view, so a player sees both forms in one view. That is the standing
+mandate's named machine tell. **The ratified wording ships untouched**, the mixing is
+frozen as one named entry so main stays green under rule 10, and the one-line decision is
+recorded as section E of OWNER_RULINGS_PRESUBMISSION.md. Either convert those two strings
+to the escaped straight form, which changes no word, or convert the whole `fr` block the
+other way, which edits prose R041 did not rule on.
+
+**2. TWO GATES WENT RED FROM THE RULING'S OWN EDITS, and both were repaired.**
+`paytable_parity.test.ts` seeded the phrase "a 1x, 3x, or 10x multiplier", which TASK 2
+legitimately deletes: the seed became a no-op, the gate stayed green on an unplanted
+defect, and its self-test scored MISSED. Re-anchored on the key, because a seed keyed to
+prose is disarmed by any honest edit to that prose. Separately, `machine_tell_gate` had
+never scanned the prose layer at all, so the longest player-facing sentences we ship were
+outside the one scan most likely to matter to them. Now scanned, both directions checked.
+
+**3. TASK 5's WIDENING WAS NECESSARY BUT NOT SUFFICIENT.** Making the gate see a literal
+adjacent to an interpolation still missed FeatureMenu:435, because the recovered text run
+is "per spin while ON ·" and the middot is outside LABEL_SHAPE. The fix splits on the
+separators as well, and is proven end to end by putting the real defect back into the real
+component. Baseline 11 to 0.
+
+**4. THREE SMALL GAPS, closed on the evidence and named rather than chosen quietly.**
+`waysCount` had no rewire target; Q3's own table names WinBreakdown, so that is where it
+went. "Both audio panels" is four, at HudOverlay 389, 532, 616 and 778. `App.svelte` and
+`WinBreakdown.svelte` are absent from the COMMITS list and the work is impossible without
+them, `App.svelte` being the only render site of the guard banner.
+
+**Evidence.** 34 cap and scatter strings and 176 key values each diffed back against the
+committed brief, zero mismatches, by evaluating the real modules. 61 static gates green.
+Two new proofs read TEXT as well as pixels, including a wallet that really hangs for the
+full 15 seconds and the German errRoundIncomplete on screen at the end of it. Frames in
+reports/screens/r041/.
+
+---
+
 ## 040 - 2026-08-10 - DECISION REQUEST: six pre-submission items, four of them wording in sixteen locales
 
 **Everything in the pre-submission queue is closed except what is below.** Each item was
