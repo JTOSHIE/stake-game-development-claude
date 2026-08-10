@@ -11154,6 +11154,44 @@ ruling's escape hatch covers it.
    the target before overwriting it.** A file whose name is singular is not
    thereby a file that holds one thing.
 
+## Remote CI, per rule 10, including the red I put there
+
+| Run | Result |
+|---|---|
+| 31347949290, entry 040 | success, browser matrix correctly skipped for a docs-only push |
+| 31351507986, the R041 close | **FAILURE**, `browser: replay contract` |
+| 31351980425, the fix | **success, 16 of 16** |
+
+**The red was mine and it was real, not an expected-fail.** `replay_contract_gate`
+seeds a violation by patching the built bundle, and its social seed matched the
+minified literal `"social"?"Token":"Currency"`, i.e. BOTH branches of the replay
+currency ternary. TASK 4 keys the real-money branch, so the built shape became
+`==="social"?"Token":s()("replayCurrencyLabel")` and the locator matched nothing.
+
+**The gate behaved exactly as designed**: it reported the seed UNAPPLIED rather
+than scoring it CAUGHT, which is the specific failure its own header was written
+about. Re-anchored on the social branch alone, since `"Token"` is a by-design
+literal that stays while the real-money half is now a key that will move again.
+
+**That is the SECOND seed R041's edits disarmed**, after `paytable_parity`'s.
+Both were anchored to a string an honest reword was always free to change, and
+the general lesson outlasts either fix: **a seeded self-test is only as durable
+as its anchor, and anchoring on prose makes convention (p)'s guarantee expire
+silently the first time the prose is improved.**
+
+**I should have caught this locally.** R041's DONE MEANS names
+`replay_contract_gate`; I ran the static suite but not that browser leg before
+pushing.
+
+## The upload kit was stale and is rebuilt
+
+The kit on the Desktop was built at `d40c4ddc`, before this work, so it still
+carried "Maximum win per spin" and the eleven English strings. Rebuilt at
+`3284db2c`: 78 files, 12,318,651 bytes, all four kit gates PASS. Verified by
+READING THE SHIPPED BUNDLE rather than trusting the build log: "per game round"
+twice, "Maximum win per spin" zero times, the German "Spielrunde" twice and the
+German errRoundIncomplete once.
+
 ---
 
 ## FOR THE NEXT SESSION
