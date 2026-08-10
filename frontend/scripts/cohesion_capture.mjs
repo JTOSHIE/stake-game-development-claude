@@ -8,9 +8,10 @@ import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT = join(__dirname, '..', '..', 'reports', 'screens', 'cohesion-pass')
+const OUT = qaTmpDir('screens', 'cohesion-pass')
 mkdirSync(OUT, { recursive: true })
 
 const port = await new Promise((res, rej) => {

@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os'
 import { spawn, execFileSync } from 'node:child_process'
 import { createServer } from 'node:net'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 // This host runs other concurrent, unrelated automated sessions (observed:
 // a stale `vite --port 5199` from a completely different worktree squatting
@@ -39,7 +40,7 @@ async function getFreePort() {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT_DIR = qaTmpDir()
 mkdirSync(OUT_DIR, { recursive: true })
 const LOG_PATH = join(OUT_DIR, 'soak-1.log')
 writeFileSync(LOG_PATH, '') // fresh log each run

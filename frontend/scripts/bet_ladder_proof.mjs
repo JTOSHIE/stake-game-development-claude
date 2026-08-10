@@ -8,9 +8,10 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT = qaTmpDir()
 mkdirSync(OUT, { recursive: true })
 
 const JPY_LADDER = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]

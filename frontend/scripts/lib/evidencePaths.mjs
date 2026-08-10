@@ -55,6 +55,27 @@ export function evidenceDir(...segments) {
 }
 
 /**
+ * The UNTRACKED tmp tree for the one-off proof scripts, R043 PHASE 3b.
+ *
+ * The 32 historical proofs frozen by evidence_hygiene_baseline.json were each
+ * written for a single pass whose evidence is already committed; a re-run's
+ * output is working material, not evidence, so it goes to
+ * reports/qa/tmp/ (gitignored) and a plain run leaves the tree clean. This is
+ * deliberately NOT evidenceDir(): these scripts' committed outputs are dated
+ * history that a re-run should never be able to overwrite, so there is no
+ * FS_WRITE_EVIDENCE escape here at all. A future job that genuinely wants to
+ * regenerate a dated evidence set writes a new dated directory on purpose.
+ *
+ * reports/screens/... writers mirror under the same root, so
+ * qaTmpDir('screens', 'motion-v2') is reports/qa/tmp/screens/motion-v2.
+ */
+export function qaTmpDir(...segments) {
+  const dir = join(REPO_ROOT, 'reports', 'qa', 'tmp', ...segments)
+  mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+/**
  * One line on stderr saying where output went, so a run is never ambiguous
  * about whether it just rewrote committed evidence. Called by every consumer.
  */

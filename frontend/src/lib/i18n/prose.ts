@@ -168,9 +168,14 @@ export const en: ProseStrings = {
 
 // ── The other fifteen locales ────────────────────────────────────────────────
 //
-// Filled by JOB 2. Every locale carries every key; `locale_completeness_check`
-// asserts that rather than trusting it, so a key added here and forgotten in a
-// locale is a build failure and not a Japanese player reading English.
+// Filled by JOB 2. Every locale carries every key; the gate that asserts that
+// is `scripts/locale_prose_conformance.mjs` (PART 1 walks every prose key
+// across all sixteen locales, PART 2 drives the resolver, PART 3 reads the
+// rendered DOM including the opened paytable), wired into CI as its own
+// browser leg. This comment previously credited `locale_completeness_check`,
+// which never scanned the prose layer; naming the wrong guard left the real
+// one unwired and RED for a fortnight (fresh-context major 6, fixed by R043
+// PHASE 3c).
 
 import { proseLocales } from './prose.locales'
 

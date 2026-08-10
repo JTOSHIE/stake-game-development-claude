@@ -47,15 +47,16 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro, clickAnyPendingGate } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
+const OUT_DIR = qaTmpDir()
 // 2026-07-14c: portrait's composition changed fundamentally (grid-first
 // recomposition - no scene/logo, much larger grid, controls pinned to the
 // true bottom safe-area), so its proofs move to a new v2 directory rather
 // than overwriting v1's screenshots of the old composition in place.
-const PORTRAIT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'portrait-v2')
-const LANDSCAPE_COMPACT_SCREENS_ROOT = join(__dirname, '..', '..', 'reports', 'screens', 'landscape-compact-v1')
+const PORTRAIT_SCREENS_ROOT = qaTmpDir('screens', 'portrait-v2')
+const LANDSCAPE_COMPACT_SCREENS_ROOT = qaTmpDir('screens', 'landscape-compact-v1')
 mkdirSync(OUT_DIR, { recursive: true })
 mkdirSync(PORTRAIT_SCREENS_ROOT, { recursive: true })
 mkdirSync(LANDSCAPE_COMPACT_SCREENS_ROOT, { recursive: true })

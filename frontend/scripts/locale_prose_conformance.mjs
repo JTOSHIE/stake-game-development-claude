@@ -66,7 +66,12 @@
 // 1365 strings harvested from 15 rendered locale/mode pages.
 
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { evidenceDir, announceEvidenceTarget } from './lib/evidencePaths.mjs'
+// R043 PHASE 3c: this import once named `announceEvidenceTarget`, which
+// evidencePaths.mjs has never exported, so the module threw at load and the
+// gate was RED at HEAD in both its live run and its self-test (fresh-context
+// majors 1 and 58) while two other artefacts cited it as their proof. The
+// throw is also why nobody saw it: a gate that cannot load cannot print FAIL.
+import { evidenceDir } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
@@ -110,6 +115,7 @@ const IDENTICAL_OK = {
   guideTurboName:    ['de', 'es', 'fi', 'fr', 'id', 'pl', 'pt', 'tr', 'vi'], // "Turbo"
   guideMenuName:     ['fr', 'id', 'pl', 'pt', 'vi'],               // "Menu"
   a11yMenu:          ['fr', 'id', 'pl', 'pt', 'vi'],               // "Menu"
+  replayModeLabel:   ['id'],                                       // "Mode" is the Indonesian word
   guideFeaturesName: ['de'],                                       // German uses "Features"
   a11yFeatures:      ['de'],                                       // same
   hudFeatures:       ['de'],                                       // same, ALL CAPS form
@@ -299,10 +305,21 @@ async function part3(english) {
         const bag = []
         bag.push(...(await page.evaluate(HARVEST)))
         // The paytable is the block an approval reviewer is guaranteed to open,
-        // and it is where the rules, the interface guide and the disclaimer live.
-        for (const sel of ['[data-testid="menu-button"]', '.hud-menu', 'button[aria-label]']) {
-          const el = await page.$(sel)
-          if (el) { await el.click().catch(() => {}); await page.waitForTimeout(300); break }
+        // and it is where the rules, the interface guide and the disclaimer
+        // live. R043 PHASE 3c (fresh-context major 2): the loop that stood
+        // here clicked the first of three guessed selectors, none of which is
+        // the paytable, so the block this PART's own comment names was never
+        // harvested. It now walks the real route a reviewer walks: the HUD
+        // menu, then the paytable item, then waits for the dialog panel; a
+        // route that stops resolving is a FAILURE, not a silent skip, because
+        // a harvest of nothing reads as a clean pass.
+        await page.click('[data-testid="hud-menu"]', { timeout: 5000 })
+        await page.click('[data-testid="open-paytable"]', { timeout: 5000 })
+        const paytableOpen = await page.waitForSelector('.fs-pt-panel', { timeout: 5000 })
+          .then(() => true).catch(() => false)
+        if (!paytableOpen) {
+          failures.push({ part: 'rendered', locale: loc, mode, key: '(paytable)',
+            leak: 'the paytable dialog did not open, so its block was not harvested' })
         }
         bag.push(...(await page.evaluate(HARVEST)))
 

@@ -23,10 +23,11 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-const SCREENS_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'currency-readiness')
+const OUT_DIR = qaTmpDir()
+const SCREENS_DIR = qaTmpDir('screens', 'currency-readiness')
 mkdirSync(OUT_DIR, { recursive: true })
 mkdirSync(SCREENS_DIR, { recursive: true })
 

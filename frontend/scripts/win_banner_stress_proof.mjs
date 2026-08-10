@@ -19,6 +19,7 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 async function getFreePort() {
   return new Promise((resolvePromise, reject) => {
@@ -39,7 +40,7 @@ function startDevServer(port) {
   })
 }
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'owner-audit-v2', 'win-banner-stress')
+const OUT_DIR = qaTmpDir('screens', 'owner-audit-v2', 'win-banner-stress')
 mkdirSync(OUT_DIR, { recursive: true })
 
 const STRESS_VALUES = [1000, 100000, 1000000]

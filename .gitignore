@@ -53,6 +53,11 @@ worktrees/
 # evidence directories. See frontend/scripts/lib/evidencePaths.mjs.
 .evidence-scratch/
 
+# R043 PHASE 3b: the untracked tmp tree the one-off proof scripts write to via
+# qaTmpDir(). Their committed evidence is dated history; a re-run's output is
+# working material and never dirties the tree.
+reports/qa/tmp/
+
 # The owner's local preview server, per rule 12. Holds the pidfile that lets a
 # run stop exactly the instance the PREVIOUS run started, and that server's log.
 # Machine state, never repository state: it names a pid on one machine.

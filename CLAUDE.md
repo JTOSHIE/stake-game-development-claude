@@ -225,6 +225,27 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   edit. Ride a one-line correction on the next sanctioned maths-package pass; not worth a
   pass of its own, and not a defect in the game.
 
+- **`games/future_spinner/README.md` describes the pre-Overdrive game** (recorded
+  2026-08-10, R043 PHASE 3a, fresh-context major 8; VERIFIED by direct read). Its Bonus
+  Feature section says the scatter is stateless, "does **not** trigger a free-spin
+  round", and awards 2x/10x/50x total bet for 3/4/5 scatters. `game_config.py` in the
+  same directory says the opposite on every point: 3/4/5 scatters award 8/12/16 free
+  spins plus an instant 1x/3x/10x, and the five-mode Overdrive package shipped
+  2026-07-07. The README is inside the locked package with no sanction to edit;
+  correct it on the next sanctioned maths-package pass, alongside the PAR line below.
+
+- **`games/future_spinner/game_executables/game_calculation.py` carries pre-Overdrive
+  docstrings and a stale embedded self-test that CRASHES** (recorded 2026-08-10, R043
+  PHASE 3a, fresh-context major 9; VERIFIED by running it: `python3
+  games/future_spinner/game_executables/game_calculation.py` exits with
+  `AssertionError: Expected 5x multiplier for 3 scatters` at its own line 861). Its
+  docstrings state the game "has no free-spin round" and the old 5x/15x/50x scatter
+  values; the shipped value for 3 scatters is 1x, which is exactly why the stale
+  assertion fails. The RUNTIME code is correct and the published books are frozen
+  truth, so this is documentation-and-test debt only: sweep the docstrings and the
+  `__main__` self-test expectations on the next sanctioned maths-package pass. Do not
+  regenerate anything on its account.
+
 - **Four dead stores inside `gameStore.ts`**: `betIndex` (derived), `buyBonusActive`
   (writable), `canSetMaxBet` (derived), `sessionStats` (writable). None has a single
   read anywhere in production code, verified including `derived()` and `.subscribe()`
