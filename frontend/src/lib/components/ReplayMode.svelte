@@ -22,6 +22,27 @@
   import { interpretEvents, type PresentationScript, type RawEvent } from '../services/roundInterpreter'
   import { socialAtBoot } from '../stores/socialMode'
 
+  // B9 / R043 PHASE 2: the replay surface sounds through the SAME cue map the
+  // live surface uses, and through nothing else. GameGrid.animateSpin already
+  // carries the spin start, per-reel stop, scatter-land and anticipation cues
+  // (GameGrid.svelte:935,444-445), so the reel leg of a replay sounds the
+  // moment it animates; the two cues that live in App.svelte rather than the
+  // grid, the win-presentation cue at settle (App.svelte:1701) and the wincap
+  // cue at the reveal (App.svelte:1677), are called here at the same points of
+  // the replay's own flow. Mute and the two volume sliders are honoured
+  // because every call routes through soundService, which reads them
+  // (soundService.ts:126,180); nothing here mixes, gates or re-levels.
+  //
+  // DELIBERATELY NOT warmUpAudio(). The game route primes decode on the first
+  // gesture because its first CUE arrives on a later one. In replay the
+  // start gesture IS the first cue: warm-up sets every element muted and its
+  // async cleanup pauses them, so a cue fired in the same tick plays muted and
+  // is then stopped. Measured on this proof's own first run
+  // (r043_replay_audio_proof.mjs): with warm-up here, the spin and wincap
+  // cues logged muted:true and never sounded; without it, every cue plays.
+  // The first cue pays its decode cost inline, which is the cheaper defect.
+  import { playWin } from '../services/soundService'
+
   // Drive the animation pipeline by setting gameStore writables via their
   // public .set() API, gameStore.ts itself is NOT modified.
   import {
@@ -153,6 +174,9 @@
 
   async function startReplay() {
     if (!response || !params) return
+    // Audio begins only at this gesture: every cue below is downstream of
+    // this click. See the import note above for why the replay route does
+    // not call warmUpAudio() here.
     phase = 'playing'
     replayPhase.set('playing')
 
@@ -205,13 +229,43 @@
         if (wincapNow) {
           // Wincap flow applies in replay too: splash first, then on COLLECT
           // present the complete round sequence, finishing on the summary.
+          // The wincap cue fires at the reveal, exactly where live fires it
+          // (App.svelte:1677 plays the win sound at the splash, before the
+          // COLLECT wait); the replay's splash IS that reveal.
+          playWin(response.payoutMultiplier)
           isWincap.set(true)
           await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
         }
+        // THE TRIGGERING SPIN ANIMATES IN REPLAY EXACTLY AS IT DOES LIVE
+        // (B9 / R043 PHASE 2). This branch used to raise the free-spins
+        // overlay directly, so a feature replay skipped the base spin that
+        // earned it: no reel animation, no scatter lands, no anticipation,
+        // in both pictures and sound, against the platform requirement to
+        // "Show all animations, sounds, and visual effects"
+        // (approval_guidelines_game_replay_requirements.md:130). Live play
+        // animates the triggering board first and then presents the feature
+        // (App.svelte's handleSpin), and animateSpin is where the spin-start,
+        // reel-stop, scatter-land and anticipation cues already live, so
+        // animating the same board through the same pipeline is what makes
+        // the feature trigger LOOK and SOUND the same here as it does live.
+        const trigBoard: string[][] = script.baseSpin.board.map((reel) =>
+          reel.slice(1, reel.length - 1).map((cell) => cell.name),
+        )
+        isSpinning.set(true)
+        if (gridRef && trigBoard.length > 0) {
+          await gridRef.animateSpin(trigBoard)
+        }
+        isSpinning.set(false)
+        boardSymbols.set(trigBoard)
+        scatterCount.set(script.baseSpin.scatterCount)
         featureScript = script
         featureActive = true
         await new Promise<void>((resolve) => { featureResolve = resolve })
         winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
+        // The round's win-presentation cue, deferred until the feature has
+        // played, exactly as live defers it (App.svelte:1701); a capped round
+        // already played its cue at the splash above.
+        if (!wincapNow) playWin(response.payoutMultiplier)
         // MAX-WIN HOLD (owner's order, 2026-07-28): the terminal splash is
         // raised LAST, after the replay has already finished. Raising it before
         // the phase change left the overlay sitting over a replay that then
@@ -251,6 +305,8 @@
       // the "how it happened" presentation, finishing on the summary.
       const wincapNow = response.payoutMultiplier >= WINCAP
       if (wincapNow) {
+        // Same reveal-time cue as the feature branch above (App.svelte:1677).
+        playWin(response.payoutMultiplier)
         isWincap.set(true)
         await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
       }
@@ -270,6 +326,11 @@
       scatterCount.set(base.scatterCount)
       // winAmount drives the derived winMultiplier (winAmount / betAmount)
       winAmount.set(microsToDisplay(response.payoutMultiplier * params.amount))
+      // The win-presentation cue, at the same point live settles it
+      // (App.svelte:1701): the result stores are populated and the count-up
+      // begins. A capped round already played its cue at the splash above,
+      // matching live's own !roundIsWincap guard.
+      if (!wincapNow) playWin(response.payoutMultiplier)
 
       // Let win-line and celebration animations complete
       await new Promise((r) => setTimeout(r, 2000))

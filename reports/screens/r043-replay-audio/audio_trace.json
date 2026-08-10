@@ -1,0 +1,188 @@
+{
+  "_what": "R043 PHASE 2 / B9. Every HTMLMediaElement.play() observed during the proof replays, audible vs muted.",
+  "_bundle": "frontend/dist at the commit this file ships in",
+  "real": {
+    "audible": [
+      {
+        "src": "spin.mp3",
+        "muted": false,
+        "volume": 0.5599999999999999,
+        "at": 1054
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1468
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1568
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1668
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1768
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1868
+      },
+      {
+        "src": "win_small.mp3",
+        "muted": false,
+        "volume": 0.32000000000000006,
+        "at": 2023
+      }
+    ],
+    "total": 7
+  },
+  "social": {
+    "audible": [
+      {
+        "src": "spin.mp3",
+        "muted": false,
+        "volume": 0.5599999999999999,
+        "at": 852
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1270
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1370
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1453
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1553
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1652
+      },
+      {
+        "src": "win_small.mp3",
+        "muted": false,
+        "volume": 0.32000000000000006,
+        "at": 1807
+      }
+    ],
+    "total": 7
+  },
+  "muted": {
+    "audible": [],
+    "total": 0
+  },
+  "wincap": {
+    "audibleAtSplash": [
+      {
+        "src": "win_epic.mp3",
+        "muted": false,
+        "volume": 0.76,
+        "at": 862
+      }
+    ]
+  },
+  "feature": {
+    "audibleAtEntry": [
+      {
+        "src": "spin.mp3",
+        "muted": false,
+        "volume": 0.5599999999999999,
+        "at": 890
+      },
+      {
+        "src": "anticipation_build.webm",
+        "muted": false,
+        "volume": 0.48,
+        "at": 1084
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1308
+      },
+      {
+        "src": "scatter_land.mp3",
+        "muted": false,
+        "volume": 0.6400000000000001,
+        "at": 1308
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 1393
+      },
+      {
+        "src": "scatter_land.mp3",
+        "muted": false,
+        "volume": 0.6400000000000001,
+        "at": 1393
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 2391
+      },
+      {
+        "src": "scatter_land.mp3",
+        "muted": false,
+        "volume": 0.6400000000000001,
+        "at": 2391
+      },
+      {
+        "src": "reel_stop.mp3",
+        "muted": false,
+        "volume": 0.68,
+        "at": 3840
+      },
+      {
+        "src": "scatter_land.mp3",
+        "muted": false,
+        "volume": 0.6400000000000001,
+        "at": 3841
+      },
+      {
+        "src": "reel_stop_anticipation.mp3",
+        "muted": false,
+        "volume": 0.7200000000000001,
+        "at": 5490
+      },
+      {
+        "src": "scatter_land.mp3",
+        "muted": false,
+        "volume": 0.6400000000000001,
+        "at": 5491
+      }
+    ]
+  }
+}
