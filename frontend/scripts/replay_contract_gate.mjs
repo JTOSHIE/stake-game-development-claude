@@ -817,10 +817,22 @@ async function main() {
       // ternary onto its real-money branch rather than, say, deleting the label.
       await seed('social-label-not-swapped',
         'social mode shows the word Currency, which is on the stake.us prohibited-terms table',
+        // RE-ANCHORED 2026-08-10 (R041). This matched `"social"?"Token":"Currency"`,
+        // i.e. BOTH branches at once. R041 keyed the real-money branch, so the
+        // minified ternary is now `==="social"?"Token":s()("replayCurrencyLabel")`
+        // and the old locator matched nothing. The gate did exactly the right
+        // thing and refused to score an UNAPPLIED seed as caught, which is the
+        // behaviour its own header exists to describe.
+        //
+        // Now anchored on the SOCIAL branch alone. `"Token"` is a deliberate
+        // English literal that stays by design (social is en-only, and 'currency'
+        // is in vocabulary.ts NOT_SUBSTITUTED because a blanket rewrite would
+        // corrupt ISO code labels), so it is the stable half of this pair. The
+        // real-money half is now a translation key and will move again.
         { qs: { social: 'true' }, patches: { [bundle.file]: (b) => {
-          const m = b.match(/"social"\?"Token":"Currency"/)
+          const m = b.match(/"social"\?"Token":/)
           if (!m) return null
-          return b.replace(m[0], '"social"?"Currency":"Currency"')
+          return b.replace(m[0], '"social"?"Currency":')
         } } }, /labels the value Token/, assertSocialToken)
 
       // SEED 2: two segments transposed. The old glob-based harness is green on
