@@ -47,7 +47,7 @@ export type ProseKey =
   | 'symbolPayoutsHeading' | 'wildSubstitutes'
   | 'colFreeSpins' | 'colInstantAward' | 'costLabel'
   | 'interfaceGuideHeading' | 'rtpAllModes' | 'maxWinLabel'
-  | 'responsiblePlayHeading' | 'disclaimerHeading'
+  | 'responsiblePlayHeading' | 'responsiblePlayBody' | 'disclaimerHeading'
   | 'rulesWaysPay' | 'rulesSymbolValues' | 'rulesWildSub' | 'rulesScatterMult' | 'rulesMaxWin' | 'rulesMalfunction'
   | 'comingSoonLower' | 'waysLabel' | 'scatterSummary'
   | 'disclaimerBody' | 'replayLoadError' | 'replayPlaybackError'
@@ -110,12 +110,13 @@ export const en: ProseStrings = {
   rtpAllModes:            'RTP (All 5 Modes)',
   maxWinLabel:            'Max Win',
   responsiblePlayHeading: 'Responsible Play',
+  responsiblePlayBody:    'Autoplay can be set to stop automatically on any win, when the Overdrive feature triggers, or once a loss limit you choose is reached, and can always be stopped manually at any time. A session summary (time played, spins, net result) is available from the menu.',
   disclaimerHeading:      'Disclaimer',
   rulesWaysPay:     'Wins pay left to right on adjacent reels starting from reel 1.',
   rulesSymbolValues: 'Symbol values shown are per matching way; the total is that value times the number of ways times your bet.',
   rulesWildSub:     'WILD substitutes for all symbols except SCATTER.',
-  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your total bet, added to any other wins.',
-  rulesMaxWin:      'Maximum win per game round is capped at 5,000× your total bet. A game round includes the triggering spin and any free spins it awards.',
+  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your base bet, added to any other wins.',
+  rulesMaxWin:      'Maximum win per game round is capped at 5,000× your base bet. A game round includes the triggering spin and any free spins it awards.',
   rulesMalfunction: 'Malfunctions void all pays and plays.',
   comingSoonLower:  'coming soon',
   waysLabel:        'WAYS TO WIN',
@@ -197,8 +198,8 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   modeSuperBlurb: 'Get a rich entry with the Overdrive meter pre-revved to 5×.',
   rulesWaysPay: 'Prizes are awarded left to right on adjacent reels starting from reel 1.',
   rulesSymbolValues: 'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
-  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant prize of 1×, 3×, or 10× your total play, added to any other prizes.',
-  rulesMaxWin: 'Maximum prize per game round is capped at 5,000× your total play. A game round includes the triggering spin and any free spins it awards.',
+  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant prize of 1×, 3×, or 10× your base play, added to any other prizes.',
+  rulesMaxWin: 'Maximum prize per game round is capped at 5,000× your base play. A game round includes the triggering spin and any free spins it awards.',
   rulesMalfunction: 'Malfunctions void all wins and plays.',
   maxWinLabel: 'Max Prize',
   maxWinFootnote: 'Max win is quoted against the base play amount.',

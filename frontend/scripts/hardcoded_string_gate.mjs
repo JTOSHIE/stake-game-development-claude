@@ -16,9 +16,17 @@
 //   PaytableModal       the 'Scatters' column header, beside two keyed siblings
 //   WinBreakdown        {current.ways} ways
 //
-// ALL OF THE ABOVE ARE NOW FIXED. Fable's ruling block R041 (2026-08-10)
-// supplied the wording for all sixteen locales, the baseline went 11 -> 0, and
-// the ratchet's both-directions check is what proved each one was really burned
+// THAT LIST WAS WRONG WHEN IT CLAIMED THEY WERE ALL FIXED, and the correction
+// is the point. After R041 this header read "ALL OF THE ABOVE ARE NOW FIXED".
+// Two of the strings it names were still shipping English to sixteen locales:
+// ReplayMode's `cost =`, and WinBreakdown's ways line which this gate had never
+// been able to see at all. A false claim in a gate's own header is worse than no
+// header, because a run can never contradict it: the gate reports on the tree,
+// not on its own comments. Found by a review pass, recorded as B10, and fixed by
+// R042 A5 rather than by editing the sentence.
+//
+// AS OF R042 (2026-08-10) the list above IS closed, the baseline is 0, and the
+// ratchet's both-directions check is what proved each entry was really burned
 // rather than merely edited around.
 //
 // TWO THINGS THIS FILE GOT WRONG, kept because they are the lesson rather than
@@ -257,12 +265,50 @@ const BY_DESIGN = new Map([
     + 'proved by replay_contract_gate.mjs rather than asserted'],
 ])
 
+/**
+ * A CONFIG FIELD RENDERED RAW. R042 TASK A6.
+ *
+ * `fsModes.ts` declares `volatility: 'Low' | 'High' | 'Very High' | 'Extreme'`
+ * and both FEATURES card layouts interpolated the union member DIRECTLY, so a
+ * Japanese player read "Very High" on a card whose every other word was
+ * translated. No .svelte file contained the string, so no markup scan could
+ * have found it.
+ *
+ * THE FIRST ATTEMPT AT THIS SCANNED THE CONFIG FILE AND WAS USELESS, which is
+ * worth recording because it looked reasonable. Reading string literals out of
+ * fsModes.ts finds `'Low'` and `'High'`, and then either PROSE_WORD rejects them
+ * (they are not prose words) or, with PROSE_WORD removed, it flags the config's
+ * own vocabulary, which is legitimately English and is now keyed at the render
+ * site. Either way the gate learns nothing: the config literal is not the
+ * defect. THE RENDER IS.
+ *
+ * So this looks for the shape that actually broke: a component interpolating a
+ * config-owned field straight into markup, with no translation call around it.
+ */
+const RENDERED_FIELDS = 'volatility|label|blurb|title|caption|unit|suffix'
+const RAW_FIELD_RENDER = new RegExp(
+  String.raw`\{\s*\w+\.(${RENDERED_FIELDS})\s*\}`, 'g')
+
+export function findRawFieldRenders(src, file) {
+  const markup = markupOf(src)
+  const out = []
+  for (const m of markup.matchAll(RAW_FIELD_RENDER)) {
+    // `{$tr(m.labelKey)}` and friends are the CORRECT form and carry a call, so
+    // the match above cannot see them: it requires the braces to hold nothing
+    // but the member expression.
+    out.push({ file, text: m[0] })
+  }
+  return out
+}
+
 function scanTree() {
   const dir = join(SRC, 'lib', 'components')
   const files = readdirSync(dir).filter((f) => f.endsWith('.svelte') && !SKIP_FILES.has(f))
   const found = []
   for (const f of files) found.push(...findHardcoded(readFileSync(join(dir, f), 'utf8'), f))
   found.push(...findHardcoded(readFileSync(join(SRC, 'App.svelte'), 'utf8'), 'App.svelte'))
+  for (const f of files) found.push(...findRawFieldRenders(readFileSync(join(dir, f), 'utf8'), f))
+  found.push(...findRawFieldRenders(readFileSync(join(SRC, 'App.svelte'), 'utf8'), 'App.svelte'))
   return found.filter((h) => !BY_DESIGN.has(`${h.file}|${h.text}`))
 }
 
@@ -350,6 +396,15 @@ function selfTest() {
     ['NEGATIVE CONTROL: a keyed call carrying a NESTED object literal, the shape '
       + 'R041 introduced at WinBreakdown, must not leak its own braces as text', false,
       () => findHardcoded(`<script></script>\n<span>{$tr('waysCount', { n: current.ways })}</span>`, 'X.svelte').length > 0],
+    // ── R042 A6. A config-owned field rendered raw. ─────────────────────────
+    ['R042: a config union member interpolated straight into markup, the shape '
+      + 'that put "Very High" on a Japanese FEATURES card', true,
+      () => findRawFieldRenders(`<script></script>\n<span class="fm-vol">{m.volatility}</span>`, 'X.svelte').length > 0],
+    ['NEGATIVE CONTROL: the keyed form through VOLATILITY_KEY must pass, or the '
+      + 'fix itself would fail the gate', false,
+      () => findRawFieldRenders(`<script></script>\n<span>{$tr(VOLATILITY_KEY[m.volatility])}</span>`, 'X.svelte').length > 0],
+    ['NEGATIVE CONTROL: a keyed prose field such as {$tr(m.labelKey)} must pass', false,
+      () => findRawFieldRenders(`<script></script>\n<span>{$tr(m.labelKey)}</span>`, 'X.svelte').length > 0],
     ['NEGATIVE CONTROL: a keyed string is not flagged', false,
       () => findHardcoded(`<script></script>\n<div>{$tr('hudSession')}</div>`, 'X.svelte').length > 0],
     ['NEGATIVE CONTROL: a CSS class is not prose', false,

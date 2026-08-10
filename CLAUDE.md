@@ -436,6 +436,17 @@ lives in `App.svelte` behind `import.meta.env.DEV`; reversible by removing those
   behaviour was and is correct; the requirement is now stated against behaviour rather
   than against component names, so it stays checkable as the component tree changes.)
 - No Stake branding in shipped assets or text. Original IP only.
+- **Player-facing French standardises on the ESCAPED STRAIGHT apostrophe** (`\'`), not the
+  typographic U+2019. Fable ruling R042 TASK A1, 2026-08-10, option (a). The rule is about
+  CONSISTENCY WITHIN A LOCALE rather than a preference between glyphs: `machine_tell_gate`
+  scans apostrophe form per locale block, because what a player sees is one locale
+  contradicting itself, and the standing mandate names "straight and curly quotes mixed in
+  one view" as a machine tell. R041 supplied two French strings in the typographic form
+  while the rest of the `fr` block used the straight one, and `rulesSymbolValues` renders
+  two lines above `rulesMaxWin` in the same paytable block, so a French player saw both
+  forms at once. **A font-verified typographic pass across all sixteen locales is a
+  POST-APPROVAL cosmetic candidate, board item TYPOGRAPHIC_APOSTROPHE_PASS**, and is not
+  to be started before submission.
 
 ## Session conventions
 

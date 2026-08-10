@@ -1,3 +1,10 @@
+// CONVENTION (h.1), MIGRATED 2026-08-10 by R042 TASK A7. This script used to
+// write its JSON and its screenshots STRAIGHT INTO the committed evidence tree,
+// so a plain run silently rewrote committed files: a review pass on 2026-08-10
+// dirtied 18 of them simply by running this gate. Two sibling gates were moved
+// onto `evidenceDir()` in July and these three were missed. Output now defaults
+// to the gitignored scratch tree; set FS_WRITE_EVIDENCE=1 to regenerate the
+// committed evidence on purpose, which is the opt-in the convention allows.
 // social_dom_conformance.mjs - R2R JOB 6 / TR-041 (2026-07-25).
 //
 // REPLACES scripts/social_string_conformance.mjs, which round-two reviewer 3
@@ -45,6 +52,7 @@
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { evidenceDir, announceEvidenceTarget } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
@@ -53,10 +61,8 @@ import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { PROHIBITED_TERMS, NOT_SUBSTITUTED, TERM_TABLE_SOURCE } from '../src/lib/i18n/vocabulary.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-const SCREENS_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'social-dom-conformance')
-mkdirSync(OUT_DIR, { recursive: true })
-mkdirSync(SCREENS_DIR, { recursive: true })
+const OUT_DIR = evidenceDir('reports', 'qa')
+const SCREENS_DIR = evidenceDir('reports', 'screens', 'social-dom-conformance')
 
 const NEVER_REWRITE = new Set(Object.keys(NOT_SUBSTITUTED))
 const UNIQUE_TERMS = [...new Map(PROHIBITED_TERMS.map((t) => [t.phrase.toLowerCase(), t])).values()]

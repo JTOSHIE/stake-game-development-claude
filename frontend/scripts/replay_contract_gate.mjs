@@ -774,8 +774,18 @@ async function main() {
       // than a silent no-op.
       await seed('multiplier-suppressed-at-1x',
         'the replay UI hides the applied multiplier when it is 1.0x, which is base and cruise',
+        // RE-ANCHORED 2026-08-10 (R042 A5). This matched the minified text up to
+        // `cost ="}`, i.e. through the English literal on the REAL-MONEY branch.
+        // A5 keyed that word, so the literal is gone and the locator matched
+        // nothing. THIS IS THE THIRD SEED IN TWO DAYS disarmed by an entirely
+        // legitimate reword, and each time the anchor reached through prose to
+        // get at structure.
+        //
+        // Anchored now on the TEMPLATE ITSELF, `× ${...}`, which is the shape
+        // the assertion is actually about: the multiplier line. Its contents are
+        // free to change; its existence is what the seed suppresses.
         { costMultiplier: 1.0, patches: { [bundle.file]: (b) => {
-          const m = b.match(/`× \$\{[\s\S]*?cost ="\} `/)
+          const m = b.match(/`× \$\{[^`]*`/)
           if (!m) return null
           return b.replace(m[0], '``')
         } } }, /multiplier is displayed at 1\.0x/, assertFlatMultiplier)

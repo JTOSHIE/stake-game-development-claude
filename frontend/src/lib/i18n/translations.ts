@@ -136,6 +136,15 @@ export interface Translations {
   perSpinWhileOn:       string
   baseBetUnit:          string
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               string
+  volHigh:              string
+  volVeryHigh:          string
+  volExtreme:           string
+
+
   // ── Overdrive Free Spins feature (optional: served from featureI18n via t) ──
   overdrive?:              string
   overdriveFreeSpins?:     string
@@ -313,6 +322,15 @@ const en: Translations = {
   perSpinWhileOn:       'per spin while ON',
   baseBetUnit:          'base bet',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Low',
+  volHigh:              'High',
+  volVeryHigh:          'Very High',
+  volExtreme:           'Extreme',
+
+
 }
 
 // ── Arabic ────────────────────────────────────────────────────────────────────
@@ -412,6 +430,15 @@ const ar: Translations = {
   betUnit:              'رهان',
   perSpinWhileOn:       'لكل لفّة أثناء التفعيل',
   baseBetUnit:          'الرهان الأساسي',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'منخفض',
+  volHigh:              'مرتفع',
+  volVeryHigh:          'مرتفع جدًا',
+  volExtreme:           'قصوى',
+
 
 }
 
@@ -513,6 +540,15 @@ const de: Translations = {
   perSpinWhileOn:       'pro Drehung, solange AN',
   baseBetUnit:          'Basiseinsatz',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Niedrig',
+  volHigh:              'Hoch',
+  volVeryHigh:          'Sehr hoch',
+  volExtreme:           'Extrem',
+
+
 }
 
 // ── Spanish ───────────────────────────────────────────────────────────────────
@@ -612,6 +648,15 @@ const es: Translations = {
   betUnit:              'apuesta',
   perSpinWhileOn:       'por giro mientras esté ACTIVADO',
   baseBetUnit:          'apuesta base',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Baja',
+  volHigh:              'Alta',
+  volVeryHigh:          'Muy alta',
+  volExtreme:           'Extrema',
+
 
 }
 
@@ -713,6 +758,15 @@ const fi: Translations = {
   perSpinWhileOn:       'per pyöräytys, kun PÄÄLLÄ',
   baseBetUnit:          'peruspanos',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Matala',
+  volHigh:              'Korkea',
+  volVeryHigh:          'Erittäin korkea',
+  volExtreme:           'Äärimmäinen',
+
+
 }
 
 // ── French ────────────────────────────────────────────────────────────────────
@@ -778,11 +832,11 @@ const fr: Translations = {
   hugeWin:              'ÉNORME GAIN!!',
   megaWin:              'MÉGA GAIN!!!',
   error:                'Erreur de connexion. Veuillez réessayer.',
-  errSessionUnavailable: 'Jeu indisponible. Votre session n’a pas pu être vérifiée. Veuillez recharger ou contacter le support.',
+  errSessionUnavailable: 'Jeu indisponible. Votre session n\'a pas pu être vérifiée. Veuillez recharger ou contacter le support.',
   insufficientBalance:  'Solde insuffisant. Veuillez ajouter des fonds.',
   sessionExpired:       'Session expirée. Veuillez relancer le jeu.',
   maintenanceMode:      'Serveur en maintenance. Réessayez plus tard.',
-  locationRestricted:   'Ce jeu n’est pas disponible dans votre région.',
+  locationRestricted:   'Ce jeu n\'est pas disponible dans votre région.',
   gamblingLimitReached: 'Limite de jeu atteinte.',
   rules:                'RÈGLES',
   paytable:             'TABLE DE PAIEMENT',
@@ -795,13 +849,13 @@ const fr: Translations = {
   symbolWild:            'JOKER',
   symbolScatter:         'SCATTER',
   settings:             'PARAMÈTRES',
-  replayDisclaimer:     'Ceci est la relecture d’une mise déjà terminée, affichée à des fins de vérification uniquement. Aucun fonds n’est misé et le résultat ne peut pas être modifié.',
+  replayDisclaimer:     'Ceci est la relecture d\'une mise déjà terminée, affichée à des fins de vérification uniquement. Aucun fonds n\'est misé et le résultat ne peut pas être modifié.',
 
   // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
   //    components and so rendered English to all sixteen locales. See
   //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
   //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
-  errRoundIncomplete:   'Jeu indisponible. Votre dernier tour n’a pas pu être terminé. Veuillez recharger ou contacter le support.',
+  errRoundIncomplete:   'Jeu indisponible. Votre dernier tour n\'a pas pu être terminé. Veuillez recharger ou contacter le support.',
   ctrlMute:             'Couper le son',
   ctrlUnmute:           'Réactiver le son',
   colScatters:          'Scatters',
@@ -810,8 +864,17 @@ const fr: Translations = {
   replayModeLabel:      'Mode :',
   waysCount:            '{n} façons',
   betUnit:              'mise',
-  perSpinWhileOn:       'par tour tant qu’ACTIVÉ',
+  perSpinWhileOn:       'par tour tant qu\'ACTIVÉ',
   baseBetUnit:          'mise de base',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Faible',
+  volHigh:              'Élevée',
+  volVeryHigh:          'Très élevée',
+  volExtreme:           'Extrême',
+
 
 }
 
@@ -913,6 +976,15 @@ const hi: Translations = {
   perSpinWhileOn:       'चालू रहने पर प्रति स्पिन',
   baseBetUnit:          'बेस बेट',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'कम',
+  volHigh:              'उच्च',
+  volVeryHigh:          'बहुत उच्च',
+  volExtreme:           'अत्यधिक',
+
+
 }
 
 // ── Indonesian ────────────────────────────────────────────────────────────────
@@ -1012,6 +1084,15 @@ const id: Translations = {
   betUnit:              'taruhan',
   perSpinWhileOn:       'per putaran selama AKTIF',
   baseBetUnit:          'taruhan dasar',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Rendah',
+  volHigh:              'Tinggi',
+  volVeryHigh:          'Sangat tinggi',
+  volExtreme:           'Ekstrem',
+
 
 }
 
@@ -1113,6 +1194,15 @@ const ja: Translations = {
   perSpinWhileOn:       'ON中、スピンごと',
   baseBetUnit:          '基本ベット',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               '低',
+  volHigh:              '高',
+  volVeryHigh:          '非常に高い',
+  volExtreme:           '極めて高い',
+
+
 }
 
 // ── Korean ────────────────────────────────────────────────────────────────────
@@ -1212,6 +1302,15 @@ const ko: Translations = {
   betUnit:              '베팅',
   perSpinWhileOn:       'ON 상태에서 스핀당',
   baseBetUnit:          '기본 베팅',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               '낮음',
+  volHigh:              '높음',
+  volVeryHigh:          '매우 높음',
+  volExtreme:           '극도로 높음',
+
 
 }
 
@@ -1313,6 +1412,15 @@ const pl: Translations = {
   perSpinWhileOn:       'za obrót, gdy WŁ.',
   baseBetUnit:          'stawki bazowej',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Niska',
+  volHigh:              'Wysoka',
+  volVeryHigh:          'Bardzo wysoka',
+  volExtreme:           'Ekstremalna',
+
+
 }
 
 // ── Portuguese ────────────────────────────────────────────────────────────────
@@ -1412,6 +1520,15 @@ const pt: Translations = {
   betUnit:              'aposta',
   perSpinWhileOn:       'por giro enquanto ATIVADO',
   baseBetUnit:          'aposta base',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Baixa',
+  volHigh:              'Alta',
+  volVeryHigh:          'Muito alta',
+  volExtreme:           'Extrema',
+
 
 }
 
@@ -1513,6 +1630,15 @@ const ru: Translations = {
   perSpinWhileOn:       'за спин, пока ВКЛ.',
   baseBetUnit:          'базовой ставки',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Низкая',
+  volHigh:              'Высокая',
+  volVeryHigh:          'Очень высокая',
+  volExtreme:           'Экстремальная',
+
+
 }
 
 // ── Turkish ───────────────────────────────────────────────────────────────────
@@ -1612,6 +1738,15 @@ const tr: Translations = {
   betUnit:              'bahis',
   perSpinWhileOn:       'AÇIK olduğunda dönüş başına',
   baseBetUnit:          'temel bahis',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Düşük',
+  volHigh:              'Yüksek',
+  volVeryHigh:          'Çok yüksek',
+  volExtreme:           'Ekstrem',
+
 
 }
 
@@ -1713,6 +1848,15 @@ const vi: Translations = {
   perSpinWhileOn:       'mỗi lượt quay khi BẬT',
   baseBetUnit:          'cược cơ bản',
 
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               'Thấp',
+  volHigh:              'Cao',
+  volVeryHigh:          'Rất cao',
+  volExtreme:           'Cực cao',
+
+
 }
 
 // ── Chinese (Simplified) ──────────────────────────────────────────────────────
@@ -1812,6 +1956,15 @@ const zh: Translations = {
   betUnit:              '投注',
   perSpinWhileOn:       '开启时每次旋转',
   baseBetUnit:          '基础投注',
+
+  // ── R042 A6. The five FEATURES cards rendered their volatility label as a
+  //    raw English string from a .ts config union, so every locale saw
+  //    "Very High". See OWNER_RULINGS section B and R042 TASK A6.
+  volLow:               '低',
+  volHigh:              '高',
+  volVeryHigh:          '很高',
+  volExtreme:           '极高',
+
 
 }
 
@@ -1959,7 +2112,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     rulesOverdriveTrigger: '3, 4 ou 5 Scatters accordent 8, 12 ou 16 tours gratuits et paient instantanément 1×, 3× ou 10× la mise totale.',
     rulesOverdriveMeter: 'Le compteur Overdrive démarre à 1× et augmente de 1× après chaque tour gratuit gagnant, multipliant tous les gains suivants. Il ne se réinitialise jamais pendant la fonction.',
     rulesOverdriveRetrigger: '3 Scatters ou plus pendant les tours gratuits accordent 5 tours gratuits supplémentaires.',
-    rulesOverdriveRetriggerBuild: 'La montée des Scatters est plus courte lors d’un redéclenchement que lors de l’entrée, car la fonctionnalité est déjà acquise.',
+    rulesOverdriveRetriggerBuild: 'La montée des Scatters est plus courte lors d\'un redéclenchement que lors de l\'entrée, car la fonctionnalité est déjà acquise.',
     recoveryResumed: 'Votre tour précédent a été terminé et son résultat appliqué.',
     hudBalanceShort: 'SOLDE',
     hudWinShort: 'GAIN',
@@ -1971,7 +2124,7 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     hudTurboLabel: 'Vitesse',
     recoveryDismiss: 'Fermer',
     rulesOverdriveBuy: 'Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement.',
-    rulesOverdriveModes: 'Le jeu de base et l’Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
+    rulesOverdriveModes: 'Le jeu de base et l\'Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise.',
     introContinue: 'Continuer',
     splashPressAnywhere: 'TOUCHEZ POUR CONTINUER',
   },

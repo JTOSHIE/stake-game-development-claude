@@ -1,0 +1,47 @@
+{
+  "generated": "R042 wording proof",
+  "ledger": [
+    {
+      "capture": "rules-de",
+      "lang": "de",
+      "rulesText": "Gewinne zahlen von links nach rechts auf benachbarten Walzen ab Walze 1. Die angezeigten Symbolwerte gelten pro passendem Gewinnweg; der Gesamtbetrag ist dieser Wert multipliziert mit der Anzahl der Gewinnwege und deinem Einsatz. WILD ersetzt alle Symbole außer SCATTER. 3, 4 oder 5 SCATTER an beliebiger Position vergeben einen Sofortgewinn von 1×, 3× oder 10× deines Basiseinsatzes, zusätzlich zu allen anderen Gewinnen. Der Maximalgewinn pro Spielrunde ist auf 5.000× deinen Basiseinsatz begrenzt. Eine Spielrunde umfasst die auslösende Drehung und alle dadurch gewährten Freispiele. Fehlfunktionen machen alle Auszahlungen und Spiele ungültig. Der Overdrive-Zähler startet bei 1× und steigt nach jedem gewonnenen Freispiel um 1×, was alle folgenden Gewinne multipliziert. Er wird während des Features nie zurückgesetzt. 3 oder mehr Scatter während der Freispiele vergeben 5 zusätzliche Freispiele. Der Scatter-Aufbau läuft bei einem Retrigger kürzer als beim Einstieg, da das Feature bereits gesichert ist. Bonuskauf: Zahle das 100-fache deines Einsatzes, um das Feature sofort zu starten. Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz."
+    },
+    {
+      "capture": "rules-tr",
+      "lang": "tr",
+      "rulesText": "Kazançlar, 1. makaradan başlayarak bitişik makaralarda soldan sağa ödenir. Gösterilen sembol değerleri eşleşen her yol için geçerlidir; toplam kazanç, bu değerin yol sayısı ve bahsinizle çarpılmasıyla bulunur. WILD, SCATTER dışındaki tüm sembollerin yerine geçer. Herhangi bir yerde 3, 4 veya 5 SCATTER, temel bahsinizin 1×, 3× veya 10× katı tutarında anında kazanç verir; bu kazanç diğer tüm kazançlara eklenir. Oyun turu başına maksimum kazanç, temel bahsinizin 5.000× katı ile sınırlıdır. Bir oyun turu, onu başlatan dönüşü ve bu dönüşün kazandırdığı tüm ücretsiz dönüşleri kapsar. Arızalar tüm ödemeleri ve oyunları geçersiz kılar. Overdrive göstergesi 1× ile başlar ve kazanan her bedava dönüşün ardından 1× artarak sonraki tüm kazançları çarpar. Özellik boyunca sıfırlanmaz. Bedava dönüşler sırasında 3 veya daha fazla Scatter 5 ek bedava dönüş verir. Yeniden tetiklemede Scatter yükselişi girişe göre daha kısa sürer, çünkü özellik zaten güvence altındadır. Bonus Satın Alma: özelliği hemen başlatmak için bahsinizin 100 katını ödeyin. Temel oyun ve Bonus Satın Alma her ikisi de %96,35 RTP döndürür. Maksimum kazanç bahsin 5.000 katı."
+    },
+    {
+      "capture": "rules-fr",
+      "lang": "fr",
+      "rulesText": "Les gains sont payés de gauche à droite sur les rouleaux adjacents dès le rouleau 1. Les valeurs de symboles affichées s'entendent par façon de gagner correspondante ; le total équivaut à cette valeur multipliée par le nombre de façons de gagner, puis par votre mise. WILD remplace tous les symboles sauf SCATTER. 3, 4 ou 5 symboles SCATTER n'importe où sur les rouleaux accordent un gain instantané de 1×, 3× ou 10× votre mise de base, ajouté à tout autre gain. Le gain maximum par tour de jeu est plafonné à 5 000× votre mise de base. Un tour de jeu comprend le tour déclencheur et tous les tours gratuits qu'il accorde. Tout dysfonctionnement annule les paiements et les parties. Le compteur Overdrive démarre à 1× et augmente de 1× après chaque tour gratuit gagnant, multipliant tous les gains suivants. Il ne se réinitialise jamais pendant la fonction. 3 Scatters ou plus pendant les tours gratuits accordent 5 tours gratuits supplémentaires. La montée des Scatters est plus courte lors d'un redéclenchement que lors de l'entrée, car la fonctionnalité est déjà acquise. Achat de bonus : payez 100× votre mise pour lancer la fonction immédiatement. Le jeu de base et l'Achat de bonus rendent tous deux 96,35 % de RTP. Gain maximum 5 000× la mise."
+    },
+    {
+      "capture": "rules-en",
+      "lang": "en",
+      "rulesText": "Wins pay left to right on adjacent reels starting from reel 1. Symbol values shown are per matching way; the total is that value times the number of ways times your bet. WILD substitutes for all symbols except SCATTER. 3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your base bet, added to any other wins. Maximum win per game round is capped at 5,000× your base bet. A game round includes the triggering spin and any free spins it awards. Malfunctions void all pays and plays. The Overdrive meter starts at 1× and rises +1× after every winning free spin, multiplying all later wins. It never resets during the feature. 3 or more Scatters during free spins award +5 free spins. The scatter build runs shorter on a retrigger than on the entry, because the feature is already secured. Bonus Buy: pay 100× your bet to start the feature immediately. Base game and Bonus Buy both return 96.35% RTP. Maximum win 5,000× bet."
+    },
+    {
+      "capture": "features-de",
+      "lang": "de",
+      "volatility": [
+        "HOCH",
+        "SEHR HOCH",
+        "EXTREM"
+      ],
+      "costs": [
+        "1× Einsatz",
+        "1× Einsatz",
+        "1,25× Einsatz",
+        "100× · $100,00",
+        "400× · $400,00"
+      ]
+    },
+    {
+      "capture": "features-ja",
+      "lang": "ja",
+      "volatility": [],
+      "costs": []
+    }
+  ]
+}

@@ -257,8 +257,20 @@ checked, so when this is ruled on the entry must be removed or the gate fails.
 - **convert the whole `fr` block to typographic apostrophes**, which is
   consistent the other way but edits prose R041 did not rule on.
 
-The builder did neither, because rewriting ratified compliance text is not a
-builder's call and neither is editing prose outside the ruling.
+**RULED AND EXECUTED, 2026-08-10, R042 TASK A1: the first option.** The French
+strings use the escaped straight form; no word changed. The frozen exemption was
+retired, and the both-directions check is what forced that rather than leaving a
+stale entry behind. Standing direction recorded in CLAUDE.md, with
+TYPOGRAPHIC_APOSTROPHE_PASS queued as a POST-APPROVAL cosmetic candidate.
+
+**IT WAS BIGGER THAN THE TWO STRINGS, AND ONLY A RENDER PROOF FOUND THAT.** After
+the two were converted, `r042_wording_proof.mjs` read the RENDERED French rules
+block and still saw three typographic apostrophes. `translations.ts` held seven in
+its `fr` blocks while `prose.locales.ts` held seven straight ones, so each file
+was internally consistent and BOTH RENDER INTO THE SAME MODAL. The per-file scan
+passed on a defect a player could see. All fourteen now use the straight form,
+and `machine_tell_gate` gained a cross-table check that judges a locale across the
+three tables rather than one file at a time.
 
 ---
 
@@ -311,8 +323,17 @@ So the class was identified in a source comment, beside the literal, and shipped
 anyway. `modeOverboostBlurb` carries the same problem. **Thirty values across ten
 locales plus two component literals**, on current count.
 
-**The ruling needed:** confirm this is fixed NOW rather than in a later pass, and
-confirm the method. Deriving both figures at render time from one locale-aware
+**RULED AND EXECUTED, 2026-08-10, R042 TASK A2.** Fixed now, per locale, by the
+committed `frontend/scripts/numeral_locale_pass.mjs`: 20 strings across the ten
+comma-decimal locales, with `en, ar, hi, ja, ko, zh` ruled unchanged and
+PROSE_SOCIAL untouched. German now reads `5.000×` and `96,35 %`, Turkish `%96,35`
+with the sign in front, Finnish, French and Russian a space-grouped `5 000×`.
+Change report at `reports/qa/r042_numeral_locale_pass.json`.
+
+`machine_tell_gate` gained an `en-form-figure` scan over the ten locales, seeded
+both ways, including a negative control proving the CORRECT German forms pass:
+the first draft flagged `5.000×` as a period decimal and would have reported the
+very strings the ruling had just fixed. Deriving both figures at render time from one locale-aware
 formatter changes no wording in any locale and adds no new prose, which is why it
 can be executed without new translations once ruled.
 
@@ -337,7 +358,11 @@ long**, so the gate was blind to its own subject. Both constraints are removed,
 the class is seeded in the form it really occurs, and the paragraph is frozen as
 the single baseline entry.
 
-**Needed: a real translation in fifteen locales.** A builder does not invent it.
+**RULED AND EXECUTED, 2026-08-10, R042 TASK A4.** Fable supplied all fifteen. The
+paragraph is now the prose key `responsiblePlayBody`, `PaytableModal` renders it
+through the translation layer, and the frozen baseline entry was burned. The
+gate's own header claim, which said every string it listed was fixed while two
+still shipped English, was corrected as B10 rather than quietly edited.
 
 ---
 
@@ -408,8 +433,49 @@ after a reviewer finds it.
 
 > Verify the mode cost is correctly represented in the game rules for each mode.
 
-**The ruling needed:** the corrected phrasing, in all sixteen locales, or a confirmation
-that "total bet" is intended to mean the base bet throughout and the footnote is sufficient.
+**RULED AND EXECUTED, 2026-08-10, R042 TASK A3: the BASE bet.** Both `rulesMaxWin`
+and `rulesScatterMult` now state the base bet in all sixteen locales and in both
+social strings, with every other word of the R041 sentences standing.
+`maxWinFootnote` was already correct and is unchanged.
+
+**Fable's derivation, recorded because it is the reason and not just the answer:**
+the cap constant is 500,000 centibets in all five published books against the BET
+parameter, so modes costing 1.25x, 100x and 400x cap at 4,000x, 50x and 12.5x of
+outlay. The base bet is the only uniformly true basis, and it is the one the
+footnote and the mode cards already used.
+
+**ONE SUBSTITUTION DID NOT MATCH AND IS FLAGGED RATHER THAN BURIED.** The brief's
+Japanese phrase was 合計ベットの; `rulesScatterMult` actually reads 合計ベット額の,
+"total bet AMOUNT". The ruled STEM was applied, 合計 to 基本, leaving 額 and every
+other character untouched. That is mechanical application of the ruling rather
+than new wording, and the alternative was leaving one of 32 strings stating the
+wrong basis while a particle was resolved.
+
+---
+
+## J. TWO MORE EN-FORM FIGURES THE NUMERAL RULING DID NOT NAME
+
+Raised 2026-08-10 while executing R042 TASK A2, by the scan that ruling asked for.
+
+TASK A2 ruled the figure tokens `5,000` and `96.35`. **`modeOverboostBlurb`
+carries two more in the same file and the same ten comma-decimal locales**, and
+the scan catches them correctly:
+
+> Double-chance: about **1.6×** the feature trigger rate. Debits **1.25×** every spin while ON.
+
+In German that reads as sixteen times the trigger rate and a debit of one hundred
+and twenty five times the bet. It is the same defect class as section F, on a
+string the ruling did not enumerate.
+
+**What was done, and what was refused.** The scan is honest and catches them; the
+findings are FROZEN as one named entry in `machine_tell_gate.mjs`, checked in both
+directions, so main stays green under rule 10 and the entry cannot outlive the
+defect. **They were NOT converted.** Deciding the wording of a maths-adjacent
+disclosure is not a builder's call under convention (l.8), and narrowing the scan
+to hide what it can see would be the worse of the two failures.
+
+**The ruling needed:** one line extending TASK A2's per-locale forms to `1.6` and
+`1.25`. The mechanism already exists and is committed.
 
 ---
 

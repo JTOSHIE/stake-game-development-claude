@@ -300,6 +300,14 @@ are pointers rather than restatements:
   waiting on the numeral question; this item is that question. Its own brief unless the
   owner strikes it.
 
+- **TYPOGRAPHIC_APOSTROPHE_PASS** (queued 2026-08-10 by Fable ruling R042 TASK A1).
+  POST-APPROVAL cosmetic candidate, explicitly not before submission. Player-facing French
+  now standardises on the escaped straight apostrophe, which removes the mixed-form machine
+  tell inside one locale. A font-verified pass could move all sixteen locales to the
+  typographic form instead, but that is a typography decision needing the shipped faces
+  checked glyph by glyph, and it changes committed prose in every locale for no compliance
+  gain.
+
 ## 8. STANDING ANSWERS
 - User manual: none exists as a separate artefact anywhere on Stake; the in-game rules/paytable/UI guide is the user manual and a review requirement.
 - Technical docs for Stake: nothing beyond the uploaded math package and static frontend; internal evidence (3b) exists to answer reviewer questions and for our own verification discipline.

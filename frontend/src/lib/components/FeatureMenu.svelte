@@ -22,7 +22,7 @@
   // English, so the words were untranslated AND outside the compliance filter.
   // `sv()` is that layer, and `$tr` supplies the translated word it rewrites.
   import { sv } from '../i18n/vocabulary'
-  import { FS_MODES, fsRtpLabel, fsCostLabel } from '../config/fsModes'
+  import { FS_MODES, fsRtpLabel, fsCostLabel, VOLATILITY_KEY } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
   import { isSocial } from '../stores/socialMode'
@@ -428,7 +428,7 @@
                     {#if !m.available}
                       <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
-                      <span class="fm-vol">{m.volatility}</span>
+                      <span class="fm-vol">{$tr(VOLATILITY_KEY[m.volatility])}</span>
                     {/if}
                   </div>
                   <p class="fm-blurb">{$tr(m.blurbKey)}</p>
@@ -488,7 +488,7 @@
                     {#if !m.available}
                       <span class="fm-soon">{$tr('hudComingSoon')}</span>
                     {:else}
-                      <span class="fm-vol">{m.volatility}</span>
+                      <span class="fm-vol">{$tr(VOLATILITY_KEY[m.volatility])}</span>
                     {/if}
                   </div>
                   <p class="fm-blurb">{$tr(m.blurbKey)}</p>

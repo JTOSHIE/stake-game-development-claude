@@ -404,13 +404,7 @@
              factual and scoped to what the player can actually set here. -->
         <div>
           <h3 class="fs-heading" style="margin-bottom:6px;">{$tr('responsiblePlayHeading')}</h3>
-          <p class="fs-disc">
-            Autoplay can be set to stop automatically on any win, when the
-            Overdrive feature triggers, or once a loss limit you choose is
-            reached, and can always be stopped manually at any time. A session
-            summary (time played, spins, net result) is available from the
-            menu.
-          </p>
+          <p class="fs-disc">{$tr('responsiblePlayBody')}</p>
         </div>
 
         <!-- Disclaimer (Stake Engine seven-point requirement) -->

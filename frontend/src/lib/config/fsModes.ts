@@ -256,6 +256,26 @@ export function maxWinVsBaseBetLabel(social: boolean, locale?: string): string {
  * branch on `isSocial`, so the two consumers can never drift out of sync.
  * Real-money strings (`label`/`blurb`) are always the fallback; the social
  * override is used only when one exists AND social mode is active. */
+/**
+ * The volatility band as a TRANSLATION KEY rather than as the English word.
+ *
+ * R042 TASK A6. `FsMode.volatility` is a union of English literals in this
+ * config, and the two FEATURES card layouts rendered it raw, so a Japanese
+ * player read "Very High" on a card whose every other word was translated. The
+ * union stays as the config's own vocabulary, because it is what the rest of
+ * this file reasons about; only the RENDERED form is keyed.
+ *
+ * Exhaustive by construction: `Record<FsMode['volatility'], ...>` means adding a
+ * band to the union without adding its key is a type error rather than another
+ * English word on a card.
+ */
+export const VOLATILITY_KEY: Record<FsMode['volatility'], 'volLow' | 'volHigh' | 'volVeryHigh' | 'volExtreme'> = {
+  'Low':       'volLow',
+  'High':      'volHigh',
+  'Very High': 'volVeryHigh',
+  'Extreme':   'volExtreme',
+}
+
 export function modeLabel(m: FsMode, social: boolean, locale: Locale): string {
   return t(locale, m.labelKey, social ? 'social' : 'real')
 }

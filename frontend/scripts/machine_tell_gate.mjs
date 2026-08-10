@@ -301,36 +301,170 @@ function apostropheForms(line) {
 }
 
 /**
- * FROZEN, ONE ENTRY, AND IT IS A QUESTION RATHER THAN AN EXEMPTION ON MERIT.
+ * EMPTY, AND THAT IS THE POINT. R042 TASK A1 ruled option (a): the two French
+ * strings R041 supplied were converted to this file's escaped straight form,
+ * word content untouched, so `fr` no longer contradicts itself and the entry
+ * that recorded the contradiction had to go with it.
  *
- * R041 (Fable, 2026-08-10) supplied replacement French text for `rulesMaxWin`
- * and `rulesScatterMult` written with the TYPOGRAPHIC apostrophe U+2019, and
- * said in the same breath both "escape apostrophes per each file's existing
- * convention" and "typographic apostrophes below are intentional". For `fr` in
- * prose.locales.ts those two halves cannot both be obeyed: the rest of that
- * block uses the escaped straight form, so honouring the second half makes the
- * locale contradict itself, which is exactly what this scan exists to catch.
+ * IT COULD NOT HAVE BEEN LEFT BEHIND. The both-directions check below fails a
+ * frozen entry that no longer describes reality, which is what turned a
+ * one-line ruling into a two-line change rather than a quiet half-fix. Kept as
+ * an empty map rather than deleted so the mechanism, and the reason it exists,
+ * survive the next time a locale needs freezing.
  *
- * IT IS PLAYER-VISIBLE, measured rather than assumed: `rulesSymbolValues`
- * (straight) renders two lines above `rulesScatterMult` and `rulesMaxWin`
- * (curly) in the same French paytable rules block, so a player sees both forms
- * in one view. That is the mandate's named machine tell.
+ * Standing direction from the same ruling: player-facing French standardises on
+ * the straight form for submission, and a font-verified typographic pass across
+ * all sixteen locales is a post-approval cosmetic candidate, board item
+ * TYPOGRAPHIC_APOSTROPHE_PASS.
  *
- * The builder did NOT resolve it. Rewriting ratified compliance text is not a
- * builder's call under convention (l.7), and converting the whole `fr` block to
- * curly would change prose Fable did not rule on. So the wording ships exactly
- * as ratified, the blind spot below is closed so the defect is machine-visible
- * instead of hidden, and the one-line decision is escalated in
- * docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md.
- *
- * Keyed `file|locale`. Checked in BOTH directions below, so when the ruling
- * lands and the mixing goes, this entry must go with it or the gate fails.
+ * Keyed `file|locale`.
  */
-const KNOWN_MIXED_APOSTROPHE = new Map([
-  ['src/lib/i18n/prose.locales.ts|fr',
-    'R041 supplied U+2019 for rulesMaxWin and rulesScatterMult while the rest of the fr block '
-    + 'uses escaped U+0027. Awaiting the owner ruling; see OWNER_RULINGS_PRESUBMISSION.md section E.'],
+const KNOWN_MIXED_APOSTROPHE = new Map([])
+
+/**
+ * ENGLISH FIGURE FORMS IN A COMMA-DECIMAL LOCALE. R042 TASK A2.
+ *
+ * In these ten locales the comma is the DECIMAL separator and the period groups
+ * thousands, so an English-punctuated figure is not a formatting inconsistency,
+ * it is a DIFFERENT NUMBER. `5,000×` reads as five. `96.35%` reads as 9,635 per
+ * cent. Both shipped to players in all ten before this ruling.
+ *
+ * Two shapes are caught:
+ *   comma-grouped thousands   1,000 / 5,000 / 12,345
+ *   period decimal beside a unit   96.35% / 1.25×
+ *
+ * The unit is REQUIRED for the second shape. A bare `1.5` in prose is usually a
+ * version, a reel count or an ordinary sentence, and flagging those would make
+ * the gate cry wolf, which is how gates get switched off.
+ *
+ * THE DECIMAL SHAPE IS CAPPED AT TWO FRACTION DIGITS, and the first draft of
+ * this scan was wrong without it: `5.000×` is the CORRECT German and Turkish
+ * form for five thousand, and a naive period-decimal rule flagged the very
+ * strings this ruling had just fixed. Exactly three digits after a period is a
+ * thousands group in these locales, not a decimal. The cost is that a genuine
+ * three-place decimal beside a unit would be missed; we ship none, and a rule
+ * that fails the correct answer is worse than one with a narrow blind spot.
+ */
+const COMMA_DECIMAL = new Set(['de', 'es', 'fi', 'fr', 'id', 'pl', 'pt', 'ru', 'tr', 'vi'])
+
+/**
+ * FROZEN, ONE KEY, AND IT IS A QUESTION RATHER THAN AN EXEMPTION ON MERIT.
+ *
+ * R042 TASK A2 ruled the figure tokens `5,000` and `96.35`. `modeOverboostBlurb`
+ * carries TWO MORE in the same file and the same ten locales: "1.6× the feature
+ * trigger rate" and "1.25× every spin", both period decimals beside a unit, so
+ * in German they read as sixteen and one hundred and twenty five.
+ *
+ * The scan the ruling asked for catches them, correctly. The ruling's REWRITE
+ * did not name them. Converting them anyway would be a builder deciding the
+ * wording of a maths-adjacent disclosure, which convention (l.8) forbids, and
+ * narrowing the scan to hide them would be worse: a gate written around a defect
+ * it can see is the exact self-deception this file exists to stop.
+ *
+ * So they are frozen HERE, visibly, checked in BOTH directions, and escalated as
+ * section J of OWNER_RULINGS_PRESUBMISSION.md. When the ruling lands, the fix
+ * removes this entry or the gate fails.
+ *
+ * Keyed `file|key`, deliberately NOT per locale: the defect is one string in ten
+ * locales, and ten entries would read as ten problems.
+ */
+const KNOWN_EN_FORM_FIGURE = new Map([
+  ['src/lib/i18n/prose.locales.ts|modeOverboostBlurb',
+    'R042 TASK A2 ruled the tokens 5,000 and 96.35 only. This string carries 1.6x and 1.25x '
+    + 'in the same ten locales, unruled. Escalated as OWNER_RULINGS section J.'],
 ])
+
+/**
+ * THE SAME LOCALE ACROSS THE THREE TABLES. R042 A1, found by a render proof.
+ *
+ * `scanApostrophes` judges a locale WITHIN ONE FILE, and that is not the
+ * property a player experiences. French was internally consistent in both
+ * files and still contradicted itself on screen: `translations.ts` held 7
+ * typographic apostrophes and `prose.locales.ts` held 7 escaped straight ones,
+ * and BOTH RENDER INTO THE SAME PAYTABLE MODAL. Each file passed. The player saw
+ * both forms in one view, which is exactly the machine tell the per-file scan
+ * was written to catch.
+ *
+ * It was found by `r042_wording_proof.mjs` reading the RENDERED text, not by any
+ * source scan, which is the argument for render-level proofs in one line.
+ */
+function scanApostrophesAcrossTables(files) {
+  const per = new Map()
+  for (const file of files) {
+    let src
+    try { src = readFileSync(file, 'utf-8') } catch { continue }
+    const rel = relative(ROOT, file)
+    const lines = src.split('\n')
+    for (const b of localeBlocks(src)) {
+      const acc = per.get(b.code) || { curly: [], straight: [] }
+      for (let i = b.from; i < b.to; i++) {
+        const { curly, straight } = apostropheForms(lines[i] || '')
+        if (curly) acc.curly.push(`${rel}:${i + 1}`)
+        if (straight) acc.straight.push(`${rel}:${i + 1}`)
+      }
+      per.set(b.code, acc)
+    }
+  }
+  const out = []
+  for (const [code, acc] of per) {
+    if (!acc.curly.length || !acc.straight.length) continue
+    out.push({
+      klass: 'mixed-apostrophe-across-tables',
+      file: 'src/lib/i18n/',
+      line: 1,
+      detail: `locale '${code}' uses BOTH apostrophe forms ACROSS the locale tables, `
+        + `which one screen renders together: U+2019 at ${acc.curly.slice(0, 3).join(', ')} `
+        + `and U+0027 at ${acc.straight.slice(0, 3).join(', ')}`,
+      text: code,
+    })
+  }
+  return out
+}
+
+function scanNumeralForms(file) {
+  const out = []
+  let src
+  try { src = readFileSync(file, 'utf-8') } catch { return out }
+  const rel = relative(ROOT, file)
+  const lines = src.split('\n')
+  const seen = new Set()
+
+  for (const b of localeBlocks(src)) {
+    if (!COMMA_DECIMAL.has(b.code)) continue
+    for (let i = b.from; i < b.to; i++) {
+      const line = lines[i] || ''
+      if (isComment(line)) continue
+      const m = line.match(/^\s*(\w+):\s*'((?:[^'\\]|\\.)*)'/)
+      if (!m) continue
+      const [, key, value] = m
+      const grouped = value.match(/\d,\d{3}(?!\d)/)
+      const decimal = value.match(/\d+\.\d{1,2}(?!\d)\s*[%×]/)
+      if (!grouped && !decimal) continue
+      const frozenKey = `${rel}|${key}`
+      if (KNOWN_EN_FORM_FIGURE.has(frozenKey)) { seen.add(frozenKey); continue }
+      out.push({
+        klass: 'en-form-figure',
+        file: rel,
+        line: i + 1,
+        detail: `locale '${b.code}' renders ${JSON.stringify((grouped || decimal)[0])} in '${key}', `
+          + 'where the comma is the decimal separator; a player reads a different number',
+        text: value.slice(0, 110),
+      })
+    }
+  }
+  // BOTH DIRECTIONS, same as the apostrophe freeze. An entry that stops matching
+  // is a rusted ratchet excusing whatever lands in that key next.
+  for (const [k, why] of KNOWN_EN_FORM_FIGURE) {
+    if (!k.startsWith(rel + '|') || seen.has(k)) continue
+    out.push({
+      klass: 'stale-figure-exemption', file: rel, line: 1,
+      detail: `${k} no longer matches, so its KNOWN_EN_FORM_FIGURE entry must be deleted. `
+        + 'Reason recorded was: ' + why,
+      text: k,
+    })
+  }
+  return out
+}
 
 function scanApostrophes(file) {
   const out = []
@@ -634,6 +768,13 @@ if (process.argv.includes('--self-test')) {
       why: 'Q-01, the Vite scaffold package name as the pre-hydration tab title, in MARKUP',
     },
     {
+      name: 'en-figure-de.ts',
+      body: "\nconst de: Translations = {\n  rulesMaxWin:          'Der Maximalgewinn ist auf 5,000\u00d7 deinen Basiseinsatz begrenzt.',\n  modeCruiseBlurb:      'Ruhigere Fahrt, unver\u00e4ndert 96.35% RTP.',\n}\n",
+      run: (p) => scanNumeralForms(p),
+      why: 'R042 A2, the shipped defect itself: comma-grouped thousands and a period decimal '
+        + 'beside a unit inside a COMMA-DECIMAL locale, where they read as five and 9,635 per cent',
+    },
+    {
       name: 'locale-emoji.ts',
       body: "const en = {\n  wincap:               '\u{1F3C6} MAXIMUM WIN, 5,000×!',\n}\n",
       run: (p) => scanGlyphs([p], { skipComments: true }),
@@ -741,6 +882,14 @@ if (process.argv.includes('--self-test')) {
   // that non-Latin locales are legitimate, that the multiplication sign is the
   // house form, and that a multiplier is not money.
   const controls = [
+    {
+      name: 'correct-figure-de.ts',
+      body: "\nconst de: Translations = {\n  rulesMaxWin:          'Der Maximalgewinn ist auf 5.000\u00d7 deinen Basiseinsatz begrenzt.',\n  modeCruiseBlurb:      'Ruhigere Fahrt, unver\u00e4ndert 96,35 % RTP.',\n}\n",
+      run: (p) => scanNumeralForms(p),
+      why: 'the CORRECT German forms must pass. The first draft of this scan failed here, '
+        + 'reading 5.000 as a period decimal rather than a thousands group, and would have '
+        + 'reported the very strings R042 had just fixed',
+    },
     {
       name: 'clean-title.html',
       body: '<!doctype html>\n<html>\n  <head>\n    <title>Future Spinner</title>\n  </head>\n</html>\n',
@@ -870,6 +1019,8 @@ const srcFindings = [
   ...scanPlaceholders([...srcFiles, indexHtml]),
   ...scanDoubleSpaces(srcFiles),
   ...localeTables.flatMap((f) => scanApostrophes(f)),
+  ...localeTables.flatMap((f) => scanNumeralForms(f)),
+  ...scanApostrophesAcrossTables(localeTables),
   ...scanMoney(srcFiles),
   ...scanCasingTransforms(srcFiles),
   ...scanFontStacks([...srcFiles, indexHtml]),

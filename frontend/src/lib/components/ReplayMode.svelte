@@ -427,7 +427,7 @@
       <div class="replay-figures">
         {mode === 'social' ? 'Play' : $tr('replayBetLabel')}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
         {#if showCostMultiplier}
-          × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
+          × {response.costMultiplier} {mode === 'social' ? '=' : `${$tr('costLabel')} =`}
           <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
         {/if}
       </div>

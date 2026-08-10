@@ -1,3 +1,8 @@
+// SUPERSEDED 2026-08-10 by frontend/scripts/r042_verify.mjs. R042 changed strings
+// this file pins, so it now fails for doing the right thing; archived rather than
+// deleted because it is the record of what R041 shipped, and moved out of
+// frontend/scripts/ so nobody runs it expecting a verdict on the current tree.
+//
 // r041_verify.mjs
 //
 // ONE COMMAND THAT RE-DERIVES EVERY CLAIM MADE ABOUT R041's EXECUTION.

@@ -7,23 +7,8 @@
     "THIS LIST ONLY SHRINKS. A new hardcoded string fails immediately, and an",
     "entry that matches nothing fails too, so a fix cannot leave its entry",
     "behind. Regenerate ONLY to record a genuine fix, never to make a new",
-    "string pass.",
-    "",
-    "2026-08-10: R041 burned this list from 11 to 0. It is back to 1, and the",
-    "entry is NOT a regression: it is a string that was ALWAYS there and that",
-    "this gate could never see. The RESPONSIBLE PLAY paragraph is 281 characters",
-    "of English rendering to all sixteen locales under a translated heading.",
-    "Two constraints hid it: rule 3 excluded newlines, so a text node was",
-    "disqualified the moment it wrapped, and LABEL_SHAPE capped candidates at 140",
-    "characters, which is a label length rather than a paragraph length. Found by",
-    "a review pass, not by the gate. It needs a real translation in fifteen",
-    "locales and is escalated in FABLE_COMMS entry 042."
+    "string pass."
   ],
-  "frozen_count": 1,
-  "frozen": [
-    {
-      "file": "PaytableModal.svelte",
-      "text": "Autoplay can be set to stop automatically on any win, when the Overdrive feature triggers, or once a loss limit you choose is reached, and can always be stopped manually at any time. A session summary (time played, spins, net result) is available from the menu."
-    }
-  ]
+  "frozen_count": 0,
+  "frozen": []
 }

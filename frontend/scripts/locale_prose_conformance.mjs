@@ -1,3 +1,10 @@
+// CONVENTION (h.1), MIGRATED 2026-08-10 by R042 TASK A7. This script used to
+// write its JSON and its screenshots STRAIGHT INTO the committed evidence tree,
+// so a plain run silently rewrote committed files: a review pass on 2026-08-10
+// dirtied 18 of them simply by running this gate. Two sibling gates were moved
+// onto `evidenceDir()` in July and these three were missed. Output now defaults
+// to the gitignored scratch tree; set FS_WRITE_EVIDENCE=1 to regenerate the
+// committed evidence on purpose, which is the opt-in the convention allows.
 // locale_prose_conformance.mjs, JOB 2 of reports/briefs/FS_FINAL_MILE_Prompt.md
 // (2026-07-28).
 //
@@ -59,6 +66,7 @@
 // 1365 strings harvested from 15 rendered locale/mode pages.
 
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { evidenceDir, announceEvidenceTarget } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
@@ -69,8 +77,7 @@ import { resolveLaunchLocale, SOCIAL_LOCALE } from '../src/lib/stores/socialLoca
 import { proseI18n, en as proseEn, PROSE_SOCIAL } from '../src/lib/i18n/prose.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-mkdirSync(OUT_DIR, { recursive: true })
+const OUT_DIR = evidenceDir('reports', 'qa')
 
 const NON_EN = LOCALE_CODES.filter((l) => l !== 'en')
 const MODES = ['real', 'social']

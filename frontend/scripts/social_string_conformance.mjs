@@ -1,3 +1,10 @@
+// CONVENTION (h.1), MIGRATED 2026-08-10 by R042 TASK A7. This script used to
+// write its JSON and its screenshots STRAIGHT INTO the committed evidence tree,
+// so a plain run silently rewrote committed files: a review pass on 2026-08-10
+// dirtied 18 of them simply by running this gate. Two sibling gates were moved
+// onto `evidenceDir()` in July and these three were missed. Output now defaults
+// to the gitignored scratch tree; set FS_WRITE_EVIDENCE=1 to regenerate the
+// committed evidence on purpose, which is the opt-in the convention allows.
 // social_string_conformance.mjs — ITEM C, social string implementation
 // (2026-07-14b, Fable's wording ruling).
 //
@@ -12,6 +19,7 @@
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { evidenceDir, announceEvidenceTarget } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
@@ -19,10 +27,8 @@ import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')
-const SCREENS_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'social-strings-item-c')
-mkdirSync(OUT_DIR, { recursive: true })
-mkdirSync(SCREENS_DIR, { recursive: true })
+const OUT_DIR = evidenceDir('reports', 'qa')
+const SCREENS_DIR = evidenceDir('reports', 'screens', 'social-strings-item-c')
 
 const EXPECTED_SOCIAL = {
   bonus: { label: 'Get Overdrive', blurb: 'Get a guaranteed Overdrive Free Spins entry.' },
