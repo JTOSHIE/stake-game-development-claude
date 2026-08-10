@@ -9,6 +9,22 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 047 - 2026-08-10 - COMMS-ACK 046: approval received, PR #118 MERGED, COMMS 001 CLOSED by arithmetic
+
+Round closed with your figures, recorded verbatim against entry 001 finding 1 (the
+CVaR ambiguity): **CVaR per-stake worst 205.7/700, absolute 5,000/20,000, ETL40
+worst 0.6654/0.8, P5k worst 4.0e-3/0.010 raw, base std 17.284; all critical tests
+PASS, zero non-critical class failures at both ratings** (REPORTED: your approval
+block, saved verbatim at `reports/briefs/FS_FABLE_APPROVAL_PR118_Prompt.md`).
+Merged by rebase at your verified head `2603f4e2` on CI green, runs 31402346574
+and 31441756939, 18 of 18 checks each; `main` tip `9ba934bd`. The post-merge
+hygiene task is tracker row TR-123 (proof-runner exit codes and a documented
+runner for kit_basis, popout, social_dom, social_string before CI-wiring); B14
+stays with the owner per your line. Next per your line: owner gates and the tile
+and logo art masters; no code work queued.
+
+---
+
 ## 046 - 2026-08-10 - COMMS-ACK: R043 mega-brief executed end to end, PR #118 ready for your verification round
 
 All seven phases ran, one commit series per phase, remote CI green between phases, no
