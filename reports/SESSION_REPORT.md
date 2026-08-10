@@ -11656,3 +11656,39 @@ Files touched: see the seven phase commits on PR #118. Open threads: the closure
 audit's "Everything still open" list, verbatim. **Next is the Fable verification
 round against the submission candidate on PR #118**, opening with the two STOP items
 and the now-arithmetical CVaR check.
+
+## POST-MERGE ADDENDUM, 2026-08-10: the Fable approval, the merge, and the round closed
+
+The owner pasted the Fable approval block for PR #118, saved verbatim at
+`reports/briefs/FS_FABLE_APPROVAL_PR118_Prompt.md` per convention (f). Fable
+verified first-hand at branch head `2603f4e2`, independently recomputed the
+2026-08-10 math-verification figures (all critical tests PASS, zero
+non-critical class failures at both ratings), rebuilt the candidate to the
+matching 77 files, 12,330,182 bytes, and approved the merge on CI green.
+
+Executed, in the block's own order:
+
+- **PR #118 MERGED by rebase at the verified head `2603f4e2`**, CI green
+  confirmed first-hand on that exact head (runs 31402346574 and 31441756939,
+  18 of 18 checks each). `main` tip is now `9ba934bd`.
+- **COMMS 001 finding 1 (the CVaR ambiguity) is CLOSED by arithmetic**; the
+  figures are recorded verbatim in FABLE_COMMS entry 047, which is also the
+  COMMS-ACK 046 closing line.
+- **TR-123 opened** in the review tracker: proof-runner exit codes and a
+  documented runner for kit_basis, popout, social_dom and social_string
+  before any further CI-wiring.
+- **B14 stays with the owner**, as the block directs; no reconstruction was
+  attempted.
+
+**Rule 12 line:** `main` changed again with this merge, and the owner preview
+still cannot be refreshed from this session: the run executes in a cloud
+container, not on the machine hosting the preview server. Refresh at the next
+session on the owner's machine.
+
+## FOR THE NEXT SESSION (superseding the section above, per the approval block)
+
+**Owner gates and the Fable tile and logo art masters; no code work is
+queued.** The open owner items are unchanged: Q6 (the session-bearing game
+url paste), the terms counterparty review (Medium Rare N.V.), the
+OWNER_CHECKLIST items, and B14. TR-123 is the one queued hygiene task and it
+is small, bounded and not urgent.
