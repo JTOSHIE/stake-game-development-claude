@@ -137,6 +137,38 @@ which case it joins the translation list in section B, or to accept the reuse.
 
 ---
 
+## D. The wallet deadline constant, which has no upstream number to inherit
+
+Added 2026-08-10, alongside A3.
+
+`frontend/src/lib/services/walletTimeout.ts:40`:
+
+> `export const WALLET_TIMEOUT_MS = 15_000`
+
+**The defect it closes**, measured against the shipped dist with a stub whose
+`/wallet/play` never responds: the spin control held its spinning state for **90
+seconds** with the stake gone from the displayed balance, no banner, no error,
+and a second click doing nothing because `handleSpin` returns early while
+`$isSpinning`. `_withRetry` could not help, because it retries REJECTIONS and a
+stall never rejects.
+
+**Why the number is ours rather than inherited.** The pinned official client sets
+no deadline on its wallet calls at all, so there is no platform figure to adopt
+and nothing in `docs/stake-engine-live/` states an expected latency.
+
+**The trade it makes, stated plainly because it is a real cost.** A wallet merely
+SLOW past 15s has its round abandoned client-side while the server settles it,
+and the player is blocked until they reload. That was chosen deliberately: the
+outcome of the round is UNKNOWN at that point, and blocking every bet route is
+what stops a second stake going out against a wallet whose state we can no longer
+see. Reloading re-authenticates and `recoverSession` settles whatever round was
+left open, which is what the banner asks for.
+
+**The ruling needed:** whether 15s is right, measured against whatever p99 the
+platform quotes for `/wallet/play`. One constant, tuned in one place.
+
+---
+
 ## C. One thing that cannot be settled from this repository at all
 
 `rgsService.ts` maps a platform error to a player-facing message by reading a

@@ -9,6 +9,171 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 040 - 2026-08-10 - DECISION REQUEST: six pre-submission items, four of them wording in sixteen locales
+
+**Everything in the pre-submission queue is closed except what is below.** Each item was
+verified from source before being written, and each states its evidence rather than a
+recommendation dressed as one. Four of the six need WORDS, not a yes or no: convention
+forbids a builder inventing player-facing text or translations, so these cannot be closed
+by ruling alone unless the ruling is that the existing text stands.
+
+The full working document is `docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md`.
+Questions are numbered per entry, per the pattern from 038.
+
+---
+
+### Q1. The rules say the 5,000x cap is "per spin". The maths caps the ROUND.
+
+**What the player reads**, `frontend/src/lib/i18n/prose.ts:118` and its fifteen localised
+siblings, quoted verbatim per (l.7):
+
+> Maximum win per spin is capped at 5,000× your total bet.
+
+**What the maths does**, `games/future_spinner/game_config.py:52`:
+
+> `_WINCAP = 5000.0     # Maximum payout multiplier (x bet amount), hard cap both modes`
+
+and line 28 describes the wincap band as *"maximum-win rounds (free spins reaching
+5,000x)"*, i.e. a property of the ROUND.
+
+**Confirmed against the shipped books, not only the config.** The payout reconciliation
+gate decoded all five books. `books_base` round 1020 presents wins totalling **977,560
+centibets** and pays **`payoutMultiplier` = 500,000**, the cap. The round was capped, not
+the spin. The cap is in fact applied at BOTH levels: each individual win is
+`min(formula, 5000x)`, and the round is `min(sum of those, 5000x)`.
+
+**Why it matters.** "Per spin" invites a player to conclude a sixteen-spin feature could
+pay up to sixteen times the cap. It cannot. The sentence understates the constraint on the
+one figure a maths reviewer checks first.
+
+**Needed: the corrected sentence, in your words, for all sixteen locales.** A draft for
+your approval or amendment, offered so there is something concrete to rule on rather than
+as a proposal to adopt: *"Maximum win per round is capped at 5,000× your total bet."*
+
+---
+
+### Q2. The scatter rule describes a multiplier. The maths adds an instant award.
+
+**What the player reads**, `prose.ts` `rulesScatterMult` and its fifteen siblings:
+
+> 3, 4, or 5 SCATTERs anywhere apply a 1×, 3×, or 10× multiplier to your total bet win.
+
+**What the maths does**, `game_config.py`, `scatter_multiplier_table` (`3: 1.0, 4: 3.0,
+5: 10.0`) and the comment above it:
+
+> "Awards are multiples of TOTAL BET, paid on the spin the scatters land."
+
+**Confirmed against the shipped books.** The reconciliation gate computes a scatter win as
+`award x globalMult x 100` centibets, with **no reference to any other win on the board**,
+and that formula reconciles all **3,618,404 wins across the five books with zero
+disagreements**. It is an instant award added independently. It is not a multiplier applied
+to a win.
+
+**Why it matters.** A player with no other win on the board could reasonably read "1x
+multiplier to your total bet win" as multiplying zero and paying nothing. The game pays
+them 1x their total bet.
+
+**Needed: the corrected phrasing, in all sixteen locales.** Note the SOCIAL variant is a
+separate string and needs the same treatment: `prose.ts:200` reads "your total play prize".
+
+---
+
+### Q3. Eleven player-facing strings render English to all sixteen locales.
+
+Frozen in `frontend/scripts/hardcoded_string_baseline.json` and held by a gate that fails on
+any NEW one, so the set can only shrink. Listed with their English so a translator works
+from one page.
+
+| Where | Shown to every locale | Note |
+|---|---|---|
+| `HudOverlay.svelte`, 4 sites | **Mute** / **Unmute** | Nearest shipped key is `hudSound` = "SOUND", a noun. This is a toggle verb, so it cannot be reused. |
+| `FeatureMenu.svelte`, 2 sites | **per spin** / **bet** | The cost line. |
+| `PaytableModal.svelte` | **Scatters** | A column header beside two keyed siblings. `symbolScatter` = "SCATTER" exists but is UPPERCASE and would break the casing of that header row. |
+| `ReplayMode.svelte` | **Bet** / **Play** | |
+| `ReplayMode.svelte` | **Currency** / **Token** | |
+| `ReplayMode.svelte` | **Mode:** | |
+| `FreeSpinsPresentation.svelte` | **Overdrive Free Spins** | An `aria-label`, so a screen reader announces English over correctly translated content. |
+| `WinBreakdown.svelte` | **N ways** | No `ways` key exists anywhere. |
+| `fsModes.ts` | **base bet** / **base play** | Trailing words of `maxWinVsBaseBetLabel`; the NUMBER in that label was made locale-aware on 2026-08-10. |
+
+**THE SOCIAL CONDITIONALS ARE NOT THE COMPLIANCE LAYER**, and this is the part most likely
+to be misread by whoever picks it up. `{$isSocial ? 'per spin' : 'bet'}` looks like the
+sweepstakes vocabulary substitution doing its job. It is not. That layer is `sv()` in
+`vocabulary.ts`, driven by the platform's own 39-row prohibited-terms table. These are
+hand-rolled copies of it, English in BOTH branches, so they are untranslated AND bypassing
+the compliance layer.
+
+**Needed: the strings, or a ruling on the route.** Three of them cannot be composed from
+shipped vocabulary at all, so "reuse an existing key" is not available for those.
+
+---
+
+### Q4. A shipped banner whose middle sentence is false.
+
+When a recovered round is presented and its `end-round` then fails, the game now blocks
+every bet route and shows the existing translated banner. Before this it was SILENT, which
+was strictly worse: the player saw their winning round, the balance never moved, nothing
+said so, and SPIN could place a real bet on top of a round the platform was still holding
+open.
+
+It reuses `errSessionUnavailable`, the only keyed message of its kind and the only one
+shipping in all sixteen locales:
+
+> Game unavailable. Your session could not be verified. Please reload or contact support.
+
+Sentences one and three are true and are the correct instruction: reloading re-runs
+recovery, and `end-round` is idempotent on the session's active round, so a reload really
+can settle it. **Sentence two is false in this case.** The session authenticated perfectly
+well; what failed was the settle.
+
+It shipped anyway, deliberately, because the alternative was continuing to say nothing, and
+because authoring a new sentence in fifteen locales is exactly what convention forbids a
+builder from doing. Under the standing mandate that nothing player-visible may read as
+machine-generated, a wrong explanation is a real defect, so it is recorded here rather than
+left in a commit message.
+
+**Needed: author a distinct message, which joins the Q3 translation list, or accept the
+reuse on the record.**
+
+---
+
+### Q5. The wallet deadline constant, which is ours to justify and has no upstream number.
+
+`frontend/src/lib/services/walletTimeout.ts:40`, `WALLET_TIMEOUT_MS = 15_000`. The pinned
+official client sets no deadline at all, so there is nothing to inherit.
+
+The defect it closes was measured against the shipped dist with a stub whose `/wallet/play`
+never responds: the spin control held its spinning state for **90 seconds** with the stake
+gone from the displayed balance, no banner, no error, and a second click doing nothing.
+
+The trade the constant makes: a wallet merely SLOW past 15s has its round abandoned
+client-side while the server settles it, and the player is blocked until they reload. That
+is deliberate, because the alternative risk is a second stake going out against a wallet
+whose state we can no longer see.
+
+**Needed: is 15s right, measured against whatever p99 the platform quotes for
+`/wallet/play`?** One constant, one place, trivially changed.
+
+---
+
+### Q6. One thing that cannot be settled from this repository at all.
+
+`rgsService.ts` maps a platform error to a player-facing message by reading a field of the
+400 response body. WHICH field a real RGS uses decides whether players ever see the correct
+session and authentication messages, and nothing in `docs/stake-engine-live/` states it.
+
+**This is not a ruling request. It is a capture request:** one 400 body from a real
+`/wallet/authenticate` or `/wallet/play`, pasted whole, settles it in a single line. Until
+then it stays UNKNOWN rather than assumed, per rule 16.
+
+---
+
+**State of the board otherwise.** The pre-submission queue is otherwise closed, including
+the five previously blocked designs. CI green, upload kit rebuilt, tree clean. Nothing
+below is waiting on anything except the six above.
+
+---
+
 ## 039 - 2026-07-31 - OWNER DECISIONS: the Q4 backlog letter, and TR-096 amended on the corrected mechanism
 
 **Two of entry 038's questions were put to the owner directly and answered. Two he referred to
