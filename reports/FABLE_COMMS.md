@@ -42,6 +42,11 @@ Brief C, then the major clusters.
 and 13 (R043, wording owed by Fable), B9 (Brief C), Q6 (owner URL), the seventy-major
 triage (next check-ins), owner standing items.
 
+**COMMS-ACK 045 CLOSURE, 2026-08-10, R043 Phase 0:** PR #117 merged to `main` at
+`ce252a8` on green CI (static gates pass; browser matrix correctly skipped for a
+documentation-only change). The R043 run is rebased on this result; the brief is
+saved verbatim at `reports/briefs/FS_R043_MEGA_CLOSEOUT_Prompt.md`.
+
 ---
 
 ## 044 - 2026-08-10 - COMMS-ACK: R042 BRIEF B executed, blocker B8 closed
