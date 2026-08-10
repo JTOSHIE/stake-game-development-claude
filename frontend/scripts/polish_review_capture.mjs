@@ -54,6 +54,7 @@ import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro, waitSpinDone } from './lib/dismissOverlays.mjs'
 import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -83,7 +84,7 @@ function killPreview() { return _server ? _server.close() : undefined }
 const REPO = join(ROOT, '..')
 
 const DATE = '2026-07-27'
-const OUT = join(REPO, 'reports', 'screens', `polish-review-${DATE}`)
+const OUT = qaTmpDir('screens', `polish-review-${DATE}`)
 
 // Same hard-timeout discipline as every browser gate here, for the reason
 // recorded against run 122: killing the npx wrapper orphans vite, whose

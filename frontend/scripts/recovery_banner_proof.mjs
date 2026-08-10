@@ -30,6 +30,7 @@ import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -56,8 +57,12 @@ async function getFreePort() {
 function startPreview() { return _server }
 function killPreview() { return _server ? _server.close() : undefined }
 
-const SCREENS = join(ROOT, '..', 'reports', 'screens', 'session-recovery')
-const QA = join(ROOT, '..', 'reports', 'qa')
+// R043 PHASE 4 follow-through: this proof rewrote its three committed
+// session-recovery PNGs on a plain re-run, caught live during the R043 run.
+// Its `join(ROOT, '..', 'reports', ...)` shape slipped past the evidence
+// hygiene predicate, which anchored on __dirname; both are fixed together.
+const SCREENS = qaTmpDir('screens', 'session-recovery')
+const QA = qaTmpDir()
 mkdirSync(SCREENS, { recursive: true })
 mkdirSync(QA, { recursive: true })
 

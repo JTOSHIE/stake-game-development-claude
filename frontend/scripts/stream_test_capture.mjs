@@ -55,6 +55,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { dismissIntro, waitSpinDone, waitFeatureDrained } from './lib/dismissOverlays.mjs'
 import { startStaticServer } from './lib/previewServer.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -78,7 +79,7 @@ const DATE = process.env.STREAM_TEST_DATE || (() => {
   const p = (n) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 })()
-const OUT = join(REPO, 'reports', 'screens', `stream-test-${DATE}`)
+const OUT = qaTmpDir('screens', `stream-test-${DATE}`)
 
 // The whole run is ten full sessions, several with a 60 to 90 second feature
 // drain, so the ceiling is set from arithmetic rather than optimism: ten

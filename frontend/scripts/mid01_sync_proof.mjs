@@ -27,10 +27,11 @@ import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
 import { spawn } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
-const OUT = join(ROOT, '..', 'reports', 'screens', 'mid01-countup-sync-2026-07-30')
+const OUT = qaTmpDir('screens', 'mid01-countup-sync-2026-07-30')
 mkdirSync(OUT, { recursive: true })
 
 // Sampled at the moment the two clocks used to be furthest apart: partway
