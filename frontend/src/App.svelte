@@ -119,7 +119,7 @@
   import { configureTelemetry, setTelemetrySink, bufferSink, track, winTier, type TelemetryEvent } from './lib/services/telemetry'
   import { rgRecordSpin, autoplayShouldStop, rgSpinDelay, rgJurisdiction } from './lib/stores/responsibleGambling'
   import { anyModalOpen, setGameBlocked, gameInert } from './lib/stores/modalGuard'
-  import { bettingDisabled, liveGuardReason, evaluateLiveGuard } from './lib/stores/liveGuard'
+  import { bettingDisabled, liveGuardReason, liveGuardMessageKey, evaluateLiveGuard } from './lib/stores/liveGuard'
   import { authPublishedNothing } from './lib/stores/authShape'
   import { recoverSession, recoveryBannerVisible, dismissRecoveryBanner, activeRound } from './lib/stores/sessionRecovery'
   import ResumeOffer from './lib/components/ResumeOffer.svelte'
@@ -2088,7 +2088,7 @@
            cannot be mistaken for something the player is meant to close. -->
       {#if $bettingDisabled}
         <div class="live-guard-banner" role="alert" data-testid="live-guard-banner">
-          {$tr('errSessionUnavailable')}
+          {$tr($liveGuardMessageKey)}
         </div>
       {/if}
 

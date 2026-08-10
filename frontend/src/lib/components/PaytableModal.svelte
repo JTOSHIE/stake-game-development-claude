@@ -266,7 +266,7 @@
           <h3 class="fs-heading" style="margin-bottom:10px;">{$tr('rulesOverdriveTitle')}</h3>
           <table class="fs-trig" aria-label={$tr('a11yOverdriveTable')}>
             <thead>
-              <tr><th>Scatters</th><th>{$tr('colFreeSpins')}</th><th>{$tr('colInstantAward')}</th></tr>
+              <tr><th>{$tr('colScatters')}</th><th>{$tr('colFreeSpins')}</th><th>{$tr('colInstantAward')}</th></tr>
             </thead>
             <tbody>
               {#each TRIGGER_TABLE as row}

@@ -45,6 +45,29 @@ export const liveGuardReason = writable<LiveGuardReason>(null)
 export const bettingDisabled = derived(liveGuardReason, ($r) => $r !== null)
 
 /**
+ * Which banner the blocked session shows. R041, answering Q4 of FABLE COMMS 040.
+ *
+ * THE DEFECT THIS FIXES. Every blocked reason rendered `errSessionUnavailable`,
+ * whose middle sentence is "Your session could not be verified". For the two
+ * runtime reasons that is FALSE: the session authenticated perfectly well, and
+ * what failed was the settle or the wallet round trip. A player was told the
+ * wrong cause, and a wrong explanation is a defect under the standing mandate
+ * even though the instruction either side of it was right.
+ *
+ * The map lives HERE rather than in App.svelte's markup so it is assertable
+ * without a browser, and so a fifth reason added later cannot quietly inherit
+ * whichever banner happens to be in the template.
+ *
+ * BOTH BANNERS END IN THE SAME INSTRUCTION, and that is the point: reloading
+ * re-authenticates and `recoverSession` settles whatever round was left open,
+ * so the action a player must take is identical. Only the stated cause differs.
+ */
+export const liveGuardMessageKey = derived(liveGuardReason, ($r) =>
+  $r === 'settle-failed' || $r === 'wallet-stalled'
+    ? 'errRoundIncomplete' as const
+    : 'errSessionUnavailable' as const)
+
+/**
  * Decide once, at boot, after initRGS has settled.
  *
  * @param hasLaunchParams whether the launch URL carried a real session

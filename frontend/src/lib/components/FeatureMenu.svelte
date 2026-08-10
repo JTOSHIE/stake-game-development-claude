@@ -17,6 +17,11 @@
   // one-line edit in the config - this component needs no change.
   import { createEventDispatcher } from 'svelte'
   import { tr } from '../i18n/tr'
+  // R041. The cost lines used to read `{$isSocial ? 'per spin' : 'bet'}`, which
+  // LOOKED like the sweepstakes vocabulary layer and was not: both branches were
+  // English, so the words were untranslated AND outside the compliance filter.
+  // `sv()` is that layer, and `$tr` supplies the translated word it rewrites.
+  import { sv } from '../i18n/vocabulary'
   import { FS_MODES, fsRtpLabel, fsCostLabel } from '../config/fsModes'
   import type { FsMode } from '../config/fsModes'
   import { standingMode, type BetMode } from '../stores/betMode'
@@ -382,7 +387,7 @@
                     </div>
                     <p class="fm-blurb">{$tr(m.blurbKey)}</p>
                     <div class="fm-action">
-                      <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {$isSocial ? 'per spin' : 'bet'}</span>
+                      <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {sv($tr('betUnit'), $isSocial)}</span>
                       {#if active}
                         <span class="fm-active-tag" data-testid="standing-active-{m.id}">{$tr('hudActive')}</span>
                       {:else}
@@ -432,12 +437,12 @@
                          and live resolved cost inline, not just the bare
                          "1.25x bet" the .fm-cost line already showed - reads
                          as "what does turning this on actually cost me". -->
-                    <p class="fm-enh-effect">{fsCostLabel(m.cost, $locale)} per spin while ON · <span class="fs-num">{price(m.cost)}</span></p>
+                    <p class="fm-enh-effect">{fsCostLabel(m.cost, $locale)} {sv($tr('perSpinWhileOn'), $isSocial)} · <span class="fs-num">{price(m.cost)}</span></p>
                   {/if}
                 </div>
 
                 <div class="fm-action">
-                  <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {$isSocial ? 'per spin' : 'bet'}</span>
+                  <span class="fm-cost fs-num">{fsCostLabel(m.cost, $locale)} {sv($tr('betUnit'), $isSocial)}</span>
 
                   {#if !m.available}
                     <span class="fm-tag" aria-hidden="true">{$tr('hudSoon')}</span>

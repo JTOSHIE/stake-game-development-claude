@@ -36,6 +36,18 @@ import { liveGuardReason } from '../stores/liveGuard'
  * is what keeps it from abandoning a round the RGS really is about to answer,
  * and short enough that a player is not staring at a frozen control for a
  * minute. One constant, tuned in one place.
+ *
+ * RULED 2026-08-10, Fable ruling block R041, answering Q5 of FABLE COMMS 040.
+ * 15 seconds STANDS. The ruling confirms what the paragraph above could only
+ * assert: there is no platform p99 and no client deadline anywhere to inherit,
+ * so the number is ours by absence rather than by preference.
+ *
+ * THE RULING CARRIES ITS OWN REPLACEMENT RULE, which is the part that matters
+ * later: if the platform ever publishes either figure, this becomes the GREATER
+ * of 3x the published p99 or the published deadline. Written here rather than
+ * only in the compliance record so the next reader of this constant finds the
+ * condition attached to the thing it governs, and does not have to know that a
+ * ruling exists in order to look for it.
  */
 export const WALLET_TIMEOUT_MS = 15_000
 

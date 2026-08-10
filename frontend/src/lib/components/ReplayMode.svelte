@@ -391,7 +391,7 @@
       {#if phase === 'ready'}
         <button class="replay-btn start-replay" on:click={startReplay}>
           <div class="btn-line-1">{t(params.lang as Locale, 'hudStartReplay', mode)}</div>
-          <div class="btn-line-2">Mode: <strong>{params.mode}</strong></div>
+          <div class="btn-line-2">{$tr('replayModeLabel')} <strong>{params.mode}</strong></div>
         </button>
       {:else if phase === 'playing'}
         <div class="replay-status playing">{$tr('replayingRound')}</div>
@@ -425,7 +425,7 @@
          platform's own Bets panel. -->
     <div class="replay-meta">
       <div class="replay-figures">
-        {mode === 'social' ? 'Play' : 'Bet'}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
+        {mode === 'social' ? 'Play' : $tr('replayBetLabel')}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
         {#if showCostMultiplier}
           × {response.costMultiplier} {mode === 'social' ? '=' : 'cost ='}
           <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
@@ -441,7 +441,7 @@
            2. The word "currency" is itself on the stake.us prohibited-terms
               table (currency -> token), so the label switches in social mode. -->
     <div class="currency-display">
-      {mode === 'social' ? 'Token' : 'Currency'}:
+      {mode === 'social' ? 'Token' : $tr('replayCurrencyLabel')}:
       <strong>{isVirtualCurrency(params.currency)
         ? currencySymbol(params.currency, params.lang)
         : params.currency}</strong>

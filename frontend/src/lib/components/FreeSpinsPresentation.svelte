@@ -451,7 +451,7 @@
 </script>
 
 {#if active && script}
-  <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label="Overdrive Free Spins">
+  <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label={t(lang, 'overdriveFreeSpins', mode)}>
     {#if phase === 'entry'}
       <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry">
         <div class="entry-scatter-flare" aria-hidden="true"></div>

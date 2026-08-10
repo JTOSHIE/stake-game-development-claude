@@ -386,7 +386,7 @@
             <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
             <div class="audio-panel" class:muted={$isMuted}>
               <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-                {$isMuted ? 'Unmute' : 'Mute'}
+                {$isMuted ? $tr('ctrlUnmute') : $tr('ctrlMute')}
                 <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M4 9v6h4l5 4V5L8 9H4z" />
                   {#if $isMuted}
@@ -529,7 +529,7 @@
         </button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'}
+            {$isMuted ? $tr('ctrlUnmute') : $tr('ctrlMute')}
                 <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M4 9v6h4l5 4V5L8 9H4z" />
                   {#if $isMuted}
@@ -613,7 +613,7 @@
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'}
+            {$isMuted ? $tr('ctrlUnmute') : $tr('ctrlMute')}
                 <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M4 9v6h4l5 4V5L8 9H4z" />
                   {#if $isMuted}
@@ -775,7 +775,7 @@
         <button class="hud-menu-item" role="menuitem" on:click={openSessionPanel} data-testid="open-session-panel">{$tr('hudSession')}</button>
         <div class="audio-panel" class:muted={$isMuted}>
           <button class="hud-menu-item audio-mute" role="menuitem" on:click={toggleMute}>
-            {$isMuted ? 'Unmute' : 'Mute'}
+            {$isMuted ? $tr('ctrlUnmute') : $tr('ctrlMute')}
                 <svg class="audio-mute-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M4 9v6h4l5 4V5L8 9H4z" />
                   {#if $isMuted}

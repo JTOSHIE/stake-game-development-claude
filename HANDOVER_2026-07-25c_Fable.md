@@ -324,6 +324,17 @@ pre-flight check: **can the model physically SEE it at this resolution.**
    line and both ready.
 4. **The remaining audit waves**, never swept: audio, social-mode capture, accessibility,
    animation timing.
+5. **PROSE_NUMERAL_LOCALE_PASS**, queued by Fable ruling block R041 (2026-08-10) TASK 8,
+   and it is the TR-037 defect class rather than a new one. **Figures inside PROSE are
+   English-formatted in every locale** (`5,000×`, written into all sixteen `rulesMaxWin`
+   strings by R041 itself) **while the mode cards next to them are locale-formatted** by
+   `fsModes.ts`'s `fsMaxWinLabel`, which passes the locale to `toLocaleString`. So a German
+   or Turkish player can see the same quantity punctuated two ways on one screen, and in
+   those locales the comma reads as a DECIMAL separator, which is the exact reading TR-037
+   was raised to stop. R041 pinned `5,000×` deliberately for this pass ("keep the figure
+   exactly 5,000× in every locale this pass") so the wording could land without waiting on
+   the numeral question; the numeral question is this item. Runs as its own brief unless
+   the owner strikes it.
 
 ## The process artefacts this arc produced
 

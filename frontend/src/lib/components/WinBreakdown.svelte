@@ -91,7 +91,7 @@
     <div class="fs-face">
       <span class="wb-symbol">{symbolLabel(current.symbol, $tr)}</span>
       <span class="wb-count">x{current.kind}</span>
-      <span class="wb-ways">{current.ways} ways</span>
+      <span class="wb-ways">{$tr('waysCount', { n: current.ways })}</span>
       <span class="wb-pay fs-num">{payLabel}</span>
     </div>
   </div>

@@ -119,6 +119,23 @@ export interface Translations {
   settings:             string
   // ── Replay mode ───────────────────────────────────────────────────────────
   replayDisclaimer:     string
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   string
+  ctrlMute:             string
+  ctrlUnmute:           string
+  colScatters:          string
+  replayBetLabel:       string
+  replayCurrencyLabel:  string
+  replayModeLabel:      string
+  waysCount:            string
+  betUnit:              string
+  perSpinWhileOn:       string
+  baseBetUnit:          string
+
   // ── Overdrive Free Spins feature (optional: served from featureI18n via t) ──
   overdrive?:              string
   overdriveFreeSpins?:     string
@@ -279,6 +296,23 @@ const en: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'SETTINGS',
   replayDisclaimer:     'This is a replay of a previously completed bet, shown for verification only. No funds are wagered and the outcome cannot be changed.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Game unavailable. Your last round could not be completed. Please reload or contact support.',
+  ctrlMute:             'Mute',
+  ctrlUnmute:           'Unmute',
+  colScatters:          'Scatters',
+  replayBetLabel:       'Bet',
+  replayCurrencyLabel:  'Currency',
+  replayModeLabel:      'Mode:',
+  waysCount:            '{n} ways',
+  betUnit:              'bet',
+  perSpinWhileOn:       'per spin while ON',
+  baseBetUnit:          'base bet',
+
 }
 
 // ── Arabic ────────────────────────────────────────────────────────────────────
@@ -362,6 +396,23 @@ const ar: Translations = {
   symbolScatter:         'سكاتر',
   settings:             'الإعدادات',
   replayDisclaimer:     'هذه إعادة لرهان مكتمل سابقاً، تُعرض للتحقق فقط. لا تتم المراهنة بأي أموال ولا يمكن تغيير النتيجة.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'اللعبة غير متاحة. تعذر إكمال جولتك الأخيرة. يرجى إعادة التحميل أو الاتصال بالدعم.',
+  ctrlMute:             'كتم الصوت',
+  ctrlUnmute:           'إلغاء كتم الصوت',
+  colScatters:          'رموز SCATTER',
+  replayBetLabel:       'الرهان',
+  replayCurrencyLabel:  'العملة',
+  replayModeLabel:      'الوضع:',
+  waysCount:            '{n} طريقة',
+  betUnit:              'رهان',
+  perSpinWhileOn:       'لكل لفّة أثناء التفعيل',
+  baseBetUnit:          'الرهان الأساسي',
+
 }
 
 // ── German ────────────────────────────────────────────────────────────────────
@@ -445,6 +496,23 @@ const de: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'EINSTELLUNGEN',
   replayDisclaimer:     'Dies ist die Wiederholung eines bereits abgeschlossenen Einsatzes und dient nur zur Überprüfung. Es wird kein Geld eingesetzt und das Ergebnis kann nicht geändert werden.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Spiel nicht verfügbar. Ihre letzte Runde konnte nicht abgeschlossen werden. Bitte neu laden oder den Support kontaktieren.',
+  ctrlMute:             'Stummschalten',
+  ctrlUnmute:           'Stummschaltung aufheben',
+  colScatters:          'Scatter',
+  replayBetLabel:       'Einsatz',
+  replayCurrencyLabel:  'Währung',
+  replayModeLabel:      'Modus:',
+  waysCount:            '{n} Gewinnwege',
+  betUnit:              'Einsatz',
+  perSpinWhileOn:       'pro Drehung, solange AN',
+  baseBetUnit:          'Basiseinsatz',
+
 }
 
 // ── Spanish ───────────────────────────────────────────────────────────────────
@@ -528,6 +596,23 @@ const es: Translations = {
   symbolScatter:         'DISPERSIÓN',
   settings:             'CONFIGURACIÓN',
   replayDisclaimer:     'Esta es la repetición de una apuesta ya completada, mostrada solo con fines de verificación. No se apuesta dinero y el resultado no se puede cambiar.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Juego no disponible. No se ha podido completar tu última ronda. Vuelve a cargar o contacta con soporte.',
+  ctrlMute:             'Silenciar',
+  ctrlUnmute:           'Activar sonido',
+  colScatters:          'Scatters',
+  replayBetLabel:       'Apuesta',
+  replayCurrencyLabel:  'Moneda',
+  replayModeLabel:      'Modo:',
+  waysCount:            '{n} formas',
+  betUnit:              'apuesta',
+  perSpinWhileOn:       'por giro mientras esté ACTIVADO',
+  baseBetUnit:          'apuesta base',
+
 }
 
 // ── Finnish ───────────────────────────────────────────────────────────────────
@@ -611,6 +696,23 @@ const fi: Translations = {
   symbolScatter:         'HAJOTUS',
   settings:             'ASETUKSET',
   replayDisclaimer:     'Tämä on aiemmin pelatun panoksen toisto, joka näytetään vain vahvistusta varten. Rahaa ei panosteta eikä lopputulosta voi muuttaa.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Peli ei ole käytettävissä. Viimeisintä kierrostasi ei voitu suorittaa loppuun. Lataa sivu uudelleen tai ota yhteyttä tukeen.',
+  ctrlMute:             'Mykistä',
+  ctrlUnmute:           'Poista mykistys',
+  colScatters:          'Scatter',
+  replayBetLabel:       'Panos',
+  replayCurrencyLabel:  'Valuutta',
+  replayModeLabel:      'Tila:',
+  waysCount:            '{n} voittotapaa',
+  betUnit:              'panos',
+  perSpinWhileOn:       'per pyöräytys, kun PÄÄLLÄ',
+  baseBetUnit:          'peruspanos',
+
 }
 
 // ── French ────────────────────────────────────────────────────────────────────
@@ -694,6 +796,23 @@ const fr: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'PARAMÈTRES',
   replayDisclaimer:     'Ceci est la relecture d’une mise déjà terminée, affichée à des fins de vérification uniquement. Aucun fonds n’est misé et le résultat ne peut pas être modifié.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Jeu indisponible. Votre dernier tour n’a pas pu être terminé. Veuillez recharger ou contacter le support.',
+  ctrlMute:             'Couper le son',
+  ctrlUnmute:           'Réactiver le son',
+  colScatters:          'Scatters',
+  replayBetLabel:       'Mise',
+  replayCurrencyLabel:  'Devise',
+  replayModeLabel:      'Mode :',
+  waysCount:            '{n} façons',
+  betUnit:              'mise',
+  perSpinWhileOn:       'par tour tant qu’ACTIVÉ',
+  baseBetUnit:          'mise de base',
+
 }
 
 // ── Hindi ─────────────────────────────────────────────────────────────────────
@@ -777,6 +896,23 @@ const hi: Translations = {
   symbolScatter:         'स्कैटर',
   settings:             'सेटिंग',
   replayDisclaimer:     'यह पहले पूर्ण किए गए दांव का रीप्ले है, जो केवल सत्यापन के लिए दिखाया गया है। कोई धनराशि दांव पर नहीं लगाई जाती और परिणाम बदला नहीं जा सकता।',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'गेम अनुपलब्ध है। आपका पिछला राउंड पूरा नहीं हो सका। कृपया पुनः लोड करें या सहायता से संपर्क करें।',
+  ctrlMute:             'म्यूट करें',
+  ctrlUnmute:           'अनम्यूट करें',
+  colScatters:          'SCATTER',
+  replayBetLabel:       'बेट',
+  replayCurrencyLabel:  'मुद्रा',
+  replayModeLabel:      'मोड:',
+  waysCount:            '{n} तरीके',
+  betUnit:              'बेट',
+  perSpinWhileOn:       'चालू रहने पर प्रति स्पिन',
+  baseBetUnit:          'बेस बेट',
+
 }
 
 // ── Indonesian ────────────────────────────────────────────────────────────────
@@ -860,6 +996,23 @@ const id: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'PENGATURAN',
   replayDisclaimer:     'Ini adalah tayangan ulang taruhan yang sudah selesai, ditampilkan hanya untuk verifikasi. Tidak ada dana yang dipertaruhkan dan hasilnya tidak dapat diubah.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Permainan tidak tersedia. Ronde terakhir Anda tidak dapat diselesaikan. Silakan muat ulang atau hubungi dukungan.',
+  ctrlMute:             'Bisukan',
+  ctrlUnmute:           'Bunyikan',
+  colScatters:          'Scatter',
+  replayBetLabel:       'Taruhan',
+  replayCurrencyLabel:  'Mata uang',
+  replayModeLabel:      'Mode:',
+  waysCount:            '{n} cara',
+  betUnit:              'taruhan',
+  perSpinWhileOn:       'per putaran selama AKTIF',
+  baseBetUnit:          'taruhan dasar',
+
 }
 
 // ── Japanese ──────────────────────────────────────────────────────────────────
@@ -943,6 +1096,23 @@ const ja: Translations = {
   symbolScatter:         'スキャッター',
   settings:             '設定',
   replayDisclaimer:     'これは完了済みのベットのリプレイで、確認のみを目的として表示されています。資金は賭けられておらず、結果を変更することはできません。',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'ゲームを利用できません。直前のラウンドを完了できませんでした。再読み込みするか、サポートにお問い合わせください。',
+  ctrlMute:             'ミュート',
+  ctrlUnmute:           'ミュート解除',
+  colScatters:          'SCATTER',
+  replayBetLabel:       'ベット',
+  replayCurrencyLabel:  '通貨',
+  replayModeLabel:      'モード:',
+  waysCount:            '{n}ウェイ',
+  betUnit:              'ベット',
+  perSpinWhileOn:       'ON中、スピンごと',
+  baseBetUnit:          '基本ベット',
+
 }
 
 // ── Korean ────────────────────────────────────────────────────────────────────
@@ -1026,6 +1196,23 @@ const ko: Translations = {
   symbolScatter:         '스캐터',
   settings:             '설정',
   replayDisclaimer:     '이것은 이미 완료된 베팅의 리플레이이며 확인용으로만 표시됩니다. 자금이 베팅되지 않으며 결과를 변경할 수 없습니다.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   '게임을 이용할 수 없습니다. 마지막 라운드를 완료하지 못했습니다. 새로 고침하거나 고객지원에 문의하세요.',
+  ctrlMute:             '음소거',
+  ctrlUnmute:           '음소거 해제',
+  colScatters:          'SCATTER',
+  replayBetLabel:       '베팅',
+  replayCurrencyLabel:  '통화',
+  replayModeLabel:      '모드:',
+  waysCount:            '{n} 웨이즈',
+  betUnit:              '베팅',
+  perSpinWhileOn:       'ON 상태에서 스핀당',
+  baseBetUnit:          '기본 베팅',
+
 }
 
 // ── Polish ────────────────────────────────────────────────────────────────────
@@ -1109,6 +1296,23 @@ const pl: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'USTAWIENIA',
   replayDisclaimer:     'To powtórka wcześniej zakończonego zakładu, pokazana wyłącznie w celu weryfikacji. Nie stawia się żadnych środków, a wyniku nie można zmienić.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Gra niedostępna. Nie udało się dokończyć Twojej ostatniej rundy. Odśwież stronę lub skontaktuj się z pomocą techniczną.',
+  ctrlMute:             'Wycisz',
+  ctrlUnmute:           'Wyłącz wyciszenie',
+  colScatters:          'Scattery',
+  replayBetLabel:       'Zakład',
+  replayCurrencyLabel:  'Waluta',
+  replayModeLabel:      'Tryb:',
+  waysCount:            '{n} sposobów',
+  betUnit:              'stawki',
+  perSpinWhileOn:       'za obrót, gdy WŁ.',
+  baseBetUnit:          'stawki bazowej',
+
 }
 
 // ── Portuguese ────────────────────────────────────────────────────────────────
@@ -1192,6 +1396,23 @@ const pt: Translations = {
   symbolScatter:         'DISPERSÃO',
   settings:             'CONFIGURAÇÕES',
   replayDisclaimer:     'Esta é a repetição de uma aposta já concluída, exibida apenas para verificação. Nenhum valor é apostado e o resultado não pode ser alterado.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Jogo indisponível. Não foi possível concluir a sua última rodada. Recarregue a página ou contacte o suporte.',
+  ctrlMute:             'Silenciar',
+  ctrlUnmute:           'Ativar som',
+  colScatters:          'Scatters',
+  replayBetLabel:       'Aposta',
+  replayCurrencyLabel:  'Moeda',
+  replayModeLabel:      'Modo:',
+  waysCount:            '{n} formas',
+  betUnit:              'aposta',
+  perSpinWhileOn:       'por giro enquanto ATIVADO',
+  baseBetUnit:          'aposta base',
+
 }
 
 // ── Russian ───────────────────────────────────────────────────────────────────
@@ -1275,6 +1496,23 @@ const ru: Translations = {
   symbolScatter:         'СКАТТЕР',
   settings:             'НАСТРОЙКИ',
   replayDisclaimer:     'Это повтор ранее завершённой ставки, показанный только для проверки. Средства не ставятся, и результат изменить нельзя.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Игра недоступна. Не удалось завершить ваш последний раунд. Перезагрузите страницу или обратитесь в поддержку.',
+  ctrlMute:             'Отключить звук',
+  ctrlUnmute:           'Включить звук',
+  colScatters:          'SCATTER',
+  replayBetLabel:       'Ставка',
+  replayCurrencyLabel:  'Валюта',
+  replayModeLabel:      'Режим:',
+  waysCount:            '{n} способов',
+  betUnit:              'ставки',
+  perSpinWhileOn:       'за спин, пока ВКЛ.',
+  baseBetUnit:          'базовой ставки',
+
 }
 
 // ── Turkish ───────────────────────────────────────────────────────────────────
@@ -1358,6 +1596,23 @@ const tr: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'AYARLAR',
   replayDisclaimer:     'Bu, daha önce tamamlanmış bir bahsin yalnızca doğrulama amacıyla gösterilen tekrarıdır. Hiçbir para yatırılmaz ve sonuç değiştirilemez.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Oyun kullanılamıyor. Son turunuz tamamlanamadı. Lütfen sayfayı yenileyin veya destek ile iletişime geçin.',
+  ctrlMute:             'Sesi kapat',
+  ctrlUnmute:           'Sesi aç',
+  colScatters:          'Scatter',
+  replayBetLabel:       'Bahis',
+  replayCurrencyLabel:  'Para birimi',
+  replayModeLabel:      'Mod:',
+  waysCount:            '{n} yol',
+  betUnit:              'bahis',
+  perSpinWhileOn:       'AÇIK olduğunda dönüş başına',
+  baseBetUnit:          'temel bahis',
+
 }
 
 // ── Vietnamese ────────────────────────────────────────────────────────────────
@@ -1441,6 +1696,23 @@ const vi: Translations = {
   symbolScatter:         'SCATTER',
   settings:             'CÀI ĐẶT',
   replayDisclaimer:     'Đây là bản phát lại của một lượt cược đã hoàn tất, chỉ hiển thị để xác minh. Không có khoản tiền nào được đặt cược và kết quả không thể thay đổi.',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   'Trò chơi không khả dụng. Không thể hoàn tất vòng chơi gần nhất của bạn. Vui lòng tải lại hoặc liên hệ hỗ trợ.',
+  ctrlMute:             'Tắt tiếng',
+  ctrlUnmute:           'Bật tiếng',
+  colScatters:          'Scatter',
+  replayBetLabel:       'Cược',
+  replayCurrencyLabel:  'Tiền tệ',
+  replayModeLabel:      'Chế độ:',
+  waysCount:            '{n} cách',
+  betUnit:              'cược',
+  perSpinWhileOn:       'mỗi lượt quay khi BẬT',
+  baseBetUnit:          'cược cơ bản',
+
 }
 
 // ── Chinese (Simplified) ──────────────────────────────────────────────────────
@@ -1524,6 +1796,23 @@ const zh: Translations = {
   symbolScatter:         '分散',
   settings:             '设置',
   replayDisclaimer:     '这是先前已完成投注的回放，仅用于验证。不会下注任何资金，且结果无法更改。',
+
+  // ── R041 (Fable, 2026-08-10). Eleven keys that were English literals in
+  //    components and so rendered English to all sixteen locales. See
+  //    docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md sections A3
+  //    and B. `waysCount` carries a {n} placeholder, which t() interpolates.
+  errRoundIncomplete:   '游戏不可用。您的上一回合未能完成。请重新加载或联系客服。',
+  ctrlMute:             '静音',
+  ctrlUnmute:           '取消静音',
+  colScatters:          'SCATTER',
+  replayBetLabel:       '投注',
+  replayCurrencyLabel:  '货币',
+  replayModeLabel:      '模式：',
+  waysCount:            '{n} 路',
+  betUnit:              '投注',
+  perSpinWhileOn:       '开启时每次旋转',
+  baseBetUnit:          '基础投注',
+
 }
 
 // ── Locale map ────────────────────────────────────────────────────────────────

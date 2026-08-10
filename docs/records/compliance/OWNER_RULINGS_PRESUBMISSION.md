@@ -167,6 +167,61 @@ left open, which is what the banner asks for.
 **The ruling needed:** whether 15s is right, measured against whatever p99 the
 platform quotes for `/wallet/play`. One constant, tuned in one place.
 
+**RULED 2026-08-10, R041. 15s STANDS.** The ruling confirms there is no platform
+p99 and no client deadline to inherit, so the figure is ours by absence rather
+than by preference. **It carries a replacement rule:** if the platform ever
+publishes either figure, the constant becomes the GREATER of 3x the published
+p99 or the published deadline. That condition is recorded beside the constant in
+`walletTimeout.ts` as well as here, so a reader of the code finds it without
+needing to know a ruling exists.
+
+---
+
+## E. R041's apostrophe instruction cannot be obeyed in French, and the two halves disagree
+
+Raised 2026-08-10 while executing R041. **The ratified wording shipped exactly as
+written; only the typography is in question, and no builder resolved it.**
+
+**The instruction**, R041 TASK 1, quoted verbatim:
+
+> Escape apostrophes per each file's existing convention; typographic apostrophes below are intentional.
+
+**Why both halves cannot hold for `fr`.** R041's French replacements for
+`rulesMaxWin` and `rulesScatterMult` use the typographic apostrophe U+2019
+("qu’il accorde", "n’importe où"). The rest of the `fr` block in
+`prose.locales.ts` uses the escaped straight form U+0027. Honouring the second
+half therefore breaks the first.
+
+**Measured, not assumed.** After applying the ruling, the `fr` block carries
+U+2019 at lines 374 and 375 and escaped U+0027 at lines 366, 372, 380 and 396.
+Only `fr` is affected: `tr` carries no typographic apostrophe at all, and no
+other locale mixes.
+
+**It is player-visible in one view**, which is what makes it a defect rather
+than a tidiness question. `rulesSymbolValues` (straight, line 372) renders two
+lines above `rulesScatterMult` and `rulesMaxWin` (curly, 374 and 375) in the
+same French paytable rules block. The standing mandate names this exact class:
+*"straight and curly quotes mixed in one view"*.
+
+**A gate should have caught it and could not.** `machine_tell_gate.mjs` encodes
+mixed apostrophes per locale, and its own block regex has always matched
+`prose.locales.ts`'s `  fr: {` shape, but the file was never passed in: the scan
+read `translations.ts` alone. So the longest player-facing sentences in the
+product, the paytable rules and the disclaimer, were never scanned for the one
+defect class most likely to appear in them. **That blind spot is now closed**,
+the `fr` mixing is frozen as a single named entry, and both directions are
+checked, so when this is ruled on the entry must be removed or the gate fails.
+
+**The ruling needed, and it is one line.** Either:
+
+- **convert R041's two French strings to the escaped straight form**, which
+  changes no word and makes the block self-consistent; or
+- **convert the whole `fr` block to typographic apostrophes**, which is
+  consistent the other way but edits prose R041 did not rule on.
+
+The builder did neither, because rewriting ratified compliance text is not a
+builder's call and neither is editing prose outside the ruling.
+
 ---
 
 ## C. One thing that cannot be settled from this repository at all

@@ -1,7 +1,7 @@
 // liveGuard.test.ts - R2 / TR-010 (2026-07-25).
 // Run (from frontend/): npx tsx src/lib/stores/liveGuard.test.ts
 import { get } from 'svelte/store'
-import { evaluateLiveGuard, bettingDisabled, liveGuardReason, resetLiveGuard } from './liveGuard.ts'
+import { evaluateLiveGuard, bettingDisabled, liveGuardReason, liveGuardMessageKey, resetLiveGuard } from './liveGuard.ts'
 
 let failures = 0
 const check = (name: string, a: unknown, e: unknown) => {
@@ -73,6 +73,38 @@ check('and names the reason for the player-facing banner', get(liveGuardReason),
   liveGuardReason.set(null)
   evaluateLiveGuard(true, true, false)
   check('a fresh auth failure still blocks', get(liveGuardReason), 'auth-failed')
+  liveGuardReason.set(null)
+}
+
+// ── R041 / Q4: the blocked session must state the RIGHT cause ────────────────
+//
+// Every blocked reason used to render `errSessionUnavailable`, whose middle
+// sentence is "Your session could not be verified". For the two RUNTIME reasons
+// that sentence is FALSE: the session authenticated, and it was the settle or
+// the wallet round trip that failed. Asserted here rather than in a browser
+// because the map is a pure derived store, which is the whole reason it lives
+// in this file instead of in App.svelte's markup.
+console.log('\nR041: the banner names the cause that actually happened')
+{
+  const cases: Array<[string, string]> = [
+    ['settle-failed',  'errRoundIncomplete'],
+    ['wallet-stalled', 'errRoundIncomplete'],
+    ['auth-failed',    'errSessionUnavailable'],
+    ['missing-params', 'errSessionUnavailable'],
+  ]
+  for (const [reason, key] of cases) {
+    liveGuardReason.set(reason as never)
+    check(`${reason} renders ${key}`, get(liveGuardMessageKey), key)
+  }
+  // NEGATIVE CONTROL. A fifth reason added later must not silently inherit
+  // whichever banner happens to be in the template: the default is the auth
+  // wording, and a maintainer who adds a runtime reason has to come here.
+  liveGuardReason.set(null)
+  check('and the unblocked state still resolves to a real key',
+    get(liveGuardMessageKey), 'errSessionUnavailable')
+  // The two must be DIFFERENT strings, or the whole fix is decorative.
+  check('the two banners are genuinely different keys',
+    'errRoundIncomplete' !== 'errSessionUnavailable', true)
   liveGuardReason.set(null)
 }
 

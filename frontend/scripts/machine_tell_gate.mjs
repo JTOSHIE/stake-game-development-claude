@@ -300,6 +300,38 @@ function apostropheForms(line) {
   return { curly, straight }
 }
 
+/**
+ * FROZEN, ONE ENTRY, AND IT IS A QUESTION RATHER THAN AN EXEMPTION ON MERIT.
+ *
+ * R041 (Fable, 2026-08-10) supplied replacement French text for `rulesMaxWin`
+ * and `rulesScatterMult` written with the TYPOGRAPHIC apostrophe U+2019, and
+ * said in the same breath both "escape apostrophes per each file's existing
+ * convention" and "typographic apostrophes below are intentional". For `fr` in
+ * prose.locales.ts those two halves cannot both be obeyed: the rest of that
+ * block uses the escaped straight form, so honouring the second half makes the
+ * locale contradict itself, which is exactly what this scan exists to catch.
+ *
+ * IT IS PLAYER-VISIBLE, measured rather than assumed: `rulesSymbolValues`
+ * (straight) renders two lines above `rulesScatterMult` and `rulesMaxWin`
+ * (curly) in the same French paytable rules block, so a player sees both forms
+ * in one view. That is the mandate's named machine tell.
+ *
+ * The builder did NOT resolve it. Rewriting ratified compliance text is not a
+ * builder's call under convention (l.7), and converting the whole `fr` block to
+ * curly would change prose Fable did not rule on. So the wording ships exactly
+ * as ratified, the blind spot below is closed so the defect is machine-visible
+ * instead of hidden, and the one-line decision is escalated in
+ * docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md.
+ *
+ * Keyed `file|locale`. Checked in BOTH directions below, so when the ruling
+ * lands and the mixing goes, this entry must go with it or the gate fails.
+ */
+const KNOWN_MIXED_APOSTROPHE = new Map([
+  ['src/lib/i18n/prose.locales.ts|fr',
+    'R041 supplied U+2019 for rulesMaxWin and rulesScatterMult while the rest of the fr block '
+    + 'uses escaped U+0027. Awaiting the owner ruling; see OWNER_RULINGS_PRESUBMISSION.md section E.'],
+])
+
 function scanApostrophes(file) {
   const out = []
   let src
@@ -321,7 +353,25 @@ function scanApostrophes(file) {
   }
 
   for (const [code, acc] of perLocale) {
-    if (acc.curly.length && acc.straight.length) {
+    const frozenKey = `${rel}|${code}`
+    const mixed = acc.curly.length > 0 && acc.straight.length > 0
+    // BOTH DIRECTIONS. A frozen entry that no longer describes reality is a
+    // rusted ratchet: the next real mixing in that locale would be silently
+    // excused by an exemption nobody noticed had stopped applying.
+    if (KNOWN_MIXED_APOSTROPHE.has(frozenKey)) {
+      if (!mixed) {
+        out.push({
+          klass: 'stale-apostrophe-exemption',
+          file: rel,
+          line: 1,
+          detail: `locale '${code}' is no longer mixed, so its KNOWN_MIXED_APOSTROPHE entry `
+            + 'must be deleted. Reason recorded was: ' + KNOWN_MIXED_APOSTROPHE.get(frozenKey),
+          text: frozenKey,
+        })
+      }
+      continue
+    }
+    if (mixed) {
       out.push({
         klass: 'mixed-apostrophe',
         file: rel,
@@ -803,13 +853,23 @@ const sourceOnly = process.argv.includes('--source')
 
 const srcFiles = walk(join(ROOT, 'src'), SRC_TEXT).filter((p) => !isTestFile(p))
 const indexHtml = join(ROOT, 'index.html')
-const localeTable = join(ROOT, 'src/lib/i18n/translations.ts')
+// THE BLIND SPOT R041 WALKED INTO. This read translations.ts alone, while
+// `localeBlocks`'s FEATURE_BLOCK regex has always matched prose.locales.ts's
+// identical `  fr: {` shape. The prose layer carries the paytable rules, the
+// disclaimer and the mode blurbs, i.e. the longest sentences in the product and
+// the ones most likely to contain an apostrophe at all, and none of it was ever
+// scanned. The gate reported PASS over a mixed-apostrophe fr block.
+const localeTables = [
+  join(ROOT, 'src/lib/i18n/translations.ts'),
+  join(ROOT, 'src/lib/i18n/prose.ts'),
+  join(ROOT, 'src/lib/i18n/prose.locales.ts'),
+]
 
 const srcFindings = [
   ...scanGlyphs([...srcFiles, indexHtml], { skipComments: true }),
   ...scanPlaceholders([...srcFiles, indexHtml]),
   ...scanDoubleSpaces(srcFiles),
-  ...scanApostrophes(localeTable),
+  ...localeTables.flatMap((f) => scanApostrophes(f)),
   ...scanMoney(srcFiles),
   ...scanCasingTransforms(srcFiles),
   ...scanFontStacks([...srcFiles, indexHtml]),

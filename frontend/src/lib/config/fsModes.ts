@@ -204,10 +204,14 @@ export function fsCostLabel(cost: number, locale?: string): string {
  */
 export function maxWinVsBaseBetLabel(social: boolean, locale?: string): string {
   const n = fsMaxWinLabel(locale)
-  // The trailing words are still hardcoded English and are frozen in
-  // scripts/hardcoded_string_baseline.json's sibling list for translation; the
-  // NUMBER is fixed here because it needs no translation, only a locale.
-  return social ? `${n} base play` : `${n} base bet`
+  // R041, closing the last of this label. The NUMBER was made locale-aware on
+  // 2026-08-10; the trailing words stayed English in all sixteen locales until
+  // Fable supplied `baseBetUnit`. The social branch keeps its English literal
+  // deliberately rather than routing through `t()`: social sessions are pinned
+  // to `en` by socialLocale.ts, so there is nothing to translate, and the words
+  // are the platform's own required replacement rather than our wording.
+  if (social) return `${n} base play`
+  return `${n} ${t((locale ?? 'en') as Locale, 'baseBetUnit')}`
 }
 
 /**

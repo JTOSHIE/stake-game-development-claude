@@ -332,8 +332,19 @@ if (!SELF_TEST) {
     ),
   }))
   // A scatter award restated wrongly in the player-facing rules.
+  //
+  // ANCHORED ON THE KEY, NOT ON THE SENTENCE, and that is the whole point of
+  // this rewrite. It used to match the literal phrase 'a 1×, 3×, or 10×
+  // multiplier'. R041 (2026-08-10) reworded the rule to 'award an instant win
+  // of 1×, 3×, or 10× your total bet' because the maths adds an award rather
+  // than applying a multiplier, and that ENTIRELY LEGITIMATE reword left the
+  // seed matching nothing: the mutation became a no-op, the gate stayed green
+  // on an unplanted defect, and the self-test scored it MISSED. A seed keyed to
+  // prose is disarmed by any honest edit to that prose, which is convention
+  // (p)'s failure mode wearing a different hat. `rulesScatterMult: '` is the
+  // key, and the key is what the gate is really about.
   seed('a scatter award in the rules drifts', (s) => ({
-    ...s, prose: s.prose.replace('a 1×, 3×, or 10× multiplier', 'a 1×, 5×, or 10× multiplier'),
+    ...s, prose: s.prose.replace(/(rulesScatterMult: '[^']*?)3×/, '$15×'),
   }))
   // A published mode that no longer reaches the cap it advertises.
   seed('a published mode stops reaching the advertised cap', (s) => ({

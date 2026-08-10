@@ -16,6 +16,20 @@
 //   PaytableModal       the 'Scatters' column header, beside two keyed siblings
 //   WinBreakdown        {current.ways} ways
 //
+// ALL OF THE ABOVE ARE NOW FIXED. Fable's ruling block R041 (2026-08-10)
+// supplied the wording for all sixteen locales, the baseline went 11 -> 0, and
+// the ratchet's both-directions check is what proved each one was really burned
+// rather than merely edited around.
+//
+// TWO THINGS THIS FILE GOT WRONG, kept because they are the lesson rather than
+// the history. The list above claimed WinBreakdown's `{current.ways} ways` as a
+// catch, and rule 3 could NEVER have made it: it read `[^<>{}\n]`, so a single
+// brace anywhere in a text node disqualified the whole node and the English
+// beside the interpolation was never a candidate. FeatureMenu's twelfth literal,
+// "per spin while ON", shipped through this gate for the same reason while it
+// printed PASS. Both were found by hand, and a gate that is trusted while blind
+// is worse than no gate. Rule 3 is widened and both shapes are seeded below.
+//
 // THE SOCIAL CONDITIONALS ARE NOT THE COMPLIANCE MECHANISM, which is the trap
 // worth naming. `{$isSocial ? 'per spin' : 'bet'}` looks like the sweepstakes
 // vocabulary layer doing its job. It is not: that layer is `sv()` in
@@ -151,10 +165,75 @@ export function findHardcoded(src, file) {
   for (const m of markup.matchAll(/\b(aria-label|title|placeholder|alt|aria-description)\s*=\s*"([^"\\\n]{2,140})"/g)) {
     push(m[2])
   }
-  // 3. Bare text nodes between tags.
-  for (const m of markup.matchAll(/>([^<>{}\n]{2,140})</g)) push(m[1])
+  // 3. Text nodes between tags, INCLUDING the English either side of an
+  //    interpolation. R041.
+  //
+  //    THIS READ `[^<>{}\n]` AND THAT IS WHY "per spin while ON" SHIPPED.
+  //    Excluding braces did not merely skip the expression, it disqualified the
+  //    WHOLE TEXT NODE: one `{` anywhere between the tags and the entire segment
+  //    stopped matching, so the prose beside it was never even a candidate. The
+  //    gate printed PASS over a literal rendering English to sixteen locales,
+  //    and its own header claimed WinBreakdown's `{current.ways} ways` as a
+  //    catch it could never have made. A gate that cannot see the commonest
+  //    shape of the defect it names is worth less than no gate, because it is
+  //    trusted.
+  for (const m of markup.matchAll(/>([^<>\n]{2,300})</g)) {
+    for (const frag of textFragments(m[1])) push(frag)
+  }
   return out.map((text) => ({ file, text }))
 }
+
+/**
+ * One text node split into the prose fragments a player actually reads.
+ *
+ * Interpolations become boundaries rather than content, and so do the visual
+ * separators that habitually sit beside them (`·`, `|`, `/`, `•`), because a
+ * fragment like "per spin while ON ·" would otherwise fail LABEL_SHAPE on the
+ * separator and vanish, which is the same silent miss in a new costume.
+ *
+ * Brace matching is DEPTH-COUNTED rather than regex `\{[^{}]*\}`: R041 itself
+ * introduced `{$tr('waysCount', { n: current.ways })}`, whose nested object
+ * literal would have closed the non-greedy form early and spilled `)}` into the
+ * text as a false positive.
+ *
+ * THE INTERPOLATION MARKER IS A NUL, NOT A SPACE, and it looks like a space in
+ * every editor. `keyOf` below already uses one as a joiner, so it is this
+ * file's convention rather than a novelty. Do not "tidy" it into a real space:
+ * the split would then break on ordinary whitespace and shred
+ * "per spin while ON" into four one-word fragments, each too short for
+ * LABEL_SHAPE, and this defect would pass again for a brand new reason.
+ */
+export function textFragments(node) {
+  let out = '', depth = 0
+  for (const ch of node) {
+    if (ch === '{') { depth++; if (depth === 1) out += ' '; continue }
+    if (ch === '}') { if (depth > 0) depth--; continue }
+    if (depth === 0) out += ch
+  }
+  return out.split(/[ ·•|/]+/).map((s) => s.trim()).filter(Boolean)
+}
+
+/**
+ * DELIBERATE English, exempt on its MERITS rather than frozen as debt. R041.
+ *
+ * These are the SOCIAL branch of a ternary whose real-money branch is now keyed.
+ * They are not awaiting translation and never will be: social sessions are
+ * pinned to `en` before first paint by `stores/socialLocale.ts`, enforcing the
+ * platform's own guideline 46 ("English is the only supported language in Social
+ * Mode"), so there is no second locale for them to be wrong in.
+ *
+ * Keyed `file|text` rather than by bare text, for the same reason the sibling
+ * gate scopes its debt by file: a bare exemption would also excuse a new `Play`
+ * written tomorrow in another component.
+ */
+const BY_DESIGN = new Map([
+  ['ReplayMode.svelte|Play',
+    "social branch of the replay cost line; the platform's own replacement for 'Bet', and social is en-only"],
+  ['ReplayMode.svelte|Token',
+    "social branch of the replay currency line; 'currency' is in vocabulary.ts NOT_SUBSTITUTED because a "
+    + 'blanket rewrite would corrupt the ISO code labels, so the swap is made at the render site and is '
+    + 'proved by replay_contract_gate.mjs rather than asserted'],
+])
 
 function scanTree() {
   const dir = join(SRC, 'lib', 'components')
@@ -162,7 +241,7 @@ function scanTree() {
   const found = []
   for (const f of files) found.push(...findHardcoded(readFileSync(join(dir, f), 'utf8'), f))
   found.push(...findHardcoded(readFileSync(join(SRC, 'App.svelte'), 'utf8'), 'App.svelte'))
-  return found
+  return found.filter((h) => !BY_DESIGN.has(`${h.file}|${h.text}`))
 }
 
 const keyOf = (h) => `${h.file} ${h.text}`
@@ -209,6 +288,28 @@ function selfTest() {
     ['a mute toggle', true,
       () => findHardcoded(`<script></script>\n<b>{$isMuted ? 'Unmute' : 'Mute'}</b>`, 'X.svelte')
         .some((h) => h.text === 'Mute')],
+    // ── R041. The class rule 3 could not see, and the reason it shipped. ──────
+    // FeatureMenu:435 rendered "per spin while ON" to all sixteen locales while
+    // this gate printed PASS, because rule 3 read `[^<>{}\n]`: a text node
+    // containing an interpolation did not match AT ALL, so the English either
+    // side of it was never a candidate. The pre-submission hunt found it by
+    // hand; the gate could not have. Seeded in the form it really occurs,
+    // interpolation and separator included, per convention (p).
+    ['R041: an English literal ADJACENT to an interpolation inside one text node, '
+      + 'which is the exact shape that shipped at FeatureMenu.svelte:435', true,
+      () => findHardcoded(
+        `<script></script>\n<p>{fsCostLabel(m.cost, $locale)} per spin while ON · <span>{price(m.cost)}</span></p>`,
+        'X.svelte').some((h) => h.text === 'per spin while ON')],
+    ['R041: the same class trailing an interpolation, the WinBreakdown form, '
+      + 'which the gate header claimed to catch and never did', true,
+      () => findHardcoded(`<script></script>\n<span>{current.ways} ways</span>`, 'X.svelte')
+        .some((h) => h.text === 'ways')],
+    ['NEGATIVE CONTROL: a text node that is ONLY an interpolation stays clean, '
+      + 'so widening rule 3 does not report every expression in the tree', false,
+      () => findHardcoded(`<script></script>\n<span>{formatWin(x, c, l)}</span>`, 'X.svelte').length > 0],
+    ['NEGATIVE CONTROL: a keyed call carrying a NESTED object literal, the shape '
+      + 'R041 introduced at WinBreakdown, must not leak its own braces as text', false,
+      () => findHardcoded(`<script></script>\n<span>{$tr('waysCount', { n: current.ways })}</span>`, 'X.svelte').length > 0],
     ['NEGATIVE CONTROL: a keyed string is not flagged', false,
       () => findHardcoded(`<script></script>\n<div>{$tr('hudSession')}</div>`, 'X.svelte').length > 0],
     ['NEGATIVE CONTROL: a CSS class is not prose', false,
@@ -264,5 +365,7 @@ if (failures) {
   console.error(`\nHARDCODED STRING GATE: FAIL (${failures})`)
   process.exit(1)
 }
-console.log(`\nHARDCODED STRING GATE: PASS (${entries.length} frozen string(s) still outstanding, `
-  + 'each needing a real translation in fifteen locales)')
+console.log(entries.length === 0
+  ? `\nHARDCODED STRING GATE: PASS (0 outstanding; ${BY_DESIGN.size} exempt by design, each with its reason above)`
+  : `\nHARDCODED STRING GATE: PASS (${entries.length} frozen string(s) still outstanding, `
+    + 'each needing a real translation in fifteen locales)')

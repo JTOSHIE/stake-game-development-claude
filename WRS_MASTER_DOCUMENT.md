@@ -288,6 +288,18 @@ are pointers rather than restatements:
   layer) and GAP 3 (five shipped assets with no master and no generator) BEFORE estimating a
   next title, because neither is visible from this chain.
 
+### 7c. Queued for Future Spinner, not yet run
+
+- **PROSE_NUMERAL_LOCALE_PASS** (queued 2026-08-10 by Fable ruling block R041 TASK 8).
+  The TR-037 defect class, in the one place TR-037 did not reach. **Figures written into
+  PROSE are English-formatted in all sixteen locales** (`5,000×` in every `rulesMaxWin`
+  string), **while the mode cards beside them are locale-formatted** by `fsModes.ts`'s
+  `fsMaxWinLabel`, which passes the locale to `toLocaleString`. In German and Turkish the
+  comma reads as a DECIMAL separator, so one screen can punctuate the same quantity two
+  ways. R041 pinned `5,000×` on purpose so the ROUND-scope rewording could land without
+  waiting on the numeral question; this item is that question. Its own brief unless the
+  owner strikes it.
+
 ## 8. STANDING ANSWERS
 - User manual: none exists as a separate artefact anywhere on Stake; the in-game rules/paytable/UI guide is the user manual and a review requirement.
 - Technical docs for Stake: nothing beyond the uploaded math package and static frontend; internal evidence (3b) exists to answer reviewer questions and for our own verification discipline.
