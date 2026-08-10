@@ -300,3 +300,26 @@ PROVISIONAL.
 | REQ-230 | STUDIO | NO | `privacy.md:56` | SUMMARY ROW for privacy.md. COUNT OF STUDIO OBLIGATIONS ON US: ZERO. Every operative statement on this page is first-person Carrot Gaming ("we collect", "we use this data to", "We do not share", "We use strong security practices", "We retain your data only as long as necessary"), i.e. obligations on Carrot Gaming Pty Ltd as controller, plus a GDPR rights list the studio may exercise by contacting support@stake-engine.com. The page is about DEVELOPER personal data, never player data; it places nothing on the artefact and nothing on our company beyond the registration items at R9-30. | 1 | R9-31 |
 | REQ-231 | STUDIO | NO | `giveaway_terms.md:34` | SUMMARY ROW for giveaway_terms.md. NINE remaining lines carry a normative marker and are commercial or legal obligations on the entrant rather than on the build: lines 21 (agreement to the Rules, the Terms and the Privacy Policy, with the Rules prevailing on inconsistency), 30 (entries after the Closing Date not considered), 34 and 36 (18-plus, account, Excluded Territories, ineligible persons, void entries), 44 (each game independently rated, restating R9-36), 54 (consent to the winner's name or username being announced), 64 and 68 (prize non-transferable, and all taxes, duties, levies, import and customs costs the winner's sole responsibility), 72 (non-exclusive perpetual royalty-free promotional licence over the entry including game name and screenshots, plus an originality warranty and indemnity) and 92 (void where prohibited, Victorian law and jurisdiction). None can be violated by the artefact's content or strings. | 1 | R9-37 |
 | REQ-232 | STUDIO | NO | `payments.md:18` | SUMMARY ROW for payments.md. SEVEN operative lines, all commercial elections or platform-side mechanics on the studio's revenue rather than on the build: the per-team model election and its next-month effective date (line 18), the two models and rates, 10% of actual GGR or 7.5% of expected GGR (lines 20 to 22), the GGR formula "GGR = Total Bets − Total Wins Paid to Players" (line 26), carried-forward negative balance with no time limit and no out-of-pocket payment to Stake (lines 33, 43 to 46), that debt carried into the 7.5% model must still be earned off (line 57), and the payout cycle, first of the month with funds within 12 hours (line 82). NOTED FOR THE MARSHAL, not raised as a row: line 83 reads "We pay out any amount above $0.00 — even $0.10", while terms.md:395 sets a USD $1,000 accrual threshold below which nothing is paid and the amount rolls over. The two documents state different payout floors; this shard records both quotes and does not resolve them. | 1 | R9-39 |
+
+## ADDENDUM 2026-08-10, R043 close-out: rows moved by the run, and one superseded source page
+
+The register above stands as built against the 2026-07-29 capture; this dated addendum
+records what the R043 run changed rather than rewriting history.
+
+**Requirements moved by this run:**
+
+| REQ | Was | Now | Evidence |
+|---|---|---|---|
+| REQ-095 (replay drives the complete animation AND AUDIO pipeline) | Walk W05 found the audio half reduced: only GameGrid's own reel cues fired, the win sound and wincap cue never, and a feature replay skipped its triggering spin | **SATISFIED**: the win-presentation and wincap cues fire at live play's own call points, and a feature replay animates its triggering spin (scatter lands audible) through the same pipeline | `frontend/scripts/r043_replay_audio_proof.mjs`, 10 assertions on the shipped bundle plus seeded self-test; frames and cue trace at `reports/screens/r043-replay-audio/` |
+| REQ-112 / REQ-130 (every round closed by end-round; the game itself settles) | Satisfied for the success path; the FAILURE path refunded the stake on screen while the RGS held the round open (blocker B12) | **SATISFIED INCLUDING THE FAILURE MODE**: a settle failure now fails closed, the debit is never refunded on assumption, the settle-failed guard blocks betting, and the reload path settles through the idempotent end-round leg | `frontend/scripts/r043_settle_failure_proof.mjs`, 17 assertions; `sessionRecovery.resyncAfterSpinRejection` |
+| REQ-113 (resume an active round from authenticate) | Satisfied at boot | Unchanged at boot, and now ALSO the recovery surface for a mid-session settle failure, per the pinned-client derivation in `sessionRecovery.ts` | same proof, scenario B |
+
+**One source page superseded.** Every `approval_guidelines_math_verification.md` citation
+above (REQ-210 to REQ-223 among others) cites the 2026-07-29 capture of a page the
+platform REWROTE by 2026-08-10: the new capture at
+`docs/stake-engine-live/2026-08-10/approval_guidelines_math_verification.md` publishes a
+Critical Tests table, bet-level template caps and per-rating CVaR and tail figures that
+the old page did not state (COMPLIANCE_WATCH.md, 2026-08-10 entry, STOP item 1). The
+maths rows of this register need re-enumeration against the new page in Fable's
+verification round; they are not edited here because each cites its capture by date and
+stands as a true record of that capture.

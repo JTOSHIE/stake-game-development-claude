@@ -368,6 +368,17 @@ still shipped English, was corrected as B10 rather than quietly edited.
 
 ## H. The settle-failure guard covers RECOVERY and not ORDINARY PLAY
 
+**RULED AND EXECUTED, 2026-08-10, R043 PHASE 4, closing blocker B12.** The
+unlocked-first, fail-closed design shipped: on any live rejection the
+optimistic debit is never handed back on assumption; `resyncAfterSpinRejection`
+(sessionRecovery.ts) adopts the authenticated balance and an active round
+engages this very guard, the reload path settling through recovery. The
+conditional lock sanction was NOT triggered: the pinned official client
+evidences mid-session authenticate as a pure read (derivation with citations
+in sessionRecovery.ts). Proof `r043_settle_failure_proof.mjs`, 17 assertions,
+seeded on the superseded source, CI browser leg. The original finding stands
+below as history.
+
 Found 2026-08-10, same review. A money-path defect, and the guard added on
 2026-08-09 does not reach it.
 
@@ -455,6 +466,12 @@ wrong basis while a particle was resolved.
 
 ## J. TWO MORE EN-FORM FIGURES THE NUMERAL RULING DID NOT NAME
 
+**RULED AND EXECUTED, 2026-08-10, R043 PHASE 1b.** The one-line extension this
+section asked for was ruled: the A2 mechanism now carries the tokens 1.6 and
+1.25, the ten comma-decimal locales render 1,6 and 1,25, and the frozen
+machine_tell entry retired WITH the fix, both directions enforced. The
+original finding stands below as history.
+
 Raised 2026-08-10 while executing R042 TASK A2, by the scan that ruling asked for.
 
 TASK A2 ruled the figure tokens `5,000` and `96.35`. **`modeOverboostBlurb`
@@ -480,6 +497,14 @@ to hide what it can see would be the worse of the two failures.
 ---
 
 ## K. THE SAME SCATTER CLAIM SURVIVES ON THE OLD BASIS, AND NOW CONTRADICTS ITSELF
+
+**RULED AND EXECUTED, 2026-08-10, R043 PHASE 1a.** `rulesOverdriveTrigger`
+states the base bet in all sixteen locales plus the social sibling, per the
+ratified A3 substitution table (literal where the source phrase appeared,
+ruled stem elsewhere, every stem recorded in the session report), and the
+discovery method that found this section is now the CI instrument
+`kit_basis_gate.mjs`, zero-asserting every superseded basis phrase against
+the BUILT kit. The original finding stands below as history.
 
 Found 2026-08-10 while verifying R042 A3 against the SHIPPED KIT rather than the
 source. **A3 was scoped, in terms, to "rulesMaxWin and rulesScatterMult only".

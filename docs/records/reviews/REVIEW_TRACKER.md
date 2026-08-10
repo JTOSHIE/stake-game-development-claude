@@ -12,6 +12,19 @@ Australian English, no em dashes or en dashes.
 
 ## Status of the source ingest
 
+### The R043 close-out run (2026-08-10)
+
+**EXECUTED.** FABLE MEGA-BRIEF R043 (saved verbatim at
+`reports/briefs/FS_R043_MEGA_CLOSEOUT_Prompt.md`, ratified by the owner's paste) ran all
+seven phases on PR #118. The R042 currency table below is updated in place with each
+item's closing state, dated and cited; TR-122 records the doc_currency predicate gap
+(fresh-context major 19); the end-state register for the whole run, mapping every
+blocker, section, actioned major and AF item to CLOSED, OPEN or SKIPPED with evidence,
+is `reports/audit/AUDIT_CLOSURE_2026-08-10.md`. Fresh-context majors actioned here: 1,
+2, 6 (locale instrument repaired, PART 3 opens the paytable, wired to CI), 7 (dead
+wiring reachability), 8 to 11 (games documentation currency, two as LOCKED_FILE_DEBTS),
+12 and 13 (rules block wording), 17 to 19 (self-assessment rows and the TR-122 record).
+
 ### Fable independent audit, and the R042 round (2026-08-10)
 
 **RESOLVED.** The Fable independent audit of `main` at `7f79148` is saved verbatim at
@@ -38,12 +51,12 @@ make, not the builder.
 | G, responsiblePlayBody in fifteen locales | **CLOSED**, Brief A, translations supplied by the ruling | OWNER_RULINGS section G |
 | I, max-win basis (base bet) | **CLOSED**, Brief A task A3; the basis is now PROVEN from primary data by the audit: cap 500,000 centibets in all five tables including the 100x and 400x modes | OWNER_RULINGS section I; audit section 1 |
 | L / B8, autoplay explicit confirm | **CLOSED**, Brief B; audit VERIFIED the split handlers, the rewritten gate and the wallet-call proof | OWNER_RULINGS section L; audit section 2 |
-| H / B12, live settle failure | **OPEN**, ranked 1; next brief R042-D, unlocked-first design | OWNER_RULINGS section H; audit section 7.1 |
-| K, rulesOverdriveTrigger basis | **OPEN**, ranked 2; wording ruled (base bet, A3 substitution table), execution awaits R043; the surviving "total bet" string confirmed wrong from primary data | OWNER_RULINGS section K; audit sections 1 and 7.2 |
-| J, modeOverboostBlurb figures | **OPEN**, ranked 3; one-line extension of the A2 mechanism, R043 | OWNER_RULINGS section J; audit section 7.3 |
-| Majors 12 and 13, Overdrive rules block wording | **OPEN**, ranked 4; corrected sixteen-locale text owed by Fable in R043 | Audit section 7.4 |
-| B9, silent Bet Replay | **OPEN**, ranked 5; Brief C, book events onto the existing audio pipeline | Audit sections 5 and 7.5 |
-| Q6, the 400-body field | **UNKNOWN**, armed; needs one owner-pasted launch URL | Audit section 7.6 |
+| H / B12, live settle failure | **CLOSED 2026-08-10, R043 PHASE 4**, unlocked-first and fail-closed: on any live rejection the debit is never refunded on assumption; `resyncAfterSpinRejection` (sessionRecovery.ts) adopts the authenticated balance and an active round engages the settle-failed guard, the reload path settling through recovery. The conditional lock sanction was NOT triggered: the pinned client evidences mid-session authenticate as a pure read (derivation with citations in sessionRecovery.ts). Proof `r043_settle_failure_proof.mjs`, 17 assertions, seeded on the superseded source, CI browser leg; unit branches in sessionRecovery.test.ts | OWNER_RULINGS section H; R043 PHASE 4 commit; reports/screens/r043-settle-failure/ |
+| K, rulesOverdriveTrigger basis | **CLOSED 2026-08-10, R043 PHASE 1a**: base-bet basis in sixteen locales plus the social sibling, A3 table applied literally where the source phrase appeared (ja, ko, ru, zh) and by the ruled stem elsewhere; `kit_basis_gate.mjs` now zero-asserts every superseded basis phrase against the BUILT kit in CI, seeded | OWNER_RULINGS section K; `r043_verify.mjs` |
+| J, modeOverboostBlurb figures | **CLOSED 2026-08-10, R043 PHASE 1b**: the A2 mechanism extended to 1.6 and 1.25, ten comma-decimal locales render 1,6 and 1,25, the machine_tell freeze retired with the fix | OWNER_RULINGS section J; `numeral_locale_pass.mjs` |
+| Majors 12 and 13, Overdrive rules block wording | **CLOSED 2026-08-10, R043 PHASES 1c and 1d**: rulesOverdriveModes replaced wholesale per locale (all five bet modes, base-bet cap basis, locale-correct figures); rulesOverdriveMeter carries the NITRO OVERDRIVE 5x entry qualification directly after the starting 1x, every locale and social | `r043_verify.mjs`, 87 checks against the committed brief |
+| B9, silent Bet Replay | **CLOSED 2026-08-10, R043 PHASE 2**: win-presentation and wincap cues wired at live play's own call points; a feature replay animates its triggering spin through the same pipeline, scatter lands included; mute and volumes honoured by construction. Proof `r043_replay_audio_proof.mjs`, 10 assertions, frames and cue trace committed | reports/screens/r043-replay-audio/ |
+| Q6, the 400-body field | **UNKNOWN**, still armed; the R043 paste supplied the PORTAL address, which is login-gated (verified by fetch: a client-rendered shell with no session material), so the capture still needs the session-bearing GAME url from the owner's logged-in browser. `tools/capture_rgs_400.sh` unchanged | Audit section 7.6; R043 session report |
 
 ### Round three (2026-07-28)
 

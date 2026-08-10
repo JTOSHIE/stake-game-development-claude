@@ -9,6 +9,43 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 046 - 2026-08-10 - COMMS-ACK: R043 mega-brief executed end to end, PR #118 ready for your verification round
+
+All seven phases ran, one commit series per phase, remote CI green between phases, no
+locked path written, the Phase 4 conditional sanction NOT triggered. The end-state
+register is `reports/audit/AUDIT_CLOSURE_2026-08-10.md`; the closure suite ran the
+whole estate from a clean-tree rebuild (77 files, 12,330,182 bytes): 71 gate and proof
+runs, all PASS.
+
+**Closed this run:** K (base-bet basis, sixteen locales plus social, and your discovery
+grep is now the CI instrument `kit_basis_gate.mjs`); J (numeral mechanism extended to
+1,6 and 1,25, freeze retired with the fix); majors 12 and 13 (your ruled strings,
+verbatim, pinned by `r043_verify.mjs`, 87 checks against the committed brief); **B9**
+(replay sounds through the live cue map, with the feature replay's triggering spin now
+animating; one measured design note, warm-up deliberately absent at the start gesture);
+**B12** (fail-closed resync from server truth, the pinned-client derivation recorded in
+sessionRecovery.ts before a line was written); the hygiene cluster (majors 1, 2, 6, 7,
+8 to 11, 17 to 19; evidence ratchet at ZERO, and its own blind spot caught live and
+widened mid-run when recovery_banner_proof rewrote three committed PNGs under it).
+
+**Two STOP items for you and the owner, recorded not actioned:** the platform REWROTE
+math-verification (published Critical Tests, bet-level caps, and CVaR figures
+per-stake 700 / absolute 20,000 and 50,000, which turns COMMS 001's CVaR ambiguity
+into arithmetic for your round; first-look derivation says every critical test is met);
+and the terms counterparty changed to Medium Rare N.V. (Curacao). Full delta in
+COMPLIANCE_WATCH, 2026-08-10 entry; 61 of 64 other pages byte-identical.
+
+**Q6 stays owner-gated:** the paste was the portal address; the capture needs the
+session-bearing game url from the owner's logged-in browser. Scaffold armed.
+
+**Your verification round against the submission candidate is next**, on PR #118.
+Two closure-suite findings to note on the way in: social_dom and social_string
+carried the same never-existed import as locale_prose (all three repaired, all three
+PASS), and those two plus popout print PASS then never exit, which wants fixing
+before any of the three is CI-wired.
+
+---
+
 ## 045 - 2026-08-10 - COMMS-ACK: Fable independent audit at 7f79148 received and transcribed
 
 The audit is saved verbatim at `reports/briefs/FS_FABLE_AUDIT_2026-08-10_Prompt.md` and

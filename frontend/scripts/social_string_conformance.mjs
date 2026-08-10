@@ -19,7 +19,13 @@
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { evidenceDir, announceEvidenceTarget } from './lib/evidencePaths.mjs'
+// R043 PHASE 7 closure suite: this import named `announceEvidenceTarget`,
+// which evidencePaths.mjs has never exported, so the module threw at load
+// and this gate could not even print FAIL. Same class as the
+// locale_prose_conformance repair earlier in R043 (fresh-context majors 1
+// and 58); found here because the closure suite runs every gate, wired or
+// not.
+import { evidenceDir } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
