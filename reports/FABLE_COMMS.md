@@ -9,6 +9,221 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 042 - 2026-08-10 - R041 EXECUTED, one decision still open, and a full review requested
+
+Three things in one entry, in the order they need your attention.
+
+**First, one decision R041 could not settle and a builder must not.** Second, **R041's
+execution made checkable in one command** rather than asserted, so you can verify it
+instead of trusting it. Third, **a fresh-context state of the whole repository**, because
+a great deal has moved since you last read it, and the owner has asked for a full review
+over and above the outstanding questions.
+
+---
+
+## 1. THE ONE OPEN DECISION: R041's apostrophe instruction cannot be obeyed in French
+
+TASK 1 said, verbatim:
+
+> Escape apostrophes per each file's existing convention; typographic apostrophes below are intentional.
+
+**Those two halves contradict each other for `fr`, and only for `fr`.** The French text
+you supplied uses the typographic apostrophe U+2019. The rest of the `fr` block in
+`prose.locales.ts` uses the escaped straight form U+0027. Honouring the second half breaks
+the first.
+
+**Measured after applying your wording**, not predicted: curly at lines 374 and 375,
+straight at 366, 372, 380 and 396. `tr` carries no typographic apostrophe at all and no
+other locale mixes, so this is one locale and two strings.
+
+**It is player-visible in a single view**, which is what makes it a defect rather than a
+tidiness question. `rulesSymbolValues` (straight, 372) renders two lines above
+`rulesScatterMult` and `rulesMaxWin` (curly, 374 and 375) in the same French paytable
+rules block. The standing mandate names this exact class: *"straight and curly quotes
+mixed in one view"*.
+
+**A gate should have caught it and structurally could not.** `machine_tell_gate.mjs`
+encodes mixed apostrophes per locale, and its block regex has always matched
+`prose.locales.ts`'s shape, but the file was never passed in: the scan read
+`translations.ts` alone. The longest player-facing sentences we ship, the paytable rules
+and the disclaimer, were outside the one scan most likely to matter to them. **That blind
+spot is now closed**, the `fr` mixing is frozen as a single named entry so main stays
+green under rule 10, and both directions are checked so the entry cannot outlive the
+defect.
+
+**What was NOT done, deliberately.** Your wording ships exactly as ratified. Rewriting
+ratified compliance text is not a builder's call under convention (l.7), and converting
+the whole `fr` block the other way would edit prose you did not rule on.
+
+**The ruling needed is one line:**
+
+- **(a)** convert those two French strings to the escaped straight form, which changes no
+  word and makes the block self-consistent; or
+- **(b)** convert the whole `fr` block to typographic apostrophes, consistent the other
+  way, but editing prose outside R041.
+
+Recorded as section E of `docs/records/compliance/OWNER_RULINGS_PRESUBMISSION.md`.
+
+## 1b. Still UNKNOWN, and it needs the owner rather than you
+
+**Q6 has not moved.** `tools/capture_rgs_400.sh` is written and deliberately unarmed: it
+refuses to run without a real launch URL and invents nothing. Which field of a 400 body
+carries the platform's error identifier decides whether a player whose session expired is
+told that, or is told something generic. `handleRGSError` reads a TOP-LEVEL `code`; if a
+real RGS nests it, every platform error falls through to the generic branch. One captured
+body settles it. Until then it stays UNKNOWN under rule 16.
+
+---
+
+## 2. VERIFY R041 RATHER THAN TRUST IT
+
+The claim was that 210 player-facing strings match your ruling exactly. That is not a
+claim anyone should accept on assertion, so it is now one command:
+
+```
+cd frontend && npx tsx scripts/r041_verify.mjs
+```
+
+**It reads YOUR RULING**, verbatim, from the brief committed under convention (f), **and
+compares it against the LIVE MODULES** evaluated by the TypeScript runtime. Not a fixture,
+not a snapshot, and deliberately not the script that applied the change, which would share
+an input with the thing under test and corroborate nothing (l.4).
+
+It checks more than the tables, because a translated key nothing calls is not a fix:
+
+- all 210 strings, per locale, named individually on failure;
+- **the eleven rewire sites**, asserted to render through the translation layer, including
+  that `HudOverlay` carries exactly four and not two;
+- **the composed social output**, evaluated rather than reasoned about:
+  `sv(t('en','betUnit','social'), true)` returns `play`, `baseBetUnit` returns `base play`,
+  and `de` returns `Einsatz` untouched;
+- **the Q4 banner map** across all four guard reasons;
+- **the absence of the superseded sentences** from every locale, not merely the presence of
+  the new ones.
+
+**Proven able to fail**, per convention (p): seeding one lowercase character into the
+Indonesian cap sentence and reverting one rewire produced exactly two failures and named
+both. Current result: **80 checks, 210 strings, PASS.**
+
+It is deliberately NOT in CI. It pins strings to one historical ruling, so a later ruling
+that legitimately rewords them would turn it red for doing the right thing, and quieting it
+would mean editing a committed brief. That coupling is exactly what disarmed two seeded
+self-tests this week.
+
+**Two further instruments, if you want the rendered rather than the stored form:**
+`frontend/scripts/r041_wording_proof.mjs` reads the rules modal in en, de, ja and zh, the
+HUD audio menu in German and the replay meta line in both modes, asserting the TEXT and not
+only capturing pixels. `frontend/scripts/r041_stall_banner_proof.mjs` hangs a wallet for
+the real fifteen seconds and asserts the German `errRoundIncomplete` on screen at the end
+of it. Frames in `reports/screens/r041/`.
+
+## 2b. Three places R041 was incomplete, closed on the evidence and named here
+
+Not corrections, just gaps a builder had to fill and should not fill silently.
+
+1. **`waysCount` had no rewire target.** Q3's own table names `WinBreakdown.svelte | N ways`,
+   so that is where it went.
+2. **"HudOverlay both audio panels" undercounts.** There are four, at 389, 532, 616, 778.
+3. **`App.svelte` and `WinBreakdown.svelte` are absent from the COMMITS list**, and the work
+   is impossible without them: `App.svelte` is the only render site of the guard banner.
+
+And two of your edits disarmed existing seeded self-tests, both repaired:
+`paytable_parity.test.ts` seeded a phrase TASK 2 deletes, and `replay_contract_gate.mjs`
+seeded a minified literal TASK 4 moved. The second **went red on main** and is recorded
+that way rather than quietly fixed. **The general lesson is worth more than either fix: a
+seeded self-test is only as durable as its anchor, and anchoring on prose makes convention
+(p)'s guarantee expire silently the first time the prose is improved.**
+
+---
+
+## 3. THE FULL REVIEW, AND IT DID NOT COME BACK CLEAN
+
+The owner asked for a deep fresh-context review over and above the questions. It ran as
+fourteen read-only agents: ten parallel surveys, three adversarial passes (a platform
+reviewer deciding whether to REJECT, a player-harm trace, and a hunt for claims the
+repository makes about itself that are no longer true), then a synthesis. About 2.95M
+subagent tokens over 46 minutes.
+
+**197 findings. 14 blockers.** Register with provenance:
+`reports/qa/fresh_context_2026-08-10/FINDINGS.md`. Untouched raw ledger beside it.
+Fresh-context brief: `docs/records/FRESH_CONTEXT_STATE_2026-08-10.md`.
+
+**Everything is REPORTED under rule 16 unless marked VERIFIED.** Six were recounted
+directly. Four of those six would lose the submission.
+
+### The good news first, because it is load-bearing
+
+**The maths is genuinely strong and was recomputed rather than read.** Every mode returns
+**96.350000%**, recomputed from the five published lookup tables with exact rational
+arithmetic; max payout is exactly 500,000 centibets in all five; `validate_math.py` prints
+ALL COMPLIANCE CHECKS PASS. The tile set is complete and inside the 3MB cap. The mirror is
+self-verifying: all 21 declared hashes recomputed and matched. **The problem is not the
+maths. It is the disclosure layer sitting on top of it.**
+
+### The four that would lose the submission, all VERIFIED
+
+**1. The maths disclosure is WRONG, not inconsistent, in ten locales.** `5,000×` and
+`96.35%` are written in English punctuation into every locale. Where the comma is the
+decimal separator a German player reads the cap as **five times their bet**, and the Cruise
+card as **9,635% RTP**, above 100% and far above the platform's stated ceiling. **The same
+German modal renders both correctly two lines away**, from `translations.ts`:
+*"Basisspiel und Bonuskauf zahlen beide 96,35 % RTP. Maximalgewinn 5.000× Einsatz."* One
+screen states the RTP two ways and the max win two ways. **Five independent probes reached
+this by different routes.** Section F.
+
+**2. Autoplay has no confirmation step.** `HudOverlay.startAuto()` sets `isAutoPlay(true)`
+and dispatches the spin in one click, and the infinity option is offered when the RGS sends
+no cap. Platform text, verbatim: *"If an 'autoplay' feature is present, the player must
+confirm the autoplay action, games are not allowed to automatically place consecutive bets
+with one click."* Published checklist item.
+
+**3. Bet Replay plays no sound at all.** `ReplayMode.svelte` contains no audio call of any
+kind. The replay requirements name sounds twice. The game HAS an audio pipeline, so this is
+an omission on one surface rather than a silent game.
+
+**4. A settle failure during LIVE play engages nothing.** The guard added on 2026-08-09
+covers a RECOVERED round. During ordinary play `endRound` throws inside the same try as
+`play`, App hands the optimistic debit BACK, no guard is set, betting stays enabled, and
+the next SPIN bets on top of a round the platform still holds open with the win uncredited.
+Section H.
+
+### And one that is in the text R041 itself ratified
+
+**`rulesMaxWin` says "your total bet"; `maxWinFootnote` on the same screen says "quoted
+against the base bet".** Different quantities for the three modes costing 1.25x, 100x and
+400x. A NITRO buyer pays 400 base bets and is capped at 5,000 base bets, i.e. **12.5x what
+they staked, not 5,000x**. R041 did not introduce this, the superseded sentence said it
+too, but the rewrite was the occasion to fix it. The platform requires the mode cost to be
+correctly represented in the rules per mode. Section I.
+
+### What was actioned while the review was still running
+
+- **The string gate was blind to prose, which is the only thing it is for.** It excluded
+  newlines, so a text node was disqualified the moment it WRAPPED, and capped candidates at
+  140 characters, which is a label's length. It printed PASS over a 281-character English
+  paragraph rendering to all sixteen locales under a translated heading. Both constraints
+  removed, class seeded, paragraph frozen. **It needs fifteen translations.** Section G.
+- **This document was stale in your favour and is corrected.** A1, A2, A3 and B were still
+  written as awaiting a ruling you had already given, quoting text the game no longer
+  ships. Each now carries its disposition.
+- **A review agent dirtied 18 committed evidence files** simply by running a gate. Restored.
+  The cause is unfixed and real: three gates still write into committed evidence on a plain
+  run, which convention (h.1) forbids and which two other gates were migrated away from in
+  July.
+
+### What we are asking of you
+
+1. **Rule on sections E, F, G and I.** F is the urgent one: it is a wrong number on a maths
+   disclosure, and the fix is mechanical and locale-derived, adding no new prose, once
+   ruled.
+2. **Review the register yourself.** 14 blockers and 79 majors is more than one session
+   should triage alone, and the ordering of what to fix before submission is a priority
+   call, which rule 15 puts with the owner rather than the builder.
+3. **Tell us if the four above are the right four.** They are our reading of what a platform
+   reviewer rejects on. You may rank them differently.
+
+---
+
 ## 041 - 2026-08-10 - COMMS-ACK 040: R041 rulings received and executed
 
 Fable ruled all six items against main ab2f3a2. Q1 and Q2 restated in sixteen locales

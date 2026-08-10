@@ -302,6 +302,15 @@ instruction was given as a CONSISTENCY deferral, and the measurement says it is 
 WRONG NUMBER on a maths disclosure, which convention (l.8) sends to the owner and
 Fable rather than to a builder's judgement.
 
+**A THIRD SITE, AND ITS OWN COMMENT NAMES THE DEFECT.** `MaxWinCelebration.svelte`
+renders a hardcoded `5,000` literal, and the comment directly above it reads:
+
+> Same quantity, two glyphs, two screens: the mandate's "decimal or currency formats that disagree". QUALITY_CHARTER.md Q-12.
+
+So the class was identified in a source comment, beside the literal, and shipped
+anyway. `modeOverboostBlurb` carries the same problem. **Thirty values across ten
+locales plus two component literals**, on current count.
+
 **The ruling needed:** confirm this is fixed NOW rather than in a later pass, and
 confirm the method. Deriving both figures at render time from one locale-aware
 formatter changes no wording in any locale and adds no new prose, which is why it
@@ -364,6 +373,43 @@ place the protocol still mandates serial care.
 **Needed: a brief, and a decision on the seam.** The non-locked candidate is
 `walletTimeout.ts`, which already wraps every `/wallet/` fetch and can see that it
 was `end-round` that failed.
+
+---
+
+## I. THE MAX-WIN RULE AND ITS OWN FOOTNOTE STATE DIFFERENT BASES
+
+Found 2026-08-10 by the review. **It is in the sentence R041 ratified**, which is why it
+goes to Fable rather than being quietly reworded.
+
+Two strings render on the same paytable screen:
+
+> `rulesMaxWin`: Maximum win per game round is capped at 5,000× your **total bet**.
+>
+> `maxWinFootnote`: Max win is quoted against the **base bet**.
+
+**They are different quantities for three of the five modes.** The costs are 1.0, 1.0,
+**1.25**, **100** and **400** times the base bet (`fsModes.ts:73-113`). A player who buys
+NITRO OVERDRIVE pays 400 base bets and is capped at 5,000 base bets, which is **12.5 times
+what they staked, not 5,000 times**. Read against "your total bet", the rule overstates the
+cap by a factor of 400 on that mode.
+
+**The project already knows this ambiguity exists.** `maxWinFootnote` was created by an
+OWNER AUDIT ROUND 4 ruling for exactly this reason, and `fsModes.ts:189-201` records it:
+*"Where the cap is quoted next to a MODE COST it must be unambiguous about what the
+multiplier applies to, because the buy tiers cost 100x and 400x and a bare 5,000x invites
+the reading 'is that 5,000x the 400x I just paid'."* The footnote fixed the MODE CARDS. The
+general rules sentence still says "total bet".
+
+**R041 did not introduce this**, the superseded sentence said "your total bet" too. But the
+rewrite was the occasion to fix it and the phrase survived, so it is raised now rather than
+after a reviewer finds it.
+
+**The platform requires this per mode**, from the dated mirror:
+
+> Verify the mode cost is correctly represented in the game rules for each mode.
+
+**The ruling needed:** the corrected phrasing, in all sixteen locales, or a confirmation
+that "total bet" is intended to mean the base bet throughout and the footnote is sufficient.
 
 ---
 
