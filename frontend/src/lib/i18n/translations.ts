@@ -144,6 +144,13 @@ export interface Translations {
   volVeryHigh:          string
   volExtreme:           string
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     string
+
+
 
   // ── Overdrive Free Spins feature (optional: served from featureI18n via t) ──
   overdrive?:              string
@@ -330,6 +337,13 @@ const en: Translations = {
   volVeryHigh:          'Very High',
   volExtreme:           'Extreme',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Start autoplay',
+
+
 
 }
 
@@ -438,6 +452,13 @@ const ar: Translations = {
   volHigh:              'مرتفع',
   volVeryHigh:          'مرتفع جدًا',
   volExtreme:           'قصوى',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'بدء اللعب التلقائي',
+
 
 
 }
@@ -548,6 +569,13 @@ const de: Translations = {
   volVeryHigh:          'Sehr hoch',
   volExtreme:           'Extrem',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Autoplay starten',
+
+
 
 }
 
@@ -656,6 +684,13 @@ const es: Translations = {
   volHigh:              'Alta',
   volVeryHigh:          'Muy alta',
   volExtreme:           'Extrema',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Iniciar juego automático',
+
 
 
 }
@@ -766,6 +801,13 @@ const fi: Translations = {
   volVeryHigh:          'Erittäin korkea',
   volExtreme:           'Äärimmäinen',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Aloita automaattipeli',
+
+
 
 }
 
@@ -874,6 +916,13 @@ const fr: Translations = {
   volHigh:              'Élevée',
   volVeryHigh:          'Très élevée',
   volExtreme:           'Extrême',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Démarrer le jeu automatique',
+
 
 
 }
@@ -984,6 +1033,13 @@ const hi: Translations = {
   volVeryHigh:          'बहुत उच्च',
   volExtreme:           'अत्यधिक',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'ऑटोप्ले शुरू करें',
+
+
 
 }
 
@@ -1092,6 +1148,13 @@ const id: Translations = {
   volHigh:              'Tinggi',
   volVeryHigh:          'Sangat tinggi',
   volExtreme:           'Ekstrem',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Mulai putar otomatis',
+
 
 
 }
@@ -1202,6 +1265,13 @@ const ja: Translations = {
   volVeryHigh:          '非常に高い',
   volExtreme:           '極めて高い',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'オートプレイを開始',
+
+
 
 }
 
@@ -1310,6 +1380,13 @@ const ko: Translations = {
   volHigh:              '높음',
   volVeryHigh:          '매우 높음',
   volExtreme:           '극도로 높음',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     '자동 플레이 시작',
+
 
 
 }
@@ -1420,6 +1497,13 @@ const pl: Translations = {
   volVeryHigh:          'Bardzo wysoka',
   volExtreme:           'Ekstremalna',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Rozpocznij grę automatyczną',
+
+
 
 }
 
@@ -1528,6 +1612,13 @@ const pt: Translations = {
   volHigh:              'Alta',
   volVeryHigh:          'Muito alta',
   volExtreme:           'Extrema',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Iniciar jogo automático',
+
 
 
 }
@@ -1638,6 +1729,13 @@ const ru: Translations = {
   volVeryHigh:          'Очень высокая',
   volExtreme:           'Экстремальная',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Запустить автоигру',
+
+
 
 }
 
@@ -1746,6 +1844,13 @@ const tr: Translations = {
   volHigh:              'Yüksek',
   volVeryHigh:          'Çok yüksek',
   volExtreme:           'Ekstrem',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Otomatik oynatmayı başlat',
+
 
 
 }
@@ -1856,6 +1961,13 @@ const vi: Translations = {
   volVeryHigh:          'Rất cao',
   volExtreme:           'Cực cao',
 
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     'Bắt đầu quay tự động',
+
+
 
 }
 
@@ -1964,6 +2076,13 @@ const zh: Translations = {
   volHigh:              '高',
   volVeryHigh:          '很高',
   volExtreme:           '极高',
+
+  // ── R042 BRIEF B. Autoplay is a two-step action: a spin count SELECTS,
+  //    and this control is the only thing that starts a bet. Platform rule:
+  //    "games are not allowed to automatically place consecutive bets with
+  //    one click".
+  autoplayStartCta:     '开始自动旋转',
+
 
 
 }

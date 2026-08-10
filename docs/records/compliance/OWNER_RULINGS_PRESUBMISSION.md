@@ -516,6 +516,49 @@ was found by grepping the built kit for the German word A3 had just removed.
 
 ---
 
+## L. AUTOPLAY NOW TAKES TWO DELIBERATE ACTIONS
+
+**RULED AND EXECUTED, 2026-08-10, R042 BRIEF B, closing blocker B8.**
+
+**The platform rule**, quoted verbatim from the dated mirror:
+
+> If an 'autoplay' feature is present, the player must confirm the autoplay action, games are not allowed to automatically place consecutive bets with one click.
+
+**What shipped before.** One tap on a spin count set the limits, armed autoplay and
+dispatched the first bet. With no RGS cap the infinity option was one tap away too.
+
+**Fable reversed a prior Fable reading to get here**, and that is worth recording:
+`check_autoplay_confirm_gate.mjs` asserted in its own header that the count button
+WAS the explicit confirm, and policed that design faithfully. **A gate can be
+perfectly implemented and still be guarding the wrong property.**
+
+**The design.** `startAuto` split into `selectAuto` and `confirmAuto`. A count tap
+only selects, shows itself selected, and reveals a single Start control; Start is
+the only thing that begins a bet. Infinity is never pre-selected, and with nothing
+chosen there is no Start control at all, so there is nothing to hit by reflex. The
+RG clamp and the stop-condition wiring are unchanged, and the clamp now runs at
+selection as well as at commitment so the number shown is the number applied.
+
+**One-click start is impossible BY CONSTRUCTION rather than by convention.** The
+rewritten gate asserts that `isAutoPlay.set(true)` exists once, sits in the confirm
+handler, and that the selection handler cannot set the store, cannot dispatch a
+spin and cannot call confirm. Five seeded violations, including the exact prior
+design, all caught; the shipped component is the negative control.
+
+**Proved on behaviour as well as on code.** `r042b_autoplay_proof.mjs` drives the
+shipped bundle and COUNTS WALLET CALLS: choosing a count places **zero** bets,
+pressing Start places one. It also re-asserts every clause of the
+`responsiblePlayBody` paragraph against a control on screen, because that
+paragraph describes this menu and would have become false the moment it was
+redesigned. Frames in `reports/screens/r042b/`, with the superseded one-click menu
+preserved under `before/`.
+
+**A11y note:** the count buttons became `role="menuitemradio"` with `aria-checked`.
+The first attempt used `aria-pressed` on `role="menuitem"`, which is not a
+supported combination, and `svelte-check` said so.
+
+---
+
 ## C. One thing that cannot be settled from this repository at all
 
 `rgsService.ts` maps a platform error to a player-facing message by reading a

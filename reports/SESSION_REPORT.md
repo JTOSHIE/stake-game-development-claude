@@ -11412,3 +11412,69 @@ the BUILT UPLOAD KIT for the German word A3 had just removed, not the source. No
 gate could have caught it, since a bet BASIS is a claim about meaning rather than
 a form. Checking the artefact rather than the source is what found it, and that is
 worth repeating on the next pass.
+
+---
+
+# Session Report - R042 BRIEF B: AUTOPLAY EXPLICIT CONFIRM (2026-08-10)
+
+Brief saved verbatim at `reports/briefs/FS_R042B_AUTOPLAY_CONFIRM_Prompt.md`.
+Clean tree at start. No locked path touched.
+
+**Closes blocker B8.** One tap on a spin count used to set the limits, arm autoplay
+and dispatch the first bet, against the platform rule that games "are not allowed
+to automatically place consecutive bets with one click".
+
+## What changed
+
+`startAuto` split into `selectAuto` and `confirmAuto`, in all three HUD menu
+layouts (full, compact, mini). A count tap only selects; a single Start control
+appears and is the only thing that begins a bet. Infinity is never pre-selected,
+and with nothing chosen there is no Start control to hit by reflex. `autoplayStartCta`
+added in sixteen locales. The RG clamp and stop-condition wiring are unchanged, and
+the clamp now also runs at selection so the number shown is the number applied.
+
+## Why the gate was rewritten rather than extended
+
+`check_autoplay_confirm_gate.mjs` asserted in its own header that the count button
+WAS the explicit confirm, on a prior compliance read, and policed that design
+faithfully for weeks. **A gate can be perfectly implemented and still be guarding
+the wrong property.** It now asserts the structural claim: `isAutoPlay.set(true)`
+exists once, sits in the confirm handler, and the selection handler cannot set the
+store, cannot dispatch a spin and cannot call confirm. **One-click start is
+impossible by construction rather than by convention.**
+
+Five seeded violations, including the exact prior design, all caught; the shipped
+component is the negative control.
+
+## Two things I got wrong on the way, both caught by instruments
+
+1. **`aria-pressed` on `role="menuitem"`** is not a supported combination.
+   `svelte-check` said so immediately; the count buttons are now
+   `role="menuitemradio"` with `aria-checked`, which is the correct semantic for a
+   single-select group.
+2. **The proof ran against a STALE `dist`.** I changed the ARIA after the last
+   build and did not rebuild, so the proof read the old bundle and reported a
+   failure that did not exist in the source. This project has recorded that trap
+   before. The rebuild made it pass honestly.
+
+## Verification
+
+- Autoplay confirm gate: self-test 5 seeded / 1 negative control, live PASS.
+- `r042b_autoplay_proof`: drives the shipped bundle and COUNTS WALLET CALLS.
+  Choosing a count places **zero** bets; pressing Start places one. Every clause of
+  the `responsiblePlayBody` paragraph re-checked against a control on screen.
+- Green: hardcoded string, machine tell, locale completeness, dash, evidence
+  hygiene, r042_verify, responsibleGambling, autoplay RG soak, disclaimer
+  conformance, replay contract. `npm run check`: 505 files, 0 errors.
+- Frames in `reports/screens/r042b/`, with the superseded one-click menu preserved
+  under `before/`.
+
+## FOR THE NEXT SESSION
+
+**R042-D, the live settle failure, remains next.** It is the one open item that
+costs a player money and is untouched by either R042 brief.
+
+Also open: **section J** (two unruled figures in `modeOverboostBlurb`), **section
+K** (`rulesOverdriveTrigger` still on the old bet basis, contradicting its
+corrected sibling on one screen), **the silent Bet Replay**, and **Q6**, which
+needs one owner-pasted launch URL and nothing else.

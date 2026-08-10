@@ -1,0 +1,12 @@
+{
+  "generated": "R042B autoplay two-step proof",
+  "afterSelect": {
+    "playCalls": 0,
+    "startControls": 1,
+    "selected": 1
+  },
+  "afterStart": {
+    "playCalls": 1
+  },
+  "menuText": "Stop on win Single win limit Stop on feature Loss limit SPINS 10 25 50 100 ∞"
+}

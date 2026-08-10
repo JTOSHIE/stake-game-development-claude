@@ -174,11 +174,49 @@
   function decreaseBet() { playClick(); decreaseBetLevel() }
   function setMaxBet()   { playClick(); setMaxBetLevel() }
 
-  function startAuto(requested: number) {
+  // ── AUTOPLAY IS A TWO-STEP ACTION. R042 BRIEF B, blocker B8. ───────────────
+  //
+  // THE PLATFORM RULE, quoted verbatim from the dated mirror:
+  //
+  //   "If an 'autoplay' feature is present, the player must confirm the autoplay
+  //    action, games are not allowed to automatically place consecutive bets
+  //    with one click."
+  //
+  // This used to be ONE function, `startAuto`, wired straight to every spin
+  // count. A single tap on "100" set the limits, armed autoplay AND dispatched
+  // the first bet, and with no RGS cap the infinity option was one tap away
+  // too. The project's own gate asserted that this was compliant, on an earlier
+  // reading in which the count button WAS the confirmation. **Fable reversed
+  // that reading against the platform sentence above**: the same click places
+  // consecutive bets, which is the thing the sentence prohibits.
+  //
+  // So selection and commitment are now separate functions with separate
+  // handlers, and `isAutoPlay.set(true)` lives in exactly one of them. The
+  // count buttons cannot start a bet however they are wired, because the code
+  // that starts one is not reachable from them. That is the property the gate
+  // asserts, and it is a structural one rather than a promise.
+  //
+  // The RG clamp and the stop-condition wiring are unchanged; they simply moved
+  // to the moment of commitment, which is also the moment they are read.
+
+  /** The chosen count, or null when nothing is chosen. NEVER pre-selected. */
+  let pendingAutoCount: number | null = null
+
+  /** Step one. Chooses a count and shows it. Starts nothing. */
+  function selectAuto(requested: number) {
     playClick()
-    // Clamped as well as filtered: the menu is the only route today, but a cap
-    // that is only enforced in markup is one refactor away from being lost.
-    const count = rgClampAutoplayCount(requested)
+    // Clamped at SELECTION as well as at commitment, so what the player is
+    // shown is what they will get rather than a number quietly reduced later.
+    pendingAutoCount = rgClampAutoplayCount(requested)
+  }
+
+  /** Step two, and the only place autoplay can begin. */
+  function confirmAuto() {
+    if (pendingAutoCount === null) return
+    playClick()
+    // Clamped again: the menu is the only route today, but a cap that is only
+    // enforced where the number was chosen is one refactor away from being lost.
+    const count = rgClampAutoplayCount(pendingAutoCount)
     autoplayLimits.set({
       count,
       stopOnAnyWin: stopOnWin,
@@ -189,8 +227,14 @@
     autoPlayCount.set(count)
     isAutoPlay.set(true)
     showAutoMenu = false
+    pendingAutoCount = null
     dispatch('spin')
   }
+
+  // Closing the menu abandons the selection. Without this a count chosen,
+  // dismissed and forgotten would still be sitting there the next time the menu
+  // opened, and the player would meet a Start button they did not arm.
+  $: if (!showAutoMenu && pendingAutoCount !== null) pendingAutoCount = null
 
   function stopAuto() {
     playClick()
@@ -469,10 +513,21 @@
               {/if}
               <div class="auto-menu-sep">{$tr('hudSpins')}</div>
               {#each allowedAutoOptions as n}
-                <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+                <button class="auto-menu-item" class:is-selected={pendingAutoCount === n} role="menuitemradio"
+                        aria-checked={pendingAutoCount === n} on:click={() => selectAuto(n)}>{n}</button>
               {/each}
               {#if $rgInfiniteAutoplayAllowed}
-                <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+                <button class="auto-menu-item" class:is-selected={pendingAutoCount === AUTO_INFINITE} role="menuitemradio"
+                        aria-checked={pendingAutoCount === AUTO_INFINITE} on:click={() => selectAuto(AUTO_INFINITE)}
+                        data-testid="auto-infinite">∞</button>
+              {/if}
+              <!-- STEP TWO. The only control that can begin a bet. Absent until a
+                   count is chosen, so there is no Start to hit by reflex and no
+                   pre-selected infinity. R042 BRIEF B. -->
+              {#if pendingAutoCount !== null}
+                <button class="auto-menu-start" role="menuitem" on:click={confirmAuto}
+                        data-testid="auto-start">{$tr('autoplayStartCta')} ·
+                  {pendingAutoCount === AUTO_INFINITE ? '∞' : pendingAutoCount}</button>
               {/if}
             </div>
           {/if}
@@ -705,10 +760,21 @@
           {/if}
           <div class="auto-menu-sep">{$tr('hudSpins')}</div>
           {#each allowedAutoOptions as n}
-            <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+            <button class="auto-menu-item" class:is-selected={pendingAutoCount === n} role="menuitemradio"
+                    aria-checked={pendingAutoCount === n} on:click={() => selectAuto(n)}>{n}</button>
           {/each}
           {#if $rgInfiniteAutoplayAllowed}
-            <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+            <button class="auto-menu-item" class:is-selected={pendingAutoCount === AUTO_INFINITE} role="menuitemradio"
+                    aria-checked={pendingAutoCount === AUTO_INFINITE} on:click={() => selectAuto(AUTO_INFINITE)}
+                    data-testid="auto-infinite">∞</button>
+          {/if}
+          <!-- STEP TWO. The only control that can begin a bet. Absent until a
+               count is chosen, so there is no Start to hit by reflex and no
+               pre-selected infinity. R042 BRIEF B. -->
+          {#if pendingAutoCount !== null}
+            <button class="auto-menu-start" role="menuitem" on:click={confirmAuto}
+                    data-testid="auto-start">{$tr('autoplayStartCta')} ·
+              {pendingAutoCount === AUTO_INFINITE ? '∞' : pendingAutoCount}</button>
           {/if}
         </div>
       {/if}
@@ -911,10 +977,21 @@
         {/if}
         <div class="auto-menu-sep">{$tr('hudSpins')}</div>
         {#each allowedAutoOptions as n}
-          <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(n)}>{n}</button>
+          <button class="auto-menu-item" class:is-selected={pendingAutoCount === n} role="menuitemradio"
+                  aria-checked={pendingAutoCount === n} on:click={() => selectAuto(n)}>{n}</button>
         {/each}
         {#if $rgInfiniteAutoplayAllowed}
-          <button class="auto-menu-item" role="menuitem" on:click={() => startAuto(AUTO_INFINITE)} data-testid="auto-infinite">∞</button>
+          <button class="auto-menu-item" class:is-selected={pendingAutoCount === AUTO_INFINITE} role="menuitemradio"
+                  aria-checked={pendingAutoCount === AUTO_INFINITE} on:click={() => selectAuto(AUTO_INFINITE)}
+                  data-testid="auto-infinite">∞</button>
+        {/if}
+        <!-- STEP TWO. The only control that can begin a bet. Absent until a
+             count is chosen, so there is no Start to hit by reflex and no
+             pre-selected infinity. R042 BRIEF B. -->
+        {#if pendingAutoCount !== null}
+          <button class="auto-menu-start" role="menuitem" on:click={confirmAuto}
+                  data-testid="auto-start">{$tr('autoplayStartCta')} ·
+            {pendingAutoCount === AUTO_INFINITE ? '∞' : pendingAutoCount}</button>
         {/if}
       </div>
     {/if}
@@ -1783,6 +1860,33 @@
     box-sizing: border-box;
   }
   .auto-menu-item:hover { background: rgba(255, 200, 50, 0.15); }
+
+  /* R042 BRIEF B. The chosen count has to be VISIBLE, or a two-step flow reads
+     as a broken one-step flow: the player taps a number, nothing appears to
+     happen, and they tap again. The selected state and the Start control are
+     what make the second step legible. */
+  .auto-menu-item.is-selected {
+    background: rgba(255, 200, 50, 0.22);
+    box-shadow: inset 3px 0 0 #ffc832;
+    font-weight: 700;
+  }
+  .auto-menu-start {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 4px;
+    padding: 0.6rem 1rem;
+    background: rgba(255, 200, 50, 0.18);
+    border: 1px solid rgba(255, 200, 50, 0.55);
+    border-radius: 6px;
+    color: #ffc832;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    cursor: pointer;
+  }
+  .auto-menu-start:hover { background: rgba(255, 200, 50, 0.3); }
 
   .auto-menu-toggle {
     display: flex;

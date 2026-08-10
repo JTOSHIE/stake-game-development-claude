@@ -9,6 +9,37 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 044 - 2026-08-10 - COMMS-ACK: R042 BRIEF B executed, blocker B8 closed
+
+Autoplay now takes two deliberate actions. A spin count SELECTS and shows itself selected;
+a single Start control is the only thing that begins a bet; infinity is never pre-selected;
+and with nothing chosen there is no Start control at all. `autoplayStartCta` in sixteen
+locales. RG clamp and stop conditions unchanged, with the clamp also applied at selection
+so the number shown is the number applied.
+
+**The gate was rewritten, not extended, and the reason is on the record.** It asserted in
+its own header that the count button WAS the explicit confirm, on the prior Fable read, and
+policed that design faithfully for weeks. **A gate can be perfectly implemented and still
+be guarding the wrong property.** It now asserts the structural claim: the selection
+handler cannot set the store, cannot dispatch a spin and cannot call confirm, so **one-click
+start is impossible by construction rather than by convention.** Five seeded violations,
+including the exact prior design, all caught; the shipped component is the negative control.
+
+**Proved on behaviour as well as code.** `r042b_autoplay_proof.mjs` drives the shipped
+bundle and COUNTS WALLET CALLS: choosing a count places zero bets, Start places one. It also
+re-checks every clause of the `responsiblePlayBody` paragraph against a control on screen,
+since that paragraph describes this menu and would have gone false the moment it changed.
+Frames in `reports/screens/r042b/`, superseded one-click menu preserved under `before/`.
+
+**Two mistakes of mine, both caught by instruments rather than by review:** `aria-pressed`
+on `role="menuitem"` is not a supported pair (now `menuitemradio` with `aria-checked`), and
+the proof first ran against a STALE dist because I changed the ARIA after the last build.
+
+**Still open, unchanged by this brief:** R042-D the live settle failure (next), section J,
+section K, the silent Bet Replay, and Q6 which needs one owner-pasted launch URL.
+
+---
+
 ## 043 - 2026-08-10 - COMMS-ACK 042: R042 BRIEF A executed, three things flagged
 
 Fable ruled E(a), F per the locale table, G with fifteen translations, and I to the base
