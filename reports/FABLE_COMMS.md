@@ -60,6 +60,28 @@ on the template rather than the prose inside it. **The gate's own unapplied-seed
 caught it**, which is the systemic protection working rather than luck, and is the
 strongest argument yet for that detector existing.
 
+### A FOURTH thing, found after the commit, by checking the SHIPPED KIT
+
+**The same scatter claim survives on the old basis in a third string, and the two
+now contradict each other on one screen.** `rulesOverdriveTrigger` in the feature
+layer reads *"pay an instant 1×, 3× or 10× total bet"* in sixteen locales. A3 was
+scoped in terms to `rulesMaxWin` and `rulesScatterMult` only, and that scope was
+followed, so German now renders **Basiseinsatz** in one bullet of the paytable and
+**Gesamteinsatz** in another.
+
+**That is worse than the original defect.** Before A3 both were wrong in the same
+direction and looked consistent; now they disagree in terms, on the screen a maths
+reviewer opens. By your own A3 derivation the base bet is the only uniformly true
+basis, so this string is the wrong one.
+
+**Not fixed.** Same reason as section J: explicit scope, maths-adjacent
+disclosure, not a builder's call. Recorded as **section K**.
+
+**Worth noting how it was found**, because no gate could have: the basis is a
+claim about MEANING, not a form, so nothing mechanical sees it. It turned up by
+grepping the built upload kit for the German word A3 had just removed. **Checking
+the artefact rather than the source is what found it.**
+
 ### Still open, in your ranked order
 
 **R042-D, the live settle failure**, is next and is untouched by Brief A. Also open:

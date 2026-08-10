@@ -479,6 +479,43 @@ to hide what it can see would be the worse of the two failures.
 
 ---
 
+## K. THE SAME SCATTER CLAIM SURVIVES ON THE OLD BASIS, AND NOW CONTRADICTS ITSELF
+
+Found 2026-08-10 while verifying R042 A3 against the SHIPPED KIT rather than the
+source. **A3 was scoped, in terms, to "rulesMaxWin and rulesScatterMult only".
+That scope was followed. The claim those keys make also lives in a third string.**
+
+`rulesOverdriveTrigger`, in the feature layer of `translations.ts`, sixteen
+locales plus the social variant, quoted verbatim:
+
+> 3, 4 or 5 Scatters award 8, 12 or 16 free spins and pay an instant 1×, 3× or 10× total bet.
+
+**Both strings render in the same paytable modal.** After A3, German reads:
+
+> `rulesScatterMult`: ...einen Sofortgewinn von 1×, 3× oder 10× deines **Basiseinsatzes**...
+>
+> `rulesOverdriveTrigger`: ...zahlen sofort 1×, 3× oder 10× des **Gesamteinsatzes**.
+
+**One screen now states the same award against two different bases**, which is
+worse than the original defect: before A3 both were wrong in the same direction,
+and a reviewer comparing them saw consistency. Now they disagree in terms.
+
+**By the derivation Fable recorded for A3**, the base bet is the only uniformly
+true basis, so `rulesOverdriveTrigger` is the one that is wrong.
+
+**Not fixed, and the reason is the same as section J.** A3's scope was explicit,
+this is a maths-adjacent disclosure, and a builder rewording it is exactly what
+convention (l.8) forbids. It is raised the moment it was found rather than left
+for a reviewer.
+
+**The ruling needed:** the corrected phrase for `rulesOverdriveTrigger` in sixteen
+locales plus the social variant, or a confirmation that it is out of scope and
+should ship as it stands. **Note this string was NOT flagged by any gate**: the
+basis is a claim about meaning, not a form, so nothing mechanical can see it. It
+was found by grepping the built kit for the German word A3 had just removed.
+
+---
+
 ## C. One thing that cannot be settled from this repository at all
 
 `rgsService.ts` maps a platform error to a player-facing message by reading a

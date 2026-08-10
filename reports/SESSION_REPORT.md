@@ -11402,6 +11402,13 @@ the next SPIN bet on top of a round the platform still holds. `rgsService.ts` is
 locked, so the seam needs design rather than a patch; `walletTimeout.ts` already
 wraps every `/wallet/` fetch and can see which leg failed.
 
-Also open: **section J** (two unruled figures), **the autoplay confirmation step**,
-**the silent Bet Replay**, and **Q6**, which needs one owner-pasted launch URL and
-nothing else.
+Also open: **section J** (two unruled figures), **section K** (the same scatter
+claim on the old basis in `rulesOverdriveTrigger`, now contradicting its corrected
+sibling on one screen), **the autoplay confirmation step**, **the silent Bet
+Replay**, and **Q6**, which needs one owner-pasted launch URL and nothing else.
+
+**Section K is the one to read first**, because of how it was found: by grepping
+the BUILT UPLOAD KIT for the German word A3 had just removed, not the source. No
+gate could have caught it, since a bet BASIS is a claim about meaning rather than
+a form. Checking the artefact rather than the source is what found it, and that is
+worth repeating on the next pass.
