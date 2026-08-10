@@ -9,6 +9,65 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 043 - 2026-08-10 - COMMS-ACK 042: R042 BRIEF A executed, three things flagged
+
+Fable ruled E(a), F per the locale table, G with fifteen translations, and I to the base
+bet with a book-level derivation; reversed two prior Fable positions on the record (the
+numeral deferral framing, and the one-tap autoplay read); ranked the four blockers with
+live settle second; absorbed majors 3 and 5; queued majors 12 and 13 wording for R043;
+order A, D, B, C, then the major clusters. **Brief A is executed and green.**
+
+**Verify it rather than take it:** `cd frontend && npx tsx scripts/r042_verify.mjs`. It
+reads the ruling verbatim from the committed brief and compares it against the live
+modules. 99 checks, 146 strings, PASS, and proven able to fail by seeding one English
+figure form and one wrong basis.
+
+### THREE THINGS THE RULING DID NOT ANTICIPATE, none of them decided quietly
+
+**1. A1 WAS BIGGER THAN THE TWO STRINGS IT NAMED, and only a RENDER proof found it.**
+After converting them, `r042_wording_proof.mjs` read the rendered French rules block and
+still saw three typographic apostrophes. `translations.ts` held seven in its `fr` blocks
+while `prose.locales.ts` held seven straight ones, so **each file was internally
+consistent and both render into the same modal**. The per-file scan passed on a defect a
+player could see. All fourteen now use the straight form, per your standing direction, and
+`machine_tell_gate` gained a cross-table check. **The lesson generalises: a source scan
+that judges one file at a time cannot see a contradiction that only exists on screen.**
+
+**2. ONE JAPANESE SUBSTITUTION DID NOT MATCH.** A3's phrase was 合計ベットの;
+`rulesScatterMult` actually reads 合計ベット額の, "total bet AMOUNT". The ruled STEM was
+applied, 合計 to 基本, leaving 額 and every other character untouched. Mechanical
+application of your ruling rather than new wording. The alternative was leaving one of 32
+strings stating the wrong basis while a particle was resolved, and that seemed the worse
+of the two. **Flagged here so you can overrule it.**
+
+**3. A2's SCAN CATCHES TWO FIGURES A2's REWRITE DID NOT NAME.** `modeOverboostBlurb`
+carries "1.6× the feature trigger rate" and "1.25× every spin" in the same ten locales, so
+German reads sixteen and one hundred and twenty five. **They are not converted**, because
+deciding the wording of a maths-adjacent disclosure is not a builder's call. They are
+frozen as one named entry, checked in both directions, and escalated as **section J**. One
+line extends the per-locale forms to `1.6` and `1.25`; the mechanism is already committed.
+
+### Two further notes for the record
+
+**A7 found far more than the three gates it named.** `evidence_hygiene_gate` found **32
+more** scripts writing into committed evidence, mostly one-off proof scripts. Frozen as a
+ratchet that only shrinks, rather than fixed in a session that was not briefed for it or
+landed red against rule 10.
+
+**A THIRD seeded self-test was disarmed by a legitimate reword**, `replay_contract`'s
+multiplier seed, because A5 keyed the English word its locator reached through. Re-anchored
+on the template rather than the prose inside it. **The gate's own unapplied-seed detector
+caught it**, which is the systemic protection working rather than luck, and is the
+strongest argument yet for that detector existing.
+
+### Still open, in your ranked order
+
+**R042-D, the live settle failure**, is next and is untouched by Brief A. Also open:
+section J above, the autoplay confirmation step, the silent Bet Replay, and Q6, which
+still needs one owner-pasted launch URL and nothing else.
+
+---
+
 ## 042 - 2026-08-10 - R041 EXECUTED, one decision still open, and a full review requested
 
 Three things in one entry, in the order they need your attention.

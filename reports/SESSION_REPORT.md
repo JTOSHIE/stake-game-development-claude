@@ -11320,3 +11320,88 @@ to use the same convention.
    still runs English-only; FEATURES, the bet selector, the HUD menu, the
    autoplay menu and the resume banner are still not focus-contained; the session
    panel still covers two tiles at Popout S.
+
+---
+
+# Session Report - R042 BRIEF A: DISCLOSURE INTEGRITY (2026-08-10)
+
+Brief saved verbatim at `reports/briefs/FS_R042A_DISCLOSURE_INTEGRITY_Prompt.md`.
+Precondition met before any work: clean tree, HEAD exactly `96a80e4`. No locked
+path touched, no exception requested.
+
+## What landed
+
+| Task | State | Evidence |
+|---|---|---|
+| A1 French apostrophes | DONE, and wider than briefed | fr uniform across all three tables |
+| A2 numeral locale pass | DONE | 20 strings, 10 locales, committed script and change report |
+| A3 bet basis | DONE | 34 strings, base bet in 16 locales plus both social |
+| A4 responsible play | DONE | keyed in 16, baseline entry burned |
+| A5 replay cost word | DONE | routes through the existing `costLabel` |
+| A6 volatility | DONE | 4 keys x 16, exhaustive by construction |
+| A7 evidence hygiene | DONE, and wider than briefed | 3 migrated, 32 more frozen |
+| A8 reconstructed record | DONE | 45 commits, from git log alone, labelled |
+| A9 verifier | DONE | 99 checks, 146 strings, proven able to fail |
+
+## The finding this session is actually about
+
+**A1 was briefed as two strings and was not.** After converting them,
+`r042_wording_proof.mjs` read the RENDERED French rules block and still saw three
+typographic apostrophes. `translations.ts` held seven in its `fr` blocks;
+`prose.locales.ts` held seven escaped straight ones. **Each file was internally
+consistent, so the per-file scan passed, and both files render into the same
+paytable modal.** A French player saw both forms in one view.
+
+**No source scan could have found it, and a render proof found it immediately.**
+That is the argument for reading rendered text rather than only capturing pixels
+or grepping source, in one line. `machine_tell_gate` now judges a locale ACROSS
+the three locale tables as well as within each one.
+
+## Three things flagged rather than decided
+
+1. **ja.rulesScatterMult** reads 合計ベット額の where the brief wrote 合計ベットの.
+   The ruled STEM was applied, 合計 to 基本, leaving 額 untouched. Mechanical
+   application rather than new wording; the alternative was leaving one of 32
+   strings on the wrong basis while a particle was resolved.
+2. **modeOverboostBlurb** carries `1.6×` and `1.25×` in the same ten locales, the
+   same class A2 fixed and not named by A2's rewrite. Frozen, both directions,
+   escalated as section J. Not converted, because that is a maths-adjacent
+   disclosure wording and convention (l.8) sends it to Fable.
+3. **A7 found 32 more offenders** than the three it named. Frozen as a ratchet
+   rather than fixed in an unbriefed sweep or landed red.
+
+## A third seeded self-test was disarmed by a legitimate reword
+
+`replay_contract_gate`'s multiplier seed reached through the English `cost =`
+literal that A5 keyed. **That is three in two days**, and every one of them
+anchored on prose to get at structure. Re-anchored on the template itself.
+
+**The systemic protection worked this time.** The gate's unapplied-seed detector
+reported UNAPPLIED rather than scoring the seed as caught, which is exactly the
+failure class it was built for. Without it the self-test would have printed a
+score over an assertion that never ran.
+
+## Verification
+
+- `r042_verify`: 99 checks, 146 strings, PASS; seeded failure demonstrated.
+- `npm run check`: 505 files, 0 errors. Build green.
+- Green: hardcoded string (self-test 7 seeded / 10 controls), machine tell
+  (16 seeded / 12 controls), locale completeness, dash, evidence hygiene
+  (4 seeded / 4 controls), numeral pass `--check`, disclaimer conformance,
+  vocabulary, paytable parity (8/8 seeds), fsModes drift, replay contract
+  (10/10 seeds, 24/24 assertions).
+- A plain run of the three migrated gates now leaves committed evidence untouched.
+- Proofs in `reports/screens/r042/`, with an observation ledger.
+
+## FOR THE NEXT SESSION
+
+**R042-D, the live settle failure, is next**, per Fable's ranking. It is untouched
+by Brief A and is the one open item that costs a player money: a settle failure
+during ordinary play refunds the stake on screen, leaves betting enabled, and lets
+the next SPIN bet on top of a round the platform still holds. `rgsService.ts` is
+locked, so the seam needs design rather than a patch; `walletTimeout.ts` already
+wraps every `/wallet/` fetch and can see which leg failed.
+
+Also open: **section J** (two unruled figures), **the autoplay confirmation step**,
+**the silent Bet Replay**, and **Q6**, which needs one owner-pasted launch URL and
+nothing else.
