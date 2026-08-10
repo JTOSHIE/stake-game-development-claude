@@ -49,6 +49,15 @@ const SCRIPTS = join(ROOT, 'scripts')
 const COMMITTED_WRITE = [
   /join\(\s*__dirname[^)]*['"]reports['"]\s*,\s*['"](screens|qa)['"]/,
   /['"]\.\.\/\.\.\/reports\/(screens|qa)/,
+  // THE SHAPE THAT SLIPPED PAST THE RATCHET, caught live during the R043 run:
+  // recovery_banner_proof.mjs built its path as join(ROOT, '..', 'reports',
+  // 'screens', ...) and rewrote three committed session-recovery PNGs on a
+  // plain re-run while this gate read zero offenders, because both predicates
+  // above anchor on __dirname or a relative string literal. Any IDENTIFIER
+  // walking into reports/screens or reports/qa is the same offence. The
+  // helper call forms (evidenceDir('reports', 'qa'), qaTmpDir(...)) do not
+  // match: their function name is not join.
+  /\bjoin\(\s*[A-Za-z_$][\w$]*\s*,[^)]*['"]reports['"]\s*,\s*['"](screens|qa)['"]/,
 ]
 
 /**
@@ -101,6 +110,9 @@ if (process.argv.includes('--self-test')) {
       "const SCREENS_DIR = join(__dirname, '..', '..', 'reports', 'screens', 'social-dom-conformance')"],
     ['the same shape into reports/qa', true,
       "const OUT_DIR = join(__dirname, '..', '..', 'reports', 'qa')"],
+    ['the shape that slipped the ratchet: an IDENTIFIER walking into reports/screens '
+      + '(recovery_banner_proof.mjs, caught rewriting committed evidence live in R043)', true,
+      "const SCREENS = join(ROOT, '..', 'reports', 'screens', 'session-recovery')"],
     ['a relative string form', true,
       "const OUT = '../../reports/screens/foo'"],
     ['NEGATIVE CONTROL: the correct evidenceDir form must pass', false,
