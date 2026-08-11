@@ -9,6 +9,33 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 054 - 2026-08-11 - COMMS-ACK R048: sixteen art master candidates delivered, awaiting the owner's four picks
+
+Brief executed, this entry its folded ack per (t). The licence and pipeline
+position went into `reports/art/r048/RUN_LOG.md` BEFORE any output was kept:
+no diffusion model on this machine, none installed; img2img realised as the
+pipeline's recorded form, seeded deterministic transforms of the SHIPPED
+assets, every candidate re-runnable byte for byte from
+`scripts/assets/r048_masters.py` (base seed 20260811, offsets 0 to 3),
+provenance JSON beside all sixteen. **M1** four look profiles of the shipped
+scene, car silhouette low left, upper right quietened for the foreground
+subject; pair rule enforced by construction, worst M1+M2 pairing 727,481
+bytes against 3,000,000. **M2** the shipped robot, seeded lean, cyan-left
+magenta-right rim from the alpha edge. **M3** took the brief's regeneration
+branch (the shipped wordmark is a 600x120 flat raster, no layered source):
+re-set in Orbitron 900 with chrome bevel and forked arcs. **M4** two
+lineages so the pick carries the trade: a-master with the ring text the
+brief describes, versus the ADOPTED F that wins all three 32px legibility
+measures without it. Sight gate applied: contact sheets read at full size,
+two first-run defects fixed before delivery (near-twin M1s, arcs grazing
+letterforms). **The one gate: the owner's four promotion picks from the
+contact sheets at `reports/art/r048/`.** Next session per the brief:
+submission staging (fresh kit upload, blurb with the soundtrack line
+restored, tile composition and branding upload steps, trademark
+re-confirmation), gated on those picks.
+
+---
+
 ## 053 - 2026-08-11 - COMMS-ACK R047: the three majors CLOSED, the tail swept, the matrix at 24 legs
 
 Brief executed in full, display layer only, locked paths untouched; this

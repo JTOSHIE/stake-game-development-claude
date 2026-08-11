@@ -445,3 +445,39 @@ completion as a rerun of the implementation-content run (31475508572): all
 22 browser legs GREEN including the two new autoplay legs; its single static
 red is exactly the corrected wording, green at the tip. Every leg is green
 at the tree where its content lives, and no red stands unexplained.
+
+## R048 ADDENDUM, 2026-08-11: sixteen art master candidates, promotion-gated
+
+FABLE ART MASTERS R048 executed, saved verbatim at
+`reports/briefs/FS_FABLE_R048_ART_MASTERS_Prompt.md`. The pipeline position
+was stated in `reports/art/r048/RUN_LOG.md` BEFORE any output was kept, per
+the standing licence rule: no diffusion model exists on this machine and
+none was installed; img2img is realised as the pipeline's own recorded form,
+seeded deterministic transforms of the SHIPPED assets (the backgrounds.py
+precedent), so every candidate is this game's own art, re-runnable byte for
+byte from `scripts/assets/r048_masters.py` (base seed 20260811, offsets 0 to
+3). Licences: Pillow HPND, fontTools and Brotli MIT, Orbitron SIL OFL 1.1,
+CairoSVG unused this run.
+
+**Two source-driven branch decisions, recorded rather than smoothed over:**
+M3 took the brief's own regeneration branch because the shipped wordmark is
+a 600x120 flat raster with no layered source (re-set in the shipped brand
+face, Orbitron 900, chrome bevel, forked arcs kept clear of the
+letterforms). M4 ships TWO lineages so the owner's pick carries the trade
+visibly: seeds 20260811/12 from the original a-master with the WE ROLL
+SPINNERS ring text the brief describes (512 native upscaled 2x, transparent
+variant by neon luma key from the opaque master); seeds 20260813/14 from
+the ADOPTED candidate F, which the derivation record chose because it wins
+all three 32px legibility measures, at the cost of the ring text
+(`PROVIDER_LOGO_DERIVATION.md` section 4).
+
+**Sight gate applied**: all four contact sheets were read at full size and
+two defects fixed before delivery (the first run's M1 candidates were
+near-twins, now four distinct look profiles with the upper right quietened
+so centre and right stay clear; the first M3 arcs grazed the letterforms,
+now clear with forks). The M1+M2 pair rule is enforced by construction and
+logged: worst pairing 727,481 bytes against 3,000,000.
+
+**Owner ask, the only gate**: four promotion picks, one per master, from the
+contact sheets at `reports/art/r048/` (M1 to M4). Nothing ships without the
+promotion reply.
