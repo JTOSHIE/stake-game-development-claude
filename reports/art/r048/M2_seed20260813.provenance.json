@@ -1,0 +1,37 @@
+{
+ "master": "M2",
+ "candidate": "M2_seed20260813",
+ "base_seed": 20260811,
+ "seed": 20260813,
+ "prompt": "full-body clean re-render of the shipped robot mascot, confident lean, cyan rim light left and magenta right, subtle reflection clipped out, transparent everywhere else",
+ "negative": "no text, no background elements, no clipping of limbs",
+ "pipeline": "AssetForge deterministic Pillow/CairoSVG transforms; img2img realised as seeded parameterised transforms of the shipped assets (no diffusion model on this machine), per the backgrounds.py precedent",
+ "tools": [
+  {
+   "name": "Pillow 12.3.0",
+   "licence": "HPND"
+  },
+  {
+   "name": "fontTools 4.63.0 + Brotli 1.2.0",
+   "licence": "MIT"
+  },
+  {
+   "name": "Orbitron 900 (@fontsource)",
+   "licence": "SIL OFL 1.1"
+  }
+ ],
+ "source_assets": [
+  {
+   "path": "frontend/public/assets/themes/future-spinner/ui/scene_character.png",
+   "sha256": "1acbd781ce1c7b79bcdf43351f789693e4f364ae182dc0693e3f0b7b8786173e"
+  }
+ ],
+ "recipe_params": {
+  "lean_deg": 7.46,
+  "rim_radius": 6,
+  "rim_strength": 0.884
+ },
+ "output_bytes": 394766,
+ "output_sha256": "7d513982547cc31da6ad011868224f57a5704e7f375a187a3925881b155888f4",
+ "note": ""
+}

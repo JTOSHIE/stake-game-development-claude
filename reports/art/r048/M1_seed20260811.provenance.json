@@ -1,0 +1,57 @@
+{
+ "master": "M1",
+ "candidate": "M1_seed20260811",
+ "base_seed": 20260811,
+ "seed": 20260811,
+ "prompt": "neon-noir cyberpunk street at night in heavy rain, low camera, wet asphalt reflections, magenta and violet signage bokeh against deep blacks, cyan accent light, sleek dark sports car silhouette low left, atmosphere haze, centre and right kept clear for a foreground subject",
+ "negative": "no text, no logos, no characters, no watermarks",
+ "pipeline": "AssetForge deterministic Pillow/CairoSVG transforms; img2img realised as seeded parameterised transforms of the shipped assets (no diffusion model on this machine), per the backgrounds.py precedent",
+ "tools": [
+  {
+   "name": "Pillow 12.3.0",
+   "licence": "HPND"
+  },
+  {
+   "name": "fontTools 4.63.0 + Brotli 1.2.0",
+   "licence": "MIT"
+  },
+  {
+   "name": "Orbitron 900 (@fontsource)",
+   "licence": "SIL OFL 1.1"
+  }
+ ],
+ "source_assets": [
+  {
+   "path": "frontend/public/assets/themes/future-spinner/backgrounds/bg_base.jpg",
+   "sha256": "c7ecfa15dde8db421f3c9428211810c24cf292db6ba49fd149973a6fbffd9491"
+  },
+  {
+   "path": "frontend/public/assets/themes/future-spinner/ui/scene_car.png",
+   "sha256": "627c6920c26e5be2570236867b8c90a50e72dd3c0a2ac52a9a761f8123959d53"
+  }
+ ],
+ "recipe_params": {
+  "profile": "balanced",
+  "shadow_lift": [
+   15,
+   2,
+   30
+  ],
+  "highlight": [
+   250,
+   255,
+   255
+  ],
+  "reflect_band_frac": 0.2796296296296296,
+  "car_width_frac": 0.34270833333333334,
+  "car_pos": [
+   56,
+   809
+  ],
+  "rain_drift": -58,
+  "jpeg_quality": 88
+ },
+ "output_bytes": 318504,
+ "output_sha256": "72c92eb59d04170b5710f9bab4108005725607e92a2b1a3481a036894e301e90",
+ "note": ""
+}

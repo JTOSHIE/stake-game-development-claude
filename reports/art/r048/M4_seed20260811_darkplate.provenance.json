@@ -1,0 +1,41 @@
+{
+ "master": "M4",
+ "candidate": "M4_seed20260811_darkplate",
+ "base_seed": 20260811,
+ "seed": 20260811,
+ "prompt": "the We Roll Spinners wheel-slot emblem, centred, 8 percent safe margin all round, ring text legible",
+ "negative": "",
+ "pipeline": "AssetForge deterministic Pillow/CairoSVG transforms; img2img realised as seeded parameterised transforms of the shipped assets (no diffusion model on this machine), per the backgrounds.py precedent",
+ "tools": [
+  {
+   "name": "Pillow 12.3.0",
+   "licence": "HPND"
+  },
+  {
+   "name": "fontTools 4.63.0 + Brotli 1.2.0",
+   "licence": "MIT"
+  },
+  {
+   "name": "Orbitron 900 (@fontsource)",
+   "licence": "SIL OFL 1.1"
+  }
+ ],
+ "source_assets": [
+  {
+   "path": "design-system/brand/provider_mark/provider_mark_a-master_512.png",
+   "sha256": "cb453c251459d923a6acfda61390e7bd0e19a62caadae803192c6efd03f3617e"
+  }
+ ],
+ "recipe_params": {
+  "lineage": "a-master-ring-text",
+  "mark_scale_in_margin": 0.9421,
+  "plate_tone": [
+   12,
+   12,
+   18
+  ]
+ },
+ "output_bytes": 737553,
+ "output_sha256": "17f599baba3ab14833381f2ea65298c543623608923051ef243167d1c4045673",
+ "note": "a-master lineage: 512 native upscaled 2x, transparent variant lifted by neon luma key from the opaque master; ring text as the brief describes"
+}

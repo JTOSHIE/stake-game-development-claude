@@ -1,0 +1,40 @@
+{
+ "master": "M3",
+ "candidate": "M3_seed20260811",
+ "base_seed": 20260811,
+ "seed": 20260811,
+ "prompt": "chrome bevelled retro-futuristic wordmark reading exactly FUTURE SPINNER, slight italic, cyan-white metal gradient, thin electric arcs, transparent background",
+ "negative": "no other text",
+ "pipeline": "AssetForge deterministic Pillow/CairoSVG transforms; img2img realised as seeded parameterised transforms of the shipped assets (no diffusion model on this machine), per the backgrounds.py precedent",
+ "tools": [
+  {
+   "name": "Pillow 12.3.0",
+   "licence": "HPND"
+  },
+  {
+   "name": "fontTools 4.63.0 + Brotli 1.2.0",
+   "licence": "MIT"
+  },
+  {
+   "name": "Orbitron 900 (@fontsource)",
+   "licence": "SIL OFL 1.1"
+  }
+ ],
+ "source_assets": [
+  {
+   "path": "frontend/public/assets/themes/future-spinner/ui/logo.png",
+   "sha256": "ec6310444b427de176d1fa36987ec0399aec80917977b7450baa5290647277f9"
+  },
+  {
+   "path": "frontend/node_modules/@fontsource/orbitron/files/orbitron-latin-900-normal.woff2",
+   "sha256": "ce87e6a1b1955bbc7b1d2d1c30fb5b53af5e34edb5b93a33e28068054892ef74"
+  }
+ ],
+ "recipe_params": {
+  "shear": 0.102,
+  "chrome_horizon": 0.529
+ },
+ "output_bytes": 103189,
+ "output_sha256": "179f5f0f6888656999cfdd51a03c440683a4e1a55cfc48b32acdee4ad048e742",
+ "note": "regeneration branch: shipped wordmark is 600x120 flat, no layered source"
+}

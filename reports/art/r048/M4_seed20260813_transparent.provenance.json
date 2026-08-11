@@ -1,0 +1,41 @@
+{
+ "master": "M4",
+ "candidate": "M4_seed20260813_transparent",
+ "base_seed": 20260811,
+ "seed": 20260813,
+ "prompt": "the We Roll Spinners wheel-slot emblem, centred, 8 percent safe margin all round, ring text legible",
+ "negative": "",
+ "pipeline": "AssetForge deterministic Pillow/CairoSVG transforms; img2img realised as seeded parameterised transforms of the shipped assets (no diffusion model on this machine), per the backgrounds.py precedent",
+ "tools": [
+  {
+   "name": "Pillow 12.3.0",
+   "licence": "HPND"
+  },
+  {
+   "name": "fontTools 4.63.0 + Brotli 1.2.0",
+   "licence": "MIT"
+  },
+  {
+   "name": "Orbitron 900 (@fontsource)",
+   "licence": "SIL OFL 1.1"
+  }
+ ],
+ "source_assets": [
+  {
+   "path": "design-system/brand/delivery/WeRollSpinners-Logo.png",
+   "sha256": "66c692daf309293568214bd57b350b02b930d610c6b7d09ecb181a35dc7a03c6"
+  }
+ ],
+ "recipe_params": {
+  "lineage": "f-adopted",
+  "mark_scale_in_margin": 0.9995,
+  "plate_tone": [
+   10,
+   14,
+   20
+  ]
+ },
+ "output_bytes": 69580,
+ "output_sha256": "5a5c6501ba0c34d450e49eefe3efd4fb397e15eacd9ff62f679191c4d47e0c68",
+ "note": "adopted candidate F lineage: wins all three 32px legibility measures (PROVIDER_LOGO_DERIVATION.md section 4), no ring text by design"
+}
