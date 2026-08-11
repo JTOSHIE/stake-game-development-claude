@@ -592,3 +592,24 @@ players ever see the correct session and authentication messages, and nothing in
 `docs/stake-engine-live/` states it. One captured 400 body from a real
 `/wallet/authenticate` or `/wallet/play` settles it in a single line. Until then
 it is UNKNOWN rather than assumed, per rule 16.
+
+**RESOLVED 2026-08-11, VERIFIED by live capture** (BRIEF L1 PHASE 2, executed
+in the R044 round when the owner's paste yielded the session-bearing launch
+url; raw bodies at `docs/stake-engine-live/captures/2026-08-11_wallet_400_1.json`
+to `_3.json`, real session id redacted, responses byte for byte). The platform
+answers both `/wallet/authenticate` and `/wallet/play` 400s with:
+
+    {"error":"ERR_VAL","message":"could not parse request json"}
+
+**The identifier lives in the top-level field `error`, not `code`.** The VALUE
+vocabulary matches the known-codes table exactly (the platform sent `ERR_VAL`,
+which is on the list `handleRGSError` matches), but `handleRGSError` reads
+top-level `code`, so on a real platform error the match never fires and every
+platform error reaches the player through the generic branch. The control call
+(authenticate, real session) returned 200 beside the two 400s, so the shape is
+the error shape and not a transport artefact. **The one-line fix (read `error`
+with a `code` fallback) is inside the locked `rgsService.ts` and is NOT made
+here: no sanction names it. Escalated per convention (l.8) as a question with
+evidence for the owner and Fable; its LOCKED_FILE_DEBTS row is queued for the
+next sanctioned CLAUDE.md pass, this document being the record of it until
+then.**

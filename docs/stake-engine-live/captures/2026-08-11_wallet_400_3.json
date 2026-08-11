@@ -1,0 +1,22 @@
+{
+  "_what": "Raw platform response, captured for Q6 of FABLE COMMS 040 (R041 TASK 7).",
+  "_reads": "rgsService.handleRGSError reads the TOP-LEVEL `code`. If `top_level_fields` below has no `code`, the mapping never fires and every platform error falls through to the generic branch.",
+  "label": "play, INVALID session (expect 400, cannot bet)",
+  "endpoint": "/wallet/play",
+  "http_status": 400,
+  "request_body": {
+    "sessionID": "fable-invalid-1786415342",
+    "mode": "base",
+    "amount": 1000000
+  },
+  "response_body_raw": "{\"error\":\"ERR_VAL\",\"message\":\"could not parse request json\"}\n",
+  "response_body_parsed": {
+    "error": "ERR_VAL",
+    "message": "could not parse request json"
+  },
+  "top_level_fields": [
+    "error",
+    "message"
+  ],
+  "has_top_level_code": false
+}

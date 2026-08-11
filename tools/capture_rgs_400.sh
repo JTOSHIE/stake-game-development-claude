@@ -39,7 +39,10 @@
 #
 #   tools/capture_rgs_400.sh 'https://.../index.html?sessionID=...&rgs_url=...&lang=en'
 #
-# Writes to docs/stake-engine-live/captures/2026-08-10_wallet_400_<n>.json.
+# Writes to docs/stake-engine-live/captures/<capture date>_wallet_400_<n>.json.
+# The date was hardcoded 2026-08-10 until 2026-08-11, which is convention (s)'s
+# changing-value-in-an-instruction class caught on the script's first real run:
+# it now stamps the day the capture actually happened.
 #
 # 2026-08-10, Fable ruling block R041 TASK 7.
 
@@ -123,7 +126,7 @@ echo
 # platform's own, so a later reader can see field names we did not anticipate.
 capture() {
   local n="$1" label="$2" endpoint="$3" body="$4"
-  local out="$OUT_DIR/2026-08-10_wallet_400_${n}.json"
+  local out="$OUT_DIR/$(date +%F)_wallet_400_${n}.json"
   if [ -e "$out" ]; then
     echo "  refusing to overwrite $out (convention h.1)" >&2
     return 1

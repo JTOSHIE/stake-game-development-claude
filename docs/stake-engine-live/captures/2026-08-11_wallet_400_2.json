@@ -1,0 +1,118 @@
+{
+  "_what": "Raw platform response, captured for Q6 of FABLE COMMS 040 (R041 TASK 7).",
+  "_reads": "rgsService.handleRGSError reads the TOP-LEVEL `code`. If `top_level_fields` below has no `code`, the mapping never fires and every platform error falls through to the generic branch.",
+  "label": "authenticate, REAL session (control, expect 200)",
+  "endpoint": "/wallet/authenticate",
+  "http_status": 200,
+  "request_body": {
+    "sessionID": "<REAL_SESSION_REDACTED>",
+    "language": "en"
+  },
+  "response_body_raw": "{\"config\":{\"gameID\":\"\",\"minBet\":10000,\"maxBet\":1000000000,\"stepBet\":10000,\"defaultBetLevel\":1000000,\"betLevels\":[10000,20000,50000,100000,200000,400000,600000,800000,1000000,1200000,1400000,1600000,1800000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,12000000,14000000,16000000,18000000,20000000,30000000,40000000,50000000,75000000,100000000,150000000,200000000,250000000,300000000,350000000,400000000,450000000,500000000,750000000,1000000000],\"gameModes\":[{\"mode\":\"base\",\"costMultiplier\":1,\"maxBet\":1000000000},{\"mode\":\"cruise\",\"costMultiplier\":1,\"maxBet\":1000000000},{\"mode\":\"antelite\",\"costMultiplier\":1.25,\"maxBet\":1000000000},{\"mode\":\"bonus\",\"costMultiplier\":100,\"maxBet\":1000000000},{\"mode\":\"super\",\"costMultiplier\":400,\"maxBet\":1000000000}],\"user\":{\"id\":\"66d6c335b0fb69f496f5ab23e176fbcc22e206b648957fea2abd70fa97bd4423\"},\"jurisdiction\":{\"socialCasino\":false,\"disabledFullscreen\":false,\"disabledTurbo\":false,\"disabledSuperTurbo\":false,\"disabledAutoplay\":false,\"disabledSlamstop\":false,\"disabledSpacebar\":false,\"disabledBuyFeature\":false,\"displayNetPosition\":false,\"displayRTP\":false,\"displaySessionTimer\":false,\"minimumRoundDuration\":0}},\"balance\":{\"amount\":1000000000,\"currency\":\"USD\"}}",
+  "response_body_parsed": {
+    "config": {
+      "gameID": "",
+      "minBet": 10000,
+      "maxBet": 1000000000,
+      "stepBet": 10000,
+      "defaultBetLevel": 1000000,
+      "betLevels": [
+        10000,
+        20000,
+        50000,
+        100000,
+        200000,
+        400000,
+        600000,
+        800000,
+        1000000,
+        1200000,
+        1400000,
+        1600000,
+        1800000,
+        2000000,
+        3000000,
+        4000000,
+        5000000,
+        6000000,
+        7000000,
+        8000000,
+        9000000,
+        10000000,
+        12000000,
+        14000000,
+        16000000,
+        18000000,
+        20000000,
+        30000000,
+        40000000,
+        50000000,
+        75000000,
+        100000000,
+        150000000,
+        200000000,
+        250000000,
+        300000000,
+        350000000,
+        400000000,
+        450000000,
+        500000000,
+        750000000,
+        1000000000
+      ],
+      "gameModes": [
+        {
+          "mode": "base",
+          "costMultiplier": 1,
+          "maxBet": 1000000000
+        },
+        {
+          "mode": "cruise",
+          "costMultiplier": 1,
+          "maxBet": 1000000000
+        },
+        {
+          "mode": "antelite",
+          "costMultiplier": 1.25,
+          "maxBet": 1000000000
+        },
+        {
+          "mode": "bonus",
+          "costMultiplier": 100,
+          "maxBet": 1000000000
+        },
+        {
+          "mode": "super",
+          "costMultiplier": 400,
+          "maxBet": 1000000000
+        }
+      ],
+      "user": {
+        "id": "66d6c335b0fb69f496f5ab23e176fbcc22e206b648957fea2abd70fa97bd4423"
+      },
+      "jurisdiction": {
+        "socialCasino": false,
+        "disabledFullscreen": false,
+        "disabledTurbo": false,
+        "disabledSuperTurbo": false,
+        "disabledAutoplay": false,
+        "disabledSlamstop": false,
+        "disabledSpacebar": false,
+        "disabledBuyFeature": false,
+        "displayNetPosition": false,
+        "displayRTP": false,
+        "displaySessionTimer": false,
+        "minimumRoundDuration": 0
+      }
+    },
+    "balance": {
+      "amount": 1000000000,
+      "currency": "USD"
+    }
+  },
+  "top_level_fields": [
+    "balance",
+    "config"
+  ],
+  "has_top_level_code": false
+}
