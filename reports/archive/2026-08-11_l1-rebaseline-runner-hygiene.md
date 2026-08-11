@@ -361,3 +361,74 @@ recorded below); tree clean at close.
 one-timers, then submission staging. The three consensus majors (TR-125 to
 TR-127) are the builder-side distance to the 3-star polish bar and are
 small, bounded, display-layer fixes awaiting a work order.
+
+## R047 ADDENDUM, 2026-08-11: the three majors closed, the round 4 tail swept
+
+FABLE BRIEF R047 executed in full, saved verbatim at
+`reports/briefs/FS_FABLE_R047_MAJORS_Prompt.md`, display layer only, the
+maths package and locked paths untouched (verified: the change set is
+exactly the named scope, `git status` reviewed before staging).
+
+**TASK 1.** The paytable's ways figure and every pays value route through
+`toLocaleString`; frames prove de and tr both render 1.024. The new
+kit_basis HALF 3 template scan (seeded per (p): '1,024' in a text node
+caught; the localised expression, a style block and an attribute all clean)
+caught a FOURTH instance on its first real run: MaxWinCelebration's
+hardcoded en-form 5,000 on the wincap surface, fixed with the shared
+FS_MAX_WIN constant and recorded here as the scan earning its keep, the
+same TR-125 class the task names.
+
+**TASK 3, one tension surfaced per convention (n).** The ruling's letter
+said the pod reads the pre-rev FROM fsModes; the component deliberately
+carries no mode field, and its recorded convention (the isNitroEntry
+comment) makes the book's own data the meter's single source of truth. So
+the pod seeds from `script.freeSpins[0].meterBefore` (the book), fsModes
+gains `METER_PRE_REV` as the design constant, and the evidence asserts the
+rendered pod equals the fsModes value: two independent inputs agreeing per
+(l.4), which is stronger than wiring one value into both places. Frames:
+MULTIPLIKATOR 5x (de) and MULTIPLIER 5x (en) at NITRO entry.
+
+**TASK 4, every conversion listed.** The three ruled strings landed byte for
+byte (r047_verify pins them against the brief). The sweep then found four
+more formal-address strings, converted:
+
+1. `resumeBody`: 'Sie haben {played} von {total} Freispielen gesehen, bevor
+   Sie gegangen sind. ...' becomes 'Du hast {played} von {total} Freispielen
+   gesehen, bevor du gegangen bist. ...'
+2. `rgRealityCheckBody`: 'Sie spielen seit {time}. Ihr Nettoergebnis in
+   dieser Sitzung beträgt {amount}.' becomes 'Du spielst seit {time}. Dein
+   Nettoergebnis in dieser Sitzung beträgt {amount}.'
+3. `recoveryResumed` (featureI18n): 'Ihre vorherige Runde wurde abgeschlossen
+   und ihr Ergebnis angewendet.' becomes 'Deine vorherige Runde wurde
+   abgeschlossen und ihr Ergebnis angewendet.' (the lowercase 'ihr Ergebnis'
+   is the round's own result, not address, and stands)
+4. `disclaimerBody` (prose.locales.ts, found by r047_verify's live-table
+   sweep after the file-scoped grep missed the third i18n file): 'Wenn Ihre
+   Verbindung während einer Runde abbricht, laden Sie das Spiel neu, ...'
+   becomes 'Wenn deine Verbindung während einer Runde abbricht, lade das
+   Spiel neu, ...', with the disclaimer conformance pin moved in the same
+   commit (both its self-test and the sixteen-locale run green).
+
+The r045 proof's hardcoded de oracle follows the ruled string (an oracle
+update after a ruling, citation updated in place).
+
+**TASK 6, old and new verbatim.** Old: 'pay an instant scatter award of 1x,
+3x or 10x total bet respectively.' New: 'pay an instant scatter award of 1x,
+3x or 10x the BASE BET respectively', with the derivation from the recorded
+unit (500,000 centibets IS the 5,000x cap, so centibets are hundredths of
+the BASE bet, `BOOKS_MANIFEST.md:102-105`) and the config's own two-mode-era
+quote kept beside it ('pay the instant scatter award of 1x, 3x or 10x total
+bet', `game_config.py:11`, verified by direct read), plus why the two bases
+coincided until OVERBOOST priced spins at 1.25x.
+
+**TASKS 5, 7, 8.** Both autoplay proofs on the matrix under the runner
+contract, r042b's new self-test planting the one-click class at the DOM
+boundary (its first draft crashed past the verdict when the seeded page
+consumed the Start control; the seed mode now concludes at the assertion it
+exists to red, recorded as the lesson). The autoplay surface framed both
+locales. The lang parameter documented. r047_verify shipped (33 checks, 9
+seeded reds, live tree clean) and r043_verify archived with its note.
+
+**Verification**: svelte-check 0 errors; the full affected gate family green
+locally (29 runs, the two first-pass failures diagnosed and closed above);
+remote CI on the enlarged 24-leg matrix recorded at close.

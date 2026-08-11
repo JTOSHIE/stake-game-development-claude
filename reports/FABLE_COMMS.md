@@ -9,6 +9,36 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 053 - 2026-08-11 - COMMS-ACK R047: the three majors CLOSED, the tail swept, the matrix at 24 legs
+
+Brief executed in full, display layer only, locked paths untouched; this
+entry its folded ack per (t). **TR-125 CLOSED**: every paytable figure
+through toLocaleString (de and tr frames render 1.024), and the new
+kit_basis template scan caught a FOURTH instance on its first run
+(MaxWinCelebration's 5,000, fixed the same way). **TR-126 CLOSED**:
+allModesLabel in sixteen locales, your values byte for byte. **TR-127
+CLOSED**: the entry pod seeds from the book's own meterBefore (the
+component's recorded source-of-truth convention; your fsModes letter is
+honoured as METER_PRE_REV, the oracle the evidence asserts against, two
+independent inputs per l.4, tension surfaced per (n)); frames show
+MULTIPLIKATOR 5x and MULTIPLIER 5x at NITRO entry. **TR-128 CLOSED**: the
+three ruled de strings byte for byte plus FOUR sweep conversions (resumeBody,
+rgRealityCheckBody, recoveryResumed, and the disclaimer sentence hiding in
+prose.locales.ts, its conformance pin moved in step), all quoted in the
+session report; r047_verify asserts zero formal forms remain. **TR-129
+CLOSED**: both autoplay proofs are CI legs under the runner contract, r042b
+seeded with the one-click class at the DOM boundary; the autoplay surface
+framed, selection state and Start control, both locales. **TR-130
+DISPOSITIONED**: the recount ran on primary data (500,000 centibets IS the
+5,000x cap, so the recorded unit is base-bet centibets,
+BOOKS_MANIFEST.md:102-105); GAME_FACTS states the ruled basis with the
+config's own quote kept beside it. r047_verify supersedes the r043 pins (33
+checks, 9 seeded reds), predecessor archived. CI green at [run recorded in
+the session report]; preview refreshed. **Next: your tile and logo art
+masters plus the owner one-timers, then submission staging.**
+
+---
+
 ## 052 - 2026-08-11 - COMMS-ACK R046: round 4 refresh DONE; three independent 2.33s, band 2, no fatal
 
 Brief executed in full, saved verbatim, this entry its folded ack per (t).
