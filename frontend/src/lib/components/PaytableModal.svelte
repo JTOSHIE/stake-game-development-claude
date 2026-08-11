@@ -200,7 +200,11 @@
             <p>{$tr('waysBody')}</p>
             <div class="fs-ways-callout fs-plate">
               <div class="fs-face">
-                <span class="fs-ways-num fs-num">1,024</span>
+                <!-- R047 TASK 1 (TR-125): 4 rows ^ 5 reels = 1024 ways,
+                     rendered per locale grouping (de 1.024; fi, fr and ru
+                     1 024) through the same toLocaleString convention as
+                     every other figure on this surface. -->
+                <span class="fs-ways-num fs-num">{(1024).toLocaleString($locale)}</span>
                 <span class="fs-ways-lbl">{waysLabel}</span>
               </div>
             </div>
@@ -240,9 +244,13 @@
                     <span class="fs-sym-note">{$tr('wildSubstitutes')}</span>
                   {:else}
                     <div class="fs-pay-rows">
-                      <div class="fs-pay-row"><span class="fs-pay-count">3×</span><span class="fs-pay-val fs-num">{sym.pays[2] ?? '-'}</span></div>
-                      <div class="fs-pay-row"><span class="fs-pay-count">4×</span><span class="fs-pay-val fs-num">{sym.pays[3] ?? '-'}</span></div>
-                      <div class="fs-pay-row"><span class="fs-pay-count">5×</span><span class="fs-pay-val fs-num">{sym.pays[4] ?? '-'}</span></div>
+                      <!-- R047 TASK 1 (TR-125): pays values render their
+                           locale decimal form (0.65 -> 0,65 in the ten
+                           comma-decimal locales), same convention as the
+                           mode cards beside them. -->
+                      <div class="fs-pay-row"><span class="fs-pay-count">3×</span><span class="fs-pay-val fs-num">{sym.pays[2]?.toLocaleString($locale, { maximumFractionDigits: 2 }) ?? '-'}</span></div>
+                      <div class="fs-pay-row"><span class="fs-pay-count">4×</span><span class="fs-pay-val fs-num">{sym.pays[3]?.toLocaleString($locale, { maximumFractionDigits: 2 }) ?? '-'}</span></div>
+                      <div class="fs-pay-row"><span class="fs-pay-count">5×</span><span class="fs-pay-val fs-num">{sym.pays[4]?.toLocaleString($locale, { maximumFractionDigits: 2 }) ?? '-'}</span></div>
                     </div>
                   {/if}
                 </div>

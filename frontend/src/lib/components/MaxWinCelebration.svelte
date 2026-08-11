@@ -11,6 +11,7 @@
   import { isSocial } from '../stores/socialMode'
   import { locale } from '../stores/gameStore'
   import { t, type GameMode } from '../i18n/translations'
+  import { FS_MAX_WIN } from '../config/fsModes'
   import { setModalOpen, setGameBlocked } from '../stores/modalGuard'
 
   export let show: boolean = false
@@ -153,7 +154,10 @@
              menu all write the multiplication sign `×` (U+00D7, which Orbitron
              carries). Same quantity, two glyphs, two screens: the mandate's
              "decimal or currency formats that disagree". QUALITY_CHARTER.md Q-12. -->
-        <span class="c1-max-mult fs-num">5,000</span><span class="c1-max-x">×</span>
+        <!-- R047 TASK 1 (TR-125 class): the wincap figure renders per locale
+             grouping through the shared FS_MAX_WIN constant, found by the new
+             template-figure scan on its first real run over the tree. -->
+        <span class="c1-max-mult fs-num">{FS_MAX_WIN.toLocaleString($locale)}</span><span class="c1-max-x">×</span>
         <!-- Was `{$isSocial ? 'PLAY' : 'BET'}`. Same duplicated layer as
              FeatureMenu's: `t()` consults SOCIAL_OVERRIDES first, so this one
              call does the social swap AND the locale swap. TR-091. -->

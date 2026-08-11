@@ -110,7 +110,18 @@ not participate in the ways calculation (`FUTURE_SPINNER_PAR_SHEET.md` §3).
 Source: `FUTURE_SPINNER_PAR_SHEET.md` §2 and `CLAUDE.md` "True game facts".
 
 - **Trigger:** 3, 4 or 5 scatters in the base game award 8, 12 or 16 free spins and pay an
-  instant scatter award of 1x, 3x or 10x total bet respectively.
+  instant scatter award of 1x, 3x or 10x the BASE BET respectively (R047 TASK 6, closing
+  TR-130). The recorded unit proves the basis from primary data: book payouts are counted
+  in centibets of the base bet, which is why the 5,000x cap is declared as exactly 500,000
+  centibets (`BOOKS_MANIFEST.md:102-105`), so every recorded award, the instant scatter
+  pays included, is a base-bet multiple. The ruled player-facing basis (R042 A3, R043
+  section K) states the same thing on every disclosure surface. The config's own feature
+  header (`game_config.py:11`, VERIFIED by direct read 2026-08-11) phrases it as "pay the
+  instant scatter award of 1x, 3x or 10x total bet"; that quote stands as the
+  specification's language from the two-mode era, when every mode cost 1.0x and the two
+  bases coincided. In the shipped five-mode package OVERBOOST debits 1.25x per spin while
+  the recorded awards remain base-bet multiples, which is exactly why the ruled
+  player-facing basis names the base bet.
 - **Overdrive meter:** starts at 1x. After every **winning** free spin the meter rises +1x
   and applies to all subsequent free-spin wins (ways wins and scatter pays alike). It never
   resets during the round and is not retroactive; no cap beyond the round win cap.

@@ -1,3 +1,11 @@
+// SUPERSEDED 2026-08-11 by frontend/scripts/r047_verify.mjs, per R047 TASK 8.
+// R047 changed strings and sources adjacent to the set this file pins (the de
+// register moved to du, the paytable figures now route through toLocaleString,
+// FeatureMenu's footer gained allModesLabel); its own checks still passed at
+// the moment of retirement, and it is archived rather than deleted because it
+// is the record of what R043 shipped, moved out of frontend/scripts/ so nobody
+// runs it expecting a verdict on the current tree.
+//
 // r043_verify.mjs
 //
 // ONE COMMAND THAT RE-DERIVES EVERY CLAIM MADE ABOUT R043 PHASE 1.

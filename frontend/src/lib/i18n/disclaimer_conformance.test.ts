@@ -283,7 +283,7 @@ function selfTest(): void {
   run('SEED 1  a dropped reload clause in de is caught by sentence count', 1, () => {
     const b = copy()
     b.de = b.de.replace(
-      'Wenn Ihre Verbindung während einer Runde abbricht, laden Sie das Spiel neu, um eine nicht abgeschlossene Runde zu beenden. ',
+      'Wenn deine Verbindung während einer Runde abbricht, lade das Spiel neu, um eine nicht abgeschlossene Runde zu beenden. ',
       '',
     )
     return [b, cleanSocial, mirror]

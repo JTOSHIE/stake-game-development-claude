@@ -60,7 +60,10 @@ const SEED = process.env.FS_SEED_VIOLATION === '1'
 
 const EXPECT = {
   en: 'Game unavailable. Your session could not be verified. Please reload or contact support.',
-  de: 'Spiel nicht verfügbar. Ihre Sitzung konnte nicht verifiziert werden. Bitte neu laden oder den Support kontaktieren.',
+  // R047 TASK 4 moved the de register to du (translations.ts, the ruled
+  // string quoted in reports/briefs/FS_FABLE_R047_MAJORS_Prompt.md); the
+  // oracle stays hardcoded per convention (l.4) and follows the ruling.
+  de: 'Spiel nicht verfügbar. Deine Sitzung konnte nicht bestätigt werden. Bitte lade neu oder kontaktiere den Support.',
   errIs: 'Your session has expired. Please relaunch the game.',
 }
 

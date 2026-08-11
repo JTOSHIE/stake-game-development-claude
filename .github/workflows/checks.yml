@@ -1135,6 +1135,19 @@ jobs:
           - name: "browser: rgs error dialect"
             run: npx tsx scripts/r045_error_field_proof.mjs --self-test && npx tsx scripts/r045_error_field_proof.mjs
 
+          # R047 TASK 5 (TR-129): the two-step autoplay property joins the
+          # matrix, both halves. The confirm gate proves the CODE cannot start
+          # a bet from a selection handler (static, seeded); the r042b proof
+          # counts WALLET CALLS through the behaviour a player meets, its
+          # self-test planting the one-click class at the DOM boundary and
+          # demanding the red AND the non-zero exit. Round 4's reviewer A
+          # observed the property was proven once and enforced never; this
+          # closes that.
+          - name: "browser: autoplay confirm gate"
+            run: npx tsx scripts/check_autoplay_confirm_gate.mjs --self-test && npx tsx scripts/check_autoplay_confirm_gate.mjs
+          - name: "browser: autoplay two-step proof"
+            run: npx tsx scripts/r042b_autoplay_proof.mjs --self-test && npx tsx scripts/r042b_autoplay_proof.mjs
+
     steps:
       - name: Check out
         uses: actions/checkout@v4

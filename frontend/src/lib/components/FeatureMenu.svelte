@@ -523,7 +523,7 @@
 
         <!-- Footer -->
         <div class="fm-foot">
-          <span class="fm-rtp">All modes · RTP {fsRtpLabel($locale)}</span>
+          <span class="fm-rtp">{$tr('allModesLabel')} · RTP {fsRtpLabel($locale)}</span>
           <button class="fm-info-btn" on:click={openBetModesInfo} data-testid="open-bet-modes-info">{$tr('betModesHeading')}</button>
         </div>
 

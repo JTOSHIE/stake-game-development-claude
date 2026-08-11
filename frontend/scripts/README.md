@@ -72,6 +72,19 @@ the self-test rather than hanging a CI leg.
   contention multiplies these; judge a leg against the range in CLAUDE.md
   protocol rule 10.
 
+## The preview language parameter is `lang`
+
+`parseSessionParams` reads the locale from the `lang` query parameter
+(`src/lib/services/rgsService.ts:531`, default `en`). Every play-test or
+evidence drive selects its locale that way and no other:
+
+```
+http://127.0.0.1:<port>/?sessionID=<id>&rgs_url=<rgs>&lang=de
+```
+
+Recorded per R047 TASK 7 so no future play-test instruction gets it wrong
+again.
+
 ## Evidence paths (convention h.1)
 
 Gates write reports and screenshots to the gitignored scratch tree via

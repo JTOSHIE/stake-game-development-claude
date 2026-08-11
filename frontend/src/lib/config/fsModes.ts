@@ -127,6 +127,19 @@ export const ENHANCER_MODES = FS_MODES.filter((m) => m.kind === 'enhancer')
 /** Buy tiers (guaranteed Overdrive entry). */
 export const BUY_MODES = FS_MODES.filter((m) => m.kind === 'buy')
 
+/**
+ * The Overdrive meter value a feature ENTERS with, per server mode (R047
+ * TASK 3, closing TR-127). NITRO OVERDRIVE sells the meter pre-revved to 5x
+ * and every other route enters at 1x. This is the DESIGN constant the entry
+ * pod proof asserts against; the pod itself renders the book's own seed
+ * (`script.freeSpins[0].meterBefore`), which is the meter's recorded source
+ * of truth, so the proof holding both equal is two independent inputs
+ * agreeing per convention (l.4), not one value read twice.
+ */
+export const METER_PRE_REV: Record<FsServerMode, number> = {
+  base: 1, cruise: 1, antelite: 1, bonus: 1, super: 5,
+}
+
 /** Cost multiplier per server mode id (the server applies the real debit; this
  * is for the UI to show/compute the correct price BEFORE the spin request). */
 export const MODE_COST = FS_MODES.reduce(

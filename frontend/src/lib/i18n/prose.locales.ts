@@ -148,7 +148,7 @@ export const proseLocales: Record<Exclude<Locale, 'en'>, ProseStrings> = {
     comingSoonLower: 'bald verfügbar',
     waysLabel: 'GEWINNWEGE',
     scatterSummary: '3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 Freispiele',
-    disclaimerBody: 'Eine Fehlfunktion macht alle Gewinne und Spiele ungültig. Für das Spielen ist eine stabile Internetverbindung erforderlich. Wenn Ihre Verbindung während einer Runde abbricht, laden Sie das Spiel neu, um eine nicht abgeschlossene Runde zu beenden. Die theoretische Auszahlungsquote an den Spieler wird über viele Tausend Spiele hinweg berechnet und garantiert kein Ergebnis in einer einzelnen Sitzung. Diese Spieldarstellung dient nur zur Veranschaulichung und stellt kein physisches Gerät dar. Gewinne werden gemäß dem Ergebnis abgerechnet, das vom Remote Game Server zurückgegeben wird, und nicht anhand der im Webbrowser angezeigten Ereignisse.',
+    disclaimerBody: 'Eine Fehlfunktion macht alle Gewinne und Spiele ungültig. Für das Spielen ist eine stabile Internetverbindung erforderlich. Wenn deine Verbindung während einer Runde abbricht, lade das Spiel neu, um eine nicht abgeschlossene Runde zu beenden. Die theoretische Auszahlungsquote an den Spieler wird über viele Tausend Spiele hinweg berechnet und garantiert kein Ergebnis in einer einzelnen Sitzung. Diese Spieldarstellung dient nur zur Veranschaulichung und stellt kein physisches Gerät dar. Gewinne werden gemäß dem Ergebnis abgerechnet, das vom Remote Game Server zurückgegeben wird, und nicht anhand der im Webbrowser angezeigten Ereignisse.',
     replayLoadError: 'Wiederholung konnte nicht geladen werden.',
     replayPlaybackError: 'Wiedergabe fehlgeschlagen.',
     guideSpinName: 'Drehen',

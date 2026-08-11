@@ -34,9 +34,12 @@
 // rather than by convention: the code that begins a bet is not reachable from
 // the control that chooses a number.
 //
-// Convention (p):
-//   node scripts/check_autoplay_confirm_gate.mjs --self-test
-//   node scripts/check_autoplay_confirm_gate.mjs
+// RUNNER (TR-123 contract, applied by R047 TASK 5 for CI wiring): npx tsx,
+// from frontend/. Exit 0 on PASS, non-zero on FAIL, terminates (static gate,
+// no server, no browser; the PASS exit is explicit so the whole family
+// carries one stated contract). Convention (p):
+//   npx tsx scripts/check_autoplay_confirm_gate.mjs --self-test
+//   npx tsx scripts/check_autoplay_confirm_gate.mjs
 //
 // Reads only.
 
@@ -203,3 +206,4 @@ if (problems.length) {
 console.log('\nAUTOPLAY EXPLICIT-CONFIRM GATE: PASS')
 console.log('  one-click start is impossible by construction: the selection handler')
 console.log('  cannot set the store, cannot dispatch a spin, and cannot call confirm.')
+process.exit(0)

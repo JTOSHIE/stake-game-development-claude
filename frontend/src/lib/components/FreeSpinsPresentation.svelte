@@ -159,7 +159,13 @@
     }
     phase = 'entry'
     spinIndex = -1
-    displayMeter = 1
+    // R047 TASK 3 (TR-127): the entry pod's FIRST PAINT shows the meter the
+    // feature actually enters with, read from the book's own seed exactly as
+    // the isNitroEntry detection above already does, so a NITRO buyer's first
+    // frame says 5x rather than contradicting the card, the confirm dialog
+    // and the rules that all sold the pre-rev. Every other route enters at 1x
+    // and renders exactly as before. No other timing changes.
+    displayMeter = script.freeSpins[0]?.meterBefore ?? 1
     runningTotalCentibets = script.baseSpin.runningTotalCentibets
     spinsRemaining = script.initialFreeSpins
     awardedTotal = script.initialFreeSpins

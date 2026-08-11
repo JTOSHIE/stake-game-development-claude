@@ -1,0 +1,52 @@
+{
+ "generated": "2026-08-11 R047",
+ "frames": [
+  "t1-paytable-de-p1",
+  "t1-paytable-de-p2",
+  "t1-paytable-de-p3",
+  "t1-paytable-tr-p1",
+  "t1-paytable-tr-p2",
+  "t1-paytable-tr-p3",
+  "t3-nitro-entry-pod-en",
+  "t3-nitro-entry-pod-de",
+  "t5-autoplay-menu-en",
+  "t5-autoplay-selected-start-en",
+  "t5-autoplay-menu-de",
+  "t5-autoplay-selected-start-de"
+ ],
+ "notes": [
+  {
+   "k": "de.waysFigure",
+   "v": "1.024"
+  },
+  {
+   "k": "tr.waysFigure",
+   "v": "1.024"
+  },
+  {
+   "k": "en.nitroEntryPod",
+   "v": [
+    "MULTIPLIER 1×",
+    "MULTIPLIER",
+    "MULTIPLIER 5×"
+   ]
+  },
+  {
+   "k": "de.nitroEntryPod",
+   "v": [
+    "MULTIPLIKATOR 1×",
+    "MULTIPLIKATOR",
+    "MULTIPLIKATOR 5×"
+   ]
+  },
+  {
+   "k": "en.autoStartPresent",
+   "v": 1
+  },
+  {
+   "k": "de.autoStartPresent",
+   "v": 1
+  }
+ ],
+ "errors": []
+}

@@ -164,6 +164,53 @@ export function scanFigures(tables, kitText) {
   return out
 }
 
+/** HALF 3 (R047 TASK 1, closing TR-125's gate gap): no .svelte TEMPLATE text
+ *  node carries a hardcoded figure with a separator. The round 4 review found
+ *  '1,024' rendering en-form into ten comma-decimal locales, and this gate's
+ *  figure half could not see it because it scans locale TABLE strings only; a
+ *  component-hardcoded figure was structurally outside every scan. This half
+ *  reads the markup section of every component (script and style blocks
+ *  stripped, {expressions} and HTML comments blanked) and flags any digits
+ *  beside a separator in rendered text, the exact form that shipped. */
+export function scanTemplates(svelteFiles) {
+  const out = []
+  const FIGURE = /\d[.,]\d/
+  for (const p of svelteFiles) {
+    let src
+    try { src = readFileSync(p, 'utf-8') } catch { continue }
+    let tpl = src
+      .replace(/<script[\s\S]*?<\/script>/g, '')
+      .replace(/<style[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\{[^{}]*\}/g, ' ')      // template expressions render at runtime
+    // Text nodes only: what sits between a closing '>' and the next '<'.
+    const lines = tpl.split('\n')
+    lines.forEach((line, i) => {
+      for (const m of line.matchAll(/>([^<>]+)</g)) {
+        if (FIGURE.test(m[1])) {
+          out.push({
+            half: 'template', file: relative(ROOT, p), line: i + 1,
+            detail: `hardcoded figure ${JSON.stringify(m[1].trim().slice(0, 40))} in a rendered template text node (route it through toLocaleString)`,
+          })
+        }
+      }
+    })
+  }
+  return out
+}
+
+function walkSvelte(dir, out = []) {
+  let entries
+  try { entries = readdirSync(dir) } catch { return out }
+  for (const name of entries) {
+    const p = join(dir, name)
+    const st = statSync(p)
+    if (st.isDirectory()) walkSvelte(p, out)
+    else if (name.endsWith('.svelte')) out.push(p)
+  }
+  return out
+}
+
 function report(findings) {
   for (const f of findings) {
     console.error(`  [${f.half}] ${f.detail}${f.file ? ` (${f.file})` : ''}${f.half === 'figure' ? (f.shipped ? ' SHIPPED IN KIT' : ' source only, ships next build') : ''}`)
@@ -208,12 +255,30 @@ if (process.argv.includes('--self-test')) {
   const cleanFig = scanFigures(cleanTables, JSON.stringify(cleanTables)).length === 0
   console.log(`  ${cleanFig ? 'clean  ' : 'FALSE+ '} the corrected comma-decimal forms (5.000×, 1,6×, 1,25×) pass`)
 
+  // SEED 3, the R047 template class: the exact '1,024' form the round 4
+  // review found in a rendered text node, beside the two forms that must
+  // stay clean (a template expression, and digits inside a style block).
+  mkdirSync(tmp, { recursive: true })
+  writeFileSync(join(tmp, 'Seeded.svelte'),
+    '<script>const n = 1024</script>\n'
+    + '<style>.x { margin: 0.5rem; }</style>\n'
+    + '<span class="x">1,024</span>\n')
+  const tplHits = scanTemplates([join(tmp, 'Seeded.svelte')])
+  const tplRed = tplHits.some((f) => f.detail.includes('1,024'))
+  console.log(`  ${tplRed ? 'caught ' : 'MISSED '} seeded '1,024' in a rendered template text node (TR-125's own form)`)
+  writeFileSync(join(tmp, 'Clean.svelte'),
+    '<script>const n = 1024</script>\n'
+    + '<style>.x { margin: 0.5rem; }</style>\n'
+    + '<span class="x">{(1024).toLocaleString($locale)}</span>\n<svg viewBox="0 0 24.5 24"></svg>\n')
+  const tplClean = scanTemplates([join(tmp, 'Clean.svelte')]).length === 0
+  console.log(`  ${tplClean ? 'clean  ' : 'FALSE+ '} the localised expression, the style block and the attribute pass`)
+
   rmSync(tmp, { recursive: true, force: true })
-  if (!basisRed || !figRed || !cleanBasis || !cleanFig) {
+  if (!basisRed || !figRed || !cleanBasis || !cleanFig || !tplRed || !tplClean) {
     console.error('\nKIT BASIS GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nKIT BASIS GATE SELF-TEST: PASS (2 seeded violations caught, 2 negative controls clean)')
+  console.log('\nKIT BASIS GATE SELF-TEST: PASS (3 seeded violations caught, 3 negative controls clean)')
   process.exit(0)
 }
 
@@ -232,6 +297,7 @@ const { proseI18n } = await import('../src/lib/i18n/prose.ts')
 const findings = [
   ...scanBasis(kitFiles),
   ...scanFigures([locales, featureI18n, proseI18n], kitText),
+  ...scanTemplates(walkSvelte(join(ROOT, 'src'))),
 ]
 // The social table is English; en is not a comma-decimal locale, so the figure
 // half does not apply to it. Its basis phrases are covered by scanBasis above.

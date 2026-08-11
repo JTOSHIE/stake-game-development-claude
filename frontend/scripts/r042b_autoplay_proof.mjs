@@ -20,8 +20,18 @@
 //
 // CONVENTION (h.1): scratch by default, --out=<dir> to place frames on purpose.
 //
-// Usage, from frontend/, after `npm run build`:
-//   node scripts/r042b_autoplay_proof.mjs [--out=<dir>]
+// RUNNER (TR-123 contract, applied by R047 TASK 5 for CI wiring): npx tsx,
+// from frontend/, after `npm run build`. Exit 0 on PASS, non-zero on FAIL,
+// terminates (in-process server closed, exits explicit). Fixed port 4551,
+// unique in the family (the 4541 pair is settle and wording).
+//   npx tsx scripts/r042b_autoplay_proof.mjs [--out=<dir>]
+//   npx tsx scripts/r042b_autoplay_proof.mjs --self-test
+//
+// The --self-test re-invokes this proof with FS_SEED_VIOLATION=1, which
+// installs a page-level handler making a COUNT SELECTION press Start the
+// moment it appears: the exact one-click class blocker B8 closed, planted at
+// the boundary a player's finger meets. The central assertion (choosing a
+// count places NO bet) must go red and the process must exit non-zero.
 
 import { chromium } from 'playwright'
 import { createServer } from 'node:http'
@@ -77,11 +87,51 @@ const ok = (m) => console.log(`  ok    ${m}`)
 const clean = (s) => s.replace(/\s+/g, ' ').trim()
 const ledger = {}
 
+const SEED = process.env.FS_SEED_VIOLATION === '1'
+
+// ── self-test, convention (p): seeded red AND the exit contract ──────────────
+if (process.argv.includes('--self-test')) {
+  const { spawnSync } = await import('node:child_process')
+  const r = spawnSync('npx', ['tsx', fileURLToPath(import.meta.url)], {
+    cwd: ROOT,
+    env: { ...process.env, FS_SEED_VIOLATION: '1' },
+    encoding: 'utf-8',
+    timeout: 300_000,
+  })
+  const out = (r.stdout || '') + (r.stderr || '')
+  const red = /R042B AUTOPLAY PROOF: FAIL/.test(out)
+  const named = /choosing a count placed \d+ bet/.test(out)
+  const exited = typeof r.status === 'number' && r.status !== 0
+  console.log(`  ${red ? 'caught ' : 'MISSED '} the seeded one-click selection turned the proof red`)
+  console.log(`  ${named ? 'named  ' : 'UNNAMED'} the red is the no-bet-on-selection assertion, blocker B8's own class`)
+  console.log(`  ${exited ? 'exited ' : 'HUNG   '} the failing invocation exited non-zero (status ${r.status}${r.signal ? ', signal ' + r.signal : ''})`)
+  if (!red || !named || !exited) {
+    console.error('\nR042B AUTOPLAY PROOF SELF-TEST: FAIL')
+    process.exit(1)
+  }
+  console.log('\nR042B AUTOPLAY PROOF SELF-TEST: PASS (seeded one-click red, non-zero exit, terminated)')
+  process.exit(0)
+}
+
 const srv = await serve()
 const browser = await chromium.launch()
 try {
   console.log('R042B AUTOPLAY PROOF: choosing a count must not place a bet\n')
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } })
+
+  if (SEED) {
+    // Convention (p): the one-click defect in the form it occurs, a selection
+    // that begins a bet, planted at the DOM boundary before the app boots.
+    await page.addInitScript(() => {
+      document.addEventListener('click', (e) => {
+        const el = e.target instanceof Element ? e.target.closest('button.auto-menu-item') : null
+        if (el) setTimeout(() => {
+          const start = document.querySelector('[data-testid="auto-start"]')
+          if (start instanceof HTMLElement) start.click()
+        }, 50)
+      }, true)
+    })
+  }
 
   let playCalls = 0
   await page.route('**/wallet/**', async (route) => {
@@ -119,7 +169,9 @@ try {
   const counts = page.locator('button.auto-menu-item')
   const nCounts = await counts.count()
   await counts.nth(Math.min(1, nCounts - 1)).click()
-  await page.waitForTimeout(700)
+  // In seed mode the observation window widens so the planted one-click's bet
+  // is certainly on the wire before the assertion reads the counter.
+  await page.waitForTimeout(SEED ? 2200 : 700)
   await page.screenshot({ path: join(OUT, '02-count-selected-not-started.png') })
 
   const startAfter = await page.locator('[data-testid="auto-start"]').count()
@@ -136,6 +188,17 @@ try {
 
   const stillIdle = await page.locator('[data-testid="spin-button"]').isEnabled().catch(() => true)
   ledger.afterSelect = { playCalls, startControls: startAfter, selected }
+
+  if (SEED) {
+    // The seed exists to prove the assertion above goes red; every later step
+    // is meaningless on a page whose selection already started autoplay, and
+    // attempting them crashes past the verdict instead of printing it.
+    await browser.close()
+    srv.close()
+    if (failures) { console.error(`\nR042B AUTOPLAY PROOF: FAIL (${failures})`); process.exit(1) }
+    console.log('\nR042B AUTOPLAY PROOF: PASS')
+    process.exit(0)
+  }
 
   // STEP TWO. Start.
   await page.locator('[data-testid="auto-start"]').click()
@@ -186,3 +249,4 @@ try {
 
 if (failures) { console.error(`\nR042B AUTOPLAY PROOF: FAIL (${failures})`); process.exit(1) }
 console.log('\nR042B AUTOPLAY PROOF: PASS')
+process.exit(0)
