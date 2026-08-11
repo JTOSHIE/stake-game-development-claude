@@ -1043,12 +1043,12 @@ ran this visit, that is fine: PART 9i does everything this one did.
 1. **The kit has a HUMAN VERSION now.** It is **v9**. You will see `v9` in the kit folder's
    README, inside the bundle, and as the first thing the browser console prints. You no
    longer have to read a hash to know which build you are looking at.
-2. **You are uploading to `future-spinner-2`**, which is the submission entry. The original
+2. **You are uploading to `future-spinner`**, the sole and submission entry since the owner deleted the -2 entry and cleared prior uploads on 2026-08-11 (R051). The original
    `future-spinner` entry is superseded and gets deleted once the cooldown allows.
 
 **What you are working from:** `~/Desktop/FS_UPLOAD_KIT_V9/`. Delete every older kit.
 
-## 1. Import the FULL kit contents to `future-spinner-2`
+## 1. Import the FULL kit contents to `future-spinner`
 
 Drag in **everything** in `FS_UPLOAD_KIT_V9/`, not a subset. The portal's sync dialog compares
 what you hand it against what it holds and reports four numbers: Upload, Skip, Delete, Move.
@@ -1108,13 +1108,13 @@ None of these is a test you can fail. Anything that looks wrong is worth a scree
 
 Delete `~/Desktop/FS_UPLOAD_KIT_V9/` when you are done, along with every older kit. Kits are
 single use. Then, once the platform's cooldown allows, delete the original `future-spinner`
-entry so only `future-spinner-2` remains.
+entry so only one entry remains. (Overtaken 2026-08-11: the owner deleted -2 instead; `future-spinner` is the sole entry, R051.)
 
 ## 6. Then the owner list
 
 `OWNER_CHECKLIST.md` at the repository root. Item 0b now says what is already done and where
 the proof is, so you are not asked twice. What is left needs you: the Guidelines ticks on
-`future-spinner-2`, the USPTO position, confirming the payments model, and the accountant.
+`future-spinner` (post-R051), the USPTO position, confirming the payments model, and the accountant.
 
 ---
 

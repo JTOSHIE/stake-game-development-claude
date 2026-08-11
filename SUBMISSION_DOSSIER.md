@@ -224,9 +224,11 @@ remember to check.
 Regenerate immediately before staging with a clean `npm run build` from `frontend/` - never
 upload a stale or hand-edited `dist/`.
 
-### 5b0. THE SUBMISSION ENTRY IS `future-spinner-2` (owner's ruling, 2026-07-28)
+### 5b0. THE SUBMISSION ENTRY IS `future-spinner` (owner action, 2026-08-11; previously future-spinner-2 by the 2026-07-28 ruling)
 
-**Everything in 5b onward targets the game entry `future-spinner-2`.** It is a fresh clean
+**REVERSED 2026-08-11 by owner action (R051): the future-spinner-2 entry is DELETED, the original future-spinner is the sole and submission entry, and the owner cleared the previous uploads and cache.**
+
+**Everything in 5b onward targets the game entry `future-spinner`** (reversed as above). The deleted -2 entry was a fresh clean
 upload and it is the entry that will be submitted.
 
 The original `future-spinner` entry is **superseded**. It awaits deletion once the platform's
@@ -238,7 +240,7 @@ here rather than left to memory.
 `071805`, whose boot line reads build `e0c30611`, the kit V8 commit, and whose bundle hash
 `index-pDIjyKAp.js` matches the kit's own JS filename.
 
-**One thing on that frame is EXPECTED and is not a fault.** `GET .../approvals/future-spinner-2`
+**One thing on that frame is EXPECTED and is not a fault.** `GET .../approvals/future-spinner-2` (a dated frame of the deleted entry)
 returns **404 (Not Found)** until Start Approval is pressed. Recorded so a reviewer meeting it
 in a console capture does not read it as a defect.
 
@@ -249,7 +251,7 @@ no code change. Full reasoning in **TR-102**.
 
 ### 5b. Exact portal upload steps
 
-1. Log in to the Stake Engine developer dashboard and open the **`future-spinner-2`** entry
+1. Log in to the Stake Engine developer dashboard and open the **`future-spinner`** entry (the sole entry since the owner's 2026-08-11 deletion of -2)
    (team profile, branding and payment details must already be confirmed one-time - see 5d
    below).
 2. Upload the frontend bundle: the full contents of `frontend/dist/` as produced in 5a,

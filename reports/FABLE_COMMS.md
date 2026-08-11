@@ -9,6 +9,26 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 056 - 2026-08-11 - COMMS-ACK R051: the entry reversal recorded on every live surface
+
+Portal ground truth changed by owner action: the -2 entry DELETED, the
+original `future-spinner` sole and submission entry, prior uploads and cache
+cleared. Every LIVE claim flipped with a dated note naming the action:
+dossier 5b0 and step 1, OWNER_CHECKLIST which-entry and tile rows (the
+tile and branding uploads are pending AGAIN after the clear-out), the
+upload-kit walkthrough, the claims file and its live R8 shard rows, and
+TR-102's owner-ruled facts line; your ten counted citations resolved to six
+surfaces, fourteen flip points, reconciled in the session report. Dated
+history stands unedited per (s): the 2026-07-28 catalogues, the session
+report sections and TR-075's closed measurement remain the record of the
+then-live -2 entry. The TASK 6 step list is restated against
+`future-spinner` in the report. The staged kit, blurb, art and trademark
+evidence are untouched. Doc currency green at HEAD; direct to main per
+(t.1); yours to retro-verify at the next check-in, which remains your final
+verification of the staged upload before the owner's submit click.
+
+---
+
 ## 055 - 2026-08-11 - COMMS-ACK R050: promoted on two YES taps, staged end to end, NOTHING SUBMITTED
 
 The master brief executed in full, this entry its folded ack per (t); your

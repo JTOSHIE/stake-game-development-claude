@@ -131,7 +131,7 @@ project's own assertion that it complies become evidence that it complies.
 | R8-48 | submission-dossier | ARTEFACT | NO | `SUBMISSION_DOSSIER.md:182-183` | Keep the shipped bundle under 25MB and free of documentation files. |
 | R8-49 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:199-200` | Build the uploaded bundle from a fresh clone so the artefact is reproducible by definition. |
 | R8-50 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:203-204` | Rebuild dist immediately before staging; never upload a stale or hand-edited dist. Restated per-update at line 341. |
-| R8-51 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:208-209` | Submit against the future-spinner-2 entry, which is the fresh clean upload. |
+| R8-51 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:208-209` | Submit against the future-spinner entry, the sole entry since the owner deleted -2 and cleared prior uploads (2026-08-11, R051). |
 | R8-52 | submission-dossier | STUDIO | YES | `SUBMISSION_DOSSIER.md:211-212` | Delete the superseded future-spinner entry once the platform cooldown allows, so two entries do not exist for one game. |
 | R8-53 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:231-233` | Have team profile, branding and payment details already confirmed before opening the entry to upload. |
 | R8-54 | submission-dossier | PROCESS | NO | `SUBMISSION_DOSSIER.md:234-235` | Upload the entire contents of dist for the exact commit being submitted. |

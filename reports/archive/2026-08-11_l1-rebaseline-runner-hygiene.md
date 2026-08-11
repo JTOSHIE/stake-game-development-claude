@@ -555,3 +555,45 @@ bundle path having printed; NOTHING IS SUBMITTED this session.
 **FOR THE NEXT SESSION**: Fable's final verification of the staged upload
 against main, then the owner's submit click, on the owner's word only after
 that verification lands.
+
+## R051 ADDENDUM, 2026-08-11: the entry reversal recorded, the step list restated
+
+FABLE RECORD CORRECTION R051: portal ground truth changed by owner action.
+The future-spinner-2 entry is DELETED, the original `future-spinner` is the
+sole and submission entry, and the owner cleared the previous uploads and
+cache. Every LIVE claim was flipped with a dated note naming the owner's
+action: the dossier's 5b0 and step 1 (4 flip points), OWNER_CHECKLIST's
+which-entry and tile rows (2), the upload-kit walkthrough (4), the claims
+file and its live R8 shard rows (3), and TR-102's owner-ruled facts line
+(1). The brief counted ten citations at 85750f9c; the sweep resolved them
+to these six surfaces, several carrying more than one mention, fourteen
+flip points in all, enumerated here so the counts reconcile. Dated history
+(session report sections, the two 2026-07-28 screens catalogues, TR-075's
+closed measurement on the then-live -2 entry) stands unedited per
+convention (s). The staged kit, blurb, art and trademark evidence are
+untouched.
+
+**THE OWNER STEP LIST, RESTATED against `future-spinner` (supersedes the
+R050 statement above; the owner's clear-out also means the tile and
+branding uploads are pending again):**
+
+(a) Provider logo, one time: Team Settings, then Branding, upload
+    `assets/portal/provider_logo.png` (1024x1024 dark plate).
+(b) Tile, on the `future-spinner` game page: Tile Editor, upload
+    `assets/portal/tile_background.jpg` as the background layer,
+    `assets/portal/tile_foreground.png` as the foreground layer,
+    `assets/portal/tile_title.png` as the title layer, set the gradient,
+    save.
+(c) Versions, on `future-spinner`: upload the staged bundle from
+    ~/Desktop/FS_UPLOAD_KIT (the frontend upload set and the twelve publish
+    files per its README), make it the active version, then bin the kit
+    folder per the standing done-means-gone rule.
+(d) Payment details under the Medium Rare N.V. terms: read the terms first,
+    then complete payment details in the portal.
+(e) Blurb: at the `future-spinner` submission form, paste the staged text
+    from `docs/records/SUBMISSION_BLURB_2026-08-11.md` once approved; the
+    social variant if the form asks.
+
+NOTHING IS SUBMITTED. Fable retro-verifies this correction at the next
+check-in; the next session remains Fable's final verification of the staged
+upload, then the owner's submit click on the owner's word.
