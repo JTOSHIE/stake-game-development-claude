@@ -297,6 +297,17 @@ The verification is recorded rather than merely performed because a deletion is 
 after the head is gone: the table is what lets a reader a year from now check the decision
 instead of trusting it.
 
+### Owner-approved deletions pending, 2026-08-11 (ruling (t.1) rule 3)
+
+Two auto-named session heads, `claude/future-spinner-audit-yv55hj` (tip `a5b51567`,
+patch-identical to main) and `claude/remote-control-tv30mf` (tip equal to main's own),
+are owner-approved for deletion but still exist on the remote: the approving session ran
+in a cloud container whose git proxy denies ref deletion (HTTP 403), so the deletion
+passes to the owner's one click or the next local session. The enumeration, the
+verification method and the exact commands are at
+**`docs/records/BRANCH_HYGIENE_2026-08-11.md`**. Once both are gone, the six-branch
+list above is exactly true again and this note becomes a dated record of the interim.
+
 ### Reference / prototype branches (not on main)
 
 Not-for-release maths prototypes and forks live on their own branch, never on `main` -

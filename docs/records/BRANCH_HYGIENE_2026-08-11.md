@@ -41,7 +41,26 @@ ruling regardless.
 
 ## State
 
-**Nothing has been deleted.** The two DELETE verdicts above await the owner's OK in
-chat, per the ruling's own condition. When the OK lands, the deletions and the
-reconciliation of CLAUDE.md's BRANCHES table (which currently says six branches and
-does not name the two auto-named session heads) are one small record-only follow-up.
+**The owner's OK landed in chat on 2026-08-11** ("OK delete both"), and the two
+deletions were then ATTEMPTED from the session and BLOCKED by the environment:
+the cloud session's git proxy returns HTTP 403 on any ref deletion (both the
+`git push origin --delete <name>` form and the empty-refspec
+`git push origin :refs/heads/<name>` form; verified by `git ls-remote --heads`
+showing both heads surviving each attempt), and the GitHub MCP toolset carries
+`create_branch` but no branch deletion. Commits push fine; only ref deletion is
+filtered.
+
+**So the two owner-approved deletions pass to a hand that can reach them**, and
+nothing here is guessed at or routed around: either one click each on the
+repository's branches page, or two commands in the next session on a machine
+with direct push credentials:
+
+```
+git push origin --delete claude/future-spinner-audit-yv55hj
+git push origin --delete claude/remote-control-tv30mf
+```
+
+Both tips are recorded in the table above for resurrection if ever wanted. Once
+they are gone, CLAUDE.md's BRANCHES table ("six branches and that is the whole
+list") is exactly true again with no edit needed; its dated note pointing here
+records the interim.

@@ -11737,3 +11737,15 @@ Fable's standing ruling (t.1) arrived by owner paste (saved verbatim at
   chat OK is awaited.**
 - This commit series is itself the first direct-to-main record commit under
   rule 1, with its push's remote CI verified per rule 10.
+
+## FOURTH ADDENDUM, 2026-08-11: the owner's OK, and the deletion the environment refused
+
+The owner's chat OK for both rule 3 deletions arrived ("OK delete both").
+Both were attempted and BLOCKED: the cloud session's git proxy returns HTTP
+403 on ref deletion in both command forms, verified by `git ls-remote` after
+each attempt, and the GitHub MCP toolset has no branch deletion. Commits push
+fine; only ref deletion is filtered. Recorded honestly per facts discipline
+item 5 rather than routed around: the two deletions pass to the owner's one
+click or the next local session, with the exact commands and both tip SHAs in
+`docs/records/BRANCH_HYGIENE_2026-08-11.md`, and CLAUDE.md's BRANCHES section
+carries a dated interim note. Nothing else remains open from ruling (t.1).
