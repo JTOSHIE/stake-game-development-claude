@@ -595,8 +595,10 @@ it is UNKNOWN rather than assumed, per rule 16.
 
 **RESOLVED 2026-08-11, VERIFIED by live capture** (BRIEF L1 PHASE 2, executed
 in the R044 round when the owner's paste yielded the session-bearing launch
-url; raw bodies at `docs/stake-engine-live/captures/2026-08-11_wallet_400_1.json`
-to `_3.json`, real session id redacted, responses byte for byte). The platform
+url; raw bodies under `docs/stake-engine-live/captures/`, the three files
+`2026-08-11_wallet_400_1.json`, `2026-08-11_wallet_400_2.json` and
+`2026-08-11_wallet_400_3.json`, real session id redacted, responses byte for
+byte). The platform
 answers both `/wallet/authenticate` and `/wallet/play` 400s with:
 
     {"error":"ERR_VAL","message":"could not parse request json"}

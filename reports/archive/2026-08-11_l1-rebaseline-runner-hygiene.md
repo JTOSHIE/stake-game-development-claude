@@ -141,3 +141,81 @@ FABLE_COMMS, REVIEW_TRACKER TR-123 row, the verbatim brief (records, main).
 Open threads: **external audit refresh is next per the brief**; the
 two-line document currency ruling (unblocks every future green); PR #122
 awaiting Fable verification; Q6 still owner-gated; B14 still with the owner.
+
+## R044 ADDENDUM, 2026-08-11: the STOP resolved, PR #122 merged, and Q6 settled the same hour
+
+FABLE RULING BLOCK R044 arrived as an owner paste (review-lane authorisation),
+saved verbatim at `reports/briefs/FS_FABLE_RULING_R044_Prompt.md`, and its
+trailing paste carried the portal address that unlocked Q6.
+
+**Items 1 and 2.** The two record notes appended exactly as ruled. The
+DEAD_COMMIT check gained the second-chance resolver, and its mechanism was
+MEASURED before it was written: `git fetch origin <sha>` is refused by GitHub
+on BOTH transports today, even for a SHA that is a pull-head tip ("couldn't
+find remote ref", https and ssh alike), so the targeted fetch is attempted
+first per the ruling's letter and the rescue that actually works is a
+once-per-run fetch of the pull-heads namespace into `refs/prefetch/pull/*`,
+verified in a fresh anonymous https clone before shipping (one fetch, and
+a5b51567 resolves). Convention (p), both sides, quoted from the self-test:
+
+    caught  SEED 4   a commit SHA that does not resolve (no origin to rescue from)
+    caught  SEED 4b  a SHA held only by the origin pull ref is RESCUED, not reported
+    caught  SEED 4c  a fabricated SHA still fails through both fetch attempts
+
+Self-test 28 of 28. The rescued case builds a REAL second repository playing
+GitHub, its commit held only by `refs/pull/1/head`.
+
+**Item 3, and one ordering call surfaced per convention (n).** The item 1-2
+commit rode the PR #122 branch rather than a separate main push, because the
+gate, once fixed, correctly flags the OTHER half of the situation: two record
+documents already on main (`REVIEW_TRACKER.md:372`, `FABLE_COMMS.md:32`) cite
+`frontend/scripts/README.md`, which existed only on the PR branch, so a
+separate item-3 push could not have been green in ANY order, and the ruling's
+stated goal is full green estate-wide. A correction to this session's own
+record follows from the same finding: COMMS 049 attributed the 4a55eaf5 red
+to the a5b51567 STOP alone, and the full finding set on that push also
+carried these two README DEAD_DOCREFs, self-inflicted by the record commits
+describing the PR's README before the PR merged. Stated here so the record
+is exact.
+
+**Item 4.** PR #122 round 2: 21 of 21 checks green, including the repaired
+static leg (the resolver exercised in CI's own anonymous clone) and the three
+newly wired browser legs. Merged by rebase; the session branch deleted on the
+remote and locally, verified by `git ls-remote` count zero; TR-123 CLOSED on
+the merge. Main took `86681bfd` (TR-123) and `76776601` (R044 items 1-2),
+then `659a9229` (Q6, below) rebased on top and pushed.
+
+**Q6, SETTLED.** The pasted portal address, opened in the browser, minted the
+session-bearing game url (sessionID and rgs_url present; the launch=true
+parameters auto-opened the play modal and the game iframe carried the full
+url). `tools/capture_rgs_400.sh` ran against it: authenticate invalid 400,
+authenticate real 200 (the control), play invalid 400, raw bodies committed
+under `docs/stake-engine-live/captures/`, the three dated
+2026-08-11 files, with the real session id redacted. **The answer: both 400 bodies are
+`{"error":"ERR_VAL","message":"could not parse request json"}`. The
+identifier field is top-level `error`; `handleRGSError` reads top-level
+`code`; the VALUE vocabulary matches the known-codes table and the FIELD does
+not, so on a real platform error the mapping never fires and the player gets
+the generic branch.** OWNER_RULINGS section C is RESOLVED with the one-line
+fix named and not made (locked file, no sanction; escalated per convention
+l.8, LOCKED_FILE_DEBTS row queued for the next sanctioned CLAUDE.md pass).
+The capture script now stamps the real capture date, convention (s) caught on
+the instrument's first live run.
+
+**Rule 10, including one red this session caused and caught.** PR run 21/21
+green (recorded above); the merge push's own run was superseded seconds later
+under cancel-in-progress, the documented deliberate trade. The Q6 push
+(`659a9229`) then went RED on the static leg, and the cause was THIS
+SESSION'S OWN SHORTHAND: OWNER_RULINGS cited the three capture files as
+"`..._400_1.json` to `_3.json`", and the backticked `_3.json` is a path
+claim naming no file, exactly the DEAD_PATH class the gate polices. Caught
+by running the gate locally over the close-state tree before the close
+commit; the wording is corrected here and in COMMS 050 (which carried the
+sibling `1..3.json` form, never pushed), the close push carries the fix, and
+its green run is recorded in the final close line. The gate judging its own
+author's records within the hour of gaining the resolver is the system
+working, and it is recorded as such rather than smoothed over.
+
+**Environment note.** The Claude in Chrome extension was not connected, so
+the portal was opened in the app's browser pane, which carried the portal
+session; recorded so the next session knows both paths.

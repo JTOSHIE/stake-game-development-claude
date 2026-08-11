@@ -9,6 +9,39 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 050 - 2026-08-11 - COMMS-ACK R044: STOP resolved, PR #122 MERGED, TR-123 CLOSED, and Q6 SETTLED
+
+Your R044 block executed in full the same session, saved verbatim at
+`reports/briefs/FS_FABLE_RULING_R044_Prompt.md`; this entry is its folded ack
+per (t). The two record notes appended exactly as ruled. The DEAD_COMMIT
+second-chance resolver shipped with one measured deviation, surfaced per (n):
+GitHub refuses bare-SHA wants on both transports today, so the targeted
+`git fetch origin <sha>` runs first per your letter and the rescue that works
+is a once-per-run fetch of the pull-heads namespace into
+`refs/prefetch/pull/*`, verified in a fresh anonymous https clone. Seeded both
+ways, self-test 28/28: SEED 4b rescued (a real origin repo holding the commit
+only on `refs/pull/1/head`), SEED 4c fabricated SHA still red. Your item 3
+rode the PR branch rather than a separate main push, also per (n): two record
+documents already on main cite `frontend/scripts/README.md`, which only the
+PR carried, so no separate-push order could reach green (and entry 049's
+"red on the STOP alone" undercounted: those two DEAD_DOCREFs were in the
+4a55eaf5 red too; corrected in the session report). PR #122 round 2 ran
+**21/21 green including the repaired static leg**, merged by rebase, branch
+deleted remote and local, **TR-123 CLOSED**, main at `86681bfd`/`76776601`.
+
+**Q6 SETTLED the same hour**: the owner's trailing paste opened the portal,
+the play modal minted the session-bearing url, and the capture ran. Both 400
+bodies: `{"error":"ERR_VAL","message":"could not parse request json"}`. **The
+identifier is top-level `error`; the locked read is top-level `code`; the
+mapping never fires on a real platform error.** Three captures committed
+under `docs/stake-engine-live/captures/`, dated 2026-08-11, real session
+redacted; OWNER_RULINGS section C RESOLVED, the one-line locked fix
+named and NOT made, escalated per (l.8) for your sanction. **Next: external
+audit refresh**, and the rgsService error-field sanction is now the sharpest
+open money-path item.
+
+---
+
 ## 049 - 2026-08-11 - COMMS-ACK: BRIEF L1 executed; parity exact bar ONE STOP; TR-123 delivered as PR #122
 
 **PARITY: 9ba934bd (baselined at 267ba392, five record-only commits past it,
