@@ -12051,3 +12051,65 @@ safety posture (fabricated session, cannot authenticate, cannot bet).
 **Queued for Fable, not done here (scope: this job only)**: CI-wiring the new
 proof as a browser leg, and the dead `sessionExpired` locale key noticed in
 passing (present in all locales, referenced by nothing).
+
+## R046 ADDENDUM, 2026-08-11: round 4 external refresh, three independent 2.33s, band 2
+
+FABLE BRIEF R046 executed in full in the adversarial posture it ordered,
+saved verbatim at `reports/briefs/FS_FABLE_R046_ROUND4_Prompt.md`. Product
+code was READ-ONLY throughout; every finding escalated as a tracker row,
+nothing fixed. The brief asked for a fresh session at judgement tier; it was
+pasted into the running Fable 5 session and executed here, R045 precedent,
+recorded not hidden.
+
+**TASK 0**: `r045_error_field_proof.mjs` wired as the browser leg "rgs error
+dialect" under the TR-123 contract; its first matrix run came back green with
+the whole 22-job set at `14cb9a2f`. TR-124 records the sessionExpired ruling
+verbatim: KEEP unchanged, wiring or retirement post-approval.
+
+**TASK 1**: all 64 mirror pages re-rendered by the recorded method, ZERO
+deltas against 2026-08-10, no STOP; dated set at
+`docs/stake-engine-live/2026-08-11/`, COMPLIANCE_WATCH entry logged.
+
+**TASK 3, and its own lesson kept**: the built kit driven headless through
+one round per mode in en and de against a stub wallet speaking the captured
+`{"error": code}` dialect, round data from round 0 of each mode's own
+published book. It took four driver passes to get all ten rounds: the
+spin-mode controls are `standing-select-*` and `enhancer-toggle-*`, not the
+buy tiers' `activate-*`; and the feature entry control sits under the
+animation layer, so only the house library's DOM-level click lands, which
+pass 3's stuck-at-entry frame proved. 52 frames plus `observations.json`
+committed; the wallet log shows base, cruise, antelite, bonus and super each
+played in both languages.
+
+**TASK 2**: three independent reviewer contexts (player-experience,
+compliance-and-requirements, production-quality lenses), no reviewer seeing
+another's output, each scoring fractional thirds against the published
+scale. **All three returned 2.33; band estimate 2 stars; no reviewer-fatal
+finding, so the STOP clause never fired.** The full report with verbatim
+reasoning, per-criterion verdicts and citations is
+`docs/records/reviews/ROUND4_EXTERNAL_REFRESH_2026-08-11.md`.
+
+**Findings, all escalated not fixed**: TR-125 (de paytable mixes en-form
+numerals beside ruled locale forms; kit_basis scans locale tables so a
+component-hardcoded figure is structurally outside it), TR-126 (hardcoded
+English 'All modes ·' footer in sixteen locales; outside the hardcoded
+string gate's baseline), TR-127 (NITRO entry pod shows MULTIPLIER 1x against
+the sold 5x pre-rev, both locales, the sharpest of the three), TR-128 (de
+du/Sie mix on one modal), TR-129 (this session's OWN capture defects: the
+autoplay surface never framed, base 'mid' frames settled, duplicate paytable
+pages; and neither autoplay proof is a CI leg), TR-130 (GAME_FACTS instant
+award basis wording, a rule 16 question for a recount, not an instruction).
+
+**Owner gates, stated plainly in the report**: play-test verdict on the
+current build, the five one-timers, the blurb sentence, trademark clearance,
+Fable's art masters, B14.
+
+**DONE MEANS, accounted**: report committed with all three scores and the
+band; frames present (52); tracker rows opened (TR-124 to TR-130); CI green
+including the newly wired leg (run at `14cb9a2f`, 22 jobs; close push run
+recorded below); tree clean at close.
+
+**FOR THE NEXT SESSION**: Fable's tile and logo art masters plus owner
+one-timers, then submission staging. The three consensus majors (TR-125 to
+TR-127) are the builder-side distance to the 3-star polish bar and are
+small, bounded, display-layer fixes awaiting a work order.

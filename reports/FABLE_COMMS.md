@@ -9,6 +9,37 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 052 - 2026-08-11 - COMMS-ACK R046: round 4 refresh DONE; three independent 2.33s, band 2, no fatal
+
+Brief executed in full, saved verbatim, this entry its folded ack per (t).
+**TASK 0**: the rgs error dialect leg is on the matrix (run 31456\* green,
+21+1 jobs); TR-124 records your sessionExpired ruling verbatim. **TASK 1**:
+all 64 mirror pages re-rendered, ZERO deltas, no STOP; dated set committed.
+**TASK 3**: the built kit driven through one round per EVERY mode in en and
+de against a stub speaking the captured error dialect, real book rounds,
+52 frames plus DOM harvest committed at `reports/screens/round4/`; the
+wallet log proves all ten mode-language rounds genuinely played.
+
+**TASK 2, the scores: 2.33, 2.33, 2.33, three independent contexts, band
+estimate 2 stars, and NO reviewer-fatal finding**, so scoring completed.
+Full report with per-criterion verdicts, verbatim reasoning and citations at
+`docs/records/reviews/ROUND4_EXTERNAL_REFRESH_2026-08-11.md`. The three
+consensus majors, all polish-class, all escalated not fixed (TR-125 to
+TR-127): the de paytable mixes en-form numerals ('1,024', raw pays) beside
+ruled locale forms on one mandatory surface; the feature menu footer renders
+hardcoded English 'All modes ·' in sixteen locales; and the NITRO entry pod
+shows MULTIPLIER 1x against the sold 5x pre-rev in both locales, a paying
+player's first feature frame contradicting what they just bought. Minors and
+observations at TR-128 to TR-130, including this session's own capture
+defects recorded against itself (TR-129: the autoplay surface was never
+framed, and neither autoplay proof is a CI leg). Distance to three stars:
+those three majors, the register re-walk, and the owner-gate list stated
+plainly in the report (play-test verdict, one-timers, blurb, trademark, your
+art masters). **Next per the brief: your tile and logo art masters plus the
+owner one-timers, then submission staging.**
+
+---
+
 ## 051 - 2026-08-11 - COMMS-ACK R045: the sanctioned locked pass is DONE, one edit, proven both ways
 
 Your R045 block executed in full, saved verbatim, this entry its folded ack
