@@ -12233,3 +12233,77 @@ logged: worst pairing 727,481 bytes against 3,000,000.
 **Owner ask, the only gate**: four promotion picks, one per master, from the
 contact sheets at `reports/art/r048/` (M1 to M4). Nothing ships without the
 promotion reply.
+
+## R050 ADDENDUM, 2026-08-11: promotion on two YES taps, and the full staging
+
+FABLE MASTER BRIEF R050 executed end to end, saved verbatim at
+`reports/briefs/FS_FABLE_R050_STAGING_Prompt.md`. The owner's four decisions
+on record were honoured without re-asking; Fable's differing recommendations
+stay in COMMS 054.
+
+**TASK 1.** Three superseded sets archived under `design-system/archive/`
+with the dated manifest, nothing deleted; the kit rebuilt before and after
+the move, BYTE IDENTICAL at 77 files, 12,331,199 bytes, so none of it ever
+shipped. Conventions (u) and (u.1) recorded; the canonical source registry
+shipped with its seeded refusals; TR-131 CLOSED. The archive move surfaced
+a doc-currency scope class (dated evidence families flagged one directory
+at a time) closed by the reports/qa/session prefix and /walk_shards/
+segment exemptions, with the baseline SHRINKING by 75 out-of-scope-keyed
+entries; the (u.1) chain blocked two of this task's own pushes before they
+could carry a red, which is the rule working.
+
+**TASK 2 and CHECKPOINT ONE, both YES taps quoted.** The artefacts were
+presented in the session with the 64px ring-text trade stated. Tap one, on
+the provider logo pair: **"YES, promote"**. Tap two, on the title layer:
+**"YES, promote"**. The four finals then promoted to `assets/portal/`
+(tile_background.jpg, tile_foreground.png, tile_title.png,
+provider_logo.png with the transparent archived beside it), every artefact
+built through the canonical source registry, provenance JSON with source
+sha256 beside each. Finder path printed in session:
+**/Users/jt/math-sdk/assets/portal**.
+
+**TASK 3.** The upload kit staged from a FRESH CLONE at `6dde511a`
+(convention o) with the embedded gate battery green: **~/Desktop/FS_UPLOAD_KIT,
+v10, 78 files, 12,331,571 bytes**, well under the 25 MB cap, version stamp
+in the kit's build-info. Artefact-level same-origin sweep re-run on the
+staged kit: the only absolute URLs are the wallet address built from the
+launch parameter and Svelte's error-documentation strings, matching
+TR-121's recorded position exactly.
+
+**TASK 4.** The blurb staged at `docs/records/SUBMISSION_BLURB_2026-08-11.md`
+with three flagged deltas (soundtrack sentence restored; both bet-basis
+phrases aligned to the ruled base-bet basis), plus the social variant.
+PENDING OWNER APPROVAL as a whole.
+
+**TASK 5.** Trademark evidence at `docs/records/legal/`: IP Australia 0 and
+0; USPTO exact combined-mark No results and No results; web scans showing
+no confusable live slot title. The method notes record the two discarded
+false captures (an empty-box screenshot caught by looking; a bot challenge
+not completed per standing rules). No conclusion beyond the screens.
+
+**TASK 6, the owner step lists**, printed in the session and standing here.
+Steps (a) and (b) are UNLOCKED by the two YES taps; (c) is available, the
+bundle path having printed; NOTHING IS SUBMITTED this session.
+
+(a) Provider logo, one time: Team Settings, then Branding, upload
+    `assets/portal/provider_logo.png` (1024x1024 dark plate).
+(b) Tile, on the future-spinner-2 game page: Tile Editor, upload
+    `assets/portal/tile_background.jpg` as the background layer,
+    `assets/portal/tile_foreground.png` as the foreground layer,
+    `assets/portal/tile_title.png` as the title layer, set the gradient,
+    save.
+(c) Versions: upload the staged bundle from ~/Desktop/FS_UPLOAD_KIT (the
+    frontend upload set and the twelve publish files per its README), make
+    it the active version, then bin the kit folder per the standing
+    done-means-gone rule.
+(d) Payment details under the Medium Rare N.V. terms: read the terms first
+    (the counterparty change is the 2026-08-10 STOP item on record), then
+    complete payment details in the portal.
+(e) Blurb: at the submission form, paste the staged text from
+    `docs/records/SUBMISSION_BLURB_2026-08-11.md` once you have approved it
+    (your approval covers its three flagged deltas); use the social variant
+    if the form asks.
+
+**FOR THE NEXT SESSION**: Fable's final verification of the staged upload
+against main, then the owner's submit click, on the owner's word only after
+that verification lands.
