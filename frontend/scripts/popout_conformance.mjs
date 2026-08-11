@@ -21,15 +21,37 @@
 // exists to work around this class of problem, so using it here would hide
 // exactly what this gate is meant to catch.
 //
-// Run (from frontend/): node scripts/popout_conformance.mjs
+// RUNNER (documented per TR-123, 2026-08-11): npx tsx, from frontend/. This
+// file has no TypeScript import of its own; tsx is the ONE documented runner
+// for the whole gate family (see scripts/README.md), because headers that said
+// `node` over an import graph that needed tsx are exactly how two siblings sat
+// unrunnable to 2026-08-10.
+//   npx tsx scripts/popout_conformance.mjs               the real run
+//   npx tsx scripts/popout_conformance.mjs --self-test   convention (p), below
+//
+// EXIT SEMANTICS (TR-123): exit 0 on PASS, non-zero on FAIL, and the process
+// TERMINATES. The vite child is spawned detached and killed as a PROCESS
+// GROUP, and the final exit is explicit, because the npx wrapper's surviving
+// grandchild used to hold this process open on its inherited pipes after PASS
+// had already printed (the R043 closure suite's lingering-handle observation,
+// which is what kept this gate out of CI from R14 to now).
+//
+// The --self-test re-invokes this gate in a child with FS_SEED_VIOLATION=1,
+// which forces the Continue button outside the viewport (the exact R14 defect,
+// in the form it occurred), and demands BOTH the red verdict AND a real
+// non-zero exit within a timeout. The second demand keeps the exit contract
+// itself under guard: a reintroduced hang fails the self-test rather than
+// hanging a CI leg.
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { qaTmpDir } from './lib/evidencePaths.mjs'
+
+const SEED = process.env.FS_SEED_VIOLATION === '1'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT = qaTmpDir()
@@ -56,8 +78,11 @@ async function freePort() {
 }
 function devServer(port) {
   return new Promise((res, rej) => {
+    // detached: the npx wrapper is not the server, so a kill must reach the
+    // whole process group or the vite grandchild survives and holds this
+    // process open on its inherited pipes (TR-123).
     const p = spawn('npx', ['vite', '--port', String(port), '--strictPort'],
-      { cwd: join(__dirname, '..'), stdio: ['ignore', 'pipe', 'pipe'] })
+      { cwd: join(__dirname, '..'), stdio: ['ignore', 'pipe', 'pipe'], detached: true })
     let done = false
     const on = (d) => { if (!done && /Local|localhost/.test(d.toString())) { done = true; res(p) } }
     p.stdout.on('data', on); p.stderr.on('data', on); p.on('error', rej)
@@ -76,6 +101,20 @@ async function run() {
       const page = await browser.newPage({ viewport: { width: v.w, height: v.h } })
       const errs = []
       page.on('pageerror', (e) => errs.push(e.message))
+
+      if (SEED) {
+        // Convention (p): the exact R14 defect in the form it occurred, the
+        // Continue button rendered outside the viewport. position:fixed so
+        // Playwright's pre-click auto-scroll cannot bring it back, which is
+        // also true of the real defect at 400x225.
+        await page.addInitScript(() => {
+          document.addEventListener('DOMContentLoaded', () => {
+            const style = document.createElement('style')
+            style.textContent = '[data-testid="intro-continue"] { position: fixed !important; top: 300vh !important; }'
+            document.head.appendChild(style)
+          })
+        })
+      }
 
       await page.goto(base, { waitUntil: 'networkidle' })
       // Dismiss the brand splash to reach the rules modal. DOM click is fine here:
@@ -149,7 +188,9 @@ async function run() {
     }
 
     await browser.close()
-  } finally { server.kill() }
+  } finally {
+    try { process.kill(-server.pid, 'SIGTERM') } catch {}
+  }
 
   results.failures = failures
   results.pass = failures.length === 0
@@ -161,6 +202,28 @@ async function run() {
     process.exit(1)
   }
   console.log(`\nPOPOUT CONFORMANCE: PASS (${VIEWPORTS.length} viewports, real clicks)`)
+  process.exit(0)
+}
+
+// ── self-test, convention (p): seeded red AND the exit contract ──────────────
+if (process.argv.includes('--self-test')) {
+  const r = spawnSync('npx', ['tsx', fileURLToPath(import.meta.url)], {
+    cwd: join(__dirname, '..'),
+    env: { ...process.env, FS_SEED_VIOLATION: '1' },
+    encoding: 'utf-8',
+    timeout: 480_000,
+  })
+  const out = (r.stdout || '') + (r.stderr || '')
+  const red = /POPOUT CONFORMANCE: FAIL/.test(out)
+  const exited = typeof r.status === 'number' && r.status !== 0
+  console.log(`  ${red ? 'caught ' : 'MISSED '} seeded off-viewport Continue turned the gate red`)
+  console.log(`  ${exited ? 'exited ' : 'HUNG   '} the failing invocation exited non-zero (status ${r.status}${r.signal ? ', signal ' + r.signal : ''})`)
+  if (!red || !exited) {
+    console.error('\nPOPOUT CONFORMANCE SELF-TEST: FAIL')
+    process.exit(1)
+  }
+  console.log('\nPOPOUT CONFORMANCE SELF-TEST: PASS (seeded violation red, non-zero exit, terminated)')
+  process.exit(0)
 }
 
 run().catch((e) => { console.error(e); process.exit(1) })
