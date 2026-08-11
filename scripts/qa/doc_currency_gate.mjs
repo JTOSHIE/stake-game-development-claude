@@ -37,7 +37,9 @@
 //   DEAD_PATH         a backticked path that does not exist at HEAD
 //   STALE_LINE        `file.ts:123`, where the file is gone or has fewer lines
 //   DEAD_SYMBOL       `symbol()` cited at `file:line`, absent from that file
-//   DEAD_COMMIT       a 7 to 40 character SHA that `git cat-file` cannot resolve
+//   DEAD_COMMIT       a 7 to 40 character SHA that `git cat-file` cannot
+//                     resolve AFTER the R044 second-chance resolver (below)
+//                     has tried to fetch it, targeted then via pull refs
 //   DEAD_DOCREF       a backticked `.md` path, or `DOC.md` section N, that is gone
 //   SUPERSEDED_CITED  a LIVE document citing reports/archive/superseded/, added
 //                     2026-08-05 by S2-C082. The file EXISTS, which is the whole
@@ -237,6 +239,51 @@ function commitResolves(sha, cwd = REPO_ROOT) {
     execFileSync('git', ['cat-file', '-e', `${sha}^{commit}`], { cwd, stdio: 'ignore' })
     return true
   } catch { return false }
+}
+
+// ── the R044 second-chance resolver, 2026-08-11 ──────────────────────────────
+//
+// A deleted branch's tip stops resolving in every fresh clone the moment the
+// deletion lands, while the dated records that cite it are records and are not
+// rewritten (the a5b51567 case: owner-approved deletions executed, two
+// documents correct on the day they were written, every CI push red). Fable's
+// R044 ruling: when a cited SHA fails local resolution, try to FETCH it before
+// calling it dead, because GitHub keeps every pull request's head reachable
+// forever under the immutable refs/pull/N/head namespace.
+//
+// TWO ATTEMPTS, in order, both MEASURED before this was written:
+//
+//   1. The ruling's letter, one targeted `git fetch origin <sha>`. Measured
+//      2026-08-11 against GitHub on BOTH transports for a SHA that IS a pull
+//      head tip: https answers "couldn't find remote ref", ssh the same, so
+//      GitHub does not serve bare-SHA wants here today. The attempt is kept
+//      anyway: it is nearly free, it is what the ruling names, and it starts
+//      working by itself the day GitHub advertises the capability.
+//   2. The fallback that realises the ruling's intent: fetch the pull-heads
+//      namespace once per run into refs/prefetch/pull/* (git's own maintenance
+//      prefetch namespace, hidden from branch listing and gc-safe). Verified
+//      2026-08-11 in a fresh anonymous https clone: one fetch, and a5b51567
+//      resolves. The kept refs also keep the resurrection objects alive
+//      locally, which is what the records promise.
+//
+// Only after both is DEAD_COMMIT reported. The self-test seeds both sides:
+// a SHA that exists only on the origin's pull ref must be RESCUED, and a
+// fabricated SHA must still FAIL through both attempts.
+const pullPrefetchDone = new Set()
+function commitResolvesWithFetch(sha, cwd = REPO_ROOT) {
+  if (commitResolves(sha, cwd)) return true
+  try {
+    execFileSync('git', ['fetch', '--quiet', 'origin', sha], { cwd, stdio: 'ignore', timeout: 30_000 })
+  } catch {}
+  if (commitResolves(sha, cwd)) return true
+  if (!pullPrefetchDone.has(cwd)) {
+    pullPrefetchDone.add(cwd)
+    try {
+      execFileSync('git', ['fetch', '--quiet', 'origin', '+refs/pull/*/head:refs/prefetch/pull/*'],
+        { cwd, stdio: 'ignore', timeout: 120_000 })
+    } catch {}
+  }
+  return commitResolves(sha, cwd)
 }
 
 // ── the scope question, asked once ───────────────────────────────────────────
@@ -582,8 +629,10 @@ function scanDocument(file, src, ctx) {
       SHA_RE.lastIndex = 0
       while ((m = SHA_RE.exec(raw)) !== null) candidates.add(m[0])
       for (const sha of candidates) {
-        if (ctx.shaCache.get(sha) === undefined) ctx.shaCache.set(sha, commitResolves(sha, ctx.root))
-        if (!ctx.shaCache.get(sha)) add('DEAD_COMMIT', sha, lineNo, 'git cat-file cannot resolve it')
+        // R044: the second-chance resolver, so a SHA preserved only by an
+        // immutable pull ref is fetched rather than reported dead.
+        if (ctx.shaCache.get(sha) === undefined) ctx.shaCache.set(sha, commitResolvesWithFetch(sha, ctx.root))
+        if (!ctx.shaCache.get(sha)) add('DEAD_COMMIT', sha, lineNo, 'git cat-file cannot resolve it, and neither fetch attempt rescued it')
       }
     }
   })
@@ -865,11 +914,53 @@ function selfTest() {
     run('CONTROL 3b  the same citation from inside the archive is NOT flagged', 0,
       () => findingsFor('reports/archive/NOTE.md', 'SUPERSEDED_CITED').length)
 
-    // ── SEED 4. A commit SHA that does not resolve, in a git context.
+    // ── SEED 4. A commit SHA that does not resolve, in a git context. At this
+    //    point the throwaway repo has NO origin, so both R044 fetch attempts
+    //    fail instantly and the class still fires: the resolver must never
+    //    turn "no remote" into a pass.
     write('SHAS.md', `Merged at commit \`deadbee1234\`, and the real tip is \`${rootSha.slice(0, 9)}\`.\n`)
     commit('docs: seed 4')
-    run('SEED 4  a commit SHA that does not resolve', 1,
+    run('SEED 4  a commit SHA that does not resolve (no origin to rescue from)', 1,
       () => findingsFor('SHAS.md', 'DEAD_COMMIT').length)
+
+    // ── SEED 4b, the R044 RESCUED case, in the form it really occurred: a SHA
+    //    that resolves NOWHERE locally and lives only on the origin's
+    //    immutable pull ref, exactly like a deleted session branch's tip. A
+    //    real second repository plays GitHub: its commit sits only under
+    //    refs/pull/1/head, this repo gains it as `origin`, and the targeted
+    //    bare-SHA fetch fails against it just as GitHub refuses it today, so
+    //    the rescue must come from the pull-refs prefetch, which is the path
+    //    CI actually takes.
+    const originDir = mkdtempSync(join(tmpdir(), 'doc-currency-origin-'))
+    git(['init', '-q', '-b', 'main'], originDir)
+    writeFileSync(join(originDir, 'base.txt'), 'origin base\n')
+    git(['add', '-A'], originDir)
+    git(['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '-m', 'base'], originDir)
+    git(['checkout', '-qb', 'session-branch'], originDir)
+    writeFileSync(join(originDir, 'f.txt'), 'kept only by a pull ref\n')
+    git(['add', '-A'], originDir)
+    git(['-c', 'user.email=t@t', '-c', 'user.name=t', 'commit', '-q', '-m', 'the deleted tip'], originDir)
+    const rescuedSha = git(['rev-parse', 'HEAD'], originDir).trim()
+    git(['update-ref', 'refs/pull/1/head', rescuedSha], originDir)
+    git(['checkout', '-q', 'main'], originDir)
+    git(['branch', '-qD', 'session-branch'], originDir)   // the tip now lives ONLY on the pull ref
+    git(['remote', 'add', 'origin', originDir], dir)
+    // The prefetch is once per run, and SEED 4 legitimately spent this repo's
+    // attempt while it had no origin. Clearing the guard here simulates the
+    // next run, which is the situation the rescue exists for.
+    pullPrefetchDone.delete(dir)
+    write('RESCUE.md', `The audit branch tip was commit \`${rescuedSha.slice(0, 8)}\`, deleted since.\n`)
+    commit('docs: seed 4b')
+    run('SEED 4b  a SHA held only by the origin pull ref is RESCUED, not reported', 0,
+      () => findingsFor('RESCUE.md', 'DEAD_COMMIT').length)
+
+    // ── SEED 4c, the R044 FABRICATED case: a full-length SHA that no
+    //    repository holds must still fail through BOTH fetch attempts against
+    //    a real origin, or the resolver has widened the gate into a pass.
+    write('FABRICATED.md', 'Restored at commit `1f2e3d4c5b6a79881f2e3d4c5b6a79881f2e3d4c` per the log.\n')
+    commit('docs: seed 4c')
+    run('SEED 4c  a fabricated SHA still fails through both fetch attempts', 1,
+      () => findingsFor('FABRICATED.md', 'DEAD_COMMIT').length)
 
     // ── SEED 5. count=N against a directory holding N minus 1. The spec's
     //    example is 519 against 518; the arithmetic is the form, not the

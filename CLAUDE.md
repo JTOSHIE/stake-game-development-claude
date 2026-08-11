@@ -308,6 +308,11 @@ verification method and the exact commands are at
 **`docs/records/BRANCH_HYGIENE_2026-08-11.md`**. Once both are gone, the six-branch
 list above is exactly true again and this note becomes a dated record of the interim.
 
+Executed 2026-08-11: both branches are deleted. a5b51567 no longer resolves from
+any branch and remains permanently fetchable via GitHub's immutable pull ref
+(git fetch origin refs/pull/117/head), verified first-hand by Fable.
+Resurrection for that row is honoured through that ref.
+
 ### Reference / prototype branches (not on main)
 
 Not-for-release maths prototypes and forks live on their own branch, never on `main` -

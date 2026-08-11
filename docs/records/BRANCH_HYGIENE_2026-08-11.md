@@ -64,3 +64,6 @@ Both tips are recorded in the table above for resurrection if ever wanted. Once
 they are gone, CLAUDE.md's BRANCHES table ("six branches and that is the whole
 list") is exactly true again with no edit needed; its dated note pointing here
 records the interim.
+
+Post-deletion note, 2026-08-11: a5b51567 resolves only via git fetch origin
+refs/pull/117/head; c6c34f0a is main's own history and unaffected.
