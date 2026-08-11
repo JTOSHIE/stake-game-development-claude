@@ -615,3 +615,17 @@ here: no sanction names it. Escalated per convention (l.8) as a question with
 evidence for the owner and Fable; its LOCKED_FILE_DEBTS row is queued for the
 next sanctioned CLAUDE.md pass, this document being the record of it until
 then.**
+
+**R045 STRENGTHENING LEG, 2026-08-11 (capture 4,
+`2026-08-11_wallet_400_4.json`).** A syntactically valid but fabricated UUID
+sessionID (`fab1e000-0000-4000-8000-000000000045`) still draws
+`{"error":"ERR_VAL","message":"could not parse request json"}`: the RGS
+rejects on token shape before session lookup, so the invalid-session class
+itself stays uncaptured. The ruling's gate asks whether the observed
+identifier matches the documented vocabulary, and it does (`ERR_VAL` is on
+the table), on a second request shape, in the same top-level `error` field.
+Recorded, and the sanctioned locked edit proceeds. **EXECUTED, same pass: the
+identifier read in `handleRGSError` now accepts a string in top-level `code`
+OR top-level `error`, `code` winning if both exist, at both the type guard
+and the cast; the full locked diff is quoted in the 2026-08-11 session
+report.**

@@ -48,6 +48,18 @@
 
 set -euo pipefail
 
+# R045 STRENGTHENING LEG (2026-08-11): --uuid-probe runs ONLY capture 4, an
+# authenticate with a syntactically valid but fabricated UUID sessionID, so
+# the RGS parses the request and answers with its invalid-session class
+# rather than the parse-failure class captures 1 and 3 recorded. The UUID is
+# a constant and visibly fabricated (hex spells fable): a probe that changed
+# per run would produce captures nobody could diff.
+UUID_PROBE=0
+if [ "${1:-}" = "--uuid-probe" ]; then
+  UUID_PROBE=1
+  shift
+fi
+
 LAUNCH_URL="${1:-}"
 if [ -z "$LAUNCH_URL" ]; then
   cat >&2 <<'USAGE'
@@ -174,6 +186,16 @@ print('        written', out)
 PY
   rm -f "$tmp_body" "$tmp_status"
 }
+
+if [ "$UUID_PROBE" = "1" ]; then
+  FABRICATED_UUID="fab1e000-0000-4000-8000-000000000045"
+  capture 4 'authenticate, fabricated UUID session (expect 400, invalid-session class)' /wallet/authenticate \
+    "$(printf '{"sessionID":"%s","language":"%s"}' "$FABRICATED_UUID" "$LANG_PARAM")"
+  echo
+  echo "Probe captured. Judge the identifier against the documented vocabulary"
+  echo "before any locked edit proceeds (FABLE RULING R045 item 2)."
+  exit 0
+fi
 
 capture 1 'authenticate, INVALID session (expect 400)' /wallet/authenticate \
   "$(printf '{"sessionID":"%s","language":"%s"}' "$INVALID_SESSION" "$LANG_PARAM")"

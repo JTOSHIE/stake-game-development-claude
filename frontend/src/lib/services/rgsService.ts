@@ -384,8 +384,14 @@ export function handleRGSError(error: unknown): RGSError {
   }
 
   // HTTP response with a known error code in body
-  if (error !== null && typeof error === 'object' && 'code' in error) {
-    const code = (error as { code: string }).code as RGSErrorCode
+  if (
+    error !== null && typeof error === 'object' &&
+    (typeof (error as { code?: unknown }).code === 'string' ||
+      typeof (error as { error?: unknown }).error === 'string')
+  ) {
+    const code = (typeof (error as { code?: unknown }).code === 'string'
+      ? (error as { code: string }).code
+      : (error as { error: string }).error) as RGSErrorCode
     const knownCodes: RGSErrorCode[] = [
       'ERR_VAL','ERR_IPB','ERR_IS','ERR_ATE',
       'ERR_GLE','ERR_LOC','ERR_GEN','ERR_MAINTENANCE',
