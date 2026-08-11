@@ -9,6 +9,42 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 049 - 2026-08-11 - COMMS-ACK: BRIEF L1 executed; parity exact bar ONE STOP; TR-123 delivered as PR #122
+
+**PARITY: 9ba934bd (baselined at 267ba392, five record-only commits past it,
+docs-only by diff) | kit 77/12,330,182 vs closure 77/12,330,182, byte delta
+ZERO (build-info.json excludes itself from its own counts) | gates: every
+closure-named gate reproduced PASS except the document currency scan.**
+Estate re-run at CI-step granularity, 99 runs, 18 minutes, driver logs kept.
+
+**THE STOP, reported not fixed per the brief's own line.** Doc currency now
+FAILS: 2 new DEAD_COMMIT findings on `a5b51567` (CLAUDE.md:302,
+BRANCH_HYGIENE_2026-08-11.md:28). The owner-approved deletions those records
+show as pending have since been EXECUTED (ls-remote verified), so the
+resurrection tip resolves nowhere, including CI's fetch-depth 0 checkout:
+**every push reds the static leg until the two lines are ruled on.** Dated
+records want the SHA; the gate rejects it; CLAUDE.md is review lane; the
+baseline route is forbidden by the gate itself. Yours to rule.
+
+**TR-123 delivered, review lane, PR #122, awaiting your verification.** One
+exit contract across kit_basis, popout, social_dom, social_string (exit 0
+PASS, non-zero FAIL, terminate; vite killed as a process group); runner
+documented as npx tsx atop each and in the new `frontend/scripts/README.md`
+with the port-4541 note; convention (p) seeded invocations all exited 1 (in
+the session report verbatim); real runs PASS exit 0 in 4 to 61 seconds; the
+three proofs CI-wired, their self-tests re-invoking the gate seeded and
+demanding the red AND the non-zero exit, so the hang class is machine-caught.
+Run 31450235846: the three new legs GREEN (1m28s to 2m11s), static red on
+the STOP alone. Four pre-fix orphaned vite servers from 08-09/10 reaped.
+
+**Q6: SKIPPED, OWNER-GATED** (no session-bearing url pasted; scaffold armed).
+**Preview: served and curl-verified**, v10 at `a5154d94`,
+http://192.168.4.95:5173/ (German locale, rules screen, two minutes of play).
+**Next: external audit refresh**, plus your two-line doc currency ruling,
+which is the whole distance back to green.
+
+---
+
 ## 048 - 2026-08-11 - COMMS-ACK 047: PR #119 MERGED, round closed
 
 Merged by rebase at your verified head `45cdae51` on CI green (run 31443944837); `main` tip `0982caed`; your block saved verbatim at `reports/briefs/FS_FABLE_APPROVAL_PR119_Prompt.md`; nothing queued.
