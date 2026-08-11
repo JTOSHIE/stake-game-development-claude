@@ -219,3 +219,83 @@ working, and it is recorded as such rather than smoothed over.
 **Environment note.** The Claude in Chrome extension was not connected, so
 the portal was opened in the app's browser pane, which carried the portal
 session; recorded so the next session knows both paths.
+
+## R045 ADDENDUM, 2026-08-11: the sanctioned locked pass, and the money path speaks the dialect
+
+FABLE RULING BLOCK R045 arrived as an owner paste (the convention (f)
+sanction itself), saved verbatim at
+`reports/briefs/FS_FABLE_RULING_R045_Prompt.md`. One tier note, surfaced
+rather than skipped: the block names Opus tier; this session runs Claude
+Fable 5, the model already driving the session, which sits above Opus in
+capability. Executed here rather than re-queued, recorded for the owner.
+
+**Item 2 ran FIRST, and its gate passed.** Capture 4, the fabricated UUID
+probe (`fab1e000-0000-4000-8000-000000000045`), still drew
+`{"error":"ERR_VAL","message":"could not parse request json"}`: the RGS
+rejects on token shape before session lookup, so the invalid-session class
+itself stays uncaptured. The observed identifier matches the documented
+vocabulary on a second request shape, in the same top-level `error` field,
+which is what the ruling's gate asks. Recorded in OWNER_RULINGS section C;
+the locked edit proceeded.
+
+**Item 1, the edit, with the mechanism followed to the letter**: deny lines 8
+and 9 lifted as a temporary working-tree edit, the single edit made, the deny
+restored, `git diff .claude/settings.json` verified at ZERO lines before the
+commit, and the locked-paths gate run against the commit reports 1 commit, 1
+sanctioned, 0 violations. The full locked diff, verbatim:
+
+```
+diff --git a/frontend/src/lib/services/rgsService.ts b/frontend/src/lib/services/rgsService.ts
+index 2bf1a726..c8d548ce 100644
+--- a/frontend/src/lib/services/rgsService.ts
++++ b/frontend/src/lib/services/rgsService.ts
+@@ -384,8 +384,14 @@ export function handleRGSError(error: unknown): RGSError {
+   }
+ 
+   // HTTP response with a known error code in body
+-  if (error !== null && typeof error === 'object' && 'code' in error) {
+-    const code = (error as { code: string }).code as RGSErrorCode
++  if (
++    error !== null && typeof error === 'object' &&
++    (typeof (error as { code?: unknown }).code === 'string' ||
++      typeof (error as { error?: unknown }).error === 'string')
++  ) {
++    const code = (typeof (error as { code?: unknown }).code === 'string'
++      ? (error as { code: string }).code
++      : (error as { error: string }).error) as RGSErrorCode
+     const knownCodes: RGSErrorCode[] = [
+       'ERR_VAL','ERR_IPB','ERR_IS','ERR_ATE',
+       'ERR_GLE','ERR_LOC','ERR_GEN','ERR_MAINTENANCE',
+```
+
+**Item 3, the proof, with one design note recorded honestly.** On the
+authenticate path the rendered banner is IDENTICAL pre and post fix (the
+blocked-session banner is the localised live-guard one, and the English
+ERROR_MESSAGES store is deliberately not rendered on a blocked session, per
+the App.svelte comment beside it), so the seeded negative would have nothing
+to bite on there. The observable the fix actually changes is on the PLAY
+path: the old read turns ERR_IS into retryable ERR_GEN and the client
+hammers a dead session with four play requests; the fixed read sends exactly
+one. `r045_error_field_proof.mjs` therefore asserts the en and de banners on
+the authenticate path (both rendered from the live locale table, expected
+strings hardcoded as the independent oracle per l.4) AND the one-request
+behaviour with the ERR_IS message beside it on the play path. Real run: five
+of five ok, exit 0. Self-test: the dual read regressed to code-only in a
+scratch copy of the real bundle (never the artefact), and the proof went red
+on the retry hammer, named, exit 1, terminating (TR-123 contract
+throughout). Settle proof 17 assertions plus self-test, stall proof,
+recovery proof: all unchanged, all green. rgs parse, wallet contract,
+svelte-check: green.
+
+**LOCKED_FILE_DEBTS reviewed** per item 3: the rgsService section records all
+debts cleared 2026-07-25, no listed debt touches the identifier read, none
+retired, none added. OWNER_RULINGS section C now carries the strengthening
+leg and the EXECUTED marker.
+
+**Also in the pass**: `tools/capture_rgs_400.sh` gained the `--uuid-probe`
+leg so capture 4 is reproducible by someone who is not this session, same
+safety posture (fabricated session, cannot authenticate, cannot bet).
+
+**Queued for Fable, not done here (scope: this job only)**: CI-wiring the new
+proof as a browser leg, and the dead `sessionExpired` locale key noticed in
+passing (present in all locales, referenced by nothing).

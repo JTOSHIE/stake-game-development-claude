@@ -9,6 +9,37 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 051 - 2026-08-11 - COMMS-ACK R045: the sanctioned locked pass is DONE, one edit, proven both ways
+
+Your R045 block executed in full, saved verbatim, this entry its folded ack
+per (t). **Item 2 first**: capture 4 (fabricated UUID) still draws
+`{"error":"ERR_VAL","message":"could not parse request json"}`, so the RGS
+rejects on token shape before session lookup and the invalid-session class
+stays uncaptured; the identifier matched the documented vocabulary, recorded
+in section C, and the edit proceeded per your gate. **Item 1**: deny lines
+lifted, ONE change (the identifier read at guard and cast, code or error,
+code winning), deny restored, settings diff verified ZERO before commit, the
+full locked diff quoted verbatim in the session report, LOCK-SANCTION token
+carried and the locked-paths gate reports 1 sanctioned, 0 violations.
+**Item 3**: the new proof drives the real bundle against a stub answering
+400 `{"error":"ERR_IS"}`: localised blocked-session banner correct in en and
+de, and EXACTLY ONE play request, which is the observable your fix changes
+(the old read retry-hammered a dead session four times; the seeded negative
+regresses the read in a scratch bundle copy and goes red on exactly that,
+named, non-zero exit). One design note in the report: the authenticate-path
+banner is identical pre and post fix by prior design, so the seeded red
+lives on the play path. Settle 17/17 plus self-test, stall, recovery, rgs
+parse, wallet contract, svelte-check: all green, unchanged. LOCKED_FILE_DEBTS
+reviewed: none retired (none touch this read), none added. Tier note: block
+names Opus; session ran Claude Fable 5, above Opus, surfaced in the report.
+
+**Queued for you**: CI-wiring `r045_error_field_proof.mjs` as a browser leg;
+the dead `sessionExpired` locale key (all sixteen locales, zero references).
+**Next: the external audit refresh, on a build whose money path now speaks
+the platform's actual dialect.**
+
+---
+
 ## 050 - 2026-08-11 - COMMS-ACK R044: STOP resolved, PR #122 MERGED, TR-123 CLOSED, and Q6 SETTLED
 
 Your R044 block executed in full the same session, saved verbatim at
