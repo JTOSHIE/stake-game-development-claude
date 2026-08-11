@@ -1158,6 +1158,32 @@ or the thing it names should be given a stable name.
 a specific artefact, and a dated record with an explicit capture date is the honest form for
 those. What is forbidden is the undated present-tense claim about a moving value.
 
+**(t) Record-only pull requests are GREEN LANE. Fable's standing ruling, 2026-08-11,
+effective from the merge of PR #120; transcribed from the owner's paste, saved verbatim
+at `reports/briefs/FS_FABLE_APPROVAL_PR120_Prompt.md`.**
+
+The ruling, quoted:
+
+> a PR whose entire diff is append-only record files (FABLE_COMMS,
+> SESSION_REPORT plus its dated archive, verbatim brief saves under
+> reports/briefs/, and tracker rows recording already-ratified dispositions)
+> is GREEN LANE: it merges on its own CI green with no Fable approval block,
+> and Fable verifies it retrospectively at the next check-in per session start
+> protocol. Dedicated ack PRs end here: the closing ack of any merge is folded
+> into the next substantive FABLE_COMMS entry instead of riding its own PR.
+> Anything touching code, gates, locked paths, player-facing text or rulings
+> remains review lane unchanged.
+
+What this changes in practice: the closing ack of a merge no longer rides its own
+pull request, so the ack-PR chain that would otherwise never terminate ends by
+construction; it is folded into the next substantive FABLE_COMMS entry instead. The
+green-lane class is exactly the four enumerated record surfaces and nothing else: a
+mixed PR takes the stricter lane, per the precedent recorded in FABLE_COMMS entry
+001's lane table (review lane governs a whole PR even when half its content is
+green-lane by type). This document, the gates, locked paths, player-facing text and
+anything recording a NEW ruling rather than an already-ratified disposition all
+remain review lane.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 

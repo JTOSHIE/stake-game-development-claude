@@ -11692,3 +11692,24 @@ queued.** The open owner items are unchanged: Q6 (the session-bearing game
 url paste), the terms counterparty review (Medium Rare N.V.), the
 OWNER_CHECKLIST items, and B14. TR-123 is the one queued hygiene task and it
 is small, bounded and not urgent.
+
+## SECOND ADDENDUM, 2026-08-11: PR #120 merged, and the standing lane ruling transcribed
+
+The Fable approval block for PR #120 (saved verbatim at
+`reports/briefs/FS_FABLE_APPROVAL_PR120_Prompt.md`) approved that merge and issued
+a STANDING RULING. Executed:
+
+- **PR #120 MERGED by rebase at the verified head `383833db`** on CI green (run
+  31444578358); `main` tip `a92210cf`.
+- **The lane ruling is transcribed as convention (t) in CLAUDE.md**: record-only
+  pull requests (the four enumerated append-only surfaces) are GREEN LANE, merging
+  on their own CI green with retrospective Fable verification; dedicated ack PRs
+  end; review lane unchanged for code, gates, locked paths, player-facing text and
+  rulings.
+- **COMMS-ACK 048 is deliberately NOT a comms entry from this session**: per the
+  ruling it is the first line of the L1 session's comms entry. Nothing was appended
+  to FABLE_COMMS here.
+- **The transcription itself touches CLAUDE.md, which the ruling keeps in review
+  lane**, so the PR carrying it stays a draft awaiting Fable's block rather than
+  merging on its own green; the ruling governs from the #120 merge regardless,
+  because a ruling is in force when issued, and the transcription records it.
