@@ -25,7 +25,7 @@ import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
 const SOURCE = '/Users/jt/Desktop/wrs_provider_mark_source.png'
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
 mkdirSync(BRAND, { recursive: true })
 
 if (!existsSync(SOURCE)) {
@@ -322,7 +322,7 @@ const lines = [
   '',
   '## Adoption',
   '',
-  '**NOT adopted.** `design-system/brand/delivery/WeRollSpinners-Logo.png` is unchanged and',
+  '**NOT adopted.** `design-system/archive/delivery/WeRollSpinners-Logo.png` is unchanged and',
   'still carries candidate d. The eye-call is the owner\'s, across e and d, with a, b and c',
   'retired as non-preferred. On the owner\'s one-line confirmation the delivery file is',
   'regenerated from the chosen candidate and TR-031 closes.',

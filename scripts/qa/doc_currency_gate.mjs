@@ -163,14 +163,32 @@ const BASELINE_PATH = join(REPO_ROOT, 'scripts', 'qa', 'doc_currency_baseline.js
 // class and every one of them is still held.
 const OUT_OF_SCOPE = [
   'reports/archive/',
+  // R050 TASK 1: the design-system archive is the same class as
+  // reports/archive, dated history moved out of the live tree with a
+  // manifest naming what each set was. Its documents describe artefacts as
+  // they were, which is exactly what an archive is for, and judging them
+  // against HEAD would forbid the archive from describing itself (the same
+  // reasoning CONTROL 3b already encodes for the superseded citation class).
+  'design-system/archive/',
   'docs/stake-engine-live/',
   'reports/briefs/',
   'reports/SESSION_REPORT.md',
+  // R050 TASK 1: every reports/qa/session* family is dated squad evidence,
+  // the CONTROL 2d class (ledgers, dispositions, verify shards, resume state
+  // of completed sessions). The archive move turned their historical path
+  // citations red one directory at a time, which is the epoch trap the
+  // out-of-scope list exists to prevent; the prefix ends the class. Same
+  // reasoning as /walk_shards/ in the segment list below.
+  'reports/qa/session',
 ]
 
 // Path SEGMENT match rather than prefix, since shards live at
 // `reports/qa/<topic>/shards/`. Same epoch-trap reasoning as above.
-const OUT_OF_SCOPE_SEGMENTS = ['/shards/']
+// R050 TASK 1: `/walk_shards/` added because the requirement-walk shards are
+// the same dated-squad-evidence class CONTROL 2d already exempts, and the
+// `/shards/` segment does not match their directory name; found when the
+// archive move turned their historical path citations red.
+const OUT_OF_SCOPE_SEGMENTS = ['/shards/', '/walk_shards/']
 
 // Gitignored trees that legitimately exist without being tracked. A reference
 // into one of these cannot be judged from git, so it is reported UNRESOLVABLE

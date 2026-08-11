@@ -26,9 +26,9 @@ checklist in the docs must be satisfied.
 | 2 | Maths files: index.json, both lookup tables, both books, game_metadata.json | Overdrive pass | MERGED to main | Done (v1.1.0) |
 | 3 | PAR sheet (five modes, FeatureMath v2 documented) | Overdrive pass + FeatureMath v2 | MERGED to main | Done |
 | 4 | Submission blurb v2 (Overdrive) | Section 3 below | Owner-approved text unchanged; a DRAFT soundtrack sentence added 2026-07-13, PENDING OWNER APPROVAL (not yet part of the approved blurb) | Owner |
-| 5 | Game tile background image | Design system Phase B | **DELIVERED** as `design-system/brand/delivery/FutureSpinner-BG.jpg`, under the platform naming convention | Owner uploads in the Tile Editor |
-| 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | **DELIVERED** as `design-system/brand/delivery/FutureSpinner-FG.png` | Owner uploads in the Tile Editor |
-| 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Owner-supplied, externally commissioned | **DELIVERED and ADOPTED** (candidate f, 2026-07-26) as `design-system/brand/delivery/WeRollSpinners-Logo.png`, 1024x1024 RGBA, real alpha, 39KB | Owner uploads once in Team Settings Branding |
+| 5 | Game tile background image | Design system Phase B | **DELIVERED** as `design-system/archive/delivery/FutureSpinner-BG.jpg`, under the platform naming convention | Owner uploads in the Tile Editor |
+| 6 | Game tile foreground hero (transparent PNG) | Design system Phase B | **DELIVERED** as `design-system/archive/delivery/FutureSpinner-FG.png` | Owner uploads in the Tile Editor |
+| 7 | WRS provider logo (square, transparent, legible small, PNG up to 10 MB) | Owner-supplied, externally commissioned | **DELIVERED and ADOPTED** (candidate f, 2026-07-26) as `design-system/archive/delivery/WeRollSpinners-Logo.png`, 1024x1024 RGBA, real alpha, 39KB | Owner uploads once in Team Settings Branding |
 | 8 | Staged upload bundle with SHA-256 manifest | Pipeline | Rebuilds each change | Pre-submission |
 | 9 | Portal facts sheet (RTP 96.35%, max 5,000x, 1,024 ways, features, volatility) | PAR v2 | Available | Done |
 | 10 | Compliance evidence pack (section 4) | Audits + re-validation pass | Five-mode re-validated: maths independently VERIFIED + CI-gated (scripts/validate_math.py, plus the semantic equality proof in section 8b via tools/verify_books_lookup_equality.py); RGS integration verified aligned (docs/RGS_CONTRACT_REFERENCE.md); replay event IDs derived for all five modes (REPLAY_TEST_EVENTS.md, cruise/antelite/super added 2026-07-08); statelessness independently proven for cruise/antelite/super (reports/qa/review_events_statelessness_2026-07-08.md); live docs mirrored under docs/stake-engine-live/, most recently 2026-07-29. <!--CHECK: exists docs/stake-engine-live/2026-07-29/*--> Remaining items are deploy-dependent only. | Complete pre-deploy |
@@ -260,14 +260,14 @@ no code change. Full reasoning in **TR-102**.
    `lookUpTable_*_0.csv`, then `game_metadata.json`.
 4. Compose the game tile in the dashboard Tile Editor from the background image,
    foreground hero and provider logo. **All four are delivered** under the platform's
-   naming convention in `design-system/brand/delivery/`: `FutureSpinner-BG.jpg`,
+   naming convention in `design-system/archive/delivery/`: `FutureSpinner-BG.jpg`,
    `FutureSpinner-FG.png`, `WeRollSpinners-Logo.png` and `FutureSpinner-Tile.png`.
    **The fourth is the COMPOSED TILE MASTER, 408x546 flat**, so if the Tile Editor
    accepts a finished tile there is nothing to compose. It was omitted from this
    list and from the upload kit until 2026-07-30 (S2-C092). The provider logo is a
    separate one-time upload in Team Settings Branding rather than in the Tile
    Editor. See
-   `design-system/brand/delivery/README.md` for hashes and `DTT_PROTOCOL.md` for the
+   `design-system/archive/delivery/README.md` for hashes and `DTT_PROTOCOL.md` for the
    owner-action checklist.
 5. Enter the submission blurb (section 3) - **only once the draft soundtrack sentence has
    been explicitly owner-approved**, otherwise upload the blurb without it.

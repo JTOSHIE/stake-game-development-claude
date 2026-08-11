@@ -1,0 +1,37 @@
+{
+  "_what": "The canonical source registry, R050 TASK 1 standing rule: every art master names its canonical source path here, and the pipeline refuses a generation source that is not listed. Additions ride the commit that introduces the master, with the owner decision or brief that named it.",
+  "sources": {
+    "tile_background_master": {
+      "path": "reports/art/r048/M1_seed20260811.jpg",
+      "named_by": "R050 owner decisions on record"
+    },
+    "tile_foreground_master": {
+      "path": "reports/art/r048/M2_seed20260811.png",
+      "named_by": "R050 owner decisions on record"
+    },
+    "title_wordmark_master": {
+      "path": "frontend/public/assets/ui/logo_future_spinner.png",
+      "named_by": "R050 owner decisions on record, identified against the live title screen"
+    },
+    "studio_mark_master": {
+      "path": "design-system/brand/hero_emblem/master_1024.png",
+      "named_by": "R050 owner decisions on record"
+    },
+    "shipped_scene_background": {
+      "path": "frontend/public/assets/themes/future-spinner/backgrounds/bg_base.jpg",
+      "named_by": "R048 brief, M1 img2img source"
+    },
+    "shipped_scene_car": {
+      "path": "frontend/public/assets/themes/future-spinner/ui/scene_car.png",
+      "named_by": "R048 brief, M1 silhouette element"
+    },
+    "shipped_robot_mascot": {
+      "path": "frontend/public/assets/themes/future-spinner/ui/scene_character.png",
+      "named_by": "R048 brief, M2 img2img source"
+    },
+    "brand_face_orbitron_900": {
+      "path": "frontend/node_modules/@fontsource/orbitron/files/orbitron-latin-900-normal.woff2",
+      "named_by": "R048 M3 regeneration branch"
+    }
+  }
+}

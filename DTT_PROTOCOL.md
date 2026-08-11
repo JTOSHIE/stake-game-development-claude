@@ -349,7 +349,7 @@ about.
 These are uploads, not tests, and they are yours because they cannot be done from the
 repository. `SUBMISSION_DOSSIER.md` section 5d is the fuller checklist.
 
-- **Provider logo**: upload `design-system/brand/delivery/WeRollSpinners-Logo.png` in Team
+- **Provider logo**: upload `design-system/archive/delivery/WeRollSpinners-Logo.png` in Team
   Settings Branding. One time.
-- **Tile layers**: upload `design-system/brand/delivery/FutureSpinner-BG.jpg` and
+- **Tile layers**: upload `design-system/archive/delivery/FutureSpinner-BG.jpg` and
   `FutureSpinner-FG.png` in the Tile Editor. One time.

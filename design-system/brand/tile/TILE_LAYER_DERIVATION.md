@@ -98,4 +98,4 @@ Recorded plainly, because this is the part that reaches a human:
 | File | SHA-256 |
 |---|---|
 | `design-system/brand/tile/tile_composed_master.png` | `741e77face74f7e93fb29790eb16dfc22f15b7a13d3d9f47a00a682e7c99434e` |
-| `design-system/brand/delivery/FutureSpinner-Tile.png` | `741e77face74f7e93fb29790eb16dfc22f15b7a13d3d9f47a00a682e7c99434e` |
+| `design-system/archive/delivery/FutureSpinner-Tile.png` | `741e77face74f7e93fb29790eb16dfc22f15b7a13d3d9f47a00a682e7c99434e` |

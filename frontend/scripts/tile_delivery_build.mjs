@@ -15,7 +15,7 @@
 // Game title: Future Spinner. Provider: We Roll Spinners. So the set is
 // FutureSpinner-BG.jpg, FutureSpinner-FG.png and WeRollSpinners-Logo.png.
 //
-// COPIES INTO design-system/brand/delivery/, RATHER THAN RENAMING IN PLACE, and
+// COPIES INTO design-system/archive/delivery/, RATHER THAN RENAMING IN PLACE, and
 // the distinction is deliberate. The masters are named for what they ARE, and
 // two committed GENERATION_NOTE files describe how each was produced BY THOSE
 // NAMES. Renaming them in place would orphan that provenance to save a copy of
@@ -74,7 +74,7 @@ const SET = [
     // RE-CONFIRMED BY DERIVATION the same day when candidate g arrived: f took
     // 3 of 3 legibility measures at 32px and 2 of 3 at every other size on the
     // ladder. Full working in
-    // design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md.
+    // design-system/archive/provider_mark/PROVIDER_LOGO_DERIVATION.md.
     //
     // Candidate f, the owner's second supplied mark, delivered at its NATIVE
     // 1024 master rather than at the 512 export. The platform asks for a "High
@@ -193,7 +193,7 @@ const doc = [
   '**Candidate g, a full variant pack, arrived later the same day and was tested',
   'against f rather than filed beside it.** f took 3 of 3 legibility measures at 32px',
   'and 2 of 3 at every other size on the ladder, so the delivered file did not change.',
-  'The working is in `design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md`.',
+  'The working is in `design-system/archive/provider_mark/PROVIDER_LOGO_DERIVATION.md`.',
   'g is superseded for the portal mark and adopted as the studio brand set for',
   'everything else: favicon, site and print.',
   '',

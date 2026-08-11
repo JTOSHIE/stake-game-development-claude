@@ -21,7 +21,7 @@ reported here rather than done in passing.
 The platform publishes no tile dimension at all. It is a DE FACTO convention that we
 measured from published games. All six now say so, and the anchors below hold the wording:
 
-**The anchors that hold this wording live in `design-system/brand/delivery/README.md`,
+**The anchors that hold this wording live in `design-system/archive/delivery/README.md`,
 NOT here.** They were written here first and PROVED INERT: seeding the old phrase back into
 `CLAUDE.md` left the gate green, because this directory is excluded from scanning. That is
 the same defect as correction 1 above, found by testing the anchor instead of trusting it.
@@ -86,7 +86,7 @@ Scrollkeeper renders `PAPERCLIP GAMING` as type; Lokis Vault renders `VALKYRIE` 
 So the three assets the requirements page asks for do not map one-to-one onto what the
 tile shows. Background and foreground are composited into the tile. The provider logo is
 used somewhere else, and nothing we have captured shows where or at what size. That gap
-is the reason `design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md` builds its
+is the reason `design-system/archive/provider_mark/PROVIDER_LOGO_DERIVATION.md` builds its
 size ladder from labelled anchors rather than claiming a rendered size it cannot observe.
 
 ## What follows for us

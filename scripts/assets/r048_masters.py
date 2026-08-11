@@ -50,7 +50,7 @@ SRC = {
     'car': 'frontend/public/assets/themes/future-spinner/ui/scene_car.png',
     'robot': 'frontend/public/assets/themes/future-spinner/ui/scene_character.png',
     'wordmark': 'frontend/public/assets/themes/future-spinner/ui/logo.png',
-    'provider': 'design-system/brand/delivery/WeRollSpinners-Logo.png',
+    'provider': 'design-system/archive/delivery/WeRollSpinners-Logo.png',
     'font': 'frontend/node_modules/@fontsource/orbitron/files/orbitron-latin-900-normal.woff2',
 }
 
@@ -360,7 +360,7 @@ def m3_candidate(seed):
 
 # ── M4: provider logo ────────────────────────────────────────────────────────
 
-SRC['provider_ring'] = 'design-system/brand/provider_mark/provider_mark_a-master_512.png'
+SRC['provider_ring'] = 'design-system/archive/provider_mark/provider_mark_a-master_512.png'
 
 def m4_candidate(seed):
     rng = random.Random(seed)

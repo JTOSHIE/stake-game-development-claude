@@ -44,8 +44,8 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
-const DELIVERY = '/Users/jt/math-sdk/design-system/brand/delivery'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
+const DELIVERY = '/Users/jt/math-sdk/design-system/archive/delivery'
 const PROOFS = '/Users/jt/math-sdk/reports/screens/provider-mark'
 for (const d of [BRAND, DELIVERY, PROOFS]) mkdirSync(d, { recursive: true })
 

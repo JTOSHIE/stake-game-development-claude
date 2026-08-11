@@ -33,7 +33,7 @@ import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
 const SOURCE = '/Users/jt/Desktop/Transparent We Roll Spinners icon.png'
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
 const OUT = '/Users/jt/math-sdk/reports/screens/provider-mark'
 mkdirSync(BRAND, { recursive: true })
 mkdirSync(OUT, { recursive: true })
@@ -297,7 +297,7 @@ const lines = [
   '',
   '## Adoption',
   '',
-  '**NOT adopted.** `design-system/brand/delivery/WeRollSpinners-Logo.png` is unchanged and',
+  '**NOT adopted.** `design-system/archive/delivery/WeRollSpinners-Logo.png` is unchanged and',
   'still carries candidate d. The eye-call is the owner\'s.',
 ]
 writeFileSync(join(BRAND, 'PROVENANCE_f.md'), lines.join('\n') + '\n')

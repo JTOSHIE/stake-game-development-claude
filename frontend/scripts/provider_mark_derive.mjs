@@ -12,7 +12,7 @@
 import { chromium } from 'playwright'
 import { writeFileSync, mkdirSync } from 'node:fs'
 
-const OUTA = '/Users/jt/math-sdk/design-system/brand/provider_mark'
+const OUTA = '/Users/jt/math-sdk/design-system/archive/provider_mark'
 const OUTP = '/Users/jt/math-sdk/reports/screens/provider-mark'
 mkdirSync(OUTA, { recursive: true }); mkdirSync(OUTP, { recursive: true })
 

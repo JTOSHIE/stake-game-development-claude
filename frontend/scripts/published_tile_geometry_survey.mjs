@@ -149,7 +149,7 @@ const lines = [
   'So the three assets the requirements page asks for do not map one-to-one onto what the',
   'tile shows. Background and foreground are composited into the tile. The provider logo is',
   'used somewhere else, and nothing we have captured shows where or at what size. That gap',
-  'is the reason `design-system/brand/provider_mark/PROVIDER_LOGO_DERIVATION.md` builds its',
+  'is the reason `design-system/archive/provider_mark/PROVIDER_LOGO_DERIVATION.md` builds its',
   'size ladder from labelled anchors rather than claiming a rendered size it cannot observe.',
   '',
   '## What follows for us',

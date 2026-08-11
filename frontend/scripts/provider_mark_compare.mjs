@@ -21,7 +21,7 @@ import { chromium } from 'playwright'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
 const OUT = '/Users/jt/math-sdk/reports/screens/provider-mark'
 
 // a, b and c are RETIRED as non-preferred (convention (h)) and stay in the sheet

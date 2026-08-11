@@ -33,7 +33,7 @@ const SOURCE_DIR = '/Users/jt/Downloads/we_roll_spinners_logo'
 const SOURCE_ZIP = '/Users/jt/Downloads/we_roll_spinners_logo_pack.zip'
 const MASTER_SRC = 'we_roll_spinners_1254x1254_transparent.png'
 const SQUARE_ALT = 'we_roll_spinners_1096x1096_square_transparent.png'
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
 const PACK = join(BRAND, 'pack_g')
 const FOUND_DATE = '2026-07-26'
 
@@ -217,7 +217,7 @@ const lines = [
   `| Export source SHA-256 | \`${srcSha}\` |`,
   `| Export source dimensions | ${a.W}x${a.H}, 8-bit **RGBA** |`,
   '| Ingested by | `frontend/scripts/provider_mark_ingest_g.mjs` |',
-  `| Pack kept at | \`design-system/brand/provider_mark/pack_g/\`, all ${packFiles.length} files, hash-verified |`,
+  `| Pack kept at | \`design-system/archive/provider_mark/pack_g/\`, all ${packFiles.length} files, hash-verified |`,
   '',
   'The delivery states its own origin in its README: the pack was generated from',
   '`we_roll_spinners_original_with_green_bg.png` (1254x1254, solid green field) by removing',

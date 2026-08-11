@@ -4,7 +4,7 @@
 //   node scripts/qa/delivery_set_gate.mjs
 //
 // EIGHT platform requirements had no proof path and all eight are properties of
-// one read-only walk of design-system/brand/delivery/ plus the kit payload
+// one read-only walk of design-system/archive/delivery/ plus the kit payload
 // layout. Session 3's register called this "the cheapest large win left"
 // because the four delivery files and their hashes are already committed.
 //
@@ -67,9 +67,9 @@ const ROOT = join(__dirname, '..', '..')
 //
 // GAME_TITLE and PROVIDER_NAME are the two halves of the platform's naming
 // rule, quoted from docs/stake-engine-live/game-tile-requirements.md via
-// design-system/brand/delivery/README.md, which records the mapping.
+// design-system/archive/delivery/README.md, which records the mapping.
 
-const DELIVERY_DIR = 'design-system/brand/delivery'
+const DELIVERY_DIR = 'design-system/archive/delivery'
 const GAME_TITLE = 'FutureSpinner'
 const PROVIDER_NAME = 'WeRollSpinners'
 
@@ -85,7 +85,7 @@ const PAIR_CEILING = 3 * 1024 * 1024
  * Deriving it from the single source at read time cannot go stale.
  */
 const PROVIDER_MASTER = join(ROOT,
-  'design-system/brand/provider_mark/provider_mark_f-owner-transparent_master_1024.png')
+  'design-system/archive/provider_mark/provider_mark_f-owner-transparent_master_1024.png')
 
 /**
  * The width a provider logo occupies on a tile. The published tile geometry is

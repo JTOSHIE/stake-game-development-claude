@@ -37,7 +37,7 @@ import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
 const TILE = '/Users/jt/math-sdk/design-system/brand/tile'
-const DELIVERY = '/Users/jt/math-sdk/design-system/brand/delivery'
+const DELIVERY = '/Users/jt/math-sdk/design-system/archive/delivery'
 const OUT = '/Users/jt/math-sdk/reports/screens/brand-tile-composed'
 const MASTER = join(TILE, 'tile_composed_master.png')
 
@@ -371,7 +371,7 @@ const lines = [
   '| File | SHA-256 |',
   '|---|---|',
   `| \`design-system/brand/tile/tile_composed_master.png\` | \`${sha256(masterBuf)}\` |`,
-  `| \`design-system/brand/delivery/${FLAT}\` | \`${flatSha}\` |`,
+  `| \`design-system/archive/delivery/${FLAT}\` | \`${flatSha}\` |`,
 ]
 writeFileSync(join(TILE, 'TILE_LAYER_DERIVATION.md'), lines.join('\n') + '\n')
 

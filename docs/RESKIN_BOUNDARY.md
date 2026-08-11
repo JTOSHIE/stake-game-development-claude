@@ -297,7 +297,7 @@ token VALUES have seven homes rather than one. See GAP 1.
 
 ### 2.8 Storefront tile and provider mark
 
-**(a)** `design-system/brand/tile/` and `design-system/brand/delivery/`.
+**(a)** `design-system/brand/tile/` and `design-system/archive/delivery/`.
 
 **(b)** `delivery/FutureSpinner-BG.jpg` JPEG 2048x1152 RGB; `delivery/FutureSpinner-FG.png`
 PNG 4159x1875 RGBA; `delivery/FutureSpinner-Tile.png` PNG **408x546** RGBA;
@@ -585,7 +585,7 @@ as one:
 
 | Carries forward to LUMEN UNCHANGED (company skin) | Replaced per title (title skin) |
 |---|---|
-| `design-system/brand/provider_mark/` | `design-system/masters/` |
+| `design-system/archive/provider_mark/` | `design-system/masters/` |
 | `design-system/brand/hero_emblem/` | `frontend/public/assets/themes/<title>/` |
 | `design-system/brand/hero_icon/` | `design-system/brand/tile/`, `delivery/` |
 | The studio name, mark and provider logo ladder | Every locale string value |

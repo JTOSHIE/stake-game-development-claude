@@ -1244,6 +1244,31 @@ ruling Fable had already issued would have re-created the decayed-citation failu
 rule 16 records. The same reasoning covered convention (t)'s own PR #121 in reverse:
 there the ruling did not order direct commit, so the PR waited for its block.
 
+**(u) Canonical art sources are REGISTERED, and the pipeline refuses the rest.
+Owner's order, 2026-08-11, R050 TASK 1.**
+
+Every art master names its canonical source path in
+`scripts/assets/canonical_sources.json`, with the brief or owner decision that
+named it. Any pipeline generator resolves its sources through
+`scripts/assets/source_registry.py`, which REFUSES an unlisted path, seeded
+per convention (p) (its self-test plants an archived exploration path and a
+fabricated path and requires both refusals). WHERE THIS CAME FROM: by R050
+three superseded provider-logo and delivery lineages sat ambient in the tree
+beside the canonical masters, and the R048 round generated candidates from
+two of them; the owner's identification caught it at promotion time, which is
+one gate later than it should ever get. The superseded sets now live under
+`design-system/archive/` with a dated manifest, and the registry makes the
+class structural: an unlisted source cannot feed a master quietly.
+
+**(u.1) Close-sequence gate invocations chain with `&&`, never semicolons.
+Owner's order, 2026-08-11, R050 TASK 1.** A gate whose exit code is followed
+by `;` is a gate whose red cannot stop the push, and this repository shipped
+that mistake twice in one day (both self-caught, both recorded in the
+2026-08-11 session report: a bare-basename DEAD_PATH red pushed past a
+semicolon, then the METER_PRE_REV DEAD_SYMBOL red pushed past another). The
+form is: `gate && git add ... && git commit ... && git push`, so a red exit
+blocks everything after it.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 

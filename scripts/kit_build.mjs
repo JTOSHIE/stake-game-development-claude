@@ -333,7 +333,7 @@ function selfTest() {
   // The first case is the REAL delivery directory rather than a fixture, because
   // the defect was a disagreement between a hand-written list and the real
   // directory, and a fixture on both sides could not have caught it.
-  const realDelivery = readdirSync(join(REPO, 'design-system/brand/delivery'))
+  const realDelivery = readdirSync(join(REPO, 'design-system/archive/delivery'))
   const realShipped = brandingFiles(realDelivery)
   const brandCases = [
     ['the real delivery set ships the COMPOSED TILE, the file the old hand-written list dropped',
@@ -499,7 +499,7 @@ if (copied.files !== stats.files || copied.bytes !== stats.bytes) {
 cpSync(join(clone, 'docs/records/upload-kit/00_READ_ME_FIRST.md'),
   join(STAGING, '00_READ_ME_FIRST_SECOND_VISIT.md'))
 mkdirSync(join(STAGING, '03_branding'), { recursive: true })
-const brandDir = join(clone, 'design-system/brand/delivery')
+const brandDir = join(clone, 'design-system/archive/delivery')
 for (const f of brandingFiles(readdirSync(brandDir))) {
   cpSync(join(brandDir, f), join(STAGING, '03_branding', f))
 }

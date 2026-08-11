@@ -82,8 +82,8 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 
-const BRAND = '/Users/jt/math-sdk/design-system/brand/provider_mark'
-const DELIVERY = '/Users/jt/math-sdk/design-system/brand/delivery'
+const BRAND = '/Users/jt/math-sdk/design-system/archive/provider_mark'
+const DELIVERY = '/Users/jt/math-sdk/design-system/archive/delivery'
 const OUT = '/Users/jt/math-sdk/reports/screens/provider-mark'
 mkdirSync(OUT, { recursive: true })
 
@@ -338,7 +338,7 @@ const lines = [
   'majority. It carries NO absolute floor: nothing here asserts that the winner is legible at',
   `${DECISION_SIZE}px, only that it is the more legible of the two. An admissibility check`,
   'against a stated ceiling would be a different instrument and would need a ceiling nobody',
-  'has yet derived. See design-system/brand/provider_mark/README.md, which gates this',
+  'has yet derived. See design-system/archive/provider_mark/README.md, which gates this',
   'sentence against the vote rule in the generator.',
   '',
   '## 1. What size does the platform actually render?',
@@ -441,7 +441,7 @@ const lines = [
     `x${Number.isFinite(t.margin) ? t.margin.toFixed(2) : 'inf'} |`),
   '',
   `**Candidate ${WINNER.key.charAt(0).toUpperCase()} takes ${Math.max(gWins, 3 - gWins)} of the 3 measures at ${DECISION_SIZE}px** and is adopted as`,
-  '`design-system/brand/delivery/WeRollSpinners-Logo.png`, delivered at its native',
+  '`design-system/archive/delivery/WeRollSpinners-Logo.png`, delivered at its native',
   `${WINNER.master.match(/_(\d+)\.png$/)?.[1] ?? 'master'} resolution so the submitted asset has been through no resampling at all.`,
   '',
   '## 5. Evidence',
@@ -456,9 +456,9 @@ const lines = [
   '',
   '| Field | Value |',
   '|---|---|',
-  `| Source master | \`design-system/brand/provider_mark/${WINNER.master}\` |`,
+  `| Source master | \`design-system/archive/provider_mark/${WINNER.master}\` |`,
   `| SHA-256 | \`${deliveredSha}\` |`,
-  '| Delivered as | `design-system/brand/delivery/WeRollSpinners-Logo.png` |',
+  '| Delivered as | `design-system/archive/delivery/WeRollSpinners-Logo.png` |',
   `| Superseded | candidate ${LOSER.key.charAt(0)}, kept on disk and kept in the comparison sheets per convention (h) |`,
   '',
   '## 7. What this derivation does not settle',
