@@ -37,6 +37,11 @@
 // Run from frontend/ (dist must exist for the default run; build first):
 //   npx tsx scripts/kit_basis_gate.mjs               scan dist
 //   npx tsx scripts/kit_basis_gate.mjs --self-test   convention (p)
+//
+// EXIT SEMANTICS (TR-123, 2026-08-11): exit 0 on PASS, non-zero on FAIL, and
+// the process terminates. This gate is static and always terminated on its
+// own; the PASS exit is now EXPLICIT so the whole TR-123 family carries one
+// contract, stated rather than relied on (see scripts/README.md).
 
 import { readFileSync, readdirSync, statSync, writeFileSync, rmSync, mkdirSync } from 'node:fs'
 import { join, relative, extname } from 'node:path'
@@ -240,3 +245,4 @@ if (findings.length) {
 }
 console.log(`KIT BASIS GATE: PASS (${phraseCount} superseded basis phrases absent from ${kitFiles.length} kit files; `
   + `no en-form figure in any comma-decimal locale string)`)
+process.exit(0)

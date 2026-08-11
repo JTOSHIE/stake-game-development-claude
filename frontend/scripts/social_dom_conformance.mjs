@@ -45,10 +45,30 @@
 // see they are brand and platform context. Hiding them would be the same
 // narrowing this script exists to undo.
 //
-// Playwright and a dev server, so it stays local and in the external audit per
-// the CI workflow's stated scope. Its result is committed as JSON.
+// RUNNER (documented per TR-123, 2026-08-11): npx tsx, from frontend/, and
+// here tsx is REQUIRED rather than merely uniform: this gate imports the live
+// src/lib/i18n/vocabulary.ts module, which plain node cannot load on the CI
+// runner. The line above used to say `node`, which is exactly the
+// header-versus-import-graph drift scripts/README.md now documents.
+//   npx tsx scripts/social_dom_conformance.mjs               the real run
+//   npx tsx scripts/social_dom_conformance.mjs --self-test   convention (p)
 //
-// Run (from frontend/): node scripts/social_dom_conformance.mjs
+// EXIT SEMANTICS (TR-123): exit 0 on PASS, non-zero on FAIL, and the process
+// TERMINATES. The vite child is spawned detached and killed as a process
+// group, and the final exit is explicit; this gate used to set exitCode and
+// then hang on the vite grandchild's inherited pipes (the R043 closure
+// suite's lingering-handle observation).
+//
+// The --self-test re-invokes this gate in a child with FS_SEED_VIOLATION=1:
+// a term drawn from the app's OWN vocabulary table is rendered visible in the
+// social DOM (the exact class this gate exists to catch), and the seeded run
+// walks first paint only, both modes, so the self-test proves the detector
+// and the exit contract without repeating the full eight-surface walk. It
+// demands the red verdict, the named social.zeroProhibitedTerms failure with
+// the seeded phrase in its printed hits, AND a real non-zero exit within a
+// timeout, so a reintroduced hang fails the self-test rather than hanging a
+// CI leg. (This run was formerly kept out of CI on purpose; that reasoning
+// predates the browser matrix and is retired with the wiring, 2026-08-11.)
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -62,7 +82,7 @@ import { evidenceDir } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 import { PROHIBITED_TERMS, NOT_SUBSTITUTED, TERM_TABLE_SOURCE } from '../src/lib/i18n/vocabulary.ts'
 
@@ -72,6 +92,11 @@ const SCREENS_DIR = evidenceDir('reports', 'screens', 'social-dom-conformance')
 
 const NEVER_REWRITE = new Set(Object.keys(NOT_SUBSTITUTED))
 const UNIQUE_TERMS = [...new Map(PROHIBITED_TERMS.map((t) => [t.phrase.toLowerCase(), t])).values()]
+
+const SEED = process.env.FS_SEED_VIOLATION === '1'
+// The seed phrase comes from the app's own table, so the seed cannot drift
+// from what the gate actually scans.
+const SEED_PHRASE = (UNIQUE_TERMS.find((t) => t.phrase.toLowerCase() === 'bet') || UNIQUE_TERMS[0]).phrase
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const phraseRe = (p) => new RegExp(`(?<![A-Za-z])${escapeRe(p)}(?![A-Za-z])`, 'gi')
@@ -89,8 +114,10 @@ async function getFreePort() {
 
 function startDevServer(port) {
   return new Promise((res, rej) => {
+    // detached so teardown can kill the whole process group; the npx wrapper
+    // is not the server (TR-123).
     const proc = spawn('npx', ['vite', '--port', String(port), '--strictPort'], {
-      cwd: join(__dirname, '..'), stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: join(__dirname, '..'), stdio: ['ignore', 'pipe', 'pipe'], detached: true,
     })
     let done = false
     const onData = (d) => {
@@ -272,6 +299,19 @@ async function run() {
       page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()) })
       page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message))
 
+      if (SEED && social) {
+        // Convention (p): a term from the app's own prohibited table, rendered
+        // visible in the social DOM before the first harvest.
+        await page.addInitScript((p) => {
+          document.addEventListener('DOMContentLoaded', () => {
+            const el = document.createElement('div')
+            el.id = 'seeded-violation'
+            el.textContent = p
+            document.body.appendChild(el)
+          })
+        }, SEED_PHRASE)
+      }
+
       console.log(`[${label}] loading ${baseUrl}`)
       await page.goto(social ? `${baseUrl}/?social=true` : baseUrl, { waitUntil: 'domcontentloaded' })
       await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30000 })
@@ -295,15 +335,23 @@ async function run() {
       await harvest(page, 'boot-overlays', bag)
 
       await dismissIntro(page)
-      console.log(`[${label}] loaded, walking surfaces`)
 
-      await openSurfaces(page, social, bag)
+      if (SEED) {
+        // Seeded runs prove the detector and the exit contract; the full
+        // eight-surface walk is the REAL run's job. First paint is where the
+        // seeded element lives, so it is the surface that matters here.
+        console.log(`[${label}] loaded, seeded run: first paint only`)
+        await harvest(page, 'first-paint', bag)
+      } else {
+        console.log(`[${label}] loaded, walking surfaces`)
+        await openSurfaces(page, social, bag)
+      }
       modes[label] = { strings: bag, consoleErrors }
       await page.close()
     }
     await browser.close()
   } finally {
-    server.kill()
+    try { process.kill(-server.pid, 'SIGTERM') } catch {}
   }
 
   // ── Scan ───────────────────────────────────────────────────────────────────
@@ -386,8 +434,35 @@ async function run() {
   }
   console.log(`\nwritten to ${outPath}`)
 
-  if (!allPass) { console.error('\nSOCIAL DOM CONFORMANCE: FAIL'); process.exitCode = 1 }
-  else console.log('\nSOCIAL DOM CONFORMANCE: PASS')
+  if (!allPass) {
+    console.error('\nSOCIAL DOM CONFORMANCE: FAIL')
+    process.exit(1)
+  }
+  console.log('\nSOCIAL DOM CONFORMANCE: PASS')
+  process.exit(0)
+}
+
+// ── self-test, convention (p): seeded red AND the exit contract ──────────────
+if (process.argv.includes('--self-test')) {
+  const r = spawnSync('npx', ['tsx', fileURLToPath(import.meta.url)], {
+    cwd: join(__dirname, '..'),
+    env: { ...process.env, FS_SEED_VIOLATION: '1' },
+    encoding: 'utf-8',
+    timeout: 480_000,
+  })
+  const out = (r.stdout || '') + (r.stderr || '')
+  const red = /SOCIAL DOM CONFORMANCE: FAIL/.test(out)
+  const named = /FAIL social\.zeroProhibitedTerms/.test(out) && out.includes(`"${SEED_PHRASE}"`)
+  const exited = typeof r.status === 'number' && r.status !== 0
+  console.log(`  ${red ? 'caught ' : 'MISSED '} seeded "${SEED_PHRASE}" in the social DOM turned the gate red`)
+  console.log(`  ${named ? 'named  ' : 'UNNAMED'} the red is social.zeroProhibitedTerms with the seeded phrase in its hits, not a coverage accident`)
+  console.log(`  ${exited ? 'exited ' : 'HUNG   '} the failing invocation exited non-zero (status ${r.status}${r.signal ? ', signal ' + r.signal : ''})`)
+  if (!red || !named || !exited) {
+    console.error('\nSOCIAL DOM CONFORMANCE SELF-TEST: FAIL')
+    process.exit(1)
+  }
+  console.log('\nSOCIAL DOM CONFORMANCE SELF-TEST: PASS (seeded violation red, named check, non-zero exit, terminated)')
+  process.exit(0)
 }
 
 run().catch((e) => { console.error(e); process.exit(1) })

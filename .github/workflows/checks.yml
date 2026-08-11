@@ -87,11 +87,15 @@
 # Post-merge auto-archiving is ON as a repository setting; it is not this
 # workflow's concern.
 #
-# NOT ADDED HERE ON PURPOSE: frontend/scripts/popout_conformance.mjs (R14). It
-# asserts a REAL Playwright click at Stake's 400x225 mini-player size, which needs
-# a browser and a dev server, so it stays local and in the external audit per this
-# workflow's stated scope. Its result is committed as
-# reports/qa/popout_conformance_2026-07-27.json.
+# A DATED RECORD, superseded 2026-08-11 (TR-123): from R14 to 2026-08-11 this
+# header said popout_conformance was NOT added on purpose, because it needs a
+# browser and a dev server and this workflow was browser-free when R14 wrote
+# that. The browser matrix has existed since 2026-07-26, so the stated reason
+# had lapsed; what actually kept popout (and social_dom, social_string) out was
+# that all three printed their verdict and never exited (the R043 closure
+# suite's lingering-handle observation). TR-123 gave the family clean exit
+# semantics and seeded self-tests, and all three are wired as browser legs
+# below.
 
 name: checks
 
@@ -1103,6 +1107,24 @@ jobs:
           # seeds the superseded refund-on-rejection source itself.
           - name: "browser: live settle failure"
             run: npx tsx scripts/r043_settle_failure_proof.mjs --self-test && npx tsx scripts/r043_settle_failure_proof.mjs
+
+          # TR-123 (COMMS 046/047), wired 2026-08-11. These three printed their
+          # verdict then never exited, because the npx wrapper's surviving vite
+          # grandchild held the process open on its inherited pipes, so they
+          # could not be wired until the exit was fixed. Each now exits 0 on
+          # PASS and non-zero on FAIL, kills its server as a process group, and
+          # its --self-test re-invokes the gate with FS_SEED_VIOLATION=1 and
+          # demands BOTH the red verdict AND a real non-zero exit within a
+          # timeout, so the lingering-handle class is itself machine-caught if
+          # it returns. tsx, not node: social_dom evaluates the live TypeScript
+          # vocabulary module, and one documented runner covers the family
+          # (frontend/scripts/README.md).
+          - name: "browser: popout conformance"
+            run: npx tsx scripts/popout_conformance.mjs --self-test && npx tsx scripts/popout_conformance.mjs
+          - name: "browser: social DOM conformance"
+            run: npx tsx scripts/social_dom_conformance.mjs --self-test && npx tsx scripts/social_dom_conformance.mjs
+          - name: "browser: social string conformance"
+            run: npx tsx scripts/social_string_conformance.mjs --self-test && npx tsx scripts/social_string_conformance.mjs
 
     steps:
       - name: Check out

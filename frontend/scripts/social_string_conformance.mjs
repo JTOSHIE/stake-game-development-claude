@@ -15,7 +15,22 @@
 // text. Captures before (real-money) / after (social) screenshots of both
 // consumers as proofs.
 //
-// Run (from frontend/): npx tsx scripts/social_string_conformance.mjs
+// RUNNER (documented per TR-123, 2026-08-11): npx tsx, from frontend/.
+//   npx tsx scripts/social_string_conformance.mjs               the real run
+//   npx tsx scripts/social_string_conformance.mjs --self-test   convention (p)
+//
+// EXIT SEMANTICS (TR-123): exit 0 on PASS, non-zero on FAIL, and the process
+// TERMINATES. The vite child is spawned detached and killed as a process
+// group, and the final exit is explicit; this gate used to set exitCode and
+// then hang on the vite grandchild's inherited pipes (the R043 closure
+// suite's lingering-handle observation).
+//
+// The --self-test re-invokes this gate in a child with FS_SEED_VIOLATION=1,
+// which plants the word Buy inside the social feature menu cards (the exact
+// class this gate catches, a prohibited real-money term on a social surface
+// it reads), and demands the red verdict, the named failing check AND a real
+// non-zero exit within a timeout, so a reintroduced hang fails the self-test
+// rather than hanging a CI leg.
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -29,9 +44,10 @@ import { evidenceDir } from './lib/evidencePaths.mjs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 
+const SEED = process.env.FS_SEED_VIOLATION === '1'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = evidenceDir('reports', 'qa')
 const SCREENS_DIR = evidenceDir('reports', 'screens', 'social-strings-item-c')
@@ -57,9 +73,12 @@ async function getFreePort() {
 
 function startDevServer(port) {
   return new Promise((resolvePreview, reject) => {
+    // detached so teardown can kill the whole process group; the npx wrapper
+    // is not the server (TR-123).
     const proc = spawn('npx', ['vite', '--port', String(port), '--strictPort'], {
       cwd: join(__dirname, '..'),
       stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true,
     })
     let resolved = false
     const onData = (d) => {
@@ -122,6 +141,18 @@ async function run() {
 
       // FeatureMenu
       await openFeatureMenu(page)
+      if (SEED && social) {
+        // Convention (p): the exact defect class, a prohibited real-money term
+        // rendered inside a social surface this gate reads.
+        await page.evaluate(() => {
+          const cards = document.querySelector('[data-testid="feature-menu-cards"]')
+          if (cards) {
+            const s = document.createElement('span')
+            s.textContent = 'Buy'
+            cards.appendChild(s)
+          }
+        })
+      }
       await page.screenshot({ path: join(SCREENS_DIR, `feature-menu-${label}.png`) })
       const featureMenuText = await page.locator('[data-testid="feature-menu-cards"]').innerText()
       await page.keyboard.press('Escape').catch(() => {})
@@ -140,7 +171,7 @@ async function run() {
 
     await browser.close()
   } finally {
-    server.kill()
+    try { process.kill(-server.pid, 'SIGTERM') } catch {}
   }
 
   const checks = {}
@@ -177,13 +208,37 @@ async function run() {
 
   if (!allPass) {
     console.error('SOCIAL STRING CONFORMANCE: FAILURES DETECTED')
-    process.exitCode = 1
-  } else {
-    console.log('SOCIAL STRING CONFORMANCE: ALL CHECKS PASS')
+    for (const [k, v] of Object.entries(checks)) if (!v.pass) console.error(`  FAIL ${k}`)
+    process.exit(1)
   }
+  console.log('SOCIAL STRING CONFORMANCE: ALL CHECKS PASS')
+  process.exit(0)
+}
+
+// ── self-test, convention (p): seeded red AND the exit contract ──────────────
+if (process.argv.includes('--self-test')) {
+  const r = spawnSync('npx', ['tsx', fileURLToPath(import.meta.url)], {
+    cwd: join(__dirname, '..'),
+    env: { ...process.env, FS_SEED_VIOLATION: '1' },
+    encoding: 'utf-8',
+    timeout: 480_000,
+  })
+  const out = (r.stdout || '') + (r.stderr || '')
+  const red = /SOCIAL STRING CONFORMANCE: FAILURES DETECTED/.test(out)
+  const named = /FAIL social\.no_Buy/.test(out)
+  const exited = typeof r.status === 'number' && r.status !== 0
+  console.log(`  ${red ? 'caught ' : 'MISSED '} seeded Buy in the social feature menu turned the gate red`)
+  console.log(`  ${named ? 'named  ' : 'UNNAMED'} the failing check is social.no_Buy, so the red is the seed and not a coverage accident`)
+  console.log(`  ${exited ? 'exited ' : 'HUNG   '} the failing invocation exited non-zero (status ${r.status}${r.signal ? ', signal ' + r.signal : ''})`)
+  if (!red || !named || !exited) {
+    console.error('\nSOCIAL STRING CONFORMANCE SELF-TEST: FAIL')
+    process.exit(1)
+  }
+  console.log('\nSOCIAL STRING CONFORMANCE SELF-TEST: PASS (seeded violation red, named check, non-zero exit, terminated)')
+  process.exit(0)
 }
 
 run().catch((err) => {
   console.error(err)
-  process.exitCode = 1
+  process.exit(1)
 })
