@@ -12184,3 +12184,16 @@ seeded reds, live tree clean) and r043_verify archived with its note.
 **Verification**: svelte-check 0 errors; the full affected gate family green
 locally (29 runs, the two first-pass failures diagnosed and closed above);
 remote CI on the enlarged 24-leg matrix recorded at close.
+
+**Rule 10, the final accounting, including one more self-caught red.** The
+close push's local doc currency run exited 1 and a semicolon-chained command
+pushed anyway, the same class this morning recorded, now recorded twice: the
+gate had caught the TR-127 row pairing a backticked METER_PRE_REV with the
+component file the constant deliberately does not live in. The correction
+(`45f66fac`) landed within minutes, pre-announcing the red; the superseded
+run was CANCELLED under cancel-in-progress before any red landed on main,
+and the tip run (31475652244) is GREEN. The enlarged matrix then ran to
+completion as a rerun of the implementation-content run (31475508572): all
+22 browser legs GREEN including the two new autoplay legs; its single static
+red is exactly the corrected wording, green at the tip. Every leg is green
+at the tree where its content lives, and no red stands unexplained.
