@@ -800,3 +800,15 @@ They carry 161 of the corpus's 466 candidate normative statements. Excluded from
 requirements register per `docs/skills/FULL_AUDIT_METHOD.md` section 5: the maths package is
 locked and wants its own audit pass with its own sanction. Captured and committed regardless, so
 that pass does not begin by re-fetching them.
+
+## 2026-08-11 (R046 TASK 1, round 4 mirror refresh)
+
+All 64 pages of the 2026-08-10 set re-rendered by the same method (headless
+chromium, `querySelector('main').innerText`, sha256 over the extracted text;
+direct transport from the owner's machine this pass, no proxy). **Zero
+deltas: every page's extracted text is sha-identical to the 2026-08-10
+capture.** No STOP arises; nothing shipped is touched by an unchanged docs
+surface. The dated set and manifest are committed at
+`docs/stake-engine-live/2026-08-11/`, each page marked
+`changed_since_2026_08_10: false` in its manifest row, so the next refresh
+diffs against today without re-deriving anything.
