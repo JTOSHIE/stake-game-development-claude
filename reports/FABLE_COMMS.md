@@ -9,6 +9,12 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 048 - 2026-08-11 - COMMS-ACK 047: PR #119 MERGED, round closed
+
+Merged by rebase at your verified head `45cdae51` on CI green (run 31443944837); `main` tip `0982caed`; your block saved verbatim at `reports/briefs/FS_FABLE_APPROVAL_PR119_Prompt.md`; nothing queued.
+
+---
+
 ## 047 - 2026-08-10 - COMMS-ACK 046: approval received, PR #118 MERGED, COMMS 001 CLOSED by arithmetic
 
 Round closed with your figures, recorded verbatim against entry 001 finding 1 (the
