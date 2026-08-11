@@ -1184,6 +1184,50 @@ green-lane by type). This document, the gates, locked paths, player-facing text 
 anything recording a NEW ruling rather than an already-ratified disposition all
 remain review lane.
 
+**(t.1) Record commits go direct to main; session branches die on merge. Fable's
+standing ruling, 2026-08-11, effective on paste; transcribed from the owner's paste,
+saved verbatim at `reports/briefs/FS_FABLE_RULING_T1_Prompt.md`.**
+
+The ruling, quoted:
+
+> 1. Record-only material as defined in (t) commits DIRECTLY to main: no
+> branch, no PR. Explicit paths per (k), remote CI verified green after the
+> push per rule 10, retrospectively verified by Fable at the next check-in.
+> Branches and pull requests are reserved for review-lane work (code, gates,
+> player-facing text, rulings, locked paths) and for deliberate parallel
+> tracks under the multi-track protocol.
+> 2. An auto-named session branch is deleted immediately after its PR merges.
+> Realigning a merged branch is never needed again; the force-with-lease class
+> retires with this line.
+> 3. One-off tidy, this session, record-only: enumerate every surviving remote
+> branch with its unique-commit count against main. The named horizon branches
+> (claude/collect-prototype, claude/gap-analysis, claude/lumen-sideproject)
+> are KEEP without question. For each remaining branch (including
+> chore/wip-backgrounds, claude/fs-super-prototype and the auto-named session
+> branches), report keep-or-delete with a one-line reason and wait for the
+> owner's OK in chat before deleting anything. The enumeration commits direct
+> to main under rule 1.
+
+What this changes in practice: the green-lane class defined in (t) no longer rides
+pull requests at all; it commits straight to `main` with explicit paths per (k) and
+the push's remote CI verified per rule 10, Fable verifying retrospectively. Branches
+and pull requests now MEAN something: one exists only for review-lane work or a
+deliberate parallel track. Auto-named session branches are deleted the moment their
+pull request merges, which retires the post-rebase force-with-lease realignment of a
+merged branch (the class this repository performed three times on 2026-08-10/11)
+along with the stop-hook nagging it answered. The rule 3 one-off tidy is recorded at
+`docs/records/BRANCH_HYGIENE_2026-08-11.md`; deletions in it wait for the owner's
+chat OK.
+
+**A lane note on this transcription itself, surfaced per convention (n) rather than
+decided quietly:** convention (t) keeps CLAUDE.md in review lane, yet this
+transcription rode direct to `main`. The sanction is the ruling's own first line,
+"Effective on paste; transcribe under convention (t)", an explicit later instrument
+naming exactly this edit; a pull request awaiting a further Fable block to record a
+ruling Fable had already issued would have re-created the decayed-citation failure
+rule 16 records. The same reasoning covered convention (t)'s own PR #121 in reverse:
+there the ruling did not order direct commit, so the PR waited for its block.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 

@@ -11713,3 +11713,27 @@ a STANDING RULING. Executed:
   lane**, so the PR carrying it stays a draft awaiting Fable's block rather than
   merging on its own green; the ruling governs from the #120 merge regardless,
   because a ruling is in force when issued, and the transcription records it.
+
+## THIRD ADDENDUM, 2026-08-11: ruling (t.1) transcribed, and the branch enumeration
+
+Fable's standing ruling (t.1) arrived by owner paste (saved verbatim at
+`reports/briefs/FS_FABLE_RULING_T1_Prompt.md`) and was executed in full:
+
+- **Convention (t.1) transcribed into CLAUDE.md**: record-only commits go direct
+  to `main` (no branch, no PR, explicit paths per (k), remote CI verified per
+  rule 10, retrospective Fable verification); auto-named session branches are
+  deleted on merge, retiring the force-with-lease realignment class.
+- **The lane tension on the transcription itself is surfaced in the convention
+  text per (n), not decided quietly**: CLAUDE.md is review lane under (t), and
+  the transcription rode direct to `main` on the sanction of the ruling's own
+  "Effective on paste; transcribe under convention (t)" line.
+- **The rule 3 enumeration is recorded at
+  `docs/records/BRANCH_HYGIENE_2026-08-11.md`**: eight remote branches, every
+  tip SHA kept, patch-equivalence checked with `git cherry`. Three KEEP without
+  question by ruling; `chore/wip-backgrounds` and `claude/fs-super-prototype`
+  KEEP (genuinely unique patches, deliberate); `claude/future-spinner-audit-yv55hj`
+  and `claude/remote-control-tv30mf` proposed DELETE (rule 2 class, both
+  patch-identical or tip-identical to `main`). **Nothing deleted; the owner's
+  chat OK is awaited.**
+- This commit series is itself the first direct-to-main record commit under
+  rule 1, with its push's remote CI verified per rule 10.
