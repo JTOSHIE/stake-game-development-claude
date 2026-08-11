@@ -1,0 +1,10 @@
+{
+ "brief": "FABLE MASTER BRIEF R050 CHECKPOINT ONE promotion",
+ "promoted_from": "reports/art/r050_checkpoint/provider_logo_transparent.png",
+ "source_key": "studio_mark_master",
+ "source_path": "design-system/brand/hero_emblem/master_1024.png",
+ "source_sha256": "6bc4ce8f58745ed240afc92b29b09f2ac4c1439b05d2524dac4c32790dcbb51f",
+ "output_sha256": "94466ec63a5e3c03207f21cc3d9d594d330bd7a6c062a0e2d67b3e3a7d9c50d3",
+ "output_bytes": 256847,
+ "gate": "promoted on the owner's two YES taps, quoted in the R050 session report"
+}

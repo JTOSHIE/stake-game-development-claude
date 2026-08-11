@@ -1,0 +1,21 @@
+{
+ "brief": "FABLE MASTER BRIEF R050 TASK 2",
+ "source_key": "title_wordmark_master",
+ "source_path": "frontend/public/assets/ui/logo_future_spinner.png",
+ "source_sha256": "ec6310444b427de176d1fa36987ec0399aec80917977b7450baa5290647277f9",
+ "params": {
+  "canvas": [
+   1600,
+   600
+  ],
+  "scale": 2.0,
+  "resample": "LANCZOS",
+  "sharpen": "UnsharpMask r1.4 60% t3, single pass",
+  "alpha_floor": 6,
+  "placement": "centred"
+ },
+ "output_bytes": 337622,
+ "output_sha256": "991d6b46f8b7ac7e052f3ffb987f9596f1969d656d2198dbb3ef8aa65cae8d10",
+ "note": "no re-rendering, no type re-setting, per the brief",
+ "owner_decision": "R050 owner decisions on record; promoted only on the CHECKPOINT ONE YES taps"
+}

@@ -1,0 +1,28 @@
+{
+ "brief": "FABLE MASTER BRIEF R050 TASK 2",
+ "source_key": "studio_mark_master",
+ "source_path": "design-system/brand/hero_emblem/master_1024.png",
+ "source_sha256": "6bc4ce8f58745ed240afc92b29b09f2ac4c1439b05d2524dac4c32790dcbb51f",
+ "params": {
+  "canvas": [
+   1024,
+   1024
+  ],
+  "safe_margin": 0.08,
+  "plate_tone": [
+   12,
+   12,
+   18
+  ],
+  "luma_key": "threshold 12, gain 1.3",
+  "resample": "LANCZOS",
+  "encoding": {
+   "provider_logo_transparent.png": "P-256 dithered (RGBA exceeded the 1 MB budget)",
+   "provider_logo_darkplate.png": "RGBA"
+  }
+ },
+ "output_bytes": 256847,
+ "output_sha256": "94466ec63a5e3c03207f21cc3d9d594d330bd7a6c062a0e2d67b3e3a7d9c50d3",
+ "note": "",
+ "owner_decision": "R050 owner decisions on record; promoted only on the CHECKPOINT ONE YES taps"
+}

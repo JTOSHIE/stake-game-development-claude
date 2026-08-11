@@ -1,0 +1,10 @@
+{
+ "brief": "FABLE MASTER BRIEF R050 CHECKPOINT ONE promotion",
+ "promoted_from": "reports/art/r048/M2_seed20260811.png",
+ "source_key": "tile_foreground_master",
+ "source_path": "reports/art/r048/M2_seed20260811.png",
+ "source_sha256": "b67177641a86e1be4a467d82e1f305046e14a68092a3824811bb849406187a9c",
+ "output_sha256": "b67177641a86e1be4a467d82e1f305046e14a68092a3824811bb849406187a9c",
+ "output_bytes": 402053,
+ "gate": "promoted on the owner's two YES taps, quoted in the R050 session report"
+}
