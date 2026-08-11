@@ -1126,6 +1126,15 @@ jobs:
           - name: "browser: social string conformance"
             run: npx tsx scripts/social_string_conformance.mjs --self-test && npx tsx scripts/social_string_conformance.mjs
 
+          # R046 TASK 0, ordered by Fable: the R045 proof joins the matrix under
+          # the TR-123 runner contract. Its exit semantics were proven at birth
+          # (the self-test re-invokes the gate with the dual read regressed in a
+          # scratch copy of the real bundle and demands the red verdict AND a
+          # real non-zero exit), so unlike the three siblings above it never had
+          # a lingering-handle era to escape.
+          - name: "browser: rgs error dialect"
+            run: npx tsx scripts/r045_error_field_proof.mjs --self-test && npx tsx scripts/r045_error_field_proof.mjs
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
