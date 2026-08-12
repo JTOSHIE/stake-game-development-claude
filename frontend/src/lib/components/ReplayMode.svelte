@@ -209,9 +209,31 @@
       // disagree about what a round means. The `response.state.board` fallback
       // is gone too: it was a second invented shape, and falling back to one
       // invention when another is missing is not a fallback.
-      const events: RawEvent[] = Array.isArray(response.state?.events)
-        ? (response.state.events as RawEvent[])
-        : []
+      //
+      // R053, CAPTURED NOT ASSUMED (2026-08-12): the LIVE replay endpoint
+      // returns `state` AS the event array itself
+      // (docs/stake-engine-live/captures/2026-08-12_replay_base_83776.json,
+      // event 83776 on the published entry), while the wallet's live rounds
+      // nest them at `state.events`. This reader accepted only the wallet
+      // shape, and the silent [] fallback below turned the mismatch into a
+      // startup grid under correct chrome: payoutMultiplier and
+      // costMultiplier are top level in BOTH shapes, so the banner, win and
+      // cost line all rendered while the board never left the idle symbols,
+      // which is precisely the owner's report. Both REAL shapes are accepted
+      // (the R045 pattern); anything else throws to the error state, because
+      // a shape this reader cannot read must never render as a silent
+      // startup grid again.
+      const rawState: unknown = response.state
+      const events: RawEvent[] | null = Array.isArray((rawState as { events?: unknown } | null)?.events)
+        ? ((rawState as { events: RawEvent[] }).events)
+        : Array.isArray(rawState)
+          ? (rawState as RawEvent[])
+          : null
+      if (!events || events.length === 0) {
+        throw new Error(
+          `replay payload carries no readable events (state is ${Array.isArray(rawState) ? 'an empty array' : typeof rawState})`,
+        )
+      }
 
       // Set bet + currency so amounts format correctly during playback.
       betAmount.set(microsToDisplay(params.amount))
@@ -354,7 +376,12 @@
       isWincap.set(wincapNow)
     } catch (e: any) {
       isSpinning.set(false)
-      error = e?.message ?? $tr('replayPlaybackError')
+      // R053: the KEYED string, always, for exactly the reason the load
+      // catch above records: a thrown message is developer text, never
+      // vocabulary-scanned, never translated, and this branch used to paint
+      // it straight at the player. The raw message stays on the dev console.
+      if (import.meta.env.DEV) console.error('[replay] playback failed:', e)
+      error = $tr('replayPlaybackError')
       phase = 'error'
       replayPhase.set('error')
       replayError.set(error)

@@ -97,6 +97,22 @@ if (!existsSync(join(DIST, 'index.html'))) {
 const FIX = JSON.parse(readFileSync(
   join(HERE, '..', 'src', 'lib', 'services', '__fixtures__', 'replay_rounds.json'), 'utf8'))
 
+// R053: THE REAL PAYLOAD, captured from the live replay endpoint on the
+// published entry (event 83776, base mode) and committed verbatim. Its
+// envelope is `{payoutMultiplier, costMultiplier, state: RawEvent[]}`, with
+// `state` AS the event array, which is NOT the invented `{state:{events}}`
+// shape every stub in this gate had encoded; that encoding is exactly why
+// this gate stayed green while the portal replay showed a startup grid.
+// The stub parts are kept (the reader accepts both shapes, and they double
+// as wallet-shape coverage); the part and seed below run against reality.
+const REAL_FIXTURE = JSON.parse(readFileSync(
+  join(HERE, '..', '..', 'docs', 'stake-engine-live', 'captures', '2026-08-12_replay_base_83776.json'), 'utf8'))
+const REAL_REVEAL = REAL_FIXTURE.state.find((e) => e.type === 'reveal')
+// The book board is padded one row top and bottom; the visible window is
+// rows 1 to 4 of each six-row column (the padded-board lesson recorded in
+// CLAUDE.md convention (l)'s worked example).
+const REAL_EXPECT_BOARD = REAL_REVEAL.board.map((col) => col.slice(1, 5).map((c) => String(c.name).toUpperCase()))
+
 // ---------------------------------------------------------------------------
 // The replay URL under test. Every value is DISTINCTIVE on purpose: a gate whose
 // fixture reuses a default cannot tell a value that was read from a value that
@@ -241,6 +257,12 @@ async function driveReplay(browser, {
     if (respond === '404') { await route.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }); return }
     if (respond === '500') { await route.fulfill({ status: 500, contentType: 'text/plain', body: 'server error' }); return }
     if (respond === 'hang') { await new Promise((r) => setTimeout(r, 30000)); await route.abort(); return }
+    if (respond === 'real') {
+      // R053: the captured live payload, byte-shaped as the platform sends it
+      // (state IS the array). Nothing invented.
+      await route.fulfill({ contentType: 'application/json', body: JSON.stringify(REAL_FIXTURE) })
+      return
+    }
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
@@ -283,6 +305,36 @@ async function driveReplay(browser, {
   if (play && observed.startVisible) {
     await page.locator('.start-replay').click({ timeout: 5000 }).catch(() => {})
     await page.locator('.play-again').waitFor({ timeout: 25000 }).catch(() => {})
+    // R053: the rendered grid, read as SYMBOL NAMES per column from the
+    // visible cells' image sources (h1_base normalises to H1; every other
+    // symbol ships under its own stem). Read after play-again appears, when
+    // the round's final board is settled on screen.
+    observed.boardNames = await page.evaluate(() => {
+      // STRUCTURAL grouping, not geometric: the grid renders one .reel-strip
+      // per column with data-col (GameGrid.svelte:1133), so column membership
+      // is read from the DOM rather than inferred from x positions, which
+      // win-presentation transforms jitter. Within a strip the settled
+      // visible window is the cells inside the strip's own clip box.
+      const strips = [...document.querySelectorAll('.reel-strip[data-col]')]
+        .sort((a, b) => Number(a.dataset.col) - Number(b.dataset.col))
+      // Filename stems map back to book names through the same table the
+      // component writes them from (GameGrid.svelte _symNameMap): wild -> W,
+      // scatter -> S, h1_base -> H1, the rest are their own upper-cased stem.
+      const stem = (src) => {
+        const m = (src || '').match(/symbols\/([^/]+)\.png/)
+        if (!m) return null
+        const s = m[1].toUpperCase().replace(/_BASE$/, '')
+        return s === 'WILD' ? 'W' : s === 'SCATTER' ? 'S' : s
+      }
+      return strips.map((strip) => {
+        const clip = (strip.parentElement || strip).getBoundingClientRect()
+        return [...strip.querySelectorAll('img.symbol-img')]
+          .map((el) => ({ src: el.getAttribute('src') || '', r: el.getBoundingClientRect() }))
+          .filter((x) => x.r.height > 4 && x.r.top >= clip.top - x.r.height / 2 && x.r.bottom <= clip.bottom + x.r.height / 2)
+          .sort((a, b) => a.r.top - b.r.top)
+          .map((c) => stem(c.src))
+      })
+    })
     observed.finalWin = (await page.locator('.win-area').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
     // THE STATE THE PLATFORM ACTUALLY ASKS ABOUT. Everything above is read in
     // the ready phase, which is the phase that was already compliant. These two
@@ -442,6 +494,22 @@ async function main() {
     // Extracted so the SEED can run the same assertion. A check that lives only
     // in the real-run branch cannot be seeded, and an unseedable assertion is
     // exactly what convention (p) says does not count.
+    // R053, extracted so the SEED runs the same assertion (the gate's own
+    // rule: an unseedable assertion does not count).
+    const assertRealFixtureBoard = (r, tag = '') => {
+      check(!r.observed.errorVisible,
+        `${tag}real fixture: the captured live payload loads without an error state`,
+        'ready and playback reached',
+        `error state rendered: "${r.observed.errorText.split('\n')[0]}" (the reader refused the real envelope)`)
+      const rendered = (r.observed.boardNames || []).map((col) => col.join(','))
+      const expected = REAL_EXPECT_BOARD.map((col) => col.join(','))
+      check(rendered.length === expected.length && rendered.every((c, i) => c === expected[i]),
+        `${tag}real fixture: the rendered board equals the round's book board`,
+        `5 columns settled as ${JSON.stringify(rendered)}`,
+        `rendered ${JSON.stringify(rendered)} against the fixture's ${JSON.stringify(expected)}; `
+          + 'a startup grid here is the exact defect the owner reported on the portal')
+    }
+
     const assertFlatMultiplier = (r, tag = '') => {
       const txt = r.observed.figuresText.replace(/\s+/g, ' ').trim()
       check(/×\s*1\b/.test(txt),
@@ -708,6 +776,15 @@ async function main() {
         'NEGATIVE CONTROL: local asset requests are not flagged',
         `${healthy.requests.length} total requests, ${off.length} off-origin, all of them the replay call`,
         `off-origin traffic beyond the replay call: ${off.map((r) => r.url).join(', ')}`)
+
+      // R053: THE REAL PAYLOAD RENDERS THE ROUND'S ACTUAL BOARD. Served
+      // byte-shaped as captured from the live endpoint, played through, the
+      // settled grid compared column for column against the fixture's own
+      // reveal board (visible window). This is the part every stub above
+      // could not be: the stubs encode our reading of the platform, this
+      // encodes the platform.
+      const real = await driveReplay(browser, { respond: 'real', play: true, qs: { mode: 'base' } })
+      assertRealFixtureBoard(real)
     }
 
     if (SELF_TEST) {
@@ -928,6 +1005,23 @@ async function main() {
           return b.replace('</head>',
             `<script>fetch('https://${P.rgsHost}/bet/replay/x/1/base/1').catch(()=>{})</script></head>`)
         } } }, /exactly one replay request|replay URL is exact/)
+
+      // SEED R053: the pre-fix reader against the REAL payload. The bundle
+      // regression collapses the dual-shape read back to state.events-only
+      // (the array branch removed, the exact reader this project shipped to
+      // the portal), then the CAPTURED live payload is served. The board can
+      // never render, the R053 guard turns what used to be a silent startup
+      // grid into an error state, and the real-fixture assertions go red
+      // either way: reality is load-bearing in this gate from here on.
+      await seed('real-envelope-reader-regressed',
+        'the state.events-only reader leaves the real replay payload boardless, the portal startup-grid defect',
+        { respond: 'real', play: true, qs: { mode: 'base' }, patches: { [bundle.file]: (b) => {
+          const m = b.match(/:Array\.isArray\(([\w$]+)\)\?\1:null/)
+          if (!m) return null
+          return b.replace(m[0], ':[]')
+        } } },
+        /real fixture/,
+        assertRealFixtureBoard)
 
       // SEED 5: the lifecycle branch suppressed, so a failed fetch leaves a
       // blank surface. Observation-boundary seed, declared in the header.
