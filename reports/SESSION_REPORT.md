@@ -12349,3 +12349,58 @@ branding uploads are pending again):**
 NOTHING IS SUBMITTED. Fable retro-verifies this correction at the next
 check-in; the next session remains Fable's final verification of the staged
 upload, then the owner's submit click on the owner's word.
+
+## R053 ADDENDUM, 2026-08-12: the replay board defect captured, fixed and proven against reality
+
+FABLE BRIEF R053 executed; saved verbatim. START APPROVAL REMAINS HELD until
+the owner confirms the fix live.
+
+**TASK 1, the capture and the named mismatch.** The owner drove the pane to
+the portal replay (event 83776, base, published entry); the wrapper resolved
+to the inner replay URL, and the public endpoint's payload is committed
+verbatim. The envelope is `{payoutMultiplier, costMultiplier, state:
+RawEvent[]}`: **`state` IS the event array**, where the wallet's live rounds
+nest events at `state.events`. The reader accepted only the wallet shape and
+the silent `Array.isArray` [] fallback converted the mismatch into a startup
+grid under correct chrome (both multiplier fields are top level in both
+envelopes), which is the owner's screenshot exactly. The fallback is
+recorded as the mechanism that hid it; the gate's own stubs had encoded the
+invented shape, so the gate was green over the live break.
+
+**TASKS 2 and 3.** The reader accepts both real shapes; an unreadable shape
+throws to the KEYED error state (and the playback catch now renders the
+keyed string, aligning with the load catch's own recorded rule). The replay
+contract gate serves the captured payload byte-shaped, plays it through,
+and asserts the settled grid equals the fixture's reveal board column for
+column (structural read from the reel strips, names mapped through the
+component's own symbol table). Seeded per (p): the bundle regression back to
+the state.events-only reader renders boardless against the real payload,
+caught; 11/11 seeds, 26/26 assertions. Frames of the ready card and the
+settled real board at `reports/screens/r053-replay/` (the settled frame
+shows the round's true board with its win lines, 0.4x, $0.41).
+
+**TASK 4, blocked at the machine and handed over honestly.** The kit
+manifest gate landed (bundle equals dist by name, bytes and sha256; three
+seeded classes caught, identical pair clean). The RESTAGE itself is blocked:
+macOS privacy protection denies THIS process Desktop access (EPERM on every
+approach, including after the owner's grant, which takes effect only on
+process restart). Per the rule 12 pattern, recorded in its own line rather
+than worked around: **the owner runs, from the repository root:**
+
+    node scripts/kit_build.mjs
+    node scripts/qa/kit_manifest_gate.mjs
+
+and the second line printing PASS with the file and byte tally is the
+delta-sync verification. The staged bundle path is
+`~/Desktop/FS_UPLOAD_KIT` as always.
+
+**Folded record notes, per the brief's close:** the bgm silence resolved
+with NO code change (the TR-102 scratch-settling window; both encodes
+present in the kit; the loop audible; the owner's mix ACCEPTED and the mix
+slot closed); the 75-file sync header is recorded as observed on the
+owner's delta sync; and an OPTIONAL post-approval polish row is noted for
+an audio element retry on transient load failure, deliberately not opened
+as work before submission.
+
+**Tracker**: TR-132 carries the finding, the fix and the proof; it closes on
+the owner's live confirmation, per the brief's own gate.

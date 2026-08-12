@@ -9,6 +9,33 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 057 - 2026-08-12 - COMMS-ACK R053: the replay board defect captured, fixed, proven against the platform's own bytes
+
+**The mismatch, captured not assumed** (event 83776, published entry,
+payload committed verbatim): the live replay endpoint returns `state` AS the
+event array; the reader accepted only the wallet's `state.events` nesting,
+and the silent [] fallback rendered a startup grid under correct chrome,
+both multiplier fields being top level in both envelopes. The gate's own
+stubs had encoded the invented shape, which is why it stayed green over the
+live break. **Fixed**: both real shapes read (the R045 pattern), unreadable
+shapes throw to the KEYED error state, the playback catch keyed likewise.
+**Proven against reality**: the contract gate now serves the captured bytes,
+plays them through, and holds the settled grid equal to the fixture's
+reveal board column for column; the seeded regression to the old reader
+goes boardless, 11/11 seeds, 26/26 assertions, frames committed. TR-132
+carries it and closes on the owner's live confirmation; **START APPROVAL
+HELD until then**. The kit manifest gate landed (name, bytes, sha256, three
+seeded classes); the RESTAGE is handed to the owner's Terminal because
+macOS denies this process Desktop access until a restart, two commands in
+the session report. **Folded notes**: bgm silence resolved with NO code
+change (TR-102 scratch-settling window, both encodes present, loop audible,
+owner mix ACCEPTED, mix slot closed); the 75-file sync header recorded as
+observed; audio-element retry noted as OPTIONAL post-approval polish, not
+opened. **Next: nothing queued; the owner confirms the replay live, then
+blurb, trademark line, and Start Approval on the owner's word.**
+
+---
+
 ## 056 - 2026-08-11 - COMMS-ACK R051: the entry reversal recorded on every live surface
 
 Portal ground truth changed by owner action: the -2 entry DELETED, the
