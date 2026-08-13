@@ -1135,6 +1135,14 @@ jobs:
           - name: "browser: rgs error dialect"
             run: npx tsx scripts/r045_error_field_proof.mjs --self-test && npx tsx scripts/r045_error_field_proof.mjs
 
+          # R057 TASK 1 (checklist item 02): an invalid rgs_url fails loudly
+          # and safely. Refused-port launch, keyed banner en+de, a press puts
+          # nothing on the wire; seeded by severing the auth-failed guard in a
+          # scratch copy of the real bundle. Same TR-123 exit contract as the
+          # dialect proof beside it.
+          - name: "browser: invalid rgs_url guard"
+            run: npx tsx scripts/r057_invalid_rgs_proof.mjs --self-test && npx tsx scripts/r057_invalid_rgs_proof.mjs
+
           # R047 TASK 5 (TR-129): the two-step autoplay property joins the
           # matrix, both halves. The confirm gate proves the CODE cannot start
           # a bet from a selection handler (static, seeded); the r042b proof
