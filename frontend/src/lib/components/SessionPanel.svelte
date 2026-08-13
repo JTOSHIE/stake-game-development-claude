@@ -114,7 +114,15 @@
       <div class="sp-row"><span>{$tr('rgTimePlayed')}</span><span class="sp-val">{hh}:{mm}:{ss}</span></div>
       <div class="sp-row"><span>{$tr('rgSpinsPlayed')}</span><span class="sp-val">{$rgSession.spins}</span></div>
       <div class="sp-row"><span>{$tr('rgTotalWagered')}</span><span class="sp-val">{formatBalance($rgSession.wageredMicros, cur, $locale)}</span></div>
-      <div class="sp-row"><span>{$tr('rgTotalWon')}</span><span class="sp-val">{formatBalance($rgSession.wonMicros, cur, $locale)}</span></div>
+      <!-- R057 TASK 2 (checklist item 12): Total Won is a sum of PAYOUTS and
+           payouts can be sub-cent (a 0.08x win at the $0.10 minimum bet is
+           $0.008), so it renders through formatWin exactly as the net line
+           below already does: winFractionDigits keeps the real precision the
+           wallet moved. Wagered stays formatBalance because stakes are bet
+           ladder values, whole currency units by construction. Through
+           formatBalance this row ledgered that $0.008 win as "$0.01", the
+           precise misstatement winFractionDigits' own header condemns. -->
+      <div class="sp-row"><span>{$tr('rgTotalWon')}</span><span class="sp-val">{formatWin($rgSession.wonMicros, cur, $locale)}</span></div>
       <div class="sp-row"><span>{$tr('rgNetResult')}</span><span class="sp-val" class:neg={net < 0} class:pos={net > 0}>{netLabel}</span></div>
     </div>
   </div>

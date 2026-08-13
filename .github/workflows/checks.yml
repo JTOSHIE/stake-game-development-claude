@@ -1143,6 +1143,14 @@ jobs:
           - name: "browser: invalid rgs_url guard"
             run: npx tsx scripts/r057_invalid_rgs_proof.mjs --self-test && npx tsx scripts/r057_invalid_rgs_proof.mjs
 
+          # R057 TASK 2 (checklist item 12): sub-cent payouts render their real
+          # value on every money surface. A REAL 0.08x book round at the $0.10
+          # minimum bet ($0.008), USD and XSC, HUD + win panel + session
+          # ledger; seeded by severing winFractionDigits' widening loop so
+          # $0.008 truncates to $0.01, the recorded pre-fix misstatement.
+          - name: "browser: sub-cent display"
+            run: npx tsx scripts/r057_subcent_proof.mjs --self-test && npx tsx scripts/r057_subcent_proof.mjs
+
           # R047 TASK 5 (TR-129): the two-step autoplay property joins the
           # matrix, both halves. The confirm gate proves the CODE cannot start
           # a bet from a selection handler (static, seeded); the r042b proof
