@@ -94,7 +94,11 @@ const files: Array<[string, string]> = [
   ['HudOverlay', 'src/lib/components/HudOverlay.svelte'],
   ['WinBanner', 'src/lib/components/WinBanner.svelte'],
   ['WinDisplay', 'src/lib/components/WinDisplay.svelte'],
-  ['WinPod', 'src/lib/components/WinPod.svelte'],
+  // WinPod was DELETED by R058 TASK 2 (owner design ruling, 2026-08-13): the
+  // replay pod is removed at every size and the end-of-replay banner carries
+  // both values; ReplayMode was its only consumer, so the file went with the
+  // mount rather than surviving as dead weight for the dead-wiring gate to
+  // allowlist.
   ['WinBreakdown', 'src/lib/components/WinBreakdown.svelte'],
   ['BonusInstrumentColumn', 'src/lib/components/BonusInstrumentColumn.svelte'],
   // ADDED 2026-08-09. The per-spin free-spin win pop was MISSED by the first

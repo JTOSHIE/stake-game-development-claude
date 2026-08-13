@@ -16,7 +16,6 @@
   } from '../stores/replayStore'
   import GameGrid from './GameGrid.svelte'
   import WinDisplay from './WinDisplay.svelte'
-  import WinPod from './WinPod.svelte'
   import WinBanner from './WinBanner.svelte'
   import FreeSpinsPresentation from './FreeSpinsPresentation.svelte'
   import MaxWinCelebration from './MaxWinCelebration.svelte'
@@ -550,20 +549,17 @@
         trigger={fsEndBannerTrigger}
         on:dismissed={() => fsRef?.onEndBannerDismissed()}
       />
-      <!-- THE POD BELONGS TO THE GRID BOX. WinPod is position:absolute with
-           `right: -220px; top: 50%`, and its own comment says those resolve
-           against the grid. Rendered inside `.win-area` they did not: that is a
-           200x56 box BELOW the grid, so `right:-220px` put the pod 188px INSIDE
-           the 616px grid's span and `top:50%` centred 320px of pod on 56px of
-           readout. Measured after driving a replay to completion: 188x108 over
-           the reel grid and 46x62 over the whole height of REPLAY AGAIN, and at
-           Popout S it pushed document scrollWidth to 520 against a 400px
-           viewport. replay_fit_gate asserts that overflow but stops at the READY
-           phase, where .win-area is not mounted, so it could not see it.
-           2026-08-10. -->
-      {#if phase === 'complete' || phase === 'playing'}
-        <WinPod />
-      {/if}
+      <!-- THE POD IS GONE, owner design ruling, R058 TASK 2 (2026-08-13): in
+           the replay view the right-hand multiplier and win pod is REMOVED at
+           every size, and the end-of-replay banner (WinDisplay below) carries
+           both values inline, so desktop and mobile replay are one layout.
+           The pod's WIN window was a fixed 99px zone over frame art, and the
+           owner's capture showed "CA$39.(" where a CAD amount met that
+           window: the clipping surface is removed rather than fitted. WinPod
+           had no other consumer, so the component is deleted with its mount;
+           the live game's Overdrive meter panel (BonusInstrumentColumn,
+           App.svelte) is NOT part of this ruling and is untouched, which the
+           replay contract gate now asserts per the brief's scope guard. -->
     </div>
 
     <!-- Win amount display once replay has played out -->

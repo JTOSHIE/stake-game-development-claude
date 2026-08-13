@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { winAmount, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
+  import { winAmount, winMultiplier, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
+  import { autofitText } from '../actions/autofitText'
   import { onDestroy } from 'svelte'
 
 
@@ -24,6 +25,12 @@
   // Digits pinned from the SETTLED targetValue rather than the eased
   // displayValue, so the readout keeps a stable width while counting.
   $: winDigits = winFractionDigits(Math.round(targetValue * CURRENCY_SCALE), $currencyCode || 'USD')
+
+  // The fit is taken against the SETTLED row text, not the eased frame: the
+  // count-up grows toward the settled string, which is therefore the widest
+  // frame, and re-fitting per frame would make the row breathe. R058 TASK 1.
+  $: amtRowText = formatWin(Math.round(targetValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)
+    + ($winMultiplier > 0 ? ` ${$winMultiplier.toFixed(1)}×` : '')
 
   // Derive tier from targetValue (not the derived $winMultiplier store) so
   // colour/label stays correct for the full duration of the count-up animation,
@@ -87,9 +94,22 @@
       <div class="win-label idle">{$tr('win')}</div>
     {/if}
 
-    <!-- Count-up amount -->
-    <div class="win-amount">
-      {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)}
+    <!-- Count-up amount, with the round's multiplier inline beside it: the
+         owner design ruling of R058 TASK 2 (2026-08-13) removed the replay
+         pod at every size and moved BOTH its values here, the amount in its
+         existing pink treatment, the multiplier in the pod's blue one,
+         amount then multiplier. The row auto-fits (R058 TASK 1): the
+         action's --autofit-scale is multiplied into the font sizes below,
+         which is the half autofitText cannot do alone and exactly the no-op
+         trap fitMoney.ts records, so the worst-case string (a wincap win at
+         the maximum bet in a CA$ format) steps down instead of clipping. -->
+    <div class="win-amount-row" use:autofitText={amtRowText} data-testid="win-amount-row">
+      <span class="win-amount">
+        {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)}
+      </span>
+      {#if $winMultiplier > 0}
+        <span class="win-mult">{$winMultiplier.toFixed(1)}×</span>
+      {/if}
     </div>
 
   </div>
@@ -140,14 +160,40 @@
     filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.9));
   }
 
+  /* ── Amount row: amount (pink) then multiplier (blue), R058 TASK 2 ───────── */
+  .win-amount-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.6em;
+    max-width: 560px;      /* the bound the auto-fit fits INTO, matching the
+                              disclaimer's width inside the 648px column */
+    white-space: nowrap;
+  }
+
   /* ── Amount ──────────────────────────────────────────────────────────────── */
+  /* The font sizes multiply --autofit-scale in, which is what makes the
+     use:autofitText on the row above actually do something: the action sets
+     the property and ONLY a rule that reads it shrinks (the no-op trap
+     fitMoney.ts records against .m-stat-value). R058 TASK 1. */
   .win-amount {
     font-family: var(--fs-font-numeric);
-    font-size: 1.1rem;
+    font-size: calc(1.1rem * var(--autofit-scale, 1));
     font-weight: 900;
     color: #FF00FF;
     text-shadow: 0 0 8px #FF00FF, 0 0 16px rgba(255, 0, 255, 0.4);
     letter-spacing: 2px;
+    line-height: 1.3;
+  }
+
+  /* The multiplier, in the deleted pod's blue treatment (R058 TASK 2). */
+  .win-mult {
+    font-family: var(--fs-font-numeric);
+    font-size: calc(1rem * var(--autofit-scale, 1));
+    font-weight: 900;
+    color: #00FFFF;
+    text-shadow: 0 0 10px #00FFFF, 0 0 20px rgba(0, 255, 255, 0.6);
+    letter-spacing: 1px;
     line-height: 1.3;
   }
 

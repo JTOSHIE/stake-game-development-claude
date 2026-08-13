@@ -364,8 +364,19 @@ async function driveReplay(browser, {
     // above (which existing assertions depend on and which stays put).
     await page.waitForTimeout(900)
     observed.settledWinText = (await page.locator('.win-area').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
-    observed.podText = (await page.locator('.win-pod').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
-    observed.podActive = await page.locator('.win-pod:not(.idle)').isVisible().catch(() => false)
+    // R058: the pod is deleted from the replay view (owner design ruling), so
+    // what is observed is its ABSENCE, plus the amount row's fit metrics.
+    observed.podCount = await page.locator('.win-pod').count().catch(() => -1)
+    observed.amtRow = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="win-amount-row"]')
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      return {
+        text: (el.innerText || '').replace(/\s+/g, ' ').trim(),
+        scrollWidth: el.scrollWidth, clientWidth: el.clientWidth,
+        left: r.left, right: r.right, viewportW: window.innerWidth,
+      }
+    }).catch(() => null)
     // THE STATE THE PLATFORM ACTUALLY ASKS ABOUT. Everything above is read in
     // the ready phase, which is the phase that was already compliant. These two
     // are read AFTER the round has played out, which is where item 50 was
@@ -606,16 +617,30 @@ async function main() {
         `the settled win area read "${r.observed.settledWinText}" against the envelope's ${amountText}; `
           + 'a dash here is the exact state the owner\'s screenshots show, the unsettled feature replay')
     }
-    const assertFeaturePodInstrument = (r, tag = '') => {
-      // Desktop only: the side pod is hidden by design below 1120px width and
-      // the win amount is carried by WinDisplay there, its own recorded rule.
-      const { multText, amountText } = featureExpect()
-      check(r.observed.podActive === true
-          && (r.observed.podText || '').includes(multText)
-          && (r.observed.podText || '').includes(amountText),
-        `${tag}the desktop pod shows the round's multiplier and amount from the envelope`,
-        `pod reads "${r.observed.podText}"`,
-        `pod active=${r.observed.podActive} text "${r.observed.podText}" against expected ${multText} and ${amountText}`)
+    // R058 TASK 2, the owner design ruling: the replay pod is DELETED at every
+    // size and the end banner carries both values inline. The three assertions
+    // below replace the desktop-pod one that lived here until 2026-08-13.
+    const assertNoPod = (r, tag = '') => {
+      check(r.observed.podCount === 0,
+        `${tag}no pod element exists in the replay DOM`,
+        'zero .win-pod elements',
+        `.win-pod count ${r.observed.podCount}; the owner ruling removed the pod from the replay view at every size`)
+    }
+    const assertEndBannerValues = (r, tag = '', expect = featureExpect()) => {
+      const txt = (r.observed.settledWinText || '')
+      check(txt.includes(expect.amountText) && txt.includes(expect.multText),
+        `${tag}the end banner carries the amount and the multiplier from the envelope`,
+        `win area reads "${txt}"`,
+        `win area read "${txt}" against the envelope's ${expect.amountText} and ${expect.multText}`)
+    }
+    const assertBannerFits = (r, tag = '') => {
+      const a = r.observed.amtRow
+      // scrollWidth can exceed clientWidth by a rounding pixel on a fitted
+      // element; anything beyond 1px is a real clip, the "CA$39.(" state.
+      check(!!a && a.scrollWidth <= a.clientWidth + 1 && a.left >= -1 && a.right <= a.viewportW + 1,
+        `${tag}the banner amount row fits with zero clipping`,
+        a ? `"${a.text}" at scroll ${a.scrollWidth} within client ${a.clientWidth}, box ${Math.round(a.left)}..${Math.round(a.right)} in ${a.viewportW}` : 'row observed',
+        a ? `overflow: scroll ${a.scrollWidth} against client ${a.clientWidth}, box ${Math.round(a.left)}..${Math.round(a.right)} in viewport ${a.viewportW}` : 'the amount row was not found in the DOM')
     }
     const assertNoVerticalOverflow = (r, sizeName, tag = '') => {
       const o = r.observed.overflow || {}
@@ -893,7 +918,12 @@ async function main() {
       // design), the instrument pod additionally at desktop, and the
       // single-viewport fit at all three, the frame committed for each when
       // FS_WRITE_EVIDENCE=1 (convention (h.1): a plain run writes scratch).
-      const framesDir = evidenceDir('reports', 'screens', 'r056-replay')
+      // The gate's LIVE evidence dir, not a dated one: these frames regenerate
+      // whenever the battery runs with FS_WRITE_EVIDENCE=1, so writing them
+      // into a dated session directory would rewrite committed history, the
+      // exact (h.1) class caught when this gate's R058 run overwrote the
+      // r056-replay frames (restored from HEAD; the dated dirs stay verbatim).
+      const framesDir = evidenceDir('reports', 'screens', 'replay-contract')
       const SIZES = [
         ['desktop-1280x720',        { width: 1280, height: 720 }],
         ['mobile-portrait-375x812', { width: 375,  height: 812 }],
@@ -904,7 +934,109 @@ async function main() {
           frame: join(framesDir, `feature_${sizeName}.png`) })
         assertFeaturePodEqualsEnvelope(fr, `[${sizeName}] `)
         assertNoVerticalOverflow(fr, sizeName, '')
-        if (sizeName.startsWith('desktop')) assertFeaturePodInstrument(fr, `[${sizeName}] `)
+        // R058: one layout at every size, so all three assertions run at all
+        // three sizes rather than the desktop-only pod check they replace.
+        assertNoPod(fr, `[${sizeName}] `)
+        assertEndBannerValues(fr, `[${sizeName}] `)
+        assertBannerFits(fr, `[${sizeName}] `)
+      }
+
+      // R058 TASK 1, the worst case: a 4999.99x round (one centibet below the
+      // cap, so the max-win hold does not gate the read) at the maximum bet in
+      // the CA$ format, the widest leading form the ladder allows:
+      // CA$4,999,990.00 with 5000.0x beside it. The round's EVENTS are the
+      // base win fixture's; only the envelope payout is raised, which is
+      // honest here because the assertion under test is the banner's FIT and
+      // the banner reads the envelope, not the events.
+      const WORST = { ...FIX.base.win, payoutMultiplier: 499_999 }
+      const worst = await driveReplay(browser, {
+        round: WORST, costMultiplier: 1.0, play: true,
+        qs: { mode: 'base', currency: 'CAD', amountMicros: '1000000000' },
+        frame: join(framesDir, 'worst_case_banner_desktop.png'),
+      })
+      const worstExpect = {
+        amountText: 'CA$4,999,990.00',
+        multText: `${(WORST.payoutMultiplier / 100).toFixed(1)}×`,
+      }
+      assertEndBannerValues(worst, '[worst-case] ', worstExpect)
+      assertBannerFits(worst, '[worst-case] ')
+      assertNoPod(worst, '[worst-case] ')
+
+      // R058 TASK 2 SCOPE GUARD: the owner ruling is REPLAY ONLY, and the live
+      // game's Overdrive meter panel must still render during a feature. This
+      // drives the GAME route (no replay param) against route-fulfilled wallet
+      // endpoints, buys nothing, lands the organic feature round the fixture
+      // carries, and asserts the instrument column is on screen.
+      {
+        const srv2 = await serve({})
+        const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+        try {
+          await page.route(/^(?!http:\/\/localhost:4519).*/, async (route) => {
+            const url = route.request().url()
+            // The wallet host is cross-origin here (the r045 and subcent
+            // proofs serve it same-origin instead), so every fulfil carries
+            // CORS headers and the preflight is answered, or the browser
+            // blocks the response and the drive fails for a reason that is
+            // ours, not the app's.
+            const cors = {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+              'Access-Control-Allow-Headers': 'content-type',
+            }
+            if (route.request().method() === 'OPTIONS') {
+              return route.fulfill({ status: 204, headers: cors })
+            }
+            const json = (o) => route.fulfill({ status: 200, headers: cors, contentType: 'application/json', body: JSON.stringify(o) })
+            if (url.includes('/wallet/authenticate')) {
+              return json({
+                balance: { amount: 100_000_000, currency: 'USD' },
+                config: { minBet: 100_000, maxBet: 1_000_000_000, stepBet: 100_000,
+                  betLevels: [1_000_000], defaultBetLevel: 1_000_000 },
+                round: null,
+              })
+            }
+            if (url.includes('/wallet/play')) {
+              return json({
+                balance: { amount: 99_000_000, currency: 'USD' },
+                round: { betID: 9001, active: true, mode: 'base', amount: 1_000_000,
+                  payout: Math.round(FEATURE_ROUND.payoutMultiplier * 10_000),
+                  payoutMultiplier: FEATURE_ROUND.payoutMultiplier,
+                  state: { events: FEATURE_ROUND.events } },
+              })
+            }
+            if (url.includes('/wallet/end-round')) return json({ balance: { amount: 99_000_000, currency: 'USD' } })
+            await route.abort()
+          })
+          await page.goto('http://localhost:4519/?sessionID=r058-meter&rgs_url=rgs.stake-engine.com&lang=en',
+            { waitUntil: 'domcontentloaded' })
+          await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30_000 })
+          const { dismissIntro } = await import('./lib/dismissOverlays.mjs')
+          await dismissIntro(page)
+          await page.waitForTimeout(500)
+          await page.locator('[data-testid="spin-button"]').click({ timeout: 10_000 })
+          await page.locator('[data-testid="entry-continue"]').waitFor({ timeout: 30_000 }).catch(() => {})
+          await page.evaluate(() => document.querySelector('[data-testid="entry-continue"]')?.click()).catch(() => {})
+          await page.waitForTimeout(2_000)
+          // NOT locator.isVisible(): the instrument renders as two mounts
+          // (the desktop column and the portrait strip), so the strict-mode
+          // locator throws on the pair and the catch read as "not visible"
+          // over a meter that was plainly on screen. Any mount with a real
+          // box counts.
+          const meterVisible = await page.evaluate(() => {
+            const els = [...document.querySelectorAll('[data-testid="bonus-instrument-column"]')]
+            return els.some((el) => {
+              const r = el.getBoundingClientRect()
+              return r.width > 0 && r.height > 0
+            })
+          }).catch(() => false)
+          check(meterVisible,
+            '[scope-guard] the live game\'s Overdrive meter panel still renders during a feature',
+            'bonus-instrument-column visible mid-feature on the game route',
+            'the live feature meter did not render; the R058 replay-only ruling has leaked into live play')
+        } finally {
+          await page.close()
+          await new Promise((r) => srv2.close(r))
+        }
       }
 
       // R056 TASK 1's fidelity pin in the same battery: an XEC replay labels
@@ -1165,6 +1297,36 @@ async function main() {
         } } },
         /FEATURE COMPLETE.*envelope payout/,
         assertFeaturePodEqualsEnvelope)
+
+      // SEED R058a, the clipped state, at the OBSERVATION BOUNDARY (declared,
+      // the fit-gate precedent): a stylesheet re-creates the fixed box the
+      // owner's "CA$39.(" capture showed, far below what MIN_SCALE 0.4 can
+      // absorb, and the zero-clipping assertion must go red on the worst-case
+      // string.
+      await seed('banner-clip-regressed',
+        'the banner amount clips again in a fixed box, the "CA$39.(" state',
+        { round: { ...FIX.base.win, payoutMultiplier: 499_999 }, costMultiplier: 1.0, play: true,
+          qs: { mode: 'base', currency: 'CAD', amountMicros: '1000000000' },
+          patches: { '/index.html': (b) => {
+            if (!b.includes('</head>')) return null
+            return b.replace('</head>',
+              '<style>[data-testid="win-amount-row"]{max-width:30px !important;overflow:hidden !important}</style></head>')
+          } } },
+        /fits with zero clipping/,
+        assertBannerFits)
+
+      // SEED R058b, a leaked pod: an element with the pod's class back in the
+      // DOM, which is the form a regression of the owner's removal ruling
+      // takes. Observation-boundary seed, declared as such.
+      await seed('pod-leaked-back',
+        'a .win-pod element returns to the replay DOM against the owner removal ruling',
+        { round: FIX.base.win, costMultiplier: 1.0, play: true,
+          patches: { '/index.html': (b) => {
+            if (!b.includes('<div id="app"></div>')) return null
+            return b.replace('<div id="app"></div>', '<div id="app"></div><div class="win-pod"></div>')
+          } } },
+        /no pod element/,
+        assertNoPod)
 
       // SEED 5: the lifecycle branch suppressed, so a failed fetch leaves a
       // blank surface. Observation-boundary seed, declared in the header.
