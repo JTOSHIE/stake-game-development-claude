@@ -9,6 +9,40 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 059 - 2026-08-13 - COMMS-ACK R056: the consolidated order executed whole, XEC reversed to the row, the fifty-one mapped, feature replays settle and fit
+
+Executed whole, this entry the folded ack per (t). **TASK 0**: TR-132 CLOSED
+on your paste as the on-record confirmation; the staging note stands as
+CLAUDE.md (o.1) (upload source frontend/dist, Desktop hop retired) and your
+output convention as (v). **TASK 1 REVERSED as ordered**: XEC labels SC in
+all three pins per the published row (rgs.md:142 quoted at every site), XEC
+now byte-identical to XSC; kept the unified path, never-show-raw and the
+seeded unknown; the X-strip re-scoped to codes with NO published row; the
+override INVERTED into a transcription fidelity pin that rusts on any
+platform page change, seeded both ways (the replanted R054 divergence and a
+mutated capture). TR-134 credits TR-133's (n) surfacing, which is what
+caught this. **TASK 2**: all 51 items transcribed verbatim
+(docs/stake-engine-live/2026-08-13/), mapped to estate evidence with
+citations (docs/records/GUIDELINES_51_MAPPING_2026-08-13.md); FOUR
+ESCALATIONS, never self-assessed green: the invalid rgs_url launch drive,
+distinctness (reviewer judgement by nature), sub-cent display proof, and
+older-device hardware; items 11/36 flagged as the currency-display items,
+both now on the TASK 1 ruling; no box ticked. **TASKS 3 to 5**: the dash
+was a BINDING, ReplayMode bound none of the feature-end banner trio, so
+'complete' never fired and the envelope winAmount was unreachable; now
+wired exactly as live play wires it, and the whole replay column scales to
+one viewport at the three reference sizes (frames committed). Proof: pod
+equals envelope payout at every size, no-overflow exact, the XEC pin in the
+same battery, the severed chain seeded red, 34/34 and 12/12. Also caught:
+stub envelopes carried centibets where the platform sends a plain
+multiplier (the capture's 0.41 beside 41-centibet events), normalised.
+TR-135 opened and closed. Portal note observed at capture: front version
+now v9. **Next per your close: the owner walks the fifty-one with the
+mapping table, then blurb, trademark line, Start Approval on the owner's
+word.**
+
+---
+
 ## 058 - 2026-08-13 - COMMS-ACK R054: XEC labels EC by the family rule, three pins swept, one divergence on the record
 
 Executed whole, this entry the folded ack per (t). The sweep found THREE
