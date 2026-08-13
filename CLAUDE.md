@@ -585,6 +585,15 @@ clone and this machine then produced byte-identical 15,510,083-byte builds. Buil
 clone makes that property structural rather than something to remember: whatever is on a
 working machine and not in the repository cannot reach the upload.
 
+**(o.1) The standing staging note: the upload source is `frontend/dist` directly.
+Recorded 2026-08-13, R056 TASK 0.** The Desktop staging hop is RETIRED. The owner's
+delta sync target is `frontend/dist` at the repository tip, so the manifest guarantee
+holds by construction when dist is the source: what is uploaded IS the built artefact,
+with no copy step for a manifest gate to reconcile. `scripts/qa/kit_manifest_gate.mjs`
+remains in the estate for comparing any staged copy against dist should a staged copy
+ever exist again, and convention (o)'s fresh-clone reproducibility property is carried
+by CI rebuilding dist from the committed tree on every push.
+
 **(p) Every gate that claims a class closed ships a self-test that plants a violation and
 must FAIL on it before its PASS counts. Ratified 2026-07-26 by Fable, generalising the
 TR-063 ruling.**
@@ -1268,6 +1277,13 @@ that mistake twice in one day (both self-caught, both recorded in the
 semicolon, then the METER_PRE_REV DEAD_SYMBOL red pushed past another). The
 form is: `gate && git add ... && git commit ... && git push`, so a red exit
 blocks everything after it.
+
+**(v) Fable-output convention: revised briefs arrive whole. Recorded 2026-08-13,
+R056 TASK 0.** Revised briefs are always issued as a single fresh consolidated block
+with predecessors declared dead; splice or fold instructions to the owner are
+prohibited. A superseded brief is named dead by its successor rather than patched in
+place, so exactly one live brief exists at any moment and the owner never edits text
+to reconstruct the current order.
 
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
