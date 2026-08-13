@@ -1,0 +1,26 @@
+{
+  "task": "R057 TASK 3, checklist item 49 diligence",
+  "date": "2026-08-13",
+  "method": "Playwright chromium, iPhone 12 profile at 375x812, CDP Emulation.setCPUThrottlingRate, real dist served with a stub wallet replaying published book round 47 (0.08x) at the $0.10 minimum bet",
+  "note": "Thresholds are reported, not invented: no figure below is judged. Emulation is not hardware; any owner hand-test on real older devices is recorded beside this pack as one line when given.",
+  "control_1x": {
+    "rate": 1,
+    "domContentLoadedMs": 82,
+    "spinInteractiveMs": 161,
+    "spinMs": [
+      1251,
+      1231,
+      1229
+    ]
+  },
+  "throttled_6x": {
+    "rate": 6,
+    "domContentLoadedMs": 288,
+    "spinInteractiveMs": 528,
+    "spinMs": [
+      1321,
+      1244,
+      1248
+    ]
+  }
+}
