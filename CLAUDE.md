@@ -1285,6 +1285,19 @@ prohibited. A superseded brief is named dead by its successor rather than patche
 place, so exactly one live brief exists at any moment and the owner never edits text
 to reconstruct the current order.
 
+**(w) The register split: player-facing English is US and international
+register; Australian English remains for all internal outputs. Recorded
+2026-08-13, R057 CLOSE.** The header's Australian English rule governs
+everything the TEAM writes (reports, comms, commit messages, this file);
+what the PLAYER reads ships in US and international register, which is the
+register the platform's own surfaces use. Confirmed by the 2026-08-13
+audit, VERIFIED that day by a direct sweep of the en player-facing string
+sources (`prose.ts` and `translations.ts` string literals against the
+GB/AU form list: colour, centre, licence, -ise verbs, cancelled, whilst
+and siblings): zero divergences. The two registers never meet in one
+file's player strings, so a spelling that looks wrong for one register is
+checked against WHICH audience reads it before being corrected.
+
 **(r) An audit is sized and scheduled like a job, not squeezed into what is left.
 Recorded 2026-07-27.**
 

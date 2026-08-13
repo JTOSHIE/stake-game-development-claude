@@ -17,17 +17,17 @@ after submission or approval).
 | # | Item (verbatim, abbreviated) | Disposition | Evidence and citation |
 |---|---|---|---|
 | 01 | Authenticates with RGS on launch | EVIDENCED | `rgsService.ts` `authenticate`/`initRGS` (locked canonical surface); behavioural rounds per mode with frames via `frontend/scripts/r047_verify.mjs`; live portal session played 2026-08-11 (Q6 capture, `reports/FABLE_COMMS.md` 052-era record) |
-| 02 | Auth fails correctly with invalid rgs_url | ESCALATED | Error banners for the platform's real 400 dialect are proven (`frontend/scripts/r045_error_field_proof.mjs`, en/de, CI leg) and an empty auth shape raises the live guard (`src/lib/stores/authShape.ts` header, measured states). No dedicated drive of an INVALID rgs_url at launch exists; the owner may accept the adjacent evidence or order the one-scenario proof |
+| 02 | Auth fails correctly with invalid rgs_url | EVIDENCED | `frontend/scripts/r057_invalid_rgs_proof.mjs` (R057 TASK 1, CI leg "browser: invalid rgs_url guard"): a refused-port rgs_url raises the keyed auth-failed banner in en and de within 0.1s, a press on the spin control puts nothing on the wire, seeded per (p) by severing the guard. The adjacent dialect evidence stands beside it (`r045_error_field_proof.mjs`) |
 | 03 | Bet button sends play request | EVIDENCED | `rgsService.play` (locked); one round per mode driven and frame-verified in `frontend/scripts/r047_verify.mjs`; autoplay legs drive the same path (`r042b_autoplay_proof.mjs`) |
 | 04 | No Stake Engine Loader | EVIDENCED | `frontend/index.html` is the custom document by direct read (favicon, title, `/src/main.ts` only; no platform loader script); dist is built from it (`frontend/scripts/dist_hygiene_gate.mjs`) |
 | 05 | Title unique, no restricted terms | EVIDENCED | Trademark evidence 2026-08-11: IP Australia exact 0 results, USPTO `CM:"Future Spinner"` genuine "No results found" (`docs/records/`, R050 TASK 5 captures); "Future Spinner" carries no restricted term (restricted-term scans: `frontend/scripts/social_string_conformance.mjs`) |
 | 06 | Assets not offensive/inappropriate | EVIDENCED | All art in-house from vector masters or owner-commissioned with recorded provenance (CLAUDE.md Assets section; `scripts/assets/canonical_sources.json` registry, convention (u)); owner reviewed every promoted final (R050 Checkpoint One) |
-| 07 | Sufficiently distinct from existing titles | ESCALATED | Original IP throughout and no Stake branding (CLAUDE.md Compliance), but distinctness against the platform's existing catalogue is the reviewer's judgement; nothing in the estate can evidence it. Owner notes this is a judgement item, not a defect |
+| 07 | Sufficiently distinct from existing titles | STAGED, AWAITING OWNER | The distinctness attestation is staged verbatim at `docs/records/DISTINCTNESS_ATTESTATION_2026-08-13.md` (R057 TASK 4) with every clause cited (five-mode maths, the Overdrive meter mechanic, provenanced art, the cleared title); it closes on the owner's one-line sign-off in chat. Distinctness against the catalogue remains the reviewers' judgement; the record shows the basis |
 | 08 | Thumbnail meets artwork guidelines | EVIDENCED | Portal pre-check reads "Thumbnail is set." (captured 2026-08-13); tile master 408x546, the measured de facto geometry of published games (`design-system/brand/tile/GENERATION_NOTE_composed_master.md`); promoted set with provenance at `assets/portal/` |
 | 09 | Dynamically uses betting parameters | EVIDENCED | `src/lib/stores/betLadder.ts` drives from `rgsBetLevels` (authenticate response) with the hardcoded array as fallback only; `betLadder.test.ts` pins it including the three TR-013 arithmetic cases |
 | 10 | Active rounds restore the bet amount | EVIDENCED | `src/lib/stores/sessionRecovery.ts:251` sets `betAmount` from `round.amount`; the comment at lines 267 to 276 quotes this checklist item verbatim as its driver; `sessionRecovery.test.ts` |
 | 11 | Supports and displays currencies correctly | FLAGGED | `src/lib/utils/currency.ts` (49-row transcription of the published table, unified resolution path); `currency.test.ts` (116 assertions); `frontend/scripts/currency_table_gate.mjs` parses the platform mirror at runtime. **Currency-display item, flagged per the brief: R056 TASK 1 reversed XEC to the published row SC (rgs.md:142) and the table gate now pins transcription fidelity** |
-| 12 | Displays sub-cent payouts correctly | ESCALATED | Integer micros throughout (CLAUDE.md micros rule, `CURRENCY_SCALE` 1e6) and per-currency `decimals` in `currency.ts`, but no dedicated sub-cent DISPLAY proof exists in the estate; owner may order one or accept the micros rule as covering it |
+| 12 | Displays sub-cent payouts correctly | EVIDENCED | `frontend/scripts/r057_subcent_proof.mjs` (R057 TASK 2, CI leg "browser: sub-cent display"): the REAL 0.08x book round 47 at the $0.10 minimum bet renders $0.008 on the HUD win, win panel, ledger Total Won and Net, and the same in XSC, every expectation derived from `winFractionDigits`; frames at `reports/screens/r057-subcent/`; seeded per (p) with the widening severed. The proof also found and fixed the ledger's Total Won truncating through formatBalance (`SessionPanel.svelte`) |
 | 13 | Zero-win bets send no end-round | EVIDENCED | `rgsService.ts` (locked): `needsEndRound = playResp.round ? playResp.active : playResp.winMicros > 0`, the official client's `active`-flag rule; a zero-win settled round sends nothing |
 | 14 | Insufficient balance sends no play | EVIDENCED | `gameStore.ts:88` `canSpin` requires `$bal >= $bet` and gates the spin control (locked, canonical); buy tiers gated per-mode by `stores/buyAffordability.ts` (TR-016) |
 | 15 | Main frame not scrollable | EVIDENCED | `frontend/scripts/layout_fit_gate.mjs` across seven presets in CI; its own header names this checklist line as its driver |
@@ -64,19 +64,27 @@ after submission or approval).
 | 46 | Provably Fair and Replay enabled | OWNER | Portal settings toggles; on the standing one-timer list for the owner (recorded since R050); replay support itself is evidenced above |
 | 47 | Front and Math requests approved | POST-SUBMISSION | Reviewer-side state that exists only after submission; latest published versions front v9, math v1 (captured 2026-08-13) |
 | 48 | Posted in stake-engine-game-approved channel | POST-SUBMISSION | Owner action after approval |
-| 49 | Works on older mobile devices | ESCALATED | The estate has emulation coverage only (mobile presets, portrait conformance); no physical old-device evidence exists and none can be self-assessed; owner decides whether to test on hardware before submission |
+| 49 | Works on older mobile devices | EVIDENCED | Diligence pack at `reports/qa/r057_throttled_device_2026-08-13.md` (R057 TASK 3): mobile portrait under 6x CPU throttle, boot to interactive 528ms against 161ms at 1x, spin cadence animation-clocked at 1.24 to 1.32s and essentially unchanged; thresholds reported, not invented, because emulation is not hardware, and the pack records the owner's hand-test on real devices as one line when given |
 | 50 | Approval request closed, emojis added | POST-SUBMISSION | Process step after go-live |
 | 51 | Game Released | POST-SUBMISSION | The end state itself |
 
 ## The escalations, gathered (per the brief: never self-assessed green)
 
+**DISPOSITIONED 2026-08-13 BY R057, the four rows above carrying the
+citations.** The original escalations stand below as the dated record of what
+was open when this table was first drawn:
+
 - **[02] invalid rgs_url at launch**: adjacent evidence strong (error dialect proof, auth
   shape guard), the exact scenario undriven. One bounded proof if the owner wants it.
+  *R057 TASK 1 drove it; EVIDENCED.*
 - **[07] distinctness**: reviewer judgement by nature; the estate can only evidence
-  originality of our own IP, which it does.
+  originality of our own IP, which it does. *R057 TASK 4 staged the attestation; closes
+  on the owner's sign-off.*
 - **[12] sub-cent display**: the micros rule prevents float error but no proof renders a
   sub-cent payout and asserts the string. One bounded proof if the owner wants it.
+  *R057 TASK 2 proved it and repaired the ledger row it found; EVIDENCED.*
 - **[49] older devices**: emulation only. Hardware testing is an owner decision.
+  *R057 TASK 3 recorded the throttled diligence pack; the hardware line stays the owner's.*
 
 ## Currency-display items against TASK 1, flagged per the brief
 
