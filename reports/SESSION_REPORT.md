@@ -12679,3 +12679,48 @@ trademark line; the one-timers (Provably Fair toggle, wallet re-read,
 payment under the Medium Rare N.V. terms); Start Approval on the owner's
 word; and item [07] closes the moment the owner's one-line sign-off lands
 in chat, at which point the attestation record and the mapping row flip.
+
+## OWNER SIGN-OFF ADDENDUM, 2026-08-13: three signatures recorded
+
+The owner's sign-off block (saved verbatim at
+`reports/briefs/FS_OWNER_SIGNOFF_THREE_2026-08-13_Prompt.md`; the paste is
+the signature on all three items) is recorded whole, record-only, direct to
+main per (t.1).
+
+**1, the blurb.** Option C, stat-forward, APPROVED: staged as the FINAL
+submission text at `docs/records/SUBMISSION_BLURB_2026-08-11.md`, main and
+social variants verbatim from the paste, with the dated approval note on
+top and the 2026-08-11 staged text retained beneath as history, exactly as
+the order asks. The facts check was re-run against the ratified register
+for the NEW text: every figure holds, including the two claims the staged
+text did not carry (the NITRO OVERDRIVE 400x price and its 5x pre-rev,
+both `game_config.py`/CLAUDE.md True game facts), and the social variant
+names no cash price, per the vocabulary layer's conventions.
+
+**2, the trademark.** The sign-off is recorded verbatim at
+`docs/records/legal/TRADEMARK_EVIDENCE_2026-08-13_SIGNOFF.md`, beside the
+2026-08-11 evidence pack it signs. The formal submission gate closes on
+the owner's line; the pack's caveats (read-only public searches, the IP
+Australia examiner disclaimer) stand unaltered, because a sign-off closes
+a gate rather than upgrading evidence.
+
+**3, the distinctness attestation.** SIGNED as written:
+`docs/records/DISTINCTNESS_ATTESTATION_2026-08-13.md` carries the owner's
+line verbatim in its Sign-off section and its status flips to SIGNED; the
+mapping row [07] flips to EVIDENCED; TR-136's one deliberately open part
+closes, so that row is now closed whole.
+
+**Rule 10.** This addendum's records-only push is verified green before the
+session ends and the run id recorded in the comms trail of the next
+check-in if not below. **Rule 12.** The preview is refreshed after the
+push as the last action, curl-verified; dist itself is unchanged by a
+records push and remains at the R057 rebuild.
+
+## FOR THE NEXT SESSION
+
+The standing board, owner-side: walk the fifty-one with the mapping table
+and tick on the portal; the remaining one-timers (Provably Fair toggle,
+the wallet re-read, payment under the Medium Rare N.V. terms); then Start
+Approval on the owner's word. Builder-side: nothing is queued; the blurb,
+trademark line and distinctness basis are all signed and staged for the
+submission form.

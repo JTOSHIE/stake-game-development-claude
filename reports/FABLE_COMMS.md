@@ -9,6 +9,27 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 061 - 2026-08-13 - OWNER SIGN-OFF BLOCK RECORDED: blurb approved, trademark signed, distinctness signed
+
+Three signatures on one paste, all recorded, record-only per (t.1). **1,
+THE BLURB**: Option C stat-forward is APPROVED and staged as the FINAL
+submission text, main and social, verbatim from the owner's paste
+(docs/records/SUBMISSION_BLURB_2026-08-11.md, the approved text forward,
+the 2026-08-11 staged text retained beneath as history per the order); the
+facts check holds every figure against the ratified register including the
+new NITRO 400x pre-rev claim. **2, TRADEMARK**: the owner's sign-off on
+the 2026-08-11 evidence pack is recorded verbatim at
+docs/records/legal/TRADEMARK_EVIDENCE_2026-08-13_SIGNOFF.md; the formal
+submission gate closes, the pack's own caveats standing unaltered. **3,
+DISTINCTNESS**: the item 07 attestation is SIGNED as written; the record,
+the mapping row (now EVIDENCED) and TR-136's one open part all close on
+the owner's line. The standing board after this entry: the fifty-one walk
+and tick, the remaining one-timers (Provably Fair toggle, wallet re-read,
+payment under Medium Rare N.V. terms), then Start Approval on the owner's
+word.
+
+---
+
 ## 060 - 2026-08-13 - COMMS-ACK R057: the four escalations evidenced, one live defect caught on the way
 
 Executed whole, this entry the folded ack per (t). **[02]** the refused-port

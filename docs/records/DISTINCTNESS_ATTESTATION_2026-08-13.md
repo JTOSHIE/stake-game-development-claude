@@ -1,11 +1,11 @@
-# Distinctness attestation, staged (R057 TASK 4, 2026-08-13)
+# Distinctness attestation, SIGNED (R057 TASK 4, 2026-08-13)
 
-**STATUS: STAGED, AWAITING THE OWNER'S ONE-LINE SIGN-OFF IN CHAT.** This record
-closes on that sign-off and not before; nothing here is submitted anywhere. It
+**STATUS: SIGNED BY THE OWNER, 2026-08-13, SAME DAY AS STAGING.** This record
 serves checklist item [07] of the fifty-one ("Game is sufficiently distinct
 from existing titles and series"), whose mapping row records that distinctness
 against the platform's catalogue is the reviewers' judgement by nature; this
-attestation is the BASIS the estate can honestly show.
+attestation is the BASIS the estate can honestly show, and the owner has
+signed it as written (the sign-off, verbatim, in the Sign-off section below).
 
 ## The attestation, verbatim per the R057 brief
 
@@ -41,5 +41,12 @@ attestation is the BASIS the estate can honestly show.
 
 ## Sign-off
 
-Owner's one-line sign-off: _none recorded yet; added here verbatim when given
-in chat, and the mapping row [07] flips to EVIDENCED on it._
+Owner's sign-off, given 2026-08-13 in the owner sign-off block (item 3, saved
+verbatim at `reports/briefs/FS_OWNER_SIGNOFF_THREE_2026-08-13_Prompt.md`; the
+paste is the signature), quoted:
+
+> DISTINCTNESS SIGNED OFF. Owner signs the staged item 07 attestation as
+> written in the dossier; the mapping row closes on this line.
+
+The mapping row [07] flips to EVIDENCED on this line, and TR-136's one open
+part closes with it.

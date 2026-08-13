@@ -22,7 +22,7 @@ after submission or approval).
 | 04 | No Stake Engine Loader | EVIDENCED | `frontend/index.html` is the custom document by direct read (favicon, title, `/src/main.ts` only; no platform loader script); dist is built from it (`frontend/scripts/dist_hygiene_gate.mjs`) |
 | 05 | Title unique, no restricted terms | EVIDENCED | Trademark evidence 2026-08-11: IP Australia exact 0 results, USPTO `CM:"Future Spinner"` genuine "No results found" (`docs/records/`, R050 TASK 5 captures); "Future Spinner" carries no restricted term (restricted-term scans: `frontend/scripts/social_string_conformance.mjs`) |
 | 06 | Assets not offensive/inappropriate | EVIDENCED | All art in-house from vector masters or owner-commissioned with recorded provenance (CLAUDE.md Assets section; `scripts/assets/canonical_sources.json` registry, convention (u)); owner reviewed every promoted final (R050 Checkpoint One) |
-| 07 | Sufficiently distinct from existing titles | STAGED, AWAITING OWNER | The distinctness attestation is staged verbatim at `docs/records/DISTINCTNESS_ATTESTATION_2026-08-13.md` (R057 TASK 4) with every clause cited (five-mode maths, the Overdrive meter mechanic, provenanced art, the cleared title); it closes on the owner's one-line sign-off in chat. Distinctness against the catalogue remains the reviewers' judgement; the record shows the basis |
+| 07 | Sufficiently distinct from existing titles | EVIDENCED | The distinctness attestation at `docs/records/DISTINCTNESS_ATTESTATION_2026-08-13.md` (R057 TASK 4), every clause cited (five-mode maths, the Overdrive meter mechanic, provenanced art, the cleared title), **SIGNED by the owner 2026-08-13** (the sign-off block, item 3, quoted verbatim in the record). Distinctness against the catalogue remains the reviewers' judgement; the signed record shows the basis |
 | 08 | Thumbnail meets artwork guidelines | EVIDENCED | Portal pre-check reads "Thumbnail is set." (captured 2026-08-13); tile master 408x546, the measured de facto geometry of published games (`design-system/brand/tile/GENERATION_NOTE_composed_master.md`); promoted set with provenance at `assets/portal/` |
 | 09 | Dynamically uses betting parameters | EVIDENCED | `src/lib/stores/betLadder.ts` drives from `rgsBetLevels` (authenticate response) with the hardcoded array as fallback only; `betLadder.test.ts` pins it including the three TR-013 arithmetic cases |
 | 10 | Active rounds restore the bet amount | EVIDENCED | `src/lib/stores/sessionRecovery.ts:251` sets `betAmount` from `round.amount`; the comment at lines 267 to 276 quotes this checklist item verbatim as its driver; `sessionRecovery.test.ts` |
@@ -78,8 +78,8 @@ was open when this table was first drawn:
   shape guard), the exact scenario undriven. One bounded proof if the owner wants it.
   *R057 TASK 1 drove it; EVIDENCED.*
 - **[07] distinctness**: reviewer judgement by nature; the estate can only evidence
-  originality of our own IP, which it does. *R057 TASK 4 staged the attestation; closes
-  on the owner's sign-off.*
+  originality of our own IP, which it does. *R057 TASK 4 staged the attestation; SIGNED
+  by the owner the same day (the sign-off block, item 3); EVIDENCED.*
 - **[12] sub-cent display**: the micros rule prevents float error but no proof renders a
   sub-cent payout and asserts the string. One bounded proof if the owner wants it.
   *R057 TASK 2 proved it and repaired the ledger row it found; EVIDENCED.*
