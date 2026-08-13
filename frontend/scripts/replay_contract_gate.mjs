@@ -84,6 +84,7 @@ import { createServer } from 'node:http'
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { join, extname, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { evidenceDir } from './lib/evidencePaths.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const DIST = join(HERE, '..', 'dist')
@@ -237,12 +238,20 @@ function serve(patches = {}) {
 async function driveReplay(browser, {
   qs = {}, patches = {}, respond = 'ok', round = FIX.super.cap, costMultiplier = 400.0,
   settleMs = 2500, play = false, keys = false,
+  // R056 TASK 5. `feature` clicks the entry continue gate a feature replay
+  // presents (the same click the owner makes; a DOM-level click, because the
+  // button animates and Playwright's stability wait spins on it forever, the
+  // R043 behavioural-leg lesson). `playTimeoutMs` extends the settle wait for
+  // feature rounds, which play a full free-spins sequence before the end
+  // banner. `viewport` drives the three reference sizes. `frame` saves a
+  // settled screenshot to that path.
+  feature = false, playTimeoutMs = 25000, viewport = { width: 1280, height: 720 }, frame = null,
 } = {}) {
   // Snapshot the miss ledger so this drive reports only its OWN unapplied
   // targets. Drives are strictly sequential, so an index is sufficient.
   const missMark = seedTargetMisses.length
   const srv = await serve(patches)
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+  const page = await browser.newPage({ viewport })
   const requests = []
   page.on('request', (r) => {
     requests.push({ url: r.url(), method: r.method(), headers: r.headers(), resourceType: r.resourceType() })
@@ -313,7 +322,12 @@ async function driveReplay(browser, {
   // that clicked before observing could not tell the two apart.
   if (play && observed.startVisible) {
     await page.locator('.start-replay').click({ timeout: 5000 }).catch(() => {})
-    await page.locator('.play-again').waitFor({ timeout: 25000 }).catch(() => {})
+    if (feature) {
+      // The entry continue gate, clicked at DOM level (see the option note).
+      await page.locator('[data-testid=entry-continue]').waitFor({ timeout: 20000 }).catch(() => {})
+      await page.evaluate(() => document.querySelector('[data-testid=entry-continue]')?.click()).catch(() => {})
+    }
+    await page.locator('.play-again').waitFor({ timeout: playTimeoutMs }).catch(() => {})
     // R053: the rendered grid, read as SYMBOL NAMES per column from the
     // visible cells' image sources (h1_base normalises to H1; every other
     // symbol ships under its own stem). Read after play-again appears, when
@@ -345,6 +359,13 @@ async function driveReplay(browser, {
       })
     })
     observed.finalWin = (await page.locator('.win-area').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
+    // R056 TASK 5: WinDisplay's count-up eases over 600ms, so the SETTLED
+    // money strings are read after it, separately from the immediate read
+    // above (which existing assertions depend on and which stays put).
+    await page.waitForTimeout(900)
+    observed.settledWinText = (await page.locator('.win-area').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
+    observed.podText = (await page.locator('.win-pod').innerText().catch(() => '')).replace(/\s+/g, ' ').trim()
+    observed.podActive = await page.locator('.win-pod:not(.idle)').isVisible().catch(() => false)
     // THE STATE THE PLATFORM ACTUALLY ASKS ABOUT. Everything above is read in
     // the ready phase, which is the phase that was already compliant. These two
     // are read AFTER the round has played out, which is where item 50 was
@@ -407,6 +428,18 @@ async function driveReplay(browser, {
       await page.waitForTimeout(1500)
     }
   }
+
+  // R056 TASK 5: the viewport-fit numbers, read on every drive because the
+  // requirement is phase-independent (the overflow TR-065 taught this gate
+  // about appeared only AFTER play, which is exactly when the old fit gate
+  // stopped looking).
+  observed.overflow = await page.evaluate(() => ({
+    docW: document.documentElement.scrollWidth,
+    docH: document.documentElement.scrollHeight,
+    winW: window.innerWidth,
+    winH: window.innerHeight,
+  }))
+  if (frame) await page.screenshot({ path: frame }).catch(() => {})
 
   await page.close()
   await new Promise((r) => srv.close(r))
@@ -544,6 +577,65 @@ async function main() {
         `social replay renders "${txt}"`,
         `a social replay rendered "${txt}". The word "currency" is on the stake.us `
           + 'prohibited-terms table, so this is a jurisdiction failure, not a wording choice')
+    }
+
+    // R056 TASK 5. The FEATURE COMPLETE pod must equal the ENVELOPE payout.
+    // ReplayMode sets winAmount from response.payoutMultiplier x amount, so
+    // the expected strings are computed HERE from the same round data the
+    // stub serves, never read back from the surface under test: an assertion
+    // that reads its expectation from the thing it checks proves only
+    // self-equality. The envelope multiplier is the round's centibets / 100,
+    // the platform semantic the capture pins (0.41 beside 41-centibet events).
+    const FEATURE_ROUND = FIX.bonus.feature
+    const featureExpect = () => {
+      const mult = FEATURE_ROUND.payoutMultiplier / 100
+      const amount = mult * (Number(P.amountMicros) / 1_000_000)
+      return {
+        mult,
+        multText: `${mult.toFixed(1)}×`,
+        amountText: '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      }
+    }
+    const FEATURE_DRIVE = { round: FEATURE_ROUND, costMultiplier: 100.0, qs: { mode: 'bonus', currency: 'USD' },
+      play: true, feature: true, playTimeoutMs: 60000 }
+    const assertFeaturePodEqualsEnvelope = (r, tag = '') => {
+      const { amountText } = featureExpect()
+      check((r.observed.settledWinText || '').includes(amountText),
+        `${tag}at FEATURE COMPLETE the pod equals the envelope payout`,
+        `settled win area reads "${r.observed.settledWinText}"`,
+        `the settled win area read "${r.observed.settledWinText}" against the envelope's ${amountText}; `
+          + 'a dash here is the exact state the owner\'s screenshots show, the unsettled feature replay')
+    }
+    const assertFeaturePodInstrument = (r, tag = '') => {
+      // Desktop only: the side pod is hidden by design below 1120px width and
+      // the win amount is carried by WinDisplay there, its own recorded rule.
+      const { multText, amountText } = featureExpect()
+      check(r.observed.podActive === true
+          && (r.observed.podText || '').includes(multText)
+          && (r.observed.podText || '').includes(amountText),
+        `${tag}the desktop pod shows the round's multiplier and amount from the envelope`,
+        `pod reads "${r.observed.podText}"`,
+        `pod active=${r.observed.podActive} text "${r.observed.podText}" against expected ${multText} and ${amountText}`)
+    }
+    const assertNoVerticalOverflow = (r, sizeName, tag = '') => {
+      const o = r.observed.overflow || {}
+      check(Number.isFinite(o.docH) && o.docH <= o.winH && o.docW <= o.winW,
+        `${tag}the replay fits one viewport at ${sizeName}, no scrolling`,
+        `document ${o.docW}x${o.docH} within viewport ${o.winW}x${o.winH}`,
+        `document ${o.docW}x${o.docH} overflows the ${o.winW}x${o.winH} viewport`)
+    }
+    // R056 TASK 1's fidelity pin AT THE REPLAY SURFACE, in the same battery
+    // per the brief: XEC labels SC exactly as the published row prints it
+    // (docs/stake-engine-live/2026-07-29/rgs.md:142), never the reversed EC
+    // derivation and never the raw code. The XSC substring lesson below
+    // applies here too, so the raw code's absence is asserted explicitly.
+    const assertXecLabelsSC = (r, tag = '') => {
+      const cur = (r.observed.currencyText || '').replace(/\s+/g, ' ').trim()
+      const figs = (r.observed.figuresText || '').replace(/\s+/g, ' ').trim()
+      check(/\bSC\b/.test(cur) && !/XEC/.test(cur + ' ' + figs) && !/\bEC\b/.test(cur + ' ' + figs),
+        `${tag}XEC labels SC, the published row (rgs.md:142), never EC and never the raw code`,
+        `currency line "${cur}", figures "${figs}"`,
+        `an XEC replay rendered currency "${cur}" figures "${figs}"; the published row prints SC`)
     }
 
     // S2-C028. Defined HERE, beside the other shared assertions, rather than
@@ -794,6 +886,31 @@ async function main() {
       // encodes the platform.
       const real = await driveReplay(browser, { respond: 'real', play: true, qs: { mode: 'base' } })
       assertRealFixtureBoard(real)
+
+      // R056 TASK 5: the feature replay played to settlement at the three
+      // reference sizes. The pod-equals-envelope claim is asserted at every
+      // size (WinDisplay carries the amount where the side pod is hidden by
+      // design), the instrument pod additionally at desktop, and the
+      // single-viewport fit at all three, the frame committed for each when
+      // FS_WRITE_EVIDENCE=1 (convention (h.1): a plain run writes scratch).
+      const framesDir = evidenceDir('reports', 'screens', 'r056-replay')
+      const SIZES = [
+        ['desktop-1280x720',        { width: 1280, height: 720 }],
+        ['mobile-portrait-375x812', { width: 375,  height: 812 }],
+        ['popout-s-400x225',        { width: 400,  height: 225 }],
+      ]
+      for (const [sizeName, viewport] of SIZES) {
+        const fr = await driveReplay(browser, { ...FEATURE_DRIVE, viewport,
+          frame: join(framesDir, `feature_${sizeName}.png`) })
+        assertFeaturePodEqualsEnvelope(fr, `[${sizeName}] `)
+        assertNoVerticalOverflow(fr, sizeName, '')
+        if (sizeName.startsWith('desktop')) assertFeaturePodInstrument(fr, `[${sizeName}] `)
+      }
+
+      // R056 TASK 1's fidelity pin in the same battery: an XEC replay labels
+      // SC per the published row, at the surface a reviewer actually loads.
+      const xec = await driveReplay(browser, { respond: 'real', qs: { mode: 'base', currency: 'XEC' } })
+      assertXecLabelsSC(xec)
     }
 
     if (SELF_TEST) {
@@ -1031,6 +1148,23 @@ async function main() {
         } } },
         /real fixture/,
         assertRealFixtureBoard)
+
+      // SEED R056: the feature-end banner chain SEVERED, which is the exact
+      // pre-fix state the owner's screenshots show: the dismissal callback
+      // becomes a bare property access, onEndBannerDismissed() is never
+      // called, finish() never dispatches 'complete', the feature replay sits
+      // on FEATURE COMPLETE forever and the pod keeps the zero-win dash. The
+      // drive still clicks the entry gate, so the ONLY difference from the
+      // green run is the severed link; playTimeoutMs is trimmed because the
+      // whole point is that .play-again never arrives.
+      await seed('feature-end-chain-severed',
+        'the feature-end banner dismissal chain is unbound, the FEATURE COMPLETE dash defect',
+        { ...FEATURE_DRIVE, playTimeoutMs: 30000, patches: { [bundle.file]: (b) => {
+          if (!b.includes('?.onEndBannerDismissed()')) return null
+          return b.replaceAll('?.onEndBannerDismissed()', '?.onEndBannerDismissed')
+        } } },
+        /FEATURE COMPLETE.*envelope payout/,
+        assertFeaturePodEqualsEnvelope)
 
       // SEED 5: the lifecycle branch suppressed, so a failed fetch leaves a
       // blank surface. Observation-boundary seed, declared in the header.
