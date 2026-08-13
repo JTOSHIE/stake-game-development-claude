@@ -139,7 +139,13 @@ async function measure(browser, origin, preset, seedUnscaled = false) {
       await page.addInitScript(() => {
         document.addEventListener('DOMContentLoaded', () => {
           const s = document.createElement('style')
-          s.textContent = '.grid-area{transform:none !important;margin-left:0 !important;'
+          // R056 TASK 4 moved the fit from the grid to the whole replay
+          // column, so the unscaled defect is planted on BOTH carriers: a
+          // seed that unset only .grid-area stopped reproducing the defect
+          // the moment the column took over the scaling, and this self-test
+          // correctly went red on its own stale seed, which is convention
+          // (p) working on the test itself.
+          s.textContent = '.grid-area,.replay-column{transform:none !important;margin-left:0 !important;'
             + 'margin-right:0 !important;margin-bottom:0 !important;}'
           document.head.appendChild(s)
         })
