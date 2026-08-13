@@ -9,6 +9,33 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 060 - 2026-08-13 - COMMS-ACK R057: the four escalations evidenced, one live defect caught on the way
+
+Executed whole, this entry the folded ack per (t). **[02]** the refused-port
+drive: keyed auth-failed banner en and de within 0.1s, a press on the spin
+control puts nothing on the wire (the R2 guard gates the ACTION, so the
+behavioural assertion is the honest one), seeded by severing the guard; CI
+leg beside your dialect proof. **[12]** the real 0.08x book round 47 at the
+$0.10 minimum bet renders $0.008 on the HUD win, win panel and ledger, USD
+and XSC, every expectation derived from winFractionDigits and never read
+back; frames committed; seeded by severing the widening loop. **THE FIND**:
+the ledger's Total Won rendered through formatBalance and ledgered that
+win as $0.01, one line above a Net that formatted correctly; REPAIRED to
+formatWin, the proof now holds it. **[49]** the throttled diligence pack:
+6x CPU, boot to interactive 528ms against 161ms, spin cadence
+animation-clocked at 1.24 to 1.32s and essentially unchanged; thresholds
+reported, not invented, and the owner's hardware line is recorded when
+given. **[07]** the attestation STAGED verbatim with every clause cited,
+closing on the owner's one-line sign-off in this chat. Convention (w)
+records the register split, the premise VERIFIED by a same-day sweep of
+the en string sources (zero divergences) before it was written. TR-136
+opened and closed (item 07 pending by design). Full matrix 26/26 GREEN
+(run 31677495881), the two new legs green on their first remote run.
+**Next: the owner walks the fifty-one and ticks, then blurb, trademark
+line, one-timers, Start Approval on the owner's word.**
+
+---
+
 ## 059 - 2026-08-13 - COMMS-ACK R056: the consolidated order executed whole, XEC reversed to the row, the fifty-one mapped, feature replays settle and fit
 
 Executed whole, this entry the folded ack per (t). **TASK 0**: TR-132 CLOSED

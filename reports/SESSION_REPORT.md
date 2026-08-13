@@ -12575,3 +12575,107 @@ approval, the trademark line, and Start Approval on the owner's word; the
 four TASK 2 escalations await the owner's disposition; the remaining
 one-timers are the Provably Fair toggle, the wallet re-read, and payment
 under the Medium Rare N.V. terms.
+
+## R057 ADDENDUM, 2026-08-13: the four escalations evidenced, and the ledger defect the second one caught
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R057_ESCALATIONS_Prompt.md`
+(commit `59529bf0`). Model: Claude Fable 5, judgement tier. No locked path
+written; `.claude/settings.json` untouched. The mapping table's four
+escalations, recorded one session earlier instead of self-assessed green,
+became this session's work queue, which is the mapping working as designed.
+
+**TASK 1, item [02]** (`311335cc`). `r057_invalid_rgs_proof.mjs` launches
+the real dist against a REFUSED port (bound and closed just before the
+drive: deterministic, offline-safe), asserts the keyed auth-failed banner
+in en and de within a bounded window (measured 0.1s, the no-hang half),
+then presses the spin control and asserts zero new requests toward the RGS
+origin with the banner standing. The R2/TR-010 containment gates the
+ACTION (App.svelte:714), not the disabled attribute, so the first draft's
+attribute assertion was wrong about the estate and was replaced by the
+behavioural one, which is what the checklist item actually claims. Seeded
+per (p) by severing the auth-failed ternary in a scratch copy of the real
+bundle; red on the missing banner, named, non-zero exit. CI leg
+"browser: invalid rgs_url guard" beside the r045 dialect proof.
+
+**TASK 2, item [12]** (`de21ad33`). `r057_subcent_proof.mjs` plays a REAL
+fixture: book round 47 of the published books_base, the 0.08x single-way
+L3 hit that is the game's minimum paying combination, committed verbatim
+and driven at the $0.10 minimum bet. Every expectation is derived from
+winFractionDigits' own rule and hardcoded per (l.4): win $0.008, balance
+$99.908, ledger won $0.008, net -$0.092, and the same in XSC with the
+trailing symbol and never the raw code. 10/10 assertions, frames at
+`reports/screens/r057-subcent/`. **THE FIND**: the session ledger's Total
+Won rendered through formatBalance, so the $0.008 win ledgered as "$0.01",
+the precise misstatement winFractionDigits' header condemns, one line
+above a Net that already formatted correctly; repaired to formatWin
+(SessionPanel.svelte) and the proof holds it. Seeded per (p) by severing
+the widening loop: $0.008 renders $0.01 and the proof goes red, named,
+non-zero exit. CI leg "browser: sub-cent display".
+
+**TASK 3, item [49]** (`df515950`). `r057_throttled_device_evidence.mjs`
+is an EVIDENCE RUN, not a gate: the mobile portrait preset (iPhone 12
+profile) under 6x CPU throttle via the DevTools protocol, real dist, stub
+wallet, the same real round. Measured: boot to the interactive spin
+control 161ms at 1x against 528ms at 6x; click-to-win cadence 1.23 to
+1.25s at 1x against 1.24 to 1.32s at 6x, animation-clocked and essentially
+unchanged under throttle. Nothing is judged: emulation is not hardware and
+the pack says so; the owner's hand-test on real devices is recorded beside
+it as one line when given. Two wrong settle signals were tried and are
+recorded in the script so neither returns: a change-predicate that never
+refires on identical settled text, and the balance readout that flips on
+the DEBIT at 46ms (the handler's latency, not the round's). Pack at
+`reports/qa/r057_throttled_device_2026-08-13.md` and `.json`, frame
+committed.
+
+**TASK 4, item [07]** (`3412cb4c`). The distinctness attestation is staged
+VERBATIM at `docs/records/DISTINCTNESS_ATTESTATION_2026-08-13.md` with
+every clause cited to the estate (the five-mode maths and its 500,000-round
+verification, the Overdrive meter mechanic, the provenanced art registry,
+the cleared title at `docs/records/legal/`). **IT AWAITS THE OWNER'S
+ONE-LINE SIGN-OFF IN CHAT AND CLOSES ON IT**; the mapping row reads
+staged-awaiting-owner and TR-136 records the same.
+
+**The register convention** is CLAUDE.md (w), and its premise was VERIFIED
+before it was written, per rule 16: the brief's "2026-08-13 audit, zero
+divergences" was recounted by a same-day direct sweep of the en
+player-facing string sources against the GB/AU form list; zero hits. The
+convention records the split: US and international register for players,
+Australian English for everything internal, per the header and (a).
+
+**Rule 10.** The R057 push (`b55c0019..3412cb4c`: the brief, the three
+evidence jobs, the ledger repair, the close records) ran the FULL matrix,
+now 26 jobs with the two new legs: run 31677495881, 26/26 GREEN, both new
+legs green on their first remote run. Local before push: doc currency gate
+PASS. This report's own records-only push follows and its static run is
+verified before the session ends; the full run was complete first, so the
+cancel trap has no window.
+
+**Rule 12.** The preview was refreshed at `3412cb4c` after the code push
+(the version line above the report, per the one-commit-lag design) and is
+refreshed once more as the last action after this report's push; both
+curl-verified.
+
+**Tracker**: TR-136 opened and closed (item [07]'s sign-off pending with
+the owner by design). COMMS 060 carries the folded ack per (t). The owner's
+single delta sync of `frontend/dist` carries R056 and R057 together, as the
+brief orders.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: each escalation became one bounded proof or record, run
+against the real dist with derived expectations, seeded per (p) where a
+gate landed; the throttle run deliberately asserts nothing. Alternatives
+rejected: asserting the spin button's disabled attribute for item 02 (the
+estate gates the action, not the attribute; the behavioural assertion is
+the claim the checklist actually makes); a DNS-based invalid rgs_url (the
+resolver's mood is not ours to test; a refused port is the same failure
+class, deterministic). Files touched: the two proofs, the evidence script,
+SessionPanel.svelte (the ledger repair), subcent_round_47.json (real book
+round, committed verbatim), checks.yml (two legs), CLAUDE.md (w), the
+mapping table, the tracker, the attestation, comms, this report. Open
+threads: the owner walks the fifty-one and ticks; the blurb approval; the
+trademark line; the one-timers (Provably Fair toggle, wallet re-read,
+payment under the Medium Rare N.V. terms); Start Approval on the owner's
+word; and item [07] closes the moment the owner's one-line sign-off lands
+in chat, at which point the attestation record and the mapping row flip.
