@@ -137,30 +137,28 @@ export function parseCapture(text) {
   }
   if (rows.length === 0) throw new Error('capture carries no Supported Currencies rows, which is itself the finding')
 
-  // R054 RULED OVERRIDE, the one place this gate knowingly diverges from the
-  // captured page, stated loudly rather than encoded quietly. The published
-  // table's XEC row says Display SC ("Stake Euro Cash / XEC / SC / 10.00 SC",
-  // rgs.md, current mirror), and the R054 ruling (owner screenshot,
-  // 2026-08-13) derives the label by the platform's own naming rule instead:
-  // X followed by two letters strips the X, so XEC labels EC. The override is
-  // SELF-RETIRING: it asserts the captured row STILL says the superseded
-  // symbol, so the day the platform updates their docs this throws as rusted
-  // and must be removed rather than silently outliving its reason.
-  const RULED_OVERRIDES = {
-    XEC: { rule: 'R054, 2026-08-13', symbol: 'EC', capturedSymbol: 'SC' },
+  // R056 TRANSCRIPTION FIDELITY PIN, the INVERSION of the R054 ruled override
+  // that briefly lived here. The published table's XEC row says Display SC
+  // ("Stake Euro Cash / XEC / SC / 10.00 SC",
+  // docs/stake-engine-live/2026-07-29/rgs.md:142), the first-party
+  // announcement is silent on labels, so the table governs: our label must
+  // EQUAL the published row, and R054's derived EC was reversed against that
+  // primary source (TR-134). This pin asserts the CAPTURED row still prints
+  // the symbol the reversal was decided on. The day the platform changes
+  // their page it throws as rusted and the label is re-derived against the
+  // new row rather than silently outliving its source; the ordinary
+  // module-vs-capture equality below then holds the shipped code to the row.
+  // No row is rewritten: the capture is the truth this gate compares against.
+  const FIDELITY_PINS = {
+    XEC: { rule: 'R056, 2026-08-13, reversing R054', symbol: 'SC' },
   }
   for (const row of rows) {
-    const o = RULED_OVERRIDES[row.code]
-    if (!o) continue
-    if (row.symbol !== o.capturedSymbol) {
-      throw new Error(`RULED OVERRIDE RUSTED: the capture now says ${row.code} displays ${JSON.stringify(row.symbol)}, `
-        + `not ${JSON.stringify(o.capturedSymbol)} as it did when ${o.rule} was recorded. Remove or re-derive the override.`)
+    const pin = FIDELITY_PINS[row.code]
+    if (!pin) continue
+    if (row.symbol !== pin.symbol) {
+      throw new Error(`FIDELITY PIN RUSTED: the capture now says ${row.code} displays ${JSON.stringify(row.symbol)}, `
+        + `not ${JSON.stringify(pin.symbol)} as it did when ${pin.rule} was recorded. Re-derive the label against the new row.`)
     }
-    row.symbol = o.symbol
-    row.example = row.symbolAfter
-      ? `${row.example.slice(0, -(o.capturedSymbol.length + 1))} ${o.symbol}`
-      : `${o.symbol}${row.example.slice(o.capturedSymbol.length)}`
-    row.ruledOverride = o.rule
   }
   return rows
 }
@@ -369,6 +367,16 @@ const SEEDS = [
     to:   'return meta.symbolAfter ? `${formatted} ${meta.symbol}` : `${meta.symbol} ${formatted}`',
     expect: /./,
   },
+  {
+    // Convention (p): the exact defect R054 shipped, in the form it really
+    // occurred: the VIRTUAL entry (the one that renders, shadowing the
+    // platform row) relabelled EC against the published row's SC. The gate
+    // must go red on XEC before its PASS over the reversal counts.
+    name: 'seed 7, the R054 divergence replanted: XEC relabelled EC against the published row',
+    from: "XEC: { symbol: 'SC', decimals: 2 },",
+    to:   "XEC: { symbol: 'EC', decimals: 2 },",
+    expect: /XEC/,
+  },
 ]
 
 async function selfTest() {
@@ -415,6 +423,33 @@ async function selfTest() {
       }
     }
 
+    // The fidelity pin's own red, convention (p) on the CAPTURE side this
+    // time: the platform "changes" the published XEC row and parseCapture
+    // must throw as RUSTED rather than let the R056 reversal outlive its
+    // primary source. The mutation edits Display and Example together, the
+    // form a real page edit would take.
+    const capSrc = readFileSync(CAPTURE, 'utf-8')
+    const PIN_ANCHOR = 'XEC\tSC\t10.00 SC'
+    if (!capSrc.includes(PIN_ANCHOR)) {
+      problems.push('pin seed: the XEC row anchor was not found in the capture, so this seed silently tested nothing')
+    } else {
+      const mutatedCapture = join(dir, 'capture-xec-changed.md')
+      writeFileSync(mutatedCapture, capSrc.replace(PIN_ANCHOR, 'XEC\tEC\t10.00 EC'))
+      try {
+        await runChecks(clean, mutatedCapture)
+        problems.push('pin seed: the FIDELITY PIN STAYED GREEN over a changed published row')
+      } catch (e) {
+        const msg = String(e && e.message)
+        if (/FIDELITY PIN RUSTED/.test(msg)) {
+          passed++
+          console.log('  PASS  pin seed: a changed published XEC row rusts the fidelity pin')
+          console.log(`          threw: ${msg.slice(0, 110)}`)
+        } else {
+          problems.push(`pin seed: threw, but on the wrong thing: ${msg.slice(0, 140)}`)
+        }
+      }
+    }
+
     // Controls, run against the clean module.
     const controls = await runControls(clean)
     for (const c of controls) {
@@ -431,7 +466,7 @@ async function selfTest() {
     for (const p of problems) console.error(`  - ${p}`)
     process.exit(1)
   }
-  console.log(`currency table gate self-test: ${passed} checks passed, ${SEEDS.length} seeded defects all caught.`)
+  console.log(`currency table gate self-test: ${passed} checks passed, ${SEEDS.length} module seeds and the capture pin seed all caught.`)
 }
 
 async function main() {

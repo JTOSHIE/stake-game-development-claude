@@ -111,18 +111,18 @@ export const VIRTUAL_CURRENCIES: Record<string, VirtualCurrency> = {
   XSC: { symbol: 'SC', decimals: 2 },
   GC:  { symbol: 'GC', decimals: 2 },
   SC:  { symbol: 'SC', decimals: 2 },
-  // Stake EU. SUPERSEDED READING KEPT AS HISTORY: the 2026-07-25 announcement
-  // ("Just like Stake US, the currency will be displayed using the SC format",
-  // quoted verbatim in reports/briefs/FS_PlatformDiscordDump_2026-07-25.md)
-  // was read as pinning the SYMBOL to SC, and that pin shipped SC as the
-  // label on a live XEC session. The owner's 2026-08-13 screenshot and the
-  // R054 ruling correct the reading: "just like" names the FORMAT (virtual
-  // currency, two decimals, same presentation), and the label derives by the
-  // platform's own naming rule, X followed by two letters strips the X
-  // (XGC to GC, XSC to SC, XEC to EC). This entry now records the derived
-  // symbol; the rule itself is enforced in currencySymbolFor for any future
-  // sibling this table has not met yet.
-  XEC: { symbol: 'EC', decimals: 2 },
+  // Stake EU. SC per the PRIMARY SOURCE: the platform's published currency
+  // table row is "Stake Euro Cash / XEC / SC / 10.00 SC"
+  // (docs/stake-engine-live/2026-07-29/rgs.md:142, byte-identical in the
+  // 2026-08-11 mirror), and the first-party announcement quoted in
+  // reports/briefs/FS_PlatformDiscordDump_2026-07-25.md is silent on labels,
+  // so the table governs. HISTORY, kept because both directions shipped: the
+  // R054 ruling (2026-08-13, owner screenshot) briefly derived EC by the
+  // X-strip naming rule, knowingly diverging from the published row; R056
+  // REVERSED it the same day against this primary source. The X-strip rule
+  // survives in currencySymbolFor as defence in depth for a future sibling
+  // with NO published row; a published row always wins.
+  XEC: { symbol: 'SC', decimals: 2 },
 }
 
 interface PlatformCurrency {
@@ -240,13 +240,13 @@ export const PLATFORM_CURRENCIES: Record<string, PlatformCurrency> = {
   XOF: { symbol: 'CFA',  decimals: 2 }, // CFA10.00
   XGC: { symbol: 'GC',   decimals: 2, symbolAfter: true }, // 10.00 GC
   XSC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
-  // R054 RULED DIVERGENCE from the published row, stated loudly: the platform
-  // page prints "Stake Euro Cash / XEC / SC / 10.00 SC" and the R054 ruling
-  // (owner screenshot, 2026-08-13) derives the label by the platform's own
-  // naming rule instead, X-strip, so XEC labels EC. currency_table_gate.mjs
-  // carries the matching self-retiring override: the day the published row
-  // stops saying SC, the override rusts and both must be re-derived.
-  XEC: { symbol: 'EC',   decimals: 2, symbolAfter: true }, // published: 10.00 SC; ruled: 10.00 EC
+  // Faithful transcription of the published row "Stake Euro Cash / XEC / SC /
+  // 10.00 SC" (docs/stake-engine-live/2026-07-29/rgs.md:142). R056 REVERSED
+  // the one-day R054 divergence (EC by the X-strip rule) back to the row:
+  // this table is a TRANSCRIPTION and never edits its source, and
+  // currency_table_gate.mjs pins this entry EQUAL to the captured row, so a
+  // platform change rusts the gate rather than silently outdating us.
+  XEC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
 }
 
 /**
@@ -300,13 +300,13 @@ export function currencySymbolFor(currencyCode: string, localeTag?: string): str
   const platform = PLATFORM_CURRENCIES[code]
   if (platform) return platform.symbol
 
-  // R054: the platform's own naming rule for its virtual family, ruled
-  // 2026-08-13: a code of X followed by two letters strips the X (XGC to GC,
-  // XSC to SC, XEC to EC). Placed AFTER the two tables so every published
-  // currency, including X-prefixed fiat like XOF, resolves from its table
-  // first; and BEFORE the Intl lookup because Intl formats a well-formed
-  // unknown code with the RAW CODE as its symbol, which is exactly the leak
-  // this family must never show a player.
+  // The X-strip family rule, RE-SCOPED by R056: defence in depth ONLY for a
+  // virtual-family code with NO published table row (a future sibling the
+  // tables have not met). A published row always wins, which the placement
+  // enforces: both tables resolve first, so XGC, XSC, XEC and X-prefixed
+  // fiat like XOF never reach this line. It sits BEFORE the Intl lookup
+  // because Intl formats a well-formed unknown code with the RAW CODE as its
+  // symbol, which is exactly the leak this family must never show a player.
   if (/^X[A-Z]{2}$/.test(code) ) return code.slice(1)
 
   try {
@@ -446,12 +446,13 @@ export function formatBalance(
     })
   }
 
-  // R054: the same X-strip naming rule currencySymbolFor applies, HERE TOO,
-  // because this function resolves its own symbol and two resolution paths
-  // that can disagree is exactly the drift class this file's 2026-07-25
-  // history records. A future platform X-code the tables have not met yet
-  // formats as a virtual (trailing, two decimals) with the derived label,
-  // never the raw code, which is what Intl below would otherwise print.
+  // The same X-strip rule currencySymbolFor applies, HERE TOO, because this
+  // function resolves its own symbol and two resolution paths that can
+  // disagree is exactly the drift class this file's 2026-07-25 history
+  // records. RE-SCOPED by R056 identically: defence in depth only for a
+  // code with NO published row, which the placement enforces (both tables
+  // resolve above). Such a code formats as a virtual (trailing, two
+  // decimals) with the derived label, never the raw code Intl would print.
   if (/^X[A-Z]{2}$/.test(code)) {
     const formatted = amount.toLocaleString(localeTag, {
       minimumFractionDigits: widen(2),
