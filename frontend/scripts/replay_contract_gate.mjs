@@ -263,10 +263,19 @@ async function driveReplay(browser, {
       await route.fulfill({ contentType: 'application/json', body: JSON.stringify(REAL_FIXTURE) })
       return
     }
+    // R056: the envelope's payoutMultiplier is a PLAIN bet-multiple, per the
+    // platform's own bytes: the real capture carries payoutMultiplier 0.41
+    // beside setTotalWin/finalWin events of 41 CENTIBETS, so envelope = book
+    // centibets / 100. The fixture rounds store the book value (centibets),
+    // and this wrapper used to pass it through raw, inflating every stub
+    // envelope 100x against reality: the same invented-stub drift class the
+    // R053 row records, invisible only because no assertion read the amount.
+    // FIX.super.cap at 500000 centibets normalises to exactly 5000, the
+    // WINCAP boundary, so the cap flow is unchanged.
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
-        payoutMultiplier: round.payoutMultiplier,
+        payoutMultiplier: round.payoutMultiplier / 100,
         costMultiplier,
         state: { events: round.events },
       }),

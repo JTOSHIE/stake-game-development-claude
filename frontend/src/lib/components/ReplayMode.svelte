@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import {
     parseReplayParams,
     fetchReplay,
@@ -17,6 +17,7 @@
   import GameGrid from './GameGrid.svelte'
   import WinDisplay from './WinDisplay.svelte'
   import WinPod from './WinPod.svelte'
+  import WinBanner from './WinBanner.svelte'
   import FreeSpinsPresentation from './FreeSpinsPresentation.svelte'
   import MaxWinCelebration from './MaxWinCelebration.svelte'
   import { interpretEvents, type PresentationScript, type RawEvent } from '../services/roundInterpreter'
@@ -89,20 +90,62 @@
   // A CSS-only `min(1, calc(...))` was tried first and is a proven no-op, which
   // is why this computes the factor in script and why the fix was measured
   // rather than read.
-  const GRID_W = 616
-  const GRID_H = 412
-  let replayFit = 1
+  // R056 TASK 4: the WHOLE COLUMN scales, not only the grid. The width-only
+  // grid fit above solved the Popout S sideways overflow, and left the
+  // vertical axis unmanaged: disclaimer, grid, win area, controls and the
+  // figures stack to more than any of the three reference viewports' heights,
+  // so the replay scrolled (or clipped, since App puts overflow:hidden on
+  // body) at exactly the sizes the platform reviews. The game's own popout
+  // behaviour is the model: the live stage renders at ONE uniform scale
+  // chosen to fit the window, so the replay column now does the same,
+  // min(1, width fit, height fit) against the column's own MEASURED height,
+  // because the column's natural height varies with phase, locale and figure
+  // wrapping and a hardcoded budget would be the (s)-class mistake. Nothing
+  // is dropped at any size: every element scales together, which is how the
+  // main game already reads at 400x225.
+  const COL_W = 648 // grid 616 plus 2rem breathing, the widest child governs
+  let columnEl: HTMLDivElement | null = null
+  let colScale = 1
+  let colH = 900 // pre-measure placeholder, corrected at first recompute
+  let containerPad = 64 // pre-measure placeholder: 2rem top + 2rem bottom
   function recomputeFit(): void {
     if (typeof window === 'undefined') return
-    // 2rem of breathing room, matching the container's own padding.
-    const avail = Math.max(0, window.innerWidth - 32)
-    replayFit = Math.min(1, avail / GRID_W)
+    if (columnEl) {
+      // offsetHeight is the LAYOUT height, unaffected by the element's own
+      // transform, so measuring the already-scaled column is stable and this
+      // cannot feed back into itself.
+      colH = columnEl.offsetHeight
+      // The container's vertical padding is real viewport spend the column
+      // cannot use, and it CHANGES at the mobile breakpoint, so it is
+      // measured rather than hardcoded. The first cut subtracted a flat
+      // 16px and the drive measured the cost: 768 against a 720 viewport at
+      // desktop and 241 against 225 at Popout S, both exactly the padding
+      // this now reads. The extra 2px absorbs fractional rounding.
+      const parent = columnEl.parentElement
+      if (parent) {
+        const cs = getComputedStyle(parent)
+        containerPad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0)
+      }
+    }
+    const availW = Math.max(0, window.innerWidth - 16)
+    const availH = Math.max(0, window.innerHeight - containerPad - 2)
+    colScale = Math.min(1, availW / COL_W, availH / colH)
   }
   if (typeof window !== 'undefined') recomputeFit()
+  // The column's height changes when the win area mounts (playing/complete)
+  // and when the figures wrap, so re-measure after the DOM settles on every
+  // phase change rather than only on window resize.
+  async function refitAfterUpdate(): Promise<void> {
+    await tick()
+    recomputeFit()
+  }
 
   let params: ReplayParams | null = null
   let response: ReplayResponse | null = null
   let phase: 'loading' | 'ready' | 'playing' | 'complete' | 'error' = 'loading'
+  // R056 TASK 4: phase mounts and unmounts column children, so every phase
+  // change re-measures the column after the DOM settles.
+  $: phase, featureActive, void refitAfterUpdate()
   let error: string | null = null
   let gridRef: GameGrid
 
@@ -116,6 +159,25 @@
     featureResolve = null
     if (r) r()
   }
+
+  // THE FEATURE-END BANNER CHAIN, R056 TASK 3, and the defect was a BINDING.
+  // FreeSpinsPresentation's toEnd() raises the FEATURE COMPLETE screen and
+  // bumps endBannerTrigger, then waits for onEndBannerDismissed() before
+  // finish() dispatches 'complete'. Live play binds that trio to a dedicated
+  // stage-level <WinBanner> whose on:dismissed chains back in
+  // (App.svelte's feature-end celebration mount). This file bound NONE of it,
+  // so the trigger bumped a prop nobody read, 'complete' never fired, the
+  // await at the feature branch never resolved, and winAmount was never set
+  // from the envelope: a feature replay sat on FEATURE COMPLETE forever with
+  // the prize pod showing the zero-win dash and no REPLAY AGAIN control,
+  // against "Show all animations, sounds, and visual effects"
+  // (approval_guidelines_game_replay_requirements.md:130). Same wiring as
+  // live, so the celebration, its count-up and its timing are the shared
+  // component's own.
+  let fsRef: FreeSpinsPresentation
+  let fsEndBannerAmount = 0
+  let fsEndBannerMultiplier = 0
+  let fsEndBannerTrigger = 0
 
   // Wincap flow (applies to replay too): show the MAX WIN splash immediately,
   // wait for COLLECT, then present the complete round sequence, finishing on
@@ -428,8 +490,14 @@
 
 <div class="replay-container">
   <!-- Replay disclaimer, always visible, Stake Engine compliance. Makes clear
-       this is a non-interactive replay of a past round with no real wager. -->
-  <div class="replay-disclaimer" role="note">{disclaimer}</div>
+       this is a non-interactive replay of a past round with no real wager.
+       R056 TASK 4: in the main branch it renders INSIDE the scaled column
+       instead, so it fits the frame with everything else; this unscaled copy
+       covers the loading and error phases, keeping "always visible" true in
+       every phase. -->
+  {#if phase === 'loading' || phase === 'error'}
+    <div class="replay-disclaimer" role="note">{disclaimer}</div>
+  {/if}
 
   <!-- Wincap flow applies in replay too: splash first, then COLLECT reveals
        the full round sequence (see startReplay). -->
@@ -443,13 +511,44 @@
       <div class="error-detail">{error}</div>
     </div>
   {:else if params && response}
+    <!-- R056 TASK 4: ONE scaled column. Everything the replay shows lives in
+         this wrapper, which renders at a single uniform scale chosen so the
+         whole column fits the viewport on both axes, the same way the live
+         game's stage fits its popout window. The disclaimer scales WITH the
+         content (it is rendered unscaled by the loading and error branches
+         above, which have no overflow to manage). Margins collapse the
+         laid-out box to the scaled size, the .grid-area pattern below,
+         so `safe center` centring keeps working on the container. -->
+    <div
+      class="replay-column"
+      bind:this={columnEl}
+      style="--col-S: {colScale}; --col-H: {colH}"
+    >
+    <div class="replay-disclaimer" role="note">{disclaimer}</div>
     <!-- Game grid is always shown once data is ready -->
-    <div class="grid-area" style="--replay-S: {replayFit}">
+    <div class="grid-area">
       <GameGrid bind:this={gridRef} />
       <FreeSpinsPresentation
+        bind:this={fsRef}
         script={featureScript}
         active={featureActive}
+        bind:endBannerAmount={fsEndBannerAmount}
+        bind:endBannerMultiplier={fsEndBannerMultiplier}
+        bind:endBannerTrigger={fsEndBannerTrigger}
         on:complete={onFeatureComplete}
+      />
+      <!-- The feature-end celebration, the same shared <WinBanner> live play
+           mounts at stage level, driven by the same three bound values and
+           chaining its dismissal back into onEndBannerDismissed() exactly as
+           App.svelte does. Mounted inside .grid-area so it shares the
+           fs-overlay's box: in replay the grid IS the stage. Without this
+           mount the chain above has no link and the feature replay never
+           settles (see the R056 TASK 3 note beside the bindings). -->
+      <WinBanner
+        amount={fsEndBannerAmount}
+        multiplier={fsEndBannerMultiplier}
+        trigger={fsEndBannerTrigger}
+        on:dismissed={() => fsRef?.onEndBannerDismissed()}
       />
       <!-- THE POD BELONGS TO THE GRID BOX. WinPod is position:absolute with
            `right: -220px; top: 50%`, and its own comment says those resolve
@@ -535,6 +634,7 @@
         : params.currency}</strong>
       </div>
     </div>
+    </div><!-- /.replay-column, R056 TASK 4 -->
   {/if}
 </div>
 
@@ -597,19 +697,46 @@
     letter-spacing: 0.01em;
   }
 
+  /* R056 TASK 4: the single scaled column. The transform-plus-collapsed-box
+     pattern is the one .grid-area proved out (its comment below records why
+     margins are needed at all); applied here to the WHOLE column so the
+     replay fits one viewport on both axes at every reference size. --col-H
+     is the column's measured natural height, supplied by recomputeFit,
+     because the height varies with phase, locale and figure wrapping. */
+  .replay-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 0 0 auto;
+    width: 648px;
+    max-width: none;
+    transform: scale(var(--col-S, 1));
+    transform-origin: top center;
+    margin-bottom: calc((var(--col-S, 1) - 1) * var(--col-H, 900) * 1px);
+    margin-left: calc((var(--col-S, 1) - 1) * 324px);
+    margin-right: calc((var(--col-S, 1) - 1) * 324px);
+  }
+
   .grid-area {
     position: relative;
     flex: 0 0 auto;
     width: 616px;
     height: 412px;
-    transform: scale(var(--replay-S, 1));
-    transform-origin: top center;
-    /* A transform does not change the LAID-OUT box, so without these the column
+    /* R056 TASK 4: the per-grid scale is retired in favour of the column
+       scale above; --replay-S is no longer set anywhere, so these compute to
+       scale(1) and margin 0. The rules are kept (rather than deleted) because
+       the collapsed-box pattern documented here is the one the column reuses,
+       and a future surface that needs to scale ONLY the grid re-enters
+       through this var.
+       A transform does not change the LAID-OUT box, so without these the column
        still reserves 616x412 and the row still overflows. Negative margins
        collapse the box to the scaled size: full height removed below, and half
        the removed width on each side, which keeps `top center` centred.
        Deliberately NOT `.grid-area > :global(*)`: that also hits .fs-overlay,
        which is position:absolute inset:0 and would be scaled twice. */
+    transform: scale(var(--replay-S, 1));
+    transform-origin: top center;
     margin-bottom: calc((var(--replay-S, 1) - 1) * 412px);
     margin-left: calc((var(--replay-S, 1) - 1) * 308px);
     margin-right: calc((var(--replay-S, 1) - 1) * 308px);
