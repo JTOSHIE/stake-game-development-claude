@@ -451,9 +451,10 @@ scene sprites, because nothing in the repository knows how they were made.
 
 `App.svelte` writes the literal paths
 `assets/themes/future-spinner/backgrounds/bg_base.jpg` and `bg_overdrive.jpg` directly into
-the markup, guarded by `{#if $activeTheme.id === 'future-spinner'}`. `WinPod.svelte` does the
+the markup, guarded by `{#if $activeTheme.id === 'future-spinner'}`. The replay win pod
+(WinPod.svelte, DELETED 2026-08-13 by the R058 owner ruling, TR-137) did the
 same for `assets/ui/win_pod_v3_{active,idle}.png`, pointing at the **legacy root** rather
-than any theme. `soundService.ts` hardcodes `assets/themes/future-spinner/sounds` as the
+than any theme; that hardcoding left the tree with the component. `soundService.ts` hardcodes `assets/themes/future-spinner/sounds` as the
 audio fallback root, so a themed sound that fails to load falls back to a Future Spinner
 sound regardless of the active theme.
 

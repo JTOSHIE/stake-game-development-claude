@@ -322,10 +322,14 @@ live is exactly 5,000.00x on the wincap round itself.
   directions. Confirmed live on a `super` buy-tier wincap round through to its celebration
   and PLAY AGAIN: `reports/screens/live-round2-2026-07-26/01_replay_22975_celebration_multiplier_5000x_win_3750000.png`
   and `02_MAX_WIN_REACHED_overlay_5000x_bet_collect.png`.
-  **One OPEN defect on this exact surface, and the dossier must not claim replay compliance
-  without it:** ledger row SA-022, HIGH. `WinPod.svelte` rendered player money with
-  `.toFixed(2)`, so replay showed `3750000.00` with no separators and no currency symbol,
-  overflowing its fixed zone, beside a banner formatting correctly in the same frame.
+  **The defect this paragraph carried is CLOSED twice over** (updated 2026-08-13):
+  ledger row SA-022, HIGH, recorded the replay win pod rendering player money with
+  `.toFixed(2)`, showing `3750000.00` with no separators and no currency symbol,
+  overflowing its fixed zone beside a banner formatting correctly in the same frame.
+  It was FIXED on 2026-07-26 (QUALITY_CHARTER Q-11, the canonical formatter routed),
+  and the component itself, WinPod.svelte, was DELETED on 2026-08-13 by the R058
+  owner design ruling (TR-137): the replay pod is gone at every size and the
+  end-of-replay banner carries both values.
   **Fixed at source 2026-07-27** by routing it through the canonical `formatBalance`
   (`docs/QUALITY_CHARTER.md` Q-11); still awaiting a live re-capture to confirm it on the
   platform, so it is recorded as fixed-not-yet-re-observed rather than closed.

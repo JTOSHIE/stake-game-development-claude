@@ -1278,6 +1278,16 @@ semicolon, then the METER_PRE_REV DEAD_SYMBOL red pushed past another). The
 form is: `gate && git add ... && git commit ... && git push`, so a red exit
 blocks everything after it.
 
+**REFINED 2026-08-13 (R058), the class's third instance, a new form: a PIPE
+eats the exit code just as a semicolon does.** `gate | tail -1 && git push`
+gates the push on TAIL's exit status, and a red gate pushed to main exactly
+that way on 2026-08-13 (the WinPod deletion's fifteen dead citations; caught
+by the remote static leg within minutes, resolved the same hour, the full
+account in the session report). The gate's exit code must be the DIRECT
+left operand of the `&&`: no pipe, no command substitution, no wrapper
+between the gate and the chain. Filter the OUTPUT of a gate in a separate
+invocation if a summary is wanted; never in the gating one.
+
 **(v) Fable-output convention: revised briefs arrive whole. Recorded 2026-08-13,
 R056 TASK 0.** Revised briefs are always issued as a single fresh consolidated block
 with predecessors declared dead; splice or fold instructions to the owner are
