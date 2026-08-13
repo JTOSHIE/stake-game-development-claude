@@ -12430,3 +12430,148 @@ Local verification: currency static 116/116; the table gate 589 assertions
 PASS with self-test 6/6 seeds; svelte-check clean; dist rebuilt at the tip
 for the owner's delta sync (77 files, 12,331,514 bytes). TR-133 opened and
 closed in the same pass.
+
+## R056 ADDENDUM, 2026-08-13: the consolidated order executed whole, the reversal, the fifty-one, and feature replays that settle
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R056_CONSOLIDATED_Prompt.md`
+(commit `55d3b4e9`). Model: Claude Fable 5, judgement tier per the brief. No
+locked path written; `.claude/settings.json` untouched. R055 and R054-R are
+dead per the brief's own header and were never pasted; this is the sole
+live order, and its arrival shape is now convention (v).
+
+**TASK 0, the record closures.** TR-132 CLOSED: the owner confirmed the
+portal replay of event 83776 renders the true board, the paste of this
+brief being that confirmation on the record. The standing staging note is
+CLAUDE.md (o.1): the upload source is `frontend/dist` directly, the Desktop
+staging hop is retired, the manifest guarantee holds by construction when
+dist is the source. The Fable-output convention is CLAUDE.md (v): revised
+briefs arrive as a single fresh consolidated block with predecessors
+declared dead; splice or fold instructions to the owner are prohibited.
+
+**TASK 1, the reversal.** XEC labels SC in all three pins, exactly as the
+published row prints it ("Stake Euro Cash / XEC / SC / 10.00 SC",
+`docs/stake-engine-live/2026-07-29/rgs.md:142`, cited at every site); the
+announcement is silent on labels, so the table governs, and XEC renders
+byte-identically to XSC. KEPT from R054: the unified resolution path in
+both currencySymbolFor and formatBalance, the never-show-a-raw-code
+property, and the seeded unknown (XQZ), with the X-strip family rule
+RE-SCOPED to codes with NO published table row, defence in depth only,
+enforced by placement after both tables. The table gate's ruled override is
+INVERTED into a transcription fidelity pin: the capture's XEC row must
+still print SC, and any platform page change rusts the gate loudly. Seeded
+per (p) in both directions: seed 7 replants the exact R054 divergence in
+the module (red on XEC), and a mutated capture rusts the pin. Battery:
+currency static 116/116, table gate 589 assertions with 10/10 controls,
+self-test 19 checks, 7 module seeds and the capture pin seed all caught.
+TR-134 records the reversal with both sources quoted and credits TR-133's
+(n) surfacing, which is what caught the mis-ruling one session later.
+
+**TASK 2, the fifty-one.** The pane's portal session survived from R053, so
+no owner re-drive was needed. All 51 Guidelines checklist items transcribed
+verbatim (platform spelling preserved) into
+`docs/stake-engine-live/2026-08-13/submission_checklist_we_roll_spinners.md`,
+section counts summing to exactly 51; the mapping table at
+`docs/records/GUIDELINES_51_MAPPING_2026-08-13.md` gives each item its
+estate evidence with citation. FOUR ESCALATIONS, per the brief never
+self-assessed green: [02] the invalid rgs_url launch drive (adjacent
+evidence strong, exact scenario undriven), [07] distinctness (reviewer
+judgement by nature), [12] sub-cent display (micros rule holds, no
+dedicated rendering proof), [49] older-device hardware (emulation only).
+Items [11] and [36] are the currency-display items, flagged and both on the
+TASK 1 ruling. NO portal box was ticked. Observed at capture: the approval
+landing's pre-checks all green, front version v9 (the owner's upload of the
+restage landed), math v1; the Begin Submission control was not operated.
+
+**TASKS 3 and 4, the replay fixes.** The dash's cause is named: a BINDING.
+FreeSpinsPresentation's toEnd() raises FEATURE COMPLETE and waits for
+onEndBannerDismissed() before finish() dispatches 'complete'; live play
+chains that through a dedicated stage-level WinBanner in App.svelte, and
+ReplayMode bound none of it, so 'complete' never fired, the await never
+resolved, and the envelope-driven winAmount.set was unreachable: the pod
+dashed forever and REPLAY AGAIN never appeared. ReplayMode now mirrors
+App.svelte's own wiring (trio bound, shared WinBanner mounted, dismissal
+chained), so the pod shows the round's total, multiplier and amount from
+the envelope's top-level payout fields through the existing stores and
+locale formatters, both vocabularies. The replay view now renders as ONE
+scaled column fitted to both viewport axes against its own measured height
+(the game's own popout behaviour), the container's real padding subtracted
+after the first cut measured 768/720 and 241/225 overflows. The entry
+continue gate is left as live play has it; the drives click it at DOM level
+because the animated button never satisfies Playwright's stability wait.
+
+**TASK 5, the proof.** `replay_contract_gate.mjs` now plays
+FIX.bonus.feature to settlement at the three reference sizes and holds: at
+FEATURE COMPLETE the pod equals the envelope payout (expected strings
+computed from the round data the stub serves, never read back from the
+surface), the replay fits one viewport with no scrolling (document equals
+viewport EXACTLY: 1280x720, 375x812, 400x225), the desktop instrument pod
+shows the round's multiplier and amount, and an XEC drive holds the TASK 1
+fidelity pin at the replay surface ("Token: SC", figures "10.00 SC", never
+EC, never the raw code). Frames committed at `reports/screens/r056-replay/`
+(written under FS_WRITE_EVIDENCE=1, this session being the evidence job per
+(h.1)). SEED feature-end-chain-severed unbinds the dismissal chain, the
+exact pre-fix state, and the gate goes red on the dash ("WIN -" against the
+envelope's $795.00). 34/34 assertions, 12/12 seeds caught, 0 unapplied.
+
+**Two harness truths surfaced by the extension, recorded because both are
+the R053 lesson recurring.** First, every stub envelope carried the book's
+CENTIBETS in payoutMultiplier where the platform's real envelope carries a
+PLAIN bet-multiple (the capture's own 0.41 beside 41-centibet events), a
+100x inflation invisible only because no assertion read the amount; the
+wrapper now divides by 100, and FIX.super.cap normalises to exactly 5000,
+the WINCAP boundary, so the cap flow is unchanged. Second, the replay fit
+gate's unscaled seed stopped reproducing its defect the moment the fit
+moved to the column, and its self-test went red on its own stale seed,
+convention (p) working on the test itself; the seed now plants on both
+carriers and is caught again (self-test 2 seeded, 2 negative controls).
+
+**One stale one-off, recorded not fixed.** `replay_blocker_proof.mjs` (not
+CI-wired, frozen history) reads 5/7 locally: its EUR-on-the-start-button
+assertion describes the pre-2026-07-31 button (the hoisted figures), and
+its seeded interception is now DOUBLY defeated because the scaled column's
+transform creates a stacking context that keeps the replay above the
+backdrop even with the container's z-index seeded away, which is the
+TR-076 class gaining a second structural protection rather than losing its
+first. Left as recorded history per the qaTmpDir rule; the live coverage of
+both classes is in the contract and fit gates.
+
+**Rule 10.** The code push (`29616b21..22d4ed3c`: TASKS 0, 1, 2 records,
+TASKS 3, 4, 5 code) ran the FULL 24-leg matrix: run 31673980103, 24/24
+GREEN, zero failures. The records-only close push follows this report and
+its static-only run is verified before the session ends; the full run was
+complete before that push, so the cancel trap recorded twice in memory
+cannot bite it. Local before push: doc currency gate PASS over the
+close-state tree.
+
+**Rule 12, stated in its own line per the rule.** The mid-close preview
+refresh was REFUSED twice by the script's own guards, first on the dirty
+records tree, then on unpushed commits; both refusals are the script
+working as designed. The preview is refreshed as the last action of the
+close, after the records push, and the version line is verified by curl at
+that point; the line quoted in this report is therefore the refusal, and
+the live refresh follows it, which is the one-commit-lag design the rule
+itself records.
+
+**Tracker.** TR-132 CLOSED (TASK 0), TR-134 opened and closed (TASK 1),
+TR-135 opened and closed (TASKS 3 to 5). COMMS 059 carries the folded ack
+per (t).
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, single session, serial
+close discipline on main per the consolidated brief. Approach taken:
+capture-first through the surviving pane session (the R053 flow's origin
+approval persists across sessions), then records, then the reversal, then
+the replay fixes proven end-to-end before the gate extension encoded them.
+Alternatives rejected: compacting the replay chrome with height media
+queries at Popout S (the chrome alone exceeds 225px at any legible size;
+the uniform column scale is the game's own popout behaviour and loses
+nothing); fixing the stale replay_blocker_proof (frozen history, not a
+gate). Files touched: currency.ts, currency.test.ts, currency_table_gate,
+ReplayMode.svelte, replay_contract_gate, replay_fit_gate, CLAUDE.md,
+tracker, comms, the two TASK 2 documents, this report. Open threads: the
+owner walks the fifty-one with the mapping table in hand, then blurb
+approval, the trademark line, and Start Approval on the owner's word; the
+four TASK 2 escalations await the owner's disposition; the remaining
+one-timers are the Provably Fair toggle, the wallet re-read, and payment
+under the Medium Rare N.V. terms.
