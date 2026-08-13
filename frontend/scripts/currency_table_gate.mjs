@@ -136,6 +136,32 @@ export function parseCapture(text) {
     rows.push({ code, symbol, symbolAfter, decimals, example })
   }
   if (rows.length === 0) throw new Error('capture carries no Supported Currencies rows, which is itself the finding')
+
+  // R054 RULED OVERRIDE, the one place this gate knowingly diverges from the
+  // captured page, stated loudly rather than encoded quietly. The published
+  // table's XEC row says Display SC ("Stake Euro Cash / XEC / SC / 10.00 SC",
+  // rgs.md, current mirror), and the R054 ruling (owner screenshot,
+  // 2026-08-13) derives the label by the platform's own naming rule instead:
+  // X followed by two letters strips the X, so XEC labels EC. The override is
+  // SELF-RETIRING: it asserts the captured row STILL says the superseded
+  // symbol, so the day the platform updates their docs this throws as rusted
+  // and must be removed rather than silently outliving its reason.
+  const RULED_OVERRIDES = {
+    XEC: { rule: 'R054, 2026-08-13', symbol: 'EC', capturedSymbol: 'SC' },
+  }
+  for (const row of rows) {
+    const o = RULED_OVERRIDES[row.code]
+    if (!o) continue
+    if (row.symbol !== o.capturedSymbol) {
+      throw new Error(`RULED OVERRIDE RUSTED: the capture now says ${row.code} displays ${JSON.stringify(row.symbol)}, `
+        + `not ${JSON.stringify(o.capturedSymbol)} as it did when ${o.rule} was recorded. Remove or re-derive the override.`)
+    }
+    row.symbol = o.symbol
+    row.example = row.symbolAfter
+      ? `${row.example.slice(0, -(o.capturedSymbol.length + 1))} ${o.symbol}`
+      : `${o.symbol}${row.example.slice(o.capturedSymbol.length)}`
+    row.ruledOverride = o.rule
+  }
   return rows
 }
 

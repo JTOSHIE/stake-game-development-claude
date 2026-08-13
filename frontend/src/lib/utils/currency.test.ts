@@ -89,20 +89,33 @@ ok('unknown code does not throw', (() => {
   try { formatBalance(S, 'ZZZ', 'en'); return true } catch { return false }
 })())
 
-// ── XEC, Stake EU (2026-07-25 first-party announcement) ─────────────────────
-// The platform's instruction is "Just like Stake US", so every assertion here
-// is that XEC behaves EXACTLY as XSC does. Asserting equality against XSC
-// rather than against hardcoded expectations means the pair cannot drift: if
-// the SC presentation is ever changed for one, this fails until it changes for
-// both.
+// ── XEC, Stake EU ────────────────────────────────────────────────────────────
+// SUPERSEDED READING ON THE RECORD: this block asserted byte-identity with
+// XSC from the 2026-07-25 "Just like Stake US" announcement, and that pin
+// shipped SC as the label on a live XEC session (owner screenshot,
+// 2026-08-13). The R054 ruling reads "just like" as the FORMAT and derives
+// the label by the platform's own naming rule: X followed by two letters
+// strips the X. The STRUCTURE still matches XSC (virtual, two decimals); the
+// SYMBOL is the code's own.
 eq('XEC is recognised as a virtual currency', isVirtualCurrency('XEC'), true)
-eq('XEC never shows the raw code to a player', currencySymbolFor('XEC'), 'SC')
-eq('XEC symbol matches XSC exactly', currencySymbolFor('XEC'), currencySymbolFor('XSC'))
-eq('XEC formats identically to XSC', formatBalance(1_000_000_000, 'XEC'), formatBalance(1_000_000_000, 'XSC'))
-eq('XEC formats identically to XSC at zero', formatBalance(0, 'XEC'), formatBalance(0, 'XSC'))
-eq('XEC formats identically to XSC on a fractional amount', formatBalance(1_234_560, 'XEC'), formatBalance(1_234_560, 'XSC'))
-eq('XEC is case-insensitive on the code', currencySymbolFor('xec'), 'SC')
+eq('XEC labels as EC, the platform naming rule, never the SC pin', currencySymbolFor('XEC'), 'EC')
+eq('XEC is case-insensitive on the code', currencySymbolFor('xec'), 'EC')
 eq('the raw code XEC never appears in a formatted balance', formatBalance(1_000_000_000, 'XEC').includes('XEC'), false)
+eq('XEC formats with the same structure as XSC, symbol aside',
+  formatBalance(1_234_560, 'XEC').replace(/ EC$/, ' SC'), formatBalance(1_234_560, 'XSC'))
+
+// The three-way derivation, R054's own rule stated whole: one family, one rule.
+eq('XGC derives to GC', currencySymbolFor('XGC'), 'GC')
+eq('XSC derives to SC', currencySymbolFor('XSC'), 'SC')
+eq('XEC derives to EC', currencySymbolFor('XEC'), 'EC')
+
+// Convention (p), the seeded unknown: a FUTURE platform sibling this table has
+// never met must derive by the rule rather than leak its raw code, because
+// Intl formats a well-formed unknown code with the code itself as the symbol,
+// which is how XEC's class would resurface. Anything outside the X-pattern
+// keeps the existing behaviour.
+eq('a seeded unknown X-code derives instead of leaking raw', currencySymbolFor('XQZ'), 'QZ')
+eq('a seeded unknown X-code never appears raw in a formatted balance', formatBalance(5_000_000, 'XQZ').includes('XQZ'), false)
 
 // ── TR-012c: placement comes from the payload, not from us ──────────────────
 // Fable dissolved the leading-vs-trailing dispute by taking the announcement's
@@ -121,8 +134,8 @@ eq('placement is honoured for fiat too', formatBalance(1000 * S, 'USD', 'en', { 
 
 // Partial payloads degrade field by field rather than being discarded whole.
 eq('symbol alone, placement falls back to trailing', formatBalance(1000 * S, 'XEC', 'en', { symbol: 'SC' }), '1,000.00 SC')
-eq('decimals alone are honoured', formatBalance(1000 * S, 'XEC', 'en', { decimals: 0 }), '1,000 SC')
-eq('symbolAfter false alone flips placement', formatBalance(1000 * S, 'XEC', 'en', { symbolAfter: false }), 'SC 1,000.00')
+eq('decimals alone are honoured', formatBalance(1000 * S, 'XEC', 'en', { decimals: 0 }), '1,000 EC')
+eq('symbolAfter false alone flips placement', formatBalance(1000 * S, 'XEC', 'en', { symbolAfter: false }), 'EC 1,000.00')
 
 // Absent metadata must leave existing behaviour untouched, which is what makes
 // this change safe to ship before the DTT confirms which placement is live.
@@ -173,14 +186,14 @@ for (const code of ['XSC', 'XGC', 'XEC']) {
   const rendered = formatBalanceCompact(52_431_098_760_000, code, 'en')
   ok(`compact never prints the raw code ${code}`, !rendered.includes(code), rendered)
 }
-for (const [code, symbol] of [['XSC', 'SC'], ['XGC', 'GC'], ['XEC', 'SC']] as const) {
+for (const [code, symbol] of [['XSC', 'SC'], ['XGC', 'GC'], ['XEC', 'EC']] as const) {
   ok(`compact renders the ${code} symbol ${symbol}`,
     formatBalanceCompact(52_431_098_760_000, code, 'en').includes(symbol))
 }
 eq('XSC abbreviates trailing, like its full form',
   formatBalanceCompact(52_431_098_760_000, 'XSC', 'en'), '52.43M SC')
-eq('XEC is byte-identical to XSC in compact form too',
-  formatBalanceCompact(52_431_098_760_000, 'XEC', 'en'),
+eq('XEC matches XSC compact structure, its own symbol in place (R054)',
+  formatBalanceCompact(52_431_098_760_000, 'XEC', 'en').replace(/EC$/, 'SC'),
   formatBalanceCompact(52_431_098_760_000, 'XSC', 'en'))
 eq('platform display metadata governs the compact form as well',
   formatBalanceCompact(52_431_098_760_000, 'XEC', 'en', { symbol: 'SC', symbolAfter: false }), 'SC 52.43M')

@@ -9,6 +9,26 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 058 - 2026-08-13 - COMMS-ACK R054: XEC labels EC by the family rule, three pins swept, one divergence on the record
+
+Executed whole, this entry the folded ack per (t). The sweep found THREE
+pins of the superseded "SC format" reading, not one: the VIRTUAL stopgap
+your brief named, the PLATFORM_CURRENCIES transcription row, and the test
+byte-identity block. All now derive by your rule (X plus two letters strips
+the X), enforced in BOTH resolution paths since two paths that can disagree
+is this file's own recorded drift class; the three-way assertion and the
+seeded unknown X-code case landed per (p), and TR-012c's payload-wins
+behaviour is untouched. **Surfaced per (n), yours to note: the platform's
+PUBLISHED table still prints XEC / SC / 10.00 SC, and the ruling knowingly
+diverges on the owner's live evidence; the table gate carries a
+self-retiring override that rusts loudly the day their page corrects.**
+Currency static 116/116, table gate 589 assertions with 6/6 seeds,
+svelte-check clean, dist rebuilt at the tip for the owner's delta sync.
+TR-133 opened and closed in the same pass. Start Approval remains held on
+the owner's live replay confirmation (TR-132).
+
+---
+
 ## 057 - 2026-08-12 - COMMS-ACK R053: the replay board defect captured, fixed, proven against the platform's own bytes
 
 **The mismatch, captured not assumed** (event 83776, published entry,

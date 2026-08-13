@@ -652,3 +652,29 @@ as work before submission.
 
 **Tracker**: TR-132 carries the finding, the fix and the proof; it closes on
 the owner's live confirmation, per the brief's own gate.
+
+## R054 ADDENDUM, 2026-08-13: XEC labels EC, one rule for the family, one tension on the record
+
+Small brief, executed whole. The XEC label now derives by the R054 ruling
+(X plus two letters strips the X), and the sweep found THREE pins of the
+superseded reading, not one: the VIRTUAL_CURRENCIES stopgap the brief named,
+the PLATFORM_CURRENCIES transcription row, and the test block asserting
+byte-identity with XSC (plus two payload-partial assertions and the compact
+byte-identity form). All moved to the ruled derivation; the payload-explicit
+SC assertions stand untouched because TR-012c's rule is that the platform's
+own display payload wins. The rule is enforced in BOTH resolution paths
+(currencySymbolFor and formatBalance) because two paths that can disagree is
+this file's own recorded drift class, and the seeded unknown X-code case
+proves a future sibling derives rather than leaking raw through Intl, which
+formats well-formed unknown codes with the code itself as the symbol.
+
+**The tension, surfaced per (n)**: the platform's PUBLISHED table still
+prints "Stake Euro Cash / XEC / SC / 10.00 SC" (current mirror), and the
+ruling knowingly diverges on the owner's live evidence. The table gate
+carries a self-retiring override that asserts the published row still says
+SC; when the platform corrects their page, the override rusts loudly.
+
+Local verification: currency static 116/116; the table gate 589 assertions
+PASS with self-test 6/6 seeds; svelte-check clean; dist rebuilt at the tip
+for the owner's delta sync (77 files, 12,331,514 bytes). TR-133 opened and
+closed in the same pass.

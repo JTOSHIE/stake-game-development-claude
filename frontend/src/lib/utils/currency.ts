@@ -111,20 +111,18 @@ export const VIRTUAL_CURRENCIES: Record<string, VirtualCurrency> = {
   XSC: { symbol: 'SC', decimals: 2 },
   GC:  { symbol: 'GC', decimals: 2 },
   SC:  { symbol: 'SC', decimals: 2 },
-  // Stake EU, confirmed by first-party platform announcement 2026-07-25 and
-  // quoted verbatim in reports/briefs/FS_PlatformDiscordDump_2026-07-25.md:
-  //   "Internally, the currency code used is XEC. However, players will not see
-  //    XEC in-game. Just like Stake US, the currency will be displayed using the
-  //    SC format"
-  // "Just like Stake US" is the operative instruction, so XEC is defined to be
-  // byte-identical to XSC rather than given its own formatting rules. If the
-  // SC presentation ever changes it must change for both, and defining them
-  // separately is how they would drift apart.
-  //
-  // This supersedes the HOLD on TR-012b. The hold was correct while three
-  // first-party sources had no trace of the code; a first-party source now
-  // exists, so the position changes with the evidence rather than despite it.
-  XEC: { symbol: 'SC', decimals: 2 },
+  // Stake EU. SUPERSEDED READING KEPT AS HISTORY: the 2026-07-25 announcement
+  // ("Just like Stake US, the currency will be displayed using the SC format",
+  // quoted verbatim in reports/briefs/FS_PlatformDiscordDump_2026-07-25.md)
+  // was read as pinning the SYMBOL to SC, and that pin shipped SC as the
+  // label on a live XEC session. The owner's 2026-08-13 screenshot and the
+  // R054 ruling correct the reading: "just like" names the FORMAT (virtual
+  // currency, two decimals, same presentation), and the label derives by the
+  // platform's own naming rule, X followed by two letters strips the X
+  // (XGC to GC, XSC to SC, XEC to EC). This entry now records the derived
+  // symbol; the rule itself is enforced in currencySymbolFor for any future
+  // sibling this table has not met yet.
+  XEC: { symbol: 'EC', decimals: 2 },
 }
 
 interface PlatformCurrency {
@@ -242,7 +240,13 @@ export const PLATFORM_CURRENCIES: Record<string, PlatformCurrency> = {
   XOF: { symbol: 'CFA',  decimals: 2 }, // CFA10.00
   XGC: { symbol: 'GC',   decimals: 2, symbolAfter: true }, // 10.00 GC
   XSC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
-  XEC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
+  // R054 RULED DIVERGENCE from the published row, stated loudly: the platform
+  // page prints "Stake Euro Cash / XEC / SC / 10.00 SC" and the R054 ruling
+  // (owner screenshot, 2026-08-13) derives the label by the platform's own
+  // naming rule instead, X-strip, so XEC labels EC. currency_table_gate.mjs
+  // carries the matching self-retiring override: the day the published row
+  // stops saying SC, the override rusts and both must be re-derived.
+  XEC: { symbol: 'EC',   decimals: 2, symbolAfter: true }, // published: 10.00 SC; ruled: 10.00 EC
 }
 
 /**
@@ -295,6 +299,15 @@ export function currencySymbolFor(currencyCode: string, localeTag?: string): str
   // symbol carried the same defect as the balance did.
   const platform = PLATFORM_CURRENCIES[code]
   if (platform) return platform.symbol
+
+  // R054: the platform's own naming rule for its virtual family, ruled
+  // 2026-08-13: a code of X followed by two letters strips the X (XGC to GC,
+  // XSC to SC, XEC to EC). Placed AFTER the two tables so every published
+  // currency, including X-prefixed fiat like XOF, resolves from its table
+  // first; and BEFORE the Intl lookup because Intl formats a well-formed
+  // unknown code with the RAW CODE as its symbol, which is exactly the leak
+  // this family must never show a player.
+  if (/^X[A-Z]{2}$/.test(code) ) return code.slice(1)
 
   try {
     const parts = new Intl.NumberFormat(localeTag, {
@@ -431,6 +444,22 @@ export function formatBalance(
       minimumFractionDigits: widen(platform.decimals),
       maximumFractionDigits: widen(platform.decimals),
     })
+  }
+
+  // R054: the same X-strip naming rule currencySymbolFor applies, HERE TOO,
+  // because this function resolves its own symbol and two resolution paths
+  // that can disagree is exactly the drift class this file's 2026-07-25
+  // history records. A future platform X-code the tables have not met yet
+  // formats as a virtual (trailing, two decimals) with the derived label,
+  // never the raw code, which is what Intl below would otherwise print.
+  if (/^X[A-Z]{2}$/.test(code)) {
+    const formatted = amount.toLocaleString(localeTag, {
+      minimumFractionDigits: widen(2),
+      maximumFractionDigits: widen(2),
+    })
+    return VIRTUAL_SYMBOL_TRAILING
+      ? `${formatted} ${code.slice(1)}`
+      : `${code.slice(1)} ${formatted}`
   }
 
   // UNREACHABLE FOR ANY SUPPORTED CODE, and that is asserted rather than
