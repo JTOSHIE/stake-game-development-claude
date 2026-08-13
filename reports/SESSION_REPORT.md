@@ -12724,3 +12724,98 @@ the wallet re-read, payment under the Medium Rare N.V. terms); then Start
 Approval on the owner's word. Builder-side: nothing is queued; the blurb,
 trademark line and distinctness basis are all signed and staged for the
 submission form.
+
+## R058 ADDENDUM, 2026-08-13: the pod removed, the banner fits, and the session's own red on main
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R058_REPLAY_POLISH_Prompt.md`
+(commit `59529bf0`-family; the R058 save). Model: Claude Fable 5, judgement
+tier. The owner's re-test at 9504c610 CONFIRMED fit, feature results and
+sub-cent display working; the two remaining findings are this session's
+work.
+
+**TASK 2, the owner design ruling** (`32bea141`). WinPod is DELETED, not
+hidden: ReplayMode was its only consumer, so the component went with its
+mount rather than surviving as dead weight. The end-of-replay banner
+carries both values inline at every size, the amount in its existing pink
+treatment, the multiplier in the pod's blue one, amount then multiplier;
+desktop and mobile replay are one layout. The clipping the owner captured
+("CA$39.(") was the pod's fixed 99px WIN window over frame art, so the
+ruling removed the clipping surface itself. One premise from the brief
+corrected on verification per rule 16: the banner component is NOT shared
+with live play (ReplayMode is WinDisplay's only consumer, verified by
+grep), so the live path renders identically by construction, and the
+scope guard below proves the live meter besides.
+
+**TASK 1** (`32bea141`). The banner's amount row auto-fits through the
+existing autofitText action, the font sizes multiplying --autofit-scale
+in (the exact no-op trap fitMoney.ts records), fitted against the SETTLED
+string so the count-up cannot make the row breathe. The worst case is
+proven: a 4999.99x round, one centibet under the cap so the max-win hold
+does not gate the read, at the maximum bet in the CA$ format, renders
+CA$4,999,990.00 with 5000.0x beside it, zero clipping, frame committed.
+
+**TASK 3** (`32bea141`). The gate gains: no pod element at all three
+sizes, the end banner equal to the envelope's amount and multiplier, zero
+clipping at three sizes plus the worst case, and the SCOPE GUARD: a drive
+of the GAME route against CORS-fulfilled wallet stubs that lands a real
+feature and asserts the Overdrive meter panel renders, so the replay-only
+ruling cannot leak into live play unnoticed. Two rider lessons landed on
+the way: a strict-mode locator over the twice-mounted instrument
+(desktop column and portrait strip) read "not visible" over a meter
+plainly on screen, so visibility is asserted structurally; and the gate's
+frames moved to `reports/screens/replay-contract/`, their own live
+evidence dir, after this run overwrote the dated r056-replay frames,
+which were restored from HEAD, the (h.1) class caught and closed
+in-session. Seeded per (p): the clipped fixed box and a leaked .win-pod
+element, both red. 46/46 assertions, 14/14 seeds.
+
+**THE RED ON MAIN, reported plainly per rule 10** (`f7a8f6c4` resolves
+it). The WinPod deletion made fifteen historical citations dead across
+nine documents. The local doc currency gate CAUGHT this before the push
+and was overridden by accident: the close sequence ran
+`gate | tail -1 && git push`, so the chain gated on tail's exit status,
+the (u.1) class in a third form. The remote static leg failed within
+minutes (run 31688242248, static only; every browser leg green on the
+R058 code) and the line stopped. Resolution, per the gate's own recorded
+escape clause ("a new-citation gate, not a purge"): the three LIVE
+documents were fixed to speak of the deleted component in the historical
+register (GAME_FACTS' SA-022 paragraph, independently stale since Q-11
+closed it, now records both closures; QUALITY_CHARTER Q-11;
+RESKIN_BOUNDARY), and the eleven dated records (old comms entries,
+evidence ledgers, a closed tracker row, dated audits and track reports)
+froze into the baseline with the reason written into its own comment.
+One first-draft charter rewording still matched the citation pattern
+unbackticked, was caught by the freeze diff, reworded, and its frozen
+entry burned in the same commit. The baseline diff was verified in BOTH
+directions: eleven added, zero dropped, 273 frozen, 0 new. CLAUDE.md
+(u.1) gains the refinement: the gate's exit code must be the DIRECT left
+operand of the chain, no pipe, no substitution, no wrapper.
+
+**Rule 10.** The R058 code push ran the full 26-job matrix and failed
+ONLY the static leg on the fifteen dead citations (31688242248); the
+resolution push ran 26/26 GREEN (31690015476). This report's records-only
+push follows, verified before the session ends. **Rule 12.** The preview
+was refreshed at the code tip after its push and is refreshed at the
+final tip as the last action, both curl-verified.
+
+**Tracker**: TR-137 opened and closed. COMMS 062 carries the folded ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: remove the clipping surface per the ruling rather than
+fitting it, fit the surviving banner against the settled worst case,
+prove the removal and the fit in the same battery that guards the live
+meter. Alternatives rejected: hiding the pod by CSS (dead weight, and the
+dead-wiring gate would have flagged the unreferenced component);
+unbacktick-and-annotate for the dated records (mutilating history to
+dodge a gate; the baseline escape with a written reason is the gate's own
+design for exactly this). Files touched: ReplayMode.svelte,
+WinDisplay.svelte, WinPod.svelte (deleted), winPrecision.test.ts,
+replay_contract_gate.mjs, GAME_FACTS.md, QUALITY_CHARTER.md,
+RESKIN_BOUNDARY.md, doc_currency_baseline.json, CLAUDE.md (u.1
+refinement), the tracker, comms, this report. Open threads: the owner's
+final re-test (the two findings plus the XEC glance), then the fifty-one
+walk and tick, the one-timers (Provably Fair toggle, wallet re-read,
+payment under the Medium Rare N.V. terms), and Start Approval on the
+owner's word.

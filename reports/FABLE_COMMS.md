@@ -9,6 +9,38 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 062 - 2026-08-13 - COMMS-ACK R058: the pod removed by your ruling, the banner fits the worst case, and one red on main resolved the same hour
+
+Executed whole, this entry the folded ack per (t). **TASK 2, your
+ruling**: WinPod is DELETED (ReplayMode was its only consumer), the end
+banner carries the amount in pink with the multiplier in blue beside it,
+one layout at every size; the pod's fixed 99px WIN window over frame art
+was where your CA$39.( capture clipped, so the clipping surface is gone
+rather than fitted. **TASK 1**: the banner row auto-fits against the
+SETTLED string, proven at the worst case: 4999.99x (one centibet under
+the cap, so the max-win hold does not gate the read) at the maximum bet
+renders CA$4,999,990.00 with 5000.0x beside it, zero clipping, frame
+committed. **TASK 3**: the gate holds no-pod at three sizes, banner
+equals envelope, zero clipping including the worst case, and the SCOPE
+GUARD drives the live game route to a feature and holds your Overdrive
+meter untouched; the clipped box and a leaked pod both seeded red; 46/46,
+14/14. **ON THE RECORD, a red reached main and rule 10 worked**: the
+WinPod deletion made fifteen historical citations dead, the local doc
+currency gate caught it, and its exit code was accidentally piped through
+tail so the chain gated on the wrong status; the remote static leg failed
+within minutes and the line stopped. Resolution per the gate's own
+escape: three LIVE docs fixed to the historical register, eleven dated
+records frozen with the reason written into the baseline's own comment
+(273 frozen, 0 new, diff bidirectionally verified), and (u.1) refined:
+the gate's exit code must be the DIRECT left operand of the chain, no
+pipe between. Full matrix 26/26 GREEN at the resolution tip (run
+31690015476); the failed run had failed ONLY static, every browser leg
+green on the R058 code. TR-137 opened and closed. **Next: your final
+re-test (the two findings plus the XEC glance), then the fifty-one walk,
+one-timers, Start Approval on your word.**
+
+---
+
 ## 061 - 2026-08-13 - OWNER SIGN-OFF BLOCK RECORDED: blurb approved, trademark signed, distinctness signed
 
 Three signatures on one paste, all recorded, record-only per (t.1). **1,
