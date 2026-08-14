@@ -608,10 +608,10 @@
          platform's own Bets panel. -->
     <div class="replay-meta">
       <div class="replay-figures">
-        {mode === 'social' ? 'Play' : $tr('replayBetLabel')}: <strong>{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
+        {mode === 'social' ? 'Play' : $tr('replayBetLabel')}: <strong data-money="cur">{formatBalance(Math.round(baseBet * CURRENCY_SCALE), params.currency, params.lang)}</strong>
         {#if showCostMultiplier}
           × {response.costMultiplier} {mode === 'social' ? '=' : `${$tr('costLabel')} =`}
-          <strong>{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
+          <strong data-money="cur">{formatBalance(Math.round(totalSpent * CURRENCY_SCALE), params.currency, params.lang)}</strong>
         {/if}
       </div>
 

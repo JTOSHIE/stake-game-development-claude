@@ -104,11 +104,11 @@
          trap fitMoney.ts records, so the worst-case string (a wincap win at
          the maximum bet in a CA$ format) steps down instead of clipping. -->
     <div class="win-amount-row" use:autofitText={amtRowText} data-testid="win-amount-row">
-      <span class="win-amount">
+      <span class="win-amount" data-money="cur">
         {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)}
       </span>
       {#if $winMultiplier > 0}
-        <span class="win-mult">{$winMultiplier.toFixed(1)}×</span>
+        <span class="win-mult" data-money="num">{$winMultiplier.toFixed(1)}×</span>
       {/if}
     </div>
 

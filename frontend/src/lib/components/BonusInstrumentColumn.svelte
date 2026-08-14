@@ -17,6 +17,7 @@
   // centrepiece per the brief).
   import { onMount } from 'svelte'
   import { tr } from '../i18n/tr'
+  import { autofitText } from '../actions/autofitText'
   import { betAmount, currencyCode, locale } from '../stores/gameStore'
   import { themeAssets } from '../stores/themeStore'
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
@@ -71,7 +72,7 @@
     </div>
     <div class="pm-cell" data-testid="feature-total-win">
       <span class="pm-label">{$tr('totalWin')}</span>
-      <span class="pm-value gold">{totalWinLabel}</span>
+      <span class="pm-value gold" use:autofitText={totalWinLabel} data-money="cur">{totalWinLabel}</span>
     </div>
   </div>
 {:else}
@@ -98,12 +99,12 @@
 
     <div class="plate" data-testid="feature-total-win">
       <span class="plate-label">{$tr('totalWin')}</span>
-      <span class="plate-value">{totalWinLabel}</span>
+      <span class="plate-value" use:autofitText={totalWinLabel} data-money="cur">{totalWinLabel}</span>
     </div>
 
     <div class="plate">
       <span class="plate-label">{$tr('hudMultiplier')}</span>
-      <span class="plate-value">{multiplier}×</span>
+      <span class="plate-value" use:autofitText={`${multiplier}×`} data-money="num">{multiplier}×</span>
     </div>
   </div>
 {/if}
@@ -202,17 +203,21 @@
   }
   .plate-value {
     font-family: var(--fs-font-numeric);
-    font-size: 30px;
+    /* R059 GOVERNING RULE: money never carries text-overflow ellipsis. This
+       rule read a flat 30px with `text-overflow: ellipsis`, so a large
+       social total rendered as dots in the owner's sweep, the exact banned
+       state. The value now fits through autofitText, the scale multiplied
+       in here (a rule that does not read the property makes the action a
+       no-op, the recorded fitMoney trap); overflow stays hidden purely as
+       containment for a value mid-fit. */
+    font-size: calc(30px * var(--autofit-scale, 1));
     font-weight: 900;
     color: #ffd54a;
     text-shadow: 0 0 10px rgba(255, 213, 74, 0.7);
     line-height: 1;
-    /* Large-win totals (up to the 5,000x wincap) can outgrow the plate at the
-       nominal 30px size: clip rather than overflow into neighbouring HUD text. */
     max-width: 230px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   /* Compact portrait strip (2026-07-15 neon polish pass) - native px
@@ -261,13 +266,14 @@
   }
   .pm-value {
     font-family: var(--fs-font-numeric);
-    font-size: 15px;
+    /* R059: same repair as .plate-value above, the portrait strip's copy of
+       the same banned dotted state. */
+    font-size: calc(15px * var(--autofit-scale, 1));
     font-weight: 800;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .pm-value.pink { color: #ff6fe0; text-shadow: 0 0 8px rgba(255, 46, 196, 0.6); }
   .pm-value.cyan { color: #6ff2ff; text-shadow: 0 0 8px rgba(22, 242, 224, 0.5); }

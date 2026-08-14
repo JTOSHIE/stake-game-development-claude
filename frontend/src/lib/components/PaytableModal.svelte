@@ -11,6 +11,7 @@
   // Fonts are the globally self-hosted Orbitron (@fontsource, see main.ts), no
   // external font CDN (Stake Engine compliance).
   import { showPaytable, betAmount, currencyCode, locale } from '../stores/gameStore'
+  import { autofitText } from '../actions/autofitText'
   import { themeAssets } from '../stores/themeStore'
   import { tr } from '../i18n/tr'
   import { isSocial } from '../stores/socialMode'
@@ -336,12 +337,12 @@
                          an ellipsis in the 3-column card grid's narrow cost
                          column (caught via a committed screenshot, not
                          assumed from the CSS). -->
-                      <span class="fs-mode-stat-value fs-num">{fsCostLabel(m.cost, $locale)}</span>
-                      <span class="fs-mode-stat-subvalue fs-num">{modePrice(m.cost)}</span>
+                      <span class="fs-mode-stat-value fs-num" use:autofitText={fsCostLabel(m.cost, $locale)} data-money="num">{fsCostLabel(m.cost, $locale)}</span>
+                      <span class="fs-mode-stat-subvalue fs-num" use:autofitText={modePrice(m.cost)} data-money="cur">{modePrice(m.cost)}</span>
                     </div>
                     <div class="fs-mode-stat">
                       <span class="fs-mode-stat-label">RTP</span>
-                      <span class="fs-mode-stat-value fs-num">{fsRtpLabel($locale)}</span>
+                      <span class="fs-mode-stat-value fs-num" use:autofitText={fsRtpLabel($locale)} data-money="num">{fsRtpLabel($locale)}</span>
                     </div>
                     <div class="fs-mode-stat">
                       <!-- ROUND 4 item 4: per-mode card, quoted against the BASE
@@ -353,7 +354,7 @@
                            it to "5,000x ba..." on every card, hiding the very
                            figure the platform requires to be displayed. -->
                       <span class="fs-mode-stat-label">{$tr('maxWinLabel')}</span>
-                      <span class="fs-mode-stat-value fs-num">{fsMaxWinLabel($locale)}</span>
+                      <span class="fs-mode-stat-value fs-num" use:autofitText={fsMaxWinLabel($locale)} data-money="num">{fsMaxWinLabel($locale)}</span>
                     </div>
                   </div>
                   <p class="fs-mode-blurb">{$tr(m.blurbKey)}</p>
@@ -725,13 +726,17 @@
     font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase;
     color: rgba(200, 220, 235, 0.6); white-space: nowrap;
   }
+  /* R059 GOVERNING RULE: ellipsis on money is banned; these two carried it
+     over the buy tiers' PRICE cell, the exact class the card's own stacked
+     layout comment was written against. The values now fit through
+     autofitText with the scale multiplied in. */
   .fs-mode-stat-value {
-    font-size: 0.72rem; font-weight: 700; color: color-mix(in srgb, var(--sig) 55%, #fff);
-    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    font-size: calc(0.72rem * var(--autofit-scale, 1)); font-weight: 700; color: color-mix(in srgb, var(--sig) 55%, #fff);
+    white-space: nowrap; max-width: 100%; overflow: hidden;
   }
   .fs-mode-stat-subvalue {
-    font-size: 0.6rem; font-weight: 600; color: rgba(230, 240, 250, 0.65);
-    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+    font-size: calc(0.6rem * var(--autofit-scale, 1)); font-weight: 600; color: rgba(230, 240, 250, 0.65);
+    white-space: nowrap; max-width: 100%; overflow: hidden;
   }
 
   /* ── Interface Guide ──────────────────────────────────────────────── */
@@ -818,5 +823,18 @@
     .fs-way-cell { width: 40px; height: 40px; font-size: 0.95rem; }
     .fs-way-arrow { font-size: 1.05rem; padding: 0 4px; }
     .fs-ways-diagram > .fs-face { padding: 12px 8px; }
+  }
+
+  /* R059 TASK 4: Mobile S. At 320 wide the 40px step above still overflowed
+     the plate's content box and the CENTRED flex row split the overflow both
+     ways, cropping the LEADING 1 (the owner's capture; the same
+     centred-overflow trap the replay container's own comment records). Two
+     repairs: a tighter step so the sequence physically fits 320, and `safe`
+     centring so if anything ever overflows again it is the trailing edge a
+     reader can infer, never the leading digit that anchors the sequence. */
+  @media (max-width: 360px) {
+    .fs-way-cell { width: 32px; height: 32px; font-size: 0.8rem; flex: 0 0 auto; }
+    .fs-way-arrow { font-size: 0.85rem; padding: 0 2px; }
+    .fs-ways-diagram > .fs-face { padding: 10px 4px; justify-content: safe center; min-width: 0; }
   }
 </style>

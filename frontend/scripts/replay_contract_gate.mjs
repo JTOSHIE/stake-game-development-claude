@@ -962,6 +962,23 @@ async function main() {
       assertBannerFits(worst, '[worst-case] ')
       assertNoPod(worst, '[worst-case] ')
 
+      // R059 TASK 2: the same worst case in the SOCIAL vocabulary, whose
+      // string is WIDER than the CA$ form (the token TRAILS with a space:
+      // "4,999,990.00 GC" is one glyph wider than "CA$4,999,990.00"), plus
+      // the token-visible property: the amount, the token and the multiplier
+      // all inside the fitted row.
+      const worstSocial = await driveReplay(browser, {
+        round: WORST, costMultiplier: 1.0, play: true,
+        qs: { mode: 'base', currency: 'GC', amountMicros: '1000000000', social: 'true' },
+        frame: join(framesDir, 'worst_case_banner_social_desktop.png'),
+      })
+      assertEndBannerValues(worstSocial, '[worst-social] ', {
+        amountText: '4,999,990.00 GC',
+        multText: `${(WORST.payoutMultiplier / 100).toFixed(1)}×`,
+      })
+      assertBannerFits(worstSocial, '[worst-social] ')
+      assertNoPod(worstSocial, '[worst-social] ')
+
       // R058 TASK 2 SCOPE GUARD: the owner ruling is REPLAY ONLY, and the live
       // game's Overdrive meter panel must still render during a feature. This
       // drives the GAME route (no replay param) against route-fulfilled wallet

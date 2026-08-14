@@ -387,11 +387,11 @@
     <div class="p-stats-row">
       <div class="p-stat p-stat--balance" data-testid="hud-balance">
         <span class="p-stat-label">{$tr('balance')}</span>
-        <span class="p-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
+        <span class="p-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
       </div>
       <div class="p-stat p-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
         <span class="p-stat-label">{$tr('win')}</span>
-        <span class="p-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
+        <span class="p-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
       </div>
     </div>
     <!-- BET gets its own full-width row: a 3-column stats row left no room
@@ -405,7 +405,7 @@
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
         </button>
-        <button class="p-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
+        <button class="p-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
         <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
           <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
         </button>
@@ -614,17 +614,17 @@
        only be taken after layout. -->
   <div class="m-stat m-stat--balance" data-testid="hud-balance">
     <span class="m-stat-label">{$tr('hudBalanceShort')}</span>
-    <span class="m-stat-value cyan" use:fitMoney={{ full: balanceLabel, compact: balanceCompact }}></span>
+    <span class="m-stat-value cyan" data-money="cur" use:fitMoney={{ full: balanceLabel, compact: balanceCompact }}></span>
   </div>
   <div class="m-stat m-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
     <span class="m-stat-label">{$tr('hudWinShort')}</span>
-    <span class="m-stat-value magenta" use:fitMoney={{ full: winLabel, compact: winCompact }}></span>
+    <span class="m-stat-value magenta" data-money="cur" use:fitMoney={{ full: winLabel, compact: winCompact }}></span>
   </div>
   <div class="m-stat m-stat--bet" data-testid="hud-bet">
     <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
     </button>
-    <button class="m-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
+    <button class="m-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
     <button class="m-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
       <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
     </button>
@@ -695,11 +695,11 @@
 
   <div class="c-stat c-stat--balance" data-testid="hud-balance">
     <span class="c-stat-label">{$tr('balance')}</span>
-    <span class="c-stat-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
+    <span class="c-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
   </div>
   <div class="c-stat c-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
     <span class="c-stat-label">{$tr('win')}</span>
-    <span class="c-stat-value magenta" use:autofitText={winLabel}>{winLabel}</span>
+    <span class="c-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
   </div>
   <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
@@ -707,7 +707,7 @@
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
       </button>
-      <button class="c-stat-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
+      <button class="c-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
       <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
         <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
       </button>
@@ -883,7 +883,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('balance')}</span>
-      <span class="fs-value cyan" use:autofitText={balanceLabel}>{balanceLabel}</span>
+      <span class="fs-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
     </span>
   </div>
 
@@ -892,7 +892,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('win')}</span>
-      <span class="fs-value magenta" use:autofitText={winLabel}>{winLabel}</span>
+      <span class="fs-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
     </span>
   </div>
 
@@ -903,7 +903,7 @@
     <span class="fs-rail"></span>
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
-      <button class="fs-value gold bet-open" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
+      <button class="fs-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
     </span>
   </div>
 
@@ -2018,8 +2018,12 @@
   .p-stat-value {
     /* OWNER AUDIT REMEDIATION B1: font-size scales down via the
        autofitText action's --autofit-scale custom property so values up to
-       $999,999.99 fit without truncating - text-overflow:ellipsis stays as
-       a defensive fallback only, not the primary mechanism now. */
+       $999,999.99 fit without truncating. R059 GOVERNING RULE: the
+       text-overflow ellipsis that sat here as a "defensive fallback" is
+       REMOVED, because ellipsis on money is banned outright: a fallback
+       that renders dots over a balance is not a defence, it is the defect
+       (the m-stat rule below reasoned this out first and never carried
+       one). Overflow stays hidden purely as containment mid-fit. */
     font-size: calc(16px * var(--autofit-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -2027,7 +2031,6 @@
     font-variant-numeric: tabular-nums;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   /* BET's own full-width row (2026-07-14 portrait pass correction): the
      original single 3-column .p-stats-row left no room for two 44px
@@ -2356,7 +2359,7 @@
     font-variant-numeric: tabular-nums;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+    /* R059: ellipsis removed, same reasoning as .p-stat-value above. */
   }
   .c-stat-value.cyan { color: color-mix(in srgb, var(--c-cyan) 20%, #fff); }
   .c-stat-value.magenta { color: color-mix(in srgb, var(--c-pink) 22%, #fff); }

@@ -1151,6 +1151,14 @@ jobs:
           - name: "browser: sub-cent display"
             run: npx tsx scripts/r057_subcent_proof.mjs --self-test && npx tsx scripts/r057_subcent_proof.mjs
 
+          # R059, the governing rule: every money-bearing element fits through
+          # the one proven mechanism in BOTH vocabularies, the marker always
+          # visible, ellipsis on money banned. GC max-value and CAD control
+          # legs at three sizes over the HUD, paytable, buy dialog and feature
+          # instruments; seeded with the dotted state and the flat-font no-op.
+          - name: "browser: money fit"
+            run: node scripts/money_fit_gate.mjs --self-test && node scripts/money_fit_gate.mjs
+
           # R047 TASK 5 (TR-129): the two-step autoplay property joins the
           # matrix, both halves. The confirm gate proves the CODE cannot start
           # a bet from a selection handler (static, seeded); the r042b proof

@@ -16,6 +16,7 @@
   import { themeAssets } from '../stores/themeStore'
   import { t, type GameMode } from '../i18n/translations'
   import { FS_MODES, fsRtpLabel, maxWinVsBaseBetLabel } from '../config/fsModes'
+  import { autofitText } from '../actions/autofitText'
   import type { BetMode } from '../stores/betMode'
 
   // Real symbol images previewed in the modal grid (scatter is the trigger, so
@@ -145,17 +146,17 @@
         <div class="buy-stats-row">
           <div class="buy-stat">
             <span class="buy-stat-label">{t($locale, 'buyPrice', localeMode)}</span>
-            <span class="buy-stat-val gold">{priceLabel}</span>
+            <span class="buy-stat-val gold" use:autofitText={priceLabel} data-money="cur">{priceLabel}</span>
           </div>
           <div class="buy-stat">
             <span class="buy-stat-label">RTP</span>
-            <span class="buy-stat-val">{fsRtpLabel($locale)}</span>
+            <span class="buy-stat-val" use:autofitText={fsRtpLabel($locale)} data-money="num">{fsRtpLabel($locale)}</span>
           </div>
           <div class="buy-stat">
             <span class="buy-stat-label">{t($locale, 'hudMaxWin', localeMode)}</span>
             <!-- ROUND 4 item 4: quoted against the BASE bet, because this stat
                  sits beside a 100x/400x cost multiplier. -->
-            <span class="buy-stat-val">{maxWinVsBaseBetLabel($isSocial, $locale)}</span>
+            <span class="buy-stat-val" use:autofitText={maxWinVsBaseBetLabel($isSocial, $locale)} data-money="num">{maxWinVsBaseBetLabel($isSocial, $locale)}</span>
           </div>
         </div>
         {#if !$canAffordMode(buyMode)}
@@ -243,25 +244,38 @@
      Sticking it to the bottom of the modal's scroll box keeps it on screen at
      every height without reordering the owner-approved B4 presentation. The
      opaque background is required: the content scrolling underneath would
-     otherwise show through the clip-path notches. */
+     otherwise show through the clip-path notches.
+     R059 TASK 3, OWNER DESIGN RULING, and the tension with the R12 paragraph
+     above is surfaced per (n) rather than silently resolved: the owner's
+     sweep found this row FLOATING OVER the scrolling copy on small screens
+     and ruled it DOCKED IN THE SCROLL FLOW at the bottom of the content, so
+     the sticky is removed. The R12 disclosure concern survives structurally:
+     the row is the last content block before the (still sticky) actions, so
+     the same scroll that reaches CONFIRM lands the disclosure directly above
+     it, and the buy proof drives that scroll rather than assuming it. */
   .buy-stats-row {
     display: flex; align-items: stretch; justify-content: space-between;
     padding: 10px 4px; margin: 0 0 4px;
     background: linear-gradient(180deg, #1a2236, #080c16);
     clip-path: polygon(0 12%, 3% 0, 97% 0, 100% 12%, 100% 100%, 3% 100%, 0 88%);
     box-shadow: inset 0 0 0 1.5px rgba(255, 43, 214, 0.85), 0 0 12px rgba(255, 43, 214, 0.25);
-    position: sticky;
-    /* Sits directly above the sticky actions rather than under them. */
-    bottom: 58px;
-    z-index: 2;
   }
   .buy-stat {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    /* min-width: 0 so a long value can actually shrink its cell: a flex item
+       refuses to go below its content width without it, which is what pushed
+       MAX WIN out of the row at Mobile S. R059 TASK 3. */
+    flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px;
     padding: 0 6px; border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
   .buy-stat:last-child { border-right: none; }
   .buy-stat-label { font-size: 0.6rem; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; }
-  .buy-stat-val { color: #cfe9ff; font-weight: 700; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  .buy-stat-val {
+    color: #cfe9ff; font-weight: 700;
+    /* R059: the fit action's scale multiplied in, per the governing rule. */
+    font-size: calc(0.92rem * var(--autofit-scale, 1));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; max-width: 100%; overflow: hidden;
+  }
   .buy-stat-val.gold { color: #ffd54a; text-shadow: 0 0 8px rgba(255, 213, 74, 0.5); }
 
   @media (prefers-reduced-motion: reduce) {

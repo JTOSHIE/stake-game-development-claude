@@ -53,6 +53,13 @@ export const MINI_LEGIBLE_FLOOR_PX = 9
 /** Matches autofitText, which this mirrors deliberately. */
 const MAX_ITERATIONS = 6
 
+/**
+ * The absolute bound of the R059 below-floor last resort, matching
+ * autofitText's own MIN_SCALE: the marker-visibility rule licenses shrinking
+ * PAST the legible floor rather than losing the token, but not to nothing.
+ */
+const MIN_SCALE = 0.4
+
 export interface FitMoneyValue {
   /** Fully formatted value, e.g. "$52,431,098.76". Always tried first. */
   full: string
@@ -110,7 +117,7 @@ export function fitMoney(node: HTMLElement, value: FitMoneyValue) {
     // even untouched, so clamp: never scale UP to reach the floor.
     const minScale = basePx > 0 ? Math.min(1, floorPx / basePx) : 1
 
-    let mode: 'full' | 'compact' = 'full'
+    let mode: 'full' | 'compact' | 'compact-subfloor' = 'full'
     let scale = shrinkToFit(node, minScale)
 
     if (overflows(node)) {
@@ -121,6 +128,22 @@ export function fitMoney(node: HTMLElement, value: FitMoneyValue) {
       node.style.setProperty('--autofit-scale', '1')
       apply(current.compact)
       scale = shrinkToFit(node, minScale)
+    }
+
+    if (overflows(node)) {
+      // R059 GOVERNING RULE: the currency or token marker is ALWAYS visible.
+      // Before this stage, a compact form that still overflowed at the
+      // legible floor was tail-cut by the overflow rule, and because social
+      // tokens TRAIL the amount, the cut ate precisely the marker: the
+      // owner's Popout S capture showed the digits without their GC. The
+      // marker outranks the floor, so the last resort is to keep shrinking
+      // below it, bounded only by the action's absolute MIN_SCALE; a small
+      // complete money string beats a legible incomplete one, which is the
+      // same judgement the flat-truncation ban above already made.
+      mode = 'compact-subfloor'
+      node.style.setProperty('--autofit-scale', '1')
+      apply(current.compact)
+      scale = shrinkToFit(node, MIN_SCALE)
     }
 
     node.dataset.fitMode = mode
