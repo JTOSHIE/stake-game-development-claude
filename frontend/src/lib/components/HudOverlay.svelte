@@ -7,7 +7,7 @@
   // $5,000.00 bet); every numeric value uses tabular numerals.
   import { createEventDispatcher, onMount, onDestroy } from 'svelte'
   import {
-    betAmount, balance, canSpin, currencyCode,
+    betAmount, balance, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
     isMuted, showPaytable, winAmount, locale, isWincap,
   } from '../stores/gameStore'
@@ -39,7 +39,7 @@
   import BetSelector from './BetSelector.svelte'
   import { standingMode } from '../stores/betMode'
   import { FS_MODES } from '../config/fsModes'
-  import { spinCostMicros } from '../stores/buyAffordability'
+  import { spinCostMicros, canAffordSpin } from '../stores/buyAffordability'
   import { jurisdictionFlags } from '../stores/jurisdiction'
 
   const dispatch = createEventDispatcher<{ spin: void; slam: void }>()
@@ -147,7 +147,7 @@
   function handleSpin() {
     if ($isSpinning) {
       dispatch('slam')
-    } else if ($canSpin) {
+    } else if ($canAffordSpin) {
       dispatch('spin')
     }
   }
@@ -470,7 +470,7 @@
     <button
       class="p-spin"
       class:spinning={$isSpinning}
-      disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
+      disabled={$isWincap ? true : ($isSpinning ? false : !$canAffordSpin)}
       on:click={handleSpin}
       aria-label={$tr('spin')}
       data-testid="spin-button"
@@ -635,7 +635,7 @@
     class:spinning={$isSpinning}
     data-testid="spin-button"
     on:click={handleSpin}
-    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canAffordSpin)}
     aria-label={$tr('spin')}
   >
     {#if $isSpinning}
@@ -788,7 +788,7 @@
   <button
     class="c-spin"
     class:spinning={$isSpinning}
-    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canAffordSpin)}
     on:click={handleSpin}
     aria-label={$tr('spin')}
     data-testid="spin-button"
@@ -927,11 +927,11 @@
   </div>
 
   <!-- SPIN - v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
-       (slam-stop, Motion Polish v2) even though $canSpin is false while spinning. -->
+       (slam-stop, Motion Polish v2) even though $canAffordSpin is false while spinning. -->
   <button
     class="fs-spin"
     class:spinning={$isSpinning}
-    disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}
+    disabled={$isWincap ? true : ($isSpinning ? false : !$canAffordSpin)}
     on:click={handleSpin}
     aria-label={$tr('spin')}
     data-testid="spin-button"

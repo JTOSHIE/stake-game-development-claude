@@ -37,7 +37,7 @@
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { canAffordMode, shortfallFor, spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, formatWin, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
 
   const dispatch = createEventDispatcher<{ buy: BetMode }>()
@@ -95,7 +95,7 @@
   // inside a called function is invisible to it and never re-triggers this
   // line (confirmed the hard way: this exact bug shipped once already,
   // caught by the conformance suite's live-reactivity check, not by eye).
-  $: currentSpinCost = formatBalance(spinCostMicros($betAmount, $standingMode), cur, $locale)
+  $: currentSpinCost = formatWin(spinCostMicros($betAmount, $standingMode), cur, $locale)
 
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.
@@ -125,7 +125,9 @@
   // visibility, Fable 2026-07-07 item 0): OVERBOOST needs a persistent,
   // clearly-labelled state since it changes the real per-spin debit; Cruise
   // only needs a subtle label since its cost is unchanged at 1.0x.
-  $: entryActiveLabel = $standingMode === 'antelite' ? 'OVERBOOST' : $standingMode === 'cruise' ? 'CRUISE' : ''
+  $: entryActiveLabel = $standingMode === 'antelite' || $standingMode === 'cruise'
+    ? $tr(FS_MODES.find((m) => m.serverMode === $standingMode)!.labelKey)
+    : ''
 
   function openMenu(): void { if (!$isSpinning) { playClick(); open = true } }
   function close(): void { playClick(); open = false }
@@ -690,7 +692,7 @@
   .fm-entry-active {
     font-family: var(--fs-font-numeric);
     font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
-    text-transform: uppercase; white-space: nowrap;
+    white-space: nowrap;
     padding: 2px 8px; border-radius: 999px;
     color: color-mix(in srgb, var(--sig-cyan) 35%, #fff);
     background: rgba(0, 240, 255, 0.08);
@@ -1102,7 +1104,7 @@
     font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
   }
   .p-fm-entry-active {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
     padding: 2px 8px; border-radius: 999px;
     background: rgba(0, 240, 255, 0.1);
     border: 1px solid color-mix(in srgb, var(--sig-cyan, #00ffff) 40%, transparent);

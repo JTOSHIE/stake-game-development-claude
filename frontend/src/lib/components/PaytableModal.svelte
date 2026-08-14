@@ -20,6 +20,7 @@
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { playClick } from '../services/soundService'
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { spinCostMicros } from '../stores/buyAffordability'
   import { overdriveVisual } from '../stores/overdriveVisual'
   import { FS_MODES, fsRtpLabel, fsMaxWinLabel, fsCostLabel, maxWinVsBaseBetLabel } from '../config/fsModes'
 
@@ -154,7 +155,7 @@
   // disagreeing about what this session offers.
   $: visibleModes = FS_MODES.filter((m) => m.kind !== 'buy' || !$buyFeatureDisabled)
 
-  $: buyPriceLabel = formatBalance(Math.round($betAmount * 100 * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+  $: buyPriceLabel = formatBalance(spinCostMicros($betAmount, 'bonus'), $currencyCode || 'USD', $locale)
 
   // Bet Modes section, every mode priced against the current bet, straight from
   // the single source of truth (config/fsModes.ts). Placeholder modes (maths not

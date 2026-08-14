@@ -55,7 +55,7 @@
   import { standingMode } from '../stores/betMode'
   import { spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
-  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, formatWin, CURRENCY_SCALE } from '../utils/currency'
   import { tr } from '../i18n/tr'
 
   export let open = false
@@ -72,8 +72,8 @@
     ? spinCostMicros($betAmount, $standingMode) / ($betAmount * CURRENCY_SCALE)
     : 1
   $: anteActive = Math.abs(costMultiplier - 1) > 0.0001
-  $: effectiveLabel = formatBalance(
-    Math.round(spinCostMicros($betAmount, $standingMode)), $currencyCode || 'USD', $locale)
+  $: effectiveLabel = formatWin(
+    spinCostMicros($betAmount, $standingMode), $currencyCode || 'USD', $locale)
 
   const money = (v: number) => formatBalance(Math.round(v * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
 

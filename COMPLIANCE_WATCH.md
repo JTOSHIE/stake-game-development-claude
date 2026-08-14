@@ -33,12 +33,12 @@ Australian English, no em dashes or en dashes.
 - **No underage appeal:** verified. No child or child-like characters.
 - **Social/jurisdiction:** social mode present; prohibited-term overrides applied for
   stake.us (`social=true`). See `docs/stake-engine-live/jurisdiction-requirements.md`.
-  Feature-buy disclosure: the `disabledBuyFeature` jurisdiction flag must hide the bonus buy
-  (Stage 2 frontend scope).
+  Feature-buy disclosure: the `disabledBuyFeature` jurisdiction flag hides the bonus buy
+  (FeatureMenu and PaytableModal filter on `$buyFeatureDisabled`; VERIFIED 2026-08-15).
 - **Bet Replay:** implemented and mandatory-compliant; player session not required. Event
   IDs are captured on the deployed staging build per `docs/REVIEW_EVENTS_PLAN.md` during the
-  SUBMISSION_DOSSIER.md section 5 protocol. Stage 2: bonus-buy replays must display the amount
-  spent including the 100x cost multiplier.
+  SUBMISSION_DOSSIER.md section 5 protocol. Bonus-buy replays display the amount spent
+  from `spinCostMicros` (WinBanner PRICE line; VERIFIED 2026-08-15).
 
 ## Process reminders
 

@@ -165,7 +165,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: rgba(0, 240, 255, 0.55);
 }
 /* S2-C017, REQ-045. This was the ONLY rule in the tree matching a plain
    `:focus`, and every component focus style is `:focus-visible` only, which does

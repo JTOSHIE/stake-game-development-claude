@@ -14,10 +14,9 @@ import { resolve, join } from 'node:path'
 //     background; themeAssets.backgroundVideo/isVideo are dead fields no
 //     component reads (static graded stills ship instead).
 //   - assets/ui/*, the pre-LAYOUT_SPEC "WinPod era" HUD art (old ControlBar
-//     buttons, panels, banner, logo variants, WinPod v1/v2), EXCEPT
-//     win_pod_v3_active.png / win_pod_v3_idle.png, which WinPod.svelte still
-//     serves. ReplayMode.svelte mounts WinPod for bet-replay, so those two
-//     files remain live and must ship.
+//     buttons, panels, banner, logo variants, WinPod v1/v2/v3). WinPod.svelte
+//     was deleted 2026-08-13. Nothing in src reads these files, so the
+//     prune list keeps none of them.
 //
 // Beyond the letter of the Build Diet brief, but in service of its explicit
 // "under 25MB" target: the three alternate themes (beautiful-game,
@@ -197,7 +196,7 @@ function pruneLegacyAssets() {
   ]
   const LEGACY_FILES = ['assets/themes/future-spinner/backgrounds/bg-1.mp4']
   const UI_DIR = 'assets/ui'
-  const KEEP_UI = new Set(['win_pod_v3_active.png', 'win_pod_v3_idle.png'])
+  const KEEP_UI = new Set<string>()
 
   return {
     name: 'build-diet-prune-legacy-assets',
