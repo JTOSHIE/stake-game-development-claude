@@ -1255,3 +1255,79 @@ sweep once more at maximum values, the still-open XEC glance, then the
 fifty-one walk and ticks, the one-timers (Provably Fair toggle, wallet
 re-read, payment under the Medium Rare N.V. terms), and Start Approval
 on the owner's word.
+
+## R061 ADDENDUM, 2026-08-14: the plate clip, and the gate that measured the wrong box
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R061_PLATE_CLIP_Prompt.md`.
+Model: Claude Fable 5, judgement tier. The owner's re-sweep confirmed
+mobile and small sizes fitting the full ten-figure GC string and found
+Desktop and Laptop clipping the leading edge of COINS and PRIZE at the
+same values, with the money fit gate green over it.
+
+**TASK 1, root cause then fix at the class** (`e60936dc`). Reproduced at
+the owner's exact values (balance 996,622,600.00 GC, prize 622,600.00 GC)
+at 1200x675 and 1024x576 BEFORE reading a line of the suspect CSS, and
+the measurement named everything: the fs profile renders at those sizes,
+and its value class was the one of four with no width bound. Inside the
+face's centred flex column the string grew PAST the plate (text rect
+190.2px in a 187.5px plate, gaps negative both sides) while never
+overflowing ITSELF, so scrollWidth equalled clientWidth, the fit action
+saw nothing, scale stayed 1, and the face's 10px corner-notch clip-path
+cut the leading glyphs. That single fact also explains the gate's green
+(it asserted the same span's logical overflow) and the owner's finding
+that small sizes were correct (their profiles carry the bound). The fix
+is the bound itself: with max-width and overflow on the value, an
+over-wide string overflows its OWN box, the fit fires, and the value
+shrinks into the face's safe interior, whose 10px side padding clears
+the notch geometry. Small sizes are pixel-guarded: 3 of 6 element shots
+byte-identical, the other 3 pixel-decoded and differenced in-browser to
+ZERO changed pixels at a max channel delta of 1
+(`reports/qa/r061_small_pixel_guard/`), with one of the three also
+differing between two captures of the same build, the recorded fitMoney
+capture-flake class.
+
+**TASK 2, the gate learns to see** (`e60936dc`). The scan gains the
+visual-bounds property: every money element's text rect must sit whole
+inside the BORDER box of every clipping ancestor within three levels,
+because the border box is where clip-path and overflow actually cut
+paint. THE FIRST DRAFT WAS WRONG in an instructive way, kept in the
+gate's own comment: it asserted against the CONTENT box (padding as safe
+inset) and flagged the win value's deliberate 1.06 count-pulse, which
+breathes 3.6px into the padding band and is cut by nothing. Desktop
+1200x675 and Laptop 1024x576 join the standing sizes, with the owner's
+values as a standing scenario (balance at rest, prize after a driven
+622.6x win). The seed is the brief's own: the SHIPPED state restored
+verbatim (the unbounded fs value), which went red under the new
+assertion and green after the fix, the proof the blind spot is closed.
+A second blind spot fell in passing: inserting the two new sizes into
+the size list silently dropped Popout S out of the trimmed seed matrix,
+and the flat-font seed stayed green over its own defect until the
+self-test caught the MISS; size selection for seeds is now by name.
+205 assertions, 5/5 seeds.
+
+**Rule 10.** One transient SSH refusal on the push (connection closed by
+github port 22, network up), cleared on the first retry. The push ran the
+full 27-job matrix: run 31774184010, 27/27 GREEN. This report's
+records-only push follows a COMPLETED full run, so the cancel trap has no
+window; verified before the session ends. **Rule 12.** The preview was
+refreshed at `e60936dc` after the code push and is refreshed at the final
+tip as the last action, both curl-verified.
+
+**Tracker**: TR-140 opened and closed, recording both the clip and the
+gate blind spot. COMMS 065 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: reproduce and MEASURE before reading code (the geometry
+dump named the profile, the class and the mechanism in one pass), fix by
+giving the one unbounded profile what its siblings had, and move the
+gate's assertion to the box where paint is actually cut. Alternatives
+rejected: padding the face wider (treats the symptom; the unbounded span
+would still escape at the next value); asserting content-box containment
+(false-positives on the deliberate count-pulse). Files touched:
+HudOverlay.svelte (one rule), money_fit_gate.mjs, the tracker, comms,
+this report, the pixel-guard pack. Open threads: the owner's sweep once
+more, the still-open XEC glance, then the fifty-one walk and ticks, the
+one-timers (Provably Fair toggle, wallet re-read, payment under the
+Medium Rare N.V. terms), and Start Approval on the owner's word.

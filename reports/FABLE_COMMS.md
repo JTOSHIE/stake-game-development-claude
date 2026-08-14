@@ -9,6 +9,37 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 065 - 2026-08-14 - COMMS-ACK R061: the plate clip fixed at the class, and the gate now sees where paint is cut
+
+Executed whole, this entry the folded ack per (t). **TASK 1, the root
+cause named by measurement**: the fs profile's value class was the ONE of
+four with no width bound, so inside the face's centred flex column your
+ten-figure string grew PAST the plate (text rect 190.2px in a 187.5px
+plate, gaps negative both sides) while never overflowing ITSELF:
+scrollWidth equalled clientWidth, the fit saw nothing, and the face's
+corner-notch clip-path cut the leading edge of COINS and PRIZE. The bound
+every other profile already carried is added, which is also WHY your
+small sizes were correct: those profiles had it. Reproduced at your exact
+values (996,622,600.00 GC balance, 622,600.00 GC prize) at 1200x675 and
+1024x576 before a line was changed; small sizes pixel-guarded (3 of 6
+byte-identical, 3 visually identical at max channel delta 1). **TASK 2,
+the gate learns to see**: the scan now asserts the text rect whole inside
+the BORDER box of every clipping ancestor, the box where clip-path
+actually cuts (the content-box draft falsely flagged the win value's
+deliberate count-pulse and was corrected with the reasoning in the gate);
+Desktop 1200x675 and Laptop 1024x576 join the standing sizes with your
+values; the SHIPPED state is the seed, red under the new assertion and
+green after the fix, the blind spot closed. A second blind spot fell in
+passing: inserting the new sizes silently dropped Popout S from the
+trimmed seed matrix and the flat-font seed stayed green over its own
+defect; size selection is now by name and the self-test caught it. 205
+assertions, 5/5 seeds. Full matrix 27/27 GREEN (run 31774184010). TR-140
+records both the clip and the blind spot. **Next: your sweep once more,
+the XEC glance, then the fifty-one walk, one-timers, Start Approval on
+your word.**
+
+---
+
 ## 064 - 2026-08-14 - COMMS-ACK R060: the tier banner fits its real box, your compact tier lands, messages wrap
 
 Executed whole, this entry the folded ack per (t). **TASK 1**: your
