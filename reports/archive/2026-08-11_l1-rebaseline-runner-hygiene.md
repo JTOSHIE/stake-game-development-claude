@@ -1557,3 +1557,111 @@ this report. Open threads: the owner's side-by-side flip-through beside
 the committed captures; the retrigger eyeball; the fifty-one walk and
 ticks; the one-timers (Provably Fair toggle, wallet re-read, payment
 under the Medium Rare N.V. terms); Start Approval on the owner's word.
+
+## R068 ADDENDUM, 2026-08-14: the RTL geometry leak, fixed at the root
+
+Brief saved verbatim and committed:
+`reports/briefs/FS_FABLE_R068_RTL_GEOMETRY_Prompt.md`. Model: Claude
+Fable 5, judgement tier, serial session on main. The owner's language
+sweep (sixteen locales, every currency, Arabic the only failure) is
+credited on the tracker row: it isolated the one failing variable
+before any code was read.
+
+**The premise, recounted per rule 16 and corrected.** The brief's
+REPORTED mechanism was a portal host-document leak with "zero dir or
+rtl references in src". One grep corrected it: our own 2026-08-09
+accessibility pass reactively sets `document.documentElement.dir` to
+rtl for ar (App.svelte:233), so the game flips its OWN document and no
+host is needed; direction cannot cross an iframe boundary in any case.
+The line is KEPT: it is what a screen reader and the platform host
+read.
+
+**The mechanism, derived then measured** ((l.1) before (l.2)):
+`.grid-scale` is a 616px static block inside the 522px `.grid-slot`,
+corrected by a scale transform with a PHYSICAL top-left origin. Under
+inherited rtl the over-constrained box re-anchors to the inline-start
+edge, which is the right edge: derived drift 616-522 = 94px left,
+measured drift exactly -94.0 at 1280x720, the frame (physical
+`left: 320px`) staying put. `.symbol-grid`'s flex row reversed reel
+order on top (col 0 measured at x=705.3 against 379). A three-agent
+workflow sweep corroborated the ancestry (CSS2 10.3.3 over-constrained
+layout; the jets all physical, consistent with the owner's screenshot
+where only the cells moved) and adversarially reviewed the pin.
+
+**The fix, exactly the brief's order.** `direction: ltr` pinned at both
+stage roots, `.game-stage` and `.replay-container` (the replay view
+renders INSTEAD of the stage, so it is the second root). Geometry is
+now direction-invariant; the ar document keeps lang and dir. The
+brief's "bidi isolation where needed" clause was then earned in one
+verified case: the bare pin scrambled Arabic sentence punctuation (the
+paytable headline's full stop and paren jumped ends, seen against the
+pre-fix rendering reproduced via the lifted-pin seed), so sentence
+elements across the paytable, session panel, dialogs, toasts and the
+replay disclaimer take `unicode-bidi: plaintext`, each paragraph's base
+direction resolving from its own first strong character: Arabic reads
+natively, Latin locales resolve ltr byte-identically. The ways diagram
+now runs 1 to 3 left to right, agreeing with the physical board and
+with the ar prose's own words ("from the left to the right"). **The ar
+HUD plates, the brief's named regression reference, held
+pixel-identical through the whole change** (the one differing plate on
+the first compare, BET, differed by the identical 27/20184 channels
+between two runs of the SAME build: the recorded autofit capture-flake
+class, discriminated exactly as R059's lesson prescribes).
+
+**TASK 2, verified by direct read**: `rulesWaysPay` ar
+(prose.locales.ts:64) states the rule from the left to the right
+starting from reel 1. CONSISTENT; no escalation. The workflow's
+independent reading agreed; the grep is the VERIFIED leg.
+
+**TASK 3, the gate.** `direction_parity_gate.mjs`: flip-in-place twins
+(the same loaded page measured ltr then with dir flipped) over the live
+stage with a settled win, the buy dialog, and the replay view, at
+desktop, mobile-s and popout-s; a real ar load keeps the document
+attributes, computes stage direction ltr, and its board matches the ltr
+twin; ar frames captured for the owner. 138 assertions. Self-test per
+(p): lifting the pin reproduces the owner's exact -94px drift and the
+reel reversal RED on both roots, negative control green, 55 checks. CI
+leg "browser: direction parity" joins the matrix. **Two gate lessons
+earned on its own first runs, kept in the tracker row**: an ar-vs-en
+twin measures locale text length as well as direction (ar's longer
+replay disclaimer changed the R056 measured column fit, a parity
+failure with nothing to do with direction; the twin became
+flip-in-place), and a seed captured at module load is a seed that
+cannot fire (the gate passed green under a lifted pin until the
+expect-red check caught it; the read moved to request time).
+
+**Battery**: direction parity 138 + self-test 55; typecheck baseline;
+money fit 205; replay contract 11; all green. Frames committed with
+this close per (h): the defect reproduced and the fixed state, live and
+replay, three sizes. Rebuilt at the tip: **v10 58f1c476, 77 files,
+12,336,028 bytes**, the owner's dist sync stamp.
+
+**Recorded for the owner's Arabic re-check, deliberate**: box geometry
+inside the pinned stage is now ltr for ar (paytable title side, card
+order, session rows) while sentences read natively rtl; the industry
+treatment for a canvas-composition slot, and one scoped rule reverses
+it if the owner rules for the mirrored modal.
+
+**Tracker**: TR-145 opened and closed by R068, the owner's sweep
+credited. COMMS 069 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on
+main. Approach taken: recount the premise first (one grep), derive the
+drift in closed form before measuring it, pin at the root exactly as
+ordered, verify the bidi fallout empirically rather than by argument,
+and let the gate's own failures teach the twin design. Alternatives
+rejected: pinning only .grid-container (the sweep's suggestion; leaves
+every other stage surface direction-sensitive and the brief orders the
+root); an ar-vs-en gate twin (measures locale length, proven on the
+replay leg); [data-money] direction isolation (the swept state already
+renders money correctly under rtl; do not fix what the sweep found
+clean). Files touched: App.svelte, ReplayMode.svelte,
+PaytableModal.svelte, SessionPanel.svelte, ResumeOffer.svelte,
+BuyBonus.svelte, direction_parity_gate.mjs (new), checks.yml, the
+frames, the tracker, comms, this report. Open threads: the owner's
+Arabic re-check beside the committed frames (the ltr box-geometry
+eyeball item above); the retrigger eyeball; the fifty-one walk and
+ticks; the one-timers (Provably Fair toggle, wallet re-read, payment
+under the Medium Rare N.V. terms); Start Approval on the owner's word.

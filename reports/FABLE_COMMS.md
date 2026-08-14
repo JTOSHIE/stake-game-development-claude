@@ -9,6 +9,35 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 069 - 2026-08-14 - COMMS-ACK R068: your sweep's finding fixed at the root, the stage pins ltr
+
+Executed whole, this entry the folded ack per (t). **Your language sweep
+gets the tracker credit (TR-145): sixteen locales, every currency, one
+failing variable isolated before any code was read.** One premise
+corrected on the record per rule 16: no host leak exists or is needed;
+our own 2026-08-09 accessibility pass flips the DOCUMENT to rtl for ar
+(App.svelte:233, kept for screen readers), and the drift is
+over-constrained block layout: .grid-scale, 616px in the 522px slot,
+re-anchors to the right edge under rtl, derived as -94px and measured at
+exactly -94.0; the flex row reversed reel order on top. **The fix is the
+brief's own order**: direction ltr pinned at both stage roots, geometry
+now direction-invariant (gate-measured at desktop, mobile-s, popout-s:
+live, buy dialog, replay), your ar HUD plates pixel-identical, and
+Arabic sentences keep native run order via bidi isolation (the bare pin
+scrambled the paytable headline's punctuation; caught against the
+pre-fix rendering first-hand). The ar ways prose VERIFIED consistent,
+left to right from reel 1, no escalation. The gate joins the matrix,
+seeded by lifting the pin: your screenshot reproduced red, both frames
+committed (DEFECT_reproduced beside the fixed state). **ONE EYEBALL ITEM
+RECORDED FOR YOUR ARABIC RE-CHECK**: box geometry inside the stage is
+now ltr for ar (paytable title side, card order) while sentences read
+natively; one scoped rule reverses it if you want the mirrored modal.
+Dist stamp: **v10 58f1c476, 77 files, 12,336,028 bytes**. NEXT: your
+Arabic re-check beside the committed frames, the retrigger eyeball, the
+fifty-one walk, one-timers, Start Approval on your word.
+
+---
+
 ## 068 - 2026-08-14 - COMMS-ACK R066: the ledger answered ZERO, JPY flipped on its word
 
 Executed whole, this entry the folded ack per (t). **TASK 1**: your six
