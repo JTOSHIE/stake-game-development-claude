@@ -2111,7 +2111,7 @@
            shown. Transient errors during normal play, which DO retry, are
            unaffected. -->
       {#if $errorMessage && !$bettingDisabled}
-        <div class="error-banner">{errorDisplay}</div>
+        <div class="error-banner" data-msg="wrap">{errorDisplay}</div>
       {/if}
 
       <!-- R2/TR-010: a blocked session must SAY SO. Silently disabling the spin
@@ -2838,7 +2838,13 @@
     left: 340px;
     top: 498px;
     width: 600px;
-    height: 54px;
+    /* R060 TASK 3: messages are not money, so WRAPPING is the rule and
+       clipping the violation. The fixed 54px height cut the invalid play
+       amount message to its first line in the owner's capture; the box now
+       grows with its text (the 54px survives as the single-line minimum)
+       and long words break rather than escape the surface. */
+    min-height: 54px;
+    height: auto;
     z-index: 90;
     background: rgba(255, 50, 50, 0.15);
     border: 1px solid rgba(255, 50, 50, 0.4);
@@ -2847,8 +2853,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 1rem;
+    padding: 0.5rem 1rem;
     font-size: 0.85rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-wrap: balance;
   }
 
   /* ── Background video layer ───────────────────────────────────────────── */

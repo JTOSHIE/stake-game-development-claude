@@ -18,7 +18,7 @@
    */
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
-  import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
+  import { formatBalance, formatBalanceCompact, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { isSocial } from '../stores/socialMode'
   import { boughtRound } from '../stores/boughtRound'
   import { locale } from '../stores/gameStore'
@@ -216,10 +216,24 @@
   // otherwise the shared $winAmount), never from the eased frame. See HudOverlay.
   $: settledAmount = amount === null ? $winAmount : amount
   $: amountDigits = winFractionDigits(Math.round(settledAmount * CURRENCY_SCALE), $currencyCode || 'USD')
-  $: amountLabel = formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale, null, amountDigits)
+  // R060 COMPACT TIER (Fable ruling): when even the fit floor cannot hold the
+  // full string in the box this mount actually got (the replay grid gives the
+  // band 616px where the live stage gives 1280, and the owner's captures
+  // showed the amount cut to leading digits there), the label switches to the
+  // popout's compact formatter with the marker intact, never a double-clipped
+  // fragment. The action reports the condition via the fitoverflow event; the
+  // switch is keyed on the SETTLED value so a mid-count frame cannot flap it.
+  let amountCompact = false
+  $: settledAmount, amountCompact = false // a new round retries the full form
+  $: amountLabel = amountCompact
+    ? formatBalanceCompact(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+    : formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale, null, amountDigits)
   // Split for the per-digit boxes below. Derived rather than done in the
   // template so the character list is computed once per value change.
   $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))
+  function onFitOverflow(e: CustomEvent<{ overflowing: boolean }>): void {
+    if (e.detail.overflowing && !amountCompact) amountCompact = true
+  }
   // TR-117 glyph half / ledger MID-02, 2026-07-29. This was an ASCII letter `x`
   // (U+0078) on 60 of the 519 stream-test frames, while the paytable, the mode
   // cards, the feature menu and MaxWinCelebration all write the multiplication
@@ -327,7 +341,7 @@
                danced. Non-digits keep their natural width: only the digits need
                to be monospaced, and boxing the currency symbol and separators
                too would space them oddly. -->
-          <div class="c1-amount fs-num" use:autofitText={amountLabel} data-testid="win-amount">
+          <div class="c1-amount fs-num" use:autofitText={amountLabel} data-money="cur" data-testid="win-amount" on:fitoverflow={onFitOverflow}>
             {#each amountChars as ch}<span class="c1-ch" class:c1-digit={ch.digit}>{ch.c}</span>{/each}
           </div>
           <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
@@ -468,7 +482,21 @@
 
   /* ── Entry + pulse (ANIMATION UPLIFT PASS 2026-07-16, item 3: stronger
        slam-in overshoot - 0.4->1.1->1 instead of 0.5->1.06->1) ───────────── */
-  .c1-plate-wrap { position: relative; animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both; }
+  .c1-plate-wrap { position: relative; animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both;
+    /* R060 TASK 1: the band's layout keys on the width this mount actually
+       received, not the viewport. The live stage hands the banner 1280px and
+       nothing changes there; the replay mounts it inside the 616px grid box,
+       where the viewport-keyed narrow block below never fired and the flex
+       row squeezed the amount to a 63px window (measured: scrollWidth 222
+       against clientWidth 63 at the floor scale, the owner's leading-digit
+       captures). A container query keys the same treatment on the box. */
+    container-type: inline-size;
+  }
+  @container (max-width: 700px) {
+    .fs-plate > .fs-face { flex-direction: column; align-items: center; gap: 4px; padding: 14px 4cqw; }
+    .c1-amount { width: 88cqw; max-width: 88cqw; font-size: calc(clamp(26px, 9cqw, 46px) * var(--autofit-scale, 1)); }
+    .tier-big .fs-face, .tier-mega .fs-face, .tier-epic .fs-face { min-height: 0; }
+  }
   .tier-epic .c1-plate-wrap { animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both, c1-pulse 1.1s ease-in-out .6s infinite; }
   @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
   @keyframes c1-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }

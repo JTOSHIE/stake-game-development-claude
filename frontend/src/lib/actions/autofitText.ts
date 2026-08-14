@@ -34,6 +34,21 @@ function fit(node: HTMLElement) {
         node.style.setProperty('--autofit-scale', scale.toFixed(3))
         if (scale <= MIN_SCALE) break
       }
+      // R060 COMPACT TIER (Fable ruling): when even MIN_SCALE cannot fit the
+      // string, the element must not double-clip; it switches to the compact
+      // form instead. The action cannot swap text it does not own (several
+      // consumers render structured children, the banner's digit boxes among
+      // them), so it REPORTS: `data-fit-overflow` lands on the node and a
+      // `fitoverflow` CustomEvent fires, and a consumer that supplied a
+      // compact form re-renders with it, which re-enters this fit through
+      // the update hook. Consumers with no compact form keep today's floor.
+      const finallyOverflows = node.scrollWidth - node.clientWidth > 1 && node.clientWidth > 0
+      const had = node.dataset.fitOverflow === '1'
+      if (finallyOverflows !== had) {
+        if (finallyOverflows) node.dataset.fitOverflow = '1'
+        else delete node.dataset.fitOverflow
+        node.dispatchEvent(new CustomEvent('fitoverflow', { detail: { overflowing: finallyOverflows } }))
+      }
     })
   })
 }

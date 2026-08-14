@@ -56,24 +56,34 @@ const DIST = join(FRONTEND, 'dist')
 const SELF_TEST = process.argv.includes('--self-test')
 const SEED = process.env.FS_MONEY_SEED || ''
 
-const FEATURE_ROUND = JSON.parse(readFileSync(
-  join(FRONTEND, 'src', 'lib', 'services', '__fixtures__', 'replay_rounds.json'), 'utf8')).bonus.feature
+const FIXTURES = JSON.parse(readFileSync(
+  join(FRONTEND, 'src', 'lib', 'services', '__fixtures__', 'replay_rounds.json'), 'utf8'))
+const FEATURE_ROUND = FIXTURES.bonus.feature
+const WIN_ROUND = FIXTURES.base.win
 
 // The owner's maximum-value scenarios: a nine-figure balance and the maximum
 // bet, so the compact form, the buy price and the instrument totals all carry
 // their longest strings.
 const MAX_BALANCE_MICROS = 100_000_000_000_000  // 100,000,000.00
 const MAX_BET_MICROS = 1_000_000_000            // 1,000.00 per spin
+// The ten-billion block swaps the stub balance through this holder rather
+// than a second stub implementation.
+const MAX_BALANCE_HOLDER = { v: MAX_BALANCE_MICROS }
 
-const LEGS = [
+const LEGS_ALL = [
   { name: 'GC',  currency: 'GC',  marker: 'GC' },
   { name: 'CAD', currency: 'CAD', marker: 'CA$' },
 ]
-const SIZES = [
+const SIZES_ALL = [
   ['desktop', 1280, 720],
   ['popout-s', 400, 225],
   ['mobile-s', 320, 568],
 ]
+// A SEEDED invocation trims to the GC leg at desktop and Popout S: every
+// seeded assertion still runs (the seeds target GC surfaces and the popout
+// strip), and the self-test's wall clock stays within a CI leg's budget.
+const LEGS = SEED ? LEGS_ALL.slice(0, 1) : LEGS_ALL
+const SIZES = SEED ? SIZES_ALL.slice(0, 2) : SIZES_ALL
 
 const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
@@ -96,6 +106,12 @@ const check = (name, cond, detail) => {
 const SEED_CSS = {
   'ellipsis-restored': '[data-money]{text-overflow:ellipsis !important;max-width:48px !important;overflow:hidden !important;display:inline-block}',
   'flat-font-restored': '.m-stat-value{font-size:11px !important}',
+  // R060 seeds. tier-clipped re-creates the squeezed 63px window the owner's
+  // leading-digit captures showed (measured on the replay mount before the
+  // container query landed); toast-clipped restores the fixed height that cut
+  // the invalid play amount message, narrowed so the en string must wrap.
+  'tier-clipped': '[data-testid="win-amount"]{width:63px !important;max-width:63px !important}',
+  'toast-clipped': '[data-msg="wrap"]{height:54px !important;min-height:54px !important;width:200px !important;overflow:hidden !important}',
 }
 
 function startStub(currency) {
@@ -108,7 +124,7 @@ function startStub(currency) {
           const json = (o) => { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(o)) }
           if (req.url === '/wallet/authenticate') {
             return json({
-              balance: { amount: MAX_BALANCE_MICROS, currency },
+              balance: { amount: MAX_BALANCE_HOLDER.v, currency },
               config: {
                 minBet: 100_000, maxBet: MAX_BET_MICROS, stepBet: 100_000,
                 betLevels: [MAX_BET_MICROS], defaultBetLevel: MAX_BET_MICROS,
@@ -117,8 +133,30 @@ function startStub(currency) {
             })
           }
           if (req.url === '/wallet/play') {
+            let sessionID = ''
+            try { sessionID = JSON.parse(b).sessionID || '' } catch { /* raw */ }
+            if (sessionID === 'r060-badamount') {
+              // The platform's real 400 dialect: the invalid play amount
+              // refusal, which is the compliant behaviour at the ladder
+              // boundary (owner confirmation, R060 close).
+              res.writeHead(400, { 'Content-Type': 'application/json' })
+              return res.end(JSON.stringify({ error: 'ERR_VAL' }))
+            }
+            if (sessionID === 'r060-tierwin') {
+              // The owner's exact case: 949.30x at the maximum bet, a MEGA
+              // tier win of 949,300.00 GC, carried by the base win round's
+              // events (the banner reads the payout, not the events).
+              return json({
+                balance: { amount: MAX_BALANCE_MICROS - MAX_BET_MICROS, currency },
+                round: {
+                  betID: 6002, active: true, mode: 'base', amount: MAX_BET_MICROS,
+                  payout: 949_300_000_000, payoutMultiplier: 94_930,
+                  state: { events: WIN_ROUND.events },
+                },
+              })
+            }
             return json({
-              balance: { amount: MAX_BALANCE_MICROS - MAX_BET_MICROS, currency },
+              balance: { amount: MAX_BALANCE_HOLDER.v - MAX_BET_MICROS, currency },
               round: {
                 betID: 5901, active: true, mode: 'base', amount: MAX_BET_MICROS,
                 payout: Math.round(FEATURE_ROUND.payoutMultiplier * MAX_BET_MICROS / 100),
@@ -128,7 +166,7 @@ function startStub(currency) {
             })
           }
           if (req.url === '/wallet/end-round') {
-            return json({ balance: { amount: MAX_BALANCE_MICROS, currency } })
+            return json({ balance: { amount: MAX_BALANCE_HOLDER.v, currency } })
           }
           res.writeHead(404); res.end('{}')
         })
@@ -330,6 +368,130 @@ async function run() {
         server.close()
       }
     }
+
+    // R060 TASK 1: the tier celebration banner at the owner's exact case,
+    // 949.30x at maximum bet in GC, at every size in scope. The amount must
+    // render WHOLE: the full string or the ruled compact form, never the
+    // leading-digit fragment of the owner's captures.
+    {
+      const server = await startStub('GC')
+      const base = `http://127.0.0.1:${server.address().port}`
+      try {
+        for (const [sizeName, w, h] of SIZES) {
+          const page = await browser.newPage({ viewport: { width: w, height: h } })
+          try {
+            await page.goto(`${base}/?sessionID=r060-tierwin&rgs_url=${encodeURIComponent(base)}&lang=en`,
+              { waitUntil: 'domcontentloaded' })
+            await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30_000 })
+            const { dismissIntro } = await import('./lib/dismissOverlays.mjs')
+            await dismissIntro(page)
+            await page.waitForTimeout(500)
+            await page.locator('[data-testid="spin-button"]').click({ timeout: 10_000, force: true })
+            await page.locator('[data-testid="win-amount"]').waitFor({ timeout: 30_000 }).catch(() => {})
+            // Sample at the settled end of the count-up.
+            await page.waitForTimeout(4_500)
+            const t = await page.evaluate(() => {
+              const el = document.querySelector('[data-testid="win-amount"]')
+              if (!el) return null
+              return {
+                text: (el.innerText || '').replace(/\s+/g, ' ').trim(),
+                overflowPx: el.scrollWidth - el.clientWidth,
+              }
+            })
+            const whole = !!t && (t.text === '949,300.00 GC' || t.text === '949.3K GC')
+            check(`tier banner ${sizeName}: 949,300.00 GC renders whole (full or ruled compact), zero overflow`,
+              whole && t.overflowPx <= 1,
+              t ? `"${t.text}" +${t.overflowPx}px` : 'the tier banner never appeared')
+            await page.screenshot({ path: join(framesDir, `gc_${sizeName}_tier_banner.png`) })
+          } finally {
+            await page.close()
+          }
+        }
+      } finally {
+        server.close()
+      }
+    }
+
+    // R060 TASK 2: the ten-billion scenario. A 1,000,000,000.00 GC balance
+    // must render everywhere without a double-clipped fragment; the popout
+    // strip's compact form is the formatter's own "1B GC" (the TR-066
+    // four-significant-character rule; the ruling names the formatter, so
+    // its output governs the brief's 1.00B example, recorded in the R060
+    // session report).
+    {
+      const TEN_BILLION = { name: 'GC-1B', currency: 'GC', marker: 'GC', balance: 1_000_000_000_000_000 }
+      const saved = MAX_BALANCE_HOLDER.v
+      MAX_BALANCE_HOLDER.v = TEN_BILLION.balance
+      const server = await startStub(TEN_BILLION.currency)
+      const base = `http://127.0.0.1:${server.address().port}`
+      try {
+        for (const [sizeName, w, h] of SIZES) {
+          const page = await browser.newPage({ viewport: { width: w, height: h } })
+          try {
+            await page.goto(`${base}/?sessionID=r060-tenbillion&rgs_url=${encodeURIComponent(base)}&lang=en`,
+              { waitUntil: 'domcontentloaded' })
+            await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30_000 })
+            const { dismissIntro } = await import('./lib/dismissOverlays.mjs')
+            await dismissIntro(page)
+            await page.waitForTimeout(900)
+            assertScan(await scanMoney(page, 'GC'), `GC-1B ${sizeName} HUD`)
+            if (sizeName === 'popout-s') {
+              const strip = await page.evaluate(() => {
+                const el = document.querySelector('.m-stat-value')
+                return el ? (el.textContent || '').trim() : null
+              })
+              check('GC-1B popout-s: the compact balance is the formatter\'s own form with the token intact',
+                strip === '1B GC', `strip reads ${JSON.stringify(strip)}`)
+            }
+            await page.screenshot({ path: join(framesDir, `gc1b_${sizeName}_hud.png`) })
+          } finally {
+            await page.close()
+          }
+        }
+      } finally {
+        MAX_BALANCE_HOLDER.v = saved
+        server.close()
+      }
+    }
+
+    // R060 TASK 3: the message toast wraps within its surface, never clips.
+    // The stub answers the play with the platform's 400 ERR_VAL dialect, the
+    // invalid play amount refusal the owner confirmed as the compliant
+    // ladder-boundary behaviour; the toast must show the whole message.
+    {
+      const server = await startStub('GC')
+      const base = `http://127.0.0.1:${server.address().port}`
+      const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+      try {
+        await page.goto(`${base}/?sessionID=r060-badamount&rgs_url=${encodeURIComponent(base)}&lang=en`,
+          { waitUntil: 'domcontentloaded' })
+        await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30_000 })
+        const { dismissIntro } = await import('./lib/dismissOverlays.mjs')
+        await dismissIntro(page)
+        await page.waitForTimeout(500)
+        await page.locator('[data-testid="spin-button"]').click({ timeout: 10_000, force: true })
+        await page.locator('[data-msg="wrap"]').waitFor({ timeout: 15_000 }).catch(() => {})
+        const toast = await page.evaluate(() => {
+          const el = document.querySelector('[data-msg="wrap"]')
+          if (!el) return null
+          const cs = getComputedStyle(el)
+          return {
+            text: (el.innerText || '').replace(/\s+/g, ' ').trim(),
+            clippedV: el.scrollHeight - el.clientHeight,
+            clippedH: el.scrollWidth - el.clientWidth,
+            ellipsis: cs.textOverflow === 'ellipsis',
+            nowrap: cs.whiteSpace === 'nowrap',
+          }
+        })
+        check('message toast: the refusal message wraps within its surface, never clips',
+          !!toast && toast.text.length > 0 && toast.clippedV <= 2 && toast.clippedH <= 1 && !toast.ellipsis && !toast.nowrap,
+          toast ? `"${toast.text.slice(0, 60)}" vClip ${toast.clippedV} hClip ${toast.clippedH} ellipsis ${toast.ellipsis}` : 'the toast never appeared')
+        await page.screenshot({ path: join(framesDir, 'gc_desktop_toast.png') })
+      } finally {
+        await page.close()
+        server.close()
+      }
+    }
   } finally {
     await browser.close()
   }
@@ -361,11 +523,14 @@ if (SELF_TEST) {
   }
   const ok1 = runSeed('ellipsis-restored', /FAIL .*no money element carries ellipsis/)
   const ok2 = runSeed('flat-font-restored', /FAIL GC popout-s.*(overflows|carries ellipsis)|FAIL .*popout-s HUD: no money element overflows/)
-  if (!ok1 || !ok2) {
+  // R060: the owner-captured clipped tier banner and the clipped toast.
+  const ok3 = runSeed('tier-clipped', /FAIL tier banner .*renders whole/)
+  const ok4 = runSeed('toast-clipped', /FAIL message toast: the refusal message wraps/)
+  if (!ok1 || !ok2 || !ok3 || !ok4) {
     console.error('\nMONEY FIT GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nMONEY FIT GATE SELF-TEST: PASS (the dotted state and the stripped-suffix popout both red, named, non-zero exits)')
+  console.log('\nMONEY FIT GATE SELF-TEST: PASS (dotted state, stripped suffix, clipped tier banner and clipped toast all red, named, non-zero exits)')
   process.exit(0)
 }
 
