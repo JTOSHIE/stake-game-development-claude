@@ -1,0 +1,71 @@
+Getting Started
+Introduction
+RGS Details
+Wallet Endpoints
+Basic RGS Example
+Payments
+Payment Models
+Front End
+Introduction
+Dependencies
+Getting Started
+Storybook
+Flowchart
+Task Breakdown
+Adding new events
+File Structure
+Context
+UI
+Math
+Introduction
+Setup
+Quickstart Guide
+Math File Format
+SDK Directory
+High-Level Structure
+State Machine
+Game Structure
+Game Format
+Game State Structure
+Simulation Acceptance
+Setup
+Configs
+Betmode
+Distribution
+Source Files
+Config
+Events
+Executables
+State
+Win Manager
+Outputs
+Calculations
+Board
+Tumble
+Lines
+Ways
+Scatter
+Cluster
+Symbols
+Board
+Wins
+Events
+Force Files
+Utilities
+Example Games
+Optimization Algorithm
+Approval Guidelines
+Submission Checklist
+General Requirements
+Game Replay Requirements
+Game Quality Rankings
+RGS Communication
+Front End Communication
+Math Verification
+Game Tile Requirements
+General Disclaimer
+Jurisdiction Requirements
+Legal
+Terms & Conditions
+Privacy Policy
+Giveaway Terms & Conditions
