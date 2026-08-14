@@ -1399,6 +1399,19 @@
     letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
     position:relative;z-index:1;
     -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+    /* R061 TASK 1, the root cause named by measurement: this was the ONE
+       profile value class with no width bound, so inside the face's centred
+       flex column a ten-figure string grew PAST the plate (text rect 190px
+       in a 187px plate, gaps negative both sides) while never overflowing
+       ITSELF: scrollWidth equalled clientWidth, the fit action saw nothing,
+       scale stayed 1, and the face's 10px corner notches cut the leading
+       edge of COINS and PRIZE in the owner's captures. The bound below is
+       what every other profile already had, and it is why the owner found
+       the small sizes correct: with it, an over-wide string overflows its
+       OWN box, the fit fires, and the value shrinks into the face's safe
+       interior, whose 10px side padding clears the notch geometry. */
+    max-width:100%;
+    overflow:hidden;
   }
   /* Crisp glyphs: near-white fill, one tight 3px halo (no wide blur = no fuzz). */
   .fs-value.cyan   {color:color-mix(in srgb,var(--sig-cyan) 18%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-cyan) 60%,transparent);}

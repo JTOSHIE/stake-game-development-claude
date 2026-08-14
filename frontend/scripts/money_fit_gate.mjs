@@ -76,6 +76,8 @@ const LEGS_ALL = [
 ]
 const SIZES_ALL = [
   ['desktop', 1280, 720],
+  ['desktop-1200', 1200, 675],
+  ['laptop-1024', 1024, 576],
   ['popout-s', 400, 225],
   ['mobile-s', 320, 568],
 ]
@@ -83,7 +85,11 @@ const SIZES_ALL = [
 // seeded assertion still runs (the seeds target GC surfaces and the popout
 // strip), and the self-test's wall clock stays within a CI leg's budget.
 const LEGS = SEED ? LEGS_ALL.slice(0, 1) : LEGS_ALL
-const SIZES = SEED ? SIZES_ALL.slice(0, 2) : SIZES_ALL
+// BY NAME, not position: inserting the R061 sizes into the list silently
+// dropped Popout S out of the seed scope and the flat-font seed stayed green
+// over its own defect, caught by the self-test going red on the MISS. The
+// seed matrix names the two sizes the seeds actually target.
+const SIZES = SEED ? SIZES_ALL.filter(([n]) => n === 'desktop' || n === 'popout-s') : SIZES_ALL
 
 const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
@@ -112,6 +118,11 @@ const SEED_CSS = {
   // the invalid play amount message, narrowed so the en string must wrap.
   'tier-clipped': '[data-testid="win-amount"]{width:63px !important;max-width:63px !important}',
   'toast-clipped': '[data-msg="wrap"]{height:54px !important;min-height:54px !important;width:200px !important;overflow:hidden !important}',
+  // R061: the shipped state this brief was written against, restored verbatim:
+  // the fs profile's value class without a width bound, so a ten-figure string
+  // escapes its plate with zero logical overflow and only the visual-bounds
+  // assertion can see it. Red before the fix, green after: the blind spot.
+  'plate-escape-restored': '.fs-value{max-width:none !important;overflow:visible !important}',
 }
 
 function startStub(currency) {
@@ -141,6 +152,17 @@ function startStub(currency) {
               // boundary (owner confirmation, R060 close).
               res.writeHead(400, { 'Content-Type': 'application/json' })
               return res.end(JSON.stringify({ error: 'ERR_VAL' }))
+            }
+            if (sessionID === 'r061-ownerwin') {
+              // R061: the owner's PRIZE value, 622,600.00 GC at maximum bet.
+              return json({
+                balance: { amount: MAX_BALANCE_HOLDER.v - MAX_BET_MICROS, currency },
+                round: {
+                  betID: 6101, active: true, mode: 'base', amount: MAX_BET_MICROS,
+                  payout: 622_600_000_000, payoutMultiplier: 62_260,
+                  state: { events: WIN_ROUND.events },
+                },
+              })
             }
             if (sessionID === 'r060-tierwin') {
               // The owner's exact case: 949.30x at the maximum bet, a MEGA
@@ -203,12 +225,45 @@ async function scanMoney(page, marker) {
       const cs = getComputedStyle(el)
       if (cs.visibility === 'hidden' || cs.display === 'none') continue
       const text = (el.textContent || '').replace(/\s+/g, ' ').trim()
+      // R061, the visual-bounds property: the desktop plate clip proved that
+      // logical overflow can read ZERO while the text escapes its PLATE (the
+      // span never overflowed itself, only its parent, and the plate's
+      // clip-path notches cut the paint). So the rect is checked against the
+      // CONTENT box of every clipping or hiding ancestor within three
+      // levels: anywhere the paint could be cut, the text must sit whole.
+      let visualEscapePx = 0
+      let escapedIn = ''
+      {
+        // The boundary is the ancestor's BORDER box: that is where clip-path
+        // and overflow actually cut paint. The first draft used the CONTENT
+        // box (padding as safe inset) and flagged the win value's deliberate
+        // 1.06 count-pulse, which breathes 3.6px into the padding band and
+        // is cut by nothing; the R061 defect by contrast had the text 1.3px
+        // OUTSIDE the border box, under the notch. Corner-notch geometry is
+        // covered by the fix's own construction: the face's 10px side
+        // padding equals the notch depth, so a value bounded to the content
+        // box at rest cannot reach a corner triangle even at pulse peak.
+        let a = el.parentElement
+        for (let depth = 0; a && depth < 3; depth++, a = a.parentElement) {
+          const acs = getComputedStyle(a)
+          const clips = acs.clipPath !== 'none' || (acs.overflow !== 'visible' && acs.overflow !== '')
+          if (!clips) continue
+          const ar = a.getBoundingClientRect()
+          const esc = Math.max(ar.left - r.left, r.right - ar.right)
+          if (esc > visualEscapePx + 0.25) {
+            visualEscapePx = esc
+            escapedIn = a.className.toString().split(' ')[0] || a.tagName.toLowerCase()
+          }
+        }
+      }
       out.push({
         kind: el.dataset.money,
         text,
         ellipsisProp: cs.textOverflow === 'ellipsis',
         dotted: /…|\.\.\./.test(text),
         overflowPx: el.scrollWidth - el.clientWidth,
+        visualEscapePx: Math.round(visualEscapePx * 10) / 10,
+        escapedIn,
         offLeft: r.left < -1,
         offRight: r.right > window.innerWidth + 1,
         hasMarker: el.dataset.money !== 'cur' || text.includes(mk),
@@ -223,13 +278,16 @@ function assertScan(nodes, where) {
   const bad = {
     ellipsis: nodes.filter((n) => n.ellipsisProp || n.dotted),
     overflow: nodes.filter((n) => n.overflowPx > 1 || n.offLeft || n.offRight),
+    visual: nodes.filter((n) => n.visualEscapePx > 0.5),
     marker: nodes.filter((n) => !n.hasMarker),
   }
-  const fmt = (list) => list.slice(0, 3).map((n) => `${n.tag} "${n.text}" +${n.overflowPx}px`).join('; ')
+  const fmt = (list) => list.slice(0, 3).map((n) => `${n.tag} "${n.text}" +${n.overflowPx}px${n.visualEscapePx > 1 ? ` escape ${n.visualEscapePx}px in .${n.escapedIn}` : ''}`).join('; ')
   check(`${where}: no money element carries ellipsis, in property or in paint (${nodes.length} scanned)`,
     bad.ellipsis.length === 0, fmt(bad.ellipsis))
   check(`${where}: no money element overflows or leaves the viewport`,
     bad.overflow.length === 0, fmt(bad.overflow))
+  check(`${where}: every money element sits whole inside its plate's safe interior`,
+    bad.visual.length === 0, fmt(bad.visual))
   check(`${where}: every currency-bearing element shows its marker`,
     bad.marker.length === 0, fmt(bad.marker))
 }
@@ -412,6 +470,41 @@ async function run() {
       }
     }
 
+    // R061 TASK 1 scenario: the owner's exact values (balance near
+    // 996,622,600.00 GC, prize 622,600.00 GC) at the two sizes the re-sweep
+    // named, Desktop 1200x675 and Laptop 1024x576, where the fs profile's
+    // plates render. The scan's visual-bounds property is what sees the
+    // plate clip; the sizes run whenever they are in scope.
+    {
+      const saved = MAX_BALANCE_HOLDER.v
+      MAX_BALANCE_HOLDER.v = 996_622_600_000_000
+      const server = await startStub('GC')
+      const base = `http://127.0.0.1:${server.address().port}`
+      try {
+        for (const [sizeName, w, h] of SIZES.filter(([n]) => n === 'desktop-1200' || n === 'laptop-1024' || n === 'desktop')) {
+          const page = await browser.newPage({ viewport: { width: w, height: h } })
+          try {
+            await page.goto(`${base}/?sessionID=r061-ownerwin&rgs_url=${encodeURIComponent(base)}&lang=en`,
+              { waitUntil: 'domcontentloaded' })
+            await page.waitForSelector('[data-testid="spin-button"]', { timeout: 30_000 })
+            const { dismissIntro } = await import('./lib/dismissOverlays.mjs')
+            await dismissIntro(page)
+            await page.waitForTimeout(700)
+            assertScan(await scanMoney(page, 'GC'), `R061 ${sizeName} owner-balance HUD`)
+            await page.locator('[data-testid="spin-button"]').click({ timeout: 10_000, force: true }).catch(() => {})
+            await page.waitForTimeout(5_000)
+            assertScan(await scanMoney(page, 'GC'), `R061 ${sizeName} owner-prize settled`)
+            await page.screenshot({ path: join(framesDir, `r061_${sizeName}_owner_values.png`) })
+          } finally {
+            await page.close()
+          }
+        }
+      } finally {
+        MAX_BALANCE_HOLDER.v = saved
+        server.close()
+      }
+    }
+
     // R060 TASK 2: the ten-billion scenario. A 1,000,000,000.00 GC balance
     // must render everywhere without a double-clipped fragment; the popout
     // strip's compact form is the formatter's own "1B GC" (the TR-066
@@ -526,11 +619,14 @@ if (SELF_TEST) {
   // R060: the owner-captured clipped tier banner and the clipped toast.
   const ok3 = runSeed('tier-clipped', /FAIL tier banner .*renders whole/)
   const ok4 = runSeed('toast-clipped', /FAIL message toast: the refusal message wraps/)
-  if (!ok1 || !ok2 || !ok3 || !ok4) {
+  // R061: the shipped plate-escape state must go red under the visual-bounds
+  // assertion, the proof the gate's blind spot is closed.
+  const ok5 = runSeed('plate-escape-restored', /FAIL R061 .*(safe interior)|FAIL .*sits whole inside its plate/)
+  if (!ok1 || !ok2 || !ok3 || !ok4 || !ok5) {
     console.error('\nMONEY FIT GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nMONEY FIT GATE SELF-TEST: PASS (dotted state, stripped suffix, clipped tier banner and clipped toast all red, named, non-zero exits)')
+  console.log('\nMONEY FIT GATE SELF-TEST: PASS (dotted state, stripped suffix, clipped tier banner, clipped toast and the escaped plate all red, named, non-zero exits)')
   process.exit(0)
 }
 
