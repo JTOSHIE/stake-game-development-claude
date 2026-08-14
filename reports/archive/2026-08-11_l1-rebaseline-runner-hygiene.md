@@ -1411,3 +1411,74 @@ the moment, the sweep once more, the XEC glance, then the fifty-one walk
 and ticks, the one-timers (Provably Fair toggle, wallet re-read, payment
 under the Medium Rare N.V. terms), and Start Approval on the owner's
 word.
+
+## R065 ADDENDUM, 2026-08-14: the currency placement set resolved whole
+
+Brief saved verbatim:
+`reports/briefs/FS_FABLE_R065_CURRENCY_PLACEMENT_Prompt.md`. Model:
+Claude Fable 5, judgement tier. R064 dead as declared, never pasted.
+
+**The classification** (`0a1e5170`): 35 leading-prefix rows unchanged
+from the table's Display column; the code-leading family renders CODE
+space AMOUNT ("PLN 10.00"); social tokens unchanged and trailing;
+symbolAfter RETIRED for fiat (it survives only on the social X-rows);
+decimals uniform two by default with the ruling's own VND 10 and CLP 10
+at zero (JPY, IDR, KRW, KWD, JOD and BHD move to two under the TASK 2
+default). **OMR AND QAR, the (n) completion awaiting the owner's word**:
+the shipped table carried eleven trailing fiat rows, not nine; the two
+outside the ruling's enumeration are identical in kind to the PLN
+evidence and TASK 1 retires fiat trailing unconditionally, so they
+flipped with the nine, surfaced in TR-143 rather than chosen quietly.
+
+**The two evidence notes, plainly.** The owner's live confirmation that
+XEC displays SC is recorded and the standing glance CLOSES. The Valkyrie
+production captures the brief records as committed were NOT in the
+repository at session time, verified by listing and a remote pull; per
+convention (m) the citation awaits the files, nothing was reconstructed,
+and TR-143 carries the note. The TASK 2 portal ledger cross-check was
+attempted and the pane's portal origin was denied this session; the
+uniform-two default stands on the production capture evidence exactly as
+the brief provides, recorded per (n).
+
+**The gate** re-anchored: its oracle is the RULING, with each superseded
+page example pinned as ILLUSTRATIVE and self-retiring per (n) (a platform
+page update rusts the pin and the classification is re-derived; both
+citations at the pin site). Seeded per the brief with a trailing fiat
+render (the owner's own PLN row restored trailing) and a raw-code leak
+where a symbol exists (NOK's kr replaced by its code), both red. Battery:
+currency static 133/133; table gate 589 assertions, 21 self-test checks,
+9 module seeds and the capture pin; win precision updated to the ruled
+DKK shape; money fit 205/205 over the new widest strings; replay
+contract 49/49. Full matrix 28/28 GREEN (run 31790659058).
+
+**The frames rider**: the evidence-mode battery re-runs regenerated the
+money-fit and replay-contract frame sets with per-run timing variance
+(the recorded flake class); they are committed with this close as the
+declared R065 evidence refresh. A standing improvement noted for a
+future tidy: evidence mode only when frames are meant to refresh.
+
+**Rule 12.** The mid-session preview refresh was refused on the dirty
+frame tree (the script working as designed) and the preview is refreshed
+at the final tip as the last action, curl-verified.
+
+**Tracker**: TR-143 opened and closed (the OMR/QAR completion and the
+captures citation awaiting the owner). COMMS 067 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: implement the ruling text (complete and self-contained),
+pin the superseded page as illustrative history that rusts loudly, and
+name the missing evidence rather than reconstructing it. Alternatives
+rejected: leaving OMR and QAR trailing (contradicts TASK 1's
+unconditional retirement and the gate's own trailing-fiat seed);
+treating the page as still authoritative for placement (the ruling
+supersedes it on the owner's production evidence). Files touched:
+currency.ts, currency.test.ts, winPrecision.test.ts,
+currency_table_gate.mjs, the tracker, comms, this report, the frame
+sets. Open threads: the owner's currency flip-through beside the
+Valkyrie captures once they land in docs/stake-engine-live/captures/;
+the OMR/QAR confirmation; the JPY ledger glance; the retrigger eyeball;
+then the fifty-one walk and ticks, the one-timers (Provably Fair toggle,
+wallet re-read, payment under the Medium Rare N.V. terms), and Start
+Approval on the owner's word.
