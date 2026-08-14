@@ -17,8 +17,8 @@ output. Every claim below was opened in this session.
 
 3. `frontend/scripts/social_string_conformance.mjs:43`,
    `social_dom_conformance.mjs:81`, `popout_conformance.mjs:52` and
-   `portrait_layout_conformance.mjs:50` all import `evidenceDir` or
-   `qaTmpDir` from `lib/evidencePaths.mjs`. Tracker TR-090 and TR-097 still
+   `portrait_layout_conformance.mjs:50` all import evidenceDir or
+   qaTmpDir from `lib/evidencePaths.mjs`. Tracker TR-090 and TR-097 still
    read OPEN. `reports/audit/AUDIT_CLOSURE_2026-08-10.md` B13 already
    records the class CLOSED.
 

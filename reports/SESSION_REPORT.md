@@ -13868,6 +13868,21 @@ defect TASK 3 exists to document, so this session also writes
 `reports/archive/2026-08-15c_report-revert-archive-repair.md` and stages it as a
 ninth path. If that is unwanted it is one file to delete.
 
+**A SECOND DEPARTURE, and it is what made the gate pass.** The brief requires both
+gates to pass. `doc_currency_gate.mjs` opened RED on three DEAD_SYMBOL findings in
+two files this brief did not stage, `docs/records/reviews/REVIEW_TRACKER.md` row
+TR-149 and `reports/qa/standback-2026-08-15/FIRST_HAND.md` line 20, both added by
+this branch's own earlier commit and never measured because that run's static job
+aborted at the locked-paths step before reaching the scan. **All three are gate
+heuristic mis-pairings over correct prose**, not false claims: the gate pairs a
+backticked identifier with the nearest backticked file, so `spinCostMicros` and
+`canAffordSpin` paired with `gameStore.ts` when the row itself attributes them to
+`buyAffordability.ts`, and `evidenceDir` paired with a script that imports
+`qaTmpDir` in a sentence that correctly says "evidenceDir or qaTmpDir". The repair
+is the project's own convention for naming a symbol without asserting its
+location: the five identifiers are unbackticked and every file citation is left
+exactly as written. No status cell, no finding and no disposition was altered.
+
 ## FOR THE NEXT SESSION
 
 Model and effort: Claude Fable 5, judgement tier, one session, on the PR #123
