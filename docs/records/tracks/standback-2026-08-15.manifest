@@ -19,6 +19,15 @@
 # carries the locked-path rule separately, so a locked file still fails without
 # an owner-sanction token even if a glob here matched it. None does.
 #
+# EXTENDED 2026-08-15 by FS_RED_CLEARANCE_2026-08-15_Prompt.md. The two dead
+# manifests are MOVED, not deleted, so the branch touches both their old paths
+# and docs/records/tracks/closed/. The disjoint check reads this directory
+# non-recursively, so a manifest under closed/ is a record rather than a claim,
+# and the check now reports 2 manifests, 0 collisions, 0 shared globs.
+#
+# SUPERSEDED 2026-08-15 by the move above, and kept as the record of why the move
+# was needed. Everything below described the state between the two passes.
+#
 # MEASURED CONSEQUENCE, RECORDED HERE BECAUSE IT IS NOT OPTIONAL AND IS NOT OURS
 # TO DECIDE. Committing this file clears the TRACK SCOPE failure and opens a
 # DISJOINT failure in the same gate, run 2026-08-15:
@@ -49,6 +58,13 @@ COMPLIANCE_WATCH.md
 docs/QUALITY_CHARTER.md
 docs/records/reviews/REVIEW_TRACKER.md
 docs/records/tracks/standback-2026-08-15.manifest
+docs/records/tracks/closed/**
+docs/records/tracks/quality-sweep.manifest
+docs/records/tracks/docs-reskin.manifest
+frontend/scripts/max_win_hold_gate.mjs
+reports/screens/layout-2026-08-15/**
+reports/archive/2026-08-15c_red-clearance-and-layout.md
+reports/briefs/FS_RED_CLEARANCE_2026-08-15_Prompt.md
 frontend/scripts/build_diet_verify.mjs
 frontend/scripts/dead_wiring_scan.mjs
 frontend/src/App.svelte
