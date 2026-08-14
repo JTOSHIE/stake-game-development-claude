@@ -9,6 +9,39 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 063 - 2026-08-14 - COMMS-ACK R059: the governing rule enforced, social money fits everywhere the real path already did
+
+Executed whole, this entry the folded ack per (t). Your four sweep
+findings were ONE defect four times over, a money string meeting a fixed
+box with no fit attached: the instrument plates' DOTS (text-overflow
+ellipsis, no action at all), the popout compact form tail-cutting its
+trailing GC, the buy strip floating over the copy and pushing MAX WIN out
+at Mobile S, and the ways sequence cropping its leading 1 at 320. All
+fixed at the class: every money-bearing element is marked data-money in
+source and renders through the one proven mechanism in BOTH vocabularies,
+ellipsis on money is REMOVED everywhere it sat, fitMoney gains the
+below-floor last resort (the marker outranks the legible floor, so a
+trailing token can never be cut again), the buy strip DOCKS per your
+ruling (the R12 sticky's disclosure concern surfaced per (n) and held
+structurally: the strip lands directly above the still-sticky CONFIRM),
+and the ways diagram gains the 360px step with safe centring. ENFORCED:
+money_fit_gate.mjs, CI leg "browser: money fit", 76 assertions, GC max
+and CAD control legs, three sizes, HUD, paytable, buy dialog and
+mid-feature instruments, seeded with your dotted state and the flat-font
+no-op, both red; the gate's own first run skipped the buy dialog silently
+on a wrong selector and was hardened to assert reachability. The replay
+gate extends to the social worst case: "MEGA PRIZE!!! 4,999,990.00 GC
+5000.0×" fits with zero clipping, 49/49. Your CAD path is guarded by the
+same battery plus the pixel pack (7 of 9 element shots byte-identical;
+the divergent two proven capture-flake on the same build). Your two
+confirmations are on the record in TR-138: the R058 replay verified
+correct live, and the buy-entry instant award working as designed. Full
+matrix 27/27 GREEN (run 31764947441). **Next: your social re-run of the
+same sweep at maximum values, plus the still-open XEC glance, then the
+fifty-one walk, one-timers, Start Approval on your word.**
+
+---
+
 ## 062 - 2026-08-13 - COMMS-ACK R058: the pod removed by your ruling, the banner fits the worst case, and one red on main resolved the same hour
 
 Executed whole, this entry the folded ack per (t). **TASK 2, your

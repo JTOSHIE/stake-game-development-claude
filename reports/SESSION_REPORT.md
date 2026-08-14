@@ -12819,3 +12819,102 @@ final re-test (the two findings plus the XEC glance), then the fifty-one
 walk and tick, the one-timers (Provably Fair toggle, wallet re-read,
 payment under the Medium Rare N.V. terms), and Start Approval on the
 owner's word.
+
+## R059 ADDENDUM, 2026-08-14: the social money fit pass, one defect fixed four times over, then fixed as a class
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R059_SOCIAL_FIT_Prompt.md`.
+Model: Claude Fable 5, judgement tier. The owner's screen-by-screen sweep
+at maximum values confirmed the real-money path fitting correctly at every
+size and found the social GC path failing on four surfaces; the sweep also
+confirmed the R058 replay display correct live and the buy-entry instant
+award working as designed, both recorded in TR-138.
+
+**The diagnosis, stated once because it covers all four findings.** Every
+failure was a money string meeting a fixed box with no fit action
+attached: the feature instrument plates carried text-overflow ellipsis
+and NO action (the dots in the owner's capture); the popout compact form
+tail-cut its trailing token because fitMoney had no stage below the
+legible floor and social tokens TRAIL where fiat symbols lead; the buy
+strip floated sticky over the copy and its unfittable cells pushed MAX
+WIN out at Mobile S; the ways sequence's centred overflow cropped the
+leading 1 at 320. Three prior sessions had each fixed one INSTANCE of
+this class (TR-066 the mini strip, R058 the banner); this pass fixed the
+class.
+
+**The fixes** (`addd1a11`). Money-bearing elements are marked
+`data-money` in source ("cur" carries a marker, "num" is a bare figure),
+which is what makes the governing rule scannable. The instrument plates
+and portrait strip render through autofitText with the scale multiplied
+into their font sizes; the two HUD stat classes and the paytable mode
+cells lose their banned ellipsis; fitMoney gains the below-floor last
+resort (marker visibility outranks the legible floor, bounded by
+MIN_SCALE, so a trailing token can never be tail-cut again); the buy
+strip is DOCKED in the scroll flow per the owner ruling, with the R12
+sticky's disclosure concern surfaced per (n) rather than silently
+overridden and held structurally (the strip is the last content block, so
+the same scroll that reaches the still-sticky CONFIRM lands the
+disclosure directly above it), its cells fitted with min-width 0; the
+ways diagram gains a 360px step with safe centring so the leading 1
+anchors the sequence at 320.
+
+**The gate** (`money_fit_gate.mjs`, CI leg "browser: money fit"). On
+every visible data-money node: the computed text-overflow is never
+ellipsis and no dotted text renders; nothing overflows its box or leaves
+the viewport; every currency-bearing node shows its marker. GC
+maximum-value and CAD control legs, three sizes, across the HUD, the
+paytable (with the leading-1 assertion at Mobile S), the buy dialog (the
+docked strip, MAX WIN in-row) and the mid-feature instruments. 76
+assertions. Seeded per (p) at the observation boundary with the two
+states the owner captured: ellipsis restored (red on the property check)
+and the flat font restored on the mini strip, the recorded no-op trap
+verbatim (red on the overflow check at Popout S). ONE GATE LESSON, kept
+in the gate's own header: its first run skipped the whole buy-dialog
+block silently on a wrong selector, reading as covered while covering
+nothing, so every step of that drive now asserts reachability rather
+than skipping, the no-silent-caps rule applied to the gate itself.
+
+**TASK 2.** The replay gate extends to the social worst case: the same
+4999.99x round at maximum bet in GC renders "MEGA PRIZE!!! 4,999,990.00
+GC 5000.0×", wider than the CA$ form, fitting with zero clipping, no pod,
+49/49 assertions.
+
+**The CAD regression guard.** Element screenshots of the three HUD money
+boxes at three sizes, pre-change build against post-change build: 7 of 9
+byte-identical. The two divergent shots are Popout S fitMoney elements
+whose screenshot is NOT a stable oracle: capturing the SAME build twice
+produced two hashes (the action measures on a double
+requestAnimationFrame), their text identical across builds. The pack with
+the comparison note is committed at `reports/qa/r059_cad_pixel_guard/`;
+the durable guard is the gate's CAD leg, which asserts the properties
+that "renders correctly" actually names.
+
+**Rule 10.** The push ran the full matrix, now 27 jobs with the money fit
+leg: run 31764947441, 27/27 GREEN, slowest leg the replay contract at
+497s. Local before push: doc currency gate PASS, direct operand per the
+refined (u.1). This report's records push follows and is verified before
+the session ends. **Rule 12.** The preview was refreshed at `addd1a11`
+after the code push and is refreshed at the final tip as the last action,
+both curl-verified.
+
+**Tracker**: TR-138 opened and closed, carrying the owner's two
+confirmations. COMMS 063 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: diagnose the four findings as one class, fix the class
+(source markers + the one mechanism + the gate), and only then the
+instances; capture the CAD pixel reference BEFORE touching source so the
+regression guard had a pre-change oracle. Alternatives rejected: fixing
+the four surfaces individually without the marker and gate (the fourth
+session fixing the fifth instance was the pattern this ended); a pixel
+guard in CI (font rendering differs across runners and the same build
+flakes its own hash; the property assertions are the durable form).
+Files touched: fitMoney.ts, autofitText consumers across
+BonusInstrumentColumn, HudOverlay, PaytableModal, BuyBonus, WinDisplay,
+SessionPanel, ReplayMode, the new money_fit_gate.mjs, the replay gate,
+checks.yml, the tracker, comms, this report. Open threads: the owner
+re-runs the sweep in social at maximum values, plus the still-open XEC
+glance, then the fifty-one walk and ticks, the one-timers (Provably Fair
+toggle, wallet re-read, payment under the Medium Rare N.V. terms), and
+Start Approval on the owner's word.
