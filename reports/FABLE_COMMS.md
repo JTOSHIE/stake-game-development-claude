@@ -9,6 +9,56 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 070 - 2026-08-15 - COMMS-ACK R070: zero delta across the WHOLE tree, and the false delta was ours
+
+Executed whole, this entry the folded ack per (t); R069 dead as declared,
+nothing of it pasted. **TASK 1**: the RGS trio is byte-identical to the newest
+dated captures, read through your logged-in pane AND independently through
+headless Playwright at a different viewport, so the zero rests on two
+transports rather than one reading: rgs 12,025 chars cefad0fd, wallet 2,537
+15d774ea, example 2,273 0abf0a75. It has not moved since 2026-07-29, four
+captures, seventeen days. **THE SUBMISSION-MORNING REFRESH STANDS DONE EARLY**,
+on your own zero-delta branch. **TASK 2**: the sidebar was enumerated from
+/docs itself, 71 anchors, 64 unique routes, every one captured to
+docs/stake-engine-live/2026-08-15/ with a manifest and the nav's own text
+committed beside it. **All 64 identical.** TWO PREMISES RECOUNTED PER RULE 16:
+the developer sub-trees are NOT first-time, every live route already had a
+2026-08-10 and 2026-08-11 predecessor, so they were DIFFED rather than indexed,
+which is the stronger standard; and "getting-started" is a nav SECTION, not a
+route. **THE ONE THING WORTH YOUR TIME**: eight pages first read as changed by
+exactly one character each, and the uniformity was the tell. The cause was in
+OUR record, not on the platform: the 2026-08-11 manifest hashed the RAW
+innerText while the file beside it holds the TRIMMED text, and those eight end
+in a code block. Re-capturing raw reproduced all eight 2026-08-11 hashes
+exactly. The new manifest records both normalisations so it cannot recur. **A
+manifest that describes a file should be checkable against that file**, and
+nothing in the estate could have noticed, because a manifest is only ever read
+against the site. **FOUR ITEMS ESCALATED FROM THE SKIM, NOTHING ACTIONED**
+(TR-148), three in the Developer Agreement and one in the locked maths package:
+the PUBLIC repository against clause 5.1.a.ii, "distribute, license, exploit
+and/or permit any third-party to use any of the Game Rights", where Game Rights
+is defined to include the Source Code and 4.4 grants MRNV an exclusive licence,
+verified PUBLIC this session with the terms recorded as accepted; the insurance
+obligation at 17.16.a, in no register at all, zero grep hits across four; the
+USD $1,000 licence-fee accrual floor against the flat "any amount above $0.00"
+in the owner's register, on a row already marked SUPERSEDED; and the maths
+package config file, whose three lookup-table hashes for cruise, antelite and
+super disagree with the shipped CSVs while the books and force records match,
+cause documented in the dossier's 2026-07-14 revert, nothing that ships
+affected. **TASK 3** (TR-147): the template and its Storybook were not used,
+the build is from scratch, and the mapping from that page's own definition of
+done to our instruments is written out at
+docs/records/STORYBOOK_DISPOSITION_2026-08-15.md, story class by story class,
+with the honest gap named. **TASK 4**: the citations index is one page at
+docs/records/RGS_CITATIONS_INDEX_2026-08-15.md; every ruling and tracker row
+citing the family resolves, and the rule behind TR-134's two line numbers is
+written once: the page text never moved, the capture header shrank by eight
+lines, so a 2026-07-29 line N is line N minus 8 today. Record-only, direct to
+main per (t.1), no rebuild. NEXT: your Arabic re-check and the retrigger
+eyeball, then the fifty-one walk, one-timers, Start Approval on your word.
+
+---
+
 ## 069 - 2026-08-14 - COMMS-ACK R068: your sweep's finding fixed at the root, the stage pins ltr
 
 Executed whole, this entry the folded ack per (t). **Your language sweep
