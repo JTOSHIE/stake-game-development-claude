@@ -160,6 +160,59 @@ export function parseCapture(text) {
         + `not ${JSON.stringify(pin.symbol)} as it did when ${pin.rule} was recorded. Re-derive the label against the new row.`)
     }
   }
+
+  // R065, THE RULED PLACEMENT AND DECIMALS LAYER (both citations recorded, per
+  // the brief's own order). The OWNER'S RULING
+  // (reports/briefs/FS_FABLE_R065_CURRENCY_PLACEMENT_Prompt.md, 2026-08-14, on
+  // the owner's stake.com production captures) supersedes the placement and
+  // decimals of the PUBLISHED page's Example column
+  // (docs/stake-engine-live/2026-07-29/rgs.md), whose trailing examples are
+  // ILLUSTRATIVE from this ruling on. Self-retiring per (n): each entry below
+  // asserts the captured page STILL prints the example the ruling was decided
+  // against, so the day the platform updates the page this throws as rusted
+  // and the classification is re-derived rather than outliving its sources.
+  // The eleven code-leading rows are the ruled nine plus OMR and QAR, the
+  // shipped table's other two trailing rows, absent from the ruling's
+  // enumeration and completed with it because TASK 1 retires fiat trailing
+  // unconditionally (surfaced per (n) in TR-143). The decimal deltas are the
+  // TASK 2 uniform-two default over the page's zero-decimal examples, with
+  // the ruling's own VND 10 and CLP 10 keeping zero.
+  const RULED = {
+    DKK: { placement: 'code-leading', symbol: 'DKK', decimals: 2, pageExample: '10.00 KR' },
+    PLN: { placement: 'code-leading', symbol: 'PLN', decimals: 2, pageExample: '10.00 zł' },
+    VND: { placement: 'code-leading', symbol: 'VND', decimals: 0, pageExample: '10 ₫' },
+    CLP: { placement: 'code-leading', symbol: 'CLP', decimals: 0, pageExample: '10 CLP' },
+    ARS: { placement: 'code-leading', symbol: 'ARS', decimals: 2, pageExample: '10.00 ARS' },
+    SAR: { placement: 'code-leading', symbol: 'SAR', decimals: 2, pageExample: '10.00 SAR' },
+    ILS: { placement: 'code-leading', symbol: 'ILS', decimals: 2, pageExample: '10.00 ILS' },
+    AED: { placement: 'code-leading', symbol: 'AED', decimals: 2, pageExample: '10.00 AED' },
+    TND: { placement: 'code-leading', symbol: 'TND', decimals: 2, pageExample: '10.00 TND' },
+    OMR: { placement: 'code-leading', symbol: 'OMR', decimals: 2, pageExample: '10.00 OMR' },
+    QAR: { placement: 'code-leading', symbol: 'QAR', decimals: 2, pageExample: '10.00 QAR' },
+    JPY: { placement: 'prefix', decimals: 2, pageExample: '¥10' },
+    IDR: { placement: 'prefix', decimals: 2, pageExample: 'Rp10' },
+    KRW: { placement: 'prefix', decimals: 2, pageExample: '₩10' },
+    KWD: { placement: 'prefix', decimals: 2, pageExample: null },
+    JOD: { placement: 'prefix', decimals: 2, pageExample: null },
+    BHD: { placement: 'prefix', decimals: 2, pageExample: null },
+  }
+  for (const row of rows) {
+    const r = RULED[row.code]
+    if (!r) continue
+    if (r.pageExample !== null && row.example !== r.pageExample) {
+      throw new Error(`R065 ILLUSTRATIVE PIN RUSTED: the page now prints ${row.code} as ${JSON.stringify(row.example)}, `
+        + `not ${JSON.stringify(r.pageExample)} as when the R065 ruling was decided. Re-derive the classification.`)
+    }
+    if (r.symbol) row.symbol = r.symbol
+    row.codeLeading = r.placement === 'code-leading'
+    row.symbolAfter = false
+    row.decimals = r.decimals
+    // The row's Example becomes the RULED form, so every downstream class
+    // (B included) holds the module to the ruling, not the page.
+    row.example = row.codeLeading
+      ? `${row.symbol} ${(10).toFixed(row.decimals)}`
+      : `${row.symbol}${(10).toFixed(row.decimals)}`
+  }
   return rows
 }
 
@@ -169,6 +222,7 @@ function expected(micros, row) {
     minimumFractionDigits: row.decimals,
     maximumFractionDigits: row.decimals,
   })
+  if (row.codeLeading) return `${row.symbol} ${n}` // R065: CODE space AMOUNT
   return row.symbolAfter ? `${n} ${row.symbol}` : `${row.symbol}${n}`
 }
 
@@ -377,6 +431,22 @@ const SEEDS = [
     to:   "XEC: { symbol: 'EC', decimals: 2 },",
     expect: /XEC/,
   },
+  {
+    // R065: a TRAILING FIAT render, the retired class restored on the
+    // owner's own evidence row.
+    name: 'seed 8, a fiat row rendered trailing against the R065 ruling',
+    from: "PLN: { symbol: 'PLN',  decimals: 2, codeLeading: true },",
+    to:   "PLN: { symbol: 'PLN',  decimals: 2, symbolAfter: true },",
+    expect: /PLN/,
+  },
+  {
+    // R065: a raw-code leak where a symbol exists: NOK's kr replaced by its
+    // ISO code, the exact never-raw-code violation for a symbol-carrying row.
+    name: 'seed 9, a raw code shown where the ruling gives a symbol',
+    from: "NOK: { symbol: 'kr',   decimals: 2 },",
+    to:   "NOK: { symbol: 'NOK',  decimals: 2 },",
+    expect: /NOK/,
+  },
 ]
 
 async function selfTest() {
@@ -490,7 +560,7 @@ async function main() {
 
   if (failures.length === 0 && badControls.length === 0) {
     console.log('')
-    console.log(`currency table gate PASS: ${checks} assertions, all ${rows.length} codes render the platform's published form.`)
+    console.log(`currency table gate PASS: ${checks} assertions, all ${rows.length} codes render the R065 ruled form (the page's superseded examples pinned as illustrative).`)
     return
   }
   console.error('')

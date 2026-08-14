@@ -78,9 +78,18 @@ eq('USD symbol resolves to $', currencySymbolFor('USD', 'en'), '$')
 ok('USD is not virtual', !isVirtualCurrency('USD'))
 
 // ── Zero-decimal / high-minimum currencies ────────────────────────────────────
-eq('JPY is zero-decimal', formatBalance(1250 * S, 'JPY', 'en'), '¥1,250')
-for (const code of ['JPY', 'IDR', 'KRW', 'VND', 'CLP']) {
-  ok(`${code}: no decimal point`, !/\.\d/.test(formatBalance(1250 * S, code, 'en')),
+// R065 TASK 2, decimals by ledger agreement: uniform TWO decimals is the
+// default (the owner's production captures), with the ruling's own written
+// zero-decimal rows the only exceptions (VND 10, CLP 10). JPY, IDR and KRW
+// therefore carry two decimals now; the old zero-decimal block asserted the
+// published Example column, which the ruling supersedes.
+eq('JPY renders two decimals per the R065 default', formatBalance(1250 * S, 'JPY', 'en'), '¥1,250.00')
+for (const code of ['VND', 'CLP']) {
+  ok(`${code}: zero decimals, written into the ruling itself`, !/\.\d/.test(formatBalance(1250 * S, code, 'en')),
+    formatBalance(1250 * S, code, 'en'))
+}
+for (const code of ['JPY', 'IDR', 'KRW']) {
+  ok(`${code}: two decimals per the R065 default`, /\.\d\d/.test(formatBalance(1250 * S, code, 'en')),
     formatBalance(1250 * S, code, 'en'))
 }
 
@@ -228,13 +237,32 @@ for (const loc of ['en', 'de', 'es', 'fr', 'pt', 'pl', 'ru', 'tr', 'id', 'vi', '
 //
 // The old expression is written out below as the CONTROL, so this test fails if
 // anyone repoints the consumer back at it.
-for (const code of ['DKK', 'PLN', 'VND', 'CLP', 'ARS', 'SAR', 'ILS', 'AED']) {
-  ok(`${code} trails its symbol, per the platform table`,
-    currencySymbolTrailing(code) === true,
+//
+// R065: FIAT TRAILING IS RETIRED. The eleven rows the published table marked
+// trailing (the ruled nine plus OMR and QAR, the (n) completion) are now
+// CODE-LEADING with one space, per the owner's production evidence: the
+// accessor answers false for every fiat code, and the rendered form is
+// CODE space AMOUNT, asserted verbatim below.
+for (const code of ['DKK', 'PLN', 'VND', 'CLP', 'ARS', 'SAR', 'ILS', 'AED', 'TND', 'OMR', 'QAR']) {
+  ok(`${code} leads with its ISO code, never trailing (R065)`,
+    currencySymbolTrailing(code) === false,
     `currencySymbolTrailing(${code}) returned ${currencySymbolTrailing(code)}`)
-  ok(`CONTROL: the OLD expression gets ${code} wrong, which is why the accessor exists`,
+  ok(`CONTROL: the OLD expression agrees ${code} does not trail as a virtual would`,
     (isVirtualCurrency(code) && VIRTUAL_SYMBOL_TRAILING) === false)
 }
+// The ruled shapes verbatim, one space between code and amount, the ruling's
+// own decimals (VND and CLP zero, the rest two).
+eq('PLN, the owner evidence row', formatBalance(10 * S, 'PLN', 'en'), 'PLN 10.00')
+eq('DKK code-leading', formatBalance(10 * S, 'DKK', 'en'), 'DKK 10.00')
+eq('VND code-leading, zero decimals', formatBalance(10 * S, 'VND', 'en'), 'VND 10')
+eq('CLP code-leading, zero decimals', formatBalance(10 * S, 'CLP', 'en'), 'CLP 10')
+eq('ARS code-leading', formatBalance(10 * S, 'ARS', 'en'), 'ARS 10.00')
+eq('SAR code-leading', formatBalance(10 * S, 'SAR', 'en'), 'SAR 10.00')
+eq('ILS code-leading', formatBalance(10 * S, 'ILS', 'en'), 'ILS 10.00')
+eq('AED code-leading', formatBalance(10 * S, 'AED', 'en'), 'AED 10.00')
+eq('TND code-leading', formatBalance(10 * S, 'TND', 'en'), 'TND 10.00')
+eq('OMR code-leading, the (n) completion', formatBalance(10 * S, 'OMR', 'en'), 'OMR 10.00')
+eq('QAR code-leading, the (n) completion', formatBalance(10 * S, 'QAR', 'en'), 'QAR 10.00')
 
 for (const code of ['USD', 'EUR', 'GBP', 'CAD', 'JPY']) {
   ok(`${code} leads its symbol`, currencySymbolTrailing(code) === false)

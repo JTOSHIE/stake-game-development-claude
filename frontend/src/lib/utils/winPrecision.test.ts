@@ -57,9 +57,11 @@ for (const v of [0.08, 1, 12.34, 1234.5, 0]) {
     formatWin(micros(v), 'USD', 'en-US'), formatBalance(micros(v), 'USD', 'en-US'))
 }
 
-// 3. THE TRAILING SYMBOL SURVIVES WIDENING. DKK renders symbol-after.
-check('a trailing-symbol currency keeps its placement when widened',
-  formatWin(micros(0.0008), 'DKK', 'en-US'), '0.0008 KR')
+// 3. PLACEMENT SURVIVES WIDENING. R065 flipped DKK to code-leading
+// ("DKK 10.00"); the property under test is unchanged: widening the
+// decimals must not move the symbol, whichever side the ruling puts it.
+check('a code-leading currency keeps its placement when widened (R065)',
+  formatWin(micros(0.0008), 'DKK', 'en-US'), 'DKK 0.0008')
 check('and is unchanged at an ordinary amount',
   formatWin(micros(12.34), 'DKK', 'en-US'), formatBalance(micros(12.34), 'DKK', 'en-US'))
 

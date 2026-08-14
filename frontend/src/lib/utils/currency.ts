@@ -126,11 +126,20 @@ export const VIRTUAL_CURRENCIES: Record<string, VirtualCurrency> = {
 }
 
 interface PlatformCurrency {
-  /** Player-facing symbol, exactly as the platform's Display column spells it. */
+  /** Player-facing symbol; for code-leading rows this IS the ISO code. */
   symbol: string
-  /** Decimal places, read off the platform's own Example column. */
+  /** Decimal places per the R065 ruling: two by default, zero where ruled. */
   decimals: number
-  /** True renders "10.00 KR"; absent renders "CA$10.00". */
+  /**
+   * R065: the ISO code leads with ONE space ("PLN 10.00"), per the owner's
+   * production evidence (the PLN capture) generalised across the class.
+   */
+  codeLeading?: boolean
+  /**
+   * SOCIAL X-rows only ("10.00 SC"). R065 TASK 1 RETIRES trailing for fiat:
+   * no fiat row may carry this, and the conformance gate seeds that exact
+   * violation.
+   */
   symbolAfter?: boolean
 }
 
@@ -192,45 +201,63 @@ interface PlatformCurrency {
  * check a row against the platform without leaving the file.
  */
 export const PLATFORM_CURRENCIES: Record<string, PlatformCurrency> = {
+  // R065, THE RULED CLASSIFICATION (FS_FABLE_R065_CURRENCY_PLACEMENT_Prompt,
+  // 2026-08-14), superseding the placement half of the published table's
+  // Example column. LEADING PREFIX rows are unchanged from the table's own
+  // Display column. The rows marked codeLeading render as CODE space AMOUNT
+  // ("PLN 10.00"), per the owner's production evidence that stake.com uses
+  // the ISO code for these; the published page's trailing examples for them
+  // are ILLUSTRATIVE and the conformance gate carries the self-retiring (n)
+  // note against the page. DECIMALS are uniform two by default (the owner's
+  // production captures) with the ruling's own zero-decimal rows written
+  // out (VND 10, CLP 10); the ledger cross-check for JPY is recorded in the
+  // R065 session report. symbolAfter is RETIRED for fiat; it survives only
+  // on the social X-rows below.
+  //
+  // OMR AND QAR, surfaced per (n) rather than chosen quietly: both sit in
+  // the shipped table as trailing ISO-code rows and are ABSENT from the
+  // ruling's enumeration. TASK 1 retires fiat trailing unconditionally and
+  // their case is byte-identical to the PLN evidence, so they are flipped
+  // with the nine; the R065 tracker row asks the owner to confirm.
   USD: { symbol: '$',    decimals: 2 }, // $10.00
   CAD: { symbol: 'CA$',  decimals: 2 }, // CA$10.00
-  JPY: { symbol: '¥',    decimals: 0 }, // ¥10
+  JPY: { symbol: '¥',    decimals: 2 }, // ¥10.00, two decimals per TASK 2 default
   EUR: { symbol: '€',    decimals: 2 }, // €10.00
   RUB: { symbol: '₽',    decimals: 2 }, // ₽10.00
   CNY: { symbol: 'CN¥',  decimals: 2 }, // CN¥10.00
   PHP: { symbol: '₱',    decimals: 2 }, // ₱10.00
   INR: { symbol: '₹',    decimals: 2 }, // ₹10.00
-  IDR: { symbol: 'Rp',   decimals: 0 }, // Rp10
-  KRW: { symbol: '₩',    decimals: 0 }, // ₩10
+  IDR: { symbol: 'Rp',   decimals: 2 }, // Rp10.00, two decimals per TASK 2 default
+  KRW: { symbol: '₩',    decimals: 2 }, // ₩10.00, two decimals per TASK 2 default
   BRL: { symbol: 'R$',   decimals: 2 }, // R$10.00
   MXN: { symbol: 'MX$',  decimals: 2 }, // MX$10.00
-  DKK: { symbol: 'KR',   decimals: 2, symbolAfter: true }, // 10.00 KR
-  PLN: { symbol: 'zł',   decimals: 2, symbolAfter: true }, // 10.00 zł
-  VND: { symbol: '₫',    decimals: 0, symbolAfter: true }, // 10 ₫
+  DKK: { symbol: 'DKK',  decimals: 2, codeLeading: true }, // DKK 10.00
+  PLN: { symbol: 'PLN',  decimals: 2, codeLeading: true }, // PLN 10.00, the owner's evidence row
+  VND: { symbol: 'VND',  decimals: 0, codeLeading: true }, // VND 10, zero per the ruling
   TRY: { symbol: '₺',    decimals: 2 }, // ₺10.00
-  CLP: { symbol: 'CLP',  decimals: 0, symbolAfter: true }, // 10 CLP
-  ARS: { symbol: 'ARS',  decimals: 2, symbolAfter: true }, // 10.00 ARS
+  CLP: { symbol: 'CLP',  decimals: 0, codeLeading: true }, // CLP 10, zero per the ruling
+  ARS: { symbol: 'ARS',  decimals: 2, codeLeading: true }, // ARS 10.00
   PEN: { symbol: 'S/',   decimals: 2 }, // S/10.00
   NGN: { symbol: '₦',    decimals: 2 }, // ₦10.00
-  SAR: { symbol: 'SAR',  decimals: 2, symbolAfter: true }, // 10.00 SAR
-  ILS: { symbol: 'ILS',  decimals: 2, symbolAfter: true }, // 10.00 ILS
-  AED: { symbol: 'AED',  decimals: 2, symbolAfter: true }, // 10.00 AED
+  SAR: { symbol: 'SAR',  decimals: 2, codeLeading: true }, // SAR 10.00
+  ILS: { symbol: 'ILS',  decimals: 2, codeLeading: true }, // ILS 10.00
+  AED: { symbol: 'AED',  decimals: 2, codeLeading: true }, // AED 10.00
   TWD: { symbol: 'NT$',  decimals: 2 }, // NT$10.00
   NOK: { symbol: 'kr',   decimals: 2 }, // kr10.00
-  KWD: { symbol: 'KD',   decimals: 2 }, // KD10.00
-  JOD: { symbol: 'JD',   decimals: 2 }, // JD10.00
+  KWD: { symbol: 'KD',   decimals: 2 }, // KD10.00, two decimals per TASK 2 default
+  JOD: { symbol: 'JD',   decimals: 2 }, // JD10.00, two decimals per TASK 2 default
   CRC: { symbol: '₡',    decimals: 2 }, // ₡10.00
-  TND: { symbol: 'TND',  decimals: 2, symbolAfter: true }, // 10.00 TND
+  TND: { symbol: 'TND',  decimals: 2, codeLeading: true }, // TND 10.00
   SGD: { symbol: 'SG$',  decimals: 2 }, // SG$10.00
   MYR: { symbol: 'RM',   decimals: 2 }, // RM10.00
-  OMR: { symbol: 'OMR',  decimals: 2, symbolAfter: true }, // 10.00 OMR
-  QAR: { symbol: 'QAR',  decimals: 2, symbolAfter: true }, // 10.00 QAR
-  BHD: { symbol: 'BD',   decimals: 2 }, // BD10.00
+  OMR: { symbol: 'OMR',  decimals: 2, codeLeading: true }, // OMR 10.00, the (n) completion above
+  QAR: { symbol: 'QAR',  decimals: 2, codeLeading: true }, // QAR 10.00, the (n) completion above
+  BHD: { symbol: 'BD',   decimals: 2 }, // BD10.00, two decimals per TASK 2 default
   PKR: { symbol: '₨',    decimals: 2 }, // ₨10.00
-  EGP: { symbol: 'ج.م',  decimals: 2 }, // ج.م10.00
+  EGP: { symbol: 'ج.م',  decimals: 2 }, // per the table's Display column
   NZD: { symbol: 'NZ$',  decimals: 2 }, // NZ$10.00
   BOB: { symbol: 'Bs',   decimals: 2 }, // Bs10.00
-  GHS: { symbol: 'GH₵',  decimals: 2 }, // GH₵10.00
+  GHS: { symbol: 'GH₵', decimals: 2 }, // GH₵10.00
   KES: { symbol: 'KSh',  decimals: 2 }, // KSh10.00
   MAD: { symbol: 'MAD',  decimals: 2 }, // MAD10.00
   BAM: { symbol: 'KM',   decimals: 2 }, // KM10.00
@@ -238,16 +265,15 @@ export const PLATFORM_CURRENCIES: Record<string, PlatformCurrency> = {
   TZS: { symbol: 'TSh',  decimals: 2 }, // TSh10.00
   UGX: { symbol: 'USh',  decimals: 2 }, // USh10.00
   XOF: { symbol: 'CFA',  decimals: 2 }, // CFA10.00
-  XGC: { symbol: 'GC',   decimals: 2, symbolAfter: true }, // 10.00 GC
-  XSC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
-  // Faithful transcription of the published row "Stake Euro Cash / XEC / SC /
-  // 10.00 SC" (docs/stake-engine-live/2026-07-29/rgs.md:142). R056 REVERSED
-  // the one-day R054 divergence (EC by the X-strip rule) back to the row:
-  // this table is a TRANSCRIPTION and never edits its source, and
-  // currency_table_gate.mjs pins this entry EQUAL to the captured row, so a
-  // platform change rusts the gate rather than silently outdating us.
-  XEC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC
+  XGC: { symbol: 'GC',   decimals: 2, symbolAfter: true }, // 10.00 GC, social
+  XSC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC, social
+  // Faithful to the published row "Stake Euro Cash / XEC / SC / 10.00 SC"
+  // (docs/stake-engine-live/2026-07-29/rgs.md:142); R056 reversed the R054
+  // divergence and R065 carries the owner's LIVE confirmation that XEC
+  // displays SC, closing the standing glance.
+  XEC: { symbol: 'SC',   decimals: 2, symbolAfter: true }, // 10.00 SC, social
 }
+
 
 /**
  * Render an amount against a platform table row.
@@ -271,6 +297,10 @@ function formatFromTable(
     localeTag,
     numberOptions ?? { minimumFractionDigits: meta.decimals, maximumFractionDigits: meta.decimals },
   )
+  // R065: three ruled shapes. Code-leading fiat renders CODE space AMOUNT
+  // ("PLN 10.00"); the social X-rows keep their trailing form; every other
+  // symbol attaches leading with no space, the platform's own DisplayBalance.
+  if (meta.codeLeading) return `${meta.symbol} ${formatted}`
   return meta.symbolAfter ? `${formatted} ${meta.symbol}` : `${meta.symbol}${formatted}`
 }
 
