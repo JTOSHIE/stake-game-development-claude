@@ -189,7 +189,7 @@ export function parseCapture(text) {
     TND: { placement: 'code-leading', symbol: 'TND', decimals: 2, pageExample: '10.00 TND' },
     OMR: { placement: 'code-leading', symbol: 'OMR', decimals: 2, pageExample: '10.00 OMR' },
     QAR: { placement: 'code-leading', symbol: 'QAR', decimals: 2, pageExample: '10.00 QAR' },
-    JPY: { placement: 'prefix', decimals: 2, pageExample: '¥10' },
+    JPY: { placement: 'prefix', decimals: 0, pageExample: '¥10' }, // ZERO per the R066 ledger read; the page agrees here
     IDR: { placement: 'prefix', decimals: 2, pageExample: 'Rp10' },
     KRW: { placement: 'prefix', decimals: 2, pageExample: '₩10' },
     KWD: { placement: 'prefix', decimals: 2, pageExample: null },

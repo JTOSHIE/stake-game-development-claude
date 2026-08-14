@@ -37,7 +37,13 @@ mkdirSync(SCREENS_DIR, { recursive: true })
 const VIRTUAL_CODES = ['XSC', 'XGC', 'SC', 'GC']
 
 // JPY is the high-minimum currency required by the brief: zero decimals, and bet
-// levels three orders of magnitude larger than USD.
+// levels three orders of magnitude larger than USD. The zero-decimal authority is
+// now the portal Bets ledger, read first-hand (R066 TASK 3,
+// docs/stake-engine-live/captures/2026-08-14_portal_bets_jpy.md: COST ¥100,
+// PAYOUT ¥0). Recorded per (n): R065's uniform-two default briefly put the
+// shipped table at ¥10.00 while this harness kept asserting zero, and being
+// local-only it was never run in that window; the ledger read settles the
+// disagreement in this file's favour.
 const DOM_CURRENCIES = ['USD', 'JPY', 'XSC', 'XGC']
 
 const failures = []
@@ -128,9 +134,11 @@ async function run() {
       check('unit: USD narrow symbol, no US prefix',
         unit.usd === '$1.25', unit.usd)
 
-      // Zero-decimal / high-minimum currency.
+      // Zero-decimal / high-minimum currency, per the ledger read (R066 TASK 3).
       check('unit: JPY is zero-decimal',
         unit.jpy.includes('1,250') && !unit.jpy.includes('.'), unit.jpy)
+      check('unit: JPY renders the exact ledger form, ¥1,250',
+        unit.jpy === '¥1,250', unit.jpy)
 
       // The core rule: the raw code must never be the player-facing symbol.
       for (const [k, v] of Object.entries({ symXSC: unit.symXSC, symSC: unit.symSC })) {

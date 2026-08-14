@@ -221,7 +221,7 @@ export const PLATFORM_CURRENCIES: Record<string, PlatformCurrency> = {
   // with the nine; the R065 tracker row asks the owner to confirm.
   USD: { symbol: '$',    decimals: 2 }, // $10.00
   CAD: { symbol: 'CA$',  decimals: 2 }, // CA$10.00
-  JPY: { symbol: '¥',    decimals: 2 }, // ¥10.00, two decimals per TASK 2 default
+  JPY: { symbol: '¥',    decimals: 0 }, // ¥10, ZERO per the portal Bets ledger read first-hand (R066 TASK 3, captures/2026-08-14_portal_bets_jpy.md; the ledger governs decimals per the R065 TASK 2 rule, and the production capture's ¥100.00 divergence is recorded per (n) in the same file)
   EUR: { symbol: '€',    decimals: 2 }, // €10.00
   RUB: { symbol: '₽',    decimals: 2 }, // ₽10.00
   CNY: { symbol: 'CN¥',  decimals: 2 }, // CN¥10.00

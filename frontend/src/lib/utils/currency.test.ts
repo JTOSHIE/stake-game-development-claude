@@ -83,13 +83,18 @@ ok('USD is not virtual', !isVirtualCurrency('USD'))
 // zero-decimal rows the only exceptions (VND 10, CLP 10). JPY, IDR and KRW
 // therefore carry two decimals now; the old zero-decimal block asserted the
 // published Example column, which the ruling supersedes.
-eq('JPY renders two decimals per the R065 default', formatBalance(1250 * S, 'JPY', 'en'), '¥1,250.00')
-for (const code of ['VND', 'CLP']) {
-  ok(`${code}: zero decimals, written into the ruling itself`, !/\.\d/.test(formatBalance(1250 * S, code, 'en')),
+// R066 TASK 3: the portal Bets ledger, read first-hand, renders JPY at ZERO
+// decimals (captures/2026-08-14_portal_bets_jpy.md), and the R065 TASK 2 rule
+// names the ledger as the decimals authority, so JPY flips to zero. IDR and
+// KRW keep the uniform-two default: their ledger rows are unread, and the
+// asymmetry is recorded rather than generalised from one currency's evidence.
+eq('JPY renders zero decimals per the ledger read (R066)', formatBalance(1250 * S, 'JPY', 'en'), '¥1,250')
+for (const code of ['VND', 'CLP', 'JPY']) {
+  ok(`${code}: zero decimals per the ruling and the ledger`, !/\.\d/.test(formatBalance(1250 * S, code, 'en')),
     formatBalance(1250 * S, code, 'en'))
 }
-for (const code of ['JPY', 'IDR', 'KRW']) {
-  ok(`${code}: two decimals per the R065 default`, /\.\d\d/.test(formatBalance(1250 * S, code, 'en')),
+for (const code of ['IDR', 'KRW']) {
+  ok(`${code}: two decimals per the R065 default, ledger unread`, /\.\d\d/.test(formatBalance(1250 * S, code, 'en')),
     formatBalance(1250 * S, code, 'en'))
 }
 
