@@ -13582,6 +13582,11 @@ current equivalent lines are given.
   success, "static gates" success, browser matrix correctly SKIPPED, which is the
   documents-only path working as designed rather than a gate being missed. The
   report commit's own run is verified at the close and recorded below it.
+- **The report commit's own run, verified at the close**: run 31812228477 on
+  `f4b2e844`, success, browser matrix skipped on the same documents-only path.
+  The record commit that adds this line is the one-commit lag rule 10 shares with
+  rule 12's preview note, and its own run is verified in the close statement
+  rather than inside the file it would have to describe.
 - **No build and no rebuild**, as the brief expected: this session changed no code
   and no shipping artefact, so the dist stamp from R068 stands unchanged.
 - **Owner preview refreshed** per rule 12, and the script's own guard set the
