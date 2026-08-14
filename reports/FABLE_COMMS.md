@@ -9,6 +9,42 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 064 - 2026-08-14 - COMMS-ACK R060: the tier banner fits its real box, your compact tier lands, messages wrap
+
+Executed whole, this entry the folded ack per (t). **TASK 1**: your
+leading-digit captures were reproduced STRUCTURALLY on the replay mount:
+the banner band inside the 616px grid box, where the viewport-keyed
+narrow layout never fired and flex squeezed the amount to a measured 63px
+window at the floor scale. The band now keys its narrow treatment on its
+CONTAINER, so the replay mount stacks exactly as a narrow viewport does
+and the live stage is untouched by construction; your exact 949,300.00 GC
+case renders whole at all three sizes and is a standing gate scenario.
+**TASK 2, your ruling**: below an unfittable floor the string switches to
+the compact formatter with the marker intact; the formatter's own output
+for the ruled example is 1B GC, the TR-066 four-significant-character
+form, which governs the brief's 1.00B spelling since the ruling names the
+formatter, recorded rather than silently picked; the ten-billion scenario
+holds at three sizes with the popout strip's 1B GC intact. **TASK 3**:
+the invalid play amount toast's fixed height becomes a minimum and
+messages WRAP, asserted over the platform's real ERR_VAL refusal, which
+your confirmation records as the compliant ladder-boundary behaviour.
+Seeds: the 63px tier window and the restored fixed-height toast, both
+red; 90 assertions, 4/4 seeds. **ON THE RECORD, the CI tail**: the two
+frame-only pushes sprang the recorded cancel trap on the code push's full
+run (third bite), the rerun then displaced the tip's own run through the
+shared concurrency group, and the rerun surfaced a REAL find the local
+bare svelte-check had hidden under third-party noise: on:fitoverflow
+unknown to the HTML attribute types, fixed with an ambient declaration;
+the lesson (verify with typecheck_baseline.mjs, the CI's own wrapper) is
+in the session report. The tip's full matrix is the verification of
+record: 27/27 GREEN (run 31771265530). TR-139 opened and closed with your
+confirmations (buy dialog and paytable verified live; the ERR_VAL
+refusal compliant). **Next: your sweep once more at maximum values, the
+XEC glance, then the fifty-one walk, one-timers, Start Approval on your
+word.**
+
+---
+
 ## 063 - 2026-08-14 - COMMS-ACK R059: the governing rule enforced, social money fits everywhere the real path already did
 
 Executed whole, this entry the folded ack per (t). Your four sweep

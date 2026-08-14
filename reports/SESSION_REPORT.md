@@ -12918,3 +12918,92 @@ re-runs the sweep in social at maximum values, plus the still-open XEC
 glance, then the fifty-one walk and ticks, the one-timers (Provably Fair
 toggle, wallet re-read, payment under the Medium Rare N.V. terms), and
 Start Approval on the owner's word.
+
+## R060 ADDENDUM, 2026-08-14: the last of the money-fit class, the compact tier, and a CI tail with one real find
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R060_COMPACT_TIER_Prompt.md`.
+Model: Claude Fable 5, judgement tier. The owner's second sweep at
+ten-figure social values CONFIRMED the R059 buy dialog and paytable fixes
+and the invalid play amount rejection as compliant ladder-boundary
+behaviour (TR-139 records both), and found three items.
+
+**TASK 1, the tier banner** (`3a5cc2b8`). The owner's leading-digit
+captures ("EPIC PRIZE 1", "MEGA PRIZE 949") were reproduced structurally
+on the REPLAY mount: at desktop the live stage hands the banner band
+1280px and everything fits, but the replay mounts the same component
+inside the 616px grid box, the viewport-keyed narrow layout never fired
+there, and flex squeezed the amount to a measured 63px window at the
+floor scale (scrollWidth 222 against clientWidth 63). The band now keys
+its narrow treatment on its CONTAINER (container-type on the plate wrap,
+the same rules in cqw), so the replay mount stacks exactly as a narrow
+viewport does and the live stage is untouched by construction, which the
+re-run estate proves. The amount is data-money and the owner's exact
+949,300.00 GC case is a standing gate scenario at all three sizes:
+renders whole, full or ruled compact, zero overflow.
+
+**TASK 2, the compact tier, Fable's ruling** (`3a5cc2b8`). Below an
+unfittable floor the string switches to the compact formatter with the
+marker intact. autofitText cannot swap text it does not own (the banner
+renders digit-boxed children), so the action REPORTS the condition
+(data-fit-overflow and a fitoverflow CustomEvent) and the consumer
+switches its label, keyed on the SETTLED value so a mid-count frame
+cannot flap it. ONE DELTA RECORDED RATHER THAN SILENTLY PICKED: the
+ruling's example spells "1.00B GC", and the ruled formatter's own output
+is "1B GC", the TR-066 four-significant-character form; the ruling names
+the formatter, so its output governs the spelling. The ten-billion
+scenario runs at all three sizes and the popout strip's compact balance
+is asserted at exactly "1B GC", token intact.
+
+**TASK 3, messages wrap** (`3a5cc2b8`). The invalid play amount toast's
+fixed 54px height cut its message to one line; the height is now the
+single-line minimum, messages wrap with long words breaking
+(data-msg="wrap"), and the gate asserts the whole message shows over the
+platform's real 400 ERR_VAL refusal.
+
+**The gate**: 90 assertions, the two new seeds (the 63px tier window and
+the restored fixed-height toast) both red, 4/4 seeds total; seeded
+invocations run a trimmed matrix so the CI leg's wall clock holds. The
+affected estate re-ran green locally: replay contract 49/49, replay fit,
+win precision, layout fit, max-win hold.
+
+**THE CI TAIL, reported plainly, three linked events.** First, the two
+frame-only pushes (`9dccc90d`, `3fc587c3`, regenerated replay-contract
+frames the R060 band change legitimately altered) sprang the recorded
+cancel trap on the code push's full-matrix run, the class's third bite.
+Second, the recorded fix (`gh run rerun` of the cancelled run) DISPLACED
+the tip's own in-progress run through the shared concurrency group, a new
+wrinkle now recorded beside the trap: rerunning an older run competes in
+the same group as the newest push. Third, the rerun then FAILED its
+static leg on a REAL find: the remote typecheck baseline (0 source
+errors) caught `on:fitoverflow` unknown to the HTML attribute types,
+which the local bare `svelte-check` run had hidden under six third-party
+node_modules errors. Fixed with an ambient declaration
+(`frontend/src/fit-events.d.ts`, `69da5967`); the standing lesson is to
+verify locally with `scripts/typecheck_baseline.mjs`, the CI's own
+wrapper, never bare svelte-check. The tip's own push then ran the FULL
+27-job matrix as the verification of record: run 31771265530, 27/27
+GREEN. The records-only close push follows a COMPLETED full run, so the
+trap has no window.
+
+**Rule 12.** The preview was refreshed at `3fc587c3` mid-session (after
+the frame commits) and is refreshed at the final tip as the last action,
+both curl-verified. **Tracker**: TR-139 opened and closed. COMMS 064
+folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: reproduce structurally before fixing (the 63px window
+measurement is what named the container fix), key layout on the box a
+component actually gets, and let the action report what it cannot do
+(the fitoverflow event) rather than seizing text it does not own.
+Alternatives rejected: viewport-keyed special-casing for the replay
+mount (the next fixed-size mount would recreate the defect); the action
+swapping textContent (it would destroy the banner's digit-boxed
+children). Files touched: autofitText.ts, WinBanner.svelte, App.svelte,
+fit-events.d.ts, money_fit_gate.mjs, the tracker, comms, this report,
+plus the regenerated replay-contract frames. Open threads: the owner's
+sweep once more at maximum values, the still-open XEC glance, then the
+fifty-one walk and ticks, the one-timers (Provably Fair toggle, wallet
+re-read, payment under the Medium Rare N.V. terms), and Start Approval
+on the owner's word.
