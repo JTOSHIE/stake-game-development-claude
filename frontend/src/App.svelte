@@ -2513,7 +2513,26 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    /* R068: the stage is a fixed 1280x720 CANVAS COMPOSITION, so its geometry
+       is pinned left-to-right regardless of the document's direction. The
+       document-level dir flip for ar (line 233, kept: it is what a screen
+       reader and the platform host read) otherwise re-flows the two
+       direction-sensitive boxes inside the stage: .grid-scale, a 616px static
+       block in the 522px .grid-slot, re-anchors to the inline-start edge and
+       drifts 94px left out of the frame while the top-left transform origin
+       stays physical; and .symbol-grid, a flex row, reverses reel order.
+       Measured both ways on 2026-08-14 (r068 direction parity gate). Arabic
+       TEXT inside the stage keeps native shaping: shaping is a property of
+       the script, not of the container's direction, and every text node's
+       bidi runs still resolve per the Unicode algorithm. */
+    direction: ltr;
   }
+
+  /* R068 bidi isolation for the two sentence surfaces this file renders (the
+     error toast and the recovery banner): base direction from the sentence's
+     own first strong character, so Arabic reads natively inside the pinned
+     stage and Latin locales are untouched. */
+  .error-banner, .recovery-banner span { unicode-bidi: plaintext; }
 
   /* LAYOUT_SPEC v3.1 stage: fixed 1280x720 design surface, every child
      absolutely positioned per spec, the whole thing scaled by S (set in the

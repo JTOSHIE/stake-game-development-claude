@@ -1166,6 +1166,15 @@ jobs:
           - name: "browser: retrigger moment"
             run: node scripts/r062_retrigger_proof.mjs --self-test && node scripts/r062_retrigger_proof.mjs
 
+          # R068 (the RTL geometry leak): stage geometry is direction-invariant.
+          # Flip-in-place twins (same page, document dir flipped) over the live
+          # stage, buy dialog and replay view at three sizes; a real ar load
+          # keeps lang/dir and its board matches the ltr twin; seeded by
+          # LIFTING THE PIN, which must reproduce the owner's exact -94px grid
+          # drift and the reel-order reversal red.
+          - name: "browser: direction parity"
+            run: node scripts/direction_parity_gate.mjs --self-test && node scripts/direction_parity_gate.mjs
+
           # R047 TASK 5 (TR-129): the two-step autoplay property joins the
           # matrix, both halves. The confirm gate proves the CODE cannot start
           # a bet from a selection handler (static, seeded); the r042b proof

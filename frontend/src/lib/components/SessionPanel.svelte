@@ -147,6 +147,14 @@
 {/if}
 
 <style>
+  /* R068 bidi isolation, the "where needed" of the stage pin: sentence
+     elements take their base direction from their own first strong character
+     (unicode-bidi: plaintext), so Arabic prose reads natively (trailing
+     punctuation at its correct end) inside the ltr-pinned stage, while every
+     Latin-script locale resolves ltr and renders byte-identically. Box
+     geometry stays pinned; this affects only inline bidi ordering. */
+  .rc-modal p { unicode-bidi: plaintext; }
+
   .rc-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .rc-stop {
     padding: 9px 18px; border-radius: 8px; cursor: pointer;

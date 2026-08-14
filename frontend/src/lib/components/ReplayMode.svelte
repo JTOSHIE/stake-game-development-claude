@@ -635,11 +635,25 @@
 </div>
 
 <style>
+  /* R068 bidi isolation, the "where needed" of the stage pin: sentence
+     elements take their base direction from their own first strong character
+     (unicode-bidi: plaintext), so Arabic prose reads natively (trailing
+     punctuation at its correct end) inside the ltr-pinned stage, while every
+     Latin-script locale resolves ltr and renders byte-identically. Box
+     geometry stays pinned; this affects only inline bidi ordering. */
+  .replay-disclaimer { unicode-bidi: plaintext; }
+
   .replay-container {
     /* TR-076. Positioned above App.svelte's fixed .bg-layer (z-index 0), the
        same relationship .game-stage (z-index 2) has in normal play. Without
        this the backdrop painted over the whole replay UI, leaving START
        REPLAY a shadow under the dark overlay. */
+    /* R068: the replay view is the second stage root (it renders INSTEAD of
+       .game-stage), so it carries the same left-to-right pin for the same
+       reason: board geometry is a canvas composition and must not re-flow
+       under the document-level dir flip for ar. See .game-stage in
+       App.svelte for the measured mechanism. */
+    direction: ltr;
     position: relative;
     z-index: 2;
     width: 100%;
