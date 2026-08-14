@@ -1482,3 +1482,78 @@ the OMR/QAR confirmation; the JPY ledger glance; the retrigger eyeball;
 then the fifty-one walk and ticks, the one-timers (Provably Fair toggle,
 wallet re-read, payment under the Medium Rare N.V. terms), and Start
 Approval on the owner's word.
+
+## R066 ADDENDUM, 2026-08-14: the evidence landed and the ledger answered zero
+
+Brief saved verbatim and committed:
+`reports/briefs/FS_FABLE_R066_EVIDENCE_LEDGER_Prompt.md`. Model: Claude
+Fable 5, judgement tier, serial session on main per the brief.
+
+**TASK 1.** The owner's six Valkyrie production captures (Waylander's
+Forge on stake.com in PLN, EUR, ARS, CAD, PHP and JPY) were extracted
+from the session transcript and committed under
+`docs/stake-engine-live/captures/` dated 2026-08-14 with a one-line
+index (`0c0d19fc`). TR-143's convention (m) AWAITING citation resolves
+to real files. The captures visually confirm the R065 classification in
+production: PLN and ARS code-leading with one space, EUR and CAD and PHP
+symbol-prefixed, and JPY at two decimals in the stake.com HUD, which
+matters below.
+
+**TASK 2.** The owner's confirmation of the eleven-row flip is on the
+record verbatim in TR-144: "OMR and QAR belong with the nine... Fable's
+nine was a miscount, corrected on the record." No code change; the (n)
+escalation closes.
+
+**TASK 3, the field pass and the finding.** Through the restored login
+the play modal ran a JPY session; one minimum spin was placed (bet ¥100,
+balance ¥1,000 to ¥900, win ¥0) and the portal Bets ledger was read
+first-hand, strings verbatim from the DOM: **COST ¥100, PAYOUT ¥0, ZERO
+decimals** (Event 78956, Currency JPY; evidence committed at
+`docs/stake-engine-live/captures/2026-08-14_portal_bets_jpy.md`). The
+R065 TASK 2 rule names the ledger as the decimals authority, so the JPY
+row FLIPPED from the uniform-two default to zero decimals: currency.ts,
+the table gate's RULED layer (its ¥10 page pin now agrees rather than
+being superseded), currency.test.ts, and the local conformance harness's
+JPY scenario extended to assert the exact ledger form.
+
+**Two tensions recorded per (n) rather than smoothed over.** First, the
+owner's same-day production capture shows stake.com rendering ¥100.00
+while the portal ledger renders ¥100; the two first-party surfaces
+disagree, the ruling's named authority is the ledger, and the evidence
+file carries the note for any later reconciliation. Second, the
+local-only conformance harness kept asserting zero-decimal JPY straight
+through the R065 two-decimal interim, unnoticed because it sits outside
+the CI battery per ruling 11; the ledger read vindicates its assertion
+by luck, not design, and TR-144 records the lesson.
+
+**Method note.** Pane screenshots cannot be saved as repository files,
+so the ledger evidence is a verbatim text transcript with the method
+stated, the established form. The modal session ran the previously
+uploaded v9 front, whose own HUD already rendered zero-decimal yen; the
+reading that governs is the PORTAL LEDGER's, not the old front's.
+
+**Battery, all green**: currency static 133/133; table gate 589
+assertions, 21 self-test checks; the conformance harness PASS with the
+extended JPY scenario; win precision PASS; money fit 205/205; typecheck
+baseline PASS. Rebuilt at the tip: **v10 8f72cae8, 77 files, 12,335,437
+bytes**, the owner's dist sync stamp. IDR and KRW keep the two-decimal
+default, their ledger rows unread, the asymmetry recorded.
+
+**Tracker**: TR-144 opened and closed by R066. COMMS 068 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on
+main. Approach taken: read the ledger before ruling, quote it verbatim,
+and let the brief's own precedence rule decide the flip; name both
+tensions instead of choosing quietly. Alternatives rejected: keeping JPY
+at two on the production capture's evidence (the ruling names the
+ledger, not the HUD, as the decimals authority); flipping IDR and KRW
+alongside (their ledgers are unread, and generalising one currency's
+evidence is the (l.4) error). Files touched: the six capture JPGs and
+index, the ledger evidence file, currency.ts, currency.test.ts,
+currency_table_gate.mjs, currency_conformance.mjs, the tracker, comms,
+this report. Open threads: the owner's side-by-side flip-through beside
+the committed captures; the retrigger eyeball; the fifty-one walk and
+ticks; the one-timers (Provably Fair toggle, wallet re-read, payment
+under the Medium Rare N.V. terms); Start Approval on the owner's word.

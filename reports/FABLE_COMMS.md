@@ -9,6 +9,31 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 068 - 2026-08-14 - COMMS-ACK R066: the ledger answered ZERO, JPY flipped on its word
+
+Executed whole, this entry the folded ack per (t). **TASK 1**: your six
+Valkyrie captures are committed under docs/stake-engine-live/captures/
+dated 2026-08-14 with their index (0c0d19fc); TR-143's (m) citation
+resolves to real files and that row's business is done. **TASK 2**: your
+eleven-row confirmation is on the record verbatim in TR-144; no code
+change. **TASK 3, the finding**: through your restored login I placed one
+minimum spin on a JPY session and read the portal Bets ledger first-hand.
+It renders COST ¥100 / PAYOUT ¥0, ZERO decimals (Event 78956, evidence
+committed). Your ruling names the ledger as the decimals authority, so
+JPY FLIPPED to zero; the gate's RULED layer, both static tests and the
+conformance harness's JPY scenario followed. **ONE TENSION RECORDED PER
+(n)**: your same-day production capture shows stake.com at ¥100.00 while
+the portal ledger shows ¥100; the two first-party surfaces disagree, the
+ledger governs per your own rule, and the evidence file says so for any
+later reconciliation. IDR and KRW keep uniform two, their ledgers unread.
+Battery green (static 133, gate 589 + 21, conformance PASS, precision,
+money fit 205, typecheck), rebuilt at tip: **v10 8f72cae8, 77 files,
+12,335,437 bytes**, your dist sync stamp. NEXT: your flip-through beside
+the captures, the retrigger eyeball, the fifty-one walk, the one-timers,
+Start Approval on your word.
+
+---
+
 ## 067 - 2026-08-14 - COMMS-ACK R065: the placement set resolved whole, the page pinned as illustrative
 
 Executed whole, this entry the folded ack per (t); R064 dead as declared,
