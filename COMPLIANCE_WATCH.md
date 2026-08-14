@@ -53,6 +53,40 @@ Australian English, no em dashes or en dashes.
 
 ## Watch log
 
+### 2026-08-15: full 64-route re-capture (R070); ZERO delta, and the RGS refresh stands done early
+
+Every route the live docs sidebar lists was enumerated from `/docs` itself and captured
+into `docs/stake-engine-live/2026-08-15/`: 71 navigation anchors, 64 unique routes, all
+rendered, none sampled or skipped. **All 64 are byte-identical to the 2026-08-11
+capture.** No page changed, so no delta is recorded, no STOP is raised and no ruling is
+owed.
+
+**The RGS family was re-diffed on two independent transports**, per the brief and per
+convention (l.4): through the logged-in browser pane, hashing
+`document.querySelector('main').innerText` in the page, and independently through
+headless Playwright at a different viewport. `/docs/rgs` reads 12,025 characters and
+sha256 `cefad0fd2ed1a789e4b50cea9f0a2266d1ab5d0f04428f3d1889531a31a24580`,
+`/docs/rgs/wallet` 2,537 and `15d774ea...`, `/docs/rgs/example` 2,273 and `0abf0a75...`,
+each matching the 2026-08-11 record exactly. **The trio has not changed since
+2026-07-29**, across four captures and seventeen days, so **the submission-morning
+refresh of the RGS family stands done early.**
+
+**Eight pages first read as changed by exactly one character each, and the cause was in
+our own record rather than on the platform.** The 2026-08-11 manifest recorded sha256
+over the raw `innerText` while the file beside it holds the trimmed text, and those eight
+pages end in a newline. Re-capturing the raw text reproduced the 2026-08-11 hashes
+exactly for all eight. The 2026-08-15 manifest records both normalisations per page so
+the false delta cannot recur. Full account in
+`docs/stake-engine-live/2026-08-15/DELTA_NOTES.md`.
+
+**Four items were escalated from the materiality skim, none actioned**: three clauses of
+the platform Developer Agreement (the public repository against clause 5.1.a.ii, the
+insurance obligation at 17.16.a that no register carries, and the USD $1,000 licence-fee
+accrual floor at line 387 against the flat "any amount above $0.00" in the owner's
+register), and one integrity artefact inside the locked maths package (three lookup-table
+hashes in the package config disagree with the shipped CSVs, cause documented in
+`SUBMISSION_DOSSIER.md`, nothing that ships is affected). Tracker row TR-148.
+
 ### 2026-08-10: full 66-page mirror re-render (R043 PHASE 6); three pages changed, two STOP flags
 
 The complete 2026-07-29 topic list was re-rendered into
