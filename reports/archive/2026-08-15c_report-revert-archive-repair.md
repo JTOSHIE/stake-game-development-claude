@@ -145,6 +145,35 @@ is the project's own convention for naming a symbol without asserting its
 location: the five identifiers are unbackticked and every file citation is left
 exactly as written. No status cell, no finding and no disposition was altered.
 
+## The remote run, recorded per rule 10, and it is RED
+
+**Run 31836692899 on `03b13a62`: failure.** Two jobs, and both are documented
+decisions rather than surprises:
+
+1. **`static gates`, at "track manifests are disjoint".** This is TASK 4's measured
+   consequence, above. **The step the brief targeted, "locked paths and track
+   scope", is CLEARED**: run locally against the full branch range it reports
+   `28 glob(s), 33 changed file(s), 0 out of scope`, and remotely it is not reached
+   because DISJOINT runs one step earlier and aborts the job.
+2. **`browser: max-win hold`.** Diagnosed under TASK 5 and deliberately not fixed.
+
+**AND THE SAME MASKING APPLIES ONE STEP EARLIER THAN BEFORE, which is worth
+naming.** The analysis pass recorded that the previous run aborted at step 3 and
+hid the rest of the static suite. This run aborts at step 5, so 40 later steps are
+still `skipped` remotely, including the document currency scan, the dash gate, the
+build and every static test. **They were run locally against this exact tree and
+both gates pass**, but a local green is not a remote green and rule 10 says so.
+
+**One deletion stands between this branch and a green run**, and it is the owner's
+call, not the builder's:
+
+```
+git rm docs/records/tracks/quality-sweep.manifest docs/records/tracks/docs-reskin.manifest
+```
+
+Both name branches deleted on 2026-07-28 with the verification recorded at
+`docs/records/BRANCH_HYGIENE_2026-07-28.md`.
+
 ## FOR THE NEXT SESSION
 
 Model and effort: Claude Fable 5, judgement tier, one session, on the PR #123
