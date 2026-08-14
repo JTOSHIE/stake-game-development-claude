@@ -1,0 +1,73 @@
+# track/standback-2026-08-15 scope manifest
+#
+# MULTI-TRACK PROTOCOL rule 2: a track is a branch plus this file. Every path a
+# commit on track/standback-2026-08-15 touches must match one of the globs
+# below, and scripts/qa/locked_paths_gate.mjs fails CI otherwise.
+#
+# Declared 2026-08-15 by FS_REPORT_REVERT_2026-08-15_Prompt.md TASK 4, AFTER the
+# work rather than before it, which rule 2 asks for the other way round. That is
+# recorded rather than smoothed over: the stand-back session opened a track/
+# branch without one, the gate caught it on run 31815432853, and this file is the
+# repair. The scope below is therefore the EXACT set of paths the branch has
+# actually touched, enumerated from git diff --name-only 90f21280..HEAD plus the
+# files this repair adds. It is not widened by a single glob beyond that.
+#
+# Glob forms: an exact path; a trailing slash for a whole directory; ** for any
+# depth and * for one segment.
+#
+# The locked paths are NOT excluded here and do not need to be. The same gate
+# carries the locked-path rule separately, so a locked file still fails without
+# an owner-sanction token even if a glob here matched it. None does.
+#
+# MEASURED CONSEQUENCE, RECORDED HERE BECAUSE IT IS NOT OPTIONAL AND IS NOT OURS
+# TO DECIDE. Committing this file clears the TRACK SCOPE failure and opens a
+# DISJOINT failure in the same gate, run 2026-08-15:
+#
+#   DISJOINT: 4 manifest(s), 4466 tracked file(s), 14 file collision(s),
+#   2 shared glob(s)
+#
+# All 14 collisions and both shared globs are against manifests whose BRANCHES NO
+# LONGER EXIST. quality-sweep declares frontend/src/**, frontend/scripts/** and
+# docs/QUALITY_CHARTER.md; docs-reskin declares COMPLIANCE_WATCH.md; both
+# branches were deleted on 2026-07-28 and the verification is recorded at
+# docs/records/BRANCH_HYGIENE_2026-07-28.md. The gate compares every .manifest
+# file in this directory and has no way to know a track has finished.
+#
+# So no honest manifest for any new track that touches frontend/src can be
+# disjoint while those two files remain. Narrowing THIS one to dodge the
+# collision would make the scope check fail instead, because the branch really
+# does touch those paths, and would be a manifest that lies.
+#
+# THE FIX IS ONE COMMAND AND IT IS NOT TAKEN HERE, because deleting another
+# track's record sits outside this brief's staged paths and outside a builder's
+# call: git rm docs/records/tracks/quality-sweep.manifest
+# docs/records/tracks/docs-reskin.manifest. It waits for the owner's word.
+
+.grok/workflows/project-audit.rhai
+CLAUDE.md
+COMPLIANCE_WATCH.md
+docs/QUALITY_CHARTER.md
+docs/records/reviews/REVIEW_TRACKER.md
+docs/records/tracks/standback-2026-08-15.manifest
+frontend/scripts/build_diet_verify.mjs
+frontend/scripts/dead_wiring_scan.mjs
+frontend/src/App.svelte
+frontend/src/app.css
+frontend/src/lib/components/BetSelector.svelte
+frontend/src/lib/components/FeatureMenu.svelte
+frontend/src/lib/components/HudOverlay.svelte
+frontend/src/lib/components/PaytableModal.svelte
+frontend/src/lib/services/replayLocale.test.ts
+frontend/src/lib/services/replayService.ts
+frontend/src/lib/stores/buyAffordability.ts
+frontend/src/lib/stores/modalGuard.test.ts
+frontend/vite.config.ts
+reports/SESSION_REPORT.md
+reports/archive/2026-07-29d_session3_remediation.md
+reports/archive/2026-07-30_true-fixdown.md
+reports/archive/2026-08-15_standback-project-audit.md
+reports/archive/2026-08-15c_report-revert-archive-repair.md
+reports/briefs/FS_PROJECT_AUDIT_2026-08-15_Prompt.md
+reports/briefs/FS_REPORT_REVERT_2026-08-15_Prompt.md
+reports/qa/standback-2026-08-15/**
+reports/qa/stream_test/KNOWN_OPEN.md
