@@ -136,6 +136,25 @@ artefact and nothing was changed on its account.
 
 ## 5. The remote reading
 
-Recorded in the session report for this pass and appended below once the run for this
-push completes, because the remote runner is a different machine and rule 10 does not
-accept a local green in its place.
+The remote runner is a different machine and rule 10 does not accept a local green in
+its place, so the authoritative reading is here.
+
+**RUN 31841069497 ON `6b9a443b`: SUCCESS, and it is the first time this branch has
+seen its own static suite.**
+
+| Reading | Value |
+|---|---|
+| jobs in the run | **29, all success** |
+| steps in `static gates` | **75** |
+| steps that succeeded | **75** |
+| steps skipped | **0** |
+| steps failed | **0** |
+
+**Every step that the two earlier runs masked ran, and every one passed**, including
+`dist hygiene, no documentation ships`, which confirms the local red in section 4 was
+the dirty-tree build stamp and nothing else. The count is 75 rather than the 69 run
+locally because the remote job also runs its checkout, Node and install steps.
+
+**PR #123 is green.** Both reds the previous pass documented are cleared: the disjoint
+failure by TASK 1, and `browser: max-win hold` by TASK 2.
+

@@ -14091,6 +14091,20 @@ and the scope check fails on any path the manifest does not declare. It is exten
 by exactly those paths and by nothing else, and its superseded header note is marked
 superseded rather than deleted.
 
+## The remote run, recorded per rule 10: GREEN
+
+**Run 31841069497 on `6b9a443b`: success. 29 jobs, all green.** The `static gates`
+job ran **75 steps, 75 successes, zero skipped**, which is the first complete
+static suite this branch has ever produced: the two earlier runs aborted at step 3
+and step 5 and reported everything after as skipped.
+
+`dist hygiene, no documentation ships` passed remotely, which confirms the local
+red under TASK 4 was the dirty-tree build stamp and not a defect.
+
+**PR #123 is green.** Both documented reds are cleared, the disjoint failure by
+TASK 1 and `browser: max-win hold` by TASK 2, and no other step went red in their
+place.
+
 ## FOR THE NEXT SESSION
 
 Model and effort: Claude Fable 5, judgement tier, one session, on the PR #123 branch.
