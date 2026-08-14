@@ -1331,3 +1331,83 @@ this report, the pixel-guard pack. Open threads: the owner's sweep once
 more, the still-open XEC glance, then the fifty-one walk and ticks, the
 one-timers (Provably Fair toggle, wallet re-read, payment under the
 Medium Rare N.V. terms), and Start Approval on the owner's word.
+
+## R062 ADDENDUM, 2026-08-14: the retrigger moment, owner art direction
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R062_RETRIGGER_Prompt.md`.
+Model: Claude Fable 5, judgement tier. The owner's findings: the +5
+retrigger notice was small, right-positioned, and hidden outside the
+frame on small screens; the owner directed a centred celebration with a
+flame-jet colour chase, under named integrity guardrails. The owner also
+CONFIRMED the R061 desktop fix live at ten figures, recorded on TR-141.
+
+**THE MOMENT** (`176446fb`). On the settled retrigger event, after the
+TR-036 ladder reveals it and never earlier: the sequencer pauses a FIXED
+1600ms, deliberately not dur()-scaled so every occurrence is identical;
+the grid dims 30 percent with the per-spin win pop yielded; the award
+text renders CENTRED over the grid in the entry pod's award treatment
+using the existing "+5 free spins" key family (no new strings); the
+eight flame jets run a perimeter colour chase, cyan to deep pink to
+green, two clockwise laps in 1.6s via per-jet clockwise delays, then the
+mode colourway resumes (the chase hue stops reuse the recolour law's own
+ruled values; jets exist on the live stage only, so the replay's moment
+simply has no jets to chase); the counter panel keeps its existing
+behaviour; the banner exits and the sequencer resumes. Reduced motion:
+static centred banner, no chase, same duration. The old side notice is
+REMOVED with its styles.
+
+**THREE CRAFT FINDS, each caught by the proof or its frames and each
+recorded at the site.** The per-spin win pop bled through the centred
+award text, and hiding it by opacity hid nothing: the pop's own entrance
+keyframes animate opacity and an active animation beats a static rule,
+so the hide is by VISIBILITY. The moment's reduced-motion override lost a
+source-order tie because the new CSS block inherited the OLD side
+notice's position AFTER the media block; it moved above it, and the
+proof's reduced-motion leg is what caught the surviving animation. And
+the proof's own seeded invocation first returned PAST its verdict and
+exited 0, the recorded r042b class, fixed so the seed carries its
+verdict with it.
+
+**Proof** (`r062_retrigger_proof.mjs`, CI leg "browser: retrigger
+moment"): fires exactly once on the retrigger fixture (base.feature,
+updateFreeSpin 16 to 21) and never on the plain fixture; the duration is
+one constant across sizes (1484 to 1512ms measured at 100ms sampling);
+the banner sits whole inside the grid box at Desktop, Mobile S and
+Popout S with the grid dimmed beneath (the R061 visual-bounds eye); the
+sequencer resumes to REPLAY AGAIN; reduced motion held. Ordinary spins
+are BYTE-IDENTICAL against the pre-R062 build: zero changed pixels
+across three mid-feature board marks of the non-retrigger fixture,
+captured by stashing the source and rebuilding
+(`reports/qa/r062_nonretrigger_guard/`). Seeded per (p) with the old
+off-frame position restored verbatim, red on visual bounds. Frames at
+all three sizes plus reduced motion at `reports/screens/r062-retrigger/`.
+
+**Rule 10.** The push ran the full matrix, now 28 jobs with the
+retrigger leg: run 31783441353, 28/28 GREEN, the new leg green on its
+first remote run. This records-only close push follows a COMPLETED full
+run. **Rule 12.** The preview was refreshed at `176446fb` after the code
+push (the owner can trigger a retrigger live on it now) and is refreshed
+at the final tip as the last action, both curl-verified.
+
+**Tracker**: TR-141 (the hidden-notice defect, carrying the owner's R061
+confirmation) and TR-142 (the owner-directed design) both closed. COMMS
+066 folds the ack.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, serial session on main.
+Approach taken: the moment is a SEQUENCER event with a fixed budget (one
+timer owns the pause, dim, banner and chase), which is what makes it
+identical every occurrence and provable in one assertion; the guardrails
+were carried one-for-one into assertions before the close. Alternatives
+rejected: scaling the moment with the speed tier (the brief says
+identical every time); an opacity hide for the win pop (beaten by its
+own keyframes, measured); new strings (the existing award key family
+covers the moment, so nothing needed escalating). Files touched:
+FreeSpinsPresentation.svelte, FlameJets.svelte, App.svelte, the new
+proof, checks.yml, the tracker, comms, this report, the two evidence
+packs. Open threads: the owner triggers a retrigger live and eyeballs
+the moment, the sweep once more, the XEC glance, then the fifty-one walk
+and ticks, the one-timers (Provably Fair toggle, wallet re-read, payment
+under the Medium Rare N.V. terms), and Start Approval on the owner's
+word.

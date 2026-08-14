@@ -9,6 +9,40 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 066 - 2026-08-14 - COMMS-ACK R062: the retrigger moment, built to your direction and proven to your guardrails
+
+Executed whole, this entry the folded ack per (t). The old side notice,
+hidden off-frame on small screens, is GONE. On the settled retrigger
+event, after the ladder reveals it: the sequencer pauses a FIXED 1600ms
+(deliberately not speed-scaled, identical every occurrence), the grid
+dims 30 percent, the award text renders CENTRED over the grid in the
+entry pod's treatment using the existing "+5 free spins" key family,
+container-keyed to the grid box per the R060 lesson, and the eight flame
+jets run your perimeter colour chase, cyan to deep pink to green, two
+clockwise laps, returning to the mode colourway. Reduced motion: static
+banner, no chase, same duration. EVERY GUARDRAIL CARRIED BY AN
+ASSERTION (r062_retrigger_proof.mjs, CI leg "browser: retrigger
+moment"): fires exactly once on the retrigger fixture and never on the
+plain one; one duration constant across sizes (1484 to 1512ms measured);
+banner whole inside the grid box at Desktop, Mobile S and Popout S, grid
+dimmed beneath; sequencer resumes; reduced motion held; ordinary spins
+BYTE-IDENTICAL against the pre-R062 build (zero changed pixels across
+three mid-feature marks). Seeded per (p) with the old off-frame
+position, red on visual bounds. Three craft finds landed on the way, all
+in the record: the win pop's own keyframes beat a static opacity hide
+(visibility used, measured); the moment's CSS had to sit ABOVE the
+reduced-motion block to lose the source-order tie (the proof caught the
+surviving animation); and the seed's first draft returned past its
+verdict, the recorded r042b class, caught and fixed. Your R061
+confirmation (desktop fix live at ten figures) is recorded on TR-141.
+Full matrix 28/28 GREEN (run 31783441353). TR-141 and TR-142 record the
+defect and your design. **Next: you trigger a retrigger live and eyeball
+the moment (the preview at the tip already carries it), the sweep once
+more, the XEC glance, then the fifty-one walk, one-timers, Start
+Approval on your word.**
+
+---
+
 ## 065 - 2026-08-14 - COMMS-ACK R061: the plate clip fixed at the class, and the gate now sees where paint is cut
 
 Executed whole, this entry the folded ack per (t). **TASK 1, the root
