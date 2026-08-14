@@ -524,6 +524,9 @@
   let liveEndBannerAmount = 0
   let liveEndBannerMultiplier = 0
   let liveEndBannerTrigger = 0
+  // R062: the retrigger moment's flame-jet chase, bound out of the
+  // presentation and handed to FlameJets.
+  let liveRetriggerChaseTrigger = 0
   let featureRef: FreeSpinsPresentation
   // OWNER AUDIT ROUND 2, item 4 (Fable's ruling): three distinct entry
   // colourways - natural (organic trigger, any standing mode), overdrive
@@ -2183,7 +2186,7 @@
              failure mode the dead-wiring gate exists for and which a store
              assertion alone would not have caught. -->
         <div class="jets-holder" class:above-overlay={retriggerBeatActive}>
-          <FlameJets active={overdriveVisualActive || retriggerBeatActive} colourway={flameColourway} />
+          <FlameJets active={overdriveVisualActive || retriggerBeatActive} colourway={flameColourway} chaseTrigger={liveRetriggerChaseTrigger} />
         </div>
       {/if}
 
@@ -2231,6 +2234,7 @@
             bind:endBannerAmount={liveEndBannerAmount}
             bind:endBannerMultiplier={liveEndBannerMultiplier}
             bind:endBannerTrigger={liveEndBannerTrigger}
+            bind:retriggerChaseTrigger={liveRetriggerChaseTrigger}
             onRetriggerBeat={(on) => { retriggerBeatActive = on }}
             on:complete={onFeatureComplete}
           />

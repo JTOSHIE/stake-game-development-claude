@@ -85,7 +85,18 @@
   // hue-shift; false again once the 'end' phase starts, so the reverse shift
   // plays out behind the total-win summary rather than after it.
   export let overdriveVisualActive = false
-  let showRetrigger = false
+  // R062, THE MOMENT (owner art direction): replaces the old small
+  // right-positioned +5 notice, which was HIDDEN outside the frame on small
+  // screens (the owner's finding). Fires ONLY on the settled retrigger event
+  // (after the ladder reveals it), holds the sequencer a FIXED 1600ms
+  // (deliberately NOT dur()-scaled: identical every occurrence, per the
+  // integrity guardrails), dims the grid about 30 percent, renders the award
+  // text CENTRED over the grid in the entry pod's award treatment, and bumps
+  // the flame-jet chase (bound out to App's FlameJets; absent surfaces, the
+  // replay among them, simply have no jets to chase).
+  const RETRIGGER_MOMENT_MS = 1600
+  let retriggerMoment = false
+  export let retriggerChaseTrigger = 0
   let timer: ReturnType<typeof setTimeout> | null = null
   // OWNER AUDIT ROUND 2, item 1: the entry card never auto-advances past the
   // scatter-award reveal - it waits here for an explicit click, and nothing
@@ -153,8 +164,7 @@
       displayMeter = 1
       spinsRemaining = 0
       runningTotalCentibets = script.baseSpin.runningTotalCentibets
-      showRetrigger = false
-      timer = setTimeout(toEnd, dur(1800))
+        timer = setTimeout(toEnd, dur(1800))
       return
     }
     phase = 'entry'
@@ -169,7 +179,6 @@
     runningTotalCentibets = script.baseSpin.runningTotalCentibets
     spinsRemaining = script.initialFreeSpins
     awardedTotal = script.initialFreeSpins
-    showRetrigger = false
     overdriveVisualActive = true
     runEntrySequence()
   }
@@ -203,7 +212,6 @@
     }
     displayMeter = script.freeSpins[resumeFromIndex].meterBefore
     runningTotalCentibets = script.freeSpins[resumeFromIndex - 1].runningTotalCentibets
-    showRetrigger = false
     overdriveVisualActive = true
     spinIndex = resumeFromIndex - 1   // nextSpin() increments into the target
     nextSpin()
@@ -327,13 +335,11 @@
     runningTotalCentibets = currentSpin.runningTotalCentibets
     // The +5 pop waits for the ladder on a retriggering spin, so the build and
     // its payoff are not on screen at the same moment.
-    showRetrigger = false
     revealedReels = 5
 
     const spin = currentSpin
     const thisIndex = spinIndex
     const advance = () => {
-      showRetrigger = !!spin.retrigger
       // After a winning spin, animate the meter increment. Bigger wins dwell
       // longer so the connection (and, in a wincap round, the spin that reaches
       // the cap) is actually seen; small wins still move fast.
@@ -353,8 +359,16 @@
 
     if (spin.retrigger) {
       // TR-036 option (b). Reveal this one spin reel by reel and run the capped
-      // ladder over it, then carry on exactly as before.
-      runRetriggerLadder(spin).then(advance)
+      // ladder over it; then R062's moment holds the settled payoff centre
+      // stage for its fixed duration before the sequencer resumes.
+      runRetriggerLadder(spin).then(() => {
+        retriggerMoment = true
+        retriggerChaseTrigger += 1
+        timer = setTimeout(() => {
+          retriggerMoment = false
+          advance()
+        }, RETRIGGER_MOMENT_MS)
+      })
     } else {
       advance()
     }
@@ -497,7 +511,7 @@
              reels at maximum size") - the live meter/spins/total-win values
              are bound out to BonusInstrumentColumn (App.svelte), the single
              source of in-feature instrumentation for both layouts. -->
-        <div class="fs-board" class:has-win={hasWin} class:fs-beat={retriggerBeat}
+        <div class="fs-board" class:has-win={hasWin} class:fs-beat={retriggerBeat} class:fs-moment-dim={retriggerMoment}
              style="--fs-esc: {$scatterEscalation}">
           {#each vrows as reel, reelIdx}
             <!-- During the retrigger ladder the reels arrive one at a time, so
@@ -526,13 +540,17 @@
               </div>
             {/key}
           {/if}
-          <!-- Retrigger notice (OWNER AUDIT ROUND 2, item 3): layered at the
-               reel edge, outside the grid, small but alive - not a big
-               centred banner. -->
-          {#if showRetrigger}
-            {#key spinIndex}
-              <div class="fs-retrigger" data-testid="retrigger-pop">+5 {t(lang, 'freeSpins', mode)}</div>
-            {/key}
+          <!-- R062, THE MOMENT (owner art direction, superseding OWNER AUDIT
+               ROUND 2 item 3's side notice, which hid outside the frame on
+               small screens): the award text CENTRED over the grid in the
+               entry pod's award treatment, container-keyed to the grid box
+               per the R060 lesson so it sits whole inside the frame at every
+               size. The wrapper is the container; the board keeps its
+               content-driven size. -->
+          {#if retriggerMoment}
+            <div class="fs-moment-wrap" data-testid="retrigger-moment-wrap">
+              <div class="fs-retrigger-moment" data-testid="retrigger-moment">+5 {t(lang, 'freeSpins', mode)}</div>
+            </div>
           {/if}
         </div>
       </div>
@@ -721,6 +739,39 @@
   .entry-continue:hover, .entry-continue:focus-visible { filter: brightness(1.08); }
   @keyframes continue-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
+  /* R062, the moment. The wrapper spans the board (absolute inset) and is
+     the CONTAINER the award text keys its size on, so the text sits whole
+     inside the frame at every size including Mobile S; the board's own
+     content-driven size is untouched (containment lives on the wrapper,
+     whose size comes from inset). The text is the entry pod's award
+     treatment (.entry-burst-text) at moment scale. The dim leaves the
+     wrapper undimmed: it applies to the reels, not the board. */
+  .fs-moment-wrap {
+    position: absolute; inset: 0; z-index: 6;
+    display: flex; align-items: center; justify-content: center;
+    container-type: size; pointer-events: none;
+  }
+  .fs-retrigger-moment {
+    font-weight: 900; color: #ffd700;
+    font-size: clamp(16px, 14cqw, 52px);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+    white-space: nowrap;
+    animation: fs-moment-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes fs-moment-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .fs-board.fs-moment-dim .fs-reel { filter: brightness(0.7); transition: filter 0.25s ease; }
+  /* The moment owns the stage: the per-spin win pop otherwise bleeds through
+     the centred award text (both sit mid-board; seen on the proof's own
+     first frame). VISIBILITY, not opacity: the pop's own entrance keyframes
+     animate opacity and an active animation beats the static rule, which is
+     how the first version of this hide hid nothing (the x3 child stayed at
+     computed opacity 1 under it). It returns with the reels when the moment
+     ends. */
+  .fs-board.fs-moment-dim .fs-spin-win { visibility: hidden; }
+
   @media (prefers-reduced-motion: reduce) {
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
       transition: none;
@@ -729,7 +780,7 @@
     .entry-continue { animation: none; }
     .fs-cell.win { animation: none; }
     .fs-spin-win { animation: none; }
-    .fs-retrigger { animation: none; }
+    .fs-retrigger-moment { animation: none; }
   }
   /* OWNER AUDIT ROUND 3, item 8: this width cap (92vw, a REAL viewport unit)
      was written as if this subtree renders at native browser scale, but it
@@ -792,15 +843,10 @@
      edge, OUTSIDE the grid (not a big centred banner blocking play) - a
      small pill that scale-ins with a glow over ~900ms, then holds briefly
      before the {#key spinIndex} block tears it down on the next spin. */
-  .fs-retrigger {
-    position: absolute; top: 50%; right: -14px; transform: translate(100%, -50%);
-    z-index: 6; pointer-events: none; white-space: nowrap;
-    font-size: 0.85rem; font-weight: 900; letter-spacing: 0.06em;
-    color: #fff; padding: 6px 14px; border-radius: 999px;
-    background: linear-gradient(135deg, rgba(255, 46, 196, 0.92), rgba(22, 242, 224, 0.85));
-    box-shadow: 0 0 10px rgba(255, 46, 196, 0.8), 0 0 22px rgba(255, 46, 196, 0.45);
-    animation: rtpop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
+  /* R062: the moment styles live ABOVE the reduced-motion media block, so its
+     animation:none override wins the source-order tie. (The first placement
+     inherited the OLD side notice rule position, AFTER the media block, and
+     the entrance animation survived reduced motion; the proof went red.) */
   @keyframes rtpop {
     0%   { transform: translate(100%, -50%) scale(0.3); opacity: 0; box-shadow: 0 0 0 rgba(255, 46, 196, 0); }
     45%  { transform: translate(100%, -50%) scale(1.15); opacity: 1; box-shadow: 0 0 16px rgba(255, 46, 196, 0.9), 0 0 30px rgba(255, 46, 196, 0.55); }

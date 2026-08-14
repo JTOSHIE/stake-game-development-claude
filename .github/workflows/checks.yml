@@ -1159,6 +1159,13 @@ jobs:
           - name: "browser: money fit"
             run: node scripts/money_fit_gate.mjs --self-test && node scripts/money_fit_gate.mjs
 
+          # R062 (owner art direction): the retrigger moment fires once on the
+          # settled event, holds a fixed 1.6s, renders centred and whole inside
+          # the grid at three sizes, resumes, and holds under reduced motion;
+          # seeded with the old off-frame side notice restored.
+          - name: "browser: retrigger moment"
+            run: node scripts/r062_retrigger_proof.mjs --self-test && node scripts/r062_retrigger_proof.mjs
+
           # R047 TASK 5 (TR-129): the two-step autoplay property joins the
           # matrix, both halves. The confirm gate proves the CODE cannot start
           # a bet from a selection handler (static, seeded); the r042b proof

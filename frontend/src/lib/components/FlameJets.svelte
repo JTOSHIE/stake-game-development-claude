@@ -46,6 +46,27 @@
   // hue family - this is the explicit "magenta-core white-tipped" brief.
   export let colourway: 'natural' | 'overdrive' | 'nitro' = 'natural'
 
+  // R062, the retrigger colour chase (owner art direction): on the settled
+  // retrigger event the eight jets run a PERIMETER colour chase, cyan to
+  // magenta to green, two clockwise laps in 1.6 seconds, then return to the
+  // mode colourway (the keyframes end where the colourway filter resumes).
+  // Bump `chaseTrigger` to run one chase; the presentation owns the moment's
+  // timing and this component only performs it. Reduced motion kills the
+  // chase with the same media block that stills the flames.
+  export let chaseTrigger = 0
+  let chasing = false
+  let lastChase = 0
+  let chaseTimer: ReturnType<typeof setTimeout> | null = null
+  $: if (chaseTrigger !== lastChase) {
+    lastChase = chaseTrigger
+    if (chaseTrigger > 0) {
+      chasing = true
+      if (chaseTimer) clearTimeout(chaseTimer)
+      // 2 laps x 0.8s, plus the last jet's delay tail.
+      chaseTimer = setTimeout(() => { chasing = false }, 1700)
+    }
+  }
+
   $: base = $themeAssets.assetBase
 
   let reduced = false
@@ -61,6 +82,11 @@
     { x: 320, y: 224, rot: 180 }, { x: 320, y: 412, rot: 180 }, // left edge, left
     { x: 960, y: 224, rot: 0   }, { x: 960, y: 412, rot: 0   }, // right edge, right
   ]
+  // R062: each jet's position in the CLOCKWISE walk of the perimeter,
+  // starting top-left, derived from the coordinates above by eye and fixed
+  // here (the array order is by-edge, not by-walk). The chase delay is this
+  // position over eight of one 0.8s lap.
+  const CW_ORDER = [0, 1, 5, 4, 7, 6, 2, 3]
   const XS = JETS.map((j) => j.x)
   const YS = JETS.map((j) => j.y)
   const MIN_X = Math.min(...XS), MAX_X = Math.max(...XS)
@@ -89,16 +115,17 @@
   class="jets colourway-{colourway}"
   class:active={lit}
   class:reduced
+  class:chasing
   class:gauge-only={!active && gauge > 0}
   style="--gauge:{intensity}"
   data-testid="flame-jets"
   data-gauge={intensity.toFixed(2)}
   aria-hidden="true"
 >
-  {#each JETS as j}
+  {#each JETS as j, i}
     <div
       class="jet"
-      style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale({jetScale}); --wave-delay:{waveDelay(j)}s;"
+      style="left:{j.x}px; top:{j.y}px; transform: rotate({j.rot}deg) scale({jetScale}); --wave-delay:{waveDelay(j)}s; --chase-delay:{(CW_ORDER[i] / 8) * 0.8}s;"
     >
       <div
         class="flame"
@@ -218,6 +245,25 @@
     50%      { transform: scaleX(1.14) scaleY(1.05); opacity: 1; }
   }
 
+  /* R062, the retrigger chase: two 0.8s clockwise laps of cyan, magenta,
+     green over the flame filter, per-jet delayed by clockwise position, then
+     the colourway's own static filter resumes (fill none by default). The
+     hue stops reuse the recolour law's own values: +60deg is the ruled cyan,
+     +215deg the ruled deep pink, +360deg the native green. Placed AFTER the
+     colourway rules so equal specificity resolves to the chase while it
+     runs; the sprite frame cycle continues beneath it. */
+  .jets.active.chasing .flame {
+    animation:
+      flame-cycle 0.42s steps(5) infinite,
+      chase-colour 0.8s linear 2;
+    animation-delay: 0s, var(--chase-delay, 0s);
+  }
+  @keyframes chase-colour {
+    0%        { filter: hue-rotate(60deg) saturate(1.2); }
+    40%       { filter: hue-rotate(215deg) saturate(1.4) brightness(1.12); }
+    80%, 100% { filter: hue-rotate(360deg) saturate(1.05); }
+  }
+
   .jets.reduced .flame { background-size: 240px 120px; background-position: 0 0; }
   .jets.reduced.active .flame { opacity: 0.9; animation: none; }
 
@@ -228,5 +274,7 @@
        --gauge, not motion, so they stay. Only the animation goes. */
     .jet { transition: none; }
     .jets.active .flame { animation: none; }
+    /* R062: the chase is motion; reduced motion stills it with the flames. */
+    .jets.active.chasing .flame { animation: none; }
   }
 </style>
