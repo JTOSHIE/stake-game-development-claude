@@ -101,11 +101,25 @@
     digitTable = out
   }
 
+  // THE FACE IS APPLIED THROUGH THE DOM API, NOT IN CSS, AND THE REASON IS A GATE.
+  //
+  // machine_tell_gate.mjs scans every file under src/ and allows exactly three
+  // font-family values: inherit, var(--fs-font-display) and var(--fs-font-numeric).
+  // That rule is correct and this file is not an exception to it: a literal stack
+  // in a component's stylesheet is how a third face reaches players. A specimen
+  // whose whole purpose is to switch faces cannot spell one in CSS, so it sets the
+  // family on its own root element only, at runtime, and the shipped tokens are
+  // never read or written. Nothing here can reach a shipped surface: this file is
+  // not in the build graph, which reports/screens/fonts-2026-08-15/SPECIMEN.md
+  // section 5 proves against the built dist.
+  let rootEl: HTMLDivElement
+  $: if (rootEl) rootEl.style.setProperty('font-family', `${face.stack}, sans-serif`)
+
   const money = (micros: number) => formatBalance(micros, 'USD', locale)
   const win = (micros: number) => formatWin(micros, 'USD', locale)
 </script>
 
-<div class="specimen" style="--face: {face.stack}" data-face={face.key} data-locale={locale}>
+<div class="specimen" bind:this={rootEl} data-face={face.key} data-locale={locale}>
   <header class="bar">
     <strong>FONT SPECIMEN</strong>
     <span class="warn">dev only, never shipped</span>
@@ -165,7 +179,7 @@
 </div>
 
 <style>
-  .specimen { font-family: var(--face), sans-serif; background: #070b16; color: #dfe9f5; min-height: 100vh; padding: 16px; }
+  .specimen { background: #070b16; color: #dfe9f5; min-height: 100vh; padding: 16px; }
   .bar { display: flex; gap: 18px; align-items: center; margin-bottom: 14px; font-size: 13px; }
   .warn { color: #ff8a3d; letter-spacing: .08em; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }

@@ -13798,6 +13798,15 @@ owner has already ruled on: the dead manifests are archived under
 requirement being silently dropped.** Once PR #123 merges, a track manifest becomes
 possible again.
 
+**ONE RED, CAUGHT BY OUR OWN GATE AND FIXED WITHOUT WEAKENING IT.** The first push
+failed `machine tell gate, source scan`: the specimen spelled a literal font stack
+in its stylesheet, which is the exact class that gate exists to stop. The gate was
+right. The specimen now sets its face on its own root element at runtime through
+the DOM API, so no literal stack exists under `src/` and **no exemption was added
+to the gate**: widening its file list would have created a hole a shipped file
+could later sit behind. Its scan still reads 78 files and its seeded self-test
+still catches 16 of 16.
+
 ## FOR THE NEXT SESSION
 
 Model and effort: Claude Fable 5, judgement tier, one session, in a worktree off

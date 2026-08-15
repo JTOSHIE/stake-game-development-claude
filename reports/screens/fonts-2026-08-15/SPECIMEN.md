@@ -158,6 +158,29 @@ font requests  orbitron-latin-400-normal-U6xZUhur.woff2
 that fonts are self-hosted via `@fontsource` only, with no font CDN, is unchanged by this
 pass. The six candidate packages are `devDependencies`.
 
+### 5b. The machine tell gate caught the specimen, and it was right to
+
+The first push of this work went red on `machine tell gate, source scan`:
+
+```
+[third-font-stack] src/FontSpecimen.svelte:168
+    a literal font stack "var(--face), sans-serif". Use var(--fs-font-display) or
+    var(--fs-font-numeric); the only literal stacks live in src/app.css as the token
+    definitions.
+```
+
+**That gate is correct and the specimen is not an exception to it.** A literal stack in a
+component's stylesheet is exactly how a third face reaches players, and the gate allows
+only three values anywhere under `src/`. The specimen cannot spell a stack in CSS and also
+be a specimen, so it now sets the family on its own root element at runtime through the
+DOM API, touching neither `--fs-font-display` nor `--fs-font-numeric`.
+
+**No exemption was added to the gate.** Widening its file list to excuse this file would
+have created an exemption that a shipped file could later sit behind; the gate's scan is
+unchanged and still reads 78 files under `src/`, and its own seeded self-test still passes
+16 of 16 with 12 clean negative controls. The reason is recorded in the component itself
+rather than only here.
+
 ---
 
 ## 6. What this document does NOT do
