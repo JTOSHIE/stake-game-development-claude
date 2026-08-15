@@ -13807,6 +13807,16 @@ to the gate**: widening its file list would have created a hole a shipped file
 could later sit behind. Its scan still reads 78 files and its seeded self-test
 still catches 16 of 16.
 
+## The remote run, recorded per rule 10: GREEN
+
+**Run 31854473710 on `e77538cb`: success, every job green**, including the full
+browser matrix, since this branch touches rendering code. The first run,
+31853809221, failed on `machine tell gate, source scan` for the reason above and
+is recorded rather than hidden.
+
+PR #125 opened so the run exists: `checks.yml` triggers on `pull_request` and on
+pushes to `main` only.
+
 ## FOR THE NEXT SESSION
 
 Model and effort: Claude Fable 5, judgement tier, one session, in a worktree off
