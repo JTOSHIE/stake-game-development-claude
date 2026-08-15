@@ -41,14 +41,39 @@ file in the same commit, and must keep every assert in
 | AUTO | `.autoplay-wrapper` | 1111 | 580 | 48 | 48 | 1159 | 628 | 604 |
 
 Background panel (`.fs-panel`, decorative only, z-index below every control
-above): `left:309px; top:560px; width:711px; height:88px` — spans from 16px
-before MAX to just short of SPIN's left edge; TURBO and SPIN/AUTO sit
-deliberately outside it, as before this pass.
+above): `left:309px; top:560px; width:718px; height:88px`, spanning from one
+gap before MAX to one gap after STEPPERS. TURBO and SPIN/AUTO sit deliberately
+outside it, as before this pass.
+
+**AMENDED 2026-08-15, and this file is amended in the same commit as the CSS
+because its own rule above requires that.** The panel was `width:711px`, an
+asymmetric backdrop: 16px of inset before MAX and 9px after STEPPERS, which put
+the two OUTER gaps at 0.00 and 7.00. The right inset is now the same one gap as
+the left, so the outer gaps are EQUAL. **No control moved**: every coordinate in
+the table above is unchanged and `hud_banner_spec_check.mjs` passes on all of
+them. The row's nine horizontal positions are now derived in `HudOverlay.svelte`
+from a single `--fs-row-gap` token rather than hand-set, and the token's value is
+the 16px this file already locks.
+
+**A geometry question this amendment deliberately does NOT answer.** The panel
+now centres on 668 rather than on the canvas centre 640, because its contents run
+MAX.left 325 to STEPPERS.right 1011 and that span's midpoint is 668. A
+canvas-centred panel WITH equal outer gaps is arithmetically impossible while
+TURBO's right edge and SPIN's left edge sit at 309 and 1027, which are 331 and
+387 from 640. Closing it means moving locked controls, which is an owner call.
+The measurement, the proof and three costed options are at
+`reports/screens/controlrow-2026-08-15/MEASUREMENTS.md`.
 
 ## Gap audit (left edge of control N+1 minus right edge of control N)
 
 TURBO→MAX 16 · MAX→MENU 16 · MENU→BALANCE 16 · BALANCE→WIN 16 · WIN→BET 16 ·
 BET→STEPPERS 16 · STEPPERS→SPIN 16 · SPIN→AUTO 0 (tangent, by design — rule 4).
+
+Re-measured from the DOM 2026-08-15 at 1280x720 and at 1200x675: all seven gaps
+read 16.00 and 15.00 respectively, SPIN→AUTO reads 0.00 at both, and the two
+outer gaps against the panel now read 0.00 and 0.00. Held by
+`frontend/scripts/control_row_symmetry_gate.mjs`, which carries a seeded
+self-test that skews one gap by 6px and must go red naming it.
 
 ## What changed from the pre-2026-07-25 geometry
 

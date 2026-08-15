@@ -803,7 +803,12 @@
      ancestor, so nothing shifts. Overdrive flips accents from the shared flag. -->
 <div class="fs-hud" class:fs-hud--overdrive={$overdriveVisual}>
 
-  <!-- HUD panel - v3.2 x 296..984 (688 wide), y 560..648, radius 18 -->
+  <!-- HUD panel. The v3.2 geometry this comment used to state, x 296..984
+         (688 wide), was superseded on 2026-07-25 by OWNER AUDIT ROUND 3 item 7,
+         which shifted the row right and re-measured the banner to 309..1020
+         (711 wide). The comment was not updated then, which is where the 711
+         against 688 discrepancy came from. It is now derived from the row's own
+         token: one gap before MAX, one gap after STEPPERS. -->
   <div class="fs-panel" data-testid="hud-panel"></div>
 
   <!-- TURBO - v3.2: OUTSIDE the panel, centre (268,604) -->
@@ -1295,6 +1300,50 @@
      token-scope wrapper so children stay absolute against the stage ancestor. */
   .fs-hud{
     display:contents;
+
+    /* ===== THE CONTROL ROW'S ONE SPACING SCALE ================================
+       Every horizontal position in this row is now derived from a SINGLE token
+       and the controls' own widths, rather than from nine hand-set left values
+       that happened to agree.
+
+       THE TOKEN'S VALUE IS NOT INVENTED. 16px is what SEVEN of the row's eight
+       control-to-control gaps already measured, and it is what HUD_SPEC.md rule
+       2 has locked since 2026-07-25: "Every distinct control is separated from
+       its neighbour by exactly 16px". The eighth gap, SPIN to AUTO, is 0 by
+       HUD_SPEC.md rule 4, AUTO tangent to SPIN, and is expressed as such below
+       rather than smuggled in as a different number.
+
+       EVERY CONTROL'S RENDERED COORDINATE IS UNCHANGED by this refactor, which
+       is provable rather than asserted: frontend/scripts/hud_banner_spec_check.mjs
+       pins each one to the exact locked value and stays green. The chain starts
+       at TURBO's locked left edge and walks right, one token at a time.
+
+       The SLAB is the one geometry that changes, by 7px on its right edge only.
+       It backs MAX through STEPPERS with one token of inset on each side, so
+       the two OUTER gaps, TURBO to slab and slab to SPIN, become EQUAL. They
+       were 0.00 and 7.00, an asymmetry with no rule behind it. See
+       reports/screens/controlrow-2026-08-15/MEASUREMENTS.md for the before and
+       after tables and for what this does NOT fix. */
+    --fs-row-gap:16px;
+
+    --fs-w-turbo:82px; --fs-w-max:48px;  --fs-w-menu:44px;
+    --fs-w-bal:200px;  --fs-w-win:150px; --fs-w-bet:120px;
+    --fs-w-step:44px;  --fs-w-spin:84px; --fs-w-auto:48px;
+
+    --fs-x-turbo:227px;
+    --fs-x-max:  calc(var(--fs-x-turbo) + var(--fs-w-turbo) + var(--fs-row-gap));
+    --fs-x-menu: calc(var(--fs-x-max)   + var(--fs-w-max)   + var(--fs-row-gap));
+    --fs-x-bal:  calc(var(--fs-x-menu)  + var(--fs-w-menu)  + var(--fs-row-gap));
+    --fs-x-win:  calc(var(--fs-x-bal)   + var(--fs-w-bal)   + var(--fs-row-gap));
+    --fs-x-bet:  calc(var(--fs-x-win)   + var(--fs-w-win)   + var(--fs-row-gap));
+    --fs-x-step: calc(var(--fs-x-bet)   + var(--fs-w-bet)   + var(--fs-row-gap));
+    --fs-x-spin: calc(var(--fs-x-step)  + var(--fs-w-step)  + var(--fs-row-gap));
+    /* HUD_SPEC.md rule 4: AUTO is tangent to SPIN, deliberately no gap. */
+    --fs-x-auto: calc(var(--fs-x-spin)  + var(--fs-w-spin));
+
+    /* The slab: one token of inset before MAX and one after STEPPERS. */
+    --fs-x-slab: calc(var(--fs-x-max) - var(--fs-row-gap));
+    --fs-w-slab: calc(var(--fs-x-step) + var(--fs-w-step) + var(--fs-row-gap) - var(--fs-x-slab));
     --sig-cyan:    var(--theme-primary,   #00FFFF);
     --sig-magenta: var(--theme-secondary, #FF00FF);
     --sig-pink:    #FF2EC4;   /* HUD magenta used in v3.7 boxes */
@@ -1352,7 +1401,7 @@
      widened slightly) - see docs/HUD_SPEC.md. TURBO and SPIN/AUTO stay
      outside the panel, as before. */
   .fs-panel{
-    position:absolute;left:309px;top:560px;width:711px;height:88px;z-index:59;
+    position:absolute;left:var(--fs-x-slab);top:560px;width:var(--fs-w-slab);height:88px;z-index:59;
     border-radius:18px;pointer-events:none;
     background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
     border:1px solid transparent;
@@ -1373,9 +1422,9 @@
      every distinct control across the entire row, MENU through AUTO. ---- */
   .fs-box{position:absolute;top:573px;height:62px;z-index:60;}
   .fs-box .fs-face{padding:0 10px;}
-  .fs-balance{left:449px;width:200px;--sig:var(--sig-cyan);}
-  .fs-win    {left:665px;width:150px;--sig:var(--sig-pink);}
-  .fs-bet    {left:831px;width:120px;--sig:var(--sig-gold);}
+  .fs-balance{left:var(--fs-x-bal);width:var(--fs-w-bal);--sig:var(--sig-cyan);}
+  .fs-win    {left:var(--fs-x-win);width:var(--fs-w-win);--sig:var(--sig-pink);}
+  .fs-bet    {left:var(--fs-x-bet);width:var(--fs-w-bet);--sig:var(--sig-gold);}
   .fs-bet .fs-face{align-items:flex-end;padding-right:14px;}
   /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
      transition (see HudOverlay's script section) - overrides .fs-plate's
@@ -1460,7 +1509,7 @@
      OWNER AUDIT ROUND 3 item 7: shifted to x967 as part of the whole-banner
      re-measure (locked spec, docs/HUD_SPEC.md) - a consistent 16px gap from
      the BET plate's new right edge at x951. */
-  .fs-arrows{position:absolute;left:967px;top:578px;width:44px;height:52px;z-index:60;
+  .fs-arrows{position:absolute;left:var(--fs-x-step);top:578px;width:var(--fs-w-step);height:52px;z-index:60;
     display:flex;flex-direction:column;gap:4px;}
   .fs-arrow{
     width:44px;height:24px;padding:0;border:none;cursor:pointer;position:relative;
@@ -1485,7 +1534,7 @@
      banner's circular-button language) - 48px circle, same shared vertical
      centre (y=604) as every other control in the locked spec
      (docs/HUD_SPEC.md). ============================================== */
-  .fs-max{position:absolute;left:325px;top:580px;width:48px;height:48px;padding:0;
+  .fs-max{position:absolute;left:var(--fs-x-max);top:580px;width:var(--fs-w-max);height:48px;padding:0;
     border:none;border-radius:50%;cursor:pointer;z-index:60;
     background:radial-gradient(circle at 36% 28%,#2a2410,#0d0b04 72%);
     box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
@@ -1502,7 +1551,7 @@
      40px -> 44px (was under the 44px touch-target floor); position now set
      by .menu-wrapper below (locked spec, docs/HUD_SPEC.md), these left/top
      values are inert when wrapped there but kept in sync for clarity. ==== */
-  .fs-menu{position:absolute;left:389px;top:582px;width:44px;height:44px;z-index:60;
+  .fs-menu{position:absolute;left:var(--fs-x-menu);top:582px;width:var(--fs-w-menu);height:44px;z-index:60;
     padding:0;border:none;cursor:pointer;border-radius:9px;
     background:linear-gradient(160deg,#c6d6e0,#55656f 52%,#222c34);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.55);
@@ -1546,7 +1595,7 @@
      asks for. It also made the states unmeasurable.
 
      The bolt grew 26px to 34px: it no longer shares the face with a caption. */
-  .fs-turbo{position:absolute;left:227px;top:563px;width:82px;height:82px;z-index:60;
+  .fs-turbo{position:absolute;left:var(--fs-x-turbo);top:563px;width:var(--fs-w-turbo);height:82px;z-index:60;
     padding:0;border:none;cursor:pointer;}
   .fs-turbo svg{width:34px;height:34px;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
@@ -1579,7 +1628,7 @@
      y=604 as the rest of the locked spec (docs/HUD_SPEC.md) - was sitting
      well below-left of SPIN entirely unaligned (top:648 vs SPIN's top:562,
      centres 68px apart). ================================================ */
-  .fs-auto{position:absolute;left:1111px;top:580px;width:48px;height:48px;z-index:60;
+  .fs-auto{position:absolute;left:var(--fs-x-auto);top:580px;width:var(--fs-w-auto);height:48px;z-index:60;
     padding:0;border:none;cursor:pointer;}
   .fs-auto .fs-face{gap:0;}
   .fs-auto svg{width:20px;height:20px;}
@@ -1598,7 +1647,7 @@
      whole-banner re-measure (locked spec, docs/HUD_SPEC.md) - a consistent
      16px gap from the bet-steppers' new right edge at x1011. Replaces
      spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
-  .fs-spin{position:absolute;left:1027px;top:562px;width:84px;height:84px;z-index:61;
+  .fs-spin{position:absolute;left:var(--fs-x-spin);top:562px;width:var(--fs-w-spin);height:84px;z-index:61;
     padding:0;border:none;cursor:pointer;border-radius:50%;
     background:conic-gradient(from 216deg,#e7f1f7,#8fa3b1,#333f49,#6d8090,#eef5fa,#47565f,#a4b7c3,#e7f1f7);
     box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),
