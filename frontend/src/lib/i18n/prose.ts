@@ -197,7 +197,14 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   tierMegaWin: 'MEGA PRIZE',
   tierEpicWin: 'EPIC PRIZE',
   modeCruiseBlurb: 'A smoother ride: more frequent smaller prizes, same 96.35% RTP.',
-  modeOverboostBlurb: 'Raises the feature trigger rate to about 1.6× Normal. Debits 1.25× every spin while ON.',
+  // SOCIAL DIFFERS FROM THE MASTER BY EXACTLY ONE WORD, and that word is the
+  // whole reason this entry exists. "Debits" is a prohibited term in social
+  // mode: it names a real-money movement, and stake.us surfaces must not.
+  // "Costs" is what the superseded social blurb used and it is kept, so the
+  // register change is invisible to a player and the compliance property is not.
+  // The file's rule above, that a string reading identically in both modes is
+  // absent rather than repeated, is honoured: these two are NOT identical.
+  modeOverboostBlurb: 'Raises the feature trigger rate to about 1.6× Normal. Costs 1.25× every spin while ON.',
   modeBonusLabel: 'Get Overdrive',
   modeBonusBlurb: 'Get a guaranteed Overdrive Free Spins entry.',
   modeSuperBlurb: 'Get a rich entry with the Overdrive meter pre-revved to 5×.',

@@ -55,7 +55,12 @@ const SCREENS_DIR = evidenceDir('reports', 'screens', 'social-strings-item-c')
 const EXPECTED_SOCIAL = {
   bonus: { label: 'Get Overdrive', blurb: 'Get a guaranteed Overdrive Free Spins entry.' },
   super: { blurb: 'Get a rich entry with the Overdrive meter pre-revved to 5×.' },
-  overboost: { blurb: 'Double-chance: about 1.6× the feature trigger rate. Costs 1.25× every spin while ON.' },
+  // CONFORMED 2026-08-15 (R071 TASK 5). The old "Double-chance" wording is
+  // retired estate-wide by the owner's ruling; the social blurb now tracks the
+  // master and differs from it only in the one prohibited word. Pinning the
+  // superseded text here would have made this gate defend the thing the ruling
+  // removed, which is how a gate turns into an obstacle.
+  overboost: { blurb: 'Raises the feature trigger rate to about 1.6× Normal. Costs 1.25× every spin while ON.' },
   cruise: { blurb: 'A smoother ride: more frequent smaller prizes, same 96.35% RTP.' },
 }
 const PROHIBITED_TERMS = ['Buy', 'Debits']
