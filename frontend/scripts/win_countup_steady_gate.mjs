@@ -115,10 +115,27 @@ const MEASURE = `(spec) => {
   }
   // Each digit alone, in the same style, so "one advance" is measured rather
   // than inferred from two totals agreeing.
+  // THE ADVANCE IS MEASURED AS A DELTA, NOT AS A LONE GLYPH'S BOX.
+  //
+  // This first read one digit at a time and compared the element widths. That
+  // measures the wrong thing and it went red on CI while passing locally, which
+  // is the useful part: locally the device pixel ratio is 2 and every digit read
+  // 41.69, on the runner it is 1 and the same digits read 42 and 44. **A lone
+  // glyph's box is its ink plus its side bearings, quantised to whole device
+  // pixels, and side bearings are exactly what tabular figures do NOT equalise.**
+  // The property under test is the ADVANCE, which is the distance from one glyph
+  // to the next and therefore only exists BETWEEN glyphs.
+  //
+  // So each digit is rendered at two lengths and the advance is the difference
+  // divided by the gap. The side bearings appear in both terms and cancel, and
+  // the rounding error is divided by ten along with everything else.
+  const ADV_LONG = 11
   const digitWidths = (tabular) => {
     const out = []
     for (let d = 0; d <= 9; d++) {
-      out.push(render(String(d), tabular).total)
+      const one = render(String(d), tabular).total
+      const many = render(String(d).repeat(ADV_LONG), tabular).total
+      out.push(Math.round(((many - one) / (ADV_LONG - 1)) * 100) / 100)
     }
     return out
   }
@@ -173,9 +190,16 @@ function judge(m, label) {
 
   ok(!RETIRED_RULE, `${label}: the retired per-digit box rule is absent from the component`)
 
-  const widths = new Set(m.digitsTabular)
-  ok(widths.size === 1,
-    `${label}: every digit renders ONE advance in the numeric face (found ${[...widths].join(', ')})`)
+  // ONE PIXEL, and the tolerance is stated rather than tuned. The advance is a
+  // delta divided by ten, so a whole-device-pixel rounding at either end moves it
+  // by at most a tenth of a pixel; 1px is two orders of magnitude of headroom
+  // against that and two orders of magnitude BELOW the defect, which is a spread
+  // of roughly 28px at this size in the display face. The seed proves the second
+  // half of that claim on every run rather than leaving it asserted.
+  const ADVANCE_TOLERANCE_PX = 1
+  const spread = Math.max(...m.digitsTabular) - Math.min(...m.digitsTabular)
+  ok(spread <= ADVANCE_TOLERANCE_PX,
+    `${label}: every digit renders ONE advance in the numeric face (spread ${spread.toFixed(2)}px across ${m.digitsTabular.length} digits)`)
 
   ok(m.narrowBoxed.total === m.wideBoxed.total,
     `${label}: "${NARROW}" and "${WIDE}" render at the SAME total width `
