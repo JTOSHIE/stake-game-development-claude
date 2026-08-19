@@ -174,6 +174,31 @@ async function measure(selfTest) {
                    inert because that face carries no tnum to switch on. */
                 .probe-host .c1-amount.seed{font-family:var(--fs-font-display);}`,
     })
+    // FORCE THE PROBE'S OWN FACES TO LOAD, AND PROVE THEY DID.
+    //
+    // `document.fonts.status === 'loaded'` above is necessary and NOT sufficient,
+    // and this gate paid for the difference: it means every face the page has
+    // ASKED FOR has arrived. The probe renders at weight 900 in a detached host,
+    // and if no page element happens to use that exact face and weight, nothing
+    // ever asked, so the probe silently measured a FALLBACK and reported its
+    // metrics as ours. That is how this gate ran green locally, where the faces
+    // were already warm, and red on a cold runner with a 2px spread that no
+    // amount of rounding could explain.
+    //
+    // So the faces are requested explicitly and then CHECKED. A gate that cannot
+    // prove which face it measured is not measuring anything, and it fails loudly
+    // here rather than reporting a fallback's numbers as a verdict.
+    const faces = await page.evaluate(async () => {
+      const want = ['900 64px "Exo 2"', '900 64px "Orbitron"']
+      await Promise.all(want.map((f) => document.fonts.load(f, '0123456789')))
+      await document.fonts.ready
+      return want.map((f) => ({ f, ok: document.fonts.check(f) }))
+    })
+    const missing = faces.filter((x) => !x.ok).map((x) => x.f)
+    if (missing.length) {
+      throw new Error(`the probe faces did not load, so nothing below would describe them: ${missing.join(', ')}`)
+    }
+    console.log(`  faces confirmed loaded: ${faces.map((x) => x.f).join(', ')}`)
     // page.evaluate with a STRING evaluates it as an expression rather than
     // calling it with the argument, so the call is written out explicitly.
     const spec = { narrow: NARROW, wide: WIDE, control: '$--.--' }
