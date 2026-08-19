@@ -180,6 +180,37 @@ jobs:
             echo "browser_needed=false" >> "$GITHUB_OUTPUT"
           fi
 
+
+  # ── THE FAIL-FAST MASKING ENDS HERE, R071 TASK 9, 2026-08-15 ────────────────
+  #
+  # A GitHub Actions job stops at its first failing step, so for this job's whole
+  # life ONE red gate hid every gate after it. That is not a hypothetical: it has
+  # cost this repository information twice on the record. Runs 117 to 120 on main
+  # all died at the layout fit step and four consecutive sessions pushed onto a
+  # red main without knowing what else was broken; and on the PR #123 branch the
+  # disjoint check sat ahead of the scope step, aborted the job, and skipped
+  # about forty later steps for that branch's entire life. Both times the
+  # information was there and the runner simply stopped asking for it.
+  #
+  # The static gates are INDEPENDENT of one another. The dash gate has nothing to
+  # say about the locked paths gate, and neither cares what the paytable parity
+  # check found. So every one of them now carries an `if:` that runs it whatever
+  # the gates before it did, and ONE run reports the whole picture rather than
+  # the first problem in file order.
+  #
+  # THE GUARD IS NOT `always()`, DELIBERATELY, and this is the part worth reading
+  # before editing. Two conditions must still hold or a gate cannot mean anything:
+  #   - `!cancelled()`, so a cancelled run stops rather than grinding through
+  #     seventy steps nobody is waiting for;
+  #   - the SETUP step it actually depends on succeeded. The repo-level gates
+  #     guard on `steps.node.outcome`, and everything downstream of the frontend
+  #     install guards on `steps.deps.outcome`. Without that, a failed `npm ci`
+  #     would produce sixty module-not-found failures, and a wall of red that all
+  #     says the same thing is worse signal than one red that says it once.
+  #
+  # `continue-on-error` is NOT used and must not be added. It would let a red gate
+  # report a GREEN job, which is the opposite of the point. A failed step still
+  # fails this job; it just no longer silences its neighbours.
   static:
     name: static gates
     runs-on: ubuntu-latest
@@ -187,6 +218,7 @@ jobs:
 
     steps:
       - name: Check out
+        id: checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -197,6 +229,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Node
+        id: node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -223,6 +256,7 @@ jobs:
       # naming exactly the locked paths it changes, checked in both directions.
       # Token format documented in CLAUDE.md beside the locks. (JOB 3h)
       - name: locked paths and track scope, self-test
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/qa/locked_paths_gate.mjs --self-test
 
       # MULTI-TRACK rule 3: parallel tracks require PROVABLY disjoint scopes.
@@ -230,6 +264,7 @@ jobs:
       # every run and a manifest widened later is caught the day it is widened,
       # rather than at the merge that discovers two tracks edited one file.
       - name: track manifests are disjoint
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/qa/locked_paths_gate.mjs --check-disjoint
 
       # The same script now carries the TRACK SCOPE rule too (MULTI-TRACK JOB 2):
@@ -247,6 +282,7 @@ jobs:
       # the merge ref, so their merge base is base.sha. The head branch tip is
       # the fix, and the gate's seeded self-test plants all three forms.
       - name: locked paths and track scope
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         env:
           GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -274,6 +310,7 @@ jobs:
       # dead-commit class asks git to resolve every SHA the documents cite, and on
       # a shallow clone every one of them would read as dead.
       - name: document currency, seeded-violation self-test
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/qa/doc_currency_gate.mjs --self-test
 
       # Session 3 JOB 4, cluster S2-C098. kit_build.mjs already ships a seeded
@@ -284,6 +321,7 @@ jobs:
       # commit on no remote branch). Only the self-test is wired, deliberately:
       # wiring --check would ship a step that can only print PASS.
       - name: kit build, seeded-violation self-test
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/kit_build.mjs --self-test
 
       # owner_preview.mjs printed a HARDCODED LAN address for three months, from
@@ -306,6 +344,7 @@ jobs:
       # an EARLIER draft of the self-test that main has since superseded, so only the
       # wiring was taken and the draft was discarded rather than merged backwards.
       - name: owner preview address, seeded-violation self-test
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/owner_preview.mjs --self-test
 
       # The scan honours scripts/qa/doc_currency_baseline.json, the frozen debt
@@ -314,9 +353,11 @@ jobs:
       # hundred claims reads exactly like a gate with nothing to excuse. The list
       # is checked in both directions, so an entry that stops matching fails too.
       - name: document currency scan
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node scripts/qa/doc_currency_gate.mjs
 
       - name: Install frontend dependencies
+        id: deps
         working-directory: frontend
         # `npm ci` is reproducible and fails if the lockfile is out of sync.
         # Playwright browsers are NOT installed: no suite here needs one.
@@ -332,10 +373,12 @@ jobs:
       # is the correct behaviour for a vulnerability scan and is why it sits
       # beside the step that already reaches the registry.
       - name: supply chain, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/supply_chain_gate.mjs --self-test
 
       - name: supply chain, licences, install hooks, integrity and advisories
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/supply_chain_gate.mjs
 
@@ -343,8 +386,31 @@ jobs:
       # Fails if the error or warning count rises above the committed baseline.
       # See scripts/typecheck_baseline.mjs for why the baseline is not zero.
       - name: svelte-check (no new type errors)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/typecheck_baseline.mjs
+
+      # ── evidence hygiene ─────────────────────────────────────────────────────
+      # WIRED 2026-08-15 by R071 TASK 9, and the REMAINDER PASS CAME FIRST, in
+      # that order deliberately. Convention (h.1) has said since 2026-07-26 that a
+      # script writing straight into a committed evidence directory destroys the
+      # evidence it is meant to produce, because a casual local re-run silently
+      # rewrites frames a reviewer is about to read. Three gates did exactly that
+      # and were migrated to evidenceDir(); this gate is what stops the class
+      # coming back. Wiring it while a remainder still existed would have made the
+      # baseline the point rather than the rule, so the remainder was cleared
+      # first: 138 scripts scanned, 0 writing to committed evidence, 0 frozen. The
+      # gate's own line is "the list only shrinks", and it now starts from zero,
+      # which is the only starting figure that cannot rot.
+      - name: evidence hygiene, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/evidence_hygiene_gate.mjs --self-test
+
+      - name: evidence hygiene, no script writes to committed evidence
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/evidence_hygiene_gate.mjs
 
       # ── Gate 2: dead wiring ──────────────────────────────────────────────────
       # The standingMode class: state a control writes that nothing ever reads.
@@ -352,16 +418,19 @@ jobs:
       # the shipped entry, and the seeded self-test (a store whose only reader
       # is a file nothing imports) runs first per convention (p).
       - name: dead wiring scan, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dead_wiring_scan.mjs --self-test
 
       - name: dead wiring scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dead_wiring_scan.mjs
 
       # ── Gate 3: integer micros ───────────────────────────────────────────────
       # CLAUDE.md makes integer micros mandatory with zero float tolerance.
       - name: wallet float scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/scan_wallet_floats.mjs
 
@@ -369,6 +438,7 @@ jobs:
       # CURRENCY_SCALE exists in the canonical util and in locked rgsService.ts.
       # Read-only: this parses the locked file as text and never writes to it.
       - name: currency scale drift
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/currency_scale_drift.test.mjs
 
@@ -377,6 +447,7 @@ jobs:
       # the two sides being independently generated. Guards the buy-tier billing
       # bug class. Read-only against the locked maths package.
       - name: fsModes / index.json drift
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/config/fsModes.drift.test.ts
 
@@ -390,10 +461,12 @@ jobs:
       # in no mechanism and in no unreachable list, and was found by counting
       # rather than by reading. HIGH severity, player visible.
       - name: paytable parity, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/config/paytable_parity.test.ts --self-test
 
       - name: paytable parity against the shipped maths
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/config/paytable_parity.test.ts
 
@@ -402,6 +475,7 @@ jobs:
       # player-facing literal in any component. Kills the class where 18 strings
       # rendered English in fifteen locales because the keys never existed.
       - name: locale completeness
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/locale_completeness_check.mjs
 
@@ -412,6 +486,7 @@ jobs:
       # blind player in a social jurisdiction heard the real-money vocabulary a
       # sighted player was protected from. (R4 / TR-012)
       - name: a11y social terms
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/a11y_social_terms_check.mjs
 
@@ -425,6 +500,7 @@ jobs:
       # stated scope; its result is committed as
       # reports/qa/social_dom_conformance_2026-07-25.json. (R2R JOB 6 / TR-041)
       - name: social vocabulary
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/i18n/vocabulary.test.ts
 
@@ -447,10 +523,12 @@ jobs:
       # cannot settle that. Self-test first, per convention (p): ten seeds, five
       # paired controls.
       - name: disclaimer conformance, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/i18n/disclaimer_conformance.test.ts --self-test
 
       - name: disclaimer conformance, sixteen locales
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/i18n/disclaimer_conformance.test.ts
 
@@ -460,10 +538,12 @@ jobs:
       # forms the old gate was blind to: if the gate cannot fail on a seeded
       # dash, its PASS means nothing. CLAUDE.md convention (p).
       - name: dash gate, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dash_gate.mjs --self-test
 
       - name: dash gate, source scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dash_gate.mjs --source
 
@@ -475,10 +555,12 @@ jobs:
       # magnitude (four recorded, 51 real), so the self-test plants the defect in
       # prose.locales.ts, which is the file the old count never searched.
       - name: multiplication sign gate, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/multiplication_sign_gate.mjs --self-test
 
       - name: multiplication sign gate, prose scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/multiplication_sign_gate.mjs
 
@@ -505,10 +587,12 @@ jobs:
       # negative controls, two of which encode corrections the gate's own first
       # real run forced.
       - name: machine tell gate, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs --self-test
 
       - name: machine tell gate, source scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs --source
 
@@ -517,6 +601,7 @@ jobs:
       # first three assertions reproduce the shipped defect arithmetically:
       # off the authenticated ladder, "+" dropped the bet to 0.10. (R5/TR-013)
       - name: bet ladder model
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/betLadder.test.ts
       # ── Gate 9: responsible-gambling enforcement ─────────────────────────────
@@ -525,6 +610,7 @@ jobs:
       # every consumer ignored it, so a market banning fast play still got it.
       # (R7/TR-015)
       - name: responsible gambling enforcement
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/responsibleGambling.test.ts
 
@@ -534,6 +620,7 @@ jobs:
       # spacebar spin under six of them. Affordability is checked against the
       # tier's real cost, not a flat 100x. (R8/TR-016)
       - name: modal guard and buy affordability
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/modalGuard.test.ts
 
@@ -542,6 +629,7 @@ jobs:
       # sets on a real auth failure as well as the dev case. The bundle half of
       # this gate needs a build and runs in the closing suite. (R2/TR-010)
       - name: live guard
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/liveGuard.test.ts
 
@@ -549,6 +637,7 @@ jobs:
       # authenticate reports an in-progress round and initRGS discarded it. On a
       # pending_end round that is an uncredited win. (R11/TR-017)
       - name: session recovery
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/sessionRecovery.test.ts
 
@@ -560,6 +649,7 @@ jobs:
       # that rejects everything for the wrong reason passes a boolean test and
       # is still broken.
       - name: feature resume, checkpoint model
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/presentationCheckpoint.test.ts
 
@@ -569,6 +659,7 @@ jobs:
       # presented, and the round is presented BEFORE it is settled, resumed or
       # not.
       - name: feature resume, recovery flow
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/featureResume.test.ts
 
@@ -578,6 +669,7 @@ jobs:
       # identically however they end - which is the property that makes the
       # build honest rather than a tell.
       - name: scatter anticipation
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/scatterEscalation.test.ts
 
@@ -586,6 +678,7 @@ jobs:
       # real launch authenticated with a dev token, failed, and the live guard
       # then correctly refused to bet. Unplayable on a real URL. (R2R blocker 1)
       - name: launch params
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/launchParams.test.ts
 
@@ -594,6 +687,7 @@ jobs:
       # 300 shipped base rounds those occur 0, 0 and 0 times, while reveal occurs
       # 724 times. Asserted against real decoded book rows. (R1a/TR-009)
       - name: rgs parse alignment
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/services/rgsService.parse.test.ts
 
@@ -605,6 +699,7 @@ jobs:
       # pinned ts-client (df9e126), importing the real functions rather than
       # restating them. (R2R JOB 4 / TR-039, TR-042)
       - name: wallet contract
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/services/rgsService.contract.test.ts
 
@@ -613,6 +708,7 @@ jobs:
       # server. Asserts the raw platform code is never player-facing, trailing
       # SC/GC placement per ruling 2, zero-decimal currencies, and no US$ prefix.
       - name: currency static assertions
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/utils/currency.test.ts
 
@@ -629,10 +725,12 @@ jobs:
       # and a naive scan flags that; the real run ships that line as a negative
       # control.
       - name: round logic currency, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/round_logic_currency_gate.mjs --self-test
 
       - name: round-shaping logic never reads currency
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/round_logic_currency_gate.mjs
 
@@ -665,18 +763,22 @@ jobs:
       # runtime half is the browser leg "sub-cent display", which drives a real
       # 0.08x round through the built bundle.
       - name: precision law, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx scripts/precision_law_gate.mjs --self-test
 
       - name: precision law, wins widen and everything else holds two
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx scripts/precision_law_gate.mjs
 
       - name: currency table, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/currency_table_gate.mjs --self-test
 
       - name: currency table against the platform mirror
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/currency_table_gate.mjs
 
@@ -699,9 +801,11 @@ jobs:
       # text and JSON, exactly as currency_scale_drift.test.mjs already parses
       # the locked rgsService.ts. No lock sanction is needed to run it.
       - name: bet ladder declaration drift, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: node scripts/qa/bet_ladder_declaration_drift.mjs --self-test
 
       - name: bet ladder declaration drift
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: node scripts/qa/bet_ladder_declaration_drift.mjs
 
       # ── Gate 12a: social mode forces English ─────────────────────────────────
@@ -716,6 +820,7 @@ jobs:
       # platform's own Language menu and not one of our sixteen (TR-059).
       # The browser half lives in scripts/locale_launch_conformance.mjs.
       - name: social mode forces English
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/stores/socialLocale.test.ts
 
@@ -728,6 +833,7 @@ jobs:
       # committed as fixtures, plus a source scan proving the legacy search has
       # not come back. (R2R JOB 5 / TR-040)
       - name: replay rounds
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/services/replayRounds.test.ts
 
@@ -741,6 +847,7 @@ jobs:
       # Drives parseReplayParams itself, not the resolver, since the resolver was
       # never the broken part. (2026-08-09)
       - name: replay locale, social English only
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/services/replayLocale.test.ts
 
@@ -751,6 +858,7 @@ jobs:
       # at once: sub-cent exactness, ordinary wins NOT gaining decimals, and the
       # trailing-symbol placement surviving the widening. (2026-08-09)
       - name: win precision, sub-cent payouts
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/utils/winPrecision.test.ts
 
@@ -762,6 +870,7 @@ jobs:
       # translation in fifteen locales, so the known set is FROZEN and the gate
       # fails on anything new, in both directions.
       - name: hardcoded player-facing strings
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/hardcoded_string_gate.mjs --self-test && node scripts/hardcoded_string_gate.mjs
 
@@ -774,6 +883,7 @@ jobs:
       # TS7006 is fixed and the whole command now runs here, so the claim and
       # the gate finally agree.
       - name: npm run check (svelte-check AND tsc)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npm run check
 
@@ -785,6 +895,7 @@ jobs:
       # depends on existing, so a build failure here is a failure of half the
       # evidence pipeline.
       - name: production build
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npm run build
 
@@ -793,6 +904,7 @@ jobs:
       # however it was authored, including in a public asset that no scan of
       # src/ could ever see. Its first run found 17 in a shipped sounds README.
       - name: dash gate, dist scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dash_gate.mjs
 
@@ -802,6 +914,7 @@ jobs:
       # tab title is read straight out of the shipped HTML rather than inferred
       # from the source that produced it.
       - name: machine tell gate, dist scan
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs
 
@@ -815,10 +928,12 @@ jobs:
       # comma-decimal locales, locating any hit in the kit bytes. After the
       # build, deliberately: dist is what ships.
       - name: kit basis gate, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx scripts/kit_basis_gate.mjs --self-test
 
       - name: kit basis gate, superseded basis words and en-form figures
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx scripts/kit_basis_gate.mjs
 
@@ -849,14 +964,17 @@ jobs:
       # workflow's own header records: a gate must run in an environment that
       # can execute it, or its placement is the failure.
       - name: asset references, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/asset_reference_gate.mjs --self-test
 
       - name: asset references resolve in dist
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/asset_reference_gate.mjs
 
       - name: dist hygiene, no documentation ships
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/dist_hygiene_gate.mjs
 
@@ -875,10 +993,12 @@ jobs:
       # reference pair above is: dist is one of its three roots and a missing
       # root exits non-zero rather than skipping.
       - name: brand tokens in file names, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/brand_token_gate.mjs --self-test
 
       - name: no Stake brand token in any shipped or source file name
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/brand_token_gate.mjs
 
@@ -898,10 +1018,12 @@ jobs:
       #
       # AFTER the production build, like its siblings: dist is its only root.
       - name: embedded stake marks, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/stake_mark_gate.mjs --self-test
 
       - name: no Stake mark embedded in any shipped asset
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/stake_mark_gate.mjs
 
@@ -921,10 +1043,12 @@ jobs:
       # and a gate that pressures someone to delete a mandatory disclaimer is
       # worse than no gate. That message ships as a negative control.
       - name: prohibited mechanics, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/prohibited_mechanic_gate.mjs --self-test
 
       - name: no prohibited mechanic ships
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/prohibited_mechanic_gate.mjs
 
@@ -951,9 +1075,11 @@ jobs:
       # and its negative control proves an ABSENT dist is not reported as a
       # breach, so the placement is checked rather than assumed.
       - name: delivery set, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: node scripts/qa/delivery_set_gate.mjs --self-test
 
       - name: delivery set conformance
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: node scripts/qa/delivery_set_gate.mjs
 
       # ── Gate 14: the books verifier fails closed ─────────────────────────────
@@ -965,6 +1091,7 @@ jobs:
       # that cannot rot, and it needs no books, so it belongs in CI where the
       # books are always absent. (R2R JOB 7 / TR-044)
       - name: books verifier self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: python3 tools/verify_books_lookup_equality.py --self-test
 
   # The second job of the two-job policy (see header). Only the gates that
