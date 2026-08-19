@@ -315,6 +315,21 @@ defect**: five browser legs hit the 15-minute budget while nothing had reported 
 Re-run, all five green. **This is the run rule 10 is satisfied by**, and it is the tip, not
 `89373c0c`.
 
+### RUN 32253559815, on `9c83fba8`, the records commits' own push: SUCCESS
+
+**Recorded per rule 10, which asks every session to verify its own FINAL push.** The report
+above is itself a commit, so this run did not exist when the section was written; adding it
+afterwards is the same one-commit lag rule 12 names for the preview, and the estate's own
+practice is a follow-up record rather than a rewritten report.
+
+**3 jobs: `what changed` green, `static gates` green at 80 steps, and the browser matrix
+SKIPPED.** The skip is the correct result and not a gap: the `changes` job gates the matrix
+on whether a push touched rendering, shipping or gate code, this push touched only record
+files, and **the static job is never gated** because it carries the document currency gate,
+the dash gate and the locked-paths gate. Filtering documents out of a documents-only push
+would have disabled exactly the gates whose purpose is checking documents. A documents-only
+push bills about 1.4 minutes against 24.1 for a full matrix.
+
 ### The 15-minute timeout, measured rather than guessed at, and NOT changed here
 
 **Three of this session's eleven runs concluded `cancelled` and only one of those was a real
