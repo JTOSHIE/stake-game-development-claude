@@ -1,1667 +1,1661 @@
 {
-  "_comment": [
-    "FROZEN DEBT, per FULL_AUDIT_METHOD.md 3.1. These are the document claims that were",
-    "already stale when the gate went live. The gate fails on anything NOT in this list,",
-    "so new drift is caught from day one, and it fails on any entry here that stops",
-    "matching, so a fix that lands without burning its entry is caught too.",
-    "Keyed by class AND file AND text: a bare text allowlist would excuse the same dead",
-    "path appearing in a new document tomorrow.",
-    "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
-    "the gate, and the list visibly empties. Do not add to this file to make a run green.",
-    "ADDED 2026-08-13 (R058, TR-137): eleven historical citations of WinPod.svelte froze",
-    "when the component was deliberately DELETED by the owner design ruling. Per the",
-    "SUPERSEDED_CITED escape recorded in the gate itself, a document legitimately naming",
-    "retired material historically freezes with its reason; these lines are dated records",
-    "(old comms entries, evidence ledgers, closed tracker rows, dated audits) whose claims",
-    "were true when written. Live documents were fixed instead, not frozen."
-  ],
-  "frozen_count": 273,
-  "by_class": {
-    "DEAD_DOCREF": 11,
-    "DEAD_PATH": 211,
-    "STALE_LINE": 12,
-    "DEAD_SYMBOL": 28,
-    "DEAD_COMMIT": 8,
-    "SUPERSEDED_CITED": 3
+ "_comment": [
+  "FROZEN DEBT, per FULL_AUDIT_METHOD.md 3.1. These are the document claims that were",
+  "already stale when the gate went live. The gate fails on anything NOT in this list,",
+  "so new drift is caught from day one, and it fails on any entry here that stops",
+  "matching, so a fix that lands without burning its entry is caught too.",
+  "Keyed by class AND file AND text: a bare text allowlist would excuse the same dead",
+  "path appearing in a new document tomorrow.",
+  "BURN EACH ENTRY IN THE SAME COMMIT AS ITS FIX. The count in the log is the count in",
+  "the gate, and the list visibly empties. Do not add to this file to make a run green.",
+  "ADDED 2026-08-13 (R058, TR-137): eleven historical citations of WinPod.svelte froze",
+  "when the component was deliberately DELETED by the owner design ruling. Per the",
+  "SUPERSEDED_CITED escape recorded in the gate itself, a document legitimately naming",
+  "retired material historically freezes with its reason; these lines are dated records",
+  "(old comms entries, evidence ledgers, closed tracker rows, dated audits) whose claims",
+  "were true when written. Live documents were fixed instead, not frozen."
+ ],
+ "frozen_count": 272,
+ "by_class": {
+  "DEAD_DOCREF": 11,
+  "DEAD_PATH": 210,
+  "STALE_LINE": 12,
+  "DEAD_SYMBOL": 28,
+  "DEAD_COMMIT": 8,
+  "SUPERSEDED_CITED": 3
+ },
+ "frozen": [
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "audit/FS_Finalisation_Report.md",
+   "text": "SUBMISSION_BLURB.md",
+   "detail": "does not exist at HEAD"
   },
-  "frozen": [
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "audit/FS_Finalisation_Report.md",
-      "text": "SUBMISSION_BLURB.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_Finalisation_Report.md",
-      "text": "BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_Finalisation_Report.md",
-      "text": "console.log",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_Finalisation_Report.md",
-      "text": "ControlBar.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "audit/FS_Finalisation_Report.md",
-      "text": "ControlBar.svelte:25",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_FinalReview_Report.md",
-      "text": "BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_FinalReview_Report.md",
-      "text": "ControlBar.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "audit/FS_FinalReview_Report.md",
-      "text": "stopAuto @ frontend/src/App.svelte",
-      "detail": "stopAuto does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "audit/FS_FinalReview_Report.md",
-      "text": "ControlBar.svelte:10",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_MathSim_Audit_Report.md",
-      "text": "audit/scratch/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "audit/FS_PopoutS_Verification.md",
-      "text": "WinPod.svelte:30",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_PreSubmission_Compliance_Report.md",
-      "text": "BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_PreSubmission_Compliance_Report.md",
-      "text": "ControlBar.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_ReSimulation_Report.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "audit/FS_ReSimulation_Report.md",
-      "text": "math_config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "audit/FS_SubmissionBundle_Report.md",
-      "text": "04c027b7",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "audit/FS_SubmissionBundle_Report.md",
-      "text": "5bc78a4d",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "CLAUDE.md",
-      "text": "games/future_spinner_collect/COLLECT_PROTOTYPE_FINDINGS.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "CLAUDE.md",
-      "text": "branding/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "CLAUDE.md",
-      "text": "games/future_spinner_collect/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "CLAUDE.md",
-      "text": "player_string_dash_check.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "SUPERSEDED_CITED",
-      "file": "CLAUDE.md",
-      "text": "reports/archive/superseded/FUTURE_SPINNER_PROJECT_STATUS.md",
-      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "COMPLIANCE_WATCH.md",
-      "text": "ControlBar.svelte:57-63",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE_v3.md",
-      "text": "design-system/brand/vector_mark/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE_v3.md",
-      "text": "frontend/scripts/gate_vector_mark_v3.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE.md",
-      "text": "design-system/brand/vector_mark/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/GENERATION_NOTE_background.md",
-      "text": "bg_highquality_1920x1080.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/GENERATION_NOTE_background.md",
-      "text": "bg_improved_v1.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/GENERATION_NOTE_background.md",
-      "text": "bg_improved_v2.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/GENERATION_NOTE_background.md",
-      "text": "bg_original_enhanced.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "design-system/brand/GENERATION_NOTE_background.md",
-      "text": "bg_original.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/books_formatting.md",
-      "text": "scripts/format_books_json.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/design/Win_Celebration_HANDOFF.md",
-      "text": "HUD_Reskin_HANDOFF.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/design/Win_Celebration_HANDOFF.md",
-      "text": "Win_Celebration.dc.html",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "apps/lines/src/routes/+page.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "apps/lines/src/stories/ComponentsGame.stories.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "packages/pixi-svelte/src/lib/createApp.svelte.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "packages/utils-event-emitter/src/createEventEmitter.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "packages/utils-layout/src/createLayout.svelte.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "packages/utils-xstate/src/createGameActor.svelte.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/context.md",
-      "text": "packages/utils-xstate/src/createXstateUtils.svelte.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/fe_docs/flowchart.md",
-      "text": "packages/utils-book/src/createPlayBookUtils.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/FEATURE_RESEARCH_v1_1.md",
-      "text": "docs/MATH_DESIGN_SPACE.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/directory.md",
-      "text": "0_0_cluster/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/directory.md",
-      "text": "0_0_expwilds/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/directory.md",
-      "text": "0_0_lines/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/directory.md",
-      "text": "0_0_scatter/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/directory.md",
-      "text": "0_0_ways/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/gamestate_section/events_info.md",
-      "text": "play/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/gamestate_section/force_info.md",
-      "text": "force.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
-      "text": "math_config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
-      "text": "optimization_algorithm/optimization_config.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
-      "text": "setup.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/overview_section/game_format.md",
-      "text": "force/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/overview_section/game_format.md",
-      "text": "game/library/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/overview_section/game_struct.md",
-      "text": "config_fe.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/overview_section/game_struct.md",
-      "text": "config_math.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/overview_section/game_struct.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/quickstart.md",
-      "text": "games/0_0_lines/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/quickstart.md",
-      "text": "play/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "config_fe.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "config_math.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "force_mode.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "force.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "game/library/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "lookUpTable_mode.csv",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/source_section/file_info.md",
-      "text": "play/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/uploads_section/upload_info.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/math_docs/utils_section/utilities.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/QUALITY_CHARTER.md",
-      "text": "frontend/src/assets/svelte.svg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/QUALITY_CHARTER.md",
-      "text": "player_string_dash_check.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/QUALITY_CHARTER.md",
-      "text": "PaytableModal @ frontend/src/lib/i18n/translations.ts",
-      "detail": "PaytableModal does not appear in frontend/src/lib/i18n/translations.ts"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
-      "text": "-FG.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
-      "text": "03_branding/FutureSpinner-BG.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
-      "text": "FS_MAX_WIN_LABEL @ frontend/src/lib/i18n/translations.ts",
-      "detail": "FS_MAX_WIN_LABEL does not appear in frontend/src/lib/i18n/translations.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
-      "text": "FS_RTP_LABEL @ frontend/src/lib/i18n/translations.ts",
-      "detail": "FS_RTP_LABEL does not appear in frontend/src/lib/i18n/translations.ts"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
-      "text": "math/HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
-      "text": "player_string_dash_check.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
-      "text": "scratch/front/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "foo.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "assets/index-DEOd1P6P.js",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "Board.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "Controls.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/public/assets/symbols.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/public/assets/themes/future-spinner/branding/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/components/Menu/AudioToggle.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/components/Paytable/AnteliteDescription.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/components/Paytable/Information.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/components/UI/SweepstakesBalance.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/components/UI/WinPresentation.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/index.html",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/locales/sweeps_en.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/managers/KeyboardManager.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/rendering/ReelSpin.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/stores/betStore.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "frontend/src/styles/mini-player.css",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "games/__init__.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "games/future_spinner/index.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "i18n.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "mini_player_preview.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "mini-player.css",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "player_string_dash_check.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "reports/screens/mini_player_preview.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "reports/screens/provider-mark/candidate-e-true-size.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "rgsApi.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "RulesModal.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "sfx_win_countup.mp3",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "soundManager.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "stores/launchParams.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "sweeps_en.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "vite.svg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "WinPod.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "clickAnyPendingGate @ frontend/src/App.svelte",
-      "detail": "clickAnyPendingGate does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "enforceSocialEnglish @ frontend/src/lib/i18n/tr.ts",
-      "detail": "enforceSocialEnglish does not appear in frontend/src/lib/i18n/tr.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "featureI18n @ frontend/src/App.svelte",
-      "detail": "featureI18n does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "FeatureMenu @ frontend/src/lib/stores/gameStore.ts",
-      "detail": "FeatureMenu does not appear in frontend/src/lib/stores/gameStore.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "featurePrice @ frontend/src/App.svelte",
-      "detail": "featurePrice does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "fsModes @ frontend/src/App.svelte",
-      "detail": "fsModes does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "HUD_LABEL_TOTAL_WIN @ frontend/scripts/locale_completeness_check.mjs",
-      "detail": "HUD_LABEL_TOTAL_WIN does not appear in frontend/scripts/locale_completeness_check.mjs"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "hudFeatures @ frontend/src/App.svelte",
-      "detail": "hudFeatures does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "hudMaxWin @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
-      "detail": "hudMaxWin does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "HudOverlay @ frontend/src/lib/stores/gameStore.ts",
-      "detail": "HudOverlay does not appear in frontend/src/lib/stores/gameStore.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "hudSpinCost @ frontend/src/App.svelte",
-      "detail": "hudSpinCost does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "hudStartReplay @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
-      "detail": "hudStartReplay does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "LOCKED_FILE_DEBTS @ frontend/src/lib/stores/gameStore.ts",
-      "detail": "LOCKED_FILE_DEBTS does not appear in frontend/src/lib/stores/gameStore.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "maxWinReached @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
-      "detail": "maxWinReached does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "modeLabel() @ frontend/src/App.svelte",
-      "detail": "modeLabel does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "overdriveFreeSpins @ frontend/scripts/locale_completeness_check.mjs",
-      "detail": "overdriveFreeSpins does not appear in frontend/scripts/locale_completeness_check.mjs"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "pruneDocs @ frontend/src/App.svelte",
-      "detail": "pruneDocs does not appear in frontend/src/App.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "replayAgain @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
-      "detail": "replayAgain does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "resolveLaunchLocale @ frontend/src/lib/i18n/tr.ts",
-      "detail": "resolveLaunchLocale does not appear in frontend/src/lib/i18n/tr.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "rgsBetLevels @ frontend/src/lib/stores/gameStore.ts",
-      "detail": "rgsBetLevels does not appear in frontend/src/lib/stores/gameStore.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "socialCasino @ frontend/src/lib/i18n/tr.ts",
-      "detail": "socialCasino does not appear in frontend/src/lib/i18n/tr.ts"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "splashPressAnywhere @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
-      "detail": "splashPressAnywhere does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "totalWin @ frontend/scripts/locale_completeness_check.mjs",
-      "detail": "totalWin does not appear in frontend/scripts/locale_completeness_check.mjs"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/reviews/REVIEW_TRACKER.md",
-      "text": "player_string_dash_check.mjs:65",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/round3_reviewer_prompt_RATIFIED.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "_2026-07-14.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "ControlBar.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "Counter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "GameTitle-FG.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "OverdriveMeter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/reviews/sources/review3_openai.md",
-      "text": "ProviderName-Logo.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "docs/records/reviews/sources/round2_review1.md",
-      "text": "c5c9b3e9",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "docs/records/reviews/sources/round2_review1.md",
-      "text": "ca68ca53",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "docs/records/reviews/sources/round2_review1.md",
-      "text": "ccee569",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "docs/records/reviews/sources/round2_review1.md",
-      "text": "d75b511",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
-      "text": "games/future_spinner_super/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
-      "text": "WinPod.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
-      "text": "frontend/src/lib/components/WinPod.svelte:5-6",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
-      "text": "WinPod.svelte:72",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "build-index.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "deploy/docker-compose.prod.yml",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "EventModal.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "EventViewerPanel.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "helpers.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
-      "text": "mcp-server/package.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/trademark/2026-07-15/SEARCH_LOG.md",
-      "text": "docs/records/trademark/2026-07-23/uspto-owner/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "01_maths_upload/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "01-authenticate.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "02_frontend_upload/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "03_branding/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "03_branding/FutureSpinner-BG.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "03_branding/FutureSpinner-FG.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "03_branding/WeRollSpinners-Logo.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "03-play.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "04-endround.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "05a-replay.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "05b-banner.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "07-gc-balance.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "09-controls.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "10-mini-player.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "10b-mini-spinning.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "BUILD_INFO.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "FS_UPLOAD_KIT_V10/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "FS_UPLOAD_KIT_V7/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "FS_UPLOAD_KIT_V8/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "FS_UPLOAD_KIT_V9/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
-      "text": "math/HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/records/V7_RECONCILIATION.md",
-      "text": "00_READ_ME_FIRST_SECOND_VISIT.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/V7_RECONCILIATION.md",
-      "text": "assets/index-CrpkyMd9.js",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/records/V7_RECONCILIATION.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "docs/records/V7_RECONCILIATION.md",
-      "text": "WinPod.svelte:6",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "docs/MASTER_TEMPLATE.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "01_base-and-buy-menu.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "02_buy-menu-and-freespins.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "04_base-play-and-bet-menu.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "05_bonus-enhancer-activate.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "06_trickster-spin-buy.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "07_trickster-multiplier-grid-bigwin.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
-      "text": "08_special-symbols-megawin.mp4",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/RESKIN_BOUNDARY.md",
-      "text": "btn_autoplay/menu/max/bet_plus/bet_minus.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/simple_example/simple_example.md",
-      "text": "math-sdk/games/fifty_fifty/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/TILE_COMPOSITION_GUIDE.md",
-      "text": "_mono_cyan.svg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "docs/TILE_COMPOSITION_GUIDE.md",
-      "text": "design-system/brand/vector_mark/wrs_mark_v2.svg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "01-authenticate-payload.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "03-play-payload.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "04-endround-payload.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "05a-mid-round-reload.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "05b-recovery-banner.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "07-xgc-balance.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "09-jurisdiction-flags.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "10-real-popout.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "DTT_PROTOCOL.md",
-      "text": "10b-real-popout-spinning.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "frontend/README.md",
-      "text": "global.d.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "frontend/README.md",
-      "text": "jsconfig.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "force.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "game_calculations.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "game_executables.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "game_override.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "games/0_0_lines/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
-      "text": "games/0_0_ways/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/README.md",
-      "text": "fifty_fifty/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "games/README.md",
-      "text": "template/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "HANDOVER_2026-07-25c_Fable.md",
-      "text": "sideproject/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "fefadc7",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "docs/records/reviews/round3_reviewer_prompt_DRAFT.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "games/future_spinner_super/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "math/HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_SYMBOL",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "KNOWN_OPEN @ frontend/src/lib/components/MaxWinCelebration.svelte",
-      "detail": "KNOWN_OPEN does not appear in frontend/src/lib/components/MaxWinCelebration.svelte"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "frontend/src/lib/components/WinPod.svelte:14-15",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "WinPod.svelte:14-15",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "SUPERSEDED_CITED",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "reports/archive/superseded/AUDIT_PACK_INDEX.md",
-      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
-    },
-    {
-      "cls": "SUPERSEDED_CITED",
-      "file": "reports/FABLE_COMMS.md",
-      "text": "reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md",
-      "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/currency_readiness_2026-07-25.md",
-      "text": "helpers.ts",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/dtt_live_session_2026-07-26.md",
-      "text": "assets/index-DEOd1P6P.js",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/dtt_live_session_2026-07-26.md",
-      "text": "HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/dtt_live_session_2026-07-26.md",
-      "text": "math/HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/dtt_live_session_2026-07-26.md",
-      "text": "player_string_dash_check.mjs",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "Counter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "OverdriveMeter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "src/lib/components/BalanceDisplay.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "src/lib/components/OverdriveMeter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
-      "text": "src/lib/Counter.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/screenshot_deep_audit_2026-07-26.md",
-      "text": "HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/screenshot_deep_audit_2026-07-26.md",
-      "text": "math/HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/social_mode_string_audit_2026-07-14.md",
-      "text": "WinPod.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "reports/qa/stream_test/LEDGER.md",
-      "text": "WinPod.svelte:6",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
-      "text": "AutoPlayModal.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
-      "text": "ControlBar.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
-      "text": "FeatureButton.svelte",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/screens/background-adopted-2026-07-27/README.md",
-      "text": "candidates/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/screens/dtt-live-2026-07-26/README.md",
-      "text": "HASHES.txt",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
-      "text": "FS_UPLOAD_KIT_V8/02_frontend_upload/assets/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
-      "text": "index-pDIjyKAp.js",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
-      "text": "scratch/front/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
-      "text": "FS_DesignSystem_ContactSheet.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
-      "text": "NN_description.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
-      "text": "photo_2026-07-17_08-15-32.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
-      "text": "photo_2026-07-17_08-15-40.jpg",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
-      "text": "wrs_provider_mark_source.png",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "STALE_LINE",
-      "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-27.md",
-      "text": "WinPod.svelte:6",
-      "detail": "the cited file does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "SUBMISSION_DOSSIER.md",
-      "text": "branding/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "SUBMISSION_DOSSIER.md",
-      "text": "build-info.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "SUBMISSION_DOSSIER.md",
-      "text": "index-pDIjyKAp.js",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "SUBMISSION_DOSSIER.md",
-      "text": "scratch/front/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "tools/audio_forge/README.md",
-      "text": "GENERATION_LOG.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "tools/audio_forge/README.md",
-      "text": ".venv/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "tools/audio_forge/README.md",
-      "text": "model_config.json",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "tools/audio_forge/README.md",
-      "text": "pyproject.toml",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "tools/audio_forge/README.md",
-      "text": "stable_audio_tools/models/lora/callbacks.py",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_COMMIT",
-      "file": "WRS_MASTER_DOCUMENT.md",
-      "text": "fefadc7",
-      "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
-    },
-    {
-      "cls": "DEAD_DOCREF",
-      "file": "WRS_MASTER_DOCUMENT.md",
-      "text": "SUBMISSION_BLURB.md",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "WRS_MASTER_DOCUMENT.md",
-      "text": "sideproject/",
-      "detail": "does not exist at HEAD"
-    },
-    {
-      "cls": "DEAD_PATH",
-      "file": "WRS_MASTER_DOCUMENT.md",
-      "text": "sideproject/README_ARCHIVE.txt",
-      "detail": "does not exist at HEAD"
-    }
-  ]
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_Finalisation_Report.md",
+   "text": "BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_Finalisation_Report.md",
+   "text": "console.log",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_Finalisation_Report.md",
+   "text": "ControlBar.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "audit/FS_Finalisation_Report.md",
+   "text": "ControlBar.svelte:25",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_FinalReview_Report.md",
+   "text": "BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_FinalReview_Report.md",
+   "text": "ControlBar.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "audit/FS_FinalReview_Report.md",
+   "text": "stopAuto @ frontend/src/App.svelte",
+   "detail": "stopAuto does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "audit/FS_FinalReview_Report.md",
+   "text": "ControlBar.svelte:10",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_MathSim_Audit_Report.md",
+   "text": "audit/scratch/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "audit/FS_PopoutS_Verification.md",
+   "text": "WinPod.svelte:30",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_PreSubmission_Compliance_Report.md",
+   "text": "BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_PreSubmission_Compliance_Report.md",
+   "text": "ControlBar.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_ReSimulation_Report.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "audit/FS_ReSimulation_Report.md",
+   "text": "math_config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "audit/FS_SubmissionBundle_Report.md",
+   "text": "04c027b7",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "audit/FS_SubmissionBundle_Report.md",
+   "text": "5bc78a4d",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "CLAUDE.md",
+   "text": "games/future_spinner_collect/COLLECT_PROTOTYPE_FINDINGS.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "CLAUDE.md",
+   "text": "branding/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "CLAUDE.md",
+   "text": "games/future_spinner_collect/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "CLAUDE.md",
+   "text": "player_string_dash_check.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "SUPERSEDED_CITED",
+   "file": "CLAUDE.md",
+   "text": "reports/archive/superseded/FUTURE_SPINNER_PROJECT_STATUS.md",
+   "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "COMPLIANCE_WATCH.md",
+   "text": "ControlBar.svelte:57-63",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE_v3.md",
+   "text": "design-system/brand/vector_mark/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE_v3.md",
+   "text": "frontend/scripts/gate_vector_mark_v3.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/archive/vector_mark/GENERATION_NOTE.md",
+   "text": "design-system/brand/vector_mark/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/GENERATION_NOTE_background.md",
+   "text": "bg_highquality_1920x1080.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/GENERATION_NOTE_background.md",
+   "text": "bg_improved_v1.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/GENERATION_NOTE_background.md",
+   "text": "bg_improved_v2.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/GENERATION_NOTE_background.md",
+   "text": "bg_original_enhanced.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "design-system/brand/GENERATION_NOTE_background.md",
+   "text": "bg_original.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/books_formatting.md",
+   "text": "scripts/format_books_json.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/design/Win_Celebration_HANDOFF.md",
+   "text": "HUD_Reskin_HANDOFF.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/design/Win_Celebration_HANDOFF.md",
+   "text": "Win_Celebration.dc.html",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "apps/lines/src/routes/+page.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "apps/lines/src/stories/ComponentsGame.stories.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "packages/pixi-svelte/src/lib/createApp.svelte.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "packages/utils-event-emitter/src/createEventEmitter.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "packages/utils-layout/src/createLayout.svelte.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "packages/utils-xstate/src/createGameActor.svelte.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/context.md",
+   "text": "packages/utils-xstate/src/createXstateUtils.svelte.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/fe_docs/flowchart.md",
+   "text": "packages/utils-book/src/createPlayBookUtils.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/FEATURE_RESEARCH_v1_1.md",
+   "text": "docs/MATH_DESIGN_SPACE.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/directory.md",
+   "text": "0_0_cluster/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/directory.md",
+   "text": "0_0_expwilds/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/directory.md",
+   "text": "0_0_lines/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/directory.md",
+   "text": "0_0_scatter/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/directory.md",
+   "text": "0_0_ways/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/gamestate_section/events_info.md",
+   "text": "play/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/gamestate_section/force_info.md",
+   "text": "force.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
+   "text": "math_config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
+   "text": "optimization_algorithm/optimization_config.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/optimization_section/optimization_algorithm.md",
+   "text": "setup.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/overview_section/game_format.md",
+   "text": "force/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/overview_section/game_format.md",
+   "text": "game/library/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/overview_section/game_struct.md",
+   "text": "config_fe.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/overview_section/game_struct.md",
+   "text": "config_math.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/overview_section/game_struct.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/quickstart.md",
+   "text": "games/0_0_lines/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/quickstart.md",
+   "text": "play/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "config_fe.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "config_math.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "force_mode.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "force.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "game/library/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "lookUpTable_mode.csv",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/source_section/file_info.md",
+   "text": "play/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/uploads_section/upload_info.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/math_docs/utils_section/utilities.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/QUALITY_CHARTER.md",
+   "text": "frontend/src/assets/svelte.svg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/QUALITY_CHARTER.md",
+   "text": "player_string_dash_check.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/QUALITY_CHARTER.md",
+   "text": "PaytableModal @ frontend/src/lib/i18n/translations.ts",
+   "detail": "PaytableModal does not appear in frontend/src/lib/i18n/translations.ts"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
+   "text": "-FG.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
+   "text": "03_branding/FutureSpinner-BG.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
+   "text": "FS_MAX_WIN_LABEL @ frontend/src/lib/i18n/translations.ts",
+   "detail": "FS_MAX_WIN_LABEL does not appear in frontend/src/lib/i18n/translations.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/compliance/STAKE_GUIDELINES_SELF_ASSESSMENT.md",
+   "text": "FS_RTP_LABEL @ frontend/src/lib/i18n/translations.ts",
+   "detail": "FS_RTP_LABEL does not appear in frontend/src/lib/i18n/translations.ts"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
+   "text": "math/HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
+   "text": "player_string_dash_check.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/FIX_LIST_2026-07-26.md",
+   "text": "scratch/front/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "foo.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "assets/index-DEOd1P6P.js",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "Board.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "Controls.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/public/assets/symbols.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/public/assets/themes/future-spinner/branding/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/components/Menu/AudioToggle.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/components/Paytable/AnteliteDescription.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/components/Paytable/Information.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/components/UI/SweepstakesBalance.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/components/UI/WinPresentation.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/index.html",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/locales/sweeps_en.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/managers/KeyboardManager.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/rendering/ReelSpin.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/stores/betStore.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "frontend/src/styles/mini-player.css",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "games/__init__.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "games/future_spinner/index.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "i18n.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "mini_player_preview.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "mini-player.css",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "player_string_dash_check.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "reports/screens/mini_player_preview.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "reports/screens/provider-mark/candidate-e-true-size.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "rgsApi.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "RulesModal.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "sfx_win_countup.mp3",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "soundManager.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "stores/launchParams.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "sweeps_en.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "vite.svg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "WinPod.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "clickAnyPendingGate @ frontend/src/App.svelte",
+   "detail": "clickAnyPendingGate does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "enforceSocialEnglish @ frontend/src/lib/i18n/tr.ts",
+   "detail": "enforceSocialEnglish does not appear in frontend/src/lib/i18n/tr.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "featureI18n @ frontend/src/App.svelte",
+   "detail": "featureI18n does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "FeatureMenu @ frontend/src/lib/stores/gameStore.ts",
+   "detail": "FeatureMenu does not appear in frontend/src/lib/stores/gameStore.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "featurePrice @ frontend/src/App.svelte",
+   "detail": "featurePrice does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "fsModes @ frontend/src/App.svelte",
+   "detail": "fsModes does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "HUD_LABEL_TOTAL_WIN @ frontend/scripts/locale_completeness_check.mjs",
+   "detail": "HUD_LABEL_TOTAL_WIN does not appear in frontend/scripts/locale_completeness_check.mjs"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "hudFeatures @ frontend/src/App.svelte",
+   "detail": "hudFeatures does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "hudMaxWin @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
+   "detail": "hudMaxWin does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "HudOverlay @ frontend/src/lib/stores/gameStore.ts",
+   "detail": "HudOverlay does not appear in frontend/src/lib/stores/gameStore.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "hudSpinCost @ frontend/src/App.svelte",
+   "detail": "hudSpinCost does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "hudStartReplay @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
+   "detail": "hudStartReplay does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "LOCKED_FILE_DEBTS @ frontend/src/lib/stores/gameStore.ts",
+   "detail": "LOCKED_FILE_DEBTS does not appear in frontend/src/lib/stores/gameStore.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "maxWinReached @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
+   "detail": "maxWinReached does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "modeLabel() @ frontend/src/App.svelte",
+   "detail": "modeLabel does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "overdriveFreeSpins @ frontend/scripts/locale_completeness_check.mjs",
+   "detail": "overdriveFreeSpins does not appear in frontend/scripts/locale_completeness_check.mjs"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "pruneDocs @ frontend/src/App.svelte",
+   "detail": "pruneDocs does not appear in frontend/src/App.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "replayAgain @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
+   "detail": "replayAgain does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "resolveLaunchLocale @ frontend/src/lib/i18n/tr.ts",
+   "detail": "resolveLaunchLocale does not appear in frontend/src/lib/i18n/tr.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "rgsBetLevels @ frontend/src/lib/stores/gameStore.ts",
+   "detail": "rgsBetLevels does not appear in frontend/src/lib/stores/gameStore.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "socialCasino @ frontend/src/lib/i18n/tr.ts",
+   "detail": "socialCasino does not appear in frontend/src/lib/i18n/tr.ts"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "splashPressAnywhere @ frontend/src/lib/components/FreeSpinsPresentation.svelte",
+   "detail": "splashPressAnywhere does not appear in frontend/src/lib/components/FreeSpinsPresentation.svelte"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "totalWin @ frontend/scripts/locale_completeness_check.mjs",
+   "detail": "totalWin does not appear in frontend/scripts/locale_completeness_check.mjs"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "docs/records/reviews/REVIEW_TRACKER.md",
+   "text": "player_string_dash_check.mjs:65",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/round3_reviewer_prompt_RATIFIED.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "_2026-07-14.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "ControlBar.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "Counter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "GameTitle-FG.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "OverdriveMeter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/reviews/sources/review3_openai.md",
+   "text": "ProviderName-Logo.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "docs/records/reviews/sources/round2_review1.md",
+   "text": "c5c9b3e9",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "docs/records/reviews/sources/round2_review1.md",
+   "text": "ca68ca53",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "docs/records/reviews/sources/round2_review1.md",
+   "text": "ccee569",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "docs/records/reviews/sources/round2_review1.md",
+   "text": "d75b511",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
+   "text": "games/future_spinner_super/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
+   "text": "WinPod.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
+   "text": "frontend/src/lib/components/WinPod.svelte:5-6",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "docs/records/screenshots/FINDINGS_LEDGER.md",
+   "text": "WinPod.svelte:72",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "build-index.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "deploy/docker-compose.prod.yml",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "EventModal.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "EventViewerPanel.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "helpers.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/tooling/TOOL_VETTING_2026-07.md",
+   "text": "mcp-server/package.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/trademark/2026-07-15/SEARCH_LOG.md",
+   "text": "docs/records/trademark/2026-07-23/uspto-owner/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "01_maths_upload/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "01-authenticate.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "02_frontend_upload/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "03_branding/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "03_branding/FutureSpinner-BG.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "03_branding/FutureSpinner-FG.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "03_branding/WeRollSpinners-Logo.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "03-play.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "04-endround.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "05a-replay.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "05b-banner.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "07-gc-balance.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "09-controls.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "10-mini-player.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "10b-mini-spinning.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "BUILD_INFO.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "FS_UPLOAD_KIT_V10/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "FS_UPLOAD_KIT_V7/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "FS_UPLOAD_KIT_V8/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "FS_UPLOAD_KIT_V9/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/upload-kit/00_READ_ME_FIRST.md",
+   "text": "math/HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/records/V7_RECONCILIATION.md",
+   "text": "00_READ_ME_FIRST_SECOND_VISIT.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/V7_RECONCILIATION.md",
+   "text": "assets/index-CrpkyMd9.js",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/records/V7_RECONCILIATION.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "docs/records/V7_RECONCILIATION.md",
+   "text": "WinPod.svelte:6",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "docs/MASTER_TEMPLATE.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "01_base-and-buy-menu.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "02_buy-menu-and-freespins.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "04_base-play-and-bet-menu.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "05_bonus-enhancer-activate.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "06_trickster-spin-buy.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "07_trickster-multiplier-grid-bigwin.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/reference/competitor-demos/waylanders-forge/README.md",
+   "text": "08_special-symbols-megawin.mp4",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/RESKIN_BOUNDARY.md",
+   "text": "btn_autoplay/menu/max/bet_plus/bet_minus.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/simple_example/simple_example.md",
+   "text": "math-sdk/games/fifty_fifty/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/TILE_COMPOSITION_GUIDE.md",
+   "text": "_mono_cyan.svg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "docs/TILE_COMPOSITION_GUIDE.md",
+   "text": "design-system/brand/vector_mark/wrs_mark_v2.svg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "01-authenticate-payload.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "03-play-payload.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "04-endround-payload.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "05a-mid-round-reload.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "05b-recovery-banner.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "07-xgc-balance.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "09-jurisdiction-flags.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "10-real-popout.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "DTT_PROTOCOL.md",
+   "text": "10b-real-popout-spinning.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "frontend/README.md",
+   "text": "global.d.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "frontend/README.md",
+   "text": "jsconfig.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "force.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "game_calculations.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "game_executables.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "game_override.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "games/0_0_lines/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/future_spinner/SDK_PATTERN_ANALYSIS.md",
+   "text": "games/0_0_ways/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/README.md",
+   "text": "fifty_fifty/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "games/README.md",
+   "text": "template/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "fefadc7",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "docs/records/reviews/round3_reviewer_prompt_DRAFT.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "games/future_spinner_super/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "math/HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_SYMBOL",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "KNOWN_OPEN @ frontend/src/lib/components/MaxWinCelebration.svelte",
+   "detail": "KNOWN_OPEN does not appear in frontend/src/lib/components/MaxWinCelebration.svelte"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "frontend/src/lib/components/WinPod.svelte:14-15",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "WinPod.svelte:14-15",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "SUPERSEDED_CITED",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "reports/archive/superseded/AUDIT_PACK_INDEX.md",
+   "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+  },
+  {
+   "cls": "SUPERSEDED_CITED",
+   "file": "reports/FABLE_COMMS.md",
+   "text": "reports/archive/superseded/CLAUDE_PROJECT_INSTRUCTIONS_v6.md",
+   "detail": "is superseded, so citing it sends a reader to retired material; cite the successor"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/currency_readiness_2026-07-25.md",
+   "text": "helpers.ts",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/dtt_live_session_2026-07-26.md",
+   "text": "assets/index-DEOd1P6P.js",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/dtt_live_session_2026-07-26.md",
+   "text": "HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/dtt_live_session_2026-07-26.md",
+   "text": "math/HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/dtt_live_session_2026-07-26.md",
+   "text": "player_string_dash_check.mjs",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "Counter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "OverdriveMeter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "src/lib/components/BalanceDisplay.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "src/lib/components/OverdriveMeter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/fresh_eyes_review_2026-07-26.md",
+   "text": "src/lib/Counter.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/screenshot_deep_audit_2026-07-26.md",
+   "text": "HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/screenshot_deep_audit_2026-07-26.md",
+   "text": "math/HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/social_mode_string_audit_2026-07-14.md",
+   "text": "WinPod.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "reports/qa/stream_test/LEDGER.md",
+   "text": "WinPod.svelte:6",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
+   "text": "AutoPlayModal.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
+   "text": "ControlBar.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/qa/wiring_integrity_audit_2026-07-07.md",
+   "text": "FeatureButton.svelte",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/screens/background-adopted-2026-07-27/README.md",
+   "text": "candidates/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/screens/dtt-live-2026-07-26/README.md",
+   "text": "HASHES.txt",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
+   "text": "FS_UPLOAD_KIT_V8/02_frontend_upload/assets/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
+   "text": "index-pDIjyKAp.js",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/screens/live-portal-2026-07-28/CATALOGUE.md",
+   "text": "scratch/front/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
+   "text": "FS_DesignSystem_ContactSheet.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
+   "text": "NN_description.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
+   "text": "photo_2026-07-17_08-15-32.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
+   "text": "photo_2026-07-17_08-15-40.jpg",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-26.md",
+   "text": "wrs_provider_mark_source.png",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "STALE_LINE",
+   "file": "reports/tracks/screenshot-analyst/SESSION_REPORT_2026-07-27.md",
+   "text": "WinPod.svelte:6",
+   "detail": "the cited file does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "SUBMISSION_DOSSIER.md",
+   "text": "branding/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "SUBMISSION_DOSSIER.md",
+   "text": "build-info.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "SUBMISSION_DOSSIER.md",
+   "text": "index-pDIjyKAp.js",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "SUBMISSION_DOSSIER.md",
+   "text": "scratch/front/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "tools/audio_forge/README.md",
+   "text": "GENERATION_LOG.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "tools/audio_forge/README.md",
+   "text": ".venv/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "tools/audio_forge/README.md",
+   "text": "model_config.json",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "tools/audio_forge/README.md",
+   "text": "pyproject.toml",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "tools/audio_forge/README.md",
+   "text": "stable_audio_tools/models/lora/callbacks.py",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_COMMIT",
+   "file": "WRS_MASTER_DOCUMENT.md",
+   "text": "fefadc7",
+   "detail": "git cat-file cannot resolve it, and neither fetch attempt rescued it"
+  },
+  {
+   "cls": "DEAD_DOCREF",
+   "file": "WRS_MASTER_DOCUMENT.md",
+   "text": "SUBMISSION_BLURB.md",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "WRS_MASTER_DOCUMENT.md",
+   "text": "sideproject/",
+   "detail": "does not exist at HEAD"
+  },
+  {
+   "cls": "DEAD_PATH",
+   "file": "WRS_MASTER_DOCUMENT.md",
+   "text": "sideproject/README_ARCHIVE.txt",
+   "detail": "does not exist at HEAD"
+  }
+ ]
 }
