@@ -9,6 +9,103 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 071 - 2026-08-15 - COMMS-ACK R071: all eleven tasks landed, and ending the CI masking found five more
+
+Executed whole, nothing degraded, nothing carried; this entry the folded ack per
+(t). Tip `8b5f71b6`, remote green: run 32250190643, 30 of 30 jobs, 80 static
+steps. Your three decisions applied as given and not re-litigated. **THE PRECISION
+LAW** is estate-wide: payouts and wins widen to four places, minimum two;
+balances, costs, bets and every other currency surface at exactly two; and a
+non-zero amount below one unit of a zero-decimal currency WIDENS instead of
+rounding to a lying integer, so JPY 0.0008 shows as 0.0008 rather than as
+nothing. New `precision_law_gate`, 21 rows, three seeds including your
+three-place balance and four-place cost. **EXO 2** takes the money and counting
+surfaces at 400/700/900, self-hosted, Orbitron still the brand face, bundle 11.89
+MB against the 25 MB cap and zero external origins. Two properties, both
+measured: tabular figures take the digit spread from 19.30px to exactly 0.00,
+and **`font-kerning: none`, which was NOT in the brief and which the gate
+found**, because Exo 2 kerns a digit against the following punctuation and left
+two amounts 5.62px apart with every digit identical. The per-site wobble
+compensations are retired, mechanism and CSS both. **THE BANNER** rebalances to
+one token value once the control rules joined the chain, 227px to 199px, and the
+symmetry gate now asserts it in CI. MENU and AUTO did not move with the origin
+and the gate is what caught it.
+
+**THE ONE THING WORTH YOUR TIME.** Ending the static job's fail-fast masking was
+the ninth item on an eleven-item list, and it changed the character of the whole
+close. **The first run after it landed found a PROHIBITED TERM on a stake.us
+surface**: your OVERBOOST text was applied verbatim, correctly, to the master
+string AND to the social override, and the master reads "Debits 1.25x every spin
+while ON". "Debits" names a real-money movement. The social string now differs by
+exactly one word, "Costs", which is the word the superseded social blurb already
+used, so a player sees no change and the compliance property is back.
+**Verbatim means verbatim for the MASTER register**; social is a second register
+with a prohibited-term list, and `prose.ts` already carried the rule that would
+have caught it while writing. Four more followed from the same change: a 44px
+touch target that met the floor only as a side effect of Orbitron's line box and
+fell to 39 under Exo 2; a gate measuring a glyph's box where it meant the
+advance; the same gate then unable to prove WHICH FACE it had measured, warm here
+and cold on the runner; and two gates still pinning the world before your
+rulings, one of them requiring the exact lying integer TASK 2 was ordered to
+close. **Every one of those had passed locally.**
+
+**THE ONE THAT TOOK FOUR THEORIES, because you should know the estate found a
+REAL defect and not a CI quirk.** The count-up gate went red on the runner and
+green here on the same commit, four rounds running. It was not the measurement,
+though that was wrong; not the font failing to load, though the proof for that
+was missing; not the CSS property failing to reach the shaper, though asking on
+both paths is now cheap insurance. **Making the gate PRINT all ten widths instead
+of a verdict named it in one run**: nine digit runs at 420px and the "4" alone at
+440px. Tabular figures were working, on nine digits out of ten. **It is the
+rasteriser's hinter moving one glyph's advance**, which FreeType does and Windows
+and macOS do not, and `text-rendering: geometricPrecision` is what reaches it.
+**A Linux browser would have jumped the counter 2px every time a 4 rolled past
+and nobody here would ever have seen it.** After the fix the runner reports
+416.81 for all ten, fractional, matching this machine to the hundredth of a
+pixel.
+
+**THE TIP IS `8b5f71b6`, NOT the commit the eleven tasks first landed on.** Run
+32247203401 on `89373c0c` finished FAILURE on its final attempt, 29 of 30 green,
+and that one red is what found the above. Two commits followed and neither is new
+scope. **Recorded plainly because a close that quotes a green run it never got
+would be the exact failure this session spent its day sweeping out of the
+records.**
+
+**REGISTERED, NOT FIXED, AND SURFACED RATHER THAN FORCED.** `BET_LEVELS` is read
+by exactly one live path and only as fallback behind the authenticated ladder, so
+it is neither dead nor live behaviour: a player on a platform sending no
+`betLevels` is on those ten rungs right now, which makes deleting it a behaviour
+change rather than a cleanup. Registered with the trace; the six locked functions
+around it are genuinely dead and go on the next sanctioned pass; the array stays.
+
+**RECORDS.** Frame v8 supersedes v7 with the eight clauses corrected and opens by
+naming each one with the evidence that disproved it. Fifty-two stale status cells
+swept, every one recounted first-hand before it was touched; sixteen more had
+closed themselves on the merges. The fifty-one mapping is corrected: **reviewers
+tick those boxes, 0 of 51 is the expected state, and the old wording set up a job
+that does not exist.** TR-148's evidence lived in a gitignored path no reviewer
+could open and is now a tracked recount.
+
+**THREE THINGS ARE YOURS AND NOTHING BLOCKS ON THEM.** Q6 is one paste of the
+session-bearing GAME url, the one carrying `sessionID=` and `rgs_url=` that
+exists only once you have launched the game in your own browser; the portal
+address cannot be made into it, and no builder work will close it. 73 MB of
+dev-only theme art sits in the repository that already cannot ship, and deleting
+commissioned work to save clone weight is your call, not a hygiene sweep. And
+forty-three consumers of the numeric font token changed face, several of which
+are neither money nor counting: the Continue button, the loading screen, the hero
+splash. Nothing is broken; whether they belong on Orbitron is an art call.
+
+**ONE THING FOR THE NEXT BRIEF RATHER THAN FOR YOU.** The browser matrix's
+15-minute per-leg budget is too tight when the queue is contended, and **a
+timed-out job reports as `cancelled` rather than `failure`**, so it reads as
+infrastructure noise. Five legs of one run died within five seconds of each other
+on the round number while another finished green in 8m41s. Measured and recorded;
+deliberately not raised in the pass where it bit, for the same reason the
+money-fit seeds were retuned by measurement and the popout threshold was left
+alone.
+---
+
 ## 070 - 2026-08-15 - COMMS-ACK R070: zero delta across the WHOLE tree, and the false delta was ours
 
 Executed whole, this entry the folded ack per (t); R069 dead as declared,
