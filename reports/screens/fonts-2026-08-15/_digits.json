@@ -1,0 +1,135 @@
+[
+ {
+  "face": "orbitron",
+  "widths": [
+   83.4,
+   39.1,
+   83,
+   82.6,
+   73,
+   83,
+   82,
+   66,
+   83.4,
+   82.8
+  ],
+  "spread": 44.3,
+  "tabular": "NO",
+  "tnumMoves": "NO",
+  "tnumSpread": 44.3
+ },
+ {
+  "face": "oxanium",
+  "widths": [
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8,
+   57.8
+  ],
+  "spread": 0,
+  "tabular": "YES",
+  "tnumMoves": "NO",
+  "tnumSpread": 0
+ },
+ {
+  "face": "chakra-petch",
+  "widths": [
+   62.8,
+   35.8,
+   55,
+   57.9,
+   55.5,
+   58.2,
+   59.8,
+   49.8,
+   61.4,
+   60.3
+  ],
+  "spread": 27,
+  "tabular": "NO",
+  "tnumMoves": "NO",
+  "tnumSpread": 27
+ },
+ {
+  "face": "saira",
+  "widths": [
+   67.1,
+   37.6,
+   61,
+   60.1,
+   64.2,
+   61.9,
+   65.7,
+   56.3,
+   68.3,
+   65.7
+  ],
+  "spread": 30.7,
+  "tabular": "NO",
+  "tnumMoves": "YES",
+  "tnumSpread": 0
+ },
+ {
+  "face": "exo-2",
+  "widths": [
+   60.3,
+   39.8,
+   56.2,
+   55.6,
+   61.5,
+   53.6,
+   57.2,
+   51.2,
+   60.7,
+   57.2
+  ],
+  "spread": 21.69,
+  "tabular": "NO",
+  "tnumMoves": "YES",
+  "tnumSpread": 0.5
+ },
+ {
+  "face": "rajdhani",
+  "widths": [
+   51.4,
+   31.7,
+   47.8,
+   49.6,
+   52,
+   48.2,
+   49.7,
+   38,
+   51.9,
+   49.7
+  ],
+  "spread": 20.3,
+  "tabular": "NO",
+  "tnumMoves": "NO",
+  "tnumSpread": 20.3
+ },
+ {
+  "face": "michroma",
+  "widths": [
+   95.1,
+   95.1,
+   95.1,
+   95.1,
+   100,
+   95.1,
+   95.1,
+   96.9,
+   95.1,
+   96.9
+  ],
+  "spread": 4.88,
+  "tabular": "NO",
+  "tnumMoves": "NO",
+  "tnumSpread": 4.88
+ }
+]

@@ -14,6 +14,12 @@
     "owner:preview": "node ../scripts/owner_preview.mjs"
   },
   "devDependencies": {
+    "@fontsource/chakra-petch": "^5.3.0",
+    "@fontsource/exo-2": "^5.3.0",
+    "@fontsource/michroma": "^5.3.0",
+    "@fontsource/oxanium": "^5.3.0",
+    "@fontsource/rajdhani": "^5.3.0",
+    "@fontsource/saira": "^5.3.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tsconfig/svelte": "^5.0.6",
     "@types/node": "^24.10.1",
