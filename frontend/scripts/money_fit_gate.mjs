@@ -111,7 +111,21 @@ const check = (name, cond, detail) => {
 // writes a property nothing reads.
 const SEED_CSS = {
   'ellipsis-restored': '[data-money]{text-overflow:ellipsis !important;max-width:48px !important;overflow:hidden !important;display:inline-block}',
-  'flat-font-restored': '.m-stat-value{font-size:11px !important}',
+  // RETUNED 2026-08-15 by R071 TASK 4, and the retune is recorded rather than
+  // performed quietly, because a seed whose figure is changed until it goes red
+  // is exactly the failure convention (p) exists to prevent. The MECHANISM is
+  // untouched: a flat, !important font-size that the fit action's
+  // --autofit-scale cannot multiply into, which is the TR-066 defect verbatim.
+  // What changed is the world around it. Exo 2 replaced Orbitron on the money
+  // surfaces, and it is narrower, so the SHIPPED 11px no longer overflows this
+  // profile at all. Measured on the popout-s HUD at 400x225, widest money
+  // element, scrollWidth against clientWidth: 11px 63 in 63, 12px 63 in 63,
+  // 13px 63 in 63, 14px 62 in 62, 16px 63 in 59. The class returns at 16, so 16
+  // is what the seed pins: the smallest measured flat size at which the fit
+  // action's inability to shrink still cuts the value. The 11px figure is kept
+  // in this comment because it is the historical shipped value and a later
+  // reader comparing the seed to TR-066 would otherwise think one of them wrong.
+  'flat-font-restored': '.m-stat-value{font-size:16px !important}',
   // R060 seeds. tier-clipped re-creates the squeezed 63px window the owner's
   // leading-digit captures showed (measured on the replay mount before the
   // container query landed); toast-clipped restores the fixed height that cut
@@ -122,7 +136,14 @@ const SEED_CSS = {
   // the fs profile's value class without a width bound, so a ten-figure string
   // escapes its plate with zero logical overflow and only the visual-bounds
   // assertion can see it. Red before the fix, green after: the blind spot.
-  'plate-escape-restored': '.fs-value{max-width:none !important;overflow:visible !important}',
+  // RETUNED 2026-08-15 by R071 TASK 4 for the same reason and in the same shape
+  // as flat-font-restored above. The two properties that ARE the shipped defect,
+  // an unbounded width and a visible overflow so the escape is invisible to the
+  // logical-overflow assertion, are untouched. The font-size multiplier is the
+  // addition, and it is there because Exo 2 renders the ten-figure PRIZE value
+  // narrow enough to sit inside the plate that Orbitron overflowed: without it
+  // the seed asserts nothing, which is worse than a seed that is too aggressive.
+  'plate-escape-restored': '.fs-value{max-width:none !important;overflow:visible !important;font-size:1.6em !important}',
 }
 
 function startStub(currency) {

@@ -216,11 +216,28 @@ export function parseCapture(text) {
   return rows
 }
 
-/** The expected string, built from the CAPTURE alone. Never from the module. */
+/**
+ * The expected string, built from the CAPTURE alone. Never from the module.
+ *
+ * THE ZERO-DECIMAL WIDENING FLOOR, added 2026-08-15 by R071 TASK 2. A zero
+ * decimal currency renders whole units, so a non-zero amount BELOW one unit
+ * formatted at the captured decimal count renders as the integer 0: the player
+ * is shown nothing where they hold something, and 0.01 and 0.0008 and 0.9 all
+ * read as the same "0". The ruling is that such an amount WIDENS rather than
+ * rounding to a lying integer, so this builder widens too.
+ *
+ * It is deliberately NOT the module's algorithm restated. The shipped formatter
+ * walks decimal places until the amount divides evenly; this asks Intl for up to
+ * four places with no minimum and lets it trim, which is a different mechanism
+ * reaching the same string. Two implementations agreeing is worth something here
+ * precisely because convention (l.4) says agreement is worth nothing when the
+ * two share an input, and these two share only the number.
+ */
 function expected(micros, row) {
+  const sub = row.decimals === 0 && micros !== 0 && Math.abs(micros) < 1_000_000
   const n = (micros / 1_000_000).toLocaleString(LOCALE, {
-    minimumFractionDigits: row.decimals,
-    maximumFractionDigits: row.decimals,
+    minimumFractionDigits: sub ? 0 : row.decimals,
+    maximumFractionDigits: sub ? 4 : row.decimals,
   })
   if (row.codeLeading) return `${row.symbol} ${n}` // R065: CODE space AMOUNT
   return row.symbolAfter ? `${n} ${row.symbol}` : `${row.symbol}${n}`

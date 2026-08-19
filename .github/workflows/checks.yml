@@ -286,6 +286,28 @@ jobs:
       - name: kit build, seeded-violation self-test
         run: node scripts/kit_build.mjs --self-test
 
+      # owner_preview.mjs printed a HARDCODED LAN address for three months, from
+      # its first commit until 2026-08-05, while probing readiness on 127.0.0.1.
+      # The address was a DHCP lease, so the owner was handed a url that answered
+      # nothing while the run reported success. Rule 12's own clause, PRINTING A
+      # URL IS NOT EVIDENCE THE URL WORKS, is what surfaced it.
+      #
+      # Wired for the same reason as kit_build above and with the same shape: the
+      # script itself cannot run in CI, because it refuses any checkout that is
+      # not the primary one and would start a server nobody reaps. The --self-test
+      # branch runs BEFORE that refusal, touches no git, starts no server, and is
+      # hermetic: it binds an ephemeral port and probes 127.0.0.1, so it needs
+      # nothing of the runner's network. Seven assertions, three seeds, four
+      # paired controls, about 2.5 seconds.
+      #
+      # ADOPTED 2026-08-15 by R071 TASK 10 from the stray worktree
+      # .claude/worktrees/trusting-colden-055579, which was the one hunk in it that
+      # main did not already carry. The worktree's own copy of owner_preview.mjs was
+      # an EARLIER draft of the self-test that main has since superseded, so only the
+      # wiring was taken and the draft was discarded rather than merged backwards.
+      - name: owner preview address, seeded-violation self-test
+        run: node scripts/owner_preview.mjs --self-test
+
       # The scan honours scripts/qa/doc_currency_baseline.json, the frozen debt
       # that existed when the gate went live (FULL_AUDIT_METHOD.md 3.1). The
       # frozen count PRINTS on every run, because a gate quietly excusing several

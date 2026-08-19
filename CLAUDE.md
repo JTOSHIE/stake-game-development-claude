@@ -256,6 +256,52 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
   `frontend/scripts/dead_wiring_scan.mjs`, so the gate stays green while remembering
   them. Delete on the next sanctioned `gameStore.ts` pass; not worth a pass of its own.
 
+- **`canSpin` inside `gameStore.ts` is locked at `$bal >= $bet`, one times the bet, and
+  the game no longer costs one times the bet in every mode.** OVERBOOST is 1.25x and
+  `handleSpin` debits `spinCostMicros`, so a balance covering the bet but not the mode's
+  real cost left the SPIN button ENABLED and the spin then no-opped. Recorded here
+  2026-08-15 by R071 TASK 8; the defect itself was closed earlier by the same pattern
+  TR-016 used for the buy tiers, and this entry exists because the DEBT inside the locked
+  file was never registered while the fix outside it was. **Not reachable:** `App.svelte`
+  and `HudOverlay.svelte` both read `canAffordSpin` from the non-locked
+  `stores/buyAffordability.ts`, which multiplies by the standing mode's own cost, and
+  VERIFIED at HEAD 2026-08-15 by direct grep, the locked `canSpin` derived store has zero
+  reads in production code: the only occurrences outside `gameStore.ts` are three comments
+  naming it as the thing that was superseded. Delete it on the next sanctioned
+  `gameStore.ts` pass, alongside the four dead stores and the two dead derived stores
+  above; do not re-import it.
+
+- **`BET_LEVELS` inside `gameStore.ts`, dispositioned 2026-08-15 by R071 TASK 7, and the
+  disposition is REGISTER rather than escalate.** The array is
+  `[0.10, 0.20, 0.50, 1.00, 2.00, 5.00, 10.00, 20.00, 50.00, 100.00]`, a hardcoded
+  USD-shaped ladder in a locked file, and the question put was whether anything live still
+  reads it. **The liveness trace, VERIFIED at HEAD 2026-08-15 by direct grep over
+  `frontend/src/` including the `derived()` and `.subscribe()` forms:** exactly ONE
+  production module outside the locked file imports the array, `stores/betLadder.ts`, and
+  it reads it in ONE derived store, `activeBetLevels`, which returns `rgsBetLevels`
+  whenever the authenticate response supplied a ladder and falls back to `BET_LEVELS`,
+  filtered to the platform's declared min and max envelope, only when it did not. Every
+  bet-changing surface in the tree drives from that derived store: `HudOverlay.svelte` and
+  `BetSelector.svelte` import `activeBetLevels`, and their `increaseBet`, `decreaseBet` and
+  `setMaxBet` handlers are LOCAL functions wrapping `betLadder`'s `increaseBetLevel`,
+  `decreaseBetLevel` and `setMaxBetLevel`, not the locked ones they share a name with. The
+  six locked functions that index the array directly, `increaseBet`, `decreaseBet`,
+  `setMaxBet`, `setMinBet`, `canIncreaseBet` and `canSetMaxBet`, have zero production reads
+  between them. **So the authenticate-driven ladder governs and the locked array is
+  fallback-only data, which is the REGISTER case, not the escalate one.**
+
+  **THE TENSION IS SURFACED RATHER THAN DECIDED QUIETLY, per convention (n), because
+  fallback-only is not the same as dead and the brief named two outcomes rather than
+  three.** A live path DOES read the array: a player on a platform that sends no
+  `betLevels` in its authenticate response is playing on these ten rungs right now, so
+  deleting the array would be a behaviour change and not a cleanup. What is dead is every
+  locked FUNCTION that operates on it; what is alive is the DATA, and it is alive
+  deliberately, reviewed, and pinned by `betLadder.test.ts` including the three arithmetic
+  cases that reproduce the old `indexOf` defect. **No casual fix was made and none is
+  proposed.** The next sanctioned `gameStore.ts` pass deletes the six functions and LEAVES
+  the array, and if a later ruling wants the fallback ladder to stop being USD-shaped, that
+  is a maths-and-jurisdiction question for the owner under (l.8), not a tidy-up.
+
 ## BRANCHES: what exists, and why each one is still here
 
 Owner's order, 2026-07-28 (`reports/briefs/FS_HYGIENE_AND_REGISTER_Prompt.md`, JOB 1), so a
