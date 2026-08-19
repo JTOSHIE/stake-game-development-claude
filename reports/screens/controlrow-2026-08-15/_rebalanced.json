@@ -1,0 +1,465 @@
+[
+ {
+  "profile": {
+   "key": "desktop-1280x720",
+   "width": 1280,
+   "height": 720,
+   "kind": "fullscreen"
+  },
+  "data": {
+   "viewport": {
+    "width": 1280,
+    "height": 720,
+    "centreX": 640
+   },
+   "canvas": {
+    "left": 0,
+    "right": 1280,
+    "top": 0,
+    "bottom": 720,
+    "w": 1280,
+    "h": 720,
+    "centreX": 640,
+    "centreY": 360
+   },
+   "elements": {
+    "turbo": {
+     "selector": "[data-testid=\"hud-turbo\"]",
+     "box": {
+      "left": 199,
+      "right": 281,
+      "top": 563,
+      "bottom": 645,
+      "w": 82,
+      "h": 82,
+      "centreX": 240,
+      "centreY": 604
+     }
+    },
+    "slab": {
+     "selector": "[data-testid=\"hud-panel\"]",
+     "box": {
+      "left": 281,
+      "right": 999,
+      "top": 560,
+      "bottom": 648,
+      "w": 718,
+      "h": 88,
+      "centreX": 640,
+      "centreY": 604
+     }
+    },
+    "max": {
+     "selector": "[data-testid=\"max-chip\"]",
+     "box": {
+      "left": 297,
+      "right": 345,
+      "top": 580,
+      "bottom": 628,
+      "w": 48,
+      "h": 48,
+      "centreX": 321,
+      "centreY": 604
+     }
+    },
+    "menu": {
+     "selector": ".fs-menu",
+     "box": {
+      "left": 361,
+      "right": 405,
+      "top": 582,
+      "bottom": 626,
+      "w": 44,
+      "h": 44,
+      "centreX": 383,
+      "centreY": 604
+     }
+    },
+    "balance": {
+     "selector": "[data-testid=\"hud-balance\"]",
+     "box": {
+      "left": 421,
+      "right": 621,
+      "top": 573,
+      "bottom": 635,
+      "w": 200,
+      "h": 62,
+      "centreX": 521,
+      "centreY": 604
+     }
+    },
+    "win": {
+     "selector": "[data-testid=\"hud-win\"]",
+     "box": {
+      "left": 637,
+      "right": 787,
+      "top": 573,
+      "bottom": 635,
+      "w": 150,
+      "h": 62,
+      "centreX": 712,
+      "centreY": 604
+     }
+    },
+    "bet": {
+     "selector": "[data-testid=\"hud-bet\"]",
+     "box": {
+      "left": 803,
+      "right": 923,
+      "top": 573,
+      "bottom": 635,
+      "w": 120,
+      "h": 62,
+      "centreX": 863,
+      "centreY": 604
+     }
+    },
+    "steppers": {
+     "selector": "[data-testid=\"bet-arrows\"]",
+     "box": {
+      "left": 939,
+      "right": 983,
+      "top": 578,
+      "bottom": 630,
+      "w": 44,
+      "h": 52,
+      "centreX": 961,
+      "centreY": 604
+     }
+    },
+    "spin": {
+     "selector": "[data-testid=\"spin-button\"]",
+     "box": {
+      "left": 999,
+      "right": 1083,
+      "top": 562,
+      "bottom": 646,
+      "w": 84,
+      "h": 84,
+      "centreX": 1041,
+      "centreY": 604
+     }
+    },
+    "auto": {
+     "selector": ".autoplay-wrapper",
+     "box": {
+      "left": 1083,
+      "right": 1131,
+      "top": 580,
+      "bottom": 628,
+      "w": 48,
+      "h": 48,
+      "centreX": 1107,
+      "centreY": 604
+     }
+    }
+   },
+   "missing": []
+  }
+ },
+ {
+  "profile": {
+   "key": "owner-1200x675",
+   "width": 1200,
+   "height": 675,
+   "kind": "fullscreen"
+  },
+  "data": {
+   "viewport": {
+    "width": 1200,
+    "height": 675,
+    "centreX": 600
+   },
+   "canvas": {
+    "left": 0,
+    "right": 1200,
+    "top": 0,
+    "bottom": 675,
+    "w": 1200,
+    "h": 675,
+    "centreX": 600,
+    "centreY": 337.5
+   },
+   "elements": {
+    "turbo": {
+     "selector": "[data-testid=\"hud-turbo\"]",
+     "box": {
+      "left": 186.56,
+      "right": 263.44,
+      "top": 527.81,
+      "bottom": 604.69,
+      "w": 76.88,
+      "h": 76.88,
+      "centreX": 225,
+      "centreY": 566.25
+     }
+    },
+    "slab": {
+     "selector": "[data-testid=\"hud-panel\"]",
+     "box": {
+      "left": 263.44,
+      "right": 936.56,
+      "top": 525,
+      "bottom": 607.5,
+      "w": 673.13,
+      "h": 82.5,
+      "centreX": 600,
+      "centreY": 566.25
+     }
+    },
+    "max": {
+     "selector": "[data-testid=\"max-chip\"]",
+     "box": {
+      "left": 278.44,
+      "right": 323.44,
+      "top": 543.75,
+      "bottom": 588.75,
+      "w": 45,
+      "h": 45,
+      "centreX": 300.94,
+      "centreY": 566.25
+     }
+    },
+    "menu": {
+     "selector": ".fs-menu",
+     "box": {
+      "left": 338.44,
+      "right": 379.69,
+      "top": 545.63,
+      "bottom": 586.88,
+      "w": 41.25,
+      "h": 41.25,
+      "centreX": 359.06,
+      "centreY": 566.25
+     }
+    },
+    "balance": {
+     "selector": "[data-testid=\"hud-balance\"]",
+     "box": {
+      "left": 394.69,
+      "right": 582.19,
+      "top": 537.19,
+      "bottom": 595.31,
+      "w": 187.5,
+      "h": 58.13,
+      "centreX": 488.44,
+      "centreY": 566.25
+     }
+    },
+    "win": {
+     "selector": "[data-testid=\"hud-win\"]",
+     "box": {
+      "left": 597.19,
+      "right": 737.81,
+      "top": 537.19,
+      "bottom": 595.31,
+      "w": 140.63,
+      "h": 58.13,
+      "centreX": 667.5,
+      "centreY": 566.25
+     }
+    },
+    "bet": {
+     "selector": "[data-testid=\"hud-bet\"]",
+     "box": {
+      "left": 752.81,
+      "right": 865.31,
+      "top": 537.19,
+      "bottom": 595.31,
+      "w": 112.5,
+      "h": 58.13,
+      "centreX": 809.06,
+      "centreY": 566.25
+     }
+    },
+    "steppers": {
+     "selector": "[data-testid=\"bet-arrows\"]",
+     "box": {
+      "left": 880.31,
+      "right": 921.56,
+      "top": 541.88,
+      "bottom": 590.63,
+      "w": 41.25,
+      "h": 48.75,
+      "centreX": 900.94,
+      "centreY": 566.25
+     }
+    },
+    "spin": {
+     "selector": "[data-testid=\"spin-button\"]",
+     "box": {
+      "left": 936.56,
+      "right": 1015.31,
+      "top": 526.88,
+      "bottom": 605.63,
+      "w": 78.75,
+      "h": 78.75,
+      "centreX": 975.94,
+      "centreY": 566.25
+     }
+    },
+    "auto": {
+     "selector": ".autoplay-wrapper",
+     "box": {
+      "left": 1015.31,
+      "right": 1060.31,
+      "top": 543.75,
+      "bottom": 588.75,
+      "w": 45,
+      "h": 45,
+      "centreX": 1037.81,
+      "centreY": 566.25
+     }
+    }
+   },
+   "missing": []
+  }
+ },
+ {
+  "profile": {
+   "key": "portrait-320x568",
+   "width": 320,
+   "height": 568,
+   "kind": "portrait"
+  },
+  "data": {
+   "viewport": {
+    "width": 320,
+    "height": 568,
+    "centreX": 160
+   },
+   "canvas": {
+    "left": -168.21,
+    "right": 488.21,
+    "top": -1.06,
+    "bottom": 368.17,
+    "w": 656.41,
+    "h": 369.23,
+    "centreX": 160,
+    "centreY": 183.55
+   },
+   "elements": {
+    "turbo": {
+     "selector": "[data-testid=\"hud-turbo\"]",
+     "box": {
+      "left": 68,
+      "right": 116,
+      "top": 498,
+      "bottom": 546,
+      "w": 48,
+      "h": 48,
+      "centreX": 92,
+      "centreY": 522
+     }
+    },
+    "slab": {
+     "selector": ".p-controls-row",
+     "box": {
+      "left": 12,
+      "right": 308,
+      "top": 486,
+      "bottom": 558,
+      "w": 296,
+      "h": 72,
+      "centreX": 160,
+      "centreY": 522
+     }
+    },
+    "max": {
+     "selector": "[data-testid=\"max-chip\"]",
+     "box": {
+      "left": 208,
+      "right": 256,
+      "top": 498,
+      "bottom": 546,
+      "w": 48,
+      "h": 48,
+      "centreX": 232,
+      "centreY": 522
+     }
+    },
+    "balance": {
+     "selector": "[data-testid=\"hud-balance\"]",
+     "box": {
+      "left": 12,
+      "right": 156,
+      "top": 343.5,
+      "bottom": 404,
+      "w": 144,
+      "h": 60.5,
+      "centreX": 84,
+      "centreY": 373.75
+     }
+    },
+    "win": {
+     "selector": "[data-testid=\"hud-win\"]",
+     "box": {
+      "left": 164,
+      "right": 308,
+      "top": 343.5,
+      "bottom": 404,
+      "w": 144,
+      "h": 60.5,
+      "centreX": 236,
+      "centreY": 373.75
+     }
+    },
+    "bet": {
+     "selector": "[data-testid=\"hud-bet\"]",
+     "box": {
+      "left": 12,
+      "right": 308,
+      "top": 414,
+      "bottom": 476,
+      "w": 296,
+      "h": 62,
+      "centreX": 160,
+      "centreY": 445
+     }
+    },
+    "steppers": {
+     "selector": "[data-testid=\"bet-arrows\"]",
+     "box": {
+      "left": 134.2,
+      "right": 293,
+      "top": 423,
+      "bottom": 467,
+      "w": 158.8,
+      "h": 44,
+      "centreX": 213.6,
+      "centreY": 445
+     }
+    },
+    "spin": {
+     "selector": "[data-testid=\"spin-button\"]",
+     "box": {
+      "left": 126,
+      "right": 198,
+      "top": 486,
+      "bottom": 558,
+      "w": 72,
+      "h": 72,
+      "centreX": 162,
+      "centreY": 522
+     }
+    },
+    "auto": {
+     "selector": ".p-autoplay-wrapper",
+     "box": {
+      "left": 264,
+      "right": 312,
+      "top": 498,
+      "bottom": 546,
+      "w": 48,
+      "h": 48,
+      "centreX": 288,
+      "centreY": 522
+     }
+    }
+   },
+   "missing": [
+    "menu"
+   ]
+  }
+ }
+]

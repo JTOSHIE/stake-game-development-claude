@@ -1187,6 +1187,12 @@ jobs:
           # keeps lang/dir and its board matches the ltr twin; seeded by
           # LIFTING THE PIN, which must reproduce the owner's exact -94px grid
           # drift and the reel-order reversal red.
+          # R071 TASK 6: wired now that the owner has ruled the row's contents
+          # centre on the canvas centre. Before the ruling this gate existed and
+          # passed but was deliberately not wired, because it would have pinned a
+          # geometry nobody had chosen.
+          - name: "browser: control row symmetry"
+            run: node scripts/control_row_symmetry_gate.mjs --self-test && node scripts/control_row_symmetry_gate.mjs
           - name: "browser: direction parity"
             run: node scripts/direction_parity_gate.mjs --self-test && node scripts/direction_parity_gate.mjs
 

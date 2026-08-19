@@ -24,15 +24,15 @@ mkdirSync(OUT_DIR, { recursive: true })
 
 // docs/HUD_SPEC.md's locked coordinate table, verbatim.
 const SPEC = {
-  turbo:    { selector: '.fs-turbo',                     left: 227,  top: 563, width: 82,  height: 82 },
-  max:      { selector: '.fs-max',                       left: 325,  top: 580, width: 48,  height: 48 },
-  menu:     { selector: '.menu-wrapper',                 left: 389,  top: 582, width: 44,  height: 44 },
-  balance:  { selector: '[data-testid="hud-balance"]',   left: 449,  top: 573, width: 200, height: 62 },
-  win:      { selector: '[data-testid="hud-win"]',       left: 665,  top: 573, width: 150, height: 62 },
-  bet:      { selector: '[data-testid="hud-bet"]',       left: 831,  top: 573, width: 120, height: 62 },
-  steppers: { selector: '[data-testid="bet-arrows"]',    left: 967,  top: 578, width: 44,  height: 52 },
-  spin:     { selector: '[data-testid="spin-button"]',   left: 1027, top: 562, width: 84,  height: 84 },
-  auto:     { selector: '.autoplay-wrapper',             left: 1111, top: 580, width: 48,  height: 48 },
+  turbo:    { selector: '.fs-turbo',                     left: 199,  top: 563, width: 82,  height: 82 },
+  max:      { selector: '.fs-max',                       left: 297,  top: 580, width: 48,  height: 48 },
+  menu:     { selector: '.menu-wrapper',                 left: 361,  top: 582, width: 44,  height: 44 },
+  balance:  { selector: '[data-testid="hud-balance"]',   left: 421,  top: 573, width: 200, height: 62 },
+  win:      { selector: '[data-testid="hud-win"]',       left: 637,  top: 573, width: 150, height: 62 },
+  bet:      { selector: '[data-testid="hud-bet"]',       left: 803,  top: 573, width: 120, height: 62 },
+  steppers: { selector: '[data-testid="bet-arrows"]',    left: 939,  top: 578, width: 44,  height: 52 },
+  spin:     { selector: '[data-testid="spin-button"]',   left: 999, top: 562, width: 84,  height: 84 },
+  auto:     { selector: '.autoplay-wrapper',             left: 1083, top: 580, width: 48,  height: 48 },
 }
 const CENTRE_Y = 604
 const GAP = 16
