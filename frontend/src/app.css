@@ -147,6 +147,24 @@ html, body {
      to shimmy on a renderer we do not own. */
   font-feature-settings: 'tnum' 1;
   font-kerning: none;
+  /* GEOMETRIC PRECISION, and this one is a PLATFORM fix rather than a feature
+     request. With the two lines above in place a CI runner still rendered nine
+     of the ten digit runs at 420px and the "4" run at 440px: tabular figures
+     were demonstrably working, on nine digits out of ten, and one glyph came
+     out 2px wider anyway. That is not a missing feature and not rounding, which
+     would be at most one pixel a glyph. **It is the rasteriser's HINTER moving a
+     specific glyph's advance**, which FreeType does and which Windows and macOS
+     do not do the same way, and no amount of asking for tnum can reach it
+     because tnum had already been applied.
+
+     `text-rendering: geometricPrecision` is the property that does reach it: it
+     asks the renderer to prefer the font's GEOMETRIC metrics over the hinter's
+     legibility adjustments, which is exactly the trade a fixed-width counter
+     wants. The cost is that hinting no longer sharpens these glyphs on low-DPI
+     screens; the money and counting surfaces are the largest text in the
+     interface and can afford it, and a counter that jumps 2px whenever a 4 rolls
+     past cannot. Scoped to this rule, so nothing else in the interface changes. */
+  text-rendering: geometricPrecision;
 }
 
 body {

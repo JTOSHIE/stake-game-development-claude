@@ -235,7 +235,8 @@ function judge(m, label) {
   // uniform anyway, the geometry checks below would pass over an unprotected
   // estate. So the rule's presence is asserted directly, on both paths it is
   // asked for, rather than inferred from a measurement.
-  for (const decl of ['font-variant-numeric: tabular-nums', "font-feature-settings: 'tnum' 1", 'font-kerning: none']) {
+  for (const decl of ['font-variant-numeric: tabular-nums', "font-feature-settings: 'tnum' 1",
+    'font-kerning: none', 'text-rendering: geometricPrecision']) {
     ok(SHIPPED_RULE.includes(decl), `${label}: app.css still declares ${decl} for every money and counting element`)
   }
 
