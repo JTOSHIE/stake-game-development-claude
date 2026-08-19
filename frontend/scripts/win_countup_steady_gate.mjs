@@ -84,6 +84,11 @@ const BANNER = readFileSync(join(ROOT, 'src/lib/components/WinBanner.svelte'), '
 // ABSENT. What is measured below is the OUTCOME instead: equal digit advances
 // and zero drift, in the face the money surfaces actually render in.
 const RETIRED_RULE = /\.c1-amount \.c1-digit \{/.test(BANNER)
+// The rule that replaced it, read out of the shipped stylesheet for the same
+// reason: one rule keyed on [data-money] and .fs-num now does for every money and
+// counting surface what TR-089 did by hand at one site, so its DELETION is the
+// regression this gate must refuse, not just its effect.
+const SHIPPED_RULE = readFileSync(join(ROOT, 'src/app.css'), 'utf-8')
 
 // The two strings, chosen so the narrowest and widest digits are compared.
 const NARROW = '$1,111.11'
@@ -169,10 +174,15 @@ async function measure(selfTest) {
     // numbers describe a fallback face and the gate proves nothing.
     await page.waitForFunction(() => document.fonts && document.fonts.status === 'loaded', { timeout: 20000 })
     await page.addStyleTag({
+      // THE PROBE DECLARES SIZE AND WEIGHT ONLY. It used to restate the numeric
+      // treatment, `font-variant-numeric` and `font-kerning`, in its own style
+      // block, which meant the gate proved that a HAND-WRITTEN COPY of the rule
+      // works. Delete the shipped rule from app.css and that probe still passed.
+      // The elements carry `fs-num`, so the SHIPPED rule is what supplies the
+      // numeric treatment now and the gate fails if it is removed or weakened.
       content: `.probe-host{position:fixed;left:-9999px;top:0;}
                 .probe-host .c1-amount{font-family:var(--fs-font-numeric);font-weight:900;
-                  letter-spacing:2px;white-space:nowrap;font-size:64px;
-                  font-variant-numeric:tabular-nums;font-kerning:none;}
+                  letter-spacing:2px;white-space:nowrap;font-size:64px;}
                 /* THE SEED, and it is the world before the ruling: the DISPLAY
                    face, which is Orbitron, with tabular-nums asked for and
                    inert because that face carries no tnum to switch on. */
@@ -219,6 +229,16 @@ function judge(m, label) {
 
   ok(!RETIRED_RULE, `${label}: the retired per-digit box rule is absent from the component`)
 
+  // AND THE SHIPPED RULE MUST STILL BE THERE. The probe now leans on app.css for
+  // the numeric treatment rather than restating it, which is the right way round,
+  // but it leaves one hole: if the rule were deleted AND the face happened to be
+  // uniform anyway, the geometry checks below would pass over an unprotected
+  // estate. So the rule's presence is asserted directly, on both paths it is
+  // asked for, rather than inferred from a measurement.
+  for (const decl of ['font-variant-numeric: tabular-nums', "font-feature-settings: 'tnum' 1", 'font-kerning: none']) {
+    ok(SHIPPED_RULE.includes(decl), `${label}: app.css still declares ${decl} for every money and counting element`)
+  }
+
   // ONE PIXEL, and the tolerance is stated rather than tuned. The advance is a
   // delta divided by ten, so a whole-device-pixel rounding at either end moves it
   // by at most a tenth of a pixel; 1px is two orders of magnitude of headroom
@@ -234,6 +254,14 @@ function judge(m, label) {
   const worst = m.digitsTabular
     .map((w, d) => ({ d, w }))
     .sort((a, b) => a.w - b.w)
+  // EVERY WIDTH IS PRINTED, ALWAYS, PASSING OR NOT. A gate that reports only its
+  // verdict makes a failing run on a machine you cannot open into a guessing
+  // game, and this one already cost two wrong theories that way: the runner's
+  // "narrowest and widest" told us 0 and 4 disagreed and nothing about the other
+  // eight, which is exactly the information needed to tell a font fallback from a
+  // shaping failure from per-glyph rounding.
+  console.log(`  digit runs (ten of each, px): `
+    + m.digitsTabular.map((w, d) => `${d}=${w}`).join(' '))
   ok(spread <= RUN_TOLERANCE_PX,
     `${label}: ten same-length digit runs render at ONE width (spread ${spread.toFixed(2)}px; `
       + `narrowest "${String(worst[0].d).repeat(3)}..." ${worst[0].w}, widest "${String(worst[9].d).repeat(3)}..." ${worst[9].w})`)

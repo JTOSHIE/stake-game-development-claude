@@ -134,6 +134,18 @@ html, body {
 [data-money],
 .fs-num {
   font-variant-numeric: tabular-nums;
+  /* THE SAME FEATURE ASKED FOR TWICE, AND IT IS NOT REDUNDANCE FOR ITS OWN SAKE.
+     `font-variant-numeric` is the high-level property and it is the right one to
+     write; `font-feature-settings` is the low-level escape hatch that reaches the
+     shaper directly. On this machine the two produce byte-identical geometry, all
+     ten digit runs at 416.81px either way, so the second line changes nothing
+     here. It is here because a CI runner reported a 20px spread across those same
+     ten runs while the faces were confirmed loaded and while two real amounts
+     rendered at one width, which is the signature of the high-level property not
+     reaching the shaper on that build. A player's browser is not this machine
+     either. Asking on both paths costs nothing and removes a way for the counter
+     to shimmy on a renderer we do not own. */
+  font-feature-settings: 'tnum' 1;
   font-kerning: none;
 }
 
