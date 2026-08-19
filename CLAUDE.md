@@ -10,7 +10,7 @@ Two instruction documents exist and they do not compete.
 - **`CLAUDE_PROJECT_INSTRUCTIONS_v8.md`** at the repository root is the **stable project
   operating frame**: the triad, the session-start protocol, platform reality and the
   standing board. It is pinned verbatim in the owner's Claude project for Fable check-ins,
-  so it changes rarely and deliberately. It supersedes v7 (2026-08-15, eight clauses corrected at HEAD), which supersedes v6 and v5; all three stay archived under `reports/archive/superseded/`, unedited.
+  so it changes rarely and deliberately. It supersedes v7 (2026-08-15, eight clauses corrected at HEAD), which supersedes v6 and v5; all three stay archived, unedited, in the superseded folder of the reports archive.
 - **`CLAUDE.md`**, this file, is the **builder's conventions document**. It accumulates
   continuously and always carries conventions the frame has not yet absorbed, which is
   why the next clause names the tie-breaker rather than assuming the two agree.

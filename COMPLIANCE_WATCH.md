@@ -96,7 +96,13 @@ sha256 against 2026-07-29: **61 of 64 shared pages byte-identical**. The three
 deltas, each read in full rather than sampled:
 
 1. **`approval_guidelines_math_verification` REWRITTEN AND EXTENDED (4,558 to
-   8,065 chars). STOP: recorded for owner and Fable, not actioned.** The page
+   8,065 chars). ANSWERED 2026-08-10; the STOP is lifted and this note records it
+   2026-08-15 under R071 TASK 8.** `FABLE_COMMS.md` entry 047 closes it by
+   arithmetic against the published figures rather than by assertion: every
+   critical test passes with margin, and the numbers are in that entry. **The
+   STOP was correct when it was written** and it is being lifted by an answer
+   rather than by time passing, which is the distinction this file exists to
+   keep. The page's contents, as first captured: The page
    now publishes, as tables, what was previously prose or absent:
    - a new **Betlevel templates** section: the RGS rejects a bet whose total
      cost exceeds $500,000 USD or whose potential payout exceeds $50,000,000
@@ -294,7 +300,14 @@ build, not carried forward from an earlier pass.
 - **RGS failure paths, each exercised once, observed behaviour recorded:**
   - **Disconnect mid-spin:** `handleRGSError()` (`rgsService.ts:194-197`) maps a fetch
     `TypeError` to the retryable `ERR_GEN` code; `_withRetry()` retries `play()` up to 3
-    times, 1s apart. **Gap found:** `endRound()` is called directly (`rgsService.ts:473`),
+    times, 1s apart. **THIS GAP IS CLOSED, 2026-07-25, by the first lock sanction (PR #103);
+    recorded here 2026-08-15 by R071 TASK 8 because the register still described it as
+    open.** VERIFIED at HEAD by direct read: `endRound` is routed through `_withRetry`, and
+    the comment beside it records both the defect and why the fix is safe, namely that
+    end-round is idempotent on the round id. `CLAUDE.md`'s LOCKED_FILE_DEBTS entry for
+    `rgsService.ts` records the same closure. **The description below is kept as the
+    original diagnosis**, because it states the consequence better than a closure note
+    would: **Gap found:** `endRound()` was called directly (`rgsService.ts:473`),
     not wrapped in `_withRetry` - a disconnect specifically during end-round (after
     `play()` already succeeded) gets no retry, just a single throw into the same
     generic error-banner path `App.svelte` already renders. The RGS contract's
@@ -310,7 +323,13 @@ build, not carried forward from an earlier pass.
     tighter gate keeps blocking first) - re-confirmed still true and still compensated
     today, not a new gap. Server-side `ERR_IPB` also maps to a clear
     "Insufficient balance" banner message.
-  - **Resume-after-refresh / replay:** **gap confirmed, not new but re-verified today** -
+  - **Resume-after-refresh / replay:** **CLOSED; recorded 2026-08-15 by R071 TASK 8.**
+    VERIFIED at HEAD by direct read: `sessionRecovery.ts` reads `auth.round` and publishes
+    it to the `activeRound` store, and `App.svelte` mounts a `ResumeOffer` presentation on
+    it, so the silent mid-round refresh this entry describes now has a recovery path. The
+    original finding is kept below unedited, because the reasoning about WHY it was
+    lower-risk rather than no-risk is the part worth re-reading:
+    **gap confirmed, not new but re-verified today** -
     repo-wide grep for `resume|reconnect|onLine|visibilitychange` returns zero matches;
     `initRGS()` always re-authenticates clean on load and never inspects `auth.round`.
     Replay mode itself (a separate, explicit URL-param flow) is fully handled with its own
@@ -394,6 +413,13 @@ Separately, and independent of tier: the maximum bet size accepted by the RGS is
 
 #### OPEN QUESTION, CVaR definition. Recorded verbatim, resolution path attached.
 
+**RESOLVED TWICE OVER, and this register carried it as open until 2026-08-15, when R071
+TASK 8 recorded the closure.** It was resolved in PRACTICE from the ACP screen, which this
+same file already records further down, and then closed by arithmetic in `FABLE_COMMS.md`
+entry 047 on 2026-08-10 against the platform's published figures. **The question below is
+kept in full, because a definitional ambiguity that was answered once will be asked again**
+and the resolution path attached to it is what answered it.
+
 The published text says the worst **0.1%** of outcomes. Our independent pre-computation
 from Fable is stated as **CVaR99**, that is the worst **1%**. These are not the same
 statistic, and the published limit (700 or 800) is given without units or an explicit
@@ -429,7 +455,14 @@ the platform uses, the answer is already on file.
 - **RTP ceiling 96.70%.** Ours is 96.3500% in all five modes, margin 0.35pp, spread
   across modes 0.0000pp against a 0.5% allowance. The public GitHub repository still
   advertises the old 90.0 to 98.0 range and must not be used as the source of truth.
-- **SC display format contradiction, unresolved.** The only first-party currency table
+- **SC display format contradiction, SETTLED 2026-08-14 by R065; recorded here 2026-08-15
+  by R071 TASK 8.** The placement set was resolved whole and the owner's live confirmation
+  of the XEC display is recorded, closing the standing glance (`FABLE_COMMS.md` entry 067).
+  The code agrees at HEAD: the platform currency table drives placement per code, with the
+  social tokens trailing and `symbolAfter` retired for fiat. **The contradiction as it was
+  first written is kept below**, because the shape of it (two first-party sources, neither
+  wrong, describing different currency classes) is the reason it took a ruling rather than
+  a lookup: **SC display format contradiction, as originally recorded.** The only first-party currency table
   found (repository only, live no longer publishes one) documents `XSC` as symbol `SC`
   with `symbolAfter: true`, example `10.00 SC`. The brief specifies an `SC 1,000`
   leading-symbol style. Part 3 drives display from platform-provided session data
@@ -665,6 +698,12 @@ its celebration and PLAY AGAIN (`SUBMISSION_DOSSIER.md` section 9a, TR-076).
 ledger row SA-022 found player money rendered by `.toFixed(2)` in the replay win pod, so a
 large win read `3750000.00` with no separators and no currency symbol. **Fixed at source
 2026-07-27** (`docs/QUALITY_CHARTER.md` Q-11) and awaiting a live re-capture.
+**THE AWAITED RE-CAPTURE IS MOOT, recorded 2026-08-15 by R071 TASK 8: the surface no longer
+exists.** The pod was deleted by R058 TASK 2 on 2026-08-13 under the owner's design ruling,
+and `ReplayMode.svelte` records in place of the mount that its fixed WIN window was removed
+rather than fitted, citing the owner's own truncated-amount capture. **A row awaiting a
+capture of a deleted component cannot be closed by capturing anything**, which is why this
+is recorded as moot rather than left open indefinitely.
 
 ### 2. The CVaR open question has an answer on file
 
@@ -691,6 +730,14 @@ Recorded as RESOLVED IN PRACTICE rather than closed as a definition.
 ### 3. A limit disagreement, RAISED not silently corrected
 
 **Two first-party sources disagree on the 2-star Maximum Exposure limit.**
+
+**THE DISAGREEMENT NO LONGER EXISTS: the platform republished the table to agree with its
+own ACP. VERIFIED 2026-08-15 by direct read of the dated mirror**, where the math
+verification page now prints Maximum Exposure at $15,000,000 and $50,000,000. The
+`$10,000,000` figure in this file's own earlier table is the superseded capture. **The
+record below stands as written**, because a platform that changed its published limits is
+exactly the thing a compliance watch exists to notice, and deleting the disagreement would
+delete the evidence that it moved.
 
 | Source | 2-star Maximum Exposure |
 |---|---|

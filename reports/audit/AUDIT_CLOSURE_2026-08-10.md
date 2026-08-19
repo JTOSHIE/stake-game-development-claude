@@ -115,6 +115,21 @@ session-bearing GAME url (the address carrying `sessionID=` and `rgs_url=`
 that exists once the game is actually launched in the owner's browser). The
 scaffold stays armed; the ask to the owner is one paste of that url.
 
+**RE-OPENED HONESTLY, NOT RE-PROVED. Recorded 2026-08-15 by R071 TASK 8, which was asked to
+do one or the other and could not do the first.** Re-checked at HEAD on 2026-08-15:
+`tools/capture_rgs_400.sh` is still present and still armed, and no capture of a 400 body
+exists anywhere in the repository. **What is missing is named precisely, so nobody spends
+another session discovering it:** the scaffold needs the SESSION-BEARING GAME url, the
+address carrying `sessionID=` and `rgs_url=` that only exists once the game has actually
+been launched in the owner's own logged-in browser. The portal address is not it and cannot
+be made into it, because the portal mints sessions only behind the login and serves a
+client-rendered shell to anything else.
+
+**This is not a repository question and no amount of builder work will close it.** It is one
+paste, and until it arrives the honest state is UNKNOWN rather than open-and-being-worked.
+Recorded that way deliberately: an owner-gated item sitting in a work queue reads as
+somebody's outstanding task, and this one is nobody's until the url exists.
+
 ### Phase dispositions for the run itself
 
 | Phase | State | CI |

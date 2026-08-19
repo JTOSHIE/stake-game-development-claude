@@ -4,7 +4,14 @@
 - **Capture method**: application browser pane, logged-in portal session (the R053 flow's
   origin approval), page text extracted from the rendered `<main>` element on 2026-08-13.
 - **State at capture**: every box unticked, 0 of 51, matching the R056 brief's "currently
-  0/51". No box was ticked this session; ticking is the owner's.
+  0/51". No box was ticked this session and none should be. **CORRECTED 2026-08-15 by R071
+  TASK 8:** this line previously read "ticking is the owner's", which was wrong and made
+  0/51 look like an outstanding studio action. **The Guidelines checkboxes in the portal
+  are ticked by REVIEWERS, not by the studio, so 0 of 51 is the EXPECTED and correct state
+  at submission and is not a finding.** Confirmed by the owner and recorded in the living
+  handover at `HANDOVER_2026-08-15_Fable.md`: "The Guidelines checkboxes in the portal are
+  ticked by reviewers, not by the studio. 0/51 is the expected state. Do not flag it."
+  Nothing below this header block is edited; the transcription stays verbatim.
 - **Transcription rule**: the checklist items and section headings below are VERBATIM,
   including the platform's own spelling ("sucessfully", "Approval requests is closed",
   "emoji's"), casing ("RGS requests", "Final approval checklist") and punctuation. Item

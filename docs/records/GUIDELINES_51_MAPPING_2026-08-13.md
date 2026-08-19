@@ -2,10 +2,22 @@
 
 Companion to the verbatim capture at
 `docs/stake-engine-live/2026-08-13/submission_checklist_we_roll_spinners.md`; item
-numbers [01] to [51] are that file's reference numbering. This table exists for the
-owner's walk of the checklist next session. NOTHING here ticks a portal box; the
-disposition column says what the ESTATE holds, and the reviewer's judgement remains the
-reviewer's.
+numbers [01] to [51] are that file's reference numbering. This table exists so the owner
+can walk the checklist and see what the estate holds behind each item. NOTHING here ticks
+a portal box; the disposition column says what the ESTATE holds, and the reviewer's
+judgement remains the reviewer's.
+
+**CORRECTED 2026-08-15 by R071 TASK 8, and the correction matters because the earlier
+wording set up a job that does not exist.** Reading "the owner's walk of the checklist"
+beside a portal showing 0 of 51 invites the conclusion that fifty-one boxes are waiting
+for the owner to tick. They are not. **The Guidelines checkboxes are ticked by REVIEWERS,
+not by the studio, so 0 of 51 is the EXPECTED state and is not an outstanding action, not
+a finding, and not something to flag.** Confirmed by the owner and recorded in the living
+handover at `HANDOVER_2026-08-15_Fable.md`: "The Guidelines checkboxes in the portal are
+ticked by reviewers, not by the studio. 0/51 is the expected state. Do not flag it." The
+walk is still worth doing, for the owner's own confidence in what sits behind each row.
+It is a READ, not a data-entry task, and the OWNER disposition in this table marks the
+items that genuinely need him, which is a much shorter list than fifty-one.
 
 Dispositions used: **EVIDENCED** (clean estate evidence, cited), **FLAGGED** (evidenced
 AND the item speaks to currency display or to work amended this session, so the note
