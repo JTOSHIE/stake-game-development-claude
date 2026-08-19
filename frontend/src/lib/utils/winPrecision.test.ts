@@ -133,6 +133,16 @@ for (const [name, path] of files.slice(0, 3)) {
     'PaytableModal.svelte',      // advertised buy prices
     'WinBanner.svelte',          // the bought-round PRICE line, not a win
     'SessionPanel.svelte',       // wagered/won rows already carry $locale
+    // ADDED 2026-08-15 by R071 TASK 1, and it is the PRECISION LAW that put it
+    // here rather than a concession. This check was written when formatBalance
+    // was "the rounding formatter" and any money readout on it was suspect. The
+    // owner's ruling splits the estate instead: payouts and wins widen to four
+    // places, and balances, costs, bets and every other currency display render
+    // at exactly two. HudOverlay's balance and bet labels are the second kind,
+    // so formatBalance is now the CORRECT formatter for them, not a leftover.
+    // Its win readout still goes through formatWin, which check 8's own
+    // per-component assertions above continue to hold.
+    'HudOverlay.svelte',         // balance, bet and the loss-limit echo: not payouts
   ])
   const dir = 'src/lib/components'
   const offenders: string[] = []

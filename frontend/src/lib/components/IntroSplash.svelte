@@ -125,6 +125,14 @@
   .intro-continue {
     position: sticky;
     bottom: 0;
+    /* THE 44px TOUCH TARGET IS PINNED, NOT INFERRED. Added 2026-08-15 (R071).
+       This button met the floor only as a SIDE EFFECT of its padding plus
+       Orbitron's line box. When Exo 2 took over --fs-font-numeric the line box
+       shrank and the height fell to 39 at all three popout profiles at once,
+       which popout_conformance caught. A touch target that depends on font
+       metrics is not a touch target, it is a coincidence; min-height states the
+       requirement so no future face can quietly undo it. */
+    min-height: 44px;
     /* Opaque, because card content scrolls underneath this button. */
     background-color: #0a0a1e;
     align-self: center;

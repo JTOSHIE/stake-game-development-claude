@@ -353,8 +353,16 @@
   // re-derived from a table this file would then have to keep in step. One whole
   // unit renders as "1", "1.00" or "1.000" depending on the currency, and no
   // grouping separator can appear at one unit, so the fraction run is the answer.
+  // The decimal count this input accepts is DERIVED from what the shipped
+  // formatter actually renders for one unit, never assumed to be two. A
+  // zero-decimal currency must not offer a 0.01 step, and the precision law's
+  // widening floor means the answer is a property of the currency rather than a
+  // constant. $locale is passed rather than a fixed tag: a hardcoded locale on a
+  // money formatter is the exact class winPrecision.test.ts check 9 guards, and
+  // the match tolerates either decimal separator because that is the one thing
+  // that genuinely varies here. Verified across en, de, fr, ar and ja.
   $: lossLimitDecimals =
-    formatBalance(CURRENCY_SCALE, $currencyCode || 'USD', 'en')
+    formatBalance(CURRENCY_SCALE, $currencyCode || 'USD', $locale)
       .match(/\d+(?:[.,](\d+))?/)?.[1]?.length ?? 0
   $: lossLimitStep = lossLimitDecimals === 0 ? 1 : Number((10 ** -lossLimitDecimals).toFixed(lossLimitDecimals))
   function sanitiseLossLimit(v: unknown): number {
