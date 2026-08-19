@@ -115,27 +115,31 @@ const MEASURE = `(spec) => {
   }
   // Each digit alone, in the same style, so "one advance" is measured rather
   // than inferred from two totals agreeing.
-  // THE ADVANCE IS MEASURED AS A DELTA, NOT AS A LONE GLYPH'S BOX.
+  // THE ADVANCE IS MEASURED ON A REAL STRING, NOT ON A LONE GLYPH AND NOT AS
+  // ARITHMETIC OVER TWO OF THEM. This is the THIRD form this measurement has
+  // taken in one day and the previous two are described here rather than
+  // deleted, because each was wrong in a way that looked right locally.
   //
-  // This first read one digit at a time and compared the element widths. That
-  // measures the wrong thing and it went red on CI while passing locally, which
-  // is the useful part: locally the device pixel ratio is 2 and every digit read
-  // 41.69, on the runner it is 1 and the same digits read 42 and 44. **A lone
-  // glyph's box is its ink plus its side bearings, quantised to whole device
-  // pixels, and side bearings are exactly what tabular figures do NOT equalise.**
-  // The property under test is the ADVANCE, which is the distance from one glyph
-  // to the next and therefore only exists BETWEEN glyphs.
+  //   1. One digit per element, compare element widths. A lone glyph's box is
+  //      its ink plus its side bearings quantised to whole device pixels, and
+  //      side bearings are exactly what tabular figures do NOT equalise. Read
+  //      41.69 for every digit here and 42 and 44 on the runner.
+  //   2. Each digit at two lengths, difference over the gap. Better, and still
+  //      arithmetic over two quantised numbers on a renderer that reports whole
+  //      pixels. Read 0.00 here and 2.00 on the runner, with the faces PROVEN
+  //      loaded, so the fallback theory was wrong too.
   //
-  // So each digit is rendered at two lengths and the advance is the difference
-  // divided by the gap. The side bearings appear in both terms and cancel, and
-  // the rounding error is divided by ten along with everything else.
-  const ADV_LONG = 11
+  // The form below asks the question the count-up actually poses: **ten
+  // same-length strings, one per digit, must render at ONE width.** That is
+  // what a rolling counter does, it is measured on strings of the length a
+  // counter really has, and it needs no division and no tolerance beyond the
+  // renderer's own pixel. Every total is returned so a failing run NAMES the
+  // digits that disagree instead of reporting one number.
+  const RUN_LEN = 10
   const digitWidths = (tabular) => {
     const out = []
     for (let d = 0; d <= 9; d++) {
-      const one = render(String(d), tabular).total
-      const many = render(String(d).repeat(ADV_LONG), tabular).total
-      out.push(Math.round(((many - one) / (ADV_LONG - 1)) * 100) / 100)
+      out.push(render(String(d).repeat(RUN_LEN), tabular).total)
     }
     return out
   }
@@ -221,10 +225,18 @@ function judge(m, label) {
   // against that and two orders of magnitude BELOW the defect, which is a spread
   // of roughly 28px at this size in the display face. The seed proves the second
   // half of that claim on every run rather than leaving it asserted.
-  const ADVANCE_TOLERANCE_PX = 1
+  // ONE PIXEL over a ten-digit run, and the tolerance is stated rather than
+  // tuned: it is the renderer's own quantum, and the defect it must catch is a
+  // spread of roughly 280px over the same run in the display face, which the
+  // seed prints on every invocation rather than leaving asserted.
+  const RUN_TOLERANCE_PX = 1
   const spread = Math.max(...m.digitsTabular) - Math.min(...m.digitsTabular)
-  ok(spread <= ADVANCE_TOLERANCE_PX,
-    `${label}: every digit renders ONE advance in the numeric face (spread ${spread.toFixed(2)}px across ${m.digitsTabular.length} digits)`)
+  const worst = m.digitsTabular
+    .map((w, d) => ({ d, w }))
+    .sort((a, b) => a.w - b.w)
+  ok(spread <= RUN_TOLERANCE_PX,
+    `${label}: ten same-length digit runs render at ONE width (spread ${spread.toFixed(2)}px; `
+      + `narrowest "${String(worst[0].d).repeat(3)}..." ${worst[0].w}, widest "${String(worst[9].d).repeat(3)}..." ${worst[9].w})`)
 
   ok(m.narrowBoxed.total === m.wideBoxed.total,
     `${label}: "${NARROW}" and "${WIDE}" render at the SAME total width `
