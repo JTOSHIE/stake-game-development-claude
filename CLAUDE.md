@@ -7,12 +7,13 @@ behaviour. Australian English, metric units, no em dashes or en dashes anywhere.
 
 Two instruction documents exist and they do not compete.
 
-- **`CLAUDE_PROJECT_INSTRUCTIONS_v7.md`** at the repository root is the **stable project
+- **`CLAUDE_PROJECT_INSTRUCTIONS_v8.md`** at the repository root is the **stable project
   operating frame**: the triad, the session-start protocol, platform reality and the
   standing board. It is pinned verbatim in the owner's Claude project for Fable check-ins,
-  so it changes rarely and deliberately. It supersedes v5, which stays archived.
+  so it changes rarely and deliberately. It supersedes v7 (2026-08-15, eight clauses corrected at HEAD), which supersedes v6 and v5; all three stay archived under `reports/archive/superseded/`, unedited.
 - **`CLAUDE.md`**, this file, is the **builder's conventions document**. It accumulates
-  beyond v6 and already carries conventions past it, including (n).
+  continuously and always carries conventions the frame has not yet absorbed, which is
+  why the next clause names the tie-breaker rather than assuming the two agree.
 
 **Where the two conflict on builder conduct, `CLAUDE.md` governs**, because it is the
 document kept current with the work.
@@ -739,7 +740,7 @@ outranks parallel speed.
 **5. Model policy.** Sonnet at High for mechanical and suite work; Opus for
 judgement work; xHigh and above reserved for a single hard bounded problem in a
 short surgical session, never for a long mixed one. **The twice-failed escalation
-rule stands**, as recorded in `CLAUDE_PROJECT_INSTRUCTIONS_v7.md`: a brief failing
+rule stands**, as recorded in `CLAUDE_PROJECT_INSTRUCTIONS_v8.md`: a brief failing
 its gates twice escalates one tier.
 
 **6. Hard problems are extracted, not solved mid-flow.** When a job turns out to
