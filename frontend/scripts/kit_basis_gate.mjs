@@ -211,6 +211,53 @@ function walkSvelte(dir, out = []) {
   return out
 }
 
+// ── THE OVERBOOST WORDING PIN, R071 TASK 5 ──────────────────────────────────
+//
+// The owner ruled the OVERBOOST card's blurb on 2026-08-15. The superseded text
+// opened "Double-chance: about 1.6x the feature trigger rate", which contradicts
+// itself inside one sentence (a 1.6x rate is not a doubled chance) and borrows a
+// rival studio's trade name for their ante. Seventeen sites carry the ruled
+// replacement: prose.ts twice, and fifteen locales in prose.locales.ts.
+//
+// Two halves, because a rename is only half a pin:
+//   PRESENT. Every one of the seventeen sites carries the ruled wording.
+//   ABSENT. No trace of the superseded family survives anywhere the player can
+//           reach it, in source or in a built asset.
+const OVERBOOST_KEY = 'modeOverboostBlurb'
+const OVERBOOST_SITES = 17
+/** One distinctive fragment of the SUPERSEDED string per locale. */
+const OVERBOOST_SUPERSEDED = [
+  'Double-chance', 'Double chance', 'فرصة مضاعفة', 'Doppelte Chance', 'Doble oportunidad',
+  'Tuplamahdollisuus', 'दोहरा मौका', 'Peluang ganda', 'チャンス2倍', '찬스 2배',
+  'Podwójna szansa', 'Chance dupla', 'Двойной шанс', 'Çift şans', 'Nhân đôi cơ hội',
+  '双倍机会',
+]
+/** A fragment of the RULED string that every locale carries verbatim. */
+const OVERBOOST_RULED_MARK = 'Normal'
+
+function scanOverboost(files, { countSites = true } = {}) {
+  const findings = []
+  let sites = 0
+  for (const f of files) {
+    let src
+    try { src = readFileSync(f, 'utf-8') } catch { continue }
+    for (const line of src.split('\n')) {
+      if (!line.includes(OVERBOOST_KEY + ':')) continue
+      if (!line.includes("'") && !line.includes('"')) continue
+      if (countSites) sites += 1
+      if (!line.includes(OVERBOOST_RULED_MARK)) {
+        findings.push({ half: 'overboost', file: f, detail: `a ${OVERBOOST_KEY} site does not carry the ruled wording` })
+      }
+    }
+    for (const phrase of OVERBOOST_SUPERSEDED) {
+      if (src.includes(phrase)) {
+        findings.push({ half: 'overboost', file: f, detail: `the superseded OVERBOOST wording "${phrase}" survives` })
+      }
+    }
+  }
+  return { findings, sites }
+}
+
 function report(findings) {
   for (const f of findings) {
     console.error(`  [${f.half}] ${f.detail}${f.file ? ` (${f.file})` : ''}${f.half === 'figure' ? (f.shipped ? ' SHIPPED IN KIT' : ' source only, ships next build') : ''}`)
@@ -247,6 +294,16 @@ if (process.argv.includes('--self-test')) {
   // NEGATIVE CONTROLS: the correct forms must pass both halves.
   writeFileSync(join(tmp, 'index-seeded.js'),
     'const x={rulesOverdriveTrigger:"3, 4 oder 5 Scatter ... 1×, 3× oder 10× des Basiseinsatzes."};\n')
+  // SEED 3, R071 TASK 5: the superseded OVERBOOST wording, in the form it
+  // really sat in, a prose table entry.
+  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
+  writeFileSync(join(tmp, 'prose-seeded.ts'),
+    "export const x = { modeOverboostBlurb: 'Double-chance: about 1.6\u00d7 the feature trigger rate.' }\n")
+  const obSeed = scanOverboost([join(tmp, 'prose-seeded.ts')])
+  const obRed = obSeed.findings.some((f) => f.detail.includes('the superseded OVERBOOST wording'))
+  console.log(`  ${obRed ? 'caught ' : 'MISSED '} seeded superseded OVERBOOST wording in a prose table (R071 TASK 5)`)
+
+  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
   const cleanBasis = scanBasis(walk(tmp)).length === 0
   console.log(`  ${cleanBasis ? 'clean  ' : 'FALSE+ '} the corrected German basis passes`)
   const cleanTables = [{
@@ -274,11 +331,11 @@ if (process.argv.includes('--self-test')) {
   console.log(`  ${tplClean ? 'clean  ' : 'FALSE+ '} the localised expression, the style block and the attribute pass`)
 
   rmSync(tmp, { recursive: true, force: true })
-  if (!basisRed || !figRed || !cleanBasis || !cleanFig || !tplRed || !tplClean) {
+  if (!basisRed || !figRed || !obRed || !cleanBasis || !cleanFig || !tplRed || !tplClean) {
     console.error('\nKIT BASIS GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nKIT BASIS GATE SELF-TEST: PASS (3 seeded violations caught, 3 negative controls clean)')
+  console.log('\nKIT BASIS GATE SELF-TEST: PASS (4 seeded violations caught, 3 negative controls clean)')
   process.exit(0)
 }
 
@@ -294,10 +351,26 @@ const kitText = kitFiles.map((p) => { try { return readFileSync(p, 'utf-8') } ca
 const { featureI18n, locales, SOCIAL_OVERRIDES } = await import('../src/lib/i18n/translations.ts')
 const { proseI18n } = await import('../src/lib/i18n/prose.ts')
 
+const PROSE_FILES = [join(ROOT, 'src/lib/i18n/prose.ts'), join(ROOT, 'src/lib/i18n/prose.locales.ts')]
+// The SITE COUNT is taken from the prose tables only: the built bundle carries
+// the same key once more, and counting it would make the expected number a
+// function of how the bundler happens to chunk. The kit is still scanned for the
+// superseded family, which is the half that matters in a shipped asset.
+const overboostProse = scanOverboost(PROSE_FILES)
+const overboostKit = scanOverboost(kitFiles, { countSites: false })
+const overboost = { findings: [...overboostProse.findings, ...overboostKit.findings], sites: overboostProse.sites }
+if (overboost.sites !== OVERBOOST_SITES) {
+  overboost.findings.push({
+    half: 'overboost',
+    detail: `expected ${OVERBOOST_SITES} ${OVERBOOST_KEY} sites in the prose files and the kit, found ${overboost.sites}`,
+  })
+}
+
 const findings = [
   ...scanBasis(kitFiles),
   ...scanFigures([locales, featureI18n, proseI18n], kitText),
   ...scanTemplates(walkSvelte(join(ROOT, 'src'))),
+  ...overboost.findings,
 ]
 // The social table is English; en is not a comma-decimal locale, so the figure
 // half does not apply to it. Its basis phrases are covered by scanBasis above.

@@ -349,9 +349,13 @@
   // player edits, and swapping it for a formatted text box would take the
   // numeric keypad away on the owner's own phone.
   const LOSS_LIMIT_MAX = 500_000
-  $: lossLimitDecimals = ($currencyCode || 'USD').toUpperCase() === 'USD'
-    ? 2
-    : (formatBalance(1_000_000, $currencyCode || 'USD', 'en').match(/[.,](\d+)$/)?.[1].length ?? 2)
+  // The currency's own precision, READ OFF THE SHIPPED FORMATTER rather than
+  // re-derived from a table this file would then have to keep in step. One whole
+  // unit renders as "1", "1.00" or "1.000" depending on the currency, and no
+  // grouping separator can appear at one unit, so the fraction run is the answer.
+  $: lossLimitDecimals =
+    formatBalance(CURRENCY_SCALE, $currencyCode || 'USD', 'en')
+      .match(/\d+(?:[.,](\d+))?/)?.[1]?.length ?? 0
   $: lossLimitStep = lossLimitDecimals === 0 ? 1 : Number((10 ** -lossLimitDecimals).toFixed(lossLimitDecimals))
   function sanitiseLossLimit(v: unknown): number {
     const n = typeof v === 'number' ? v : Number(v)
