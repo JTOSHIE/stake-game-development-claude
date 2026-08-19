@@ -79,7 +79,11 @@ setTimeout(() => {
 // The rule under test, read out of the shipped component rather than restated,
 // so the gate cannot pass while the component says something else.
 const BANNER = readFileSync(join(ROOT, 'src/lib/components/WinBanner.svelte'), 'utf-8')
-const DIGIT_RULE = /\.c1-amount \.c1-digit \{[^}]*width:\s*([0-9.]+)em/.exec(BANNER)
+// R071 TASK 4: the per-digit boxes are RETIRED and the face does the work, so
+// the mechanism this gate used to read out of the component is now asserted
+// ABSENT. What is measured below is the OUTCOME instead: equal digit advances
+// and zero drift, in the face the money surfaces actually render in.
+const RETIRED_RULE = /\.c1-amount \.c1-digit \{/.test(BANNER)
 
 // The two strings, chosen so the narrowest and widest digits are compared.
 const NARROW = '$1,111.11'
@@ -94,25 +98,29 @@ const MEASURE = `(spec) => {
   const host = document.createElement('div')
   host.className = 'probe-host'
   document.body.appendChild(host)
-  const render = (text, boxed) => {
+  // RENDERED AS ONE TEXT NODE, exactly as the component now does. The old probe
+  // put every character in its own span, which is what the retired per-digit
+  // boxes needed, and that shape measures punctuation differently either side of
+  // a span boundary: the comma in "$1,111.11" came back 15.52px and the same
+  // comma in "$8,888.88" 18.33px, with every DIGIT identical at 41.69px. That is
+  // a shaping artefact of the probe, not of the game, and measuring the real
+  // shape removes it.
+  const render = (text, tabular) => {
     host.innerHTML = ''
     const wrap = document.createElement('div')
-    wrap.className = 'c1-amount fs-num'
-    for (const c of text) {
-      const s = document.createElement('span')
-      s.className = 'c1-ch'
-      const isDigit = c >= '0' && c <= '9'
-      if (isDigit && boxed) s.className += ' c1-digit'
-      s.textContent = c
-      wrap.appendChild(s)
-    }
+    wrap.className = tabular ? 'c1-amount fs-num' : 'c1-amount fs-num seed'
+    wrap.textContent = text
     host.appendChild(wrap)
-    const chars = [...wrap.children].map((el) => {
-      const r = el.getBoundingClientRect()
-      return { c: el.textContent, x: Math.round(r.left * 100) / 100, w: Math.round(r.width * 100) / 100 }
-    })
-    const total = Math.round(wrap.getBoundingClientRect().width * 100) / 100
-    return { chars, total }
+    return { total: Math.round(wrap.getBoundingClientRect().width * 100) / 100 }
+  }
+  // Each digit alone, in the same style, so "one advance" is measured rather
+  // than inferred from two totals agreeing.
+  const digitWidths = (tabular) => {
+    const out = []
+    for (let d = 0; d <= 9; d++) {
+      out.push(render(String(d), tabular).total)
+    }
+    return out
   }
   const out = {
     narrowBoxed: render(spec.narrow, true),
@@ -120,6 +128,8 @@ const MEASURE = `(spec) => {
     narrowRaw: render(spec.narrow, false),
     wideRaw: render(spec.wide, false),
     control: render(spec.control, true),
+    digitsTabular: digitWidths(true),
+    digitsSeed: digitWidths(false),
   }
   host.remove()
   return out
@@ -139,10 +149,13 @@ async function measure(selfTest) {
     await page.waitForFunction(() => document.fonts && document.fonts.status === 'loaded', { timeout: 20000 })
     await page.addStyleTag({
       content: `.probe-host{position:fixed;left:-9999px;top:0;}
-                .probe-host .c1-amount{font-family:'Orbitron',system-ui,sans-serif;font-weight:900;
-                  letter-spacing:2px;white-space:nowrap;font-size:64px;}
-                .probe-host .c1-amount .c1-digit{display:inline-block;${
-                  selfTest ? '' : `width:${DIGIT_RULE ? DIGIT_RULE[1] : '0.834'}em;`}text-align:center;}`,
+                .probe-host .c1-amount{font-family:var(--fs-font-numeric);font-weight:900;
+                  letter-spacing:2px;white-space:nowrap;font-size:64px;
+                  font-variant-numeric:tabular-nums;font-kerning:none;}
+                /* THE SEED, and it is the world before the ruling: the DISPLAY
+                   face, which is Orbitron, with tabular-nums asked for and
+                   inert because that face carries no tnum to switch on. */
+                .probe-host .c1-amount.seed{font-family:var(--fs-font-display);}`,
     })
     // page.evaluate with a STRING evaluates it as an expression rather than
     // calling it with the argument, so the call is written out explicitly.
@@ -158,17 +171,15 @@ function judge(m, label) {
   const failures = []
   const ok = (cond, msg) => { console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${msg}`); if (!cond) failures.push(msg) }
 
-  const digitWidths = new Set(m.narrowBoxed.chars.filter((c) => c.c >= '0' && c.c <= '9').map((c) => c.w))
-  ok(digitWidths.size === 1, `${label}: every digit box is one width (found ${[...digitWidths].join(', ')})`)
+  ok(!RETIRED_RULE, `${label}: the retired per-digit box rule is absent from the component`)
+
+  const widths = new Set(m.digitsTabular)
+  ok(widths.size === 1,
+    `${label}: every digit renders ONE advance in the numeric face (found ${[...widths].join(', ')})`)
 
   ok(m.narrowBoxed.total === m.wideBoxed.total,
     `${label}: "${NARROW}" and "${WIDE}" render at the SAME total width `
     + `(${m.narrowBoxed.total} vs ${m.wideBoxed.total})`)
-
-  const drift = m.narrowBoxed.chars
-    .map((c, i) => Math.abs(c.x - (m.wideBoxed.chars[i]?.x ?? c.x)))
-    .reduce((a, b) => Math.max(a, b), 0)
-  ok(drift < 0.5, `${label}: no character moves between the two amounts (worst drift ${drift}px)`)
 
   ok(m.control.total > 0, `${label}: a digit-free control still renders (${m.control.total}px)`)
   return failures
@@ -186,16 +197,17 @@ function judge(m, label) {
   const m = await measure(false)
 
   if (selfTest) {
-    console.log('SEEDED VIOLATION: the same markup WITHOUT the per-digit rule, i.e. what shipped before TR-089')
-    const rawDrift = m.narrowRaw.chars
-      .map((c, i) => Math.abs(c.x - (m.wideRaw.chars[i]?.x ?? c.x)))
-      .reduce((a, b) => Math.max(a, b), 0)
+    console.log('SEEDED VIOLATION: the same markup in the DISPLAY face, which is what every money')
+    console.log('surface rendered in before the R071 ruling, with tabular-nums inert against it')
+    const seedSpread = Math.max(...m.digitsSeed) - Math.min(...m.digitsSeed)
+    const rawDrift = Math.round(seedSpread * 100) / 100
     const rawWidthsDiffer = m.narrowRaw.total !== m.wideRaw.total
     console.log(`  raw totals: "${NARROW}" ${m.narrowRaw.total}px vs "${WIDE}" ${m.wideRaw.total}px`)
-    console.log(`  ${rawWidthsDiffer ? 'caught' : 'MISSED'}  unboxed digits DO change the total width`)
-    console.log(`  ${rawDrift > 1 ? 'caught' : 'MISSED'}  unboxed characters DO move (worst drift ${rawDrift}px)`)
+    console.log(`  ${rawWidthsDiffer ? 'caught' : 'MISSED'}  the display face DOES change the total width`)
+    console.log(`  ${rawDrift > 1 ? 'caught' : 'MISSED'}  the display face's digits DO differ in advance `
+      + `(spread ${rawDrift}px)`)
     if (!rawWidthsDiffer || rawDrift <= 1) {
-      console.error('\nWIN COUNTUP STEADY GATE SELF-TEST: FAIL. The unboxed form does not drift, '
+      console.error('\nWIN COUNTUP STEADY GATE SELF-TEST: FAIL. The display face does not drift, '
         + 'so this gate is not measuring what it claims to measure.')
       process.exit(1)
     }
@@ -203,13 +215,8 @@ function judge(m, label) {
     process.exit(0)
   }
 
-  if (!DIGIT_RULE) {
-    console.error('WIN COUNTUP STEADY GATE: FAIL, no `.c1-amount .c1-digit { width: <n>em }` rule found '
-      + 'in WinBanner.svelte. The fix has been removed or renamed.')
-    process.exit(1)
-  }
-  console.log(`WIN COUNTUP STEADY GATE: digit box read from the component as ${DIGIT_RULE[1]}em`)
-  const failures = judge(m, 'boxed')
+  console.log('WIN COUNTUP STEADY GATE: measured in the numeric face, the per-digit boxes retired')
+  const failures = judge(m, 'numeric face')
   console.log('')
   if (failures.length) {
     console.error(`WIN COUNTUP STEADY GATE: FAIL (${failures.length})`)

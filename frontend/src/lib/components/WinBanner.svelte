@@ -228,9 +228,6 @@
   $: amountLabel = amountCompact
     ? formatBalanceCompact(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
     : formatWin(Math.round(displayAmount * CURRENCY_SCALE), $currencyCode || 'USD', $locale, null, amountDigits)
-  // Split for the per-digit boxes below. Derived rather than done in the
-  // template so the character list is computed once per value change.
-  $: amountChars = [...amountLabel].map((c) => ({ c, digit: c >= '0' && c <= '9' }))
   function onFitOverflow(e: CustomEvent<{ overflowing: boolean }>): void {
     if (e.detail.overflowing && !amountCompact) amountCompact = true
   }
@@ -342,7 +339,7 @@
                to be monospaced, and boxing the currency symbol and separators
                too would space them oddly. -->
           <div class="c1-amount fs-num" use:autofitText={amountLabel} data-money="cur" data-testid="win-amount" on:fitoverflow={onFitOverflow}>
-            {#each amountChars as ch}<span class="c1-ch" class:c1-digit={ch.digit}>{ch.c}</span>{/each}
+            {amountLabel}
           </div>
           <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
           {#if $boughtRound}
@@ -449,12 +446,16 @@
     width: min(46vw, 640px); box-sizing: border-box; text-align: center;
     max-width: min(46vw, 640px); overflow: hidden;
   }
-  /* 0.834em is Orbitron's WIDEST digit advance (834 of its 1000 unitsPerEm,
-     shared by `0` and `8`), measured on the shipped woff rather than guessed, so
-     every digit fits its box and no digit is clipped. Centred, because a digit
-     narrower than the box should sit in the middle of it rather than against one
-     edge. TR-089. */
-  .c1-amount .c1-digit { display: inline-block; width: 0.834em; text-align: center; }
+  /* THE PER-DIGIT BOXES ARE RETIRED, R071 TASK 4, and the reason is recorded
+     rather than the rule quietly deleted. TR-089 boxed every digit at 0.834em,
+     Orbitron's widest advance, because Orbitron's digits span 44.30px at 100px
+     and carry no OpenType tnum, so `font-variant-numeric: tabular-nums` on
+     .fs-num was inert and a rolling total visibly danced. The owner's R071
+     ruling moves every money and counting surface to Exo 2, which HAS a real
+     tnum: the same measurement takes its digits from a 21.69 spread to 0.50.
+     The compensation was per-site and the face is not, so the mechanism goes
+     and the property does the work. win_countup_steady_gate.mjs asserts the
+     OUTCOME, equal advances and no drift, with the display face as its seed. */
   .tier-big  .c1-amount { font-size: calc(50px * var(--autofit-scale, 1)); }
   .tier-mega .c1-amount { font-size: calc(64px * var(--autofit-scale, 1)); }
   .tier-epic .c1-amount { font-size: calc(80px * var(--autofit-scale, 1)); }

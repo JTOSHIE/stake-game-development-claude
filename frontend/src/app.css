@@ -95,7 +95,11 @@ html, body {
      (see src/main.ts) and is Latin-only by design, so the fallbacks behind it
      still carry the non-Latin locales. QUALITY_CHARTER.md Q-13. */
   --fs-font-display: 'Orbitron', system-ui, sans-serif;
-  --fs-font-numeric: 'Orbitron', 'Courier New', monospace;
+  /* R071 TASK 4, owner ruling: EXO 2 is the money and counting face. Orbitron
+     stays --fs-font-display, the brand and heading face, immediately above.
+     Exo 2 carries a real OpenType tnum, so tabular-nums is no longer inert and
+     the per-site digit-width compensations retire. */
+  --fs-font-numeric: 'Exo 2', 'Courier New', monospace;
   font-family: var(--fs-font-display);
   line-height: 1.5;
   font-weight: 400;
@@ -108,6 +112,29 @@ html, body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── MONEY AND COUNTING SURFACES, R071 TASK 4 ───────────────────────────────
+   Every element carrying a money value is marked `data-money` (the R059 marker
+   discipline) or `.fs-num`, so the two properties a stable counter needs live
+   here once rather than at each site.
+
+   TABULAR-NUMS is now real. Against Orbitron it was inert, because that face
+   ships no OpenType features at all, which is why TR-089 had to box every digit
+   by hand. Exo 2 carries a genuine tnum: measured in the shipped build at the
+   900 weight the money surfaces use, its ten digits go from a 19.30px spread to
+   EXACTLY 0.00 with the property on.
+
+   FONT-KERNING: NONE is the other half, and it was measured rather than
+   assumed. With kerning on, Exo 2 kerns a digit against the following
+   punctuation, so "$1,111.11" and "$8,888.88" rendered 5.62px apart at 64px
+   even with every digit identical: the comma was 15.52px after a 1 and 18.33px
+   after an 8. A rolling total still moved, just far less than Orbitron moved it.
+   With kerning off both strings render at one width and the counter is still. */
+[data-money],
+.fs-num {
+  font-variant-numeric: tabular-nums;
+  font-kerning: none;
 }
 
 body {

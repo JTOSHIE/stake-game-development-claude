@@ -2041,7 +2041,9 @@
     min-height: 44px;
     padding: 8px 10px;
     font-size: 0.95rem;
-    font-family: var(--fs-font-display);
+    /* R071 TASK 4: this field holds a money amount, so it takes the NUMERIC
+       face like every other money surface rather than the brand face. */
+    font-family: var(--fs-font-numeric);
     color: #fff;
     background: rgba(0, 255, 255, 0.1);
     border: 1px solid rgba(0, 255, 255, 0.4);
