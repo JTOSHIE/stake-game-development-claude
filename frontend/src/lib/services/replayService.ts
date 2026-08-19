@@ -92,7 +92,10 @@ export function parseReplayParams(): ReplayParams | null {
   // trace of it, and the standing recommendation in
   // docs/stake-engine-live/2026-07-25/DELTA_NOTES.md is not to record it as a
   // supported code until a first-party source is produced. See TR-012.
-  const socialFlag = params.get('social') === 'true'
+  const socialFlag = (() => {
+    const v = params.get('social')
+    return v === 'true' || v === '1'
+  })()
   const currency = params.get('currency') ?? (socialFlag ? 'SC' : 'USD')
   const social = socialFlag || isVirtualCurrency(currency)
 

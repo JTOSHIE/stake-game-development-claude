@@ -73,12 +73,13 @@
 //   node scripts/max_win_hold_gate.mjs --self-test
 //
 import { chromium } from 'playwright'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { createServer } from 'node:net'
-import { spawn } from 'node:child_process'
+import { spawn, execFileSync } from 'node:child_process'
 import { startStaticServer, assertNoSurvivors } from './lib/previewServer.mjs'
+import { qaTmpDir } from './lib/evidencePaths.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -200,14 +201,21 @@ const RULES = [
     seed: (s) => s.replace(/\s*if \(\$isWincap\) return\n/g, '\n'),
     why: 'the SPIN button stays focusable under the scrim and SPACE or ENTER placed a real bet behind the hold',
   },
-  {
-    name: 'the SPIN control is disabled by state during the hold, not merely covered',
-    file: join(ROOT, 'src/lib/components/HudOverlay.svelte'),
-    check: (s) => (s.match(/disabled=\{\$isWincap \? true : \(\$isSpinning \? false : !\$canSpin\)\}/g) || []).length === 4,
-    seed: (s) => s.replace(/disabled=\{\$isWincap \? true : \(\$isSpinning \? false : !\$canSpin\)\}/g,
-      'disabled={$isSpinning ? false : !$canSpin}'),
-    why: 'a scrim stops a pointer and nothing else, so the control has to be unavailable by state',
-  },
+  // THE SPIN-CONTROL RULE USED TO SIT HERE AND IT WAS A STATIC STRING COUNT.
+  //
+  // It required the literal `disabled={$isWincap ? true : ($isSpinning ? false :
+  // !$canSpin)}` to appear exactly four times in HudOverlay.svelte. That is an
+  // assertion about an IDENTIFIER'S SPELLING, not about the control, and it
+  // failed on run 31815432853 for a rename that made the behaviour STRONGER:
+  // `canSpin` compares the balance against the bare bet, `canAffordSpin`
+  // compares it against the bet times the mode cost, and the ternary's shape,
+  // including the `$isWincap ? true` arm this rule exists to protect, was
+  // untouched. The gate went red while the thing it guards was correct.
+  //
+  // It is now a RUNTIME assertion, `spinDisabledPerProfile` below, which reads
+  // the rendered `disabled` property off the DOM at wincap in each of the four
+  // layout profiles the four instances belong to. A rename cannot break it and
+  // a real regression cannot hide from it.
   {
     name: 'the autoplay stop reads the round fact, not the already-cleared $isWincap',
     file: APP,
@@ -534,6 +542,164 @@ async function runtime(seedKind) {
   }
 }
 
+// ── the four spin controls, asserted at runtime ───────────────────────────────
+//
+// HudOverlay renders ONE of four mutually exclusive layout branches, and each
+// carries its own SPIN button with its own `disabled` binding. The branches are
+// selected by three props App.svelte computes from the window, so the honest way
+// to reach all four instances is to drive four real viewports rather than to
+// count four strings in the source.
+//
+// THE PROFILES ARE READ OUT OF THE COMPONENT AND ITS CALLER, NOT ASSUMED.
+// HudOverlay.svelte declares `portrait`, `miniPlayer` and `compactLandscape` as
+// props and branches on them in that order, with the desktop case as the final
+// `{:else}`. App.svelte computes each one:
+//
+//   computePortrait()         innerHeight > innerWidth
+//   computeMiniPlayer()       innerWidth <= 480 AND innerHeight <= 300
+//   computeCompactLandscape() NOT mini, innerHeight < innerWidth, innerHeight < 500
+//
+// so the four viewports below are chosen to land one profile each, and the
+// assertion CHECKS which branch it actually got by reading the button's own
+// class rather than trusting the arithmetic.
+const SPIN_PROFILES = [
+  { key: 'portrait', cls: 'p-spin', width: 390, height: 844,
+    rule: 'innerHeight > innerWidth' },
+  { key: 'miniPlayer', cls: 'm-spin', width: 400, height: 225,
+    rule: 'innerWidth <= 480 and innerHeight <= 300' },
+  { key: 'compactLandscape', cls: 'c-spin', width: 900, height: 450,
+    rule: 'not mini, innerHeight < innerWidth, innerHeight < 500' },
+  { key: 'fullscreen', cls: 'fs-spin', width: 1280, height: 720,
+    rule: 'the {:else} branch, none of the three above' },
+]
+
+/**
+ * Boot one page to the raised max-win celebration.
+ *
+ * DELIBERATELY A COPY of the boot sequence inside `runtime()` rather than a
+ * refactor of it. That function carries three working seeds and the notes that
+ * earned each step; rewriting it to share code here would put those at risk to
+ * save a dozen lines. The steps are identical and the reasons are recorded there.
+ */
+async function bootToCelebration(page, port) {
+  await page.goto(
+    `http://localhost:${port}/?sessionID=maxwin-spin-gate&rgs_url=${RGS_HOST}&lang=en`,
+    { waitUntil: 'domcontentloaded' })
+  const spin = page.locator('[data-testid="spin-button"]').first()
+  await spin.waitFor({ state: 'visible', timeout: 45_000 })
+  for (let i = 0; i < 12; i++) {
+    const hero = page.locator('.hero-splash').first()
+    if (await hero.count() && await hero.isVisible().catch(() => false)) {
+      await hero.click({ force: true }).catch(() => {})
+      await page.waitForTimeout(350)
+      continue
+    }
+    const cont = page.locator('[data-testid="intro-continue"]').first()
+    if (await cont.count() && await cont.isVisible().catch(() => false)) {
+      await cont.click({ force: true }).catch(() => {})
+      await page.waitForTimeout(350)
+      continue
+    }
+    break
+  }
+  await page.waitForFunction(() => {
+    const btn = document.querySelector('[data-testid="spin-button"]')
+    if (!btn) return false
+    const r = btn.getBoundingClientRect()
+    if (r.width === 0) return false
+    const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+    return !!top && (top === btn || btn.contains(top))
+  }, { timeout: 30_000 })
+  await spin.click()
+  await page.locator('[data-testid="max-win-collect"]').waitFor({ state: 'visible', timeout: 45_000 })
+}
+
+/**
+ * At wincap, in each named profile, the rendered SPIN button must be disabled.
+ *
+ * Reads the DOM `disabled` PROPERTY and the attribute, not the source text, so a
+ * rename of the affordability store cannot break it and a control that renders
+ * clickable cannot hide behind a scrim.
+ */
+async function spinDisabledPerProfile(distDir, profiles) {
+  const server = await startStaticServer(distDir)
+  const browser = await chromium.launch()
+  const failures = []
+  const ok = (cond, msg) => { console.log(`  ${cond ? 'ok    ' : 'FAIL  '}  ${msg}`); if (!cond) failures.push(msg) }
+  try {
+    for (const p of profiles) {
+      const page = await browser.newPage({ viewport: { width: p.width, height: p.height } })
+      const counters = { play: 0, endRound: 0 }
+      await routeWallet(page, counters)
+      await bootToCelebration(page, server.port)
+      const seen = await page.evaluate(() => {
+        const btns = [...document.querySelectorAll('[data-testid="spin-button"]')]
+        return btns.map((b) => ({
+          cls: b.className,
+          disabledProp: b.disabled === true,
+          disabledAttr: b.hasAttribute('disabled'),
+        }))
+      })
+      await page.close()
+
+      // One branch renders at a time, so more than one instance means the
+      // profile selection itself has broken and every reading below is suspect.
+      ok(seen.length === 1,
+        `${p.key} ${p.width}x${p.height}: exactly one SPIN control is mounted (saw ${seen.length})`)
+      if (seen.length !== 1) continue
+      const [btn] = seen
+      ok(btn.cls.includes(p.cls),
+        `${p.key} ${p.width}x${p.height}: the mounted control is the ${p.cls} instance, `
+        + `so the viewport really selected this branch (${p.rule}) (class "${btn.cls}")`)
+      ok(btn.disabledProp && btn.disabledAttr,
+        `${p.key} ${p.width}x${p.height}: the ${p.cls} SPIN control is DISABLED at wincap, `
+        + `read from the DOM (property ${btn.disabledProp}, attribute ${btn.disabledAttr})`)
+    }
+    return failures
+  } finally {
+    await browser.close().catch(() => {})
+    server.close()
+  }
+}
+
+/**
+ * Convention (p): sever the `$isWincap ? true` arm on ONE instance, in a scratch
+ * copy of the source, and require the gate to go red on exactly that instance.
+ *
+ * The seed is a REBUILD rather than a patch of the built bundle, because the
+ * defect it plants is a source defect and a bundle patch would be proving that
+ * the gate catches a string edit in a file nobody ships from. The build lands in
+ * the gitignored scratch tree, never in the committed `dist`.
+ *
+ * The working file is restored in a `finally` and then VERIFIED byte for byte.
+ * A gate that can leave a component modified is worse than the defect it hunts.
+ */
+function buildSeededDist(instanceIndex) {
+  const file = join(ROOT, 'src/lib/components/HudOverlay.svelte')
+  const original = readFileSync(file, 'utf-8')
+  const ARM = 'disabled={$isWincap ? true : '
+  const positions = []
+  for (let i = original.indexOf(ARM); i !== -1; i = original.indexOf(ARM, i + 1)) positions.push(i)
+  if (positions.length !== SPIN_PROFILES.length) {
+    throw new Error(`seed: expected ${SPIN_PROFILES.length} wincap arms in HudOverlay.svelte, found ${positions.length}`)
+  }
+  const at = positions[instanceIndex]
+  const severed = original.slice(0, at) + 'disabled={' + original.slice(at + ARM.length)
+  const out = join(qaTmpDir('max-win-hold-seed'), 'dist')
+  try {
+    writeFileSync(file, severed)
+    execFileSync(join(ROOT, 'node_modules/.bin/vite'),
+      ['build', '--outDir', out, '--emptyOutDir'],
+      { cwd: ROOT, stdio: 'pipe' })
+  } finally {
+    writeFileSync(file, original)
+  }
+  if (readFileSync(file, 'utf-8') !== original) {
+    throw new Error('seed: HudOverlay.svelte was NOT restored, refusing to continue')
+  }
+  return out
+}
+
 // ── entry ────────────────────────────────────────────────────────────────────
 ;(async () => {
   const selfTest = process.argv.includes('--self-test')
@@ -567,7 +733,36 @@ async function runtime(seedKind) {
     console.log(`  ${equalityStayedQuiet ? 'ok    ' : 'CHECK '}  and it is the new precondition that caught it, `
       + 'not the equality assertion')
 
-    const problems = [...missed]
+    console.log('')
+    console.log('SEEDED VIOLATION, source: the `$isWincap ? true` arm is severed on ONE of the four SPIN')
+    console.log('controls in a scratch copy of HudOverlay.svelte, rebuilt to a scratch dist, so that one')
+    console.log('instance renders ENABLED at wincap while the other three stay correct')
+    const SEEDED = 0 // the portrait instance, the first wincap arm in the file
+    const seededProfile = SPIN_PROFILES[SEEDED]
+    const controlProfile = SPIN_PROFILES[SPIN_PROFILES.length - 1]
+    let spinSeedProblems = []
+    let caughtSpin = false
+    let controlStayedGreen = false
+    try {
+      const seededDist = buildSeededDist(SEEDED)
+      const seedFailures = await spinDisabledPerProfile(seededDist, [seededProfile, controlProfile])
+      // The seed must go red on the SEVERED instance, by name.
+      caughtSpin = seedFailures.some((f) =>
+        f.startsWith(`${seededProfile.key} `) && f.includes('is DISABLED at wincap'))
+      // And the PAIRED CONTROL must stay green, or the gate is failing everything
+      // and would "catch" a seed it never actually looked at.
+      controlStayedGreen = !seedFailures.some((f) => f.startsWith(`${controlProfile.key} `))
+      console.log(`  ${caughtSpin ? 'caught' : 'MISSED'}  the ${seededProfile.cls} instance is reported enabled at wincap, by name`)
+      console.log(`  ${controlStayedGreen ? 'ok    ' : 'CHECK '}  and the ${controlProfile.cls} control instance stayed green in the same run`)
+      rmSync(seededDist, { recursive: true, force: true })
+    } catch (e) {
+      spinSeedProblems = [`SEED NOT RUN: the severed-source build failed (${e.message})`]
+      console.error(`  ERROR   ${e.message}`)
+    }
+
+    const problems = [...missed, ...spinSeedProblems]
+    if (!caughtSpin) problems.push(`SEED NOT CAUGHT: a severed ${seededProfile.cls} wincap arm did not fail the gate`)
+    if (!controlStayedGreen) problems.push(`SEED NOT ISOLATED: the ${controlProfile.cls} control also failed, so the seed proves nothing`)
     if (!caughtBanner) problems.push('SEED NOT CAUGHT: a banner behind the hold did not fail the gate')
     if (!caughtDismiss) problems.push('SEED NOT CAUGHT: an auto-dismiss did not fail the gate')
     if (!caughtReadout) problems.push('SEED NOT CAUGHT: absent balance and win readouts did not fail the gate')
@@ -594,8 +789,20 @@ async function runtime(seedKind) {
   console.log('')
   console.log(`RUNTIME, a real capped round from the shipped book held for ${HOLD_MS / 1000}s:`)
   const runtimeFailures = await runtime(null)
+  console.log('')
+  console.log('RUNTIME, the four SPIN controls read from the DOM at wincap, one layout profile each:')
+  // FS_SPIN_SEED=<0..3> points this REAL run at a severed-source build, so the
+  // claim "a seeded defect gives a real non-zero exit" is demonstrable rather
+  // than argued from the code path. It is never set in CI, and it builds to the
+  // gitignored scratch tree exactly as the self-test does.
+  const seedIdx = process.env.FS_SPIN_SEED
+  const spinDist = seedIdx === undefined ? join(ROOT, 'dist') : buildSeededDist(Number(seedIdx))
+  if (seedIdx !== undefined) {
+    console.log(`  (FS_SPIN_SEED=${seedIdx}: serving a build with the ${SPIN_PROFILES[Number(seedIdx)].cls} wincap arm severed)`)
+  }
+  const spinFailures = await spinDisabledPerProfile(spinDist, SPIN_PROFILES)
 
-  const failures = [...staticFailures, ...runtimeFailures]
+  const failures = [...staticFailures, ...runtimeFailures, ...spinFailures]
   console.log('')
   if (failures.length) {
     for (const f of failures) console.error(`  ${f}`)

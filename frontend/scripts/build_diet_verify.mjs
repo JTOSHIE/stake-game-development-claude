@@ -122,8 +122,8 @@ const PRUNED_PREFIXES = [
   'assets/themes/trap-lane/', 'assets/themes/source/',
   'assets/themes/future-spinner/backgrounds/bg-1.mp4',
 ]
-// assets/ui/ is prune-except-two; individual matches checked separately.
-const KEEP_UI = new Set(['win_pod_v3_active.png', 'win_pod_v3_idle.png'])
+// assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
+const KEEP_UI = new Set()
 
 
 
@@ -163,8 +163,7 @@ async function run() {
         if (rel.startsWith('assets/ui/')) {
           const fname = rel.slice('assets/ui/'.length)
           if (!KEEP_UI.has(fname) && status < 400) {
-            // Only the two kept WinPod files should ever be requested from assets/ui/.
-            failures.push({ url, status, reason: 'request into pruned assets/ui/* (not a kept WinPod file)' })
+            failures.push({ url, status, reason: 'request into pruned assets/ui/*' })
           }
         }
       }

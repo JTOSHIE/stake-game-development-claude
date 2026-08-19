@@ -47,7 +47,7 @@
     isLoading, betAmount, boardSymbols, activeWins,
     scatterCount, isSpinning, autoPlayCount, isAutoPlay,
     recordSpinResult, resetWin, errorMessage,
-    winMultiplier, winAmount, showPaytable, isWincap, canSpin,
+    winMultiplier, winAmount, showPaytable, isWincap,
     balance, locale,
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
@@ -61,7 +61,7 @@
   import BuyBonus from './lib/components/BuyBonus.svelte'
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, type BetMode } from './lib/stores/betMode'
-  import { spinCostMicros } from './lib/stores/buyAffordability'
+  import { spinCostMicros, canAffordSpin } from './lib/stores/buyAffordability'
   import { boughtRound } from './lib/stores/boughtRound'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
@@ -1860,7 +1860,7 @@
   }
 
   // Spacebar triggers the same action as the spin button (Stake Engine
-  // requirement). Reuses handleSpin and the canSpin guard so it behaves
+  // requirement). Reuses handleSpin and the canAffordSpin guard so it behaves
   // identically to clicking spin.
   function handleKeydown(e: KeyboardEvent): void {
     // Normal-play branch only, never drive a spin in replay mode.
@@ -1913,7 +1913,7 @@
     e.preventDefault()
 
     // Respect the same guard the spin button uses.
-    if ($canSpin) handleSpin()
+    if ($canAffordSpin) handleSpin()
   }
 
 </script>

@@ -1,3 +1,8 @@
+# CLOSED RECORD. The branch this manifest scoped, track/quality-sweep, was DELETED on
+# 2026-07-28 with the verification recorded at docs/records/BRANCH_HYGIENE_2026-07-28.md.
+# Moved here 2026-08-15 rather than deleted, so the scope it declared stays readable in
+# the tree; the disjoint check reads docs/records/tracks/ non-recursively and no longer
+# compares it against a live track.
 # track/quality-sweep scope manifest
 #
 # MULTI-TRACK PROTOCOL rule 2: a track is a branch plus this file. Every path a

@@ -71,6 +71,11 @@ const ALLOWLIST = {
   // `bal >= bet * 100` for every tier, so at the 400x tier it enabled CONFIRM
   // beside a correctly displayed 400x price. Locked, so it cannot be deleted.
   canBuyBonus:    'locked gameStore.ts, LOCKED_FILE_DEBTS',
+  // Stand-back 2026-08-15: became unread when SPIN enablement moved onto
+  // canAffordSpin. Locked canSpin is `$bal >= $bet` (1x) while handleSpin
+  // debits spinCostMicros, so OVERBOOST at 1.25x left the button enabled and
+  // then no-op'd. Locked, so it cannot be deleted here.
+  canSpin:        'locked gameStore.ts, 1x vs mode cost; canAffordSpin is the reader',
   // Read by scripts/modal_safety_proof.mjs to assert WHICH surface is blocking.
   // Diagnostics rather than product state; kept because a proof that can only
   // see a boolean cannot show which registration fired.

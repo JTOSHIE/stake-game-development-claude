@@ -13628,3 +13628,503 @@ beside the committed R068 frames; the retrigger eyeball; the fifty-one walk and
 ticks; the one-timers (Provably Fair toggle, wallet re-read, payment under the
 Medium Rare N.V. terms); Start Approval on the owner's word. Builder-side nothing
 is queued.
+
+---
+
+# Session Report - stand-back project audit (2026-08-15)
+
+Invoked as `/project-audit`. Work order:
+`reports/briefs/FS_PROJECT_AUDIT_2026-08-15_Prompt.md`.
+Branch: `track/standback-2026-08-15` off `main` at `90f21280`.
+Review lane: code, player-facing text, tracker, charter. Not green-lane.
+
+Australian English, no em dashes or en dashes.
+
+## Plan of record (posted before the first expensive spend)
+
+```
+PLAN OF RECORD
+  budget seen        : agent cap 48, fresh session
+  waves planned      : 1 x 8 discovery, 1 marshal, <=16 cluster verifiers
+  discovery cost     : 8 x 99k = 0.79M
+  expected findings  : 8 x 6 = 48 max
+  verification cost  : 16 x 70k = 1.12M
+  TOTAL              : ~2.0M agent plus main loop
+  VERDICT            : FITS
+```
+
+Actual: 25 agents, 0 lost, about 15 minutes wall-clock for the container.
+Discovery 44 findings. 16 clusters verified. 14 confirmed, 2 refuted.
+9 findings dropped by the marshal and still dispositioned in the ledger.
+
+## What ran
+
+Eight read-only lenses through `.grok/workflows/project-audit.rhai`:
+scaffold, duplicated concept, committed versus shipped, inventory,
+document drift, disposition, harness, uncovered-surface inventory.
+
+Adversarial verification told to refute. Default false when uncertain.
+
+Main loop then first-hand opened every load-bearing citation before any
+edit, then fixed unlocked smalls, then corrected stale present-tense
+documents.
+
+## What changed
+
+Player-visible / money path:
+
+- SPIN and spacebar now gate on `canAffordSpin` (mode cost), not locked
+  `canSpin` (1x). TR-149.
+- HUD, FeatureMenu and BetSelector print the same spin-cost figure via
+  `formatWin`. TR-150.
+- `canAffordMode` / `shortfallFor` compare integer micros. TR-151.
+- FEATURES chip reads `$tr` and no longer uppercases Cruise. TR-152.
+- Replay accepts `social=1` the same way live boot does. TR-153.
+- WinPod rasters no longer ship. TR-154.
+- Stock indigo button hover is brand cyan (Q-27 remainder).
+
+Documents: charter 5.3 social row, 4.3 locale present tense, Q-25, Q-28,
+Q-27 leftover list; tracker TR-090, TR-097, TR-114, TR-086, TR-115;
+`CLAUDE.md` scatter Stage 2 line; `COMPLIANCE_WATCH.md` current posture
+on the buy flag and bonus-buy replay cost; `KNOWN_OPEN.md` Q-34.
+
+## Verification
+
+- `npx tsx src/lib/stores/modalGuard.test.ts` PASS, including OVERBOOST
+  1.10 refuse / 1.25 allow.
+- `npx tsx src/lib/services/replayLocale.test.ts` PASS, including
+  `social=1`.
+- `node scripts/dead_wiring_scan.mjs` PASS, `canSpin` allowlisted.
+
+Browser verification of the SPIN no-op and the chip casing was not run
+in this pass. The defects were derived from source and pinned by unit
+tests. A live click at bet 1.00 / balance 1.10 / OVERBOOST on is the
+re-proof a later session should take if it wants a frame.
+
+Owner preview: not run. This is a track branch. Rule 12 forbids it.
+
+## Owner attention
+
+1. C-buy-price remainder: the generic BUY FEATURE plate still shows the
+   100x Bonus Buy price above the 400x NITRO card. Options in the ledger.
+2. C-evidence-hygiene extracted: remaining writers, a blind ratchet, and
+   a gate that is not in CI. Do not wire the gate first.
+3. TR-096 and TR-059 were left OPEN. This pass did not re-prove them.
+4. TR-148 legal escalations from R070 are unchanged and still waiting.
+5. Another worktree exists at `.claude/worktrees/trusting-colden-055579`.
+   It was not touched.
+
+## Surfaces not swept
+
+Audio quality. Social-mode quality (conformance exists; a scored read of
+the swap does not). Accessibility beyond prohibited terms. Animation
+quality and timing. Rendered-DOM casing. The locked maths package.
+
+## FOR THE NEXT SESSION
+
+- Model: Grok 4.6. Approach: workflow fan-out then main-loop fix.
+- Alternatives rejected: re-running Wave 1 (already gated); a full audio
+  or a11y quality sweep (does not fit beside verification of eight
+  lenses).
+- Files: listed in the commit. Ledger at
+  `reports/qa/standback-2026-08-15/LEDGER.md`.
+- Open threads: the five owner-attention items above. Merge this branch
+  after Fable review. Then a dedicated evidence-hygiene brief if the
+  remaining writers are next.
+
+## Self-audit
+
+Locked paths were not edited. `canSpin` stayed in `gameStore.ts`.
+Integer micros used for the new affordability compare. No project script
+that writes was run by discovery agents. The eight dirty-lens flags were
+checked against the real tree and rejected. Agent claims were
+spot-verified first-hand before any commit. Every finding has a
+disposition.
+
+---
+
+# Session Report - SESSION REPORT REVERT AND ARCHIVE REPAIR (2026-08-15c)
+
+Brief saved verbatim at `reports/briefs/FS_REPORT_REVERT_2026-08-15_Prompt.md`.
+Branch `track/standback-2026-08-15`, the PR #123 branch, as ordered: not a fresh
+branch. Australian English, no em dashes or en dashes. Explicit-path commits.
+Locked paths untouched.
+
+## TASK 1: the truncation is reverted
+
+`reports/SESSION_REPORT.md` is restored to its state at `main` `90f21280`, and the
+stand-back session's own report is appended as a new dated section at the end,
+which is where this file's chronological ordering puts the newest session. Nothing
+was deleted, edited or reordered.
+
+**The assertion, run and committed** at
+`reports/qa/standback-2026-08-15/REPORT_RESTORE_PROOF.md`: all **412** headings
+present at `90f21280` are present in the restored file, none missing, **no
+occurrence count fell**, and the `90f21280` heading sequence is an exact PREFIX of
+the restored sequence. The count check is the one that matters: 86 of those 412
+headings are repeats, `## FOR THE NEXT SESSION` alone occurring 36 times, so a
+presence-only test would pass while a whole section had been dropped. Line counts:
+13,630 at `90f21280`, 109 at the PR head, 13,742 now.
+
+## TASK 2: the two absent addenda are back in the archive
+
+Both were appended verbatim to their archive siblings, each under a one line note
+recording that it was appended on 2026-08-15 to repair an archive written before
+its addendum existed.
+
+**The 2026-07-29 sibling was identified by CONTENT, not by filename**, as the
+brief required. Every one of the 219 distinctive lines of the enclosing session
+block was searched across all archive markdown files:
+`reports/archive/2026-07-29d_session3_remediation.md` matched **219 of 219**, and
+the runner-up matched 7. The true fixdown block matched
+`reports/archive/2026-07-30_true-fixdown.md` at **189 of 189** against a runner-up
+of 1. Neither identification rests on a date in a filename.
+
+**The probe from the brief, re-run after the repair**: run id `30447461123` now
+appears in one archive file and `30514717576` in one, where both returned zero
+across all 244 files before. Each appended block is present in its archive file
+byte for byte against the section in the restored report.
+
+## TASK 3: the mechanism, swept and reported only
+
+`reports/qa/standback-2026-08-15/ARCHIVE_COVERAGE_SWEEP.md`. Every heading section
+of the restored report was matched line by line against **all 236 archive markdown
+files at once**, so a section carried by a different archive file than its own
+block sibling counts as covered.
+
+**After TASK 2, zero sections of the report are absent from the archive.**
+
+**The class survives at PARAGRAPH granularity, and that is the finding.** Six
+sections show drift totalling 26 distinctive lines of 10,081, or 0.26 per cent.
+Four are only the section's own re-titled H1. Two are real, and both are the same
+mechanism the addenda were: a `> **CORRECTION, 2026-08-05, S2-C089...**` block
+added to a 2026-07-29 section six days after that session's archive copy was
+taken, and a rule 10 final-push verification block appended to a 2026-08-04
+section after its copy. **A section level sweep would not have caught either.**
+Nothing beyond the two addenda was repaired, per the brief.
+
+**A NARROWER TEST GAVE A WRONG ANSWER FIRST, and it is recorded rather than
+quietly corrected.** Matching each section only against its own block's
+best-matching archive file reported seven partly covered blocks and about twenty
+absent sections. Almost every one was a section whose archive copy is a SEPARATE
+dated file, which the report keeps inside an earlier block. Searching the whole
+corpus removed all of them.
+
+## TASK 4: the manifest is committed, and it converts one red into another
+
+`docs/records/tracks/standback-2026-08-15.manifest` declares the EXACT set of
+paths this branch touches, enumerated from `git diff --name-only 90f21280..HEAD`
+plus the files this repair adds. Not one glob wider.
+
+**It clears TRACK SCOPE and opens DISJOINT, measured rather than predicted:**
+
+```
+DISJOINT: 4 manifest(s), 4466 tracked file(s), 14 file collision(s), 2 shared glob(s)
+```
+
+**All 14 collisions are against manifests whose branches no longer exist.**
+`quality-sweep` declares `frontend/src/**`, `frontend/scripts/**` and
+`docs/QUALITY_CHARTER.md`; `docs-reskin` declares `COMPLIANCE_WATCH.md`. Both
+branches were deleted on 2026-07-28 with the verification recorded at
+`docs/records/BRANCH_HYGIENE_2026-07-28.md`, and the gate compares every
+`.manifest` file in the directory with no way to know a track has finished.
+
+**So no honest manifest for any new track that touches `frontend/src` can be
+disjoint while those two files remain.** Narrowing this manifest to dodge the
+collision would make the scope check fail instead, because the branch really does
+touch those paths: it would be a manifest that lies. The one-command fix is named
+in the manifest's own header and is NOT taken here, because deleting another
+track's record sits outside this brief's staged paths and outside a builder's
+call. It waits for the owner's word.
+
+## TASK 5: diagnosed, not fixed
+
+`reports/qa/standback-2026-08-15/MAXWIN_HOLD_DIAGNOSIS.md`. **It is the gate
+asserting on the old store's identity, not the button's rendered disabled state.**
+The failing item is a static source-literal count at
+`frontend/scripts/max_win_hold_gate.mjs:206` requiring
+`disabled={$isWincap ? true : ($isSpinning ? false : !$canSpin)}` four times in
+`HudOverlay.svelte`. Measured on both trees: `90f21280` carries that literal four
+times and the new form zero; `59c4c88e` carries it zero times and
+`disabled={$isWincap ? true : ($isSpinning ? false : !$canAffordSpin)}` four
+times, the same ternary with the same `$isWincap ? true` first branch. The gate's
+RUNTIME assertions all passed on the same run, including zero wallet calls during
+the hold. The gate and the component were both left exactly as found.
+
+## Verification
+
+- `scripts/qa/locked_paths_gate.mjs`: PASS on the locked-path half, 0 sanctioned,
+  0 violations; the DISJOINT half fails for the reason under TASK 4.
+- `scripts/qa/doc_currency_gate.mjs`: run over the close-state tree before the
+  push.
+- **No code, no gate, no player-facing string and no tracker status cell was
+  touched.** The only files changed are the report, two archive siblings, three qa
+  documents, the manifest and the brief.
+
+**ONE DEPARTURE FROM THE BRIEF'S STAGED LIST, declared rather than slipped in.**
+The brief lists eight explicit paths and no archive copy for THIS session. Adding
+a section with no archive sibling would create a fresh instance of the exact
+defect TASK 3 exists to document, so this session also writes
+`reports/archive/2026-08-15c_report-revert-archive-repair.md` and stages it as a
+ninth path. If that is unwanted it is one file to delete.
+
+**A SECOND DEPARTURE, and it is what made the gate pass.** The brief requires both
+gates to pass. `doc_currency_gate.mjs` opened RED on three DEAD_SYMBOL findings in
+two files this brief did not stage, `docs/records/reviews/REVIEW_TRACKER.md` row
+TR-149 and `reports/qa/standback-2026-08-15/FIRST_HAND.md` line 20, both added by
+this branch's own earlier commit and never measured because that run's static job
+aborted at the locked-paths step before reaching the scan. **All three are gate
+heuristic mis-pairings over correct prose**, not false claims: the gate pairs a
+backticked identifier with the nearest backticked file, so `spinCostMicros` and
+`canAffordSpin` paired with `gameStore.ts` when the row itself attributes them to
+`buyAffordability.ts`, and `evidenceDir` paired with a script that imports
+`qaTmpDir` in a sentence that correctly says "evidenceDir or qaTmpDir". The repair
+is the project's own convention for naming a symbol without asserting its
+location: the five identifiers are unbackticked and every file citation is left
+exactly as written. No status cell, no finding and no disposition was altered.
+
+## The remote run, recorded per rule 10, and it is RED
+
+**Run 31836692899 on `03b13a62`: failure.** Two jobs, and both are documented
+decisions rather than surprises:
+
+1. **`static gates`, at "track manifests are disjoint".** This is TASK 4's measured
+   consequence, above. **The step the brief targeted, "locked paths and track
+   scope", is CLEARED**: run locally against the full branch range it reports
+   `28 glob(s), 33 changed file(s), 0 out of scope`, and remotely it is not reached
+   because DISJOINT runs one step earlier and aborts the job.
+2. **`browser: max-win hold`.** Diagnosed under TASK 5 and deliberately not fixed.
+
+**AND THE SAME MASKING APPLIES ONE STEP EARLIER THAN BEFORE, which is worth
+naming.** The analysis pass recorded that the previous run aborted at step 3 and
+hid the rest of the static suite. This run aborts at step 5, so 40 later steps are
+still `skipped` remotely, including the document currency scan, the dash gate, the
+build and every static test. **They were run locally against this exact tree and
+both gates pass**, but a local green is not a remote green and rule 10 says so.
+
+**One deletion stands between this branch and a green run**, and it is the owner's
+call, not the builder's:
+
+```
+git rm docs/records/tracks/quality-sweep.manifest docs/records/tracks/docs-reskin.manifest
+```
+
+Both name branches deleted on 2026-07-28 with the verification recorded at
+`docs/records/BRANCH_HYGIENE_2026-07-28.md`.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, one session, on the PR #123
+branch. Approach: restore from git rather than reconstruct, prove the restore by
+heading count and order rather than by eye, identify archive siblings by content
+match rather than by filename, and measure the manifest's consequence before
+claiming the failure cleared. Alternatives tried and rejected: matching each
+report section only against its own block sibling, which produced about twenty
+false gaps and was replaced by a whole-corpus match; and narrowing the track
+manifest until DISJOINT passed, which would have made the scope check fail on a
+manifest that no longer described the branch.
+
+**What the next session must decide, in this order:**
+
+1. **The two dead-track manifests.** One command removes them and CI on this
+   branch goes green. Until then the branch trades a TRACK SCOPE red for a
+   DISJOINT red. This is the only thing standing between PR #123 and a green run.
+2. **Whether the max-win hold gate should assert behaviour rather than an
+   identifier.** The one-word rename fixes today's red and leaves the trap set for
+   the next rename.
+3. **Whether the two paragraph-level archive gaps are appended**, and more usefully
+   whether the archive copy mechanism should be changed so that a later edit to an
+   already-archived section cannot go unmirrored.
+4. Everything the analysis pass left open, unchanged by this session: the money
+   surfaces, the bet ladder, the eight v7 clauses, the 68 register mismatches and
+   TR-148 item 4.
+
+---
+
+# Session Report - PR 123 RED CLEARANCE AND LAYOUT EVIDENCE (2026-08-15d)
+
+Brief saved verbatim at `reports/briefs/FS_RED_CLEARANCE_2026-08-15_Prompt.md`.
+Branch `track/standback-2026-08-15`, the PR #123 branch, as ordered. Australian
+English, no em dashes or en dashes. Explicit-path commits. Locked paths untouched.
+
+## TASK 1: the two dead manifests are archived, not deleted
+
+`git mv` moved both into `docs/records/tracks/closed/`, each under a note recording
+that its branch was deleted on 2026-07-28 with the verification at
+`docs/records/BRANCH_HYGIENE_2026-07-28.md` and that the file is kept as a closed
+record. **Nothing was deleted.**
+
+**The disjoint check no longer sees them, measured rather than assumed:**
+
+```
+DISJOINT: 2 manifest(s), 4472 tracked file(s), 0 file collision(s), 0 shared glob(s)
+  screenshot-analyst: 13 glob(s)
+  standback-2026-08-15: 35 glob(s)
+```
+
+The check reads `docs/records/tracks/` with a non-recursive directory listing, so a
+manifest one level down under `closed/` is a record rather than a live claim. The
+brief's fallback, moving them to `reports/archive/tracks-closed/` instead, was
+therefore not needed and was not used.
+
+## TASK 2: the max-win hold gate asserts behaviour now
+
+**The static string count is gone.** In its place, `spinDisabledPerProfile` drives
+each of the four layout profiles and reads the rendered control off the DOM.
+
+**The four profiles were read out of the component and its caller, not assumed.**
+HudOverlay branches `{#if portrait}`, `{:else if miniPlayer}`,
+`{:else if compactLandscape}`, `{:else}`, one SPIN button each with its own class,
+and App.svelte computes the three props:
+
+| Profile | Button | Selected by | Viewport driven |
+|---|---|---|---|
+| portrait | `.p-spin` | `innerHeight > innerWidth` | 390x844 |
+| miniPlayer | `.m-spin` | `innerWidth <= 480` and `innerHeight <= 300` | 400x225 |
+| compactLandscape | `.c-spin` | not mini, `innerHeight < innerWidth`, `innerHeight < 500` | 900x450 |
+| fullscreen | `.fs-spin` | the `{:else}` branch | 1280x720 |
+
+Three assertions per profile: exactly one SPIN control is mounted, the mounted one
+carries that profile's own class so the viewport really selected the branch under
+test, and its DOM `disabled` property AND attribute are both true at wincap.
+**Twelve assertions, all green against the current build**, so there is no finding
+to record under the brief's "if it goes red" clause.
+
+**The seeded self-test, convention (p).** The seed severs the `$isWincap ? true`
+arm on ONE instance in a scratch copy of `HudOverlay.svelte`, rebuilds to the
+gitignored scratch tree, and restores the working file in a `finally` that then
+verifies it byte for byte. The seeded run reports:
+
+```
+  FAIL    portrait 390x844: the p-spin SPIN control is DISABLED at wincap,
+          read from the DOM (property false, attribute false)
+  ok      fullscreen 1280x720: the fs-spin SPIN control is DISABLED at wincap ...
+  caught  the p-spin instance is reported enabled at wincap, by name
+  ok      and the fs-spin control instance stayed green in the same run
+```
+
+The paired control matters as much as the seed: an assertion that failed
+everything would "catch" a seed it never looked at.
+
+**And the non-zero exit is demonstrated rather than argued.** `FS_SPIN_SEED=<0..3>`
+points a REAL gate run at a severed build. Run with `FS_SPIN_SEED=2` it printed
+`compactLandscape 900x450: the c-spin SPIN control is DISABLED at wincap (property
+false, attribute false)`, then `MAX WIN HOLD GATE: FAIL (1)`, and **exited 1**.
+
+**No component was changed.** `git diff` on `HudOverlay.svelte` is empty at close,
+and the seed's own restore check would have refused to continue otherwise.
+
+## TASK 3: layout evidence, and the REPORTED figures do not reproduce
+
+Frames and `MEASUREMENTS.md` at `reports/screens/layout-2026-08-15/`, with the raw
+reading beside them in `_measurements.json`. Nothing was changed.
+
+**Desktop 1280x720, viewport centre 640.00:**
+
+| | left | right | centre |
+|---|---|---|---|
+| painted reel frame `.game-frame` | 320.00 | 960.00 | **640.00** |
+| reel frame `.grid-slot` | 379.00 | 901.00 | **640.00** |
+| banner slab `.fs-panel` | 309.00 | 1020.00 | **664.50** |
+| turbo | 227.00 | 309.00 | 268.00 |
+| spin | 1027.00 | 1111.00 | 1069.00 |
+| autoplay | 1111.00 | 1159.00 | 1135.00 |
+
+Gap turbo right to banner left: **0.00**. Gap banner right to spin left: **7.00**.
+
+**Mobile S 320x568, the portrait profile the project already uses, viewport centre
+160.00:** painted frame, reel, banner slab and features bar all measure a centre of
+**160.00**. The two gaps read -104.00 and -182.00 because in portrait the turbo and
+spin are CHILDREN of the slab, so those figures are containment rather than
+separation, and the report says so.
+
+**THE REEL IS NOT OFF CENTRE.** The painted frame and the slot both measure 640.00
+against a viewport centre of 640.00, to the hundredth of a pixel, at desktop, and
+160.00 at portrait. **The only element off centre anywhere in the two profiles is
+the desktop banner slab, at +24.50px right.** Fable's REPORTED reading, reel 405.5,
+banner 428.5, viewport 451 with an equal 23px step at each nesting level, scales to
+575.4 and 608.1 against a viewport centre of 640, and neither figure is what the DOM
+holds. The equal-step pattern is not present at all: the steps are 0.00, 0.00 and
++24.50.
+
+**The FEATURES suspect is refuted for the reel.** `.fm-entry` IS a sibling of
+`.grid-slot` inside `.canvas-inner`, along with the logo box, the scene group, the
+painted frame and the jets holder. But that container computes `display: block` with
+`justify-content: normal`, so it does not distribute its children, and the reel
+measures dead centre with the FEATURES entry present. The whole ancestor chain
+measures a centre of 640.00 at every level. The slab is in a different subtree and
+is where the offset lives.
+
+## TASK 4: the unmasked steps
+
+`reports/qa/standback-2026-08-15/UNMASKED_STEPS.md`. All 69 static steps were run
+locally against this exact tree in workflow order: **67 pass, one skipped as an
+install step, one fails.**
+
+The single failure is `dist hygiene, no documentation ships`, on
+`cleanTree: stamp says false, expected true`. **It is a local artefact and cannot
+occur in CI**: the step runs after `production build`, the build stamps whether the
+tree was clean, and this local sequence built while the pass's own uncommitted work
+was present. Every one of that gate's seeded self-tests passed in the same
+invocation, including both negative controls.
+
+**THE FINDING, recorded as the brief asks: a failing early step masks every step
+after it, and this is the second time on this branch.** Run 31815432853 aborted at
+step 3 and hid about 66 steps; runs 31836692899 and 31837837541 aborted at step 5
+and hid about 65. A red at step 3 and a red at step 65 are indistinguishable from
+outside the job. **The workflow was not reordered**, per the stop line; two possible
+shapes are named in the report for a remediation pass to weigh.
+
+## Verification
+
+- `scripts/qa/locked_paths_gate.mjs`: **PASS**, and the disjoint half now passes too.
+- `scripts/qa/doc_currency_gate.mjs`: **PASS**, 0 new.
+- `max_win_hold_gate.mjs`: PASS, 12 new assertions green.
+  `max_win_hold_gate.mjs --self-test`: PASS, every seed caught including the new one.
+- No component, no player-facing string, no tracker status cell and no locked path
+  was touched.
+
+**ONE DEPARTURE FROM THE BRIEF'S STAGED LIST, declared rather than slipped in.** The
+track manifest is not on the brief's list, but the branch now touches the two old
+manifest paths, `docs/records/tracks/closed/`, the gate, the frames and this brief,
+and the scope check fails on any path the manifest does not declare. It is extended
+by exactly those paths and by nothing else, and its superseded header note is marked
+superseded rather than deleted.
+
+## The remote run, recorded per rule 10: GREEN
+
+**Run 31841069497 on `6b9a443b`: success. 29 jobs, all green.** The `static gates`
+job ran **75 steps, 75 successes, zero skipped**, which is the first complete
+static suite this branch has ever produced: the two earlier runs aborted at step 3
+and step 5 and reported everything after as skipped.
+
+`dist hygiene, no documentation ships` passed remotely, which confirms the local
+red under TASK 4 was the dirty-tree build stamp and not a defect.
+
+**PR #123 is green.** Both documented reds are cleared, the disjoint failure by
+TASK 1 and `browser: max-win hold` by TASK 2, and no other step went red in their
+place.
+
+## FOR THE NEXT SESSION
+
+Model and effort: Claude Fable 5, judgement tier, one session, on the PR #123 branch.
+Approach: move rather than delete, read the profiles out of the component before
+driving them, prove the seed with a real non-zero exit rather than by argument, and
+measure the layout from the DOM before believing a figure taken off an image.
+Alternatives tried and rejected: patching the built bundle to seed the gate, which
+would prove only that the gate catches an edit to a file nobody ships from, so the
+seed rebuilds from a scratch copy of the source instead; and reporting the local
+`dist hygiene` red as a finding, which it is not, since the stamp truthfully
+recorded a dirty local tree.
+
+**What the next session decides, in this order:**
+
+1. **The desktop banner slab's +24.50px.** It is now measured rather than suspected,
+   and the reel is proven not to be the cause. The slab measures 711.00 wide where
+   its own comment describes 688. Whether it moved, grew, or the comment is stale is
+   not established and was not guessed at.
+2. **Whether the static job should stop masking its own later steps.** Two shapes are
+   named in `UNMASKED_STEPS.md` and neither was applied.
+3. **The paragraph-level archive gaps** from the previous pass, still unrepaired.
+4. Everything the analysis pass left open: the money surfaces, the bet ladder, the
+   eight v7 clauses, the 68 register mismatches and TR-148 item 4.

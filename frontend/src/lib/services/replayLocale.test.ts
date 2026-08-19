@@ -72,6 +72,10 @@ const socialFlagged = launch(`${BASE}&social=true&lang=de&currency=SC`)
 check('social flag with lang=de resolves to en', socialFlagged?.lang, 'en')
 check('and it is still recognised as a social session', socialFlagged?.social, true)
 
+const socialNumeric = launch(`${BASE}&social=1&lang=de&currency=USD`)
+check('social=1 with lang=de resolves to en', socialNumeric?.lang, 'en')
+check('and social=1 is recognised as a social session', socialNumeric?.social, true)
+
 // 2. Social arriving via a virtual currency rather than the flag. parseReplayParams
 //    computes `social` as `socialFlag || isVirtualCurrency(currency)`, so both
 //    routes into social mode must land on English.

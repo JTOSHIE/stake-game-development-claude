@@ -349,8 +349,7 @@ jackpot, gamble, or continuation.
   +1x after every winning spin, applied to all subsequent free-spin wins (ways and scatter
   pays), never resetting, not retroactive. 3+ scatters in free spins retrigger +5 spins and
   pay their instant award x the current meter. The bonus buy guarantees a 3+ trigger.
-- **Scatter values are 1x/3x/10x everywhere** (maths, PAR, and frontend once Stage 2 wires
-  the feature). Not 5x/15x/50x.
+- **Scatter values are 1x/3x/10x everywhere** (maths, PAR, and frontend). Not 5x/15x/50x.
 - **RTP: 96.3500% at 4dp in ALL FIVE modes** (base 10dp 96.3499998727%, bonus
   96.3499999962%; cruise/antelite/super independently re-verified 2026-07-07 at
   96.350000% - see `reports/archive/handovers/HANDOVER_2026-07-07_Fable.md` for the full per-mode table).

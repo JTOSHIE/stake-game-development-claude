@@ -1,0 +1,956 @@
+[
+ {
+  "profile": {
+   "key": "desktop-1280x720",
+   "width": 1280,
+   "height": 720,
+   "branch": "fullscreen, the {:else} branch"
+  },
+  "data": {
+   "viewport": {
+    "width": 1280,
+    "height": 720,
+    "centreX": 640
+   },
+   "elements": {
+    "reel_frame_painted": {
+     "selector": ".game-frame",
+     "cls": "game-frame svelte-1n46o8q",
+     "box": {
+      "x": 320,
+      "y": 84,
+      "w": 640,
+      "h": 468,
+      "left": 320,
+      "right": 960,
+      "top": 84,
+      "bottom": 552,
+      "centreX": 640,
+      "centreY": 318
+     }
+    },
+    "reel_frame": {
+     "selector": ".grid-slot",
+     "cls": "grid-slot svelte-1n46o8q",
+     "box": {
+      "x": 379,
+      "y": 143.5,
+      "w": 522,
+      "h": 349,
+      "left": 379,
+      "right": 901,
+      "top": 143.5,
+      "bottom": 492.5,
+      "centreX": 640,
+      "centreY": 318
+     }
+    },
+    "reel_scale_block": {
+     "selector": ".grid-scale",
+     "cls": "grid-scale svelte-1n46o8q",
+     "box": {
+      "x": 379,
+      "y": 143.5,
+      "w": 522,
+      "h": 349.13,
+      "left": 379,
+      "right": 901,
+      "top": 143.5,
+      "bottom": 492.63,
+      "centreX": 640,
+      "centreY": 318.06
+     }
+    },
+    "symbol_grid": {
+     "selector": ".symbol-grid",
+     "cls": "symbol-grid svelte-1rf55k2",
+     "box": {
+      "x": 379,
+      "y": 143.5,
+      "w": 522,
+      "h": 349.13,
+      "left": 379,
+      "right": 901,
+      "top": 143.5,
+      "bottom": 492.63,
+      "centreX": 640,
+      "centreY": 318.06
+     }
+    },
+    "banner_slab": {
+     "selector": "[data-testid=\"hud-panel\"]",
+     "cls": "fs-panel svelte-1waqajp",
+     "box": {
+      "x": 309,
+      "y": 560,
+      "w": 711,
+      "h": 88,
+      "left": 309,
+      "right": 1020,
+      "top": 560,
+      "bottom": 648,
+      "centreX": 664.5,
+      "centreY": 604
+     }
+    },
+    "turbo_button": {
+     "selector": "[data-testid=\"hud-turbo\"]",
+     "cls": "fs-turbo fs-knob svelte-1waqajp",
+     "box": {
+      "x": 227,
+      "y": 563,
+      "w": 82,
+      "h": 82,
+      "left": 227,
+      "right": 309,
+      "top": 563,
+      "bottom": 645,
+      "centreX": 268,
+      "centreY": 604
+     }
+    },
+    "spin_button": {
+     "selector": "[data-testid=\"spin-button\"]",
+     "cls": "fs-spin svelte-1waqajp",
+     "box": {
+      "x": 1027,
+      "y": 562,
+      "w": 84,
+      "h": 84,
+      "left": 1027,
+      "right": 1111,
+      "top": 562,
+      "bottom": 646,
+      "centreX": 1069,
+      "centreY": 604
+     }
+    },
+    "autoplay_button": {
+     "selector": ".fs-auto",
+     "cls": "fs-auto fs-knob svelte-1waqajp",
+     "box": {
+      "x": 1111,
+      "y": 580,
+      "w": 48,
+      "h": 48,
+      "left": 1111,
+      "right": 1159,
+      "top": 580,
+      "bottom": 628,
+      "centreX": 1135,
+      "centreY": 604
+     }
+    },
+    "features_button": {
+     "selector": "[data-testid=\"feature-menu-button\"]",
+     "cls": "fm-entry-pill svelte-vw75gt",
+     "box": {
+      "x": 966,
+      "y": 238,
+      "w": 143.33,
+      "h": 44,
+      "left": 966,
+      "right": 1109.33,
+      "top": 238,
+      "bottom": 282,
+      "centreX": 1037.66,
+      "centreY": 260
+     }
+    }
+   },
+   "missing": [
+    "hud_root"
+   ],
+   "reelChain": [
+    {
+     "depth": 0,
+     "tag": "div",
+     "cls": "grid-slot svelte-1n46o8q",
+     "box": {
+      "x": 379,
+      "y": 143.5,
+      "w": 522,
+      "h": 349,
+      "left": 379,
+      "right": 901,
+      "top": 143.5,
+      "bottom": 492.5,
+      "centreX": 640,
+      "centreY": 318
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "grid-scale svelte-1n46o8q",
+       "w": 522,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 1,
+     "tag": "div",
+     "cls": "canvas-inner svelte-1n46o8q",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 7,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "logo-box svelte-1n46o8q",
+       "w": 380,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "scene-group svelte-ifjsn5",
+       "w": 1280,
+       "visible": true
+      },
+      {
+       "tag": "img",
+       "cls": "game-frame svelte-1n46o8q",
+       "w": 640,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "jets-holder svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "grid-slot svelte-1n46o8q",
+       "w": 522,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "fm-entry svelte-vw75gt",
+       "w": 143.3,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "fs-hud svelte-1waqajp",
+       "w": 0,
+       "visible": false
+      }
+     ]
+    },
+    {
+     "depth": 2,
+     "tag": "div",
+     "cls": "canvas-slot svelte-1n46o8q",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "canvas-inner svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 3,
+     "tag": "main",
+     "cls": "game-wrapper svelte-1n46o8q",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "matrix(1, 0, 0, 1, 0, 0)",
+     "childCount": 2,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "warm-mount svelte-1n46o8q painted",
+       "w": 1280,
+       "visible": false
+      },
+      {
+       "tag": "div",
+       "cls": "canvas-slot svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 4,
+     "tag": "div",
+     "cls": "game-stage svelte-1n46o8q",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "flex",
+     "justifyContent": "center",
+     "alignItems": "center",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "main",
+       "cls": "game-wrapper svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 5,
+     "tag": "div",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 2,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "bg-layer svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "game-stage svelte-1n46o8q",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 6,
+     "tag": "body",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "flex",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 7,
+     "tag": "html",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 720,
+      "left": 0,
+      "right": 1280,
+      "top": 0,
+      "bottom": 720,
+      "centreX": 640,
+      "centreY": 360
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 2,
+     "children": [
+      {
+       "tag": "head",
+       "cls": "",
+       "w": 0,
+       "visible": false
+      },
+      {
+       "tag": "body",
+       "cls": "",
+       "w": 1280,
+       "visible": true
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "profile": {
+   "key": "mobile-s-320x568",
+   "width": 320,
+   "height": 568,
+   "branch": "portrait, innerHeight > innerWidth"
+  },
+  "data": {
+   "viewport": {
+    "width": 320,
+    "height": 568,
+    "centreX": 160
+   },
+   "elements": {
+    "reel_frame_painted": {
+     "selector": ".game-frame",
+     "cls": "game-frame svelte-1n46o8q",
+     "box": {
+      "x": -4.1,
+      "y": 42.01,
+      "w": 328.21,
+      "h": 240,
+      "left": -4.1,
+      "right": 324.1,
+      "top": 42.01,
+      "bottom": 282.01,
+      "centreX": 160,
+      "centreY": 162.01
+     }
+    },
+    "reel_frame": {
+     "selector": ".grid-slot",
+     "cls": "grid-slot svelte-1n46o8q",
+     "box": {
+      "x": 26.15,
+      "y": 72.53,
+      "w": 267.69,
+      "h": 178.97,
+      "left": 26.15,
+      "right": 293.85,
+      "top": 72.53,
+      "bottom": 251.5,
+      "centreX": 160,
+      "centreY": 162.01
+     }
+    },
+    "reel_scale_block": {
+     "selector": ".grid-scale",
+     "cls": "grid-scale svelte-1n46o8q",
+     "box": {
+      "x": 26.15,
+      "y": 72.53,
+      "w": 267.69,
+      "h": 179.04,
+      "left": 26.15,
+      "right": 293.85,
+      "top": 72.53,
+      "bottom": 251.57,
+      "centreX": 160,
+      "centreY": 162.05
+     }
+    },
+    "symbol_grid": {
+     "selector": ".symbol-grid",
+     "cls": "symbol-grid svelte-1rf55k2",
+     "box": {
+      "x": 26.15,
+      "y": 72.53,
+      "w": 267.69,
+      "h": 179.04,
+      "left": 26.15,
+      "right": 293.85,
+      "top": 72.53,
+      "bottom": 251.57,
+      "centreX": 160,
+      "centreY": 162.05
+     }
+    },
+    "banner_slab": {
+     "selector": ".p-controls-row",
+     "cls": "p-controls-row svelte-1waqajp",
+     "box": {
+      "x": 12,
+      "y": 486,
+      "w": 296,
+      "h": 72,
+      "left": 12,
+      "right": 308,
+      "top": 486,
+      "bottom": 558,
+      "centreX": 160,
+      "centreY": 522
+     }
+    },
+    "hud_root": {
+     "selector": ".p-hud",
+     "cls": "p-hud svelte-1waqajp",
+     "box": {
+      "x": 0,
+      "y": 333.5,
+      "w": 320,
+      "h": 234.5,
+      "left": 0,
+      "right": 320,
+      "top": 333.5,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 450.75
+     }
+    },
+    "turbo_button": {
+     "selector": "[data-testid=\"hud-turbo\"]",
+     "cls": "p-round-btn p-turbo svelte-1waqajp",
+     "box": {
+      "x": 68,
+      "y": 498,
+      "w": 48,
+      "h": 48,
+      "left": 68,
+      "right": 116,
+      "top": 498,
+      "bottom": 546,
+      "centreX": 92,
+      "centreY": 522
+     }
+    },
+    "spin_button": {
+     "selector": "[data-testid=\"spin-button\"]",
+     "cls": "p-spin svelte-1waqajp",
+     "box": {
+      "x": 126,
+      "y": 486,
+      "w": 72,
+      "h": 72,
+      "left": 126,
+      "right": 198,
+      "top": 486,
+      "bottom": 558,
+      "centreX": 162,
+      "centreY": 522
+     }
+    },
+    "autoplay_button": {
+     "selector": ".p-autoplay-wrapper button",
+     "cls": "p-round-btn svelte-1waqajp",
+     "box": {
+      "x": 264,
+      "y": 498,
+      "w": 48,
+      "h": 48,
+      "left": 264,
+      "right": 312,
+      "top": 498,
+      "bottom": 546,
+      "centreX": 288,
+      "centreY": 522
+     }
+    },
+    "features_button": {
+     "selector": "[data-testid=\"feature-menu-button\"]",
+     "cls": "p-fm-entry svelte-vw75gt",
+     "box": {
+      "x": 12,
+      "y": 281.5,
+      "w": 296,
+      "h": 44,
+      "left": 12,
+      "right": 308,
+      "top": 281.5,
+      "bottom": 325.5,
+      "centreX": 160,
+      "centreY": 303.5
+     }
+    }
+   },
+   "missing": [],
+   "reelChain": [
+    {
+     "depth": 0,
+     "tag": "div",
+     "cls": "grid-slot svelte-1n46o8q",
+     "box": {
+      "x": 26.15,
+      "y": 72.53,
+      "w": 267.69,
+      "h": 178.97,
+      "left": 26.15,
+      "right": 293.85,
+      "top": 72.53,
+      "bottom": 251.5,
+      "centreX": 160,
+      "centreY": 162.01
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "grid-scale svelte-1n46o8q",
+       "w": 267.7,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 1,
+     "tag": "div",
+     "cls": "canvas-inner svelte-1n46o8q portrait",
+     "box": {
+      "x": -168.21,
+      "y": -1.06,
+      "w": 656.41,
+      "h": 369.23,
+      "left": -168.21,
+      "right": 488.21,
+      "top": -1.06,
+      "bottom": 368.17,
+      "centreX": 160,
+      "centreY": 183.55
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "matrix(0.512821, 0, 0, 0.512821, -640, 0",
+     "childCount": 3,
+     "children": [
+      {
+       "tag": "img",
+       "cls": "game-frame svelte-1n46o8q",
+       "w": 328.2,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "jets-holder svelte-1n46o8q",
+       "w": 656.4,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "grid-slot svelte-1n46o8q",
+       "w": 267.7,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 2,
+     "tag": "div",
+     "cls": "canvas-slot svelte-1n46o8q portrait",
+     "box": {
+      "x": 0,
+      "y": 42,
+      "w": 320,
+      "h": 239.5,
+      "left": 0,
+      "right": 320,
+      "top": 42,
+      "bottom": 281.5,
+      "centreX": 160,
+      "centreY": 161.75
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "canvas-inner svelte-1n46o8q portrait",
+       "w": 656.4,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 3,
+     "tag": "main",
+     "cls": "game-wrapper svelte-1n46o8q portrait",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 320,
+      "h": 568,
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 284
+     },
+     "display": "flex",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 4,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "warm-mount svelte-1n46o8q painted",
+       "w": 320,
+       "visible": false
+      },
+      {
+       "tag": "div",
+       "cls": "portrait-wordmark svelte-1n46o8q",
+       "w": 320,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "canvas-slot svelte-1n46o8q portrait",
+       "w": 320,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "native-hud-slot svelte-1n46o8q portrait",
+       "w": 320,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 4,
+     "tag": "div",
+     "cls": "game-stage svelte-1n46o8q",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 320,
+      "h": 568,
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 284
+     },
+     "display": "flex",
+     "justifyContent": "center",
+     "alignItems": "center",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "main",
+       "cls": "game-wrapper svelte-1n46o8q portrait",
+       "w": 320,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 5,
+     "tag": "div",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 320,
+      "h": 568,
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 284
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 2,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "bg-layer svelte-1n46o8q",
+       "w": 320,
+       "visible": true
+      },
+      {
+       "tag": "div",
+       "cls": "game-stage svelte-1n46o8q",
+       "w": 320,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 6,
+     "tag": "body",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 320,
+      "h": 568,
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 284
+     },
+     "display": "flex",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 1,
+     "children": [
+      {
+       "tag": "div",
+       "cls": "",
+       "w": 320,
+       "visible": true
+      }
+     ]
+    },
+    {
+     "depth": 7,
+     "tag": "html",
+     "cls": "",
+     "box": {
+      "x": 0,
+      "y": 0,
+      "w": 320,
+      "h": 568,
+      "left": 0,
+      "right": 320,
+      "top": 0,
+      "bottom": 568,
+      "centreX": 160,
+      "centreY": 284
+     },
+     "display": "block",
+     "justifyContent": "normal",
+     "alignItems": "normal",
+     "gridTemplateColumns": "none",
+     "margin": "0px",
+     "transform": "none",
+     "childCount": 2,
+     "children": [
+      {
+       "tag": "head",
+       "cls": "",
+       "w": 0,
+       "visible": false
+      },
+      {
+       "tag": "body",
+       "cls": "",
+       "w": 320,
+       "visible": true
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

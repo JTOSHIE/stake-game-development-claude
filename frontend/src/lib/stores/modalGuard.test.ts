@@ -3,7 +3,8 @@
 
 import { get } from 'svelte/store'
 import { setModalOpen, anyModalOpen, openModalIds, resetModalGuard } from './modalGuard.ts'
-import { canAffordMode, shortfallFor, modeCostFor } from './buyAffordability.ts'
+import { canAffordMode, shortfallFor, modeCostFor, canAffordSpin } from './buyAffordability.ts'
+import { standingMode } from './betMode.ts'
 import { balance, betAmount, isSpinning, isLoading } from './gameStore.ts'
 
 let failures = 0
@@ -79,6 +80,22 @@ isLoading.set(true)
 check('never affordable while loading', get(canAffordMode)('super'), false)
 isLoading.set(false)
 check('affordable again once idle', get(canAffordMode)('super'), true)
+
+// C-spin-afford / C-afford-float, stand-back 2026-08-15. OVERBOOST is 1.25x.
+// Locked canSpin would return true at 1.10 / bet 1.00; the debit is 1.25.
+standingMode.set('antelite')
+balance.set(1.10)
+betAmount.set(1.00)
+isSpinning.set(false)
+isLoading.set(false)
+check('OVERBOOST at 1.10 with bet 1.00 is not affordable', get(canAffordMode)('antelite'), false)
+check('and canAffordSpin agrees with that debit', get(canAffordSpin), false)
+balance.set(1.25)
+check('OVERBOOST at exactly 1.25 is affordable', get(canAffordMode)('antelite'), true)
+check('and canAffordSpin is true at exact price', get(canAffordSpin), true)
+standingMode.set('base')
+balance.set(1.00)
+check('base spin at 1.00 / bet 1.00 stays affordable', get(canAffordSpin), true)
 
 if (failures) { console.error(`\nMODAL GUARD + AFFORDABILITY: FAIL (${failures})`); process.exit(1) }
 console.log('\nMODAL GUARD + AFFORDABILITY: PASS')
