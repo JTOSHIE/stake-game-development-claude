@@ -26,8 +26,17 @@
 // EXPECTED STRINGS ARE HARDCODED, DELIBERATELY (convention l.4), derived from
 // the rule rather than read back from the surface: bet 100,000 micros, payout
 // 8,000 micros, so win $0.008 (8,000 % 10,000 != 0 -> 3 digits), balance
-// 100.00 - 0.10 + 0.008 = $99.908 (three digits by the same test), ledger won
-// $0.008, net -(100,000 - 8,000) = -$0.092. Citations:
+// 100.00 - 0.10 + 0.008 = $99.908 in micros. Citations:
+//
+// AMENDED 2026-08-15, R071 TASK 1, and the amendment is the point of the ruling.
+// The settled platform law, a Stake reviewer message corroborated exactly by
+// rgs.md, is that PAYOUTS AND WINS render at up to four places and every other
+// currency display renders at exactly two. So this proof's two WIN expectations
+// are unchanged, $0.008 at the HUD and $0.008 on the ledger's TOTAL WON, and its
+// two non-win expectations move to two places: the BALANCE reads $99.91 and the
+// NET reads -$0.09. Checklist item 12, "game displays sub-cent payouts
+// correctly", is still exactly what this proof holds: the sub-cent PAYOUT is
+// displayed, at four places, on both surfaces that carry a payout.
 //   the rule            src/lib/utils/currency.ts winFractionDigits
 //   HUD labels          src/lib/components/HudOverlay.svelte:329,367
 //   win panel           src/lib/components/WinDisplay.svelte:92
@@ -67,8 +76,8 @@ const PAYOUT_MICROS = 8_000         // 0.08x of the bet: $0.008, sub-cent
 
 // The expectations, per currency, derived from the rule (see header).
 const LEGS = [
-  { name: 'USD', currency: 'USD', win: '$0.008', balance: '$99.908', won: '$0.008', net: '-$0.092' },
-  { name: 'XSC', currency: 'XSC', win: '0.008 SC', balance: '99.908 SC', won: '0.008 SC', net: '-0.092 SC' },
+  { name: 'USD', currency: 'USD', win: '$0.008', balance: '$99.91', won: '$0.008', net: '-$0.09' },
+  { name: 'XSC', currency: 'XSC', win: '0.008 SC', balance: '99.91 SC', won: '0.008 SC', net: '-0.09 SC' },
 ]
 
 const MIME = {

@@ -69,7 +69,10 @@
   $: ss = String(elapsedS % 60).padStart(2, '0')
   $: cur = $currencyCode || 'USD'
   $: net = $rgNetMicros
-  $: netLabel = (net >= 0 ? '+' : '-') + formatWin(Math.abs(net), cur, $locale)
+  // R071 TASK 1, the settled platform precision law (a Stake reviewer message corroborated exactly by rgs.md): payouts and wins render at up to four places, every other currency display at exactly two. NET RESULT is a derived currency display rather than a payout,
+  // so it renders at exactly two. The sub-cent payout itself stays visible on the
+  // TOTAL WON row above, which is what checklist item 12 actually asks for.
+  $: netLabel = (net >= 0 ? '+' : '-') + formatBalance(Math.abs(net), cur, $locale)
   // Was `$isSocial ? 'COINS' : ''`, the same duplicated-layer shape TR-091 is
   // about, hiding in the script block where even the widened gate cannot see it.
   // SOCIAL_OVERRIDES already maps `balance` to COINS in every locale, so this

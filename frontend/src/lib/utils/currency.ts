@@ -419,6 +419,30 @@ export function currencySymbolTrailing(currencyCode: string): boolean {
  *   formatBalance(1_000_000_000, 'XSC')        // "1,000.00 SC"
  *   formatBalance(500_000_000, 'XGC')          // "500.00 GC"
  */
+/**
+ * Fraction digits for a ZERO-DECIMAL currency carrying a sub-unit amount.
+ *
+ * R071 TASK 2, the settled platform rule: a non-zero amount below one unit of a
+ * zero-decimal currency widens to show its value rather than rounding to an
+ * integer that misstates it. Returns 0 for anything at or above one unit, and
+ * for exact zero, so the ordinary case is untouched.
+ *
+ * The widening test is the same one `winFractionDigits` uses: keep adding a
+ * place while the integer micros still carry value below it. Capped at four,
+ * which is the platform's own ceiling for any money display.
+ */
+export function zeroDecimalDigits(micros: number, maxDigits = 4): number {
+  const whole = Math.abs(Math.round(micros))
+  if (whole === 0 || whole >= CURRENCY_SCALE) return 0
+  let digits = 0
+  while (digits < maxDigits) {
+    digits += 1
+    const unit = CURRENCY_SCALE / Math.pow(10, digits)
+    if (whole % Math.round(unit) === 0) break
+  }
+  return digits
+}
+
 export function formatBalance(
   micros: number,
   currencyCode: string,
@@ -433,9 +457,25 @@ export function formatBalance(
 ): string {
   const amount = micros / CURRENCY_SCALE
   const code = (currencyCode || '').toUpperCase()
-  /** Applied in EVERY branch below, so no currency route can miss it. */
-  const widen = (d: number): number =>
-    minFractionDigits === undefined ? d : Math.max(d, minFractionDigits)
+  /**
+   * Applied in EVERY branch below, so no currency route can miss it.
+   *
+   * Two floors, and they are different rules with different reasons.
+   *
+   * 1. `minFractionDigits`, the caller's floor, for sub-cent WIN amounts. See
+   *    `formatWin`.
+   * 2. THE ZERO-DECIMAL FLOOR, R071 TASK 2. A zero-decimal currency renders
+   *    whole units, so a non-zero amount BELOW one unit has nowhere to go: JPY
+   *    500,000 micros is 0.5 yen and `toLocaleString` with zero fraction digits
+   *    prints it as an integer, which states a number the wallet did not move.
+   *    Below one unit the display widens until the value is visible, capped at
+   *    the same four places the win rule uses. At or above one unit nothing
+   *    changes, so every existing zero-decimal render is byte-identical.
+   */
+  const widen = (d: number): number => {
+    const floored = d === 0 ? zeroDecimalDigits(micros) : d
+    return minFractionDigits === undefined ? floored : Math.max(floored, minFractionDigits)
+  }
 
   // Platform-provided display information wins over anything we hold locally,
   // for ANY code including fiat. This is the TR-012c resolution: we render what

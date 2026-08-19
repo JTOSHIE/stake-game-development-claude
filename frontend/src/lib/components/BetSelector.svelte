@@ -55,7 +55,7 @@
   import { standingMode } from '../stores/betMode'
   import { spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
-  import { formatBalance, formatWin, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { tr } from '../i18n/tr'
 
   export let open = false
@@ -72,7 +72,8 @@
     ? spinCostMicros($betAmount, $standingMode) / ($betAmount * CURRENCY_SCALE)
     : 1
   $: anteActive = Math.abs(costMultiplier - 1) > 0.0001
-  $: effectiveLabel = formatWin(
+  // R071 TASK 1, the settled platform precision law (a Stake reviewer message corroborated exactly by rgs.md): payouts and wins render at up to four places, every other currency display at exactly two. The stand-back audit widened this cost site; R071 returns it.
+  $: effectiveLabel = formatBalance(
     spinCostMicros($betAmount, $standingMode), $currencyCode || 'USD', $locale)
 
   const money = (v: number) => formatBalance(Math.round(v * CURRENCY_SCALE), $currencyCode || 'USD', $locale)

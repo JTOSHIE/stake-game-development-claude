@@ -635,6 +635,21 @@ jobs:
       # which (`CAD: '$'`) is byte-for-byte what actually shipped. Plus a paired
       # positive for the whole set and one for every negative control, because a
       # control that can never fire is indistinguishable from one that passes.
+      # ── The precision law, R071 TASK 1 and TASK 2 ────────────────────────────
+      # The settled platform ruling: payouts and wins render at up to four
+      # places, every other currency display at exactly two, and a zero-decimal
+      # currency widens rather than rounding a sub-unit amount to a lying
+      # integer. This is the UNIT half and runs here in about a second; the
+      # runtime half is the browser leg "sub-cent display", which drives a real
+      # 0.08x round through the built bundle.
+      - name: precision law, seeded-violation self-test
+        working-directory: frontend
+        run: npx tsx scripts/precision_law_gate.mjs --self-test
+
+      - name: precision law, wins widen and everything else holds two
+        working-directory: frontend
+        run: npx tsx scripts/precision_law_gate.mjs
+
       - name: currency table, seeded-violation self-test
         working-directory: frontend
         run: node scripts/currency_table_gate.mjs --self-test

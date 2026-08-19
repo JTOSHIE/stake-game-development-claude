@@ -162,6 +162,17 @@ const BASELINE_PATH = join(REPO_ROOT, 'scripts', 'qa', 'doc_currency_baseline.js
 // that is the whole point of the gate. 341 of the 492 frozen claims were in this
 // class and every one of them is still held.
 const OUT_OF_SCOPE = [
+  // R071: the Fable handover class, `HANDOVER_<date>_Fable.md` at the root.
+  // EXACTLY the decisive case above, for exactly the same reason. Convention (j)
+  // makes the handover a living document written by the OUTGOING Fable and
+  // committed verbatim by the builder; convention (f)'s rule that a verbatim
+  // record is never tidied or corrected governs it as surely as it governs a
+  // brief. The 2026-08-15 handover cites `reports/archive/superseded/`, which is
+  // a SUPERSEDED_CITED finding, and names a gate that lives on an unmerged
+  // branch. Both are true statements about the world the handover describes, and
+  // neither is fixable without editing a document that must not be edited. A
+  // gate that demands an impossible action is broken, not strict.
+  'HANDOVER_',
   'reports/archive/',
   // R050 TASK 1: the design-system archive is the same class as
   // reports/archive, dated history moved out of the live tree with a

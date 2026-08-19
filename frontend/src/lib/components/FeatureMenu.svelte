@@ -37,7 +37,7 @@
   import { buyFeatureDisabled } from '../stores/jurisdiction'
   import { canAffordMode, shortfallFor, spinCostMicros } from '../stores/buyAffordability'
   import { setModalOpen } from '../stores/modalGuard'
-  import { formatBalance, formatWin, CURRENCY_SCALE } from '../utils/currency'
+  import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { playClick } from '../services/soundService'
 
   const dispatch = createEventDispatcher<{ buy: BetMode }>()
@@ -95,7 +95,8 @@
   // inside a called function is invisible to it and never re-triggers this
   // line (confirmed the hard way: this exact bug shipped once already,
   // caught by the conformance suite's live-reactivity check, not by eye).
-  $: currentSpinCost = formatWin(spinCostMicros($betAmount, $standingMode), cur, $locale)
+  // R071 TASK 1, the settled platform precision law (a Stake reviewer message corroborated exactly by rgs.md): payouts and wins render at up to four places, every other currency display at exactly two. The stand-back audit widened this cost site; R071 returns it.
+  $: currentSpinCost = formatBalance(spinCostMicros($betAmount, $standingMode), cur, $locale)
 
   // Buy cards are hidden entirely where the jurisdiction disables feature buys,
   // exactly as the current FeatureButton / BuyBonus do.

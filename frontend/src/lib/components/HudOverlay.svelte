@@ -326,8 +326,45 @@
   // places it, exactly as formatBalance() does for every other money readout.
   $: lossLimitSymbol   = currencySymbolFor($currencyCode || 'USD')
   $: lossLimitTrailing = currencySymbolTrailing($currencyCode || 'USD')
-  $: balanceLabel = formatWin(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
-  $: betLabel     = formatWin(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+
+  // ── THE AUTOPLAY LOSS LIMIT, FORMATTED AND VALIDATED (R071 TASK 3) ─────────
+  //
+  // This field was the one money surface in the game that reached the DOM with
+  // NO formatter on either side: a bare `type="number"` bound straight to a
+  // float, so a de or tr session saw "12.5" beside a symbol in a view where
+  // every other amount used that locale's separators, and a typed value could
+  // carry more precision than the currency has.
+  //
+  // Two halves now:
+  //   VALIDATION. Every keystroke and every commit runs through
+  //   `sanitiseLossLimit`, which coerces to a number, floors at one unit,
+  //   caps at the platform's own bet ceiling, and rounds to the CURRENCY's
+  //   precision, zero places for a zero-decimal currency and two otherwise.
+  //   FORMATTING. The committed value renders beside the field through
+  //   `formatBalance`, under TASK 1's law that a limit is a currency display
+  //   and takes exactly two places (or the widened sub-unit form a
+  //   zero-decimal currency needs, per TASK 2).
+  //
+  // The input itself keeps `type="number"`, deliberately: it is the control a
+  // player edits, and swapping it for a formatted text box would take the
+  // numeric keypad away on the owner's own phone.
+  const LOSS_LIMIT_MAX = 500_000
+  $: lossLimitDecimals = ($currencyCode || 'USD').toUpperCase() === 'USD'
+    ? 2
+    : (formatBalance(1_000_000, $currencyCode || 'USD', 'en').match(/[.,](\d+)$/)?.[1].length ?? 2)
+  $: lossLimitStep = lossLimitDecimals === 0 ? 1 : Number((10 ** -lossLimitDecimals).toFixed(lossLimitDecimals))
+  function sanitiseLossLimit(v: unknown): number {
+    const n = typeof v === 'number' ? v : Number(v)
+    if (!Number.isFinite(n)) return 1
+    const clamped = Math.min(Math.max(n, lossLimitStep), LOSS_LIMIT_MAX)
+    return Number(clamped.toFixed(lossLimitDecimals))
+  }
+  $: lossLimitLabel = formatBalance(
+    Math.round(sanitiseLossLimit(lossLimitAmount) * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+  // R071 TASK 1, the settled platform precision law (a Stake reviewer message corroborated exactly by rgs.md): payouts and wins render at up to four places, every other currency display at exactly two. A BALANCE is not a win, so it renders at exactly two.
+  $: balanceLabel = formatBalance(Math.round($balance * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
+  // A COST is a currency display, not a payout, so it renders at exactly two.
+  $: betLabel     = formatBalance(Math.round(effectiveCost * CURRENCY_SCALE), $currencyCode || 'USD', $locale)
   // Abbreviated companions, consumed by the 400x225 mini profile ONLY. Computed
   // here rather than inside the action so both forms come from the one currency
   // module and cannot disagree about the symbol, the locale or the code.
@@ -509,7 +546,7 @@
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
               <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
               {#if lossLimitOn}
-                <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
+                <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min={lossLimitStep} step={lossLimitStep} max={LOSS_LIMIT_MAX} bind:value={lossLimitAmount} on:change={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} on:blur={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}<span class="auto-menu-amount-fmt" data-money="cur" data-testid="loss-limit-formatted" aria-live="polite">{lossLimitLabel}</span></label>
               {/if}
               <div class="auto-menu-sep">{$tr('hudSpins')}</div>
               {#each allowedAutoOptions as n}
@@ -756,7 +793,7 @@
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
           <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
           {#if lossLimitOn}
-            <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
+            <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min={lossLimitStep} step={lossLimitStep} max={LOSS_LIMIT_MAX} bind:value={lossLimitAmount} on:change={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} on:blur={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}<span class="auto-menu-amount-fmt" data-money="cur" data-testid="loss-limit-formatted" aria-live="polite">{lossLimitLabel}</span></label>
           {/if}
           <div class="auto-menu-sep">{$tr('hudSpins')}</div>
           {#each allowedAutoOptions as n}
@@ -973,7 +1010,7 @@
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={stopOnFeature} /> {$tr('stopOnFeature')}</label>
         <label class="auto-menu-toggle"><input type="checkbox" bind:checked={lossLimitOn} /> {$tr('lossLimit')}</label>
         {#if lossLimitOn}
-          <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min="1" step="1" bind:value={lossLimitAmount} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}</label>
+          <label class="auto-menu-amount">{#if !lossLimitTrailing}{lossLimitSymbol}{/if}<input type="number" min={lossLimitStep} step={lossLimitStep} max={LOSS_LIMIT_MAX} bind:value={lossLimitAmount} on:change={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} on:blur={() => { lossLimitAmount = sanitiseLossLimit(lossLimitAmount) }} class="auto-menu-input" data-testid="loss-limit-input" />{#if lossLimitTrailing}{lossLimitSymbol}{/if}<span class="auto-menu-amount-fmt" data-money="cur" data-testid="loss-limit-formatted" aria-live="polite">{lossLimitLabel}</span></label>
         {/if}
         <div class="auto-menu-sep">{$tr('hudSpins')}</div>
         {#each allowedAutoOptions as n}
@@ -1943,6 +1980,7 @@
     border-radius: 6px;
     box-sizing: border-box;
   }
+  .auto-menu-amount-fmt { margin-left: 6px; opacity: 0.75; font-size: 11px; letter-spacing: 0.02em; }
   .auto-menu-sep {
     padding: 0.5rem 1rem 0.25rem;
     font-size: 0.66rem;
