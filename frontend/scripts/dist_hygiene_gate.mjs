@@ -339,23 +339,40 @@ console.log(`  ${uriControlClean ? 'clean ' : 'FALSE+'}  seeded: negative contro
 check('the data: URI scan can actually fail',
   uriSeeded.every((s) => s.caught) && uriControlClean)
 
-// ── GUIDELINE ITEM 6: NO STAKE BRANDING SHIPS ────────────────────────────────
+// ── GUIDELINE ITEM 6: NO STAKE BRANDING SHIPS, OUTSIDE THE MANDATED BLOCK ────
 //
 // Added 2026-07-30. CLAUDE.md's compliance section has required this since the
 // project began, `STAKE_GUIDELINES_SELF_ASSESSMENT.md` ticks it, and a 2026-07-30
 // verification pass found NO GATE ANYWHERE SCANNED THE BUNDLE FOR IT. The tick
 // was true and held by nothing, which is the class convention (p) exists to close.
 //
+// THE SCOPE NOTE, R078, 2026-08-21, and it is a RULING rather than a preference.
+// Since R076 the bundle carries the platform's MANDATED General Disclaimer block
+// byte-exact, and that block closes `TM and © 2026 Stake Engine.` The platform
+// REQUIRES that text, so the mark is carried by mandate rather than adopted, and
+// the branding rule now reads: studio marks only everywhere EXCEPT inside the
+// mandated block.
+//
+// WHAT THAT MEANS FOR THIS GATE, stated so nobody "fixes" it later: the rules
+// below deliberately DO NOT match the mandated line, and that is correct rather
+// than a gap. Widening them to catch `Stake Engine.` would make this gate demand
+// that we breach the platform's own requirement. The mandated block is
+// `disclaimer_conformance.test.ts`'s business: it pins the block byte-exact and
+// flags any Stake mark appearing OUTSIDE it, which is the half this gate cannot
+// see. Everything else in the bundle remains a violation exactly as before.
+//
 // THE HARD PART IS THAT "stake" IS NOT ALWAYS BRANDING, and a naive scan would
 // either false-positive forever or be quietly disabled. Measured against the real
-// bundle, `stake` occurs exactly twice and BOTH are the social vocabulary layer
-// doing its job: the phrase table that rewrites the gambling term "stake" to
-// "play amount", and its own annotation calling stake a brand name that is
-// scanned and never rewritten. Those are the compliance MECHANISM, not a breach.
+// bundle, TWO of the occurrences are the social vocabulary layer doing its job:
+// the phrase table that rewrites the gambling term "stake" to "play amount", and
+// its own annotation calling stake a brand name that is scanned and never
+// rewritten. Those are the compliance MECHANISM, not a breach. The mandated
+// disclaimer's closing line joined them as an expected occurrence at R076.
 //
 // So the rule is narrow and stated: flag Stake used as a BRAND, being the
 // platform's product names and any "Powered by" attribution, and leave the
-// lower-case gambling noun to the vocabulary layer that owns it.
+// lower-case gambling noun to the vocabulary layer that owns it and the mandated
+// closing line to the ruling that requires it.
 function stakeBrandingViolations(text) {
   const out = []
   const RULES = [
@@ -375,7 +392,7 @@ for (const f of brandFiles) {
     brandViolations.push({ file: f.replace(DIST, 'dist'), ...v })
   }
 }
-check('no Stake branding ships in the bundle', brandViolations.length === 0,
+check('no Stake branding ships in the bundle outside the mandated disclaimer', brandViolations.length === 0,
   brandViolations.map((v) => `${v.file}: "${v.hit}" (${v.why})`).join('; '))
 
 // Seeded per convention (p), in the forms branding really arrives: a footer

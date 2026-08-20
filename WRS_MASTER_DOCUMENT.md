@@ -35,7 +35,10 @@ be withdrawn once indexed.
 ## 2. PLATFORM REGISTER (Stake Engine obligations)
 - Review model: 3 anonymous reviewers, fractional scores (0 to 3 in ~0.33 steps), rounded average; average below 1.0 = not published, thread locked 7 days, then resubmission allowed. Target: 3 stars.
 - Post-approval lockdown: only minor cosmetic updates after approval; NO math changes, NO new modes, NO gameplay changes. Everything ships final.
-- Exclusivity/content: original designs only; no Stake/Kick branding; nothing appealing to minors; reviewer discretion on taste.
+- Exclusivity/content: original designs only; no Stake/Kick branding in game assets, save
+  that the same platform MANDATES its General Disclaimer block verbatim and that block
+  closes with the platform's own mark (R078, 2026-08-21); nothing appealing to minors;
+  reviewer discretion on taste.
 - Dual-platform: auto-considered for stake.com and stake.us; social-mode language must pass (JOB 9b audits strings).
 - Ranking: released games start at the bottom of New Releases; re-ranked every Friday (AU time).
 - Static-only rule: build reaches no external source (fonts included). Conformance sweep in JOB 2 extensions.
@@ -69,7 +72,11 @@ Carried from the 2026-07-25 brief. **No first-party source for any of the three 
 
 - **Multi-operator expansion:** Stake Engine games reaching operators beyond Stake's own properties. Would change the exclusivity calculus in section 2 if true.
 - **Regulatory push:** increased regulatory posture, consistent in direction with the observed tightening of the RTP ceiling and the introduction of automated bet-level risk limits, both of which ARE verified.
-- **Rebrand:** a platform rebrand. Would affect the "no Stake branding" asset rule and our doc URLs if it lands.
+- **Rebrand:** a platform rebrand. Would affect the studio-marks-only asset rule, our doc
+  URLs, and, since R076, the byte-exact General Disclaimer we are MANDATED to ship: the
+  wording would change, the constant at `frontend/src/lib/i18n/disclaimer.ts` would need
+  re-capturing, and the conformance gate re-reads the dated mirror every run so it goes
+  red until that happens. A rebrand is a build item now, not just a docs one.
 
 ## 3. FUTURE SPINNER DOCUMENT REGISTRY (in-repo paths)
 ### 3a. Player-facing (the "user manual"; review requirement)

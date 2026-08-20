@@ -505,23 +505,45 @@ jobs:
         run: npx tsx src/lib/i18n/vocabulary.test.ts
 
       # ── Gate 6c: the disclaimer, sixteen locales, both modes ─────────────────
-      # M02 of reports/qa/session3/MECHANISMS.md. SEVEN platform requirements
-      # (REQ-010 to REQ-015 and REQ-038) had no proof path and all seven are
-      # properties of one artefact: the disclaimer prose.
+      # M02 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
+      # (REQ-010 to REQ-016 and REQ-038) are properties of one artefact, the
+      # disclaimer prose, and this gate is their proof path.
       #
-      # Nothing mechanical can check that sixteen translations convey six
-      # meanings, so this asserts the STRUCTURAL invariants the real defect
-      # breaks and which hold in any script: six sentences per locale (a dropped
-      # clause drops the count) and the untranslated "Remote Game Server"
-      # anchor. Meaning is checked in English only, against the platform's own
-      # template read from the dated mirror at runtime, so a platform rewrite
-      # goes red rather than being silently checked against a stale memory.
+      # REWRITTEN 2026-08-21 (R078) to describe what the gate now does. The
+      # paragraphs that stood here until then described the PARAPHRASE design
+      # retired at R076: six sentences per locale, an untranslated anchor,
+      # meaning checked in English only. None of that has been true since, and
+      # the description outlived the thing it described by two rulings. That is
+      # the same class of defect R077 and R078 were spent closing one layer
+      # down, so it is fixed here rather than left as an escalation.
       #
-      # REQ-016 is deliberately NOT held: it asks whether the template's closing
-      # TM line is mandatory, NO_PROOF_SET.tsv records it UNKNOWN and says it
-      # should be ruled, and it sits against the no-Stake-branding rule. A gate
-      # cannot settle that. Self-test first, per convention (p): ten seeds, five
-      # paired controls.
+      # WHAT IT ASSERTS NOW: BYTE-IDENTITY. The platform's mandated General
+      # Disclaimer ships verbatim, untranslated, in all sixteen locales and both
+      # modes, and NOTHING may follow it. Byte-identity subsumes every
+      # structural invariant the old design guarded, because a dropped clause,
+      # a merged sentence, a localised-away anchor and a missing concept all
+      # surface at the first differing byte.
+      #
+      # The klasses it emits: VERBATIM_DRIFT, TRAILING_CONTENT (the block
+      # correct and something added after it, which is the R077 defect and has
+      # its own klass so the finding names it rather than printing a length
+      # mismatch), ABSENT, SOCIAL_DIVERGED, PROHIBITED_TERM, BRANDING and
+      # MIRROR_MOVED. The dated mirror is re-read at every run, so a platform
+      # rewrite of the template rusts the pin loudly instead of being checked
+      # against a stale memory.
+      #
+      # REQ-016 IS HELD, and how is the point. It asked whether the template's
+      # closing "TM and © 2026 Stake Engine." is mandatory. R076 answered it at
+      # the Start Approval form, R077 confirmed the shape against a live title,
+      # and R078 made it the branding rule's one scoped exception: the mandated
+      # block is required shipped text carrying the platform's mark by mandate,
+      # and this gate flags any Stake mark appearing OUTSIDE it.
+      #
+      # Self-test first, per convention (p): ten seeds and four paired
+      # controls, led by the two forms this repository actually shipped, the
+      # pre-R076 paraphrase and the R076 appended sentence, planted verbatim.
+      # Every seed names the KLASS it must produce, so none can pass on another
+      # detector's finding.
       - name: disclaimer conformance, seeded-violation self-test
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend

@@ -55,13 +55,51 @@
 //                       lang=ar and dir=rtl (the accessibility pass must
 //                       survive the fix), the stage roots compute direction
 //                       ltr, and the ar frames are captured for the owner
+//   D  SENTENCE BIDI    (R078, 2026-08-21) on the ar rules screen, in two
+//                       halves. BEHAVIOURAL: both p.fs-disc paragraphs carry
+//                       plaintext isolation, the ARABIC one's sentence-final
+//                       punctuation reads at the RTL end, and the
+//                       platform-mandated ENGLISH block is unaffected.
+//                       GENERAL: EVERY Arabic sentence leaf in the modal is
+//                       bidi-isolated, found by property rather than by an
+//                       enumerated class list.
+//
+//                       WHY THIS CHECK EXISTS AND WHAT IT CORRECTS. R068 put
+//                       unicode-bidi: plaintext on the sentence elements it
+//                       swept and MISSED four classes in this one modal:
+//                       .fs-disc (which carries the translated responsible-play
+//                       body and, since R076, the mandated English disclaimer),
+//                       .fs-mode-blurb, .fs-mode-footnote and .fs-guide-desc.
+//                       MEASURED before the fix: 13 of 32 Arabic sentence
+//                       leaves read at the wrong end. They had done so for as
+//                       long as R068's pin has been in.
+//
+//                       THE GENERAL HALF IS THE POINT. An enumerated list is
+//                       how R068 missed these, and how R078's own brief would
+//                       have missed three of the four had the sweep stopped at
+//                       the class it named. Asserting the mechanism over every
+//                       Arabic sentence in the surface cannot be out-enumerated
+//                       by the next element somebody adds.
+//
+//                       THE ORACLE IS DIRECTION-INVARIANT ON PURPOSE: last
+//                       character against FIRST character, never against the
+//                       box. With plaintext the whole run re-aligns inside its
+//                       box, so a midpoint test reports the opposite of the
+//                       truth. That was measured while deriving this check,
+//                       and the first oracle drafted for it was wrong in
+//                       exactly that way.
 //
 // SELF-TEST (convention (p)): --self-test LIFTS THE PIN, exactly the shipped
 // defect. Seed 'pin-lifted-stage' forces the stage roots back to
 // direction: inherit, and the gate must go RED reproducing the owner's exact
 // drift: .grid-scale DX -94 (at the design scale) and reel order reversed.
 // Seed 'pin-lifted-replay' lifts only the replay root and the replay leg must
-// catch it. A green gate that cannot reproduce the owner's screenshot is a
+// catch it. Seed 'bidi-lifted-disc' (R078) LIFTS THE CLASS, restoring the
+// pre-R078 computed value, and check D must go red on the Arabic paragraph
+// while a scope control asserts the English block did NOT move: a lift that
+// moved both would mean the seed reaches wider than the class under test, and
+// that control sits OUTSIDE the expected-red collection so it cannot be hidden
+// inside it. A green gate that cannot reproduce the owner's screenshot is a
 // script that prints PASS.
 //
 // Run (from frontend/):
@@ -69,8 +107,9 @@
 //   node scripts/direction_parity_gate.mjs --self-test
 //   FS_WRITE_EVIDENCE=1 node scripts/direction_parity_gate.mjs   # commit-run frames
 //
-// Frames: reports/screens/r068-direction-parity/ (scratch unless evidence mode,
-// per (h.1)).
+// Frames: reports/screens/r068-direction-parity/ for checks A to C, and
+// reports/screens/r078-rtl-disclaimer/ for check D's rules-screen captures
+// (both scratch unless evidence mode, per (h.1)).
 
 import { chromium } from 'playwright'
 import { createServer } from 'node:http'
@@ -132,6 +171,11 @@ const REPLAY_SURFACES = ['.replay-container', '.replay-column', '.grid-container
 const SEED_CSS = {
   'pin-lifted-stage': '.game-stage{direction:inherit !important}',
   'pin-lifted-replay': '.replay-container{direction:inherit !important}',
+  // R078: the class LIFTED, which is exactly the pre-R078 shipped state of
+  // .fs-disc. isolate rather than normal because isolate is what the paragraph
+  // computed to before the rule reached it (the HTML rendering spec isolates
+  // block containers), so this restores the real defect and not a synthetic one.
+  'bidi-lifted-disc': '.fs-disc{unicode-bidi:isolate !important}',
 }
 
 const failures = []
@@ -254,6 +298,12 @@ async function settleReplay(page) {
 
 const framesDir = evidenceDir('reports', 'screens', 'r068-direction-parity')
 mkdirSync(framesDir, { recursive: true })
+// R078's rules-screen frames get their OWN directory rather than joining the
+// R068 set. An evidence-mode run regenerates every frame it writes, with
+// timing variance, so pointing new evidence at an existing dated set would
+// churn seven R068 frames to add three (the R065 lesson, recorded there).
+const rulesFramesDir = evidenceDir('reports', 'screens', 'r078-rtl-disclaimer')
+mkdirSync(rulesFramesDir, { recursive: true })
 
 if (!existsSync(DIST)) {
   console.error('dist/ is absent. Run `npm run build` first.')
@@ -275,6 +325,88 @@ const measureBothDirections = async (page, selectors) => {
   const rtl = await readSurfaces(page, selectors)
   await flipDir(page, 'ltr')
   return { ltr, rtl }
+}
+
+// ── R078 check D: sentence-level bidi isolation on the rules screen ─────────
+//
+// THE ORACLE IS DIRECTION-INVARIANT ON PURPOSE. It compares the paragraph's
+// LAST character against its FIRST, never against the box, because with
+// plaintext the whole run re-aligns inside the box and a midpoint test then
+// reports the opposite of the truth. Measured both ways while deriving this:
+// the midpoint oracle called the fixed state broken and the broken state fixed.
+//
+// For an Arabic paragraph the sentence-final full stop must sit LEFT of the
+// first character. Without isolation the paragraph takes the ltr base direction
+// of the pinned stage and the trailing punctuation resolves to the wrong end,
+// which is the R068 defect surviving in the one sentence class its sweep missed.
+// The mandated English disclaimer shares the class and must be UNAFFECTED, so
+// both are measured and the Latin one is asserted to stay ltr-read.
+// Every Arabic sentence LEAF in the rules modal, found by property rather than
+// by an enumerated class list, so a new element added to this modal cannot
+// repeat the R068 miss silently. A leaf is an element with its own text and no
+// text-bearing element child; a sentence is 20 characters or more containing
+// Arabic. Asserting the MECHANISM (plaintext isolation) over the whole set is
+// what makes this general; the geometric assertion below stays pinned to the
+// named paragraphs, which is what makes it behavioural.
+const readSentenceBidi = (page) => page.evaluate(() => {
+  const root = document.querySelector('.fs-pt-body')
+  if (!root) return null
+  const out = []
+  for (const el of root.querySelectorAll('*')) {
+    if ([...el.children].some((c) => (c.textContent || '').trim())) continue
+    const t = (el.textContent || '').trim()
+    if (t.length < 20 || !/[؀-ۿ]/.test(t)) continue
+    // SENTENCES ONLY, and the filter is not cosmetic. A first draft without it
+    // flagged .fs-rtp-lbl, a stat-plate LABEL with no terminal punctuation,
+    // where the measure reports which way the run is ALIGNED in its cell rather
+    // than whether anything reads wrongly. R068's rule governs sentence
+    // elements, whose trailing punctuation is the thing that lands at the wrong
+    // end, so the oracle asks for exactly that and a label is not a defect.
+    if (!/[.!?:؟۔]$/.test(t)) continue
+    out.push({
+      cls: String(el.className || '').split(' ').filter((c) => !c.startsWith('svelte-'))[0] || el.tagName.toLowerCase(),
+      bidi: getComputedStyle(el).unicodeBidi,
+    })
+  }
+  return out
+})
+
+const readDiscBidi = (page) => page.evaluate(() => {
+  const out = []
+  for (const el of document.querySelectorAll('p.fs-disc')) {
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+    let n = null
+    while (w.nextNode()) n = w.currentNode
+    if (!n || !n.textContent.length) continue
+    const at = (i) => {
+      const r = document.createRange()
+      r.setStart(n, i); r.setEnd(n, i + 1)
+      return r.getBoundingClientRect()
+    }
+    const first = at(0), last = at(n.textContent.length - 1)
+    out.push({
+      arabic: /[؀-ۿ]/.test(n.textContent),
+      bidi: getComputedStyle(el).unicodeBidi,
+      tailIsLeftOfHead: last.left < first.left,
+    })
+  }
+  return out
+})
+
+// Opens the rules and paytable overlay the way a player does, per TR-028: the
+// FEATURES control, then its bet-modes info button. Returns false rather than
+// throwing so the caller can FAIL LOUDLY instead of skipping, which is the
+// money-fit gate's own lesson: a drive that silently skips its subject reports
+// a green it never earned.
+const openRulesScreen = async (page) => {
+  const menu = page.locator('[data-testid="feature-menu-button"], .feature-menu-button').first()
+  if (!await menu.click({ timeout: 5000 }).then(() => true).catch(() => false)) return false
+  await page.waitForTimeout(600)
+  const info = page.locator('[data-testid="open-bet-modes-info"]').first()
+  if (!await info.click({ timeout: 5000 }).then(() => true).catch(() => false)) return false
+  await page.waitForSelector('p.fs-disc', { timeout: 10000 }).catch(() => null)
+  await page.waitForTimeout(500)
+  return (await page.locator('p.fs-disc').count()) > 0
 }
 
 const openBuyDialog = async (page) => {
@@ -310,6 +442,35 @@ const runSeed = async (seedName, expectRed) => {
       const mark = failures.length
       compareTwins('desktop', 'seed-replay', ltr, rtl)
       seedFailures.push(...failures.splice(mark))
+    } else if (seedName === 'bidi-lifted-disc') {
+      // R078: the class lifted. Load ar, open the rules screen, and demand the
+      // Arabic paragraph's trailing punctuation back at the WRONG end, which is
+      // what shipped until R078. The English block must be unmoved either way,
+      // so the seed also proves the fix is scoped rather than broad.
+      await page.goto(`${base}/?sessionID=r078&rgs_url=${encodeURIComponent(base)}&lang=ar`, { waitUntil: 'networkidle' })
+      await settle(page)
+      const opened = await openRulesScreen(page)
+      check('seed bidi-lifted-disc: the rules screen opened', opened, 'could not reach p.fs-disc')
+      let latinHeld = true
+      if (opened) {
+        const disc = await readDiscBidi(page)
+        const arabic = disc.filter((d) => d.arabic)
+        const latin = disc.filter((d) => !d.arabic)
+        // Only the ARABIC assertion is collected as the expected red. The seed
+        // must reproduce the shipped defect in the paragraph under test.
+        const mark = failures.length
+        check('seed bidi-lifted-disc: the Arabic paragraph reads at the RTL end',
+          arabic.length > 0 && arabic.every((d) => d.tailIsLeftOfHead), JSON.stringify(arabic))
+        seedFailures.push(...failures.splice(mark))
+        // The control half stays a REAL failure, deliberately outside the
+        // splice: if lifting the class moved the English block too, the lift
+        // did something broader than the class under test and the seed would
+        // otherwise hide that inside its own expected red.
+        latinHeld = latin.length > 0 && latin.every((d) => !d.tailIsLeftOfHead)
+        check('seed bidi-lifted-disc: the lift leaves the English block alone (scope control)',
+          latinHeld, JSON.stringify(latin))
+      }
+      void latinHeld
     } else {
       await page.goto(`${base}/?sessionID=r068&rgs_url=${encodeURIComponent(base)}&lang=en`, { waitUntil: 'networkidle' })
       await settle(page)
@@ -343,6 +504,9 @@ if (SELF_TEST) {
   // (p): lift the pin, demand the owner's screenshot back.
   await runSeed('pin-lifted-stage', true)
   await runSeed('pin-lifted-replay', true)
+  // (p) for R078: lift the class, demand the Arabic trailing punctuation back
+  // at the wrong end.
+  await runSeed('bidi-lifted-disc', true)
   // Negative control: an empty seed name must stay green, so a seed that
   // could never fire is caught.
   await runSeed('', false)
@@ -351,7 +515,7 @@ if (SELF_TEST) {
     for (const f of failures) console.error(`  - ${f.name}: ${f.detail}`)
     process.exit(1)
   }
-  console.log(`direction parity gate self-test: ${pass} checks passed, the lifted pin reproduced the owner's drift red on both roots, negative control green.`)
+  console.log(`direction parity gate self-test: ${pass} checks passed, the lifted pin reproduced the owner's drift red on both roots, the lifted class reproduced the Arabic trailing-punctuation defect with the English block held, negative control green.`)
   process.exit(0)
 }
 
@@ -415,6 +579,38 @@ try {
         && Math.abs(arLive.rects['.grid-scale'].x - live.ltr.rects['.grid-scale'].x) <= 0.5,
       JSON.stringify({ ar: arLive.rects['.grid-scale'], ltr: live.ltr.rects['.grid-scale'] }))
     await page.screenshot({ path: join(framesDir, `live_ar_${sizeName}.png`) })
+
+    // ── D (R078): the rules screen's sentence bidi, on the same ar load ─────
+    if (await openRulesScreen(page)) {
+      const disc = await readDiscBidi(page)
+      const arabic = disc.filter((d) => d.arabic)
+      const latin = disc.filter((d) => !d.arabic)
+      check(`ar ${sizeName}: the rules screen renders both fs-disc paragraphs`,
+        disc.length === 2, JSON.stringify(disc))
+      check(`ar ${sizeName}: fs-disc carries plaintext isolation`,
+        disc.length > 0 && disc.every((d) => d.bidi === 'plaintext'),
+        JSON.stringify(disc.map((d) => d.bidi)))
+      check(`ar ${sizeName}: the Arabic paragraph's sentence-final punctuation reads at the RTL end`,
+        arabic.length > 0 && arabic.every((d) => d.tailIsLeftOfHead), JSON.stringify(arabic))
+      check(`ar ${sizeName}: the mandated English block still reads ltr, unaffected`,
+        latin.length > 0 && latin.every((d) => !d.tailIsLeftOfHead), JSON.stringify(latin))
+      // The general half: EVERY Arabic sentence leaf in the modal, by property.
+      // This is the check that would have caught R068's miss, and R078's own
+      // wider sweep, without anyone thinking to look.
+      const leaves = await readSentenceBidi(page)
+      const unisolated = (leaves || []).filter((l) => l.bidi !== 'plaintext')
+      check(`ar ${sizeName}: the rules modal has Arabic sentences to check`,
+        !!leaves && leaves.length >= 20, `found ${leaves ? leaves.length : 'no .fs-pt-body'}`)
+      void 0
+      check(`ar ${sizeName}: every Arabic sentence in the rules modal is bidi-isolated`,
+        unisolated.length === 0,
+        `${unisolated.length} unisolated: ${JSON.stringify(unisolated.slice(0, 6))}`)
+      await page.screenshot({ path: join(rulesFramesDir, `rules_ar_${sizeName}.png`) })
+    } else {
+      check(`ar ${sizeName}: the rules screen opened for the bidi checks`, false,
+        'the FEATURES control or its bet-modes info button did not open the paytable')
+    }
+
     await page.goto(`${base}/?${REPLAY_Q(base)}&lang=ar`, { waitUntil: 'networkidle' })
     await settleReplay(page)
     await page.screenshot({ path: join(framesDir, `replay_ar_${sizeName}.png`) })
@@ -431,4 +627,4 @@ if (failures.length) {
   for (const f of failures) console.error(`  - ${f.name}: ${f.detail}`)
   process.exit(1)
 }
-console.log(`direction parity gate PASS: ${pass} assertions, the stage geometry is direction-invariant at ${SIZES.map((s) => s[0]).join(', ')} (live, buy dialog, replay, flip-in-place twins), the ar document keeps lang and dir and its board matches the ltr twin.`)
+console.log(`direction parity gate PASS: ${pass} assertions, the stage geometry is direction-invariant at ${SIZES.map((s) => s[0]).join(', ')} (live, buy dialog, replay, flip-in-place twins), the ar document keeps lang and dir and its board matches the ltr twin, and the ar rules screen isolates its sentences so the Arabic paragraph reads natively while the mandated English block is unaffected.`)

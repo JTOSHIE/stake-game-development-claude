@@ -518,7 +518,21 @@ lives in `App.svelte` behind `import.meta.env.DEV`; reversible by removing those
   was ported into `HudOverlay.svelte` and the autoplay menu lives there too. The
   behaviour was and is correct; the requirement is now stated against behaviour rather
   than against component names, so it stays checkable as the component tree changes.)
-- No Stake branding in shipped assets or text. Original IP only.
+- No Stake branding in shipped assets or text. Studio marks only. **ONE SCOPED EXCEPTION,
+  and it is the only one (Fable ruling R078, 2026-08-21, on R076 and R077): the platform's
+  mandated General Disclaimer block is REQUIRED shipped text and carries the platform's own
+  mark by mandate.** It ships byte-exact from `docs/stake-engine-live/general-disclaimer.md`
+  line 18, 472 characters, closing `TM and © 2026 Stake Engine.`, single-sourced at
+  `frontend/src/lib/i18n/disclaimer.ts`. The mark is CARRIED, not adopted: we do not choose
+  it and may not alter it. Everywhere outside that block the rule is unchanged, and
+  `frontend/src/lib/i18n/disclaimer_conformance.test.ts` flags any Stake mark that appears
+  outside it. **WHY THE FLAT SENTENCE HAD TO GO:** it stopped being true at R076, when the
+  mandated block entered shipped text, and no gate could say so, because the bundle scanner
+  matches Stake.com, Stake.us, Stake Originals and Powered by Stake but not this line, while
+  the document gate checks whether citations RESOLVE and never what prose CLAIMS. Three live
+  documents asserted the flat rule for a day. The anchor below is why this one cannot go
+  stale silently again.
+  <!--CHECK: grep "TM and © 2026 Stake Engine." frontend/src/lib/i18n/disclaimer.ts-->
 - **Player-facing French standardises on the ESCAPED STRAIGHT apostrophe** (`\'`), not the
   typographic U+2019. Fable ruling R042 TASK A1, 2026-08-10, option (a). The rule is about
   CONSISTENCY WITHIN A LOCALE rather than a preference between glyphs: `machine_tell_gate`

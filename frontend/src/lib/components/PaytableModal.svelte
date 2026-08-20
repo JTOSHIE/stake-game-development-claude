@@ -439,7 +439,35 @@
      punctuation at its correct end) inside the ltr-pinned stage, while every
      Latin-script locale resolves ltr and renders byte-identically. Box
      geometry stays pinned; this affects only inline bidi ordering. */
-  .fs-htw h4, .fs-htw p, .fs-caption, .fs-sym-note, .fs-rules li { unicode-bidi: plaintext; }
+  /* R078, 2026-08-21: .fs-disc JOINS THE LIST, and the reason is worth stating
+     because the brief that ordered it and the measurement disagree in a useful
+     direction. .fs-disc carries TWO paragraphs: the responsible-play body,
+     which is genuinely translated, and the platform-mandated disclaimer, which
+     has been English in all sixteen locales since R076. Measured at lang=ar,
+     comparing the final character against the first (direction-invariant, so
+     the oracle does not depend on where the run sits in its box):
+       responsible play, before: last char RIGHT of first, the wrong end
+       responsible play, after:  last char LEFT of first, correct RTL reading
+       the disclaimer, before and after: identical, firstX 0, lastX 887.3
+     So this fixes a live Arabic defect in the neighbouring paragraph, the one
+     sentence class R068's sweep missed, and is provably a no-op for the
+     mandated English block, which the ltr stage pin already rendered correctly.
+     Held by direction_parity_gate check D, seeded by lifting the class.
+
+     AND THE SWEEP WENT WIDER THAN THE BRIEF, which is surfaced in the session
+     report per convention (n) rather than decided quietly. Measuring .fs-disc
+     meant enumerating every Arabic sentence leaf in this modal, and 13 of 32
+     read at the wrong end, not one: .fs-mode-blurb, .fs-mode-footnote and
+     .fs-guide-desc were missed by the R068 sweep exactly as .fs-disc was. They
+     join the rule here. The change is measured zero-risk for the fifteen
+     Latin-script locales (identical geometry with and without) and a strict
+     repair for ar, it is one selector list, and the owner is about to submit
+     this build with the rules screen being the surface a reviewer opens first.
+     Check D now asserts the MECHANISM over the whole class rather than over an
+     enumerated list, so the next element added to this modal cannot repeat the
+     miss silently. */
+  .fs-htw h4, .fs-htw p, .fs-caption, .fs-sym-note, .fs-rules li,
+  .fs-disc, .fs-mode-blurb, .fs-mode-footnote, .fs-guide-desc { unicode-bidi: plaintext; }
 
   /* TR-037: the max-win qualifier as one footnote under the mode grid. Repeating
      it in five column labels clipped every one of them; a four-column stat row

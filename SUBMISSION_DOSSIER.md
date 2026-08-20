@@ -75,7 +75,9 @@ and full paytable always reachable; RTP and max win displayed; paytable matches
 the validated maths exactly; spacebar spin; autoplay confirmation, no one-click
 consecutive bets; working sound disable; incremental win count-up; sixteen
 locales; social mode clean including first paint; static build, no external
-origins, no Stake branding, original IP; Bet Replay implemented for base rounds;
+origins, no Stake branding outside the platform's own mandated General Disclaimer (which
+ships byte-exact and closes with the platform's mark, R078 2026-08-21), original IP;
+Bet Replay implemented for base rounds;
 responsive verified at all six required viewports.
 New obligations created by Overdrive (owned by Stage 2 unless noted): buy-tier
 UI must carry social overrides for every string (the live prohibited terms table

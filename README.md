@@ -99,9 +99,14 @@ Historical briefs, handovers and superseded documents are retained under
 All game design, artwork, audio and code in this repository are original works of
 We Roll Spinners. The visual and audio assets are produced in-house from vector masters.
 
-No Stake branding appears in any shipped asset or string. The repository carries no
-open-source licence grant: it is published for platform review and audit, not for reuse.
-See `LICENSE`, which grants nothing over that original work.
+Every mark in the game is We Roll Spinners' own, with the single exception the platform
+itself requires: the General Disclaimer shown on the rules screen is Stake Engine's own
+mandated wording, shipped byte-exact as the platform specifies, and it closes with the
+platform's mark. That mark is carried by mandate, not adopted. No other Stake branding
+appears in any shipped asset or string.
+
+The repository carries no open-source licence grant: it is published for platform review
+and audit, not for reuse. See `LICENSE`, which grants nothing over that original work.
 
 **Third party components.** This repository was created from the Stake Engine math SDK,
 which its authors publish under the MIT licence so that studios can build titles on it.

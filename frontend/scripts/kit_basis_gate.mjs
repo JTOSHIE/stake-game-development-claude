@@ -9,7 +9,16 @@
 // rather than form, and the one instrument that did see it was a hand-typed
 // grep that ran once. This file is that grep, kept, per locale, and seeded.
 //
-// TWO HALVES, BOTH AGAINST WHAT ACTUALLY SHIPS:
+// FIVE HALVES, ALL AGAINST WHAT ACTUALLY SHIPS.
+//
+// THE COUNT WAS WRONG UNTIL 2026-08-21 (R078), and the way it went wrong is the
+// ordinary way: this header said TWO and documented two, halves 3, 4 and 5 were
+// added by R047, R071 and R076 without it being revisited, and nothing reads a
+// comment so nothing complained. "Halves" is kept as the file's own word for
+// its checks rather than renamed to something arithmetically honest, because
+// the numbering is load-bearing: the HALF 5 header is cited from the import
+// block and from the guard message that prints when a disclaimer part is not a
+// string, and renaming would break citations in the records to buy nothing.
 //
 //   1. SUPERSEDED BASIS WORDS. The A3 ruling (R042) and R043 Phase 1a moved
 //      every player-facing bet-basis claim from the total-bet phrase to the
@@ -26,6 +35,22 @@
 //      en-form shapes, and any hit is then located in the kit text to prove
 //      whether it shipped. Either way it is red: a source hit ships on the next
 //      build.
+//
+//   3. TEMPLATE TEXT NODES (R047 TASK 1, closing TR-125's gate gap). No .svelte
+//      template renders a hardcoded grouped figure into a text node, which is
+//      the form that escaped the locale tables entirely.
+//
+//   4. SUPERSEDED OVERBOOST WORDING (R071 TASK 5). The retired phrasing must be
+//      absent from the prose tables and the kit, and the site count must match,
+//      so a silently dropped site is as red as a surviving one.
+//
+//   5. THE MANDATED DISCLAIMER (R076, reversed by R077, scoped by R078). The
+//      built kit carries the platform's mandated block as one byte-exact
+//      literal, and neither superseded family survives anywhere: the pre-R076
+//      paraphrase in sixteen locales plus the old social override, and the
+//      trademark sentence R076 appended and R077 removed. Its own header,
+//      further down, carries the silent-green trap this half nearly set for
+//      itself.
 //
 // WHY THE FIGURE HALF READS THE SOURCE TABLES AS WELL AS THE KIT: the bundle
 // interleaves all sixteen locales in one file, so a bare grep cannot say WHICH

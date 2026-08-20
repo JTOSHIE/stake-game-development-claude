@@ -29,7 +29,16 @@ Australian English, no em dashes or en dashes.
   its recorded licence. **The number of provenance records is deliberately not written here**,
   per convention (s): it grows whenever art is commissioned. Read the set from the brand
   directory.
-- **No Stake branding:** verified. No Stake trademark or themes in any shipped asset or text.
+- **No Stake branding, studio marks only:** verified, and **SCOPED 2026-08-21 by Fable
+  ruling R078, because the flat claim stopped being true at R076.** No Stake trademark or
+  themes in any shipped asset or text, save the one block the platform MANDATES: the
+  General Disclaimer ships byte-exact from `docs/stake-engine-live/general-disclaimer.md`
+  line 18, 472 characters, and closes with the platform's own mark, `TM and © 2026 Stake
+  Engine.` The platform requires that text, so the mark is carried by mandate rather than
+  adopted, and the studio-marks-only rule governs every other shipped string and asset
+  unchanged. Single source `frontend/src/lib/i18n/disclaimer.ts`; any Stake mark OUTSIDE
+  the block is caught by `frontend/src/lib/i18n/disclaimer_conformance.test.ts`.
+  <!--CHECK: grep "TM and © 2026 Stake Engine." frontend/src/lib/i18n/disclaimer.ts-->
 - **No underage appeal:** verified. No child or child-like characters.
 - **Social/jurisdiction:** social mode present; prohibited-term overrides applied for
   stake.us (`social=true`). See `docs/stake-engine-live/jurisdiction-requirements.md`.
@@ -614,9 +623,19 @@ same edit.**
 
 Additional operators beyond Stake; more games taken through regulation; a **minor rebrand
 away from Stake-specific branding**; stateful games deferred. The rebrand item is worth
-watching: our compliance rule is already that no Stake branding appears in any shipped
-asset or string, so a platform-side rebrand does not create work for us, and that is worth
-knowing in advance rather than discovering it.
+watching: our compliance rule is that no Stake branding appears in any shipped asset or
+string EXCEPT the platform's own mandated General Disclaimer block, which we ship
+byte-exact and which closes with the platform's mark (R078, 2026-08-21).
+
+**THE OLD CONSEQUENCE WAS STRUCK 2026-08-21 AND THE REASON IS WORTH KEEPING.** This
+paragraph used to conclude that a platform-side rebrand "does not create work for us".
+That was true while every mark we shipped was our own. It stopped being true at R076: a
+rebrand would rewrite the mandated wording, the byte-exact constant at
+`frontend/src/lib/i18n/disclaimer.ts` would have to be re-captured against the new page,
+and `frontend/src/lib/i18n/disclaimer_conformance.test.ts` re-reads the dated mirror on
+every run, so it goes RED until that happens. **A rebrand is now a build item with a
+gate already pointed at it**, which is exactly the sort of thing this section exists to
+know in advance rather than discover.
 
 ### 7. Payments page. MIRRORED 2026-07-25, no build work owed.
 

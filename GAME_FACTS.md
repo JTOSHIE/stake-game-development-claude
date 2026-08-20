@@ -341,7 +341,10 @@ live is exactly 5,000.00x on the wincap round itself.
   `reports/archive/2026-07-04_layout-install.md` and `reports/archive/2026-07-04_ux-polish.md`).
 - **Stateless / no jackpot, gamble, or continuation:** verified, matches the Stake Engine
   approval-guidelines key restrictions (`COMPLIANCE_WATCH.md`).
-- **Original IP, no Stake branding, no underage appeal:** verified (`COMPLIANCE_WATCH.md`).
+- **Original IP, studio marks only, no underage appeal:** verified (`COMPLIANCE_WATCH.md`).
+  The one Stake mark in shipped text is the closing line of the platform's MANDATED
+  General Disclaimer, which the platform requires verbatim and which R078 made the
+  branding rule's one scoped exception (2026-08-21).
 - **fps gate:** headless run of 20 spins including a full bonus round averaged **59.9fps**
   against a >=55fps gate (PASS); a single frame exceeded 100ms, root-caused to a one-time
   browser cold-start cost at the very first Overdrive-entry mount on a fresh page load, not
