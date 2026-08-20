@@ -9,6 +9,58 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 078 - 2026-08-21 - COMMS-ACK R079: the attestation basis, and the form does NOT match the docs
+
+**The line for the owner at Step 2.** Swept 33 restricted phrases, a SUPERSET
+of the form's 32, whole-word and case-insensitive, over every player-facing
+string the shipped bundle renders in social mode: 203 of 203 keys resolved as
+social renders them, 232 unique rendered strings harvested from the built
+bundle, and the CI social walk's 3,402 social strings covering the win banner
+and autoplay menu the harvest could not reach. **Zero hits across 32 of the 33
+phrases.** The one occurrence anywhere is "stake" inside `TM and (c) 2026 Stake
+Engine.`, the closing line of the platform's OWN mandated General Disclaimer,
+cited to the R078 carve-out because it actually hits. Bundle v10 at fada3c77,
+clean tree, 93 files, 12,455,660 bytes.
+
+**It is not zero and the owner should tick knowing why.** A reviewer running the
+same grep finds the same single hit. Better explained than discovered.
+
+**YOUR SPOT-MATCH DOES NOT HOLD ACROSS THE WHOLE TABLE, and per the brief it is
+quoted rather than acted on.** The docs restrict `fund` and the form omits it;
+`credit` maps to balance in the docs and to coins on the form. I checked my own
+source before calling the difference real, because a stale mirror looks exactly
+like this: the docs table is byte-stable across all six captures from 2026-07-04
+to 2026-08-20, so the form and the documentation genuinely disagree today. Four
+further apparent differences are the platform's OWN internal duplication, six
+phrases listed twice in the docs with four carrying different replacements each
+time. The sweep used the UNION, so the result holds whichever list governs, but
+which one governs the attestation is your call and Fable's, not mine.
+
+**THE STATIC PASS PRODUCED FOUR FALSE POSITIVES AND THAT IS THE METHOD LESSON.**
+Resolving a key measures the TABLE, not the render. Four keys hold restricted
+words that never reach a player because the component handles social at the CALL
+SITE: two ReplayMode ternaries, an sv() wrapper in FeatureMenu, a social branch
+in fsModes. A table scan alone would have escalated four non-defects; a render
+scan alone would have missed the four names, which now ride the report as E2
+because a future component reading one of those keys directly would ship a
+restricted word with every gate green.
+
+**The scanner was seeded before its zero was believed**, convention (p) applied
+to the instrument rather than the product: 33 of 33 phrases fired on a
+case-flipped positive and stayed silent on a glued-inside-a-word negative, in
+the same expression that produced the results, plus a control proving it does
+find the real hit. A sweep that finds nothing and a sweep that is broken print
+the same thing. And the phrase list came from the PLATFORM's sources, never from
+our own table, because scanning our transcription against our strings shares an
+input; the transcription was then verified separately as an exact set match, 33
+in and 33 out.
+
+Read-only throughout: no code changed, no rebuild, nothing patched. Tree clean,
+brief saved verbatim, TR-180 landed. Nothing queued: you tick Step 2 on the
+report's top line, paste the game details at Step 3, and submit.
+
+---
+
 ## 077 - 2026-08-21 - COMMS-ACK R078: the carve-out stated in nine places, machine-held, and the RTL class was four selectors wide
 
 Your ruling is landed and the E1 contradiction is closed. **The branding rule
