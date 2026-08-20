@@ -184,6 +184,33 @@ export function findHardcoded(src, file) {
   for (const m of markup.matchAll(/\b(aria-label|title|placeholder|alt|aria-description)\s*=\s*"([^"\\\n]{2,140})"/g)) {
     push(m[2])
   }
+  // 2b. INTERPOLATED values of the same player-facing attributes: title={expr}.
+  //     R075, closing G2 of the R074 final audit. The four speed tooltips
+  //     shipped `title={$speedTier === 'normal' ? 'Normal speed' : ...}` while
+  //     this gate printed PASS, and the blindness had TWO independent causes:
+  //     rule 2 reads only STATIC double-quoted attribute values, and rule 1,
+  //     which does see expression literals, then rejected 'Normal speed',
+  //     'Turbo' and 'Super Turbo' because PROSE_WORD carries no speed
+  //     vocabulary. Inside an attribute a player actually reads, a quoted
+  //     literal IS a label by construction, so the attribute name is the prose
+  //     marker and PROSE_WORD deliberately does not apply here. Keys and
+  //     comparisons are excluded exactly as in rule 1, so the state names in
+  //     `$speedTier === 'normal'` stay clean while the label branches flag.
+  //     SHAPE NOT SEEN, stated per the audit discipline: a literal sitting
+  //     AFTER a nested `}` inside the same attribute expression is beyond the
+  //     `[^}]` capture; no shipped attribute carries that form today.
+  for (const m of markup.matchAll(/\b(aria-label|title|placeholder|alt|aria-description)\s*=\s*\{([^}\n]{2,300})\}?/g)) {
+    const expr = m[2]
+    for (const q of expr.matchAll(/'([^'\\\n]{2,140})'/g)) {
+      const before = expr.slice(Math.max(0, q.index - 24), q.index)
+      if (/\b(?:\$?tr|t|sv|get)\(\s*$/.test(before)) continue          // a key
+      if (/,\s*$/.test(before) && /\b(?:\$?tr|t|sv)\(/.test(before)) continue
+      if (/[=!]==?\s*$/.test(before)) continue                          // a comparison
+      const s = q[1].trim()
+      if (!s || !LABEL_SHAPE.test(s) || DEV_ONLY_TEXT.has(s)) continue
+      if (!out.includes(s)) out.push(s)
+    }
+  }
   // 3. Text nodes between tags, INCLUDING the English either side of an
   //    interpolation. R041.
   //
@@ -396,6 +423,27 @@ function selfTest() {
     ['NEGATIVE CONTROL: a keyed call carrying a NESTED object literal, the shape '
       + 'R041 introduced at WinBreakdown, must not leak its own braces as text', false,
       () => findHardcoded(`<script></script>\n<span>{$tr('waysCount', { n: current.ways })}</span>`, 'X.svelte').length > 0],
+    // ── R075, G2. An interpolated player-facing attribute. ──────────────────
+    // The exact form that shipped at HudOverlay 513, 621, 778 and 871 until
+    // R075: a title attribute whose ternary carries hardcoded English labels,
+    // beside an aria-label that routes correctly. Seeded verbatim per (p),
+    // comparison literals included, so the seed proves BOTH that the labels
+    // flag and that the state names beside them do not.
+    ['R075/G2: the shipped speed tooltip, an interpolated title attribute whose '
+      + 'ternary carries hardcoded English labels', true,
+      () => findHardcoded(
+        `<script></script>\n<button aria-label={$tr('a11yCycleSpeed')} title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}></button>`,
+        'X.svelte').some((h) => h.text === 'Normal speed')],
+    ['R075/G2: the same seed must flag the colon branch too, the Super Turbo label', true,
+      () => findHardcoded(
+        `<script></script>\n<button title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}></button>`,
+        'X.svelte').some((h) => h.text === 'Super Turbo')],
+    ['NEGATIVE CONTROL: the R075 fix form, an interpolated title routed through '
+      + 'a key, must pass, or the fix itself would fail the gate', false,
+      () => findHardcoded(`<script></script>\n<button title={$tr('a11yCycleSpeed')}></button>`, 'X.svelte').length > 0],
+    ['NEGATIVE CONTROL: comparison literals inside an attribute expression are '
+      + 'state names, not labels, and stay clean', false,
+      () => findHardcoded(`<script></script>\n<span title={mode === 'social' ? $tr('a') : $tr('b')}></span>`, 'X.svelte').length > 0],
     // ── R042 A6. A config-owned field rendered raw. ─────────────────────────
     ['R042: a config union member interpolated straight into markup, the shape '
       + 'that put "Very High" on a Japanese FEATURES card', true,

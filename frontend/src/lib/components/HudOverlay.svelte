@@ -510,7 +510,7 @@
         on:click={toggleTurbo}
         disabled={$isSpinning || $rgJurisdiction.turboDisabled}
         aria-label={$tr('a11yCycleSpeed')}
-        title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+        title={$tr('a11yCycleSpeed')}
       >
         <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
       </button>
@@ -618,7 +618,7 @@
                 data-speed={$speedTier}
                 data-testid="hud-turbo"
                 disabled={$isSpinning || $rgJurisdiction.turboDisabled}
-                title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}>
+                title={$tr('a11yCycleSpeed')}>
           <svg class="m-turbo-bolt" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
           {$tr('hudTurboLabel')}
         </button>
@@ -775,7 +775,7 @@
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label={$tr('a11yCycleSpeed')}
-    title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+    title={$tr('a11yCycleSpeed')}
   >
     <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
   </button>
@@ -868,7 +868,7 @@
     on:click={toggleTurbo}
     disabled={$isSpinning || $rgJurisdiction.turboDisabled}
     aria-label={$tr('a11yCycleSpeed')}
-    title={$speedTier === 'normal' ? 'Normal speed' : $speedTier === 'turbo' ? 'Turbo' : 'Super Turbo'}
+    title={$tr('a11yCycleSpeed')}
   >
     <span class="fs-face">
       <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>

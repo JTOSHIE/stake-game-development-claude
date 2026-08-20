@@ -162,8 +162,11 @@ async function run() {
         results.viewports[v.name] = geom
         check(`${v.name}: Continue button inside the viewport`, geom.btnInViewport, JSON.stringify(geom))
         check(`${v.name}: card does not overflow the viewport`, geom.cardWithinViewport, JSON.stringify(geom))
-        // 44px touch-target rule, same standard as the Round 3 audit.
-        check(`${v.name}: Continue meets the 44px touch target`, geom.btnH >= 40, `height ${geom.btnH}`)
+        // 44px touch-target rule, the HUD_SPEC bar whose provenance TR-169
+        // ruled (our own Apple HIG figure; the platform names none). The
+        // assertion read >= 40 beside this 44 label from R14 until R075
+        // aligned it to the bar, G4 of the R074 final audit.
+        check(`${v.name}: Continue meets the 44px touch target`, geom.btnH >= 44, `height ${geom.btnH}`)
       }
 
       await page.screenshot({ path: join(SHOTS, `popout-${v.name}.png`) })
