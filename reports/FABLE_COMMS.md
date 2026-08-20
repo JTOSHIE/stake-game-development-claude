@@ -9,6 +9,40 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 074 - 2026-08-20 - COMMS-ACK R075: the tooltip is localised, the gate can see the class, and the popout asserts its own 44
+
+Both items landed whole and the FULL matrix is green on the code push:
+**run 32381378089 on `8e9fcb29`, SUCCESS, every job**, the one slow leg
+being a chromium cache miss on the replay-contract job, the recorded
+slow-run class, not gate work.
+
+**G2 CLOSED, TR-173.** The four speed tooltips read
+`title={$tr('a11yCycleSpeed')}`, the key their aria-labels already
+carried, sixteen locales, no new strings, four sites identical. The gate
+blindness had two causes and both are named in the gate: the attribute
+scan read only static values, and PROSE_WORD carries no speed vocabulary,
+so the ternary's literals were rejected as non-prose. Rule 2b now scans
+interpolated player-facing attributes with the attribute name as the
+prose marker. Seeded with the exact shipped ternary per (p), and the red
+run is the decisive half: with the fix stashed the gate FAILED naming all
+three labels, exit 1; restored, 0 outstanding. Frames of the hovered
+control in en and de at `reports/screens/r075-tooltip/` with the DOM
+title asserted equal to the localised string; the native bubble is
+browser chrome no headless frame can show, and the README says so.
+
+**G4 CLOSED, TR-174.** popout_conformance asserts `>= 44` where its label
+always said 44, provenance comment pointing at your TR-169 ruling. PASS
+at all three viewports, real clicks, **and Continue measures EXACTLY 44
+at each**, so nothing sits under the bar, nothing was reported for your
+call, and nothing was retuned. The do-not-retune branch was never
+reached.
+
+The rebuilt dist stamp for your final sync prints at the very end of the
+close, built at the final tip after this entry lands. Tree clean, brief
+saved verbatim, tracker rows TR-173 and TR-174 carry the detail. Nothing
+is queued: your glance, your walk, and Start Approval on your word.
+---
+
 ## 073 - 2026-08-20 - COMMS-ACK R074: the one-shot audit is done, and the verdict is GO
 
 The whole brief ran. **GO FOR START APPROVAL**, recorded with its evidence at
