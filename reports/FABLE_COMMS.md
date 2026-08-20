@@ -9,6 +9,52 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 073 - 2026-08-20 - COMMS-ACK R074: the one-shot audit is done, and the verdict is GO
+
+The whole brief ran. **GO FOR START APPROVAL**, recorded with its evidence at
+`docs/records/FINAL_SUBMISSION_AUDIT_2026-08-20.md`, the fifty-one walked at
+HEAD beside it. The short form: platform truth is byte-stable across all 64
+routes back to 2026-08-11 and the submission-morning refresh stands done; the
+fifty-one came back 38 CONFIRMED, 12 STALE-refreshed and 1 ESCALATED, with no
+item's substance failing, the twelve being mapping-cell drift from the passes
+that landed after 2026-08-13, corrected in the new table; the entire CI battery
+re-ran locally from the workflow's own command lines, static 74 of 74 and
+browser 28 of 28 with every seed; the maths recomputed exactly to ten places in
+all five modes and the books equality re-ran whole at HEAD, 500,000 rounds,
+zero failures, inputs hash-bound to the manifest first; and a fresh build at
+the tip reproduces your published stamp byte for byte, 93 files, 12,467,624
+bytes, so `a95c521a` stands and nothing was rebuilt.
+
+**ONE THING I COULD NOT DO, AND IT IS YOURS ANYWAY.** The pane's portal login
+has expired, and the sign-in page wants two terms boxes ticked and an OAuth
+grant, which are your actions, never mine. So every logged-in read the brief
+asked for is escalated as one bundle, E1 in the verdict: the item-level
+fifty-one re-read against the 2026-08-13 transcription, the pre-checks, the
+version stamps, the Math page, the clean-load console inventory, the Start
+Approval form dry-read, and the first-time-publisher terms you quoted, which
+exist in no committed capture and on no public route. All of it is your
+logged-in submission morning, which is the walk the brief already ends on.
+
+**WHAT THE HUNT FOUND, all escalated, none blocking.** Two submission-material:
+dossier 5g's anonymous checklist fetch now meets a login wall at the criteria
+level, so that protocol step is blind and wants your and Fable's reword; and
+the speed control's hover tooltip is hardcoded English at four sites with its
+three states inconsistently worded, beside an aria-label that routes correctly,
+needing sixteen translations and exposing a gate blind spot for interpolated
+title attributes. Quality: three local-only harnesses have gone stale at HEAD,
+the R066 class with three live instances; the popout gate still says 44px and
+asserts 40, your ruled decision from R073 restated; the ellipsis glyph splits
+by layer; two social override lines read machine-substituted; live and replay
+carry two win-tier vocabularies; and the shipped fonts' OFL texts live only in
+gitignored paths. The record-only set is enumerated for one records pass.
+TR-148's four escalations still await your rulings and none blocks the portal
+act. TR-172 records the audit; every non-CLOSED tracker row is dispositioned in
+the verdict table.
+
+Zero fixes landed on any shipped surface; every commit is a record. Tree clean,
+every push green, the owner preview refreshed at `cc56e248`.
+---
+
 ## 072 - 2026-08-20 - COMMS-ACK R072 and R073: the end-frame holds, and one task I did not do
 
 R072 executed whole, remote green first attempt, run 32353012031 on `307989ad`,
