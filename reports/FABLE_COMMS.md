@@ -9,6 +9,83 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 076 - 2026-08-21 - COMMS-ACK R077: the disclaimer ships the mandated text alone, and your R076 append is the overruled ruling
+
+Your production capture beat our reading of the page, and the reversal is
+landed whole. **disclaimerBody is the platform's mandated text and NOTHING
+ELSE in all sixteen locales and both modes**, 472 characters ending at its
+own closing line. The single source exports ONE constant where R076 exported
+three, the appended sentence and the template join deleted, sixteen consumers
+moved to the surviving name. Verified before any edit and more widely than
+R076 verified it: the block is byte-identical in the canonical mirror AND all
+five dated captures, and in every one of the six it is the LAST line, so the
+brief's "ending exactly at its own closing line" is corroborated by the
+platform's own captures rather than taken on trust.
+
+**The render site needed no code change and its comment needed rewriting.**
+The reactive read has been bare since R076 removed the two script-level
+appends; what survived was a comment explaining why a trademark sentence was
+appended there, describing a design already dismantled. It now says the
+opposite and says why the rule is strong: a render-site append is invisible
+to every source pin, so it is the one form of this defect that could return
+quietly.
+
+**THREE TRAPS WERE CAUGHT BEFORE THEY LANDED AND THE WORST WAS GREEN.** The
+kit gate destructured the deleted export at module load; a missing named
+export resolves to undefined without throwing, includes() coerces it, and the
+real bundle contains that token, so the PRESENT half would have reported
+satisfied while pinning nothing, self-test included. The half now refuses a
+non-string part and the refusal is seeded. The old SEED 4 asserted that
+DROPPING the trademark sentence was a violation, which R077 makes correct: it
+did not go stale, it changed sign, and left alone it would have reddened the
+gate against the fix. And the kit gate's clean control wrote that sentence
+into its own scratch kit and scanned it, so adding it to the superseded
+family would have made the control flag its own seed.
+
+**The pins.** Byte-identity everywhere, with TRAILING_CONTENT as its own
+klass because the block-plus-something is the R077 defect exactly; the mirror
+re-read every run; 10 seeds and 4 paired controls, and every seed now names
+the KLASS it must produce, because two of them fire on more than one detector
+and a bare count would let a seed pass on another's finding. The R076
+appended form is the new seeded violation per (p), planted verbatim by both
+its routes, and held as a local literal rather than imported, since a seed
+that imports what it detects vanishes with it. kit_basis half 5 pins the one
+mandated literal present and BOTH superseded families absent, red-proven
+against the genuine pre-R077 dist. The render is framed in en, de and social
+and proven able to fail against a scratch build carrying a render-site append
+that the source pin passed with exit 0, which is the whole argument for
+framing the render at all.
+
+**ONE ESCALATION NEEDS YOUR RULING AND IT IS NOT R077'S.** Three LIVE
+documents still assert that no Stake branding ships, and that has been false
+since R076: the mandated block ends "TM and (c) 2026 Stake Engine." and it is
+in the bundle. CLAUDE.md's compliance list, COMPLIANCE_WATCH.md's verified
+line, and README.md, which is PUBLIC and which a reviewer may read. A fourth,
+the compliance register's REQ-016, reasons to the conclusion R076 overruled.
+No gate can see it: dist hygiene's patterns do not match "Stake Engine." and
+are right not to, and doc currency checks whether citations resolve, never
+what the prose claims. R076 scoped the branding rule correctly inside the
+conformance test and never brought the four documents forward. One short
+ruling closes it. Three smaller items ride the session report: the Gate 6c
+comment block in checks.yml still describes the pre-R076 paraphrase design,
+the kit gate header still says two halves where there are five, and the
+studio's marks now reach a player only through the art, which is what your
+capture shows a live title doing but is a real change worth seeing rather
+than inferring.
+
+**Run 32404267403 on the code commit: SUCCESS, the FULL matrix, 30 of 30 jobs, zero
+failures**, static gates included, and locale prose conformance green, the leg that
+reddened R076 and which I watched deliberately for that reason. The rebuild at the tip
+stamps v10, 93 files, 12,455,543 bytes, 94 bytes under R076's as the appended sentence
+leaves the bundle; the shipped bundle carries the mandated block once and the append
+zero times.
+
+Tree clean, brief saved verbatim, tracker rows landed. Nothing is queued:
+your loop, the rules-screen glance beside the frames, and Start Approval on
+your word.
+
+---
+
 ## 075 - 2026-08-21 - COMMS-ACK R076: the mandated disclaimer ships verbatim, and one red on main resolved within the hour
 
 Your find at the form is landed whole. **disclaimerBody is the platform's
