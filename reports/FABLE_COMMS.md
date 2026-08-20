@@ -9,6 +9,51 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 075 - 2026-08-21 - COMMS-ACK R076: the mandated disclaimer ships verbatim, and one red on main resolved within the hour
+
+Your find at the form is landed whole. **disclaimerBody is the platform's
+mandated text byte-exact in all sixteen locales and both modes**, plus
+exactly the one trademark sentence, single-sourced in the new
+disclaimer.ts, the social override deleted per the identical-strings rule,
+and the source verified against the canonical mirror and BOTH dated
+captures before any edit. **The render site was the second half of your
+find**: PaytableModal was appending two more trademark sentences at the
+script level where no markup gate looks, which would have doubled our
+marks beside the mandated block; both appends are gone and the rendered
+disclaimer is asserted byte-equal to the constant in en, de and social,
+frames at `reports/screens/r076-disclaimer/`.
+
+**The pins.** disclaimer_conformance is rebuilt on byte-identity: all
+sixteen locales against the constant, the dated mirror re-read on every
+run, the branding rule scoped to hold everywhere OUTSIDE the mandated
+block (REQ-016's long-parked question resolved by your ruling), nine
+seeds led by the SHIPPED paraphrase verbatim. kit_basis gains half 5:
+both mandated literals present in the built kit, the seventeen-fragment
+superseded family absent, red-proven against the genuine pre-R076 dist.
+Per (n): no social scanner needed an edit, because the prohibited table
+carries no win-words, social_dom already reports-not-fails the
+never-rewrite trio (its walk logged the rendered mandated block as its
+one informational stake hit, which is also live proof social renders the
+new text), and the conformance scan strips exactly the block. The dash
+scan raised no conflict. The substance-versus-letter lesson is named in
+TR-175, which also records that the brief addressed TR-174, a number
+R075 had already assigned.
+
+**ONE RED ON MAIN, RESOLVED WITHIN THE HOUR, recorded plainly.** Run
+32391062354 on `b4eface9` failed at browser: locale prose conformance:
+its English-leak detector correctly read fifteen en-identical
+disclaimers, and that leg was not in my local affected-set re-run, which
+is rule 10 earning its keep. `5947987f` adds disclaimerBody to the
+gate's IDENTICAL_OK table for the fifteen non-en locales, the ruling
+recorded in place, nothing else widened; **run 32392694251 on the
+resolution: SUCCESS, full matrix, zero failed jobs.**
+
+The rebuilt dist stamp for your final sync prints at the close's end,
+built at the final tip. Tree clean, brief saved verbatim. Nothing is
+queued: your loop, the rules-screen glance beside the frames, and Start
+Approval on your word.
+---
+
 ## 074 - 2026-08-20 - COMMS-ACK R075: the tooltip is localised, the gate can see the class, and the popout asserts its own 44
 
 Both items landed whole and the FULL matrix is green on the code push:
