@@ -49,7 +49,9 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..')
 
-const { DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS } = await import('../src/lib/i18n/disclaimer.ts')
+// ONE constant since R077. See the HALF 5 header for why a second name here
+// would degrade the PRESENT half into a green that pins nothing.
+const { DISCLAIMER_MANDATED } = await import('../src/lib/i18n/disclaimer.ts')
 
 /**
  * The superseded basis phrases, per locale, exactly as they shipped before
@@ -260,25 +262,40 @@ function scanOverboost(files, { countSites = true } = {}) {
   return { findings, sites }
 }
 
-// ── HALF 5: the mandated disclaimer, verbatim (R076, 2026-08-21) ─────────────
-// The owner met the Start Approval form (Step 1 of 4) and the ruling is the
-// LETTER: the platform's mandated disclaimer ships byte-exact, untranslated,
-// identical in all sixteen locales and both modes, plus our one trademark
-// sentence (disclaimer.ts is the single source; the mirror citation lives
-// there). The estate shipped a PARAPHRASE in sixteen translations from
-// 2026-07-29 until R076, and those exact strings are the superseded family:
-// one distinctive opening fragment per locale, plus the old social override.
+// ── HALF 5: the mandated disclaimer, alone (R076, REVERSED by R077) ──────────
+// R077, 2026-08-21: the owner ruled on PRODUCTION EVIDENCE that the shipped
+// disclaimer is the platform's mandated text and NOTHING ELSE, so the one
+// trademark sentence R076 appended is gone (disclaimer.ts is the single
+// source; the mirror citation lives there). TWO superseded families exist now
+// and this half holds both absent:
+//   the PARAPHRASE the estate shipped in sixteen translations from 2026-07-29
+//   until R076, one distinctive opening fragment per locale plus the old
+//   social override; and
+//   the TRADEMARK SENTENCE R076 appended and R077 removed.
 // Two halves, the OVERBOOST pattern:
-//   PRESENT. The built kit carries the mandated block and the trademark
-//            sentence, each as a byte-exact literal. The TWO literals rather
-//            than the joined string, learned on this half's first real run:
-//            disclaimer.ts joins them in a template at runtime, so the joined
-//            form never exists in the bundle bytes, and demanding it went red
-//            over a correct kit. The joined RENDER is proven live by the
-//            social DOM walk and the R076 frames.
-//   ABSENT.  No fragment of the superseded paraphrase family survives in the
-//            kit or the prose sources.
+//   PRESENT. The built kit carries the mandated block as a byte-exact literal.
+//            ONE literal now, and the reason is worth keeping. R076 demanded
+//            the JOINED string and went red over a correct kit, because
+//            disclaimer.ts joined two constants in a template at runtime and a
+//            runtime join never exists in the bundle bytes; R076 fixed that by
+//            pinning the two literals separately. R077 deletes the join
+//            altogether, so the shipped string IS one constant and the class
+//            of bug cannot recur.
+//   ABSENT.  No fragment of either superseded family survives in the kit or
+//            the prose sources.
+//
+// THE TRAP THIS HALF NEARLY SET FOR ITSELF, recorded because it produces a
+// GREEN gate rather than a red one. If the appended sentence were still
+// destructured from disclaimer.ts after R077 deleted the export, the binding
+// would be `undefined`, `src.includes(undefined)` would coerce to
+// `src.includes('undefined')`, and the built bundle genuinely contains that
+// token, so the PRESENT half would report satisfied while pinning nothing at
+// all. A deleted export does not throw on a namespace destructure; it goes
+// quiet. Keep `parts` built from real constants only.
 const DISCLAIMER_SUPERSEDED = [
+  // R077's family: the sentence R076 appended, held as a literal here because
+  // its constant no longer exists to import.
+  'are trademarks of We Roll Spinners',                      // the R076 append
   'A stable internet connection is required to play',        // en paraphrase
   'Malfunction voids all prizes and plays',                  // old social override
   'يؤدي أي خلل فني إلى إبطال جميع المكاسب',                  // ar
@@ -299,6 +316,15 @@ const DISCLAIMER_SUPERSEDED = [
 ]
 
 function scanDisclaimer(files, parts, { requirePresent = true } = {}) {
+  // A guard, not decoration: the whole silent-green failure recorded in the
+  // HALF 5 header turns on a `parts` entry that is not a real string, so the
+  // gate refuses to run rather than reporting a PASS it has not earned.
+  for (const part of parts) {
+    if (typeof part !== 'string' || part.length === 0) {
+      throw new Error('kit basis HALF 5: a disclaimer part is not a non-empty string, '
+        + 'which would coerce to a substring search for the token "undefined" and pass over an empty pin')
+    }
+  }
   const findings = []
   const present = new Set()
   for (const f of files) {
@@ -307,12 +333,12 @@ function scanDisclaimer(files, parts, { requirePresent = true } = {}) {
     for (const part of parts) if (src.includes(part)) present.add(part)
     for (const phrase of DISCLAIMER_SUPERSEDED) {
       if (src.includes(phrase)) {
-        findings.push({ half: 'disclaimer', file: f, detail: `the superseded disclaimer paraphrase ${JSON.stringify(phrase.slice(0, 44))} survives` })
+        findings.push({ half: 'disclaimer', file: f, detail: `the superseded disclaimer text ${JSON.stringify(phrase.slice(0, 44))} survives` })
       }
     }
   }
   if (requirePresent && present.size < parts.length) {
-    findings.push({ half: 'disclaimer', detail: 'the mandated disclaimer text is not fully present in the kit (the mandated block and the trademark sentence must each ship as a byte-exact literal)' })
+    findings.push({ half: 'disclaimer', detail: 'the mandated disclaimer text is not present in the kit (it must ship as a byte-exact literal)' })
   }
   return findings
 }
@@ -391,31 +417,64 @@ if (process.argv.includes('--self-test')) {
 
   // SEED 4, R076: the SHIPPED en disclaimer paraphrase, planted verbatim in a
   // bundle-shaped asset, which is the exact string the kit carried until R076
-  // (the brief's own words: the shipped paraphrase becomes the seeded
-  // violation). The same scratch kit also omits the mandated text, so the
-  // PRESENT half must fire too: two findings from one seeded file.
+  // (the brief's own words: the shipped text becomes the seeded violation).
+  // The same scratch kit also omits the mandated text, so the PRESENT half
+  // must fire too: two findings from one seeded file.
   rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
   writeFileSync(join(tmp, 'index-seeded.js'),
     `const d={disclaimerBody:"Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round."};export default d;\n`)
-  const discSeed = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS])
-  const discRed = discSeed.some((f) => f.detail.includes('superseded disclaimer paraphrase'))
-    && discSeed.some((f) => f.detail.includes('not fully present'))
+  const discSeed = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED])
+  const discRed = discSeed.some((f) => f.detail.includes('superseded disclaimer text'))
+    && discSeed.some((f) => f.detail.includes('not present'))
   console.log(`  ${discRed ? 'caught ' : 'MISSED '} seeded shipped paraphrase AND the absent mandated text (R076's own form)`)
 
-  // NEGATIVE CONTROL: a kit carrying both mandated literals passes both
+  // SEED 5, R077: the R076 APPENDED FORM, planted verbatim, which is exactly
+  // what this kit shipped between the two rulings.
+  //
+  // ITS ASSERTION IS DELIBERATELY TWO-DIRECTIONAL, and copying SEED 4's shape
+  // here would have been wrong. This scratch kit CONTAINS the mandated block,
+  // unlike SEED 4's, so the PRESENT half must stay SILENT while the ABSENT
+  // half fires. Asserting only the red would pass on a kit that had merely
+  // lost the block; asserting SEED 4's pair would report MISSED on a seed the
+  // gate caught correctly.
+  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
+  writeFileSync(join(tmp, 'index-seeded.js'),
+    `const d={disclaimerBody:${JSON.stringify(DISCLAIMER_MANDATED + ' Future Spinner and We Roll Spinners are trademarks of We Roll Spinners.')}};export default d;\n`)
+  const appendSeed = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED])
+  const appendRed = appendSeed.some((f) => f.detail.includes('are trademarks of We Roll Spinners'))
+    && !appendSeed.some((f) => f.detail.includes('not present'))
+  console.log(`  ${appendRed ? 'caught ' : 'MISSED '} seeded R076 trademark append, with the PRESENT half correctly silent (R077's own form)`)
+
+  // NEGATIVE CONTROL: a kit carrying the bare mandated literal passes both
   // halves, or the fix itself would fail the gate.
+  //
+  // THIS CONTROL WAS THE TRAP. Until R077 it wrote the trademark sentence into
+  // its own scratch kit and then scanned that kit; the moment the sentence
+  // joined the superseded family the control would have flagged its own seed
+  // string and the self-test would have exited 1 against a correct tree.
   rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
   writeFileSync(join(tmp, 'index-clean.js'),
-    `const a=${JSON.stringify(DISCLAIMER_MANDATED)},b=${JSON.stringify(DISCLAIMER_OUR_MARKS)};export default a+' '+b;\n`)
-  const discClean = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS]).length === 0
-  console.log(`  ${discClean ? 'clean  ' : 'FALSE+ '} both mandated literals verbatim pass both halves`)
+    `const a=${JSON.stringify(DISCLAIMER_MANDATED)};export default a;\n`)
+  const discClean = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED]).length === 0
+  console.log(`  ${discClean ? 'clean  ' : 'FALSE+ '} the bare mandated literal passes both halves`)
+
+  // SEED 6, R077: the SILENT-GREEN class itself, seeded rather than asserted.
+  // A deleted export destructures to `undefined` without throwing, and
+  // `src.includes(undefined)` coerces to a search for the token "undefined",
+  // which real bundles contain. Before the guard, that made the PRESENT half
+  // report satisfied over an empty pin. The seed plants exactly that value and
+  // requires a refusal.
+  let guardRed = false
+  try { scanDisclaimer([], [DISCLAIMER_MANDATED, undefined]) } catch { guardRed = true }
+  console.log(`  ${guardRed ? 'caught ' : 'MISSED '} a non-string disclaimer part refused rather than coerced (the silent-green form)`)
 
   rmSync(tmp, { recursive: true, force: true })
-  if (!basisRed || !figRed || !obRed || !cleanBasis || !cleanFig || !tplRed || !tplClean || !discRed || !discClean) {
+  if (!basisRed || !figRed || !obRed || !cleanBasis || !cleanFig || !tplRed || !tplClean
+    || !discRed || !appendRed || !guardRed || !discClean) {
     console.error('\nKIT BASIS GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nKIT BASIS GATE SELF-TEST: PASS (5 seeded violations caught, 4 negative controls clean)')
+  console.log('\nKIT BASIS GATE SELF-TEST: PASS (7 seeded violations caught, 4 negative controls clean)')
   process.exit(0)
 }
 
@@ -451,12 +510,13 @@ const findings = [
   ...scanFigures([locales, featureI18n, proseI18n], kitText),
   ...scanTemplates(walkSvelte(join(ROOT, 'src'))),
   ...overboost.findings,
-  // R076: the kit carries the mandated disclaimer literals and no fragment of
-  // the superseded paraphrase family; the prose sources are swept for the
-  // family too, present-half waived there because the single source is
-  // disclaimer.ts rather than the tables.
-  ...scanDisclaimer(kitFiles, [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS]),
-  ...scanDisclaimer(PROSE_FILES, [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS], { requirePresent: false }),
+  // R077: the kit carries the mandated disclaimer literal and no fragment of
+  // either superseded family (the pre-R076 paraphrase, and the trademark
+  // sentence R076 appended); the prose sources are swept for the families too,
+  // present-half waived there because the single source is disclaimer.ts
+  // rather than the tables.
+  ...scanDisclaimer(kitFiles, [DISCLAIMER_MANDATED]),
+  ...scanDisclaimer(PROSE_FILES, [DISCLAIMER_MANDATED], { requirePresent: false }),
 ]
 // The social table is English; en is not a comma-decimal locale, so the figure
 // half does not apply to it. Its basis phrases are covered by scanBasis above.

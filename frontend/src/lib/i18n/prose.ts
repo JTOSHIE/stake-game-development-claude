@@ -24,7 +24,7 @@
 // is the same pattern applied to a different class of string.
 
 import type { Locale } from './translations'
-import { DISCLAIMER_VERBATIM } from './disclaimer'
+import { DISCLAIMER_MANDATED } from './disclaimer'
 
 export type ProseKey =
   // ── Celebration tier words. The banner previously hardcoded these in a
@@ -122,7 +122,7 @@ export const en: ProseStrings = {
   comingSoonLower:  'coming soon',
   waysLabel:        'WAYS TO WIN',
   scatterSummary:   '3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins',
-  disclaimerBody:   DISCLAIMER_VERBATIM,
+  disclaimerBody:   DISCLAIMER_MANDATED,
   replayLoadError:     'Failed to load replay.',
   replayPlaybackError: 'Playback failed.',
 
@@ -228,9 +228,10 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   a11yCollectMaxWin: 'Collect max prize',
   a11yMaxWinReached: 'Max Prize reached',
   waysLabel: 'WAYS',
-  // disclaimerBody is deliberately ABSENT since R076: the platform-mandated
-  // disclaimer ships VERBATIM in both modes (disclaimer.ts is the one source),
-  // and a key reading identically in both modes is absent rather than
+  // disclaimerBody is deliberately ABSENT since R076, and R077 confirms it:
+  // the platform-mandated disclaimer ships word for word in both modes and is
+  // the whole of what the disclaimer says (disclaimer.ts is the one source),
+  // so a key reading identically in both modes is absent rather than
   // repeated, per this file's own rule above. The social prohibited-term
   // exemption for the mandated block is scoped in the scanners, not here.
 }

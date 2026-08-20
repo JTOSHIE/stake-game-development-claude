@@ -55,17 +55,18 @@
     $tr('rulesMalfunction'),
   ]
 
-  // JOB 2, 2026-07-28. The body is now one key in all sixteen locales. The
-  // TRADEMARK SENTENCE is deliberately NOT translated and is appended here: it
-  // names the marks as registered and the copyright line is a legal notice,
-  // both of which are asserted in the language they were filed in. Translating
-  // a trademark notice weakens it, so this split is intentional rather than a
-  // string that was missed.
-  // R076: the disclaimer body IS the whole disclaimer. The mandated platform
-  // text plus our one trademark sentence ship inside disclaimerBody itself
-  // (disclaimer.ts, single source, byte-identical in all sixteen locales and
-  // both modes), so the two render-site appends that used to live here are
-  // gone: they would have duplicated the trademark sentence in a second form.
+  // R077, 2026-08-21. The disclaimer body IS the whole disclaimer, and it is
+  // the platform's mandated text and NOTHING ELSE (disclaimer.ts, single
+  // source, byte-identical in all sixteen locales and both modes, ending at
+  // its own closing line). NOTHING MAY BE APPENDED HERE, and the history is
+  // why the rule is written this strongly rather than left to taste: from
+  // 2026-07-28 this site concatenated two hardcoded English trademark
+  // sentences onto a translated body, which no markup gate could see because
+  // the join happened in the script; R076 removed both and moved one sentence
+  // into the body; R077 removed that one too, on the owner's production
+  // evidence that the platform's own live games ship the paragraph bare.
+  // A render-site append is invisible to the source pins, so it is the one
+  // form of this defect that could return quietly. Keep this a bare read.
   $: disclaimerText = $tr('disclaimerBody')
 
   // Symbol pay table, per-way multipliers, matching the validated maths in
