@@ -9,6 +9,81 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 077 - 2026-08-21 - COMMS-ACK R078: the carve-out stated in nine places, machine-held, and the RTL class was four selectors wide
+
+Your ruling is landed and the E1 contradiction is closed. **The branding rule
+now carries its one scoped exception wherever it lives**, and "wherever" was
+NINE live documents rather than the three the brief named. A read-only sweep
+found them and an independent verifier re-ran it over the whole tree at HEAD to
+confirm there is no tenth, which is the claim worth having checked: a rule
+restated in eight places and left false in a ninth is the same defect in a
+smaller font. The six you did not name were GAME_FACTS, whose claim CITED the
+COMPLIANCE_WATCH line that was also wrong so the fact and its evidence
+corroborated each other into the same error; the submission dossier's evidence
+map, which is handed to the platform; the master document twice; the guidelines
+self-assessment row 6; and the register's REQ-004.
+
+**Two consequence corrections came out of the sweep rather than the brief.** The
+rebrand watch concluded that a platform rebrand creates no work for us. True
+while every mark we shipped was our own, backwards since R076: a rebrand
+rewrites the wording we ship byte-exact and the conformance gate reddens until
+the constant is re-captured, so a rebrand is a build item now. And the
+self-assessment row is a PASS you TRANSCRIBE onto the platform's own tick-list,
+so the stale sentence would have been re-asserted on their surface, not just
+ours.
+
+**REQ-016 is re-reasoned and says plainly what changed.** The old reasoning was
+sound on the corpus available and lost to two surfaces that corpus does not
+contain, the Start Approval form and a live title in production. Method stands,
+conclusion does not.
+
+**THE REPAIR IS MACHINE-HELD THIS TIME.** CLAUDE.md and COMPLIANCE_WATCH.md
+carry a document-currency anchor binding the carve-out to the mandated constant,
+proven able to fail by mutating the constant and watching the gate redden at the
+exact line. The flat claim went false at R076 and nothing could say so: the
+bundle scanner does not match the mandated line and is RIGHT not to, and the
+document gate checks whether citations resolve, never what prose claims. A green
+document-currency run is not evidence the documents are true.
+
+**TASK 2 WENT WIDER THAN YOU ORDERED AND YOU CAN REVERSE IT IN ONE LINE.** The
+brief's rationale was that the class needed isolation for the mandated English
+block; measurement says the English block already rendered correctly under the
+R068 stage pin and the change is a no-op for it. The real defect was the
+paragraph SHARING the class, and enumerating the surface found four selectors,
+not one: 13 of 32 Arabic sentence leaves in the rules modal read their trailing
+punctuation at the wrong end. I took all four, because it is measured zero-risk
+for the fifteen Latin locales, a strict repair for ar, one selector list, and
+this is the build you submit with the rules screen the first thing a reviewer
+opens. Deleting three selectors returns it to exactly what you ordered.
+
+The gate is deliberately GENERAL: check D asserts every Arabic sentence leaf is
+isolated by property rather than against a class list, because an enumerated
+list is how R068 missed four classes and how this brief would have missed three.
+Seeded by lifting the class, with a scope control outside the expected red, and
+the seed proven load-bearing by pointing it at a class that does not exist.
+
+**Two of my own oracles were wrong first and both are in the gate beside the
+checks they constrain**: a box-midpoint measure that reported the opposite of the
+truth, and a first draft that flagged a stat-plate label with no terminal
+punctuation. Convention (l.2) did the work both times.
+
+**Run 32413212046: SUCCESS, the FULL matrix, 30 of 30, zero failures.** The
+build you ship stamps v10, 93 files, 12,455,660 bytes at 38cd2257, clean tree,
+and on that exact build dist hygiene, kit basis and disclaimer conformance all
+pass with exactly ONE shipped file carrying a Stake mark, the mandated block, by
+mandate and now by ruling.
+
+Two escalations ride the report, neither blocking: mkdocs.yml carries two
+inherited Stake-token artefacts in the DOCS site, outside today's ruling and
+outside every brand gate's roots; and the general bidi check covers the rules
+modal only, so the other components carrying translated prose have not been
+re-swept with the property-based oracle. Nothing is known wrong there.
+
+Tree clean, brief saved verbatim, three tracker rows landed. Nothing queued:
+your loop, the glances, and Start Approval on your word.
+
+---
+
 ## 076 - 2026-08-21 - COMMS-ACK R077: the disclaimer ships the mandated text alone, and your R076 append is the overruled ruling
 
 Your production capture beat our reading of the page, and the reversal is
