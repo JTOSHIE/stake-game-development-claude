@@ -131,6 +131,14 @@ const IDENTICAL_OK = {
   modeCruiseLabel:    ['de', 'fi', 'id'],
   modeOverboostLabel: NON_EN,
   modeSuperLabel:     NON_EN,
+  // R076 (2026-08-21): the disclaimer is the platform's MANDATED text,
+  // verbatim and deliberately UNTRANSLATED in every locale, owner-caught at
+  // the Start Approval form. Byte-identity to English is the REQUIREMENT
+  // here, not a leak: disclaimer.ts is the single source, and
+  // disclaimer_conformance.test.ts pins all sixteen locales to its bytes
+  // with the dated mirror re-read on every run. An entry this broad exists
+  // for exactly one key and carries the ruling; nothing else widened.
+  disclaimerBody:     NON_EN,
 }
 
 const isNumericOrSymbolic = (s) => !/[A-Za-zЀ-ӿ؀-ۿऀ-ॿ぀-ヿ一-鿿가-힯]{2}/.test(s)
