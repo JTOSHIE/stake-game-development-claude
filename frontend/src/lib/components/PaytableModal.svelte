@@ -61,9 +61,12 @@
   // both of which are asserted in the language they were filed in. Translating
   // a trademark notice weakens it, so this split is intentional rather than a
   // string that was missed.
+  // R076: the disclaimer body IS the whole disclaimer. The mandated platform
+  // text plus our one trademark sentence ship inside disclaimerBody itself
+  // (disclaimer.ts, single source, byte-identical in all sixteen locales and
+  // both modes), so the two render-site appends that used to live here are
+  // gone: they would have duplicated the trademark sentence in a second form.
   $: disclaimerText = $tr('disclaimerBody')
-    + ' Future Spinner\u2122 and We Roll Spinners\u2122 are trademarks of We Roll Spinners.'
-    + ' \u00A9 2026 We Roll Spinners. All rights reserved.'
 
   // Symbol pay table, per-way multipliers, matching the validated maths in
   // games/future_spinner/game_config.py exactly. Final payout = paytable value

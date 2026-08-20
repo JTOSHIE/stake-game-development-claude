@@ -24,6 +24,7 @@
 // is the same pattern applied to a different class of string.
 
 import type { Locale } from './translations'
+import { DISCLAIMER_VERBATIM } from './disclaimer'
 
 export type ProseKey =
   // ── Celebration tier words. The banner previously hardcoded these in a
@@ -121,7 +122,7 @@ export const en: ProseStrings = {
   comingSoonLower:  'coming soon',
   waysLabel:        'WAYS TO WIN',
   scatterSummary:   '3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins',
-  disclaimerBody:   'Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Winnings are settled according to the result returned by the Remote Game Server, not from events shown in the web browser.',
+  disclaimerBody:   DISCLAIMER_VERBATIM,
   replayLoadError:     'Failed to load replay.',
   replayPlaybackError: 'Playback failed.',
 
@@ -227,6 +228,10 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   a11yCollectMaxWin: 'Collect max prize',
   a11yMaxWinReached: 'Max Prize reached',
   waysLabel: 'WAYS',
-  disclaimerBody: 'Malfunction voids all prizes and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round. The theoretical return to player is calculated over many thousands of plays and does not guarantee any result in a single session. This game display is for illustrative purposes only and does not represent a physical device. Prizes are settled according to the result returned by the Remote Game Server, not from events shown in the web browser.',
+  // disclaimerBody is deliberately ABSENT since R076: the platform-mandated
+  // disclaimer ships VERBATIM in both modes (disclaimer.ts is the one source),
+  // and a key reading identically in both modes is absent rather than
+  // repeated, per this file's own rule above. The social prohibited-term
+  // exemption for the mandated block is scoped in the scanners, not here.
 }
 

@@ -49,6 +49,8 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..')
 
+const { DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS } = await import('../src/lib/i18n/disclaimer.ts')
+
 /**
  * The superseded basis phrases, per locale, exactly as they shipped before
  * R042 A3 and R043 1a removed them. Sources: the A3 table in
@@ -258,6 +260,63 @@ function scanOverboost(files, { countSites = true } = {}) {
   return { findings, sites }
 }
 
+// ── HALF 5: the mandated disclaimer, verbatim (R076, 2026-08-21) ─────────────
+// The owner met the Start Approval form (Step 1 of 4) and the ruling is the
+// LETTER: the platform's mandated disclaimer ships byte-exact, untranslated,
+// identical in all sixteen locales and both modes, plus our one trademark
+// sentence (disclaimer.ts is the single source; the mirror citation lives
+// there). The estate shipped a PARAPHRASE in sixteen translations from
+// 2026-07-29 until R076, and those exact strings are the superseded family:
+// one distinctive opening fragment per locale, plus the old social override.
+// Two halves, the OVERBOOST pattern:
+//   PRESENT. The built kit carries the mandated block and the trademark
+//            sentence, each as a byte-exact literal. The TWO literals rather
+//            than the joined string, learned on this half's first real run:
+//            disclaimer.ts joins them in a template at runtime, so the joined
+//            form never exists in the bundle bytes, and demanding it went red
+//            over a correct kit. The joined RENDER is proven live by the
+//            social DOM walk and the R076 frames.
+//   ABSENT.  No fragment of the superseded paraphrase family survives in the
+//            kit or the prose sources.
+const DISCLAIMER_SUPERSEDED = [
+  'A stable internet connection is required to play',        // en paraphrase
+  'Malfunction voids all prizes and plays',                  // old social override
+  'يؤدي أي خلل فني إلى إبطال جميع المكاسب',                  // ar
+  'Eine Fehlfunktion macht alle Gewinne und Spiele ungültig', // de
+  'anula todas las ganancias y jugadas',                     // es
+  'Toimintahäiriö mitätöi kaikki voitot ja pelit',           // fi
+  "Tout dysfonctionnement annule l'ensemble des gains",      // fr
+  'खराबी होने पर सभी जीतें और दांव रद्द',                       // hi
+  'Kerusakan membatalkan semua kemenangan dan permainan',    // id
+  '誤作動が発生した場合、すべての配当およびプレイは無効',       // ja
+  '오작동이 발생하면 모든 당첨과 플레이가 무효',                 // ko
+  'Awaria unieważnia wszystkie wygrane i rozgrywki',         // pl
+  'Mau funcionamento anula todos os ganhos e todas as jogadas', // pt
+  'Технический сбой аннулирует все выигрыши и игры',         // ru
+  'Arıza tüm kazançları ve oyunları geçersiz kılar',         // tr
+  'Sự cố kỹ thuật sẽ hủy bỏ mọi khoản thắng',                // vi
+  '如发生故障，所有中奖与游戏局均无效',                         // zh
+]
+
+function scanDisclaimer(files, parts, { requirePresent = true } = {}) {
+  const findings = []
+  const present = new Set()
+  for (const f of files) {
+    let src
+    try { src = readFileSync(f, 'utf-8') } catch { continue }
+    for (const part of parts) if (src.includes(part)) present.add(part)
+    for (const phrase of DISCLAIMER_SUPERSEDED) {
+      if (src.includes(phrase)) {
+        findings.push({ half: 'disclaimer', file: f, detail: `the superseded disclaimer paraphrase ${JSON.stringify(phrase.slice(0, 44))} survives` })
+      }
+    }
+  }
+  if (requirePresent && present.size < parts.length) {
+    findings.push({ half: 'disclaimer', detail: 'the mandated disclaimer text is not fully present in the kit (the mandated block and the trademark sentence must each ship as a byte-exact literal)' })
+  }
+  return findings
+}
+
 function report(findings) {
   for (const f of findings) {
     console.error(`  [${f.half}] ${f.detail}${f.file ? ` (${f.file})` : ''}${f.half === 'figure' ? (f.shipped ? ' SHIPPED IN KIT' : ' source only, ships next build') : ''}`)
@@ -330,12 +389,33 @@ if (process.argv.includes('--self-test')) {
   const tplClean = scanTemplates([join(tmp, 'Clean.svelte')]).length === 0
   console.log(`  ${tplClean ? 'clean  ' : 'FALSE+ '} the localised expression, the style block and the attribute pass`)
 
+  // SEED 4, R076: the SHIPPED en disclaimer paraphrase, planted verbatim in a
+  // bundle-shaped asset, which is the exact string the kit carried until R076
+  // (the brief's own words: the shipped paraphrase becomes the seeded
+  // violation). The same scratch kit also omits the mandated text, so the
+  // PRESENT half must fire too: two findings from one seeded file.
+  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
+  writeFileSync(join(tmp, 'index-seeded.js'),
+    `const d={disclaimerBody:"Malfunction voids all wins and plays. A stable internet connection is required to play. If your connection drops during a round, reload the game to finish any uncompleted round."};export default d;\n`)
+  const discSeed = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS])
+  const discRed = discSeed.some((f) => f.detail.includes('superseded disclaimer paraphrase'))
+    && discSeed.some((f) => f.detail.includes('not fully present'))
+  console.log(`  ${discRed ? 'caught ' : 'MISSED '} seeded shipped paraphrase AND the absent mandated text (R076's own form)`)
+
+  // NEGATIVE CONTROL: a kit carrying both mandated literals passes both
+  // halves, or the fix itself would fail the gate.
+  rmSync(tmp, { recursive: true, force: true }); mkdirSync(tmp, { recursive: true })
+  writeFileSync(join(tmp, 'index-clean.js'),
+    `const a=${JSON.stringify(DISCLAIMER_MANDATED)},b=${JSON.stringify(DISCLAIMER_OUR_MARKS)};export default a+' '+b;\n`)
+  const discClean = scanDisclaimer(walk(tmp), [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS]).length === 0
+  console.log(`  ${discClean ? 'clean  ' : 'FALSE+ '} both mandated literals verbatim pass both halves`)
+
   rmSync(tmp, { recursive: true, force: true })
-  if (!basisRed || !figRed || !obRed || !cleanBasis || !cleanFig || !tplRed || !tplClean) {
+  if (!basisRed || !figRed || !obRed || !cleanBasis || !cleanFig || !tplRed || !tplClean || !discRed || !discClean) {
     console.error('\nKIT BASIS GATE SELF-TEST: FAIL')
     process.exit(1)
   }
-  console.log('\nKIT BASIS GATE SELF-TEST: PASS (4 seeded violations caught, 3 negative controls clean)')
+  console.log('\nKIT BASIS GATE SELF-TEST: PASS (5 seeded violations caught, 4 negative controls clean)')
   process.exit(0)
 }
 
@@ -371,6 +451,12 @@ const findings = [
   ...scanFigures([locales, featureI18n, proseI18n], kitText),
   ...scanTemplates(walkSvelte(join(ROOT, 'src'))),
   ...overboost.findings,
+  // R076: the kit carries the mandated disclaimer literals and no fragment of
+  // the superseded paraphrase family; the prose sources are swept for the
+  // family too, present-half waived there because the single source is
+  // disclaimer.ts rather than the tables.
+  ...scanDisclaimer(kitFiles, [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS]),
+  ...scanDisclaimer(PROSE_FILES, [DISCLAIMER_MANDATED, DISCLAIMER_OUR_MARKS], { requirePresent: false }),
 ]
 // The social table is English; en is not a comma-decimal locale, so the figure
 // half does not apply to it. Its basis phrases are covered by scanBasis above.
