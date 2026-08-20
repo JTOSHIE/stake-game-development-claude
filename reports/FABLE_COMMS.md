@@ -9,6 +9,57 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 072 - 2026-08-20 - COMMS-ACK R072 and R073: the end-frame holds, and one task I did not do
+
+R072 executed whole, remote green first attempt, run 32353012031 on `307989ad`,
+30 of 30. **THE REPLAY END-FRAME HOLDS ITS SPOTLIGHT.** Your reading of it was
+right and the measurement is blunt: twelve of twenty cells dimmed at the moment,
+**zero** still dimmed at rest, on the shipped build, at every size. The cause was
+ordinary and invisible: the win burst dims the losers, a timer strips that four
+seconds later, and the replay's own sequence finishes two seconds after the
+burst, so the frame a player was left studying was the teardown's rather than the
+round's. Motion still comes off, the dim now stays, and the gold borders and
+connecting lines persist with it because only a next spin clears them and a
+finished replay has none. **The winning way reads as one shape instead of five
+lit tiles.** Proof at Desktop, Mobile S and Popout S, both vocabularies, reduced
+motion identical, eight frames committed, seeded with today's all-bright frame as
+the negative control, 15 of 15 seeds caught. **The scope guard is the same board
+on the other surface**: same fixture events, live wallet, press SPIN, and live
+still clears to zero. It caught its own first draft, which reported a peak of
+zero, because a replay plays itself on load while live play waits for the button,
+and a board that never had a spotlight must never look like one correctly torn
+down.
+
+**THE 44 IS OURS AND THE PLATFORM NEVER ASKED FOR IT.** Swept the whole dated
+mirror including the fifty-one: **zero** touch-target or tap-target requirements,
+no number anywhere; the checklist's only "44" is its own item [44] about replay
+in Popout S. So 44 is recorded at `HUD_SPEC.md` as an Apple HIG figure we adopted,
+stricter than Material's 48 and far stricter than WCAG's 24, and the distinction
+now bites correctly: **a 43px control is a QUALITY failure against our bar, not a
+COMPLIANCE failure against theirs.** TR-164 closes on your review, quoted whole:
+the 1,024 plate confirmed in the new face at the glass, the blanket Exo 2 ruling
+stands. **Item 46 is corrected to PLATFORM-MANAGED and off your one-timer list**:
+there is no Provably Fair toggle, its twin Replay has no toggle either and works,
+so both halves are the platform's to manage. Worth knowing that an earlier round
+had that same sentence and correctly refused it as unsourced; what changed is that
+YOU looked, which is the only provenance that could have moved it.
+
+**ONE TASK I DID NOT DO, AND IT IS THE ONE YOU WANTED MOST.** I did not fire the
+`/wallet/play` call. That endpoint is the WAGER endpoint: an accepted request
+places a real bet with real money on your live account, and submitting one is
+yours rather than mine, whatever response is expected. **Your construction is
+sound and I checked it rather than assuming**: the top ladder rung is 100.00, the
+request sends 1,000.00, ten times it, which is the invalid-amount boundary the
+estate already models, so a refusal is what should come back. But expected is not
+guaranteed, and if I am wrong the cost is a real 1,000-unit wager that I placed,
+against ten seconds of yours. **The half that did not need you has landed**: the
+capture protocol, the file shape, and the redaction rule are committed at
+`docs/stake-engine-live/captures/`, and **no placeholder body was written**,
+because a stub under that path would be read as evidence by someone who did not
+write it. Paste the body back and Q6 closes on it the same minute. **You will need
+a fresh token; the one in the order dies with its tab.**
+---
+
 ## 071 - 2026-08-15 - COMMS-ACK R071: all eleven tasks landed, and ending the CI masking found five more
 
 Executed whole, nothing degraded, nothing carried; this entry the folded ack per

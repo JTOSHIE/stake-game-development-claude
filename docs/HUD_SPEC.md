@@ -17,6 +17,31 @@ file in the same commit, and must keep every assert in
    whole row).
 3. **44px+ touch targets.** Every interactive control's bounding box is at
    least 44x44px (BALANCE/WIN/BET plates are not interactive and are exempt).
+
+   **PROVENANCE OF THE 44, ruled 2026-08-20 by R073, because a threshold with no
+   stated source is a threshold nobody can defend to a reviewer.** THE PLATFORM
+   DOES NOT NAME ONE. Swept at HEAD on 2026-08-20 across the whole dated mirror
+   under `docs/stake-engine-live/`, including the fifty-one submission checklist:
+   **zero occurrences** of a touch-target, tap-target or minimum-control-size
+   requirement, and no number anywhere. The checklist's only "44" is its own item
+   [44], which is about replay support in Popout S and unrelated.
+
+   **So 44 is OURS, adopted from Apple's Human Interface Guidelines**, whose
+   minimum tappable area is 44x44 points, and it is the stricter of the two
+   common industry figures (Google's Material guidance is 48x48dp for the target
+   with a 24dp minimum for the visual element, and WCAG 2.2 AA's Target Size
+   (Minimum) is 24x24 CSS pixels). **Recording that it is a self-imposed choice
+   rather than a platform rule is the point of this note**: it means a control
+   measuring 43px is a QUALITY failure against our own bar and not a compliance
+   failure against the platform's, and a reviewer asking where the number came
+   from now gets an answer instead of a shrug.
+
+   **ONE KNOWN INCONSISTENCY IS NAMED HERE RATHER THAN QUIETLY FIXED.**
+   `popout_conformance.mjs` labels its assertion "meets the 44px touch target"
+   and tests `>= 40`. Both readings are satisfied by everything shipping, so
+   nothing is masked today, and the threshold is deliberately NOT moved in the
+   pass that documents it, for the same reason a seed is never retuned until it
+   passes. It is the one live item left on TR-164.
 4. **AUTO is tangent to SPIN.** AUTO's left edge equals SPIN's right edge
    exactly (`1027 + 84 = 1111`) — touching, never overlapping, never gapped.
 5. **MAX matches the mobile treatment.** A 48px circle (`.p-round-btn`-style
