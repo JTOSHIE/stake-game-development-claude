@@ -42,6 +42,7 @@
     scatterEscalation, resetEscalation, type EscalationLevel,
   } from '../stores/scatterEscalation'
   import { activeTheme, themeAssets } from '../stores/themeStore'
+  import { replayParams } from '../stores/replayStore'
 
   // Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5): App.svelte
   // owns the 20s timer; this is just a boolean prop, so `class:` in the
@@ -756,12 +757,57 @@
     // autoplay scheduler's own fire-time re-check.
     const armWinBurstTeardown = () => setTimeout(() => {
       if (get(isWincap)) { winBurstTimer = armWinBurstTeardown(); return }
+      // THE REPLAY END-FRAME HOLDS ITS SPOTLIGHT (owner's direction, R072).
+      //
+      // A replay is a VERIFICATION surface, not a play surface. A player opens
+      // it to check one round, and the frame they end on is the frame they read.
+      // Until now that end-frame was the teardown's: this timer stripped the win
+      // presentation four seconds after the burst, the replay's own sequence
+      // completes two seconds after it, so the settled frame a player was left
+      // studying had every cell at full brightness and nothing distinguishing
+      // the winning way from the board around it.
+      //
+      // In replay the MOTION comes off exactly as before, so nothing pulses or
+      // flashes forever and reduced motion is unaffected, but the DIM STAYS: the
+      // non-winners keep `loser-dim`, which is the very treatment the moment
+      // itself used, and the winners keep full opacity. The Pixi overlay's gold
+      // borders and connecting lines are drawn once and cleared only by the next
+      // `animateSpin`, of which a finished replay has none, so they persist with
+      // it and the winning way reads as one shape.
+      //
+      // LIVE PLAY IS UNTOUCHED AND THAT IS THE POINT OF THE GUARD. `replayParams`
+      // is null in live play, so this branch cannot be entered there; the live
+      // teardown below is the same code it has always been, and the pixel guard
+      // in the proof battery asserts the live end-state has not moved a channel.
+      // Computed unconditionally rather than behind the flag, so the type is a
+      // Set and never a null the loop below has to re-narrow on every cell.
+      const holdSpotlight = get(replayParams) !== null
+      const winners = _winningCells(wins, board)
       for (let col = 0; col < REELS; col++) {
         for (let row = 0; row < ROWS; row++) {
           const img     = visImg(col, row)
           const overlay = visOverlay(col, row)
           const cell    = visCell(col, row)
-          if (img) { img.style.opacity = '1'; img.classList.remove('win-flash', 'loser-dim') }
+          if (img) {
+            img.style.opacity = '1'
+            img.classList.remove('win-flash', 'loser-dim')
+            // THE HOLD IS ITS OWN CLASS, NOT A SKIPPED REMOVAL, and that is a
+            // deliberate choice about what can be SEEDED. Leaving `loser-dim`
+            // in place would hold the dim, but the defect this must be provable
+            // against, the all-bright end-frame that shipped until today, could
+            // then only be seeded by patching a control-flow branch, which
+            // minifies to something no self-test can target honestly. A class
+            // name survives minification as a STRING, so the seed plants the
+            // real defect in the real form: rename the literal and no rule
+            // matches, the end frame goes all-bright, and the gate goes red.
+            // The level is not copied: app.css lists this class beside
+            // `loser-dim` in ONE rule, so the end frame holds the moment's own
+            // treatment by construction rather than by two numbers agreeing.
+            if (holdSpotlight && !winners.has(`${col},${row}`)) {
+              img.style.opacity = ''
+              img.classList.add('end-frame-dim')
+            }
+          }
           overlay?.classList.remove('win-spin-fast')
           cell?.classList.remove('plate-bloom', 'pre-charge')
         }
@@ -777,7 +823,10 @@
         const img     = visImg(col, row)
         const overlay = visOverlay(col, row)
         const cell    = visCell(col, row)
-        if (img) { img.style.opacity = '1'; img.classList.remove('win-flash', 'loser-dim') }
+          // `end-frame-dim` comes off here too. A feature replay drives several
+        // spins, so a held end frame from spin N must not survive into spin N+1;
+        // this is the path every new spin goes through.
+        if (img) { img.style.opacity = '1'; img.classList.remove('win-flash', 'loser-dim', 'end-frame-dim') }
         overlay?.classList.remove('win-spin-fast')
         cell?.classList.remove('plate-bloom', 'pre-charge', 'scatter-charge')
       }
@@ -1521,8 +1570,16 @@
   }
   .symbol-cell.plate-bloom { animation: plate-bloom-pulse 0.6s ease-in-out infinite; z-index: 5; }
 
-  /* Dimmed, desaturated losers - spotlight the winners (harder than before). */
-  .symbol-img:global(.loser-dim) {
+  /* Dimmed, desaturated losers - spotlight the winners (harder than before).
+
+     `end-frame-dim` is listed HERE, in the same rule, rather than given values
+     of its own. R072's owner direction is that the replay's settled end-frame
+     keeps non-winners at THE MOMENT-DIM LEVEL, and the only way to make that
+     true rather than approximately true is for the two states to be one
+     declaration block. Two rules with matching numbers drift the first time
+     either is tuned; this cannot. */
+  .symbol-img:global(.loser-dim),
+  .symbol-img:global(.end-frame-dim) {
     opacity: 0.2 !important;
     filter: grayscale(0.6) brightness(0.62) !important;
     animation: none !important;
@@ -1672,7 +1729,8 @@
     .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after { display: none; }
     /* Winners still spotlight, but statically (no pop / pulse / flash motion);
        losers still dim. Particle bursts are gated in JS (_reduceMotion). */
-    .symbol-img:global(.loser-dim) { transition: none; }
+    .symbol-img:global(.loser-dim),
+    .symbol-img:global(.end-frame-dim) { transition: none; }
     /* Item 4 additions: the neighbour dim stays (a static state, not motion)
        but loses its transition; edge sparks are motion, so they're hidden. */
     .symbol-grid:global(.grid-anticipating) .symbol-col:not(:global(.col-anticipate)) .reel-strip { transition: none; }

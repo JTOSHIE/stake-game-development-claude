@@ -246,12 +246,20 @@ async function driveReplay(browser, {
   // banner. `viewport` drives the three reference sizes. `frame` saves a
   // settled screenshot to that path.
   feature = false, playTimeoutMs = 25000, viewport = { width: 1280, height: 720 }, frame = null,
+  // R072. `endFrame` installs an in-page recorder before anything renders and
+  // waits past the four-second win-burst teardown, so the drive reports what the
+  // board looked like AT THE MOMENT and what it looks like once everything has
+  // settled. Both are needed: the assertion is that the second HOLDS the first,
+  // and a reading of only the end state cannot tell a held spotlight from a
+  // round that never had one. `live` boots the ordinary game surface instead of
+  // a replay url, which is how the scope guard proves live play did not move.
+  endFrame = false, endFrameWaitMs = 9000, live = false, reducedMotion = false,
 } = {}) {
   // Snapshot the miss ledger so this drive reports only its OWN unapplied
   // targets. Drives are strictly sequential, so an index is sufficient.
   const missMark = seedTargetMisses.length
   const srv = await serve(patches)
-  const page = await browser.newPage({ viewport })
+  const page = await browser.newPage({ viewport, ...(reducedMotion ? { reducedMotion: 'reduce' } : {}) })
   const requests = []
   page.on('request', (r) => {
     requests.push({ url: r.url(), method: r.method(), headers: r.headers(), resourceType: r.resourceType() })
@@ -261,6 +269,37 @@ async function driveReplay(browser, {
   // third party is captured and neutralised rather than escaping to the network.
   await page.route(/^(?!http:\/\/localhost:4519).*/, async (route) => {
     const url = route.request().url()
+    // THE LIVE LEG'S WALLET, and it is deliberately the SAME fixture events the
+    // replay leg reads. The scope guard's whole claim is that one board renders
+    // two different end states depending on which surface it is on, so feeding
+    // the two surfaces different rounds would leave the comparison meaning
+    // nothing. Only the transport differs.
+    if (live && url.includes('/wallet/')) {
+      const CUR = 'USD', BAL = 1_000_000_000, BET = 1_000_000
+      if (url.includes('/wallet/authenticate')) {
+        await route.fulfill({ contentType: 'application/json', body: JSON.stringify({
+          balance: { amount: BAL, currency: CUR },
+          config: { minBet: 100_000, maxBet: 100_000_000, stepBet: 100_000,
+            betLevels: [BET], defaultBetLevel: BET },
+          round: null,
+        }) })
+        return
+      }
+      if (url.includes('/wallet/play')) {
+        await route.fulfill({ contentType: 'application/json', body: JSON.stringify({
+          balance: { amount: BAL - BET, currency: CUR },
+          round: { betID: 7201, active: true, mode: 'base', amount: BET,
+            payout: Math.round(BET * (round.payoutMultiplier / 100)),
+            payoutMultiplier: round.payoutMultiplier,
+            state: { events: round.events } },
+        }) })
+        return
+      }
+      await route.fulfill({ contentType: 'application/json', body: JSON.stringify({
+        balance: { amount: BAL - BET, currency: CUR },
+      }) })
+      return
+    }
     if (!url.includes('/bet/replay/')) { await route.abort(); return }
     if (respond === 'abort') { await route.abort('failed'); return }
     if (respond === '404') { await route.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }); return }
@@ -291,7 +330,42 @@ async function driveReplay(browser, {
     })
   })
 
-  await page.goto(`http://localhost:${PORT}/?${REPLAY_QS(qs)}`, { waitUntil: 'domcontentloaded' })
+  // THE RECORDER GOES IN BEFORE THE FIRST PAINT, because the moment it has to
+  // catch is transient by design: the win burst dims the losers, and four
+  // seconds later a teardown timer takes that treatment off again. Polling from
+  // the test process would have to guess when to look; polling INSIDE the page
+  // at 100ms cannot miss it, and it costs one interval on a page that is about
+  // to be thrown away.
+  if (endFrame) {
+    await page.addInitScript(() => {
+      const w = window
+      w.__fsDimTrace = { peak: [], last: [], samples: 0 }
+      const read = () => {
+        const dim = []
+        for (const img of document.querySelectorAll('.symbol-img')) {
+          const cell = img.closest('.symbol-cell')
+          if (!cell) continue
+          const cs = getComputedStyle(img)
+          // Measured, not inferred from the class list: what a player sees is
+          // the COMPUTED opacity, and a class that no rule matches is exactly
+          // the seeded defect this has to catch.
+          if (parseFloat(cs.opacity) < 0.9) {
+            dim.push(`${cell.getAttribute('data-col')},${cell.getAttribute('data-slot')}`)
+          }
+        }
+        dim.sort()
+        w.__fsDimTrace.samples += 1
+        w.__fsDimTrace.last = dim
+        if (dim.length > w.__fsDimTrace.peak.length) w.__fsDimTrace.peak = dim
+      }
+      setInterval(read, 100)
+    })
+  }
+
+  const bootQs = live
+    ? `sessionID=r072-live&rgs_url=http://rgs.r072.invalid&currency=USD&lang=en`
+    : REPLAY_QS(qs)
+  await page.goto(`http://localhost:${PORT}/?${bootQs}`, { waitUntil: 'domcontentloaded' })
   // Deliberately NO interaction here. REQ-085 is that the fetch is issued on
   // load, so the absence of a click is the assertion, not an omission.
   const observed = {}
@@ -450,11 +524,77 @@ async function driveReplay(browser, {
     winW: window.innerWidth,
     winH: window.innerHeight,
   }))
+  // THE LIVE LEG HAS TO ACTUALLY SPIN. A replay plays itself on load, which is
+  // most of why it is the surface a player verifies a round on; live play does
+  // nothing until someone presses the button. Without this the guard reported a
+  // peak of zero, which is a board that never had a spotlight rather than a
+  // board whose spotlight was correctly torn down, and those two must never be
+  // allowed to look alike (the same trap the seed-target ledger above records).
+  if (live) {
+    const { dismissIntro, clickAnyPendingGate, waitSpinDone } =
+      await import('./lib/dismissOverlays.mjs')
+    await dismissIntro(page).catch(() => {})
+    await clickAnyPendingGate(page).catch(() => {})
+    await page.locator('[data-testid="spin-button"]').click({ timeout: 15000 }).catch(() => {})
+    await waitSpinDone(page, 30000).catch(() => {})
+  }
+
+  // Wait past the teardown, then take the trace. The wait is the four-second
+  // burst teardown plus margin; the recorder has been sampling throughout, so
+  // the peak is already captured whatever the sequence's own timing did.
+  if (endFrame) {
+    await page.waitForTimeout(endFrameWaitMs)
+    observed.dimTrace = await page.evaluate(() => window.__fsDimTrace)
+  }
+
   if (frame) await page.screenshot({ path: frame }).catch(() => {})
 
   await page.close()
   await new Promise((r) => srv.close(r))
   return { requests, observed, unapplied: seedTargetMisses.slice(missMark) }
+}
+
+/**
+ * R072. The replay's settled end-frame must HOLD the win spotlight.
+ *
+ * Three separate claims, asserted separately so a failure names which one broke:
+ * that a spotlight happened at all, that it survived the teardown, and that it
+ * survived UNCHANGED rather than partially. The third is what makes this an
+ * assertion about holding rather than about dimness: a board that ends with
+ * some other set of cells dim would satisfy a count check and fail this.
+ */
+function assertReplayEndFrameHoldsSpotlight(r, tag = '') {
+  const t = r.observed.dimTrace || { peak: [], last: [], samples: 0 }
+  check(t.samples > 10,
+    `${tag}end-frame: the in-page recorder actually sampled (${t.samples} samples)`)
+  check(t.peak.length > 0,
+    `${tag}end-frame: a win spotlight ran at the moment (${t.peak.length} cells dimmed at peak)`)
+  check(t.last.length > 0,
+    `${tag}end-frame: non-winning cells are STILL dimmed once everything settles `
+      + `(${t.last.length} dimmed at rest, peak was ${t.peak.length})`)
+  check(JSON.stringify(t.last) === JSON.stringify(t.peak),
+    `${tag}end-frame: the settled dim set is the MOMENT's set, unchanged `
+      + `(rest ${JSON.stringify(t.last)} vs moment ${JSON.stringify(t.peak)})`)
+  // The complement is the winning way. If every visible cell were dim the board
+  // would read as uniformly dark rather than as a spotlight, which is a
+  // different defect from an all-bright frame and would otherwise pass above.
+  check(t.last.length < 20,
+    `${tag}end-frame: some cells are at full strength, so the winning way reads `
+      + `(${t.last.length} of 20 visible cells dimmed)`)
+}
+
+/**
+ * The SCOPE GUARD. Live play's end-state is unchanged: the burst dims, the
+ * teardown clears, and the board a player is left on before their next spin is
+ * the all-bright board it has always been.
+ */
+function assertLiveEndStateClears(r, tag = '') {
+  const t = r.observed.dimTrace || { peak: [], last: [], samples: 0 }
+  check(t.peak.length > 0,
+    `${tag}live: the win spotlight ran (${t.peak.length} cells dimmed at peak)`)
+  check(t.last.length === 0,
+    `${tag}live: the settled board is ALL BRIGHT, the teardown is untouched `
+      + `(${t.last.length} still dimmed, expected 0)`)
 }
 
 const offOrigin = (reqs) => reqs.filter((r) => !r.url.startsWith(`http://localhost:${PORT}`))
@@ -941,6 +1081,55 @@ async function main() {
         assertBannerFits(fr, `[${sizeName}] `)
       }
 
+      // R072 TASK 2. THE END-FRAME READ, at the three reference sizes the owner
+      // names. The size list is the project's own presets rather than this
+      // gate's existing trio, and the difference is recorded rather than
+      // smoothed over: the loop above uses mobile-portrait 375x812, while
+      // Mobile S in this project's gate family (contrast, layout fit, direction
+      // parity, popout conformance) is 320x568. The brief names Mobile S, so
+      // Mobile S is what is driven here, and the narrower of the two is the
+      // harder read anyway.
+      const ENDFRAME_SIZES = [
+        ['desktop-1280x720', { width: 1280, height: 720 }],
+        ['mobile-s-320x568', { width: 320,  height: 568 }],
+        ['popout-s-400x225', { width: 400,  height: 225 }],
+      ]
+      // BOTH VOCABULARIES. The dim is CSS and carries no words, but the owner
+      // asked for both and the cheap way to be sure is to drive both: a fiat
+      // currency and a social one, which is what selects the social vocabulary.
+      const ENDFRAME_VOCAB = [['fiat', 'USD'], ['social', 'GC']]
+      for (const [sizeName, viewport] of ENDFRAME_SIZES) {
+        for (const [vocab, currency] of ENDFRAME_VOCAB) {
+          const ef = await driveReplay(browser, {
+            round: FIX.base.win, costMultiplier: 1.0, play: true, endFrame: true,
+            qs: { mode: 'base', currency }, viewport,
+            frame: join(framesDir, `endframe_${vocab}_${sizeName}.png`),
+          })
+          assertReplayEndFrameHoldsSpotlight(ef, `[${vocab} ${sizeName}] `)
+        }
+      }
+
+      // REDUCED MOTION IS THE SAME FRAME. The hold is a static state, not an
+      // animation, so the reduced-motion media query must not change what a
+      // player ends on: it strips the transition and nothing else.
+      const efReduced = await driveReplay(browser, {
+        round: FIX.base.win, costMultiplier: 1.0, play: true, endFrame: true,
+        qs: { mode: 'base', currency: 'USD' },
+        viewport: { width: 1280, height: 720 },
+        reducedMotion: true,
+        frame: join(framesDir, 'endframe_reduced-motion_desktop-1280x720.png'),
+      })
+      assertReplayEndFrameHoldsSpotlight(efReduced, '[reduced-motion] ')
+
+      // THE SCOPE GUARD, in the same battery as the brief asks. Same fixture,
+      // same board, live surface: the end state must be all bright.
+      const liveEnd = await driveReplay(browser, {
+        round: FIX.base.win, live: true, endFrame: true, play: true,
+        viewport: { width: 1280, height: 720 },
+        frame: join(framesDir, 'endframe_LIVE_desktop-1280x720.png'),
+      })
+      assertLiveEndStateClears(liveEnd, '[scope guard] ')
+
       // R058 TASK 1, the worst case: a 4999.99x round (one centibet below the
       // cap, so the max-win hold does not gate the read) at the maximum bet in
       // the CA$ format, the widest leading form the ladder allows:
@@ -1105,6 +1294,26 @@ async function main() {
           if (!m) return null
           return b.replace(m[0], `bet/replay/\${${m[1]}.game}/\${${m[1]}.version}/base`)
         } } }, /replay URL is exact/)
+
+      // SEED R072, AND THE PLANTED DEFECT IS LITERALLY THE STATE THAT SHIPPED
+      // UNTIL TODAY. Convention (p) asks for the defect in the form it really
+      // occurs, and the form this one really occurred in is an end-frame with
+      // nothing dimmed: the win burst ran, the four-second teardown cleared it,
+      // and the frame a player was left studying had no spotlight on it. The
+      // seed renames the hold's class in the SHIPPED BUNDLE, so no CSS rule
+      // matches and the teardown's result is exactly the pre-R072 board. It is
+      // planted as a string because that is what survives minification, which
+      // is the same reason the hold was implemented as a class rather than as a
+      // skipped removal.
+      await seed('all-bright-end-frame',
+        "today's shipped behaviour: the replay end-frame clears the spotlight and reads all bright",
+        { round: FIX.base.win, costMultiplier: 1.0, play: true, endFrame: true,
+          qs: { mode: 'base', currency: 'USD' },
+          patches: { [bundle.file]: (b) => {
+            if (!b.includes('end-frame-dim')) return null
+            return b.split('end-frame-dim').join('end-frame-dim-SEEDED-ABSENT')
+          } } },
+        /non-winning cells are STILL dimmed/, assertReplayEndFrameHoldsSpotlight)
 
       // SEED 1b, THE DEFECT THIS GATE SHIPPED WITH, seeded at the OBSERVATION
       // BOUNDARY per the practice declared in this file's header.
