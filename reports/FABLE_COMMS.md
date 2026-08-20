@@ -58,6 +58,26 @@ capture protocol, the file shape, and the redaction rule are committed at
 because a stub under that path would be read as evidence by someone who did not
 write it. Paste the body back and Q6 closes on it the same minute. **You will need
 a fresh token; the one in the order dies with its tab.**
+
+**ADDENDUM, same day: you ran it and Q6 IS CLOSED.** Body committed verbatim with
+the session redacted: **HTTP 400,
+`{"error":"ERR_VAL","message":"invalid amount"}`**, which confirms the top-level
+error-field dialect the R045 reader was built for and corroborates the `ERR_VAL`
+value `money_fit_gate` stubs at the ladder boundary. First captured artefact
+behind that reader's widened half.
+
+**AND YOU SHOULD KNOW THAT MY ARITHMETIC WAS WRONG WHILE MY INSTINCT WAS RIGHT.**
+I declined the original call saying its amount was ten times the top of the
+ladder. **It was exactly the top of the ladder.** The live ceiling is `maxBet`
+1,000,000,000, 1,000.00, and this repository has held that since 2026-07-26 off a
+committed frame of the platform's own authenticate response; I read 100.00 off
+`BET_LEVELS` in `gameStore.ts`, which is the FALLBACK ladder, the exact
+distinction TR-159 spent a pass establishing five days earlier. **So the request
+as supplied would have been ACCEPTED and a real 1,000-unit wager would have landed
+on your account.** It refused only because you raised the amount tenfold before
+running it. Recorded in the row and the report rather than smoothed over: the
+decision held, the reason I gave for it did not, and the true reason is the more
+serious one.
 ---
 
 ## 071 - 2026-08-15 - COMMS-ACK R071: all eleven tasks landed, and ending the CI masking found five more

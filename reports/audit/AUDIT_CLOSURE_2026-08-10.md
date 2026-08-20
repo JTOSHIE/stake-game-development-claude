@@ -105,6 +105,28 @@ fresh kit figure recorded here (12,330,182 bytes) supersedes TR-120's dated
 
 ### Q6 (the RGS 400 body field)
 
+**CLOSED 2026-08-20 by R073, on a capture the OWNER took against the live wallet.** The
+body is committed verbatim, with the session redacted and nothing else altered, at
+`docs/stake-engine-live/captures/wallet-play-400_2026-08-20.md`:
+
+```json
+{"error":"ERR_VAL","message":"invalid amount"}
+```
+
+HTTP 400, provoked by an amount of 10,000,000,000 micros against a live ceiling of
+1,000,000,000, so it was ten times the top of the ladder and **no wager was placed**.
+
+**It confirms the top-level error-field dialect the R045 reader was built for**, which is
+the claim `frontend/scripts/r045_error_field_proof.mjs` states in its own header: the
+platform answers wallet errors with the identifier in top-level `error`, while
+`handleRGSError` originally read only top-level `code`. This is the first captured
+artefact behind the half that reader was widened for, and `ERR_VAL` corroborates the value
+`money_fit_gate` stubs at the ladder boundary.
+
+**Everything below is the record of what was open and why, kept unedited**, because the
+account of a thing that could not be settled from this repository at all is worth reading
+beside the one paste that settled it.
+
 **OPEN, OWNER-GATED, and the run attempted it.** The R043 paste supplied
 `https://stake-engine.com/teams/we-roll-spinners/games/future-spinner/files?launch=true&...`,
 which is the PORTAL address: fetched from this environment it serves a

@@ -14873,7 +14873,28 @@ a refusal is the expected outcome. **Expected is not guaranteed, and the asymmet
 decides it**: the downside of being wrong is a real 1,000-unit wager that a session
 placed, against ten seconds of the owner's time.
 
-**What landed instead is the half that does not need the owner.**
+**CLOSED THE SAME DAY, AND THE ARITHMETIC ABOVE WAS WRONG.** The owner ran the call and
+returned the body, committed verbatim with the session redacted at
+`docs/stake-engine-live/captures/wallet-play-400_2026-08-20.md`: HTTP 400,
+`{"error":"ERR_VAL","message":"invalid amount"}`. **It confirms the top-level error-field
+dialect the R045 reader was built for**, the first captured artefact behind the half that
+reader was widened for, and `ERR_VAL` corroborates what `money_fit_gate` stubs at the
+ladder boundary.
+
+**The correction is recorded rather than quietly replaced, because it makes the decision
+stronger rather than weaker.** The paragraph above justified declining the call by saying
+the supplied amount was ten times the highest selectable bet. **It was not. It was
+EXACTLY the highest selectable bet.** The live ceiling is `"maxBet": 1000000000`, 1,000.00
+display units, recorded in this repository since 2026-07-26 off a committed frame of the
+platform's own authenticate response. **The 100.00 figure was read off `BET_LEVELS` in
+`gameStore.ts`, which is the FALLBACK ladder and not the live one**, the very distinction
+TR-159 established in this same tracker five days earlier. Convention (l.1) says derive
+from the specification first; the specification was found and it was the wrong one, with
+the right one already committed. **So the request as supplied would have been ACCEPTED and
+a real 1,000-unit wager would have landed.** The refusal came back only because the owner
+raised the amount tenfold before running it.
+
+**What landed alongside is the half that did not need the owner.**
 `docs/stake-engine-live/captures/README.md` records the capture protocol, the file shape,
 who runs it and why, and the redaction rule: **the committed copy replaces the session
 token with a placeholder and alters nothing else**, because a session token authorises
@@ -14945,10 +14966,12 @@ plus eight new and five regenerated frames under `reports/screens/replay-contrac
 
 **Open threads, in the order they are worth taking.**
 
-1. **Q6 is one paste and it is the owner's**, not because the repository lacks anything
-   but because the capture is a live wager request. The protocol, the file shape and the
-   redaction rule are committed and waiting; the body is the only missing piece. **A fresh
-   token is needed**, since the one supplied expires with the tab it came from.
+1. **Q6 is CLOSED**, on the owner's own capture, the same day it was raised. What is
+   worth carrying forward is not the answer but the near miss: **the request as originally
+   supplied would have placed a real wager**, and the session's stated reason for declining
+   it was arithmetically wrong while its instinct was right. **Derive the bet ceiling from
+   the LIVE authenticate payload, never from `BET_LEVELS`**, which is fallback-only data
+   that TR-159 spent a pass establishing.
 2. **`popout_conformance`'s label and threshold still disagree**, named "44px", tests
    `>= 40`. Now that the 44's provenance is ruled, this is a small, well-defined decision
    rather than an open question about where the number came from.

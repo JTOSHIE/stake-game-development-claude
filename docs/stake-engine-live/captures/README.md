@@ -47,7 +47,13 @@ block**. Any commentary sits outside the fence so the fence is quotable on its o
 
 ## Current state
 
-**NO CAPTURE HAS BEEN TAKEN. Q6 REMAINS OPEN.** The request was reconstructed and the
-protocol above written on 2026-08-20; the call itself was not made by this session, for
-the reason in "who runs it". The moment a body is handed back it lands here under the
-naming above and the Q6 row closes on it.
+**ONE CAPTURE TAKEN, 2026-08-20, and Q6 IS CLOSED ON IT.** The owner ran the call against
+the live wallet and returned the body; it is committed at `wallet-play-400_2026-08-20.md`
+with the session redacted and nothing else altered. **HTTP 400,
+`{"error":"ERR_VAL","message":"invalid amount"}`**, which confirms the top-level
+error-field dialect the R045 reader was built for.
+
+**The amount used was 10,000,000,000 micros against a live ceiling of 1,000,000,000**, so
+it was ten times the top of the ladder and no wager was placed. **That ceiling is the
+LIVE one and it is not the fallback ladder in the source**, a distinction this directory's
+first draft got wrong; see the note in the capture file and TR-171.
