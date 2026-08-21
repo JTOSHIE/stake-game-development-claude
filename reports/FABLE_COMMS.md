@@ -9,6 +9,52 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 080 - 2026-08-22 - R082: the pasted frame was numbered against a dead lineage, and both frames are unified at v9
+
+**The instruction could not be executed as written, and that was the finding.** A frame
+arrived numbered v7 (2026-08-21) declaring it superseded v6, with orders to commit it at the
+root and archive v6. All four premises were false at `eb7b978d`, verified before a byte was
+written: v6 was archived 2026-07-25 at `fbaea577`; a DIFFERENT v7 dated 2026-07-25 was
+archived 2026-08-15 at `447cdfca`; v8 had been the root frame since 2026-08-15 and had been
+updated that same morning by R080; and `CLAUDE.md` line 10 named v8. Filing the draft as v7
+would have put two documents under one number and orphaned v8 at the root. Surfaced per (n)
+and nothing committed until the owner ruled.
+
+**The ruling withdrew the numbering and unified at v9**, v8 as base, the draft folded in,
+draft wins on current facts and v8 wins where richer. `CLAUDE_PROJECT_INSTRUCTIONS_v9.md` is
+the root frame. v8 is archived under a dated note with its body proved byte-identical, and
+the withdrawn draft is archived unedited too, so **v9 can be diffed against both parents**.
+
+**Two clauses in the draft were regressions and are NOT carried:** it called the builder the
+"sole writer", which the multi-track protocol retired in July, and its session-start list
+omitted `docs/records/WAYS_OF_WORKING.md`. Both were v8 corrections 5 and 6, and v9 names
+them as considered and rejected rather than letting them look overlooked.
+
+**Three facts corrected against first-hand sources, none of them in the ruling.** The 2-star
+bar was quoted with its demanding half elided, and the third sentence, "they still
+demonstrate strong development quality and attention to detail", is the clause that sets the
+bar; v9 quotes all three with the dated capture. Valkyrie is the PUBLISHER, `Lokis Vault`
+the captured game, Waylander's Forge the competitor title from the feature research. And the
+one-active-review limit IS committed, at the 2026-08-09 checklist capture line 141, with the
+follow-on the draft dropped: five concurrent once approved. R074's "no committed capture"
+was true only of its own 2026-08-20 set.
+
+**A live letter collision, found while merging and now stated in both documents.** The
+draft's (w) is the branding carve-out; `CLAUDE.md`'s (w) is the register split. The frame's
+(a) and (o) already diverged from `CLAUDE.md`'s too. v9 opens with a clause-letter note and
+`CLAUDE.md` carries its mirror. **E1 asks you to ratify a `CLAUDE.md` letter for the
+branding rule**, which is the only genuinely unhomed one.
+
+E2: v9 carries live arc state again, which v8 deliberately did not; dated facts are stated as
+dated, moving values are pointed at, and you may want that resolved differently next
+revision. E3: the approval-page re-capture is owed for two figures now, the 6-of-9 bar and
+the one-active-review limit.
+
+Records only, no game code, no rebuild, locked paths untouched, tree clean. **The mechanic
+decision is still yours and still pending**, and it gates the books regeneration.
+
+---
+
 ## 079 - 2026-08-21 - COMMS-ACK R080 and R081: the verdict on record, ARC 2 open, and the art brief is 30 files not 115
 
 **A lane note first, per (n).** Both briefs arrived in one paste and both declare themselves

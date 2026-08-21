@@ -7,10 +7,21 @@ behaviour. Australian English, metric units, no em dashes or en dashes anywhere.
 
 Two instruction documents exist and they do not compete.
 
-- **`CLAUDE_PROJECT_INSTRUCTIONS_v8.md`** at the repository root is the **stable project
+- **`CLAUDE_PROJECT_INSTRUCTIONS_v9.md`** at the repository root is the **stable project
   operating frame**: the triad, the session-start protocol, platform reality and the
   standing board. It is pinned verbatim in the owner's Claude project for Fable check-ins,
-  so it changes rarely and deliberately. It supersedes v7 (2026-08-15, eight clauses corrected at HEAD), which supersedes v6 and v5; all three stay archived, unedited, in the superseded folder of the reports archive.
+  so it changes rarely and deliberately. It supersedes v8 (2026-08-15), which superseded
+  v7 (2026-07-25, eight clauses corrected at HEAD), which superseded v6 (2026-07-13) and
+  v5; all four stay archived, unedited under a prepended dated note, in the superseded
+  folder of the reports archive. **The frame is numbered from the repository and never
+  from a document describing itself** (R082, 2026-08-22): a draft arrived that day
+  numbered v7 and claiming to supersede v6, both already archived, and the two lineages
+  were unified at v9 rather than left to compete. That is convention (s) applied to the
+  frame's own version number.
+- **The frame's clause letters are its own and do NOT match this file's.** The frame's (a)
+  is the register split, which this file carries at (w); the frame's (o) is the
+  close-sequence rule, which this file carries at (u.1). A citation across the two is
+  always written in full, as "CLAUDE.md convention (x)" or "frame convention (x)".
 - **`CLAUDE.md`**, this file, is the **builder's conventions document**. It accumulates
   continuously and always carries conventions the frame has not yet absorbed, which is
   why the next clause names the tie-breaker rather than assuming the two agree.
@@ -754,7 +765,7 @@ outranks parallel speed.
 **5. Model policy.** Sonnet at High for mechanical and suite work; Opus for
 judgement work; xHigh and above reserved for a single hard bounded problem in a
 short surgical session, never for a long mixed one. **The twice-failed escalation
-rule stands**, as recorded in `CLAUDE_PROJECT_INSTRUCTIONS_v8.md`: a brief failing
+rule stands**, as recorded in `CLAUDE_PROJECT_INSTRUCTIONS_v9.md`: a brief failing
 its gates twice escalates one tier.
 
 **6. Hard problems are extracted, not solved mid-flow.** When a job turns out to
