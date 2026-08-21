@@ -1,0 +1,56 @@
+Fetched URL: https://platform.stability.ai/pricing
+Fetch date: 2026-08-22 (Australian Eastern Standard Time)
+Fetched by: Claude Code builder session, We Roll Spinners repo, for the R084 TASK 0 licence gate
+Capture scope: the pricing page renders client-side, so this is the rendered text read from the page rather than its HTML source. Prices are in CREDITS; the page states the credit-to-dollar rate.
+---
+Pricing
+Power your applications with Stability AI API
+
+How does pricing work?
+API usage is based on credits. 1 credit = $0.01.
+Pricing is subject to change as we improve our models and infrastructure.
+
+Buying Credits
+Get started with 25 free credits. Check your credit balance and purchase additional
+credits on your account page.
+
+Stable Image Services / Generate
+Service                             Price (credits)
+Stable Image Ultra                  8
+Stable Diffusion 3.5 Large          6.5
+Stable Diffusion 3.5 Large Turbo    4
+Stable Diffusion 3.5 Medium         3.5
+Stable Diffusion 3.5 Flash          2.5
+Stable Image Core                   3
+SDXL 1.0                            From 0.9
+
+Upscale
+Creative Upscaler                   60
+Conservative Upscaler               40
+Fast Upscaler                       2
+
+Edit
+Erase Object                        5
+Inpaint                             5
+Outpaint                            4
+Remove Background                   5
+Search and Recolor                  5
+Search and Replace                  5
+Replace Background & Relight        8
+
+Control
+Structure                           5    (Use an input image to precisely guide generation)
+Sketch                              5
+Style Guide                         5
+Style Transfer                      8    (Apply visual styles from reference images to a
+                                          target image to maintain consistency across content)
+
+3D
+Stable Fast 3D                      10
+Stable Point Aware 3D               4
+
+Audio
+Stable Audio 3.0                    26
+Stable Audio 2.5                    20
+
+(c) STABILITY AI LTD, 2026

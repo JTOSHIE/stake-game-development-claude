@@ -16337,3 +16337,405 @@ Nothing in R082 is queued for a builder. The arc's real work is unchanged and un
 regeneration. Art, animation and sound proceed independently of it.
 
 Model and effort: Opus, judgement tier, one session, integrator on `main`, records only.
+
+# Session Report - R083 ASSETFORGE: THE STOP AT TASK 1, AND THE HALO THE INGEST FOUND IN ITSELF (2026-08-22)
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R083_ASSETFORGE_Prompt.md`. Branch:
+`assetforge/2026-08-22`, REVIEW LANE, delivered by pull request. **No game code changed, no
+locked path written.** `.claude/settings.json` diff verified empty.
+
+**THE LANE, decided against convention (t) rather than against the brief's silence.** The
+brief said explicit paths, CI green and comms folded per (t), and did not name a lane. (t)
+names it: green lane is the four record surfaces only, and "anything touching code, gates,
+locked paths, player-facing text or rulings remains review lane", with a mixed change taking
+the stricter lane. This session ships a Python pipeline and edits a gate, so it is review
+lane and rides a PR. R082 went direct to main because it was records only; this is not.
+
+## TASK 1: STOPPED, which is what the brief asked for
+
+The brief's own instruction: assess the hardware honestly, and **if local generation is
+impractical, STOP** and report a costed cloud alternative on the same weights. It is
+impractical, so nothing was stood up, no weights were fetched, and no image was generated.
+The full assessment is `docs/art/ASSETFORGE_FEASIBILITY_2026-08-22.md`. Three independent
+blockers, any one of which is sufficient:
+
+**A. The machine cannot hold the model at reference precision.** Apple M5 MacBook Air,
+10-core GPU, 32 GB UNIFIED memory, passively cooled, and measured **already 2.09 GB into
+swap with 11.5 GB free-plus-inactive before anything was loaded**. SD 3.5 Large at fp16 is
+about 27.4 GB resident once the T5-XXL encoder and the CLIP pair are counted. It fits only
+by quantising the transformer or by sequential offload, and that is the wrong instrument for
+this specific job: **a calibration pass exists to let the owner judge the MODEL, so running
+it through a quantiser means a "not good enough" verdict cannot be attributed.** Convention
+(m), a measurement taken with a broken instrument.
+
+**Seconds per image is reported as DERIVED, not measured, and the report says so.** It could
+not be measured because of blocker B. Derived floor about 3 to 4 minutes at 1024x1024 by
+scaling published M4 Max timings on GPU core count; realistically 6 to 15 minutes here once
+offload and fanless throttling are counted. The brief's twice-delivery-size render is the
+harder half: SC-01 at twice delivery is 3840x2160, roughly 8x the compute AND far outside
+the model's roughly 1 megapixel training distribution, where it produces repeated structure
+rather than detail. The correct method is generate near 1 MP then upscale, which is a change
+to the brief's method and is flagged for the owner rather than made unilaterally.
+
+**B. THE WEIGHTS ARE GATED AND THE GATE IS AN OWNER ACTION.** Proven first-hand, not
+assumed: `GET huggingface.co/stabilityai/stable-diffusion-3.5-large/raw/main/LICENSE.md`
+returns **HTTP 401**, "Access to model ... is restricted. You must have access to it and be
+authenticated". Even the licence file is behind it. Opening it needs the owner's HuggingFace
+account (none configured here: no `HF_TOKEN`, no token in the HF cache) and acceptance of
+the Community License on the model page. Accepting an agreement and operating an account are
+owner actions under rule 1. **This blocker applies to the cloud path too**, so it is on the
+owner's list either way.
+
+**C. The licence needed vetting before generation, and it has two live issues.** Below.
+
+## The licence vetting, and the good result first
+
+Both documents captured verbatim under `docs/licences/stability/2026-08-22/`, in the same
+dated-capture shape as the Google Gemini dossier, per convention (l).
+
+**REAL-MONEY GAMBLING IS NOT RESTRICTED.** The Acceptable Use Policy, which the licence
+incorporates by reference, contains zero occurrences of "gambl", "casino", "wager",
+"betting", "real money" or "lottery". **Verified with a working control on the same file**
+("Acceptable Use" 14 hits, "sexual" 7 hits), so the zero is a real absence rather than a
+grep that silently matched nothing. Outputs are ours: "You own any outputs generated from
+the Models or Derivative Works to the extent permitted by applicable law."
+
+**ISSUE 1, AND IT COLLIDES WITH CONVENTION (w) DIRECTLY.** The licence requires the licensee
+to "prominently display 'Powered by Stability AI' on a related website, user interface,
+blogpost, about page, or product documentation." Frame convention (w), settled yesterday,
+says the platform-mandated General Disclaimer is the SOLE sanctioned occurrence of
+third-party branding in shipped text. A "Powered by Stability AI" line in the game UI would
+be a second one. The requirement is a DISJUNCTION, so werollspinners.com or the product
+documentation discharges it without touching the game, but which surface carries it is a
+ruling and not a builder's choice. Escalated as E1.
+
+**ISSUE 2, THE REVENUE CLIFF.** "If at any time You or Your Affiliate(s) ... generate more
+than USD $1,000,000 in annual revenue ... any licenses granted to You under this Agreement
+shall terminate", after which "You must request a license from Stability AI, which Stability
+AI may grant to You in its sole discretion." For a studio whose product is a slot game that
+is a live commercial risk on the SUCCESS case, and "sole discretion" means it is not a
+formality. Output ownership survives termination; the right to keep generating does not.
+Escalated as E2.
+
+## TASK 2: not run, and blocked twice over
+
+It depends on TASK 1, which stopped. It is **also** independently blocked, and that is worth
+recording because it will still be blocked when the pipeline exists:
+
+**The pivot letter does not exist in this repository.** The brief sources the SD prompt
+register from "the pivot letter (committed alongside)". Nothing named pivot is tracked or
+untracked anywhere; "prompt register" and "SD prompt" return nothing across every tracked
+file. CLAUDE.md convention (m) is explicit that external documents must physically exist in
+the repository before work cites them. The prompt register has to arrive before TASK 2 can
+run, whatever hardware it runs on.
+
+**A CORRECTION TO MY OWN FIRST READING, recorded rather than quietly fixed.** I first
+reported H1 and H2 as undefined, having checked them against the manifest ID column where
+they genuinely do not appear. They are not IDs, they are FILENAMES, and the seven resolve
+cleanly:
+
+| Brief's name | Manifest row | Path | Target |
+|---|---|---|---|
+| SY-01 | SY-01 | `symbols/wild.png` | 240x240 |
+| H1 composed | SY-03 | `symbols/h1.png` | 240x240 |
+| H1 base | SY-04 | `symbols/h1_base.png` | 240x240 |
+| H1 spin | SY-05 | `symbols/h1_spin.png` | 240x240 |
+| H2 | SY-06 | `symbols/h2.png` | 240x240 |
+| SY-13 | SY-13 | `symbols/tile_plate.png` | 244x204 |
+| SC-01 | SC-01 | `backgrounds/bg_base.jpg` | 1920x1080 |
+
+All seven are REPLACE, so all seven are ingestable by TASK 3's pass. Recorded here so the
+next session does not re-derive it.
+
+## TASK 3: delivered in full, and it went red three times on itself
+
+`scripts/assets/assetforge/ingest.py` plus a 15-case convention (p) self-test. Green-key
+knockout, delivery downscale, 64px silhouette, dimension assertion, manifest refusal.
+Outputs to `.scratch/assetforge/ingest/` per (h.1); exit 2 on any refusal so it can gate a
+chain.
+
+**The refusal rules are per manifest CLASS, and each class refuses for its own reason**,
+taken from the manifest's own notes rather than invented: KEEP is BR-01, the emblem the
+palette anchors to, "do not replace, restyle or recolour"; DEAD "ships but never renders"
+and its rows say delete rather than redraw; REGEN is **not UI art at all**, those PNGs being
+headless screenshots of live CSS and SVG controls, so a hand-drawn replacement drifts from
+the control it documents. Only the 30 REPLACE rows are ingestable.
+
+**It also refuses ASPECT DRIFT, which is the failure a dimension assertion structurally
+cannot see.** A square candidate resized into 244x204 satisfies every dimension check ever
+written and still looks wrong, so aspect is compared on the SOURCE, before the resize.
+
+**THE SELF-TEST WAS SEEN RED THREE TIMES ON REAL DEFECTS, which is the only reason its green
+means anything (convention (p)).** In order:
+
+1. **A metric that could not fail.** `max_residual_dominance` was computed from the
+   PRE-despill array, so a broken despill and a working one produced identical numbers. Now
+   measured after despill, on the pixels the matte kept.
+2. **A GREEN HALO IN THE DELIVERED FILE, and the self-test did not catch this one, the first
+   end-to-end run did.** RGBA was downscaled without premultiplying alpha. A cleared pixel
+   still carries its original RGB, which after a green-key knockout is the key itself, and
+   Lanczos resamples colour and alpha independently: alpha said "barely there" while RGB
+   said "pure green", and the game would have composited the green on every symbol edge.
+   Every statistic the knockout reported was clean throughout, because they are all measured
+   BEFORE the resize. **The lesson is the one this project keeps relearning: assert on the
+   artefact that ships, not on the stage before it.** The delivered-file assertion exists
+   because of this and is now case 11.
+3. **The despill ceiling was too generous.** It permitted dominance up to `tol_low` in kept
+   pixels, and the downscale then resampled that allowance up to 46/255 on the delivered
+   edge. A partially transparent pixel is a blend WITH THE KEY by definition, so the edge is
+   now clamped to zero green dominance while solid interior pixels, which never touched the
+   key, keep the gentle ceiling and stay free to be legitimately green.
+
+**Delivered green dominance across those three fixes went 255/255 to 0/255**, alpha-weighted
+17.3/255 to 0.0/255, measured on the shipped artefact. The realistic end-to-end candidate
+lands at 4/255 raw and 1.93/255 alpha-weighted.
+
+I want to be plain that fix 2 was found by luck of running the tool for real, not by the
+test I had just written. The test was measuring the pipeline's own opinion of itself.
+
+## The gate gap this pass exposed
+
+`docs/currency` went red on `scripts/assets/assetforge/README.md` for citing
+`.scratch/assetforge/ingest/`, a directory that is gitignored BY DESIGN under convention
+(h.1) and can therefore never exist at HEAD. `.evidence-scratch/` sits in the gate's
+`UNRESOLVABLE_PREFIXES` for exactly that reason; `.scratch/` was added to `.gitignore` later
+and never added to the gate. **The omission had sat unexercised because no tracked document
+had ever cited the path in backticks, and this README is the first.** One line, with the
+reasoning in a comment beside it. The gate's own self-test still reports 28/28 with every
+seed red, so it can still fail.
+
+## Verification
+
+Document currency: **PASS, 272 frozen, 0 new**, self-test 28/28. Ingest self-test: **15/15**,
+after being seen red. Locked paths: self-test PASS then PASS at 0 violations. Gates chained
+with `&&` per the frame's (o). Explicit paths per (k).
+
+**REMOTE CI GREEN on `1ff12e4a`, run 32509661980: the FULL 30-job matrix, every job success,
+none skipped.** Verified with the full sha per R082's lesson, never an abbreviation.
+
+**A PREDICTION IN THIS REPORT WAS WRONG AND IS CORRECTED RATHER THAN QUIETLY DROPPED.** An
+earlier draft of this section said "no frontend change and no rebuild, so the browser matrix
+has nothing to exercise", reasoning from R082, where a records-only push correctly skipped
+it. That was wrong here: all 28 browser legs RAN and all 28 passed. R082 changed only
+documents; this pass changes `scripts/qa/doc_currency_gate.mjs`, and the `changes` job that
+gates the matrix is deliberately built to fail OPEN, running the full matrix whenever it
+cannot prove the change is inert. The prediction was a guess dressed as a derivation, which
+is the thing convention (m) exists to stop, and the outcome is better evidence than the one
+I predicted.
+
+## ESCALATIONS
+
+**E1 (R083). "Powered by Stability AI" against convention (w).** The licence requires
+prominent attribution on one of website, user interface, blogpost, about page or product
+documentation. (w) makes the platform disclaimer the sole third-party mark in shipped text.
+Recommendation, for the owner to accept or overrule: werollspinners.com plus the product
+documentation, never the game UI, which discharges the licence and leaves (w) intact.
+
+**E2 (R083). The USD $1,000,000 revenue termination clause.** Whether that is acceptable for
+art that ships in a commercial slot game, or whether the Enterprise conversation happens
+BEFORE the art is generated rather than after the game succeeds. This is a company-layer
+decision and squarely the owner's.
+
+**E3 (R083). The pivot letter and its SD prompt register do not exist**, so TASK 2 stays
+blocked on content regardless of hardware.
+
+**E4 (R083). The twice-delivery-size method should become generate-near-1MP-then-upscale**,
+for the training-distribution reason in the feasibility report. Method change, so it is a
+Fable ruling rather than a builder's edit.
+
+R082's E1, E2 and E3 all stand, as do R080's E1, R081's E2 and E3, TR-148's four, R078's E1
+and E2, and R079's E1 and E2.
+
+## FOR THE NEXT SESSION
+
+**Nothing proceeds on art generation until the owner answers the feasibility report's four
+questions**, of which the weights gate (blocker B) is the one that blocks every path
+including the cloud one, because it needs the owner's own account.
+
+The ingestion half is ready and needs no generator to be useful: it will accept the seven
+calibration files the moment they exist, from any source. LoRA training remains where the
+brief left it, on the owner's word only, and wants the 48 GB or 80 GB class rather than the
+24 GB one.
+
+Model and effort: Opus, judgement tier, one session, review lane on `assetforge/2026-08-22`,
+code plus records.
+
+# Session Report - R084 THE LICENCE GATE BARRED A PROVIDER, AND THE INGEST DESTROYED A CUTOUT (2026-08-22)
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R084_ASSETFORGE_API_Prompt.md`. Branch:
+`assetforge/2026-08-22`, REVIEW LANE, continuing pull request #126. **No game code changed,
+no locked path written.**
+
+**NUMBERED R084, NOT R083, AND THE BRIEF'S OWN PREMISE IS THE REASON.** The brief opens
+"the earlier R083 draft is dead, never pasted". It was pasted, and it was executed: R083 is
+the local-SD feasibility assessment, committed at `1ff12e4a` and `44e7c741`, sitting in the
+still-open PR #126 with its full 30-job CI green. Filing this as R083 would put two
+different sessions under one number, which is precisely the collision R082 settled two days
+ago when the frame lineage was unified at v9. **Repository numbering is authoritative**, so
+this is R084 and the earlier work stands. PR #126 is not superseded by this brief; it is
+the evidence that produced it, and this session extends the same branch rather than
+rewriting the ingest it already contains.
+
+## TASK 0, the blocking gate: one provider BARRED, one CLEARED
+
+Ruling `docs/licences/PROVIDER_GATE_2026-08-22.md`; captures under
+`docs/licences/openai/2026-08-22/` and `docs/licences/stability/2026-08-22/`.
+
+**OPENAI IS BARRED.** Its Usage Policies, effective 2026-10-29, list under "Protect people.
+Everyone has a right to safety and security. So you cannot use our services for:" the item:
+
+> real money gambling
+
+**It is contractual, not advisory, and that is what makes it a BARRED rather than a
+caution.** 16.1 incorporates the OpenAI Policies by reference; the definition of "OpenAI
+Policies" includes the Usage Policies; 3.3(a) restricts use that violates them. And the
+consequences of breaching that specific clause are unusually sharp: **14.1 carves
+"CUSTOMER'S BREACH OF SECTION 3.3 (RESTRICTIONS)" OUT of the mutual liability cap**, 13.2
+indemnifies OpenAI for claims arising from violating use, and 8.2 permits termination.
+Assets already generated would be of contested provenance in a product that goes to a
+regulated operator for approval.
+
+**The narrow reading exists and is deliberately NOT relied on.** One could argue that
+generating art is not itself "real money gambling" and that the clause targets operating
+gambling through the service. That reading may be right. It is not adopted, for three
+reasons: Future Spinner IS a real-money gambling product and the art is made expressly for
+it; the prohibition is category-level and unqualified; and convention (m) forbids resolving
+a compliance ambiguity in our own favour. **The route to OpenAI is written confirmation
+from OpenAI, not our construction of their policy.** Escalated as E1.
+
+**STABILITY IS CLEARED**, and the finding worth carrying is that **the API route is
+materially cleaner than the weights route**. Gambling appears in neither its API Terms of
+Service nor its Acceptable Use Policy, each verified with a working control so the zero is
+a real absence rather than a search that matched nothing. More than that: the Community
+License that governs self-hosted weights carries the two clauses R083 escalated, the
+"Powered by Stability AI" attribution that collides with frame convention (w) and the USD
+$1,000,000 revenue termination. **Measured on the API terms' body with the provenance
+header excluded, because the header names both phrases and would otherwise have counted
+itself: `Powered by Stability` 0, `1,000,000` 0, `annual revenue` 0.** So moving to the
+hosted API does not merely solve R083's hardware problem. **It retires R083's E1 and E2 for
+art generated on this route.** Both stay live for anything self-hosted.
+
+Cost, derived from the captured pricing rather than remembered: 1 credit = USD $0.01,
+`sd3.5-large` 6.5 credits, `sd3.5-large-turbo` 4, and the Structure control that the H1
+trio needs is 5. **The calibration seven is USD $0.455, or $0.555 with two Structure
+calls**, under six percent of the brief's $10 cap.
+
+## TASK 1, the client, and the gate is enforced in code
+
+`scripts/assets/assetforge/generate.py` plus `provider_gate.json`, the machine-readable
+form of the TASK 0 marks, which the client reads on **every** call. **A client that merely
+omitted OpenAI would silently become wrong the day somebody added it back; one that refuses
+by mark stays right.** Keys from env, never committed. Every call appends provider, model,
+full prompt and negative, parameters, seed, request id and cost to a provenance ledger
+before the image counts as delivered. **The USD 10 session cap is checked BEFORE each call
+against the ledger's running total**, because spending is the owner's under rule 1 and a
+cap checked afterwards is not a cap.
+
+`compose.py` is the composer: production prompts are BUILT by merging the style register
+with each manifest row, so no hand-written prompt can drift from the manifest, and the same
+inputs always yield the same prompt, which is what makes a regeneration reproducible.
+
+**IT REFUSES TODAY, AND THAT IS THE HONEST STATE.** `docs/art/style_register.json` does not
+exist. The brief sources production prompts from "the committed Grok style register" and
+the calibration seven from "Grok's verbatim prompts, committed alongside". **Neither is in
+this repository.** Searched exhaustively: the only "grok" hits are a workflow file and two
+session-report mentions of Grok as a tool, and "style register" matches only the phrase
+"art style bible" in the v9 frame's OWNER STANDING ITEMS, which is an OPEN owner item and
+not a document. This is the same class as R083's missing pivot letter, and convention (m)
+governs it identically. The composer names exactly what it needs rather than inventing a
+prompt, because a hand-written prompt is the drift it exists to prevent.
+
+## TASK 2, not run, and blocked three ways
+
+It could not run even had the register existed: **no API key is configured** on this
+machine (`STABILITY_API_KEY` unset), and **spending is the owner's** under rule 1 even
+inside the authorised cap. Blocked on the style register, on Grok's verbatim prompts, and
+on a credential. The client's `--dry-run` exercises everything up to the call, so the
+moment those three arrive the seven run without further building.
+
+## TASK 3, both alpha routes, and a fourth red
+
+`ingest.py` now decides the route **by measurement rather than by a flag somebody remembers
+to pass**: a source carrying a real cutout takes the native route and keeps it; a render on
+a chroma field takes the key route; and an RGBA source whose alpha is uniformly opaque is
+an RGB image wearing four channels and correctly takes the key route.
+
+**THE NATIVE ROUTE WAS DESTROYING THE PROVIDER'S CUTOUT, and this is the fourth real defect
+these self-tests have been seen red on.** `green_key_knockout` reads RGB only. Handed an
+already-transparent PNG it converted to RGB, discarded the supplied alpha, computed a fresh
+matte from colour, and returned a **fully opaque** image. Measured directly: a source
+71.3 percent transparent came back **0.0 percent transparent**. Dimensions correct, format
+correct, silhouette generated, ledger written. Nothing downstream could have caught it. The
+seeded case is real in the strict (p) sense, proven by running both paths side by side.
+
+Ingest self-test now **17/17**, generate self-test **16/16**.
+
+## TASK 4, already delivered, verified rather than duplicated
+
+`frontend/scripts/machine_tell_gate.mjs` already flags the emoji planes 0x1F000 to 0x1FAFF,
+U+FE0F, and the arrow, technical, enclosed-alphanumeric, geometric-shape,
+miscellaneous-symbol and dingbat blocks, with a reviewed allowlist of exactly one entry. It
+already carries seeded emoji and dingbat cases. It already runs three ways in CI:
+`--self-test`, `--source` in the static job, and source-and-dist after a build in the
+browser job, so **rendered surfaces are covered as well as shipped strings**. **A second
+gate over the same class would be two sources of truth**, which is the failure this project
+avoids by design.
+
+Verified by running it rather than by reading it: self-test **16 seeded violations caught
+against 12 clean negative controls**; source scan **PASS** over 79 files plus `index.html`.
+
+**And corroborated independently, which is where it got interesting.** My own census over
+`frontend/src` found **11 glyph codepoints the gate had passed**: U+2713, U+2605 three
+times, U+2715 twice, U+2192 five times. Every one is inside a COMMENT recording a glyph the
+2026-07-27 sweep had already removed: "Was `✓`, U+2713, absent from the Orbitron subset",
+"This was `★ ★ ★`, U+2605", "The arrow was `→`, U+2192. Drawn now". The gate excludes
+comments because the bundler strips them, so it was right and the census was measuring
+something else. **Shipped strings are genuinely zero.** Recorded because a disagreement
+between two methods is worth resolving in writing rather than assuming the gate wins.
+
+**One provenance note, surfaced per (n):** the brief attributes the emoji rule to "platform
+staff guidance captured from Discord". No such capture is in the repository. The rule needs
+no rescue, because the v9 frame's section 5 already lists "generic AI-generated assets
+(standard fonts, gradients, emoji icons, border effects)" among the platform's own named
+causes of a low rating, sourced from a dated capture. The rule stands on that; the Discord
+attribution is uncorroborated and is recorded as such.
+
+## Verification
+
+Document currency, locked paths and both AssetForge self-tests below, chained with `&&` per
+the frame's (o). Explicit paths per (k). Remote CI verified with the FULL sha, never an
+abbreviation, per R082's lesson.
+
+## ESCALATIONS
+
+**E1 (R084). OpenAI is BARRED on our reading; only OpenAI can lift it.** If the owner wants
+gpt-image-1, the ask is written confirmation from OpenAI that generating art assets for a
+real-money gambling product is permitted under the Usage Policies. Our own narrow reading
+is not a substitute, and 14.1 removing the liability cap is why.
+
+**E2 (R084). The style register and Grok's verbatim prompts do not exist**, so TASK 2 is
+blocked on content as well as on credentials. Same class as R083's pivot letter.
+
+**E3 (R084). A Stability API key and the owner's decision to spend.** The cap is coded at
+USD 10 and the seven cost $0.555, but rule 1 makes the spend the owner's call and no key is
+configured.
+
+**E4 (R084). PR #126 is open and unreviewed.** It carries R083 and now R084. Review lane
+needs Fable approval; it will not merge on CI alone.
+
+R083's E1 and E2 are **retired for the hosted-API route** by TASK 0 and stay live for
+self-hosted weights. R083's E3 and E4 stand, as do R082's three, R080's E1, R081's E2 and
+E3, TR-148's four, R078's E1 and E2, and R079's E1 and E2.
+
+## FOR THE NEXT SESSION
+
+Three things unblock TASK 2 and none is a builder's: **the style register plus Grok's
+verbatim prompts committed**, **a Stability API key**, and **the owner's word on spending**
+the $0.555. With those the seven run unattended and land a provider-labelled contact sheet
+for the eye-call.
+
+Nothing else is queued. The mechanic decision remains open and still gates the books
+regeneration.
+
+Model and effort: Opus, judgement tier, one session, review lane on `assetforge/2026-08-22`,
+code plus records.

@@ -207,6 +207,13 @@ const OUT_OF_SCOPE_SEGMENTS = ['/shards/', '/walk_shards/']
 const UNRESOLVABLE_PREFIXES = [
   'frontend/dist/', 'dist/', 'worktrees/', '.evidence-scratch/', '.owner-preview/',
   'node_modules/', '__pycache__/', 'env/',
+  // R083: `.scratch/` was added to .gitignore as the convention (h.1) home for
+  // proof and gate scratch output, beside `.evidence-scratch/`, but was never
+  // added here. The omission sat unexercised because no tracked document had
+  // ever cited the path in backticks; the first one that did went red for
+  // naming a directory that is gitignored BY DESIGN and so can never exist at
+  // HEAD. Same class and same reason as the entry above it.
+  '.scratch/',
 ]
 
 // Directory names `.gitignore` excludes wherever they appear, so the maths
