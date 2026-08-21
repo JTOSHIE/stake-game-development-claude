@@ -16302,6 +16302,30 @@ capture and which R074's 2026-08-20 sweep could not find in its own set.
 R080's E1, R081's E2 and E3, TR-148's four escalations, R078's E1 and E2, and R079's E1 and
 E2 all stand.
 
+## RETRO-VERIFICATION (per convention (t))
+
+**Remote CI green on `ab3f2f18`**: run 32503156941, workflow `checks`, conclusion success,
+2m2s. Three jobs, verified at job level: "what changed" success, "static gates" success, and
+the browser matrix correctly SKIPPED, because the `browser` job declares `needs: changes` and
+this pass altered no code and no asset. That is the expected shape for a records-only commit
+and it matches what the verification section above predicted rather than merely agreeing with
+it after the fact.
+
+**THE NEW (o) WATCHER CLAUSE EARNED ITS PLACE ON ITS FIRST USE, and what it caught was me.**
+The close-sequence poll was written against the ABBREVIATED sha `ab3f2f18`. `gh run list
+--commit` requires the full 40-character sha: given an abbreviation it returns an empty JSON
+array **and exits 0**, with no error and no warning. The poll therefore probed empty for
+thirty minutes against a run that had been green since its second minute. Because the clause
+requires an on-demand poll to ABORT LOUDLY on empty probe output rather than read silence as
+green, it exited 1 and said so, and the verification was then done properly. A blocking
+watcher of the old shape would have produced no output at all, and no output would have been
+read as nothing wrong.
+
+**The operational form, recorded so it is not rediscovered:** always probe with
+`$(git rev-parse HEAD)`, never a short sha, and never let an empty probe stand in for a green
+one. Proven both ways this session: `gh run list --commit ab3f2f18` returns `[]` at exit 0,
+`gh run list --commit $(git rev-parse HEAD)` returns the run.
+
 ## FOR THE NEXT SESSION
 
 **The frame is settled and the numbering question is closed forever: read the version from

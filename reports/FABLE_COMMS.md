@@ -50,8 +50,17 @@ dated, moving values are pointed at, and you may want that resolved differently 
 revision. E3: the approval-page re-capture is owed for two figures now, the 6-of-9 bar and
 the one-active-review limit.
 
-Records only, no game code, no rebuild, locked paths untouched, tree clean. **The mechanic
-decision is still yours and still pending**, and it gates the books regeneration.
+Records only, no game code, no rebuild, locked paths untouched, tree clean. CI green on
+`ab3f2f18`, run 32503156941, browser matrix correctly skipped for a docs-only change.
+
+**The new (o) watcher clause caught me on its first use, which is the best argument for it.**
+My close poll used the SHORT sha; `gh run list --commit` needs the full 40 characters and
+returns `[]` at **exit 0** for an abbreviation, so it probed empty for thirty minutes against
+a run green since minute two. The clause forbids reading silence as green, so it aborted
+loudly instead of reporting nothing. Always probe with `$(git rev-parse HEAD)`.
+
+**The mechanic decision is still yours and still pending**, and it gates the books
+regeneration.
 
 ---
 
