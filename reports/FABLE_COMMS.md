@@ -62,8 +62,13 @@ One gate gap closed: `.scratch/` was gitignored under (h.1) but never added to t
 currency gate's unresolvable list, so the first document to cite it went red. Self-test still
 28/28.
 
-Gates green, tree clean. **Nothing proceeds on generation until you answer the report's four
-questions**, and the weights gate needs your account whichever path you pick.
+Gates green, tree clean. **CI green on `1ff12e4a`, run 32509661980, the FULL 30-job matrix,
+every job success and none skipped.** I had predicted the browser matrix would skip as it did
+for R082; it did not, because this pass touches a gate and the `changes` job fails OPEN by
+design. Corrected in the report rather than dropped: it was a guess dressed as a derivation.
+
+**Nothing proceeds on generation until you answer the report's four questions**, and the
+weights gate needs your account whichever path you pick.
 
 ---
 

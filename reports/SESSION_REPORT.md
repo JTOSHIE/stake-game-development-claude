@@ -16507,9 +16507,21 @@ seed red, so it can still fail.
 ## Verification
 
 Document currency: **PASS, 272 frozen, 0 new**, self-test 28/28. Ingest self-test: **15/15**,
-after being seen red. Locked paths: run below. Gates chained with `&&` per the frame's (o).
-Explicit paths per (k). No frontend change and no rebuild, so the browser matrix has nothing
-to exercise. Remote CI verified with the FULL sha per R082's lesson, never an abbreviation.
+after being seen red. Locked paths: self-test PASS then PASS at 0 violations. Gates chained
+with `&&` per the frame's (o). Explicit paths per (k).
+
+**REMOTE CI GREEN on `1ff12e4a`, run 32509661980: the FULL 30-job matrix, every job success,
+none skipped.** Verified with the full sha per R082's lesson, never an abbreviation.
+
+**A PREDICTION IN THIS REPORT WAS WRONG AND IS CORRECTED RATHER THAN QUIETLY DROPPED.** An
+earlier draft of this section said "no frontend change and no rebuild, so the browser matrix
+has nothing to exercise", reasoning from R082, where a records-only push correctly skipped
+it. That was wrong here: all 28 browser legs RAN and all 28 passed. R082 changed only
+documents; this pass changes `scripts/qa/doc_currency_gate.mjs`, and the `changes` job that
+gates the matrix is deliberately built to fail OPEN, running the full matrix whenever it
+cannot prove the change is inert. The prediction was a guess dressed as a derivation, which
+is the thing convention (m) exists to stop, and the outcome is better evidence than the one
+I predicted.
 
 ## ESCALATIONS
 
