@@ -16727,6 +16727,51 @@ R083's E1 and E2 are **retired for the hosted-API route** by TASK 0 and stay liv
 self-hosted weights. R083's E3 and E4 stand, as do R082's three, R080's E1, R081's E2 and
 E3, TR-148's four, R078's E1 and E2, and R079's E1 and E2.
 
+## THE MERGE, AND AN ORDERING CONSTRAINT THE CLOSE SEQUENCE HAD NOT MET BEFORE
+
+**PR #126 merged to main as `d8183f15`**, a merge commit per the repository's convention
+(215 of them on main), carrying both R083 and R084. The remote branch
+`assetforge/2026-08-22` was deleted on merge per (t.1). **The owner's instruction of
+2026-08-22 discharged the review-lane approval that E4 was waiting on**, which is the only
+thing that could: (t) keeps code and gates in review lane and CI green alone never merges
+them.
+
+**RETRO-VERIFIED PER RULE 10: the merge commit's OWN run is green.** Run 32513897964,
+**30 jobs, 30 success**, none skipped, 18:32:46Z to 18:44:32Z. Probed with the full sha
+throughout, never an abbreviation, per R082's lesson. The merged tree was also re-gated
+locally before the close: document currency PASS at 272 frozen and 0 new, locked paths
+PASS, ingest self-test 17/17, generate self-test 16/16.
+
+**AND THE CLOSE HAD TO WAIT FOR THAT RUN, WHICH IS NOT OBVIOUS AND IS WORTH RECORDING.**
+`checks.yml` declares `concurrency: group: checks-${{ github.ref }}` with
+`cancel-in-progress: true`. A records commit pushed to `main` while the merge commit's run
+is still going lands in the SAME concurrency group and **cancels it**. So posting the close
+promptly after a merge does not merely race the verification, it destroys it: rule 10 would
+then be verifying a cancelled run, or nothing at all. The close sequence for a MERGE is
+therefore ordered merge, wait for the merge run to finish, then close, and that ordering is
+the opposite of the instinct to record promptly.
+
+The wait was estimated from measurement rather than guessed: the three preceding
+full-matrix runs took 11m49s, 11m52s and 12m16s, so the remainder was called at five to six
+minutes against a six-minute elapsed. It finished at 11m46s.
+
+## TASK 2, THE HONEST CARRY
+
+Not completed, and it could not be. All three blockers were re-verified first-hand at the
+merged HEAD rather than carried forward from earlier in the session:
+
+| Blocker | State at `d8183f15` |
+|---|---|
+| The style register, expected at docs/art/style_register.json | **ABSENT** |
+| Grok's verbatim prompts for the calibration seven | **ABSENT**, no tracked artefact |
+| `STABILITY_API_KEY` | **NOT SET** |
+
+The client demonstrates it end to end rather than asserting it: `generate.py --id SY-01
+--dry-run` refuses at the composer and reports `0 of 1 produced, session spend USD 0.000 of
+cap 10.00`. **Two of the three are content the owner or Fable supplies, and the third is a
+credential plus a spending decision that rule 1 reserves to the owner.** Nothing here is a
+builder's to unblock, which is why it carries rather than waits.
+
 ## FOR THE NEXT SESSION
 
 Three things unblock TASK 2 and none is a builder's: **the style register plus Grok's

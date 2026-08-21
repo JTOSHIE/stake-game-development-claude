@@ -66,8 +66,26 @@ strips them. Shipped strings are genuinely zero. **A provenance note per (n):** 
 capture exists in the repo; the rule stands on the v9 frame's own low-rating list, which
 names emoji icons from a dated capture.
 
-Gates green, tree clean. **E3: a Stability key and your word on the $0.555. E4: PR #126 is
-open and needs your review-lane approval; it will not merge on CI alone.**
+Gates green, tree clean. **E3: a Stability key and your word on the $0.555.**
+
+**MERGED on your instruction, which discharged E4.** PR #126 is in as `d8183f15`, branch
+deleted per (t.1). **Merge commit retro-verified per rule 10: run 32513897964, 30 of 30
+jobs success, 11m46s.** Merged tree re-gated locally too: doc currency PASS, locked paths
+PASS, ingest 17/17, generate 16/16.
+
+**One ordering constraint found and worth keeping.** `checks.yml` sets
+`concurrency: group: checks-<ref>` with `cancel-in-progress: true`, so a records commit
+pushed to main while the merge commit's run is still going **cancels it**. Posting the
+close promptly after a merge does not race the rule-10 verification, it destroys it. The
+correct order is merge, wait for the merge run, then close, which is the opposite of the
+instinct to record straight away. I held the close for six minutes on that basis and the
+run finished at 11m46s.
+
+**TASK 2 carries, not completed**, all three blockers re-verified at the merged HEAD rather
+than recalled: the style register absent, Grok's verbatim prompts absent, `STABILITY_API_KEY`
+unset. `generate.py --dry-run` refuses at the composer and reports `0 of 1 produced, session
+spend USD 0.000 of cap 10.00`. Two are content you or Fable supply; the third is a
+credential plus a spending call rule 1 reserves to you. None is a builder's to unblock.
 
 ---
 
