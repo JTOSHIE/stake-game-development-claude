@@ -148,6 +148,40 @@ def main() -> int:
         except Refusal as exc:
             record("valid REPLACE accepted", False, f"refused: {exc}")
 
+        # THE NATIVE-TRANSPARENT ROUTE. A provider that returns an already cut-out PNG
+        # must have its cutout PRESERVED, not recomputed from colour. Before the route
+        # detection existed the keyer converted to RGB first, discarded the supplied
+        # alpha and returned a fully opaque image, and nothing downstream could see it
+        # because the dimensions and the format were both still correct.
+        native = Image.new("RGBA", (480, 480), (0, 0, 0, 0))
+        nd = ImageDraw.Draw(native)
+        nd.ellipse([96, 96, 384, 384], fill=(200, 40, 40, 255))
+        p = write(tmp, "scatter.png", native)          # SY-02, a REPLACE row at 240x240
+        try:
+            rec = ingest_one(p, index, out)
+            d = Image.open(rec["delivered"])
+            al = np.asarray(d)[..., 3]
+            kept = float((al > 0).mean())
+            record("native cutout preserved, not re-keyed",
+                   rec["key"]["route"] == "native" and 0.05 < kept < 0.95,
+                   f"route={rec['key']['route']}, {kept:.1%} of the delivered image is opaque")
+        except Refusal as exc:
+            record("native cutout preserved, not re-keyed", False, f"refused: {exc}")
+
+        # An RGBA source whose alpha is uniformly opaque is an RGB image wearing four
+        # channels, and must take the KEY route rather than the native one.
+        flat = Image.new("RGBA", (480, 480), (0, 255, 0, 255))
+        fd = ImageDraw.Draw(flat)
+        fd.ellipse([96, 96, 384, 384], fill=(200, 40, 40, 255))
+        p = write(tmp, "h2.png", flat)                 # SY-06, a REPLACE row at 240x240
+        try:
+            rec = ingest_one(p, index, out)
+            record("fully opaque alpha takes the key route",
+                   rec["key"]["route"] == "key" and rec["key"]["cleared_px"] > 0,
+                   f"route={rec['key']['route']}, cleared={rec['key'].get('cleared_px')}")
+        except Refusal as exc:
+            record("fully opaque alpha takes the key route", False, f"refused: {exc}")
+
         # An opaque row: no key to knock out, no silhouette, JPEG delivery.
         p = write(tmp, "bg_base.jpg", Image.new("RGB", (3840, 2160), (20, 30, 60)))
         try:

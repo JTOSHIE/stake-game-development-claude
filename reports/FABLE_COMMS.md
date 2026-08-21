@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 082 - 2026-08-22 - R084: OpenAI is BARRED on its own words, Stability is CLEARED and cleaner than the weights, and the ingest was destroying cutouts
+
+**Numbered R084, because R083 is taken.** Your brief says "the earlier R083 draft is dead,
+never pasted". It was pasted and executed: R083 is the local-SD assessment, committed and
+sitting in PR #126 with full 30-job CI green. Same collision class R082 settled at v9, so
+repository numbering wins and the earlier work stands. **PR #126 is not superseded by this
+brief, it is the evidence that produced it**, and this session extends that branch.
+
+**TASK 0. OPENAI IS BARRED, on its own words.** Usage Policies effective 2026-10-29, under
+"you cannot use our services for": **"real money gambling"**. It is contractual, not
+advisory: 16.1 incorporates the Policies, 3.3(a) restricts violating use, and **14.1 carves
+a breach of 3.3 OUT of the liability cap** while 13.2 indemnifies OpenAI. The narrow
+reading (generating art is not itself gambling) may well be right and is deliberately NOT
+relied on, because (m) forbids resolving a compliance ambiguity in our own favour. **E1:
+the route to OpenAI is written confirmation from OpenAI, not our reading of their policy.**
+
+**STABILITY IS CLEARED, and the API route is materially cleaner than the weights route.**
+Zero gambling terms in its API ToS and AUP, each verified with a working control. And the
+two clauses R083 escalated live in the Community License, NOT the API terms: measured on
+the ToS body with my own provenance header excluded, because the header names both phrases
+and would otherwise have counted itself, `Powered by Stability` 0 and `1,000,000` 0.
+**Moving to the API retires R083's E1 and E2 for art generated there.**
+
+Cost from the captured pricing, not memory: 1 credit = $0.01, sd3.5-large 6.5 credits.
+**The calibration seven is USD 0.455, or 0.555 with the two Structure calls for the H1
+trio.** Under six percent of your $10 cap.
+
+**TASK 1 built, and the gate is enforced in code, not remembered.** `provider_gate.json`
+carries the marks and `generate.py` reads them on every call, so a BARRED provider is
+refused by name. Ledger, per-image cost, and the $10 cap checked BEFORE each call against
+the running total. **The composer REFUSES today: the style register it expects, at docs/art/style_register.json,
+does not exist, and neither do Grok's verbatim prompts.** I searched exhaustively; "style register"
+matches only "art style bible" in the v9 frame's OPEN owner items. Same class as R083's
+pivot letter. **E2.**
+
+**TASK 2 not run, blocked three ways**: the register, Grok's prompts, and no API key
+configured. Spending is yours under rule 1 regardless. `--dry-run` exercises everything up
+to the call, so the seven run the moment those land.
+
+**TASK 3, and the fourth red these self-tests have caught. The native-transparent route was
+DESTROYING the provider's cutout.** The keyer reads RGB only, so handed an already
+transparent PNG it discarded the supplied alpha and returned a fully opaque image, with
+correct dimensions, correct format and a silhouette generated. **Measured: 71.3 percent
+transparent in, 0.0 percent out.** Nothing downstream could have seen it. Route is now
+decided by measurement. Ingest 17/17, generate 16/16.
+
+**TASK 4 was already done, so I verified it instead of building a second one.**
+`machine_tell_gate.mjs` already flags the emoji planes, U+FE0F and the dingbat, arrow and
+symbol blocks, is already seeded, and already runs three ways in CI including
+source-and-dist after a build. Two gates over one class would be two sources of truth. Ran
+it: 16 seeded violations caught, 12 clean controls, source scan PASS. **My independent
+census then found 11 glyphs it had passed** and every one is inside a COMMENT recording a
+glyph the 2026-07-27 sweep already removed. The gate excludes comments because the bundler
+strips them. Shipped strings are genuinely zero. **A provenance note per (n):** no Discord
+capture exists in the repo; the rule stands on the v9 frame's own low-rating list, which
+names emoji icons from a dated capture.
+
+Gates green, tree clean. **E3: a Stability key and your word on the $0.555. E4: PR #126 is
+open and needs your review-lane approval; it will not merge on CI alone.**
+
+---
+
 ## 081 - 2026-08-22 - R083: local SD 3.5 is impractical here so TASK 1 stopped, and the ingest found a green halo in itself
 
 **Review lane, not green lane.** The brief named (t) without naming a lane; (t) names it.

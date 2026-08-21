@@ -1,0 +1,31 @@
+{
+  "_comment": "R084 TASK 0 licence gate, machine-readable. The ruling and its evidence are docs/licences/PROVIDER_GATE_2026-08-22.md. generate.py REFUSES any provider not marked CLEARED, so the gate is enforced by the code rather than by whoever remembers it. Changing a mark here without a Fable ruling is the violation.",
+  "assessed": "2026-08-22",
+  "providers": {
+    "stability": {
+      "mark": "CLEARED",
+      "reason": "No gambling restriction in the API Terms of Service or the Acceptable Use Policy, verified with working controls. The API terms carry neither the Community License's 'Powered by Stability AI' attribution nor its USD 1,000,000 revenue termination clause.",
+      "evidence": [
+        "docs/licences/stability/2026-08-22/stability-api-terms-of-service.txt",
+        "docs/licences/stability/2026-08-22/stability-ai-acceptable-use-policy.txt",
+        "docs/licences/stability/2026-08-22/stability-api-pricing.txt"
+      ],
+      "env_key": "STABILITY_API_KEY",
+      "credit_usd": 0.01,
+      "models": {
+        "sd3.5-large": {"credits": 6.5},
+        "sd3.5-large-turbo": {"credits": 4}
+      }
+    },
+    "openai": {
+      "mark": "BARRED",
+      "reason": "The Usage Policies effective 2026-10-29 prohibit 'real money gambling' under 'you cannot use our services for'. The Services Agreement incorporates those policies by reference (16.1), restricts use that violates them (3.3a), carves a breach of 3.3 out of the liability cap (14.1) and indemnifies OpenAI for it (13.2). Future Spinner is a real-money gambling product.",
+      "evidence": [
+        "docs/licences/openai/2026-08-22/openai-usage-policies.txt",
+        "docs/licences/openai/2026-08-22/openai-services-agreement-operative-clauses.txt"
+      ],
+      "env_key": "OPENAI_API_KEY",
+      "models": {"gpt-image-1": {}}
+    }
+  }
+}

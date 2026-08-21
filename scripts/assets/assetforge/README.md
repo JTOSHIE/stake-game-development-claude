@@ -1,56 +1,91 @@
 # AssetForge
 
-The arc-two art pipeline. **Generation is NOT stood up**: R083 assessed this machine and
-found local SD 3.5 impractical, so the brief's own STOP applied. The assessment, the three
-blockers and the costed cloud alternative are in
-`docs/art/ASSETFORGE_FEASIBILITY_2026-08-22.md`. Licence captures are under
-`docs/licences/stability/2026-08-22/`.
+The arc-two art pipeline. **Nothing installs on the owner's machine**: no weights, no
+models, no UIs. Hosted APIs through a thin client, per the R084 constraint on record.
 
-What exists today is the half that does not depend on where the pixels come from.
+R083 assessed local SD 3.5 and stopped: `docs/art/ASSETFORGE_FEASIBILITY_2026-08-22.md`.
+R084 replaced that route with hosted APIs behind a blocking licence gate.
+
+## The licence gate comes first
+
+`docs/licences/PROVIDER_GATE_2026-08-22.md` is the ruling; `provider_gate.json` is the
+machine-readable form that `generate.py` reads on **every** call.
+
+| Provider | Mark |
+|---|---|
+| Stability AI (`sd3.5-large`, `sd3.5-large-turbo`) | **CLEARED** |
+| OpenAI (`gpt-image-1`) | **BARRED**, its Usage Policies prohibit "real money gambling" |
+
+A client that merely omitted OpenAI would silently become wrong the day somebody added it
+back. One that refuses by mark stays right, so the mark is enforced in code.
+
+## `compose.py`, the deterministic prompt composer
+
+Production prompts are BUILT by merging the committed style register with each
+`art_manifest_arc2.csv` row, so no hand-written prompt can drift from the manifest. The
+same row plus the same register always yields the same prompt, which is what makes a
+regeneration reproducible.
+
+**It refuses today**, because the register it expects, at docs/art/style_register.json, does
+not exist. Convention (m): an external document must be in the repository before work cites
+it, so the path is named in prose rather than as a citation to a file that is not there.
+
+## `generate.py`, the hosted-API client
+
+```
+scripts/assets/.venv/bin/python scripts/assets/assetforge/generate.py --id SY-01 --dry-run
+```
+
+Keys come from env (`STABILITY_API_KEY`) and are never committed. Every call appends
+provider, model, full prompt and negative, parameters, seed, request id and cost to a
+provenance ledger before the image counts as delivered. Outputs go to
+`.scratch/assetforge/`, gitignored per (h.1). Per-image cost is printed. A **USD 10
+session cap** is checked before each call against the ledger's running total, because
+spending is the owner's under rule 1 and a cap checked afterwards is not a cap.
+
+Costs are read from the captured pricing, not from memory: 1 credit = USD $0.01,
+`sd3.5-large` 6.5 credits ($0.065), `sd3.5-large-turbo` 4 ($0.040).
 
 ## `ingest.py`, the candidate QA pass
 
-Green-key knockout, delivery downscale, 64px silhouette, and a manifest assertion that
-refuses anything it should not touch. Outputs land in `.scratch/assetforge/ingest/`, which
-is gitignored per convention (h.1); only an owner-approved asset is ever copied into the
-shipped tree.
+Handles **both alpha routes**, decided by measurement rather than a flag:
+
+- **native**, the provider returned a cutout: the supplied alpha is preserved and only the
+  edge despill runs.
+- **key**, the render arrived on a chroma field: green-key knockout, then despill.
+
+An RGBA source whose alpha is uniformly opaque is an RGB image wearing four channels and
+correctly takes the key route.
+
+Then delivery downscale, 64px silhouette, dimension assertion, and refusal of anything
+without a manifest row or outside the 30 REPLACE rows. Exit 2 on any refusal so it can
+gate a chain.
+
+## The self-tests, convention (p)
 
 ```
-scripts/assets/.venv/bin/python scripts/assets/assetforge/ingest.py --in <dir-or-file>
+scripts/assets/.venv/bin/python scripts/assets/assetforge/ingest_selftest.py     # 17 cases
+scripts/assets/.venv/bin/python scripts/assets/assetforge/generate_selftest.py   # 16 cases
 ```
 
-Exit 0 when everything was accepted, 2 when anything was refused, so it can gate a chain.
+Between them they have been seen RED on four real defects, which is the only reason their
+green counts:
 
-**It refuses by manifest class, and each refusal has a different reason.** Only the 30
-REPLACE rows of `docs/art/art_manifest_arc2.csv` are ingestable. KEEP is the hero emblem
-the whole palette anchors to. DEAD ships but never renders and its rows say delete rather
-than redraw. REGEN is not UI art at all: those PNGs are headless screenshots of live CSS
-and SVG controls, so a hand-drawn replacement drifts from the control it documents.
+1. A residual metric measured pre-despill, so a broken despill and a working one produced
+   the same number.
+2. **A green halo in the delivered file.** RGBA was downscaled without premultiplying
+   alpha, so Lanczos averaged the key colour of fully transparent pixels back into every
+   edge pixel. Caught by the first end-to-end run, not by the test.
+3. A despill ceiling that resampled up to 46/255 on the delivered edge.
+4. **The native route destroyed the provider's cutout.** The keyer reads RGB only, so on
+   an already-transparent PNG it computed a fresh matte from colour and returned a fully
+   opaque image. Measured: a 71.3% transparent source came back 0% transparent, with
+   correct dimensions and format throughout, so nothing downstream could have seen it.
 
-**It also refuses aspect drift**, which is the failure a dimension assertion cannot see. A
-square candidate resized into 244x204 satisfies any dimension check and still looks wrong,
-so the aspect is compared on the SOURCE, before the resize.
+## Emoji: no gate was added here, because one already exists
 
-## `ingest_selftest.py`, convention (p)
-
-```
-scripts/assets/.venv/bin/python scripts/assets/assetforge/ingest_selftest.py
-```
-
-Fifteen cases, importing the shipping functions rather than copies of them. It went red
-three times on real defects while it was being written, which is the only reason its green
-counts for anything:
-
-1. `max_residual_dominance` was measured on the pre-despill array, so a broken despill and
-   a working one produced the same number.
-2. The delivered file carried a **green halo**: RGBA was downscaled without premultiplying,
-   so Lanczos averaged the key colour of fully transparent pixels back into every edge
-   pixel. Alpha said "barely there" while RGB said "pure green". Caught by the first
-   end-to-end run, NOT by the self-test, which was only checking the knockout's own
-   statistics. The delivered-file assertion exists because of this.
-3. Despill allowed dominance up to `tol_low` in kept pixels, and the downscale resampled
-   that allowance up to 46/255 on the edge. Partially transparent pixels are blends with
-   the key by definition, so they are now clamped to zero green dominance while solid
-   interior pixels, which never touched the key, keep the gentle ceiling.
-
-Delivered green dominance went from 255/255 to 0/255 across those three fixes.
+R084 TASK 4 asked for an emoji sweep. `frontend/scripts/machine_tell_gate.mjs` already
+flags the emoji planes, `U+FE0F`, and the symbol, dingbat, arrow and geometric-shape
+blocks, carries seeded emoji and dingbat cases, and runs three ways in CI: `--self-test`,
+`--source`, and source-and-dist after a build. A second gate for the same class would be
+two sources of truth. Verified rather than duplicated; see the session report.

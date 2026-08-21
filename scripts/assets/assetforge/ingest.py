@@ -207,6 +207,27 @@ def green_key_knockout(
     return Image.fromarray(out, mode="RGBA"), stats
 
 
+def despill_existing(rgba: Image.Image) -> tuple[Image.Image, dict]:
+    """Native route: keep the supplied alpha, apply the same edge despill rule."""
+    arr = np.asarray(rgba, dtype=np.float32) / 255.0
+    r, g, b, alpha = arr[..., 0], arr[..., 1], arr[..., 2], arr[..., 3]
+    other = np.maximum(r, b)
+    edge = (alpha > 0.0) & (alpha < 1.0)
+    solid = alpha >= 1.0
+    g_despilled = np.where(edge, np.minimum(g, other),
+                  np.where(solid, np.minimum(g, other + KEY_TOL_LOW), g))
+    out = np.stack([r, g_despilled, b, alpha], axis=-1)
+    residual = (g_despilled - other)[alpha > 0.0]
+    stats = {
+        "cleared_px": int((alpha <= 0.0).sum()),
+        "opaque_px": int((alpha >= 1.0).sum()),
+        "soft_edge_px": int(edge.sum()),
+        "despilled_px": int((g_despilled < g).sum()),
+        "max_residual_dominance": float(residual.max()) if residual.size else 0.0,
+    }
+    return Image.fromarray(np.clip(out * 255.0, 0, 255).astype(np.uint8), mode="RGBA"), stats
+
+
 def resize_premultiplied(rgba: Image.Image, w: int, h: int) -> Image.Image:
     """Downscale RGBA through PREMULTIPLIED alpha, then restore straight alpha.
 
@@ -249,6 +270,31 @@ def resize_premultiplied(rgba: Image.Image, w: int, h: int) -> Image.Image:
     return Image.fromarray(np.clip(out * 255.0, 0, 255).astype(np.uint8), mode="RGBA")
 
 
+def detect_alpha_route(img: Image.Image) -> tuple[str, dict]:
+    """Decide whether this candidate arrived with alpha already, or on a key field.
+
+    Both routes are real now: the Stability API can return a PNG that is already cut out,
+    and it can also return an opaque render on a chroma field. Guessing wrong is not a
+    near miss in either direction. Running the keyer over an ALREADY transparent PNG is
+    the worse one, because the keyer reads RGB only: it would compute a fresh matte from
+    colour, ignore the alpha the provider supplied, and hand back a fully opaque image
+    whose cutout has been silently thrown away. Nothing downstream would notice, because
+    the dimensions and the format would both still be right.
+
+    So the route is decided by measurement, not by a flag somebody remembers to pass.
+    """
+    if img.mode not in ("RGBA", "LA", "PA"):
+        return "key", {"reason": f"source mode {img.mode} carries no alpha channel"}
+    alpha = np.asarray(img.convert("RGBA").split()[-1], dtype=np.uint8)
+    clear_fraction = float((alpha < 255).mean())
+    # A PNG can carry an alpha channel that is uniformly opaque, which is an RGB image
+    # wearing four channels. That is the key route, not the native one.
+    if clear_fraction < 1e-6:
+        return "key", {"reason": "alpha channel present but fully opaque, so it carries no cutout"}
+    return "native", {"reason": "source supplied its own cutout",
+                      "clear_fraction": round(clear_fraction, 5)}
+
+
 def silhouette_thumb(rgba: Image.Image, size: int = SILHOUETTE_PX) -> Image.Image:
     """A contain-fitted binary silhouette, for eyeballing shape reads at a glance."""
     alpha = np.asarray(rgba.split()[-1], dtype=np.uint8)
@@ -286,9 +332,18 @@ def ingest_one(
     drift = check_aspect(src, w, h, allow_aspect_change)
 
     if wants_alpha:
-        keyed, key_stats = green_key_knockout(src)
+        route, route_why = detect_alpha_route(src)
+        if route == "native":
+            # Preserve the provider's cutout untouched. Despill still runs, because a
+            # natively cut-out render can still carry a green rim if it was composed
+            # against one, and the edge clamp is the same rule either way.
+            keyed, key_stats = despill_existing(src.convert("RGBA"))
+        else:
+            keyed, key_stats = green_key_knockout(src)
+        key_stats = {"route": route, **route_why, **key_stats}
     else:
-        keyed, key_stats = src.convert("RGB"), {"skipped": "row is opaque, no key to knock out"}
+        keyed, key_stats = src.convert("RGB"), {"route": "opaque",
+                                                "reason": "row is opaque, no alpha to handle"}
 
     delivered = (resize_premultiplied(keyed, w, h) if wants_alpha
                  else keyed.resize((w, h), Image.LANCZOS))
