@@ -9,6 +9,64 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 081 - 2026-08-22 - R083: local SD 3.5 is impractical here so TASK 1 stopped, and the ingest found a green halo in itself
+
+**Review lane, not green lane.** The brief named (t) without naming a lane; (t) names it.
+Code and gates are review lane and a mixed change takes the stricter one, so this rides
+`assetforge/2026-08-22` and a PR rather than going direct to main the way R082 did.
+
+**TASK 1 STOPPED, per the brief's own instruction.** Apple M5 MacBook Air, 10-core GPU,
+32 GB UNIFIED, fanless, and measured **already 2.09 GB into swap with 11.5 GB
+free-plus-inactive before loading anything**, against about 27.4 GB resident for SD 3.5
+Large at fp16. It fits only by quantising or offloading, and a calibration pass run through
+a quantiser cannot answer its own question: a "not good enough" verdict could not be
+attributed to the model. Seconds per image is reported DERIVED, not measured, and the report
+says so, because of the next paragraph.
+
+**The weights are GATED and the gate is yours.** Proven, not assumed: the HuggingFace
+LICENSE.md for `stable-diffusion-3.5-large` returns **HTTP 401**. Even the licence file. It
+needs your account and your acceptance of the Community License, which are owner actions
+under rule 1. **This blocks the cloud path too**, so it is on your list either way. Costed
+alternative on the same weights is in the feasibility report: a 24 GB class instance, 2 to 4
+hours, single-figure dollars for the calibration seven.
+
+**LICENCE VETTED, and the good news first: real-money gambling is NOT restricted.** Zero
+occurrences of gambl, casino, wager, betting, real money or lottery in the AUP, verified
+with a working control on the same file so the zero is a real absence. Outputs are ours.
+**But E1: the licence requires prominently displaying "Powered by Stability AI"**, and
+convention (w) makes the platform disclaimer the SOLE third-party mark in shipped text. The
+requirement is a disjunction, so werollspinners.com or the product documentation discharges
+it without touching the game UI. Your call. **E2: licences TERMINATE above USD $1,000,000
+annual revenue**, renewal at Stability's "sole discretion". That is a risk on the success
+case for a slot game.
+
+**TASK 2 is blocked twice: on TASK 1, and on content.** The pivot letter does not exist in
+the repo and neither does its SD prompt register. Convention (m) forbids citing a document
+that is not there. **A correction to my own first read:** I reported H1 and H2 as undefined,
+having checked the ID column. They are filenames, and the seven resolve as SY-01, SY-03
+(h1), SY-04 (h1_base), SY-05 (h1_spin), SY-06 (h2), SY-13, SC-01. All REPLACE, all
+ingestable. Table is in the report so nobody re-derives it.
+
+**TASK 3 SHIPPED IN FULL and its self-test was seen RED three times on real defects.** The
+one worth your attention: **the delivered file carried a GREEN HALO**, because RGBA was
+downscaled without premultiplying alpha, so Lanczos averaged the key colour of fully
+transparent pixels back into every edge pixel. Alpha said barely there, RGB said pure green.
+**Every statistic the knockout reported was clean, because they are all measured before the
+resize.** The first real end-to-end run caught it, not the test I had just written. Fixed,
+plus a too-generous despill ceiling that resampled up to 46/255 on the edge. Delivered green
+dominance went **255/255 to 0/255**. The ingest also refuses by manifest class, KEEP, DEAD
+and REGEN each for its own reason, and refuses aspect drift, which is the failure a
+dimension assertion structurally cannot see.
+
+One gate gap closed: `.scratch/` was gitignored under (h.1) but never added to the doc
+currency gate's unresolvable list, so the first document to cite it went red. Self-test still
+28/28.
+
+Gates green, tree clean. **Nothing proceeds on generation until you answer the report's four
+questions**, and the weights gate needs your account whichever path you pick.
+
+---
+
 ## 080 - 2026-08-22 - R082: the pasted frame was numbered against a dead lineage, and both frames are unified at v9
 
 **The instruction could not be executed as written, and that was the finding.** A frame
