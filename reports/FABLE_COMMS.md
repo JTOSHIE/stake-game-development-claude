@@ -9,6 +9,73 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 079 - 2026-08-21 - COMMS-ACK R080 and R081: the verdict on record, ARC 2 open, and the art brief is 30 files not 115
+
+**A lane note first, per (n).** Both briefs arrived in one paste and both declare themselves
+the sole live brief, which (v) says cannot both be true. I read them as a SEQUENCE, R080
+then R081, because R081 depends on ARC 2 existing and R080 opens it, and because R081
+declares no predecessor dead. If that is wrong the two are separable commits.
+
+**R080. Attempt 1 is on record: 4.3 of 9 against a 6-point bar, not published.** Reviewers
+1.33, 1.33, 1.67; tags low quality assets, poor animations, bad sound design; resubmission
+opens 24/08/2026 18:19:53. Recomputed rather than accepted: the three sum to 4.33, average
+1.44, the 1-star tier the rankings page calls "Not published", and the gap to the bar is
+1.67 points or 0.56 per reviewer.
+
+**What the verdict does not say is the load-bearing part.** No compliance, functional,
+correctness, maths, RGS, localisation, responsible-gambling or accessibility issue anywhere
+in the feedback. The estate arc one built was not challenged and ARC 2 inherits it whole.
+The post-approval lockdown has NOT engaged either, so gameplay and mode changes are lawful
+in this arc in a way they never will be after publication.
+
+**THE CALIBRATION GAP IS THE FINDING I would want you to read twice.** Our round-four
+external refresh scored this same build band 2, three reviewers at 2.33 of 3. The platform
+scored it 1.44. We over-scored the shipped article by about nine-tenths of a star, and the
+whole gap sits in the three tags our rubric barely weighted. Internal review re-anchors to
+the live rankings tiers and the owner's Valkyrie captures.
+
+**The publication rule is corrected with the delta stated**, 6 of 9 and a 3-day lock,
+superseding "average below 1.0" and "7 days" in the frame and the master document. One
+caveat recorded rather than buried: NO capture we hold contains those figures, so the mirror
+is known stale on this point and a re-capture of the approval page is owed. The verdict
+corroborates the threshold by quoting it.
+
+**R081. The brief's "~115" is exactly the SOURCE count and only 47 rasters ship.** The other
+68 sit in legacy roots the build fully prunes, dead since WinPod went at R058. Of the 47:
+**1 KEEP, 30 REPLACE, 10 REGEN, 6 DEAD. The real art brief is 30 files.**
+
+**Ten look like UI art and are not.** The button set and feature_button are DOCUMENTATION
+ICONS rendered only in the paytable guide; the live controls are CSS and inline SVG, and
+these are headless screenshots of the running app. A hand-drawn replacement drifts from the
+button it documents, which a gate exists to catch. Restyle the control and re-run the
+regenerator instead.
+
+**Six ship and render nowhere, and two need more than a delete.** scene_character_car
+REGENERATES ITSELF from a stale export entry, and the same class would recreate two
+already-deleted brand_mark files, taking the theme folder from 47 rasters to 50 on the next
+asset build. hero_icon_96 derives from the PROTECTED emblem master, so it goes with
+LoadingScreen rather than to an art tool.
+
+**A LIVE VISUAL DEFECT, found and specified.** The Overdrive meter renders TWO NEEDLES:
+gauge_face is a whole render of a master whose needle is baked in at 62 degrees, and the
+live needle sprite rotates on top. Confirmed in the component and visible on the contact
+sheet. The pipeline had already declared a needle-free under-layer, nothing referenced it,
+it was deleted as unreferenced, and the bug survived. Escalated as E3, because it is live on
+a player-facing surface today and not only an art note.
+
+**A class rule for every replacement:** the two dead panels BAKE ENGLISH WORDS into the art,
+BALANCE and WIN, which cannot survive sixteen locales and which social remaps to COINS and
+PRIZE. No replacement may bake copy into a raster.
+
+Deliverables: `docs/art/ART_HANDOVER_ARC2.md`, the 47-row manifest
+`docs/art/art_manifest_arc2.csv`, contact sheets by tier at `reports/art/arc2/current/`.
+Tracker rows TR-181 and ARC2-ART. No game code changed, no rebuild. Tree clean.
+
+Next: the production arc plan, owner and Fable first. The manifest is ready for the
+generation tools.
+
+---
+
 ## 078 - 2026-08-21 - COMMS-ACK R079: the attestation basis, and the form does NOT match the docs
 
 **The line for the owner at Step 2.** Swept 33 restricted phrases, a SUPERSET

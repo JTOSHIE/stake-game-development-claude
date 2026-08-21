@@ -33,7 +33,22 @@ be withdrawn once indexed.
 | Studio web presence | OPTIONAL | JOSH | Not required by platform. |
 
 ## 2. PLATFORM REGISTER (Stake Engine obligations)
-- Review model: 3 anonymous reviewers, fractional scores (0 to 3 in ~0.33 steps), rounded average; average below 1.0 = not published, thread locked 7 days, then resubmission allowed. Target: 3 stars.
+- Review model: 3 anonymous reviewers, fractional scores (0 to 3 in ~0.33 steps).
+  **THE BAR IS 6 OF 9 POINTS, a 2-star average, and the lock is 3 DAYS. Corrected 2026-08-21
+  by R080 against the live approval page, superseding the figures below.** Below 6 of 9 the
+  game is not published and resubmission opens after the lock.
+  **THE SUPERSEDED FIGURES, kept so the delta is visible rather than silently overwritten:**
+  this line previously read "rounded average; average below 1.0 = not published, thread
+  locked 7 days". Two things changed. The threshold is stated as a POINT TOTAL out of 9
+  rather than as an average below 1.0, and it sits at a 2-star average rather than a 1-star
+  one, which is a materially higher bar: a game averaging 1.5 stars was publishable under the
+  old reading and is not under this one. And the lock is 3 days rather than 7.
+  **PROVENANCE, stated plainly because it matters here.** These figures come from the OWNER'S
+  LIVE READING of the approval page on 2026-08-21, relayed through the R080 brief. **No
+  capture in `docs/stake-engine-live/` contains them**, including the newest, so the mirror
+  is now KNOWN STALE on this point and a re-capture of the approval page is owed. Attempt 1's
+  own verdict corroborates the threshold independently: it quotes a 6-point threshold and
+  scored 4.3 against it. Target: 3 stars.
 - Post-approval lockdown: only minor cosmetic updates after approval; NO math changes, NO new modes, NO gameplay changes. Everything ships final.
 - Exclusivity/content: original designs only; no Stake/Kick branding in game assets, save
   that the same platform MANDATES its General Disclaimer block verbatim and that block
@@ -225,12 +240,101 @@ from a stated deficiency rather than from an instruction to make something nicer
 ## 5. SUBMISSION RECORD (fill at submission; append per attempt)
 Attempt #: | Date: | Build commit: | Math package hashes: | Blurb version: | Reviewer thread notes: | Scores (3x fractional): | Final stars: | Outcome: | Follow-ups:
 
+### ATTEMPT 1, 2026-08-21: NOT PUBLISHED, 4.3 of 9
+
+Recorded verbatim from the review verdict, R080.
+
+| Field | Value |
+|---|---|
+| Attempt | 1 |
+| Outcome | **Not published.** Resubmission invited once improvements are made |
+| Final score | **4.3 of 9**, against a **6-point threshold** |
+| Reviewer scores | **1.33, 1.33, 1.67** |
+| Tags returned | **low quality assets, poor animations, bad sound design** |
+| Resubmission opens | **24/08/2026 18:19:53** |
+| Compliance, functional or correctness issues raised | **NONE, anywhere in the feedback** |
+
+**The arithmetic, recomputed rather than accepted:** 1.33 + 1.33 + 1.67 = 4.33, which is the
+quoted 4.3 to one decimal. The average is 1.44, which rounds to the 1-star tier, and the live
+rankings page says of that tier "Not published. The developer will be asked to resubmit once
+improvements have been made." The gap to the bar is **1.67 points, or 0.56 per reviewer**:
+slightly over half a step each, on a scale whose steps are about 0.33.
+
+**WHAT THE VERDICT DOES NOT SAY IS AS LOAD-BEARING AS WHAT IT DOES.** All three tags are
+PRODUCTION VALUES. Not one compliance, functional, correctness, maths, RGS, localisation,
+responsible-gambling or accessibility issue was raised. The estate those arcs built was not
+challenged, and ARC 2 inherits it whole rather than reopening it. The three reviewers also
+agreed tightly, 1.33/1.33/1.67, which reads as a consistent judgement of the same thing
+rather than one dissenting opinion to be argued with.
+
+**A CALIBRATION FACT WORTH KEEPING BESIDE IT.** Our own round-four external refresh scored
+2.33 out of 3 from each of three independent reviewers, band 2
+(`docs/records/reviews/ROUND4_EXTERNAL_REFRESH_2026-08-11.md`). The platform scored the same
+build at 1.44. **Our internal review over-scored the shipped article by about 0.9 of a
+star**, and the whole of that gap sits in the three tags above, which our rubric weighted
+lightly or not at all. Internal calibration re-anchors in ARC 2, see section 7.
+
 ## 6. POST-RELEASE OPERATIONS
 - Change policy: cosmetic-only; anything else requires Stake's request. Plan features into the NEXT title instead (Collection Meter prototype lives on claude/collect-prototype for this reason).
 - Weekly: check Friday re-rank position; monitor approval-thread/messages; record payments per cycle against the payments register.
 - Licence watch: Stability revenue threshold; keep provenance folder current.
 
-## 7. HORIZON, and the next-title template
+## 7. ARC 2: PRODUCTION VALUES (opened 2026-08-21 by R080)
+
+**The arc's whole thesis, in one line: the game is compliant and correct and does not look
+or sound like a shelf product, and only the second half of that sentence is now in scope.**
+
+### 7a. What transfers whole, and is NOT reopened
+
+**The compliance estate is FROZEN-VALID.** Attempt 1 raised no compliance, functional or
+correctness issue of any kind, so everything the first arc built stands and transfers: the
+maths package and its verified figures, the RGS and wallet contracts, bet replay, sixteen
+locales, social mode and its wording attestation, responsible gambling, jurisdiction
+handling, the mandated disclaimer, accessibility and RTL, the sub-cent and precision laws,
+and the whole gate estate that holds them. **ARC 2 does not re-litigate any of it**, and a
+change that would disturb it is out of scope unless the platform asks.
+
+Two standing consequences of that freeze. The post-approval lockdown in section 6 has NOT
+engaged, because nothing was approved, so gameplay and mode changes are still lawful in this
+arc in a way they never will be again after publication. And the gates keep running: a
+production-values change that reddens a compliance gate is a defect in the change, not a
+reason to relax the gate.
+
+### 7b. What is in scope
+
+The three tags returned, in the platform's own words, are **low quality assets, poor
+animations, bad sound design**. The scope is those three plus the fourth thing the rankings
+page names as a common cause of a low rating:
+
+1. **Art.** Every shipped raster except the hero emblem, per the owner's ARC 2 ruling.
+2. **Animation.** Reel motion, symbol wins, celebrations, transitions, the feature entry.
+3. **Sound.** The whole audio bed, effects and music.
+4. **Gameplay depth.** The rankings page names "shallow gameplay with limited depth, players
+   typically place only 1 to 2 bets before losing interest" and "missing engaging features"
+   as frequent causes of a 1-star rating. Attempt 1 was not tagged for this, so it is a
+   WATCH item rather than a finding: worth raising deliberately, not worth assuming.
+
+**The target is the 2-star shelf standard**, which the rankings page defines as games that
+"show considerable creativity or originality" and that "may lack polish compared to more
+established studios" while still demonstrating "strong development quality and attention to
+detail". That is the bar to clear. Three stars is the ambition and not the gate.
+
+### 7c. Internal review calibration RE-ANCHORS
+
+Our round-four external refresh scored this build band 2 while the platform scored it 1.44.
+An internal rubric that reads nine-tenths of a star high is not a rubric, so it re-anchors on
+two things that are outside our own judgement: **the live quality-rankings tiers**, including
+its explicit list of what causes a 1-star rating, and **the owner's Valkyrie benchmark
+captures** of a real published title. A candidate is scored against what is on the shelf, not
+against what we shipped last time.
+
+**The named failure mode to design the new rubric against**, from the rankings page: "over
+reliance on generic AI-generated assets, standard fonts, gradients, emoji icons, and border
+effects are not sufficient for a quality release". That sentence is the platform telling us
+what it sees when it looks at art like ours, and it should be read as feedback rather than as
+a general warning.
+
+## 7z. HORIZON, and the next-title template
 
 ### 7a. Off-repo archive: the LUMEN side project (owner ruled, 2026-07-26)
 

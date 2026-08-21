@@ -29,6 +29,15 @@ Australian English, no em dashes or en dashes.
   its recorded licence. **The number of provenance records is deliberately not written here**,
   per convention (s): it grows whenever art is commissioned. Read the set from the brand
   directory.
+- **Publication threshold and lock: KNOWN STALE IN THE MIRROR, corrected 2026-08-21 by
+  R080.** The live approval page states the bar as **6 of 9 points, a 2-star average**, with
+  a **3-day** lock before resubmission. **No capture under `docs/stake-engine-live/` contains
+  those figures**, including the newest, so this is the one live enforcement number currently
+  held by the owner's reading rather than by a mirror, and a re-capture of the approval page
+  is OWED. The superseded figures our records carried were "average below 1.0" and "7 days":
+  a lower bar and a longer lock, both corrected in the frame and the master document.
+  Corroborated independently by attempt 1's own verdict, which quotes the 6-point threshold
+  and scored 4.3 against it.
 - **No Stake branding, studio marks only:** verified, and **SCOPED 2026-08-21 by Fable
   ruling R078, because the flat claim stopped being true at R076.** No Stake trademark or
   themes in any shipped asset or text, save the one block the platform MANDATES: the

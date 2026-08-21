@@ -835,3 +835,34 @@ convention should be raised with the platform before submission. Waiting since 2
 | Bundle figure in §5 | Superseded. **As at 2026-07-27 the kit was V6, built from a fresh clone, 110 files, 15,601,767 bytes (14.88 MB)**; the two files added since V5 were the two speed-control captures. **CORRECTED 2026-07-29 by the boot-set audit: this row said "Current kit is V6" in the present tense and the kit is now V10.** The byte figure is deliberately NOT restated, because a bundle size changes on every build and a number chased today is stale tomorrow: **read it from `frontend/dist/build-info.json`, which stamps the version, the commit and the byte count on every build**, rather than from any sentence in this document. That file is the authority; this row is a dated note. |
 | §2 item 10, "live docs refreshed 2026-07-04" | Dated mirrors exist under `docs/stake-engine-live/`, five of them as at 2026-07-31 (`2026-07-25/`, `2026-07-25b/`, `2026-07-26/`, `2026-07-28/`, `2026-07-29/`). |
 | §6 and §2 item 13, which read as though the portal has never been entered | The game is published and the owner has run at least four live portal sessions. The two URLs §6 asks to capture are recorded in `COMPLIANCE_WATCH.md` as wrong and erroring. |
+## 10. THE ATTEMPT 1 VERDICT (2026-08-21, recorded by R080)
+
+**NOT PUBLISHED.** Recorded verbatim as received.
+
+| Field | Value |
+|---|---|
+| Final score | **4.3 of 9**, against a **6-point threshold** |
+| Reviewer scores | **1.33, 1.33, 1.67** |
+| Tags | **low quality assets, poor animations, bad sound design** |
+| Resubmission opens | **24/08/2026 18:19:53** |
+| Compliance, functional or correctness issues | **none raised anywhere in the feedback** |
+
+**Recomputed rather than accepted:** the three reviewer scores sum to 4.33, the quoted 4.3 to
+one decimal, for an average of 1.44 and a 1-star tier. The gap to the 6-point bar is 1.67
+points, about 0.56 per reviewer on a scale of roughly 0.33 steps.
+
+**THIS DOSSIER'S OWN VERDICT ON ITSELF.** Sections 1 to 9 assemble the compliance case, and
+the compliance case was never contested: the reviewers raised nothing about maths, RGS,
+replay, localisation, social wording, responsible gambling, jurisdiction, accessibility or
+correctness. Every one of the three tags is a PRODUCTION VALUE. The honest reading is that
+this dossier answered the questions it set itself and that the questions the platform
+actually scored on are not in it. ARC 2 opens against those, recorded at
+`WRS_MASTER_DOCUMENT.md` section 7.
+
+**The calibration gap, stated because it is the most useful thing here for next time.** Our
+own round-four external refresh scored this same build band 2, three reviewers at 2.33 of 3
+each (`docs/records/reviews/ROUND4_EXTERNAL_REFRESH_2026-08-11.md`). The platform scored it
+1.44. We over-scored the shipped article by about nine-tenths of a star, and all of that gap
+sits in art, animation and sound, which our rubric barely weighted. The rubric re-anchors in
+ARC 2 to the live quality-rankings tiers and the owner's benchmark captures of a published
+title rather than to our own prior work.
