@@ -69,12 +69,29 @@ design-system statement, not a second authority.
 | H2 | Nitro Canister (crimson #ff2d3d) | charge flash, redline surge | reel: H2_reel_nitro.svg in masters/ |
 | M1 | Steering Wheel | quick spin with glow | v3 in masters/ |
 | M2 | Coilover (neon violet #8a5cff) | spring compress and rebound | reel: M2_reel_coilover.svg in masters/ |
-| M3 | Plasma Booster (acid green #5dff3c, flame with cyan shock diamonds) | plasma flame burst, cyan shock diamonds | in masters/ (M3_master_v3.svg) |
+| M3 | **Holographic Dash Readout** (acid green #5dff3c) — see the correction note below | holo scan flicker | in masters/ (M3_master_v3.svg) |
 | L1 | Lug Nut | torque spin punch | in masters/ |
 | L2 | Blade Fuse (electric blue #9adcff) | filament arc blink | reel: L2_reel_fuse.svg in masters/ |
 | L3 | Piston | rapid pump, exhaust flash | in masters/ |
 | W | Wild hub with machined W | core flare | approved (in masters/) |
 | S | Energy Burst Scatter | rupture burst | approved v2 (in masters/), may iterate in game |
+
+**M3 CORRECTION, recorded 2026-08-25 by R103 rather than silently overwritten.** This row read
+"Plasma Booster (acid green #5dff3c, flame with cyan shock diamonds) | plasma flame burst, cyan
+shock diamonds" until today. **That was a transcription error.** M3 is the HOLOGRAPHIC DASH
+READOUT, corrected in the arc-2 manifest on 2026-08-24 by R086 and ratified by the owner's own
+paste of that brief. The prior text is kept here because the record of what was believed is
+evidence, and because two other documents still carried the old reading when this correction
+was made.
+
+**One consequence is NOT yet applied and is deliberately left to the owner.** The arc-2
+manifest's FX-01 row still describes its overlay sheet as "6-frame flipbook of the M3 booster
+flame". The SY-09 note already states that those semantics become the HOLO FLICKER sheet with
+the layout spec unchanged at six frames of 200x200. That role field is fed directly into
+generation prompts, so changing it changes what a generator would produce; R103 escalated it
+rather than editing game content silently. The independently produced arc-2 FX batch has
+already adopted the corrected reading, describing its sheet as a holo dash flicker for the M3
+family, which is corroboration rather than authority.
 Idle animations: subtle mechanical motion per object (rotation, needle flicker,
 pulse), breathing scale 1.000 to 1.015, periodic light sweep. Reference motion:
 the H1 idle loops seamlessly over 72 degrees (five fold symmetry); the bonus
