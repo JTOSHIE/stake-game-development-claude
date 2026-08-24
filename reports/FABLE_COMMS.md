@@ -9,6 +9,71 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 088 - 2026-08-24 - R090: five square symbols in, the tile plate refused because its target is the one that is not square
+
+**FIVE SWAPPED, WORKING TREE ONLY: m2, m3, l1, l2, l3.** All five sources are 480x480 RGB
+keyed on green, ingested at 0.00% aspect drift to 240x240 RGBA through the AssetForge
+primitives. **Zero rasters staged, ever.** The tree now carries TWENTY modified placeholders
+(the fifteen from R086/R087/R089 plus these five); nothing committed. Build exit 0, zero
+console faults, zero missing assets. The board reads as one set now: lug nuts, spark plugs,
+piston, coilover struts and the dash readout all in the same painted gunmetal with cyan and
+magenta accents, silhouettes distinct at cell size, no visible green.
+
+**THE TILE PLATE IS REFUSED, and the reason is structural rather than a bad render.** The
+square re-render pass fixed the five symbols precisely because their targets are square. The
+tile plate's target is **244x204**, the one asset in the set that is not square, so a 480x480
+master is 16.39% adrift, 16.4 times the 1% gate. Verified independently rather than assumed,
+and three further facts settle it: `ingest.py` has NO pad, crop or letterbox path anywhere,
+so `--allow-aspect-change` would not crop, it would **squash the bezel to 83.6% of correct
+height**; a centre crop to 480x401 would cut 20px into the plate at the top and 22px at the
+bottom, **shearing both rails, both centre latches and all four corner radii**, which SY-13
+explicitly requires to match the grid; and `.tile-plate` is `object-fit: fill` into a 120x100
+cell, so a square master squashes 16.667% at runtime regardless of what ingest does.
+
+**THE REMEDY, if you want it: re-render the plate on a 732x612 canvas** (3x of 244x204, drift
+0.0000%), pure `#00FF00`, bezel filling the canvas EDGE TO EDGE with zero margin. The current
+candidate leaves 21/21/19/18px of transparent margin, and the batch record's "fills square
+cleanly" is not true of it. Then ingest runs unmodified and unflagged. Separately and for
+your call rather than mine: this candidate is a heavy ornate bezel where the shipped plate is
+a flat dark navy rounded rectangle, and it sits behind all 35 tile slots with no per-symbol
+branch, so it is a larger art-direction decision than an aspect fix.
+
+**M2's HEADROOM: a contract violation on the strictest reading, with NO visible effect, and
+NOT a regression.** Worth the detail because I went looking for a defect and the evidence
+refused to support it. SY-08 asks 3px of top headroom at 240; the new m2 measures 0px at any
+alpha, 2px at alpha 128, and **exactly 3px at alpha 254**. What crosses the box top is a
+28px-wide antialiased shoulder at about half opacity. Measured in the RUNNING game, not
+derived: every relevant `overflow` is `visible` so nothing clips, and at the peak of the bob
+the image box still sits **7.6px clear of its cell top** (6.3px for L3's pump), landing
+inside the cell's own 9px inset over the symbol's own plate. For calibration, `win-pop`
+lifts the same element about nine times further on every win and has always shipped. And the
+same any-alpha test **fails the OLD l3 harder** (0px against a 7px requirement) than it fails
+the new m2, on the very asset R087 authored `-2.9167%` for, while the NEW l3 (8px) is the
+first version that actually clears it. So l3 went from violating to clearing and m2 from
+clearing to grazing. No code change, no owner decision; nudge the master's top edge to row
+8 to 10 of 480 at the next natural re-render.
+
+**THREE THINGS FOUND WHILE VERIFYING, none caused by this swap.** (1) `ALPHA_SNAP_FLOOR` in
+`ingest.py` does not clear what its own docstring claims: the array is float32 and the
+constant float64, and the comparison is strict, so **alpha 2 survives** (76 to 119 pixels per
+file), and the real fringe sits at alpha 3 to 16, above the floor entirely. (2) The refusal
+message tells the reader to "pass `--allow-aspect-change` if the crop is deliberate", but
+**the flag performs no crop**, it squashes; a later session could take that at its word. (3)
+The five files grow the symbol payload from 126,745 to 209,632 bytes, **up 65%**, which is
+small in absolute terms but is a direction nobody had recorded. Also noted: `m1.png` is now
+the only glow-era symbol left in the directory, so the set is one asset short of consistent.
+
+**The batch record's Pixel QA table verifies exactly**, all six bounding boxes and foreground
+percentages, which is worth saying because two of its prose claims do not: "top edge
+positioned at pixel 3 to preserve the requested idle-animation headroom" is a scale error
+(pixel 3 of 480 is 1.5px at 240), and "fills square cleanly" is wrong for the plate.
+
+Working tree LEFT SWAPPED for your look pass; the twenty-path restore command is in the
+session report. Ship bar unchanged pending the provider ruling; placeholders remain visual
+test only.
+
+---
+
 ## 087 - 2026-08-24 - R089: seven UI controls swapped into the working tree, seven symbols and the background refused on aspect, four UI rows have no live raster
 
 **SEVEN NEW SWAPS, WORKING TREE ONLY, on top of the eight already there.** spin_button,
