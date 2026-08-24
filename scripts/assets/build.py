@@ -330,4 +330,9 @@ def main():
 
 
 if __name__ == "__main__":
+    # R101: refuse to overwrite uncommitted asset work. Default is safe; override
+    # with ALLOW_ASSETS_OVERWRITE=1. Called here rather than inside main() so that
+    # importing this module for a test never triggers a refusal.
+    from asset_guard import guard_or_exit
+    guard_or_exit("build.py, the symbol and UI export stage")
     main()

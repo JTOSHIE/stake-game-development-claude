@@ -9,6 +9,74 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 099 - 2026-08-25 - R101: npm run assets is safe by default, the hazard was measured by running it, and R097's second figure was 15 when it is 17
+
+**THE HAZARD IS GUARDED.** `npm run assets` now REFUSES by default when tracked asset files
+differ from HEAD, exits 2, and writes nothing. Verified on the live tree: it refuses over all
+27 placeholders and the chain stops at stage 1, so stages 2 and 3 never run. **The 27
+placeholders are byte-for-byte unchanged**, confirmed by sha256 before and after.
+
+**THE OVERRIDE, and it is deliberately an environment variable rather than a flag:**
+
+```
+ALLOW_ASSETS_OVERWRITE=1 npm run assets
+```
+
+None of the three generators takes command-line arguments, so a flag would have to be added
+to all three and would still only guard the npm route: anyone running the python script
+directly would sail past it. An env var read inside the guard covers every route into the
+code. An empty value and the value 0 do NOT disarm it, so a stray export in a shell profile
+cannot silently switch the guard off for good; both cases are asserted in the self-test.
+
+**I MEASURED THE HAZARD BY RUNNING IT, in a sandbox copy of the tree with the real venv, and
+diffed by sha256.** That matters, because reading code got the number wrong last time.
+
+- **Overwrites 16 of the 27 placeholders**, all 13 symbol rasters plus feature_button,
+  gauge_face and gauge_needle. R097's 16 is CONFIRMED, now by execution rather than by
+  derivation.
+- **Leaves 11 alone**: both backgrounds, logo, scene_car, scene_character and the six
+  remaining UI buttons.
+- **Creates 17 files absent from HEAD, not 15.** R097 said 15 and its own method line says
+  why: it measured "from manifest.json plus build.py read as text". **The command chains
+  THREE scripts.** The two it could not see are the reduced-motion still frames written by
+  symbol_fx.py, which does not even name them in its own summary line. R097's ten _1x
+  variants, four brand_mark files and gauge_base are all confirmed.
+
+**No safety check existed anywhere.** Not a flag, not an env var, not a dry run, not an
+existence check, not a confirmation. build.py does not import os at all, so an env var was
+structurally impossible in it before this change.
+
+**THE GUARD MATCHES THE PROJECT'S OWN IDIOM RATHER THAN INVENTING ONE.** It is a shared
+refusing module in the shape convention (u) already established for source_registry.py: a
+module the generators ask before acting, which raises loudly. All three call it, so the
+guard cannot be bypassed by running one script directly. It protects only TRACKED files
+under the asset output root that differ from HEAD, which is exactly the set carrying
+unrecoverable work. Untracked files there are deliberately not guarded, because creating a
+file destroys nothing and the generators create files as their normal product.
+
+**Self-test, convention (p): 9 of 9**, and it builds a REAL throwaway git repository and
+dirties a tracked asset in it rather than calling the predicate with hand-made strings,
+because git status parsing is where this class of guard actually goes wrong. It seeds the
+defect in the form it really occurs, and carries the controls that make the refusals mean
+something: a clean tree passes, dirt outside the asset root is ignored, untracked output
+does not trip it, a deleted tracked asset is protected, and a non-repository returns
+ignorance rather than cleanliness. **Wired into CI**, stdlib only, so it needs no venv and
+no image libraries.
+
+The three states were also proved END TO END in a sandbox git repository: clean tree runs
+and exits 0, dirty placeholder refuses and the file is preserved, explicit override proceeds
+and the file is overwritten with the notice printed.
+
+**One reassurance worth recording:** the protected KEEP asset, hero_emblem_512.png, is
+itself a pipeline output, and the pipeline reproduces it BYTE-IDENTICALLY. It was never at
+risk from regeneration, which is not something anyone had checked.
+
+Gates: asset guard 9/9, source registry PASS, generate self-test 21/21, doc currency PASS,
+locked paths PASS. **Zero rasters staged or committed.** No kit. The incoming art directory
+was read only.
+
+---
+
 ## 098 - 2026-08-24 - R100: the style register is on file and the composer runs, but OpenAI still cannot be called, and the reason is not the one anybody expected
 
 **THE STYLE REGISTER EXISTS.** `docs/art/style_register.json`, new this session, derived

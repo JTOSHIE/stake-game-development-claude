@@ -618,6 +618,19 @@ jobs:
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs --source
 
+      # ── asset regeneration guard (R101) ──────────────────────────────────────
+      # `npm run assets` chains three generators that write straight into the
+      # shipped asset tree. Measured R101 by running the chain against a copy:
+      # it overwrote 16 of the 27 uncommitted arc-2 placeholders and created 17
+      # files absent from HEAD, silently, exiting 0. The guard refuses that by
+      # default. Its self-test builds a real throwaway git repository and dirties
+      # a tracked asset in it, because git status parsing is where this class of
+      # guard actually goes wrong. Stdlib only, so no venv and no image
+      # libraries are needed here.
+      - name: asset regeneration guard, seeded-violation self-test
+        if: ${{ !cancelled() }}
+        run: python3 scripts/assets/asset_guard.py --self-test
+
       # ── Gate 8: authenticated bet ladder ─────────────────────────────────────
       # Both bet-changing surfaces must drive from the RGS-supplied levels. The
       # first three assertions reproduce the shipped defect arithmetically:
