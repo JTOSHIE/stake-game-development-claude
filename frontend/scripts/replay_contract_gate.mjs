@@ -340,16 +340,41 @@ async function driveReplay(browser, {
     await page.addInitScript(() => {
       const w = window
       w.__fsDimTrace = { peak: [], last: [], samples: 0 }
+      // R087. The dim treatment is `opacity: 0.2 !important`; full strength is
+      // 1. The only other actor on a symbol's opacity is `valve-hiss`, the H2
+      // idle flicker, which dips to 0.82 for one step of a 1.7s cycle. A
+      // threshold of 0.9 could not tell those apart, so a tile caught mid-hiss
+      // by the 100ms poll registered as dimmed. 0.5 sits clear of both and
+      // still catches the defect this measures for: a pruned or missing rule
+      // leaves the tile at 1, nowhere near it.
+      //
+      // This did not bite before R087 only because every per-symbol idle was
+      // pruned out of the built CSS and nothing animated opacity at all.
+      const DIM_MAX = 0.5
       const read = () => {
         const dim = []
         for (const img of document.querySelectorAll('.symbol-img')) {
           const cell = img.closest('.symbol-cell')
           if (!cell) continue
+          // VISIBLE CELLS ONLY. The strip carries seven slots, [buf, r0..r3,
+          // buf, buf], so three of them are off screen and a player never sees
+          // them. Counting them made the trace depend on padding tiles: the
+          // failing case was cell 2,5, a buffer row. The reel reader further
+          // down already filters by this same geometry.
+          const strip = cell.closest('.reel-strip')
+          if (strip) {
+            const clip = (strip.parentElement || strip).getBoundingClientRect()
+            const r = cell.getBoundingClientRect()
+            const visible = r.height > 4
+              && r.top >= clip.top - r.height / 2
+              && r.bottom <= clip.bottom + r.height / 2
+            if (!visible) continue
+          }
           const cs = getComputedStyle(img)
           // Measured, not inferred from the class list: what a player sees is
           // the COMPUTED opacity, and a class that no rule matches is exactly
           // the seeded defect this has to catch.
-          if (parseFloat(cs.opacity) < 0.9) {
+          if (parseFloat(cs.opacity) < DIM_MAX) {
             dim.push(`${cell.getAttribute('data-col')},${cell.getAttribute('data-slot')}`)
           }
         }

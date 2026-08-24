@@ -1000,6 +1000,34 @@ jobs:
         working-directory: frontend
         run: node scripts/dist_hygiene_gate.mjs
 
+      # ── CSS liveness: a class applied only from script must still have a rule ─
+      # R087, and the class it closes shipped for real. Svelte's scoper removes any
+      # selector it cannot see used in the markup, so a rule for a class that only
+      # ever arrives through classList.add is dropped while its @keyframes survives
+      # as an orphan. The build stays green and the behaviour is simply absent.
+      # R086 measured NINE of GameGrid's ten per-symbol idle animations dead that
+      # way; running this gate for the first time found SIX MORE in the same file,
+      # the two sprite-sheet fx layers and four win and anticipation effects.
+      #
+      # It runs HERE, after the production build, because dist is the authority.
+      # The compiled-but-unminified CSS still contains the pruned rule as a COMMENT,
+      # `/* (unused) .idle-coil{...} */`, so a check run against anything earlier
+      # than the minified artefact finds the text it is looking for and reports PASS
+      # on precisely the defect it exists to catch. Placement is the gate, exactly
+      # as this workflow's own header records for layout_fit_gate.
+      #
+      # The self-test runs first, per convention (p) and the house shape: it compiles
+      # a fixture through the project's own Svelte compiler with the class applied
+      # only via classList.add, asserts the compiled CSS DROPS the rule and the gate
+      # goes RED, then asserts the :global() form compiles and passes green.
+      - name: css liveness, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: node scripts/qa/css_liveness_gate.mjs --self-test
+
+      - name: css liveness, script-applied classes survive into dist
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: node scripts/qa/css_liveness_gate.mjs
+
       # ── S2-C010: no Stake brand token in any FILE NAME ──────────────────────
       # The companion to dist_hygiene_gate.mjs's Stake branding block, which
       # scans file CONTENT in dist. This scans file NAMES across dist, the
