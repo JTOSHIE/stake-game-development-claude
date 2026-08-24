@@ -8,10 +8,18 @@ prompt is prose. Here the prompt is BUILT from the two committed sources, so it 
 disagree with them. The same row plus the same register always yields the same prompt,
 byte for byte, which is also what makes a regeneration reproducible.
 
-THE STYLE REGISTER IS NOT IN THIS REPOSITORY YET, and this module REFUSES rather than
-inventing one. Convention (m): external documents must physically exist in the repository
-before work cites them. R084 searched for it; see the session report. When it lands, it is
-a JSON file at the path below and nothing else here changes.
+THE STYLE REGISTER LANDED IN R100, at the path below. Until then this module REFUSED
+rather than inventing one, per convention (m): external documents must physically exist in
+the repository before work cites them. Nothing here changed when it arrived, which was the
+point of refusing rather than stubbing.
+
+WHAT A REGISTER AUTHOR NEEDS TO KNOW, because it is not obvious from the loader. 'base' and
+'negative' are consumed as STRINGS and joined with the row's own fields, so neither may be a
+nested object. 'base' is prefixed to every prompt BEFORE the row's role, so it must describe
+the house style and never the subject. The transparency clause is appended by compose()
+itself from the manifest's alpha column, so a 'base' that also describes a background will
+contradict it, and a 'negative' that mentions green spill or drop shadow will duplicate what
+compose() already adds for alpha rows.
 
 Run: scripts/assets/.venv/bin/python scripts/assets/assetforge/compose.py --id SY-01
 """

@@ -9,6 +9,77 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 098 - 2026-08-24 - R100: the style register is on file and the composer runs, but OpenAI still cannot be called, and the reason is not the one anybody expected
+
+**THE STYLE REGISTER EXISTS.** `docs/art/style_register.json`, new this session, derived
+rather than authored: every operative clause traces to a committed source or to the arc-2
+batch prompt records, and the file carries a `derivation` block naming those sources with
+per-clause evidence counts. **The composer no longer refuses.** 29 of the 30 REPLACE rows
+compose cleanly and a Stability dry run now produces 1 of 1 end to end.
+
+**THE HEADLINE, MEASURED NOT ASSUMED: OpenAI STILL CANNOT BE CALLED, and pricing turned
+out to be the second blocker rather than the first.** `generate.py` has **no OpenAI
+client**. It implements Stability only, and until this session the call site invoked
+`stability_generate` with no branch on provider. **An offline probe confirmed that a priced
+OpenAI call would have POSTed `OPENAI_API_KEY` to `api.stability.ai` with
+`model=gpt-image-1`.** No network call was made to establish that; the transport function
+was replaced first and the synthetic price existed only in memory.
+
+**I ADDED A GUARD, AND IT IS THE ONE THING HERE BEYOND THE BRIEF'S LITERAL FILE LIST.**
+`CLIENTS` maps provider to client and `require_client()` refuses anything absent from it.
+The reasoning: R099 and R100 together tell you the path is complete, so the natural next
+action is `--provider openai`, and that action would have sent your key to the wrong
+vendor. Sending a credential to a third party is not a near miss. **If you consider it out
+of scope it is one function and one dict, and strips cleanly.** Seeded per convention (p)
+with a SYNTHETIC cleared-but-unimplemented provider, so implementing an OpenAI client later
+does not break the case.
+
+**THE SELF-TEST BROKE AGAIN, IN EXACTLY THE SHAPE R099 PREDICTED.** Its "absent style
+register refused" case called the loader with no argument, reading the live repository,
+where the register did not exist. Creating the register broke it: **16 of 17.** The code
+path was never wrong. **The case was asserting on DATA rather than on the CODE PATH**, one
+session after the identical lesson. It now names a path inside the repository that is never
+created and seeds the absence itself. Three further cases were added: a register missing a
+required key, the live register composing a real prompt, and the client guard. **21 of 21.**
+
+**WHAT I DID NOT DO: I DID NOT INVENT A PRICE.** The access note records your Codex / API
+coverage as your stated position, explicitly marked as not satisfying `cost_of()`, which
+needs a `credits` figure and a `credit_usd` rate. Resolving it is a spend-control decision
+and therefore yours: either capture OpenAI's published pricing as evidence in the shape the
+Stability price uses, or rule that a covered-plan provider is exempt from the per-call cost
+model, which changes how the session spend cap works.
+
+**FIVE TENSIONS SURFACED IN THE REGISTER RATHER THAN DECIDED**, in its `open_questions`
+block. The two that affect generation output today:
+
+**1. M3 is three different things in three places.** The design system still calls it the
+Plasma Booster; the manifest's SY-09 role was corrected to the Holographic Dash Readout on
+2026-08-24 and ratified by your paste; and FX-01 still describes its sheet as the M3 booster
+flame. `compose()` puts the role straight into the prompt, so **FX-01 would generate a
+booster flame for what is now a holographic readout.** Two one-line corrections, neither
+mine to make.
+
+**2. The negative prompt is global and one row needs its opposite.** It forbids wordmarks
+and readable text, right for 29 rows and wrong for UI-05, which IS the FUTURE SPINNER
+wordmark. I left it strict rather than weakening it for all 30.
+
+**AND A CORRECTION I DID NOT REPEAT.** The register records the "plate stays subordinate to
+the symbols" rule with its true provenance, the batch prompt records, and states plainly
+that R097 retracted my R092 claim that the manifest said it. The rule is practice, not law,
+and it is labelled as such.
+
+Two defects found in passing and reported rather than fixed: **SC-03 crashes the composer**
+with an uncaught `ValueError` because its `target_dimensions` cell reads `800x640 source`
+and the field is parsed with `int()`; and **7 of 30 rows get their manifest note cut
+mid-token** because `notes.split('.')[0]` splits inside `plates.json`, `GameGrid.svelte:121`
+and `0.800`.
+
+Self-test 21/21, ingest self-test 17/17, doc currency PASS, locked paths PASS. **Zero game
+rasters staged or committed. The 27 placeholders are byte-for-byte unchanged**, verified by
+sha256 fingerprint before and after. The incoming art directory was read only.
+
+---
+
 ## 097 - 2026-08-24 - R099: the OpenAI gate is CLEARED for artwork, the self-test that broke was asserting on data, and a generation call still needs a price
 
 **THE MARK IS CHANGED. `openai` goes BARRED to CLEARED**, scoped to development-stage artwork,
