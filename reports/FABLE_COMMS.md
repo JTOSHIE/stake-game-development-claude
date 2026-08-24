@@ -9,6 +9,61 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 096 - 2026-08-24 - R098: the OpenAI ruling is on file, the comps-only restriction is lifted, and the machine gate still reads BARRED
+
+**THE PROVIDER RULING IS RECORDED.** `docs/legal/openai-ticket-456254-ruling.md`, new this
+session. Ticket **456254**, received **24 August 2026**, to Joshua / Synergistic Interaction Pty
+Ltd (We Roll Spinners).
+
+**The substance, as supplied.** OpenAI support confirmed that ChatGPT image generation
+(`gpt-image-1`) **may be used to create visual art assets**, symbols, backgrounds and other
+artwork, **for incorporation into real-money slot machine games published on licensed gambling
+platforms**, permitted as **development-stage artwork**, provided the service is **not used to
+operate gambling, accept or process wagers, process payments, or interact with players**, and
+**subject to the current Usage Policies and Terms of Use**.
+
+**This closes the previous "comps and style-targets only" restriction on ChatGPT-generated art**
+under those conditions. That is recorded explicitly in section 2 of the new file.
+
+**THREE THINGS I HAVE NOT DONE, and each is deliberate.**
+
+**1. The machine gate is unchanged and still refuses.** `provider_gate.json` still carries
+`"openai": {"mark": "BARRED"}` and `generate.py:63` still raises `GateRefusal` for any mark that
+is not `CLEARED`. This brief said not to alter asset pipeline behaviour or ingest rules, so I
+did not. **The operational position is therefore unchanged: a generation call to OpenAI still
+refuses today.** The file records the ruling; it does not lift the gate. `provider_gate.json`'s
+own comment sets the mechanism: *"Changing a mark here without a Fable ruling is the violation."*
+So lifting it is a Fable ruling in its own review-lane session.
+
+**2. The underlying correspondence is not in the repository.** There is no capture of the support
+reply under `docs/licences/openai/`. What is on file is **the owner's transcription**, and the
+record says so plainly rather than implying a primary source exists. Recommended and not done
+here: archive the original in a dated 2026-08-24 folder under the OpenAI licence directory,
+matching the shape already used for the 2026-08-22 OpenAI captures and for Google Gemini at `docs/licences/google-gemini/2026-07-15/`.
+That would satisfy convention (m) in full and give whoever changes the gate a primary source to
+point at.
+
+**3. A tension is surfaced rather than decided, per (l.8).** R084's BARRED mark did not rest on an
+opinion; it rested on a four-link contractual chain quoted verbatim (Services Agreement 16.1
+incorporates the Policies, the definitions pull in the Usage Policies, 3.3(a) restricts use that
+violates them, the Usage Policies prohibit "real money gambling"), plus the 14.1 liability carve-out
+and the 13.2 indemnity. **The new confirmation is a support statement, and it says of itself that
+it is "subject to the current Usage Policies and Terms of Use".** Whether it resolves that chain
+or sits beside it is a legal judgement for you and Fable, not for me. **I have not argued against
+the ruling and it is recorded in full and at face value**; section 5 exists only so that whoever
+changes the machine gate does it with both documents in view.
+
+**Records only. Zero rasters staged or committed. The 27 placeholders are untouched**, verified
+by sha256 fingerprint before and after. No code change, no kit, and the incoming art directory
+stayed read only.
+
+**The practical read for the arc:** the provider ruling was the item every other open decision was
+downstream of, and it is now on file. It does not by itself unblock generation, because the gate
+is code and the code has not changed. Two small follow-ups turn this into an actual unblock: the
+archived correspondence, and a Fable ruling on the mark.
+
+---
+
 ## 095 - 2026-08-24 - R097: the audit. 27 placeholders, 66.7% coverage, one tier is the whole gap, and `npm run assets` would silently revert 16 of them
 
 **READ-ONLY. Nothing was touched.** Proved rather than promised: the 28 modified paths were
