@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 092 - 2026-08-24 - R094: all three corrected hero assets pass at zero drift, and three things the gate cannot see
+
+**ALL THREE SWAPPED, 0.0000% DRIFT, NOTHING FORCED.** Title lockup to UI-05 `ui/logo.png`
+600x120, robot to SC-06 `ui/scene_character.png` 680x1344, car to SC-05 `ui/scene_car.png`
+2840x1000. Sizes taken from the shipped targets worked exactly as R093 predicted, the same way
+the tile plate did at R092. **Twenty-seven rasters now modified, zero staged.
+`hero_emblem_512.png` was not touched**, confirmed by `git status` on that path returning
+nothing. Build exit 0, zero console errors, zero page errors, zero missing assets.
+
+**Ingest took the NATIVE route on all three**, which is the right one and worth confirming
+rather than assuming: these arrive as RGBA with real cutouts, and `ingest.py`'s own docstring
+warns that running the keyer over an already-transparent PNG silently discards the supplied
+alpha. Route recorded as `native, source supplied its own cutout` for each.
+
+**THE GATE PASSED AND THREE THINGS STILL WANT YOUR EYE.** Aspect and dimension are only what the
+gate measures. Applying CLAUDE.md's own adoption test, which asks for the SUBJECT bounding box
+measured against what it replaces:
+
+**1. The title is materially less legible.** Measured on the opaque pixels: mean luminance drops
+**176.0 to 81.6**, and against the backdrop it actually sits on the contrast ratio drops
+**5.16:1 to 2.58:1**, roughly halved and under the 3:1 large-text threshold at the mean. Its
+bright highlights still reach 6.19:1, so the lettering reads as dark metal with lit edges rather
+than the bright chrome it replaces. On the workshop background it is noticeably harder to read.
+Not a gate failure and not something I will overrule you on, but it is the single most visible
+change in this swap.
+
+**2. The silhouettes moved, and the precedent bar was much tighter.** Subject bounding boxes:
+
+| Asset | Old subject | New subject | Delta |
+|---|---|---|---|
+| logo | 488x113 | 584x85 | width **+19.7%**, height **-24.8%** |
+| scene_character | 553x1250 | 330x1283 | **width -40.3%**, height +2.6% |
+| scene_car | 2729x914 | 2667x725 | width -2.3%, **height -20.7%** |
+
+For comparison, when the enhanced scene art was adopted in July the record states
+`scene_character` matched the original **to 0.7%** and `scene_car` was **identical at
+2729x914**. The robot is now a much slimmer figure and the car much flatter.
+
+**3. Two percentage-positioned overlays no longer sit on their art, which is the concrete
+consequence CLAUDE.md warns about** ("a changed silhouette breaks layout, because overlay
+effects are positioned by percentage within their layer"). Measured in the running game against
+where the subject actually draws:
+
+- **`.antenna-light` is only 6% inside the robot.** It is pinned at `left: 12%` and now lands
+  almost entirely in empty space beside the figure, because the new subject starts at x 160 of
+  680 where the old one started at x 13. The art carries its own orange orb, so the visible
+  damage is a faint blink floating off-model rather than a missing light.
+- **`.underglow` is 64% inside the car**, hanging roughly 22px below its new bottom edge, because
+  the car's silhouette is 20.7% shorter while the glow stays pinned at `bottom: 4%`.
+- `.visor-glint` and `.car-neon` both measure 100% inside their subjects and are fine.
+
+**None of this is a reason to reject the art and I have not.** The swaps are in the tree for your
+look pass exactly as the brief asks. If you keep this hero set, the overlay percentages in
+`SceneGroup.svelte` want re-tuning to the new silhouettes, which is a small component change and
+its own brief. If the title's darkness is not the intent, that is an art call and the canvas is
+already right, so a re-render at the same 600x120 would land unforced.
+
+Payload: logo 106,148 to 127,594 bytes, scene_car 1,036,271 to 1,657,838, scene_character 629,245
+to 474,277. Ship bar unchanged pending the provider ruling.
+
+---
+
 ## 091 - 2026-08-24 - R093: nothing landed, three refused on aspect and three have nowhere to go, with the exact canvases to re-render
 
 **ZERO SWAPS THIS SESSION.** Three refused by the gate, three are NO-ROW. The tree still carries
