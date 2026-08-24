@@ -9,6 +9,64 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 094 - 2026-08-24 - R096: the silhouettes came back, the antenna light went from 6 per cent on the robot to 89, and the CSS re-tune is no longer needed
+
+**ALL THREE SWAPPED, 0.0000% DRIFT, NATIVE ROUTE, NOTHING FORCED.** Robot to SC-06, car to
+SC-05, extra-bright title to UI-05. Raster count stays at **twenty-seven**, these overwrite the
+same three files. Zero staged. **`hero_emblem_512.png` not modified.** Build exit 0, zero console
+errors, zero page errors, zero missing assets.
+
+**THE ADDITIONAL CHECK, answered with numbers rather than an impression.** Because the swaps are
+never committed, `HEAD` still holds the original pre-R094 art, so all three generations can be
+compared directly. Subject bounding boxes:
+
+| Asset | Original (pre-R094) | R095 | **R096** |
+|---|---|---|---|
+| robot | 553x1250 | 330x1283, **width -40.3%** | 504x1284, **width -8.9%** |
+| car | 2729x914 | 2667x725, **height -20.7%** | 2750x842, **height -7.9%** |
+| title | 488x113 | 584x85 | 584x85, unchanged |
+
+**Yes, the robot is fuller**: the width deficit closes from 40.3 per cent to 8.9. **Yes, the car
+has more height and weight**: its height deficit closes from 20.7 per cent to 7.9. On screen the
+robot now reads as a substantial armoured figure rather than a thin one, and the car has body
+again. The title is a pure grade once more, its bounding box identical to R095's.
+
+**AND THE OVERLAY QUESTION IS ANSWERED: THE CSS RE-TUNE IS NO LONGER NEEDED.** This is the third
+session running on this thread and the first where the numbers move. Re-measured in the running
+game, not assumed:
+
+| Overlay | R094 / R095 | **R096** |
+|---|---|---|
+| `.antenna-light` | **6%** inside the robot | **89%** |
+| `.underglow` | 64% inside the car | **76%** |
+| `.visor-glint` | 100% | 100% |
+| `.car-neon` | 100% | 100% |
+
+**`.antenna-light` is effectively resolved at 89 per cent**, and the orange orb now sits on the
+antenna where it was designed to. I withdraw R095's E1 estimate that it needed `left` moved from
+12 to about 23 per cent; the art moved instead and the CSS is correct as written.
+
+**`.underglow` at 76 per cent is not a defect either, and I want to be careful not to over-report
+it.** Its overhang below the car's bottom edge halves, 21.8px to **10.9px** at the rendered size.
+More to the point, a **hover-pad glow arguably SHOULD sit slightly under the vehicle**, which is
+what it now does. What looked wrong at 64 per cent was the glow detaching from a car that had
+shrunk away from it; at 76 per cent it reads as the effect it was written to be.
+
+**The title keeps improving but has not returned to the original.** Contrast against the backdrop
+it sits on: original 5.16:1, R094 2.58:1, R095 3.20:1, **R096 3.42:1**. Comfortably over the 3:1
+large-text threshold and brighter again, still a darker treatment than the chrome it replaces.
+That remains a style position for your eye rather than a defect, and the canvas is right so any
+further pass lands unforced.
+
+Payload: `scene_character.png` 498,716 to 791,212 bytes, `scene_car.png` 1,888,353 to 2,169,737,
+`logo.png` 131,684 to 132,328. The two scene assets are meaningfully larger for the fuller
+silhouettes, which is the trade being made.
+
+Ship bar unchanged pending the provider ruling. **With this, the hero set has no open findings
+against it.**
+
+---
+
 ## 093 - 2026-08-24 - R095: the brightening clears the contrast threshold, and it cannot touch the overlay problem because it is a pure grade
 
 **ALL THREE SWAPPED, 0.0000% DRIFT, NATIVE ROUTE, NOTHING FORCED.** Brightened title to UI-05
