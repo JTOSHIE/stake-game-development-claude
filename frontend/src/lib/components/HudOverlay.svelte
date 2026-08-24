@@ -1465,9 +1465,11 @@
     background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
     border:1px solid transparent;
     background-image:
+      url('/assets/themes/future-spinner/ui/hud_banner.png'),
       linear-gradient(135deg,rgba(6,9,20,.86),rgba(10,15,34,.74)),
       linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#c9d7e0),color-mix(in srgb,var(--acc) 12%,#2b363f));
-    background-origin:border-box;background-clip:padding-box,border-box;
+    background-size:100% 100%,auto,auto;background-repeat:no-repeat,repeat,repeat;
+    background-origin:border-box;background-clip:padding-box,padding-box,border-box;
     box-shadow:
       0 6px 22px rgba(0,0,0,.5),
       inset 0 1px 0 rgba(255,255,255,.06),
