@@ -62,6 +62,18 @@ const ROOT = join(FRONTEND, '..')
 const UI_DIR = join(FRONTEND, 'public', 'assets', 'themes', 'future-spinner', 'ui')
 const VENV_PY = join(ROOT, 'scripts', 'assets', '.venv', 'bin', 'python')
 
+// R102: this script screenshots the live controls STRAIGHT INTO the shipped ui/ directory,
+// so it can overwrite uncommitted placeholder art exactly as `npm run assets` could. It
+// enforces the R101 rule through the SAME python guard rather than a second implementation
+// in JS, because two copies of a rule drift. ALLOW_ASSETS_OVERWRITE=1 to proceed anyway.
+{
+  const g = spawnSync('python3',
+    [join(ROOT, 'scripts', 'assets', 'asset_guard.py'), '--require-clean',
+     '--caller', 'regen_interface_guide_icons.mjs, the interface-guide icon capture'],
+    { stdio: 'inherit' })
+  if (g.status !== 0) process.exit(g.status ?? 2)
+}
+
 const TARGETS = [
   { selector: '[data-testid="spin-button"]', out: 'spin_button.png', label: 'Spin' },
   { selector: 'button[aria-label="Increase bet"]', out: 'btn_bet_plus.png', label: 'Increase Bet' },

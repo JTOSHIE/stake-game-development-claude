@@ -9,6 +9,83 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 100 - 2026-08-25 - R102: the HUD draws no rasters at all and never did, the Spine rig is specified, and a SECOND silent destroyer was found and closed
+
+**WORKSTREAM A. THE PREMISE NEEDED CORRECTING, AND THE PROJECT'S OWN HANDOVER ALREADY SAID
+SO.** The question was which new art exists but is not wired into the live HUD. The answer is
+that **the live HUD contains ZERO raster images**: `HudOverlay.svelte` has **0 `<img>` tags
+and 27 `<svg>` tags**. Every control, Balance, Win, Bet, Spin, Turbo, Bet +/-, Menu, Autoplay,
+Max, is CSS or inline SVG. Nothing is waiting to be wired.
+
+**And the button rasters are PHOTOGRAPHS OF THOSE CSS CONTROLS.**
+`frontend/scripts/regen_interface_guide_icons.mjs` drives a headless browser, screenshots the
+live buttons by CSS selector, and writes the results into the shipped ui directory as
+spin_button.png, btn_turbo.png, btn_menu.png and the rest. They are documentation icons for
+the Paytable Interface Guide. `docs/art/ART_HANDOVER_ARC2.md` section 3 has named all ten of
+them since arc 2 opened, states "The live controls they depict are drawn in CSS and inline
+SVG", and warns that a hand-drawn replacement "would immediately drift from the button it
+documents". **Wiring them into the HUD would replace a live vector-quality control with a
+low-resolution photograph of itself.**
+
+**A CONSEQUENCE THAT IS NOT COMFORTABLE.** Six of the 27 placeholders ARE those icon files:
+spin_button, btn_turbo, btn_menu, btn_autoplay, btn_bet_plus, btn_bet_minus. They were swapped
+with hand-painted art, same 200x200 canvas, files 1.4x to 2.8x larger. **So the Interface
+Guide currently shows art that does not depict the controls a player actually uses**, and
+nothing automated will say so: `interface_guide_icon_proof.mjs` is NOT in CI and only asserts
+byte-uniqueness plus builds a grid for a human to eyeball. I recommend reverting those six,
+and did not, because the fence forbids touching placeholders.
+
+**THE REAL HUD OPPORTUNITY IS THE ONE ELEMENT NOBODY ASKED ABOUT.** `docs/HUD_SPEC.md` locks
+every control to exact pixels, enforced by `hud_banner_spec_check.mjs` and by
+`control_row_symmetry_gate.mjs` in CI, on a 44px touch-target floor, with 35 aria-labels and
+localised text across sixteen locales. Baked text cannot localise, so raster controls are a
+bad trade. **But `.fs-panel`, the bottom banner, is a markup-empty div carrying only CSS gradients,
+explicitly "decorative only, z-index below every control".** It has no raster and its one
+`background-image` is two linear-gradients with no `url()` in it. Art can land there without touching one locked coordinate,
+one touch target or one accessible name. **It needs a 718x88 panel raster and nothing on disk
+is close** to that aspect of 8.16. That is the recommended next brief: commission the panel,
+not the buttons.
+
+**WORKSTREAM B. THE RIG IS SPECIFIED AND THE PIVOTS WERE CHECKED, NOT TRUSTED.** New file
+`docs/design/SPINE_ROBOT_RIG_SETUP.md`. Eleven parts, all RGBA with true alpha and zero corner
+alpha, all subjects centred at (0.50, 0.50) so **every pivot must be set deliberately on
+import**, and a consistent 20 to 23 px margin that must not be cropped. The supplied pivot set
+verifies: every pivot is exactly horizontally centred, both socket pairs are exactly
+symmetric, and the chain assembles to about 1280 px against the 1344 px reference, **95 per
+cent, which is agreement rather than coincidence.**
+
+**Two things the rig cannot do as delivered.** The visor is BAKED INTO the head part, so the
+"visor energy" a good idle wants is not a keyframe: it needs a tinted overlay, a commissioned
+emissive layer, or deferral. And the delivery record promises a review folder and a
+source-original folder that **do not exist**; the folder holds eleven PNGs and the record.
+
+**No code landed, deliberately.** There is no Spine runtime anywhere and the robot is a single
+static img. A config stub nothing reads is dead wiring, and `dead_wiring_scan.mjs` runs in CI
+to catch exactly that. The document carries the ranked next brief instead.
+
+**WORKSTREAM C. I WAS WRONG AT R101, AND A SECOND DESTROYER EXISTED.**
+
+**C1, and the correction matters more than the fix.** R101 exempted three background scripts
+on the reasoning that "each takes deliberate command-line arguments, so invoking one is an
+explicit act". **I checked. Two of the three have no argparse at all**, and the third's
+arguments tune quality while its destination is hardcoded. The reasoning was wrong, so **all
+three are now guarded** and refuse over uncommitted asset work.
+
+**C3 found a second silent destroyer, and R097's "only known command" is no longer true.**
+`regen_interface_guide_icons.mjs` writes screenshots straight into the shipped ui directory
+and **would have silently overwritten 6 of the 27 placeholders**. It is now guarded through
+the SAME python guard via a new `--require-clean` entry point, rather than a second
+implementation in JavaScript that could drift. Self-test **11 of 11**, including two new cases
+that exercise that entry point as a real subprocess, because an exit code another language
+reads is not proven by a function that works when imported.
+
+**Final safety statement: every writer into the shipped asset tree is now guarded**, and the
+sweep that establishes it is in the report. Placeholders 27/27 byte-for-byte unchanged, same
+fingerprint as R100 and R101. Zero rasters staged. No kit. The incoming art directory was read
+only.
+
+---
+
 ## 099 - 2026-08-25 - R101: npm run assets is safe by default, the hazard was measured by running it, and R097's second figure was 15 when it is 17
 
 **THE HAZARD IS GUARDED.** `npm run assets` now REFUSES by default when tracked asset files

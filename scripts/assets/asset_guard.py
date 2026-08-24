@@ -283,6 +283,24 @@ def _selftest():
         rec("non-repository returns None, not []",
             at_risk(repo=tmp + "/not-a-repo") is None, "ignorance is not cleanliness")
 
+        # THE --require-clean CLI, exercised as a real SUBPROCESS, because that is how the
+        # Node caller uses it. A function that works when imported proves nothing about an
+        # exit code a different language reads.
+        with open(wild, "wb") as fh:
+            fh.write(b"\x89PNG\r\n\x1a\n" + b"dirty again for the CLI case")
+        cli = [sys.executable, os.path.abspath(__file__), "--require-clean",
+               "--repo", repo, "--caller", "a node caller"]
+        run = subprocess.run(cli, capture_output=True, text=True,
+                             env={k: v for k, v in os.environ.items()
+                                  if k != OVERRIDE_ENV})
+        rec("--require-clean exits 2 on a dirty tree",
+            run.returncode == 2 and "REFUSED" in run.stderr,
+            f"exit {run.returncode}, refusal on stderr")
+        run_ok = subprocess.run(cli, capture_output=True, text=True,
+                                env={**os.environ, OVERRIDE_ENV: "1"})
+        rec("--require-clean exits 0 under the override",
+            run_ok.returncode == 0, f"exit {run_ok.returncode}")
+
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -302,6 +320,20 @@ def _selftest():
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
         raise SystemExit(_selftest())
+    if "--require-clean" in sys.argv:
+        # Exit 2 with the refusal if the asset tree is dirty, 0 otherwise. This is the entry
+        # point for NON-PYTHON writers, so that a Node generator enforces the same rule
+        # through the same code rather than through a second implementation that can drift.
+        # R102 added it for frontend/scripts/regen_interface_guide_icons.mjs, which
+        # screenshots the live controls straight into the shipped ui/ directory.
+        caller, repo = "the caller", _REPO
+        for i, a in enumerate(sys.argv):
+            if a == "--caller" and i + 1 < len(sys.argv):
+                caller = sys.argv[i + 1]
+            if a == "--repo" and i + 1 < len(sys.argv):
+                repo = sys.argv[i + 1]      # for the self-test; production callers omit it
+        guard_or_exit(caller, repo=repo)
+        raise SystemExit(0)
     risky = at_risk()
     if risky is None:
         print("asset_guard: git could not be consulted")

@@ -109,4 +109,9 @@ def main():
 
 
 if __name__ == "__main__":
+    # R102: same guard as the npm run assets chain. R101 exempted this script on the
+    # reasoning that it takes deliberate command-line arguments; R102 checked and that
+    # was wrong. Refuses over uncommitted asset work; ALLOW_ASSETS_OVERWRITE=1 to proceed.
+    from asset_guard import guard_or_exit
+    guard_or_exit("backgrounds.py, the background render stage")
     main()
