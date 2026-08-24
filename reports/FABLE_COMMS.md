@@ -9,6 +9,64 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 083 - 2026-08-24 - R085: STOPPED at TASK 1, no tag was safe to write, because two committed records name different builds
+
+**NO TAG CREATED, NO TAG PUSHED, NO RELEASE.** Your own evidence rule stopped this one and
+it was right to: tags are pushed once and never moved, force operations are forbidden this
+session, so a guess would have been permanent.
+
+**Preconditions all met.** On main, pulled, tracked tree clean. BASELINE_SHA is
+`d256b30d`. Neither target tag exists; **this repository has never carried a tag at all**,
+zero remote.
+
+**What IS explicitly stated**, quoted verbatim per (m), from
+`docs/records/FINAL_SUBMISSION_AUDIT_2026-08-20.md` line 21: *"Tip equalled the
+owner-confirmed published stamp `a95c521a` exactly; tree clean; zero open"*, and line 12,
+*"`a95c521a` build stands and no rebuild is owed"*. That is `a95c521a`, 2026-08-20 21:30.
+
+**What contradicts it.** R074 closed saying plainly *"nothing submitted"*, with the verdict
+only GO FOR START APPROVAL. **Then four sessions changed SHIPPED TEXT on 2026-08-21 before
+the verdict arrived.** R076 line 4: *"owner-caught at the Start Approval form (Step 1 of
+4)"*. R078 line 84: *"this is the build being submitted"*. R076, R077 and R078 changed the
+mandated General Disclaimer and the RTL selector set. **A kit built at `a95c521a` cannot
+contain any of them.** Both records are committed and they cannot both describe the
+reviewed kit.
+
+**What would settle it does not exist.** The verdict archive has **zero** SHA-shaped
+strings; so does your relayed R080 verdict brief. **No committed record cites any of the
+six 08-21 commits as a build or upload SHA**, checked one by one. No kit zip and no
+build-info.json is in history, because build-info.json is gitignored by design.
+
+**Three candidates, tabled with evidence in the report**: `a95c521a` (the only
+owner-confirmed published stamp, but predates the disclaimer), `1fdaa188` R079 09:47 (last
+commit before the verdict window), `38cd2257` R078 (the one whose report says "the build
+being submitted"). The 3-day lock puts the verdict at about 21/08 18:19, which argues for
+`1fdaa188`. **That is an inference from a lock duration, not a record, and your rule asks
+for a record.**
+
+**Figures verified against the tracker, which wins over the brief as you said.** TR-181
+distinguishes two numbers the brief collapses into one: the platform **quoted 4.3 of 9**,
+and **4.33** is our recomputed sum of 1.33 + 1.33 + 1.67, average 1.44. A tag message
+should carry both rather than pick one. The zero-findings clause matches TR-181 exactly.
+
+**E1: which build did you upload for review 1?** Best answered from the portal or the
+uploaded zip, whose `frontend/dist/build-info.json` stamps the commit, rather than from
+memory. **E2: no session ever recorded the submission act or its SHA**, because the act is
+yours and no brief asked for it to be written down. That gap caused this stop and recurs at
+review 2 unless a submission record becomes a convention. **E3: 70 untracked generated art
+files sit in an output/imagegen directory that is not tracked and not gitignored**, dated
+08-22 and 08-24, each folder carrying a PROMPTS_AND_QA record;
+untouched per the no-generation rule, and they want your disposition since they intersect
+R086 and the blocked provider ruling.
+
+**Timing, not an escalation: resubmission opens today at 18:19:53.** The arc-2 work has not
+started, so the standing rule holds: resubmit when the game clears the bar, never on the
+timer.
+
+One line from you turns TASKS 2 and 3 into ten minutes of mechanical work.
+
+---
+
 ## 082 - 2026-08-22 - R084: OpenAI is BARRED on its own words, Stability is CLEARED and cleaner than the weights, and the ingest was destroying cutouts
 
 **Numbered R084, because R083 is taken.** Your brief says "the earlier R083 draft is dead,
