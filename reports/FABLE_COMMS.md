@@ -9,6 +9,91 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 101 - 2026-08-25 - R103: the guide is honest again, one FX landed, and the Spine plan hit a system law that forecloses it
+
+**EIGHT WORKSTREAMS, ALL HANDLED.** One ledger, one restore, one intake, two commissioning
+specs, one code fix, one law conflict. **Zero rasters staged or committed.**
+
+**W1. ONE LEDGER NOW EXISTS.** `reports/OUTSTANDING_LEDGER_2026-08-25.md` reconciles every
+escalation from R086 to R102 into a single list with evidence, owner-decision flags and next
+actions, and it opens with the four corrected assumptions so they cannot be misread again. The
+scattered ESCALATIONS sections stay where they are, because what each session believed is
+evidence, but **this is now the place to look**. R097's stale, self-contradicting ledger is
+closed by it.
+
+**W2. THE SIX DOCUMENTATION ICONS ARE RESTORED, working tree only, hashes recorded.**
+spin_button, btn_turbo, btn_menu, btn_autoplay, btn_bet_plus, btn_bet_minus. Proof they were
+guide targets and not live controls: each has **zero** live-HUD `<img>` references, exactly one
+PaytableModal reference, and is a capture target of the regen script. **The Interface Guide now
+depicts the live controls again.** Byte-uniqueness, the one thing the icon proof actually
+asserts, holds in both states, so nothing was traded away. **27 placeholders became 22**: 21
+originals plus one intake.
+
+**W3. ONE FX ASSET LANDED OUT OF TWELVE, and the eleven refusals are the useful part.**
+`docs/design/FX_SET_INTAKE_2026-08-25.md` carries the full table.
+
+**The jet nozzle (UI-04) is in the working tree.** Exact **3.00x** downscale at **0.00% aspect
+drift**, a live REPLACE row genuinely rendered at `FlameJets.svelte:134`, subject bounding box
+**-7.6% / -9.5%** which sits inside the band this project accepted at R096 and far from the
+-40.3% it refused at R094. Critically, **nothing is anchored to its silhouette**: the nozzle and
+the flame both hang off the jet origin, so the R094 failure mode cannot occur. Recorded plainly:
+opaque mass fell 20.2 points, so it is a lighter shape, and whether that reads is a look call.
+
+**The two animation sheets fail on FRAME COUNT, which no resize fixes.** FX-03 wants 5 frames of
+240x120 and got 4 of 512x512; FX-01 wants **6** frames and got **4**. A four-frame sheet in a
+six-frame slot does not look slightly wrong, it desyncs. **The reel bezel is wrong for either
+reading of SC-03's target**, 17% or 28% adrift, so that ambiguity does not even block it.
+
+**Eight are HOMELESS, and I checked the runtime rather than guessing.** A particle system exists
+and is live, but it draws 32 to 128 px sprites, not 960 to 1200 px overlays. There is no
+selected-cell concept, only a multiplier-badge container. **The two ground shadows are 680 and
+2840 wide, exactly matching the hero robot and car**, but SceneGroup separates them with a CSS
+`drop-shadow()` filter and has no shadow layer. That is the smallest component job with the
+clearest payoff. **And this set contains nothing under 480px, so the four particle REPLACE rows
+R097 called the whole coverage gap are still unfilled.**
+
+**W4. THE BANNER SPEC IS EXACT.** `docs/design/HUD_BANNER_COMMISSIONING_SPEC.md`. **718x88
+verified from the token arithmetic**, not carried forward: `--fs-x-slab = 297 - 16 = 281` and
+`--fs-w-slab = 939 + 44 + 16 - 281 = 718`, matching the locked spec. **The constraint nobody had
+noticed: the panel's border and glow key off `--acc`, which flips cyan to pink in Overdrive.** A
+static raster cannot follow that, so the commission must be **accent-neutral** with the CSS edge
+left layered on top. Then it is a one-declaration change, and no CI gate measures this element.
+
+**W6. THE SPINE PLAN HIT A WALL, AND IT IS THE PROJECT'S OWN LAW.** The system law says anything
+the animation pipeline "positions or animates" is **"NEVER externally designed. No exception, and
+no measurement changes that answer"** — and external scene art is permitted *because* "it is flat,
+terminal, and animates nothing". **Rigging the robot is the exact act that destroys the
+justification the permission rests on.** A provenance record does not help; that is condition 3
+and condition 2 fails first. **So R102's step 1, adopt the parts, is withdrawn.**
+
+**But R103 found a third option nobody had considered.** There IS an in-house vector master,
+`frontend/scripts/scene/scene_character.svg`, tracked, 340x672 — and **dormant**: nothing renders
+from it, and it is one flat group of about 35 unnamed paths, so `build.py`'s existing layered
+track cannot split it as-is. Three routes are now written up: amend the law, rig from the
+in-house master and accept it predates the enhancement, or re-author the enhanced look as a
+grouped vector master. **Only the second can start without a ruling.**
+
+**W7. SC-03 NO LONGER CRASHES.** `compose()` parsed `target_dimensions` with a bare `int()`, so
+one of thirty rows raised an uncaught `ValueError` in a module whose whole design is to refuse
+cleanly. It now raises `ComposerRefusal` naming the row and the fix. **29 compose, 1 refuses
+cleanly, 0 crash.** Seeded from the real SC-03 row, 22/22. **The TARGET stays open**: the row's
+own note offers two remedies, so it is an owner question and I did not pick one.
+
+**M3 is corrected in the design system with the prior text preserved**, not overwritten.
+**FX-01's role was NOT edited**: it feeds a generation prompt, so changing it changes game
+content, and the brief said escalate rather than rewrite. The FX batch independently calls its
+sheet a holo dash flicker "for the M3 family", which corroborates the correction.
+
+**W8. 21 of 30 REPLACE rows covered, 70.0%**, up from R097's 66.7%. 22 working-tree rasters.
+**7.19 MiB of FX art has nowhere to go.** Guards all active; every writer into the shipped tree
+still refuses over dirty asset work.
+
+**Five owner decisions gate everything else**, in unblocking order: OpenAI pricing or a
+covered-plan exemption; the banner commission; the Spine law question; the homeless win and
+Overdrive art; the background room. The rest of the ledger is builder work waiting for a slot.
+
+---
+
 ## 100 - 2026-08-25 - R102: the HUD draws no rasters at all and never did, the Spine rig is specified, and a SECOND silent destroyer was found and closed
 
 **WORKSTREAM A. THE PREMISE NEEDED CORRECTING, AND THE PROJECT'S OWN HANDOVER ALREADY SAID

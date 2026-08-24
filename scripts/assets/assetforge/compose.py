@@ -71,7 +71,22 @@ def compose(row: dict, register: dict, *, oversample: int = 2) -> dict:
             f"{row['id']} is classified {row['classification']}, not {INGESTABLE}; "
             f"only the REPLACE rows are generated"
         )
-    w, h = (int(v) for v in row["target_dimensions"].lower().split("x"))
+    # R103: this used to be a bare int() over the split, which raised an uncaught ValueError
+    # rather than refusing. SC-03's cell reads "800x640 source", so ONE of the thirty REPLACE
+    # rows crashed the composer with a traceback, in a module whose entire design is to refuse
+    # cleanly and never guess. Neither main() catches ValueError, so it escaped as a crash.
+    raw = (row.get("target_dimensions") or "").strip()
+    try:
+        w, h = (int(v) for v in raw.lower().split("x"))
+    except (ValueError, TypeError):
+        raise ComposerRefusal(
+            f"{row['id']} has an unparseable target_dimensions cell {raw!r}. The cell must read "
+            f"exactly WIDTHxHEIGHT, for example '240x240'. This is a MANIFEST DATA defect, so "
+            f"fix the cell rather than this parser. The known case is SC-03, whose own note says "
+            f"the replacement should be authored at the true 640x468 aspect OR the engine call "
+            f"site should change; which of those is intended is an owner decision and the "
+            f"composer will not pick one."
+        ) from None
     wants_alpha = row["alpha"].strip().lower() == "yes"
 
     # Twice delivery size, per the brief, then clamped so the request stays near the

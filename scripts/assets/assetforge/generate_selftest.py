@@ -147,6 +147,21 @@ def main() -> int:
     except (ComposerRefusal, KeyError) as e:
         rec("live style register composes a production prompt", False, str(e)[:74])
 
+    # An unparseable target_dimensions cell must REFUSE, not crash. Seeded in the form it
+    # really occurs and from the row it really occurs on: SC-03 ships "800x640 source" in the
+    # live manifest, so this case reads the real row rather than an invented fixture. R103.
+    rows_all = load_rows()
+    try:
+        compose(rows_all["SC-03"], SYNTHETIC_REGISTER)
+        rec("unparseable target_dimensions refused", False,
+            "SC-03 composed despite an unparseable dimension cell")
+    except ComposerRefusal as e:
+        rec("unparseable target_dimensions refused",
+            "unparseable target_dimensions" in str(e) and "SC-03" in str(e), str(e)[:70])
+    except ValueError as e:
+        rec("unparseable target_dimensions refused", False,
+            f"crashed with ValueError instead of refusing: {str(e)[:44]}")
+
     rows = load_rows()
     for bad_id, cls in (("BR-01", "KEEP"), ("SC-04", "DEAD"), ("DOC-01", "REGEN")):
         try:

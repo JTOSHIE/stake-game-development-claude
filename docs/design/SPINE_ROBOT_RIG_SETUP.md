@@ -203,16 +203,99 @@ So the honest deliverable is this specification plus the ranked brief below.
 
 ### The next brief, if the owner wants the rig
 
-1. **Adopt the parts into the repository** under the design-system, with a provenance record
-   per the Assets convention, since they are owner-commissioned external art. Nothing can cite
-   them until this happens.
-2. **Rig in Spine to this document** and export skeleton, atlas and page PNG.
-3. **Decide the visor question** in section 6 before rigging, because option 2 changes the
-   part list.
-4. **Then, and only then, a runtime brief**: add the Spine player, load the skeleton behind a
-   feature flag, and keep the static `<img>` as the fallback so the current display cannot
-   break. That brief should carry its own budget: a runtime is a dependency, a loader, a
-   render target and a reduced-motion path, not an afternoon.
+**AMENDED 2026-08-25 BY R103. Step 1 as originally written is BLOCKED, and the reason is a
+system law rather than a preference.** The original step 1 read "Adopt the parts into the
+repository under the design-system, with a provenance record per the Assets convention, since
+they are owner-commissioned external art." R103 checked that against the law and it does not
+hold. The original four-step list is superseded by section 8.
 
-**Do not run steps 2 to 4 before step 1.** Rigging art that is not in the repository produces
-a skeleton whose sources cannot be found by anyone else.
+---
+
+## 8. THE COMPLIANCE BLOCKER, found 2026-08-25
+
+**The eleven external parts cannot enter the animation pipeline as the rules stand.**
+
+`design-system/DESIGN_SYSTEM.md` SYSTEM LAWS, quoted exactly:
+
+> **Symbols, frames and anything the animation pipeline positions or animates derive from
+> vector masters in this directory and are NEVER externally designed.** No exception, and no
+> measurement changes that answer (Manus retired July 2026).
+> **Owner-commissioned SCENE, TILE and MARKETING art may come from outside**, because it is
+> flat, terminal, and animates nothing.
+
+`CLAUDE.md`'s Assets section states the same thing as condition 2 of three: "**It does not
+enter the animation pipeline.** Symbols, frames and anything the effect system positions or
+animates are still produced in-house from vector masters, full stop."
+
+**The permission the shipped hero art relies on is justified BY the fact that it animates
+nothing. Rigging it is precisely the act that destroys that justification.** So the parts move
+from the permitted class into the prohibited one on the day they are rigged, and the law
+forecloses the usual escape: "No exception, and no measurement changes that answer."
+
+**A provenance record does not fix this.** Provenance is condition 3; condition 2 fails first.
+
+### What R103 found that changes the options
+
+**There is an in-house vector master of this robot, it is tracked, and it is dormant.**
+`frontend/scripts/scene/scene_character.svg`, 340x672, named as the source of the shipped
+character render by `design-system/masters/COMPLIANCE_NOTE_scene_character.md`. Two facts
+about it decide what can be done with it:
+
+1. **It is a single flat group.** One `<g id="racer">` containing about 35 unnamed paths,
+   circles and rects. There are no per-body-part groups and no ids on the elements, so
+   `build.py`'s existing LAYERED track, which selects by named `group_ids` and already emits
+   split part pairs for the H1 rim, the gauge and the brand mark, **cannot separate it as-is.**
+2. **It has been superseded and nothing renders from it.** The shipped
+   `ui/scene_character.png` is 680x1344 and is the externally ENHANCED raster adopted under the
+   2026-07-25 amendment. A sweep for the master's filename across the source tree returns no
+   live consumer. So a rig built from it would look like the pre-enhancement flat art, not like
+   the robot a player currently sees.
+
+### The three routes, and none of them is free
+
+| Route | Compliant today? | Matches shipped art? | Size of job |
+|---|---|---|---|
+| **A. Rig from the external parts** | **No.** Needs an owner amendment to the system law | Yes | Small, but gated on a ruling |
+| **B. Rig from the in-house SVG master** | **Yes**, no ruling needed | **No.** The master predates the enhancement | Medium: group the master's paths into named body parts, then add a `layered` manifest block |
+| **C. Re-author the enhanced look as an in-house vector master with named part groups** | Yes | Yes | Largest, and it is real vector authoring |
+
+**Route A is not unreasonable and the precedent exists**: the Assets law has already been
+amended twice by owner ruling, on 2026-07-25 for enhancement and on 2026-07-27 for commissioned
+scene, tile and marketing art. A third amendment covering rigged character art would be the
+same shape. **But it is an owner ruling, and no builder may assume it.**
+
+**Route B is the only one a builder can start unblocked**, and it has a hidden virtue: it needs
+no new pipeline. Grouping the master's paths and adding a `layered` block reuses machinery this
+project already ships and already trusts.
+
+**This is the decision that gates every other Spine task.** Nothing below can start until it is
+made.
+
+## 9. First motion, once a route is chosen
+
+**The smallest useful outcome, deliberately smaller than it is tempting to make it.**
+
+1. **Idle breathe only.** `hip` translate Y 6 to 10 px over a 3 to 4 second loop, with `torso`
+   scale Y 1.00 to 1.015 in phase. Nothing else moves. Ship this alone and look at it.
+2. **Then head settle.** `head` rotate 1.5 to 2.5 degrees, LAGGING the torso by 4 to 6 frames.
+   The lag is what makes it read as weight rather than as a rigid pivot.
+3. **Then arm sway**, 1 to 2 degrees on the upper arms opposing the bob, 0.5 to 1 degree on the
+   forearms lagging behind. Offset left and right by about a fifth of the loop; perfect
+   bilateral symmetry is the strongest tell that something is rigged rather than alive.
+4. **Visor energy is LAST and only if the art supports it.** Section 6 records why: the visor is
+   baked into the head part, so this needs either a tinted overlay quad or a commissioned
+   emissive layer.
+5. **No celebration choreography.** No win poses, no feature entry, no reactions. Those need a
+   state machine the game does not have, which is the same gap recorded against the title states
+   and character poses.
+
+**Sequencing rules for whoever executes this:**
+
+- **Feature-flag it and keep the static image as the fallback.** The robot renders today from
+  one `<img>`; that path must keep working untouched while the rig is behind a flag.
+- **Reduced motion must stop the idle**, not slow it. The project already pins
+  `prefers-reduced-motion` behaviour elsewhere and this must join it.
+- **Legs stay planted for all of the above.** Feet do not move in an idle, and a shifting
+  contact point is the fastest way to make a standing figure look like it is floating.
+- The two hero ground shadows in the 2026-08-25 FX set would make the contact read properly and
+  are a separate, smaller job that does not need the rig at all.
