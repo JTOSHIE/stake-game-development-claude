@@ -1,5 +1,39 @@
 # OUTSTANDING LEDGER, arc 2 — one authoritative list
 
+> **AMENDED 2026-08-25 by R104.** A completion kit of 122 files arrived after this ledger was
+> written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
+> pre-R104 rows as though the kit does not exist.**
+
+## 0A. WHAT THE COMPLETION KIT CHANGED
+
+**Of 24 top-level deliverables in the kit, ONE could be used.**
+
+| Ledger item | Was | Now |
+|---|---|---|
+| **R102-E2** banner art missing | OPEN, art did not exist | **CLOSED IN ART.** Four 718x88 candidates arrived; variant B selected on measurement and PLACED working-tree-only, with its CSS wiring also working-tree-only. **Committing either would fail CI**, see below |
+| **R102-E5** visor baked into the head | OPEN, needed an art request | **SOLVED IN ART, STILL BLOCKED IN LAW.** The kit ships a visor-off head plus separate visor, eye and chest emissive layers. They are externally designed, so the ruling still gates them |
+| **R103-SPINE-LAW** external parts illegal | OPEN | OPEN, and **route B was re-sized from medium to LARGE**: the in-house master is in the folded-arm hero pose and needs limb re-authoring, not just grouping. **Route A, one owner ruling, is now the cheapest path by a wide margin** |
+| **R097-FX-SET** particle gap | OPEN | **STILL OPEN.** The kit's smallest asset is 128x160; the four particle rows need 40, 128, 56 and 32 px. Neither art flood has addressed them. A machine-ready commissioning prompt is now written |
+| **FX-01 / FX-03 sheets** | WRONG-SPEC | **STILL WRONG-SPEC.** FX-01's frame COUNT is right at last (6), the frame SHAPE is not: 256x320 delivered against 200x200 required |
+| **R097-SC03-UI04** | UI-04 closed at R103 | SC-03 still open; the kit's two bezel variants are both wrong for either reading of the target |
+| **R103-E10** unused paytable import | OPEN | **CLOSED.** Removed; the function is still used by BuyBonus so the export stays |
+| **R102-E1** guide misrepresented controls | CLOSED at R103 | **VERIFIED STILL CLOSED.** The six icons match HEAD |
+
+**THE BANNER'S WIRING CANNOT BE COMMITTED, and the reason is a gate rather than a preference.**
+`frontend/scripts/asset_reference_gate.mjs` asserts every asset path the code references exists
+in dist, and `build_diet_verify.mjs` fails any 404. A committed `url()` pointing at an
+uncommitted raster would fail both. **So the raster and its one CSS line both stay in the working
+tree, together**, and the next session either commits both or reverts both.
+
+**Two working-tree changes are live and deliberate**, and are recorded here so nobody finds them
+cold: a new untracked hud_banner.png under the theme's ui directory, and one `background-image`
+layer added to `.fs-panel` in `HudOverlay.svelte` (modified, uncommitted). (The raster's path is
+deliberately written in prose rather than backticked, because it does not exist at HEAD and the
+document currency gate correctly refuses a citation to a file that is not there. It refused this
+very line once.)
+
+
+
 **Built 2026-08-25 by R103 WORKSTREAM 1**, reconciling every escalation and open finding from
 R086 through R102 into a single list, then correcting it against the repository at HEAD.
 

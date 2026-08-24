@@ -188,6 +188,14 @@ an idle wants is not an attachment keyframe, and there are exactly three honest 
 Option 2 is the right answer if the visor is meant to carry the character's life. **It is a
 new art request and is not in scope for a rig built from the parts that exist.**
 
+**UPDATE 2026-08-25 (R104): option 2 HAS BEEN DELIVERED.** The completion kit's spine-support
+group contains a head with the visor REMOVED (640x640), a separate visor glow layer (640x320), an
+eye sensor light layer (640x160) and a chest energy layer (640x480), all RGBA with true
+transparency. **So the visor limitation recorded above is solved in art.** It is not solved in
+law: those four layers are externally designed and would enter the animation pipeline, so they sit
+behind the same ruling as the eleven body parts. If the owner amends the law, the visor question
+closes with it at no extra cost.
+
 ---
 
 ## 7. Why no code landed with this
@@ -255,9 +263,48 @@ about it decide what can be done with it:
 
 | Route | Compliant today? | Matches shipped art? | Size of job |
 |---|---|---|---|
-| **A. Rig from the external parts** | **No.** Needs an owner amendment to the system law | Yes | Small, but gated on a ruling |
-| **B. Rig from the in-house SVG master** | **Yes**, no ruling needed | **No.** The master predates the enhancement | Medium: group the master's paths into named body parts, then add a `layered` manifest block |
-| **C. Re-author the enhanced look as an in-house vector master with named part groups** | Yes | Yes | Largest, and it is real vector authoring |
+| **A. Rig from the external parts** | **No.** Needs an owner amendment to the system law | Yes | **Small.** The parts are already neutral-posed and rig-ready; the whole cost is one ruling |
+| **B. Rig from the in-house SVG master** | **Yes**, no ruling needed | **No.** Flat vector, predates the enhancement | **LARGE, and R104 corrected this.** See below |
+| **C. Re-author the enhanced look as an in-house vector master, neutral pose, named groups** | Yes | Yes | Largest, and it is real vector authoring |
+
+### R104 CORRECTION: route B is not "group the paths and export"
+
+**R103 sized route B as medium, on the assumption that the master's 35 paths only needed
+grouping. R104 rendered the master and looked at it, and that assumption was wrong.**
+
+The in-house master is drawn in the HERO POSE, which
+`design-system/masters/COMPLIANCE_NOTE_scene_character.md` already described in words:
+"Posture is arms folded, weight on one leg." Rendering it confirms both:
+
+- **The forearms are folded in an X across the chest**, overlapping each other and the torso.
+- **The stance is weighted**, with the legs asymmetric and one crossing in front.
+
+**A rig needs limbs in neutral, separable orientations.** Rotating a folded forearm about an
+elbow pivot does not uncross it; it gives you crossed arms that wave. Grouping the existing
+paths therefore produces a skeleton that cannot perform the idle in section 9, no matter how
+carefully the pivots are placed.
+
+**This is exactly the problem the external batch solved deliberately**, and its own record says
+so: the limb parts "are rendered in neutral straight orientations rather than the crossed hero
+pose so they can be rotated freely in Spine."
+
+**So route B requires re-authoring the limbs in neutral orientation, in vector, in-house.** That
+is most of the work of route C, without route C's benefit of matching the shipped art.
+
+### What this does to the decision
+
+**Route A is now clearly the cheapest path, and its entire cost is one owner ruling.** The
+external parts are already neutral-posed, already separated, already measured, and already carry
+a matching visor layer in the 2026-08-25 completion kit. Everything about them is ready except
+their legal standing.
+
+**The law has been amended twice before by owner ruling**, on 2026-07-25 for enhancement and on
+2026-07-27 for commissioned scene, tile and marketing art. A third amendment covering rigged
+character art would be the same shape, and it is the owner's to make or refuse.
+
+**If the answer is no, route C is the honest one**, not route B: if the limbs must be re-authored
+anyway, they should be re-authored to match the art the player actually sees rather than to match
+a flat vector master that nothing renders.
 
 **Route A is not unreasonable and the precedent exists**: the Assets law has already been
 amended twice by owner ruling, on 2026-07-25 for enhancement and on 2026-07-27 for commissioned
