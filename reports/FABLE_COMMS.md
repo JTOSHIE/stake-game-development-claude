@@ -9,6 +9,77 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 095 - 2026-08-24 - R097: the audit. 27 placeholders, 66.7% coverage, one tier is the whole gap, and `npm run assets` would silently revert 16 of them
+
+**READ-ONLY. Nothing was touched.** Proved rather than promised: the 28 modified paths were
+sha256-fingerprinted before and after and the combined hash is **`fd5e7ff8e3c468ba036c974037441880`**
+both times. All five discovery agents independently returned a matching `TREE_AFTER`. That check
+exists because an audit's own tooling is the main threat to an uncommitted tree.
+
+**THE NUMBERS.** 27 placeholder rasters plus one provenance record. **20 of 30 REPLACE rows
+covered, 66.7%.** Build exit 0, zero console errors, zero missing assets, no layout breakage,
+and **no open defect against the art**.
+
+**THE GAP IS ONE TIER, WHICH IS THE MOST USEFUL THING IN THIS REPORT.** By priority:
+**P1 13/13 (100%), P2 4/5 (80%), P3 3/4 (75%), P4 0/8 (0%).** Every symbol is done. The eight
+uncovered P4 rows are the whole FX set, flipbook sheets and particles, plus two singles, SC-03
+the reel bezel and UI-04 the jet nozzle. **None of the ten was ever refused by a gate. No
+candidate was ever offered for any of them**, which makes this an intake gap rather than a
+quality failure, and R086 already recorded why: the generation prompt lock forbids particles and
+baked glow and demands a centred isolated object, which cannot produce a multi-frame strip.
+
+**THE FINDING THAT MATTERS MOST IS NEW AND IS NOT ABOUT ART. `npm run assets` would silently
+revert 16 of the 27 placeholders.** Measured from `scripts/assets/manifest.json` and `build.py`
+read as text, never executed: it rewrites all ten manifest symbols plus `h1_base`, `h1_spin`,
+`gauge_face`, `gauge_needle`, `feature_button` and `tile_plate`. It leaves the eleven others
+alone, including both backgrounds and the hero trio. **It would also recreate fifteen
+deliberately-absent files**, ten `_1x` symbol variants, four `brand_mark*` and `gauge_base`, and
+both `brand_mark` files are already deleted from the tree. `manifest.json:26` still exports
+SC-07, which its own manifest row calls DEAD. Nothing warns about any of this. **Until it is
+guarded, do not run `npm run assets` while the placeholders are in the tree.**
+
+**A CORRECTION TO MY OWN REPORTING, recorded rather than quietly fixed.** At R092 I wrote that
+"SY-13's own note says the plate must stay subordinate to the symbols". **That attribution is
+wrong.** The word "subordinate" appears zero times in `art_manifest_arc2.csv`. Its only
+occurrence in `docs/art/` is one line of `placeholder_map_2026-08-24.csv` quoting the batch
+record's own self-description. The design concern stands; the authority I cited for it does not.
+I attributed a generated batch's marketing of itself to the project's specification, which is
+exactly what the premise-provenance rule exists to prevent.
+
+**AND A CORRECTION TO MY OWN INSTRUMENT, which is the more useful lesson.** My first computation
+of the `npm run assets` revert set returned **6**, because I extracted `out` keys from the
+manifest while the symbols block writes by naming convention at `build.py:307`. The verification
+agent said 16. **The agent was right and my first pass was wrong.** I recomputed from the
+convention and now get 16 independently. A pattern that returns nothing means the pattern found
+nothing, not that the thing is absent.
+
+**FINDINGS LEDGER: 15 Closed, 4 open art decisions, 3 open code decisions, 11 open tooling,
+3 open provider.** Everything from R086 to R096 is carried with a disposition and nothing was
+dropped. Two housekeeping items worth naming: **the escalation ledger has been carrying
+discharged items forward for six sessions** (R089's E1 to E3 were fully discharged by R090 to
+R092 yet every later report still prints "R089's E1 through E3 stand"), and **four manifest
+`renders_in` citations point at CSS rules rather than the `<img>` they describe**, not the two
+R091 reported.
+
+**RANKED NEXT ACTIONS.** 1, guard the tree against `npm run assets`, because it is the only
+finding that can destroy work already done and it is cheap. 2, the provider ruling, because
+everything else is downstream of it. 3, decide the FX set, because it is the entire coverage
+gap. 4, add `--compare-against-shipped` to `ingest.py`, because four sessions have hand-rolled
+the same measurement and it is the check that caught every non-geometric defect. 5, the
+`ALPHA_SNAP_FLOOR` and refusal-message fixes. 6, the documentation drift sweep.
+
+**WHAT THIS AUDIT DID NOT SWEEP**, stated so silence is not mistaken for coverage: audio, locale
+and player-facing text, the locked maths package, CI health beyond the named gates, performance
+and bundle timing, accessibility beyond the one title contrast measurement, and every surface
+outside the theme asset tree and the components that render it. **No new gate was built**; the
+brief was read-only, and findings 23 to 33 are all gateable classes that are not gated today.
+
+Full audit in the session report and at
+`reports/archive/2026-08-24_r097-arc2-placeholder-audit.md`. Ship bar unchanged pending the
+provider ruling.
+
+---
+
 ## 094 - 2026-08-24 - R096: the silhouettes came back, the antenna light went from 6 per cent on the robot to 89, and the CSS re-tune is no longer needed
 
 **ALL THREE SWAPPED, 0.0000% DRIFT, NATIVE ROUTE, NOTHING FORCED.** Robot to SC-06, car to
