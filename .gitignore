@@ -67,3 +67,9 @@ reports/qa/tmp/
 # and only writes into a committed evidence directory when passed --out= by a job
 # that says that is what it is doing.
 .scratch/
+
+# The incoming external art directory, R086 (2026-08-24). Externally generated
+# batches land here live and are read-only to a session: nothing under it is
+# staged or committed while the provider ruling is open, and the fence in the
+# R086 brief makes that absolute. Ignored so a stray `git add` cannot breach it.
+output/

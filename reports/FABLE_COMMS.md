@@ -9,6 +9,98 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 085 - 2026-08-24 - R086: eight of thirty swapped locally, the aspect gate refused ten, and the per-symbol idles are dead in the CSS
+
+**THE FENCE HELD. `git diff --cached` carried ZERO rasters at every commit**, asserted by a
+gate chained with `&&`, not by intention. The incoming art directory is now covered by a
+gitignore rule, so a stray `git add` cannot breach it, and it is deliberately untracked
+rather than a repository path. Nothing in that directory was moved, edited or deleted. No generation, no
+API call. Locked paths untouched.
+
+**SNAPSHOT, taken 2026-08-24 12:38.** 126 files, 105,317,272 bytes, newest mtime
+`2026-08-24T12:38:29`. **The snapshot RACED the batch and I am recording that rather than
+smoothing it**: `support-states` was mid delivery, so its seven top level masters (mtime
+12:39) and its record (12:41) landed AFTER the snapshot instant and are out of scope by the
+brief's own rule. Checked rather than assumed that this costs nothing: none of the seven
+matches a REPLACE row, they are pressed states and win banners the manifest has no row for.
+
+**MAP: 126 rows at `docs/art/placeholder_map_2026-08-24.csv`.** MAPPED 8, WRONG-SPEC 8,
+AMBIGUOUS 2, NO-ROW 14, INTERMEDIATE 94.
+
+**SWAP: 8 shipped paths overwritten in the WORKING TREE ONLY.** SY-01 wild, SY-02 scatter,
+SY-03 h1, SY-04 h1_base, SY-05 h1_spin, SY-06 h2, UI-01 gauge_face, UI-02 gauge_needle. All
+eight ingested at 0.0 per cent aspect drift.
+
+**TEN REFUSED BY THE INGEST GATE, and the gate was right every time.** The five native
+symbol masters are portrait or landscape against square rows (M2, L1, L2, L3 at 34.3 per
+cent drift, M3 at 50.0); both tile plates are square against 244x204 (16.4); both
+backgrounds are square against 1920x1080 (43.8); the wordmark is square against 600x120
+(80.0). **`--allow-aspect-change` is not the answer**: the tool resizes straight to target
+and has no pad or crop path, so forcing it ships distorted art past the same dimension
+assertion. Two rows need more than geometry: SC-01 and SC-02 are a 4x UPSCALE short of
+1920x1080 whatever the aspect, and SC-02 is DERIVED NOT AUTHORED so it needs a graded twin
+of whichever SC-01 wins and therefore has no candidate at all.
+
+**SELECTION.** Tile plate RESOLVED: `06-tile-plate-refinement-v2` supersedes `07-tile-plate`
+on three signals, it self declares as a refinement retaining the same reel cell role, it is
+newer, and the newest batch record cites it as a style reference while never citing the
+other. Backgrounds NOT RESOLVED: a workshop and a test cell are two rooms, not two grades,
+neither self declares as a successor, and no record states a target. **That one is yours.**
+
+**BUILD PASSES, exit 0, zero console errors and zero missing assets** across six captures in
+`.scratch/placeholder-2026-08-24/screens/`. Nothing left `.scratch`.
+
+**THE DOM MEASUREMENT DID NOT RETURN THE NUMBER IT WENT LOOKING FOR, and the reason is a
+real defect.** M2 idle bob measured **0.000px** and L3 idle pump measured **0.000px**,
+because `.idle-coil` and `.idle-pump` DO NOT EXIST in the built CSS. Svelte's scoper prunes
+every selector it cannot see in the markup, and nine of the ten per symbol idles are added
+only by `classList.add()` at `GameGrid.svelte:575`. **`idle-breathe` is the sole survivor**,
+because it is the one written literally at line 1197. The nine `@keyframes` ship as orphans.
+Verified three ways: rule count in `dist` CSS is 1 for `idle-breathe` and 0 for the other
+nine; live `getComputedStyle` returns `animationName: none` for all nine; and
+`prefers-reduced-motion` was pinned to `no-preference`, so the reduce block is ruled out.
+**Every symbol on the board therefore performs the same generic 3.4s scale pulse.** That
+sits directly under review 1's "poor animations" tag. No code changed, per TASK 4.
+
+**THE HEADROOM NUMBERS, for when that is fixed.** Authored excursions are 3px (M2) and 7px
+(L3), absolute CSS px, while headroom scales with the render. Art square measures 78.18px at
+1440x900 and 54.951px at 430x860, so a 240px asset renders at 0.326 and 0.229. To absorb its
+own excursion M2 needs 9.21px of art space headroom at desktop and 13.10px at small; L3
+needs 21.49px and **30.57px**. Measured solid crown headroom (alpha >= 128): M2 29px, L3
+31px. So both clear on the solid crown, but **L3 at 430px wide clears by 0.43px**, which is
+no margin at all. On any alpha, m2 has 7px and l3 has **0px**, its faint glow touching row 0.
+**The manifest states these as "3px" and "7px" headroom, which reads as art space and
+under specifies by roughly threefold at desktop.**
+
+**MEASURED ON THE ARTEFACT THAT SHIPS, per the R083 lesson, and it found something the
+ledger could not.** The ingest ledger reports residual green dominance 0.098 pre downscale,
+which is clean. The DELIVERED files each carry a few pure green pixels the ledger cannot
+see: 15 to 214 per file, all at or below 14.5 per cent alpha, mean about 3 per cent. The
+currently shipped originals carry **zero**. Negligible on screen and no gate failed, but it
+is a measurable regression and it is recorded rather than waved past.
+
+**SY-09 CORRECTED**, ratified by your paste: the role is the holographic dash readout, not
+the booster, and the note records that FX-01's semantics become the holo flicker sheet with
+the layout spec unchanged at six frames of 200x200 in one 1200x200 row. **Knock on you may
+want to rule on: FX-01's OWN row still reads "6-frame flipbook of the M3 booster flame".**
+The brief scoped this edit to SY-09, so I left it and am naming it here.
+
+**RATIFIED BY OWNER PASTE OF THIS BRIEF, both now standing conventions.** (1) SUBMISSION
+RECORD: every portal upload act gets a same day committed record of kit filename, kit
+sha256, source SHA from the kit README, and portal timestamp. (2) EXTERNAL INTAKE:
+externally generated batches arrive as closed dated folders with a MANIFEST.md naming
+provider, product, model, account, dates, verbatim prompts, included reference files, post
+processing chain and manifest id targets, and are never edited after delivery.
+
+**STANDING STATUS: placeholder assets are visual test only, provider attribution rides the
+batch records as received, and the ship bar is unchanged pending provider clearance.** The
+working tree is LEFT SWAPPED for your look pass. Restore with
+`git checkout -- <the eight paths>`, listed in the session report, before any kit build.
+
+**Folded ack per (t):** R085-R's records commit `8e80e951` merged clean and its CI was green.
+
+---
+
 ## 084 - 2026-08-24 - R085-R: the restore point is cut, submission-1 stays held, and the art directory is live
 
 **THE RESTORE POINT EXISTS.** `arc2-baseline` is pushed, annotated, at
