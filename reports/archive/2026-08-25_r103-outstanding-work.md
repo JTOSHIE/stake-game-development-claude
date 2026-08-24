@@ -284,6 +284,16 @@ exemption; archive the Ticket 456254 correspondence; `--compare-against-shipped`
 Generate self-test **22/22**. Asset guard **11/11**. Doc currency **PASS, 0 new**. Locked paths
 **PASS**. Explicit paths per (k).
 
+## CI RESULT, and a correction to the first diagnosis
+
+**First run CANCELLED, re-run GREEN 30/30.** The `what changed` job timed out at 5m01s with all
+steps successful; its checkout alone took 298s, so the browser matrix never ran and the run was
+not green. **The initial diagnosis, that the 1.37 GiB history had crossed the timeout, was wrong.**
+The four preceding runs checked out in 30s, 39s, 24s and 106s, and the re-run of this same commit
+took **36s** and passed 30/30. It was a runner incident, which is the second recorded instance of
+that class and exactly what CLAUDE.md's own rule predicts: read the per-step timings before
+concluding a gate is getting slower. Full note in the ledger.
+
 ## ESCALATIONS
 
 **E1 (R103). The Spine system-law conflict.** External parts cannot be rigged without an owner

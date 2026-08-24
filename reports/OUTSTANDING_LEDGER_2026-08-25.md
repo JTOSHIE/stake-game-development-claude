@@ -136,6 +136,33 @@ path, verified this session, so it produces candidates rather than shipping them
 | R103-E4 | Overdrive award strings bypass the locale number convention | **NEW** | Lens finding | No visible defect today | Route through the formatter |
 | R102-E1 | The guide misrepresented the live controls | **CLOSED** R103 W2.3 | Six icons restored to HEAD in the working tree | No | — |
 
+
+### CI incident, 2026-08-25, recorded so the next session does not misdiagnose it
+
+**R103's first run on `b305f9d9` concluded CANCELLED, and it was a runner incident, not a
+defect and not a threshold.** The `what changed` job hit its `timeout-minutes: 5` at 5m01s
+with EVERY step reporting success; its `Check out` step alone took **298 seconds**. Because
+that job gates the browser matrix, the 28 browser gates never ran, so the run could not be
+called green even though `static gates` had passed every step.
+
+**The first diagnosis was wrong and the numbers corrected it.** The repository's pack is
+1.37 GiB, of which `reports/` is 1,199 MiB (63%), so "the repo has grown past the timeout"
+was an appealing story. It does not survive the data: the four preceding runs checked out the
+same repository in **30s, 39s, 24s and 106s**, and the re-run of this very commit took **36s**
+and went **30/30 green**. 298s is an outlier at roughly 3x the worst recent run, not a trend.
+
+**This is the second recorded instance of the class**, the first being the 9m24s run whose
+`Install frontend dependencies` step ran 320s against 9 to 22s elsewhere in the same run.
+`CLAUDE.md` already draws the rule from it: **a slow run is a runner or npm incident until the
+per-step timings say otherwise, and the way to tell is to read the step breakdown.** That rule
+worked here.
+
+**The residual fragility is real but is NOT a defect to fix on this evidence.** A 1.37 GiB
+history makes a `fetch-depth: 0` job more exposed to a bad runner than a small repository would
+be. If this recurs, the cheap fixes in order are: raise `timeout-minutes` on that one job; or
+fetch only the merge-base rather than full history; or address the evidence volume in
+`reports/`, which is the largest and riskiest option and rewrites history.
+
 ---
 
 ## The shortest true summary
