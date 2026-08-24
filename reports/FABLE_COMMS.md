@@ -9,6 +9,49 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 087 - 2026-08-24 - R089: seven UI controls swapped into the working tree, seven symbols and the background refused on aspect, four UI rows have no live raster
+
+**SEVEN NEW SWAPS, WORKING TREE ONLY, on top of the eight already there.** spin_button,
+btn_turbo, btn_bet_plus, btn_bet_minus, feature_button, btn_menu (from the settings-menu
+source) and btn_autoplay. All seven sources are 480x480 square keyed on green, downscaled
+premultiplied to each shipped file's own real size (200x200, feature_button 224x224) through
+the proven AssetForge primitives rather than a fresh keyer. **Zero rasters staged, ever.**
+The working tree now carries FIFTEEN modified placeholders; nothing committed. output/ read
+only, no generation, no API call, no kit.
+
+**WHERE THE OWNER WILL SEE THESE, and it is not the live HUD.** Verified in source rather
+than assumed: the live HUD spin/bet/menu/turbo controls are CSS plus inline SVG, and none of
+these seven rasters is drawn as an `<img>` in the running HUD. They render as the INTERFACE
+GUIDE inside the Paytable modal (spin, increase bet, decrease bet, features, autoplay, menu,
+turbo, max are all `kind: 'img'` guide rows in PaytableModal.svelte), and feature_button
+additionally renders live on the Buy screen (BuyBonus.svelte). So open the paytable to see
+the swapped set; the HUD buttons themselves keep their CSS look. Captured the paytable guide
+at 1440x900, all seven load, zero console faults, zero missing assets.
+
+**SEVEN REFUSED ON ASPECT, and the gate was right, same finding as R086.** The five native
+symbol masters are portrait or landscape against square 240x240 rows: M2 34.4%, M3 50.0%,
+L1 34.3%, L2 34.4%, L3 34.4% drift. Tile plate refinement-v2 is 480x480 square against
+244x204 at 16.4%. The garage background is 480x480 against 1920x1080 at 43.7% and is a 4x
+upscale besides. Each would have to be squashed to fit, so each is recorded WRONG-SPEC and
+skipped, leaving the current art. These want a re-render at target aspect or an owner
+authorised pad to square before they can go in undistorted; that is unchanged from R086 and
+was not attempted here because the brief says skip on gate failure.
+
+**FOUR UI ROWS HAVE NO LIVE RASTER TARGET.** Main HUD Banner and Paytable Button map to no
+shipped raster (the HUD is composed of CSS plus the DEAD panel plates, and the paytable is
+opened from a CSS menu control); Sound On and Sound Off have no shipped sound-toggle raster
+at all. All four recorded NO-ROW and skipped. Also noted for the record: the Turbo source is
+one quick-spin control and maps to btn_turbo.png only; the two further speed-state rasters
+btn_turbo_2 and btn_turbo_3 were not in the shortlist and are left as they were.
+
+**DISPOSITION: swapped 7, wrong-spec 7, no-row 4, already in place 8**, 26 shortlist rows in
+all. Build exit 0. Local preview clean. The working tree is LEFT SWAPPED for the owner's look
+pass; restore any path with `git checkout -- <path>`, the full list is in the session report.
+The eight R086/R087 placeholders were not re-touched. Ship bar unchanged pending the provider
+ruling; placeholder assets remain visual test only.
+
+---
+
 ## 086 - 2026-08-24 - R087: the idles are alive, the excursions are percentages, and the gate found seven more dead rules than R086 did
 
 **SIXTEEN PRUNED RULES, NOT NINE.** R086 measured the nine per symbol idles. Writing the
