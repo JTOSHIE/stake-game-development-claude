@@ -9,6 +9,60 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 090 - 2026-08-24 - R092: the tile plate and M1 both land, and the arc-2 placeholder set is now complete
+
+**BOTH SWAPPED, BOTH AT 0.0000% DRIFT.** These were the last two gaps, and both were closed by
+re-rendering to spec rather than by loosening anything.
+
+**Tile plate: 732x612 against a 244x204 target, 0.0000% drift.** R090 refused a square master at
+16.39% and recommended exactly this canvas, 3x the target with the bezel edge to edge and zero
+margin; the new master is built that way and `ingest.py` accepted it unmodified and unflagged.
+Measured rather than trusted: the ink reaches all four canvas edges, **margins 0/0/0/0**, so the
+"fills the cell" requirement in SY-13 is satisfied for the first time.
+
+**One property worth naming before the look pass.** This plate carries **no green key and no
+alpha**, deliberately, because the whole image is the plate. Ingest reported "cleared 0px, soft
+edge 0px" and the delivered file is **100% opaque**, where the old plate had transparent rounded
+corners at a 23px radius. The corner rounding is now done by `.tile-plate`'s own
+`border-radius: 8px` instead of by the art's alpha. Verified in the running game: the plate
+loads at 244x204 into a 114.4x95.3 box under `object-fit: fill`, 35 instances, corners round
+cleanly, no square-corner artefact. Also verified the despill did nothing it should not: colour
+delta against a plain Lanczos downscale is **max 0, mean 0.000**, because there is no green for
+it to act on.
+
+**M1: 480x480 to 240x240, 0.0000% drift, the last glow-era symbol retired.** R090's E5 recorded
+`m1.png` as the only asset left from the old set, carrying 60.2% soft-edge pixels where the
+swapped symbols carry 7 to 20%, with no candidate in any batch. There is one now. Delivered
+file: 22,850 visible pixels, **37 pure-green pixels at or below 5.9% alpha**, invisible. Alpha
+bbox rows 63 to 179, a wide short intake module, top pad 63px of 240, and **M1's idle is
+`idle-rev`, which is scale-only with no translate**, so the headroom question that dogged M2 does
+not arise here at all.
+
+**TWENTY-FOUR rasters now modified in the working tree** and the arc-2 placeholder set is
+complete: every symbol, the tile plate behind all 35 cells, the background pair, the gauge and
+the seven UI controls. Zero staged. Build exit 0, zero console errors, zero page errors, zero
+missing assets, no layout breakage.
+
+**Payload, recorded because it is a real direction.** `tile_plate.png` goes **1,054 to 81,899
+bytes**, which looks alarming as a ratio but is one file: the old plate was a flat three-colour
+rounded rectangle that compressed to almost nothing, and the new one is a carbon field with a
+machined bezel. `m1.png` goes 37,695 to 61,996. Neither is a problem against a 25 MiB kit
+budget; both are noted so nobody has to rediscover them.
+
+**One design question that is yours rather than mine.** SY-13's own note says the plate must stay
+**subordinate to the symbols**, and this plate is materially busier than the flat rectangle it
+replaces: it has stepped bezel edges, corner transitions and a visible carbon weave behind every
+one of the 35 cells. On screen the symbols still dominate and I would not call it a defect, but
+it is the single highest-leverage tile in the set and the change is deliberate art direction, so
+it wants your eye rather than my verdict.
+
+Ship bar unchanged pending the provider ruling; placeholders remain visual test only. The
+twenty-four path restore command is in the session report, and it still includes
+`reports/qa/background_overdrive_derive.json`, left dirty since R091 so the provenance record
+keeps describing the background pair that is actually on disk.
+
+---
+
 ## 089 - 2026-08-24 - R091: the background finally fits, its Overdrive twin was derived with it, and all four win graphics are NO-ROW
 
 **THE BACKGROUND IS IN, and it is the first one that ever passed.** `01-workshop` is
