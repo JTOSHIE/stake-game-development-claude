@@ -17,8 +17,19 @@ be seen to pass. The cases plant the defect in the form it really occurs:
   the spend cap         seeded by writing a ledger that is already near the cap, which is
                         how a cap is really reached: not by one huge call but by the
                         twentieth small one in an unattended run.
-  the absent register   the live state of this repository today, so this case also proves
-                        the composer's refusal is real rather than a message nobody reaches.
+  the absent register   R100 note: this case used to call load_style_register() with no
+                        argument, which read the LIVE repository, where the register did not
+                        exist. When R100 authored docs/art/style_register.json the case broke,
+                        for exactly the reason the BARRED case broke at R099: it was asserting
+                        on DATA rather than on the CODE PATH. Whether a file exists today is a
+                        fact that can legitimately change; the refusal it triggers must be
+                        provable regardless. So the case now names a path INSIDE the repository
+                        that is never created, and seeds the absence itself. The path must stay
+                        under the repository root because the refusal message renders it with
+                        relative_to(REPO), which raises on anything outside.
+  the missing key       the other half of the loader's contract. A register that exists but has
+                        been hand-edited down to one key is the realistic form of this defect,
+                        so it is seeded that way rather than as an empty object.
 
 Run: scripts/assets/.venv/bin/python scripts/assets/assetforge/generate_selftest.py
 """
@@ -31,6 +42,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import compose as C  # noqa: E402
 import generate as G  # noqa: E402
 from compose import ComposerRefusal, compose, load_rows  # noqa: E402
 
@@ -77,11 +89,63 @@ def main() -> int:
     except G.GateRefusal as e:
         rec("unassessed provider refused", "never been assessed" in str(e), str(e)[:74])
 
+    # A provider that is CLEARED but has no client. Seeded with a synthetic provider rather
+    # than by naming whichever real one happens to be unimplemented today, so implementing an
+    # OpenAI client later does not break this case. The defect is in the form it really
+    # occurs: a licence mark saying MAY, with no code saying HOW.
+    unimplemented = {"providers": {"acme-image": {
+        "mark": "CLEARED", "reason": "synthetic fixture", "evidence": ["none"],
+        "env_key": "ACME_API_KEY", "models": {"acme-1": {"credits": 1}}, "credit_usd": 0.01}}}
     try:
-        G.load_style_register()
+        entry_u = G.require_cleared("acme-image", unimplemented)
+        G.require_client("acme-image", entry_u)
+        rec("CLEARED provider with no client refused", False,
+            "a provider with no client was routed somewhere")
+    except G.GateRefusal as e:
+        rec("CLEARED provider with no client refused",
+            "no client for it" in str(e) and "ACME_API_KEY" in str(e), str(e)[:74])
+
+    # The control: the one provider that DOES have a client resolves to it.
+    rec("implemented provider resolves to its own client",
+        G.require_client("stability", gate["providers"]["stability"]) is G.stability_generate,
+        "stability -> stability_generate")
+
+    # Seeded, not borrowed from the live tree: a path under the repository that is never
+    # created. Under the repository because the refusal renders it with relative_to(REPO).
+    absent = C.STYLE_REGISTER.with_name("style_register.__selftest_absent__.json")
+    assert not absent.exists(), "the seeded-absent path must never exist"
+    try:
+        G.load_style_register(absent)
         rec("absent style register refused", False, "a register was loaded from nowhere")
     except ComposerRefusal as e:
         rec("absent style register refused", "does not exist" in str(e), str(e)[:74])
+
+    # The other half of the loader's contract, never previously exercised: a register that
+    # exists but is missing a required key. Seeded in its realistic form, a hand-edited file
+    # that kept 'base' and lost 'negative'.
+    partial = C.STYLE_REGISTER.with_name("style_register.__selftest_partial__.json")
+    try:
+        partial.write_text(json.dumps({"base": "a style with no negative"}), encoding="utf-8")
+        try:
+            G.load_style_register(partial)
+            rec("register missing a required key refused", False, "a partial register loaded")
+        except ComposerRefusal as e:
+            rec("register missing a required key refused",
+                "missing required key" in str(e) and "negative" in str(e), str(e)[:74])
+    finally:
+        partial.unlink(missing_ok=True)
+
+    # And the live register now EXISTS and drives a real prompt. Asserted so the R100 unblock
+    # is covered rather than assumed, and so a future deletion of the file goes red here.
+    try:
+        live = G.load_style_register()
+        live_spec = compose(load_rows()["SY-01"], live)
+        rec("live style register composes a production prompt",
+            isinstance(live.get("base"), str) and live["base"].strip() != ""
+            and "Future Spinner" in live_spec["prompt"],
+            f"register {live.get('register_id')!r} -> {len(live_spec['prompt'])} char prompt")
+    except (ComposerRefusal, KeyError) as e:
+        rec("live style register composes a production prompt", False, str(e)[:74])
 
     rows = load_rows()
     for bad_id, cls in (("BR-01", "KEEP"), ("SC-04", "DEAD"), ("DOC-01", "REGEN")):

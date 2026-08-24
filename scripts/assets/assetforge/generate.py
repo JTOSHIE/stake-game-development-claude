@@ -4,7 +4,11 @@
 No model, no weight and no UI installs on the owner's machine: this is a thin HTTP client
 over provider APIs, per the R084 constraint on record.
 
-THREE THINGS THIS REFUSES TO DO, each because remembering is not a control:
+FOUR THINGS THIS REFUSES TO DO, each because remembering is not a control:
+
+  A PROVIDER IT HAS NO CLIENT FOR. See CLIENTS below. A licence mark says a provider MAY
+  be called; it does not say this module knows HOW. Those are different questions and
+  conflating them sends an API key to the wrong vendor.
 
   A BARRED PROVIDER. provider_gate.json carries the R084 TASK 0 marks and this module
   reads them on every call. OpenAI is BARRED because its Usage Policies prohibit "real
@@ -127,10 +131,34 @@ def _nearest_aspect(w: int, h: int) -> str:
     return min(supported, key=lambda k: abs(supported[k] - target))
 
 
+# One client per provider, and a provider with no entry here is REFUSED rather than routed
+# to somebody else's endpoint. Added R100. Until then generate_one called stability_generate
+# unconditionally, with no branch on provider, which was correct while Stability was the only
+# CLEARED provider and became a hazard the moment a second one was cleared: R099 cleared
+# OpenAI, and an offline probe at R100 confirmed that a priced OpenAI call would have POSTed
+# OPENAI_API_KEY to api.stability.ai with model=gpt-image-1. Sending a credential to the wrong
+# vendor is not a near miss, so the refusal is structural rather than a note in a README.
+CLIENTS = {"stability": stability_generate}
+
+
+def require_client(provider: str, entry: dict):
+    client = CLIENTS.get(provider)
+    if client is None:
+        raise GateRefusal(
+            f"{provider!r} passes the licence gate but this module has no client for it, so "
+            f"no call will be made. Implemented: {', '.join(sorted(CLIENTS))}. Refusing rather "
+            f"than falling through to another provider's endpoint, which would send "
+            f"{entry.get('env_key', 'the API key')} to the wrong vendor. Implementing a client "
+            f"is a code change, not a gate edit."
+        )
+    return client
+
+
 def generate_one(manifest_id: str, *, provider: str, model: str, seed: int,
                  out_dir: Path, cap_usd: float, dry_run: bool) -> dict:
     gate = load_gate()
     entry = require_cleared(provider, gate)
+    client = require_client(provider, entry)
 
     register = load_style_register()               # refuses if absent
     rows = load_rows()
@@ -173,7 +201,7 @@ def generate_one(manifest_id: str, *, provider: str, model: str, seed: int,
         record["image"] = None
     else:
         try:
-            img, req_id = stability_generate(spec, model, api_key, seed)
+            img, req_id = client(spec, model, api_key, seed)
         except urllib.error.HTTPError as exc:
             raise GateRefusal(f"{provider} returned HTTP {exc.code}: {exc.read()[:200]!r}") from exc
         dest = out_dir / f"{manifest_id}_{provider}_{model}_seed{seed}.png"

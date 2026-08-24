@@ -1,0 +1,200 @@
+{
+  "_comment": "THE ARC-2 STYLE REGISTER. Four keys are OPERATIVE (read by code): 'base' and 'negative' are required by compose.load_style_register; 'per_role' is merged per manifest id; 'camera' is named by the loader's own refusal message but is NOT yet consumed by compose() - see open_questions. compose() builds each production prompt as: base . row role . first sentence of row notes . per_role clause . a transparency clause the composer appends itself. So 'base' must not describe the background or the subject, and 'negative' must not mention green spill or drop shadow, both of which compose() adds for alpha rows. EVERY OTHER KEY IS DOCUMENTATION and is ignored by the code; it records where each operative clause came from, so the style is changed deliberately rather than by drift. Nothing here is invented: see 'derivation'. Editing 'base' or 'negative' changes every production prompt, so change them by ruling, not in passing.",
+  "register_id": "arc-2-future-spinner",
+  "name": "Future Spinner, arc 2",
+  "version": "1.0.0",
+  "authored": "2026-08-24",
+  "authored_by": "R100, derived from committed project records and the arc-2 batch prompt records",
+  "base": "Dimensional painted cyberpunk-automotive game art in the locked Future Spinner arc-2 direction: high-end hand-painted 2D slot-game illustration, clearly illustrated rather than photographic or photoreal 3D. Automotive engineering is primary and cyberpunk accents are secondary. Confident authored outlines with decisive black edge control, broad readable value shapes and strong dimensionality. Materials are polished chrome, brushed gunmetal and carbon fibre, with ceramic or glass where the object calls for it, in confident material separation and warm gold used sparingly; emissives are cyan #00FFFF and magenta #FF00FF together over a deep navy #060610 ground, richly saturated and never pastel, with neon kept secondary to the physical form. Lighting is a fixed upper-left white key, a cool cyan reflected fill from the left and restrained magenta edge reflections from the right. Presentation is front facing always, a strict dead-on orthographic front elevation with no perspective angles, the subject centred with clear breathing room. Silhouette first: readable at 64 pixels and identifiable by outline alone before colour or detail resolves, and still legible at one reel cell of 120x100 pixels",
+  "negative": "photorealism, photoreal rendering, 3D-render sheen, flat-vector treatment, generic gradient wash, generic AI sheen, pastel palette, perspective angles, perspective distortion, three-quarter rotation, backing plate, shield, badge, medallion framing, circular badge ring, surrounding ring, container framing, border effect, decorative outer neon rings, baked outer glow, baked text, readable text, pseudo-readable marks, letters, numerals, currency symbols, captions, labels, logos, wordmarks, watermarks, signatures, stickers, emoji, emoji-style icons, coins, confetti, fireworks, gold cast, magical portals, stray particles, detached energy effects, excessive bloom, outer fog glow, motion blur, cast shadow, floor, ground plane, reflection puddle, checkerboard matte, white matte halo, colour fringing, duplicate parts, extra limbs, malformed hands, skinny or razor-thin proportions, cropped or clipped subject, central clutter",
+  "camera": "Front facing, always. No perspective angles on symbols or UI objects. Dead-on front elevation, orthographic, no three-quarter rotation. Subject centred, its optical centre on the canvas centre.",
+  "per_role": {
+    "SY-01": "The one standing exception to the no-baked-text law is this symbol's own machined W emblem, which is part of the object rather than typography. The engine applies the #ff00ff signature colour as a CSS inset glow and the idle-rings animation adds a magenta drop-shadow, so bake no outer glow of any kind into the art",
+    "SY-02": "Radially symmetric, or explicitly designed to spin about the exact image centre, so a continuous 360-degree rotation never reads as tumbling",
+    "SY-05": "Rotationally balanced about the exact image centre, because this layer spins over h1_base",
+    "SY-06": "This symbol is the miniature of the Boost Gauge, the declared design anchor, and should borrow its language of needles, redlines and flares at reduced intensity",
+    "SY-09": "A holographic dash readout: a substantial gunmetal and carbon housing carrying a recessed cyan and magenta holographic display with abstract non-readable telemetry marks and a clean bezel hierarchy. Telemetry may be abstract only: no letters, no numerals, no pseudo-readable marks",
+    "SY-13": "A dark tech cell plate with the symbol's signature colour carried on its engine-tinted edge, never baked into the art. Broad and readable with inset carbon weave and restrained stepped gunmetal edges, its lighting deliberately flattened so the symbol on top stays dominant, and with no outer glow. Fill the canvas edge to edge with zero margin",
+    "SC-01": "Keep the central reel zone the darkest, quietest and lowest-detail region of the frame, and keep the upper HUD strip dark enough for white text to hold contrast over it",
+    "SC-02": "The same scene and the same geometry as the base backdrop under a hotter grade, pushed magenta and darkened, so the two crossfade without the image shifting",
+    "UI-01": "The dial face only, and it MUST be needle-free: the live needle is a separate sprite that rotates on top, and a baked needle is the confirmed two-needle defect this replacement exists to fix",
+    "UI-02": "The needle alone on an otherwise empty field, drawn pre-rotated to +62 degrees to match the angle the call site already assumes",
+    "UI-05": "Narrow exception to the no-baked-text rule, recorded in the arc-2 batch prompt records: this asset IS the FUTURE SPINNER wordmark. Render those two words as a single-line wide display lockup treated as machined metal rather than typography, sitting beside the kept emblem without competing with it. A two-line lockup is a composition mismatch against the 5:1 strip",
+    "FX-04": "Must match frame 3 of the corresponding flipbook sheet exactly, and should be exported from that sheet rather than drawn separately"
+  },
+  "rendering_language": {
+    "medium": "Dimensional painted game-art treatment. Not photoreal, not flat vector, not a 3D render.",
+    "subject": "Cyberpunk automotive. Automotive engineering is the primary subject; cyberpunk is an accent layer over it.",
+    "theme_statement": "Cyberpunk spinners in a rain-soaked neon megacity. High-octane automotive chaos.",
+    "source": "theme statement is verbatim from frontend/src/lib/config/themes.ts:27; the painted/dimensional wording is from the arc-2 batch prompt records, which state it under a heading of Production lock."
+  },
+  "palette": {
+    "theme": {
+      "primary": "#00FFFF",
+      "secondary": "#FF00FF",
+      "background": "#0a0a1a",
+      "text": "#ffffff"
+    },
+    "emissive_pair": "cyan #00FFFF and magenta #FF00FF, used together",
+    "ground": "deep navy #060610",
+    "accent_sparing": "gold #FFD700",
+    "saturation": "Rich saturation, never pastel.",
+    "hud_signature": {
+      "sig-cyan": "#00FFFF",
+      "sig-magenta": "#FF00FF",
+      "sig-pink": "#FF2EC4",
+      "sig-gold": "#FFD700",
+      "sig-orange": "#FF9A2E",
+      "navy": "#060610"
+    },
+    "tile_plate_base": "#0b0f1c, a dark tech plate; the symbol's signature colour lives on the engine-tinted edge",
+    "per_symbol_signature": {
+      "h1": "cyan and magenta duo",
+      "h2": "crimson #ff2d3d",
+      "m1": "neon orange #ff9a2e",
+      "m2": "neon violet #8a5cff",
+      "m3": "acid green #5dff3c",
+      "l1": "gold #ffd700",
+      "l2": "electric blue #9adcff",
+      "l3": "heat orange #ff7a2e",
+      "wild": "magenta #ff00ff, with cyan",
+      "scatter": "spectrum, gold #ffd700 anchor"
+    },
+    "rule": "Each symbol carries exactly one signature colour so the value ladder reads by hue.",
+    "engine_not_baked": "Signature colours are applied by the ENGINE as a CSS inset glow driven by a --plate-tint custom property from plates.json. They are NOT baked into the art. A baked rim would sit under a live inset glow and double it.",
+    "source": "design-system/DESIGN_SYSTEM.md SYSTEM LAWS and its per-symbol signature list; frontend/src/lib/config/themes.ts:28-33; the shipped plates.json; docs/art/ART_HANDOVER_ARC2.md section 7."
+  },
+  "lighting": {
+    "key": "A fixed upper-left key. Stated as white in one batch record, the only place the key's colour rather than its direction is given.",
+    "fill": "Cool cyan reflected fill, entering from the left.",
+    "rim": "Restrained magenta edge reflections from the right. On flat or subordinate surfaces the split is diagonal: cyan upper-left, magenta lower-right.",
+    "neon_discipline": "Neon is secondary to the physical form; it never replaces material rendering.",
+    "edge_control": "Confident authored outlines with decisive black edge control, and broad readable value shapes.",
+    "rig_parts_exception": "Character and rig parts carry a deliberate asymmetry: anatomical-left pieces take stronger magenta outer rims with cyan inner fill, anatomical-right pieces take stronger silver or cyan key highlights with restrained magenta inner rims.",
+    "evidence": "'Key light upper left.' is a committed SYSTEM LAW at design-system/DESIGN_SYSTEM.md:38. The cool-cyan-fill and magenta-rim halves of the triplet, their sidedness, and the black edge control are NOT in any committed document: they come from the arc-2 batch prompt records, where the upper-left key appears in 14 of 16 batch records literally and 15 of 16 in force, and cool cyan fill in 14 of 16. One batch record calls the upper-left key 'fixed', which is the corpus's own strongest statement that the direction was treated as settled. Recorded this way so a future reader knows which half is committed law and which is established practice. See open_questions OQ-2."
+  },
+  "materials": {
+    "language": "Polished chrome, brushed gunmetal, carbon, warm gold accents, holographic display surfaces where a row calls for one.",
+    "separation": "Confident material separation: chrome against gunmetal against carbon must be legible as different materials, not one grey mass.",
+    "evidence": "design-system/DESIGN_SYSTEM.md:36 states the material language as a SYSTEM LAW. Across the 16 arc-2 batch prompt records gunmetal and carbon appear in 16 of 16, chrome in 14 of 16, holographic in 5 of 16."
+  },
+  "hierarchy": {
+    "law": "Premium symbols carry the most elaborate rendering and the richest animation. Low tier symbols keep the identical palette and materials with simpler forms. Order of elaboration: Gauge and Wild and Scatter above all, then H, then M, then L. The player's eye must learn the value ladder without the paytable.",
+    "law_status": "OWNER-RATIFIED and committed at design-system/DESIGN_SYSTEM.md:145-148.",
+    "anchor": "The Boost Gauge is the design anchor; the H2 reel symbol is its miniature, and everything else flows outward from it with less intensity.",
+    "expressed_by": "Tier escalation is achieved by construction and mass, explicitly NOT by added glow, coins or ornament.",
+    "symbols_over_frame": "Symbols outrank the reel frame and the tile plate: the tile plate's lighting is deliberately flattened so the symbol on top stays dominant.",
+    "symbols_over_frame_status": "IMPORTANT PROVENANCE. This rule comes from the arc-2 batch prompt records, NOT from the manifest and NOT from a committed specification. R092 asserted that the manifest's own SY-13 note required the plate to stay subordinate to the symbols; R097 established that the word does not appear in the manifest at all and formally retracted the claim as a misattribution. The rule is retained here because the batch records state it and the accepted tile plate was produced under it, but it is practice, not law. Do not re-attribute it to the manifest.",
+    "backgrounds": "Backgrounds rank below everything: the central reel zone must be the darkest, quietest and lowest-detail region of the frame.",
+    "legibility_floor": "Every symbol must read at one reel cell, 120x100 pixels, and be identifiable by outline alone before colour or detail resolves."
+  },
+  "transparency": {
+    "who_decides": "The manifest's alpha column decides, never this register. compose() appends the transparency clause itself: a pure chroma-key green field with no cast shadow for alpha rows, full-bleed opaque for the rest. A 'base' that also described a background would contradict it.",
+    "key_colour": "Pure green #00FF00. Corner pixels are expected to be exactly RGB (0,255,0).",
+    "key_hygiene": "The key must be uncontaminated: flat, with no shadow, gradient, texture, floor, reflection or background glow on the field.",
+    "generator_cutouts": "STATED PRECISELY, because the code does not say what a loose paraphrase would suggest. ingest.detect_alpha_route decides by MEASUREMENT, not by a flag: a source with a genuine cutout takes the 'native' route and its alpha is KEPT, with only the edge despill applied; a source with no alpha, or with an alpha channel that is uniformly opaque, takes the 'key' route. Running the keyer over an already-transparent PNG is the worse failure direction, so generator cutouts ARE honoured for production when they are genuine. What production does not do is DEPEND on one arriving: the composer requests the green field for every alpha row so the deterministic route is always available. A documented generator defect makes this concrete: the image generator has returned a baked checkerboard matte instead of real alpha across three batches, which must be isolated and converted rather than trusted.",
+    "full_frame_exempt": "Full-frame environment art is deliberately exempt from keying and fills its canvas.",
+    "aspect_gate": "Ingest checks aspect on the SOURCE, before any resize, at a 1 per cent tolerance. It will not pad, crop or letterbox. The only remedy that has ever worked is re-rendering on the shipped target's own canvas."
+  },
+  "text_policy": {
+    "law": "Text free artwork. Localised labels render in CSS Orbitron over the art, never inside it, because English words cannot survive sixteen locales and social mode remaps WIN to PRIZE.",
+    "committed_exception": "design-system/DESIGN_SYSTEM.md:34-35 names exactly ONE exception: the machined W emblem inside the Wild.",
+    "practice_exceptions": "The arc-2 batch prompt records name two further narrow exceptions, both described as functional machined-metal labels rather than typography: the 100x buy-in label, and the FUTURE SPINNER wordmark, which is an asset whose entire manifest role is that wordmark.",
+    "status": "All three are recorded here rather than silently reconciled. The committed law names one; practice has used three. See open_questions.",
+    "pseudo_text": "Even pseudo-readable marks are banned. Telemetry and display surfaces may carry abstract marks only, with no letters and no numerals."
+  },
+  "exclusions": [
+    "No photorealism and no photoreal drift; no 3D-render sheen; no flat-vector treatment.",
+    "No emoji or emoji-style icons, no generic gradient washes, no border effects, no generic AI sheen. The platform's own quality-rankings page names over-reliance on generic AI-generated assets, standard fonts, gradients, emoji icons and border effects as a frequent cause of a 1-star rating, and the arc-2 handover says that sentence should be read as feedback on this asset set.",
+    "No badges, medallion framing, circular badge rings or surrounding rings. The object IS the symbol; it gets no backing plate, shield or container.",
+    "No baked outer glow anywhere: the engine applies signature colour as a live inset glow and a baked rim would double it.",
+    "No baked copy, captions, numerals or currency, beyond the exceptions in text_policy.",
+    "No baked needle on the gauge face: the live needle sprite rotates on top, and a baked one is the confirmed two-needle defect.",
+    "No perspective angles on symbols or UI objects, and no three-quarter rotation.",
+    "No coins, confetti, fireworks, gold cast or magical portals: the generic slot-win vocabulary is out of bounds.",
+    "No stray particles, detached energy effects, outer fog glow or excessive bloom.",
+    "No cast shadow onto the key field, no floor, no ground plane, no reflection puddle.",
+    "No checkerboard matte, white matte halo or colour fringing at the silhouette edge.",
+    "No skinny or razor-thin proportions on characters and rig parts; thin silhouettes were a recurring failure mode across the hero arc.",
+    "KEEP-class assets are never replaced, restyled or recoloured. The hero emblem is the palette anchor."
+  ],
+  "licence": {
+    "provider_clearance": "OpenAI image generation (gpt-image-1) is CLEARED for DEVELOPMENT-STAGE VISUAL ART ASSETS ONLY, per OpenAI support Ticket 456254 received 2026-08-24, recorded at docs/legal/openai-ticket-456254-ruling.md and machine-enforced in scripts/assets/assetforge/provider_gate.json since R099.",
+    "prohibited": [
+      "operating gambling",
+      "accepting or processing wagers",
+      "processing payments",
+      "interacting with players"
+    ],
+    "subject_to": "the current OpenAI Usage Policies and Terms of Use",
+    "scope_note": "This register describes STYLE. It confers no licence and broadens no clearance. Any use outside the permitted scope above is outside the ticket and outside the provider mark.",
+    "per_asset_duty": "Every generated or purchased replacement must be commercially usable in real-money gambling, verified BEFORE it ships. Record the tool or vendor, the terms as fetched on the day, and whether they permit commercial use in a gambling context specifically. Assets whose licence cannot be established do not ship."
+  },
+  "derivation": {
+    "principle": "Every operative clause traces to a source below. Nothing was invented for this file. Where committed law and established practice differ, both are recorded and the difference is named in open_questions.",
+    "committed_in_repo": [
+      "design-system/DESIGN_SYSTEM.md - SYSTEM LAWS and the July 2026 owner-ratified addendum. Primary source for materials, palette, key-light direction, front-facing discipline, silhouette-first, the 120x100 legibility floor, the text-free law and its one exception, the per-symbol signature colours, the tile-plate spec and the pay-tier richness law.",
+      "docs/art/ART_HANDOVER_ARC2.md - sections 5 to 8. Per-asset hard constraints, the engine-not-baked rule, the no-baked-needle defect, the shipped palette record, the priority order and the AI-asset quality risk.",
+      "docs/art/art_manifest_arc2.csv - per-row role, alpha, dimensions, format and notes. The composer merges these directly, so the register deliberately does not repeat them.",
+      "frontend/src/lib/config/themes.ts - the theme statement and the four palette tokens.",
+      "the shipped plates.json and scripts/assets/manifest.json - the signature colour table and the engine-tint mechanism.",
+      "docs/stake-engine-live/game-quality-rankings.md - the captured platform page naming generic AI assets, gradients, emoji icons and border effects as a 1-star cause.",
+      "scripts/assets/assetforge/ingest.py and compose.py - the transparency routes, the green-key rules, the 1 per cent source aspect gate and the prompt assembly order.",
+      "docs/legal/openai-ticket-456254-ruling.md and scripts/assets/assetforge/provider_gate.json - the clearance and its scope."
+    ],
+    "arc2_batch_prompt_records": {
+      "what": "The prompt and QA records written alongside each arc-2 master batch, which produced the 27 placeholder assets currently in the working tree.",
+      "where": "Working files in the incoming art directory. They are NOT tracked by git, so under convention (m) they are weaker evidence than the committed sources above, and every clause taken from them is marked as practice rather than law.",
+      "what_they_supplied": "The painted/dimensional rendering wording, the cool cyan fill and magenta rim halves of the lighting triplet, the #00FF00 key discipline, the no-container rule, the flattened tile-plate rule, the two further text exceptions, and most of the negative vocabulary.",
+      "evidence_strength": {
+        "batches_examined": 16,
+        "cyan_and_magenta": "16 of 16",
+        "gunmetal": "16 of 16",
+        "carbon": "16 of 16",
+        "photorealism_banned": "16 of 16",
+        "some_text_prohibition": "16 of 16",
+        "upper_left_key": "14 of 16 literally, 15 of 16 in force",
+        "cool_cyan_fill": "14 of 16",
+        "chrome": "14 of 16",
+        "orthographic": "9 of 16",
+        "green_key_00FF00": "9 of 16, the isolated-asset batches",
+        "front_facing": "6 of 16",
+        "holographic": "5 of 16",
+        "note": "The lower counts are scope, not disagreement: the green key and the orthographic rule apply to isolated symbol and UI batches, while the background and hero batches are full-frame or true-RGBA by design."
+      }
+    },
+    "adjudication_history": "Sessions R086 to R097 accepted or refused each candidate master. The refusals are the operational proof of these rules: the 1 per cent source aspect gate fired most often; the hero arc R093 to R096 established that a pure brightness grade cannot move a silhouette problem and that restoring mass in the art, not tuning CSS, is the fix; and subject bounding-box comparison is the project's own art-adoption test."
+  },
+  "open_questions": [
+    {
+      "id": "OQ-1",
+      "topic": "M3 identity is inconsistent across three places",
+      "detail": "design-system/DESIGN_SYSTEM.md still lists M3 as the Plasma Booster, while the manifest's SY-09 role was corrected on 2026-08-24 (R086, ratified by owner paste) to the M3 Holographic Dash Readout, recording the earlier text as a transcription error. The manifest row FX-01 still describes its sheet as the M3 booster flame, although the SY-09 note states the overlay becomes a holo flicker sheet with an unchanged layout. This register follows the manifest, as the later and owner-ratified instrument. Because compose() puts the row's role straight into the prompt, FX-01 would currently generate a booster flame for what is now a holographic readout. Two documents need a one-line correction; neither is this register's to make.",
+      "owner_decision": true
+    },
+    {
+      "id": "OQ-2",
+      "topic": "Half the lighting triplet is practice, not committed law",
+      "detail": "'Key light upper left.' is a SYSTEM LAW. 'Cool cyan fill' and 'magenta rim' are not in any committed document; they are established in the batch prompt records and named in the R100 brief. They are carried here because the approved masters were made under them, and flagged here so nobody later mistakes them for law.",
+      "owner_decision": false
+    },
+    {
+      "id": "OQ-3",
+      "topic": "The text-free law names one exception; practice has used three",
+      "detail": "The committed law's single exception is the machined W emblem inside the Wild. The batch records add the 100x buy-in label and the FUTURE SPINNER wordmark, both framed as machined-metal labels rather than typography. All three are recorded in text_policy. Ratifying or narrowing the list is an owner call.",
+      "owner_decision": true
+    },
+    {
+      "id": "OQ-4",
+      "topic": "The negative prompt is global, and one row needs the opposite of it",
+      "detail": "compose() reads a single 'negative' for every row and has no per-row override. This register's negative forbids wordmarks and readable text, which is right for 29 of the 30 REPLACE rows and wrong for UI-05, whose entire purpose is the FUTURE SPINNER wordmark. The negative was deliberately left strict rather than weakened for all 30. UI-05 needs either a per-row negative in the composer or hand-handling.",
+      "owner_decision": false
+    },
+    {
+      "id": "OQ-5",
+      "topic": "Background subject matter has drifted",
+      "detail": "The manifest's SC-01 role is a rain-soaked neon megacity skyline, matching the theme statement. Later batch records ban rain, city streets, readable signage and characters for environments and moved to a cyberpunk garage or workshop interior. Both cannot be the direction. This register does not choose: the manifest role reaches the prompt directly, so whichever is intended should be settled in the manifest.",
+      "owner_decision": true
+    }
+  ]
+}

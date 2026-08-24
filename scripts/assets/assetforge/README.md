@@ -19,6 +19,17 @@ machine-readable form that `generate.py` reads on **every** call.
 A client that merely omitted OpenAI would silently become wrong the day somebody added it
 back. One that refuses by mark stays right, so the mark is enforced in code.
 
+**A MARK IS NOT A CLIENT, and R100 made that structural.** OpenAI is CLEARED and still
+cannot be called, because `generate.py` has no OpenAI client: it implements Stability only.
+Until R100 the call site invoked `stability_generate` with no branch on provider, so a
+priced OpenAI call would have sent `OPENAI_API_KEY` to `api.stability.ai`. That was proven
+by an offline probe before the guard existed. `CLIENTS` now maps provider to client and
+`require_client()` refuses anything absent from it, seeded in the self-test with a synthetic
+CLEARED-but-unimplemented provider so the case survives an OpenAI client being added later.
+
+**So the two OpenAI blockers today are:** no client, and no committed credit price. Neither
+is a licence question and neither is fixed by editing the gate.
+
 ## `compose.py`, the deterministic prompt composer
 
 Production prompts are BUILT by merging the committed style register with each
@@ -26,9 +37,17 @@ Production prompts are BUILT by merging the committed style register with each
 same row plus the same register always yields the same prompt, which is what makes a
 regeneration reproducible.
 
-**It refuses today**, because the register it expects, at docs/art/style_register.json, does
-not exist. Convention (m): an external document must be in the repository before work cites
-it, so the path is named in prose rather than as a citation to a file that is not there.
+**It runs.** The register it expects landed at `docs/art/style_register.json` in R100,
+derived from the committed design system, the arc-2 handover, the manifest and the arc-2
+batch prompt records rather than written fresh. Four of its keys are operative: `base` and
+`negative` are required, `per_role` is merged per manifest id, and `camera` is named by the
+loader's own refusal message but is not yet read by `compose()`. Everything else in the file
+is documentation, including a `derivation` block giving the source of every operative clause
+and an `open_questions` block naming the tensions it deliberately did not resolve.
+
+Twenty-nine of the thirty REPLACE rows compose cleanly. `SC-03` raises `ValueError` rather
+than refusing, because its `target_dimensions` cell reads `800x640 source` and `compose()`
+parses that field with `int()`.
 
 ## `generate.py`, the hosted-API client
 

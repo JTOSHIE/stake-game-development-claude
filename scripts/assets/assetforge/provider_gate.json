@@ -1,5 +1,5 @@
 {
-  "_comment": "R084 TASK 0 licence gate, machine-readable. The ruling and its evidence are docs/licences/PROVIDER_GATE_2026-08-22.md. generate.py REFUSES any provider not marked CLEARED, so the gate is enforced by the code rather than by whoever remembers it. Changing a mark here without a Fable ruling is the violation. AMENDED 2026-08-24 (R099): the openai mark moved BARRED to CLEARED on the owner's written brief, carrying OpenAI support Ticket 456254; the clearance is SCOPED to development-stage artwork generation and the conditions are in that entry's scope field. The R084 assessment below is unchanged for stability and remains the basis for the gate's existence.",
+  "_comment": "R084 TASK 0 licence gate, machine-readable. The ruling and its evidence are docs/licences/PROVIDER_GATE_2026-08-22.md. generate.py REFUSES any provider not marked CLEARED, so the gate is enforced by the code rather than by whoever remembers it. Changing a mark here without a Fable ruling is the violation. AMENDED 2026-08-24 (R099): the openai mark moved BARRED to CLEARED on the owner's written brief, carrying OpenAI support Ticket 456254; the clearance is SCOPED to development-stage artwork generation and the conditions are in that entry's scope field. The R084 assessment below is unchanged for stability and remains the basis for the gate's existence. R100 (2026-08-24) added an 'access' block to the openai entry recording the owner's confirmed Codex / API coverage. That block is a BILLING POSITION, not a price: it does not satisfy cost_of(), and no credit price was invented. See openai.access.",
   "assessed": "2026-08-22",
   "providers": {
     "stability": {
@@ -33,6 +33,12 @@
       "models": {
         "gpt-image-1": {}
       },
+      "access": {
+        "position": "Owner-confirmed 2026-08-24 (R100 brief): OpenAI image generation for this project is covered under the owner's existing Codex / API access, with substantial remaining capacity. Continued development-stage artwork generation is therefore NOT blocked on purchasing credits.",
+        "status": "OWNER-STATED. Recorded as the owner's position, not as a measured or captured figure.",
+        "what_this_does_NOT_do": "This note does NOT satisfy cost_of(). That function requires a numeric 'credits' figure on the model AND a 'credit_usd' rate on this entry, and neither is present because R084 never priced a provider it had barred. No price has been invented here: a committed price is a factual claim about OpenAI's billing and needs a captured source, exactly as the Stability price does. So a generate.py call with --provider openai still refuses at the cost step.",
+        "to_resolve": "Two routes, and the choice is the owner's because it is a spend-control decision. (1) Capture OpenAI's published pricing as evidence in the shape used for Stability and commit 'credit_usd' plus a 'credits' figure for gpt-image-1, which keeps the USD session cap meaningful. (2) Rule that a provider billed under a covered plan is exempt from the per-call cost model, which requires a deliberate change to cost_of() and to how the session spend cap applies. Route 2 changes spend control and is not a builder decision."
+      },
       "scope": {
         "permitted": "Development-stage visual art assets only: symbols, backgrounds and other artwork, for incorporation into the game.",
         "prohibited": [
@@ -51,7 +57,8 @@
         "assessed": "2026-08-22",
         "reason": "The Usage Policies effective 2026-10-29 prohibit 'real money gambling' under 'you cannot use our services for'. The Services Agreement incorporates those policies by reference (16.1), restricts use that violates them (3.3a), carves a breach of 3.3 out of the liability cap (14.1) and indemnifies OpenAI for it (13.2). Future Spinner is a real-money gambling product.",
         "note": "Kept rather than deleted: the record of what was believed, and why, is evidence. See docs/legal/openai-ticket-456254-ruling.md section 5."
-      }
+      },
+      "_note_ordering": "'access' records the owner's billing position; 'scope' records the licence. They are separate questions and are deliberately not merged."
     }
   },
   "amended": "2026-08-24"
