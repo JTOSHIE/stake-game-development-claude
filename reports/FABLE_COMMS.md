@@ -9,6 +9,63 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 084 - 2026-08-24 - R085-R: the restore point is cut, submission-1 stays held, and the art directory is live
+
+**THE RESTORE POINT EXISTS.** `arc2-baseline` is pushed, annotated, at
+`618b711eebcaed7682aca4f63b16b24911d5c456`. Verified three ways rather than assumed: the
+object type is `tag` so it is annotated and not lightweight; it dereferences to
+BASELINE_SHA exactly; and the remote lists the two refs an annotated tag should have, the
+tag object `b11163e4` and its commit. **This is the repository's first tag ever.**
+
+The message carries the two-figure score form R085 recovered from TR-181 (platform-quoted
+4.3 of 9, recomputed sum 4.33 from 1.33 + 1.33 + 1.67, average 1.44) and records inside the
+tag itself that the submission-1 question was open when it was cut, pointing at comms 083.
+A reader finding this tag in a year is told what was not known.
+
+**SUBMISSION-1 STAYS HELD**, confirmed absent after the push. The bar is now written down
+so it is not renegotiated: an owner artefact stating the built SHA verbatim, meaning the
+kit README line, or the build-info.json from the zip actually uploaded, or a portal capture
+of the uploaded package identity. **Memory does not qualify.**
+
+**INVENTORY, touching nothing, and the first finding is that the directory is LIVE.** My
+first pass counted 90 files and three prompt records; a re-read minutes later counted 91
+and four, the new one timestamped 12:01, one minute before I read it. **So every figure
+below is a reading taken at 2026-08-24 12:01, not a state.**
+
+91 files, 72,797,588 bytes, mtimes 2026-08-22 05:57 to 2026-08-24 12:01. Four folders:
+480-masters 27 files, ui-support 24, core-controls-hud 20, symbols 17. Subfolders
+source-1254, work-alpha, review, chroma, preview-64px. 85 PNGs by header: 41 at 1254x1254,
+24 at 480x480, 6 at 1016x1548, 5 at 64x64, the rest singles.
+
+**THE FIELDS YOU ASKED ABOUT ARE ABSENT FROM ALL FOUR RECORDS.** Counted with controls so
+the zeros are real: provider 0, model 0, endpoint 0, seed 0, cost 0, request-id 0, api_key
+0, credits 0, licence 0, sha256 0; controls prompt 9, generator 2, workflow 3. No
+key-shaped string anywhere. The only method attributions, verbatim: *"Generated on
+2026-08-22 with the built-in image-generation workflow"* (and the 08-24 and reordered
+variants), and *"The generator produced square 1254x1254 RGB source renders."*
+
+Reference material, verbatim: *"The five Gemini sheets supplied by the owner were used only
+as visual references"*, naming three Gemini_Generated_Image jpegs. **Those three files are
+not in the directory**, so the reference chain the records describe is not reconstructable
+from disk. One line states intended use plainly: *"Commercial real-money slot-game UI in
+the locked Future Spinner cyberpunk automotive art direction."*
+
+**No style register and no config sits in or beside the directory**; the four prompt
+records are its only non-image files, and docs/art/style_register.json is still absent, so
+the composer still refuses. The records DO carry dense QA: foreground-mass percentages,
+alpha bounds, green-fringe checks, H1 registration at mean absolute difference 2.63/255,
+needle angle 62.53 degrees, background contrast ratios 0.574 and 0.414.
+
+**I have drawn no conclusions about provider, licence or fitness.** You reserved that
+ruling to yourself and Fable and I have kept to inventory. E2 notes only that convention
+(l) wants seeded, logged, re-runnable provenance and that what these records carry is
+prompts plus QA; whether that satisfies (l) is your call, not mine.
+
+Nothing moved, edited, deleted or committed in that directory. Gates green, tracked tree
+clean.
+
+---
+
 ## 083 - 2026-08-24 - R085: STOPPED at TASK 1, no tag was safe to write, because two committed records name different builds
 
 **NO TAG CREATED, NO TAG PUSHED, NO RELEASE.** Your own evidence rule stopped this one and
