@@ -9,6 +9,71 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 089 - 2026-08-24 - R091: the background finally fits, its Overdrive twin was derived with it, and all four win graphics are NO-ROW
+
+**THE BACKGROUND IS IN, and it is the first one that ever passed.** `01-workshop` is
+**1920x1080 against a 1920x1080 target, 0.00% drift**, so `ingest.py` accepted SC-01
+unmodified and unflagged. R086 and R089 both refused a background at 43.7% drift on a 480x480
+square that was also a 4x upscale; a full-resolution render removes the whole problem. WORKSHOP
+was taken as the default per the brief.
+
+**AND ITS TWIN WAS DERIVED IN THE SAME PASS, which was not optional.** SC-02 `bg_overdrive`
+is DERIVED NOT AUTHORED, "supply as a matched pair or the crossfade will jump", so I ran
+`scripts/assets/background_overdrive_derive.py` from the new base. Measured on the project's
+own 64x36 z-scored grey metric: the **new pair scores Pearson r +0.9961** against the old
+pair's +0.9985, while **base-only would have scored r -0.2575 with 71.5% of cells moved**,
+actively anti-correlated, worse than two unrelated images. Worse than a jump: `.bg-still` base
+sits at `opacity 0.92` and never fades out, so the player would have seen a 0.6s double
+exposure on every Overdrive entry AND exit, plus a permanent 7.36% ghost of the old skyline
+through the whole feature, with **no gate catching any of it**. Verified by eye too: the
+Overdrive layer is visibly the same workshop under a hotter magenta-leaning grade.
+
+**I SHIPPED THE BACKGROUND TOO BIG FIRST AND CORRECTED IT.** `ingest.py` hardcodes
+`quality=92, subsampling=0`, which is right for small transparent symbol rows and wrong for a
+1920x1080 backdrop: it produced **643,957 bytes, 2.36x the 273,173-byte incumbent**. Every
+other background writer in this repo (`backgrounds.py`, `background_candidate_ingest.py`, the
+derive tool) uses q80 progressive 4:2:0. Re-encoded **from the source PNG rather than from the
+jpg**, so no double compression, and the pair now lands at **270,011 and 259,050 bytes, both
+slightly UNDER the incumbent**. The manifest calls this row the largest single raster in the
+kit and the kit has a 25 MiB budget, so a 371 KB overshoot on one file was worth catching.
+
+**ALL FOUR WIN AND OVERDRIVE GRAPHICS ARE NO-ROW, and the reason is not squeamishness.** They
+were traced through source rather than guessed at:
+
+- Small and medium wins (1x to 10x) render in `WinCelebration.svelte:34`, **one CSS text div,
+  zero rasters**. Wins at 10x and above render in `WinBanner.svelte`, whose entire plate is
+  `linear-gradient` and `box-shadow`; its only two rasters are the 40x40 coin and the 128x128
+  shock ring.
+- `MaxWinCelebration.svelte` contains **zero rasters of any kind** and does not even import
+  the theme store. Its crown is inline SVG paths, its halo a `conic-gradient`.
+- The Overdrive entry card is `FreeSpinsPresentation.svelte` CSS; its five rasters are smoke
+  wisps, the gauge pair and the shock ring, all sprites INSIDE the card.
+- The manifest has **no row of any classification** for a banner, big win, max win or entry
+  graphic, and the shipped tree contains no such raster.
+
+**Three further disqualifiers beyond the missing row**, any one of which is decisive. **They
+are opaque**: `WinBanner` is deliberately a band with the reels visible above and below, so an
+opaque full-screen plate would black out the game on every win over 10x. **The geometry is
+wrong by an order of magnitude**: the Overdrive card is a 616x412 box scaled into a 522x349
+stage slot, and the only 1920x1080 slots that exist in the game are the two backgrounds.
+**And if any of them carries baked copy** it collides with the standing UI-07 and UI-08
+disposition, "never bake copy into art again", because all four moments render live localised
+strings across sixteen locales plus the social vocabulary swap. Installing any of these is a
+component change, not the filling of an existing target, and that is a code brief rather than
+a swap.
+
+**Twenty-two rasters now modified in the working tree**, the twenty from R086 to R090 plus the
+background pair. Zero staged. Build exit 0, zero console faults, zero missing assets, no
+layout breakage. **One non-raster is deliberately left dirty**: the derive tool always writes
+`reports/qa/background_overdrive_derive.json`, and I let it, because a provenance record that
+named files no longer on disk would be exactly the stale-document failure the currency gate
+exists for. It is in the restore list with the rasters.
+
+Ship bar unchanged pending the provider ruling; placeholders remain visual test only. Tile
+plate still needs its 732x612 re-render, and `m1.png` is still the only glow-era symbol left.
+
+---
+
 ## 088 - 2026-08-24 - R090: five square symbols in, the tile plate refused because its target is the one that is not square
 
 **FIVE SWAPPED, WORKING TREE ONLY: m2, m3, l1, l2, l3.** All five sources are 480x480 RGB
