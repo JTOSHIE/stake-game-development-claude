@@ -17389,6 +17389,29 @@ Close gates chained with `&&` per (u.1), including the zero raster staged assert
 brief requires. Explicit paths per (k). Remote CI verified with the full SHA per rule 10,
 never a short SHA.
 
+| Gate | Result |
+|---|---|
+| Zero raster staged assertion | **PASS**, `git diff --cached` matched no `.png .jpg .jpeg .webp .gif` |
+| `scripts/qa/doc_currency_gate.mjs` | **PASS**, 272 documents, 0 new |
+| `scripts/qa/locked_paths_gate.mjs` | **PASS**, 1 commit, 0 sanctioned, 0 violations |
+| `npm run build` | **PASS**, exit 0 |
+| Remote CI, run `32685436579` on `6609cd6b63bc9e95594757811ae4f2f043327845` | **SUCCESS**: `what changed` pass, `static gates` pass, browser matrix correctly skipped for a records change |
+
+**The doc currency gate went RED first and the fix was the document, not the baseline.** Two
+DEAD_PATH claims: `docs/art/placeholder_map_2026-08-24.csv`, which resolved once committed,
+and a backticked bare `output/` in the comms entry, which is the exact backticked shorthand
+trap this project has hit before. The incoming directory is deliberately untracked, so the
+comms line was reworded to stop presenting it as a repository path.
+
+**And the gate's own exit code was nearly lost to a pipe.** The first run was invoked as
+`gate | tail`, which reported exit 0 from `tail` while the gate itself was red. That is the
+(u.1) refinement exactly, caught here rather than shipped, and every close gate above was
+re-run with its exit code as the direct left operand.
+
+**THE ONE COMMIT LAG is named rather than left to be rediscovered**: this table is itself a
+commit, so the run it cites is the run of the commit BEFORE it. That is the design the
+owner preview rule already records, not a fault.
+
 ## ESCALATIONS
 
 **E1 (R086). The nine per symbol idle classes are pruned out of the built CSS and do not
