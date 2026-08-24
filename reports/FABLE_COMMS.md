@@ -9,6 +9,52 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 093 - 2026-08-24 - R095: the brightening clears the contrast threshold, and it cannot touch the overlay problem because it is a pure grade
+
+**ALL THREE SWAPPED, 0.0000% DRIFT, NATIVE ROUTE, NOTHING FORCED.** Brightened title to UI-05
+`ui/logo.png`, robot to SC-06 `ui/scene_character.png`, car to SC-05 `ui/scene_car.png`. The
+raster count stays at **twenty-seven** because these overwrite the same three files R094 placed.
+Zero staged. **`hero_emblem_512.png` not modified**, verified on that exact path. Build exit 0,
+zero console errors, zero page errors, zero missing assets.
+
+**R094's E1 IS ANSWERED, and I measured it rather than eyeballed it.** Contrast of the title's
+opaque pixels against the backdrop it actually sits on, where 3:1 is the large-text threshold:
+
+| Version | mean luminance | contrast (mean) | contrast (p95) |
+|---|---|---|---|
+| OLD shipped, pre-R094 | 176.0 | **5.16:1** | 7.07:1 |
+| R094 candidate | 81.6 | **2.58:1** | 6.19:1 |
+| **R095 brightened** | **104.1** | **3.20:1** | 6.83:1 |
+
+**It crosses the threshold**, moving 2.58 to 3.20 against a 3:1 bar, and reads visibly better on
+the workshop background. **It is still well under the 5.16:1 the art it replaces achieved**, so
+the lockup remains a darker treatment than the original chrome rather than a match for it. That
+is now a deliberate style position rather than an accident, and it is yours to accept or push
+further; the canvas is right either way, so another pass would land unforced.
+
+**R094's E2 IS NOT ANSWERED, and could not have been by this batch.** I checked whether these
+were re-renders or grades before swapping: the title's subject bounding box is **byte-for-byte
+identical** to R094's, and the robot and car differ by a single pixel on one edge, which is
+re-encode noise. **These are pure brightness and contrast grades, so every silhouette is
+unchanged and the overlay misalignment is exactly where it was.** Re-measured in the running
+game after the swap, not assumed:
+
+- **`.antenna-light` still sits 6% inside the robot**, pinned at `left: 12%` while the subject
+  starts far to its right.
+- **`.underglow` still sits 64% inside the car**, hanging below its bottom edge.
+- `.visor-glint` and `.car-neon` remain 100% and are fine.
+
+**That is not a criticism of the brightening pass, which did the job it was given.** It is a note
+that the two problems are independent: one is an art grade and is now addressed, the other is CSS
+percentages in `SceneGroup.svelte` that were tuned to a silhouette these assets no longer have.
+No amount of regrading will move it. If this hero set is kept, that re-tune is a small component
+change and wants its own brief.
+
+Payload: `logo.png` 127,594 to 131,684 bytes, `scene_car.png` 1,657,838 to 1,888,353,
+`scene_character.png` 474,277 to 498,716. Ship bar unchanged pending the provider ruling.
+
+---
+
 ## 092 - 2026-08-24 - R094: all three corrected hero assets pass at zero drift, and three things the gate cannot see
 
 **ALL THREE SWAPPED, 0.0000% DRIFT, NOTHING FORCED.** Title lockup to UI-05 `ui/logo.png`
