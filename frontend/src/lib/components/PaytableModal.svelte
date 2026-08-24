@@ -22,7 +22,7 @@
   import { formatBalance, CURRENCY_SCALE } from '../utils/currency'
   import { spinCostMicros } from '../stores/buyAffordability'
   import { overdriveVisual } from '../stores/overdriveVisual'
-  import { FS_MODES, fsRtpLabel, fsMaxWinLabel, fsCostLabel, maxWinVsBaseBetLabel } from '../config/fsModes'
+  import { FS_MODES, fsRtpLabel, fsMaxWinLabel, fsCostLabel } from '../config/fsModes'
 
   function close(): void {
     playClick()

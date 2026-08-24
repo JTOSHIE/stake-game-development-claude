@@ -9,6 +9,80 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 102 - 2026-08-25 - R104: the banner is chosen and placed, one asset of 24 was usable, and the Spine decision just got much cheaper
+
+**THE BANNER EXISTS AND IS ON SCREEN.** Four 718x88 candidates arrived, exactly to the R103
+spec. **Variant B selected on measurement, not taste**, and placed working-tree-only with its
+one CSS line.
+
+**The instrument mattered.** My first scoring ranked the candidates on how calm they were under
+the Balance, Win and Bet plates. Then I checked whether the plates are opaque. **They are**:
+`.fs-plate`'s final face layer is a solid `linear-gradient(180deg,#111a2b,#070b16)`. So **56.5%
+of the panel is completely hidden behind controls** and I had been scoring occluded pixels.
+Re-measured on visible pixels only, the ranking changed and B won on the constraint that is hard
+rather than aesthetic:
+
+| | cyan+magenta | saturation | luma | std |
+|---|---|---|---|---|
+| **B** | **2.98%** | **0.061** | **19.9** | 50.4 |
+| C | 13.77% | 0.175 | 28.6 | 55.3 |
+| D | 16.98% | 0.209 | 25.8 | 35.9 |
+| A | 20.13% | 0.222 | 44.2 | 65.3 |
+
+**B is the only accent-neutral one**, which is the R103 constraint: `--acc` flips cyan to pink in
+Overdrive and a static raster cannot follow it. A, C and D all carry 10 to 12% strong cyan and
+would fight the pink skin.
+
+**Overdrive correctness is proven structurally, not hoped for.** The raster is background layer 1
+clipped to `padding-box`; the accent border is layer 3 clipped to `border-box`. `--acc` reaches
+layer 3 only. And B's **outer 2px ring is fully transparent**, so the art does not even touch the
+border it must not fight. Because every plate is opaque, the banner also cannot affect text
+contrast at all.
+
+**NEITHER THE RASTER NOR ITS CSS IS COMMITTED, and that is forced rather than chosen.**
+`asset_reference_gate.mjs` asserts every referenced asset exists in dist and
+`build_diet_verify.mjs` fails any 404. A committed `url()` pointing at an uncommitted raster
+would fail both. **So both live in the working tree together**: the next session commits both or
+reverts both. Recorded in the ledger so nobody finds them cold.
+
+**ONE ASSET OF TWENTY-FOUR WAS USABLE.** The kit is 122 files and well made. Everything else is
+blocked, and I checked the runtime rather than guessing: **15 blocked by law, 17 by a missing
+component, 5 by wrong specs, 2 by the open SC-03 question.**
+
+**I caught my own matcher producing nonsense.** An aspect-based sweep cheerfully matched a robot
+head to `symbols/wild.png` because both are square. Aspect equality says nothing about what an
+asset IS. Re-done by intent first, geometry second.
+
+**The FX sheets got closer and still miss.** FX-01's frame COUNT is right at last, 6 frames. The
+frame SHAPE is not: **200x200 is square, 256x320 is portrait.** The numbers are not preferences,
+they are compiled into CSS: `GameGrid.svelte:1373-1374` carries `background-size:492px 82px` with
+`steps(6)`, and `FlameJets.svelte:206` carries `steps(5)`. **`docs/design/FX_REGENERATION_SPEC.md`
+now states every number as a copy-paste prompt** so a third attempt lands.
+
+**The particle gap is STILL open after two art floods**, and now I know why: both delivered large
+overlays. The four live rows need **40, 128, 56 and 32 pixels**. The kit's smallest asset is
+128x160. A commissioning prompt for exactly those four sizes is in the spec.
+
+**THE SPINE DECISION GOT MUCH CHEAPER, and I had it wrong.** R103 sized "rig from the in-house
+master" as medium, assuming the 35 paths only needed grouping. **I rendered the master and looked
+at it.** It is the hero pose: **arms folded in an X across the chest, weight on one leg.** You
+cannot uncross a folded forearm by rotating it about an elbow pivot. So route B needs limb
+RE-AUTHORING, which is most of route C's work without route C's benefit.
+
+**So route A, amending the law, is now the cheapest path by a wide margin** and its entire cost is
+one ruling. The external parts are already neutral-posed, already separated, already measured, and
+**the kit now ships the separate visor, eye and chest emissive layers that R102 said were
+missing.** The law has been amended twice before by owner ruling. **This one is yours.**
+
+**Also:** the guide still matches the live controls after R103's restoration; `feature_button` is
+the last un-restored guide icon; one dead paytable import removed, the function stays because
+BuyBonus uses it. Coverage remains **21/30 = 70.0%** because the banner has no manifest row.
+
+Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked paths PASS.
+Zero rasters staged. Guards all refusing.
+
+---
+
 ## 101 - 2026-08-25 - R103: the guide is honest again, one FX landed, and the Spine plan hit a system law that forecloses it
 
 **EIGHT WORKSTREAMS, ALL HANDLED.** One ledger, one restore, one intake, two commissioning
