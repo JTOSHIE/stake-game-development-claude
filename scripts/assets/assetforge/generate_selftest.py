@@ -5,9 +5,15 @@ A client that refused everything would look identical to a working one from its 
 both directions are seeded: every refusal must be SEEN to fire, and the CLEARED path must
 be seen to pass. The cases plant the defect in the form it really occurs:
 
-  the BARRED provider   not a nonsense name, but "openai", which is a real provider with a
-                        real key name and a real model, sitting in the gate file marked
-                        BARRED. That is the call somebody actually makes by habit.
+  the BARRED provider   R099 note: this case used to read the LIVE openai mark, which was
+                        BARRED. When Ticket 456254 cleared that mark for development-stage
+                        artwork the case broke, because it was asserting on DATA rather than
+                        on the CODE PATH. A provider's mark is a fact that can legitimately
+                        change; the refusal it triggers must be provable regardless. So the
+                        case now seeds a BARRED entry itself, built from the REAL R084
+                        assessment the gate still preserves under `superseded_assessment`.
+                        Same defect, same wording, same code path, no longer hostage to
+                        which provider happens to be barred today.
   the spend cap         seeded by writing a ledger that is already near the cap, which is
                         how a cap is really reached: not by one huge call but by the
                         twentieth small one in an unattended run.
@@ -43,12 +49,27 @@ def main() -> int:
     gate = G.load_gate()
 
     # ---- SEEDED REFUSALS -----------------------------------------------------
+    # Seeded from the gate's own preserved R084 assessment, so the planted defect is the
+    # real historical one in its real form rather than an invented fixture.
+    barred_gate = {"providers": {"openai": dict(gate["providers"]["openai"])}}
+    barred_gate["providers"]["openai"].update(
+        gate["providers"]["openai"]["superseded_assessment"]
+    )
     try:
-        G.require_cleared("openai", gate)
-        rec("BARRED provider refused", False, "openai passed the gate")
+        G.require_cleared("openai", barred_gate)
+        rec("BARRED provider refused", False, "a BARRED-marked provider passed the gate")
     except G.GateRefusal as e:
         rec("BARRED provider refused", "marked BARRED" in str(e) and "real money gambling" in str(e),
             str(e)[:74])
+
+    # And the live openai mark is now CLEARED, scoped by Ticket 456254. Asserted so the
+    # unblock itself is covered rather than merely assumed.
+    try:
+        entry = G.require_cleared("openai", gate)
+        rec("openai CLEARED for artwork per Ticket 456254",
+            entry["scope"]["ticket"] == "456254", "scoped clearance in force")
+    except G.GateRefusal as e:
+        rec("openai CLEARED for artwork per Ticket 456254", False, str(e)[:74])
 
     try:
         G.require_cleared("midjourney", gate)

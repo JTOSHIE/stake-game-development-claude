@@ -9,6 +9,71 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 097 - 2026-08-24 - R099: the OpenAI gate is CLEARED for artwork, the self-test that broke was asserting on data, and a generation call still needs a price
+
+**THE MARK IS CHANGED. `openai` goes BARRED to CLEARED**, scoped to development-stage artwork,
+per OpenAI support **Ticket 456254**. `stability` is untouched at CLEARED, the `midjourney`
+control still refuses, and `require_cleared('openai')` now passes on the live gate. Four files
+changed, **zero game rasters staged or committed**, and the 27 placeholders are byte-for-byte
+untouched.
+
+| file | change |
+|---|---|
+| `scripts/assets/assetforge/provider_gate.json` | mark, scoped reason, `scope` block, preserved `superseded_assessment`, amended `_comment` |
+| `scripts/assets/assetforge/generate_selftest.py` | the seeded BARRED case, see below |
+| `scripts/assets/assetforge/README.md` | the mark table said BARRED and was wrong the moment the gate changed |
+| `docs/legal/openai-ticket-456254-ruling.md` | referenced as evidence; unchanged |
+
+**THE CLEARANCE IS SCOPED AND I DID NOT BROADEN IT.** The entry carries a `scope` block naming
+the ticket, the ruling file, what is permitted (development-stage visual art assets only) and
+what is prohibited verbatim from the ticket: operating gambling, accepting or processing wagers,
+processing payments, interacting with players. It also records that the permission is subject to
+the current Usage Policies and Terms of Use.
+
+**THE R084 ASSESSMENT IS PRESERVED, NOT DELETED.** The BARRED mark and its four-link contractual
+reasoning now sit in the same entry under `superseded_assessment`, because the record of what was
+believed and why is evidence. It also turned out to be useful, see the next paragraph.
+
+**THE SELF-TEST BROKE, AND THE REASON IS WORTH MORE THAN THE FIX.** `generate_selftest.py`'s
+first seeded case read the LIVE `openai` mark and asserted the refusal fired. Change the mark and
+the case fails, which it duly did: 15 of 16, one FAIL. **But the code path was never broken. The
+case was asserting on DATA rather than on the CODE PATH**, and a provider's mark is a fact that
+can legitimately change. So the case now **seeds a BARRED entry itself, built from the real R084
+assessment the gate still preserves**, which means the planted defect is the genuine historical
+one in its genuine wording, no longer hostage to which provider happens to be barred today. I
+also added a case asserting the new scoped clearance, so the unblock is covered rather than
+assumed. **17 of 17 pass**, every seeded refusal still fires.
+
+**THE HONEST LIMIT: THE LICENCE GATE IS LIFTED, BUT A GENERATION CALL STILL REFUSES.** Measured,
+not assumed: with the mark CLEARED, `require_cleared` passes and then `cost_of` raises
+*"'gpt-image-1' has no committed credit price in provider_gate.json"*. The OpenAI entry has no
+`credit_usd` and no per-model `credits`, because R084 never priced a provider it had barred. **I
+did not invent a price.** A committed price is a factual claim about OpenAI's billing and it needs
+a captured source, which is exactly the discipline that gate line exists to enforce. So: **the
+licence block is gone; the pricing block remains**, and it is one small captured-source task away.
+
+**TWO THINGS SURFACED RATHER THAN DECIDED.**
+
+**1. The gate's own comment asks for a Fable ruling.** `provider_gate.json` reads *"Changing a
+mark here without a Fable ruling is the violation."* This session changed it on the owner's
+direct written brief, which names exactly this change and is the later and better-informed
+instrument, so convention (n) says the sanction governs. **(n) also says the tension must be
+surfaced rather than quietly resolved, which is what this paragraph is.** If Fable wants the mark
+ratified separately, the change is one field and fully reversible.
+
+**2. The primary source is still not in the repository.** TASK 1 searched the repo, the Desktop
+and Downloads for any capture of Ticket 456254 and found only the R098 records I wrote. Per the
+brief's own fallback I proceeded on the committed transcription at
+`docs/legal/openai-ticket-456254-ruling.md` as the controlling record, and the gate now cites
+that file as its first evidence line. **The recommendation from R098 stands and is now more
+pointed, because a machine gate depends on it**: capture the correspondence and archive it beside
+the 2026-08-22 captures.
+
+Self-test 17/17, doc currency PASS, locked paths PASS, zero rasters. The incoming art directory
+stayed read only, no kit, no placeholder touched.
+
+---
+
 ## 096 - 2026-08-24 - R098: the OpenAI ruling is on file, the comps-only restriction is lifted, and the machine gate still reads BARRED
 
 **THE PROVIDER RULING IS RECORDED.** `docs/legal/openai-ticket-456254-ruling.md`, new this

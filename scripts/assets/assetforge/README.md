@@ -14,7 +14,7 @@ machine-readable form that `generate.py` reads on **every** call.
 | Provider | Mark |
 |---|---|
 | Stability AI (`sd3.5-large`, `sd3.5-large-turbo`) | **CLEARED** |
-| OpenAI (`gpt-image-1`) | **BARRED**, its Usage Policies prohibit "real money gambling" |
+| OpenAI (`gpt-image-1`) | **CLEARED for development-stage artwork only** (R099, Ticket 456254). Not for operating gambling, wagers, payments or player interaction. Was BARRED at R084; see `docs/legal/openai-ticket-456254-ruling.md` |
 
 A client that merely omitted OpenAI would silently become wrong the day somebody added it
 back. One that refuses by mark stays right, so the mark is enforced in code.
