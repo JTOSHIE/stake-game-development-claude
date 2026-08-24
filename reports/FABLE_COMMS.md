@@ -9,6 +9,88 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 086 - 2026-08-24 - R087: the idles are alive, the excursions are percentages, and the gate found seven more dead rules than R086 did
+
+**SIXTEEN PRUNED RULES, NOT NINE.** R086 measured the nine per symbol idles. Writing the
+gate and running it once found **seven more in the same file**: the two sprite sheet fx
+layers `fx-flame` and `fx-arc`, four win and anticipation effects `plate-bloom`,
+`pre-charge`, `scatter-charge` and `win-spin-fast`, and then `spinning`, whose three rules
+are what PAUSE idles on travelling reels. That last one mattered doubly: with the idles
+restored and `spinning` still dead, every symbol would have kept animating while its reel
+was in motion. All sixteen now carry `.symbol-img:global(.name)` and its siblings, the
+pattern `win-flash` was already using at line 1617. `idle-breathe` and `fx-none` were
+converted too, though neither was pruned, so one pattern governs each set rather than the
+set depending on which member happens to be literal in the markup.
+
+**THE COMPILER HAD BEEN SAYING SO ALL ALONG.** `svelte-check` reported **33** "Unused CSS
+selector" warnings before this session and **4** after, and the 29 that went were exactly
+these rules. They sat under a `BASELINE_WARNINGS` of 36 and so never went red. The four
+that remain are in other components and are report only per the brief:
+`.fs-hud.scheme-trap`, `.fs-hud.scheme-oil`, `.fs-hud.scheme-pitch` in HudOverlay and
+`.pm-value.pink` in BonusInstrumentColumn.
+
+**PERCENTAGES.** `idle-coil` `-3px` becomes `-1.25%`, `idle-pump` `-7px` becomes
+`-2.9167%`, both verified in the shipped minified CSS. Those are the only two px translates
+on symbol images in the idle set; audited and unconverted are `reel-tremble`
+`translateX(±1.5px)`, which is a cell not a symbol image, and `edge-spark-rise`
+`translateY(-380px)`, which is a spark travelling the reel height. Rotations, scales and
+opacities untouched. SY-08 and SY-12 note fields carry the equivalence, LF preserved, two
+rows changed and no others.
+
+**THE GATE WENT RED ON A PLANTED PRUNE BEFORE IT WAS ALLOWED TO PASS.** Fixture A applies
+`.seeded-prune` only via `classList.add`, and the project's own compiler returns, verbatim:
+`.host.svelte-19vb6p4 { color: red }` then `/* (unused) .seeded-prune { animation: seeded 1s
+infinite }*/` then `@keyframes svelte-19vb6p4-seeded { to { opacity: .5 } }`. Fixture B, the
+`:global()` form, keeps the rule. **The comment is the trap**: Svelte does not delete a
+pruned rule, it comments it out, and the minifier then strips it, so a check that does not
+strip comments reports PASS on exactly the defect it exists to catch.
+
+**THE GATE ALSO CAUGHT ITSELF TWICE, and that is the part worth keeping.** Its first version
+asked whether `.spinning` appeared anywhere in the bundle. It does, because HudOverlay has
+its own `.spinning` under a different scope hash, so another component's class vouched for
+GameGrid's and the gate printed PASS over a genuinely dead rule. `svelte-check` disagreeing
+is the only reason it surfaced. It now judges per rule, requiring the owning component's
+hash on the same selector. The correction then produced a FALSE POSITIVE on App.svelte's
+`:global(body.replay-route)`, which is fully global and correctly carries no hash, and a
+second on a class named only inside a CSS comment. Both are fixed and both are written into
+the gate's own header so the next reader does not re-derive them.
+
+**PROOF ON THE RUNNING GAME**, own dev server on 4173, the owner's 5173 untouched, after a
+real paint outside a win, `prefers-reduced-motion` pinned to `no-preference` and asserted
+false. **All ten resolve, none of them `none`**: idle-breathe 3.4s, idle-charge 2.4s plus
+valve-hiss 1.7s, idle-rev 1.8s, idle-coil 1.4s, idle-flame 1.2s, idle-glint 3s, idle-arc 2s,
+idle-pump 2.2s, idle-rings 1.9s, idle-rays 12s plus scatter-core 2s.
+
+| class | width | box h | min translateY | achieved | target | delta |
+|---|---|---|---|---|---|---|
+| idle-coil | 1280 | 69.487px | -0.869px | 1.2500% | 1.25% | 0.0000pp |
+| idle-pump | 1280 | 69.487px | -2.027px | 2.9167% | 2.9167% | 0.0000pp |
+| idle-coil | 390 | 49.839px | -0.622px | 1.2473% | 1.25% | 0.0027pp |
+| idle-pump | 390 | 49.839px | -1.453px | 2.9153% | 2.9167% | 0.0014pp |
+
+**L3 CROWN CLEARANCE IS POSITIVE AT BOTH WIDTHS**, against the shipped art's solid crown
+bound at row 31 of 240: at 1280, headroom 8.975px against a 2.027px excursion, **margin
++6.948px**; at 390, headroom 6.438px against 1.453px, **margin +4.985px**. R086 measured
++0.43px at 430px wide and negative below it. The margin now scales with the art instead of
+staying fixed while the art shrinks, which was the whole point.
+
+**ONE CONSEQUENCE THE OWNER SHOULD PUT AN EYE ON RATHER THAN TAKE FROM ME.** Honouring the
+art space contract makes the motion SMALLER in absolute terms than the old px: the pump
+moves 2.03px at 1280 where it used to be authored at 7px, about 3.4 times less, and the bob
+0.87px against 3px. That is correct against the manifest and it is what keeps the crown
+inside its headroom, but it is a visible change in amplitude. If the intent was the visual
+amplitude rather than the art contract, the percentages want raising and that is your call.
+
+**OWNER EYE, REPORTED** (look pass verdicts, not record verdicts, per (h)): wild outclasses
+the remaining old set; H1 registered in static view; single sane needle on the feature
+screen; no breakage observed.
+
+Build exit 0, zero console faults, zero missing assets. Typecheck baseline PASS, 29 fewer
+warnings. The incoming art directory was read only, no generation, no API call, no kit. **The eight placeholder
+rasters are untouched and remain unstaged**, exactly as left at R086.
+
+---
+
 ## 085 - 2026-08-24 - R086: eight of thirty swapped locally, the aspect gate refused ten, and the per-symbol idles are dead in the CSS
 
 **THE FENCE HELD. `git diff --cached` carried ZERO rasters at every commit**, asserted by a

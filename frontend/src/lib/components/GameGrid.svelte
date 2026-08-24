@@ -1367,26 +1367,26 @@
     mix-blend-mode: screen;
     opacity: 0.9;
   }
-  .symbol-fx.fx-none { display: none; }
+  .symbol-fx:global(.fx-none) { display: none; }
   /* M3 booster flame, 6-frame flipbook at ~9fps */
-  .symbol-fx.fx-flame {
+  .symbol-fx:global(.fx-flame) {
     background-size: 492px 82px;
     animation: fx-flame-cycle 0.66s steps(6) infinite;
   }
   @keyframes fx-flame-cycle { from { background-position-x: 0; } to { background-position-x: -492px; } }
   /* L2 fuse arc, 4-frame flicker at an irregular cadence */
-  .symbol-fx.fx-arc {
+  .symbol-fx:global(.fx-arc) {
     background-size: 328px 82px;
     animation: fx-arc-cycle 0.34s steps(4) infinite;
   }
   @keyframes fx-arc-cycle { from { background-position-x: 0; } to { background-position-x: -328px; } }
 
   /* Idles pause on travelling reels. */
-  .reel-strip.spinning .symbol-img,
-  .reel-strip.spinning .symbol-overlay,
-  .reel-strip.spinning .symbol-fx { animation: none !important; }
-  .reel-strip.spinning .symbol-overlay,
-  .reel-strip.spinning .symbol-fx { display: none !important; }
+  .reel-strip:global(.spinning) .symbol-img,
+  .reel-strip:global(.spinning) .symbol-overlay,
+  .reel-strip:global(.spinning) .symbol-fx { animation: none !important; }
+  .reel-strip:global(.spinning) .symbol-overlay,
+  .reel-strip:global(.spinning) .symbol-fx { display: none !important; }
 
   /* Scatter-anticipation charge glow on still-travelling reels - stronger glow
      plus a faint tremble on every tile of the anticipating reel. The tremble
@@ -1485,7 +1485,7 @@
 
   /* ── Symbol Life v2 idles (Set A), tuned to read at 120px ─────────────── */
   @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-  .idle-breathe { animation: idle-breathe 3.4s ease-in-out infinite; }
+  .symbol-img:global(.idle-breathe) { animation: idle-breathe 3.4s ease-in-out infinite; }
 
   /* H2 nitro crimson charge halo (2.4s) + valve-hiss opacity flicker */
   @keyframes idle-charge {
@@ -1493,25 +1493,26 @@
     50%      { filter: brightness(1.14) drop-shadow(0 0 10px rgba(255, 45, 61, 0.9)); }
   }
   @keyframes valve-hiss { 0%,90%,100% { opacity: 1; } 93% { opacity: 0.82; } 96% { opacity: 1; } }
-  .idle-charge { animation: idle-charge 2.4s ease-in-out infinite, valve-hiss 1.7s steps(1) infinite; }
+  .symbol-img:global(.idle-charge) { animation: idle-charge 2.4s ease-in-out infinite, valve-hiss 1.7s steps(1) infinite; }
 
   /* M1 rev, rim dash stream + rev LED chase (the LED strip is the fx layer) */
   @keyframes idle-rev {
     0%, 100% { filter: brightness(1); transform: scale(1); }
     50%      { filter: brightness(1.12) saturate(1.15); transform: scale(1.012); }
   }
-  .idle-rev { animation: idle-rev 1.8s ease-in-out infinite; }
+  .symbol-img:global(.idle-rev) { animation: idle-rev 1.8s ease-in-out infinite; }
 
-  /* M2 coilover, coil highlight chase (1.4s) + 3px body bob */
+  /* M2 coilover, coil highlight chase (1.4s) + body bob of 1.25%, which is
+     3px of the 240 art contract at every rendered size. */
   @keyframes idle-coil {
     0%, 100% { transform: translateY(0); filter: brightness(1); }
-    50%      { transform: translateY(-3px); filter: brightness(1.12) drop-shadow(0 0 6px rgba(138, 92, 255, 0.6)); }
+    50%      { transform: translateY(-1.25%); filter: brightness(1.12) drop-shadow(0 0 6px rgba(138, 92, 255, 0.6)); }
   }
-  .idle-coil { animation: idle-coil 1.4s ease-in-out infinite; }
+  .symbol-img:global(.idle-coil) { animation: idle-coil 1.4s ease-in-out infinite; }
 
   /* M3 booster, the flame flipbook lives on the fx layer; base gently breathes */
   @keyframes idle-flame { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.08); } }
-  .idle-flame { animation: idle-flame 1.2s ease-in-out infinite; }
+  .symbol-img:global(.idle-flame) { animation: idle-flame 1.2s ease-in-out infinite; }
 
   /* L1 chrome lug, facet glint sweep every 3s + bore ring pulse */
   @keyframes idle-glint {
@@ -1519,25 +1520,26 @@
     88%           { filter: brightness(1.55) drop-shadow(0 0 7px rgba(255, 215, 0, 0.85)); }
     94%           { filter: brightness(1); }
   }
-  .idle-glint { animation: idle-glint 3s ease-in-out infinite; }
+  .symbol-img:global(.idle-glint) { animation: idle-glint 3s ease-in-out infinite; }
 
   /* L2 fuse, arc flicker lives on the fx layer; base steady */
   @keyframes idle-arc { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.06); } }
-  .idle-arc { animation: idle-arc 2s ease-in-out infinite; }
+  .symbol-img:global(.idle-arc) { animation: idle-arc 2s ease-in-out infinite; }
 
-  /* L3 piston - crown pump 7px over 2.2s */
+  /* L3 piston, crown pump of 2.9167% over 2.2s, which is 7px of the 240 art
+     contract at every rendered size. */
   @keyframes idle-pump {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-7px); }
+    50%      { transform: translateY(-2.9167%); }
   }
-  .idle-pump { animation: idle-pump 2.2s ease-in-out infinite; }
+  .symbol-img:global(.idle-pump) { animation: idle-pump 2.2s ease-in-out infinite; }
 
   /* W wild, dual rings pulsing in opposite phase (approximated on the base) */
   @keyframes idle-rings {
     0%, 100% { filter: brightness(1) drop-shadow(0 0 3px rgba(255, 0, 255, 0.4)); transform: scale(1); }
     50%      { filter: brightness(1.2) drop-shadow(0 0 11px rgba(255, 0, 255, 0.85)); transform: scale(1.03); }
   }
-  .idle-rings { animation: idle-rings 1.9s ease-in-out infinite; }
+  .symbol-img:global(.idle-rings) { animation: idle-rings 1.9s ease-in-out infinite; }
 
   /* S scatter, rays rotating (1 rev / 12s) + core pulse */
   @keyframes idle-rays { to { transform: rotate(360deg); } }
@@ -1545,13 +1547,13 @@
     0%, 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.5)); }
     50%      { filter: brightness(1.25) drop-shadow(0 0 12px rgba(255, 215, 0, 0.95)); }
   }
-  .idle-rays { animation: idle-rays 12s linear infinite, scatter-core 2s ease-in-out infinite; }
+  .symbol-img:global(.idle-rays) { animation: idle-rays 12s linear infinite, scatter-core 2s ease-in-out infinite; }
 
   /* H1, continuous idle rotation on the spoke overlay, fast on wins. */
   @keyframes h1-idle-spin { to { transform: rotate(72deg); } }
   @keyframes h1-win-spin  { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
   .symbol-overlay { animation: h1-idle-spin 8s linear infinite; }
-  .symbol-overlay.win-spin-fast { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
+  .symbol-overlay:global(.win-spin-fast) { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
 
   /* ── Win state, brighten, plate bloom, punch scale ──────────────────────── */
   /* Stronger, larger edge bloom in the symbol's tint (bigger spread + a wider
@@ -1568,7 +1570,7 @@
         0 0 28px 8px color-mix(in srgb, var(--plate-tint, #00ffff) 85%, transparent);
     }
   }
-  .symbol-cell.plate-bloom { animation: plate-bloom-pulse 0.6s ease-in-out infinite; z-index: 5; }
+  .symbol-cell:global(.plate-bloom) { animation: plate-bloom-pulse 0.6s ease-in-out infinite; z-index: 5; }
 
   /* Dimmed, desaturated losers - spotlight the winners (harder than before).
 
@@ -1591,7 +1593,7 @@
     0%   { box-shadow: inset 0 0 10px 1px color-mix(in srgb, var(--plate-tint, #00ffff) 55%, transparent); }
     100% { box-shadow: inset 0 0 20px 3px color-mix(in srgb, var(--plate-tint, #00ffff) 95%, transparent), 0 0 12px 2px color-mix(in srgb, var(--plate-tint, #00ffff) 60%, transparent); }
   }
-  .symbol-cell.pre-charge { animation: pre-charge-pulse 0.25s ease-in forwards; z-index: 5; }
+  .symbol-cell:global(.pre-charge) { animation: pre-charge-pulse 0.25s ease-in forwards; z-index: 5; }
 
   /* Winner pop (biggest lift): a squash-and-stretch overshoot to 1.22 that
      spring-settles to 1.0, then a gentle 1.0<->1.06 pulse for the win duration.
@@ -1658,16 +1660,16 @@
     0%, 100% { box-shadow: inset 0 0 12px 2px rgba(255, 215, 0, 0.5), 0 0 10px 2px rgba(255, 215, 0, 0.4); }
     50%      { box-shadow: inset 0 0 26px 6px rgba(255, 215, 0, 0.95), 0 0 22px 6px rgba(255, 215, 0, 0.8); }
   }
-  .symbol-cell.scatter-charge { animation: scatter-charge-bloom 0.5s ease-in-out infinite; z-index: 6; }
+  .symbol-cell:global(.scatter-charge) { animation: scatter-charge-bloom 0.5s ease-in-out infinite; z-index: 6; }
   /* scanline sweep */
-  .symbol-cell.scatter-charge::before {
+  .symbol-cell:global(.scatter-charge)::before {
     content: ''; position: absolute; inset: 0; border-radius: 8px; pointer-events: none;
     background: linear-gradient(to bottom, transparent 42%, rgba(255, 240, 170, 0.55) 50%, transparent 58%);
     animation: scatter-scanline 0.7s linear infinite; z-index: 7;
   }
   @keyframes scatter-scanline { 0% { background-position: 0 -100%; } 100% { background-position: 0 100%; } }
   /* orbiting spark */
-  .symbol-cell.scatter-charge::after {
+  .symbol-cell:global(.scatter-charge)::after {
     content: ''; position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px;
     border-radius: 50%; background: #fff8c0; box-shadow: 0 0 8px 3px rgba(255, 224, 120, 0.9);
     pointer-events: none; transform-origin: -34px 0; animation: scatter-orbit 0.9s linear infinite; z-index: 8;
@@ -1719,14 +1721,14 @@
 
   @media (prefers-reduced-motion: reduce) {
     .symbol-img, .symbol-overlay, .symbol-fx,
-    .symbol-img:global(.win-flash), .symbol-cell.plate-bloom, .symbol-cell.pre-charge,
+    .symbol-img:global(.win-flash), .symbol-cell:global(.plate-bloom), .symbol-cell:global(.pre-charge),
     .reel-strip:global(.anticipate) .symbol-cell,
-    .symbol-cell.scatter-charge, .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after,
+    .symbol-cell:global(.scatter-charge), .symbol-cell:global(.scatter-charge)::before, .symbol-cell:global(.scatter-charge)::after,
     .idle-glint-sweep.active {
       animation: none !important;
     }
     .idle-glint-sweep { display: none; }
-    .symbol-cell.scatter-charge::before, .symbol-cell.scatter-charge::after { display: none; }
+    .symbol-cell:global(.scatter-charge)::before, .symbol-cell:global(.scatter-charge)::after { display: none; }
     /* Winners still spotlight, but statically (no pop / pulse / flash motion);
        losers still dim. Particle bursts are gated in JS (_reduceMotion). */
     .symbol-img:global(.loser-dim),

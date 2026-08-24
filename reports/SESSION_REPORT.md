@@ -17487,3 +17487,246 @@ until a ruling clears a batch.
 
 Model and effort: Sonnet at high effort per the brief, one session, unattended, review lane
 material recorded rather than actioned.
+
+# Session Report - R087 ANIMFIX: sixteen pruned rules restored, excursions converted to percentages, and a gate that caught itself twice (2026-08-24)
+
+Brief saved verbatim: `reports/briefs/FS_FABLE_R087_ANIMFIX_Prompt.md`. Branch:
+`claude/r087-animfix`, review lane, held for Fable and the owner. **THE FENCE HELD: the
+eight placeholder rasters were left exactly as found and never staged; zero raster
+additions or modifications in the diff, asserted by a gate. The incoming art directory was
+read only, no generation, no API call, no kit packaged. The owner's dev server on 5173 was never touched;
+this session ran its own on 4173.** Locked paths not involved and untouched.
+
+## Preconditions: all met
+
+| Precondition | State |
+|---|---|
+| `c7dd318` ancestor of `origin/main` | **Yes**, PR #127 merged. Checked out `main`, pulled, HEAD `76c296169dd9d85ac8782bbc163cdf8926c49b6c` |
+| `arc2-baseline` | **`618b711eebcaed7682aca4f63b16b24911d5c456`**, unchanged |
+| Modified rasters in the working tree | **8**, exactly as expected, carried across the branch switch and left in place |
+
+## TASK 1: the rules restored, and there were more than nine
+
+**SIXTEEN pruned rules, not the nine R086 measured.** Running the new gate once against the
+unfixed build found seven the earlier pass had not looked for:
+
+| Class | What it drives | Found by |
+|---|---|---|
+| `idle-charge`, `idle-rev`, `idle-coil`, `idle-flame`, `idle-glint`, `idle-arc`, `idle-pump`, `idle-rings`, `idle-rays` | the nine per symbol idles | R086 |
+| `fx-flame`, `fx-arc` | the M3 and L2 sprite sheet flipbook layers | **R087** |
+| `plate-bloom`, `pre-charge`, `scatter-charge`, `win-spin-fast` | win bloom, the 250ms charge pre-burst, scatter anticipation, the H1 fast spoke spin | **R087** |
+| `spinning` | **pauses idles and hides the overlay and fx layers on TRAVELLING reels** | **R087** |
+
+**`spinning` mattered doubly and would have been a regression introduced by this very
+session.** Its three rules are `animation: none !important` and `display: none !important`
+on travelling tiles. Dead, it did not matter while the idles were also dead. Restore the
+idles and leave `spinning` pruned, and every symbol keeps animating while its reel is in
+motion. It was caught only because `svelte-check` disagreed with the gate's first version.
+
+All sixteen now use the `:global()` form the same file was already using correctly at line
+1617 for `win-flash`. **`idle-breathe` and `fx-none` were converted too although neither was
+pruned**, so one pattern governs each set rather than the set's survival depending on which
+member happens to appear literally in the markup. The reduced-motion block carried the same
+classes as plain scoped selectors and was converted with them, otherwise the reduce
+overrides would prune exactly as the rules they override did.
+
+**THE COMPILER HAD BEEN REPORTING THIS FOR MONTHS.** `svelte-check` emitted **33** "Unused
+CSS selector" warnings at HEAD and **4** after this session; the 29 that went are precisely
+these rules. They never went red because `BASELINE_WARNINGS` in
+`frontend/scripts/typecheck_baseline.mjs` is 36. A warning budget larger than the defect
+class hid it in plain sight.
+
+**Other components, scanned and REPORTED only per the brief, no fixes made.** Exactly one
+other component applies a class from script with a rule of its own, `App.svelte`'s
+`.replay-route`, and it is **live** (authored `:global(body.replay-route)`). The four
+remaining unused selectors are not classList applied and are outside this brief:
+`.fs-hud.scheme-trap`, `.fs-hud.scheme-oil`, `.fs-hud.scheme-pitch` in `HudOverlay.svelte`
+and `.pm-value.pink` in `BonusInstrumentColumn.svelte`.
+
+## TASK 2: percentage excursions
+
+`idle-coil` `translateY(-3px)` becomes `translateY(-1.25%)`; `idle-pump` `translateY(-7px)`
+becomes `translateY(-2.9167%)`. Both verified present in the shipped minified CSS.
+
+**Every remaining idle keyframe audited for px translates on symbol images. There were no
+others.** Two px translates exist elsewhere in the style block and are deliberately NOT
+converted, with the reason recorded rather than left implicit:
+
+| Keyframe | Value | Why unconverted |
+|---|---|---|
+| `reel-tremble` | `translateX(±1.5px)` | applies to `.symbol-cell`, not a symbol image, and is a fixed-amplitude shake rather than an art-space contract |
+| `edge-spark-rise` | `translateY(-380px)` | the edge spark travels the reel's height; it is a distance in layout space, not a fraction of any art |
+
+Rotations, scales and opacities untouched, as the brief directs.
+
+`docs/art/art_manifest_arc2.csv` rows **SY-08** and **SY-12** carry the equivalence in their
+note fields (`1.25% = 3px of 240`, `2.9167% = 7px of 240`). Two rows changed and no others,
+2 insertions and 2 deletions, LF endings preserved and asserted before and after the write.
+
+## TASK 3: the gate, and it caught itself twice
+
+**`scripts/qa/css_liveness_gate.mjs`**, wired into `.github/workflows/checks.yml` after the
+production build, beside the other dist-reading gates, self-test first per the house shape.
+
+**THE SEEDED RED, OBSERVED BEFORE ANY PASS WAS ALLOWED TO COUNT.** Fixture A applies
+`.seeded-prune` only through `classList.add` and never writes it in the markup, which is the
+form that actually shipped. The project's own compiler returns, verbatim:
+
+```
+.host.svelte-19vb6p4 { color: red }
+/* (unused) .seeded-prune { animation: seeded 1s infinite }*/
+@keyframes svelte-19vb6p4-seeded { to { opacity: .5 } }
+```
+
+`GATE VERDICT : RED (correct, the violation was caught)`. Fixture B, the same fixture with
+`:global()`, keeps the rule and the gate goes green.
+
+**THE COMMENT IS THE TRAP, and it is why the gate reads dist rather than anything earlier.**
+Svelte does not delete a pruned rule, it comments it out. The production minifier then
+strips the comment, so the compiled file and the shipped file disagree about whether the
+text is present. A liveness check that does not strip comments finds the rule it is looking
+for and prints PASS on precisely the defect it exists to catch.
+
+**THE GATE'S OWN TWO FAILURES, recorded because they are the useful part.**
+
+1. **A false NEGATIVE, and it hid a real defect.** The first version asked whether
+   `.spinning` appeared anywhere in the bundle. It does: `HudOverlay` has its own
+   `.spinning` under scope hash `svelte-1waqajp`. GameGrid's had been pruned, and another
+   component's identically named class vouched for it. The gate now judges per RULE and
+   requires the owning component's hash on the same selector, discovering that hash from a
+   class present in both the component's markup and its style block.
+2. **Two false POSITIVES produced by that correction.** `App.svelte`'s
+   `:global(body.replay-route)` is fully global and correctly carries no hash, so demanding
+   one reported a live rule as pruned; the test is now whether anything SCOPED survives once
+   every `:global()` group is removed, not whether the class sits inside one. And a long CSS
+   comment sitting above a selector was being swallowed into the selector text, so style
+   blocks are now comment-stripped at the source, which also stops a class named only in
+   prose from counting as having a rule.
+
+Both are written into the gate's header so the next reader does not re-derive them.
+
+The collector deliberately follows one level of indirection through array literals, object
+literals and helper functions, because the defect that shipped was never
+`classList.add('idle-coil')`: it was `classList.add(idleClass(sym))` and
+`classList.remove(...IDLE_ALL)`. A collector reading only direct string arguments would have
+found nothing and printed PASS.
+
+## TASK 4: proof on the running game
+
+Own dev server on port **4173**; the owner's 5173 untouched throughout. **The production
+preview cannot serve this proof and that is recorded rather than worked around**: with no
+RGS reachable locally, a `vite preview` build never leaves the dev-seeded at-rest board, so
+no real paint exists to measure. The production ARTEFACT's liveness is therefore proven
+statically, by the gate against `dist`, and the DOM behaviour is proven on the dev server.
+Both surfaces are named against each claim rather than blurred.
+
+Measured after a real paint (post spin, board carrying 9 and 10 distinct symbols, **0**
+tiles dimmed so `loser-dim`'s `animation: none !important` cannot mask a result), with
+`prefers-reduced-motion` pinned to `no-preference` and asserted `false` in the page.
+
+**(a) All ten resolve to their keyframes. None is `none`, at either width.**
+
+| class | animationName | duration |
+|---|---|---|
+| idle-breathe | `s-DgLkktMuji77-idle-breathe` | 3.4s |
+| idle-charge | `s-DgLkktMuji77-idle-charge, s-DgLkktMuji77-valve-hiss` | 2.4s, 1.7s |
+| idle-rev | `s-DgLkktMuji77-idle-rev` | 1.8s |
+| idle-coil | `s-DgLkktMuji77-idle-coil` | 1.4s |
+| idle-flame | `s-DgLkktMuji77-idle-flame` | 1.2s |
+| idle-glint | `s-DgLkktMuji77-idle-glint` | 3s |
+| idle-arc | `s-DgLkktMuji77-idle-arc` | 2s |
+| idle-pump | `s-DgLkktMuji77-idle-pump` | 2.2s |
+| idle-rings | `s-DgLkktMuji77-idle-rings` | 1.9s |
+| idle-rays | `s-DgLkktMuji77-idle-rays, s-DgLkktMuji77-scatter-core` | 12s, 2s |
+
+**(b) Excursion at two widths, sampled over a full cycle on a real settled tile.**
+
+| class | width | box height | min translateY | achieved | target | delta |
+|---|---|---|---|---|---|---|
+| idle-coil | 1280 | 69.487px | -0.869px | 1.2500% | 1.25% | **0.0000pp** |
+| idle-pump | 1280 | 69.487px | -2.027px | 2.9167% | 2.9167% | **0.0000pp** |
+| idle-coil | 390 | 49.839px | -0.622px | 1.2473% | 1.25% | **0.0027pp** |
+| idle-pump | 390 | 49.839px | -1.453px | 2.9153% | 2.9167% | **0.0014pp** |
+
+All four inside a tenth of a percentage point, the brief's bar, by two orders of magnitude.
+
+**(c) L3 crown clearance, against the shipped art's solid crown bound at row 31 of 240.**
+
+| width | art box | crown headroom | excursion | margin |
+|---|---|---|---|---|
+| 1280 | 69.487px | 8.975px | 2.027px | **+6.948px** |
+| 390 | 49.839px | 6.438px | 1.453px | **+4.985px** |
+
+Positive at both. R086 measured **+0.43px** at 430px wide and negative below it. The margin
+now scales with the art instead of holding fixed while the art shrinks, which was the point
+of the conversion.
+
+Zero console errors, zero page errors, zero missing assets. Build exit 0. Captures at
+`.scratch/animfix-2026-08-24/`; nothing depicting placeholder art is committed.
+
+**OWNER EYE, REPORTED** (look pass verdicts arrive by eye and are not record verdicts, per
+(h)): wild outclasses the remaining old set; H1 registered in static view; single sane
+needle on the feature screen; no breakage observed.
+
+## Verification
+
+Close gates chained with `&&` per (u.1), each gate's exit code the DIRECT left operand, no
+pipe and no command substitution between the gate and the chain.
+
+| Gate | Result |
+|---|---|
+| Zero raster staged assertion | **PASS** |
+| `css_liveness_gate.mjs --self-test` | **PASS**, RED observed on the planted prune first |
+| `css_liveness_gate.mjs` | **PASS** |
+| `typecheck_baseline.mjs` | **PASS**, 0 errors, 29 fewer warnings |
+| `doc_currency_gate.mjs` | **PASS** |
+| `locked_paths_gate.mjs` | **PASS**, 0 violations |
+| `npm run build` | **PASS**, exit 0 |
+
+## ESCALATIONS
+
+**E1 (R087). The excursions are now SMALLER in absolute terms and the owner should judge
+that by eye.** Honouring the art space contract means the pump moves 2.03px at 1280 where it
+was authored at 7px, about 3.4 times less, and the bob 0.87px against 3px. That is correct
+against the manifest and it is what keeps the crown inside its headroom at every width, but
+it is a visible reduction in amplitude. If the intent was the VISUAL amplitude rather than
+the art space contract, the percentages want raising, and that is an owner call rather than
+a builder one.
+
+**E2 (R087). `BASELINE_WARNINGS` is 36 and the real count is now 4.** Twenty-nine of the
+thirty-six were this defect class. Leaving the constant at 36 preserves headroom for the
+same class to return silently. It is a one line change and it was NOT made, because the
+brief scoped this session and the new gate already covers the classList-applied subset
+directly. Lower it to lock the gain in.
+
+**E3 (R087). Four unused selectors remain in other components**, reported not fixed per the
+brief: `.fs-hud.scheme-trap`, `.fs-hud.scheme-oil`, `.fs-hud.scheme-pitch`
+(`HudOverlay.svelte`) and `.pm-value.pink` (`BonusInstrumentColumn.svelte`). These are not
+classList applied, so they are dead styling rather than this session's defect class.
+
+**E4 (R087). The production preview cannot exercise a real board locally**, because no RGS
+is reachable, so `vite preview` never leaves the seeded at-rest board. Any future proof
+needing a painted board must use the dev server or a seeded dist. Recorded so the next
+session does not spend the time discovering it again.
+
+R086's E1 is CLOSED by this session. R086's E2, E3, E4 and E5 stand, as do R085-R's E1, E2
+and E4, R085's E2, R084's E1, E2 and E3, R083's E3 and E4, R082's three, R080's E1, R081's
+E2 and E3, TR-148's four, R078's E1 and E2, and R079's E1 and E2.
+
+## FOR THE NEXT SESSION
+
+**The eight placeholder rasters are still in the working tree, still unstaged, untouched by
+this session.** The restore command remains as recorded in the R086 report, and kit
+packaging stays forbidden until it is run and `git status` is clean.
+
+With `idle-rays` restored, **the scatter placeholder may visibly tumble**, because that class
+rotates the whole image through 360 degrees over 12s and the current placeholder is not
+radially symmetric. The brief names this as expected, judged by eye, and fixed in
+regeneration rather than in code.
+
+R088 ships on the owner's REISSUE: style register, secret scanning gate, Gemini terms
+capture, arc-2 living handover. The backgrounds ruling, WORKSHOP or TESTCELL, is still
+pending and blocks SC-01 and SC-02.
+
+Model and effort: Sonnet at high effort per the brief, one session, no gate failed twice so
+no escalation was triggered.
