@@ -17730,3 +17730,41 @@ pending and blocks SC-01 and SC-02.
 
 Model and effort: Sonnet at high effort per the brief, one session, no gate failed twice so
 no escalation was triggered.
+
+## ADDENDUM: the red that restoring the idles caused, and what it was
+
+**CI went RED on `browser: replay contract` on the first push, and the cause was this
+session's own fix.** Recorded here in full rather than as a footnote, because the shape of
+it is the interesting part: a correct change made a hidden assumption in an unrelated gate
+false.
+
+`replay_contract_gate.mjs` measures which cells are dimmed by reading COMPUTED opacity,
+deliberately rather than by reading the class list, because "a class that no rule matches is
+exactly the seeded defect this has to catch". Its threshold was `opacity < 0.9`.
+
+**That threshold was safe only while the idles were dead.** The dim treatment is
+`opacity: 0.2 !important` and full strength is 1, so 0.9 separated them with room to spare.
+But `idle-charge` carries `valve-hiss`, which dips a symbol to **0.82** for one step of a
+1.7s cycle, and the reader polls every 100ms. Restore `idle-charge` and an H2 tile caught
+mid-hiss registers as dimmed. The failing assertion was the settled dim set not matching the
+moment's: **rest 12 cells, moment 13**, the extra one being cell `2,5`.
+
+**Cell `2,5` is a BUFFER row.** The strip carries seven slots, `[buf, r0..r3, buf, buf]`, so
+three are off screen and no player ever sees them. The reader was counting them; the reel
+reader further down the same file already filtered by exactly the geometry that would have
+excluded it.
+
+**Two corrections, both precision rather than sensitivity.** The threshold is now `0.5`,
+clear of both 0.2 and 0.82, and still catching what the reader exists for, since a pruned or
+missing rule leaves the tile at 1. And the reader now counts visible cells only, by the same
+clip test its sibling uses.
+
+**VERIFIED THAT THE GATE KEEPS ITS TEETH RATHER THAN ASSUMED IT.** This is the exact move
+convention (p) warns about, loosening a gate until the change passes, so the check is the
+gate's own seeded self-test: **15 of 15 seeds still caught, 0 missed**, and the full run
+**86 of 86 assertions passed**. Nothing was added to any baseline.
+
+**The general lesson, which is worth more than the fix.** A gate that infers a state from a
+continuous measurement carries an implicit assumption about everything else that can move
+that measurement. Nine dead animations had been holding this one's assumption true by
+accident for as long as the defect existed. Repairing the defect is what exposed it.

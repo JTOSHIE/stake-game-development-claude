@@ -89,6 +89,17 @@ Build exit 0, zero console faults, zero missing assets. Typecheck baseline PASS,
 warnings. The incoming art directory was read only, no generation, no API call, no kit. **The eight placeholder
 rasters are untouched and remain unstaged**, exactly as left at R086.
 
+**CI FIRST WENT RED, and this session's own fix caused it.** `browser: replay contract`
+failed: restoring the idles made a hidden assumption in that gate false. Its dim reader
+flagged any symbol under 0.9 opacity, and `valve-hiss` (the H2 idle) dips to 0.82 for one
+step, so an H2 tile caught mid-flicker on a BUFFER row read as dimmed. Threshold moved to
+0.5 and the reader now counts visible cells only, both precision not sensitivity: the gate's
+own seeded self-test still catches 15 of 15 seeds, and the full run is 86 of 86. This is
+the general shape worth keeping: nine dead animations had held that gate's assumption true
+by accident, and repairing them is what exposed it. **Full matrix now green**, run
+32691427467 on bc4f1cfa, all 29 jobs including replay contract and the new css liveness
+gate on the static leg. PR #128, held for Fable and the owner.
+
 ---
 
 ## 085 - 2026-08-24 - R086: eight of thirty swapped locally, the aspect gate refused ten, and the per-symbol idles are dead in the CSS
