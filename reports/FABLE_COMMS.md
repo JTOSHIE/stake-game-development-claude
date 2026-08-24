@@ -9,6 +9,69 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 091 - 2026-08-24 - R093: nothing landed, three refused on aspect and three have nowhere to go, with the exact canvases to re-render
+
+**ZERO SWAPS THIS SESSION.** Three refused by the gate, three are NO-ROW. The tree still carries
+the same twenty-four placeholders R092 left, unchanged. Saying that plainly because a session
+that lands nothing is a real outcome and the useful product here is the re-render spec, not a
+diff.
+
+**THE PROTECTED EMBLEM WAS NEVER A CANDIDATE AND WAS NOT TOUCHED.** `ui/hero_emblem_512.png` is
+BR-01, the owner-ruled SOLE KEEP, "do not replace, restyle or recolour". A brief asking to swap
+a "Main Title lockup" could plausibly have been aimed at it; it was not, and the only live
+title raster is UI-05 `ui/logo.png`.
+
+**THREE WRONG-SPEC, all on aspect, measured by running the real ingest rather than predicted:**
+
+| Asset | Source | Target | Drift |
+|---|---|---|---|
+| Main Title lockup | 1600x600 (2.6667) | UI-05 `ui/logo.png` 600x120 (5.0000) | **46.67%** |
+| Robot main | 800x1000 (0.8000) | SC-06 `ui/scene_character.png` 680x1344 (0.5060) | **58.12%** |
+| Car only | 1400x600 (2.3333) | SC-05 `ui/scene_car.png` 2840x1000 (2.8400) | **17.84%** |
+
+**THREE NO-ROW**, and each for the same structural reason: the game has one title raster and one
+character raster, not a set of states. Title Idle / Soft Glow and Title Energy Surge have no
+shipped raster and **no wiring anywhere** (a full-tree search for title-state or surge handling
+returns nothing), and Robot Active Pose likewise. The brief says not to invent component wiring,
+so all three are recorded and skipped.
+
+**THE EXACT CANVASES TO RE-RENDER, which is what this session is actually for.** All three land
+at 0.0000% drift and would then pass ingest unmodified and unflagged, exactly as the tile plate
+did at R092 once it was rebuilt to the 732x612 I specified at R090:
+
+- **Title:** `600x120` at 5:1, or 2x `1200x240`, or 3x `1800x360`.
+- **Robot:** `680x1344` at 85:168, or 2x `1360x2688`.
+- **Car:** `2840x1000` at 71:25. The shipped file is already large, so 1x is the sensible ask.
+
+**AND A REASON THE TITLE SHAPE MATTERS BEYOND THE GATE.** `.logo-box` is a **380x60 strip**, and
+`.game-logo-img` is `max-height: 60px; object-fit: contain`. Measured in the running game, the
+box renders at 338x68 and the current 5:1 wordmark fills it. A 2.6667:1 lockup contained in that
+same box renders **180x68, leaving 47% of the box empty** and reading materially smaller than the
+wordmark it replaces. The slot is a wide strip by construction. If the owner wants a tall,
+blocky title lockup instead, that is a layout change to `.logo-box` and the manifest row, not an
+asset swap, and it is out of scope here by the brief's own instruction.
+
+**A NOTE ON HOW THE TWO SCENE ASSETS FAIL, because it differs from the tile plate.** `.car-img`
+and `.char-img` both use `object-fit: contain`, so a wrong-aspect file would **letterbox rather
+than distort at render**. The gate still refuses correctly, because ingest must resize the file
+to the exact target dimensions and that squashes it IN THE FILE. Forced through, the car would
+sit 803x344 in a 977x344 box (18% empty) and the robot 238x298 in a 238x466 box (**36% empty**),
+so the robot in particular would read as a small figure floating in its slot.
+
+**Two files in the folder were out of scope and are noted rather than used:**
+`04-robot-car-main-1400x1000` and `05-robot-car-active-1400x1000`, the pre-separation combined
+hero. The brief named the separated layers. Worth flagging for whoever reaches for them next:
+their natural home would be `ui/scene_character_car.png`, which is **SC-07, DEAD** and carries
+an explicit "delete, do not redraw" plus a trap, it **regenerates itself** from
+`scripts/assets/manifest.json` on the next `npm run assets` unless the manifest entry goes in the
+same edit.
+
+Build exit 0, zero console errors, zero page errors, zero missing assets, no layout breakage;
+all three live targets load at their shipped dimensions. Twenty-four rasters still modified,
+zero staged. Ship bar unchanged pending the provider ruling.
+
+---
+
 ## 090 - 2026-08-24 - R092: the tile plate and M1 both land, and the arc-2 placeholder set is now complete
 
 **BOTH SWAPPED, BOTH AT 0.0000% DRIFT.** These were the last two gaps, and both were closed by
