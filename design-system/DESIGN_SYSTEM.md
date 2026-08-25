@@ -12,15 +12,55 @@ section had already permitted owner-commissioned external scene and marketing ar
 Read that section for the governing text and the three conditions; this is its
 design-system statement, not a second authority.
 
-- One design output, and it is TWO rules rather than one:
-  **Symbols, frames and anything the animation pipeline positions or animates derive
-  from vector masters in this directory and are NEVER externally designed.** No
-  exception, and no measurement changes that answer (Manus retired July 2026).
-  **Owner-commissioned SCENE, TILE and MARKETING art may come from outside**, because
-  it is flat, terminal, and animates nothing. It is permitted only where the owner
-  commissioned it, it does not enter the animation pipeline, and its provenance is
-  recorded and MEASURED against what it replaces before it ships.
-  Unrequested external art remains prohibited whatever its quality.
+- One design output. **AMENDED 2026-08-25 BY OWNER RULING: the animation-pipeline
+  restriction is WITHDRAWN FOR FUTURE SPINNER.** The ruling, quoted:
+
+  > External development-stage artwork may be used in the Future Spinner animation
+  > pipeline, including character rigging and Spine, provided final shipped assets remain
+  > quality-controlled, provenance-recorded, and presentation-safe for Stake.
+
+  **So the current rule for Future Spinner is:** external development-stage art MAY be
+  rigged, animated, and driven by the effect system. **Static-only treatment of the robot
+  is no longer required.** The three surviving conditions are the ruling's own, and they
+  are not optional:
+  **quality-controlled**, **provenance-recorded** (a generation note or provenance record
+  beside the asset, per the next bullet), and **presentation-safe for Stake**.
+  Unrequested external art remains prohibited whatever its quality: the owner still
+  commissions.
+
+  **SCOPE, stated rather than assumed.** The ruling names Future Spinner. This document
+  governs "Future Spinner and all future We Roll Spinners games", so **other WRS titles
+  continue under the superseded rule below until the owner rules otherwise.**
+
+  **THE SUPERSEDED RULE IS KEPT, not deleted, because the record of what was believed is
+  evidence and because it still governs other titles:**
+
+  > **Symbols, frames and anything the animation pipeline positions or animates derive
+  > from vector masters in this directory and are NEVER externally designed.** No
+  > exception, and no measurement changes that answer (Manus retired July 2026).
+  > **Owner-commissioned SCENE, TILE and MARKETING art may come from outside**, because
+  > it is flat, terminal, and animates nothing. It is permitted only where the owner
+  > commissioned it, it does not enter the animation pipeline, and its provenance is
+  > recorded and MEASURED against what it replaces before it ships.
+  > Unrequested external art remains prohibited whatever its quality.
+
+  **WHAT THE SUPERSEDED RULE WAS FOR, so the amendment is not read as forgetting it.** It
+  was written after the Manus failure: externally designed assets, symbols above all, that
+  did not fit the animation pipeline and had to be redone. **That risk has not vanished; it
+  has moved.** It is now managed by the ruling's own three conditions rather than by a
+  blanket prohibition, and by the measurement discipline in `CLAUDE.md`'s Assets section,
+  which still applies in full: measure a replacement against what it replaces, preserve the
+  alpha channel and every effect anchor, and check what else is derived from it.
+
+  **ONE READING SURFACED RATHER THAN DECIDED QUIETLY, per convention (n).** The superseded
+  rule's strictest clause was about SYMBOLS. The ruling withdraws the animation-pipeline
+  restriction without naming symbols as an exception to the withdrawal, and it names
+  rigging and Spine only as an example ("including"). **Read literally, externally sourced
+  development-stage symbols are now permitted too**, which is also what this project has
+  been doing in practice for the whole of arc 2: the working-tree placeholder set is
+  externally generated symbol art under review. **This document applies the ruling as
+  written. If the owner intended to keep symbols in-house-only, that is one sentence and it
+  belongs here.**
 - Every such exception carries a generation note or provenance record beside the asset,
   giving source path, source hash, shipped hash, dimensions, what the supplier claimed
   and what the measurement found. The background and the composed tile are the worked

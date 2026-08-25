@@ -18,7 +18,12 @@ Australian English, no em dashes or en dashes.
   5,000x, all at 96.3500% RTP.
 - **Original IP:** verified, and **QUALIFIED 2026-08-05 because the flat claim was no longer
   true of what ships.** Symbols, frames and UI are original designs produced in-house from
-  vector masters, never externally designed. Owner-commissioned SCENE, TILE and MARKETING art
+  vector masters. **QUALIFIED AGAIN 2026-08-25: the owner withdrew the animation-pipeline
+    restriction for Future Spinner, so external development-stage art may now be rigged and
+    animated, subject to being quality-controlled, provenance-recorded and presentation-safe.
+    What SHIPS at HEAD today is still in-house symbol art; that changes if and when the
+    working-tree placeholder set is adopted, and this line must be re-checked at that point.**
+    Owner-commissioned SCENE, TILE and MARKETING art
   is adopted from outside under the Assets rulings in `CLAUDE.md`, each carrying a generation
   note or provenance record beside the asset giving source, hashes, dimensions and the
   measurement against what it replaced. The hero emblem is a Google Gemini generation and

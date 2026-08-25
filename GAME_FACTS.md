@@ -274,11 +274,18 @@ live is exactly 5,000.00x on the wincap round itself.
   | `design-system/brand/tile/tile_composed_master.png` 408x546 | Owner-commissioned NEW DESIGN | Landed byte-identical at the platform's own observed published tile geometry, 408x546 | `design-system/brand/tile/GENERATION_NOTE_composed_master.md` |
   | `ui/scene_character.png` 680x1344, `ui/scene_car.png` 2840x1000 | External ENHANCEMENT of art we already own | Character subject bounding box matching the original to **0.7%**; car bounding box **identical** at 2729x914, 40.7% transparent in both | `CLAUDE.md` Assets section; shipped hashes recorded in `SUBMISSION_DOSSIER.md` section 9 |
 
-  **Every symbol, frame, particle and animated element still derives from the in-house SVG
-  masters.** That is the line the rule actually draws, and it is unbroken: none of the four
-  above enters the animation pipeline. Scene backdrops, tiles and marketing art are flat and
-  terminal and animate nothing, which is why they can come from outside without recreating
-  the failure the original prohibition was written for.
+  **Every symbol, frame, particle and animated element in the SHIPPED SET still derives from
+  the in-house SVG masters**, and that remains true of this repository at HEAD: none of the
+  four adopted assets above enters the animation pipeline.
+
+  **THE RULE BEHIND THAT SENTENCE CHANGED ON 2026-08-25, and the distinction matters for an
+  auditor reading this.** The owner withdrew the animation-pipeline restriction for Future
+  Spinner: *"External development-stage artwork may be used in the Future Spinner animation
+  pipeline, including character rigging and Spine, provided final shipped assets remain
+  quality-controlled, provenance-recorded, and presentation-safe for Stake."* External art is
+  therefore no longer barred from being animated. **The sentence above is a fact about the
+  shipped set, not a claim about the rule**, and it must be re-verified before any submission
+  that adopts the externally generated development-stage art currently held under review.
 - **Backgrounds:** static graded stills (one base scene, one Overdrive-state variant), no
   background video ships (`design-system/DESIGN_SYSTEM.md` ADDENDUM "Static environment
   backgrounds"). Since 2026-07-27 the base is owner-commissioned art and the Overdrive

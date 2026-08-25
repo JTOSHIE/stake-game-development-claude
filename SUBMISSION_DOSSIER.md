@@ -679,6 +679,23 @@ assets fit neither side of the old line, which is why the rule was restated to d
 the project actually does. The full adoption register, with hashes and measurements, is
 section 9c below.
 
+**SUPERSEDED AGAIN 2026-08-25, same discipline: the correction is added, the old text is not
+edited away.** The owner withdrew the animation-pipeline restriction for Future Spinner:
+
+> External development-stage artwork may be used in the Future Spinner animation pipeline,
+> including character rigging and Spine, provided final shipped assets remain
+> quality-controlled, provenance-recorded, and presentation-safe for Stake.
+
+**So "symbols are never externally designed" is no longer the operative rule for this title.**
+The three conditions that survive are the ruling's own: quality-controlled,
+provenance-recorded, presentation-safe. Unrequested external design remains prohibited.
+
+**What SHIPS at the time of writing is unchanged**: every symbol, frame and animated element
+in the committed set still derives from the in-house SVG masters, and section 9c's register is
+accurate. **This paragraph exists so a reviewer is not shown a rule the project has since
+withdrawn**, and so that any future submission adopting externally generated symbol art is
+described accurately rather than against a superseded line.
+
 ---
 
 ## 9. STATE AT HEAD (2026-07-27): the live confirmations, the art adoptions, the display convention

@@ -451,6 +451,11 @@ owner-commissioned NEW DESIGNS are permitted for SCENE and MARKETING art, with r
 provenance. Symbols remain never externally designed, and unrequested external design
 remains prohibited.**
 
+**THAT SENTENCE'S SYMBOL CLAUSE IS SUPERSEDED FOR FUTURE SPINNER by the 2026-08-25 owner
+ruling below.** Unrequested external design does remain prohibited; "symbols remain never
+externally designed" no longer holds for this title. The paragraph is kept unedited because
+it is the dated record of the 2026-07-27 ruling.
+
 The 2026-07-25 amendment drew the line at enhancement because that was the case in front
 of it. Two adoptions since have not fitted on either side of that line, and both were
 accepted on their merits, so the rule is restated to describe what the project actually
@@ -470,18 +475,46 @@ enhancement versus design. It is these three things, and they are the conditions
 
 1. **The owner commissioned it.** Art that arrives unrequested is out, whatever its
    quality. The Manus failure was a pipeline handing over work nobody had specified.
-2. **It does not enter the animation pipeline.** Symbols, frames and anything the effect
-   system positions or animates are still produced in-house from vector masters, full
-   stop. Scene backdrops, tiles and marketing art are flat, terminal, and animate nothing,
-   which is why they can come from outside without the failure recurring.
+2. ~~**It does not enter the animation pipeline.**~~ **WITHDRAWN 2026-08-25 BY OWNER
+   RULING, FOR FUTURE SPINNER.** See the amendment below. The superseded text read:
+   "Symbols, frames and anything the effect system positions or animates are still produced
+   in-house from vector masters, full stop. Scene backdrops, tiles and marketing art are
+   flat, terminal, and animate nothing, which is why they can come from outside without the
+   failure recurring."
 3. **Its provenance is recorded and measured**, per point 4 below, before it ships.
+
+**AMENDED 2026-08-25 by owner ruling (R109): external art MAY now enter the Future Spinner
+animation pipeline.** The ruling, quoted verbatim:
+
+> External development-stage artwork may be used in the Future Spinner animation pipeline,
+> including character rigging and Spine, provided final shipped assets remain
+> quality-controlled, provenance-recorded, and presentation-safe for Stake.
+
+**So condition 2 is replaced, not merely relaxed.** The three conditions for Future Spinner
+are now: **the owner commissioned it**; **its provenance is recorded and measured**; and the
+ruling's own bar, that the shipped result is **quality-controlled and presentation-safe for
+Stake**. **Static-only treatment of the robot is no longer required, and rigging it is no
+longer a violation.**
+
+**What this does NOT change.** Every measurement discipline in the test below still applies
+in full, and it is now doing more of the work than before: measure a replacement against what
+it replaces, preserve the alpha channel and every effect anchor, record provenance beside the
+asset, and check what else is derived from it. **The Manus risk did not vanish when the
+prohibition did; it moved from a blanket rule to those checks.**
+
+**Scope:** the ruling names Future Spinner. `design-system/DESIGN_SYSTEM.md` carries the same
+amendment with the same scope note and keeps the superseded rule for other WRS titles.
 
 **The test for any future external asset**, in order:
 
-1. **Which class is it?** A symbol, or anything the animation pipeline touches: in-house
-   only, no exceptions, and no measurement will change that answer. Scene, tile or
-   marketing art: continue, and state plainly whether it is an enhancement or a new
-   design rather than letting the question go unasked.
+1. **Which class is it?** **AMENDED 2026-08-25: class no longer decides admissibility for
+   Future Spinner.** Anything the animation pipeline touches may now come from outside under
+   the ruling above, so this step is no longer a gate; it is a labelling step. State plainly
+   whether the asset is an enhancement or a new design, and whether it will be animated,
+   rather than letting either question go unasked, then continue to step 2 in every case.
+   **The superseded text read:** "A symbol, or anything the animation pipeline touches:
+   in-house only, no exceptions, and no measurement will change that answer." **Steps 2 to 5
+   are now the whole of the test, and they are load-bearing in a way they were not before.**
 2. **Measure it against what it replaces rather than asserting the answer.** For a subject
    with a silhouette, the subject bounding box; a changed silhouette breaks layout,
    because overlay effects are positioned by percentage within their layer. For a

@@ -124,6 +124,99 @@ ones.**
 picture. The remaining programme is owner decisions and component work, both already enumerated
 in sections 0B, 0C and 0D.
 
+## 0F. R109 — THE ANIMATION-PIPELINE RESTRICTION IS WITHDRAWN, AND THE BLOCKER MAP IS REBUILT
+
+**OWNER RULING, 2026-08-25, quoted verbatim:**
+
+> External development-stage artwork may be used in the Future Spinner animation pipeline,
+> including character rigging and Spine, provided final shipped assets remain
+> quality-controlled, provenance-recorded, and presentation-safe for Stake.
+
+**Static-only treatment of the robot is no longer required.** Three conditions survive and are
+not optional: **quality-controlled**, **provenance-recorded**, **presentation-safe for Stake**.
+Unrequested external art is still prohibited. **Scope: Future Spinner.** Other WRS titles remain
+under the superseded rule until the owner says otherwise.
+
+**Documents amended** (six; every one keeps its superseded text rather than deleting it):
+`design-system/DESIGN_SYSTEM.md` (the SYSTEM LAW itself), `CLAUDE.md` (condition 2 and test step
+1), `COMPLIANCE_WATCH.md`, `GAME_FACTS.md`, `SUBMISSION_DOSSIER.md`,
+`docs/design/SPINE_ROBOT_RIG_SETUP.md`, plus `docs/design/FX_REGENERATION_SPEC.md`.
+
+**Dated records were NOT edited.** Session reports, archives, comms entries and saved briefs keep
+the old law verbatim, per convention (s): history does not go stale, instructions do.
+
+**TWO AUDIT-FACING DOCUMENTS NEEDED CARE, not just an edit.** `GAME_FACTS.md` states it is
+compiled for external audit and `SUBMISSION_DOSSIER.md` is submission-facing. Both asserted
+"symbols remain never externally designed". **That claim is now false as a RULE and still true as
+a FACT about the shipped set**, because the externally generated symbol art is uncommitted and
+under review. Both were amended to state the rule change AND to say plainly that the shipped-set
+statement must be re-verified before any submission that adopts that art. **A reviewer must not
+be shown a withdrawn rule, and must not be shown a false claim about what ships.**
+
+### Rows this closes
+
+| Row | Now |
+|---|---|
+| **R103-SPINE-LAW** external parts cannot be rigged | **CLOSED by ruling.** Route A is open and recommended |
+| **R102-E4** parts not in the repository, nothing may cite them | **Reduced to ordinary adoption work.** Provenance is still required by the ruling's own condition |
+| **R102-E5** visor baked into the head | **CLOSED.** Solved in art, and now in law |
+| **R104-E2** route A needs a law amendment | **CLOSED** |
+
+---
+
+## 0G. THE BLOCKER MAP, REBUILT FROM ZERO UNDER THE NEW LAW
+
+### A. Real Stake or product blockers
+
+**None identified.** The one item touching the platform is R097-F35, submission-1 held on the
+portal artefact, which is an owner-side hold rather than a defect. The AI-provenance scoring risk
+recorded in the arc-2 handover is a QUALITY consideration the ruling's "presentation-safe"
+condition now carries, not a gate.
+
+### B. Internal outdated process residue
+
+**Found and removed this session:**
+
+| Item | Disposition |
+|---|---|
+| The animation-pipeline restriction | **WITHDRAWN** by owner ruling |
+| Ledger rows marked "blocked in law" | **Updated** |
+| The FX spec's "static art that animates nothing" distinction | **Withdrawn**; the distinction no longer exists |
+| `CLAUDE.md` test step 1, "class decides admissibility" | **Amended**; class is now a labelling step, steps 2 to 5 are the whole test |
+
+**Actively looked for and NOT found:** any rule blocking component work while placeholders are
+dirty. The only match was a heading in the HUD commissioning spec categorising art-only versus
+component work, which is a categorisation and not a prohibition.
+
+**Examined and DELIBERATELY KEPT, because each has a real basis:**
+
+| Rule | Why it stays |
+|---|---|
+| Kit packaging forbidden while any placeholder differs from HEAD | Packaging now would ship 30 unreviewed rasters. **Real safety, not residue** |
+| The asset guards (7 writers) | They prevent silent destruction of the visual set, proven by execution |
+| Locked-path sanction tokens | Money path and maths package |
+| Convention (p) seeded self-tests, explicit-path commits, evidence hygiene | Ordinary engineering discipline |
+| HUD control labels must stay CSS/SVG | **Real basis: sixteen locales.** Baked text cannot localise. This is scoped to labels, values, the accent colour and state animations, not to whole controls |
+
+### C. Owner decisions still needed
+
+1. **SC-03's target** — the last uncovered REPLACE row: author at the true 640x468 aspect, or change the call site.
+2. **The shared `.car-img, .char-img` drop-shadow** — blocks the contact shadows; adding a raster shadow doubles it or changes the car too.
+3. **`char-idle` versus a rigged idle** — NEW, from R109. The wrapper supplies the bob in CSS; a rig would supply it in the skeleton. Running both doubles it.
+4. **Does the ruling cover SYMBOLS?** — surfaced per convention (n). Read literally it does, and that matches arc-2 practice. One sentence settles it.
+5. **Whether sub-10x wins should celebrate** — the burst art exists; the thresholds are deliberate.
+6. **Whether to commit the 30 working-tree placeholders**, which is what makes the audit-facing documents' shipped-set statements need re-verification.
+7. The baked MAX in the guide icon; the background room; OpenAI pricing or a covered-plan exemption.
+
+### D. Ordinary implementation work, cheapest first
+
+1. **Visor, eye and chest overlays on the static hero.** No new dependency; the v2 layers register to the shipped hero canvas exactly, and `.visor-glint` already exists with its own keyframes and reduced-motion path.
+2. **Contact shadows**, once C2 is answered. Fully measured in the R107 report.
+3. **The OpenAI client**, then pricing.
+4. **The Spine rig**, once C3 is answered. Needs a runtime dependency, an atlas loader, a render target and a reduced-motion path.
+5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
+6. **Paytable panel targets**, which do not exist at all.
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**
@@ -131,7 +224,7 @@ in sections 0B, 0C and 0D.
 | Ledger item | Was | Now |
 |---|---|---|
 | **R102-E2** banner art missing | OPEN, art did not exist | **CLOSED IN ART.** Four 718x88 candidates arrived; variant B selected on measurement and PLACED working-tree-only, with its CSS wiring also working-tree-only. **Committing either would fail CI**, see below |
-| **R102-E5** visor baked into the head | OPEN, needed an art request | **SOLVED IN ART, STILL BLOCKED IN LAW.** The kit ships a visor-off head plus separate visor, eye and chest emissive layers. They are externally designed, so the ruling still gates them |
+| **R102-E5** visor baked into the head | OPEN, needed an art request | **CLOSED 2026-08-25: solved in art AND in law, see 0F.** Historic text follows: The kit ships a visor-off head plus separate visor, eye and chest emissive layers. They are externally designed, so the ruling still gates them |
 | **R103-SPINE-LAW** external parts illegal | OPEN | OPEN, and **route B was re-sized from medium to LARGE**: the in-house master is in the folded-arm hero pose and needs limb re-authoring, not just grouping. **Route A, one owner ruling, is now the cheapest path by a wide margin** |
 | **R097-FX-SET** particle gap | OPEN | **STILL OPEN.** The kit's smallest asset is 128x160; the four particle rows need 40, 128, 56 and 32 px. Neither art flood has addressed them. A machine-ready commissioning prompt is now written |
 | **FX-01 / FX-03 sheets** | WRONG-SPEC | **STILL WRONG-SPEC.** FX-01's frame COUNT is right at last (6), the frame SHAPE is not: 256x320 delivered against 200x200 required |
@@ -261,7 +354,7 @@ path, verified this session, so it produces candidates rather than shipping them
 
 | ID | Item | Status | Evidence | Owner? | Next action |
 |---|---|---|---|---|---|
-| **R103-SPINE-LAW** | **The external robot parts CANNOT enter the animation pipeline under the system law** | **NEW, BLOCKING** | DESIGN_SYSTEM: anything the pipeline "positions or animates" is "NEVER externally designed. No exception, and no measurement changes that answer". External scene art is permitted *because* "it animates nothing" | **Yes** | Owner ruling, or the in-house route |
+| **R103-SPINE-LAW** | ~~external robot parts cannot enter the animation pipeline~~ **CLOSED 2026-08-25 BY OWNER RULING, see 0F** | **CLOSED** | DESIGN_SYSTEM: anything the pipeline "positions or animates" is "NEVER externally designed. No exception, and no measurement changes that answer". External scene art is permitted *because* "it animates nothing" | **Yes** | Owner ruling, or the in-house route |
 | R102-E4 | Parts are in a gitignored path, so nothing may cite them | OPEN, subsumed by the above | Convention (m) | **Yes** | — |
 | R102-E5 | The visor is baked into the head part | OPEN | Measured R102, re-verified R103 | **Yes** | Three options recorded |
 | R103-SVG-DORMANT | The in-house robot vector master exists, is tracked, and is DORMANT | **NEW** | `frontend/scripts/scene/scene_character.svg`, 340x672, one flat group of ~35 unnamed paths, zero live consumers | **Yes** | See the three routes in the Spine doc |
