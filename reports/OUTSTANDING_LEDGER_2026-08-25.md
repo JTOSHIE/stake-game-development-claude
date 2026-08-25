@@ -33,6 +33,30 @@ working-tree-only. **This is the first FX row closed after three art batches.**
 **Two kit assets are fully opaque** and would black out whatever sits behind them: the
 feature-rules card background and the side-panel texture strip.
 
+## 0C. WHAT R106 CHANGED (the FX closure kit)
+
+**THREE FX ROWS ARE NOW CLOSED. REPLACE COVERAGE 24 of 30, 80.0%**, up from 73.3%.
+
+| Row | Outcome | Why |
+|---|---|---|
+| **FX-02** L2 filament arc | **CLOSED** | Exactly 800x200 in four 200x200 frames, **no resize needed**. Correct subject at last, a filament arc rather than the reel-stop impostor R105 refused. Hue 199 against the incumbent's 215, both cyan-family and matching the L2 electric-blue signature. Marginally denser than what it replaces, not weaker |
+| **FX-07** smoke wisp | **CLOSED** | 64x64 to 56x56 is a uniform downscale. **The only particle that is genuinely better than its incumbent**: mean alpha 27.9 to 67.4. The incumbent is an amorphous smudge; this reads as smoke |
+| **FX-03** jet flame | **REFUSED ON HUE**, and this is the finding of the session | Geometry is PERFECT: exactly 1200x120 in five 240x120 frames. **But the jet flame sheet is a FIXED GREEN ASSET BY DESIGN.** `FlameJets.svelte` recolours it per colourway with CSS `hue-rotate`: natural none, overdrive 60deg, nitro 215deg, implementing an owner-ruled contrast law. The candidate is cyan at hue 202. A green source yields green, cyan, magenta exactly as documented; a cyan source yields **cyan, violet, yellow**. All three colourways would be wrong |
+| **FX-05** coin | REFUSED | The row is a **gold** coin; the candidate is a grey and magenta chrome token. Hue 51 to 240, saturation 0.75 to 0.26 |
+| **FX-06** shock ring | REFUSED | Right subject, exactly 128x128, but saturation 0.94 to 0.26 and mean alpha 47.9 to 29.5. The incumbent is a bold pure-cyan ring; the candidate is sketchy and dual-hued. It is "the most reused particle" |
+| **FX-08** spark | REFUSED | Stronger than the previous kit's attempt but still saturation 0.94 to 0.37, and visually a **dark** blue shard where a spark should be bright |
+
+**THE SHADOW INSERTION POINT IS NOW EXACT.** The breathing animation sits on the LAYER, not the
+image: `.car-layer` carries `car-hover` and `.char-layer` carries `char-idle`, both animating
+`transform`. So a shadow inside either layer bobs with its hero. **`.scene-group` is the correct
+parent**: it is `position:absolute; inset:0; pointer-events:none` and its own comment calls it a
+"Non-stacking wrapper: no z-index/transform of its own". The snippet is in the session report.
+Not implemented, because positioning a 680x240 shadow under a character inside an 860px
+`object-fit: contain` box needs visual iteration that cannot be verified headlessly.
+
+**FX-04 is coupled to FX-03** and cannot close while FX-03 is refused: it must be frame 3 of that
+sheet, exported from it.
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**

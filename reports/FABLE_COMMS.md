@@ -9,6 +9,63 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 104 - 2026-08-25 - R106: two more FX rows closed at 80% coverage, and a perfect-geometry sheet refused because the flame has to be GREEN
+
+**THREE OF EIGHT FX ROWS ARE NOW CLOSED. REPLACE COVERAGE 24 of 30, 80.0%**, up from 73.3%.
+
+**FX-02 IS CLOSED, and it is the asset R105 refused an impostor for.** Exactly 800x200 in four
+200x200 frames, **no resize needed at all**. This time it genuinely is a filament arc rather than
+a reel-stop impact, its hue is 199 against the incumbent's 215 (both cyan-family, matching the L2
+electric-blue signature), and it is marginally denser than what it replaces rather than weaker.
+Frames ramp 107, 194, 255, 122: a proper blink.
+
+**FX-07 IS CLOSED, and it is the only particle in three batches that beat its incumbent.** Mean
+alpha 27.9 to 67.4. The shipped smoke puff is an amorphous faint smudge; this one actually reads
+as a wisp of smoke. 64x64 down to 56x56 is a uniform downscale.
+
+**THE FINDING OF THE SESSION: FX-03 ARRIVED AT PERFECT GEOMETRY AND I HAD TO REFUSE IT.**
+
+Exactly 1200x120, exactly five 240x120 frames, exactly what the spec asked for. **But the jet
+flame sheet is a FIXED GREEN ASSET BY DESIGN.** `FlameJets.svelte` recolours one green source per
+colourway with CSS `hue-rotate`, implementing an owner-ruled contrast law from Round 2 item 4:
+flame hue at least 90 degrees from the backdrop, never green-on-green.
+
+| colourway | filter | from GREEN 110 | from the candidate's CYAN 202 |
+|---|---|---|---|
+| natural | none | **green** | cyan |
+| overdrive | hue-rotate 60 | **cyan** | violet |
+| nitro | hue-rotate 215 | **magenta** | yellow |
+
+The component's own comment says natural is "native green", overdrive "rotates green -> cyan",
+nitro "green -> magenta". **A green source delivers exactly that. This cyan one delivers all
+three wrong.** Nothing about size, frame count or alpha would have caught it. The spec now states
+the hue contract so the next attempt does not repeat it, and **FX-04 stays coupled to FX-03**
+because it must be frame 3 of that same sheet.
+
+**THREE PARTICLES REFUSED, each measured and then LOOKED AT.** The coin row wants a **gold** coin
+and the candidate is a grey and magenta chrome token, hue 51 to 240. The shock ring is the right
+subject at exactly the right size but saturation falls 0.94 to 0.26 and it is sketchy where the
+incumbent is a bold clean cyan ring, and it is "the most reused particle". The spark is stronger
+than the last kit's attempt and still a **dark** blue shard where a spark should be bright. **The
+measurements said weaker and the picture agreed**; I built a side-by-side rather than trusting
+either alone.
+
+**THE SHADOW INSERTION POINT IS NOW EXACT, and my R105 statement of it was slightly off.** The
+breathing animation is on the LAYER, not the image: `.car-layer` carries `car-hover` and
+`.char-layer` carries `char-idle`. **`.scene-group` is the correct parent** — its own comment
+calls it a "Non-stacking wrapper: no z-index/transform of its own". Not implemented: placing a
+680x240 shadow under a character inside an 860px `object-fit: contain` box needs visual iteration
+I cannot verify headlessly, and guessing at it is how you get a shadow floating beside the feet.
+
+**No wiring was needed for any intake.** All three closures are direct replacements at paths the
+runtime already references, so nothing was built and nothing was disturbed. The committed banner
+pair is untouched.
+
+Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked paths PASS.
+Guards still refusing at exit 2. Zero rasters staged.
+
+---
+
 ## 103 - 2026-08-25 - R105: the banner pair is COMMITTED, the first FX row is closed after three batches, and the particle gap is now a design gap not a size gap
 
 **THE BANNER IS IN THE REPOSITORY.** Raster and CSS committed together as one two-file commit,

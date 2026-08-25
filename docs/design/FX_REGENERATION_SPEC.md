@@ -62,8 +62,19 @@ NO text, NO watermark, NO baked outer glow.
 
 ### FX-03, the jet flame sheet
 
+**IT MUST BE GREEN, AND THAT IS NOT AN AESTHETIC CHOICE.** R106 received a sheet at exactly the
+right geometry and had to refuse it because it was cyan. `FlameJets.svelte` treats this sprite as
+a **fixed green asset** and recolours it per colourway with CSS `hue-rotate`: natural is a no-op,
+overdrive rotates 60 degrees, nitro rotates 215 degrees. That implements an owner-ruled contrast
+law, flame hue at least 90 degrees from the backdrop, never green-on-green. From a green source
+at hue ~110 the three colourways land on green, cyan and magenta exactly as the component's own
+comment describes. **From a cyan source at hue ~200 they land on cyan, violet and yellow, and all
+three are wrong.** Any regeneration must target a median hue near 110 over its saturated pixels.
+
 ```
 One horizontal sprite strip, EXACTLY 1200 x 120 pixels, RGBA PNG with true transparency.
+THE FLAME MUST BE GREEN, median hue near 110 degrees. It is recoloured at runtime by CSS
+hue-rotate per colourway, so a cyan or blue flame breaks all three colourways.
 EXACTLY 5 frames, each EXACTLY 240 x 120 pixels (LANDSCAPE, twice as wide as tall),
 packed left to right in ONE row with ZERO padding and NO divider lines.
 Frames start at x=0, 240, 480, 720, 960.
