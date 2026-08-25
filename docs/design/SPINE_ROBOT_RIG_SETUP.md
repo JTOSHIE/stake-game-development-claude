@@ -485,3 +485,78 @@ pinch, putting **5.7 per cent** of its light on the lens and wasting **32.4 per 
 sprite entirely. At 11 per cent it centres on y228, mid-lens: **56.4 per cent on lens, 3.6 per
 cent wasted**. The mapping is 1:1 at scale 3.302 because `.char-img` is `object-fit:contain` and
 the box aspect 206/407 matches the source 680/1344 to four decimals.
+
+---
+
+## 11. WHAT R111 ACTUALLY BUILT, AND WHY IT IS NOT SPINE (2026-08-25)
+
+**The hero is articulated and non-static as of R111, and no Spine runtime was added.** This
+section is the correction to the assumption running through sections 1 to 10: that making the
+robot move requires a skeletal runtime. It does not, and the reasons are specific to this
+codebase rather than general.
+
+### 11a. The constraints that decided it
+
+| Fact | Consequence |
+|---|---|
+| No Spine package of any kind is installed, and there are **zero `.atlas` or `.skel` files** in the repo | The Spine route starts by adding a dependency AND authoring skeleton data that does not exist |
+| pixi.js 7.4.3 is imported in exactly one file, `GameGrid.svelte`, for `Application` + `Graphics` | It drives a fixed 616x412 win overlay parented inside the reel grid; it cannot share a canvas with the hero's box without a layout change |
+| CSS animates this game: **95 `@keyframes` blocks** across `frontend/src` | CSS is the house idiom, not a workaround |
+| A parented, transform-driven, multi-part animation with a reduced-motion contract already shipped on this exact hero | The pattern to extend already existed |
+
+### 11b. Nested DOM elements ARE a bone hierarchy
+
+This is the whole idea and it is worth stating plainly:
+
+- A child element's `transform` **composes with its parent's**. Rotating `.bone-torso` carries the
+  head and both arms because they are its descendants. That is what a bone chain does.
+- **`transform-origin` IS the joint.** Set to the connector coordinate the part was drawn around,
+  rotation happens at the elbow instead of at the corner of a rectangle.
+- The browser composites transforms on the GPU, so eleven transformed layers cost about what the
+  one `<img>` cost. Measured: **60fps, zero frames over 20ms**.
+
+### 11c. The shipped structure
+
+`frontend/src/lib/components/RobotRig.svelte`, mounted by `SceneGroup.svelte` inside the existing
+`.char-layer`.
+
+```
+pelvis (root, static)
+├── leg upper L/R ──> leg lower L/R          static, so the feet stay planted
+└── torso                    breathe: +/-0.55deg about the waist, 4 source px rise, 5.2s
+    ├── arm upper L/R        +/-1.3deg / +/-1.1deg about the shoulders, 5.8s / 6.3s
+    │   └── arm lower L/R    +/-1.1deg / +/-1.3deg about the elbows, 6.7s / 5.5s
+    └── head                 +/-0.9deg about the neck, 7.1s
+```
+
+Periods share no common factor, so the bones drift in and out of phase and the loop never resolves
+into a visible pulse.
+
+**Geometry.** Everything inside the root is positioned in the parts' own SOURCE pixels so the kit's
+joint table is used unmodified. One transform on the root maps that space into the 206x407 box:
+`left: 23.95px; top: 9.09px; transform: scale(0.27784)`, derived by matching the assembled
+subject (569x1400 source px) to the shipped hero's subject (504x1284 source px) on height.
+
+**Motion policy.** `.char-layer.char-rigged { animation: none }` switches the old whole-body
+`char-idle` off, so exactly one idle runs.
+
+**Fallback.** `SceneGroup` takes `rig` (default `true`). `rig={false}` renders the original flat
+`<img class="char-img">` with every original rule intact.
+
+**Overlay re-registration.** `.antenna-light` and `.visor-glint` are percentages of `.char-layer`
+calibrated to the flat sprite, and the rig's head lands elsewhere. Both are re-derived under
+`.char-rigged` against the rig's own head raster. The antenna one was urgent: unmoved it blinks in
+empty space, because its box ends at x 49.4 and the rig's head starts at x 50.1.
+
+### 11d. What this does NOT settle
+
+- **The pose.** The kit's limbs are drawn straight so they can rotate, so the rig stands neutrally
+  where the shipped hero stood with arms folded and legs crossed. Same character, less attitude.
+  Folding is not achievable from these parts. This is an owner decision, recorded in section 0I of
+  the outstanding ledger.
+- **When Spine WOULD earn its place:** mesh deformation, skinning, IK, or animation authored by an
+  artist in the Spine editor rather than by hand in CSS. None of those are needed for an idle. If a
+  future performance set wants them, sections 1 to 10 remain the right plan and the part kit is
+  already rig-ready.
+- **The visor emissive** is still a CSS gradient and still blocked on art, per section 10c.
+

@@ -217,6 +217,51 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0I. R111 - THE HERO IS ARTICULATED, AND SPINE TURNED OUT NOT TO BE THE ANSWER
+
+**The robot is non-static.** `frontend/src/lib/components/RobotRig.svelte` renders the eleven-part
+kit as a nested bone hierarchy driven by CSS transforms, mounted in `.char-layer` where the flat
+sprite was. Head, torso and both arms articulate; **pelvis and legs are deliberately not animated
+so the feet stay planted**, verified as zero changed pixels across the bottom third of the figure.
+
+**NO SPINE RUNTIME WAS ADDED AND NONE IS NEEDED FOR THIS.** Established before building: the repo
+has no Spine package and **zero .atlas or .skel files**; pixi 7.4.3 is imported in one file
+(`GameGrid.svelte`) for a 616x412 win overlay that cannot share a canvas with the hero's box; and
+CSS carries the game's animation across 95 keyframe blocks. A child element's transform composes
+with its parent's and `transform-origin` is the joint, so nesting gives real bone behaviour with
+no dependency. **This closes the "first Spine idle rig" row by satisfying its intent, not by doing
+the thing it named.**
+
+**THE PART KIT IS VERIFIED GOOD.** 11/11 canvases match its document, corner alphas zero,
+transparent RGB zeroed, 20px margins, and its published pivots assemble into a coherent figure
+when rendered. Its document claims a review/ and a source-original/ directory; **neither
+exists on disk**.
+
+**GEOMETRY:** root `left 23.95px, top 9.09px, scale 0.27784`, derived by matching the assembled
+subject (569x1400 source px) to the shipped hero's subject (504x1284). `.char-layer` still measures
+exactly 206x407 design px with the rig mounted.
+
+**MOTION POLICY:** `.char-layer.char-rigged { animation: none }`. Exactly one idle runs.
+Reduced motion freezes every bone to the assembled rest pose, verified under emulation.
+
+**OPEN, AND IT IS AN OWNER DECISION, NOT A DEFECT: THE POSE CHANGED.** Shipped hero = arms folded,
+legs crossed, real attitude. Rig = neutral stance, arms at sides, wider shoulders. Same character
+and same quality, less swagger. Folding is not possible from these parts. Options: commission
+crossed-arm limb variants, or `rig={false}`.
+
+**NEW ROW, PRE-EXISTING, NOT FIXED:** `.antenna-light` never overlapped the earpiece orb on the
+FLAT sprite (independently confirmed twice). Fixed for the rig only; the flat path is untouched
+because retiring it may be simpler than correcting it. Fix if wanted: `left: 25.6%; top: 11.3%`.
+
+**NEW ROW, PRE-EXISTING, NOT FIXED:** the cohesion rim-light and scene-grading `filter` on
+`.char-img` / `.car-img` is **dead in the shipped bundle**, overridden by a later equal-specificity
+rule that re-declares `filter` wholesale.
+
+**STILL OPEN FROM 0H:** the painted visor emissive still needs redrawing to the 10c spec; the
+contact-shadow decision is still blocked by that same shared drop-shadow rule.
+
+---
+
 ## 0H. R110 - THE PAINTED VISOR DOES NOT FIT, AND R109's REGISTRATION CLAIM WAS WRONG
 
 **Nothing in the kit is a visor for this robot.** Measured against the shipped 680 x 1344

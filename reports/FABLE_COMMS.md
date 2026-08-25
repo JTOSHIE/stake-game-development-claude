@@ -9,6 +9,50 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 109 - 2026-08-25 - R111: the robot is alive, it needed no Spine runtime at all, and the new pose is your call
+
+**HE MOVES.** Chest rises and falls, head drifts against it, both arms carry independent shoulder
+and elbow life, **and the feet stay planted**. Before this he was one flat image sliding up seven
+pixels and back, which is the most recognisable tell there is of a game with no animation budget.
+
+**THERE IS NO SPINE RUNTIME, AND ADDING ONE WOULD HAVE BEEN THE WRONG CALL.** I checked before
+building: this project has **no Spine of any kind and not a single .atlas or .skel file**, pixi is
+imported in exactly one file for a win overlay that cannot share a canvas with the hero, and
+**CSS is what actually animates this game, across 95 keyframe blocks**. So Spine meant adding a
+dependency AND authoring skeleton data that does not exist, to rebuild something the browser
+already does. **Nested elements ARE a bone hierarchy**: a child's transform composes with its
+parent's and the joint is just the transform origin. Rotating the torso carries the head and arms
+because they live inside it. Eleven images, six animations, **60fps with not one frame over 20ms**.
+
+**THE ELEVEN-PART KIT IS GOOD, and I verified it rather than trusting it.** All eleven canvases
+match its own document, all corner alphas zero, all transparent pixels zeroed, 20px margins. Its
+published pivots are correct: I chained every joint and rendered the figure before writing a line
+of code, and it assembles into a coherent robot. Two things its document claims, a review folder
+and a source-original folder, **do not exist on disk**.
+
+**ONE THING NEEDS YOUR EYE, and it is artistic, not technical.** Your shipped hero stands with
+**arms folded and legs crossed**. The rig parts are drawn straight so they can rotate, so the
+articulated robot stands **neutral, arms at its sides, shoulders visibly wider**. Same character,
+same art quality, **less attitude**. The game gains life and loses swagger. I cannot fold the arms
+from these parts because your hero's folded arms are one baked shape. If you want the attitude
+back it is either crossed-arm limb variants, or `rig={false}` and wait. **The fallback is one
+prop and it restores the old sprite exactly.**
+
+**A BUG I FOUND ON THE WAY.** The antenna light was blinking in **empty space** beside his head on
+the rig, and measured properly **it never sat on the earpiece on the flat sprite either**. Fixed
+for the rig, confirmed in the browser at (65.1, 58.2) against a target of (65.1, 58.0). I left the
+flat-sprite version alone because it is the fallback and retiring it may be simpler than fixing it.
+
+**Worth one line:** my first motion measurement said the feet were moving. They were not. I had
+frozen only the robot's animations, so **the car hovering behind him was being counted as his
+motion**. Frozen all 54 and re-measured: the bottom third of the figure has **exactly zero changed
+pixels**.
+
+**Eleven rasters committed, 1.1MB, dist 15.72 of 25MB.** Your thirty working-tree placeholders were
+not touched. Fourteen gates green.
+
+---
+
 ## 108 - 2026-08-25 - R110: no painted visor fits this robot, and the glint you already had was lighting his neck
 
 **THE REPLACEMENT IS REFUSED, and not on taste.** All three painted emissive layers in the
