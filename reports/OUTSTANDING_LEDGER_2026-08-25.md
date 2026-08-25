@@ -217,6 +217,59 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0J. R112 - THE CROSSED-ARMS HERO IS BACK AND ANIMATED, AND THE PACKAGE HOLDS TWO FIGURES
+
+**DEFAULT HERO = the crossed-arms idle strip, played as a five-frame flipbook.**
+`frontend/src/lib/components/HeroIdle.svelte`, sheet `ui/hero/hero_crossed_idle_5f.png`
+(3400x1344), `steps(5)` over `background-position-x`, 4.4s loop, same idiom as `FlameJets.svelte`.
+`SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default `'idle'`.
+
+**THE MASTER IS THE SHIPPED SPRITE.** `01-full-body-crossed-arms-master` vs
+`ui/scene_character.png`: silhouette **IoU 0.9995**, mean RGB diff **0.90**. The crossed-arms pose
+was never lost; R111 replaced it because modular parts cannot fold arms. The package's value is the
+strip, not the master.
+
+**THE PACKAGE CONTAINS TWO FIGURES, SEPARATED BY GROUND LINE:**
+
+| Family | Ground | Contents |
+|---|---|---|
+| A = the shipped hero | y1321-1322 | crossed master, 13 coverage poses, strip 01, strip 06 |
+| B = modular neutral | y1299 | assembled reference, head tilts, strips 02/03/04/05 |
+
+Strip identity vs the shipped hero: **01 = 0.9997 (USE)**; 03 = 0.7453; 02/04/05 = 0.6812;
+**06-win-reaction = 0.5097, a THIRD figure** (slimmer limbs, longer legs, smaller head).
+**The assembly guide recommends mixing A and B**, which would jump the robot 23px and change its
+stance. Four of five motions refused on that evidence.
+
+**WHY STRIP > RIG:** head travel between frames is only 3.8 source px, yet 31-42% of pixels change,
+because frames are RE-RENDERED not transformed, so everything relights. R111's rig: 17.96% between
+extremes and ZERO below the waist. Flipbook: 21-30% across the whole body including legs.
+
+**FRAME 06 DROPPED:** byte-identical to frame 01. steps(5) over 01..05 is the closed loop.
+
+**DEFECT FIXED, PREDATES R111:** `.antenna-light` had ZERO overlap with the earpiece orb, centred
+at layer (37.1, 97.7) against an orb at (65.3, 71.9). Base rule corrected once, serving both the
+flipbook and the flat sprite; the rig keeps its own override (its head sits higher).
+`.visor-glint` needed NO change: R110's energy sweep re-run on the strip returns top:11%.
+
+**THE PACKAGE'S HAND PROOF IS INVALID EVIDENCE FOR A TRUE CLAIM.** It cites differing SHA-256 to
+show the hands are not mirrored clones. A mirror changes the hash, so that proves nothing. Flip
+test: mirrored IoU 0.752 vs as-delivered 0.847. Hands ARE distinct.
+
+**OPEN - THE HERO DOES NOT REACT.** Identical breathing through a dead spin and a big win. The
+package cannot close this: its win strip is the wrong figure. **EXACT ART SPEC:** win reaction
+drawn as family A (crossed arms, crossed legs), 680x1344, ground **y1322**, 5-8 frames, starting
+and ending on frame 01 of the idle so it enters and exits without a cut. Same spec for a
+head-glance accent.
+
+**NOT SHIPPED, AVAILABLE, MEASURED:** `05-soft-contact-shadow-680x240` (594px wide) and
+`06-ground-reflection-plate-680x191` register correctly to the master.
+
+**BYTES:** three hero modes ship about 5.3MB between them; dist 18.33MB of 25MB. Dropping `'rig'`
+would return 1.1MB.
+
+---
+
 ## 0I. R111 - THE HERO IS ARTICULATED, AND SPINE TURNED OUT NOT TO BE THE ANSWER
 
 **The robot is non-static.** `frontend/src/lib/components/RobotRig.svelte` renders the eleven-part
