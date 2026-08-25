@@ -289,6 +289,18 @@
       <div class="c1-chromatic-flash" data-testid="win-chromatic-flash" aria-hidden="true"></div>
     {/if}
     <div class="c1-plate-wrap">
+      <!-- R113. Painted tier energy behind the band. First in DOM at z-index 0,
+           so it paints under .fs-plate (z-index auto) while the shockwave at
+           z-index 1 still bursts over the top. Kept under reduced motion as a
+           still image: it is art, not movement, and removing it would strip the
+           tier identity rather than calm it. -->
+      <img
+        class="c1-tier-burst"
+        src="{$themeAssets.assetBase}/ui/win/{tier === 'big' ? 'burst_big' : 'burst_epic'}.png"
+        alt=""
+        aria-hidden="true"
+        data-testid="win-tier-burst"
+      />
       {#if !reduced}
         <img
           class="c1-shockwave"
@@ -505,6 +517,33 @@
   /* ── Expanding shock ring (ANIMATION UPLIFT PASS 2026-07-16, item 3): the
        shared shock_ring particle, scaled a little larger per tier so it
        feels proportionate to the plate it's bursting behind. ────────────── */
+  /* ── Tier energy (R113) ──────────────────────────────────────────────────
+     The band was a flat dark bar with a coloured rule: correct, tiered and
+     completely inert. These are the celebration package's text-free bursts,
+     which is the only part of it that can ship, since every frame carrying a
+     painted "BIG WIN" would render English in the fifteen locales that
+     translate that label.
+
+     Ascends by size and opacity rather than by swapping art at every step:
+     big gets its own sparse impact burst, mega and epic share the denser bloom
+     at two strengths. That keeps one asset doing two jobs and keeps the ladder
+     smooth, since the existing plate glow, type scale and colour already carry
+     a lot of the tier signal. */
+  .c1-tier-burst {
+    position: absolute; top: 50%; left: 50%; z-index: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+    animation: c1-burst-in 0.75s ease-out both;
+  }
+  .tier-big  .c1-tier-burst { width: 430px; height: 430px; opacity: 0.9; }
+  .tier-mega .c1-tier-burst { width: 400px; height: 400px; opacity: 0.62; }
+  .tier-epic .c1-tier-burst { width: 540px; height: 540px; opacity: 0.88; }
+  @keyframes c1-burst-in {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.55); }
+    100% { }
+  }
+
   .c1-shockwave {
     position: absolute; top: 50%; left: 50%; pointer-events: none; z-index: 1;
     transform: translate(-50%, -50%) scale(0.25); opacity: 0;
@@ -581,6 +620,9 @@
 
   /* ── Reduced motion guard ─────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
+    /* The burst stays: it is a still painting, and it is what makes the tier
+       legible at a glance. Only its entrance is dropped. */
+    .c1-tier-burst { animation: none; }
     .c1-plate-wrap, .tier-epic .c1-plate-wrap, .c1-particle { animation: none !important; }
     .c1-particle { opacity: 0; }
     .c1-shockwave, .c1-coin, .c1-chromatic-flash { display: none; }

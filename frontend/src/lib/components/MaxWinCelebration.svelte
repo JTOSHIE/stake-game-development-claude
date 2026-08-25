@@ -13,6 +13,7 @@
   import { t, type GameMode } from '../i18n/translations'
   import { FS_MAX_WIN } from '../config/fsModes'
   import { setModalOpen, setGameBlocked } from '../stores/modalGuard'
+  import { themeAssets } from '../stores/themeStore'
 
   export let show: boolean = false
 
@@ -106,6 +107,15 @@
 
 {#if show}
   <div class="c1-win c1-win--overdrive max-win-overlay c1-max fs-scrim" role="dialog" aria-modal="true" aria-label={t($locale, 'a11yMaxWinReached', localeMode)}>
+
+    <!-- Painted max-win energy, R113. Behind the halo and the particle field,
+         above the scrim. Both layers are text-free: every frame in the
+         celebration package that carried a painted "MAX WIN" or "5000x" was
+         refused, because this overlay already renders the headline through
+         t(locale, 'hudMaxWin') in sixteen languages and writes the multiplier
+         as FS_MAX_WIN.toLocaleString(locale) + U+00D7. -->
+    <img class="c1-max-surges" src="{$themeAssets.assetBase}/ui/win/max_surges.png" alt="" aria-hidden="true" data-testid="max-win-surges" />
+    <img class="c1-max-bloom"  src="{$themeAssets.assetBase}/ui/win/max_bloom.png"  alt="" aria-hidden="true" data-testid="max-win-bloom" />
 
     <!-- Rotating halo ring behind everything -->
     <div class="c1-halo halo-ring" aria-hidden="true"></div>
@@ -208,6 +218,61 @@
   @keyframes c1-fadein { from { opacity: 0; } to { opacity: 1; } }
 
   /* ── Rotating halo ring ─────────────────────────────────────────────────── */
+  /* ── Painted max-win energy (R113) ───────────────────────────────────────
+     Two text-free layers from the celebration package. The surges frame the
+     overlay from its corners; the bloom sits behind the headline. Both are
+     below the halo, the particle field and all content, so nothing they do can
+     touch the legibility of the amount or the COLLECT button.
+
+     `screen` blending means they add light and never darken: over the existing
+     scrim they brighten the corners and the centre without lifting the black
+     the headline is read against. */
+  .c1-max-surges,
+  .c1-max-bloom {
+    position: absolute;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    z-index: 0;
+  }
+  .c1-max-surges {
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    animation: c1-max-surge-in 1.1s ease-out both;
+  }
+  /* Measured, not guessed: at opacity 0.7 centred on 44% the bloom's core sat
+     directly behind the headline and took its contrast from 14.2:1 down to
+     4.7:1. Still a WCAG AA pass for large type, but this is the single most
+     photographed screen in the game and the headline should not be the thing
+     that pays for the effect. Dropped and dimmed so the bright core sits below
+     the headline, with the corner surges carrying the drama out at the edges
+     where there is no text at all. */
+  .c1-max-bloom {
+    top: 58%; left: 50%;
+    width: min(66%, 620px); height: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0.42;
+    animation: c1-max-bloom-in 1.3s ease-out both, c1-max-bloom-breathe 4.6s ease-in-out 1.3s infinite;
+  }
+  @keyframes c1-max-surge-in {
+    0%   { opacity: 0; transform: scale(1.08); }
+    100% { }
+  }
+  @keyframes c1-max-bloom-in {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    100% { }
+  }
+  @keyframes c1-max-bloom-breathe {
+    0%, 100% { opacity: 0.36; }
+    50%      { opacity: 0.50; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Hold both as stills. The art is the tier identity; only the motion goes. */
+    .c1-max-surges, .c1-max-bloom { animation: none; }
+    .c1-max-bloom { opacity: 0.42; }
+  }
+
   .c1-halo {
     position: absolute;
     inset: -10%;

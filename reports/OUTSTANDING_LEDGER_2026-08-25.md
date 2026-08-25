@@ -217,6 +217,65 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0K. R113 - CELEBRATION ART IS LIVE, AND SEVEN OF NINETEEN ASSETS ARE PERMANENTLY REFUSED
+
+**SHIPPED:** four text-free rasters into `ui/win/` (2.21MB, 65% Lanczos downscale) wired as
+additive layers. `WinBanner` gains `.c1-tier-burst` (first child of `.c1-plate-wrap`, z-index 0, so
+it paints under the band while the existing shockwave at z-index 1 still bursts over the top).
+`MaxWinCelebration` gains `.c1-max-surges` + `.c1-max-bloom` below the halo. Both `mix-blend-mode:
+screen`, so they add light and can never darken text. **No threshold, string, layout or existing
+behaviour changed.**
+
+| Tier | Art | Size | Opacity |
+|---|---|---|---|
+| big | burst_big | 430px | 0.90 |
+| mega | burst_epic | 400px | 0.62 |
+| epic | burst_epic | 540px | 0.88 |
+| MAX | max_bloom + max_surges | 66% / full-bleed | 0.42 / 0.85 |
+
+**REFUSED PERMANENTLY, 7 ASSETS, ALL THE MAIN FRAMES.** They bake BIG WIN / EPIC WIN / MAX WIN /
+5000x. Grounds, each verified first-hand:
+- **16 locales**; tier labels are `t(locale, ...)` (`hudMaxWin` = 'MAX WIN' / 'أقصى فوز').
+- **Manifest row UI-07** already marks `ui/panel_balance.png` DEAD for baking 'BALANCE': "cannot
+  survive sixteen locales or the social swap to COINS ... If a plate is ever wanted again it must
+  be text-free."
+- **The number**: the cap ships as `FS_MAX_WIN.toLocaleString(locale) + ×`; the raster bakes
+  `5000x` with no separator.
+- **The glyph**: `multiplication_sign_gate` enforces U+00D7 over letter x (charter row Q-26).
+- **NO GATE READS TEXT INSIDE AN IMAGE**, so this class can only ever be caught by judgement.
+
+**CORRECTION TO A CLAIM RECEIVED:** baked text is NOT forbidden by a blanket art law. `CLAUDE.md:425`
+says "front-facing **symbols** carry no baked-in text" - scoped to symbols. The refusal rests on
+locales + UI-07 + the multiplication gate, not on that sentence.
+
+**ALSO REFUSED ON GEOMETRY:** the 1920x1080 full-screen frames would replace a full-width band that
+`WinBanner.svelte:4-8` records as an owner-audit outcome ("reels visible above and below, replaces
+the prior centred box that blocked the grid"). Adopting them reverses an owner ruling.
+
+**CONTRAST, MEASURED:** max headline 14.16 -> 4.73 on the first pass (bloom sat behind the headline)
+-> **8.41** after moving it to 58%, narrowing and dimming to 0.42. big 10.07, mega 6.40, epic 12.11,
+all essentially unchanged.
+
+**STILL HOMELESS: 15 of 19.** 7 refused unless redrawn text-free; 8 READY but unwired (side accents,
+chrome accents, banner backing 1400x360, spark cluster, side flares, centre bloom, vignette).
+
+**BLOCKED RESIDUAL:** `support/05-shock-impact-ring` is better art than the shipped
+`ui/particles/shock_ring.png` (blocky flat cyan, 128x128) but that file has THREE consumers -
+WinBanner, FreeSpinsPresentation entry, and HeroSplash, where the manifest warns it is "a STEADY
+presence at 42% opacity in screen blend over the emblem". Safe form: a new win-only asset, ~112KB.
+
+**THE ART THAT WOULD UNBLOCK THE REST:** the same main frames with the wordmark region left empty.
+
+**FOUND WHILE TRACING, NOT FIXED (brief forbids rebuilding tiers):**
+- The tier numbers live in FOUR places and one disagrees: `winCountUp.ts` 10/30/100, but
+  `WinDisplay.svelte:38-45` uses **mega at 50** with no epic band (verified first-hand).
+  `soundService.ts` re-declares them as bare literals **with names offset one step** (>=30 plays
+  `winBig` while the celebration calls 30 `mega`).
+- The multiplier is **base bet, not total bet** despite the comments: the divisor is `betAmount`,
+  never scaled by `MODE_COST`, so under OVERBOOST (1.25x) a 10x-base win is 8x total and fires BIG.
+
+---
+
 ## 0J. R112 - THE CROSSED-ARMS HERO IS BACK AND ANIMATED, AND THE PACKAGE HOLDS TWO FIGURES
 
 **DEFAULT HERO = the crossed-arms idle strip, played as a five-frame flipbook.**
