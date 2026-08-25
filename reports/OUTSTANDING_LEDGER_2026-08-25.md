@@ -217,6 +217,72 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0M. R115 - THE RESIDUAL LIST REBUILT FROM ZERO UNDER CURRENT REALITY
+
+**SHIPPED THIS SESSION:** `ui/win/bloom_mega.png` (new, mega gets its own art), `ui/win/max_bloom.png`
+(REPLACED with the purpose-built headline-safe bloom), `ui/win/overdrive_perimeter.png` (new,
+Overdrive stage perimeter at z41: above the grade at z40, below the HUD at z50). Plus: WinDisplay's
+tier boundary aligned to the shared table, two soundService stuck-state bugs fixed, and the R111 rig
+path deleted for **1,091,408 bytes** recovered.
+
+**CONTRAST, ALL RE-MEASURED:** big 9.96 | mega **6.40 -> 8.96** | epic 12.10 | max headline
+**8.41 -> 11.05**. All pass WCAG AA. R113 had to compromise the max bloom's position and opacity to
+recover from 4.73; the purpose-built asset removed the need.
+
+---
+
+### BLOCKED ON ART (nothing can proceed without new assets)
+
+1. **Anticipation, symbol life, ambient scene life, base<->Overdrive transitions.** The brief's
+   `chatgpt-overnight-review-closure-marathon` kit **IS NOT ON DISK**. No other kit carries this art.
+2. **A feature-entry splash that fits a HUD-bearing border.** The kit's is a full-stage arch whose
+   pillars land on the controls.
+3. **Tier frames redrawn as THIN perimeters** if the framed look is wanted. The four full-stage
+   primaries are refused: composited at stage size they bury the tier label, the multiplier, the BET
+   window, the SPIN button and the hero.
+4. **A hero glance/attention strip at reaction amplitude.** Both offered so far were ~31% peak
+   against the win reaction's 57%.
+5. **A stronger hero performance set** (arm unfold, turn toward the reels, lean) needs new RENDERS:
+   every reaction kit so far is a lift/rotate/energy-ramp of ONE master.
+
+### BLOCKED ON OWNER DECISIONS
+
+1. **WEBP, still the biggest single lever.** ~5x on the hero sheets (678KB vs 3,492KB at q90);
+   `previewServer.mjs:61` already serves it; but ZERO .webp files exist in the project, so it is a
+   first for a submission-bound bundle. dist is at 91% of the 25MB budget.
+2. **The `win_big` / `win_medium` name skew.** The NUMBERS agree exactly (10/30/100); only the file
+   names are one slot out, so `win_big.mp3` plays at MEGA. Nothing records whether that was intended.
+3. **`scene_character.png` (791,212 B) ships and cannot render.** The `'static'` branch is
+   unreachable by the identical mechanism that made the rig unreachable: App.svelte:2159 never passes
+   `heroMode`. KEPT DELIBERATELY as the hero's one-line escape hatch. Deleting it removes the
+   fallback.
+4. **Six confirmed orphan assets, 337,523 bytes.** Not removed this session: a reconnaissance pass
+   warned that nine OTHER assets look like orphans to a basename grep but are built dynamically, and
+   a careless sweep would delete 3.4MB of working audio plus six live sprites. Worth doing carefully,
+   not quickly.
+
+### AUDIO, NOW THE WEAKEST OF THE THREE REVIEW TAGS
+
+- **The entire Overdrive feature is silent** apart from the music-bed crossfade.
+  `FreeSpinsPresentation` imports zero audio. Largest single gap.
+- **Nine moments have no cue:** spin-button press, slam-stop, feature trigger, feature entry,
+  per-free-spin reel stops, retrigger, feature end, **max win**, hero reactions.
+- **The loudness ladder is uneven:** small->medium 5.9 dB, medium->big and big->epic each under 2 dB,
+  because one call site hardcodes a volume that bypasses the BASE table.
+- Architecture: 12 hand-rolled HTMLAudioElements, no Web Audio, no pooling, cloneNode voicing.
+  `soundService.ts` is NOT a locked path.
+
+### CARRIED FORWARD, STILL TRUE
+
+- The win banner covers the hero's head during reactions, but **60.8% of the reaction's motion is in
+  the visible chest band** and only 17.1% is hidden at big tier. Measured, not worth a fix.
+- `winCountUpTier()` still has ZERO external callers; every consumer re-implements the ternary.
+  WinDisplay now at least imports the constants.
+- Telemetry's `max` at 5000 is deliberate and documented. WinDisplay's `gold`/`green` bands are its
+  own colour treatment, not celebration tiers, and were left alone.
+
+---
+
 ## 0L. R114 - THE HERO REACTS TO WINS AND TO FEATURE ENTRY
 
 **SHIPPED:** `HeroIdle.svelte` is now a three-state machine on one element: `idle` / `win` /
@@ -400,7 +466,7 @@ would return 1.1MB.
 
 ## 0I. R111 - THE HERO IS ARTICULATED, AND SPINE TURNED OUT NOT TO BE THE ANSWER
 
-**The robot is non-static.** `frontend/src/lib/components/RobotRig.svelte` renders the eleven-part
+**The robot is non-static.** frontend/src/lib/components/RobotRig.svelte renders the eleven-part
 kit as a nested bone hierarchy driven by CSS transforms, mounted in `.char-layer` where the flat
 sprite was. Head, torso and both arms articulate; **pelvis and legs are deliberately not animated
 so the feet stay planted**, verified as zero changed pixels across the bottom third of the figure.

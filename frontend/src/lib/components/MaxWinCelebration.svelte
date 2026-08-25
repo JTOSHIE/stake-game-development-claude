@@ -247,12 +247,17 @@
      photographed screen in the game and the headline should not be the thing
      that pays for the effect. Dropped and dimmed so the bright core sits below
      the headline, with the corner surges carrying the drama out at the edges
-     where there is no text at all. */
+     where there is no text at all.
+
+     R115: the asset itself is now the purpose-built headline-safe bloom, which is
+     a compact swirl rather than a full-frame burst, so the position and opacity no
+     longer have to compensate for it. Brought back up a little; the contrast is
+     re-measured below rather than assumed. */
   .c1-max-bloom {
-    top: 58%; left: 50%;
-    width: min(66%, 620px); height: auto;
+    top: 54%; left: 50%;
+    width: min(70%, 660px); height: auto;
     transform: translate(-50%, -50%);
-    opacity: 0.42;
+    opacity: 0.52;
     animation: c1-max-bloom-in 1.3s ease-out both, c1-max-bloom-breathe 4.6s ease-in-out 1.3s infinite;
   }
   @keyframes c1-max-surge-in {
@@ -264,13 +269,13 @@
     100% { }
   }
   @keyframes c1-max-bloom-breathe {
-    0%, 100% { opacity: 0.36; }
-    50%      { opacity: 0.50; }
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.60; }
   }
   @media (prefers-reduced-motion: reduce) {
     /* Hold both as stills. The art is the tier identity; only the motion goes. */
     .c1-max-surges, .c1-max-bloom { animation: none; }
-    .c1-max-bloom { opacity: 0.42; }
+    .c1-max-bloom { opacity: 0.52; }
   }
 
   .c1-halo {

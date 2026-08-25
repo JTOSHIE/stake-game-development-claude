@@ -1,0 +1,37 @@
+{
+ "brief": "R115 OVERNIGHT REVIEW CLOSURE",
+ "source_package": ".scratch/art-review/chatgpt-textfree-celebration-hero-reinforce",
+ "refused_full_stage_frames": "The four 1920x1080 primary tier frames (big/mega/epic/max) are text-free and value-safe in the centre, but composited over a real celebration at stage size their pillars bury the tier label, the multiplier readout, the BET window, the SPIN button and the hero. Evidence: scratch composite r115_frame_test.png. They are perimeter art for a layout with a clear border, and this stage has HUD in that border.",
+ "assets": [
+  {
+   "file": "ui/win/bloom_mega.png",
+   "from": ".scratch/art-review/chatgpt-textfree-celebration-hero-reinforce/mega/03-mega-support-bloom-1024x1024.png",
+   "scale": 0.8,
+   "bytes": 592259,
+   "sha256": "fb51dd98f4c1e0842415255a8879dcf6b540e8b6be0bbd296d47b8de35983029",
+   "baked_text": "none",
+   "value_safe_centre": true,
+   "role": "mega tier now has its OWN bloom. R113 had mega and epic sharing one asset at two strengths because the kit of the day had no mega art; this kit does."
+  },
+  {
+   "file": "ui/win/max_bloom.png",
+   "from": ".scratch/art-review/chatgpt-textfree-celebration-hero-reinforce/max/04-max-headline-safe-centre-bloom-1024x1024.png",
+   "scale": 1.0,
+   "bytes": 407139,
+   "sha256": "a5e1770251a5971d60a951cdf53a37f6e7b9458733078bc8d52e6a24c0292f51",
+   "baked_text": "none",
+   "value_safe_centre": true,
+   "role": "REPLACES the R113 max bloom. R113 measured its own bloom taking the max headline from 14.16:1 contrast down to 4.73:1 and recovered it to 8.41:1 by moving and dimming. This asset is purpose-built compact and headline-safe, so the fix stops being a compromise."
+  },
+  {
+   "file": "ui/win/overdrive_perimeter.png",
+   "from": ".scratch/art-review/chatgpt-textfree-celebration-hero-reinforce/feature/02-overdrive-active-accent-textfree-1920x1080.png",
+   "scale": 0.7,
+   "bytes": 461912,
+   "sha256": "ffbfa712d844dd01792fc3d1888739877a683beb3821108f8bc91d0290715a0f",
+   "baked_text": "none",
+   "role": "Overdrive-active stage perimeter. ONE raster serves BOTH the active and the settle state: the kit also ships 04-overdrive-settle-accent, but measured against 02 its alpha silhouette IoU is 0.9932 and it is the same frame at 64% brightness and 21% saturation. A CSS filter reproduces it exactly, saves 782 KB, and guarantees the two states register perfectly because they are the same pixels."
+  }
+ ],
+ "refused_feature_splash": "feature/01-overdrive-entry-splash (2140 KB) is the same shape of problem as the tier frames: a full-stage spiky arch whose pillars land on the HUD. The perimeter pair is the part of this folder that fits a layout with controls in its border."
+}

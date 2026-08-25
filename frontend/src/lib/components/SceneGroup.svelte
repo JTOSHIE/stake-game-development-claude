@@ -19,7 +19,6 @@
   // All motion is subtle ambient scene life and is disabled under
   // prefers-reduced-motion. The group is decorative (aria-hidden).
   import { themeAssets } from '../stores/themeStore'
-  import RobotRig from './RobotRig.svelte'
   import HeroIdle from './HeroIdle.svelte'
 
   // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
@@ -29,16 +28,21 @@
   //            flipbook. This is the shipped hero's own pose and silhouette
   //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
   //            re-rendered per frame so the body relights as it breathes.
-  //   'rig'    R111's eleven-part bone hierarchy. Real articulation, but only in
-  //            the pose those parts were drawn in: arms at sides, neutral. Kept
-  //            because it is the right foundation for genuine skeletal work, and
-  //            because it is the fallback R111 shipped.
   //   'static' The original flat sprite with its whole-body bob. The oldest and
-  //            safest path; unchanged since before R111.
+  //            safest path, and the one-line escape hatch: pass heroMode="static"
+  //            at the App.svelte mount and the hero reverts to the pre-R111 sprite.
+  //
+  // R111's eleven-part bone hierarchy WAS a third mode here and was removed in
+  // R115. It could never render: heroMode has exactly one mount, App.svelte:2159
+  // `<SceneGroup haze={hazeLevel} />`, which does not pass it, so the branch was
+  // unreachable while its eleven part rasters shipped to every player. R112
+  // established that the pose those parts are drawn in, arms at sides and neutral,
+  // is not the wanted one. The rig remains in git history and in
+  // docs/design/SPINE_ROBOT_RIG_SETUP.md if a real skeletal pass is ever revived.
   //
   // Every mode keeps the same 206x407 box, the same grounding and its own
   // reduced-motion behaviour, so switching cannot move the scene.
-  export let heroMode: 'idle' | 'rig' | 'static' = 'idle'
+  export let heroMode: 'idle' | 'static' = 'idle'
 
   // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
   // The car and pilot were separated from the backdrop by a flat drop-shadow
@@ -88,15 +92,12 @@
   <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
   <div
     class="char-layer"
-    class:char-rigged={heroMode === 'rig'}
     class:char-idle-strip={heroMode === 'idle'}
     aria-hidden="true"
   >
     <div class="depth-haze" aria-hidden="true"></div>
     {#if heroMode === 'idle'}
       <HeroIdle assetBase={$themeAssets.assetBase} />
-    {:else if heroMode === 'rig'}
-      <RobotRig assetBase={$themeAssets.assetBase} />
     {:else}
       <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
     {/if}
@@ -250,7 +251,6 @@
      it 7px and sways it. The rig articulates instead, from the waist up, with the feet
      planted. Running both would stack a rigid slide on top of a breathe and read as a
      double bob, so mounting the rig switches char-idle off at the source. */
-  .char-layer.char-rigged,
   .char-layer.char-idle-strip {
     animation: none;
     transform: none;
@@ -258,38 +258,7 @@
 
 
 
-  /* ── Overlay re-registration for the rig (R111) ──────────────────────────────
-     .antenna-light and .visor-glint are positioned in percentages of .char-layer,
-     and those percentages were calibrated against the FLAT sprite. The rig's head
-     is a separately drawn part that lands in a different place, so both overlays
-     have to be re-derived against it or they light the wrong thing. Measured on
-     the rig's own head raster, mapped through the root scale:
-
-       rig visor lens   layer x 59.2..149.3, y 10.8..86.9
-       rig earpiece orb layer centre (65.1, 58.0)
-
-     THE ANTENNA LIGHT WAS THE URGENT ONE. Its inherited box is x 24.7..49.4, and
-     the rig's head does not start until x 50.1, so unmoved it would blink in empty
-     space beside the character. Re-centred on the orb, and made near-circular
-     because the orb is 10.5x11.6 layer px and the inherited 12%x8% box smeared a
-     round light into a vertical ellipse.
-
-     The glint keeps R110's method: sweep `top` and take the most gradient energy
-     landing on the lens. For the rig that peaks at 9% (49.2% on lens) rather than
-     the flat sprite's 11%.
-
-     The base rules are deliberately NOT touched, so `rig={false}` still restores
-     the flat sprite's exact shipped behaviour. */
-  .char-rigged .antenna-light {
-    left: 25.6%;
-    top: 11.3%;
-    width: 12%;
-    height: 6%;
-  }
-  .char-rigged .visor-glint {
-    top: 9%;
-  }
-  /* Slow bob + gentle sway + subtle breathing scale, layered so he feels alive
+    /* Slow bob + gentle sway + subtle breathing scale, layered so he feels alive
      without competing with the reels. */
   @keyframes char-idle {
     0%   { transform: translateY(0) rotate(-0.6deg) scale(1); }

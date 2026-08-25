@@ -185,9 +185,25 @@ export function setMuted(val: boolean): void {
     // everything at once, not only future sounds.
     activeClones.forEach(c => { c.pause(); c.currentTime = 0 })
     activeClones.clear()
+    // R115, STUCK ANTICIPATION. stopAnticipation() has exactly one caller,
+    // playReelStop(), and that function returns early while muted - so muting
+    // during the tension build meant the build never got stopped. A muted
+    // <audio> still plays, it is only silent, so the riser kept running and
+    // `bgmDuck` stayed pinned at BGM_DUCK_ANTICIPATION (0.27). On unmute the
+    // player heard a riser with no reels moving, over a music bed stuck at 27%
+    // for the rest of the session. Tearing it down here is the fix, because
+    // this is the one place that always runs when sound goes away.
+    if (anticipationActive) stopAnticipation()
   } else {
     // On unmute, restore every volume to the current slider-derived values.
     applyVolumes()
+    // R115, SILENT SESSION. playBGM() has exactly one caller, App.svelte:1402,
+    // and it returns early when muted WITHOUT setting `bgmStarted`. Nothing
+    // called it a second time, so a player whose mute preference was restored
+    // from a previous session and who then unmuted got no music at all, for the
+    // whole session. Retrying here is safe: playBGM() is idempotent through
+    // `bgmStarted`, so this is a no-op whenever the bed is already running.
+    playBGM()
   }
 }
 

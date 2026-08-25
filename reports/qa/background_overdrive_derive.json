@@ -1,9 +1,9 @@
 {
-  "generated_utc": "2026-07-26T15:43:36Z",
+  "generated_utc": "2026-08-24T08:00:08Z",
   "script": "scripts/assets/background_overdrive_derive.py",
   "derived_from": {
     "path": "frontend/public/assets/themes/future-spinner/backgrounds/bg_base.jpg",
-    "sha256": "c7ecfa15dde8db421f3c9428211810c24cf292db6ba49fd149973a6fbffd9491",
+    "sha256": "193d6936accf7aaf242706937fd70b859ff3b0866a507fee2d1b6a33f1dff63a",
     "dimensions": "1920x1080"
   },
   "parameter_source": "scripts/assets/backgrounds.py JOBS, base and overdrive",
@@ -22,13 +22,13 @@
   },
   "output": {
     "path": "frontend/public/assets/themes/future-spinner/backgrounds/bg_overdrive.jpg",
-    "sha256": "909dbeefd304b10b0cba7d69656895eed2e0db77dd97213821d9d39f30774120",
-    "bytes": 269186,
+    "sha256": "5c4eae889792f799624f2af9d7fae7e5b3ddd1a41ce5708ef44e07f56a46e9e3",
+    "bytes": 259050,
     "dimensions": "1920x1080",
     "encoder": "JPEG quality=80 optimize progressive 4:2:0"
   },
   "replaced": {
-    "sha256": "7db9fd0d1632181c68ddb49cb6eb3043f2e4f1c0976e7b4c543defa94ad55299",
-    "bytes": 280904
+    "sha256": "8bdb11b42b17a9df9ad012fd8acaf527a50ca1e20472d9afa26bab4a4f5a520c",
+    "bytes": 264759
   }
 }

@@ -296,7 +296,7 @@
            tier identity rather than calm it. -->
       <img
         class="c1-tier-burst"
-        src="{$themeAssets.assetBase}/ui/win/{tier === 'big' ? 'burst_big' : 'burst_epic'}.png"
+        src="{$themeAssets.assetBase}/ui/win/{tier === 'big' ? 'burst_big' : tier === 'mega' ? 'bloom_mega' : 'burst_epic'}.png"
         alt=""
         aria-hidden="true"
         data-testid="win-tier-burst"
@@ -524,11 +524,11 @@
      painted "BIG WIN" would render English in the fifteen locales that
      translate that label.
 
-     Ascends by size and opacity rather than by swapping art at every step:
-     big gets its own sparse impact burst, mega and epic share the denser bloom
-     at two strengths. That keeps one asset doing two jobs and keeps the ladder
-     smooth, since the existing plate glow, type scale and colour already carry
-     a lot of the tier signal. */
+     R115: EVERY TIER NOW HAS ITS OWN ART. R113 had mega and epic sharing one
+     bloom at two strengths, because the kit of the day simply had no mega asset.
+     The text-free kit does, and it is a different SHAPE rather than a different
+     size: a mechanical iris against the spiky bursts either side of it, so the
+     three tiers read as three things instead of one thing growing. */
   .c1-tier-burst {
     position: absolute; top: 50%; left: 50%; z-index: 0;
     pointer-events: none;
@@ -537,7 +537,7 @@
     animation: c1-burst-in 0.75s ease-out both;
   }
   .tier-big  .c1-tier-burst { width: 430px; height: 430px; opacity: 0.9; }
-  .tier-mega .c1-tier-burst { width: 400px; height: 400px; opacity: 0.62; }
+  .tier-mega .c1-tier-burst { width: 420px; height: 420px; opacity: 0.78; }
   .tier-epic .c1-tier-burst { width: 540px; height: 540px; opacity: 0.88; }
   @keyframes c1-burst-in {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.55); }

@@ -517,7 +517,7 @@ This is the whole idea and it is worth stating plainly:
 
 ### 11c. The shipped structure
 
-`frontend/src/lib/components/RobotRig.svelte`, mounted by `SceneGroup.svelte` inside the existing
+frontend/src/lib/components/RobotRig.svelte, mounted by `SceneGroup.svelte` inside the existing
 `.char-layer`.
 
 ```

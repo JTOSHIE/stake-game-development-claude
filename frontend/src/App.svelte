@@ -572,6 +572,21 @@
   // paytable flip their accents from one source of truth.
   $: overdriveVisual.set(overdriveVisualActive)
 
+  // R115. The perimeter does not snap off with the feature: it cools. `settling`
+  // holds the same raster under a dim/desaturate filter for a beat after Overdrive
+  // clears, which is what the kit's separate settle accent depicts.
+  let overdriveSettling = false
+  let overdriveSettleTimer: ReturnType<typeof setTimeout> | undefined
+  $: {
+    if (overdriveVisualActive) {
+      clearTimeout(overdriveSettleTimer)
+      overdriveSettling = true
+    } else if (overdriveSettling) {
+      clearTimeout(overdriveSettleTimer)
+      overdriveSettleTimer = setTimeout(() => { overdriveSettling = false }, 1600)
+    }
+  }
+
   /** Build a presentation script from a raw event list (live) or a served round. */
   function scriptFromEvents(events: RawEvent[]): PresentationScript {
     const finalWin = [...events].reverse().find((e) => e.type === 'finalWin')
@@ -2208,6 +2223,26 @@
         ></div>
       {/if}
 
+      <!-- OVERDRIVE PERIMETER (R115), z41: the stage edge energises while the
+           feature runs. Deliberately a THIN border and deliberately below the HUD,
+           because the celebration kit's full-stage frames were refused for landing
+           on the tier label, the multiplier, the BET window and the SPIN button.
+           This is the shape that fits a layout with controls in its border.
+
+           ONE raster covers both states. The kit ships a separate settle accent,
+           but it is the same frame at 64% brightness and 21% saturation (alpha
+           silhouette IoU 0.9932), so `settling` reproduces it with a filter: same
+           pixels, perfect registration, 782 KB saved. -->
+      {#if overdriveVisualActive || overdriveSettling}
+        <div
+          class="overdrive-perimeter"
+          class:settling={!overdriveVisualActive}
+          data-testid="overdrive-perimeter"
+          style="background-image: url('{$themeAssets.assetBase}/ui/win/overdrive_perimeter.png');"
+          aria-hidden="true"
+        ></div>
+      {/if}
+
       <!-- GRID, 522x349, centred inside the frame, z20 -->
       <div class="grid-slot">
         <div class="grid-scale">
@@ -2542,6 +2577,37 @@
     inset: 0;
     z-index: 40;          /* above art (frame 10, grid 20, character 30), below HUD (50) */
     pointer-events: none;
+  }
+
+  /* Overdrive perimeter, R115. z41 puts it just above the grade and still below
+     the HUD at z50, so the controls always render over it. */
+  .overdrive-perimeter {
+    position: absolute;
+    inset: 0;
+    z-index: 41;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    mix-blend-mode: screen;
+    opacity: 0;
+    animation: overdrive-perimeter-in 0.9s ease-out forwards;
+  }
+  /* The measured settle: 64% brightness, 21% saturation of the active frame. */
+  .overdrive-perimeter.settling {
+    animation: overdrive-perimeter-out 1.6s ease-in forwards;
+  }
+  @keyframes overdrive-perimeter-in {
+    from { opacity: 0; filter: brightness(1.35) saturate(1.2); }
+    to   { opacity: 0.75; filter: none; }
+  }
+  @keyframes overdrive-perimeter-out {
+    from { opacity: 0.75; filter: none; }
+    to   { opacity: 0; filter: brightness(0.64) saturate(0.21); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Hold it steady: the perimeter is a STATE, not a movement. */
+    .overdrive-perimeter { animation: none; opacity: 0.75; }
+    .overdrive-perimeter.settling { animation: none; opacity: 0; }
   }
 
   .game-wrapper {
