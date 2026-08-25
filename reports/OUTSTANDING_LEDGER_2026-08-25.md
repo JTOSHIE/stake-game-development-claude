@@ -217,6 +217,75 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0L. R114 - THE HERO REACTS TO WINS AND TO FEATURE ENTRY
+
+**SHIPPED:** `HeroIdle.svelte` is now a three-state machine on one element: `idle` / `win` /
+`energy`. Two one-shot reaction sheets in `ui/hero/` at a common 70% scale.
+
+| Asset | Frames | Size | Bytes |
+|---|---:|---|---:|
+| hero_win_reaction_8f.png | 8 | 3800x940 | 2281 KB |
+| hero_energy_up_6f.png | 6 | 2850x940 | 1692 KB |
+| hero_crossed_idle_5f.png (re-packed) | 5 | 3500x940 | 2038 KB (was 3410) |
+
+**THE IDLE RE-PACK WAS NOT OPTIONAL:** every hero sheet must share one resolution or the figure
+changes sharpness at the cut. At true display size (1221 device px) a 70% source is **99.5% of full
+sharpness**, mean pixel difference 2.42/255, and it returns 1.37 MB.
+
+**TRIGGERS:** win on `$winMultiplier >= BIG_WIN_THRESHOLD` **imported** from `winCountUp.ts` (the
+hero reacts exactly when the banner does, and this is deliberately not a fifth threshold
+declaration); energy on the RISING EDGE of `overdriveVisual`. Round-latched so it fires once.
+Reactions never interrupt each other. Reduced motion SKIPS them rather than damping.
+**Max win deliberately shares the win path**: a wincap clears the same threshold, and
+`MaxWinCelebration` is a full-screen modal that covers the hero, so a stronger hero path would
+render behind an opaque overlay.
+
+**IDENTITY GATE PASSED, all four strips.** The package derives every frame from one immutable
+master whose sha256 IS the R112 crossed-arms master. IoU 0.9695-0.9932 vs the live rest frame;
+every strip's f1 is pixel-identical to its fN.
+
+**GROUND-LINE FALSE ALARM, and the instrument matters:** soft alpha drifts 16-18px below the feet,
+mid alpha 1px, **opaque core 0px**. It is a reactive ground glow, not foot movement.
+
+**REFUSED:**
+- 04-crossed-arms-idle-b: **WEAKER than the shipped idle** (30.4% peak vs 59.0%; 2.2 src px head
+  travel vs 6.6). R112's idle is RE-RENDERED per frame; this package's frames are TRANSFORMS of one
+  master. A transform moves a sprite, only a re-render relights one.
+- 02-attention-glance: 31.9% peak vs the win reaction's 57.1%; the package's own QA calls it
+  "intentionally subtle". Skipped per the brief, and it would have cost ~1.5 MB.
+
+**BUG CAUGHT ONLY BY SCREENSHOT, worth remembering:** the first build reported `idle -> win -> idle`
+with zero errors and the correct sheet **and drew nothing**. (a) all three modes shared one
+animation NAME, and CSS restarts on a name change not a duration change, so the reaction inherited
+the idle's elapsed time and started at its end; (b) `steps(n)` + `forwards` holds a value one frame
+PAST the sheet. Fixed with distinct keyframe names and `steps(n, jump-none)` over an (n-1)-frame
+span. **A state machine reporting the right state is not evidence that anything was drawn.**
+
+**MEASURED OCCLUSION, pre-existing but newly relevant:** the win banner (y310) covers the hero's
+head (y295-390) during the reaction. **17.1% of the reaction's motion hidden at big, 23.7% mega,
+30.2% epic.** 70-83% still reads, and the surviving part is the largest (the chest lift, 22.8% of
+the motion). The feature reaction has no banner and is seen in full.
+
+**OPEN - THE HIGHEST-VALUE ITEM ON THIS LEDGER: WEBP.**
+`frontend/scripts/lib/previewServer.mjs:61` already declares `'.webp': 'image/webp'`. The hero idle
+sheet as WebP q90 is **678 KB vs 3,492 KB as PNG (19.4%)**. But **zero .webp files exist in the
+project**, so adopting it introduces a new format to a submission-bound bundle: an infrastructure
+and compliance decision, not art work. **dist is at 23.08 of 25 MB = 92%.** This is the single
+biggest lever available.
+
+**OPEN - DEAD SHIPPED WEIGHT:** `SceneGroup` declares `heroMode: 'idle' | 'rig' | 'static'` but
+`App.svelte:2159` mounts `<SceneGroup haze={hazeLevel} />` and never passes it, so the `'rig'`
+branch ships **~1.1 MB of R111 robot parts that can never render**. Deleting returns 1.1 MB.
+
+**NOT AUDITED, NEXT INTAKE:** this package's nine feature-presentation/ assets and four
+support-accents/. The brief put the hero first and the budget was spent.
+
+**WHAT BLOCKS A STRONGER HERO SET:** everything this package expresses is a lift, a rotate and an
+energy ramp of ONE master. An arm unfold, a turn toward the reels or a lean needs new RENDERS, not
+new transforms.
+
+---
+
 ## 0K. R113 - CELEBRATION ART IS LIVE, AND SEVEN OF NINETEEN ASSETS ARE PERMANENTLY REFUSED
 
 **SHIPPED:** four text-free rasters into `ui/win/` (2.21MB, 65% Lanczos downscale) wired as

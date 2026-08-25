@@ -1,43 +1,129 @@
 <script lang="ts">
-  // HeroIdle.svelte, the crossed-arms pilot as a living sprite.
+  // HeroIdle.svelte, the crossed-arms pilot: breathing by default, reacting when
+  // something happens.
   //
-  // WHY A FLIPBOOK AND NOT A RIG. R111 articulated the hero out of eleven separate
-  // part rasters, which gave real bone motion but only in the pose those parts were
-  // drawn in: arms at sides, neutral. The owner's preferred attitude is the crossed
-  // arms the game shipped with, and crossed arms cannot be produced from those parts,
-  // because the fold is a single baked shape rather than two posable forearms.
+  // R112 made him alive. R114 makes him respond. The idle is unchanged in
+  // character: a five-frame breathe over 4.4 seconds. On top of it sit two
+  // one-shot reactions that borrow the same element and hand it straight back.
   //
-  // The art package answers that directly. Its crossed-arms idle strip is the SHIPPED
-  // HERO, re-rendered five times: frame 01 has a silhouette IoU of 0.9997 against
-  // ui/scene_character.png and a mean RGB difference of 0.90. So playing that strip
-  // gives back exactly the attitude the game had, with the sprite now breathing.
+  // WHY ONE ELEMENT AND NOT THREE LAYERS. Every sheet is the same figure at the
+  // same scale in the same box, so the only thing that has to change to play a
+  // reaction is which sheet the element is reading and how many steps it takes
+  // through it. Stacking three layers and cross-fading would add two idle
+  // compositor layers that are invisible 99% of the time, for a transition that
+  // measurement says does not need softening (see below).
   //
-  // WHAT MAKES IT WORK. The frames are re-rendered rather than transformed, so the
-  // chest, shoulder and visor highlights relight as the body moves. That is why it
-  // reads as a body rather than as a picture being nudged: 31 to 42 per cent of the
-  // figure's pixels change between adjacent frames, while the head itself travels only
-  // 3.8 source pixels. A transform can move a sprite; only a re-render can relight it.
+  // WHY THE CUT DOES NOT SHOW. The reaction sheets come from a package that
+  // derives every frame from one immutable master, and that master is the same
+  // crossed-arms hero the idle was rendered from. Measured against the live idle
+  // rest frame, entering a reaction changes 34-54% of the figure depending which
+  // idle frame we cut from - and a NORMAL step inside the idle loop already
+  // changes 36-48%. The cut is no larger than what the idle does every 0.88s.
   //
-  // FIVE FRAMES, NOT SIX. The kit ships six, but frame 06 is byte-identical to frame
-  // 01: it is a closing frame for a linear player, and a duplicate for a looping one.
-  // steps(5) over frames 01..05 is the closed loop.
-  //
-  // The ground line is identical in all five frames, so the feet do not move at all.
+  // WHY THE LAST FRAME OF EACH REACTION IS A DUPLICATE OF ITS FIRST. It is the
+  // exit. Ending on it leaves the figure 36.2% from the idle's rest frame; ending
+  // one frame earlier would leave it 48.3% away. The duplicate costs almost
+  // nothing after PNG compression and buys the smoothest hand-back available.
+  import { onMount, onDestroy } from 'svelte'
+  import { winMultiplier, isSpinning } from '../stores/gameStore'
+  import { overdriveVisual } from '../stores/overdriveVisual'
+  // The SAME constant the win banner tiers on. This codebase already carries four
+  // separate declarations of the win thresholds and one of them disagrees; this
+  // is deliberately not a fifth. The hero reacts exactly when the banner does.
+  import { BIG_WIN_THRESHOLD } from '../stores/winCountUp'
+
   export let assetBase: string
 
-  // 5 frames wide, each the width of the hero box, matching the FlameJets sheet idiom.
-  const FRAMES = 5
+  type HeroMotion = 'idle' | 'win' | 'energy'
+
+  const SHEET: Record<HeroMotion, string> = {
+    idle: 'hero_crossed_idle_5f.png',
+    win: 'hero_win_reaction_8f.png',
+    energy: 'hero_energy_up_6f.png',
+  }
+  const FRAMES: Record<HeroMotion, number> = { idle: 5, win: 8, energy: 6 }
+  // ~0.19s a frame for the reactions against the idle's 0.88s: fast enough to read
+  // as a response, slow enough not to look twitchy at game distance.
+  const DURATION_MS: Record<HeroMotion, number> = { idle: 4400, win: 1500, energy: 1100 }
+
   const BOX_W = 206
   const BOX_H = 407
+
+  // THE SPAN DIFFERS BETWEEN A LOOP AND A ONE-SHOT, and getting it wrong renders
+  // nothing at all.
+  //
+  // The idle loops, so it uses steps(5) over a FULL five-frame span: the timing
+  // function yields 0, 1/5 ... 4/5, which is frames 01..05, and the wrap back to
+  // frame 01 is the loop.
+  //
+  // A one-shot must END on its final frame and hold it. steps(8) would yield
+  // 0, 1/8 ... 7/8 during play and then 1 at completion, and with `forwards` that
+  // held value is one whole frame PAST the sheet: the element paints empty. So the
+  // reactions use steps(n, jump-none) over an (n-1)-frame span, which yields n
+  // values from 0 to 1 inclusive, landing exactly on the last frame and staying
+  // there until Svelte hands the element back to the idle.
+  const SPAN_PX: Record<HeroMotion, number> = {
+    idle: -(FRAMES.idle * BOX_W),
+    win: -((FRAMES.win - 1) * BOX_W),
+    energy: -((FRAMES.energy - 1) * BOX_W),
+  }
+
+  let motion: HeroMotion = 'idle'
+  let reduced = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  onMount(() => {
+    reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Warm both reaction sheets so the first one to play does not decode on the
+    // frame it is needed. They would be fetched anyway; this only moves the cost.
+    for (const key of ['win', 'energy'] as HeroMotion[]) {
+      const img = new Image()
+      img.src = `${assetBase}/ui/hero/${SHEET[key]}`
+    }
+  })
+  onDestroy(() => clearTimeout(timer))
+
+  /** Play a one-shot, then hand the element back to the idle. */
+  function react(next: HeroMotion) {
+    // Under reduced motion the hero holds its rest frame and nothing interrupts
+    // it. A sudden one-shot is exactly the kind of motion that setting exists to
+    // suppress, so reactions are not damped here, they are skipped.
+    if (reduced) return
+    // Never interrupt a reaction in flight. Two overlapping one-shots would cut
+    // the first mid-pose, and every strip is only safe to leave at its own end.
+    if (motion !== 'idle') return
+    motion = next
+    clearTimeout(timer)
+    timer = setTimeout(() => { motion = 'idle' }, DURATION_MS[next])
+  }
+
+  // ── Win: once per round, after the reels stop ────────────────────────────────
+  // Guarded by a round latch rather than by the multiplier alone, because
+  // winMultiplier is derived from winAmount and stays raised for the whole
+  // settled round: without the latch any unrelated re-render would re-fire it.
+  let reactedThisRound = false
+  $: if ($isSpinning) reactedThisRound = false
+  $: if (!$isSpinning && !reactedThisRound && $winMultiplier >= BIG_WIN_THRESHOLD) {
+    reactedThisRound = true
+    react('win')
+  }
+
+  // ── Feature: the moment Overdrive turns on ───────────────────────────────────
+  let sawOverdrive = false
+  $: {
+    if ($overdriveVisual && !sawOverdrive) react('energy')
+    sawOverdrive = $overdriveVisual
+  }
 </script>
 
 <div
   class="hero-idle"
-  aria-hidden="true"
+  data-motion={motion}
   data-testid="hero-idle"
-  style="background-image: url('{assetBase}/ui/hero/hero_crossed_idle_5f.png');
-         background-size: {BOX_W * FRAMES}px {BOX_H}px;
-         --idle-span: -{BOX_W * FRAMES}px;"
+  aria-hidden="true"
+  style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
+         background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
+         --hero-span: {SPAN_PX[motion]}px;"
 ></div>
 
 <style>
@@ -46,26 +132,39 @@
     inset: 0;
     background-repeat: no-repeat;
     background-position-x: 0;
-    /* 4.4s over five frames is 0.88s a frame. The cuts are invisible because the
-       most any part of the figure moves between two frames is 1.1 layer px; what
-       the eye reads is the relighting, not the step. */
-    animation: hero-idle-cycle 4.4s steps(5) infinite;
-    /* Matches the flat sprite's own shadow exactly, so the swap does not change
-       how the hero sits in the scene. */
+    /* Matches the flat sprite's own shadow, so no mode changes how the hero sits
+       in the scene. */
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
   }
 
-  /* steps(5) with a -5-frame span lands on 0, -1, -2, -3, -4 frame widths, which is
-     frames 01..05 and never the wrapped end value. Same construction as
-     FlameJets.svelte's flame-cycle. */
-  @keyframes hero-idle-cycle {
+  /* THREE SEPARATE KEYFRAME NAMES, DELIBERATELY, even though the bodies are
+     identical. CSS restarts an animation when its NAME changes, not when its
+     duration does: with one shared name, switching from the 4.4s idle to the 1.5s
+     reaction kept the running animation's elapsed time, which was usually already
+     past the shorter duration, so the reaction started at its own end. Distinct
+     names make every mode change a clean restart. */
+  @keyframes hero-cycle-idle {
     from { background-position-x: 0; }
-    to   { background-position-x: var(--idle-span); }
+    to   { background-position-x: var(--hero-span); }
+  }
+  @keyframes hero-cycle-win {
+    from { background-position-x: 0; }
+    to   { background-position-x: var(--hero-span); }
+  }
+  @keyframes hero-cycle-energy {
+    from { background-position-x: 0; }
+    to   { background-position-x: var(--hero-span); }
   }
 
+  .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(5) infinite; }
+  /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
+     is no flash of frame 01 between the reaction ending and the idle resuming. */
+  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(8, jump-none) 1 forwards; }
+  .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.1s steps(6, jump-none) 1 forwards; }
+
   /* Freeze to frame 01, which IS the shipped hero pose, so the reduced-motion
-     presentation is the game's own established still rather than an arbitrary
-     stopped frame. */
+     presentation is the game's own established still. Reactions never start under
+     this setting, so only the idle needs stilling. */
   @media (prefers-reduced-motion: reduce) {
     .hero-idle {
       animation: none;
