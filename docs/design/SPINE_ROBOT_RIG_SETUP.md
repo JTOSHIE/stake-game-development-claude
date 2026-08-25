@@ -560,3 +560,49 @@ empty space, because its box ends at x 49.4 and the rig's head starts at x 50.1.
   already rig-ready.
 - **The visor emissive** is still a CSS gradient and still blocked on art, per section 10c.
 
+---
+
+## 12. THE DEFAULT HERO IS NOW A STRIP, NOT THE RIG (R112, 2026-08-25)
+
+**Section 11 described the rig as the shipped hero. It is no longer the default.** The owner's
+preferred attitude is crossed arms, and section 11d already recorded that folding the arms is not
+achievable from the modular parts. R112 resolved that from the art side instead.
+
+### What changed
+
+`SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default **`'idle'`**:
+
+- **`'idle'`** renders `HeroIdle.svelte`: a five-frame flipbook of the crossed-arms idle strip,
+  `steps(5)` over `background-position-x`, 4.4 s loop, sheet `ui/hero/hero_crossed_idle_5f.png`.
+- **`'rig'`** is section 11's bone hierarchy, unchanged and still supported.
+- **`'static'`** is the original flat sprite.
+
+### Why the strip beats the rig for THIS character
+
+| | R111 rig | R112 flipbook |
+|---|---|---|
+| Pose | neutral, arms at sides | **crossed arms, the shipped attitude** |
+| Motion between extremes | 17.96% of the box | **21-30% between adjacent frames** |
+| Motion below the waist | **zero** | present, relighting |
+| Joint separation risk | real, mitigated by tuning | **cannot occur, each frame is one render** |
+| Bytes | 1.1 MB of parts | 3.4 MB sheet |
+
+**The mechanism, and it is the general lesson:** the head travels only 3.8 source px between
+frames, yet a third of the figure changes, because the frames are **re-rendered rather than
+transformed**. A transform can move a sprite; only a re-render can relight it. For a character
+whose material read is chrome and carbon under a fixed key light, the relighting IS the animation.
+
+### When the rig is still the right answer
+
+Section 11c's hierarchy remains the correct foundation for anything a fixed strip cannot do:
+reacting to arbitrary game state, aiming at a moving target, blending two motions, or any motion
+whose timing is not known in advance. A strip is a recording; a rig is an instrument. This hero
+needs a recording.
+
+### The blocking art spec, if the hero should react
+
+The package's win-reaction strip is unusable: it is a third figure (silhouette IoU 0.5097 against
+the shipped hero). A usable one must be **family A**, meaning drawn from the crossed-arms hero with
+crossed legs, on a **680x1344** canvas with its ground line at **y 1322**, 5 to 8 frames, starting
+and ending on frame 01 of the existing idle so it can be entered and left without a cut.
+

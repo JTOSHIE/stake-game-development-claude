@@ -9,6 +9,58 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 110 - 2026-08-25 - R112: the crossed-arms pose was never lost, and only one of the six strips is your robot
+
+**THE HERO IS CROSSED-ARMED AGAIN, AND HE BREATHES.** Default on screen, 4.4 second loop, 60fps.
+
+**THE FINDING THAT MATTERS MOST: the package's "signature crossed-arms master" IS the sprite your
+game already ships.** Silhouette IoU **0.9995**, mean RGB difference **0.90**. The attitude you
+asked me to bring back was never gone; R111 swapped it out because eleven modular parts cannot fold
+their arms. So the master is not the prize here. **The idle strip is**, because it is that same
+hero re-rendered five times.
+
+**ONLY ONE STRIP OF SIX IS THIS ROBOT, and that is measured.** Sorting every full-body asset by its
+ground line splits the package in two: your hero at **y1321-1322**, and a modular neutral figure
+with straight legs at **y1299**. Twenty-three pixels and a different body apart. Strip 01 matches
+your hero at **IoU 0.9997**. Strips 02, 03, 04 and 05 are the neutral figure at 0.68 to 0.75.
+Strip 06, the win reaction, is a **third** figure entirely at 0.51: slimmer limbs, longer legs,
+smaller head. **The package's own assembly guide recommends mixing them**, which would make your
+robot jump 23px and change stance mid-animation. I refused four of the five motions for that
+reason, exactly as your brief instructed.
+
+**WHY THE STRIP BEATS THE RIG, in one number.** The head moves only **3.8 source pixels** between
+frames, yet **a third of the figure changes**, because the frames are re-rendered rather than
+transformed: chest, shoulders, visor and boots all relight. R111's rig moved 17.96 per cent of the
+box with **zero motion below the waist**, because bones only rotate what they own. The flipbook
+moves **21 to 30 per cent across the whole body including the legs**. A transform moves a sprite;
+only a re-render relights one.
+
+**AND THE JOIN RISKS YOU ASKED ME TO CHECK CANNOT HAPPEN ON THIS ROUTE.** Every frame is one
+complete render, so there are no shoulder gaps, no pelvis separation and no hand duplication to
+find. The crossed arms read cleanly at 6x; one hand shows correct articulated fingers and the other
+is hidden by the fold, which the guide documents.
+
+**I HAD TO RE-TEST YOUR PACKAGE'S HAND PROOF.** It argues the hands are not mirrored clones because
+their SHA-256 hashes differ. **That proves nothing** - a mirrored image has a different hash. I
+flipped one and compared: mirrored IoU **0.752** against as-delivered **0.847**, so the mirrored
+form is LESS alike. **The hands are genuinely distinct. The conclusion was right and the stated
+reason was not.**
+
+**A DEFECT OLDER THAN BOTH SESSIONS, NOW FIXED.** The antenna light had **zero overlap** with the
+orb it is named for, glowing on bare head shell 28px to its left. R111 fixed it only for the rig.
+Since the flipbook and the flat sprite are the same image, one corrected base rule now serves both.
+Confirmed in-browser at (65.3, 71.9), exactly on target. The visor glint needed **no** change: R110's
+own method re-run on the strip puts the optimum back at 11%, which is what R110 shipped.
+
+**WHAT IS STILL MISSING, honestly: he does not react.** He breathes the same through a dead spin
+and a big win. **Your package cannot fix that** because its win strip is the wrong figure. What
+would: a win strip drawn as your crossed-arms hero with crossed legs, 680x1344, ground **y1322**,
+starting and ending on frame 01 so it enters and exits without a cut.
+
+**One raster added, dist 18.33 of 25MB. Your thirty placeholders untouched. Thirteen gates green.**
+
+---
+
 ## 109 - 2026-08-25 - R111: the robot is alive, it needed no Spine runtime at all, and the new pose is your call
 
 **HE MOVES.** Chest rises and falls, head drifts against it, both arms carry independent shoulder

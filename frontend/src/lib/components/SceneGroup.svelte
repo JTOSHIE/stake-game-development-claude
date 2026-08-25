@@ -20,14 +20,25 @@
   // prefers-reduced-motion. The group is decorative (aria-hidden).
   import { themeAssets } from '../stores/themeStore'
   import RobotRig from './RobotRig.svelte'
+  import HeroIdle from './HeroIdle.svelte'
 
-  // ── HERO RIG (R111) ────────────────────────────────────────────────────────
-  // The pilot ships as an articulated eleven-part figure rather than one baked
-  // sprite. `rig={false}` restores the flat scene_character.png exactly as it was,
-  // including its own whole-body bob, which is the fallback if the rig ever needs
-  // to come out in a hurry. Both paths keep the same box, the same grounding and
-  // the same reduced-motion behaviour.
-  export let rig: boolean = true
+  // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
+  // Three ways to draw the pilot, in descending order of how good he looks:
+  //
+  //   'idle'   DEFAULT. The crossed-arms idle strip, played as a five-frame
+  //            flipbook. This is the shipped hero's own pose and silhouette
+  //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
+  //            re-rendered per frame so the body relights as it breathes.
+  //   'rig'    R111's eleven-part bone hierarchy. Real articulation, but only in
+  //            the pose those parts were drawn in: arms at sides, neutral. Kept
+  //            because it is the right foundation for genuine skeletal work, and
+  //            because it is the fallback R111 shipped.
+  //   'static' The original flat sprite with its whole-body bob. The oldest and
+  //            safest path; unchanged since before R111.
+  //
+  // Every mode keeps the same 206x407 box, the same grounding and its own
+  // reduced-motion behaviour, so switching cannot move the scene.
+  export let heroMode: 'idle' | 'rig' | 'static' = 'idle'
 
   // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
   // The car and pilot were separated from the backdrop by a flat drop-shadow
@@ -75,9 +86,16 @@
   </div>
 
   <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
-  <div class="char-layer" class:char-rigged={rig} aria-hidden="true">
+  <div
+    class="char-layer"
+    class:char-rigged={heroMode === 'rig'}
+    class:char-idle-strip={heroMode === 'idle'}
+    aria-hidden="true"
+  >
     <div class="depth-haze" aria-hidden="true"></div>
-    {#if rig}
+    {#if heroMode === 'idle'}
+      <HeroIdle assetBase={$themeAssets.assetBase} />
+    {:else if heroMode === 'rig'}
       <RobotRig assetBase={$themeAssets.assetBase} />
     {:else}
       <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
@@ -232,10 +250,13 @@
      it 7px and sways it. The rig articulates instead, from the waist up, with the feet
      planted. Running both would stack a rigid slide on top of a breathe and read as a
      double bob, so mounting the rig switches char-idle off at the source. */
-  .char-layer.char-rigged {
+  .char-layer.char-rigged,
+  .char-layer.char-idle-strip {
     animation: none;
     transform: none;
   }
+
+
 
   /* ── Overlay re-registration for the rig (R111) ──────────────────────────────
      .antenna-light and .visor-glint are positioned in percentages of .char-layer,
@@ -286,12 +307,23 @@
 
   /* Antenna tip, the orange orb blinks. Positioned over the orb on the
      character's upper left. */
+  /* R112: re-registered onto the orb it is named for. The inherited box was
+     centred at layer (37.1, 97.7); the orange earpiece orb it lights sits at
+     (65.3, 71.9), measured on the shipped sprite and confirmed across all five
+     strip frames, where it drifts about 1px. So the light had ZERO overlap with
+     the orb and glowed on bare head shell 28px to its left. R111 measured the
+     same defect from the other direction and scoped its fix to the rig, because
+     the flat sprite was only a fallback then. The flipbook and the flat sprite
+     are the same image (IoU 0.9997), so one corrected base rule now serves both
+     and there is no per-mode duplicate. Height drops 8% -> 6% because the orb is
+     10.5 x 11.6 layer px and the taller box smeared a round light into an
+     ellipse. The rig keeps its own override below: its head sits higher. */
   .antenna-light {
     position: absolute;
-    left: 12%;
-    top: 20%;
+    left: 25.72%;
+    top: 14.66%;
     width: 12%;
-    height: 8%;
+    height: 6%;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 176, 64, 1) 0%, rgba(255, 122, 46, 0.55) 45%, transparent 72%);
     animation: antenna-blink 2.8s ease-in-out infinite;

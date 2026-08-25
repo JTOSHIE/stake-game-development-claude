@@ -1,0 +1,40 @@
+{
+ "brief": "R112 CROSSED-ARMS HERO ANIMATION SYSTEM",
+ "ruling": "2026-08-25 owner ruling (R109): external development-stage artwork may be used in the Future Spinner animation pipeline, provided final shipped assets remain quality-controlled, provenance-recorded, and presentation-safe for Stake.",
+ "asset": "ui/hero/hero_crossed_idle_5f.png",
+ "derivation": "Horizontal 5-frame sheet packed from frames 01..05 of .scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/. Frame 06 was DROPPED because it is byte-identical to frame 01 (verified by exact pixel comparison); including it would hold a duplicate frame for one step of the loop.",
+ "kit_doc": ".scratch/art-review/chatgpt-full-hero-animation-package/PROMPTS_AND_QA.md",
+ "quality_control": {
+  "frames": 5,
+  "frame_size": "680x1344",
+  "sheet_size": "3400x1344",
+  "ground_line_drift_within_strip_px": 0,
+  "identity_vs_shipped_hero": "frame 01 silhouette IoU 0.9997 against ui/scene_character.png, mean RGB difference 0.90: it is the shipped hero, animated",
+  "loop_closure": "frame 06 == frame 01 exactly, so frames 01..05 form a closed loop",
+  "max_adjacent_frame_head_travel": "3.8 source px (1.1 layer px)"
+ },
+ "source_frames": [
+  {
+   "file": ".scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/frame-01-680x1344.png",
+   "sha256": "f416cbff9ce73ee806e81cb45826797350c961f72b7d2083616b58f54dd3e9af"
+  },
+  {
+   "file": ".scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/frame-02-680x1344.png",
+   "sha256": "6c54a7ad3bcde06286f82b6d060a5f140b05595eebd4d9ac6bb726ad3fdef3ec"
+  },
+  {
+   "file": ".scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/frame-03-680x1344.png",
+   "sha256": "2a263dcf8764e02bbee433b82f2b0056a7f4d9a571816152f9e85edbc0abb98e"
+  },
+  {
+   "file": ".scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/frame-04-680x1344.png",
+   "sha256": "f387e79c4c4e1d8567625f9dee0eef161e8b0c362d05c1e92559e9d59700719b"
+  },
+  {
+   "file": ".scratch/art-review/chatgpt-full-hero-animation-package/strips/01-crossed-arms-idle/frame-05-680x1344.png",
+   "sha256": "35e63ddcc9dd1bb9cfb94edb1a7f8caccf63cfa93347575d152ec9b70161f794"
+  }
+ ],
+ "sheet_sha256": "b771b5ceec3b79db19e52638f372589e619b094ffb2d55753ccd8106f7176751",
+ "sheet_bytes": 3492427
+}
