@@ -9,6 +9,62 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 112 - 2026-08-25 - R114: he reacts now, and one CSS bug nearly shipped a hero that drew nothing
+
+**HE NO LONGER BREATHES THE SAME THROUGH A DEAD SPIN AND A BIG WIN.** Two one-shot reactions ship:
+a win acknowledgement (chest lifts, visor powers magenta to bright cyan, glow pools under his feet)
+and an Overdrive energy-up. Both return to the idle by construction.
+
+**THIS PACKAGE PASSED THE IDENTITY GATE, unlike the last one.** All four strips are genuinely your
+robot: the package derives every frame from ONE immutable master whose sha256 IS the crossed-arms
+master your hero came from. Silhouette IoU 0.9695 to 0.9932 against the live rest frame, across
+every frame of every strip, and every strip's last frame is pixel-identical to its first.
+
+**THE GROUND-LINE SCARE WAS A FALSE ALARM, and the instrument is the point.** Two strips extend
+16-18px below the feet at peak, which by bounding box reads as the foot teleport your brief
+forbids. Measured at the right alpha threshold: soft alpha drifts 16px, mid alpha 1px, and the
+**OPAQUE FOOT CORE drifts 0px**. The feet do not move; a glow pools under them.
+
+**I REFUSED TWO STRIPS, and the more interesting refusal is the second idle.** `04-idle-b` is
+**weaker than the idle you already have**: 30.4% peak change against your live idle's 59.0%, and
+2.2 source px of head travel against 6.6. The reason is structural. R112's idle is RE-RENDERED per
+frame so every surface relights; this package's frames are deterministic TRANSFORMS of one master.
+A transform moves a sprite; only a re-render relights one. **Adopting it would have regressed what
+you approved two sessions ago.** The glance strip went for the same reason at 31.9%.
+
+**THE PART YOU SHOULD KNOW ABOUT.** My first implementation reported perfect behaviour: idle to win
+to idle, zero console errors, correct sheet, correct size. **And it drew nothing at all** - the
+screenshot showed empty space where the hero should be. Two CSS causes, both invisible to a state
+check: all three modes shared one animation NAME (CSS restarts on a name change, not a duration
+change, so the reaction inherited the idle's elapsed time and began at its own end), and
+`steps(8)` with `forwards` holds a value one whole frame PAST the sheet. **A state machine
+reporting the right state is not evidence that anything was drawn.** Fixed with distinct keyframe
+names and `steps(n, jump-none)`.
+
+**AN HONEST MEASUREMENT YOU MAY NOT LIKE.** Your win banner sits at y310 and his head is at y295 to
+390, so **the band covers his head during exactly the moment the reaction plays**. Measured:
+17.1% of the reaction's motion hidden at big, 23.7% at mega, **30.2% at epic**. So 70-83% still
+reads, and the part that survives is the biggest part, the chest lift. The visor brighten is what
+gets covered. **This is pre-existing composition, not something I introduced** - but it is newly
+relevant now that he does something under there. The feature reaction has no banner over it and is
+seen in full, which is why it looks the more striking of the two.
+
+**THE HIGHEST-VALUE THING I DID NOT DO: WEBP.** Your gates' static server already declares
+`.webp: image/webp`, and your hero idle sheet as WebP q90 is **678KB against 3,492KB as PNG - 19%**.
+But there is **not one .webp file in the project today**, so adopting it introduces a new format to
+a bundle heading for submission. That is an infrastructure decision, not hero animation, so I
+recorded it instead of taking it. **You are at 92% of your 25MB budget; this is the single biggest
+lever available.**
+
+**ALSO WORTH A LOOK:** R111's rig assets ship to every player and **can never render** - SceneGroup
+declares heroMode but App.svelte never passes it, so the 'rig' branch carries ~1.1MB that is
+unreachable without a code edit.
+
+60fps, zero frames over 20ms, zero console errors in any state. Reduced motion skips reactions
+rather than damping them. dist 23.08 of 25MB. Fourteen gates green.
+
+---
+
 ## 111 - 2026-08-25 - R113: the celebration band has real energy now, and your package's seven best assets cannot ship
 
 **BIG, MEGA, EPIC AND MAX NOW CARRY PAINTED ENERGY.** The band was a flat dark bar with a coloured

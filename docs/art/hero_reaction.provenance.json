@@ -1,0 +1,46 @@
+{
+ "brief": "R114 HERO REACTION SYSTEM + FEATURE REACTION WIRING",
+ "ruling": "2026-08-25 owner ruling (R109): external development-stage artwork may be used in the Future Spinner animation pipeline, provided final shipped assets remain quality-controlled, provenance-recorded, and presentation-safe for Stake.",
+ "source_package": ".scratch/art-review/chatgpt-hero-reaction-feature-package",
+ "identity_gate": "Measured against the LIVE idle rest frame, not against filenames: silhouette IoU 0.9695-0.9932 across every frame of every strip; opaque foot core (alpha>=250) drift 0 px on all four strips; every strip's frame 01 is pixel-identical to its final frame. The package derives all frames from one immutable master whose sha256 matches the R112 crossed-arms master.",
+ "ground_glow_note": "Soft alpha extends 16-18 px below the feet on win-reaction and energy-up. That is the reactive ground glow, not foot movement: at alpha>=128 the drift is 1 px and at alpha>=250 it is 0 px.",
+ "refused": {
+  "02-attention-glance": "Moderate motion: 31.9% peak change against the win reaction's 57.1%. The package's own QA calls it \"intentionally subtle\" and suggests holding frames to compensate. The brief says skip rather than ship distraction, and it would have cost a further ~1.5 MB.",
+  "04-crossed-arms-idle-b": "WEAKER than the idle already shipping: 30.4% peak change against the live idle's 59.0% between extremes, and 2.2 source px of head travel against 6.6. Adopting it would regress the idle R112 shipped and the owner approved."
+ },
+ "common_scale": 0.7,
+ "assets": [
+  {
+   "file": "ui/hero/hero_crossed_idle_5f.png",
+   "frames": 5,
+   "note": "R112 sheet re-packed at 70% so every hero sheet shares one resolution. Mixing scales would change the hero's sharpness at the cut into a reaction. Measured at true display size (1221 device px tall) a 70% source renders at 99.5% of full sharpness with a mean pixel difference of 2.42 of 255.",
+   "shipped_size": "2375x940",
+   "bytes": 2087774,
+   "sha256": "43297adcee78442acec16cd34e294143e16626a051f1753e11e4fba76565d414"
+  },
+  {
+   "file": "ui/hero/hero_win_reaction_8f.png",
+   "frames": 8,
+   "role": "one-shot win acknowledgement: chest lift, visor powers magenta to cyan, reactive ground glow, returns to exact rest",
+   "scale": 0.7,
+   "from": ".scratch/art-review/chatgpt-hero-reaction-feature-package/hero-strips/01-win-reaction/frames",
+   "shipped_size": "3800x940",
+   "bytes": 2336213,
+   "sha256": "67a14b23bd3a7f5d0234ec90d2f66e4613b948ce932f4c9d23818ab1e6711f41",
+   "first_frame_equals_last": true,
+   "exit_smoothness": "the duplicate final frame is kept deliberately: it differs from the live idle rest by 36.2% of the figure against 48.3% for the frame before it, and a normal step inside the idle loop is 36.5-47.9%"
+  },
+  {
+   "file": "ui/hero/hero_energy_up_6f.png",
+   "frames": 6,
+   "role": "one-shot feature / Overdrive entry response, gentler than the win reaction",
+   "scale": 0.7,
+   "from": ".scratch/art-review/chatgpt-hero-reaction-feature-package/hero-strips/03-energy-up/frames",
+   "shipped_size": "2850x940",
+   "bytes": 1733371,
+   "sha256": "cbcacaad840b9ea0d8c234ffb8dd23f46f3fd1ec2a9755b392037e0a98778cf2",
+   "first_frame_equals_last": true,
+   "exit_smoothness": "the duplicate final frame is kept deliberately: it differs from the live idle rest by 36.2% of the figure against 48.3% for the frame before it, and a normal step inside the idle loop is 36.5-47.9%"
+  }
+ ]
+}
