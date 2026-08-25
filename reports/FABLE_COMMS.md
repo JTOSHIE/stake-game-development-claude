@@ -9,6 +9,73 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 107 - 2026-08-25 - R109: the animation-pipeline restriction is withdrawn, Spine is unblocked, and two audit-facing documents needed care rather than an edit
+
+**THE LAW IS CHANGED.** Your ruling is recorded verbatim in every document that carried the old
+one, and **not one of them had its old text deleted** — each carries the supersession beside what
+it replaced, because the record of what was believed is evidence and because other WRS titles
+still operate under it.
+
+**Seven documents amended:** `design-system/DESIGN_SYSTEM.md` (the SYSTEM LAW itself), `CLAUDE.md`
+(condition 2 and test step 1), `COMPLIANCE_WATCH.md`, `GAME_FACTS.md`, `SUBMISSION_DOSSIER.md`,
+`docs/design/SPINE_ROBOT_RIG_SETUP.md`, `docs/design/FX_REGENERATION_SPEC.md`. **Dated records
+were not touched** — session reports, archives, comms and saved briefs keep the old law verbatim,
+per convention (s).
+
+**TWO OF THOSE NEEDED CARE RATHER THAN AN EDIT, and this is the part worth your eye.**
+`GAME_FACTS.md` says of itself that it is compiled for external audit; `SUBMISSION_DOSSIER.md` is
+submission-facing. Both asserted **"symbols remain never externally designed"**. That sentence is
+now **false as a RULE and still true as a FACT**, because the externally generated symbol art is
+uncommitted and under review. Both now state the rule change AND say plainly that the shipped-set
+claim must be re-verified before any submission that adopts that art. **A reviewer must not be
+shown a rule you have withdrawn, and must not be shown a false claim about what ships.**
+
+**ONE READING SURFACED RATHER THAN DECIDED, per convention (n).** The old law's strictest clause
+was about SYMBOLS. Your ruling withdraws the animation-pipeline restriction and names rigging and
+Spine as an example ("including"), without naming symbols as an exception. **Read literally,
+externally sourced development-stage symbols are now permitted** — which is also exactly what arc
+2 has been doing for twenty sessions. **I applied it as written and flagged it.** If you meant to
+keep symbols in-house-only, that is one sentence and the place for it is marked.
+
+**SPINE IS UNBLOCKED, and the first step is smaller than a rig.**
+
+Re-measuring the package found the emissive layers come in **two incompatible generations**: a
+640-wide family that registers to itself, and a **680x1344 family that registers to the SHIPPED
+HERO exactly**. And `SceneGroup.svelte` **already animates the visor** — `.visor-glint` is a CSS
+radial-gradient with its own keyframes, `mix-blend-mode: screen` and a reduced-motion path.
+
+**So the smallest useful animated outcome is not a rig at all**: swap that gradient for the real
+painted visor layer, which registers pixel-for-pixel to the hero it sits on, keeping the same
+keyframes and the same accessibility rule. **No runtime, no dependency, no new architecture.**
+
+**I did not implement it**, and the reason is not the law: it is a player-visible change to the
+hero, `mix-blend-mode: screen` behaves differently over a full-canvas painted raster than over a
+small gradient, and it pairs a new raster with a CSS reference so both must land together. That is
+a short brief, not a blind edit.
+
+**The one genuinely missing piece:** there is no visor emissive registered to the RIG's 380x330
+head part. The 640x640 visor-off head is a **different render** — subject aspect 1.140 against the
+rig head's 1.175 — so a rig using it must take the whole 640 family and be checked for
+consistency against the other ten parts.
+
+**AND A NEW DECISION THE UNBLOCK CREATES:** `.char-layer` supplies the bob and breathe in CSS via
+`char-idle`. A rigged idle would do the same job in the skeleton. **Running both doubles it.**
+Decide before rigging, not after.
+
+**OTHER OVER-BLOCKING RULES: I looked and found little.** The suspected "no component work while
+placeholders are dirty" rule **does not exist**. What I did find, examined and deliberately KEPT:
+kit packaging forbidden while placeholders differ from HEAD (packaging now would ship 30
+unreviewed rasters — real safety); the seven asset guards; locked-path tokens; and the rule that
+HUD control labels stay CSS, which rests on sixteen locales rather than on habit.
+
+**THE BLOCKER MAP, REBUILT: there are no Stake or product blockers.** What remains is seven owner
+decisions and ordinary implementation work, both listed in the ledger.
+
+Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked paths PASS. Zero
+rasters staged. Guards refusing.
+
+---
+
 ## 106 - 2026-08-25 - R108: both particles closed, ALL EIGHT FX ROWS DONE, and the art arc is complete but for one owner decision
 
 **REPLACE COVERAGE 29 OF 30 = 96.7%. ALL EIGHT FX ROWS ARE CLOSED.** Exactly **one** REPLACE row

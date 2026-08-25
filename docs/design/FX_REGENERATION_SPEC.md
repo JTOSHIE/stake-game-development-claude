@@ -139,9 +139,11 @@ the game has nowhere to draw them.** Listed with the smallest job first.
 | residual glow chips | 1024x160, 8f | the same ambient layer |
 | paytable panels, 5 assets | various | paytable component work; the paytable is CSS today |
 | corner connectors, side panel, thin bezel | various | frame-level component work |
-| robot head/visor/eye/chest layers | various | **BLOCKED BY SYSTEM LAW**, see the Spine document |
+| robot head/visor/eye/chest layers | various | **UNBLOCKED 2026-08-25 by owner ruling.** See the Spine document section 10: the v2 layers register to the shipped hero canvas exactly and need no rig |
 
-**The two contact shadows are the best value in the whole set**: the art exists, the widths
-already match their heroes exactly, and the change is two `<img>` tags plus a reduced CSS
-drop-shadow. They are also, unlike the robot part layers, static art that animates nothing,
-so they sit on the permitted side of the external-art law.
+**The two contact shadows are the best value in the whole set**: the art exists and the widths
+already match their heroes exactly. **The clause that used to end this paragraph, distinguishing
+them from the robot part layers as "static art that animates nothing" and therefore on the
+permitted side of the external-art law, is withdrawn: that distinction no longer exists.** Their
+remaining blocker is the shared `.car-img, .char-img` drop-shadow rule, recorded in the R107
+session report.

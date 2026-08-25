@@ -191,10 +191,11 @@ new art request and is not in scope for a rig built from the parts that exist.**
 **UPDATE 2026-08-25 (R104): option 2 HAS BEEN DELIVERED.** The completion kit's spine-support
 group contains a head with the visor REMOVED (640x640), a separate visor glow layer (640x320), an
 eye sensor light layer (640x160) and a chest energy layer (640x480), all RGBA with true
-transparency. **So the visor limitation recorded above is solved in art.** It is not solved in
-law: those four layers are externally designed and would enter the animation pipeline, so they sit
-behind the same ruling as the eleven body parts. If the owner amends the law, the visor question
-closes with it at no extra cost.
+transparency. **So the visor limitation recorded above is solved in art.** **And as of 2026-08-25 it is solved in
+law too**: the owner's ruling permits external development-stage art in the animation pipeline, so
+those layers are admissible on the same footing as the eleven body parts. **The visor question is
+closed.** The runtime-true kit later supplied visor, eye and chest layers at **680x1344**, matching
+the shipped hero canvas exactly, so they register without a resize.
 
 ---
 
@@ -219,9 +220,24 @@ hold. The original four-step list is superseded by section 8.
 
 ---
 
-## 8. THE COMPLIANCE BLOCKER, found 2026-08-25
+## 8. THE COMPLIANCE BLOCKER — **WITHDRAWN BY OWNER RULING, 2026-08-25 (R109)**
 
-**The eleven external parts cannot enter the animation pipeline as the rules stand.**
+> **THIS SECTION IS SUPERSEDED. THE PARTS ARE UNBLOCKED.** The owner has withdrawn the
+> animation-pipeline restriction for Future Spinner:
+>
+> > External development-stage artwork may be used in the Future Spinner animation pipeline,
+> > including character rigging and Spine, provided final shipped assets remain
+> > quality-controlled, provenance-recorded, and presentation-safe for Stake.
+>
+> **Route A below is now OPEN and is the recommended path.** Static-only treatment of the
+> robot is no longer required. The three surviving conditions are the ruling's own:
+> quality-controlled, provenance-recorded, presentation-safe.
+>
+> **The analysis below is kept unedited** because it is the reasoning that identified the
+> blocker and got it to the owner, and because it still describes the rule other WRS titles
+> operate under. Read it as history, not as instruction.
+
+**[SUPERSEDED] The eleven external parts cannot enter the animation pipeline as the rules stand.**
 
 `design-system/DESIGN_SYSTEM.md` SYSTEM LAWS, quoted exactly:
 
@@ -263,7 +279,7 @@ about it decide what can be done with it:
 
 | Route | Compliant today? | Matches shipped art? | Size of job |
 |---|---|---|---|
-| **A. Rig from the external parts** | **No.** Needs an owner amendment to the system law | Yes | **Small.** The parts are already neutral-posed and rig-ready; the whole cost is one ruling |
+| **A. Rig from the external parts** | **YES — the ruling landed 2026-08-25.** | Yes | **Small, and now UNBLOCKED. This is the path.** |
 | **B. Rig from the in-house SVG master** | **Yes**, no ruling needed | **No.** Flat vector, predates the enhancement | **LARGE, and R104 corrected this.** See below |
 | **C. Re-author the enhanced look as an in-house vector master, neutral pose, named groups** | Yes | Yes | Largest, and it is real vector authoring |
 
@@ -346,3 +362,79 @@ made.
   contact point is the fastest way to make a standing figure look like it is floating.
 - The two hero ground shadows in the 2026-08-25 FX set would make the contact read properly and
   are a separate, smaller job that does not need the rig at all.
+
+---
+
+## 10. THE PATH AFTER THE 2026-08-25 RULING (R109)
+
+**The law no longer blocks anything here.** What remains is ordinary sequencing, and there are
+two targets of very different size. **Do the small one first.**
+
+### 10a. What the package actually contains, measured
+
+| Group | Canvas | Registers to | Usable for |
+|---|---|---|---|
+| **11 body parts** | 190x270 to 480x340 | each other, pivots verified | **the Spine rig** |
+| **emissive family v1**, visor-off head, visor glow, eye, chest | 640x640, 640x320, 640x160, 640x480 | **each other** (subjects 583-596 wide) | a rig built on the v1 head |
+| **emissive family v2**, visor, eye, chest | **680x1344 each** | **the SHIPPED hero exactly** | **CSS overlays on the static hero, no rig needed** |
+| contact shadows | 680x240, 2840x300 | the hero widths exactly | grounding, blocked separately |
+
+**THE ONE GENUINELY MISSING PIECE.** There is no visor emissive registered to the RIG's head
+part canvas of 380x330. v1's visor-off head is 640x640 and its subject aspect is 1.140 against
+the rig head's 1.175, so **it is a different render, not the same head at another size**. A rig
+using v1's head must take the whole v1 family and be checked for style consistency against the
+other ten parts; a rig using part 01 has no separable visor.
+
+### 10b. FIRST NON-STATIC TARGET: the visor overlay, and it needs no Spine at all
+
+**The game already animates the visor.** `SceneGroup.svelte` carries
+`<div class="visor-glint">`, a CSS radial-gradient positioned at `left:32%; top:17%; width:20%;
+height:12%` with a keyframed opacity flash, `mix-blend-mode: screen`, and a
+`prefers-reduced-motion` path that sets it to `opacity: 0`.
+
+**v2's visor layer is a painted emissive registered to the same 680x1344 canvas as the hero it
+sits on.** Swapping the gradient for it is:
+
+- one element, `.visor-glint`, changing from a positioned gradient to a full-canvas layer at
+  `inset: 0` carrying the raster;
+- the SAME keyframes, so the flash rhythm is unchanged;
+- the SAME reduced-motion rule, which must be kept.
+
+**Why this is the right first step:** the art exists, it registers exactly, no runtime is added,
+the animation and its accessibility behaviour already exist, and it upgrades a white blob
+gradient to real painted art. The same argument applies to the eye and chest layers.
+
+**Why R109 did NOT implement it:** it is a player-visible change to the hero's appearance, and
+`mix-blend-mode: screen` over a full-canvas painted raster behaves differently from a small
+gradient in ways that need looking at on the running game. It also pairs a new raster with a CSS
+reference, so both must land together or neither, exactly as the banner did. **That is a short,
+well-defined implementation brief, not a blind edit.**
+
+### 10c. SECOND TARGET: the Spine rig
+
+Sections 3, 4 and 9 already carry the naming convention, the full pivot and socket table, the
+import procedure, the draw order and the first-idle specification. What R109 adds is the
+**runtime insertion point**, which was previously unanswerable:
+
+**Insert at `SceneGroup.svelte`'s `.char-layer`.** It is a positioned wrapper at
+`left:22px; bottom:18px; width:206px; height:407px` carrying `animation: char-idle 5s`. The
+rigged character replaces `<img class="char-img">` inside it. Two things must be preserved:
+
+1. **Keep the static `<img>` as the fallback**, behind a feature flag, so the current display
+   cannot break. This is the whole reason the insertion point is a wrapper rather than the image.
+2. **Decide what happens to `char-idle`.** The wrapper currently supplies the bob and breathe in
+   CSS. A rigged idle would do the same job in the skeleton, so running both would double it.
+   Either the CSS animation is disabled when the rig is active, or the rig ships without its own
+   bob. **This is the same class of question as the contact shadow's shared `drop-shadow`, and it
+   should be decided rather than discovered.**
+
+**What still needs tooling, and it is not small:** a Spine runtime dependency, an atlas loader, a
+render target inside a Svelte component, and a `prefers-reduced-motion` path that stops the idle
+rather than slowing it. That is a dependency decision, and it is the reason 10b comes first.
+
+### 10d. Recommended order
+
+1. **Visor, eye and chest overlays on the static hero.** No new dependency. Art registers exactly.
+2. **Contact shadows**, once the shared `drop-shadow` question is answered.
+3. **The Spine rig**, with the `char-idle` question decided up front and the static image kept as
+   the flagged fallback.
