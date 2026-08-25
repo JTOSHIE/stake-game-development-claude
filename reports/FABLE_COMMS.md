@@ -9,6 +9,61 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 114 - 2026-08-25 - R116: the factory is real art, honestly counted, and 710 of 799 have nowhere to go
+
+**YOUR ONE QUESTION, ANSWERED: it is NOT bulk derivative filler, and it is not mostly usable either.
+It is real art without consumers.**
+
+**THE FACTORY'S OWN CLAIMS HOLD UP, which is rarer than it sounds.** It claims 798 runtime
+candidates; I measured **799**. It claims zero dimension/filename mismatches across 841 named files;
+**there are zero**. It claims every hero strip returns to the byte-identical rest master;
+**all ten do**. I checked each of those rather than taking them.
+
+**90.5% ARE INDIVIDUAL SINGLE-SUBJECT SPRITES, not atlas cutouts.** My own sheet-detection heuristic
+flagged 35 files as grid-like; I rendered them rather than reporting the number, and **none is a
+contact sheet** - they are a legitimate 6-frame strip, scattered atmospheric dust, and single
+bursts. The 47 genuine review sheets are correctly separated by the factory itself.
+
+**THE HERO STRIPS ARE THE REAL PRIZE AND THEY ARE GOOD.** All ten pass the identity gate against
+your LIVE rest frame: IoU 0.9488-0.9938, **f1 == fN pixel-identical on all ten**, and **0 px
+opaque-core ground drift on all ten**. Same figure, same stance, same discipline as the package you
+already shipped. **Four of them BEAT what is live** (63.5% / 62.9% / 62.6% / 61.5% against your
+57.2% win and 56.5% energy-up) and two fill gaps you have no art for at all.
+
+**BUT 710 OF 799 HAVE NO CONSUMER**, and that is not a criticism of the art: 133 symbol-state files
+need a per-symbol state machine you do not have; 85 anticipation files need an anticipation system;
+76 transitions, 82 celebration pieces, 40 ambient, 40 paytable, 30 boot. **Every one needs a system
+built before a single file is worth shipping.** And the runtime set is **348MB against about 2.1MB
+of headroom**. Nothing here ships in bulk at any quality setting.
+
+**TWO THINGS I GOT WRONG AND CAUGHT.**
+1. I suspected phase-11's 100 denser/quieter variants were near-duplicates. Measured against their
+   actual parents: **median 94.9% of pixels differ, zero under 10%, light ratio 0.48x to 2.22x.**
+   They are genuine alternates. My thumbnail impression was wrong.
+2. More seriously: 51% of files carry non-zero RGB under transparent pixels, against your own
+   standard, and 49% of the hero phase is SEVERE. I tested whether it bleeds and got a clean 0.00 at
+   every scale. **Then I seeded the exact defect as a control and my test reported 0.00 there too.**
+   Pillow's resize is alpha-aware and could never detect it. **So the honest answer is that the
+   fringing is real and whether it shows in a browser is UNTESTED**, because testing it means wiring,
+   which your fence forbids. It is cheap to fix at intake and must be done deliberately.
+
+**ALSO: 12 "runtime" files are completely blank.** They are first/last frames of fades, so blank is
+correct - but they cost **6.67MB delivered against 0.07MB if they were actually empty.**
+
+**THE "STOCK" FOLDER IS NOT WHAT THE WORD SUGGESTS.** You asked about weak generic stock FX. Phase-06
+has 60 files under stock/; rendered, they are on-palette cyan/magenta blooms, spark rains and gold
+coins matching your shipped coin.png. It means a library of reusable pieces, and the quality is good.
+
+**TOP OF THE INTAKE QUEUE for next session, not wired:** feature-trigger-reaction and
+power-surge-settle first (both beat your energy-up, and R115 just built the Overdrive perimeter they
+would land beside), then epic-win-reaction, then glance-to-reels. **Max-win-reaction is the strongest
+of all at 63.5% and I ranked it LAST on purpose** - your max overlay is a full-screen modal that
+covers the hero, so it would play behind an opaque panel.
+
+Nothing wired. No factory raster committed. Working tree clean, your thirty placeholders untouched.
+
+---
+
 ## 113 - 2026-08-25 - R115: every tier has its own art, Overdrive has a perimeter, and I found two real audio bugs
 
 **MORNING SUMMARY.** Four things shipped and are visible on screen: **every win tier now has its own

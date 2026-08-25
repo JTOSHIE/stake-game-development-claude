@@ -217,6 +217,64 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0N. R116 - FACTORY AUDIT: 799 runtime candidates, 49 READY, 710 HOMELESS
+
+**AUDIT ONLY. Nothing wired, no factory raster committed, working tree clean, 30 placeholders
+untouched.**
+
+**THE VERDICT: not bulk derivative filler, and not mostly usable. Real art without consumers.**
+
+| Class | Count | Meaning |
+|---|---:|---|
+| READY | **49** | 6 hero strips passing identity AND beating/filling vs incumbent |
+| WEAK | 28 | 4 hero idle variants weaker than the shipped idle (31.6-47.8% vs 60.0%) |
+| WRONG-SPEC | 12 | fully blank frames at full byte cost (6.67MB delivered vs 0.07MB if empty) |
+| HOMELESS | **710** | good on-brand art for systems the game does not have |
+| SHEET-ONLY | 47 | review/QA sheets, correctly excluded by the factory itself |
+| DUPLICATE | **0** | the near-duplicate hypothesis was tested and REFUTED |
+
+**CLAIMS THAT VERIFY:** 798 runtime claimed / **799 measured**; **zero** dimension-filename
+mismatches across 841 named files; **all 10 hero strips f1==fN pixel-identical**; 90.5% are
+single-subject sprites, NOT atlas cutouts (my own grid heuristic's 35 hits were rendered and none
+was a contact sheet).
+
+**HERO IDENTITY GATE, all 10 strips vs the LIVE rest frame:** IoU 0.9488-0.9938, f1==fN 10/10,
+**opaque-core ground drift 0 px 10/10**. (R114's accepted package: 0.9695-0.9932, 0 px.)
+
+**STRONGER THAN LIVE:** 01-max-win 63.5% | 09-power-surge-settle 62.9% | 03-feature-trigger 62.6% |
+02-epic-win 61.5%, against live win 57.2% / energy 56.5%.
+**FILL A GAP:** 04-glance-to-reels 37.4%, 08-short-approval-nod 36.7%.
+**WEAKER THAN THE IDLE (60.0%):** 06-second-idle 39.7%, 05-dead-spin-settle 34.5%, 07-third-idle
+31.6%, 10-overdrive-active-life 47.8%.
+
+**INTAKE QUEUE (next session, ranked by review impact):**
+1. 03-feature-trigger-reaction + 09-power-surge-settle - beat the energy-up, and R115's Overdrive
+   perimeter is already built for them to land beside. Highest impact per byte in the factory.
+2. 02-epic-win-reaction - beats the live win reaction, pairs with R115's epic tier art.
+3. 04-glance-to-reels - fills a real gap; R114/R115 both refused weaker glance strips.
+4. 08-short-approval-nod - cheap small-win acknowledgement below the celebration threshold.
+5. 01-max-win-reaction - strongest at 63.5% but ranked LAST ON PURPOSE: MaxWinCelebration is a
+   full-screen modal that COVERS the hero. Only worth taking if that modal is restaged.
+
+**TWO MANDATORY INTAKE CONDITIONS:**
+- **Zero the RGB where alpha==0.** 53 of phase-07's 108 files carry bright RGB under transparency
+  (mean 162-173, p99 255). This is a deviation from the project's own stated standard.
+- **Budget.** Runtime set is 348MB against ~2.1MB headroom. Needs R114's 70% common-scale treatment
+  or WebP (still the owner's outstanding decision).
+
+**INSTRUMENT FAILURE WORTH REMEMBERING:** I tested whether the fringing bleeds on downscale and got
+0.00 at every scale. Then I seeded the exact defect as a control and **my test reported 0.00 there
+too** - Pillow's resize is alpha-aware and could never detect it. **Whether the fringe shows in a
+BROWSER remains UNTESTED**, because testing it requires wiring, which this brief forbade.
+
+**PHASE-11's 100 VARIANTS ARE GENUINE, NOT FILLER:** measured against their actual parents, median
+94.9% of pixels differ, zero under 10%, integrated-light ratio 0.48x-2.22x.
+
+**PHASE-06's "stock" FOLDER IS A REUSABLE-PIECE LIBRARY, not stock imagery:** 60 on-palette
+cyan/magenta blooms, spark rains and gold coins matching the shipped coin.png. Quality is good.
+
+---
+
 ## 0M. R115 - THE RESIDUAL LIST REBUILT FROM ZERO UNDER CURRENT REALITY
 
 **SHIPPED THIS SESSION:** `ui/win/bloom_mega.png` (new, mega gets its own art), `ui/win/max_bloom.png`
