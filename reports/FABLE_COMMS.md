@@ -9,6 +9,54 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 105 - 2026-08-25 - R107: coverage 90%, six of eight FX rows closed, and the burst-overlay recommendation I made three times was wrong
+
+**REPLACE COVERAGE 27 OF 30, 90.0%**, from 80.0%. **SIX OF EIGHT FX ROWS CLOSED.** Only three
+REPLACE rows remain uncovered in the whole manifest.
+
+**FX-03 IS CLOSED, and the kit hit the contract R106 discovered.** Exactly 1200x120, five 240x120
+frames, and **median hue 110.1 on every single frame** — the green source the `hue-rotate`
+colourways require. R106 refused this row at perfect geometry because it was cyan; the green is
+now measured and exact, so natural, overdrive and nitro will land on green, cyan and magenta as
+the component's own comment describes.
+
+**FX-04 IS CLOSED, and it was delivered correctly rather than derived by me.** The kit shipped an
+explicit frame-3 export that is **byte-identical to its own frame 3** and **pixel-identical to
+frame 3 of the strip**. The manifest demands exactly that: "literally frame 3 of the sheet,
+verified pixel-identical". Confirmed after placement, not assumed.
+
+**FX-06 IS CLOSED. The ring is the first particle to beat its incumbent on punch**: meanA 47.9 to
+51.1 and peak luma 148.6 to 170.6, **stronger and brighter**, at exactly 128x128.
+
+**TWO PARTICLES STILL REFUSED, and the coin is now genuinely close.** It IS gold at last, hue 45
+at saturation 0.86 against the incumbent's 0.75 — the previous batch sent a blue token. **But peak
+luma falls 177.4 to 114.1, a 36% dimming**, in a coin fountain that has to read against a busy win
+banner. The spark is a third attempt named "bright" that measures dimmer and far flatter, peak
+luma 222.9 to 188.0 and saturation 0.94 to 0.31. **Both need brightness, not size or subject.**
+
+**I HAVE BEEN RECOMMENDING A BURST-OVERLAY COMPONENT SINCE R103. IT ALREADY EXISTS.**
+`WinBanner.svelte` renders `c1-shockwave` from `ui/particles/shock_ring.png` on every win tier,
+gated only by reduced motion, alongside a chromatic flash and an epic-tier coin fountain. **This
+session improved the exact asset it draws.** What genuinely does not exist is celebration feedback
+BELOW the 10x big-win threshold — and those thresholds are deliberate, the same ones the
+autoplay-pause uses. Adding a tier under them is a game-feel decision, not minimal wiring, so the
+micro-bursts stay unplaced and the standing recommendation is withdrawn.
+
+**THE CONTACT SHADOWS ARE FULLY MEASURED AND BLOCKED ON SOMETHING ELSE ENTIRELY.** Geometry is
+solved: character scale 0.3028, feet 27.7px above the stage bottom, shadow centroid at 49.9% of
+canvas so it needs 36.4px below the contact point, leaving 8.7px past the stage bottom. Composited
+over the real backdrop it does ground the figure, shadow luminance 19.7 against a floor of 32.2.
+**But `.car-img, .char-img` is a SHARED rule already carrying
+`drop-shadow(0 6px 18px rgba(0,0,0,.5))`, which is itself a contact shadow.** Adding a raster one
+either doubles it or means stripping the filter from a rule that also governs the car. **That is a
+coupled design decision, so it is recorded with every number rather than guessed at.**
+
+Intakes are working-tree-only. The committed banner pair was not touched. Guards still refusing.
+
+Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked paths PASS.
+
+---
+
 ## 104 - 2026-08-25 - R106: two more FX rows closed at 80% coverage, and a perfect-geometry sheet refused because the flame has to be GREEN
 
 **THREE OF EIGHT FX ROWS ARE NOW CLOSED. REPLACE COVERAGE 24 of 30, 80.0%**, up from 73.3%.
