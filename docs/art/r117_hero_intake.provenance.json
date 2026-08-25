@@ -1,0 +1,62 @@
+{
+ "brief": "R117 SELECTIVE FACTORY INTAKE",
+ "source": ".scratch/art-review/chatgpt-multi-hour-review-factory/phase-07-hero-performance/strips",
+ "gate": "R116 audit classification, not filenames. Only READY hero strips that beat their incumbent or fill a gap were considered.",
+ "mandatory_sanitation": "RGB zeroed where alpha==0 BEFORE any resample. These strips genuinely needed it: 6 of 8, 5 of 7 and 4 of 6 frames carried RGB p99 255 under transparency.",
+ "assets": [
+  {
+   "file": "ui/hero/hero_win_reaction_8f.png",
+   "from": ".scratch/art-review/chatgpt-multi-hour-review-factory/phase-07-hero-performance/strips/02-epic-win-reaction",
+   "frames": 8,
+   "scale": 0.7,
+   "role": "replaces the R114 win reaction",
+   "bytes": 1499277,
+   "sha256": "836a2ae738ed803e94cad4d55c4364d7bc50bc4e9a302de93a6110eb00dbc2c6",
+   "size": "3800x940",
+   "frames_sanitised": 6,
+   "residual_rgb_under_alpha0_after": 0,
+   "identity_iou_vs_live_rest": [
+    0.9593,
+    0.993
+   ],
+   "opaque_ground_drift_px": 0,
+   "first_frame_equals_last": true
+  },
+  {
+   "file": "ui/hero/hero_feature_trigger_7f.png",
+   "from": ".scratch/art-review/chatgpt-multi-hour-review-factory/phase-07-hero-performance/strips/03-feature-trigger-reaction",
+   "frames": 7,
+   "scale": 0.7,
+   "role": "replaces hero_energy_up_6f.png",
+   "bytes": 1496738,
+   "sha256": "117b3eeccff61d7112e118493eb52b0f0a0d91e3d0a030662732c65880969c54",
+   "size": "3325x940",
+   "frames_sanitised": 5,
+   "residual_rgb_under_alpha0_after": 0,
+   "identity_iou_vs_live_rest": [
+    0.9542,
+    0.993
+   ],
+   "opaque_ground_drift_px": 0,
+   "first_frame_equals_last": true
+  },
+  {
+   "file": "ui/hero/hero_glance_6f.png",
+   "from": ".scratch/art-review/chatgpt-multi-hour-review-factory/phase-07-hero-performance/strips/04-glance-to-reels",
+   "frames": 6,
+   "scale": 0.7,
+   "role": "NEW behaviour: an idle attract accent",
+   "bytes": 1655215,
+   "sha256": "a9ce33b46d9732ab59e68b172f5094a864f3dcb5ec1ce8a8d793d61d837e505d",
+   "size": "2850x940",
+   "frames_sanitised": 4,
+   "residual_rgb_under_alpha0_after": 0,
+   "identity_iou_vs_live_rest": [
+    0.979,
+    0.993
+   ],
+   "opaque_ground_drift_px": 0,
+   "first_frame_equals_last": true
+  }
+ ]
+}

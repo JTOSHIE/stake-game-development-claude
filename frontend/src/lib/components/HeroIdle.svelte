@@ -25,6 +25,7 @@
   // one frame earlier would leave it 48.3% away. The duplicate costs almost
   // nothing after PNG compression and buys the smoothest hand-back available.
   import { onMount, onDestroy } from 'svelte'
+  import { get } from 'svelte/store'
   import { winMultiplier, isSpinning } from '../stores/gameStore'
   import { overdriveVisual } from '../stores/overdriveVisual'
   // The SAME constant the win banner tiers on. This codebase already carries four
@@ -34,17 +35,19 @@
 
   export let assetBase: string
 
-  type HeroMotion = 'idle' | 'win' | 'energy'
+  type HeroMotion = 'idle' | 'win' | 'energy' | 'glance'
 
   const SHEET: Record<HeroMotion, string> = {
     idle: 'hero_crossed_idle_5f.png',
     win: 'hero_win_reaction_8f.png',
-    energy: 'hero_energy_up_6f.png',
+    energy: 'hero_feature_trigger_7f.png',
+    glance: 'hero_glance_6f.png',
   }
-  const FRAMES: Record<HeroMotion, number> = { idle: 5, win: 8, energy: 6 }
+  const FRAMES: Record<HeroMotion, number> = { idle: 5, win: 8, energy: 7, glance: 6 }
   // ~0.19s a frame for the reactions against the idle's 0.88s: fast enough to read
-  // as a response, slow enough not to look twitchy at game distance.
-  const DURATION_MS: Record<HeroMotion, number> = { idle: 4400, win: 1500, energy: 1100 }
+  // as a response, slow enough not to look twitchy at game distance. The glance is
+  // slower still, because it is an idle accent rather than a response to anything.
+  const DURATION_MS: Record<HeroMotion, number> = { idle: 4400, win: 1500, energy: 1300, glance: 1700 }
 
   const BOX_W = 206
   const BOX_H = 407
@@ -66,6 +69,7 @@
     idle: -(FRAMES.idle * BOX_W),
     win: -((FRAMES.win - 1) * BOX_W),
     energy: -((FRAMES.energy - 1) * BOX_W),
+    glance: -((FRAMES.glance - 1) * BOX_W),
   }
 
   let motion: HeroMotion = 'idle'
@@ -76,7 +80,7 @@
     reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // Warm both reaction sheets so the first one to play does not decode on the
     // frame it is needed. They would be fetched anyway; this only moves the cost.
-    for (const key of ['win', 'energy'] as HeroMotion[]) {
+    for (const key of ['win', 'energy', 'glance'] as HeroMotion[]) {
       const img = new Image()
       img.src = `${assetBase}/ui/hero/${SHEET[key]}`
     }
@@ -114,6 +118,28 @@
     if ($overdriveVisual && !sawOverdrive) react('energy')
     sawOverdrive = $overdriveVisual
   }
+
+  // ── Glance: the only motion here that nothing triggers ───────────────────────
+  // R117. Everything above is a RESPONSE. The gap a reviewer actually sees is the
+  // long middle: a dead spin, then another, with the hero breathing identically
+  // through all of it. The glance is a one-shot look toward the reels on a slow
+  // timer, so the character reads as paying attention rather than as a loop.
+  //
+  // Deliberately NOT random per-tick: a fixed cadence with a long period is calmer
+  // than a coin flip, and it cannot cluster. It is skipped entirely while spinning,
+  // while Overdrive runs and while any reaction is in flight, so it can never step
+  // on something that means something.
+  const GLANCE_EVERY_MS = 24_000
+  let glanceTimer: ReturnType<typeof setInterval> | undefined
+  onMount(() => {
+    glanceTimer = setInterval(() => {
+      if (reduced || motion !== 'idle') return
+      if (get(isSpinning) || get(overdriveVisual)) return
+      if (get(winMultiplier) >= BIG_WIN_THRESHOLD) return
+      react('glance')
+    }, GLANCE_EVERY_MS)
+  })
+  onDestroy(() => clearInterval(glanceTimer))
 </script>
 
 <div
@@ -155,12 +181,17 @@
     from { background-position-x: 0; }
     to   { background-position-x: var(--hero-span); }
   }
+  @keyframes hero-cycle-glance {
+    from { background-position-x: 0; }
+    to   { background-position-x: var(--hero-span); }
+  }
 
   .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(5) infinite; }
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the idle resuming. */
   .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(8, jump-none) 1 forwards; }
-  .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.1s steps(6, jump-none) 1 forwards; }
+  .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.3s steps(7, jump-none) 1 forwards; }
+  .hero-idle[data-motion='glance']  { animation: hero-cycle-glance 1.7s steps(6, jump-none) 1 forwards; }
 
   /* Freeze to frame 01, which IS the shipped hero pose, so the reduced-motion
      presentation is the game's own established still. Reactions never start under
