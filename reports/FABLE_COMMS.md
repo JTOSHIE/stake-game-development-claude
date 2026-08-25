@@ -9,6 +9,63 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 103 - 2026-08-25 - R105: the banner pair is COMMITTED, the first FX row is closed after three batches, and the particle gap is now a design gap not a size gap
+
+**THE BANNER IS IN THE REPOSITORY.** Raster and CSS committed together as one two-file commit,
+which is the only CI-safe way either half could land. Verified before committing, not after:
+the path `assets/themes/future-spinner/ui/` is **not** in `PRUNED_PREFIXES` and **not** under
+the fully-pruned `assets/ui/` that `KEEP_UI` guards; 63,873 bytes against a 25 MB budget; and no
+CI gate measures `.fs-panel`. **W1.2 outcome: option A.**
+
+**The six new finalists did not beat the one already placed.** Scored on visible pixels only:
+placed 2.98% cyan+magenta at saturation 0.061, against 3.50%, 3.89%, 8.38%, 8.66%, 13.78% and
+20.46%. So no re-swap, and the decision is now closed rather than carried.
+
+Confirmed visually in both skins: the accent border reads cyan in base and pink in Overdrive,
+because the art is neutral, sits in the padding box, and its outer 2px ring is fully transparent.
+
+**FX-01 IS CLOSED. The first FX row to close after three art batches.** The holo flicker sheet
+arrived at 1536x256 in six 256x256 frames, which is a **uniform 1.28x downscale to the required
+1200x200 in six 200x200 frames at 0.00% aspect drift**, with every one of the seven frame
+boundaries landing on an integer. Ingested and swapped working-tree-only. **REPLACE coverage
+22 of 30, 73.3%**, up from 70.0%.
+
+**A THRESHOLD ARTEFACT NEARLY MADE ME REJECT IT.** Three of the six frames read 0.0% ink, and I
+was about to call the sheet half-empty. Those "empty" frames are 31 to 39 KB, which no blank PNG
+is. My ink metric counted alpha at or above 128; the frames ramp **max alpha 72, 115, 186, 229,
+255, 78**, which is precisely what a flicker loop should do. **The sheet is correct and my
+instrument was wrong.**
+
+**THE PARTICLE GAP CHANGED CHARACTER, and this is the useful finding.** Twenty-four sprites
+arrived at 32, 64, 96 and 128 px, so **the sizes are finally reachable**. The designs are not:
+the six are spark chip, ember chip, cyan mote, magenta mote, glow chip and metallic flake.
+**There is no coin, no expanding ring and no smoke wisp**, which is what FX-05, FX-06 and FX-07
+actually are. The one plausible match, the spark, measures **saturation 0.20 against the
+incumbent's 0.94** and 16% coverage against 60%: a materially fainter spark on a reel edge, and
+nothing asked for a quieter one. **Refused rather than forced.** So the gap is now a DESIGN
+brief, not a size brief, and that is a much easier thing to commission.
+
+**TWO REFUSALS WORTH THE WORDS.** The 4-frame impact sheet fits FX-02's geometry EXACTLY, 1024x256
+downscaling uniformly to 800x200 at 0.00% drift. **It is a reel-stop impact and FX-02 is the L2
+fuse arc.** Refused on intent, because geometry is not identity. And the jet flame finally has
+five frames, but they are 256x256 square against a 240x120 landscape target: 50% adrift.
+
+**SHADOWS: the blocker is now precise.** The art matches the hero widths exactly, 680 and 2840.
+But `.char-layer` carries a **breathing transform**, `translateY(-6px) scale(1.01)`, so a shadow
+placed inside it lifts off the ground with the character. A contact shadow must stay planted.
+That is a design decision about where the layer sits, not a wiring line, so it is documented
+rather than guessed.
+
+**PAYTABLE SUPPORT IS HOMELESS, AND NOW PROVEN SO.** `PaytableModal.svelte` has **2 `<img>` tags
+and no `background-image url()` anywhere**. There is no panel raster target to aim at. Two kit
+assets are also fully opaque and would black out whatever sits behind them.
+
+Guide honesty intact: all six restored icons still match HEAD. Guards all still refusing.
+
+Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked paths PASS.
+
+---
+
 ## 102 - 2026-08-25 - R104: the banner is chosen and placed, one asset of 24 was usable, and the Spine decision just got much cheaper
 
 **THE BANNER EXISTS AND IS ON SCREEN.** Four 718x88 candidates arrived, exactly to the R103
