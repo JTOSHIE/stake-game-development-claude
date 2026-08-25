@@ -4,6 +4,35 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0B. WHAT R105 CHANGED (the runtime-true kit)
+
+**THE BANNER PAIR IS COMMITTED.** Raster and CSS landed together, which is the only CI-safe
+way either half could land: `asset_reference_gate.mjs` requires every referenced asset to exist
+in dist, `build_diet_verify.mjs` fails any 404. Verified safe first: the path
+`assets/themes/future-spinner/ui/` is not in PRUNED_PREFIXES and not under the fully-pruned
+`assets/ui/` that KEEP_UI guards, 63,873 bytes against a 25 MB budget, and no CI gate measures
+`.fs-panel`. **The six new finalists did not beat the placed one**, so no re-swap: it still wins
+on accent neutrality at 2.98% cyan+magenta against 3.5% to 20.5%.
+
+**FX-01 IS CLOSED IN ART.** The holo flicker sheet arrived at 1536x256, six frames of 256x256,
+which is a **uniform 1.28x downscale to the required 1200x200 in six 200x200 frames, 0.00%
+aspect drift**, with every frame boundary landing on an integer. Ingested and swapped
+working-tree-only. **This is the first FX row closed after three art batches.**
+
+| Ledger item | Was | Now |
+|---|---|---|
+| **R102-E2** banner | placed but uncommittable | **COMMITTED as a pair** |
+| **R104-E1** banner pair unresolved | OPEN | **CLOSED**, option A taken |
+| **FX-01** M3 overlay sheet | WRONG-SPEC across two batches | **INTAKEN**, working-tree |
+| **FX-02** L2 fuse arc | WRONG-SPEC | **STILL OPEN.** The kit's 4-frame sheet fits the geometry EXACTLY but it is a reel-stop impact, not a fuse arc. Refused on intent, not on numbers |
+| **FX-03** jet flame | WRONG-SPEC | **STILL OPEN.** Five frames at last, but 256x256 square against 240x120 landscape: 50% drift |
+| **FX-05..08** particles | gap open after two batches | **STILL OPEN, and now precisely.** 24 sprites arrived at 32/64/96/128. Sizes are finally reachable; the DESIGNS are not: there is no coin, no ring and no smoke wisp among the six. The one plausible match, spark, measures saturation 0.20 against the incumbent's 0.94 |
+| **R104-E5** shadows need a component | OPEN | **OPEN with the exact blocker named**: `.char-layer` carries a breathing transform, so a shadow inside it lifts off the ground |
+| Paytable support art | homeless | **STILL HOMELESS, and now proven**: `PaytableModal.svelte` has 2 `<img>` tags and no `background-image url()` at all. There is no panel raster target to aim at |
+
+**Two kit assets are fully opaque** and would black out whatever sits behind them: the
+feature-rules card background and the side-panel texture strip.
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**
