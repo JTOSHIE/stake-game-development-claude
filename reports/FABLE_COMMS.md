@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 113 - 2026-08-25 - R115: every tier has its own art, Overdrive has a perimeter, and I found two real audio bugs
+
+**MORNING SUMMARY.** Four things shipped and are visible on screen: **every win tier now has its own
+art** (R113 had mega borrowing epic's bloom); **the max headline is more legible than at any point
+since R113 touched it while carrying MORE art**, contrast 8.41 to **11.05**; **Overdrive now has a
+stage perimeter** that energises with the feature and cools when it ends; and **two genuine audio
+bugs are fixed**. I also **recovered 1.09MB** by deleting the R111 rig path, which could never
+render.
+
+**THE MARATHON KIT IS NOT ON DISK.** `chatgpt-overnight-review-closure-marathon` does not exist, and
+no other kit carries anticipation, symbol-life, transition or ambient art. **Workstreams 5 and 6 are
+hard-blocked and I staged nothing rather than half-wiring them.**
+
+**I REFUSED THE KIT'S FOUR BIG TIER FRAMES, and they are the best-looking things in it.** They are
+genuinely text-free and value-safe. Composited over a real celebration at stage size, the epic
+frame's pillars land on **the tier label, the multiplier, the BET window, the SPIN button and the
+hero**. They are perimeter art for a layout with a clear border, and your stage has HUD in its
+border. The feature entry splash goes the same way for the same reason.
+
+**WHAT I SHIPPED INSTEAD IS THE BETTER ANSWER ANYWAY.** Mega finally has its own bloom, a mechanical
+iris against the spiky bursts either side of it, so your three banner tiers read as three THINGS
+rather than one thing growing. And the max bloom is now the purpose-built **headline-safe** one, so
+R113's compromise on position and opacity could be relaxed and the headline STILL gained 2.6 points
+of contrast.
+
+**THE PERIMETER USES ONE RASTER FOR TWO STATES, and that was measurement not shortcut.** The kit
+ships a separate settle accent; measured against the active one its alpha silhouette IoU is
+**0.9932** and it is the same frame at 64% brightness and 21% saturation. A CSS filter reproduces it
+exactly, saves **782KB**, and the two states register perfectly because they are the same pixels.
+
+**I REFUSED BOTH HERO REINFORCEMENT STRIPS.** They ARE stronger in raw motion (62.9% against 57.1%).
+But your brief's bar is a clear improvement across four criteria and they clear one: identity is
+identical, rest-return is identical, and **under the win banner they are slightly WORSE**. One
+better, one worse, two the same is not a clear improvement.
+
+**AND THAT ANSWERS THE BANNER OCCLUSION QUESTION WITH A NUMBER RATHER THAN A FIX.** 60.8% of the win
+reaction's motion already lives in the chest band, which is visible below the band. Only 17.1% falls
+where the banner covers. **The reaction already reads through the chest**, which was option three on
+your own list, without new art. A hero offset was considered and rejected: it would move the feet.
+
+**A PLAYER-VISIBLE CONTRADICTION, FIXED.** `WinDisplay` put MEGA at 50 while `WinBanner` has always
+celebrated MEGA at 30, so **a win between 30x and 50x showed "MEGA WIN" on the banner and "BIG WIN"
+in the HUD readout at the same time**. Git history shows the 50 came from the original scaffold and
+was never a decision. Both now import from one table.
+
+**TWO AUDIO BUGS, BOTH STUCK-STATE, BOTH FOUND BY READING THE CALL GRAPH.**
+1. **A muted player never got music again for the whole session.** `playBGM()` has one caller,
+   returns early when muted WITHOUT setting `bgmStarted`, and nothing ever called it again.
+2. **Muting during the anticipation build left a riser looping and the music bed ducked to 27%
+   permanently.** `stopAnticipation()` has one caller, and that caller returns early while muted. A
+   muted audio element still plays, it is only silent.
+
+**THE HONEST AUDIO PICTURE: your entire Overdrive feature is silent** apart from the music
+crossfade, and nine moments have no cue at all including max win. Sound is now clearly the weakest
+of your three review tags, and **no amount of further art will move it.** The full checklist is in
+the report.
+
+dist **22.85 of 25MB**. Sixteen gates green. Nothing shipped carries baked text, a baked amount or a
+letter-x.
+
+---
+
 ## 112 - 2026-08-25 - R114: he reacts now, and one CSS bug nearly shipped a hero that drew nothing
 
 **HE NO LONGER BREATHES THE SAME THROUGH A DEAD SPIN AND A BIG WIN.** Two one-shot reactions ship:

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { winAmount, winMultiplier, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
+  import { BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD } from '../stores/winCountUp'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { autofitText } from '../actions/autofitText'
@@ -35,10 +36,20 @@
   // Derive tier from targetValue (not the derived $winMultiplier store) so
   // colour/label stays correct for the full duration of the count-up animation,
   // even after winAmount has been reset to 0 for the next spin.
+  // R115. The mega boundary was 50 here while WinBanner has always celebrated
+  // MEGA at 30, so a win between 30x and 50x put "MEGA WIN" on the banner and
+  // "BIG WIN" in this readout AT THE SAME TIME, on the same screen. The 50 dates
+  // from the initial scaffold and was never a decision: the deliberate tier table
+  // arrived later, in winCountUp.ts. Both boundaries now come from that table, so
+  // this stops being an independent declaration that can drift again.
+  //
+  // The 'gold' and 'green' bands below are NOT celebration tiers and are left
+  // exactly as they were: they are this readout's own colour treatment for
+  // ordinary wins, and no other surface contradicts them.
   $: winTier = (() => {
     const mult = $betAmount > 0 ? targetValue / $betAmount : 0
-    if (mult >= 50) return 'mega'
-    if (mult >= 10) return 'big'
+    if (mult >= MEGA_WIN_THRESHOLD) return 'mega'
+    if (mult >= BIG_WIN_THRESHOLD)  return 'big'
     if (mult >= 1)  return 'gold'
     if (mult > 0)   return 'green'
     return 'none'
