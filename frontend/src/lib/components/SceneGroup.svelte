@@ -248,11 +248,25 @@
     60%      { opacity: 0.6; transform: scale(1); }
   }
 
-  /* Visor, occasional glint sweep over the visor. */
+  /* Visor, occasional glint sweep over the visor.
+
+     top was 17% until R110, which measured where the light actually landed.
+     .char-img is object-fit:contain and the box aspect (206/407) matches the
+     source (680/1344) to four decimals, so layer % maps 1:1 onto the sprite at
+     scale 3.302. At 17% the gradient centred on image y309, which is the neck
+     pinch, not the lens: only 5.7% of the gradient's energy fell on the visor
+     and 32.4% missed the sprite entirely and lit nothing. At 11% the centre is
+     y228, the middle of the lens (image y37..319), giving 56.4% on the lens and
+     3.6% wasted. Nothing else changes: same keyframes, same 6s period, same
+     blend mode, same box, so the reduced-motion path and layout are untouched.
+
+     Left is deliberately NOT centred on the lens (centre 42% against a lens
+     centroid of 54.3%): a specular highlight belongs off-centre, near the
+     visor's own painted streak. That is an art choice, not the defect. */
   .visor-glint {
     position: absolute;
     left: 32%;
-    top: 17%;
+    top: 11%;
     width: 20%;
     height: 12%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(200, 240, 255, 0.3) 45%, transparent 75%);

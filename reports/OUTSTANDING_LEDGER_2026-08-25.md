@@ -217,6 +217,44 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0H. R110 - THE PAINTED VISOR DOES NOT FIT, AND R109's REGISTRATION CLAIM WAS WRONG
+
+**Nothing in the kit is a visor for this robot.** Measured against the shipped 680 x 1344
+`ui/scene_character.png`, whose head spans y 40..300 with a maximum width of 297 px and whose lens
+sits at x 185..568, y 37..319:
+
+| Layer | Centroid y | Lands on | Fatal measurement |
+|---|---|---|---|
+| 40-visor-only-glow-layer-680x1344.png | 446 (33.2%) | chest and folded arms | 488 px wide, 1.64x the whole head |
+| 41-eye-light-layer-680x1344.png | 404 (30.1%) | folded arms | 13 points low |
+| 42-chest-energy-layer-680x1344.png | 700 (52.1%) | pelvis | 14 points low |
+| 19-robot-visor-glow-layer.png (640x320) | n/a | floats above a different robot's dome | 44.3% on-body |
+
+All three 680-family layers are displaced downward by a **consistent 13 to 16 percentage points**.
+They are coherent with each other and with a differently framed reference figure. A translate does
+not fix the visor: shifted up 211 px or 240 px it swallows the head and hides the real visor.
+
+**CORRECTION TO SECTION 0F.** R109 recorded that these layers "register to the shipped hero canvas
+exactly". **They do not.** The checks behind that claim were canvas dimensions and
+percentage-of-pixels-on-silhouette, both true, neither answering the question: 93.9 per cent
+on-body is fully compatible with being on the wrong body part. The 0F text stands with this
+correction beside it, per convention (s).
+
+**A REAL DEFECT WAS FOUND IN THE INCUMBENT AND FIXED.** `.visor-glint` at `top:17%` centred on
+image y309, the neck pinch. Only **5.7 per cent** of the gradient's energy reached the lens and
+**32.4 per cent** missed the sprite. Now `top:11%`: **56.4 per cent on lens, 3.6 per cent wasted**.
+One declaration, one value to revert, keyframes and reduced-motion path untouched.
+
+**WHAT IS NOW BLOCKED ON ART, WITH AN EXACT SPEC.** Canvas 680 x 1344 registered to
+`scene_character.png`; lens x 185..568, y 37..319; emissive peak y 201..268; maximum width 297 px;
+cyan to magenta left to right. Until that exists, the visor stays a CSS gradient.
+
+**STILL OPEN, UNCHANGED BY THIS SESSION:** the contact-shadow decision, blocked by the shared
+`.car-img, .char-img` drop-shadow rule; the coordinated idle policy that must precede any rig; the
+first Spine idle rig itself.
+
+---
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**

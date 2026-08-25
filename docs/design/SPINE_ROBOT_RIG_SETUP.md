@@ -367,6 +367,18 @@ made.
 
 ## 10. THE PATH AFTER THE 2026-08-25 RULING (R109)
 
+> **CORRECTED BY R110, 2026-08-25.** This section was written believing that v2's three
+> 680x1344 layers register to the shipped hero. **They do not.** R110 measured them against
+> `ui/scene_character.png` and all three land on the wrong body part: the visor on the chest and
+> folded arms, the eye on the arms, the chest on the pelvis, each displaced downward by a
+> consistent 13 to 16 percentage points of canvas height. The visor layer is **488 px wide
+> against a head that is 297 px at its widest**. The original claim rested on canvas dimensions
+> matching and 88 to 94 per cent of pixels falling on the silhouette; both are true and neither
+> is registration. **Section 10b's overlay route is therefore blocked on new art, not ready to
+> build.** The superseded text is kept below so the reasoning stays legible. Full evidence:
+> `reports/archive/2026-08-25_r110-painted-visor.md`.
+
+
 **The law no longer blocks anything here.** What remains is ordinary sequencing, and there are
 two targets of very different size. **Do the small one first.**
 
@@ -376,7 +388,7 @@ two targets of very different size. **Do the small one first.**
 |---|---|---|---|
 | **11 body parts** | 190x270 to 480x340 | each other, pivots verified | **the Spine rig** |
 | **emissive family v1**, visor-off head, visor glow, eye, chest | 640x640, 640x320, 640x160, 640x480 | **each other** (subjects 583-596 wide) | a rig built on the v1 head |
-| **emissive family v2**, visor, eye, chest | **680x1344 each** | **the SHIPPED hero exactly** | **CSS overlays on the static hero, no rig needed** |
+| **emissive family v2**, visor, eye, chest | **680x1344 each** | ~~the SHIPPED hero exactly~~ **canvas only; content is displaced 13-16% downward (R110)** | **nothing yet: needs redrawing to the spec in 10c** |
 | contact shadows | 680x240, 2840x300 | the hero widths exactly | grounding, blocked separately |
 
 **THE ONE GENUINELY MISSING PIECE.** There is no visor emissive registered to the RIG's head
@@ -392,15 +404,15 @@ other ten parts; a rig using part 01 has no separable visor.
 height:12%` with a keyframed opacity flash, `mix-blend-mode: screen`, and a
 `prefers-reduced-motion` path that sets it to `opacity: 0`.
 
-**v2's visor layer is a painted emissive registered to the same 680x1344 canvas as the hero it
-sits on.** Swapping the gradient for it is:
+**v2's visor layer shares the hero's 680x1344 canvas but is NOT registered to it (R110).** The
+route below stays here because it is the right shape once a correctly registered layer exists. Swapping the gradient for it is:
 
 - one element, `.visor-glint`, changing from a positioned gradient to a full-canvas layer at
   `inset: 0` carrying the raster;
 - the SAME keyframes, so the flash rhythm is unchanged;
 - the SAME reduced-motion rule, which must be kept.
 
-**Why this is the right first step:** the art exists, it registers exactly, no runtime is added,
+**Why this is the right first step (once the art exists):** ~~the art exists, it registers exactly~~, no runtime is added,
 the animation and its accessibility behaviour already exist, and it upgrades a white blob
 gradient to real painted art. The same argument applies to the eye and chest layers.
 
@@ -438,3 +450,38 @@ rather than slowing it. That is a dependency decision, and it is the reason 10b 
 2. **Contact shadows**, once the shared `drop-shadow` question is answered.
 3. **The Spine rig**, with the `char-idle` question decided up front and the static image kept as
    the flagged fallback.
+
+---
+
+## 10c. THE MEASURED SPEC FOR A USABLE VISOR EMISSIVE (R110)
+
+Measured off the shipped sprite rather than described, so a new layer can be drawn to fit on the
+first attempt.
+
+| Property | Value |
+|---|---|
+| Canvas | **680 x 1344**, transparent, registered to `ui/scene_character.png` at the origin |
+| Head extent | y 40..300; the neck pinch is at y 300 where the silhouette narrows to 111 px |
+| Head maximum width | **297 px**, at y 200..240 |
+| Visor lens | bbox **x 185..568, y 37..319**, centroid **(369, 214)** |
+| Where emissive mass should peak | **y 201..268** |
+| Colour | the hero's own cyan to magenta gradient, left to right across the lens |
+| Format | premultiplied straight-alpha PNG, safe under screen or additive blending |
+
+**Anything approaching 488 px wide is wider than the head and will read as a lozenge over the
+face.** That is precisely how the current v2 layer fails.
+
+### The runtime insertion point is unchanged
+
+`.visor-glint` in `frontend/src/lib/components/SceneGroup.svelte`. The element already carries the
+keyframes, the 6s period, `mix-blend-mode: screen`, and the `prefers-reduced-motion` rule that
+sets it to `opacity: 0`. A correctly registered raster becomes a full-canvas layer at `inset: 0`
+on that same element, keeping all four.
+
+### What R110 changed in the meantime
+
+The gradient's `top` moved from `17%` to `11%`. At 17 per cent it centred on image y309, the neck
+pinch, putting **5.7 per cent** of its light on the lens and wasting **32.4 per cent** off the
+sprite entirely. At 11 per cent it centres on y228, mid-lens: **56.4 per cent on lens, 3.6 per
+cent wasted**. The mapping is 1:1 at scale 3.302 because `.char-img` is `object-fit:contain` and
+the box aspect 206/407 matches the source 680/1344 to four decimals.

@@ -9,6 +9,49 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 108 - 2026-08-25 - R110: no painted visor fits this robot, and the glint you already had was lighting his neck
+
+**THE REPLACEMENT IS REFUSED, and not on taste.** All three painted emissive layers in the
+runtime-true kit are drawn for a different figure. The visor layer is **488 px wide against a head
+that is 297 px at its widest**, so it is 1.64 times wider than his entire head. Its content sits at
+**33.2 per cent** of canvas height when the visor is at 17 per cent. It composites onto the chest
+and folded arms. I also tested it shifted up by 211 px and by 240 px: it swallows the head and
+hides the real visor. The 640-wide alternative floats above the dome of a different robot render.
+
+**THE EYE AND CHEST LAYERS FAIL THE SAME WAY.** Eye centroid 30.1 per cent, lands on the arms.
+Chest centroid 52.1 per cent, lands on the pelvis. **All three are displaced downward by a
+consistent 13 to 16 percentage points**, and that consistency is the useful part: they are coherent
+with each other and with some reference figure framed differently from our hero. They are not
+broken files, they are the wrong body. Per the brief I stopped after the visor.
+
+**I MUST CORRECT MYSELF ON R109.** I told you those layers "register to the shipped hero canvas
+exactly". They do not. I had checked that the canvas matched and that 88 to 94 per cent of pixels
+landed on the silhouette, and both are true, and **neither answers the question**. A layer can be
+93.9 per cent on-body and be entirely on the wrong body part. Canvas match is not registration. The
+R109 text stays where it is with this correction beside it.
+
+**SO I MEASURED WHAT YOU ALREADY HAVE, AND FOUND A REAL DEFECT.** The CSS glint at `top:17%`
+centres on image y309, **which is the neck pinch**. Only **5.7 per cent** of its light was landing
+on the visor lens and **32.4 per cent** was missing him entirely. Plotted as a heatmap it lights up
+his neck rings. At `top:11%` it is **56.4 per cent on the lens, 3.6 per cent wasted**.
+
+**One declaration changed, and one value reverts it.** Same keyframes, same 6s period, same blend
+mode, same box. Reduced motion already sets the glint to `opacity:0`, so that path is a no-op by
+construction. It is absolutely positioned, so nothing can reflow. Zero rasters staged, the 30
+working-tree placeholders untouched. Build and all six gates pass.
+
+**Worth one line of your attention:** judging the composites by eye I picked the wrong value, and
+the metric picked the right one. Screening white onto a bright cyan lens looks like nothing while
+washing a dark neck looks dramatic. I rendered the light actually added rather than the result, and
+that settled it.
+
+**WHAT UNBLOCKS THIS.** A visor emissive on a **680 x 1344** canvas registered to
+`scene_character.png`, lens at **x 185..568, y 37..319**, emissive peak in **y 201..268**, maximum
+width **297 px**, cyan to magenta left to right. That spec is measured off the shipped sprite, not
+described. It is the only thing standing between you and the brief's actual goal.
+
+---
+
 ## 107 - 2026-08-25 - R109: the animation-pipeline restriction is withdrawn, Spine is unblocked, and two audit-facing documents needed care rather than an edit
 
 **THE LAW IS CHANGED.** Your ruling is recorded verbatim in every document that carried the old
