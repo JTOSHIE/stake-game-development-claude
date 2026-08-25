@@ -1,0 +1,66 @@
+{
+ "brief": "R113 WIN CELEBRATION PACKAGE INTAKE + WIRING",
+ "ruling": "2026-08-25 owner ruling (R109): external development-stage artwork may be used in the Future Spinner animation pipeline, provided final shipped assets remain quality-controlled, provenance-recorded, and presentation-safe for Stake.",
+ "source_package": ".scratch/art-review/chatgpt-win-celebration-package/",
+ "intake_rule": "ONLY assets whose qa-inventory.json records baked_text == \"none\" were taken. Every asset carrying baked text was refused: the game translates its tier labels into 16 locales via t(locale, ...), so baked English would render English to 15 of them.",
+ "downscale": "65% Lanczos, then PNG optimize. These are soft glows on mostly transparent canvases; mean light per alpha pixel is recorded per file to show the downscale did not dim them.",
+ "assets": [
+  {
+   "file": "ui/win/burst_big.png",
+   "role": "big-tier burst behind the win band",
+   "from": ".scratch/art-review/chatgpt-win-celebration-package/big-win/03-big-win-impact-burst-1024x1024.png",
+   "source_sha256": "a5e93379b31e196da7c8021d6f360e73f37c98dd288ddef3d9b5d823581e9469",
+   "source_size": "1024x1024",
+   "shipped_size": "665x665",
+   "scale": 0.65,
+   "shipped_sha256": "c7d5faa696f34ec63d1fb678553e00fbb2729b696f4c891c12f9a6b3dcd41221",
+   "bytes": 293004,
+   "baked_text": "none",
+   "mean_light_per_alpha_source": 142.5,
+   "mean_light_per_alpha_shipped": 142.22
+  },
+  {
+   "file": "ui/win/burst_epic.png",
+   "role": "epic-tier bloom behind the win band; mega reuses it smaller and dimmer",
+   "from": ".scratch/art-review/chatgpt-win-celebration-package/epic-win/03-epic-win-energy-bloom-1024x1024.png",
+   "source_sha256": "f636c0586d1f8a88504fc0f25fbf8d5823d4f692f7388256a05fe1f270b4d412",
+   "source_size": "1024x1024",
+   "shipped_size": "665x665",
+   "scale": 0.65,
+   "shipped_sha256": "b1c7a63f4f1399c7f07d0f9c41a45dc16187a1f7a08d0282e858387a7727b094",
+   "bytes": 775796,
+   "baked_text": "none",
+   "mean_light_per_alpha_source": 140.87,
+   "mean_light_per_alpha_shipped": 140.51
+  },
+  {
+   "file": "ui/win/max_bloom.png",
+   "role": "centre bloom behind the max-win headline",
+   "from": ".scratch/art-review/chatgpt-win-celebration-package/max-win/03-max-win-intense-centre-bloom-1024x1024.png",
+   "source_sha256": "a1babef63e7183c0b43d0be5c53e03141a3ed71c8ebb543926b4511cb040f04b",
+   "source_size": "1024x1024",
+   "shipped_size": "665x665",
+   "scale": 0.65,
+   "shipped_sha256": "2915bf18f4e525e5f3cbf1ce1b2b6bed2f78e49fa9d92e45adeab0006bd633b4",
+   "bytes": 611417,
+   "baked_text": "none",
+   "mean_light_per_alpha_source": 147.43,
+   "mean_light_per_alpha_shipped": 147.1
+  },
+  {
+   "file": "ui/win/max_surges.png",
+   "role": "corner surges framing the max-win overlay",
+   "from": ".scratch/art-review/chatgpt-win-celebration-package/max-win/04-max-win-corner-side-surges-1920x1080.png",
+   "source_sha256": "c7f41f77adeab951e6bbaaf8e7c921154b2cb0b9a018b40a1908e70048cf6f0e",
+   "source_size": "1920x1080",
+   "shipped_size": "1248x702",
+   "scale": 0.65,
+   "shipped_sha256": "e9cc9f80c0a2d586b0d20f565ec7278624600dabe41942e1d408b52d513f8cd8",
+   "bytes": 639324,
+   "baked_text": "none",
+   "mean_light_per_alpha_source": 97.47,
+   "mean_light_per_alpha_shipped": 97.35
+  }
+ ],
+ "total_bytes": 2319541
+}

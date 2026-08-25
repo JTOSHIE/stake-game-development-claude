@@ -9,6 +9,55 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 111 - 2026-08-25 - R113: the celebration band has real energy now, and your package's seven best assets cannot ship
+
+**BIG, MEGA, EPIC AND MAX NOW CARRY PAINTED ENERGY.** The band was a flat dark bar with a coloured
+rule: correct, tiered, and completely inert. Max Win went from a purple gradient with dots to a
+framed, energised moment.
+
+**BUT THE SEVEN BEST ASSETS IN THE PACKAGE ARE UNUSABLE, and the reason is already written down in
+your own manifest.** Every main frame bakes English tier copy: BIG WIN, EPIC WIN, MAX WIN, 5000x.
+This game renders those labels through `t(locale, ...)` in **sixteen languages** - `hudMaxWin` is
+'MAX WIN' in English and 'أقصى فوز' in Arabic. Your manifest already condemned an asset for exactly
+this: row **UI-07**, `ui/panel_balance.png`, marked **DEAD** because it "BAKES THE ENGLISH WORD
+'BALANCE' into the art, which cannot survive sixteen locales or the social swap to COINS ... **If a
+plate is ever wanted again it must be text-free.**"
+
+**The 5000x emblem is wrong three ways over.** You write the cap as
+`FS_MAX_WIN.toLocaleString(locale) + ×`, so it is locale-formatted with each locale's own
+separator; the raster bakes `5000x` with no separator at all. And it uses a lowercase letter x
+where you have a **gate** enforcing U+00D7 in player-visible prose, closed as charter row Q-26
+after 51 instances of drift. The overlay renders × three lines above where that x would sit.
+
+**NO GATE COULD HAVE CAUGHT THIS.** Every locale, prose, dash and machine-tell gate is a text scan
+over source code. **None of them reads text inside an image.** This refusal was a judgement call,
+so I have set the evidence out in full in the report rather than just asserting it.
+
+**WHAT I SHIPPED: four text-free assets, 2.21MB, downscaled to 65%.** At full size they were 4.65MB
+against 6.67MB of remaining budget, which is not a fair share for art that appears occasionally. I
+recorded mean light per alpha pixel per file to prove the downscale did not dim them: it moves by
+less than 0.4 in every case.
+
+**YOUR TIER LADDER HAS FOUR STEPS AND THE PACKAGE HAS THREE** - there is no `mega` art. So mega and
+epic share one bloom at two strengths, which works because your existing plate glow, type scale and
+signature colour already carry much of the tier signal.
+
+**ONE THING I NEARLY SHIPPED BADLY.** My first pass put the max bloom behind the headline and took
+its contrast from **14.2:1 down to 4.7:1**. Still a WCAG pass, still the wrong trade on the most
+photographed screen in the game, and **I would not have caught it by eye**. Measured, moved the
+bloom below the headline, dimmed it, and let the corner surges carry the drama at the edges where
+there is no text. **Recovered to 8.4:1.**
+
+**NO REGRESSION:** ordinary sub-10x wins and losing spins raise nothing at all. Reduced motion keeps
+the art and drops only the movement, because the art IS the tier identity. Zero console errors.
+dist 20.54 of 25MB. Seventeen gates green including your max-win hold, count-up and money-fit gates.
+
+**WHAT WOULD UNBLOCK THE REST:** the same main frames **with the wordmark region left empty**. The
+decorative surround is excellent and the empty centre is already the right shape; only the painted
+words make them unusable.
+
+---
+
 ## 110 - 2026-08-25 - R112: the crossed-arms pose was never lost, and only one of the six strips is your robot
 
 **THE HERO IS CROSSED-ARMED AGAIN, AND HE BREATHES.** Default on screen, 4.4 second loop, 60fps.
