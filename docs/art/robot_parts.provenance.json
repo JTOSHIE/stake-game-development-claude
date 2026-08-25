@@ -1,0 +1,105 @@
+{
+ "brief": "R111 SPINE FOUNDATION + FIRST ROBOT IDLE",
+ "ruling": "2026-08-25 owner ruling (R109): external development-stage artwork may be used in the Future Spinner animation pipeline, including character rigging and Spine, provided final shipped assets remain quality-controlled, provenance-recorded, and presentation-safe for Stake.",
+ "origin": "externally generated development-stage art, kit chatgpt-robot-spine-parts, requested by the owner",
+ "kit_doc": ".scratch/art-review/chatgpt-robot-spine-parts/PROMPTS_AND_QA.md",
+ "quality_control": {
+  "canvases_match_kit_doc": "11/11 verified",
+  "corner_alpha_zero": "11/11 verified",
+  "transparent_pixels_rgb_zeroed": "11/11 verified",
+  "safety_margin_px": "20 on every side (21 left/right on 06-lower-right-arm-hand)",
+  "assembly_check": "assembled from the kit-documented pivots and rendered; coherent full figure, no joint separation, subject 569x1400 aspect 0.4036 against the shipped hero subject 504x1284 aspect 0.3925 (2.8% delta)"
+ },
+ "presentation_note": "Parts are drawn in neutral straight orientations, NOT the shipped hero's crossed-arm pose. Adopting the rig changes the character's stance. Surfaced for the owner in the R111 report; the static hero remains the fallback.",
+ "copied_verbatim": "byte-identical to the kit source, sha256 verified per file",
+ "parts": [
+  {
+   "file": "01-head-visor.png",
+   "width": 380,
+   "height": 330,
+   "sha256": "f91f4e6714a429a2e792875a5dc5e7c00bb2e5e56444f00e365d1b3754aee7aa",
+   "bytes": 114863,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/01-head-visor.png"
+  },
+  {
+   "file": "02-torso-chest.png",
+   "width": 480,
+   "height": 340,
+   "sha256": "2d40f233cedf807fbeebd9d6744fd1365b35923c92597a64c7c615509d1efde6",
+   "bytes": 200735,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/02-torso-chest.png"
+  },
+  {
+   "file": "03-upper-left-arm.png",
+   "width": 190,
+   "height": 270,
+   "sha256": "4e8498e49cbb0fdce6e65a99752033f13ac67b5b74a3dd9d61e964c9cb98ceca",
+   "bytes": 55114,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/03-upper-left-arm.png"
+  },
+  {
+   "file": "04-lower-left-arm-hand.png",
+   "width": 200,
+   "height": 310,
+   "sha256": "08f8dc28d90abab6338409fec98df8ed6bc999e06af477d311fbdacb838e2f0f",
+   "bytes": 75540,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/04-lower-left-arm-hand.png"
+  },
+  {
+   "file": "05-upper-right-arm.png",
+   "width": 190,
+   "height": 270,
+   "sha256": "05f9cf60309da058e77051b596197e33dafec30710def1cd324cd815bc0ef1c5",
+   "bytes": 53621,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/05-upper-right-arm.png"
+  },
+  {
+   "file": "06-lower-right-arm-hand.png",
+   "width": 200,
+   "height": 310,
+   "sha256": "e0c126825c810088d90067787678f25999bbd8736c586782a766a170bab2d478",
+   "bytes": 77043,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/06-lower-right-arm-hand.png"
+  },
+  {
+   "file": "07-pelvis-waist.png",
+   "width": 420,
+   "height": 260,
+   "sha256": "f9b5c837af1134eaf51a017d06537f84fbd8d9b32997b330d17506fc243182de",
+   "bytes": 124840,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/07-pelvis-waist.png"
+  },
+  {
+   "file": "08-upper-left-leg.png",
+   "width": 220,
+   "height": 340,
+   "sha256": "c8ec6f3682ac6b8fc7c83d6d2fc14cb4feabea43b650fa8dd316bac45a791031",
+   "bytes": 84665,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/08-upper-left-leg.png"
+  },
+  {
+   "file": "09-lower-left-leg-foot.png",
+   "width": 230,
+   "height": 450,
+   "sha256": "0bdcddc3fe1fe9f538630235f012ece39f45bfec523bfadd9217504c7a4a06cb",
+   "bytes": 108578,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/09-lower-left-leg-foot.png"
+  },
+  {
+   "file": "10-upper-right-leg.png",
+   "width": 220,
+   "height": 340,
+   "sha256": "8cc04b33e2d4f08362d09c913a356f4baff92d4ef4d593ea2ba94554dcfa6306",
+   "bytes": 86363,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/10-upper-right-leg.png"
+  },
+  {
+   "file": "11-lower-right-leg-foot.png",
+   "width": 230,
+   "height": 450,
+   "sha256": "5147010d4c7122eae72563f0fc040431a1c229089ea192265e11037b312907f4",
+   "bytes": 110046,
+   "source_path": ".scratch/art-review/chatgpt-robot-spine-parts/11-lower-right-leg-foot.png"
+  }
+ ]
+}
