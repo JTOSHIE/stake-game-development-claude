@@ -57,6 +57,39 @@ Not implemented, because positioning a 680x240 shadow under a character inside a
 **FX-04 is coupled to FX-03** and cannot close while FX-03 is refused: it must be frame 3 of that
 sheet, exported from it.
 
+## 0D. WHAT R107 CHANGED (the final closure kit)
+
+**REPLACE COVERAGE 27 of 30 = 90.0%**, from 80.0%. **SIX OF EIGHT FX ROWS CLOSED.** Only three
+REPLACE rows remain uncovered in the entire manifest.
+
+| Row | Outcome | Evidence |
+|---|---|---|
+| **FX-03** jet flame | **CLOSED** | Exactly 1200x120, five 240x120 frames, and **median hue 110.1 on every frame** — the green source the hue-rotate colourways require. R106 refused this row at perfect geometry for being cyan; the contract is now met |
+| **FX-04** jet still | **CLOSED** | The kit shipped an explicit frame-3 export that is **byte-identical** to its own frame 3 and **pixel-identical** to frame 3 of the strip, which is exactly what the manifest demands |
+| **FX-06** shock ring | **CLOSED** | meanA **47.9 to 51.1** and peak luma **148.6 to 170.6**: stronger AND brighter, at exactly 128x128, hue 185 |
+| **FX-05** coin | **still open, but close** | It IS gold at last, hue 45, saturation 0.86 against the incumbent's 0.75. **Refused on brightness**: peak luma 177.4 to 114.1, a 36% dimming, and meanA 145 to 116. The rule is "clearly as strong or stronger" |
+| **FX-08** spark | **still open** | Third attempt. Named "bright" and measures dimmer: peak luma 222.9 to 188.0, saturation **0.94 to 0.31** |
+
+**THE THREE REMAINING REPLACE ROWS ARE:** SC-03 (blocked on the owner's target decision), FX-05
+(coin, needs brightness), FX-08 (spark, needs brightness and saturation).
+
+**THE BURST-OVERLAY RECOMMENDATION IS WITHDRAWN, and it was wrong for three sessions.** I have
+been recommending a burst-overlay component since R103. **It already exists.**
+`WinBanner.svelte` renders `c1-shockwave` from `ui/particles/shock_ring.png` for every win tier,
+gated only by reduced motion, plus a chromatic flash and an epic-tier coin fountain. **This
+session improved the very asset it draws.** What does NOT exist is celebration feedback BELOW the
+10x big-win threshold, and those thresholds are deliberate: they are the same ones the
+autoplay-pause uses. Adding a fourth tier under them is a game-feel decision, not minimal wiring.
+
+**THE CONTACT SHADOWS HAVE A NEWLY FOUND BLOCKER, and it is not placement.** All the geometry is
+now measured: character scale 0.3028, feet 27.7px above the stage bottom, shadow centroid at 49.9%
+of its canvas so it needs 36.4px below the contact point, leaving 8.7px past the stage bottom.
+Composited over the real backdrop it does ground the figure, shadow luminance 19.7 against a floor
+of 32.2. **But `.car-img, .char-img` is a SHARED CSS rule carrying
+`drop-shadow(0 6px 18px rgba(0,0,0,.5))`, which is already a contact shadow.** Adding a raster
+shadow either doubles it, or requires removing the filter from a rule that also governs the car.
+That is a coupled design decision and it is not a builder's to make.
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**
