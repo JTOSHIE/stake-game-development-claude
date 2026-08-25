@@ -90,6 +90,40 @@ of 32.2. **But `.car-img, .char-img` is a SHARED CSS rule carrying
 shadow either doubles it, or requires removing the filter from a rule that also governs the car.
 That is a coupled design decision and it is not a builder's to make.
 
+## 0E. WHAT R108 CHANGED — THE ART ARC IS EFFECTIVELY COMPLETE
+
+**REPLACE COVERAGE 29 of 30 = 96.7%. ALL EIGHT FX ROWS ARE CLOSED.**
+**Exactly ONE REPLACE row remains uncovered in the entire manifest: SC-03**, which has been
+blocked on an owner decision since the arc opened, not on art.
+
+| Row | Outcome | Evidence |
+|---|---|---|
+| **FX-05** coin | **CLOSED** | Delivered at the **exact 40x40 runtime target**, gold at hue 45, saturation **0.75 to 0.82**, and **107.2%** of the incumbent's integrated light. Brighter, warmer and more saturated on every measure |
+| **FX-08** spark | **CLOSED** | Exact 32x32, and **252.1% of the incumbent's integrated light** |
+
+### The instrument that decided it, recorded because it reversed a refusal
+
+R107 refused this spark's predecessor partly on **peak luminance**, the mean over opaque pixels.
+On this candidate that measure again read DIMMER: 195.4 against the incumbent's 222.9, with
+saturation 0.24 against 0.94. **Both readings were true and both were the wrong instrument.**
+
+The incumbent spark is a **thin cross**: few opaque pixels, each very bright. The candidate is a
+**fuller six-point burst**: more pixels at a slightly lower average. Per-pixel brightness favours
+the cross; what the eye actually receives at 32px is the INTEGRATED LIGHT, the sum of alpha times
+luminance over the whole sprite. On that measure the burst delivers **two and a half times more**.
+The low saturation is likewise explained rather than damning: the core is white-hot, which is what
+a bright spark looks like, and the spikes are still cyan.
+
+**The lesson worth keeping: for a small sprite judged on "does it catch the eye", integrate
+alpha x luminance over the canvas. Peak-over-opaque rewards thin bright shapes and punishes full
+ones.**
+
+### What is left
+
+**Art: nothing, for the REPLACE set**, apart from SC-03 which needs a decision rather than a
+picture. The remaining programme is owner decisions and component work, both already enumerated
+in sections 0B, 0C and 0D.
+
 ## 0A. WHAT THE COMPLETION KIT CHANGED
 
 **Of 24 top-level deliverables in the kit, ONE could be used.**

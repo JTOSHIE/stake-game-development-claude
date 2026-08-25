@@ -9,6 +9,53 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 106 - 2026-08-25 - R108: both particles closed, ALL EIGHT FX ROWS DONE, and the art arc is complete but for one owner decision
+
+**REPLACE COVERAGE 29 OF 30 = 96.7%. ALL EIGHT FX ROWS ARE CLOSED.** Exactly **one** REPLACE row
+remains uncovered in the whole manifest, and it is **SC-03**, which has been waiting on an owner
+decision rather than on art since the arc opened.
+
+**FX-05, THE COIN, IS CLOSED.** The kit shipped it at the **exact 40x40 runtime target** rather
+than only the larger sizes, so no downscale was needed. Gold at hue 45, saturation **0.75 to
+0.82**, and **107.2% of the incumbent's integrated light**. Brighter, warmer and more saturated.
+Three batches ago this row received a blue token; two ago a gold coin that was 36% dimmer; this
+one is right.
+
+**FX-08, THE SPARK, IS CLOSED — AND I HAD TO CHANGE INSTRUMENT TO SEE IT.**
+
+R107 refused this spark's predecessor partly on **peak luminance**, the mean over opaque pixels.
+On this candidate that same measure again read DIMMER, 195.4 against 222.9, with saturation 0.24
+against 0.94. **Both numbers were true and both were the wrong instrument.**
+
+The incumbent is a **thin cross**: few opaque pixels, each very bright. The candidate is a **full
+six-point burst**: more pixels at a slightly lower average. Per-pixel brightness rewards the thin
+shape. What the eye actually receives at 32px is the **integrated light**, alpha times luminance
+summed over the sprite — and on that the burst delivers **252.1%**, two and a half times more.
+The low saturation is explained rather than damning: the core is white-hot, which is what a bright
+spark looks like, and the spikes are still cyan.
+
+**I nearly refused a good asset for the third time on a measure that was quietly wrong for this
+shape.** The picture is what prompted the recheck: magnified, the candidate is plainly an
+energetic burst, not the dim shard the earlier batches sent.
+
+**THE LESSON, recorded in the ledger:** for a small sprite judged on "does it catch the eye",
+integrate alpha times luminance across the canvas. Peak-over-opaque rewards thin bright shapes and
+punishes full ones.
+
+**WHAT IS LEFT OF THE ART PROGRAMME: for the REPLACE set, nothing.** SC-03 needs a decision, not a
+picture: its own note says "either author at the true 640x468 aspect or the engine call site
+changes", and the composer refuses that row cleanly rather than crashing since R103.
+
+Everything still open is a decision or a component: SC-03's target; the shared `drop-shadow` rule
+that blocks the contact shadows; sub-10x win feedback; the Spine law amendment; the baked MAX in
+the guide icon; the background room; OpenAI pricing.
+
+Intakes working-tree-only through the ingest path, exact sizes, ledgered. Banner pair untouched.
+Guards refusing. Gates: generate 22/22, asset guard 11/11, ingest 17/17, doc currency PASS, locked
+paths PASS.
+
+---
+
 ## 105 - 2026-08-25 - R107: coverage 90%, six of eight FX rows closed, and the burst-overlay recommendation I made three times was wrong
 
 **REPLACE COVERAGE 27 OF 30, 90.0%**, from 80.0%. **SIX OF EIGHT FX ROWS CLOSED.** Only three
