@@ -38,12 +38,12 @@
   type HeroMotion = 'idle' | 'win' | 'energy' | 'glance'
 
   const SHEET: Record<HeroMotion, string> = {
-    idle: 'hero_crossed_idle_5f.png',
+    idle: 'hero_crossed_idle_6f.png',
     win: 'hero_win_reaction_8f.png',
     energy: 'hero_feature_trigger_7f.png',
     glance: 'hero_glance_6f.png',
   }
-  const FRAMES: Record<HeroMotion, number> = { idle: 5, win: 8, energy: 7, glance: 6 }
+  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 8, energy: 7, glance: 6 }
   // ~0.19s a frame for the reactions against the idle's 0.88s: fast enough to read
   // as a response, slow enough not to look twitchy at game distance. The glance is
   // slower still, because it is an idle accent rather than a response to anything.
@@ -176,13 +176,18 @@
 
 <style>
   /* ===== THE BODY LAYER (R121) ===============================================
-     WHY THIS EXISTS. Measured at render size (206x407) over every live state and
-     every one of the factory's ten hero strips, the SILHOUETTE change between
-     consecutive frames is 0.11% to 0.51% of the figure's pixels. The strips
-     change LIGHTING, not pose - the factory's own QA note says so outright:
-     "Crossed arms, crossed-leg stance, hand identity ... remain locked". The
-     live idle at 0.51% is already the most body-motion anything available has.
-     So no strip swap can make this hero move; only a transform can.
+     WHY THIS EXISTS, AND WHY IT IS NOW MUCH SMALLER THAN R121 SHIPPED IT.
+     R121 measured every live state and all ten factory strips at render size and
+     found silhouette change of 0.11% to 0.51% between frames: they animated
+     LIGHTING on a locked pose. A transform was then the only way to move him.
+
+     R122 replaced those strips with real pose-changing performances - the arms
+     actually unfold and recross - measured at 3.4% to 5.4% mean per frame pair,
+     8x to 12x the incumbents by total silhouette path length. The frames now
+     carry the motion, so the transform's job has changed from SUPPLYING motion
+     to seasoning it, and the idle sway in particular is dialled right back: two
+     lateral motions on one figure is the same double-bob mistake R115 removed,
+     just on a different axis.
 
      WHAT IT DOES. The outer element rotates the whole figure about its FEET,
      which is what a person standing with their arms crossed actually does. The
@@ -207,10 +212,23 @@
     transform-origin: 50% 97%;   /* the feet, not the centre */
     will-change: transform;
   }
+  /* R122: amplitude cut from 1.05deg to 0.32deg. MEASURED: with the new
+     weight-shift strip the frames alone give 1.614% silhouette change and
+     13.29px of head travel - already more than R121's strip-plus-full-sway
+     managed (1.007% / 12.61px). Layering the old sway on top pushed excursion
+     to 7.0% and head travel to 18.7px while per-sample silhouette change FELL
+     to 1.545%, which is the signature of two motions cancelling at some phases
+     and stacking at others. Two lateral motions on one figure is the double-bob
+     mistake R115 removed, on a different axis.
+
+     It is not removed, because it still earns its keep: the strip is a 6-frame
+     loop on a 4.4s cycle and repeats exactly, and a slow rotation at 7.2s beats
+     against it so the loop never lands the same way twice. That is all it does
+     now - de-looping, not motion. */
   @keyframes hero-sway-idle {
-    0%   { transform: rotate(-1.05deg); }
-    50%  { transform: rotate( 1.05deg); }
-    100% { transform: rotate(-1.05deg); }
+    0%   { transform: rotate(-0.32deg); }
+    50%  { transform: rotate( 0.32deg); }
+    100% { transform: rotate(-0.32deg); }
   }
   /* THE WIN PUNCH IS TRANSLATION-LED, AND THAT IS A MEASURED CORRECTION.
      The first version was rotation-led about the feet, like the sway. Measured
@@ -304,7 +322,7 @@
     to   { background-position-x: var(--hero-span); }
   }
 
-  .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(5) infinite; }
+  .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(6) infinite; }
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the idle resuming. */
   .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(8, jump-none) 1 forwards; }

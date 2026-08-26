@@ -1,0 +1,53 @@
+{
+  "session": "R122",
+  "date": "2026-08-26",
+  "package": ".scratch/art-review/chatgpt-pose-changing-hero-strips",
+  "accepted": [
+    {
+      "source": "idle-weight-shift",
+      "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png",
+      "frames": 6,
+      "packed_scale": 0.58,
+      "frame_px": "394x780",
+      "bytes": 1402693,
+      "replaces": "hero_crossed_idle_5f.png (2087774 bytes)",
+      "net_bytes": -685081,
+      "measured": {
+        "silhouette_change_mean_consecutive_frame_area_pct": 3.38,
+        "silhouette_change_max_consecutive_frame_area_pct": 8.13,
+        "total_path_length_pct": 16.89,
+        "identity_iou_vs_live_rest": 0.9930,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "residual_rgb_under_alpha_zero": 0,
+        "canvas_edge_contact": "none on any frame"
+      }
+    }
+  ],
+  "refused": [
+    {
+      "source": "win-reaction-unfold",
+      "reason": "SEVERED LIMB AT THE CANVAS EDGE. Frames 3 and 4 carry 192px and 176px of fully opaque material flat against the left edge column (y336-534), and frames 5 and 6 carry 33px and 24px against the right. The unfolded arm is cut by the canvas boundary; the missing pixels do not exist in the source, so no packing or inset can restore them.",
+      "measured": {
+        "silhouette_change_mean_consecutive_frame_area_pct": 4.07,
+        "identity_iou_vs_live_rest": 0.9930,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "edge_opaque_px": {"frame3_left": 192, "frame4_left": 176, "frame5_right": 33, "frame6_right": 24}
+      }
+    },
+    {
+      "source": "feature-brace",
+      "reason": "SEVERED LIMB AT THE CANVAS EDGE. Frame 4 carries 51px of opaque material against the left edge and 56px against the right (y531-631) - both fists cut by the canvas boundary.",
+      "measured": {
+        "silhouette_change_mean_consecutive_frame_area_pct": 5.39,
+        "identity_iou_vs_live_rest": 0.9930,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "edge_opaque_px": {"frame4_left": 51, "frame4_right": 56}
+      }
+    }
+  ],
+  "metric_note": "The package reports MAX XOR against the rest frame normalised by BODY pixels; R121's floors were MEAN change between CONSECUTIVE frames normalised by FRAME area. Both are legitimate and they are not interchangeable. The package's three published figures were reproduced to within 0.7% using its convention, so the numbers are not in dispute - only their basis.",
+  "scale_note": "Packed at 0.58 rather than R117's 0.70. Measured: at the most demanding render target (a 1.5x stage on a 2x display, 618x1221) the difference between 0.70 and 0.50 source scale is 0.009 vs 0.018 mean absolute error out of 255 - two orders of magnitude below visibility. Source scale above 0.50 buys nothing here."
+}
