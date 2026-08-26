@@ -671,7 +671,33 @@
     white-space: nowrap;
     transition: filter 0.15s ease;
   }
-  .fm-entry-pill:hover:not(:disabled) { border-color: var(--hud-border-strong); }
+  /* R125, THE ONE HUD CONTROL WITH NO PRESS. Every other utility control in the
+     shell answers a press - .fs-max, .fs-menu and .fs-arrow all
+     `translateY(1px)`, .fs-spin scales - and the FEATURES entry, the only one of
+     them that opens a dialog, answered nothing. Three of its four layouts had no
+     HOVER either: the rule below used to be desktop-only, so portrait, compact
+     and mini were inert to the pointer entirely.
+     Written once across all four triggers so they cannot drift apart again, the
+     same way R120 brought them onto one token block.
+     NO OPEN STATE, AND THAT IS A MEASUREMENT, NOT AN OMISSION. `aria-expanded` is
+     already on all four buttons, so an open style costs no markup and no state,
+     and one was written and then removed: WHILE THE MENU IS OPEN THE TRIGGER IS
+     NOT ON SCREEN. Desktop and compact put an 82%-opaque black scrim (`.fm`)
+     over it; portrait draws the panel's own `.fs-face`/`.fm-name-row`/`.fm-cards`
+     across it. Sampled at five points across the control in each layout, nothing
+     at any point is the trigger. A rule there would be dead wiring - CSS that
+     can never reach a player, reading in review as a shipped affordance. The
+     open affordance is the PANEL's job while the panel is what covers it. */
+  .fm-entry-pill:hover:not(:disabled),
+  .p-fm-entry:hover:not(:disabled),
+  .c-fm-entry:hover:not(:disabled),
+  .m-fm-entry:hover:not(:disabled) { border-color: var(--hud-border-strong); }
+
+  .fm-entry-pill:active:not(:disabled),
+  .p-fm-entry:active:not(:disabled),
+  .c-fm-entry:active:not(:disabled),
+  .m-fm-entry:active:not(:disabled) { transform: translateY(1px); }
+
   .fm-entry-pill:disabled { opacity: 0.5; cursor: not-allowed; }
   .fm-entry-pill svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
   /* ROUND 4 item 5: the grille carries more geometry than the old three-bar

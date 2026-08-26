@@ -56,7 +56,11 @@ const ENTRIES = [
   { live: '[data-testid="spin-button"]', guideName: 'Spin', file: 'spin_button.png' },
   { live: 'button[aria-label="Increase bet"]', guideName: 'Increase Bet', file: 'btn_bet_plus.png' },
   { live: 'button[aria-label="Decrease bet"]', guideName: 'Decrease Bet', file: 'btn_bet_minus.png' },
-  { live: '[data-testid="feature-menu-button"]', guideName: 'Features', file: 'feature_button.png' },
+  // R125: repointed at the live-capture file. This row used to name the painted
+  // manifest badge, so the proof grid faithfully rendered the mismatch side by
+  // side and asserted nothing about it - see the note at the byte-uniqueness
+  // gate below, which is the only assertion this script actually makes.
+  { live: '[data-testid="feature-menu-button"]', guideName: 'Features', file: 'btn_features.png' },
   { live: '.fs-auto', guideName: 'Autoplay', file: 'btn_autoplay.png' },
   { live: '.fs-menu', guideName: 'Menu', file: 'btn_menu.png' },
   // OWNER AUDIT ROUND 3, item 5: joined the guide as real captures.

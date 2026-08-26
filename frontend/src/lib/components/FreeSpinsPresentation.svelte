@@ -18,7 +18,7 @@
   // base game already plays for the SAME events, so this is the reel landing
   // sounding like a reel landing, not a borrowed noise standing in for a missing
   // one. No new stem is invented here.
-  import { playReelStop } from '../services/soundService'
+  import { playReelStop, playFeatureEnter, playFeatureEnd, playRetrigger } from '../services/soundService'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
   // TR-036 option (b), R2R-R JOB E. The SAME gauge as the base game, capped at
   // level 3 for a retrigger. See scatterEscalation.ts for why capped rather
@@ -238,6 +238,12 @@
    *  click. 180+150+380+300 = 1010ms baseline (non-turbo) to reach the
    *  gate. */
   function runEntrySequence(): void {
+    // R125 HOOK, feature_enter. Placed HERE rather than in start() on purpose:
+    // startFrom() (the TR-099 resume) deliberately skips this sequence, and a
+    // feature resumed at a spin boundary must not replay its entry stinger. The
+    // hook inherits that correctness instead of restating it.
+    // SILENT until feature_enter.mp3 exists - see soundService's PENDING_CUES.
+    playFeatureEnter()
     entryStage = 'flare'
     timer = setTimeout(() => {
       entryStage = 'dip'
@@ -377,6 +383,10 @@
       // ladder over it; then R062's moment holds the settled payoff centre
       // stage for its fixed duration before the sequencer resumes.
       runRetriggerLadder(spin).then(() => {
+        // R125 HOOK, retrigger. On the SETTLED moment, after the capped ladder
+        // has run, so it marks the award rather than racing the per-reel stops
+        // the ladder already sounds. SILENT until retrigger.mp3 exists.
+        playRetrigger()
         retriggerMoment = true
         retriggerChaseTrigger += 1
         timer = setTimeout(() => {
@@ -390,6 +400,12 @@
   }
 
   function toEnd() {
+    // R125 HOOK, feature_end. GUARDED ON script.triggered: toEnd() is also the
+    // exit of start()'s wincap WALKTHROUGH, a base-game round that reached the
+    // cap and never entered the feature at all. An unguarded cue there would
+    // announce the end of a feature that never happened.
+    // SILENT until feature_end.mp3 exists.
+    if (script?.triggered) playFeatureEnd()
     phase = 'end'
     // TR-099. The feature is over, so the cursor is cleared here rather than
     // only on settle: a checkpoint that outlives its round is a stale cursor

@@ -468,6 +468,139 @@ export function playWin(multiplier: number): void {
   }
 }
 
+// ── PENDING CUES: WIRED, SILENT, NOT FAKED (R125) ────────────────────────────
+//
+// Four moments in this game have no stem: feature entry, feature end, retrigger,
+// and a dedicated max-win. R125 wires their CALL SITES so the moment the files
+// land the cue is one line away, WITHOUT inventing audio to fill the gap. Nothing
+// below ships a sound; nothing below pretends a cue is finished.
+//
+// WHY AN AVAILABILITY LIST RATHER THAN A TRY-AND-FALL-BACK. The obvious shape is
+// to build these like every other sound and let makeAudio()'s error handler cope.
+// That would be wrong twice over. It would fire four 404s under /sounds/ on every
+// session, and `audio_verify.mjs` asserts `zeroSoundRequestFailures` over exactly
+// that path (audio_verify.mjs:168) - a green gate would go red for cues that are
+// only honestly absent. It would also route each miss into makeAudio()'s fallback,
+// which re-points the element at a SECOND file that does not exist either, so the
+// player would get a console warning per cue instead of silence.
+//
+// So availability is DECLARED, not discovered. Nothing is requested until its name
+// is in AVAILABLE_PENDING_CUES, which means: no network request, no console noise,
+// no gate breakage, and no cue that half-exists.
+//
+// TO TURN ONE ON, once its mastered file is in the theme sounds directory:
+//   1. add the key to AVAILABLE_PENDING_CUES below
+//   2. add its path to themeStore.ts's `sounds` map under the same key
+// Nothing else changes: the hooks are already at the right call sites.
+const PENDING_CUES = {
+  featureEnter: 'feature_enter.mp3',
+  featureEnd:   'feature_end.mp3',
+  retrigger:    'retrigger.mp3',
+  winMax:       'win_max.mp3',
+} as const
+type PendingCue = keyof typeof PENDING_CUES
+
+// EMPTY ON PURPOSE, AND IT IS THE POINT OF THIS BLOCK. No stem exists for any of
+// the four as of R125. An entry here is a claim that a real mastered file ships at
+// that name - do not add one to "wire it up" ahead of the audio.
+const AVAILABLE_PENDING_CUES = new Set<PendingCue>([])
+
+// Design volumes for the four, on the same scale as BASE above. They are declared
+// now so the loudness decision is made once, in the same table as every other cue,
+// rather than improvised at drop-in time. winMax sits above winEpic (0.95) because
+// it is the single loudest moment the game has; the feature bookends sit near the
+// medium tier so they announce without competing with the win ladder.
+const PENDING_BASE: Record<PendingCue, number> = {
+  featureEnter: 0.85,
+  featureEnd:   0.70,
+  retrigger:    0.80,
+  winMax:       1.00,
+}
+
+const pendingEls = new Map<PendingCue, HTMLAudioElement>()
+
+/**
+ * Dev-only instrumentation for the four pending cues (R125).
+ *
+ * A hook that is CORRECT today is a hook that fires and makes no sound, and those
+ * two facts are indistinguishable from a hook that was never called at all - which
+ * is how dead wiring survives review. `__playedSounds` in audio_verify.mjs patches
+ * HTMLMediaElement.play(), so by construction it cannot see a cue that deliberately
+ * never reaches play(). Counting at the boundary instead, which is the same answer
+ * this file already reached for the bed crossfade above (Fable ruling 23: keep the
+ * instrumentation as the assert).
+ *
+ * `fired` counts hook calls; `played` counts the ones that reached real audio. While
+ * AVAILABLE_PENDING_CUES is empty the correct reading is fired > 0, played === 0.
+ * When a stem lands, the same counter proves it started playing.
+ */
+export interface PendingCueTrace {
+  fired: Record<PendingCue, number>
+  played: Record<PendingCue, number>
+  mutedSkips: number
+}
+const pendingTrace: PendingCueTrace = {
+  fired:  { featureEnter: 0, featureEnd: 0, retrigger: 0, winMax: 0 },
+  played: { featureEnter: 0, featureEnd: 0, retrigger: 0, winMax: 0 },
+  mutedSkips: 0,
+}
+if (import.meta.env.DEV) {
+  ;(window as unknown as { __pendingCueTrace: PendingCueTrace }).__pendingCueTrace = pendingTrace
+}
+
+/** Returns the element for a pending cue, or null while the cue has no file.
+ *  Constructed lazily and cached, so an unavailable cue never touches the network. */
+function pendingEl(cue: PendingCue): HTMLAudioElement | null {
+  if (!AVAILABLE_PENDING_CUES.has(cue)) return null
+  const cached = pendingEls.get(cue)
+  if (cached) return cached
+  const paths = get(themeAssets).sounds as Record<string, string | undefined>
+  const url = paths[cue] ?? `${FS_BASE}/${PENDING_CUES[cue]}`
+  // No makeAudio(): its fallback would re-point a missing file at a second missing
+  // file. A declared-available cue that still fails is a real fault, so it is left
+  // to surface as one rather than being papered over.
+  const el = new Audio(url)
+  pendingEls.set(cue, el)
+  return el
+}
+
+/** Play a pending cue if its stem exists. Returns whether anything was played, so
+ *  callers that must not go silent (max win) can fall back to what ships today. */
+function playPending(cue: PendingCue): boolean {
+  pendingTrace.fired[cue]++
+  if (muted) { pendingTrace.mutedSkips++; return false }
+  const el = pendingEl(cue)
+  if (!el) return false
+  el.currentTime = 0
+  el.volume = Math.min(1, PENDING_BASE[cue] * sfxVol)
+  el.play().catch(() => {})
+  pendingTrace.played[cue]++
+  return true
+}
+
+/** Feature entry. Silent until feature_enter.mp3 exists. */
+export function playFeatureEnter(): void { playPending('featureEnter') }
+
+/** Feature end. Silent until feature_end.mp3 exists. */
+export function playFeatureEnd(): void { playPending('featureEnd') }
+
+/** Retrigger landed. Silent until retrigger.mp3 exists. */
+export function playRetrigger(): void { playPending('retrigger') }
+
+/**
+ * Max win / wincap.
+ *
+ * This one is NOT silent today and must not become silent: the max win currently
+ * reuses the epic win stinger and its 800ms echo, which soundService has done
+ * deliberately since R5 (see playWin's doc). So this plays the dedicated stem when
+ * one exists and otherwise does exactly what the game does today - an upgrade path,
+ * not a hole. `multiplier` is only used by that fallback.
+ */
+export function playMaxWin(multiplier: number): void {
+  if (playPending('winMax')) return
+  playWin(multiplier)
+}
+
 // ── UI ───────────────────────────────────────────────────────────────────────
 
 export function playUIClick(): void {

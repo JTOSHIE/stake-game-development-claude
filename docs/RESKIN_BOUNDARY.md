@@ -164,7 +164,9 @@ incumbent's byte budget), and `scripts/assets/background_candidate_ingest_selfte
 **(a)** `frontend/public/assets/themes/future-spinner/ui/`.
 
 **(b)** All PNG RGBA. `spin_button.png` 200x200; `btn_autoplay/menu/max/bet_plus/bet_minus.png`
-200x200; `btn_turbo{,_2,_3}.png` 200x200; `feature_button.png` 224x224;
+200x200; `btn_turbo{,_2,_3}.png` 200x200; `btn_features.png` 450x200 (R125, the one non-square
+guide icon: the FEATURES control is a 2.95:1 pill, so its capture normalises on HEIGHT
+and its width follows the control); `feature_button.png` 224x224;
 `gauge_{face,base,needle}.png` 464x464; `panel_balance.png` 340x90; `panel_win.png` 360x100;
 `logo.png` 600x120; `subtitle.png` 300x30; `jet_nozzle.png` 160x160; `jet_flame_sheet.png`
 1200x120 (five 240x120 frames); `scene_car.png` 2840x1000; `scene_character.png` 680x1344;
@@ -178,8 +180,8 @@ incumbent's byte budget), and `scripts/assets/background_candidate_ingest_selfte
    specified at `manifest.json:77-110`. No SVG master, deterministic geometry, no seed.
 3. `jet_*`: `scripts/assets/flame_jets.py` from `design-system/masters/M3_master_v3.svg`.
 4. `spin_button`, `btn_bet_plus`, `btn_bet_minus`, `btn_autoplay`, `btn_menu`,
-   `btn_turbo{,_2,_3}`, `btn_max`: **NOT in the manifest.** They are Playwright
-   screenshot-crops of the live rendered HudOverlay chrome, produced by
+   `btn_turbo{,_2,_3}`, `btn_max`, `btn_features` (R125): **NOT in the manifest.** They are
+   Playwright screenshot-crops of the live rendered HudOverlay/FeatureMenu chrome, produced by
    `frontend/scripts/regen_interface_guide_icons.mjs`. Its header explains why: the chrome
    uses `conic-gradient`, which has no SVG equivalent, and cairosvg does not evaluate CSS
    filters, so an SVG master would be a re-interpretation rather than a capture.

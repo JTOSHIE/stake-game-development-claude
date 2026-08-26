@@ -119,7 +119,18 @@
     { kind: 'img',  files: ['spin_button.png'],    nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
     { kind: 'img',  files: ['btn_bet_plus.png'],   nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
     { kind: 'img',  files: ['btn_bet_minus.png'],  nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
-    { kind: 'img',  files: ['feature_button.png'], nameKey: 'guideFeaturesName',  descKey: 'guideFeaturesDesc' },
+    // R125: WAS `feature_button.png`, a 224x224 painted machine badge produced by
+    // the manifest/build.py path. Every other row in this guide is a headless crop
+    // of the live control (regen_interface_guide_icons.mjs), so this was the only
+    // row that could drift away from the button it documents - and it had: the
+    // live FEATURES control is a dark-glass pill carrying the inline car-grille
+    // glyph, and the guide was showing a player an ornate plate that does not
+    // exist anywhere in the game. Now captured from `.fm-entry-pill` like the rest.
+    // `wide` because the pill is 2.95:1, not square - see .fs-guide-icon--wide.
+    // feature_button.png is NOT orphaned by this: it still renders as the buy
+    // dialog's header art (BuyBonus.svelte:117), which is its other role.
+    { kind: 'img',  files: ['btn_features.png'], wide: true,
+      nameKey: 'guideFeaturesName',  descKey: 'guideFeaturesDesc' },
     { kind: 'img',  files: ['btn_autoplay.png'],   nameKey: 'guideAutoplayName',  descKey: 'guideAutoplayDesc' },
     { kind: 'img',  files: ['btn_menu.png'],       nameKey: 'guideMenuName',      descKey: 'guideMenuDesc' },
     // OWNER AUDIT ROUND 3, item 5: Turbo and Max were text pills with no
@@ -377,7 +388,8 @@
           <div class="fs-guide-list">
             {#each INTERFACE_GUIDE as g}
               <div class="fs-guide-row">
-                <div class="fs-guide-icon" class:fs-guide-icon--set={g.files.length > 1}>
+                <div class="fs-guide-icon" class:fs-guide-icon--set={g.files.length > 1}
+                     class:fs-guide-icon--wide={'wide' in g && g.wide}>
                   <!-- R10, 2026-07-27: the former {:else} branch rendered a
                        `kind: 'pill'` text token via `g.label`. OWNER AUDIT ROUND 3
                        item 5 converted Turbo and Max to real captures, so ALL
@@ -834,6 +846,24 @@
   @media (max-width: 420px) {
     .fs-guide-icon--set { gap: 4px; padding: 0 5px; }
     .fs-guide-icon--set .fs-guide-img { width: 28px; height: 28px; }
+  }
+
+  /* R125. The FEATURES control is a 130x44 pill, not a round button, so only its
+     SLOT widens - the image keeps the same 44px height every other row uses, and
+     releases its width instead. Nothing about its scale is special-cased: the
+     capture fills 82.0% of its frame's height, which sits between spin_button
+     (84.0%) and btn_turbo (76.0%), so at a shared 44px it renders a control of
+     the same visible size as its neighbours rather than a larger or smaller one.
+     Measured from the shipped files, not assumed.
+     Width: 44 x 2.25 aspect = 99px + 16px padding = 115px, which is NARROWER
+     than the three-up speed row's slot (130px) that this list already carries
+     and that is already proven at Popout S. The text side of the row is
+     `min-width: 0`, so the description reflows rather than widening the panel. */
+  .fs-guide-icon--wide { width: auto; padding: 0 8px; }
+  .fs-guide-icon--wide .fs-guide-img { width: auto; height: 44px; }
+  @media (max-width: 420px) {
+    .fs-guide-icon--wide { padding: 0 5px; }
+    .fs-guide-icon--wide .fs-guide-img { height: 36px; }
   }
   .fs-guide-pill {
     display: inline-flex;

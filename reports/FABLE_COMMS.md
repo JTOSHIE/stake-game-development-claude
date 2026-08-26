@@ -9,6 +9,60 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 123 - 2026-08-26 - R125: the guide's last painted row is fixed, and your four missing sounds turn out to be one decision away, not one purchase away.
+
+**THE FEATURES ROW MATCHES THE BUTTON NOW.** Seven of the eight rows in your Interface
+Guide were screenshots of the real control. The Features row was a painted 224x224 machine
+badge from a different pipeline, and it had drifted: it showed an ornate chrome and magenta
+plate where your actual control is a dark glass pill with a car grille glyph. A player
+reading that guide was being shown a button that exists nowhere in the game. It is now a
+capture of the live pill, taken the same way as the other seven. No new art, no new
+lightning bolt, and Turbo still uniquely owns that mark.
+
+It needed a new capture mode and I got it wrong twice before I got it right. Your other
+icons are round, so the tool pads them square. The FEATURES control is a wide pill, and
+padding it square would have printed the word FEATURES at about 3.7 pixels tall. The
+second attempt cropped so tight it sliced 333 pixels off the bottom of its own drop shadow.
+Third one is clean: zero pixels touching any edge, and the pill renders the same visible
+size as its neighbours. Your 30 work in progress rasters were checksummed before and after
+and are untouched.
+
+**THE FEATURES BUTTON ALSO HAD NO PRESS.** Every other control in the shell dips a pixel
+when you click it. The one that opens a dialog did nothing, in all four layouts, and three
+of the four did nothing on hover either. Fixed. I also wrote an open state and then deleted
+it, because I checked whether the button is visible while the menu is open and it is not:
+the scrim covers it. Shipping that would have been a dead style rule that reads like a
+feature in review.
+
+**NOW THE PART THAT MATTERS FOR YOUR SOUND.** I mapped every cue in the game, where its
+file is and where it fires, and wrote it up at `docs/audio/AUDIO_TRUTH_MAP.md`. Three
+things came out of it.
+
+First, your max win is not silent. It has been playing the epic stinger and its echo since
+R5, deliberately. It lacks a sound of its own, not a sound. So the new max win hook falls
+back to exactly what you have today and can only ever be an upgrade.
+
+Second, all four missing cues now have real hooks, wired at the right moments and proven to
+fire while staying silent. I did not invent a single stem and did not commit any
+placeholder. When your files arrive it is two lines each.
+
+Third, and this is the one to read: **you do not need to buy these.** The twelve sounds you
+already ship were generated here, by `tools/audio_forge/` in your own repository, and I
+confirmed that tool still runs on this machine right now, weights already downloaded. The
+four files are a decision away, not a purchase away, and the exact step by step is in
+section 5.2.
+
+**ONE THING I WANT YOU TO DECIDE RATHER THAN INHERIT.** That generator's licence, the
+Stability AI Community License, is royalty free for commercial use but it requires you to
+register with Stability, and it TERMINATES if you or your affiliates pass one million US
+dollars of annual revenue, whether or not that money came from the audio. For a slot game
+meant to earn, the thing that cancels the licence is the game succeeding. I am not a
+lawyer and this is a summary of a file sitting in your repo, but you should look at it
+before more of your soundtrack depends on it. Section 5.4 sets out what a clean
+alternative would have to grant if you decide you are not comfortable.
+
+Every gate green. Working tree back to exactly your 30 rasters.
+
 ## 122 - 2026-08-26 - R124: your win reaction finally has BOTH the big gesture and the containment. Four of the five other categories are refused.
 
 **THE ONE THAT MATTERS SHIPPED.** The v3 win unfold is exactly what I asked for last session: v1's

@@ -26,6 +26,21 @@ mastering pass itself, silence trim, loop-point/bar alignment, loudness, encodin
 Full prompts (including the shared SFX palette prefix and negative prompt) are in
 `tools/audio_forge/generate.py`'s `MANIFEST`.
 
+## Four cues have no file yet (R125, 2026-08-26)
+
+`feature_enter`, `feature_end`, `retrigger` and `win_max` are NOT in the table above
+because no stem exists for them. Their call sites are wired and permanent, and each stays
+silent until its file lands - `soundService.ts`'s `AVAILABLE_PENDING_CUES` is empty on
+purpose, so nothing is requested and no 404 reaches `audio_verify.mjs`.
+
+Do not drop a placeholder into this directory to "fill" one of them. The full spec, the
+exact hook for each, the run sequence and the licensing position are in
+`docs/audio/AUDIO_TRUTH_MAP.md`.
+
+Note that max win is NOT silent today: it reuses `win_epic.mp3` and its 800ms echo, as it
+has since R5. **win_max.mp3** would be an upgrade to a dedicated cue, not the filling of a
+silence.
+
 ## Licence
 
 Generated audio is subject to the **Stability AI Community License Agreement** (the

@@ -4,6 +4,75 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0W. R125 - THE GUIDE'S LAST PAINTED ROW IS GONE, AND THE AUDIO PATH IS MAPPED
+
+**Branch `claude/r125-features-audio`.**
+
+**THE FEATURES GUIDE ROW IS CLOSED.** Seven of the eight Interface Guide rows named files
+captured from the live control by `regen_interface_guide_icons.mjs`; the Features row named
+`feature_button.png`, built by `build.py` from an SVG master. The size headers gave it away
+before anything rendered: the captures are 200x200, that badge is 224x224. It had actually
+drifted, too, showing an ornate chrome and magenta machine plate where the live control is
+a dark-glass pill with a car-grille glyph. `.fm-entry-pill` now joins the regenerator's
+targets as `btn_features.png`. New file rather than an overwrite, because
+`feature_button.png` is one of the owner's 30 WIP rasters AND still renders as the buy
+dialog header art. Nothing orphaned, nothing of the owner's touched, all 30 verified
+byte-identical across the path-scoped stash.
+
+**THE CAPTURE NEEDED A NEW FIT MODE AND TWO ATTEMPTS WERE MEASURABLY WRONG BEFORE THE
+THIRD.** Pad-to-square is right for a round button and wrong for a 2.95:1 pill: it would
+have rendered the word FEATURES at about 3.7px. Native-height fit at the old margin rule
+drowned the pill (50% fill); at an 8px margin it clipped the drop shadow (333 pixels on the
+bottom edge). Shipped at 450x200, 82.0% fill, zero pixels on any edge. No scale
+special-casing was needed because 82.0% sits between `spin_button` at 84.0% and `btn_turbo`
+at 76.0%, so at the shared 44px height it renders a control the same visible size as its
+neighbours. Slot 117px, narrower than the speed row's 132px that is already proven.
+
+**THE FEATURES CONTROL HAD NO PRESS ANYWHERE, AND NO HOVER IN THREE OF FOUR LAYOUTS.** The
+one control that opens a dialog was the only utility control in the shell that did not
+answer a press. Fixed across all four triggers in one rule per state.
+
+**AN OPEN STATE WAS WRITTEN AND DELETED, AND THAT IS THE MORE USEFUL FINDING.** While the
+menu is open the trigger is not on screen: desktop and compact cover it with an 82%-opaque
+scrim, portrait draws the panel's own content across it, sampled at five points per layout.
+The rule would have been dead wiring that reads in review as a shipped affordance. Removed,
+with the measurement recorded in the stylesheet where the next person will look.
+
+**FOUR SOUND CUES NOW HAVE HOOKS THAT FIRE AND STAY SILENT.** `feature_enter`,
+`retrigger`, `feature_end` and `win_max` have permanent call sites. Availability is
+DECLARED rather than discovered, because `audio_verify.mjs` asserts
+`zeroSoundRequestFailures` and building these the ordinary way would fire four 404s a
+session and turn a green gate red for cues that are only honestly absent. Proven with a
+dev-only `__pendingCueTrace`: `fired > 0, played: 0`, with the entry overlay confirmed on
+screen at t=711ms where the hook fires. **No audio was generated and no placeholder was
+committed.**
+
+**MAX WIN WAS NEVER SILENT, WHICH THE "FOUR MISSING STEMS" FRAMING HID.** The wincap
+reveal has played the epic stinger and its 800ms echo deliberately since R5. It lacks a cue
+of its own, not a cue. `playMaxWin()` falls back to exactly that, so turning the stem on is
+an upgrade and can never introduce a silence.
+
+**THE ACQUISITION ROUTE IS NOT A PURCHASE, IT IS A TOOL IN THIS REPOSITORY THAT RUNS ON
+THIS MACHINE TODAY.** The twelve shipped stems came from `tools/audio_forge/` (Stable Audio
+3 open weights, deterministic mastering, per-file model/seed/prompt logged). Verified: venv
+present, torch 2.7.1 with MPS, `stable_audio_tools` imports, all three model repos already
+in the local Hugging Face cache. `docs/audio/AUDIO_TRUTH_MAP.md` section 5.2 is the
+step-by-step, down to which two lines wire each cue on.
+
+**AND IT CARRIES A CEILING THAT SUCCESS TRIGGERS, WHICH THE OWNER SHOULD DECIDE ON
+KNOWINGLY.** The Stability AI Community License grants royalty-free commercial use but
+requires registration with Stability, and TERMINATES above USD $1,000,000 annual revenue
+for the licensee or its affiliates, regardless of whether that revenue comes from the
+generated material at all. For a game intended to earn, the trigger condition is the game
+working. Truth map section 5.4 sets out what a licence-clean alternative must grant.
+
+**STILL OPEN AFTER R125.** Four stems still do not exist, and nothing but a decision is
+blocking them. Max win still covers the hero (`MaxWinCelebration` is a full-screen modal,
+six sessions running). `interface_guide_icon_proof.mjs` still asserts only byte-uniqueness
+and renders the rest for a human to eyeball, which is exactly why the Features mismatch
+survived as long as it did; a real similarity assertion is well-scoped and unstarted. The
+bought-max-win reveal still sounds different from the spun one (truth map 4.5).
+
 ## 0V. WHAT R124 CHANGED (review-critical closure) AND THE FOUR REFUSALS
 
 *** THE WIN UNFOLD FINALLY HAS BOTH THE GESTURE AND THE CONTAINMENT. v3 is the strip R123 asked for:
