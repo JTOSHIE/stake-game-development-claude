@@ -1349,35 +1349,17 @@
   /* ---- token bridge: reads the app's existing --theme-* vars, falls back to
      themes.ts future-spinner palette. display:contents keeps .fs-hud a pure
      token-scope wrapper so children stay absolute against the stage ancestor. */
-  /* ===== OPERATOR SHELL TOKENS (R119) =======================================
-     ONE declaration of the shell's material, inherited by all FOUR HUD layouts.
-     Before this block the same palette was declared three times over as
-     --sig-* (desktop), --p-* (portrait) and --c-* (compact), which is
-     RESKIN_BOUNDARY.md GAP 1 in miniature: "token VALUES have seven homes
-     rather than one". A restyle that edited one family and missed the others
-     would ship three mismatched HUDs, so the shell is declared once here and
-     the three families are re-pointed at it.
+  /* ===== OPERATOR SHELL, R119 ================================================
+     The base --hud-* tokens moved to App.svelte's .game-wrapper in R120 so the
+     paytable, the FEATURES bar and the instrument column inherit the same shell.
+     THEY CANNOT LIVE ON :root. --theme-primary is declared on .game-wrapper, and
+     a custom property is substituted where it is DECLARED, not where it is used:
+     a :root token referencing it resolves to its fallback and silently stops
+     following the palette. Verified in a browser before moving it - a :root
+     token rendered the cyan fallback while the same token on the wrapper
+     rendered the theme colour.
 
-     THE ACCENT DISCIPLINE. Chrome at rest is NEUTRAL. The accent is spent in
-     exactly three places, because a colour that appears everywhere signals
-     nothing: the SPIN control, a live win, and active toggle states. The
-     resting bar used to carry three DIFFERENT accents on three adjacent
-     plates - balance cyan, win magenta, bet gold - which is the "multi-colour
-     neon chrome" this pass exists to remove. */
-  .fs-hud, .p-hud, .c-hud, .m-hud{
-    --hud-surface:        rgba(11, 15, 24, 0.84);   /* plate + panel fill      */
-    --hud-surface-raised: rgba(20, 26, 37, 0.88);   /* buttons sit above it    */
-    --hud-surface-sunken: rgba(6, 9, 15, 0.90);     /* value wells             */
-    --hud-border:         rgba(226, 238, 250, 0.13);/* neutral hairline        */
-    --hud-border-strong:  rgba(226, 238, 250, 0.26);/* hover / active edge     */
-    --hud-text:           #eef4fa;                  /* live values, near-white */
-    --hud-text-dim:       rgba(214, 230, 244, 0.58);/* labels                  */
-    --hud-accent:         var(--theme-primary, #00FFFF);
-    --hud-shadow:         0 6px 20px rgba(0, 0, 0, 0.45);
-    --hud-shadow-soft:    0 2px 8px rgba(0, 0, 0, 0.40);
-  }
-  /* The feature keeps its established signal: the accent, and only the accent,
-     flips. Nothing else about the shell changes shape or weight. */
+     Only the state flip stays here, because it is scoped to a HUD state. */
   .fs-hud--overdrive, .p-hud--overdrive, .c-hud--overdrive{
     --hud-accent: var(--theme-secondary, #FF2EC4);
   }

@@ -540,13 +540,15 @@
     position: relative;
     display: flex;
     --sig: var(--sig-cyan);
-    padding: 2px;
+    /* R120: this is the paytable's OWN COPY of the six-stop brushed-metal
+       bezel R119 removed from the HUD. docs/design/CHROME_PRIMITIVES.md was
+       scoped to keep it canonical HERE, on the assumption the paytable would
+       stay on the old language; the R120 brief asks for the opposite, so the
+       copy follows the shell and that scoping note is now corrected. */
+    padding: 1px;
     clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 13px 100%, 0 calc(100% - 13px));
-    background: linear-gradient(150deg, #eef5fa, #b3c6d2 15%, #63737f 37%, #2b363f 52%, #8499a8 72%, #dceaf2);
-    box-shadow:
-      0 3px 10px rgba(0, 0, 0, 0.6),
-      0 0 9px color-mix(in srgb, var(--sig) 20%, transparent),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: var(--hud-border-strong);
+    box-shadow: var(--hud-shadow);
   }
   .fs-plate > .fs-face {
     position: relative;
@@ -559,28 +561,30 @@
     align-items: center;
     justify-content: center;
     clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-    background:
-      linear-gradient(160deg, color-mix(in srgb, var(--sig) 12%, transparent), transparent 44%),
-      linear-gradient(180deg, #111a2b, #070b16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 -8px 18px rgba(0, 0, 0, 0.6);
+    background: var(--hud-surface-sunken);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), inset 0 0 12px rgba(0, 0, 0, 0.45);
   }
   .fs-rail {
     position: absolute;
-    left: 2px;
+    left: 1px;
     top: 9px;
     bottom: 9px;
     width: 3px;
     border-radius: 2px;
     z-index: 2;
-    background: var(--sig);
-    box-shadow: 0 0 8px var(--sig);
+    /* Neutral at rest, like every rail in the shell. The panel's own rail is
+       the exception: it keeps the accent, because it is the modal's identity
+       edge and the one place the accent is spent here. */
+    background: var(--hud-border-strong);
+    box-shadow: none;
   }
+  .fs-pt-panel > .fs-rail { background: var(--sig); box-shadow: 0 0 8px color-mix(in srgb, var(--sig) 45%, transparent); }
   .fs-knob {
     border-radius: 50%;
-    padding: 3px;
+    padding: 1px;
     position: relative;
-    background: conic-gradient(from 216deg, #e7f1f7, #93a7b5, #39454f, #728593, #eef5fa, #4f5f6b, #a9bcc8, #e7f1f7);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    background: var(--hud-border);
+    box-shadow: var(--hud-shadow-soft);
   }
   .fs-knob > .fs-face {
     position: absolute;
@@ -601,7 +605,8 @@
     max-width: 1178px;
     height: 92%;
     max-height: 662px;
-    --sig: var(--sig-gold);
+    /* Was gold, the only gold surface in the game outside the win colours. */
+    --sig: var(--hud-accent);
     display: flex;
     flex-direction: column;
   }
@@ -622,7 +627,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 18px 26px;
-    border-bottom: 1px solid color-mix(in srgb, var(--sig-gold) 22%, transparent);
+    border-bottom: 1px solid var(--hud-border);
     flex-shrink: 0;
   }
   .fs-pt-title {
@@ -630,14 +635,18 @@
     font-weight: 900;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    background: linear-gradient(135deg, var(--sig-gold), var(--sig-orange));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    /* A gold-to-orange gradient clipped to the title text. The shell's rule is
+       that headings are text, not decoration. */
+    color: var(--hud-text);
   }
-  .fs-pt-close { width: 38px; height: 38px; padding: 3px; border: none; cursor: pointer; flex-shrink: 0; }
-  .fs-pt-close > .fs-face { color: #cfe6f2; font-size: 0.9rem; }
-  .fs-pt-close:hover > .fs-face { color: #fff; filter: brightness(1.2); }
+  /* R120: was 38x38, under docs/HUD_SPEC.md's own 44px touch floor, and NO gate
+     measures it - the spec's rule 3 scopes to the HUD banner, so the modal's
+     close never came under it. Raised to 44, which is the figure this project
+     adopted from Apple's HIG and holds itself to elsewhere. Geometry outside the
+     locked HUD, so nothing in HUD_SPEC moves. */
+  .fs-pt-close { width: 44px; height: 44px; padding: 1px; border: none; cursor: pointer; flex-shrink: 0; }
+  .fs-pt-close > .fs-face { color: var(--hud-text-dim); font-size: 0.9rem; }
+  .fs-pt-close:hover > .fs-face { color: var(--hud-text); }
   /* Sized in em off the font-size the glyph used, and stroked in currentColor,
      so the existing colour and hover rules above keep working untouched. */
   .fs-close-glyph { width: 1.05em; height: 1.05em; display: block; }
@@ -661,24 +670,27 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     font-weight: 700;
-    color: color-mix(in srgb, var(--sig-gold) 78%, #fff);
+    color: var(--hud-text-dim);
   }
 
   /* how-to-win + ways callout */
-  .fs-htw { --sig: var(--sig-cyan); }
+  .fs-htw { --sig: var(--hud-accent); }
   .fs-htw > .fs-face { padding: 16px 20px; gap: 6px; flex-direction: column; align-items: flex-start; }
   .fs-htw h4 { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.4; margin: 0; }
   .fs-htw p { font-size: 0.82rem; color: color-mix(in srgb, var(--sig-cyan) 60%, #fff); margin: 0; }
   .fs-ways-callout {
     display: flex; flex-direction: column; align-items: center; gap: 2px;
-    margin-top: 6px; align-self: center; padding: 10px 24px; --sig: var(--sig-gold);
+    margin-top: 6px; align-self: center; padding: 10px 24px; --sig: var(--hud-accent);
   }
   .fs-ways-callout > .fs-face { padding: 8px 22px; }
-  .fs-ways-num { font-size: 2.3rem; font-weight: 900; line-height: 1; color: #fff2c2; text-shadow: 0 0 3px var(--sig-gold); }
-  .fs-ways-lbl { font-size: 0.62rem; letter-spacing: 0.22em; color: color-mix(in srgb, var(--sig-gold) 70%, #fff); }
+  /* 1,024 is the single biggest number in this modal and it was gold-on-metal,
+     the loudest thing left after the panel came down. It is a VALUE, so it gets
+     the same near-white every other value in the game now gets. */
+  .fs-ways-num { font-size: 2.3rem; font-weight: 900; line-height: 1; color: var(--hud-text); text-shadow: none; }
+  .fs-ways-lbl { font-size: 0.62rem; letter-spacing: 0.22em; color: var(--hud-text-dim); }
 
   /* ways diagram */
-  .fs-ways-diagram { --sig: var(--sig-cyan); }
+  .fs-ways-diagram { --sig: var(--hud-accent); }
   .fs-ways-diagram > .fs-face { flex-direction: row; gap: 0; padding: 14px 18px; }
   .fs-way-cell {
     width: 56px; height: 56px; border-radius: 8px;
@@ -687,9 +699,9 @@
     background: rgba(255, 255, 255, 0.04); border: 2px solid rgba(255, 255, 255, 0.12);
   }
   .fs-way-cell.matched {
-    color: var(--acc); border-color: var(--acc);
-    background: color-mix(in srgb, var(--acc) 10%, transparent);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--acc) 45%, transparent);
+    color: var(--hud-accent); border-color: var(--hud-accent);
+    background: color-mix(in srgb, var(--hud-accent) 10%, transparent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--hud-accent) 45%, transparent);
   }
   .fs-way-arrow { font-size: 1.3rem; padding: 0 8px; color: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; }
   /* The arrow was `→`, U+2192, absent from the Orbitron subset. Drawn now, and
@@ -787,8 +799,12 @@
     align-items: center;
     gap: 14px;
     padding: 10px 16px;
-    background: color-mix(in srgb, var(--sig-cyan) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--sig-cyan) 16%, transparent);
+    /* R120: the interface-guide rows were the ONE surface in this modal that
+       shared no vocabulary with anything else - a flat cyan-tinted box, while
+       every other row in here is a plate. Now the same sunken glass and neutral
+       hairline as the rest of the shell. */
+    background: var(--hud-surface-sunken);
+    border: 1px solid var(--hud-border);
     border-radius: 10px;
   }
   .fs-guide-icon {
@@ -798,8 +814,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--hud-surface-raised);
+    border: 1px solid var(--hud-border);
     border-radius: 8px;
   }
   .fs-guide-img { width: 44px; height: 44px; object-fit: contain; }
@@ -847,8 +863,10 @@
   .fs-disc { font-size: 0.72rem; line-height: 1.55; color: rgba(255, 255, 255, 0.5); margin: 0; }
 
   /* Overdrive: whole modal warms, gold rail -> magenta bloom */
-  .fs-pt--overdrive .fs-pt-panel { --sig: var(--sig-pink); }
-  .fs-pt--overdrive .fs-pt-panel .fs-rail { box-shadow: 0 0 12px var(--sig-pink), 0 0 22px color-mix(in srgb, var(--sig-orange) 40%, transparent); }
+  /* The modal keeps its Overdrive signal, now through the same accent the rest
+     of the shell flips to, and without the second orange bloom. */
+  .fs-pt--overdrive .fs-pt-panel { --sig: var(--theme-secondary, #FF2EC4); }
+  .fs-pt--overdrive .fs-pt-panel .fs-rail { box-shadow: 0 0 10px color-mix(in srgb, var(--sig) 55%, transparent); }
   .fs-pt--overdrive .fs-pt-body { filter: saturate(1.06) hue-rotate(-4deg); }
 
   /* small viewports */

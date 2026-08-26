@@ -14,7 +14,8 @@ The canonical implementation is the `<style>` block of
 All four HUD layouts inherit one declaration:
 
 ```css
-.fs-hud, .p-hud, .c-hud, .m-hud {
+/* App.svelte, on .game-wrapper - the element that also carries --theme-primary */
+.game-wrapper {
   --hud-surface:        rgba(11, 15, 24, 0.84);   /* plate + panel fill      */
   --hud-surface-raised: rgba(20, 26, 37, 0.88);   /* buttons sit above it    */
   --hud-surface-sunken: rgba(6, 9, 15, 0.90);     /* value wells             */
@@ -26,16 +27,35 @@ All four HUD layouts inherit one declaration:
   --hud-shadow:         0 6px 20px rgba(0, 0, 0, 0.45);
   --hud-shadow-soft:    0 2px 8px rgba(0, 0, 0, 0.40);
 }
+/* HudOverlay.svelte - the state flip only */
 .fs-hud--overdrive, .p-hud--overdrive, .c-hud--overdrive {
   --hud-accent: var(--theme-secondary, #FF2EC4);
 }
 ```
 
-**Why it is declared on four roots rather than on `:root`.** Svelte scopes styles
-per component, so a selector must match an element the component actually
-renders or it is stripped and `svelte-check` reports an unused selector, which
-`typecheck_baseline.mjs` fails on any rise. The four roots are the four layout
-branches of the same `{#if}` chain, so exactly one of them exists at a time.
+**AMENDED 2026-08-26 by R120: the block MOVED, and R119's stated reason for its
+old home was wrong on the mechanism.** The ten base tokens now live on
+`.game-wrapper` in `App.svelte`, so the paytable modal, the FEATURES bar and the
+feature instrument column inherit the same shell. Only the Overdrive accent flip
+stays on the HUD roots, because it is a HUD state.
+
+**The correction, recorded rather than erased.** R119 wrote that the block avoided
+`:root` because "Svelte scopes styles per component, so a selector must match an
+element the component actually renders or it is stripped". **That is not true of
+`:root`**: compiling a `:root { --token: … }` rule with this project's own Svelte
+5.53.0 shows it is neither scoped nor stripped, and `svelte-check` raises nothing.
+The conclusion was right for the wrong reason.
+
+**The real reason `:root` cannot hold these tokens**, and it is a trap worth
+knowing: `--theme-primary` is declared on `.game-wrapper`, and a custom property
+is substituted **where it is declared, not where it is used**. So
+`--hud-accent: var(--theme-primary, #00FFFF)` written on `:root` resolves against
+an `html` element that has no `--theme-primary`, freezes at the literal fallback,
+and inherits that frozen value to the whole tree. The accent silently stops
+following the palette — and it is silent precisely because the fallback IS the
+current theme's cyan, so nothing looks wrong until someone changes theme.
+Measured in a browser before the move: a `:root` token rendered the cyan fallback
+while the same token on the wrapper rendered the theme colour.
 
 ## 2. What a new title inherits UNCHANGED
 
@@ -82,8 +102,14 @@ branches of the same `{#if}` chain, so exactly one of them exists at a time.
 
 ## 5. Known surfaces this shell does NOT cover
 
-R119 restyled `HudOverlay.svelte` only. These neighbouring surfaces still carry
-the previous chrome language and now read as inconsistent beside the shell:
+**AMENDED 2026-08-26 by R120: all three were brought onto the shell.** The table
+below is kept as the record of what R119 left behind; every row is now done.
+`BonusInstrumentColumn` and `FeatureMenu` consume the shell tokens directly, and
+`PaytableModal`'s own copy of the metal `.fs-plate` follows the shell too, which
+supersedes the scoping note added to `CHROME_PRIMITIVES.md` in R119.
+
+R119 restyled `HudOverlay.svelte` only. These neighbouring surfaces carried
+the previous chrome language and read as inconsistent beside the shell:
 
 | surface | file | what still looks old |
 |---|---|---|

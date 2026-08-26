@@ -4,6 +4,80 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0R. WHAT R120 CHANGED (the neighbour consistency pass) AND WHAT IT CORRECTED IN R119
+
+**THE SHELL IS NOW ONE TOKEN LAYER FOR THE WHOLE STAGE.** The ten `--hud-*` tokens moved from
+HudOverlay's four roots to `.game-wrapper` in `App.svelte`, so the paytable modal, the FEATURES bar
+and the feature instrument column inherit them. Only the Overdrive accent flip stays HUD-scoped.
+Proven a visual no-op on the HUD: **75 differing pixels across all ten control boxes, ZERO in
+BALANCE / WIN / BET / SPIN / AUTO / steppers.**
+
+*** THEY CANNOT LIVE ON `:root`, AND THE FAILURE IS SILENT. `--theme-primary` is declared on
+`.game-wrapper`, and a custom property is substituted WHERE IT IS DECLARED, not where it is used.
+`--hud-accent: var(--theme-primary, #00FFFF)` on `:root` resolves against an html element with no
+`--theme-primary`, FREEZES AT THE FALLBACK and inherits that everywhere - the accent stops
+following the palette. It is invisible because the fallback IS the current theme's cyan. MEASURED
+in a browser with --theme-primary:#FF0000 -> `:root` gave rgb(0,255,255), `.game-wrapper` gave
+rgb(255,0,0). ALWAYS TEST A TOKEN HOIST; the default theme will hide the bug. ***
+
+**R119'S OWN RECORDED REASON WAS WRONG AND IS CORRECTED.** `HUD_SHELL_TEMPLATE.md` said `:root` was
+avoided because "Svelte ... strips" an unmatched selector. Compiling `:root { --token: ... }` with
+the project's OWN Svelte 5.53.0 shows it is neither scoped nor stripped and svelte-check raises
+nothing. Right placement, wrong mechanism; the doc now carries both.
+
+### WHAT WAS RESTYLED
+
+**FEATURES: there are FOUR triggers, not one.** `.fm-entry-pill` (desktop), `.p-fm-entry`
+(portrait), `.c-fm-entry` (compact), `.m-fm-entry` (mini). **The mini one is absent from
+FeatureMenu's own token block**, so no `--sig-*` resolved on it and it used raw `#FF00FF` where the
+others use `#ff2ec4`. All four: magenta border + 12px outer glow + 10px inset glow + magenta text
+-> hairline + dark glass + near-white. OVERBOOST keeps a WARM signal deliberately: it is a COST
+state, not decoration. Grille glyph, 44px floor and every handler preserved.
+
+**INSTRUMENT COLUMN:** plate bezel (magenta->cyan->magenta gradient under a 7px magenta bloom) ->
+neutral hairline; face -> sunken glass; rail (cyan->magenta + glow) -> neutral; desktop value
+(gold #ffd54a + 10px glow) and the three portrait values (pink/cyan/gold, each glowing) -> one
+near-white. FUNCTION UNTOUCHED, and worth recording: **the gauge NEEDLE is functional**
+(`needleDeg = -110 + clamp01((multiplier-1)/15)*220`), **the dial behind it is ornament**.
+
+**PAYTABLE:** its OWN COPY of the six-stop metal `.fs-plate` -> the shell (superseding R119's
+scoping note in `CHROME_PRIMITIVES.md`); panel `--sig` gold -> the one accent; title gold-to-orange
+gradient-clipped text -> near-white; headings, dividers, ways callout, ways diagram, knob bezel and
+the guide rows all -> the shell. Content model untouched.
+
+*** TWO LATENT DEFECTS FIXED IN PASSING: (1) the paytable TITLE was `background-clip:text` +
+`-webkit-text-fill-color:transparent` WITH NO FALLBACK COLOUR - if the clip ever failed the word
+PAYTABLE rendered INVISIBLE. (2) the CLOSE button was 38x38, under this project's own 44px floor;
+HUD_SPEC rule 3 scopes to the HUD banner so the modal never came under it and NO GATE MEASURES IT.
+Now 44x44. ***
+
+### WS5: THE INTERFACE GUIDE WAS FIXED, NOT BLOCKED - R119'S RESIDUAL IS CLOSED
+
+*** THE GUARD'S REFUSAL SET AND THE REGENERATOR'S WRITE SET ARE COMPLETELY DISJOINT. asset_guard
+refuses on 30 tracked rasters under OUTPUT_ROOT; `regen_interface_guide_icons.mjs` writes exactly
+NINE files and all nine were CLEAN. So the guard was satisfied LEGITIMATELY, not bypassed: stage
+own work -> `git stash push --` the 30 raster paths only -> confirm OUTPUT_ROOT dirty count is 0 ->
+run (the guard runs and PASSES) -> confirm exactly 9 files changed -> `git stash pop` -> verify all
+30 byte-identical. ALLOW_ASSETS_OVERWRITE was never set and `asset_guard.py --self-test` passes. ***
+**`feature_button.png` is a guide row that this script can NEVER refresh**: it is manifest-driven
+from an SVG master via `build.py`, not screenshotted, and is also one of the 30 owner rasters.
+
+### STILL OPEN AFTER R120
+
+1. **The gauge dial is untouched and unjudgeable locally.** `gauge_face.png` and `gauge_needle.png`
+   are both owner WIP, and HEAD vs worktree are not the same picture: HEAD is a ROUND chrome dial
+   **with a red needle baked into the face** (the documented two-needle defect), worktree is a
+   SQUARE carbon dial, baked needle angles 34 degrees apart.
+2. **No `:active` or open state on ANY of the four FEATURES triggers**; `aria-expanded` is bound but
+   nothing keys off it. Portrait, compact and mini have NO hover feedback at all, and quieting the
+   resting glow removed the only affordance signal they had.
+3. **The mini FEATURES trigger draws a different glyph** (three-bar mixer, not the grille).
+4. **The mini-player HUD is outside the Overdrive accent flip.** Predates R119.
+5. **`.fs-heading` carries inline `style="margin-bottom:..."` at all eight use sites**, three
+   different values, none in the stylesheet.
+6. **Nothing measures any of it**: no gate checks paytable touch targets, guide freshness against
+   live chrome, or value legibility anywhere.
+
 ## 0Q. WHAT R119 CHANGED (the operator-standard HUD shell) AND WHAT IT LEFT OPEN
 
 **THE HUD IS NOW A SHELL WITH A TOKEN LAYER.** Ten `--hud-*` tokens declared ONCE on

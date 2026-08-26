@@ -544,14 +544,20 @@
     flex: 0 0 auto;
     width: 36px; height: 36px; border-radius: 8px; padding: 0;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255, 0, 255, 0.10); border: 1px solid rgba(255, 0, 255, 0.34);
-    color: #f9f; cursor: pointer;
+    /* R120: the FOURTH trigger. It sits OUTSIDE this component's own token
+       block (`.fm-entry, .p-fm-entry, .c-fm-entry, .fm`), so none of the --sig-*
+       tokens resolve on it and it was painted from raw literals in a different
+       magenta from the other three. It inherits the shell tokens from
+       .game-wrapper like everything else now. */
+    background: var(--hud-surface-raised); border: 1px solid var(--hud-border);
+    color: var(--hud-text); cursor: pointer;
   }
   .m-fm-entry::after { content: ''; position: absolute; inset: -4px; }
   .m-fm-entry svg { width: 20px; height: 20px; }
   .m-fm-entry:disabled { opacity: 0.4; cursor: default; }
   .m-fm-entry:disabled::after { content: none; }
-  .m-fm-entry.mode-enhancer { border-color: rgba(255, 213, 74, 0.55); color: #ffd54a; }
+  /* Kept warm, like the other three: OVERBOOST is a cost state, not decoration. */
+  .m-fm-entry.mode-enhancer { border-color: color-mix(in srgb, var(--sig-orange) 60%, transparent); color: color-mix(in srgb, var(--sig-orange) 22%, var(--hud-text)); }
 
   /* ==========================================================================
      FUTURE SPINNER - FEATURES MENU
@@ -648,19 +654,24 @@
     gap: 8px;
     min-height: 44px;
     padding: 10px 18px;
-    border: 1.5px solid color-mix(in srgb, var(--sig-pink) 55%, transparent);
+    /* R120: NEUTRAL AT REST. The FEATURES entry carried a persistent magenta
+       border, a 12px outer glow, an inset glow and magenta-tinted text - the
+       "NEON LIFT" of 2026-07-15, added when the bar read as a plain rectangle
+       against the OLD chrome. Beside R119's operator shell it is the loudest
+       thing on the stage. It is now the same dark glass as every other utility
+       control, and the accent is spent only when a mode is actually engaged
+       (.mode-enhancer below), which is the one state a player must not miss. */
+    border: 1px solid var(--hud-border);
     border-radius: 10px;
-    background: linear-gradient(160deg, rgba(255, 46, 196, 0.1), rgba(6, 9, 20, 0.9));
-    box-shadow:
-      0 0 12px color-mix(in srgb, var(--sig-pink) 45%, transparent),
-      inset 0 0 10px color-mix(in srgb, var(--sig-pink) 14%, transparent);
-    color: color-mix(in srgb, var(--sig-pink) 25%, #fff);
+    background: var(--hud-surface-raised);
+    box-shadow: var(--hud-shadow-soft);
+    color: var(--hud-text);
     cursor: pointer;
     font-family: var(--fs-font-display);
     white-space: nowrap;
     transition: filter 0.15s ease;
   }
-  .fm-entry-pill:hover:not(:disabled) { filter: brightness(1.1); }
+  .fm-entry-pill:hover:not(:disabled) { border-color: var(--hud-border-strong); }
   .fm-entry-pill:disabled { opacity: 0.5; cursor: not-allowed; }
   .fm-entry-pill svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
   /* ROUND 4 item 5: the grille carries more geometry than the old three-bar
@@ -674,12 +685,14 @@
   /* OVERBOOST engaged: the pill glows orange (matching the enhancer card's
      tone) instead of the default pink, so the FEATURES chip itself reflects
      the toggle state at a glance (cost-visibility item). */
+  /* OVERBOOST engaged keeps a WARM signal rather than the shell accent, and
+     deliberately so: this is a COST state, not a decoration. It is the one
+     place on this control where colour carries information, so it survives the
+     neutral-at-rest rule - restrained, not removed. */
   .fm-entry-pill.mode-enhancer {
-    border-color: color-mix(in srgb, var(--sig-orange) 55%, transparent);
-    box-shadow:
-      0 0 12px color-mix(in srgb, var(--sig-orange) 45%, transparent),
-      inset 0 0 10px color-mix(in srgb, var(--sig-orange) 14%, transparent);
-    color: color-mix(in srgb, var(--sig-orange) 25%, #fff);
+    border-color: color-mix(in srgb, var(--sig-orange) 60%, transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--sig-orange) 30%, transparent);
+    color: color-mix(in srgb, var(--sig-orange) 22%, var(--hud-text));
   }
   .fm-entry-label {
     font-family: var(--fs-font-numeric);
@@ -1086,16 +1099,13 @@
     padding: 8px 14px;
     margin: 0 12px 8px;
     width: calc(100% - 24px);
-    /* NEON LIFT (2026-07-15): persistent bright magenta/pink border glow,
-       not just a flat 1px outline - the FEATURES bar is the entry point to
-       every bet mode and reads as a plain rectangle without it. */
-    border: 1.5px solid color-mix(in srgb, var(--sig-pink, #ff2ec4) 55%, transparent);
+    /* R120 supersedes the NEON LIFT of 2026-07-15 here too. See the desktop
+       pill above for the reasoning. */
+    border: 1px solid var(--hud-border);
     border-radius: 10px;
-    background: linear-gradient(160deg, rgba(255, 46, 196, 0.1), rgba(6, 9, 20, 0.9));
-    box-shadow:
-      0 0 12px color-mix(in srgb, var(--sig-pink, #ff2ec4) 45%, transparent),
-      inset 0 0 10px color-mix(in srgb, var(--sig-pink, #ff2ec4) 14%, transparent);
-    color: color-mix(in srgb, var(--sig-pink, #ff2ec4) 25%, #fff);
+    background: var(--hud-surface-raised);
+    box-shadow: var(--hud-shadow-soft);
+    color: var(--hud-text);
     cursor: pointer;
     font-family: var(--fs-font-display);
   }
@@ -1129,14 +1139,10 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    border: 1.5px solid color-mix(in srgb, var(--sig-pink, #ff2ec4) 50%, transparent);
+    border: 1px solid var(--hud-border);
     border-radius: 50%;
-    background: radial-gradient(circle at 36% 28%, #2a1030, #05121b 72%);
-    /* NEON LIFT (2026-07-15): persistent pink glow, matching the portrait bar. */
-    box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12),
-      0 0 10px color-mix(in srgb, var(--sig-pink, #ff2ec4) 40%, transparent);
+    background: var(--hud-surface-raised);
+    box-shadow: var(--hud-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
