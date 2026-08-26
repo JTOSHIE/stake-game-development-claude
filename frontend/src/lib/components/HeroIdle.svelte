@@ -3,7 +3,9 @@
   // something happens.
   //
   // R112 made him alive. R114 makes him respond. The idle is unchanged in
-  // character: a five-frame breathe over 4.4 seconds. On top of it sit two
+  // character: a SIX-frame weight shift over 4.4 seconds (R126: this said "five-frame
+  // breathe"; the strip has been six frames since R122 replaced it, and it shifts
+  // weight rather than breathing). On top of it sit two
   // one-shot reactions that borrow the same element and hand it straight back.
   //
   // WHY ONE ELEMENT AND NOT THREE LAYERS. Every sheet is the same figure at the
@@ -18,7 +20,7 @@
   // crossed-arms hero the idle was rendered from. Measured against the live idle
   // rest frame, entering a reaction changes 34-54% of the figure depending which
   // idle frame we cut from - and a NORMAL step inside the idle loop already
-  // changes 36-48%. The cut is no larger than what the idle does every 0.88s.
+  // changes 36-48%. The cut is no larger than what the idle does every 0.73s.
   //
   // WHY THE LAST FRAME OF EACH REACTION IS A DUPLICATE OF ITS FIRST. It is the
   // exit. Ending on it leaves the figure 36.2% from the idle's rest frame; ending
@@ -39,11 +41,11 @@
 
   const SHEET: Record<HeroMotion, string> = {
     idle: 'hero_crossed_idle_6f.png',
-    win: 'hero_win_reaction_8f.png',
+    win: 'hero_win_reaction_14f.png',
     energy: 'hero_feature_trigger_7f.png',
     glance: 'hero_glance_6f.png',
   }
-  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 8, energy: 7, glance: 6 }
+  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 14, energy: 7, glance: 6 }
   // ~0.19s a frame for the reactions against the idle's 0.88s: fast enough to read
   // as a response, slow enough not to look twitchy at game distance. The glance is
   // slower still, because it is an idle accent rather than a response to anything.
@@ -55,12 +57,13 @@
   // THE SPAN DIFFERS BETWEEN A LOOP AND A ONE-SHOT, and getting it wrong renders
   // nothing at all.
   //
-  // The idle loops, so it uses steps(5) over a FULL five-frame span: the timing
-  // function yields 0, 1/5 ... 4/5, which is frames 01..05, and the wrap back to
-  // frame 01 is the loop.
+  // The idle loops, so it uses steps(6) over a FULL six-frame span: the timing
+  // function yields 0, 1/6 ... 5/6, which is frames 01..06, and the wrap back to
+  // frame 01 is the loop. (R126: this said steps(5)/five frames; the code has said
+  // six since R122.)
   //
-  // A one-shot must END on its final frame and hold it. steps(8) would yield
-  // 0, 1/8 ... 7/8 during play and then 1 at completion, and with `forwards` that
+  // A one-shot must END on its final frame and hold it. A plain steps(n) would yield
+  // 0, 1/n ... (n-1)/n during play and then 1 at completion, and with `forwards` that
   // held value is one whole frame PAST the sheet: the element paints empty. So the
   // reactions use steps(n, jump-none) over an (n-1)-frame span, which yields n
   // values from 0 to 1 inclusive, landing exactly on the last frame and staying
@@ -325,7 +328,11 @@
   .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(6) infinite; }
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the idle resuming. */
-  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(8, jump-none) 1 forwards; }
+  /* R126: steps(14), not steps(8). THIS IS THE ONE PLACE THE FRAME COUNT IS
+     HARDCODED - background-size and --hero-span both derive from FRAMES.win in the
+     markup above, so a denser sheet with a stale steps() here does not error, it
+     silently plays the first 8 of 14 frames and stops mid-gesture. */
+  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(14, jump-none) 1 forwards; }
   .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.3s steps(7, jump-none) 1 forwards; }
   .hero-idle[data-motion='glance']  { animation: hero-cycle-glance 1.7s steps(6, jump-none) 1 forwards; }
 

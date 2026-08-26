@@ -24,8 +24,8 @@
   // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
   // Three ways to draw the pilot, in descending order of how good he looks:
   //
-  //   'idle'   DEFAULT. The crossed-arms idle strip, played as a five-frame
-  //            flipbook. This is the shipped hero's own pose and silhouette
+  //   'idle'   DEFAULT. The crossed-arms idle strip, played as a six-frame
+  //            flipbook (R126: this said five; it has been six since R122). This is the shipped hero's own pose and silhouette
   //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
   //            re-rendered per frame so the body relights as it breathes.
   //   'static' The original flat sprite with its whole-body bob. The oldest and

@@ -1,0 +1,119 @@
+{
+ "session": "R126",
+ "date": "2026-08-26",
+ "package": ".scratch/art-review/chatgpt-hero-inbetween-factory",
+ "package_claim": "68 runtime frames across five strips",
+ "package_claim_verified": true,
+ "census_note": "Three directory names disagree with their contents and the CONTENTS are what match the brief: win-unfold-16/ holds 24 frames (packed strip is named 24f), feature-brace-12/ holds 16 (packed strip 16f), idle-12/ holds 12. 24+16+12+8+8 = 68 runtime frames as claimed, plus 24 QA files (5 contact sheets, 16 keyposes, 3 reports) that are not runtime art.",
+ "measurement_method": {
+  "render_size": "206x407, the hero's own stage box (HeroIdle BOX_W/BOX_H), which is the bar every R121-R124 hero decision was taken at",
+  "silhouette": "alpha > 127; symmetric difference over union",
+  "edge_test": "alpha > 8 in column 0 or the last column",
+  "rgb_sanitation": "RGB zeroed under alpha 0 BEFORE and AFTER the resample",
+  "controls": [
+   "a frame differs from itself by 0.00%",
+   "self-IoU is exactly 1.0",
+   "a 12px horizontal shift reads as 25.59%, so the metric can detect movement"
+  ],
+  "encoder_parity": "the shipped hero_win_reaction_8f.png is reproduced BYTE-FOR-BYTE by PIL save(PNG, optimize=True), so every byte figure below is directly comparable to what ships"
+ },
+ "budget": {
+  "cap_bytes": 26214400,
+  "dist_before": 24464517,
+  "headroom_before": 1749883,
+  "dist_after": 25425888,
+  "headroom_after": 788512,
+  "net_change": 961368
+ },
+ "accepted": [
+  {
+   "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_win_reaction_14f.png",
+   "replaces": "hero_win_reaction_8f.png (deleted, not kept alongside)",
+   "source": "win-unfold-16/frames, 24 frames at 680x1344",
+   "selection": "14 of 24, evenly spaced with both pose extremes forced in: source frames [1,3,5,6,8,10,12,13,15,17,19,20,22,24]",
+   "why_not_all_24": "the full 24-frame sheet costs +3,353,011 bytes against 1,749,883 of headroom. It is the best strip measured (max neighbour jump 15.58%) and it is unaffordable.",
+   "why_not_a_minimax_pick": "a minimax subset reached 15.01% max jump at 12 frames, better than the full 24. It was REJECTED: steps() plays frames at uniform time intervals, so a pick with gaps of 1,1,1,3,1,3,3,3,1,3,3 replays an evenly-timed performance unevenly - it would linger on the wind-up and snap through the settle. Spatial smoothness bought with temporal distortion is not smoothness. Even spacing keeps the timing the artist drew.",
+   "packed": "5516x780, 394x780 per frame, the incumbent's exact per-frame size and 0.58 scale",
+   "bytes": 2913522,
+   "net_bytes": 961368,
+   "measurements": {
+    "max_neighbour_jump_render_pct": {
+     "live_8f": 26.68,
+     "accepted_14f": 18.63,
+     "change": "-30.2%"
+    },
+    "p90_neighbour_jump_render_pct": {
+     "live_8f": 26.28,
+     "accepted_14f": 17.25
+    },
+    "pairs_above_20pct": {
+     "live_8f": 2,
+     "accepted_14f": 0
+    },
+    "pairs_above_25pct": {
+     "live_8f": 2,
+     "accepted_14f": 0
+    },
+    "max_silhouette_vs_rest_render_pct": {
+     "live_8f": 26.52,
+     "accepted_14f": 27.04
+    },
+    "chest_band_width_render_px": {
+     "live_8f": "137->193",
+     "accepted_14f": "126->194"
+    },
+    "identity_iou_vs_live_rest": 1.0,
+    "first_equals_last_xor_pct": 0.0,
+    "ground_drift_px": 0,
+    "edge_violations": 0,
+    "widest_at_render_px": 194,
+    "fits_206px_box": true,
+    "rgb_under_zero_alpha_dirty_px": 0
+   },
+   "why_accepted": "the live strip's defect is two neighbour pairs above 25% - the arms snapping open at f3->f4 and shut at f5->f6. Those are the pops. The 14-frame sheet removes every pair above 20% while reaching a SLIGHTLY LARGER peak pose (chest 194 against 193) and adding an anticipation crouch the live strip does not have (chest dips to 126 before the swing). Same character at rest, IoU 1.0000.",
+   "live_verification": {
+    "background_position_x_values": 14,
+    "range": "0px to -2678px in exact 206px increments",
+    "note": "all 14 frames play; nothing truncated at 8",
+    "hold_ms": 1499,
+    "fps_during_reaction": 60.1,
+    "console_errors": 0,
+    "banner_occlusion": "the win banner covers hero rows 0..100 of 407 (24% of the box). The chest band that carries this strip's measured motion is rows 106..171, entirely below the banner, so the performance lands where it can be seen.",
+    "reduced_motion": "reaction skipped entirely; stays on the idle sheet, body transform none"
+   }
+  }
+ ],
+ "refused": [
+  {
+   "item": "idle-12, 12 frames",
+   "cost_if_shipped": 1167292,
+   "reason": "WEAKER THAN THE LIVE INCUMBENT, which the fence refuses. Peak silhouette change vs rest 3.89% against the live 6-frame strip's 10.23% - 38% of the amplitude. It is also a different motion: the live idle is one clean weight shift ([0, 5.36, 10.07, 10.23, 5.44, 0]) and the candidate is a shallow double bob ([0, 0.97, 2.05, 3.16, 3.88, 3.01, 1.42, 0.56, 2.32, 3.64, 2.10, 0]). Visually the candidate barely moves across all 12 frames while the live strip visibly swaps which leg is forward. It IS smoother (max jump 2.10% against 18.74%), but it buys that by removing the motion rather than by filling it in. R122 fought to make this idle change pose; this would undo that.",
+   "what_would_be_accepted": "in-betweens of the LIVE weight shift - same 10.23% amplitude, same leg-swap, more frames through the f3->f4 cross-over that currently jumps 18.74% in one step."
+  },
+  {
+   "item": "feature-brace-12, 16 frames",
+   "cost_if_shipped": 1915161,
+   "reason": "NO DEFECT TO FIX, AND UNAFFORDABLE ANYWAY. The live 7-frame brace has no neighbour pair above 20% - it is four even ~19% steps, stepped but not popping. The candidate's meaningful variants (16f and 14f, max jump 17.33%) cost +1,915,161 and +1,451,021, neither of which fits beside the accepted win. The variants that DO fit are not improvements: brace_10f reaches 18.42% max but its MEAN jump is 14.32% against the live strip's 13.31%, so it is worse on average. Buying a 5% max-jump reduction for 515,760 bytes is not reviewer-visible smoothness.",
+   "what_would_be_accepted": "the 14- or 16-frame version, once there is ~1.5 MB of headroom for it."
+  },
+  {
+   "item": "approval-nod-8, 8 frames",
+   "cost_if_shipped": null,
+   "reason": "NOT ACTING. Peak silhouette change vs rest 1.63%, max neighbour jump 0.76%, and every one of its 7 pairs is under 1%. The live glance it would sit beside is 1.64% - identical magnitude - so it adds a second micro-motion rather than a performance. Visually the head does not perceptibly move. R124 refused an approval nod at 0.23% on the same grounds; this is the same refusal at a larger number. There is also no state to wire it to without inventing one."
+  },
+  {
+   "item": "feature-ambient-8, 8 frames",
+   "cost_if_shipped": null,
+   "reason": "RESTRAINED BUT NOT USEFUL. Peak 2.01% vs rest, max jump 1.54%. The brief admits it only if restrained AND useful; there is no feature-ambient state in HeroIdle, and the feature-active moment is already carried by the bgm_tension bed swap and the Overdrive visuals. Adding a state for a 2% motion is a new animation system, which the fence excludes."
+  }
+ ],
+ "corrections_to_my_own_instruments": [
+  "A first-pass lighting-only detector (silhouette < 1% AND rgb delta > 2) fired on LIVE glance 6f, a strip this project already ships, and on holds in every candidate. The threshold was wrong, not the art: shipped strips move RGB by 4.13 to 49.54 between genuinely different poses, so a delta of 3-10 is ordinary shading. Recalibrated to silhouette < 0.30% AND rgb delta above the shipped maximum, NO strip in this package has a single lighting-only frame.",
+  "A flat-cut detector reported a 326px run on the candidate win and 190px on the live incumbent. Scale-normalised those are 24.3% and 24.4% of canvas height - the same feature in both, and the live one was accepted at R124 after its own edge testing. It measures a naturally straight body edge at the silhouette's widest column, not a severed limb. Canvas-edge violations are 0 everywhere, which is the test that actually catches severing."
+ ],
+ "not_done": [
+  "No new CI gate measures hero animation smoothness. Nothing in this repo does. That remains true after R126.",
+  "The full 24-frame win is measurably the best strip in the package and is refused on budget alone. It becomes affordable if ~2.4 MB is freed elsewhere in dist.",
+  "Max win still covers the hero: MaxWinCelebration is a full-screen modal. Seven sessions running."
+ ]
+}

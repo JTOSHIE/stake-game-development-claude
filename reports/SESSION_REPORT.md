@@ -25823,3 +25823,201 @@ to their pre-session state.
   this brief.
 - **Max win still covers the hero.** `MaxWinCelebration` is a full-screen modal, six
   sessions running.
+
+---
+
+# R126 - ONE STRIP OF FIVE SHIPS, AND THE BUDGET DECIDED HOW MUCH OF IT
+
+**2026-08-26. Branch `claude/r126-hero-inbetween`. Review lane.**
+
+The package delivers what it claims. Only one of its five strips is both an improvement and
+affordable, and the 24-frame version of that one is measurably the best art here and still
+does not fit. What shipped is 14 of its 24 frames.
+
+## 1. WS1: census, and three directory names that lie
+
+Runtime frames total **68, exactly as claimed**. But three directories are misnamed and the
+CONTENTS are what match the brief:
+
+| Directory | Frames inside | Packed strip says | Brief asked for |
+|---|---|---|---|
+| win-unfold-16/ | **24** | `...24f-16320x1344.png` | 24-frame win |
+| feature-brace-12/ | **16** | `...16f-10880x1344.png` | 16-frame brace |
+| idle-12/ | 12 | `...12f-8160x1344.png` | 12-frame idle |
+| approval-nod-8/ | 8 | 8f | 8-frame nod |
+| feature-ambient-8/ | 8 | 8f | 8-frame ambient |
+
+24 + 16 + 12 + 8 + 8 = 68. A further 24 files under `qa/` are contact sheets, keyposes and the
+vendor's own reports: QA, not runtime art, and not counted.
+
+## 2. WS2: the hard gates, and two of my own instruments that were wrong
+
+Everything below was measured at **render size 206x407**, the hero's own stage box, which is the
+bar every hero decision since R121 has been taken at. Controls first, because a metric that cannot
+fail is not a measurement: a frame differs from itself by 0.00%, self-IoU is exactly 1.0, and a
+12px horizontal shift reads as 25.59%.
+
+**Encoder parity was established before any byte figure was quoted.** The shipped
+`hero_win_reaction_8f.png` is reproduced BYTE-FOR-BYTE by Pillow's `save(PNG, optimize=True)`
+(1,952,154 B, exactly), so every cost below is directly comparable to what ships. No optimiser
+(pngquant/oxipng/optipng) is on PATH or referenced in the build.
+
+| strip | f | max jump | p90 | >20% | >25% | max vs rest | chest travel | identity IoU | edge | ground |
+|---|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
+| LIVE idle | 6 | 18.74 | 5.48 | 0 | 0 | 10.23 | 137 flat | 1.0000 | 0 | 0 |
+| LIVE win | 8 | **26.68** | 26.28 | **2** | **2** | 26.52 | 137->193 | 1.0000 | 0 | 0 |
+| LIVE brace | 7 | 19.45 | 19.29 | 0 | 0 | 27.99 | 137->184 | 1.0000 | 0 | 0 |
+| CAND win | 24 | 15.58 | 14.51 | 0 | 0 | 27.04 | 126->194 | 0.9998 | 0 | 0 |
+| CAND idle | 12 | 2.10 | 1.94 | 0 | 0 | **3.88** | 137 flat | 0.9998 | 0 | 0 |
+| CAND brace | 16 | 17.33 | 15.49 | 0 | 0 | 28.16 | 126->187 | 0.9998 | 0 | 0 |
+| CAND nod | 8 | 0.76 | 0.65 | 0 | 0 | 1.63 | 137 flat | 0.9998 | 0 | 0 |
+| CAND ambient | 8 | 1.54 | 1.51 | 0 | 0 | 2.01 | 137 flat | 0.9998 | 0 | 0 |
+
+**THE DEFECT IS SPECIFIC AND IT IS ONLY IN THE WIN.** Reading the live win's neighbour jumps in
+order, `[2.08, 12.06, 26.28, 1.66, 26.68, 11.99, 2.12]`, the two 26% pairs are the arms snapping
+open (f3->f4) and snapping shut (f5->f6). Those two pops ARE the jitter. The live brace, by
+contrast, is `[1.54, 19.14, 18.86, 19.45, 19.29, 1.59]`: four even steps and no pop at all. The
+live idle is `[5.36, 5.38, 18.74, 5.48, 5.44]`, one cross-over snap where the weight shift changes
+which leg is forward in a single frame.
+
+**MY LIGHTING-ONLY DETECTOR WAS WRONG AND FIRED ON SHIPPED ART.** A first pass flagged any pair
+with silhouette change under 1% and RGB delta over 2 as "lighting-only", and it flagged three pairs
+of LIVE glance 6f, a strip this project already ships, plus holds in every candidate. The threshold
+was the problem, not the art: across shipped strips, RGB moves 4.13 to 49.54 between genuinely
+different poses, so a delta of 3-10 is ordinary shading and anti-aliasing. Recalibrated against
+shipped art (silhouette < 0.30% AND RGB delta above the shipped maximum), **no strip in this package
+contains a single lighting-only frame.** The near-static pairs are holds, and they sit exactly where
+an animator puts them: easing out of rest, the peak, and settling back.
+
+**MY FLAT-CUT DETECTOR ALSO NEEDED A CONTROL.** It reported a 326px straight run at the silhouette's
+widest column on the candidate win and 190px on the live incumbent. Scale-normalised those are 24.3%
+and 24.4% of canvas height: the same feature in both, and the live one passed R124's own edge
+testing. It measures a naturally straight body edge, not a severed limb. Canvas-edge violations,
+which is the test that actually catches severing, are **0 on every frame of every strip**.
+
+## 3. WS3: the budget, which decided the session
+
+Measured from a real build, the way `build_diet_verify` counts (sum of file sizes under `dist/`):
+
+- before: **24,464,517 B**, headroom **1,749,883 B**
+- after: **25,425,888 B**, headroom **788,512 B**, cap 26,214,400 B
+
+Packed at the incumbent's exact per-frame size (394x780, 0.58 scale), the candidates cost:
+
+| variant | bytes | net vs live | max jump |
+|---|---:|---:|---:|
+| win 24f | 5,305,165 | **+3,353,011** | 15.58 |
+| win 16f | 3,333,380 | +1,381,226 | 19.72 |
+| **win 14f (shipped)** | **2,913,522** | **+961,368** | **18.63** |
+| win 12f | 2,485,879 | +533,725 | 19.72 |
+| brace 16f | 3,601,941 | +1,915,161 | 17.33 |
+| brace 10f | 2,202,540 | +515,760 | 18.42 |
+| idle 12f | 2,569,985 | +1,167,292 | 2.08 |
+
+The 24-frame win is the best strip in the package and misses the budget by 1.6 MB on its own.
+
+**A MINIMAX FRAME PICK WAS TRIED AND DELIBERATELY THROWN AWAY.** Choosing 12 of the 24 frames to
+minimise the worst neighbour jump reached **15.01%** - better than the full 24-frame strip - for
++538,765 bytes. It was rejected on inspection of the frames it picked:
+`[1,2,3,7,8,11,12,14,17,18,19,24]`, gaps of `1,1,4,1,3,1,2,3,1,1,5`. `steps()` plays frames at
+UNIFORM time intervals, so a pick that samples the wind-up every frame and the settle every fifth
+frame replays an evenly-timed performance unevenly: it would linger on the wind-up and snap through
+the settle. **Spatial smoothness bought with temporal distortion is not smoothness.** Even spacing
+preserves the timing the artist drew, and that is what shipped.
+
+Naive even spacing had its own failure worth recording: `linspace(0,23,12)` skips source frames 12
+and 13 and takes 11 and 14, so the 12-frame sheet peaked at chest 187 against the live incumbent's
+193. Every downsample in this session therefore force-includes both pose extremes.
+
+RGB-under-zero-alpha on the shipped sheet: **0 dirty pixels** of 2,619,520 transparent ones, zeroed
+before AND after the resample.
+
+## 4. WS4: wiring, and the one place the frame count is hardcoded
+
+Three edits in `HeroIdle.svelte`: `SHEET.win`, `FRAMES.win` 8 -> 14, and the CSS
+`steps(8, jump-none)` -> `steps(14, jump-none)`. `background-size` and `--hero-span` both derive
+from `FRAMES.win`, so **the CSS `steps()` is the only site that does not**. A stale `steps(8)` there
+does not throw, does not 404 and fails no gate in this repo: it silently plays 8 of 14 frames and
+stops mid-gesture. That is why the swap is verified below by counting positions rather than by
+assuming.
+
+Timing is unchanged at 1500 ms, which is the point: 14 frames in the same window is 107 ms a frame
+against the old 187 ms, so density buys smoothness without touching pacing, and `holdFor()`'s
+1500 ms hold still matches the CSS exactly. The epic path is unchanged (flipbook 1.5 s, body punch
+1.9 s, hold 1900 ms), and since the strip ends on rest there is nothing to truncate.
+
+**THE TRANSFORM LAYER WAS LEFT ALONE, AND THAT IS A MEASURED DECISION.** The brief allows reducing
+the sway if dense frames look drunk. The win punch is translation-led on a different axis from the
+flipbook's arm motion, so the two compose rather than fight, and the live capture shows 60 distinct
+`.hero-body` transforms across the reaction with no visible conflict. R122's cut of the idle sway
+was needed because two LATERAL motions fought; this is not that case.
+
+Three stale comments were corrected in passing, all the same class of drift: `HeroIdle.svelte`
+called the idle "a five-frame breathe" and its own `steps(5) over a FULL five-frame span" when the
+code has said six since R122, and quoted the idle cadence as 0.88 s (4400/5) when it is 0.73 s
+(4400/6). `SceneGroup.svelte` called it "a five-frame flipbook". `SceneGroup.svelte:227`'s
+`booster-flicker ... steps(6, jump-none)` is the CAR, not the hero, and was deliberately not touched.
+
+## 5. WS5: proved in the running game
+
+- **All 14 frames play.** Stepping the paused animation across 1500 ms yields exactly **14 distinct
+  `background-position-x` values, 0px to -2678px in exact 206px increments**. `background-size` is
+  2884px (206 x 14) and `--hero-span` is -2678px (206 x 13). Nothing is truncated at 8.
+- **The state machine holds for 1499 ms** and returns to idle, matching `DURATION_MS.win`.
+- **60.1 fps** across the reaction, measured by counting rAF callbacks over 1514 ms.
+- **Zero console errors, zero failed or 4xx hero requests.**
+- **Reduced motion is genuinely off**: `data-motion` stays `idle` through a win, the sheet stays
+  `hero_crossed_idle_6f.png`, `.hero-body` transform is `none` and no punch animation is running.
+  Reactions are skipped, not damped, which is what that setting is for.
+- **Banner occlusion, from real element rects rather than a screenshot**: the win banner (`.c1-win`,
+  z-index 100) covers hero rows **0..100 of 407**, 24% of the box. The chest band that carries this
+  strip's measured motion is rows **106..171**, entirely below it. The performance lands where the
+  player can see it.
+
+**Is the jitter gone?** In the win, yes: both pairs above 25% are gone and nothing exceeds 20%.
+**Does it read as animation rather than stills?** In the win, yes. Everywhere else the answer is
+unchanged, because nothing else shipped.
+
+## 6. WS6: what shipped, what was refused
+
+**SHIPPED: one strip.** `hero_win_reaction_14f.png`, 14 frames of 24, replacing (not joining) the
+8-frame sheet. Live frame counts are now **idle 6, win 14, energy 7, glance 6**.
+
+**Thinned for budget: yes, and only this one.** 24 -> 14 frames, evenly spaced with both pose
+extremes preserved. It is the single compromise in the session and it is a budget compromise, not a
+quality one.
+
+**REFUSED: four.**
+
+1. **idle 12f** - weaker than the incumbent, which the fence refuses outright. Peak 3.89% against
+   10.23%: 38% of the amplitude. It is also a different motion, a shallow double bob against one
+   clean weight shift, and visually it barely moves across all 12 frames while the live strip
+   visibly swaps which leg is forward. It is smoother, but it buys that by removing motion rather
+   than filling it in. R122 fought to make this idle change pose.
+2. **brace 16f** - no defect to fix and unaffordable anyway. The live brace has no pair above 20%.
+   The variants that would improve it cost +1,915,161 and +1,451,021, neither of which fits beside
+   the win. The variant that does fit (10f, +515,760) has a WORSE mean jump than the live strip,
+   14.32% against 13.31%.
+3. **approval nod 8f** - not acting. Every one of its 7 pairs is under 1%, peak 1.63% vs rest, and
+   the live glance beside it is 1.64%. R124 refused an approval nod at 0.23% on the same grounds.
+4. **feature ambient 8f** - restrained but not useful. Peak 2.01%, and there is no feature-ambient
+   state to wire it to; the feature-active moment is already carried by the `bgm_tension` bed swap.
+
+**Remaining animation gaps.**
+- The **24-frame win** is measurably the best art in this package and is refused on budget alone. It
+  becomes affordable if roughly 2.4 MB is freed elsewhere in `dist`.
+- The **idle still has its 18.74% cross-over snap**. The fix is in-betweens of the LIVE weight shift
+  at its own amplitude, not a new smaller motion.
+- The **brace is still stepped** at four even ~19% jumps. Worth revisiting at ~1.5 MB of headroom.
+- **Nothing in CI measures hero animation at all** - not smoothness, not frame count, not motion.
+  That was true before R126 and is still true. Every number in this report came from a script written
+  for this session and thrown away.
+- **Max win still covers the hero.** `MaxWinCelebration` is a full-screen modal, seven sessions now.
+
+## 7. What R126 did not do
+
+- **No new CI gate.** See above; it is a real gap and it was outside this brief.
+- **No WebP.** It remains an owner decision and no new media pipeline was invented.
+- **The transform layer was not retuned**, on the measured grounds in section 4.
+- **The four refused strips were not modified or partially salvaged.** They are refused, not parked
+  in a half-state.

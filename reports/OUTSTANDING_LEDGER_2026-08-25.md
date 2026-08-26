@@ -4,6 +4,65 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0X. R126 - THE WIN IS SMOOTH NOW, AND THE BUDGET DECIDED THE REST
+
+**Branch `claude/r126-hero-inbetween`.** Package delivered 68 runtime frames as claimed. **One strip
+of five shipped.**
+
+**THREE DIRECTORY NAMES LIE AND THE CONTENTS ARE RIGHT.** win-unfold-16/ holds 24 frames,
+feature-brace-12/ holds 16, idle-12/ holds 12. 24+16+12+8+8 = 68. The brief's priority list
+matched the contents, not the folder names.
+
+**THE DEFECT WAS ONLY EVER IN THE WIN, AND IT IS TWO FRAMES WIDE.** Live win neighbour jumps read
+`[2.08, 12.06, 26.28, 1.66, 26.68, 11.99, 2.12]`: the arms snap open at f3->f4 and shut at f5->f6.
+Those two pops ARE the jitter. The live brace is `[1.54, 19.14, 18.86, 19.45, 19.29, 1.59]`, four
+even steps and no pop; the live idle is one 18.74% cross-over where the weight shift swaps legs in a
+single frame.
+
+**SHIPPED: `hero_win_reaction_14f.png`, 14 of 24 frames**, replacing the 8-frame sheet. Max
+neighbour jump **26.68% -> 18.63%**, pairs above 20% **2 -> 0**, pairs above 25% **2 -> 0**, while
+the peak pose gets slightly BIGGER (chest 137->193 becomes 126->194, adding an anticipation crouch
+the live strip has not got). Identity IoU 1.0000, edge violations 0, ground drift 0, f1==fN exactly.
+Cost +961,368 B. **dist 24.25 MB of 25, headroom 1.67 MB -> 0.75 MB.**
+
+**THE 24-FRAME VERSION IS THE BEST ART HERE AND IS REFUSED ON BUDGET ALONE**: +3,353,011 B against
+1,749,883 of headroom. It misses by 1.6 MB. Affordable again if ~2.4 MB is freed elsewhere.
+
+**A MINIMAX FRAME PICK BEAT THE FULL 24-FRAME STRIP AND WAS THROWN AWAY ON PURPOSE.** 12 frames
+chosen to minimise the worst jump reached 15.01%, better than 24 frames at 15.58%, for a third of
+the bytes. Its gaps were `1,1,4,1,3,1,2,3,1,1,5`. `steps()` plays frames at UNIFORM intervals, so
+that pick would linger on the wind-up and snap through the settle. **Spatial smoothness bought with
+temporal distortion is not smoothness.** Even spacing shipped. Separately, naive even spacing drops
+the peak (a 12f linspace pick topped out at chest 187 against the live 193), so every downsample
+force-includes both pose extremes.
+
+**TWO OF MY OWN INSTRUMENTS WERE WRONG AND THE CONTROLS CAUGHT BOTH.** A lighting-only detector
+flagged three pairs of LIVE glance 6f, a strip already shipping - the threshold was wrong, not the
+art (shipped strips move RGB 4.13 to 49.54 between real poses, so 3-10 is ordinary shading).
+Recalibrated against shipped art, NO strip in the package has a lighting-only frame. A flat-cut
+detector reported 326px on the candidate and 190px on the live incumbent; scale-normalised those are
+24.3% and 24.4% of canvas height, the same naturally straight body edge in both.
+
+**REFUSED, FOUR.** *idle 12f*: weaker than the incumbent, peak 3.89% against 10.23%, 38% of the
+amplitude, and a shallow double bob rather than one weight shift - it is smoother by REMOVING motion,
+which undoes what R122 fought for. *brace 16f*: the live brace has no pop to fix, and the variants
+that improve it (+1,915,161 / +1,451,021) do not fit beside the win, while the one that does fit has
+a WORSE mean jump than live (14.32% vs 13.31%). *approval nod 8f*: all 7 pairs under 1%, peak 1.63%
+against the live glance's 1.64% - not acting, same refusal R124 made at 0.23%. *feature ambient 8f*:
+peak 2.01% and no state to wire it to.
+
+**PROVED IN THE RUNNING GAME**: 14 distinct `background-position-x` values, 0 to -2678px in exact
+206px steps, so nothing truncates at 8 (the CSS `steps()` is the ONE site that does not derive from
+`FRAMES.win`, and a stale one fails silently). Hold 1499 ms. 60.1 fps. Zero console errors. Reduced
+motion genuinely skips the reaction. Banner covers hero rows 0..100 of 407; the chest band carrying
+the motion is rows 106..171, entirely visible.
+
+**STILL OPEN AFTER R126.** The 24-frame win, on budget. The idle's 18.74% cross-over snap, which
+needs in-betweens of the LIVE weight shift at its own amplitude rather than a smaller motion. The
+brace's four even ~19% steps, at ~1.5 MB. **Nothing in CI measures hero animation at all** - not
+smoothness, not frame count, not motion - which was true before R126 and still is. Max win still
+covers the hero (`MaxWinCelebration` is a full-screen modal, seven sessions).
+
 ## 0W. R125 - THE GUIDE'S LAST PAINTED ROW IS GONE, AND THE AUDIO PATH IS MAPPED
 
 **Branch `claude/r125-features-audio`.**
@@ -131,9 +190,15 @@ both strips; smallest margin 36px. The supplier ADDED the test R122 asked for an
 per-frame min/max opaque x (my figures differ by 1px only because I threshold at alpha>127). ***
 
 **BOTH SHIPPED, packed at 0.58 like R122**, drop-in (frame counts and filenames unchanged, NO code
-change): `hero_win_reaction_8f.png` 1,918,408 bytes (+419,131) and `hero_feature_trigger_7f.png`
+change): hero_win_reaction_8f.png 1,918,408 bytes (+419,131) and `hero_feature_trigger_7f.png`
 1,686,780 (+190,042). Net +609,173. dist **23.27 MB of 25**, headroom 1.73 MB. Residual RGB under
 alpha 0 = 0 (one of seven brace frames carried fringe; zeroed before AND after resample).
+
+> **R126 NOTE, 2026-08-26.** The win filename above is de-backticked because that file no
+> longer exists: R126 replaced it with a 14-frame sheet, hero_win_reaction_14f.png. The R123
+> numbers are left exactly as they were recorded, because they were true when written; only
+> the path citation is softened so the doc-currency gate stops reading a historical statement
+> as a live claim. See section 0X.
 
 **THE FEATURE BRACE BEATS EVEN THE BROKEN v1** while being edge-safe: mean 5.75% (floor >4.0), path
 34.52%, XOR/rest 33.40%, chest width 137->184 (+47px). Incumbent was 0.44% / 2.61% / 3.19% / +1px.
