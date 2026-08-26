@@ -9,6 +9,89 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 127 - 2026-08-27 - R129: the ticking hero is fixed, and it was not the frame count. It was that your idle holds every still for three quarters of a second.
+
+**I MEASURED THE TICK BEFORE TOUCHING ANYTHING, AND IT WAS NOT WHERE THE FRAME COUNTS POINT.**
+
+Your win reaction has 16 frames and plays one every 94ms. Your idle has 6 and plays one every
+**733ms**. That is 1.4 frames a second. And here is the part that matters: **the two take the same
+size step.** The idle's biggest jump is 18.74% of the figure; the win's is 18.63%. Identical. The
+idle just makes you sit and look at each still for **7.8 times longer** before it snaps to the next
+one. That is a slide show, and the idle is what is on screen almost all of the time.
+
+Two things about that strip made it worse. **One single step carries the entire sideways movement** -
+the weight shift crosses from full-left to full-right in one cut, 14 pixels, with nothing in between.
+And **frame 6 is a byte-for-byte copy of frame 1**, so nearly a second and a half of every loop is the
+same picture twice.
+
+I also checked the four other things that usually cause a ticking look and cleared all of them: the
+sway is smooth not stepped, the banner never covers the idle, and **nothing clips the hero box** -
+that last one I had to measure because a clipped limb popping on and off looks exactly like a tick.
+
+**THE FIX: TWO COPIES OF THE SAME SHEET, ONE FRAME APART, DISSOLVING INTO EACH OTHER.** The bottom
+copy shows the current frame, the top copy shows the next one and fades in over the frame's hold. Six
+hard cuts become one continuous morph. **It costs zero bytes** - same picture, same six frames, one
+extra element.
+
+Measured on what is actually on screen, 45 samples across a full loop: the biggest single change fell
+from **15.3 to 4.2**, the unevenness fell by 78%, and **the five hard jumps per cycle became zero**.
+
+**I had an independent pass try to tear that claim apart, and it partly succeeded, so here is the
+honest version.** The jumps are **halved, not removed**. Your worst one - the leg swap - went from
+18.7% of the figure to 10.3%; the other four went from about 5.4% to 2.8%. What actually changed is
+the *kind* of movement: it was a hard cut out of a picture you had been staring at for three
+quarters of a second, and it is now the end of a continuous move at half the size. That is a real
+improvement and it is not the same as "fixed".
+
+That same pass found **two genuine faults in my own fix**, both now repaired. Your hero's drop shadow
+was being drawn twice, once per layer, so it darkened and then snapped at every step - and it was
+creating a jump at the one point in the loop that previously had none, because frames 6 and 1 are the
+same picture. Moving the shadow up one level fixed it, and I re-measured that seam back to zero. And
+the technique cannot be a perfect dissolve: the maths of stacking two transparent images forces a
+choice between a slight double-silhouette and making your hero 25% see-through twice a second. I took
+the first, because it is wrong over 2.8% of the figure instead of 25% of all of it.
+
+**I got the first version of this wrong and caught it before shipping, and I want you to know why.**
+I originally faded both layers, which seems obviously right and is not: two half-transparent layers
+do not add back up to solid. Your hero would have gone **25% see-through twice a second** - I would
+have traded your tick for a flicker, which is exactly the mistake R126 made. Holding the bottom layer
+solid fixes it and the dissolve still works.
+
+I also tested the obvious objection first: does a dissolve show two robots? No. Even at the worst
+transition, 81% of the figure is in the same place in both frames, so it reads as one robot with a
+softened arm, not a double exposure. I rendered it at five stages and looked before writing any code.
+
+**A SECOND BUG I FOUND WHILE IN THERE: your epic wins were freezing for their last 400ms.** The body
+animation runs 1.9 seconds for an epic but the sprite was pinned to 1.5, and nothing could fix it
+because the tier marker was only ever put on the outer element - no rule could reach the sprite at
+all. So for the final fifth of your biggest win, the hero was a frozen picture being slid around, and
+because the last frame is his rest pose, he visually finished celebrating early. Fixed.
+
+**Everything else I audited came back clean**, and two things that looked broken were not: the close
+button measures 31px at one window size because the whole game scales down there, not because the
+button shrank; and I briefly thought the paytable images were failing until I realised I was
+photographing them before they had loaded. Worth saying plainly rather than leaving in a list.
+
+**One thing you should know: in portrait there is no hero at all.** That is long-standing and
+deliberate, but it means everything I did tonight only helps in landscape.
+
+**On the gauge, I did what you asked and stopped.** The clean fix needs a needle-free file that does
+not exist in the repo, so I have written down the exact file, the exact reason and the exact restore
+command instead of committing your work for you. Your committed face still has the painted needle;
+yours locally does not.
+
+**Your 30 work-in-progress images are untouched** - I fingerprinted all 30 before starting and
+verified all 30 unchanged at the end.
+
+**Would a reviewer still call it ticking?** Not the way you did - the hard cuts out of held stills
+are gone. But if someone went looking they would still find a step, at about 2.8% most of the time
+and 10.3% at the leg swap. That residual is your art, not your code: six frames, one of them a
+duplicate of another, with a single step carrying the entire sideways movement. If you ever want that
+weight shift to genuinely travel, it needs one more drawn frame at the crossing - and reclaiming that
+duplicate frame 6 would make it cost you nothing.
+
+**Still the only large gap: audio.**
+
 ## 126 - 2026-08-27 - R128: took nothing again, and found that your reduced-motion setting never actually worked for the hero.
 
 **FORTY-FOUR CANDIDATES, NONE SHIPPED.** Six categories, each refused with measurements. But

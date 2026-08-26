@@ -93,10 +93,28 @@
   // Declared here rather than beside the win latch because holdFor() reads it.
   let winTier: 'big' | 'epic' = 'big'
   let reduced = false
+  let reduceMq: MediaQueryList | undefined
+  let onReduceChange: ((e: MediaQueryListEvent) => void) | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
 
   onMount(() => {
-    reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // R129: THIS USED TO BE A ONE-SHOT READ AND THAT WAS WRONG IN BOTH DIRECTIONS.
+    // macOS Accessibility > Reduce motion propagates to a live tab without a reload, so a
+    // single read at mount goes stale the moment a player toggles it. Turning it ON left
+    // `reduced` false and reactions kept firing at someone who had just asked them to stop;
+    // turning it OFF left `reduced` true and the hero never reacted again for the rest of
+    // the session. Both were reachable by a real user action, and an adversarial pass
+    // produced the first one in a browser.
+    const rmq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reduced = rmq.matches
+    onReduceChange = (e: MediaQueryListEvent) => {
+      reduced = e.matches
+      // Drop anything in flight immediately rather than letting it play out: a player who
+      // turns this on mid-reaction wants it to stop now, not in 1.9 seconds.
+      if (e.matches) { clearTimeout(timer); motion = 'idle' }
+    }
+    rmq.addEventListener('change', onReduceChange)
+    reduceMq = rmq
     // Warm both reaction sheets so the first one to play does not decode on the
     // frame it is needed. They would be fetched anyway; this only moves the cost.
     for (const key of ['win', 'energy', 'glance'] as HeroMotion[]) {
@@ -104,7 +122,10 @@
       img.src = `${assetBase}/ui/hero/${SHEET[key]}`
     }
   })
-  onDestroy(() => clearTimeout(timer))
+  onDestroy(() => {
+    clearTimeout(timer)
+    if (reduceMq && onReduceChange) reduceMq.removeEventListener('change', onReduceChange)
+  })
 
   /** Play a one-shot, then hand the element back to the idle. */
   // R121: the epic punch runs 1.9s where the standard one runs 1.5s, so the hold
@@ -180,14 +201,30 @@
      every frame in every strip is the same locked pose under different lighting
      (measured, see the style block), so body motion has to come from a transform. -->
 <div class="hero-body" data-motion={motion} data-tier={motion === 'win' ? winTier : null} aria-hidden="true">
+  <!-- R129, TWO STACKED FLIPBOOK LAYERS FOR THE IDLE ONLY. Layer A is the element
+       everything already knew about and keeps the test id; layer B sits under it,
+       runs the SAME sheet one frame ahead, and the two cross-dissolve. See the
+       style block for why, and for why the reactions deliberately do NOT get this. -->
   <div
-    class="hero-idle"
+    class="hero-idle hero-layer-a"
     data-motion={motion}
+    data-tier={motion === 'win' ? winTier : null}
     data-testid="hero-idle"
     aria-hidden="true"
     style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
            background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
-           --hero-span: {SPAN_PX[motion]}px;"
+           --hero-span: {SPAN_PX[motion]}px;
+           --hero-frame: {DURATION_MS[motion] / FRAMES[motion]}ms;"
+  ></div>
+  <div
+    class="hero-idle hero-layer-b"
+    data-motion={motion}
+    data-tier={motion === 'win' ? winTier : null}
+    aria-hidden="true"
+    style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
+           background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
+           --hero-span: {SPAN_PX[motion]}px;
+           --hero-frame: {DURATION_MS[motion] / FRAMES[motion]}ms;"
   ></div>
 </div>
 
@@ -217,7 +254,7 @@
      compose instead of fighting. There is deliberately NO translateY here.
 
      WHY 7.2s AGAINST THE FLIPBOOK'S 4.4s. Equal periods would lock the sway to
-     the breath and read as a metronome. 4.4 and 7.2 only re-align every 39.6s,
+     the breath and read as a metronome. 4.4 and 7.2 only re-align every 79.2s (R129: this said 39.6s, which is where the sway is at the OPPOSITE extreme - 9.0000 flipbook cycles against 5.5000 sway cycles - so it is the anti-alignment, not the re-alignment. LCM(4.4, 7.2) = 79.2),
      so the combined motion does not visibly repeat.
 
      DISTINCT KEYFRAME NAMES PER STATE, for the same reason the flipbook needs
@@ -228,6 +265,10 @@
     inset: 0;
     transform-origin: 50% 97%;   /* the feet, not the centre */
     will-change: transform;
+    /* Matches the flat sprite's own shadow, so no mode changes how the hero sits in the
+       scene. It lives HERE rather than on the sheet layers so it is computed once from
+       the composite of both - see the note in .hero-idle. */
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
   }
   /* R122: amplitude cut from 1.05deg to 0.32deg. MEASURED: with the new
      weight-shift strip the frames alone give 1.614% silhouette change and
@@ -253,20 +294,33 @@
      the HEAD band, which the banner covers, and the player saw almost none of the
      reaction he earned.
 
-     R126 RE-MEASURED THE BANNER AND THE OLD FIGURE HERE WAS WRONG. This said the
-     banner "covers the hero's own rows 15..185", derived from `top:310` read as the
-     banner's TOP edge. WinBanner sets `top:310px` WITH `translateY(-50%)`, so 310 is
-     the band's CENTRE, not its top. Measured live from element rects at 1280x720:
-     the banner (.c1-win, z-index 100) spans y240..380 and the hero box spans
-     y280.5..695.1, so it covers the hero's rows 0..100 of 407, which is 24% of the
-     box. The conclusion is unchanged and the reasoning below still holds - a
-     rotation about the feet is head-weighted by construction, and the head is
-     exactly what is covered.
+     THE BANNER GEOMETRY, RE-DERIVED AT R129 BECAUSE R126's CORRECTION WAS ITSELF WRONG.
+     The original figure said the banner "covers the hero's own rows 15..185", from
+     reading `top:310` as the banner's TOP edge; WinBanner pairs it with
+     `translateY(-50%)`, so 310 is the band's CENTRE. R126 corrected that and introduced
+     three new errors of its own, which an adversarial pass caught and which are fixed
+     here. It reported the hero box as y280.5..695.1, height 414.6 - that is a MID-PUNCH
+     TRANSFORMED rect quoted as the resting box - and it quoted one tier's coverage
+     against another tier's rectangle. The tell was arithmetic: its own two shares summed
+     to 99.4, which cannot be a two-way partition.
 
-     WITH R126's 16-FRAME STRIP, 71.1% of the reaction's silhouette change falls in
-     rows 101..407, below the banner, and only 28.3% behind it. The chest band
-     (rows 106..171) alone carries 39.0%. The reaction the player earns is the part
-     he can see.
+     Measured live at 1280x720, stage scale 1, and re-derived offline on the shipped
+     16-frame sheet. The hero box is y294.98..702.02, height 407.04, which is BOX_H.
+     The banner height is per-tier, so the coverage is too:
+
+         tier   banner span    covers hero rows   share of the reaction's motion
+         big    y254.5..365.5      0..73                 12.68% behind, 87.32% below
+         mega   y240  ..380        0..85                 17.83% behind, 82.17% below
+         epic   y224  ..396        0..101                29.44% behind, 70.56% below
+
+     Each pair sums to exactly 100.00. The hero reacts from BIG_WIN_THRESHOLD = 10x, so
+     the COMMON case is the big tier and 87% of the motion is visible; even at epic it is
+     71%. The chest band, rows 106..171, carries 40.07% on its own (39.00% is rows
+     106..170 - the previous figure was an off-by-one in the stated band).
+
+     The conclusion the rest of this note rests on is unchanged and is now better
+     supported: a rotation about the feet is head-weighted by construction, and the head
+     is exactly the part the banner covers.
 
      A rotation about the feet displaces each row in proportion to its height, so
      it is head-weighted by construction. A TRANSLATION displaces every row
@@ -327,7 +381,14 @@
     background-position-x: 0;
     /* Matches the flat sprite's own shadow, so no mode changes how the hero sits
        in the scene. */
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
+    /* R129: THE DROP-SHADOW MOVED UP TO .hero-body AND THAT IS A REAL FIX, NOT TIDYING.
+       With two stacked layers each carrying its own drop-shadow, the shadow is drawn
+       TWICE wherever they overlap, so it darkened as layer B faded in and then snapped
+       back at every step boundary. An adversarial pass measured the skirt going 0.1291
+       to 0.3033 mean alpha across a hold, a 2.35x pulse at 1.36 Hz, and a 3.269 pop at
+       the frame6->frame1 seam - a seam that is otherwise a perfect no-op, because those
+       two frames are byte-identical. One shadow, computed once from the composite on the
+       parent, removes both. */
   }
 
   /* THREE SEPARATE KEYFRAME NAMES, DELIBERATELY, even though the bodies are
@@ -353,7 +414,106 @@
     to   { background-position-x: var(--hero-span); }
   }
 
-  .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(6) infinite; }
+  /* ===== R129, THE CROSS-DISSOLVED IDLE ====================================
+     THE DEFECT, MEASURED BEFORE ANY CHANGE. The owner's word was "ticking", and
+     the numbers agree, but not where you would guess. Neighbour-frame silhouette
+     change at render size 206x407, against the time each still is HELD:
+
+         idle    6 frames / 4400ms =  733ms a frame ( 1.4 fps)  worst step 18.74%
+         win    16 frames / 1500ms =   94ms a frame (10.7 fps)  worst step 18.63%
+         brace   7 frames / 1300ms =  186ms a frame ( 5.4 fps)  worst step 19.45%
+
+     The win and the idle take the SAME SIZE STEP. The idle holds it 7.8x longer.
+     At 1.4 fps the eye fully resolves each still and then watches it snap: that is
+     a slide show, and it is the state on screen almost all the time. The tick is
+     TEMPORAL, and it is the idle. The reactions are not the problem.
+
+     THE FIX IS TWO STACKED COPIES OF THE SAME SHEET, ONE FRAME APART, DISSOLVING.
+     Layer A shows frame N at FULL opacity throughout; layer B sits one frame ahead
+     showing N+1 and fades in over the frame's hold, on top of it. At each step boundary A becomes N+1 at
+     full opacity while B becomes N+2 at zero, so the composite is continuous
+     across the seam rather than cutting. Six discrete stills become one continuous
+     morph. It costs ZERO BYTES: same sheet, same six frames, one extra element.
+
+     WHAT IT DOES NOT DO, AND AN ADVERSARIAL PASS IS WHY THIS PARAGRAPH EXISTS.
+     This is NOT a true cross-dissolve and it cannot be one. Two stacked RGBA layers
+     composite as out = aTop + aBottom(1 - aTop), so holding composite alpha at 1
+     REQUIRES the bottom layer to stay opaque - which means at the end of every dissolve
+     the composite carries the OLD frame's silhouette as well as the new one, and then
+     snaps back to a single frame at the step. The alternative, fading both, removes the
+     union but drops composite alpha to 0.750 at every midpoint: a 25% translucency pulse
+     on the whole figure, 1.4 times a second. The algebra forces a choice between the two.
+     Measured offline on the real sheet, exactly:
+         hold      old hard cut     new end-of-dissolve snap
+         f1->f2         5.36%              2.80%
+         f2->f3         5.38%              2.79%
+         f3->f4        18.74%             10.32%
+         f4->f5         5.48%              2.80%
+         f5->f6         5.44%              2.76%
+         f6->f1         0.00%              0.00%
+     So the pops are roughly HALVED, not removed, and the loop's one free transition (f6
+     and f1 are byte-identical) stays free. The union was chosen over the alpha dip on
+     area: the dip is 25% wrong across 100% of the figure, the union is 100% wrong across
+     2.8% of it, so the union is between 2.4x and 9x less wrong by area. It is also the
+     END of a 733ms continuous move rather than a cut out of a held still, which is a
+     different thing perceptually even at the same number.
+
+     WHY IT DOES NOT GHOST TWO BODIES, WHICH IS THE OBVIOUS OBJECTION. Measured
+     per pair, the share of the union that is solid in only one of the two frames
+     is 5.4%, 5.4%, 18.7%, 5.5%, 5.4%. Four of five transitions are near-invisible.
+     Even the worst - frame 3 to 4, where the weight shift swaps which leg is
+     forward - leaves 81.3% of the figure common to both, so the composite reads as
+     ONE robot with a softened limb, not as two. Rendered and inspected at 0, 25,
+     50, 75 and 100% before this was written.
+
+     WHY THE REACTIONS DO NOT GET THIS, AND IT IS NOT AN OVERSIGHT. The one-shots
+     use steps(n, jump-none) with `forwards`, so they END on the last frame and
+     hold it. A layer running one frame AHEAD would run off the end of the sheet
+     there and the hero would fade to nothing at the close of every reaction. They
+     also do not need it: at 94ms and 186ms a frame they are 7.8x and 3.9x faster
+     than the idle. Layer B is therefore inert unless data-motion is 'idle'.
+
+     --hero-frame is the state's own ms-per-frame, computed in the markup from
+     DURATION_MS / FRAMES, so the dissolve can never drift out of phase with the
+     steps: both are derived from the same two numbers rather than restated. */
+  .hero-layer-b { opacity: 0; animation: none; }
+  /* Layer B carries the class `hero-idle`, so the reaction rules below match it too
+     and it would run a second, invisible copy of every one-shot at opacity 0. It is
+     harmless but it is a compositor animation doing nothing, and it makes the claim
+     "layer B is inert unless the state is idle" false in the computed styles even
+     though it is true on screen. Made literally true here.
+     BOTH CLASSES ON PURPOSE: `.hero-layer-b:not([attr])` is (0,2,0) because :not()
+     takes its argument's specificity, which exactly TIES the reaction rules below and
+     then loses on source order. Verified by reading the computed animation-name in the
+     browser: it still reported hero-cycle-win. Adding .hero-idle makes it (0,3,0).
+     Third specificity tie this file has lost while looking like it should have won. */
+  .hero-idle.hero-layer-b:not([data-motion='idle']) { animation: none; }
+
+  /* LAYER A DOES NOT FADE, AND THAT IS A CORRECTION TO THIS SESSION'S OWN FIRST
+     ATTEMPT. It originally ran hero-dissolve-out while B ran hero-dissolve-in, which
+     looks symmetrical and is wrong: two stacked SEMI-TRANSPARENT layers do not
+     composite back to solid. For a pixel opaque in both frames, source-over gives
+     out = a_top + a_bot(1 - a_top) = t + (1-t)^2, which dips to 0.750 at t=0.5. The
+     hero went 25% TRANSPARENT at every dissolve midpoint, 1.4 times a second - a
+     brightness pulse traded for the tick, which is exactly the kind of swap R126 was
+     burned by. Holding the bottom layer solid gives t + 1(1-t) = 1.000 at every t,
+     and the colour still lerps correctly because the TOP layer's own alpha does the
+     blending. Verified arithmetically before the change and by sampling computed
+     opacity after it. */
+  .hero-layer-a[data-motion='idle'] {
+    animation: hero-cycle-idle 4.4s steps(6) infinite;
+  }
+  .hero-layer-b[data-motion='idle'] {
+    animation: hero-cycle-idle 4.4s steps(6) calc(-1 * var(--hero-frame)) infinite,
+               hero-dissolve-in var(--hero-frame) linear infinite;
+  }
+  @keyframes hero-dissolve-in  { from { opacity: 0; } to { opacity: 1; } }
+
+  /* The old single rule `.hero-idle[data-motion='idle']` lived here and is GONE on
+     purpose. It was (0,2,0), exactly tying the two layer rules above, and it sat
+     LATER in source order - so it would have won and silently overwritten both
+     dissolve animations with the plain one-layer flipbook. The two rules above now
+     cover both layers between them, so it is redundant as well as harmful. */
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the idle resuming. */
   /* R126: steps(16), not steps(8). THIS IS THE ONE PLACE THE FRAME COUNT IS
@@ -361,6 +521,21 @@
      markup above, so a denser sheet with a stale steps() here does not error, it
      silently plays the first 8 of 16 frames and stops mid-gesture. */
   .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(16, jump-none) 1 forwards; }
+  /* R129: THE EPIC WIN'S FLIPBOOK DIED 400ms BEFORE ITS BODY DID.
+     holdFor() returns 1900ms for an epic win and .hero-body runs hero-punch-epic for
+     1.9s, but this rule pinned the SHEET to 1.5s and nothing could override it,
+     because data-tier was only ever set on the outer .hero-body div - no selector
+     could reach the sheet element for the epic case at all. So from 1500ms to 1900ms
+     the sprite sat frozen on its final frame while the transform kept sliding it
+     around: 21.1% of the reaction, the entire settle, playing as a still being
+     translated. And because win frame 16 is 0.00% from idle rest, the frozen image
+     is the REST pose, so the hero visually finished his reaction 400ms early and was
+     then just moved about.
+     data-tier is now on both sheet layers, and this override stretches the same 16
+     frames across the epic's own 1.9s: 119ms a frame instead of 94ms, still 8.4fps,
+     and the flipbook now ends exactly when the body does. (0,3,0) beats the (0,2,0)
+     rule above outright rather than relying on source order. */
+  .hero-idle[data-motion='win'][data-tier='epic'] { animation-duration: 1.9s; }
   .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.3s steps(7, jump-none) 1 forwards; }
   .hero-idle[data-motion='glance']  { animation: hero-cycle-glance 1.7s steps(6, jump-none) 1 forwards; }
 
@@ -380,16 +555,30 @@
        over 3.2s, identical to a no-preference context. With the attribute
        repeated the selector is (0,2,0), ties the state rules, and wins on source
        order because this block comes after them. */
+    /* R129: !important, AND IT IS NOT LAZINESS. The tier rules above are (0,3,0) -
+       `.hero-body[data-motion='win'][data-tier='epic']` and its sheet sibling - and these
+       resets are (0,2,0), so the epic tier OUTRANKED the accessibility override and
+       escaped it. An adversarial pass reproduced that in a browser: with the media query
+       reporting reduce=true, an epic win still ran hero-punch-epic for 1.9s with 27.5px of
+       vertical travel, while big wins and the feature brace (both (0,2,0)) were correctly
+       stilled. Chasing specificity here means every future tier rule has to remember to
+       stay below a number nobody writes down; !important makes the override
+       unconditional, which is what an accessibility reset is FOR. GameGrid.svelte's own
+       reduced-motion block already does this for the same reason. */
     .hero-idle[data-motion] {
-      animation: none;
-      background-position-x: 0;
+      animation: none !important;
+      background-position-x: 0 !important;
     }
+    /* R129: layer B must also be stilled AND hidden. Without the opacity reset it
+       would sit at whatever the dissolve last left it on, half-covering layer A
+       with a second frozen copy. */
+    .hero-layer-b[data-motion] { animation: none !important; opacity: 0 !important; }
     /* THE ATTRIBUTE SELECTOR HAS TO BE REPEATED HERE, and this is not cosmetic.
        The state rules above are `.hero-body[data-motion='idle']`, specificity
        (0,2,0). A bare `.hero-body` reset is (0,1,0) and LOSES to them, so the
        sway kept running under prefers-reduced-motion. Caught by reading the
        computed animation-name in a reduced-motion browser context, which
        reported hero-sway-idle and a live rotation matrix. */
-    .hero-body[data-motion] { animation: none; transform: none; }
+    .hero-body[data-motion] { animation: none !important; transform: none !important; }
   }
 </style>
