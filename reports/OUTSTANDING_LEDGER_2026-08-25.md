@@ -4,6 +4,74 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0Y. R127 - TOOK NOTHING, AND FOUND THAT THE BUDGET MEANS TWO THINGS AND main SHIPS TWO NEEDLES
+
+**Branch `claude/r127-parallel-support`.** 47 runtime candidates arrived; **none shipped**. Two
+findings that were not in the brief are the session's real output.
+
+*** THE 25MB BUDGET MEANS TWO DIFFERENT THINGS AND THEY DIFFER BY 2 MB. *** `npm run build` copies
+frontend/public/** off DISK, so a LOCAL build measures the WORKING TREE; CI checks out the committed
+tree and measures what a deploy from main ships. With 30 uncommitted rasters in the tree they are
+different builds reporting different numbers for the same commit:
+  CI / committed tree  23,771,355 B = 22.67 MB, headroom **2,443,045 B**
+  local / working tree 25,875,171 B = 24.68 MB, headroom **339,229 B**
+  gap +2,103,763 B, entirely the owner's WIP art (scene_car alone is +1,133,466)
+Confirmed against CI run 32970759158 on ca3b4818 (`distSizeBytes: 23771355`), predicted from file
+deltas to within 53 bytes. **Plan against the smaller number**, because the WIP is meant to land.
+R126 quoted the local number without saying which tree; corrected here, not by rewriting R126. The
+trap is now documented at DIST_BUDGET_BYTES in build_diet_verify.mjs.
+
+*** A DEPLOY FROM main RENDERS THE OVERDRIVE METER WITH TWO NEEDLES, TODAY. *** Red-pixel test:
+the COMMITTED gauge_face.png carries **1,723** strongly-red lit pixels (a baked needle and arc,
+x 51..366, y 119..229 of 464x464); the owner's working-tree face and the candidate both carry **0**.
+BonusInstrumentColumn.svelte:85-88 and FreeSpinsPresentation.svelte:513-514 then stack a separately
+rotating gauge_needle.png on top. **ROOT CAUSE IN ONE SENTENCE: the pipeline has always produced the
+right file and the engine has always read the wrong one.** manifest.json already declares the correct
+split (match_transform 'rotate(62 512 512)' to out_only, master-minus-needle to
+out_base: ui/gauge_base.png) and build.py:90 emits it - but gauge_base.png has ZERO references in
+src/, is not on disk, and was once deleted as unreferenced, which cemented the bug. Verified
+first-hand at design-system/masters/H2_master_v31.svg:75. **REGENERATION HAZARD: running the asset
+pipeline re-bakes the needle over the owner's uncommitted fix.** An inert _doc_R127_HAZARD note was
+added at that manifest entry. NOT FIXED here: the fix is committing the owner's art or regenerating
+into a tree full of it, both the owner's call under a fence that forbids sweeping placeholders.
+
+**REFUSED, ALL FIVE CATEGORIES.** *features glyph* (56,261 B): genuinely a grille/intake and not a
+bolt, but **no consumer** - R125 closed the guide with a live capture and the live control draws an
+inline SVG grille; taking it ships unreferenced art. *compact banner* (585,411 B): the banner is
+**full stage width 1280px**, not compact; its only raster slots are c1-tier-burst, c1-shockwave and
+c1-coin, so bars and streaks have nowhere to go, and the 256px blooms that DO have a slot are weaker
+in it (mega 21.56 vs incumbent 42.23, epic 24.71 vs 70.77) and would upscale into a 430-540px draw.
+*particles* (102,278 B): all four live targets are owner WIP, and judged at the size each is actually
+DRAWN the candidates lose - coin is worse than the owner's WIP, and shock_ring, the ONE genuinely
+upscaled sprite (drawn 440-704px from 128px), is **72% fainter** with no resolution gain. *gauge*
+(378,250 B): exceeds the entire headroom alone, targets owner WIP, and fixes what the owner already
+fixed. *hero masters* (2,343,948 B): reference only; no live still is missing, asset_reference_gate
+PASSES.
+
+**WORTH THE OWNER KNOWING: their uncommitted particles beat what is committed in all four cases** -
+spark energy 13.74 committed vs 34.09 in the tree; smoke_puff 11.82 vs 31.45, where the committed one
+has peak luminance 0.0 and is effectively a black smudge. Committing them improves what ships.
+
+**WS7: THE PUNCH DOES NOT FIGHT THE 16-FRAME WIN.** 31 composed captures, punch ON vs forced OFF:
+per-step change mean 6.871 vs 4.828 (the punch ADDS 42.3%) and spikiness 3.54 vs 4.23 (it is LESS
+lurchy). R122's fighting signature is excursion up with per-sample change DOWN; this is the opposite.
+It also fills the still moments between discrete frames: punch off, 8 of 30 sampled steps show
+almost no change; punch on, none do. **Left exactly as it is.**
+
+*** THIRD INSTRUMENT FAILURE IN THREE SESSIONS, CAUGHT BY A CONTROL. *** The first run of the WS7
+measurement returned 0.00 for every metric and a confident conclusion. Captures were fine and
+stepping worked; the ANALYSIS was broken - omitBackground gave no transparency because the stage
+behind the hero is opaque, so alpha covered 100% of the clip and every mask was all-true. Re-run on
+RGB with an explicit control. **Second time a mask has silently measured nothing. Always assert the
+instrument can see a difference before trusting that it found none.**
+
+**STILL OPEN AFTER R127.** **AUDIO IS THE BIGGEST PUBLICATION GAP**: the four R125 stems still do not
+exist, hooks wired and silent, route verified runnable, blocker is the Stability licence decision.
+The two-needle gauge. The 24-frame win (+3,353,011 B, fits neither budget). The R126 brace variant
+(+521,988 B, fits the committed-tree headroom but not the working-tree one, and needs endpoints
+anchored). Max win still covers the hero (eight sessions). Nothing in CI measures hero animation,
+particle punch or gauge correctness.
+
 ## 0X. R126 - THE WIN IS SMOOTH AT BOTH ENDS NOW, AND AN ADVERSARIAL PASS IS WHY
 
 **Branch `claude/r126-hero-inbetween`.** Package delivered 68 runtime frames as claimed. **One strip

@@ -1,0 +1,133 @@
+{
+ "session": "R127",
+ "date": "2026-08-26",
+ "package": ".scratch/art-review/chatgpt-parallel-support-factory",
+ "package_claim": "47 runtime candidate PNGs",
+ "package_claim_verified": true,
+ "census": {
+  "compact-banner": {
+   "files": 16,
+   "bytes": 585411
+  },
+  "features-glyph": {
+   "files": 6,
+   "bytes": 56261
+  },
+  "gauge": {
+   "files": 2,
+   "bytes": 378250
+  },
+  "hero-masters": {
+   "files": 3,
+   "bytes": 2343948,
+   "note": "reference only per the brief"
+  },
+  "particles": {
+   "files": 20,
+   "bytes": 102278
+  },
+  "qa": {
+   "files": 23,
+   "bytes": 16074483,
+   "note": "QA only, not runtime art"
+  },
+  "runtime_total": 47
+ },
+ "accepted": [],
+ "accepted_note": "NOTHING from this package was taken. Every refusal below is measured, not assumed.",
+ "budget": {
+  "THE_HEADLINE_FINDING": "THE 25MB BUDGET MEANS TWO DIFFERENT THINGS AND THEY DIFFER BY 2 MB. `npm run build` copies frontend/public/** off DISK, so a LOCAL build measures the WORKING TREE. CI checks out the committed tree, so a CI run measures what a deploy from main actually ships. With 30 uncommitted theme rasters in the tree those are different builds.",
+  "ci_committed_tree": {
+   "dist_bytes": 23771355,
+   "dist_mb": 22.67,
+   "headroom_bytes": 2443045,
+   "evidence": "build diet job of CI run 32970759158 on ca3b4818, distSizeBytes 23771355"
+  },
+  "local_working_tree": {
+   "dist_bytes": 25875171,
+   "dist_mb": 24.676,
+   "headroom_bytes": 339229
+  },
+  "gap_bytes": 2103763,
+  "gap_cause": "the owner's 30 uncommitted work-in-progress rasters, entirely",
+  "worst_contributors": {
+   "ui/scene_car.png": 1133466,
+   "ui/gauge_face.png": 194872,
+   "ui/scene_character.png": 161967,
+   "symbols/m3_flame_sheet.png": 130066
+  },
+  "which_to_plan_against": "the SMALLER one, 339,229 B, because the uncommitted art is intended to land. Neither number is wrong; R126's report quoted the local number without saying which tree it came from, which is corrected here.",
+  "unchanged_by_this_session": true
+ },
+ "refused": [
+  {
+   "item": "features-glyph, 6 sizes of one grille/intake, 56,261 B",
+   "gates_passed": "it IS a grille/intake and not a turbo bolt, and carries no baked text",
+   "reason": "NO CONSUMER. R125 already closed the guide mismatch by pointing the Interface Guide's Features row at btn_features.png, a headless capture of the live .fm-entry-pill produced by regen_interface_guide_icons.mjs. The live control itself draws an INLINE SVG grille, which is crisp at every scale and cannot be pruned from the bundle. Taking this raster would ship unreferenced art into a build with 339 KB of headroom, and the brief says explicitly not to force a painted glyph back in once the guide is fixed with a live screenshot. The art is good and there is simply nowhere for it to go."
+  },
+  {
+   "item": "compact-banner, 16 files across 4 tiers, 585,411 B",
+   "reason": "NO SLOT, AND THE ONE REAL SLOT IS BETTER FILLED TODAY. Measured live: the celebration banner .c1-win is FULL STAGE WIDTH (1280 px, heights 111/140/172 by tier), not the narrow plate the 'compact' framing assumes. Its raster consumers are exactly three: c1-tier-burst (from ui/win/*), c1-shockwave and c1-coin (both reusing the PARTICLE files). There is no element a 600x48 energy bar or a 512x128 settle streak could slot into; taking them means writing new markup. The 256x256 centre-blooms DO have a slot (c1-tier-burst) and are measurably weaker there: energy at the real draw size is 21.56 against the incumbent bloom_mega's 42.23 and 24.71 against burst_epic's 70.77, and at 256px source against a 430-540px draw they would upscale on all three tiers where the incumbents are 665-819px. On big alone the candidate is punchier (26.70 vs 19.00) but would still upscale. Also: the whole set is 585,411 B against 339,229 of headroom, so it could not ship entire in any case."
+  },
+  {
+   "item": "particles, 20 files across 4 families, 102,278 B",
+   "reason": "ALL FOUR LIVE TARGETS ARE THE OWNER'S UNCOMMITTED WORK, AND THE CANDIDATES DO NOT BEAT IT. ui/particles/{spark,coin,shock_ring,smoke_puff}.png are all ' M' in the working tree, so installing candidates over them destroys owner work that is not in git. Measured at the size each is actually DRAWN, the case is weak anyway: spark draws at 22x22 from a 32px source (already oversampled), and the candidate is only +25% energy over the owner's WIP. coin draws at a randomised 16-30px from 40px (downscaled) and the candidate is SLIGHTLY WORSE than the owner's WIP (103.25 vs 108.85). shock_ring is the ONE genuinely upscaled sprite, drawn at 440-704px from 128px (3.4x to 5.5x), so resolution there would really help - but the candidate cyan-ring also tops out at 128px, giving no resolution gain, and it is 72% FAINTER (energy 10.52 against the owner's WIP 37.60, coverage 8.0% against 23.6%), which is exactly the faint filler the brief says to refuse. shock-bloom is a bright blue bloom mapped onto smoke_puff, a half-opacity deliberate blur: a different thing, not a replacement.",
+   "worth_knowing": "the owner's uncommitted particles are BETTER than what is committed in all four cases, sometimes by a lot: spark energy 13.74 committed against 34.09 in the working tree, smoke_puff 11.82 against 31.45 (the committed smoke_puff is effectively a black smudge, peak luminance 0.0). Committing them is a real improvement to what ships."
+  },
+  {
+   "item": "gauge, needle-free face + single needle, 378,250 B",
+   "reason": "EXCEEDS THE ENTIRE HEADROOM ON ITS OWN (378,250 B against 339,229), TARGETS OWNER WIP, AND FIXES SOMETHING ALREADY FIXED. Both ui/gauge_face.png and ui/gauge_needle.png are uncommitted owner work. The candidate face is genuinely needle-free, which is the right gate - but so is the owner's uncommitted face, verified by a red-pixel test: 1,723 strongly-red lit pixels in the COMMITTED face against 0 in both the owner's working-tree face and the candidate. The owner has already solved this; the candidate would overwrite their solution at a cost the budget cannot pay."
+  },
+  {
+   "item": "hero-masters, 3 stills, 2,343,948 B",
+   "reason": "REFERENCE ONLY, per the brief, unless a live still is missing. None is: asset_reference_gate PASSES, meaning every referenced asset path exists in dist. Nothing to fix, and 2.3 MB against 339 KB of headroom in any case."
+  }
+ ],
+ "the_defect_this_session_found": {
+  "what": "A DEPLOY FROM main RENDERS THE OVERDRIVE METER WITH TWO NEEDLES.",
+  "evidence": [
+   "the committed ui/gauge_face.png carries 1,723 strongly-red lit pixels spanning x 51..366, y 119..229 of a 464x464 canvas: a baked needle and its arc",
+   "design-system/masters/H2_master_v31.svg:75 is `<g transform=\"rotate(62 512 512)\">`, the needle group",
+   "scripts/assets/manifest.json exports that WHOLE master to ui/gauge_face.png",
+   "BonusInstrumentColumn.svelte:85-88 and FreeSpinsPresentation.svelte:513-514 then stack a separately rotating ui/gauge_needle.png over it",
+   "so the player sees the baked needle frozen at 62 degrees plus the live one"
+  ],
+  "root_cause": "THE PIPELINE HAS ALWAYS PRODUCED THE RIGHT FILE AND THE ENGINE HAS ALWAYS READ THE WRONG ONE. manifest.json's next entry already declares the correct split: match_transform 'rotate(62 512 512)' extracts the needle to out_only, and the master with that group REMOVED goes to out_base: ui/gauge_base.png. build.py:90 emits it. But gauge_base.png has ZERO references in src/, does not exist on disk, and was once deleted as unreferenced, which cemented the defect.",
+  "current_status": "the owner's UNCOMMITTED working-tree gauge_face.png is needle-free, so a local build is clean and CI is not. Every record still lists this as OPEN (docs/art/ART_HANDOVER_ARC2.md, art_manifest_arc2.csv, OUTSTANDING_LEDGER, REVIEW_TRACKER).",
+  "regeneration_hazard": "running the asset pipeline would RE-BAKE the needle over the owner's uncommitted fix, because manifest.json:25 still renders the whole master. R127 added an inert _doc_R127_HAZARD note at that entry so the next person sees it before regenerating. The note changes no behaviour: build.py reads named keys only.",
+  "not_fixed_here_because": "the fix is either committing the owner's uncommitted art or regenerating into a tree full of it. Both are the owner's call and the fence forbids sweeping placeholders."
+ },
+ "animation_residual_WS7": {
+  "question": "does the punch transform now make the 16-frame win look drunk?",
+  "answer": "NO. It was left exactly as it is.",
+  "method": "31 composed captures of the hero over the 1500ms reaction, identical fixed clip, once with .hero-body[data-motion='win'] animating and once with it forced to none.",
+  "numbers": {
+   "per_step_change_mean": {
+    "punch_on": 6.871,
+    "punch_off": 4.828
+   },
+   "per_step_change_max": {
+    "punch_on": 24.348,
+    "punch_off": 20.423
+   },
+   "spikiness_max_over_mean": {
+    "punch_on": 3.54,
+    "punch_off": 4.23
+   }
+  },
+  "reading": "R122 diagnosed two motions FIGHTING as excursion rising while per-sample change FALLS. Here per-step change RISES 42.3% with the punch on, and spikiness FALLS (3.54 against 4.23). The punch adds motion on top of the frames rather than cancelling them, and it fills the still moments between discrete flipbook steps: with the punch off, 8 of 30 sampled steps show almost no change at all (0.03) because the sample lands inside a held frame; with it on, none do. The win punch is translation-led and the flipbook's motion is the arms, so they are on different axes - unlike R122's idle case where two LATERAL motions fought.",
+  "instrument_error_corrected": "the first pass of this measurement returned 0.00 for every metric and an authoritative-sounding conclusion. The captures were fine (31 distinct files) and the stepping worked; the ANALYSIS was broken - omitBackground did not yield transparency because the stage behind the hero is opaque, so alpha covered 100% of the clip and every silhouette mask was all-true. Re-run on RGB with a control that a frame differs from itself by 0 and from its neighbour by more than 0. Third instrument failure of this class in three sessions."
+ },
+ "changes_made": [
+  "frontend/scripts/build_diet_verify.mjs: documented the two-budget trap at DIST_BUDGET_BYTES, with both measured numbers and which to plan against.",
+  "scripts/assets/manifest.json: inert _doc_R127_HAZARD at the gauge_face export explaining that regenerating re-creates the two-needle defect and would overwrite the owner's uncommitted fix."
+ ],
+ "not_done": [
+  "No asset from the package was taken. Every one is refused above with measurements.",
+  "The two-needle defect was NOT fixed: the fix is the owner's uncommitted art or a regeneration into a tree full of it.",
+  "The optional R126 brace variant was not taken; headroom was not recovered and the brief forbids spending the last of it.",
+  "The anticipation/lobby factory does not exist on disk yet; nothing was touched there.",
+  "Audio is unchanged: the four stems from R125's truth map still do not exist.",
+  "Still no CI gate measures hero animation, particle punch, or gauge correctness."
+ ]
+}
