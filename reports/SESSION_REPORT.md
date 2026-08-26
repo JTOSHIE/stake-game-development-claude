@@ -26241,3 +26241,202 @@ whether the owner's WIP has been committed by then.
 - Did not spend the last of the headroom on the optional brace variant.
 - Made exactly two changes, both documentation: the two-budget trap in `build_diet_verify.mjs` and
   the regeneration hazard in `manifest.json`.
+
+---
+
+# R128 - TOOK NOTHING AGAIN, AND FOUND THAT REDUCED MOTION NEVER WORKED FOR THE HERO
+
+**2026-08-27. Branch `claude/r128-anticipation-symbol-lobby`. Review lane.**
+
+Forty-four runtime candidates arrived and none ship. The session's output is a one-line fix to an
+accessibility defect that has been live since R121 and that no amount of art would have found.
+
+## 1. WS1: both budgets, and a WIP map with a surprising shape
+
+| | dist | headroom |
+|---|---:|---:|
+| local / working tree (30 owner WIP rasters present) | 25,875,180 B = **24.676 MB** | **339,220 B** |
+| clean / CI committed tree (what a deploy from main ships) | 23,771,417 B = **22.670 MB** | **2,442,983 B** |
+
+Planned against the local number, because the owner's WIP is intended to land. After the session:
+25,875,193 B, headroom 339,207 B. Unchanged; the 13-byte drift is `build-info.json`.
+
+**THE WIP MAP CAME BACK EMPTY, AND THAT IS THE WHOLE STORY OF THE PACKAGE.** Not one candidate
+targets an existing file. There is no anticipation raster, no cell glow, no symbol flash, no pip and
+no lobby tile anywhere in the shipped theme. So there is **zero WIP-clobber risk** - and **no
+candidate has an existing consumer**. Those are the same fact stated twice.
+
+The one adjacent WIP note: the only raster slot in the entire anticipation path is the edge-spark
+`<img>` at `GameGrid.svelte:1222-1223`, which points at `ui/particles/spark.png`, an owner WIP file.
+Nothing was written to it.
+
+## 2. WS2: census
+
+44 runtime PNGs, exactly as claimed: anticipation 16 (250,634 B), symbol-life 16 (367,441 B),
+feature-accents 5 (115,666 B), lobby-tile 4 (4,625,603 B), reduced-motion-stills 3 (2,343,948 B),
+plus 12 QA-only files.
+
+**The three reduced-motion stills are byte-identical by sha256 to the three hero-masters R127
+already refused.** The same art, re-delivered under a new name.
+
+## 3. WS3: a real anticipation system with exactly one raster slot
+
+The anticipation system is genuinely rich: escalation levels, a `.col-focus` tremble, non-focused
+reels dimmed by a brightness filter, and a per-cell `.scatter-charge` bloom plus scanline. But it is
+implemented **entirely in CSS**. Verified: **zero `url()` references in any anticipation rule**, and
+GameGrid has no `<canvas>` and **zero `drawImage` calls**.
+
+- **cell-glow (240x240 x4), tall-reel-glow (240x480 x4), side-spark-streak (64x240 x4): refused as
+  orphan glows.** Today's cell glow is a `filter:` on `.tile-inner`, not an overlay element. There is
+  nothing to attach them to without new markup per reel and per cell plus new wiring to the
+  escalation levels.
+- **anticipation-spark 4f (128x128): refused.** The one real slot, `.edge-spark`, takes a SINGLE
+  static image and renders it at **22x22**. A four-frame strip needs a packed sheet and `steps()`
+  markup that does not exist, and a 128px source into a 22px box is 5.8x oversampled.
+
+**A correction I made to myself mid-session:** I first reported that the anticipation path had no
+raster at all, on the strength of a `url(` grep returning zero. That was the wrong instrument - the
+edge sparks are `<img src>`, not CSS `url()`. The grep was right and my conclusion from it was wrong.
+
+## 4. WS4: the cell is 120x100 and the overlays are 240x240 square
+
+`CELL_W = 120`, `CELL_H = 100`, 5 reels x 4 rows (`GameGrid.svelte:62-68`). Every existing symbol
+effect is CSS with zero `url()`: `.scatter-charge` is a linear-gradient scanline plus a 6x6 dot and a
+bloom animation (`:1663-1678`), triggered per cell at `:877`.
+
+All sixteen refused. Taking them means replacing tuned CSS effects with rasters plus new four-frame
+flipbook markup. And **`selected-cell-pulse` has no consumer that could ever exist**: this is a slot
+machine, and there is no cell-selection mechanic to pulse.
+
+**The art is genuinely good and on-palette.** The vendor's centre-openness claim holds for three of
+four families - mean alpha in the central 50% box is 0.00-0.84 for land-impact, 0.04-0.49 for
+scatter-tease, 0.00 for selected-cell-pulse. **`win-cell-crown-glow` is the exception at 9.85-19.19
+with a max of 255**, and its side spikes reach well down a 120x100 cell. It is the least symbol-safe
+of the four.
+
+## 5. WS5: four accents have no consumer, and the fifth has one I first missed
+
+The whole feature presentation loads six images: `smoke_puff` x2, `gauge_face`, `gauge_needle`,
+`shock_ring` (`FreeSpinsPresentation.svelte:509-516`). Four of the five accents are refused for
+absence: there is no horizontal band element for a 320x80 streak, the entry burst is **text**
+(`+N FREE SPINS`, `:525`), the **retrigger moment is also a text div** (`+5 FREE SPINS`, `:586`) and
+not a pip, and `spinsRemaining` is a **number**, not a row of pips.
+
+**I FIRST WROTE THAT ALL FIVE HAD NO CONSUMER. THAT WAS WRONG ABOUT ONE OF THEM.** The
+`feature-spark-burst` has a real, occupied slot: `.entry-shockwave` at `:516`, a 260x260 box scaling
+0.2 to 2.2 (peak draw 572px), currently loading `ui/particles/shock_ring.png`. Installing it would be
+a **one-line `src` edit** and would not touch owner WIP, because it would be a new file rather than
+an overwrite. So I measured it at the real peak draw size:
+
+| source at 572x572 draw | src px | energy | coverage | edge sharpness |
+|---|---:|---:|---:|---:|
+| committed `shock_ring.png` | 128 | 25.34 | 44.0% | 8.884 |
+| owner WIP `shock_ring.png` | 128 | 37.58 | 24.1% | 13.149 |
+| **candidate spark burst** | **256** | 25.35 | 21.5% | **17.403** |
+
+The candidate is **sharper** - 17.403 against 13.149, a 32% gain, which is the genuine payoff of a
+256px source into a 4.5x upscale - and **33% dimmer** (energy 25.35 against 37.58). It is also a
+**burst** where the slot is a **ring that expands**, which changes the feature entry's visual
+language rather than improving it. **Refused on quality and semantics, not on absence.**
+
+## 6. WS6: the tile slot is real, costs no runtime budget, and the candidate still loses
+
+I first said the project had no runtime tile consumer and that the candidate was smaller than the
+incumbent. The first half was right for the wrong reason and the second half was simply wrong.
+
+**`assets/portal/` exists at the repo ROOT** - outside `frontend/public/`, so it is **not bundled and
+costs zero runtime budget**. It already ships `tile_background.jpg` at **exactly 1920x1080**
+(318,504 B), `tile_foreground.png` at 1200x1200, `tile_title.png`, and provider logos, each with its
+own `provenance.json`. The 2048x1152 figure in `WRS_MASTER_DOCUMENT.md:123` is the **master**; the
+delivered portal file is 1920x1080, which the candidate matches exactly. So neither the budget
+objection nor the size objection applies.
+
+It is refused on measurement instead:
+
+| | mean luminance | contrast (sd) | bytes |
+|---|---:|---:|---:|
+| incumbent `tile_background.jpg` | **73.8** | **61.3** | 318,504 (JPEG) |
+| candidate environment still | 17.1 | 31.0 | 2,370,569 (PNG) |
+
+The candidate is **4.3x darker with half the contrast**, and it is a subject-free dark workshop
+interior where the incumbent is a vivid neon street scene - a flying car, a huge magenta star, rain,
+strong cyan/magenta separation - which is what a tile needs to survive a lobby grid. It is also
+**7.4x the bytes** against a recorded portal constraint of **BG+FG under 3MB combined**, which the
+candidate plus the existing 1200x1200 foreground would nearly exhaust. The 800x800 car cutout is a
+straight downgrade from the 1200x1200 incumbent; the 1600x1600 is larger than the slot.
+
+**Recorded as ready residuals**, exactly as the brief directs. The store tile is outward-facing and
+is the owner's call, not a builder's.
+
+## 7. WS7: THE DEFECT. REDUCED MOTION NEVER WORKED FOR THE HERO
+
+WS7 asked whether the stills improve the frozen fallback. Checking what the fallback actually did
+found that **there was no frozen fallback**.
+
+`HeroIdle.svelte`'s reduced-motion block reset a **bare `.hero-idle`** at specificity (0,1,0), while
+the state rule is `.hero-idle[data-motion='idle']` at (0,2,0). The bare reset lost. **This is the
+identical specificity bug R121 found and fixed for the transform layer, one layer down, and the
+comment explaining it sits three lines below the broken selector.** It survived R121 through R127.
+
+Measured in a real reduced-motion browser context:
+
+| | before | after |
+|---|---|---|
+| media query matches | true | true |
+| computed `animation-name` | `hero-cycle-idle` | **`none`** |
+| `getAnimations()` | `["hero-cycle-idle"]` | **`[]`** |
+| `background-position-x` over 3.2s | `-618px, -1030px, -206px` | **`0px, 0px, 0px`** |
+
+**Negative control:** a no-preference context after the fix still reports `hero-cycle-idle` and still
+cycles `-618/-1030/-206`, so normal motion is untouched. **Cost: zero bytes.**
+
+The fallback now freezes on frame 01, the rest pose - which settles the stills. The candidate
+`01-idle-rest` measures **IoU 0.9998, silhouette XOR 0.02%** against the frame now on screen. It
+would cost 767,421 B to show a pose the player is already looking at. The other two are a win peak
+and a brace peak, which reduced motion never reaches because reactions are skipped entirely.
+
+**I swept for the same bug class** across every `prefers-reduced-motion` block in `src/`. Three
+further sites matched the pattern and **all three are false positives**, each already handling its
+qualified variant inside the block: `App.svelte:2632-2633`, `GameGrid.svelte:1727-1731`,
+`SceneGroup.svelte:254`. HeroIdle was the only genuine instance.
+
+## 8. WS8: the gauge and the particles were not touched
+
+No WIP file was written to. R127's findings stand unchanged and remain the owner's to land: the
+committed `gauge_face.png` still carries a baked needle (1,723 red pixels), so a deploy from main
+still renders two needles, and the owner's uncommitted face fixes it. The owner's uncommitted
+particles still beat the committed ones in all four cases. **R128 did not commit any of the 30
+rasters and did not swap anything silently.**
+
+## 9. WS9: QA, and which consumers are still empty
+
+Gates: `build_diet_verify` PASS, `asset_reference_gate` PASS, `dead_wiring_scan` PASS, `dash_gate`
+PASS, `typecheck_baseline` PASS (0 errors), `audio_verify` ALL CHECKS PASS, `doc_currency_gate` PASS,
+`locked_paths_gate` PASS, `asset_guard --self-test` 11/11.
+
+Live QA: idle on the right sheet, the 16-frame win resolving all 16 positions to -3090px, **60.3
+fps**, zero console errors, zero failed requests. Reduced motion verified in both directions above.
+
+**Does anticipation actually play?** Yes - the CSS system runs today: escalation levels, tremble,
+dimming, per-cell scatter charge, and two rising edge sparks per column. It is not missing. What it
+lacks is a raster slot, which is a different thing from being absent.
+
+**Consumers still empty:** none, in the sense that matters. Nothing in this package was refused for
+lack of an *empty* slot - every relevant slot is already filled with a working effect. The empty
+consumers in this project are audio, not art.
+
+## 10. What R128 did not do
+
+- **Took nothing.** Six categories, each refused with measurements.
+- Did not touch the gauge, the particles, or any of the 30 owner WIP rasters.
+- Did not add markup to manufacture a consumer for a candidate; that is a feature, not an intake.
+- Audio unchanged: the four R125 stems still do not exist.
+- **Still no CI gate measures reduced-motion conformance**, which is exactly why a dead reset
+  survived seven sessions three lines from its own explanation.
+
+**Three claims I made and then corrected within the session**, all caught by re-checking rather than
+by a gate: that the anticipation path had no raster at all (the edge sparks are `<img src>`, not CSS
+`url()` - the grep was right and my inference from it was not); that the feature accents had no
+consumer (one of five does); and that the lobby candidate was smaller than the incumbent (I compared
+it against a 2048x1152 master when the delivered file is 1920x1080, which it matches exactly). None
+of the three changed a verdict, but all three would have been wrong in the record.
