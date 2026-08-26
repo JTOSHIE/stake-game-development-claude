@@ -21,46 +21,57 @@
   "cap_bytes": 26214400,
   "dist_before": 24464517,
   "headroom_before": 1749883,
-  "dist_after": 25425888,
-  "headroom_after": 788512,
-  "net_change": 961368
+  "dist_after": 25875169,
+  "headroom_after": 339231,
+  "net_change": 1410652,
+  "note": "dist_after - dist_before is 1,410,652 while the hero sheet delta is 1,410,649; the 3-byte difference is build-info.json regenerating, not asset drift."
  },
  "accepted": [
   {
-   "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_win_reaction_14f.png",
+   "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_win_reaction_16f.png",
    "replaces": "hero_win_reaction_8f.png (deleted, not kept alongside)",
    "source": "win-unfold-16/frames, 24 frames at 680x1344",
-   "selection": "14 of 24, evenly spaced with both pose extremes forced in: source frames [1,3,5,6,8,10,12,13,15,17,19,20,22,24]",
+   "selection": "16 of 24, interior filled evenly with FIVE anchors forced in: rest, ease-IN, peak, ease-OUT, rest = source frames [1,2,3,5,7,8,10,12,13,15,17,18,20,22,23,24]",
    "why_not_all_24": "the full 24-frame sheet costs +3,353,011 bytes against 1,749,883 of headroom. It is the best strip measured (max neighbour jump 15.58%) and it is unaffordable.",
    "why_not_a_minimax_pick": "a minimax subset reached 15.01% max jump at 12 frames, better than the full 24. It was REJECTED: steps() plays frames at uniform time intervals, so a pick with gaps of 1,1,1,3,1,3,3,3,1,3,3 replays an evenly-timed performance unevenly - it would linger on the wind-up and snap through the settle. Spatial smoothness bought with temporal distortion is not smoothness. Even spacing keeps the timing the artist drew.",
-   "packed": "5516x780, 394x780 per frame, the incumbent's exact per-frame size and 0.58 scale",
-   "bytes": 2913522,
-   "net_bytes": 961368,
+   "packed": "6304x780, 394x780 per frame, the incumbent's exact per-frame size and 0.58 scale",
+   "bytes": 3362803,
+   "net_bytes": 1410649,
    "measurements": {
     "max_neighbour_jump_render_pct": {
      "live_8f": 26.68,
-     "accepted_14f": 18.63,
+     "accepted_16f": 18.63,
      "change": "-30.2%"
     },
-    "p90_neighbour_jump_render_pct": {
-     "live_8f": 26.28,
-     "accepted_14f": 17.25
+    "mean_neighbour_jump_render_pct": {
+     "live_8f": 11.84,
+     "accepted_16f": 11.1
+    },
+    "entry_step_pct": {
+     "live_8f": 2.08,
+     "accepted_16f": 0.93,
+     "note": "gentler than the incumbent"
+    },
+    "exit_step_pct": {
+     "live_8f": 2.12,
+     "accepted_16f": 0.53,
+     "note": "gentler than the incumbent"
     },
     "pairs_above_20pct": {
      "live_8f": 2,
-     "accepted_14f": 0
+     "accepted_16f": 0
     },
     "pairs_above_25pct": {
      "live_8f": 2,
-     "accepted_14f": 0
+     "accepted_16f": 0
     },
     "max_silhouette_vs_rest_render_pct": {
      "live_8f": 26.52,
-     "accepted_14f": 27.04
+     "accepted_16f": 27.04
     },
     "chest_band_width_render_px": {
      "live_8f": "137->193",
-     "accepted_14f": "126->194"
+     "accepted_16f": "126->194"
     },
     "identity_iou_vs_live_rest": 1.0,
     "first_equals_last_xor_pct": 0.0,
@@ -68,17 +79,20 @@
     "edge_violations": 0,
     "widest_at_render_px": 194,
     "fits_206px_box": true,
-    "rgb_under_zero_alpha_dirty_px": 0
+    "rgb_under_zero_alpha_dirty_px": 0,
+    "motion_below_banner_pct": 71.1,
+    "motion_behind_banner_pct": 28.3,
+    "chest_band_share_pct": 39.0
    },
-   "why_accepted": "the live strip's defect is two neighbour pairs above 25% - the arms snapping open at f3->f4 and shut at f5->f6. Those are the pops. The 14-frame sheet removes every pair above 20% while reaching a SLIGHTLY LARGER peak pose (chest 194 against 193) and adding an anticipation crouch the live strip does not have (chest dips to 126 before the swing). Same character at rest, IoU 1.0000.",
+   "why_accepted": "the live strip's defect is two neighbour pairs above 25%, the arms snapping open at f3->f4 and shut at f5->f6. The 16-frame sheet removes every pair above 20% AND makes both endpoints gentler than the incumbent, while reaching a slightly larger peak pose (chest 194 against 193) and adding an anticipation crouch the live strip has not got.",
    "live_verification": {
-    "background_position_x_values": 14,
-    "range": "0px to -2678px in exact 206px increments",
-    "note": "all 14 frames play; nothing truncated at 8",
-    "hold_ms": 1499,
-    "fps_during_reaction": 60.1,
+    "background_position_x_values": 16,
+    "range": "0px to -3090px in exact 206px increments",
+    "note": "all 16 frames play; nothing truncated at 8",
+    "hold_ms": 1501,
+    "fps_during_reaction": 60.4,
     "console_errors": 0,
-    "banner_occlusion": "the win banner covers hero rows 0..100 of 407 (24% of the box). The chest band that carries this strip's measured motion is rows 106..171, entirely below the banner, so the performance lands where it can be seen.",
+    "banner_occlusion": "measured twice from live element rects: .c1-win spans y240..380, the hero box y280.5..695.1, so it covers hero rows 0..100 of 407 (24% of the box). 71.1% of this strip's silhouette change falls in rows 101..407, below it.",
     "reduced_motion": "reaction skipped entirely; stays on the idle sheet, body transform none"
    }
   }
@@ -94,7 +108,8 @@
    "item": "feature-brace-12, 16 frames",
    "cost_if_shipped": 1915161,
    "reason": "NO DEFECT TO FIX, AND UNAFFORDABLE ANYWAY. The live 7-frame brace has no neighbour pair above 20% - it is four even ~19% steps, stepped but not popping. The candidate's meaningful variants (16f and 14f, max jump 17.33%) cost +1,915,161 and +1,451,021, neither of which fits beside the accepted win. The variants that DO fit are not improvements: brace_10f reaches 18.42% max but its MEAN jump is 14.32% against the live strip's 13.31%, so it is worse on average. Buying a 5% max-jump reduction for 515,760 bytes is not reviewer-visible smoothness.",
-   "what_would_be_accepted": "the 14- or 16-frame version, once there is ~1.5 MB of headroom for it."
+   "what_would_be_accepted": "that 10-frame pick with its endpoints anchored the way the win's were, once there is ~600 KB of headroom for it.",
+   "reason_CORRECTED": "MY FIRST STATED REASON WAS FALSE. I claimed 'no variant that improves the brace is affordable'. A 10-frame pick of source frames [1,2,4,6,7,9,11,12,14,16] reaches max neighbour jump 15.64% against the live 19.45%, mean 12.61% against 13.31%, keeps the peak at 187px, loops, is edge-safe, and costs +521,988 bytes. I had tested only linspace and gap-capped picks and generalised from those to the whole design space. Reproduced first-hand at 15.64% and +521,988 exactly. THE REFUSAL STANDS on narrower and true grounds: the live brace has NO neighbour pair above 20%, so there is no pop to fix; it does not fit beside the corrected 16-frame win (339,231 B remain, it needs 521,988); and that counterexample itself has a 12.79% exit step against the live strip's 1.59%, which is exactly the defect recorded in defect_i_shipped_and_corrected."
   },
   {
    "item": "approval-nod-8, 8 frames",
@@ -109,11 +124,28 @@
  ],
  "corrections_to_my_own_instruments": [
   "A first-pass lighting-only detector (silhouette < 1% AND rgb delta > 2) fired on LIVE glance 6f, a strip this project already ships, and on holds in every candidate. The threshold was wrong, not the art: shipped strips move RGB by 4.13 to 49.54 between genuinely different poses, so a delta of 3-10 is ordinary shading. Recalibrated to silhouette < 0.30% AND rgb delta above the shipped maximum, NO strip in this package has a single lighting-only frame.",
-  "A flat-cut detector reported a 326px run on the candidate win and 190px on the live incumbent. Scale-normalised those are 24.3% and 24.4% of canvas height - the same feature in both, and the live one was accepted at R124 after its own edge testing. It measures a naturally straight body edge at the silhouette's widest column, not a severed limb. Canvas-edge violations are 0 everywhere, which is the test that actually catches severing."
+  "A flat-cut detector reported a 326px run on the candidate win and 190px on the live incumbent. Scale-normalised those are 24.3% and 24.4% of canvas height - the same feature in both, and the live one was accepted at R124 after its own edge testing. It measures a naturally straight body edge at the silhouette's widest column, not a severed limb. Canvas-edge violations are 0 everywhere, which is the test that actually catches severing.",
+  "A third instrument error, and the worst: max neighbour jump was used as the acceptance metric for frame selection, and it is blind to the entry and exit steps of a one-shot. See defect_i_shipped_and_corrected."
  ],
  "not_done": [
-  "No new CI gate measures hero animation smoothness. Nothing in this repo does. That remains true after R126.",
-  "The full 24-frame win is measurably the best strip in the package and is refused on budget alone. It becomes affordable if ~2.4 MB is freed elsewhere in dist.",
+  "No new CI gate measures hero animation. Nothing in this repo does, and this session demonstrated the cost of that by pushing an endpoint regression that no gate could see.",
+  "The full 24-frame win is the best strip in the package and is refused on budget alone; affordable again if ~2 MB is freed elsewhere in dist.",
+  "The brace's affordable improving variant did not fit this session and needs its endpoints anchored.",
+  "Headroom is down to 339,231 B from 1,749,883.",
   "Max win still covers the hero: MaxWinCelebration is a full-screen modal. Seven sessions running."
+ ],
+ "defect_i_shipped_and_corrected": {
+  "what": "The FIRST accepted pick was 14 frames, evenly spaced with both pose extremes forced in: source [1,3,5,6,8,10,12,13,15,17,19,20,22,24]. It met every headline number (max jump 18.63%, zero pairs above 20% or 25%) and was committed and pushed as a9979c7c.",
+  "the_defect": "It dropped source frames 2 and 23, which are the ease-IN and ease-OUT (0.93% and 0.53% steps in the source). That made the strip's entry step 13.02% and its exit step 12.77%, against the live incumbent's 2.08% and 2.12%. Because frames now hold 107ms instead of 188ms, those are 11.0x and 10.5x the RATE. Two mid-gesture pops were removed and two ENDPOINT pops were introduced, at the seam where the strip hands back to the idle loop.",
+  "why_it_was_missed": "max neighbour jump was the acceptance metric and 13.02% is nowhere near the maximum, so the summary statistic could not see it. The lesson: when you optimise a summary statistic, check the places that statistic cannot see. For a one-shot, that is the endpoints.",
+  "how_it_was_caught": "an adversarial verification pass that re-measured the decision independently.",
+  "the_fix": "anchor rest, ease-in, peak, ease-out and rest as non-negotiable and fill the interior evenly. At 14 frames that costs max-jump (21.75%, two pairs back above 20%); only at 16 does the strip get both endpoints AND the middle. That is why the sheet grew from 14 to 16 frames and from +961,368 to +1,410,649 bytes."
+ },
+ "stale_comments_corrected": [
+  "HeroIdle: idle called a 'five-frame breathe' with 'steps(5) over a FULL five-frame span'; six since R122.",
+  "HeroIdle: the idle cadence quoted as 0.88s (4400/5) in TWO separate places; it is 0.73s (4400/6).",
+  "SceneGroup: idle called 'a five-frame flipbook'.",
+  "HeroIdle 'why the cut does not show': claimed 34-54% cut-in, 36-48% idle step, 36.2% vs 48.3% exit. Re-derived against shipped art: 0.00-10.23%, 5.36-18.74%, and 0.00% exactly. The argument survives and is stronger than it was written.",
+  "HeroIdle banner geometry: claimed the banner 'covers the hero's own rows 15..185', derived from reading WinBanner's top:310px as the banner's TOP edge. WinBanner.svelte:398-399 pairs it with translateY(-50%), so 310 is the band's CENTRE. Measured live twice: banner y240..380, hero box y280.5..695.1, covering hero rows 0..100 of 407. Design conclusion unchanged."
  ]
 }

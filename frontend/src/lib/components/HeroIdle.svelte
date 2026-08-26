@@ -17,15 +17,29 @@
   //
   // WHY THE CUT DOES NOT SHOW. The reaction sheets come from a package that
   // derives every frame from one immutable master, and that master is the same
-  // crossed-arms hero the idle was rendered from. Measured against the live idle
-  // rest frame, entering a reaction changes 34-54% of the figure depending which
-  // idle frame we cut from - and a NORMAL step inside the idle loop already
-  // changes 36-48%. The cut is no larger than what the idle does every 0.73s.
+  // crossed-arms hero the idle was rendered from.
+  //
+  // R126 RE-DERIVED THESE FIGURES AND THE OLD ONES WERE ALL WRONG. This comment
+  // used to claim the cut changed "34-54%" of the figure, that a normal idle step
+  // "already changes 36-48%", and that ending one frame early would leave the
+  // figure "48.3%" from rest against "36.2%". None of those reproduce against the
+  // shipped art; they are stale from an art generation two intakes ago. Measured
+  // now, at render size 206x407, against the strips actually on disk:
+  //
+  //   cutting IN  (an idle frame -> win frame 01): 0.00% to 10.23%, depending
+  //               which idle frame we cut from
+  //   a NORMAL step inside the idle loop:          5.36% to 18.74%
+  //   cutting OUT (win last frame -> idle rest):   0.00%, exactly
+  //
+  // The argument survives and is stronger than it was written: the worst cut into
+  // a reaction (10.23%) is smaller than the idle's own worst step (18.74%), and
+  // the cut back out is free, because every reaction strip ends on the rest pose.
   //
   // WHY THE LAST FRAME OF EACH REACTION IS A DUPLICATE OF ITS FIRST. It is the
-  // exit. Ending on it leaves the figure 36.2% from the idle's rest frame; ending
-  // one frame earlier would leave it 48.3% away. The duplicate costs almost
-  // nothing after PNG compression and buys the smoothest hand-back available.
+  // exit, and it is what makes that 0.00% true. Ending one frame earlier would
+  // leave the figure 0.53% from rest instead - still small, because R126's win
+  // strip keeps the source's ease-out frame, but not free. The duplicate costs
+  // almost nothing after PNG compression and buys the smoothest hand-back there is.
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { winMultiplier, isSpinning } from '../stores/gameStore'
@@ -41,12 +55,12 @@
 
   const SHEET: Record<HeroMotion, string> = {
     idle: 'hero_crossed_idle_6f.png',
-    win: 'hero_win_reaction_14f.png',
+    win: 'hero_win_reaction_16f.png',
     energy: 'hero_feature_trigger_7f.png',
     glance: 'hero_glance_6f.png',
   }
-  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 14, energy: 7, glance: 6 }
-  // ~0.19s a frame for the reactions against the idle's 0.88s: fast enough to read
+  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 16, energy: 7, glance: 6 }
+  // ~0.09s a frame for the win against the idle's 0.73s: fast enough to read
   // as a response, slow enough not to look twitchy at game distance. The glance is
   // slower still, because it is an idle accent rather than a response to anything.
   const DURATION_MS: Record<HeroMotion, number> = { idle: 4400, win: 1500, energy: 1300, glance: 1700 }
@@ -235,10 +249,24 @@
   }
   /* THE WIN PUNCH IS TRANSLATION-LED, AND THAT IS A MEASURED CORRECTION.
      The first version was rotation-led about the feet, like the sway. Measured
-     against the banner's real geometry - it mounts at stage top:310 over a hero
-     occupying stage y295..702, so it covers the hero's own rows 15..185 - that
-     put 77.1% of the reaction's silhouette motion in the HEAD band and left only
-     29.5% of it visible. The player saw almost none of the reaction he earned.
+     against the banner's real geometry, that put most of the reaction's motion in
+     the HEAD band, which the banner covers, and the player saw almost none of the
+     reaction he earned.
+
+     R126 RE-MEASURED THE BANNER AND THE OLD FIGURE HERE WAS WRONG. This said the
+     banner "covers the hero's own rows 15..185", derived from `top:310` read as the
+     banner's TOP edge. WinBanner sets `top:310px` WITH `translateY(-50%)`, so 310 is
+     the band's CENTRE, not its top. Measured live from element rects at 1280x720:
+     the banner (.c1-win, z-index 100) spans y240..380 and the hero box spans
+     y280.5..695.1, so it covers the hero's rows 0..100 of 407, which is 24% of the
+     box. The conclusion is unchanged and the reasoning below still holds - a
+     rotation about the feet is head-weighted by construction, and the head is
+     exactly what is covered.
+
+     WITH R126's 16-FRAME STRIP, 71.1% of the reaction's silhouette change falls in
+     rows 101..407, below the banner, and only 28.3% behind it. The chest band
+     (rows 106..171) alone carries 39.0%. The reaction the player earns is the part
+     he can see.
 
      A rotation about the feet displaces each row in proportion to its height, so
      it is head-weighted by construction. A TRANSLATION displaces every row
@@ -328,11 +356,11 @@
   .hero-idle[data-motion='idle']   { animation: hero-cycle-idle 4.4s steps(6) infinite; }
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the idle resuming. */
-  /* R126: steps(14), not steps(8). THIS IS THE ONE PLACE THE FRAME COUNT IS
+  /* R126: steps(16), not steps(8). THIS IS THE ONE PLACE THE FRAME COUNT IS
      HARDCODED - background-size and --hero-span both derive from FRAMES.win in the
      markup above, so a denser sheet with a stale steps() here does not error, it
-     silently plays the first 8 of 14 frames and stops mid-gesture. */
-  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(14, jump-none) 1 forwards; }
+     silently plays the first 8 of 16 frames and stops mid-gesture. */
+  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(16, jump-none) 1 forwards; }
   .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.3s steps(7, jump-none) 1 forwards; }
   .hero-idle[data-motion='glance']  { animation: hero-cycle-glance 1.7s steps(6, jump-none) 1 forwards; }
 

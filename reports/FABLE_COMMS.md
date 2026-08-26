@@ -9,54 +9,57 @@ Australian English, no em dashes or en dashes.
 
 ---
 
-## 124 - 2026-08-26 - R126: your win reaction is smooth now. One strip of five shipped, and the 25MB cap is what stopped the rest.
+## 124 - 2026-08-26 - R126: your win reaction is smooth at both ends now. I shipped a new fault first and a second pass caught it, so you are getting the corrected version.
 
-**THE PACKAGE IS HONEST.** 68 runtime frames exactly as claimed. Three of the folder names are wrong
-though, and the contents are right: win-unfold-16 actually holds 24 frames, feature-brace-12 holds
-16. So you got what you asked for, just labelled badly.
+**THE PACKAGE IS HONEST.** 68 runtime frames exactly as claimed. Three folder names are wrong and
+the contents are right: win-unfold-16 actually holds 24 frames, feature-brace-12 holds 16.
 
-**THE JITTER WAS ONLY EVER IN THE WIN, AND IT WAS TWO FRAMES WIDE.** I measured the neighbour-frame
-change through your live win reaction: 2%, 12%, **26%**, 2%, **26%**, 12%, 2%. Those two 26% jumps
-are the arms snapping open and snapping shut. That is the pop you have been seeing. Your feature
-brace, by contrast, has no pop at all, and your idle has exactly one, where the weight shift swaps
-which leg is forward in a single frame.
+**THE JITTER WAS ONLY EVER IN THE WIN, AND IT WAS TWO FRAMES WIDE.** Through your live win the
+frame-to-frame change goes 2%, 12%, **26%**, 2%, **26%**, 12%, 2%. Those two 26% jumps are the arms
+snapping open and shut. Your feature brace has no pop at all, and your idle has exactly one.
 
-**SHIPPED: a 14-frame win unfold**, replacing the 8-frame one. The worst jump drops from 26.68% to
-18.63%, and there is now NOTHING above 20% anywhere in the strip. The peak pose actually got slightly
-bigger, not smaller, and it gained an anticipation crouch before the swing that the old one did not
-have. Same character, identity match exact.
+**I WANT TO BE STRAIGHT WITH YOU ABOUT WHAT HAPPENED.** My first fix was a 14-frame strip. It hit
+every number I was aiming at: worst jump down from 26.68% to 18.63%, nothing above 20% anywhere. I
+committed it and pushed it. Then I had it independently checked, and the check found that I had
+dropped the two frames the artist used to ease INTO and OUT OF the rest pose. So the strip started
+with a 13% jump and ended with a 13% jump where yours had 2% at each end. **I had removed two pops
+from the middle and added two at the ends**, right where the reaction hands back to the idle. The
+number I was optimising could not see it.
 
-**I COULD NOT SHIP THE 24-FRAME VERSION AND I WANT TO BE STRAIGHT ABOUT WHY.** It is the best art in
-the package. It costs 3.35 MB and you had 1.75 MB of headroom. It misses by 1.6 MB. So I shipped 14
-of its 24 frames, evenly spaced, keeping both extremes of the pose. That is the one compromise in
-this session and it is a budget compromise, not a quality one. Free up about 2.4 MB anywhere in the
-build and the full 24 becomes affordable.
+**WHAT SHIPPED IS THE CORRECTED VERSION: a 16-frame win unfold.** It pins the rest, ease-in, peak,
+ease-out and rest frames as untouchable. Entry step **0.93%** and exit step **0.53%**, both gentler
+than what you have now. Worst jump 18.63%, nothing above 20% anywhere in the strip. The peak pose is
+slightly bigger than yours, not smaller, and it gains an anticipation crouch before the swing. At 14
+frames I could not get both ends and the middle; at 16 I could, which is why the file grew.
 
-**ONE THING I TRIED AND DELIBERATELY THREW AWAY.** I found a way to pick 12 frames that scored
-BETTER than the full 24 on smoothness, for a third of the bytes. I did not ship it. The browser plays
-sprite frames at even time intervals, and that pick sampled the wind-up densely and the settle
-sparsely, so it would have lingered going out and snapped coming back. Better numbers, worse
-animation. Even spacing keeps the timing your artist drew.
+**THE 24-FRAME VERSION IS THE BEST ART IN THE BOX AND I COULD NOT SHIP IT.** It costs 3.35 MB and
+you had 1.75 MB. Free up about 2 MB anywhere in the build and it becomes possible.
 
-**REFUSED, FOUR.** The 12-frame idle is smoother but it is 38% of the amplitude of the one you have,
-and it is a shallow double bob rather than a real weight shift. It gets smooth by removing the
-motion, which undoes what R122 fought for, so it is refused. The 16-frame brace has no pop to fix and
-does not fit beside the win anyway. The approval nod has every single frame pair under 1% change,
-which is not acting, and the feature ambient has nowhere to live.
+**Budget: you are now at 24.68 MB of 25.** That is 0.32 MB left, down from 1.67 MB. The next asset
+change of any size needs something freed first, and I want that on your radar rather than buried.
 
-**TWO OF MY OWN MEASURING TOOLS WERE WRONG AND I CAUGHT THEM ON YOUR SHIPPED ART.** My lighting-only
-detector flagged three frames of your live glance strip, which already ships. That meant my threshold
-was wrong, not your art. Recalibrated properly, no strip in this package has a single lighting-only
-frame. My flat-cut detector flagged the new strip and the live one about equally, which meant it was
-reading a straight body edge, not a severed limb.
+**REFUSED, FOUR** - and one of my reasons was wrong, so here it is corrected. The 12-frame idle is
+smoother but it is 38% of the amplitude you have and a shallow wobble rather than a real weight
+shift, so it gets smooth by removing the motion. The nod has every frame pair under 1% change, which
+is not acting. The ambient has nowhere to live. **On the brace I told you no affordable better
+version existed. That was false.** There is one: a 10-frame pick that takes the worst jump from
+19.45% down to 15.64% for about 522 KB. It still does not ship, because your brace has no pop to fix
+in the first place, because it does not fit next to the corrected win, and because that particular
+pick has the same abrupt-ending fault I just spent the session removing. But the reason I first gave
+you was wrong and you should have the right one.
 
-Proved in the running game: all 14 frames actually play, 60 fps, no console errors, reduced motion
-still correctly skips the whole reaction. The win banner covers the top quarter of the hero, and the
-chest movement this strip carries sits below it, so you see the part that moves.
+**I also found four comment blocks in your code stating measurements that are simply not true of the
+art any more** - including one that had the win banner covering the wrong part of the hero, because
+it read a CSS `top:310px` as the banner's top edge when it is actually its centre. All corrected
+against live measurements. The banner covers the top quarter of the hero, and **71% of the new
+strip's movement happens below it**, where you can see it.
 
-**Still open:** the full 24-frame win, on budget. Your idle's one snap, which needs in-betweens of
-the weight shift you already have rather than a smaller motion. And nothing in your CI measures hero
-animation at all, which is why this kept needing a person to look.
+Proved running: all 16 frames play, 60 fps, no console errors, reduced motion still skips the whole
+reaction.
+
+**Still open:** the full 24-frame win, on budget. That brace variant, once its ends are anchored.
+Your idle's one snap. And **nothing in your CI measures hero animation at all**, which is exactly
+why I was able to push a regression and only catch it on a second look.
 
 ## 123 - 2026-08-26 - R125: the guide's last painted row is fixed, and your four missing sounds turn out to be one decision away, not one purchase away.
 
