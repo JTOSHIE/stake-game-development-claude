@@ -25631,3 +25631,195 @@ zero failed requests in every state.** **16 gates green**, including `asset_guar
    (379,488), not 1920x240.
 3. **Nothing further for the hero.** Idle, win and feature entry all now change pose, and the only
    remaining hero gap is max win, which is a layout decision rather than an art one.
+
+---
+
+# R125 - THE GUIDE'S LAST PAINTED ROW, AND THE AUDIO PATH MAPPED RATHER THAN FAKED
+
+**2026-08-26. Branch `claude/r125-features-audio`. Review lane.**
+
+Two holes closed to the extent each could be: one visual mismatch fixed and measured, and
+the four missing sound cues given verified call sites plus a complete acquisition route.
+No audio was generated. No placeholder was committed.
+
+## 1. WS1: the Features guide row
+
+**The mismatch, confirmed first-hand.** `PaytableModal.svelte`'s Interface Guide has eight
+`kind: 'img'` rows. Seven of them named files produced by
+`frontend/scripts/regen_interface_guide_icons.mjs`, a Playwright screenshot-crop of the
+live control. The Features row named `feature_button.png`, which is built by
+`scripts/assets/build.py` from `M2_master_v2.svg` via `manifest.json`. The structural
+signature was visible in the file headers before anything was rendered: every regenerated
+icon is 200x200, and `feature_button.png` is 224x224.
+
+It was also the one row that had actually drifted. The live FEATURES control is a
+dark-glass pill carrying an inline car-grille glyph; the badge is an ornate chrome and
+magenta machine plate. A player reading that guide was being shown a control that does not
+exist anywhere in the game.
+
+**The fix.** `.fm-entry-pill` joined the regenerator's `TARGETS` as `btn_features.png`, and
+the guide row points there. Deliberately a NEW file rather than an overwrite:
+`feature_button.png` is one of the owner's 30 uncommitted work-in-progress rasters, and it
+still renders as the buy dialog header art at `BuyBonus.svelte:117`. Nothing was orphaned
+and nothing of the owner's was touched.
+
+**THE CAPTURE NEEDED A NEW FIT MODE, AND THE FIRST TWO ATTEMPTS WERE MEASURABLY WRONG.**
+Every other target is round or square, so the post-process pads to a square and resizes to
+200x200. The FEATURES control is a 130x44 pill, 2.95:1. Padded to square and dropped into
+the guide's 44px slot it renders 44x15, putting the word FEATURES at about 3.7px tall: a
+faithful capture that no one can read. So `fit: 'native'` normalises on HEIGHT instead.
+
+- **Attempt 1** kept the existing margin rule, 0.18 of the LONG side. On a 130x44 pill that
+  is a 22px band on every edge, half again the control's own height stacked above and
+  below it. Result 393x200, the pill filling 50.0% of the frame height. Measured, not
+  guessed, and rejected.
+- **Attempt 2** made the margin proportional to the SHORT side with a floor of 6, giving
+  8px. Result 483x200, fill 92.7% x 82.0%, and **333 pixels touching the bottom edge**. The
+  pill carries `--hud-shadow-soft`, `0 2px 8px`, which needs about 10px of clearance below.
+  The canvas-edge test caught it, the same test the R123 hero strips were held to.
+- **Attempt 3**, shipped: proportional to the short side, floor kept at 12. Crop 154x68,
+  result **450x200, fill 92.7% x 82.0%, zero pixels on any of the four edges.**
+
+**No special-casing of scale was needed, and that is a measurement.** The shipped capture
+fills 82.0% of its frame height. `spin_button.png` fills 84.0%, `btn_turbo.png` 76.0%,
+`btn_autoplay.png` 68.5%. So at the standard 44px image height the pill renders a control
+the same visible size as its neighbours. The row keeps `height: 44px` and only releases its
+width; the slot widens to 117px, which is NARROWER than the three-up speed row's 132px that
+this list already carries and that is already proven at Popout S.
+
+**Nine icons came back byte-identical to HEAD.** The regenerator rewrites all ten targets,
+so each run was checked against `git show HEAD:` for the nine pre-existing files. All nine
+matched exactly, every time. That is worth recording twice over: it proves the regenerator
+is deterministic, and it proves this capture used the same live chrome the others did.
+
+**The owner's 30 rasters were protected by measurement, not by care.** `asset_guard.py
+--require-clean` scopes to `frontend/public/assets/themes/future-spinner` and ignores
+untracked files, so the R120 path-scoped stash satisfies it legitimately. Before stashing,
+sha256 of all 30 was recorded; after popping, all 30 verified byte-identical, and the nine
+guide icons verified against HEAD again.
+
+**QA, desktop 1280x720 and narrow 900x700.** Features slot 117px / 82.3px against Turbo's
+132px / 92.8px; row height identical to every other row; image loads at its natural
+450x200; zero horizontal overflow on the list, any row, or the body; **zero console errors
+and zero failed or 4xx requests at both widths.** `interface_guide_icon_proof.mjs` passes,
+including its byte-uniqueness gate across all ten icon files. The lightning bolt path
+`M13 2 4 14h6l-1 8 9-12h-6z` appears four times in the repository, all four in
+`HudOverlay.svelte`'s turbo control across its four layouts, and none in `FeatureMenu`.
+Turbo still uniquely owns the bolt.
+
+## 2. WS2: the Features control had no press, and the open state is impossible
+
+Every other utility control in the shell answers a press: `.fs-max`, `.fs-menu` and
+`.fs-arrow` all `translateY(1px)`, `.fs-spin` scales. The FEATURES entry, the only one of
+them that opens a dialog, answered nothing in all four layouts, and three of the four had
+no hover either, because the single hover rule was desktop-only.
+
+Fixed with one rule per state written across all four triggers so they cannot drift apart
+again. Verified live: border `rgba(226,238,250,0.13)` to `0.26` on hover, and
+`matrix(1,0,0,1,0,1)` on press, on desktop, portrait and compact.
+
+**AN OPEN STATE WAS WRITTEN AND THEN DELETED, WHICH IS THE MORE USEFUL RESULT.**
+`aria-expanded` is already on all four buttons, so it cost no markup. Then the obvious
+question got asked: while the menu is open, is the trigger on screen? Sampled at five
+points across the control in each layout, nothing at any point is the trigger. Desktop and
+compact put an 82%-opaque black scrim over it; portrait draws the panel's own
+`.fs-face` / `.fm-name-row` / `.fm-cards` across it. A pixel diff of the trigger's own
+screen region, closed against open, changes 100% of pixels, but that is the scrim arriving,
+not the control restyling.
+
+The rule was removed. It would have been dead wiring: CSS that can never reach a player and
+that reads in review as a shipped affordance. The finding is recorded in the stylesheet at
+the point where the next person will look for it. `dead_wiring_scan` PASSES.
+
+## 3. WS3: the audio truth map
+
+Written to `docs/audio/AUDIO_TRUTH_MAP.md`, 276 lines. Full cue-by-cue inventory with call
+sites, the missing-stem matrix, per-stem implementation readiness, and the acquisition
+route. Three findings from it are worth surfacing here.
+
+**Max win was never silent, and the "four missing stems" framing hid that.** The wincap
+reveal plays `win_epic.mp3` and its 800ms echo, deliberately, since R5. What it lacks is a
+cue of its OWN. So `playMaxWin()` was built to fall back to exactly today's behaviour: it
+cannot introduce a silence, only an upgrade.
+
+**THE ACQUISITION ROUTE ALREADY EXISTS IN THIS REPOSITORY AND RUNS ON THIS MACHINE.** The
+twelve shipped stems were not bought; they were generated by `tools/audio_forge/`, a local
+deterministic pipeline using Stable Audio 3 open weights, mastered by
+`tools/audio_forge/master.py`, logged per file with model, seed and prompt. Verified at
+R125: the venv exists, torch 2.7.1 with MPS is available, `stable_audio_tools` imports, and
+all three model repos are already in the local Hugging Face cache. Nothing stands between
+this project and the four files except the decision to make them.
+
+**THE LICENCE HAS A CEILING THAT SUCCESS TRIGGERS, AND THE OWNER SHOULD SEE IT.** The
+Stability AI Community License, archived in-repo, grants royalty-free commercial use but
+requires registration with Stability, and terminates if the licensee or its affiliates
+generate more than USD $1,000,000 in annual revenue, "regardless of whether that revenue is
+generated directly or indirectly from the Stability AI Materials". For a slot game intended
+to earn, that is a live business risk rather than a theoretical one: the trigger condition
+is the game working. The licence carves out downstream recipients, so the exposure sits
+with the studio, not the operator or the player. Section 5.4 of the truth map sets out what
+a licence-clean alternative has to grant if the owner decides that ceiling is unacceptable.
+
+## 4. WS4: four hooks, wired, silent, and proven to fire
+
+**The hooks cannot request a file that does not exist, and that is a hard constraint rather
+than tidiness.** `audio_verify.mjs` asserts `zeroSoundRequestFailures` over any request
+under `/sounds/`. Building the four cues the ordinary way would fire four 404s per session
+and turn a green gate red for cues that are only honestly absent, and would additionally
+route each miss into `makeAudio()`'s fallback, which re-points at a second file that does
+not exist either. So availability is DECLARED: `AVAILABLE_PENDING_CUES` is empty, nothing
+is constructed, nothing is requested.
+
+| Cue | Hook site | Guard |
+|---|---|---|
+| `feature_enter` | `FreeSpinsPresentation.runEntrySequence()`, first statement | inherits `startFrom()`'s skip, so a resumed feature does not replay its entry stinger |
+| `retrigger` | after `runRetriggerLadder()` settles, before `retriggerMoment = true` | fires on the settled award, not racing the ladder's own per-reel stops |
+| `feature_end` | `FreeSpinsPresentation.toEnd()`, first statement | **guarded on `script?.triggered`**: `toEnd()` is also the exit of the wincap walkthrough, a round that never entered the feature |
+| `win_max` | `App.svelte:1709`, `ReplayMode.svelte:320` and `:395` | falls back to `playWin()`, so it cannot go silent |
+
+**A HOOK THAT IS CORRECT TODAY IS INDISTINGUISHABLE FROM A HOOK THAT IS NEVER CALLED.**
+Both make no sound. `__playedSounds` in `audio_verify.mjs` patches
+`HTMLMediaElement.play()`, so by construction it cannot see a cue that deliberately never
+reaches `play()`. A dev-only `__pendingCueTrace` counts `fired` and `played` per cue
+instead, the same answer this file already reached for the bed crossfade.
+
+Measured: `featureEnter` and `featureEnd` both `fired: 1, played: 0`. They fired at boot,
+which looked wrong and was not: sampling the DOM every 120ms from first paint showed the
+feature entry overlay on screen in `stage-flare` at t=711ms and cleared at t=2060ms. That
+is the TR-035b boot recovery replaying an interrupted round, and the hooks track the visible
+presentation exactly. **No pending-cue filename was requested at any point.**
+
+**One inconsistency found and deliberately not fixed.** On the bought feature path,
+`App.svelte:871` plays the round's win cue AFTER the presentation with no reveal-time cue
+when a bought round hits the cap, where the ordinary spin path plays it at the splash. A
+bought max win and a spun max win sound different. Outside R125's fence; recorded in the
+truth map section 4.5 so it is not rediscovered.
+
+## 5. Gates
+
+`typecheck_baseline` PASS (0 errors). `audio_verify` ALL CHECKS PASS, including
+`zeroSoundRequestFailures` and `zeroConsoleErrors`. `interface_guide_icon_proof` PASS,
+all ten icon files byte-unique. `dead_wiring_scan` PASS. `asset_reference_gate` PASS,
+33 referenced paths present in dist. `build_diet_verify` ALL CHECKS PASS, dist 23.31MB
+against the 25MB budget. `turbo_intensity_gate` PASS at 1.295:1 against a 1.25:1 floor.
+`control_row_symmetry_gate`, `paytable_card_fill_gate` (16 locales, 374 cards),
+`scrim_coverage_gate` all PASS. `locked_paths_gate` PASS. `dash_gate` PASS.
+`doc_currency_gate` PASS.
+
+Working tree returned to exactly 30 dirty placeholder rasters, all verified byte-identical
+to their pre-session state.
+
+## 6. What R125 did not do
+
+- **No audio was generated, auditioned or judged.** Every duration and byte size in the
+  truth map was read from a file header. Nothing in it is a claim about how anything sounds.
+- **`win_max`'s BGM duck is specified but not implemented.** A duck's correctness is
+  audible, not structural, and cannot be judged without the file.
+- **The bought-max-win timing inconsistency is recorded, not fixed.**
+- **No new CI gate was added.** `interface_guide_icon_proof.mjs` assembles a side-by-side
+  grid for a human to eyeball and asserts only byte-uniqueness, which is why this mismatch
+  survived: the proof faithfully rendered it and asserted nothing about it. Closing that
+  blind spot with a real similarity assertion is a well-scoped next task and was outside
+  this brief.
+- **Max win still covers the hero.** `MaxWinCelebration` is a full-screen modal, six
+  sessions running.

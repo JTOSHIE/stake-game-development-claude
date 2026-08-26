@@ -7,8 +7,9 @@
 // manifest.json only wires up feature_button.png + the brand/gauge/scene
 // exports — see manifest.json's "exports" list). spin_button.png,
 // btn_bet_plus.png, btn_bet_minus.png, btn_autoplay.png, btn_menu.png,
-// btn_turbo.png and btn_max.png are all legacy-or-newly-added hand-placed
-// PNGs regenerated from the CURRENT shipped HudOverlay.svelte chrome.
+// btn_turbo.png, btn_max.png and btn_features.png (R125) are all legacy-or-
+// newly-added hand-placed PNGs regenerated from the CURRENT shipped
+// HudOverlay.svelte / FeatureMenu.svelte chrome.
 //
 // Mechanism chosen: headless-browser screenshot-crop of the real, live
 // rendered button (Playwright), NOT a new SVG master wired into build.py.
@@ -96,6 +97,28 @@ const TARGETS = [
   { selector: '.fs-turbo', out: 'btn_turbo_2.png', label: 'Speed, turbo', clicks: 1 },
   { selector: '.fs-turbo', out: 'btn_turbo_3.png', label: 'Speed, super turbo', clicks: 1 },
   { selector: '.fs-max', out: 'btn_max.png', label: 'Max Bet' },
+  // R125: the FEATURES row was the ONE guide row not produced here. It pointed at
+  // `feature_button.png`, a 224x224 painted badge from the build.py/manifest path
+  // (an ornate machine plate), while the live control is a wide dark-glass pill
+  // carrying the inline car-grille glyph. Every other row is a crop of the real
+  // button, so that row was the only place the guide could drift from the game -
+  // and it had.
+  //
+  // WHY IT IS NOT SQUARE. Every other target is a round or square control, so the
+  // pad-to-square post-process below is faithful to it. The FEATURES control is a
+  // 130x44 pill (2.95:1). Padded to square and rendered in the guide's 44px slot
+  // it would come out 44x15, putting the word FEATURES at roughly 3.7px tall: the
+  // capture would be honest and unreadable. `fit: 'native'` keeps its real aspect
+  // and normalises on HEIGHT instead, so it lands at the same 4.5x supersample
+  // over the guide's row height as the square icons get over theirs. The guide
+  // slot widens to receive it, exactly as it already does for the three-up speed
+  // row (.fs-guide-icon--set).
+  //
+  // NOT written over feature_button.png: that file is DUAL ROLE (it also renders
+  // as the buy-dialog header art, BuyBonus.svelte:117) and is one of the owner's
+  // uncommitted work-in-progress rasters. New name, matching the btn_* convention
+  // every other captured icon in this set already uses.
+  { selector: '.fm-entry-pill', out: 'btn_features.png', label: 'Features', fit: 'native' },
 ]
 
 async function getFreePort() {
@@ -191,7 +214,17 @@ async function captureIcon(page, tmpDir, target) {
   // committed icons this replaces fill almost the whole 200x200 frame (their
   // content bbox spans edge-to-edge to within ~8-16px), so the crop stays
   // tight to match that convention.
-  const margin = clamp(Math.round(0.18 * Math.max(box.width, box.height)), 12, 22)
+  // R125: proportionate to the SHORT side for a native-fit (non-square) target.
+  // The 0.18-of-the-LONG-side rule is right for a round or square control, where
+  // long and short are the same number. On the 130x44 FEATURES pill it produces a
+  // 22px band on every edge - half again the control's own height stacked above
+  // and below it - so the pill would arrive drowned in padding and render at
+  // roughly 40% of its real size in the guide slot. Measured, not assumed: the
+  // first capture came back 393x200 with the pill occupying 50% of the height.
+  const marginBasis = target.fit === 'native'
+    ? Math.min(box.width, box.height)
+    : Math.max(box.width, box.height)
+  const margin = clamp(Math.round(0.18 * marginBasis), 12, 22)
   const clip = {
     x: Math.max(0, box.x - margin),
     y: Math.max(0, box.y - margin),
@@ -204,18 +237,27 @@ async function captureIcon(page, tmpDir, target) {
   await restore(page)
 
   const outPath = join(UI_DIR, target.out)
+  // `fit: 'native'` (R125) keeps the control's real aspect and normalises on
+  // height; the default pads to square. Both land on a 200px normal so every
+  // shipped icon is supersampled by the same factor over its guide slot.
   const py = `
 import sys
 from PIL import Image
 im = Image.open(sys.argv[1]).convert('RGBA')
 w, h = im.size
-side = max(w, h)
-canvas = Image.new('RGBA', (side, side), (0, 0, 0, 0))
-canvas.paste(im, ((side - w) // 2, (side - h) // 2), im)
-canvas = canvas.resize((200, 200), Image.LANCZOS)
-canvas.save(sys.argv[2], 'PNG')
+native = len(sys.argv) > 3 and sys.argv[3] == 'native'
+if native:
+    out = im.resize((max(1, round(w * 200 / h)), 200), Image.LANCZOS)
+else:
+    side = max(w, h)
+    out = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+    out.paste(im, ((side - w) // 2, (side - h) // 2), im)
+    out = out.resize((200, 200), Image.LANCZOS)
+out.save(sys.argv[2], 'PNG')
 `
-  const res = spawnSync(VENV_PY, ['-c', py, rawPath, outPath], { stdio: 'inherit' })
+  const pyArgs = ['-c', py, rawPath, outPath]
+  if (target.fit === 'native') pyArgs.push('native')
+  const res = spawnSync(VENV_PY, pyArgs, { stdio: 'inherit' })
   if (res.status !== 0) throw new Error(`Pillow post-process failed for ${target.out}`)
   console.log(`  wrote ${outPath.replace(ROOT + '/', '')} (source crop ${Math.round(clip.width)}x${Math.round(clip.height)} from live ${target.selector})`)
 }

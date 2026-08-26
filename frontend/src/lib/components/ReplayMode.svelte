@@ -41,7 +41,7 @@
   // (r043_replay_audio_proof.mjs): with warm-up here, the spin and wincap
   // cues logged muted:true and never sounded; without it, every cue plays.
   // The first cue pays its decode cost inline, which is the cheaper defect.
-  import { playWin } from '../services/soundService'
+  import { playWin, playMaxWin } from '../services/soundService'
 
   // Drive the animation pipeline by setting gameStore writables via their
   // public .set() API, gameStore.ts itself is NOT modified.
@@ -313,9 +313,11 @@
           // Wincap flow applies in replay too: splash first, then on COLLECT
           // present the complete round sequence, finishing on the summary.
           // The wincap cue fires at the reveal, exactly where live fires it
-          // (App.svelte:1677 plays the win sound at the splash, before the
-          // COLLECT wait); the replay's splash IS that reveal.
-          playWin(response.payoutMultiplier)
+          // (App.svelte plays the win sound at the splash, before the COLLECT
+          // wait); the replay's splash IS that reveal.
+          // R125: routed through playMaxWin() so replay stays identical to live
+          // both before and after a dedicated max-win stem exists.
+          playMaxWin(response.payoutMultiplier)
           isWincap.set(true)
           await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
         }
@@ -388,8 +390,9 @@
       // the "how it happened" presentation, finishing on the summary.
       const wincapNow = response.payoutMultiplier >= WINCAP
       if (wincapNow) {
-        // Same reveal-time cue as the feature branch above (App.svelte:1677).
-        playWin(response.payoutMultiplier)
+        // Same reveal-time cue as the feature branch above. R125: playMaxWin(),
+        // matching live and the branch above.
+        playMaxWin(response.payoutMultiplier)
         isWincap.set(true)
         await new Promise<void>((resolve) => { wincapCollectResolve = resolve })
       }

@@ -52,7 +52,7 @@
   } from './lib/stores/gameStore'
   import { spin, initRGS } from './lib/services/rgsService'
   import type { SpinResult } from './lib/services/rgsService'
-  import { playBGM, playWin, warmUpAudio } from './lib/services/soundService'
+  import { playBGM, playWin, warmUpAudio, playMaxWin } from './lib/services/soundService'
   import { isSocial, socialAtBoot } from './lib/stores/socialMode'
   import { resolveLaunchLocale, enforceSocialEnglish } from './lib/stores/socialLocale'
   // ── Overdrive Stage 2 (non-locked feature layer) ──────────────────────────
@@ -1702,7 +1702,11 @@
         // from activeWins, so hold on it (a max win is the one moment to linger)
         // before recordSpinResult flips isWincap and the celebration covers the
         // screen. Deliberately NOT turbo-shortened.
-        playWin(bet > 0 ? win / bet : 0)
+        // R125: the max win's reveal cue. playMaxWin() plays a dedicated max-win
+        // stem WHEN ONE EXISTS and otherwise does exactly what this line did
+        // before - the epic stinger and its 800ms echo, which is what the cap has
+        // reused since R5. An upgrade path, not a silence.
+        playMaxWin(bet > 0 ? win / bet : 0)
         await new Promise((r) => setTimeout(r, 2600))
       }
 
