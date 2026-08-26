@@ -4,6 +4,66 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0S. WHAT R121 CHANGED (hero animation quality) AND THE FINDING THAT DECIDED IT
+
+*** THE FACTORY HERO STRIPS CANNOT MOVE HIM, AND IT IS MEASURED. Silhouette change per frame pair,
+at RENDER size (206x407): live idle 0.51%, win 0.33%, energy 0.44%, glance 0.34%; and all TEN
+factory strips between 0.112% and 0.435%. They animate visor glow, chest lamps and ground bloom on
+an IMMUTABLE POSE. The factory's own QA_PHASE.md says it: "Crossed arms, crossed-leg stance, hand
+identity, and 680x1344 registration remain locked." THE BEST CANDIDATE (0.435%) IS ALREADY SHIPPED
+and the live idle (0.51%) already beats every one of them. There was nothing to buy. ***
+
+**ALL FOUR OF THE BRIEF'S PRIORITY CANDIDATES REFUSED ON ITS OWN RULE** ("refuse weaker-than-
+incumbent strips"): 09-power-surge 0.397% (weaker than live energy 0.44%), 02-epic-win 0.325%
+(already live), 08-approval-nod 0.173%, 01-max-win 0.434% (and still behind a full-screen modal -
+now refused for the FOURTH session, on two independent grounds).
+
+**THE FIX IS A TRANSFORM LAYER, ZERO NEW BYTES.** `.hero-body` wraps `.hero-idle`; the flipbook
+plays untouched inside it while the wrapper moves the whole figure about its FEET.
+MEASURED ON THE SHIPPED BUILD: silhouette motion 0.278% -> 1.007% (3.6x), excursion 0.646% ->
+4.121% (6.4x), **head travel 1.29px -> 12.61px (9.8x)**. Feet stay pin-sharp.
+Idle is ROTATION ONLY - no translateY - because R111 shipped a whole-body bob on top of the
+breathing flipbook and R115 removed it as a double bob. Sway period 7.2s against the flipbook's
+4.4s so they only re-align every 39.6s and never read as a metronome.
+
+*** WORKSTREAM 4 CORRECTED MY OWN FIRST ATTEMPT. The win punch was rotation-led like the sway.
+The banner mounts at stage top:310 over a hero at stage y295..702, so it covers HIS OWN ROWS
+15..185. A rotation about the feet displaces each row IN PROPORTION TO ITS HEIGHT, so it is
+head-weighted by construction: 77.1% of the reaction's motion was in the head band and only 29.5%
+was visible. Rewritten TRANSLATION-LED, because a translation displaces every row EQUALLY:
+hidden 70.5% -> 52.4%, visible 29.5% -> 47.6%, head band 77.1% -> 26.3%. Peak at 180ms, inside the
+banner's own 0.6s entry. Ground line 400 -> 386 -> 400: a 15px hop that returns exactly. ***
+
+**EPIC-CLASS WINS GET A BIGGER PUNCH** (27px / 1.9s vs 15px / 1.5s), keyed off EPIC_WIN_THRESHOLD.
+No strip could deliver "a stronger epic reaction"; a larger transform costs nothing.
+
+**SHIPPED MATRIX** (MutationObserver on data-motion, installed before the spin): dead time = sway +
+glance at 21.3s; small win (<10x) = NO reaction; 16.2x = win/big 1504ms; 135.6x = win/epic 1902ms;
+feature entry = energy 1302ms; reduced motion = animation-name none, transform none.
+60fps, p95 16.8ms, ZERO frames over 20ms in 194 samples. dist 23.35 MB of 25, CSS only.
+
+*** TWO BUGS I INTRODUCED, BOTH CAUGHT BY MEASURING:
+ 1. REDUCED MOTION WAS SILENTLY STILL ANIMATING. The state rules are
+    `.hero-body[data-motion='idle']` = specificity (0,2,0); my reset was a bare `.hero-body` =
+    (0,1,0) and LOST. The users who ask for less motion were the ones still getting it. A
+    reduced-motion reset MUST match or beat the specificity of what it overrides.
+ 2. THE EPIC PUNCH WAS TRUNCATED AT 79%. Its curve is 1900ms but react() held the state for
+    DURATION_MS['win'] = 1500ms, so data-motion flipped mid-curve and the figure SNAPPED from
+    -6px to the idle sway. Found by timing the observed sequence against the CSS. ***
+
+### THE REMAINING GAP IS A RENDERING GAP, NOT A CODE GAP - EXACT ART REQUEST
+
+A transform moves the figure; it cannot change what the figure is DOING. The arms stay crossed in
+every frame of every state. New renders needed, each holding the existing bar (identity IoU >0.95
+vs the live rest frame, opaque-core ground drift 0px, f1==fN, RGB zeroed under alpha 0):
+1. **A win reaction THAT CHANGES THE POSE** - arms unfolding to a fist-pump, returning to crossed.
+   Target silhouette change **>5%** per frame pair against today's 0.33%.
+2. **An idle with a real weight shift** - stance moving, not lighting. >2%.
+3. **A feature brace where the stance widens.** >4%.
+4. **Max-win stays pointless** until MaxWinCelebration stops being a full-screen modal over him.
+The measurement script IS the acceptance test: point it at a frames/ directory and it reports
+silhouette change per frame pair at render size.
+
 ## 0R. WHAT R120 CHANGED (the neighbour consistency pass) AND WHAT IT CORRECTED IN R119
 
 **THE SHELL IS NOW ONE TOKEN LAYER FOR THE WHOLE STAGE.** The ten `--hud-*` tokens moved from

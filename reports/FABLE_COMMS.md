@@ -9,6 +9,67 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 119 - 2026-08-26 - R121: your hero's strips were never going to move him, so something else does. Head travel 1.3px to 12.6px.
+
+**THE FINDING THAT DECIDED THIS SESSION.** I measured every live hero state and all ten factory
+hero strips the same way: how much of his OUTLINE moves between frames, at the size he actually
+renders. **Every single one is between 0.11% and 0.51%.** They animate his visor glow, his chest
+lamps and the bloom on the floor. **His body is a still.** The factory's own QA note says it
+outright: "Crossed arms, crossed-leg stance, hand identity ... remain locked."
+
+**So there was nothing to buy.** The best strip in the whole factory is 0.435% and it is already
+in your game. Your live idle at 0.51% was already the most body-motion anything available had. I
+refused all four of the brief's priority candidates on your own rule - "refuse weaker-than-incumbent
+strips" - and every refusal has a number beside it in the report.
+
+**WHAT I DID INSTEAD.** The motion now comes from a transform layer that moves the whole figure,
+with the flipbook still playing inside it. **Zero new bytes.** Measured on the shipped build:
+
+- **head travel 1.29px to 12.61px** (9.8x)
+- silhouette motion 3.6x
+- excursion from his resting pose 6.4x
+
+He now leans, slowly and continuously, pivoting on his feet like a person standing with their arms
+folded. His feet stay planted - I checked, and in an overlay of eight samples the feet are
+pin-sharp while the head has a visible arc.
+
+**WINS.** He pops 15px off the ground and settles. **Epic wins get a bigger version** - 27px over
+1.9s - which is the "stronger epic reaction" you asked for; no strip could do it, a transform can.
+
+**AND A CORRECTION I MADE TO MY OWN FIRST ATTEMPT.** I built the win punch as a lean, like the
+idle. Then I measured it against where your win banner actually sits, and **77% of the reaction was
+happening behind the banner.** A lean pivots on the feet, so the head moves most - and the head is
+exactly what the banner covers. Rebuilt as a lift instead, because a lift moves every part of him
+equally. Visible share went from 29.5% to 47.6%.
+
+**TWO BUGS I INTRODUCED AND CAUGHT.** Reduced motion was silently still animating - my "stop"
+rule lost a CSS specificity contest to the rules it was meant to override, so the users who
+explicitly ask for less motion were the ones still getting it. And the epic punch was being cut off
+at 79% of its curve, snapping. Both found by measuring rather than looking, both fixed.
+
+60fps, zero long frames, zero console errors, 22 checks green.
+
+---
+
+**WHAT THIS DOES NOT FIX, AND THE EXACT ART REQUEST.** A transform can move him; it cannot change
+what he is DOING. His arms stay crossed in every frame of every state, because there is one master
+pose and ten lighting treatments of it. For idle and dead time this pass is a decisive improvement.
+For the reactions it is an improvement, not a transformation.
+
+To go further you need new renders, not more code:
+
+1. **A win reaction that changes the pose** - arms unfolding into a fist-pump, returning to crossed.
+   Target: outline change above **5%** per frame, against today's 0.33%.
+2. **An idle with a real weight shift** - the stance moving, not the lighting. Above 2%.
+3. **A feature brace where the stance widens.** Above 4%.
+4. **A max-win reaction stays pointless** until the max-win celebration stops being a full-screen
+   panel over the top of him. That is a layout decision, not an art one.
+
+The script that produced every number here is the acceptance test for those renders: hand it a
+folder of frames and it tells you the outline change at the size he actually renders.
+
+---
+
 ## 118 - 2026-08-26 - R120: the UI is one system now, and your interface guide is FIXED rather than blocked
 
 **ALL THREE NEIGHBOURS MATCH THE SHELL.** The FEATURES button, the feature instrument column and

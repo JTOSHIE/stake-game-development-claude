@@ -31,7 +31,7 @@
   // The SAME constant the win banner tiers on. This codebase already carries four
   // separate declarations of the win thresholds and one of them disagrees; this
   // is deliberately not a fifth. The hero reacts exactly when the banner does.
-  import { BIG_WIN_THRESHOLD } from '../stores/winCountUp'
+  import { BIG_WIN_THRESHOLD, EPIC_WIN_THRESHOLD } from '../stores/winCountUp'
 
   export let assetBase: string
 
@@ -73,6 +73,8 @@
   }
 
   let motion: HeroMotion = 'idle'
+  // Declared here rather than beside the win latch because holdFor() reads it.
+  let winTier: 'big' | 'epic' = 'big'
   let reduced = false
   let timer: ReturnType<typeof setTimeout> | undefined
 
@@ -88,6 +90,15 @@
   onDestroy(() => clearTimeout(timer))
 
   /** Play a one-shot, then hand the element back to the idle. */
+  // R121: the epic punch runs 1.9s where the standard one runs 1.5s, so the hold
+  // has to know which is playing. Without this the state flipped back to idle at
+  // 1500ms and cut the epic curve off at 79%, snapping the figure from -6px to
+  // the idle sway. Caught by timing the observed state sequence against the CSS.
+  function holdFor(next: HeroMotion): number {
+    if (next === 'win' && winTier === 'epic') return 1900
+    return DURATION_MS[next]
+  }
+
   function react(next: HeroMotion) {
     // Under reduced motion the hero holds its rest frame and nothing interrupts
     // it. A sudden one-shot is exactly the kind of motion that setting exists to
@@ -98,7 +109,7 @@
     if (motion !== 'idle') return
     motion = next
     clearTimeout(timer)
-    timer = setTimeout(() => { motion = 'idle' }, DURATION_MS[next])
+    timer = setTimeout(() => { motion = 'idle' }, holdFor(next))
   }
 
   // ── Win: once per round, after the reels stop ────────────────────────────────
@@ -106,9 +117,14 @@
   // winMultiplier is derived from winAmount and stays raised for the whole
   // settled round: without the latch any unrelated re-render would re-fire it.
   let reactedThisRound = false
+  // R121: the punch is scaled to the win. The brief asks for a stronger
+  // epic-class reaction "if available" - no STRIP is available (every factory
+  // strip is the same locked pose), but a stronger transform costs nothing and
+  // is the only axis on which this hero can express a bigger win at all.
   $: if ($isSpinning) reactedThisRound = false
   $: if (!$isSpinning && !reactedThisRound && $winMultiplier >= BIG_WIN_THRESHOLD) {
     reactedThisRound = true
+    winTier = $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic' : 'big'
     react('win')
   }
 
@@ -142,17 +158,119 @@
   onDestroy(() => clearInterval(glanceTimer))
 </script>
 
-<div
-  class="hero-idle"
-  data-motion={motion}
-  data-testid="hero-idle"
-  aria-hidden="true"
-  style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
-         background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
-         --hero-span: {SPAN_PX[motion]}px;"
-></div>
+<!-- TWO LAYERS, DELIBERATELY. The inner element plays the flipbook; the outer one
+     moves the whole figure. They are separate because the flipbook CANNOT move him:
+     every frame in every strip is the same locked pose under different lighting
+     (measured, see the style block), so body motion has to come from a transform. -->
+<div class="hero-body" data-motion={motion} data-tier={motion === 'win' ? winTier : null} aria-hidden="true">
+  <div
+    class="hero-idle"
+    data-motion={motion}
+    data-testid="hero-idle"
+    aria-hidden="true"
+    style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
+           background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
+           --hero-span: {SPAN_PX[motion]}px;"
+  ></div>
+</div>
 
 <style>
+  /* ===== THE BODY LAYER (R121) ===============================================
+     WHY THIS EXISTS. Measured at render size (206x407) over every live state and
+     every one of the factory's ten hero strips, the SILHOUETTE change between
+     consecutive frames is 0.11% to 0.51% of the figure's pixels. The strips
+     change LIGHTING, not pose - the factory's own QA note says so outright:
+     "Crossed arms, crossed-leg stance, hand identity ... remain locked". The
+     live idle at 0.51% is already the most body-motion anything available has.
+     So no strip swap can make this hero move; only a transform can.
+
+     WHAT IT DOES. The outer element rotates the whole figure about its FEET,
+     which is what a person standing with their arms crossed actually does. The
+     inner element keeps playing the flipbook untouched.
+
+     WHY ROTATION AND NOT A BOB. R111 shipped a whole-body translateY slide on
+     top of the breathing flipbook and R115 removed it: two vertical motions on
+     one figure read as a double bob. A rotation about the feet is a different
+     axis - it reads as weight shift, not as a second breath - so the two
+     compose instead of fighting. There is deliberately NO translateY here.
+
+     WHY 7.2s AGAINST THE FLIPBOOK'S 4.4s. Equal periods would lock the sway to
+     the breath and read as a metronome. 4.4 and 7.2 only re-align every 39.6s,
+     so the combined motion does not visibly repeat.
+
+     DISTINCT KEYFRAME NAMES PER STATE, for the same reason the flipbook needs
+     them: CSS restarts an animation on a NAME change, not a duration change. A
+     shared name would hand the reaction the idle's elapsed time. */
+  .hero-body {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 97%;   /* the feet, not the centre */
+    will-change: transform;
+  }
+  @keyframes hero-sway-idle {
+    0%   { transform: rotate(-1.05deg); }
+    50%  { transform: rotate( 1.05deg); }
+    100% { transform: rotate(-1.05deg); }
+  }
+  /* THE WIN PUNCH IS TRANSLATION-LED, AND THAT IS A MEASURED CORRECTION.
+     The first version was rotation-led about the feet, like the sway. Measured
+     against the banner's real geometry - it mounts at stage top:310 over a hero
+     occupying stage y295..702, so it covers the hero's own rows 15..185 - that
+     put 77.1% of the reaction's silhouette motion in the HEAD band and left only
+     29.5% of it visible. The player saw almost none of the reaction he earned.
+
+     A rotation about the feet displaces each row in proportion to its height, so
+     it is head-weighted by construction. A TRANSLATION displaces every row
+     EQUALLY, so the chest and stance - the part that stays visible under the
+     banner - move as much as the head does. The rotation is kept small, for
+     character rather than for reach.
+
+     The peak lands at 12% of 1.5s = 180ms, deliberately inside the banner's own
+     0.6s entry animation, so the strongest moment reads before full occlusion. */
+  @keyframes hero-punch-win {
+    0%   { transform: translateY(0)     rotate(0deg)    scale(1);     }
+    12%  { transform: translateY(-15px) rotate(-1.2deg) scale(1.028); }
+    30%  { transform: translateY(-4px)  rotate( 0.9deg) scale(1.010); }
+    52%  { transform: translateY(-8px)  rotate(-0.5deg) scale(1.014); }
+    76%  { transform: translateY(-2px)  rotate( 0.2deg) scale(1.004); }
+    100% { transform: translateY(0)     rotate(0deg)    scale(1);     }
+  }
+  @keyframes hero-punch-epic {
+    0%   { transform: translateY(0)     rotate(0deg)    scale(1);     }
+    10%  { transform: translateY(-27px) rotate(-2.0deg) scale(1.050); }
+    26%  { transform: translateY(-7px)  rotate( 1.5deg) scale(1.016); }
+    46%  { transform: translateY(-16px) rotate(-0.9deg) scale(1.028); }
+    68%  { transform: translateY(-4px)  rotate( 0.5deg) scale(1.008); }
+    86%  { transform: translateY(-6px)  rotate(-0.2deg) scale(1.010); }
+    100% { transform: translateY(0)     rotate(0deg)    scale(1);     }
+  }
+  /* Feature entry: a brace. He sinks, then rises taller than rest, then settles. */
+  @keyframes hero-brace-energy {
+    0%   { transform: rotate(0deg)    scale(1);                 }
+    18%  { transform: rotate(0.5deg)  scale(0.984) translateY(4px); }
+    46%  { transform: rotate(-0.8deg) scale(1.030) translateY(-5px); }
+    72%  { transform: rotate(0.3deg)  scale(1.010) translateY(-1px); }
+    100% { transform: rotate(0deg)    scale(1)     translateY(0);   }
+  }
+  /* The glance is a look, so the body barely turns: a small horizontal squeeze
+     plus a lean is enough to sell a head turn on a flat sprite. */
+  @keyframes hero-turn-glance {
+    0%   { transform: rotate(0deg)     scaleX(1);     }
+    30%  { transform: rotate(-1.3deg)  scaleX(0.985); }
+    70%  { transform: rotate(-1.3deg)  scaleX(0.985); }
+    100% { transform: rotate(0deg)     scaleX(1);     }
+  }
+  .hero-body[data-motion='idle']   { animation: hero-sway-idle 7.2s ease-in-out infinite; }
+  .hero-body[data-motion='win']    { animation: hero-punch-win 1.5s cubic-bezier(.22,1.2,.36,1) 1 both; }
+  /* Epic-class wins get the same SHAPE at greater amplitude and a beat longer,
+     so the difference reads as "bigger", not as "different". A distinct keyframe
+     NAME, not just a longer duration, for the restart reason above. */
+  .hero-body[data-motion='win'][data-tier='epic'] {
+    animation: hero-punch-epic 1.9s cubic-bezier(.22,1.25,.36,1) 1 both;
+  }
+  .hero-body[data-motion='energy'] { animation: hero-brace-energy 1.3s cubic-bezier(.3,.9,.3,1) 1 both; }
+  .hero-body[data-motion='glance'] { animation: hero-turn-glance 1.7s ease-in-out 1 both; }
+
   .hero-idle {
     position: absolute;
     inset: 0;
@@ -201,5 +319,12 @@
       animation: none;
       background-position-x: 0;
     }
+    /* THE ATTRIBUTE SELECTOR HAS TO BE REPEATED HERE, and this is not cosmetic.
+       The state rules above are `.hero-body[data-motion='idle']`, specificity
+       (0,2,0). A bare `.hero-body` reset is (0,1,0) and LOSES to them, so the
+       sway kept running under prefers-reduced-motion. Caught by reading the
+       computed animation-name in a reduced-motion browser context, which
+       reported hero-sway-idle and a live rotation matrix. */
+    .hero-body[data-motion] { animation: none; transform: none; }
   }
 </style>
