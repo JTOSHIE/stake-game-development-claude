@@ -9,6 +9,58 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 124 - 2026-08-26 - R126: your win reaction is smooth at both ends now. I shipped a new fault first and a second pass caught it, so you are getting the corrected version.
+
+**THE PACKAGE IS HONEST.** 68 runtime frames exactly as claimed. Three folder names are wrong and
+the contents are right: win-unfold-16 actually holds 24 frames, feature-brace-12 holds 16.
+
+**THE JITTER WAS ONLY EVER IN THE WIN, AND IT WAS TWO FRAMES WIDE.** Through your live win the
+frame-to-frame change goes 2%, 12%, **26%**, 2%, **26%**, 12%, 2%. Those two 26% jumps are the arms
+snapping open and shut. Your feature brace has no pop at all, and your idle has exactly one.
+
+**I WANT TO BE STRAIGHT WITH YOU ABOUT WHAT HAPPENED.** My first fix was a 14-frame strip. It hit
+every number I was aiming at: worst jump down from 26.68% to 18.63%, nothing above 20% anywhere. I
+committed it and pushed it. Then I had it independently checked, and the check found that I had
+dropped the two frames the artist used to ease INTO and OUT OF the rest pose. So the strip started
+with a 13% jump and ended with a 13% jump where yours had 2% at each end. **I had removed two pops
+from the middle and added two at the ends**, right where the reaction hands back to the idle. The
+number I was optimising could not see it.
+
+**WHAT SHIPPED IS THE CORRECTED VERSION: a 16-frame win unfold.** It pins the rest, ease-in, peak,
+ease-out and rest frames as untouchable. Entry step **0.93%** and exit step **0.53%**, both gentler
+than what you have now. Worst jump 18.63%, nothing above 20% anywhere in the strip. The peak pose is
+slightly bigger than yours, not smaller, and it gains an anticipation crouch before the swing. At 14
+frames I could not get both ends and the middle; at 16 I could, which is why the file grew.
+
+**THE 24-FRAME VERSION IS THE BEST ART IN THE BOX AND I COULD NOT SHIP IT.** It costs 3.35 MB and
+you had 1.75 MB. Free up about 2 MB anywhere in the build and it becomes possible.
+
+**Budget: you are now at 24.68 MB of 25.** That is 0.32 MB left, down from 1.67 MB. The next asset
+change of any size needs something freed first, and I want that on your radar rather than buried.
+
+**REFUSED, FOUR** - and one of my reasons was wrong, so here it is corrected. The 12-frame idle is
+smoother but it is 38% of the amplitude you have and a shallow wobble rather than a real weight
+shift, so it gets smooth by removing the motion. The nod has every frame pair under 1% change, which
+is not acting. The ambient has nowhere to live. **On the brace I told you no affordable better
+version existed. That was false.** There is one: a 10-frame pick that takes the worst jump from
+19.45% down to 15.64% for about 522 KB. It still does not ship, because your brace has no pop to fix
+in the first place, because it does not fit next to the corrected win, and because that particular
+pick has the same abrupt-ending fault I just spent the session removing. But the reason I first gave
+you was wrong and you should have the right one.
+
+**I also found four comment blocks in your code stating measurements that are simply not true of the
+art any more** - including one that had the win banner covering the wrong part of the hero, because
+it read a CSS `top:310px` as the banner's top edge when it is actually its centre. All corrected
+against live measurements. The banner covers the top quarter of the hero, and **71% of the new
+strip's movement happens below it**, where you can see it.
+
+Proved running: all 16 frames play, 60 fps, no console errors, reduced motion still skips the whole
+reaction.
+
+**Still open:** the full 24-frame win, on budget. That brace variant, once its ends are anchored.
+Your idle's one snap. And **nothing in your CI measures hero animation at all**, which is exactly
+why I was able to push a regression and only catch it on a second look.
+
 ## 123 - 2026-08-26 - R125: the guide's last painted row is fixed, and your four missing sounds turn out to be one decision away, not one purchase away.
 
 **THE FEATURES ROW MATCHES THE BUTTON NOW.** Seven of the eight rows in your Interface
