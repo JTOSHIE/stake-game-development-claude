@@ -9,6 +9,65 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 115 - 2026-08-26 - R117: two hero upgrades that cost NEGATIVE bytes, a new glance, and your feature finally has sound
+
+**MORNING SUMMARY.** Four things shipped, all verified by behaviour rather than by flags:
+
+1. **Two hero reactions replaced with measurably stronger ones, and both are SMALLER than what they
+   replaced. Net -1,048 KB.**
+2. **A new hero behaviour: the glance.** He now looks toward the reels on a slow cadence during dead
+   time. First thing that answers "he does the same thing through every dead spin".
+3. **Your Overdrive feature is no longer silent.** Reel landings sound inside it: **6 cues on a base
+   spin, 17 across a feature round.**
+4. **Your win loudness ladder was not a ladder.** +5.46 dB, then +1.09, then +0.96. Now +2.20, +2.12,
+   +2.17.
+
+**The full hero matrix, from one real feature round:**
+`idle -> energy -> idle -> glance -> idle -> win -> idle`
+
+**THE BUDGET INSIGHT THAT MADE IT POSSIBLE.** The R116 queue looked unaffordable against 2.15MB. It
+was not, because **replacements are nearly free and only additions cost**. Both replacements are
+stronger AND smaller, which funded the glance. Three strips taken from 799 candidates. No bulk
+import.
+
+**SANITATION WAS NOT A NO-OP.** All three strips I took were among R116's fringed set: 6 of 8, 5 of
+7 and 4 of 6 frames carried RGB p99 255 under transparency. Every frame zeroed BEFORE resampling,
+and re-measured after: **residual now 0 on all three.** The byte count barely moved, because PNG
+compresses a bright field like a black one - which is exactly why this has to be measured rather
+than eyeballed.
+
+**REFUSED AGAIN, THIRD SESSION RUNNING: the max-win reaction.** It is the strongest strip in the
+whole factory at 63.5%. `MaxWinCelebration` is a full-screen modal that covers the hero. **A
+stronger reaction behind an opaque panel is not a stronger reaction.**
+
+**THE AUDIO WORK, AND WHAT IT IS NOT.** `FreeSpinsPresentation` imported no audio at all. I wired
+the SAME cue your base game already plays for the SAME event: ordinary free spins reveal the whole
+board so they get one landing; retriggering spins reveal reel by reel so each reel commits. **That
+is a reel landing sounding like a reel landing. I invented no stem and borrowed no unrelated sound
+to paper over a gap.**
+
+**MY VERIFICATION FIRST SAID IT DIDN'T WORK, and both reasons are worth your attention.**
+`reel_stop` sat at 5 for 108 seconds with the feature on screen. It turned out (a) the `.fs-overlay`
+I was watching was the **hidden warm-mount instance** that lives all session and carries the same
+testids, and (b) the real feature was **stalled on a "TAP TO CONTINUE" button my harness never
+pressed** - the free-spin counter sat frozen at 12 for 54 seconds, which is what proved it. **Every
+earlier session's feature probe had the same blind spot and only ever saw the entry moment.** With
+the tap added: 5 -> 10 -> 13 -> 17. Twelve free spins, twelve landings.
+
+**WHAT I CANNOT FIX WITHOUT YOU.** Four moments are still silent and no amount of code will change
+that, because there is no file to play: **feature entry, retrigger, feature end, and max win.** Your
+sound map has twelve slots and none of them is any of those. In priority order the stems to
+commission are feature_enter.mp3, win_max.mp3, feature_end.mp3, retrigger.mp3, at
+assets/themes/future-spinner/sounds/, matching your existing snake_case convention.
+
+**Where the three tags now stand.** Assets: strong, no longer the problem. Animations: genuinely
+good - four hero states, all on real game events, all returning cleanly to rest. **Sound: moved, but
+still last, and now blocked on four files rather than on code.**
+
+dist 22.85 -> 23.40 of 25MB. Sixteen gates green. Your thirty placeholders untouched.
+
+---
+
 ## 114 - 2026-08-25 - R116: the factory is real art, honestly counted, and 710 of 799 have nowhere to go
 
 **YOUR ONE QUESTION, ANSWERED: it is NOT bulk derivative filler, and it is not mostly usable either.

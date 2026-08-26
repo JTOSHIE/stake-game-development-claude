@@ -217,6 +217,76 @@ component work, which is a categorisation and not a prohibition.
 5. The small tooling debts: 7 truncated manifest notes, `BASELINE_WARNINGS`, four wrong `renders_in` citations, the unreferenced `_1x` variants.
 6. **Paytable panel targets**, which do not exist at all.
 
+## 0O. R117 - HERO UPGRADED, FEATURE AUDIBLE, AND THE RESIDUAL LIST IS NOW FOUR SOUND FILES
+
+**SHIPPED:** three factory strips (of 799 candidates), two as REPLACEMENTS that are stronger AND
+smaller, one as a new behaviour.
+
+| Sheet | Frames | Replaces | Net bytes | Strength |
+|---|---:|---|---:|---|
+| hero_win_reaction_8f.png | 8 | the R114 win reaction | **-817 KB** | 61.5% vs 57.2% |
+| hero_feature_trigger_7f.png | 7 | hero_energy_up_6f.png | **-231 KB** | 62.6% vs 56.5% |
+| hero_glance_6f.png | 6 | nothing, NEW behaviour | +1616 KB | idle attract, 24s cadence |
+
+**All three:** identity IoU 0.9542-0.9930 vs the LIVE rest frame, **opaque ground drift 0 px**,
+f1==fN. **Sanitation was real:** 6/8, 5/7 and 4/6 frames carried RGB p99 255 under transparency;
+zeroed BEFORE resample; **residual now 0**. Byte count barely moved because PNG compresses a bright
+field like a black one, so this must be measured not eyeballed.
+
+**HERO BEHAVIOUR MATRIX NOW LIVE**, from one real feature round:
+`idle -> energy -> idle -> glance -> idle -> win -> idle`. Small wins and losses raise nothing.
+Reduced motion skips every reaction.
+
+**AUDIO FIXED, NO NEW STEMS:**
+- **The win ladder was not a ladder.** `playWin()` hardcoded 0.4 for small and bypassed BASE, giving
+  **+5.46 dB then +1.09 then +0.96** - three tiers that sounded like two. Now an even x1.284 ladder:
+  **+2.20 / +2.12 / +2.17**, and the bypass is gone.
+- **Audio thresholds were a FIFTH independent declaration** (literal 100/30/10). Now imported from
+  winCountUp.ts, so audio tracks the visual tiers by construction.
+- **The Overdrive feature had NO audio** (FreeSpinsPresentation imported none). Wired the same cue
+  the base game plays for the same event: one landing per ordinary free spin, per-reel on retrigger
+  ladders (mutually exclusive by guard). **Verified 5 -> 10 -> 13 -> 17 across twelve free spins.**
+
+**TWO HARNESS BLIND SPOTS FOUND, and they invalidate earlier feature probes:**
+1. The `.fs-overlay` element is a **hidden warm-mount instance** alive for the whole session carrying
+   the same testids. Matching on it proves nothing.
+2. The real feature **stalls on a "TAP TO CONTINUE" button** (`[data-testid="entry-continue"]`).
+   Without pressing it the free-spin counter sits frozen and no feature code runs. **Every earlier
+   session's feature probe only ever observed the ENTRY moment.**
+
+**REFUSED:**
+- **01-max-win-reaction**, strongest strip in the factory (63.5%), refused for the THIRD session:
+  MaxWinCelebration is a full-screen modal that covers the hero.
+- **09-power-surge-settle, 08-short-approval-nod**: good, but additions the budget could not carry
+  alongside the glance. Dead time dominates a review session, so the glance won.
+- **Anticipation and symbol-state** (85 + 133 files): architecture cost too high, as R116 predicted.
+- **Factory feature/celebration frames**: same full-stage-vs-HUD problem R115 and R116 both refused.
+
+---
+
+### THE RESIDUAL LIST, REBUILT
+
+**BLOCKED ON EXTERNAL DELIVERABLES (this is now the critical path):**
+1. **FOUR AUDIO STEMS.** No file exists to play, so no code can fix these. At
+   assets/themes/future-spinner/sounds/, snake_case, each needing a themeStore key and a BASE
+   volume entry: feature_enter.mp3 (most conspicuous silence), win_max.mp3 (the most
+   photographed screen is silent), feature_end.mp3, retrigger.mp3.
+2. **Anticipation art with a consumer** - the reels have no tension build.
+
+**BLOCKED ON OWNER DECISIONS:**
+1. **WEBP.** dist is at **23.40 of 25 MB = 93.6%**. Every future intake is gated on this.
+2. **The max-win modal.** Restaging it to leave the hero visible would unlock the factory's
+   strongest strip.
+3. `scene_character.png` (791 KB) still ships and cannot render; kept as the hero's escape hatch.
+4. Six confirmed orphans (337,523 B), not swept because nine OTHER assets look like orphans to a
+   grep but are built dynamically.
+
+**CARRIED, STILL TRUE:** the win banner covers the hero's head during reactions, but 60.8% of the
+motion is in the visible chest band; `winCountUpTier()` still has no external callers; the
+win_big/win_medium file-name skew is unresolved (numbers agree, names do not).
+
+---
+
 ## 0N. R116 - FACTORY AUDIT: 799 runtime candidates, 49 READY, 710 HOMELESS
 
 **AUDIT ONLY. Nothing wired, no factory raster committed, working tree clean, 30 placeholders

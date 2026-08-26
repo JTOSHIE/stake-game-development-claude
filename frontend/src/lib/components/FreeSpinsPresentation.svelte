@@ -12,6 +12,13 @@
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
   import { themeAssets } from '../stores/themeStore'
+  // R117. This component rendered its own board and its own reveal ladder and
+  // imported no audio at all, which is why the whole Overdrive feature was silent
+  // apart from the music bed swapping underneath it. These are the SAME cues the
+  // base game already plays for the SAME events, so this is the reel landing
+  // sounding like a reel landing, not a borrowed noise standing in for a missing
+  // one. No new stem is invented here.
+  import { playReelStop } from '../services/soundService'
   import type { PresentationScript, PresentedSpin } from '../services/roundInterpreter'
   // TR-036 option (b), R2R-R JOB E. The SAME gauge as the base game, capped at
   // level 3 for a retrigger. See scatterEscalation.ts for why capped rather
@@ -303,6 +310,9 @@
 
       const before = landed
       revealedReels = r + 1
+      // Each reel of the retrigger ladder commits audibly, exactly as it does in
+      // the base game. This is the only free spin that reveals reel by reel.
+      playReelStop(r)
       landed += rows[r].filter((sym) => sym === 'S').length
 
       // Beat on the TRANSITION, so it fires when the scatter lands. Above the
@@ -336,6 +346,11 @@
     // The +5 pop waits for the ladder on a retriggering spin, so the build and
     // its payoff are not on screen at the same moment.
     revealedReels = 5
+    // R117. Ordinary free spins reveal the whole board at once, so they get ONE
+    // landing cue. Retriggering spins are excluded here because their ladder
+    // sounds every reel individually a few lines above; without this guard a
+    // retrigger would fire six cues for five reels.
+    if (!currentSpin.retrigger) playReelStop()
 
     const spin = currentSpin
     const thisIndex = spinIndex

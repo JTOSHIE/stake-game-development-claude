@@ -2,6 +2,7 @@
 // Full tiered audio: 5 win tiers, anticipation, scatter events
 
 import { get } from 'svelte/store'
+import { BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD, EPIC_WIN_THRESHOLD } from '../stores/winCountUp'
 import { isMuted as isMutedStore } from '../stores/gameStore'
 import { musicVolume, sfxVolume } from '../stores/audioSettings'
 import { themeAssets } from '../stores/themeStore'
@@ -51,9 +52,18 @@ const BASE = {
   spin:                 0.70,
   reelStop:             0.85,
   reelStopAnticipation: 0.90,
-  winSmall:             0.65,
-  winMedium:            0.75,
-  winBig:               0.85,
+  // R117, THE WIN LADDER WAS NOT A LADDER. The four tiers were 0.65/0.75/0.85/0.95
+  // here, but playWin() hardcoded 0.4 for the small tier and bypassed this table,
+  // so what a player actually heard was 0.40 / 0.75 / 0.85 / 0.95: a +5.45 dB leap
+  // into the second tier and then +1.08 dB and +0.96 dB, which are below the level
+  // most listeners reliably notice. Three tiers therefore sounded like two.
+  //
+  // These values are an even ladder: each step is x1.284, or +2.17 dB, across the
+  // whole range. The hardcoded bypass in playWin() is gone, so this table is once
+  // again the single place win loudness is decided.
+  winSmall:             0.45,
+  winMedium:            0.58,
+  winBig:               0.74,
   winEpic:              0.95,
   scatterLand:          0.80,
   anticipationBuild:    0.60,
@@ -433,24 +443,28 @@ export function playScatterLand(): void {
 export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
 
-  if (multiplier >= 100) {
+  // R117: the boundaries are IMPORTED rather than restated. They were literal
+  // 100 / 30 / 10 here, which happened to match the celebration table but was a
+  // separate declaration that could drift away from it silently. Audio now tracks
+  // whatever the visual tiers do, by construction.
+  if (multiplier >= EPIC_WIN_THRESHOLD) {
     // Epic win (and MAX/wincap), play twice with slight delay for emphasis
     sounds.winEpic.currentTime = 0
     sounds.winEpic.play().catch(() => {})
     setTimeout(() => {
       playClone(sounds.winEpic, 0.6)
     }, 800)
-  } else if (multiplier >= 30) {
+  } else if (multiplier >= MEGA_WIN_THRESHOLD) {
     // Big win
     sounds.winBig.currentTime = 0
     sounds.winBig.play().catch(() => {})
-  } else if (multiplier >= 10) {
+  } else if (multiplier >= BIG_WIN_THRESHOLD) {
     // Medium win
     sounds.winMedium.currentTime = 0
     sounds.winMedium.play().catch(() => {})
   } else {
-    // Small win, softer version
-    playClone(sounds.winSmall, 0.4)
+    // Small win. No explicit volume: the BASE table decides, like every other tier.
+    playClone(sounds.winSmall)
   }
 }
 
