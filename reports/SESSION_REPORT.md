@@ -25326,3 +25326,149 @@ and 12x the motion of the incumbents.
 intent: for every frame, the count of pixels with alpha > 8 in the first and last columns must be
 **zero**. The existing suite's four tests all pass on the broken frames, so this needs to be added
 rather than assumed.
+
+# Session Report - R123 POSE STRIPS V2: the severed limbs are gone, the brace is better than the version that had them, and the win strip bought its containment by shrinking the gesture (2026-08-26)
+
+**MORNING SUMMARY.**
+
+1. **THE CANVAS-EDGE DEFECT IS FIXED.** Zero pixels above alpha 8 in the first or last column on
+   **every frame of both strips**. Smallest margin 36px. R122's finding does not recur.
+2. **BOTH SHIPPED.** The hero now changes pose on a win, on feature entry, and while idle.
+3. **The brace is a straight win**: 5.75% against a 4.0% floor, and **better than the v1 that had
+   the severed limbs** on every motion metric.
+4. **The win strip is shipped BELOW its stated floor, deliberately and on the record** - 3.25%
+   against >5%. They bought containment by making the gesture compact: chest-band width moves
+   **+3px where v1 moved +68px**.
+5. **Banner visibility doubled** for the win reaction, 14.0% to 28.7%, because the motion moved out
+   of the head band and into the chest.
+6. **Neither strip clips the hero box** - 159px and 184px against 206px.
+
+---
+
+## 1. WORKSTREAM 1 - THE CANVAS-EDGE TEST, WHICH IS WHY THIS SESSION EXISTS
+
+R122 refused v1 because 192 pixels of solid arm lay flat against the canvas boundary, and recorded
+that the supplier's four-test suite could not see it. **They added the test.** Their QA now publishes
+per-frame min/max opaque x. Verified first-hand on every frame:
+
+| strip | frames | smallest L margin | smallest R margin | pixels a>8 in col 0 or 679 |
+|---|---|---|---|---|
+| win-reaction-unfold | 8 | 78px | 77px | **0 on every frame** |
+| feature-brace | 7 | 36px | 36px | **0 on every frame** |
+
+My min/max differ from their table by 1px because I threshold at alpha > 127 and they appear to use
+alpha > 0. Immaterial, and the direction is consistent.
+
+**The rest of the acceptance gate:**
+
+| strip | f | mean Δ | floor | path | XOR/rest | identity IoU | f1==fN | ground | box fit |
+|---|---|---|---|---|---|---|---|---|---|
+| win-reaction-unfold | 8 | 3.25% | > 5.0% | 22.75% | 16.73% | 0.9998 | true | 0px | 159/206 |
+| feature-brace | 7 | **5.75%** | > 4.0% | 34.52% | 33.40% | 0.9998 | true | 0px | 184/206 |
+
+## 2. THE BRACE IS BETTER THAN THE VERSION THAT HAD SEVERED LIMBS
+
+| | mean Δ | path | XOR/rest | chest width |
+|---|---|---|---|---|
+| LIVE energy (incumbent) | 0.44% | 2.61% | 3.19% | 137 -> 138 (**+1px**) |
+| v1 brace (edge-clipped) | 5.39% | 32.35% | 24.71% | 137 -> 203 (+66px) |
+| **v2 brace (shipped)** | **5.75%** | **34.52%** | **33.40%** | 137 -> 184 (**+47px**) |
+
+They did not trade motion for containment here - they gained on both. **13x the incumbent's motion.**
+
+## 3. THE WIN STRIP IS SHIPPED BELOW ITS FLOOR, AND HERE IS THE WHOLE ARGUMENT
+
+| | mean Δ | path | XOR/rest | chest width | arm reach | area change |
+|---|---|---|---|---|---|---|
+| LIVE win (incumbent) | 0.33% | 2.28% | 2.79% | 137 -> 138 (+1px) | +0.0px | 376px |
+| v1 win (edge-clipped) | 4.07% | 28.48% | 23.35% | 137 -> 205 (+68px) | +27.0px | 2993px |
+| **v2 win (shipped)** | **3.25%** | **22.75%** | **16.73%** | 137 -> 140 (**+3px**) | +4.0px | **0px** |
+
+**They fixed the edge by shrinking the gesture.** Their own note says it: *"re-rendered with compact
+arm gestures and clear lateral breathing room"*. v1's arms swung wide and were cut; v2's stay close
+to the torso. The silhouette AREA change is **exactly zero pixels** - the arms rearrange within the
+same envelope rather than widening it.
+
+**Why I shipped it anyway.** It is 10x the incumbent by path length and 6x by XOR-against-rest; it is
+edge-safe, identity-perfect, ground-stable; and rendered at true game size the arms visibly leave the
+crossed position, one fist up and one hand down. **Leaving the lighting-only incumbent in place -
+which moves the chest band by one pixel across its entire performance - to honour a metric I wrote
+myself would have been the worse outcome for the player.** The shortfall is recorded here, in the
+provenance JSON and in the commit, and the strip is a drop-in replacement that can be reverted with
+one `git checkout`.
+
+**A caution about the metric itself, carried from R122**: mean-change-per-consecutive-pair is diluted
+by frame count. v2 win has 8 frames; the same path over 6 frames would read 4.55%. The floor was
+never a good instrument for comparing strips of different lengths, and path length is.
+
+## 4. WORKSTREAM 4 - BANNER OCCLUSION AND BOX CLIP
+
+**Computed from the shipped sheets and the banner's known geometry**, not in-browser. The banner
+mounts at stage `top: 310px` over a hero occupying stage y295..702, so it covers the hero's own rows
+15..185.
+
+| state | hidden | visible | head band | chest band |
+|---|---|---|---|---|
+| win incumbent | 86.0% | 14.0% | 63.0% | 28.9% |
+| **win v2** | **71.3%** | **28.7%** | **27.1%** | **54.9%** |
+| feature incumbent | 83.3% | 16.7% | 61.4% | 27.9% |
+| **feature v2** | **77.5%** | **22.5%** | **26.9%** | **61.3%** |
+
+**Visible share doubles for the win.** The reason is structural rather than lucky: the incumbent's
+"motion" was a visor and chest-lamp glow concentrated in the head band, which is exactly what the
+banner covers. A pose change puts the motion in the torso.
+
+**No box clipping.** Maximum rendered width is 159px (win) and 184px (feature) against the 206px
+`.char-layer` box, so the repaired limbs are not clipped by the layout either.
+
+## 5. THE SHIPPED BEHAVIOUR MATRIX
+
+| state | observed | duration |
+|---|---|---|
+| idle / dead time | R122 weight-shift strip + 0.32deg de-loop; glance at 21.3s | 1701ms |
+| small win (< 10x) | no reaction | - |
+| meaningful win (16.2x) | `idle -> win/big -> idle` | 1503ms |
+| epic win (135.6x) | `idle -> win/epic -> idle` | 1901ms |
+| feature entry | `idle -> energy -> idle` | 1301ms |
+| reduced motion | `animation-name: none`, `transform: none` | - |
+
+**60 fps, p95 17.6ms, worst 18.7ms, zero frames over 20ms across 194 samples. Zero console errors and
+zero failed requests in every state.** dist **23.27 MB of 25**, headroom **1.73 MB**, net +609,173
+bytes for both sheets. Sanitation: RGB zeroed under alpha 0 before and after the resample; one of the
+seven brace frames carried fringe, and the shipped sheets measure **0** residual.
+
+**No code changed.** Frame counts and filenames are unchanged, so both strips are drop-in
+replacements. The R121 transform layer is untouched: the win hop is vertical and the strip's motion
+is in the arms, so unlike R122's idle - where a lateral sway fought a lateral weight shift - these
+compose on different axes.
+
+## 6. AN INSTRUMENT FAILURE WORTH RECORDING, BECAUSE IT NEARLY CORRUPTED WORKSTREAM 4
+
+**An element screenshot captures whatever is painted over that element's box, not just the element.**
+Measuring the win reaction in-browser, the hero's 206x407 box came back **fully opaque, 83,842 pixels,
+identical on every frame** - the win banner painting across it. Earlier the same harness produced a
+"hero" silhouette 206px wide with 396 of 407 rows opaque at both edges, which I briefly read as the
+figure overflowing its box.
+
+Three attempts to isolate the hero by hiding named selectors all failed, because the list was a guess.
+Switching to `body * { visibility: hidden }` plus `.char-layer, .char-layer * { visibility: visible }`
+removed the wrong elements but the capture stayed opaque, because that probe lacked the
+background-transparency rules its sibling had.
+
+**The fix was to stop capturing at all.** Banner occlusion and box fit are both deterministic
+functions of the shipped sheets and geometry that is written down in `docs/HUD_SPEC.md` and the
+component CSS. Computing them in the source domain needs no isolation, no timing, and no browser.
+**The in-browser numbers from any earlier session that used this harness for reaction bands should be
+treated as suspect for the same reason** - including R122's, whose 45.0% figure came from the same
+contaminated route. The band figures in section 4 supersede them.
+
+## 7. WHAT IS STILL MISSING
+
+- **The win gesture is a compromise.** v1 proved the wide unfold is renderable; v2 proved containment
+  is renderable; **nothing has yet proved both at once.** A v3 should pair v1's arm swing with v2's
+  margins. The canvas has room: the widest v2 frame still leaves 36px on each side, and the widest
+  v1 frame needed roughly 90px more than it had.
+- **Max win still has no reaction at all**, and still cannot usefully have one while
+  `MaxWinCelebration` is a full-screen modal over the hero. Four sessions running.
+- **Nothing measures hero animation in CI.** Every number in this report came from a script written
+  for the session. A strip that regressed would not be caught by any gate.

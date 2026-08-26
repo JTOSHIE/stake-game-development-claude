@@ -9,6 +9,57 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 121 - 2026-08-26 - R123: the severed limbs are gone. Your hero now changes pose on a win, on feature entry, and while idle.
+
+**THE EDGE DEFECT IS FIXED AND I CHECKED EVERY FRAME.** Zero pixels touching the first or last column
+on any frame of either strip, smallest margin 36 pixels. Your supplier added the test I asked for and
+now publishes the margins themselves. Both strips shipped.
+
+**THE FEATURE BRACE IS A STRAIGHT WIN.** It beats even the broken v1 on every motion measure while
+being edge-safe: 13 times the motion of what you were shipping, and the figure's width at chest
+height goes from 137 to 184 pixels where the old one moved by one pixel.
+
+**Your banner problem improved as a side effect.** The visible share of the win reaction has DOUBLED,
+14% to 29%. The reason is structural: the old "reaction" was a visor and chest glow happening in the
+head band, which is exactly where your win banner sits. A real pose change puts the motion in the
+torso, below the banner.
+
+**Neither strip is clipped by the hero's layout box** either - 159 and 184 pixels against a 206 box.
+
+---
+
+**ONE THING I WANT TO BE STRAIGHT WITH YOU ABOUT.** I shipped the win strip even though it misses the
+target I set. **They bought the containment by shrinking the gesture.** v1's arms swung wide and got
+cut off; v2's stay close to the body. Measured at chest height, v1 moved 68 pixels and v2 moves 3.
+
+I shipped it because it is still 10 times the motion of what you have today, it is edge-safe, and at
+real game size the arms do visibly come uncrossed - one fist up, one hand down. Leaving the old
+lighting-only strip in place, which moves the chest by a single pixel across its whole performance,
+just to honour a number I wrote myself, would have been the worse deal for you. It is a drop-in
+replacement and can be reverted with one command if you disagree.
+
+**WHAT TO ASK FOR NEXT.** A v3 of the win strip only. **v1 proved the wide unfold is renderable and
+v2 proved the containment is renderable; nothing has yet proved both at once.** There is room: v2's
+widest frame still leaves 36 pixels of margin on each side, and v1 needed about 90 more than it had.
+Ask for v1's arm swing with v2's margins.
+
+---
+
+**A MISTAKE OF MINE WORTH KNOWING ABOUT.** Measuring how much of the reaction your banner hides, my
+tool kept reporting the hero's box as completely solid. It was capturing the banner painted on top of
+him, not him. I chased it through three failed attempts at hiding the right elements before realising
+the measurement did not need a browser at all - the answer is a fixed calculation from the artwork
+and the banner's known position. **The numbers I gave you last session for banner coverage came from
+that same faulty route and are superseded by this session's.**
+
+Still open: max win has no reaction at all and still cannot have a useful one while the max-win
+celebration is a full-screen panel over the top of him. That is now four sessions running. And
+nothing in CI measures hero animation, so a regression would not be caught automatically.
+
+22 checks green, 60fps, zero console errors. PR on the review lane.
+
+---
+
 ## 120 - 2026-08-26 - R122: your idle finally changes pose. The other two strips have the hero's arms cut off at the edge of the canvas.
 
 **ONE OF THREE SHIPPED, AND IT IS THE ONE THAT RUNS MOST OF THE TIME.** The idle now does a real

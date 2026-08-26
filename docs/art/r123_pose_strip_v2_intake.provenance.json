@@ -1,0 +1,66 @@
+{
+  "session": "R123",
+  "date": "2026-08-26",
+  "package": ".scratch/art-review/chatgpt-pose-changing-hero-strips-v2",
+  "context": "V2 of the two strips R122 refused for severed limbs at the canvas edge. The idle from R122 is unchanged and was correctly excluded from this replacement-only package.",
+  "canvas_edge_test": {
+    "rule": "for every runtime frame, pixels with alpha > 8 in column 0 and in the last column must be ZERO",
+    "result": "PASS on every frame of both strips",
+    "win_margins_px": [[89,89],[85,93],[107,109],[78,79],[80,77],[111,106],[93,85],[89,89]],
+    "feature_margins_px": [[89,89],[86,92],[75,79],[36,36],[79,75],[92,86],[89,89]],
+    "smallest_margin_px": 36,
+    "note": "R122's defect does not recur. The package also now publishes per-frame min/max opaque x; my figures differ from theirs by 1px because I threshold at alpha>127 and they appear to use alpha>0."
+  },
+  "accepted": [
+    {
+      "source": "feature-brace",
+      "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_feature_trigger_7f.png",
+      "frames": 7, "packed_scale": 0.58, "frame_px": "394x780",
+      "bytes": 1686780, "replaces_bytes": 1496738, "net_bytes": 190042,
+      "measured": {
+        "silhouette_mean_consecutive_frame_area_pct": 5.75,
+        "floor_pct": 4.0,
+        "total_path_length_pct": 34.52,
+        "xor_vs_rest_body_normalised_pct": 33.40,
+        "chest_band_width_px": {"rest": 137, "peak": 184, "delta": 47},
+        "identity_iou_vs_live_rest": 0.9998,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "residual_rgb_under_alpha_zero": 0,
+        "max_rendered_width_px": 184,
+        "hero_box_px": 206
+      },
+      "verdict": "PASS on every test, and stronger than the v1 it replaces on every motion metric while being edge-safe."
+    },
+    {
+      "source": "win-reaction-unfold",
+      "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_win_reaction_8f.png",
+      "frames": 8, "packed_scale": 0.58, "frame_px": "394x780",
+      "bytes": 1918408, "replaces_bytes": 1499277, "net_bytes": 419131,
+      "measured": {
+        "silhouette_mean_consecutive_frame_area_pct": 3.25,
+        "floor_pct": 5.0,
+        "floor_met": false,
+        "total_path_length_pct": 22.75,
+        "xor_vs_rest_body_normalised_pct": 16.73,
+        "chest_band_width_px": {"rest": 137, "peak": 140, "delta": 3},
+        "silhouette_area_change_px": 0,
+        "identity_iou_vs_live_rest": 0.9998,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "residual_rgb_under_alpha_zero": 0,
+        "max_rendered_width_px": 159,
+        "hero_box_px": 206
+      },
+      "verdict": "SHIPPED BELOW ITS STATED FLOOR, deliberately and on the record. It misses the >5% mean-consecutive floor at 3.25%, and its arms stay far closer to the torso than v1's (+3px chest width against v1's +68px, area change exactly 0). But it is 10x the incumbent by path length and 6x by XOR-vs-rest, it is edge-safe, and at true render size the arms visibly leave the crossed position. Shipping it is strictly better for the player than the lighting-only incumbent it replaces; leaving the incumbent in place to honour a metric would have been the worse outcome. A v3 should pair v1's gesture with v2's containment."
+    }
+  ],
+  "totals": {"net_bytes": 609173, "dist_mb": 23.27, "headroom_mb": 1.73},
+  "banner_occlusion": {
+    "method": "computed from the shipped sheets and the banner's known geometry (stage top:310 over a hero at stage y295..702, so hero-local rows 15..185). The in-browser route was abandoned: an element screenshot captures whatever is painted over that box, and the win banner leaked into the measured silhouette and filled it.",
+    "win_incumbent": {"hidden_pct": 86.0, "visible_pct": 14.0, "head_band_pct": 63.0, "chest_band_pct": 28.9},
+    "win_v2": {"hidden_pct": 71.3, "visible_pct": 28.7, "head_band_pct": 27.1, "chest_band_pct": 54.9},
+    "feature_incumbent": {"hidden_pct": 83.3, "visible_pct": 16.7},
+    "feature_v2": {"hidden_pct": 77.5, "visible_pct": 22.5}
+  }
+}

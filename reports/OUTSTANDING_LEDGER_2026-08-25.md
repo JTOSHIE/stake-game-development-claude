@@ -4,6 +4,59 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0U. WHAT R123 CHANGED (pose strips v2) AND THE ONE COMPROMISE IN IT
+
+*** THE CANVAS-EDGE DEFECT IS FIXED. Zero pixels with alpha>8 in column 0 or 679 on EVERY frame of
+both strips; smallest margin 36px. The supplier ADDED the test R122 asked for and now publishes
+per-frame min/max opaque x (my figures differ by 1px only because I threshold at alpha>127). ***
+
+**BOTH SHIPPED, packed at 0.58 like R122**, drop-in (frame counts and filenames unchanged, NO code
+change): `hero_win_reaction_8f.png` 1,918,408 bytes (+419,131) and `hero_feature_trigger_7f.png`
+1,686,780 (+190,042). Net +609,173. dist **23.27 MB of 25**, headroom 1.73 MB. Residual RGB under
+alpha 0 = 0 (one of seven brace frames carried fringe; zeroed before AND after resample).
+
+**THE FEATURE BRACE BEATS EVEN THE BROKEN v1** while being edge-safe: mean 5.75% (floor >4.0), path
+34.52%, XOR/rest 33.40%, chest width 137->184 (+47px). Incumbent was 0.44% / 2.61% / 3.19% / +1px.
+**13x the incumbent's motion.**
+
+*** THE WIN STRIP IS SHIPPED BELOW ITS STATED FLOOR, DELIBERATELY AND ON THE RECORD: mean 3.25%
+against a >5% floor. THEY BOUGHT CONTAINMENT BY SHRINKING THE GESTURE - their own note says
+"re-rendered with compact arm gestures". Chest width moves +3px where v1 moved +68px, and the
+silhouette AREA change is EXACTLY 0 (the arms rearrange within the same envelope). Shipped anyway
+because it is 10x the incumbent by path length, 6x by XOR-vs-rest, edge-safe, identity 0.9998, and at
+true render size the arms visibly uncross. Leaving a lighting-only incumbent that moves the chest by
+ONE PIXEL, to honour a metric I wrote myself, was the worse outcome. Reverts with one git checkout. ***
+
+**METRIC CAUTION CARRIED FROM R122:** mean-change-per-consecutive-pair is DILUTED BY FRAME COUNT. v2
+win has 8 frames; the same path over 6 would read 4.55%. Use PATH LENGTH to compare strips of
+different lengths.
+
+**BANNER OCCLUSION IMPROVED AS A SIDE EFFECT, and the reason is structural:** the incumbent's
+"motion" was visor and chest-lamp GLOW concentrated in the head band, which is exactly what the
+banner covers. A pose change puts motion in the torso. win hidden 86.0% -> 71.3% (visible 14.0% ->
+**28.7%**, head band 63.0% -> 27.1%, chest 28.9% -> 54.9%); feature hidden 83.3% -> 77.5%.
+**NO BOX CLIPPING:** max rendered width 159px (win) / 184px (feature) against the 206px .char-layer.
+
+*** INSTRUMENT FAILURE THAT SUPERSEDES EARLIER NUMBERS: AN ELEMENT SCREENSHOT CAPTURES WHATEVER IS
+PAINTED OVER THAT BOX, NOT JUST THE ELEMENT. Measuring the win reaction in-browser returned the
+hero's box as FULLY OPAQUE - 83,842 px, identical every frame - because the win banner paints across
+it. Three attempts to hide the offending elements by NAME failed (the selector list was a guess); a
+visibility-based isolation removed the right elements but the capture stayed opaque because that
+probe lacked the background-transparency rules its sibling had. THE FIX WAS TO STOP CAPTURING:
+banner occlusion and box fit are deterministic functions of the shipped sheets plus geometry already
+written down. **R122's 45.0% banner figure came from the same contaminated route and is superseded
+by section 4 of the R123 report.** ***
+
+### STILL OPEN
+1. **The win gesture is a compromise.** v1 proved the wide unfold is renderable; v2 proved the
+   containment is renderable; NOTHING HAS PROVED BOTH AT ONCE. Ask for v3 of the win strip only:
+   v1's arm swing with v2's margins. There is room - v2's widest frame leaves 36px each side and v1
+   needed about 90px more than it had.
+2. **Max win still has no reaction** and cannot usefully have one while MaxWinCelebration is a
+   full-screen modal over the hero. FOUR sessions running.
+3. **Nothing in CI measures hero animation.** Every number in R121-R123 came from session scripts; a
+   regression would not be caught.
+
 ## 0T. WHAT R122 CHANGED (pose-changing strip intake) AND WHY TWO OF THREE WERE REFUSED
 
 **SHIPPED: `hero_crossed_idle_6f.png`** - 6 frames, packed at **0.58** common scale, 394x780/frame,
