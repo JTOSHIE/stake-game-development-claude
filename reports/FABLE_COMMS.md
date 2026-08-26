@@ -9,6 +9,58 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 122 - 2026-08-26 - R124: your win reaction finally has BOTH the big gesture and the containment. Four of the five other categories are refused.
+
+**THE ONE THAT MATTERS SHIPPED.** The v3 win unfold is exactly what I asked for last session: v1's
+wide arm swing with v2's margins. He winds up, swings both arms out - fist up, palm out - and
+recrosses. His silhouette at chest height goes **137 to 193 pixels**, where the version you have been
+shipping since yesterday moved it by 3. It is the first win strip to clear the 5% motion floor AND
+stay inside its canvas, and it cost 33 KB because it replaces a sheet of the same size.
+
+Every gate passed first-hand: no pixel touching the canvas edge on any of the 8 frames, 20px of
+margin to spare, identity 0.9998, first frame equals last, ground line dead still at 399 across the
+whole performance, and it fits your hero's layout box with 6px each side.
+
+**Your hero now changes pose in every state that matters** - idle weight shift, win unfold, feature
+brace. That is the "poor animations" tag closed as far as art can close it.
+
+---
+
+**FOUR REFUSALS, ALL WITH NUMBERS.**
+
+**The Features glyph: refused, and not for being ugly.** It is genuinely nicer than the ornate badge
+it would replace. **But it is a lightning bolt, and the lightning bolt is already your TURBO mark** -
+it appears three times in that same interface guide as your three speed settings. Shipping it would
+put the same symbol on two different controls in one list. It also does not match the button players
+actually see: your live FEATURES control is a GRILLE.
+**The right fix needs no new art.** Every other row in that guide is a screenshot of the live control.
+The Features row is the only painted one, which is exactly why it is the only one that mismatches.
+Capture the grille the way the others are captured.
+
+**The three win-banner bars: refused on geometry.** They are clean, text-free, and keep their centres
+clear for your live text. But **your actual banner is 522x28 pixels**, not the full-width strip a
+1920x240 rail implies, and it sits inside the reels. At the banner's own width the bar covers **72%
+of your reels**; at full stage width it covers the hero, SPIN, BET, BALANCE and the whole HUD panel.
+There is no placement that frames the text without burying something.
+
+**The three blooms/bursts: refused as filler.** They would replace tier art you already paid to have
+measured and placed, and whose contrast problem was already fixed. One of them is 0.1% opaque -
+literally almost invisible.
+
+**Both optional hero extras: refused as lighting-only.** The approval nod moves 0.23% - **less than
+the glance you already ship.** Their own QA agrees with my numbers; the numbers just are not enough.
+
+---
+
+**One asset taken from a 42-file package. That is the right outcome, not a thin one.** 16 checks
+green, 60fps, zero console errors, dist 23.31 MB with 1.69 MB spare.
+
+**Still open, unchanged:** the four audio stems only you can supply; and the max-win celebration is
+still a full-screen panel over the top of your hero, so he cannot react during your biggest moment.
+That is now five sessions running and it is a layout decision, not an art one.
+
+---
+
 ## 121 - 2026-08-26 - R123: the severed limbs are gone. Your hero now changes pose on a win, on feature entry, and while idle.
 
 **THE EDGE DEFECT IS FIXED AND I CHECKED EVERY FRAME.** Zero pixels touching the first or last column

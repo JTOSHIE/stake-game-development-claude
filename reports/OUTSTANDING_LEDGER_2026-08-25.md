@@ -4,6 +4,57 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0V. WHAT R124 CHANGED (review-critical closure) AND THE FOUR REFUSALS
+
+*** THE WIN UNFOLD FINALLY HAS BOTH THE GESTURE AND THE CONTAINMENT. v3 is the strip R123 asked for:
+v1's arm swing with v2's margins. mean 5.03% (FIRST to clear the >5% floor), path 35.18%, XOR/rest
+30.63%, CHEST 137->193px (+56) against R123's +3px. Edge-safe (0 px alpha>8 in col 0/679, smallest
+canvas margin 20px), identity 0.9998, f1==fN, ground drift 0px, residual 0. FITS THE HERO BOX: 193px
+of 206 with 6px each side. Cost only +33,746 bytes - a same-size drop-in. dist 23.31 MB, headroom
+1.69 MB. ***
+The shipped curve, chest width per frame: 137 137 140 **193 193** 140 137 137, with the ground line
+at 399 on ALL EIGHT frames.
+**THE HERO NOW CHANGES POSE IN EVERY STATE THAT MATTERS** - idle weight shift (R122), win unfold
+(R124), feature brace (R123).
+
+### FOUR REFUSALS, EACH WITH THE MEASUREMENT THAT DECIDED IT
+
+*** 1. FEATURES GLYPH - REFUSED ON A SEMANTIC COLLISION, NOT AESTHETICS. It is a LIGHTNING BOLT, and
+the bolt is already TURBO's mark: `<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>` in HudOverlay, and it
+already appears THREE TIMES in the same interface guide as btn_turbo/btn_turbo_2/btn_turbo_3. It
+would put one mark on two controls in one list. It also does not match the live FEATURES control,
+which is a GRILLE (FeatureMenu.svelte:196-199) and is what DESIGN_SYSTEM.md sanctions.
+THE RIGHT FIX NEEDS NO NEW ART: every other guide row is a screenshot-crop of the live control via
+regen_interface_guide_icons.mjs. The Features row is the ONLY painted raster, which is exactly why it
+is the only one that mismatches. Add `.fm-entry-pill` to that script's TARGETS. ***
+
+*** 2. THE THREE TIER BARS (1920x240) - REFUSED ON GEOMETRY. They pass every content test: text-free,
+no amounts, no multipliers, centre band only 3.2% opaque. THEN: THE LIVE BANNER TEXT PLATE IS ONLY
+522x28 AT (379,488) and sits INSIDE the reels box. Scaled to that width the bar covers 72% OF THE
+REELS; at stage width it covers hero 53%, SPIN 77%, BET 46%, BALANCE 47%, HUD panel 78%, reels 56%.
+NO PLACEMENT FRAMES THE TEXT WITHOUT BURYING SOMETHING. ***
+
+3. **THE THREE 640x360 OVERLAYS - REFUSED AS FILLER.** They would replace tier art R113/R115 measured
+and placed so the three banner tiers read as three things, and whose contrast was already fixed
+(max headline 8.41 -> 11.05:1). Candidates carry far LESS centre light than the incumbents
+(strong-burst 0.0040 vs burst_big 0.1684) - safer for text but solving a problem that does not exist,
+and less presence is a presentation regression. quiet-settle is 0.1% opaque, effectively invisible.
+
+4. **BOTH OPTIONAL HERO EXTRAS - REFUSED AS LIGHTING-ONLY.** approval-nod mean 0.23%, chest +0px,
+XOR 1.33% - **WEAKER THAN THE LIVE GLANCE (0.34%)**. feature-active-ambient mean 0.66%, chest +0px.
+Their own QA reports 1.316% and 2.110% max with 1px chest deltas, so the numbers are not in dispute.
+The feature-active window is already filled by the R122 weight-shift idle.
+
+**ONE ASSET INTAKEN FROM A 42-FILE PACKAGE.** 16 gates green, 60fps p95 16.8ms zero long frames, zero
+console errors, paytable unchanged and green.
+
+### STILL OPEN AFTER R124
+1. **The Features guide row** - fixable with no new art, see refusal 1.
+2. **Audio stems** - feature entry, retrigger, feature end, max win. Owner supply, unchanged since R117.
+3. **MAX WIN STILL COVERS THE HERO.** MaxWinCelebration is a full-screen modal, so no hero reaction
+   can be seen during the biggest moment. **FIVE sessions running.** A layout decision, not art.
+4. **Nothing in CI measures hero animation.** Every number in R121-R124 came from session scripts.
+
 ## 0U. WHAT R123 CHANGED (pose strips v2) AND THE ONE COMPROMISE IN IT
 
 *** THE CANVAS-EDGE DEFECT IS FIXED. Zero pixels with alpha>8 in column 0 or 679 on EVERY frame of
