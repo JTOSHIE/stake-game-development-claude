@@ -12,6 +12,17 @@ this doc mirrors them):
 - `frontend/src/lib/components/HudOverlay.svelte` (B1 HUD)
 - `frontend/src/lib/stores/overdriveVisual.ts` (the shared Overdrive flag)
 
+> **SCOPE AMENDED 2026-08-26 by R119.** The `.fs-` brushed-steel primitives below
+> are still canonical for `PaytableModal.svelte` (B3), which is unchanged. They are
+> **no longer canonical for `HudOverlay.svelte` (B1)**: R119 pivoted the HUD to an
+> operator-standard shell, so `.fs-plate`'s six-stop metal bezel, `.fs-knob`'s
+> eight-stop conic bezel, the per-field `--sig` rails and the tinted value colours
+> are superseded there by the token block in `docs/design/HUD_SHELL_TEMPLATE.md`.
+> The five signature tokens still EXIST in HudOverlay and still drive the scheme
+> classes; what changed is that the shell's chrome no longer reads from them.
+> A design mock of the HUD should be built on HUD_SHELL_TEMPLATE.md; a mock of the
+> paytable should be built on this file.
+
 ## Constraints (do not regress)
 - NO external font CDN. Do NOT add a `fonts.googleapis.com` / `fonts.gstatic.com`
   `<link>`. Orbitron is self-hosted via `@fontsource`; just use

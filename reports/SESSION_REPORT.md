@@ -24504,3 +24504,241 @@ binding and one filter rule, mirroring what `.game-frame` already does.
 
 **The pattern in all six: a plausible number is not a verified one, and the cheapest defence is an
 assertion that makes the physically impossible case fail loudly.**
+
+# Session Report - R119 OPERATOR-STANDARD HUD SHELL: three neon rails become one, and a CI gate that was passing by three thousandths now passes by forty-two (2026-08-26)
+
+**MORNING SUMMARY.**
+
+1. **The HUD is now an operator shell.** Dark glass, neutral hairlines, near-white values,
+   one accent. The bar used to carry a six-stop brushed-metal bezel on every plate, an
+   eight-stop conic metal disc on SPIN, and **three DIFFERENT neon rails on three adjacent
+   plates** - balance cyan, win magenta, bet gold.
+2. **All FOUR layouts, not one.** There are four HUD layouts, not the three the brief
+   implies and not the one HUD_SPEC locks. All four now inherit a single shell token block.
+3. **Zero geometry moved.** `hud_banner_spec_check.mjs` passes on all seven 16px gaps, the
+   AUTO/SPIN tangency and all six touch targets.
+4. **The restyle made a CI gate SAFER by 14x.** `turbo_intensity_gate` was passing with a
+   worst adjacent step of **1.253:1 against a 1.250:1 floor** - three thousandths of margin.
+   It now passes at **1.292:1**.
+5. **BLOCKED, with exact evidence: the in-game interface guide.** Eight shipped PNGs are
+   screenshot-crops of the live controls and now show the OLD buttons. The regenerator is
+   refused by `asset_guard.py --require-clean`, and the only override is the one thing the
+   fence forbids. Section 7.
+6. **The brief contradicts the project's own written design law.** Surfaced, resolved in the
+   brief's favour, and both documents amended rather than left to drift. Section 6.
+
+---
+
+## 1. WORKSTREAM 1 - THE TRUTH MAP
+
+**THERE ARE FOUR HUD LAYOUTS, NOT THREE.** One `{#if}` chain in `HudOverlay.svelte`:
+portrait :420, mini-player :588, compact-landscape :698, desktop :849. `docs/HUD_SPEC.md`
+locks only the fourth. Selection is by viewport: `portrait = innerHeight > innerWidth` (an
+ASPECT test, not a width breakpoint), `mini = w<=480 AND h<=300`, `compact = h<w AND h<500`,
+else desktop. **A pass that edited only `.fs-*` would have left three quarters of the
+player-facing surfaces untouched**, and three quarters of this file is the other three.
+
+**PRECONDITION 1, ANSWERED: the HUD is CSS/SVG, not painted buttons.** Zero `<img>` tags in
+2590 lines and exactly ONE image reference: `hud_banner.png` on the decorative `.fs-panel`
+(z-index 59, `pointer-events:none`, desktop only). Every control is CSS-drawn with an inline
+SVG or a text glyph on top. The other three layouts render no raster at all.
+
+**PRECONDITION 2, ANSWERED: the values are live text.** `balanceLabel` is a `$:` over
+`$balance` / `$currencyCode` / `$locale`; `betLabel` over `effectiveCost` which is itself a
+`$:` over `$betAmount` / `$standingMode`; `winLabel` over `$sharedWinCountUp`, the EASED
+count-up value, not `$winAmount` directly.
+
+**PRECONDITION 3, ANSWERED: no baked text anywhere.** `hud_banner.png` was inspected at its
+native 718x88 and again at a 3x upscale: a wordless chrome frame, no glyphs at either
+resolution. Every visible label is a `$tr()` call.
+
+**THE COLOUR PROBLEM, COUNTED.** `docs/RESKIN_BOUNDARY.md` GAP 1 says "152 hex colours in
+HudOverlay.svelte". The real figure is **155 hex, plus 130 `rgba()`, 73 `color-mix()` and 63
+`transparent` - 423 colour tokens, 81 distinct hex values**. All of it lives in the style
+block: lines 1-1062, the entire script and markup including 27 inline SVGs, contain zero
+colour of any form. Three parallel token families declared the same palette three times
+over: `--sig-*` (desktop), `--p-*` (portrait), `--c-*` (compact).
+
+**NINE PAINTED BUTTON RASTERS SHIP AND ARE NOT THE HUD.** `spin_button.png`,
+`btn_bet_plus/minus.png`, `btn_autoplay.png`, `btn_menu.png`, `btn_max.png`, `btn_turbo*.png`
+are consumed ONLY by the paytable's interface guide. `panel_balance.png` and `panel_win.png`
+are consumed by **nothing at all** - roughly 37 KB of dead shipped weight, plus seven dead
+`themeStore.ts` keys. A restyle that assumed the HUD was raster-driven would have repainted
+nine PNGs and changed nothing on screen.
+
+## 2. WORKSTREAM 1.2 - WHAT MUST NOT BREAK, AND WHAT ACTUALLY GUARDS IT
+
+**THE GEOMETRY LOCK IS NOT IN CI.** `hud_banner_spec_check.mjs` appears zero times in
+`.github/workflows/checks.yml`. Neither do `hud_reskin_proof.mjs`,
+`interface_guide_icon_proof.mjs`, `hud_naming_uniformity_check.mjs` or
+`hud_reel_size_check.mjs`. The lock is real and documented; nothing runs it automatically. It
+was run by hand here and passes.
+
+**EXACTLY ONE CI-BLOCKING GATE COULD BREAK: `turbo_intensity_gate.mjs`.** It measures the
+mean WCAG luminance of the live `[data-testid="hud-turbo"]` at three speeds across seven
+presets and asserts a 1.25:1 minimum step between adjacent tiers.
+
+**ONLY TWO CI LEGS RENDER THE NON-DESKTOP LAYOUTS AT ALL:** `layout_fit` and
+`turbo_intensity`, seven presets each.
+
+**THE AUTOFIT TRAP.** The value fitters rewrite `font-size` at runtime through
+`--autofit-scale`. Any new `font-size` rule that does not multiply that variable in silently
+disables autofit - a defect that already shipped once. **This pass changed no `font-size`
+anywhere**, which is why the stress-value asserts still pass.
+
+## 3. WORKSTREAMS 2 AND 3 - WHAT CHANGED
+
+**ONE SHELL TOKEN BLOCK, INHERITED BY ALL FOUR LAYOUTS.** Ten tokens on
+`.fs-hud, .p-hud, .c-hud, .m-hud`, plus one accent flip for Overdrive. Declared on four roots
+rather than `:root` because Svelte strips a scoped selector that matches nothing and
+`typecheck_baseline` fails on any rise in unused-selector warnings.
+
+**THE ACCENT DISCIPLINE, which is the actual answer to workstream 3.4.** Chrome at rest is
+neutral. The accent is spent in exactly three places: **SPIN, a live win, and active toggle
+states.** A colour that appears everywhere signals nothing.
+
+| surface | before | after |
+|---|---|---|
+| plate bezel | six-stop brushed-metal gradient, near-white at the rim | 1px neutral hairline |
+| plate face | per-plate `--sig` colour wash over navy | one sunken glass, identical on all three |
+| plate rails | three neons: cyan, magenta, gold | neutral; accent ONLY on a live win |
+| values | three tinted whites with three coloured text-shadows | one near-white, no shadow |
+| knobs | eight-stop conic metal bezel | hairline over raised glass |
+| SPIN | eight-stop conic metal disc + double-glow ring + glowing glyph | dark disc, one accent ring, flat accent glyph |
+| MAX | amber radial well, gold cap | neutral raised, near-white cap |
+| MENU | bright chrome slab, full-accent glyph | quiet raised, dim glyph |
+| steppers | chrome caps, accent glyphs at rest | quiet raised, dim glyphs, accent on hover |
+| TURBO | amber three-step escalation | same three steps, on the accent |
+| panel | chrome-gradient border + 22px accent bloom | neutral hairline, no bloom |
+| portrait/compact plates | per-field neon edge, cyan/magenta/gold | one neutral hairline |
+
+**THE PANEL RASTER WAS KEPT, AND ONLY ITS LAYER ORDER MOVED.** `hud_banner.png` is the
+committed banner pair from R105 - 63,873 bytes, raster and CSS landed together, an
+owner-level decision. It was the TOPMOST background layer, painted over the glass, and it is
+a bright metal-bracket graphic drawn to sit UNDER metal plates. With the plates now dark
+glass its struts poked out between them and read as debris. **One line moves the glass above
+it**, so the asset, its reference, its guard coverage and its budget line are all untouched
+while it reads as faint structure rather than competing chrome.
+
+**THE 2026-07-15 "NEON LIFT" IS SUPERSEDED, NOT SILENTLY DELETED.** That pass gave portrait
+and compact a persistent per-field neon edge. The shell spends the accent on a live win only,
+so the resting edge is now one neutral hairline on all three fields and they are told apart
+by their LABELS, which is what labels are for.
+
+**Colour literals in `HudOverlay.svelte`: 155 hex to 89, a 43% reduction**, absorbed into ten
+named tokens.
+
+## 4. THE RESULT THAT WAS NOT ASKED FOR: A SAFETY MARGIN WENT UP 14x
+
+`turbo_intensity_gate` was measured before and after by reverting the file, rebuilding and
+re-running, then restoring by checksum:
+
+| preset | before nt / ts | after nt / ts |
+|---|---|---|
+| Desktop 1200x675 | 1.27 / 1.55 | **1.31 / 2.35** |
+| Laptop 1024x576 | **1.25** / 1.50 | 1.29 / 2.20 |
+| Popout S 400x225 | 1.33 / 1.51 | 1.43 / 1.65 |
+| Popout L 800x450 | 1.43 / 1.70 | 1.41 / 2.34 |
+| Mobile L 425x812 | 1.46 / 1.75 | 1.43 / 2.42 |
+| Mobile M 375x667 | 1.46 / 1.75 | 1.43 / 2.42 |
+| Mobile S 320x568 | 1.39 / 1.65 | 1.37 / 2.24 |
+
+**Worst adjacent step 1.253:1 before, against a 1.250:1 floor. Three thousandths.** The
+shipped HUD was one rounding away from a red CI run and nobody knew. It is now **1.292:1**.
+The turbo-to-super step improved most, from 1.50-1.75 to 2.20-2.42, because an accent
+escalating out of dark glass has more headroom than amber escalating out of amber.
+
+## 5. WORKSTREAM 4 - RESPONSIVE AND STATE QA
+
+Six viewports, every one driven to a real feature via the trigger round and the TAP TO
+CONTINUE tap. **Zero console errors and zero failed requests everywhere.**
+
+| viewport | layout | controls | values |
+|---|---|---|---|
+| 1920x1080 | `.fs-hud` | 10/10 present | BALANCE $100.00 / WIN $0.00 / BET $1.00 |
+| 1280x720 | `.fs-hud` | 10/10 | same |
+| 1024x576 | `.fs-hud` | 10/10 | same |
+| 800x450 | `.c-hud` | compact set | same |
+| 400x225 | `.m-hud` | mini set | BAL $100.00 / WIN $0.00 / $1.00 |
+| 390x844 | `.p-hud` | portrait set | same |
+
+**Geometry, re-measured after the restyle:** all seven gaps exactly 16px, AUTO tangent to
+SPIN at exactly 0, touch targets 82x82 / 48x48 / 44x44 / 44x52 / 84x84 / 48x48, and both
+autofit stress asserts pass at $1,234,567.89 and $1,000,000.00.
+
+**States:** base game, feature active and win-banner visible all verified at the design size.
+In the feature the accent correctly flips to the Overdrive magenta across the whole shell at
+once. On a win the WIN plate's rail lights with the accent while BALANCE and BET stay
+neutral, which is the accent discipline doing its job: the eye goes to the number that
+changed. **The hero and car are not newly crowded** - the shell is strictly darker and
+smaller in visual weight than what it replaced, and R118's Overdrive perimeter coexists with
+it unchanged.
+
+## 6. THE BRIEF CONTRADICTS THE PROJECT'S OWN DESIGN LAW, AND BOTH DOCUMENTS ARE AMENDED
+
+`design-system/DESIGN_SYSTEM.md` states: **"Material language: polished chrome, brushed
+gunmetal, warm gold accents."** That is precisely what this brief removes from the HUD. The
+brief is the live owner instruction and it is explicit that this is a pivot - "game art
+carries the theme, HUD carries clarity" - so it wins. But leaving the law contradicting the
+code would be exactly the documentation drift the project already tracks as a gap, so:
+
+- **`DESIGN_SYSTEM.md` amended**, scoping the material law to the GAME WORLD. Symbols,
+  frames, scene and celebration art are unchanged and still follow it.
+- **The "exactly two themed accents" law amended.** It was ALREADY stale before this pass:
+  it specifies "TURBO uses the existing turbocharger art with flames on engage", and FS
+  VISUAL FIXPACK JOB 2 had already replaced that with the measured intensity escalation,
+  deliberately, because an animated flame made the three speeds indistinguishable.
+- **`docs/design/CHROME_PRIMITIVES.md` scoped.** Its `.fs-` metal primitives remain canonical
+  for `PaytableModal.svelte`, which is untouched, and are no longer canonical for the HUD.
+
+## 7. BLOCKED, WITH EXACT EVIDENCE: THE IN-GAME INTERFACE GUIDE IS NOW STALE
+
+`frontend/scripts/regen_interface_guide_icons.mjs` screenshot-crops the LIVE controls into
+shipped PNGs, and `PaytableModal.svelte` renders eight of them in the in-game interface
+guide. **A HUD restyle silently falsifies that guide.** Nothing fails; the manual is simply
+wrong, and the in-game guide is a review requirement.
+
+**Why it was not regenerated.** The script's first statement is
+`asset_guard.py --require-clean`, which refuses when any TRACKED file under
+`frontend/public/assets/themes/future-spinner` differs from HEAD. The working tree carries
+**30 dirty rasters under exactly that root** - the owner's work in progress. The only
+override is `ALLOW_ASSETS_OVERWRITE=1`, and **"Do not weaken asset guards" is in this
+brief's fence.** So it was not run.
+
+**Worth stating plainly: the bypass would very likely have been safe.** The regenerator
+writes exactly nine filenames, and all nine are tracked and CLEAN; none is among the 30. But
+"I checked and it looked safe" is the exact reasoning that guard exists to refuse, and an
+unattended session is the exact context it was written for.
+
+**The remedy, one command, once the tree is clean:**
+
+    node frontend/scripts/regen_interface_guide_icons.mjs
+
+**This is NOT a CI failure.** `interface_guide_icon_proof.mjs` is not wired into CI and
+asserts only byte-uniqueness across the icons, which still holds.
+
+## 8. WHAT THIS SESSION DID NOT DO
+
+- **Three neighbouring surfaces still carry the old chrome and now look inconsistent beside
+  the shell**: `BonusInstrumentColumn.svelte` (magenta borders, gold values, visible next to
+  the calm HUD in every feature screenshot), `FeatureMenu.svelte` (the magenta FEATURES
+  button) and `PaytableModal.svelte` (its own copy of the metal `.fs-plate`). Each is a token
+  re-point, not a rewrite. They are the natural next pass.
+- **A pre-existing dead control was found and left alone**: the mini-player's AUTOPLAY menu
+  item calls `toggleAutoMenu()` but the mini branch renders no `{#if showAutoMenu}` block, so
+  pressing it sets state and mounts nothing.
+- **`panel_balance.png` and `panel_win.png` ship with zero consumers** and were not deleted,
+  because deleting shipped assets is not a chrome restyle.
+- **The sound toggle** was not restyled: it lives in the shared menu surface, not the bar.
+- **No contrast measurement of the new values against their wells was taken.** They are
+  near-white on near-black and `contrast_gate` passes, but that gate measures two portrait
+  FEATURES-bar nodes only and has no bearing on the HUD.
+
+## 9. A PROCESS ERROR OF MY OWN, RECORDED
+
+One read-only recon agent reported that **the tree changed under it mid-pass**: `git status`
+went 30 to 31 with `M HudOverlay.svelte`. That was ME, editing the file while a read-only
+fan-out was still running. Nothing was corrupted and the agent was right to flag it rather
+than quietly absorb it - its own start/end tree check is what caught it. **The lesson is
+scheduling, not tooling: do not start editing the file a read-only pass is still reading**,
+because the next such report might be a real one and I would have taught myself to discount it.

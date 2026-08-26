@@ -9,6 +9,65 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 117 - 2026-08-26 - R119: your HUD is now an operator shell, and it accidentally fixed a CI gate that was passing by three thousandths
+
+**DONE.** The control bar was carrying a six-stop brushed-metal bezel on every plate, an
+eight-stop conic metal disc on SPIN, and **three different neon rails on three plates sitting
+side by side**: balance cyan, win magenta, bet gold. Your three live numbers were three
+different colours of white. It is now dark glass, neutral hairlines, near-white values, and
+**one** accent.
+
+**The accent discipline, which is the actual answer to "no multi-colour neon chrome".** At
+rest the chrome is neutral everywhere. The accent is spent in exactly three places: SPIN, a
+live win, and active toggles. On a win, the WIN plate lights and the other two stay quiet, so
+your eye goes to the number that changed. A colour that appears everywhere signals nothing.
+
+**All four layouts, not one.** You have FOUR HUD layouts, not three: desktop, portrait,
+compact landscape and mini player. Only the desktop one is covered by your geometry lock. All
+four now inherit one shell token block, so a future title re-points two colours and gets the
+whole shell.
+
+**Nothing moved.** Every one of the seven 16px gaps, the AUTO/SPIN tangency and all six touch
+targets re-measure exactly as your locked spec says. Zero console errors and zero failed
+requests at all six viewports.
+
+---
+
+**THE BEST NUMBER IN THIS SESSION, AND NOBODY WAS LOOKING FOR IT.** Your `turbo_intensity`
+CI gate demands a 1.25:1 brightness step between adjacent speed settings. I measured it
+before my change: **1.253:1. Three thousandths of margin.** Your shipped HUD was one rounding
+away from a red CI run. The restyle takes it to **1.292:1**, and the turbo-to-super step goes
+from 1.50 up to 2.35, because an accent escalating out of dark glass has far more headroom
+than amber escalating out of amber.
+
+---
+
+**ONE THING IS BLOCKED AND YOU NEED TO KNOW.** Eight of the icons in your in-game interface
+guide are **screenshots of the live buttons**. They now show the OLD buttons. The regenerator
+refuses to run because `asset_guard` requires a clean asset tree and you have 30 uncommitted
+rasters in there. The override exists, but "do not weaken asset guards" was in your fence, so
+I did not use it. Once those 30 are committed or reverted, one command fixes it:
+
+    node frontend/scripts/regen_interface_guide_icons.mjs
+
+Nothing fails in CI over this. The manual is just wrong until it is run, and the in-game guide
+is a review requirement.
+
+**A CONFLICT I RESOLVED IN YOUR FAVOUR, BUT YOU SHOULD SEE IT.** Your own
+`DESIGN_SYSTEM.md` says the material language is "polished chrome, brushed gunmetal, warm gold
+accents". This brief removes exactly that from the HUD. I followed the brief, and amended the
+document to scope that law to the GAME WORLD rather than leaving it contradicting the code.
+Your symbols, frames and scene art are untouched and still follow it.
+
+**WHAT NOW LOOKS OUT OF PLACE.** Making the HUD calm has made three neighbours look loud: the
+feature instrument column (magenta borders, gold numbers, sitting right beside the new bar),
+the FEATURES button, and the paytable's chrome. Each is a token re-point, not a rewrite. That
+is the obvious next pass.
+
+30 checks green. PR on the review lane.
+
+---
+
 ## 116 - 2026-08-26 - R118: the frame stopped outshining the game, and the real culprit is a colour, not a brightness
 
 **DONE, and it is measured.** Your Overdrive perimeter held at **0.75**. Measured against the thing
