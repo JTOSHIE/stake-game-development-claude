@@ -9,6 +9,55 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 116 - 2026-08-26 - R118: the frame stopped outshining the game, and the real culprit is a colour, not a brightness
+
+**DONE, and it is measured.** Your Overdrive perimeter held at **0.75**. Measured against the thing
+it frames, that band was **2.54 times brighter than your reels**. The frame was literally brighter
+than the game. It now holds at **0.50**, which is **1.44 times** the reels: still the brightest thing
+at the stage edge, no longer dominant.
+
+**Feature entry lost nothing.** The complaint is the long sustained state, not the announcement, so
+entry still blooms to the old 0.75 and then relaxes. Verified frame by frame: peak 0.746 at 446 ms,
+settled to exactly 0.500 by 926 ms. Twelve free spins are calmer; the moment it starts is not.
+
+**Clearance improved.** The wash on your hero is cut **45.3%** and the separation he was losing to
+the perimeter more than halves, from -4.31% to -1.78%. The car actually **gains** from the perimeter
+(it lights the ground around the car more than the car itself) and keeps almost all of that.
+
+**Your reels were never touched by it.** Not reduced, zero. The raster carries no light at all
+inside the frame box, so "reels stay primary" was already true.
+
+**Every viewport behaves identically.** 1920x1080, 1280x720, 1024x576 and 800x450 all reduce by
+52.5 to 53.1%. At mini-player 400x225 the perimeter falls entirely outside the screen, so it never
+felt heavy there. Portrait has no hero and no car at all, by design. Zero console errors and zero
+failed requests everywhere.
+
+---
+
+**NOW THE PART YOU SHOULD READ TWICE. The perimeter is not what makes your feature feel
+overbearing.** I toned it because you asked and the numbers supported it, but it is a minor
+contributor. Two other things are much larger:
+
+1. **Your whole screen changes colour.** On the default route the entire backdrop takes a 95 degree
+   hue rotation, a measured 80 degree hue swing behind the hero. By area this is the biggest change
+   in the whole feature. Worth knowing: **no Overdrive backdrop is brighter than the base one.** All
+   three are darker. So if it reads as "too much", that is colour, not brightness.
+2. **The perimeter is the only Overdrive layer with no route colour.** Everything else shifts hue per
+   route. The perimeter stays teal-cyan while your default feature goes green and your nitro feature
+   goes deep pink. **That is very likely why it reads as stuck on, and dimming can never fix it.**
+
+**My recommendation for R119: tint the perimeter to the route** instead of dimming it further. One
+class binding and one filter rule, mirroring what the game frame already does. Cheap, reversible,
+and it addresses the actual cause. I did not do it here because you asked for a tone-down, not a
+re-colour, and that is a change in kind.
+
+**One gap you should know about:** no gate anywhere measures your hero or your car for legibility,
+in any state. Every hero and car change since R110 is unprotected against regression.
+
+27 gates green. PR on the review lane.
+
+---
+
 ## 115 - 2026-08-26 - R117: two hero upgrades that cost NEGATIVE bytes, a new glance, and your feature finally has sound
 
 **MORNING SUMMARY.** Four things shipped, all verified by behaviour rather than by flags:
