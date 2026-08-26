@@ -1,0 +1,145 @@
+{
+ "session": "R128",
+ "date": "2026-08-27",
+ "package": ".scratch/art-review/chatgpt-anticipation-symbol-lobby-factory",
+ "package_claim": "44 runtime candidate PNGs",
+ "package_claim_verified": true,
+ "budget": {
+  "cap_bytes": 26214400,
+  "local_working_tree": {
+   "dist": 25875180,
+   "headroom": 339220,
+   "note": "the planning number; the owner's 30 WIP rasters are in it and are intended to land"
+  },
+  "clean_ci_committed": {
+   "dist": 23771417,
+   "headroom": 2442983,
+   "note": "what a deploy from main ships"
+  },
+  "wip_delta": 2103763,
+  "after_this_session": {
+   "dist": 25875193,
+   "headroom": 339207,
+   "note": "unchanged; no art was taken. The 13-byte drift is build-info.json."
+  }
+ },
+ "wip_map": {
+  "candidates_targeting_owner_wip": 0,
+  "finding": "NO candidate in this package targets an existing file at all. There is no anticipation raster, no cell glow, no symbol flash, no pip and no lobby tile anywhere in the shipped theme, so every candidate would be a NEW file. That means zero WIP-clobber risk - and it also means no candidate has an existing consumer. The two facts are the same fact.",
+  "one_adjacent_wip_note": "the ONLY raster slot anywhere in the anticipation path is the edge-spark <img> at GameGrid.svelte:1222-1223, which points at ui/particles/spark.png - an owner WIP file. Nothing was written to it."
+ },
+ "census": {
+  "anticipation": {
+   "files": 16,
+   "bytes": 250634
+  },
+  "symbol-life": {
+   "files": 16,
+   "bytes": 367441
+  },
+  "feature-accents": {
+   "files": 5,
+   "bytes": 115666
+  },
+  "lobby-tile": {
+   "files": 4,
+   "bytes": 4625603
+  },
+  "reduced-motion-stills": {
+   "files": 3,
+   "bytes": 2343948
+  },
+  "qa_only": {
+   "files": 12,
+   "bytes": 737287
+  },
+  "runtime_total": 44,
+  "note": "the three reduced-motion stills are BYTE-IDENTICAL (sha256) to the three hero-masters R127 already refused; the same art re-delivered under a new name."
+ },
+ "accepted": [],
+ "accepted_note": "Nothing from the package was taken. One code fix was made, described below, costing zero bytes.",
+ "refused": [
+  {
+   "item": "anticipation cell-glow x4 (240x240), tall-reel-glow x4 (240x480), side-spark-streak 4f (64x240)",
+   "bytes": 230510,
+   "reason": "ORPHAN GLOWS: THERE IS NO ELEMENT TO PLAY THEM IN. The anticipation system is real and rich - escalation levels, a .col-focus tremble, non-focused reel dimming via a brightness filter, and a per-cell .scatter-charge bloom plus scanline - but it is implemented entirely in CSS. Verified: ZERO url() references in any anticipation rule, and GameGrid has no <canvas> and zero drawImage calls. Today's cell glow is a `filter:` on .tile-inner, not an overlay element. Attaching a raster glow means new markup per reel and per cell plus new state wiring to the escalation levels, which is not the 'tiny safe hook already exists' the brief allows."
+  },
+  {
+   "item": "anticipation-spark 4f (128x128)",
+   "bytes": 22042,
+   "reason": "THE ONE REAL RASTER SLOT IS A SINGLE STATIC IMAGE AT 22x22. GameGrid.svelte:1222-1223 renders two <img class='edge-spark'> per column from ui/particles/spark.png, animated by a CSS rise/scale/fade. It is a genuine consumer with a genuine trigger (.col-focus), but it takes ONE still image, not a four-frame strip - a flipbook needs a packed sheet and steps() markup that does not exist. And it renders at 22x22, so a 128px source is 5.8x oversampled and nothing of the extra resolution can be seen. Its file is also owner WIP."
+  },
+  {
+   "item": "symbol-life: land-impact-flash, win-cell-crown-glow, scatter-tease-ring, selected-cell-pulse (16 files, 240x240)",
+   "bytes": 367441,
+   "reason": "NO RASTER SLOT, AND ONE OF THEM HAS NO CONSUMER THAT COULD EVER EXIST. The cell is 120x100 (CELL_W 120, CELL_H 100, 5 reels x 4 rows, GameGrid.svelte:62-68) and the candidates are 240x240 SQUARE. Every existing symbol effect is CSS with zero url(): .scatter-charge is a linear-gradient scanline plus a 6x6 dot and a bloom animation (GameGrid.svelte:1663-1678), triggered per cell at :877. Taking these would mean replacing tuned CSS effects with rasters plus new four-frame flipbook markup. SEPARATELY, 'selected-cell-pulse' has no consumer BY DEFINITION: this is a slot machine and there is no cell-selection mechanic to pulse.",
+   "quality_note": "the art is genuinely good and on-palette. Centre openness, which the vendor claims for all four, holds for three: mean alpha in the central 50% box is 0.00-0.84 for land-impact, 0.04-0.49 for scatter-tease and 0.00 for selected-cell-pulse. win-cell-crown-glow is the exception at 9.85-19.19 with a max of 255, and its side spikes reach well down the cell at 120x100. It is the least symbol-safe of the four."
+  },
+  {
+   "item": "feature accents: entry streak, settle streak, spark burst, retrigger pip, free-spin pip (5 files)",
+   "bytes": 115666,
+   "reason": "EVERY SLOT IS ALREADY FILLED AND THE TWO PIPS HAVE NO CONSUMER. The whole feature presentation loads six images: smoke_puff x2, gauge_face, gauge_needle and shock_ring (FreeSpinsPresentation.svelte:509-516). There is no empty raster slot for a 320x80 streak; the entry stages are flare/dip/gauge/burst and the burst is TEXT ('+N FREE SPINS', :525). The RETRIGGER MOMENT is likewise a text div ('+5 FREE SPINS', :586), not a pip, and spinsRemaining is a NUMBER, not a row of pips. Two pip assets with nothing to pip.",
+   "reason_CORRECTED_after_verification": "MY FIRST READING SAID THESE HAD NO CONSUMER AT ALL. THAT WAS WRONG FOR ONE OF THE FIVE. The feature-spark-burst DOES have a real, occupied slot: `.entry-shockwave` at FreeSpinsPresentation.svelte:516, a 260x260 box scaling 0.2 -> 2.2 (peak draw 572px), currently loading ui/particles/shock_ring.png. Installing the candidate would be a ONE-LINE src edit and would NOT touch owner WIP, because it would be a new file rather than an overwrite. Measured at the 572px peak draw: the candidate is SHARPER (edge sharpness 17.403 against the owner's WIP 13.149, a 32% gain, which is the real payoff of 256px source into a 4.5x upscale) but 33% DIMMER (energy 25.35 against 37.58). It is also a BURST where the slot is a RING that expands - a change to the feature entry's visual language, not an upgrade to it. REFUSED on quality and semantics, not on absence. The other four accents genuinely have no consumer: the retrigger moment is a text div, spinsRemaining is a number, and the entry sequence has no horizontal band element."
+  },
+  {
+   "item": "lobby-tile: 1920x1080 environment, 1600x1600 and 800x800 car cutouts, 512x512 studio mark",
+   "bytes": 4625603,
+   "reason": "RECORDED AS READY RESIDUALS, NOT FORCED INTO THE RUNTIME, exactly as the brief directs. There IS a tile deliverable and it is already DONE: WRS_MASTER_DOCUMENT.md:123 records tile_background_master.jpg at 2048x1152 shipped as FutureSpinner-BG.jpg, with SUBMISSION_DOSSIER.md:395 noting the composed tile passes the portal's thumbnail guidelines. That is a PORTAL UPLOAD asset, not a runtime consumer: nothing in frontend/src references a 1920x1080 or 800x800 source and no build step consumes one. The candidate environment is also SMALLER than the incumbent (1920x1080 against 2048x1152). And 4,625,603 B against 339,220 of headroom is impossible regardless.",
+   "residual_status": "available to the owner for the portal if they ever want an alternative; not a runtime asset.",
+   "reason_CORRECTED_after_verification": "A REAL TILE SLOT EXISTS AND I UNDERSTATED IT, THEN MEASURED IT AND THE ANSWER DID NOT CHANGE. assets/portal/ at the REPO ROOT (outside frontend/public/, so it is NOT bundled and costs ZERO runtime budget) already ships tile_background.jpg at exactly 1920x1080 (318,504 B), tile_foreground.png at 1200x1200, tile_title.png, and provider logos, each with a provenance.json. So the candidate BG matches the slot dimension EXACTLY and the budget objection does not apply. It is still refused, on measurement: the candidate is 4.3x DARKER (mean luminance 17.1 against 73.8) with HALF the contrast (sd 31.0 against 61.3), and it is a subject-free dark workshop interior where the incumbent is a vivid neon street scene that pops in a lobby grid. It is also 2,370,569 B of PNG against a 318,504 B JPEG, and the recorded portal constraint is BG+FG <= 3MB COMBINED, which the candidate plus the existing 1200x1200 foreground would nearly exhaust. The 800x800 car cutout is a straight downgrade from the 1200x1200 incumbent; the 1600x1600 is larger than the slot. STATUS: ready residuals, available if the owner wants them, refused as a swap. The store tile is outward-facing and is the owner's call, not a builder's."
+  },
+  {
+   "item": "reduced-motion stills x3 (680x1344)",
+   "bytes": 2343948,
+   "reason": "THE FALLBACK ALREADY SHOWS THIS EXACT POSE. After the fix below, reduced motion freezes the idle sheet at background-position-x 0, which is frame 01, the rest pose. Measured against the candidate still: IoU 0.9998, silhouette XOR 0.02%. It would cost 767,421 B to show a pose already on screen. The other two are a win peak and a brace peak, which reduced motion never reaches because reactions are skipped entirely. All three are byte-identical to the hero-masters R127 refused."
+  }
+ ],
+ "the_defect_this_session_found_and_fixed": {
+  "what": "THE HERO'S SIX-FRAME IDLE FLIPBOOK KEPT ANIMATING FOR PLAYERS WHO ASKED FOR REDUCED MOTION.",
+  "where": "frontend/src/lib/components/HeroIdle.svelte, the prefers-reduced-motion block",
+  "cause": "the reset was a BARE `.hero-idle` at specificity (0,1,0) while the state rule is `.hero-idle[data-motion='idle']` at (0,2,0). The bare reset lost. This is the IDENTICAL specificity bug R121 found and fixed for the transform layer, one layer down, and the comment explaining it sits THREE LINES BELOW the broken selector. It survived R121 through R127.",
+  "measured_before": {
+   "media_query_matches": true,
+   "computed_animation_name": "hero-cycle-idle",
+   "getAnimations": [
+    "hero-cycle-idle"
+   ],
+   "background_position_x_over_3.2s": [
+    "-618px",
+    "-1030px",
+    "-206px"
+   ],
+   "verdict": "still animating, identical to a no-preference context"
+  },
+  "measured_after": {
+   "media_query_matches": true,
+   "computed_animation_name": "none",
+   "getAnimations": [],
+   "background_position_x_over_3.2s": [
+    "0px",
+    "0px",
+    "0px"
+   ],
+   "verdict": "frozen on frame 01, the rest pose"
+  },
+  "negative_control": "a no-preference context after the fix still reports hero-cycle-idle and still cycles -618/-1030/-206, so normal motion is untouched",
+  "cost_bytes": 0,
+  "sweep": "swept every prefers-reduced-motion block in src/ for the same pattern - a bare-class reset inside the block with a more-specific rule outside it. Three further sites matched the pattern and ALL THREE are false positives, each already handling its qualified variant inside the block: App.svelte:2632-2633 (.overdrive-perimeter AND .overdrive-perimeter.settling), GameGrid.svelte:1727-1731 (.idle-glint-sweep.active with !important AND .idle-glint-sweep display:none), SceneGroup.svelte:254 (.char-layer.char-idle-strip already sets animation:none). HeroIdle was the only genuine instance."
+ },
+ "ws8_gauge_and_particles": {
+  "action_taken": "NONE, as instructed. No WIP file was written to.",
+  "owner_decision_pending": "R127's findings stand unchanged: the COMMITTED gauge_face.png still carries a baked needle (1,723 red pixels) so a deploy from main renders two needles, and the owner's uncommitted face fixes it. The owner's uncommitted particles also beat the committed ones in all four cases. Both are the owner's to land; R128 did not touch either and did not commit any of the 30 rasters."
+ },
+ "not_done": [
+  "Took nothing from the package. All six categories refused with measurements.",
+  "Did not touch the gauge, the particles, or any of the owner's 30 WIP rasters.",
+  "Did not add markup to create a consumer for any candidate; that would be a feature, not an intake.",
+  "Audio unchanged: the four R125 stems still do not exist.",
+  "Still no CI gate measures reduced-motion conformance, which is why this defect survived seven sessions."
+ ],
+ "corrections_made_during_the_session": [
+  "I reported the anticipation path had no raster at all, from a `url(` grep returning zero. Wrong instrument: the edge sparks are <img src>, not CSS url(). The grep was right; my inference was not.",
+  "I reported the feature accents had no consumer. One of the five does - see the corrected note above.",
+  "I reported the lobby candidate was smaller than the incumbent, comparing it against a 2048x1152 MASTER named in WRS_MASTER_DOCUMENT.md:123. The DELIVERED portal file is 1920x1080, which the candidate matches exactly. Corrected above."
+ ]
+}

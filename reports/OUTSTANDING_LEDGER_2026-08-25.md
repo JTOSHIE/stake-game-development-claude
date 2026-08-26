@@ -4,6 +4,83 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0Z. R128 - TOOK NOTHING AGAIN, AND FOUND THAT REDUCED MOTION NEVER WORKED FOR THE HERO
+
+**Branch `claude/r128-anticipation-symbol-lobby`.** 44 runtime candidates, **none shipped**. The
+output is a one-line fix to an accessibility defect live since R121.
+
+**BOTH BUDGETS RECORDED, AS THE BRIEF REQUIRED.** local/working-tree 25,875,180 B = 24.676 MB,
+headroom **339,220 B**; clean/CI committed 23,771,417 B = 22.670 MB, headroom **2,442,983 B**.
+Planned against the local one. Unchanged after the session (339,207 B; 13-byte build-info drift).
+
+**THE WIP MAP CAME BACK EMPTY AND THAT IS THE WHOLE STORY.** Not one candidate targets an existing
+file - there is no anticipation raster, no cell glow, no symbol flash, no pip, no lobby tile anywhere
+in the shipped theme. Zero WIP-clobber risk AND no existing consumer: the same fact twice.
+
+*** THE DEFECT: THE HERO'S IDLE FLIPBOOK KEPT ANIMATING FOR PLAYERS WHO ASKED FOR REDUCED MOTION. ***
+HeroIdle's reduced-motion block reset a BARE `.hero-idle` at (0,1,0) while the state rule is
+`.hero-idle[data-motion='idle']` at (0,2,0). The bare reset LOST. **This is the identical specificity
+bug R121 found and fixed for the transform layer, one layer down, and the comment explaining it sits
+THREE LINES BELOW the broken selector.** It survived R121 through R127. Measured in a real
+reduced-motion context: BEFORE, animation-name `hero-cycle-idle`, background-position-x cycling
+-618/-1030/-206 over 3.2s, identical to no-preference. AFTER, animation-name `none`,
+getAnimations `[]`, position frozen at `0px` = frame 01, the rest pose. **Negative control: a
+no-preference context still animates, so normal motion is untouched. Cost: ZERO BYTES.**
+Swept every prefers-reduced-motion block in src/ for the same pattern: 3 further matches, **all three
+false positives** (App.svelte:2632-2633, GameGrid.svelte:1727-1731, SceneGroup.svelte:254 each
+already handle their qualified variant). HeroIdle was the only genuine instance.
+
+**REFUSED, ALL SIX CATEGORIES.** *anticipation glows* (230,510 B): the anticipation system is real
+and rich - escalation, .col-focus tremble, brightness dim, per-cell .scatter-charge bloom+scanline -
+but is **entirely CSS, zero url(), no <canvas>, zero drawImage**. Today's cell glow is a `filter:` on
+.tile-inner, not an element. Orphan glows. *anticipation-spark 4f* (22,042 B): the ONE raster slot,
+`.edge-spark` at GameGrid.svelte:1222-1223, takes a SINGLE static image rendered at **22x22**; a
+4-frame strip needs sheet+steps() markup that does not exist, and 128px into 22px is 5.8x
+oversampled. *symbol-life* (367,441 B): the cell is **120x100** and the candidates are 240x240
+SQUARE; every existing symbol effect is CSS with zero url(); and **selected-cell-pulse has no
+consumer that could EVER exist - a slot has no cell-selection mechanic**. *feature accents*
+(115,666 B): FOUR have no consumer - the retrigger moment is a TEXT div, spinsRemaining is a NUMBER,
+and there is no band element for a streak. **THE FIFTH DOES, AND I FIRST SAID IT DID NOT.** The
+spark burst fits `.entry-shockwave` (FreeSpinsPresentation.svelte:516, 260px box scaling to 2.2,
+peak draw 572px) as a ONE-LINE src edit touching no WIP. Measured there: SHARPER (edge 17.403 vs
+the owner's WIP 13.149, +32%, the real payoff of 256px into a 4.5x upscale) but **33% DIMMER**
+(energy 25.35 vs 37.58), and a BURST where the slot is an expanding RING. Refused on quality and
+semantics, not absence. *lobby tile* (4,625,603 B): READY RESIDUALS per the brief. **A REAL SLOT
+EXISTS AND I UNDERSTATED IT:** `assets/portal/` at the REPO ROOT is OUTSIDE the bundle, costs ZERO
+runtime budget, and already ships tile_background.jpg at EXACTLY 1920x1080 (318,504 B) plus a
+1200x1200 foreground - the 2048x1152 in WRS_MASTER_DOCUMENT.md:123 is the MASTER, not the delivery.
+So the candidate matches the slot exactly and neither the budget nor the size objection applies.
+Refused on measurement instead: **4.3x DARKER (mean lum 17.1 vs 73.8) with HALF the contrast (sd
+31.0 vs 61.3)**, a subject-free dark workshop against a vivid neon street scene, and 7.4x the bytes
+(2,370,569 PNG vs 318,504 JPEG) against a recorded BG+FG <= 3MB combined cap. The 800x800 cutout is
+a downgrade from the 1200x1200 incumbent. The store tile is outward-facing and the owner's call. *reduced-motion stills* (2,343,948 B): **byte-identical to the
+hero-masters R127 refused**, and after the fix the fallback already shows that exact pose - IoU
+0.9998, XOR 0.02%.
+
+**THE ART IS GOOD AND THAT IS NOT THE PROBLEM.** On-palette cyan/magenta, centre-open for three of
+four symbol families (win-cell-crown-glow is the exception at centre alpha 9.85-19.19, max 255, with
+side spikes reaching down a 120x100 cell). Everything was refused on CONSUMER and GEOMETRY, not
+quality.
+
+**THREE MID-SESSION SELF-CORRECTIONS, none of which changed a verdict but all of which would have
+been wrong in the record.** (1) I reported the anticipation path had no raster at all, from a
+`url(` grep returning zero - wrong instrument, the edge sparks are `<img src>`, not CSS `url()`.
+(2) I reported the feature accents had no consumer; one of five does. (3) I reported the lobby
+candidate was smaller than the incumbent, having compared it to a MASTER rather than the delivered
+file it matches exactly.
+
+**WS8 HONOURED: the gauge and particles were NOT touched.** R127's findings stand and remain the
+owner's to land - committed gauge_face still has its baked needle (1,723 red px) so main still ships
+two needles, and the owner's uncommitted particles still beat the committed ones in all four cases.
+No WIP file was written; none of the 30 rasters was committed.
+
+**STILL OPEN AFTER R128.** **AUDIO REMAINS THE BIGGEST PUBLICATION GAP** (four R125 stems absent,
+hooks wired and silent, forge runnable, blocker is the Stability licence decision). The two-needle
+gauge. The 24-frame win (+3,353,011 B). The R126 brace variant (+521,988 B, needs endpoints
+anchored). Max win still covers the hero (nine sessions). **Nothing in CI measures reduced-motion
+conformance**, hero animation, particle punch or gauge correctness - and this session is the proof of
+what that costs.
+
 ## 0Y. R127 - TOOK NOTHING, AND FOUND THAT THE BUDGET MEANS TWO THINGS AND main SHIPS TWO NEEDLES
 
 **Branch `claude/r127-parallel-support`.** 47 runtime candidates arrived; **none shipped**. Two

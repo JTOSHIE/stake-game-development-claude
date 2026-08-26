@@ -9,6 +9,71 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 126 - 2026-08-27 - R128: took nothing again, and found that your reduced-motion setting never actually worked for the hero.
+
+**FORTY-FOUR CANDIDATES, NONE SHIPPED.** Six categories, each refused with measurements. But
+checking one of them found a real accessibility bug that has been live since R121, and fixing it cost
+zero bytes.
+
+**YOUR HERO KEPT ANIMATING FOR PLAYERS WHO ASKED FOR REDUCED MOTION.** The brief asked whether the
+new still images would improve the frozen fallback. So I checked what the fallback actually did, and
+there wasn't one. The CSS rule meant to stop the flipbook was written as a plain `.hero-idle`, which
+is weaker than the rule that starts it, so it simply lost and never applied. I measured it in a real
+reduced-motion browser: the setting was on, and the sprite was still cycling through all six frames,
+exactly as it does for everyone else.
+
+**This is the same mistake, in the same file, three lines away from the comment that explains it.**
+R121 hit this exact specificity trap on the body layer, wrote a careful note about why the selector
+has to be repeated, fixed that layer, and left the one below it broken. It survived R121 through
+R127. It is one line, it costs nothing, and now reduced motion genuinely freezes the hero on his
+rest pose. I checked the other direction too: normal motion is completely unchanged.
+
+I also swept every other reduced-motion block in the codebase for the same pattern. Three more
+looked suspicious and all three turned out to be already correct. Yours was the only real one.
+
+**AND THAT SETTLED THE STILLS.** Since the fallback now freezes on the rest pose, I measured the
+candidate still against the frame already on screen: they are the same image to within 0.02%. It
+would cost 767 KB to show you a pose you are already looking at. The other two stills are a win peak
+and a brace peak, which reduced motion never reaches. All three are byte-identical to files I already
+refused last session.
+
+**WHY THE REST WAS REFUSED - and the art is good, that is not the problem.** It is on-palette and
+well made. The issue is that nothing in your game has anywhere to put it.
+
+Your anticipation system is real and quite rich already: escalating levels, the focused reel
+trembling, the other reels dimming, a charge bloom on each scatter cell, and two sparks rising up
+each column. But it is built entirely in CSS. There is no image slot for a glow to play in, so the
+cell glows and reel glows are orphans. The one genuine image slot, the rising spark, takes a single
+still picture and draws it at 22 by 22 pixels, so a 128-pixel four-frame animation cannot fit it.
+
+The symbol overlays are 240x240 squares; your cells are 120x100. And one of them is a "selected cell
+pulse", which a slot machine cannot ever use, because there is nothing to select.
+
+The feature accents include a retrigger pip and a free-spin pip, but your retrigger moment is
+text ("+5 FREE SPINS") and your spins counter is a number, so there is nothing to pip. **One of
+the five did turn out to have a home and I want to flag it**: the spark burst fits your feature
+entry shockwave, and swapping it in would be a single line. I measured it there and it is sharper
+than what you have, because it is twice the resolution into a slot that stretches the image 4.5
+times - but it is also a third dimmer, and it is a burst where your slot is an expanding ring. So
+I left it. If you want the sharpness, the right move is a higher-resolution RING, not this.
+
+**The lobby parts I have recorded as ready residuals rather than forcing them in, as you asked -
+and I owe you a correction here.** I first said the candidate was smaller than what you have. It
+is not: your delivered tile background in `assets/portal/` is exactly 1920x1080 and the candidate
+matches it precisely. That folder also sits outside the game bundle, so a tile swap would cost you
+no build budget at all. I still did not take it, on measurement: the candidate is **more than four
+times darker with half the contrast**, and it is an empty workshop where yours is a neon street
+with a flying car and a giant magenta star. In a lobby full of competing tiles, yours wins. It is
+also 2.4 MB of PNG against your 318 KB JPEG, against a 3 MB combined cap. Your store tile is
+outward-facing and your call, not mine, so the files are there if you disagree.
+
+**I did not touch the gauge or the particles**, per your instruction. Both R127 findings stand and
+are still yours to decide: your committed gauge face still has the painted needle, so a deploy from
+main still shows two, and your uncommitted particles still beat the committed ones.
+
+**Still the biggest gap: audio.** Four sounds, hooks wired and silent, the tool runs on your machine,
+and the only blocker is your licence decision.
+
 ## 125 - 2026-08-26 - R127: I took nothing from the support pack, and found two things that matter more than anything in it.
 
 **NOTHING SHIPPED, AND I THINK THAT IS THE RIGHT ANSWER.** Forty-seven candidates arrived. All five

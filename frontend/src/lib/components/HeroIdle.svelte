@@ -368,7 +368,19 @@
      presentation is the game's own established still. Reactions never start under
      this setting, so only the idle needs stilling. */
   @media (prefers-reduced-motion: reduce) {
-    .hero-idle {
+    /* R128: `.hero-idle` HERE USED TO BE BARE, AND IT DID NOTHING. This is the
+       SAME specificity bug the note below records for the body layer, one layer
+       down, three lines away from its own fix, and it survived R121 through R127.
+       The state rules are `.hero-idle[data-motion='idle']` at (0,2,0); a bare
+       `.hero-idle` reset is (0,1,0) and loses, so the six-frame flipbook kept
+       running for a player who asked for reduced motion.
+       Measured in a real reduced-motion browser context before and after: the
+       media query reported true, computed animation-name was still
+       hero-cycle-idle, and background-position-x cycled -618px, -1030px, -206px
+       over 3.2s, identical to a no-preference context. With the attribute
+       repeated the selector is (0,2,0), ties the state rules, and wins on source
+       order because this block comes after them. */
+    .hero-idle[data-motion] {
       animation: none;
       background-position-x: 0;
     }
