@@ -9,6 +9,54 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 118 - 2026-08-26 - R120: the UI is one system now, and your interface guide is FIXED rather than blocked
+
+**ALL THREE NEIGHBOURS MATCH THE SHELL.** The FEATURES button, the feature instrument column and
+the paytable modal now read as the same family as the R119 HUD. No more magenta pill beside a dark
+glass bar, no more gold numbers beside white ones.
+
+**YOUR INTERFACE GUIDE IS FIXED.** Last session I reported it blocked by the asset guard and did
+not bypass it. That was right on the information I had, but the information was incomplete: **the
+guard's 30-file refusal list and the regenerator's 9-file write list do not overlap at all.** So
+the guard could be satisfied honestly instead of bypassed. I staged my own work, stashed only your
+30 rasters, let the guard run and PASS on its own terms, regenerated, then restored your 30 and
+verified every one byte-identical. `ALLOW_ASSETS_OVERWRITE` was never set and the guard's own
+self-test still passes. Your in-game manual now shows the buttons the game actually has.
+
+**One guide row still cannot be fixed by that script and never could.** The FEATURES row uses
+`feature_button.png`, which is one of your 30 work-in-progress rasters AND is built from an SVG
+master rather than screenshotted, so the regenerator cannot touch it.
+
+---
+
+**THE THING WORTH KNOWING.** I nearly introduced a bug that would have been invisible for months.
+To share the shell across components I wanted to move its colour tokens to a global `:root`. I
+tested it first. **On `:root` the accent freezes at its fallback and stops following your theme
+palette entirely** - because a CSS variable is resolved where it is DECLARED, and your theme colours
+are declared further down the tree. It looks perfectly fine right now, because the frozen fallback
+happens to be the same cyan your current theme uses. It would only have surfaced when someone
+changed theme. The tokens went on the stage wrapper instead, where they work.
+
+Related: I also had to correct something **I** wrote last session. R119's note explaining why those
+tokens were not on `:root` gave the wrong reason. The placement was right; the explanation was not.
+Both are now corrected in the doc rather than quietly overwritten.
+
+**TWO SMALL DEFECTS FIXED IN PASSING.** Your paytable close button was **38x38**, under the 44px
+touch floor this project holds itself to, and no gate was watching it. And the paytable title was
+gradient-clipped text with no fallback colour, so if that clip ever failed the word PAYTABLE would
+have rendered **invisible**. Both fixed.
+
+**WHAT I DID NOT DO.** Your gauge dial is untouched: both gauge rasters are in your 30
+work-in-progress files, and the committed version and your working version are not even the same
+picture (one round with a red needle baked in, one square carbon). I will not judge art I cannot
+see shipped. Also, none of the four FEATURES buttons has a pressed or open state, and three of them
+have no hover feedback at all - quieting the resting glow removed the only affordance signal they
+had, and I did not add one back. That is the obvious next small job.
+
+26 checks green. PR on the review lane.
+
+---
+
 ## 117 - 2026-08-26 - R119: your HUD is now an operator shell, and it accidentally fixed a CI gate that was passing by three thousandths
 
 **DONE.** The control bar was carrying a six-stop brushed-metal bezel on every plate, an

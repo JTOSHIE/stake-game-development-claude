@@ -165,10 +165,14 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    /* the bezel: gradient shows through as a 2px frame around ::before */
-    background: linear-gradient(135deg, #ff2ec4 0%, #16f2e0 55%, #ff2ec4 100%);
+    /* R120: the bezel was a magenta -> cyan -> magenta gradient under a 7px
+       magenta bloom, sitting directly beside R119's dark-glass HUD. It is the
+       same "multi-colour neon rail" pattern that pass removed from the bar,
+       still living here. Now one neutral hairline, same as a HUD plate. The
+       chamfer stays: it is the title's shape language and costs no contrast. */
+    background: var(--hud-border-strong);
     clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-    filter: drop-shadow(0 0 7px rgba(255, 46, 196, 0.55));
+    filter: none;
   }
   /* interior fill, inset by the bezel width */
   .plate::before {
@@ -176,9 +180,7 @@
     position: absolute;
     inset: 2px;
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-    background:
-      linear-gradient(160deg, rgba(255, 46, 196, 0.14), transparent 42%),
-      linear-gradient(180deg, rgba(26, 15, 46, 0.97) 0%, rgba(10, 7, 20, 0.98) 100%);
+    background: var(--hud-surface-sunken);
   }
   /* left accent rail + faint scan sheen */
   .plate::after {
@@ -189,8 +191,8 @@
     bottom: 8px;
     width: 3px;
     border-radius: 2px;
-    background: linear-gradient(180deg, #16f2e0, #ff2ec4);
-    box-shadow: 0 0 6px rgba(22, 242, 224, 0.7);
+    background: var(--hud-border-strong);
+    box-shadow: none;
   }
   .plate-label,
   .plate-value { position: relative; z-index: 1; }
@@ -198,7 +200,7 @@
     font-family: var(--fs-font-numeric);
     font-size: 12px;
     letter-spacing: 0.16em;
-    color: rgba(180, 240, 255, 0.72);
+    color: var(--hud-text-dim);
     text-transform: uppercase;
   }
   .plate-value {
@@ -212,8 +214,8 @@
        containment for a value mid-fit. */
     font-size: calc(30px * var(--autofit-scale, 1));
     font-weight: 900;
-    color: #ffd54a;
-    text-shadow: 0 0 10px rgba(255, 213, 74, 0.7);
+    color: var(--hud-text);
+    text-shadow: none;
     line-height: 1;
     max-width: 230px;
     white-space: nowrap;
@@ -246,8 +248,8 @@
     padding: 6px 4px;
     min-height: 48px;
     border-radius: 8px;
-    background: linear-gradient(160deg, rgba(255, 46, 196, 0.12), transparent 60%), #150c1e;
-    border: 1px solid rgba(255, 46, 196, 0.35);
+    background: var(--hud-surface-sunken);
+    border: 1px solid var(--hud-border);
     box-shadow: 0 0 10px rgba(255, 46, 196, 0.2);
   }
   .pm-label {
@@ -256,7 +258,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(230, 200, 255, 0.7);
+    color: var(--hud-text-dim);
     /* Two fields only now (item 3), one of which is the longer "OVERDRIVE
        FREE SPINS" label - let it wrap onto a second line rather than
        force-nowrap/overflow; the cell has no fixed height so it grows. */
@@ -275,7 +277,11 @@
     max-width: 100%;
     overflow: hidden;
   }
-  .pm-value.pink { color: #ff6fe0; text-shadow: 0 0 8px rgba(255, 46, 196, 0.6); }
-  .pm-value.cyan { color: #6ff2ff; text-shadow: 0 0 8px rgba(22, 242, 224, 0.5); }
-  .pm-value.gold { color: #ffd54a; text-shadow: 0 0 8px rgba(255, 213, 74, 0.5); }
+  /* R120: three feature values in three colours, each with its own glow, is the
+     same defect R119 fixed on the bar. One near-white, like every other live
+     value in the game. The class names stay: they are field identifiers and are
+     attached to markup and autofit, not colour names. */
+  .pm-value.pink,
+  .pm-value.cyan,
+  .pm-value.gold { color: var(--hud-text); text-shadow: none; }
 </style>

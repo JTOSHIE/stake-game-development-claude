@@ -2629,6 +2629,34 @@
     .overdrive-perimeter.settling { animation: none; opacity: 0; }
   }
 
+  /* ===== OPERATOR SHELL TOKENS (R119, hoisted here by R120) ==================
+     One declaration of the UI shell's material, inherited by EVERY component
+     inside the stage: the HUD, the paytable modal, the FEATURES bar and the
+     feature instrument column. Before R120 these lived in HudOverlay's scoped
+     block, so the three neighbours could not see them and drifted.
+
+     WHY HERE AND NOT ON :root. --theme-primary is declared on this same element
+     (see the inline style above). A custom property is substituted where it is
+     DECLARED, not where it is used, so `--hud-accent: var(--theme-primary)` on
+     :root would resolve against a :root that has no --theme-primary and freeze
+     at the fallback - invisibly, because the fallback IS the current theme's
+     cyan. Verified in a browser before moving it.
+
+     THE ACCENT DISCIPLINE: chrome at rest is NEUTRAL. The accent is spent on the
+     primary action, a live win, and active states. Nowhere else. */
+  .game-wrapper {
+    --hud-surface:        rgba(11, 15, 24, 0.84);
+    --hud-surface-raised: rgba(20, 26, 37, 0.88);
+    --hud-surface-sunken: rgba(6, 9, 15, 0.90);
+    --hud-border:         rgba(226, 238, 250, 0.13);
+    --hud-border-strong:  rgba(226, 238, 250, 0.26);
+    --hud-text:           #eef4fa;
+    --hud-text-dim:       rgba(214, 230, 244, 0.58);
+    --hud-accent:         var(--theme-primary, #00FFFF);
+    --hud-shadow:         0 6px 20px rgba(0, 0, 0, 0.45);
+    --hud-shadow-soft:    0 2px 8px rgba(0, 0, 0, 0.40);
+  }
+
   .game-wrapper {
     position: relative;
     width: 1280px;
