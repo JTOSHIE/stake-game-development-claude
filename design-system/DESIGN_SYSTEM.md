@@ -76,6 +76,16 @@ design-system statement, not a second authority.
 - Material language: polished chrome, brushed gunmetal, warm gold accents.
   Emissives cyan #00FFFF and magenta #FF00FF together, gold #FFD700 sparingly,
   on deep navy #060610. Key light upper left. Rich saturation, never pastel.
+
+  **AMENDED 2026-08-26 by R119, and the scope of the amendment matters: this law
+  now describes the GAME WORLD only, not the HUD.** The owner's R119 brief
+  pivoted the control overlay to an operator-standard shell, on the principle
+  that "game art carries the theme, HUD carries clarity". The HUD is therefore
+  dark translucent glass with neutral hairline borders, near-white values and a
+  single restrained accent, and it no longer uses polished chrome, brushed
+  gunmetal or warm gold. Symbols, frames, scene art and celebration art are
+  UNCHANGED and still follow the line above. The shell is specified at
+  docs/design/HUD_SHELL_TEMPLATE.md.
 - Masters are 1024x1024 SVG, filter free: glows are baked as layered stroke
   stacks so rendering is deterministic in any rasteriser (cairosvg or browser).
   **This law scopes to the in-house pipeline**, meaning symbols, frames and UI. The
@@ -101,6 +111,18 @@ design-system statement, not a second authority.
   every WRS title), with exactly two themed accents: TURBO uses the existing
   turbocharger art with flames on engage, and FEATURE uses the Grille art
   carrying the button with no plate box.
+
+  **AMENDED 2026-08-26 by R119.** The first clause is now SHIPPED rather than
+  aspired to: the overlay is standardised across all four layouts by one shell
+  token block, and a new title inherits it by re-pointing two theme colours.
+  The second clause is superseded in part and was already stale in the code
+  before this pass. TURBO carries no turbocharger art and no flames: FS VISUAL
+  FIXPACK JOB 2 replaced them with a three-step intensity escalation on a bolt
+  glyph, deliberately, because an animated flame made the three speeds
+  indistinguishable, and turbo_intensity_gate.mjs has measured that escalation
+  ever since. R119 keeps the escalation and moves it from amber onto the single
+  shell accent. FEATURE still carries no Grille art. The accent count is now ONE
+  in the HUD, spent on SPIN, on a live win, and on active toggles.
 
 ## APPROVED SYMBOL LINEUP (art is skin level; maths IDs never change)
 | ID | Object | Win animation | Master status |

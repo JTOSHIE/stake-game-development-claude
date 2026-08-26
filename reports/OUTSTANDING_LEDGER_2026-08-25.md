@@ -4,6 +4,86 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0Q. WHAT R119 CHANGED (the operator-standard HUD shell) AND WHAT IT LEFT OPEN
+
+**THE HUD IS NOW A SHELL WITH A TOKEN LAYER.** Ten `--hud-*` tokens declared ONCE on
+`.fs-hud, .p-hud, .c-hud, .m-hud` plus one accent flip for Overdrive. Declared on four roots
+rather than `:root` because Svelte strips a scoped selector matching nothing and
+`typecheck_baseline` fails on ANY rise in unused-selector warnings. Colour literals in
+`HudOverlay.svelte`: **155 hex to 89**.
+
+*** THERE ARE FOUR HUD LAYOUTS, NOT THREE. One {#if} chain: portrait :420, mini-player :588,
+compact-landscape :698, desktop :849. `docs/HUD_SPEC.md` locks ONLY the fourth. `portrait` is
+an ASPECT test (innerHeight > innerWidth), NOT a width breakpoint. A pass that edits only
+`.fs-*` leaves three quarters of the player-facing HUD untouched. ***
+
+**THE ACCENT DISCIPLINE, which is the reusable part.** Chrome at rest is neutral. The accent
+is spent in exactly three places: SPIN, a live win, and active toggles. Before, three adjacent
+plates carried three different neon rails (balance cyan, win magenta, bet gold) and the three
+live values were three differently tinted whites. Spec: `docs/design/HUD_SHELL_TEMPLATE.md`.
+
+**ZERO GEOMETRY MOVED.** `hud_banner_spec_check.mjs` re-measured: all seven gaps exactly 16px,
+AUTO tangent to SPIN at 0, touch targets 82x82/48x48/44x44/44x52/84x84/48x48, autofit stress
+asserts pass at $1,234,567.89 and $1,000,000.00. **No `font-size` was touched anywhere**,
+which is what keeps autofit alive (the fitters rewrite it through `--autofit-scale`).
+
+*** THE NUMBER NOBODY WAS LOOKING FOR: `turbo_intensity_gate` was passing at **1.253:1
+against a 1.250:1 floor** - THREE THOUSANDTHS of margin, one rounding from a red CI run.
+Measured by reverting the file, rebuilding and re-running. After the restyle it passes at
+**1.292:1**, and the turbo-to-super step goes from 1.50-1.75 to 2.20-2.42, because an accent
+escalating out of dark glass has more headroom than amber escalating out of amber. ***
+
+**THE COMMITTED BANNER PAIR WAS KEPT.** `hud_banner.png` (63,873 bytes, the R105 pair) was
+the TOPMOST panel layer painted over the glass; with dark plates its metal struts read as
+debris between them. ONE line moves the glass above it. Asset, reference, guard coverage and
+budget line all untouched.
+
+### GATE MAP CORRECTIONS (read every gate this session)
+
+*** `hud_banner_spec_check.mjs` IS NOT IN CI. Neither are `hud_reskin_proof.mjs`,
+`interface_guide_icon_proof.mjs`, `hud_naming_uniformity_check.mjs` or
+`hud_reel_size_check.mjs`. The geometry lock is real and documented and NOTHING RUNS IT
+AUTOMATICALLY. ***
+**Exactly ONE CI-blocking gate can be broken by a HUD restyle: `turbo_intensity_gate.mjs`.**
+**Only TWO CI legs render the non-desktop layouts at all:** `layout_fit` and `turbo_intensity`.
+
+### BLOCKED, WITH EXACT EVIDENCE
+
+*** THE IN-GAME INTERFACE GUIDE IS NOW STALE. Eight shipped PNGs are screenshot-crops of the
+LIVE controls, rendered by `PaytableModal.svelte`. `regen_interface_guide_icons.mjs` is
+refused by `asset_guard.py --require-clean` because 30 tracked rasters under
+`frontend/public/assets/themes/future-spinner` differ from HEAD (owner WIP). The only override
+is `ALLOW_ASSETS_OVERWRITE=1` and "do not weaken asset guards" was in the R119 fence, so it was
+NOT run. The bypass would very likely have been safe - the regenerator writes exactly nine
+filenames and all nine are tracked and clean - but that is the exact reasoning the guard exists
+to refuse. REMEDY, once the tree is clean: `node frontend/scripts/regen_interface_guide_icons.mjs`.
+NOT a CI failure: `interface_guide_icon_proof` is not in CI and asserts only byte-uniqueness. ***
+
+### THE BRIEF CONTRADICTED THE PROJECT'S OWN DESIGN LAW
+
+`design-system/DESIGN_SYSTEM.md` states the material language is "polished chrome, brushed
+gunmetal, warm gold accents" - exactly what R119 removes from the HUD. Resolved in the brief's
+favour (it is the live owner instruction and explicitly a pivot), and **both documents amended
+in the same commit rather than left to drift**: DESIGN_SYSTEM's material law now scopes to the
+GAME WORLD; its "exactly two themed accents" law is marked superseded and was ALREADY stale
+(it specifies turbocharger art with flames on TURBO, which FS VISUAL FIXPACK JOB 2 had already
+replaced with the measured intensity escalation); `docs/design/CHROME_PRIMITIVES.md` is scoped
+so its `.fs-` metal primitives remain canonical for the PAYTABLE only.
+
+### STILL OPEN AFTER R119
+
+1. **Three neighbouring surfaces now look loud beside the shell** and are each a token
+   re-point, not a rewrite: `BonusInstrumentColumn.svelte` (magenta borders + gold values,
+   sits directly beside the bar in every feature frame), `FeatureMenu.svelte` (the magenta
+   FEATURES button), `PaytableModal.svelte` (its own copy of the metal `.fs-plate`).
+2. **A pre-existing dead control**: the mini-player's AUTOPLAY menu item calls
+   `toggleAutoMenu()` but the mini branch renders no `{#if showAutoMenu}` block, so it mounts
+   nothing.
+3. **`panel_balance.png` and `panel_win.png` ship with ZERO consumers** (~37 KB), plus seven
+   dead `themeStore.ts` button keys.
+4. **No gate measures HUD value legibility.** `contrast_gate` covers two portrait
+   FEATURES-bar nodes only.
+
 ## 0P. WHAT R118 CHANGED (the perimeter tone-down) AND WHAT IT FOUND INSTEAD
 
 **THE PERIMETER IS TONED, WITH A MEASURED ANCHOR.** Held opacity 0.75 to **0.50** in

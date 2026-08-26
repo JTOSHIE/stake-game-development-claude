@@ -1280,10 +1280,12 @@
        the row apart. */
     overflow: hidden;
   }
-  .m-stat-value.cyan { color: #7ff; }
-  .m-stat-value.magenta { color: #f9f; }
-  .m-stat-value.gold { color: #ffd54a; }
-  .m-stat.lit .m-stat-value.magenta { text-shadow: 0 0 8px rgba(255, 0, 255, 0.6); }
+  .m-stat-value.cyan,
+  .m-stat-value.magenta,
+  .m-stat-value.gold { color: var(--hud-text); }
+  .m-stat.lit .m-stat-value.magenta {
+    text-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 55%, transparent);
+  }
 
   /* Weighted by string length, and by EXPLICIT CLASS rather than by position.
      The first attempt used .m-stat:nth-of-type(2), which counts among sibling
@@ -1347,6 +1349,39 @@
   /* ---- token bridge: reads the app's existing --theme-* vars, falls back to
      themes.ts future-spinner palette. display:contents keeps .fs-hud a pure
      token-scope wrapper so children stay absolute against the stage ancestor. */
+  /* ===== OPERATOR SHELL TOKENS (R119) =======================================
+     ONE declaration of the shell's material, inherited by all FOUR HUD layouts.
+     Before this block the same palette was declared three times over as
+     --sig-* (desktop), --p-* (portrait) and --c-* (compact), which is
+     RESKIN_BOUNDARY.md GAP 1 in miniature: "token VALUES have seven homes
+     rather than one". A restyle that edited one family and missed the others
+     would ship three mismatched HUDs, so the shell is declared once here and
+     the three families are re-pointed at it.
+
+     THE ACCENT DISCIPLINE. Chrome at rest is NEUTRAL. The accent is spent in
+     exactly three places, because a colour that appears everywhere signals
+     nothing: the SPIN control, a live win, and active toggle states. The
+     resting bar used to carry three DIFFERENT accents on three adjacent
+     plates - balance cyan, win magenta, bet gold - which is the "multi-colour
+     neon chrome" this pass exists to remove. */
+  .fs-hud, .p-hud, .c-hud, .m-hud{
+    --hud-surface:        rgba(11, 15, 24, 0.84);   /* plate + panel fill      */
+    --hud-surface-raised: rgba(20, 26, 37, 0.88);   /* buttons sit above it    */
+    --hud-surface-sunken: rgba(6, 9, 15, 0.90);     /* value wells             */
+    --hud-border:         rgba(226, 238, 250, 0.13);/* neutral hairline        */
+    --hud-border-strong:  rgba(226, 238, 250, 0.26);/* hover / active edge     */
+    --hud-text:           #eef4fa;                  /* live values, near-white */
+    --hud-text-dim:       rgba(214, 230, 244, 0.58);/* labels                  */
+    --hud-accent:         var(--theme-primary, #00FFFF);
+    --hud-shadow:         0 6px 20px rgba(0, 0, 0, 0.45);
+    --hud-shadow-soft:    0 2px 8px rgba(0, 0, 0, 0.40);
+  }
+  /* The feature keeps its established signal: the accent, and only the accent,
+     flips. Nothing else about the shell changes shape or weight. */
+  .fs-hud--overdrive, .p-hud--overdrive, .c-hud--overdrive{
+    --hud-accent: var(--theme-secondary, #FF2EC4);
+  }
+
   .fs-hud{
     display:contents;
 
@@ -1422,34 +1457,45 @@
   .fs-plate{
     position:absolute;
     --sig:var(--sig-cyan);
-    padding:2px;                                   /* rim thickness */
+    padding:1px;                                   /* rim thickness */
     clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px));
-    background:linear-gradient(150deg,#eef5fa 0%,#b3c6d2 15%,#63737f 37%,#2b363f 52%,#8499a8 72%,#dceaf2 100%);
-    box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35);
+    /* Was a six-stop brushed-metal gradient, the single loudest thing in the
+       bar: it read near-white at the bezel and out-contrasted the reels it
+       sits under. Now a neutral hairline. The chamfer is kept because it is
+       the game's own shape language and it costs no contrast. */
+    background:var(--hud-border-strong);
+    box-shadow:var(--hud-shadow);
   }
   .fs-plate > .fs-face{
     position:absolute;inset:2px;
     clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
-    background:
-      linear-gradient(160deg,color-mix(in srgb,var(--sig) 15%,transparent),transparent 44%),
-      linear-gradient(180deg,#111a2b 0%,#070b16 100%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -8px 18px rgba(0,0,0,.6);
+    /* The per-plate --sig colour wash is gone: at rest every plate is the same
+       neutral glass, so the row reads as one instrument rather than three. */
+    /* Sunken, not level: the plates sit INSIDE the panel, so they read a step
+       darker than it. This is what replaces the metal bezel as the thing that
+       separates a value from its background. */
+    background:var(--hud-surface-sunken);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 12px rgba(0,0,0,.45);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   }
   .fs-rail{
     position:absolute;left:2px;top:9px;bottom:9px;width:3px;border-radius:2px;
-    background:var(--sig);box-shadow:0 0 8px var(--sig),0 0 14px color-mix(in srgb,var(--sig) 60%,transparent);
+    /* Neutral at rest. The accent is spent on a LIVE WIN only (.fs-win.lit
+       below), which is the one thing on this bar worth colouring. */
+    background:var(--hud-border-strong);box-shadow:none;
     z-index:2;
   }
   .fs-knob{
-    border-radius:50%;padding:3px;
-    background:conic-gradient(from 216deg,#e7f1f7,#93a7b5,#39454f,#728593,#eef5fa,#4f5f6b,#a9bcc8,#e7f1f7);
-    box-shadow:0 3px 10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.55);
+    border-radius:50%;padding:1px;
+    /* Was an eight-stop conic brushed-metal ring. Secondary controls are meant
+       to be quieter than SPIN, and a metal bezel is not quiet. */
+    background:var(--hud-border);
+    box-shadow:var(--hud-shadow-soft);
   }
   .fs-knob > .fs-face{
-    position:absolute;inset:3px;border-radius:50%;
-    background:radial-gradient(circle at 36% 28%,#1a3640,#06131c 72%);
-    box-shadow:inset 0 2px 3px rgba(255,255,255,.14),inset 0 -6px 12px rgba(0,0,0,.7);
+    position:absolute;inset:1px;border-radius:50%;
+    background:var(--hud-surface-raised);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   }
 
@@ -1464,16 +1510,27 @@
     border-radius:18px;pointer-events:none;
     background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
     border:1px solid transparent;
+    /* R119 ORDER SWAP, one line, fully reversible. The committed hud_banner.png
+       raster is KEPT - it is an owner-level decision from R105 and its CSS and
+       raster landed together. But it was the TOPMOST layer, painted over the
+       glass, and it is a bright metal-bracket graphic drawn to sit UNDER metal
+       plates. With the plates now dark glass its struts poked out between them
+       and read as debris. Moving the glass above it keeps the asset, its
+       reference and its budget line intact while letting it read as faint
+       structure instead of competing chrome. */
     background-image:
+      linear-gradient(135deg,rgba(7,10,17,.94),rgba(11,16,26,.90)),
       url('/assets/themes/future-spinner/ui/hud_banner.png'),
-      linear-gradient(135deg,rgba(6,9,20,.86),rgba(10,15,34,.74)),
-      linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#c9d7e0),color-mix(in srgb,var(--acc) 12%,#2b363f));
-    background-size:100% 100%,auto,auto;background-repeat:no-repeat,repeat,repeat;
+      linear-gradient(180deg,var(--hud-border),var(--hud-border));
+    background-size:auto,100% 100%,auto;background-repeat:repeat,no-repeat,repeat;
     background-origin:border-box;background-clip:padding-box,padding-box,border-box;
+    /* The committed hud_banner.png raster is deliberately KEPT - it is the
+       panel's own art and prior sessions committed it as a pair. What goes is
+       the chrome-gradient border and the 22px accent bloom around the whole
+       bar, which is what made the bar glow rather than sit. */
     box-shadow:
       0 6px 22px rgba(0,0,0,.5),
-      inset 0 1px 0 rgba(255,255,255,.06),
-      0 0 22px color-mix(in srgb,var(--acc) 22%,transparent);
+      inset 0 1px 0 rgba(255,255,255,.05);
   }
 
   /* ===== BALANCE / WIN / BET =================================================
@@ -1499,7 +1556,7 @@
 
   .fs-label{
     font-family: var(--fs-font-numeric);font-size:.52rem;font-weight:700;
-    letter-spacing:.18em;text-transform:uppercase;color:rgba(190,232,255,.62);
+    letter-spacing:.18em;text-transform:uppercase;color:var(--hud-text-dim);
     position:relative;z-index:1;
   }
   .fs-value{
@@ -1524,9 +1581,15 @@
     overflow:hidden;
   }
   /* Crisp glyphs: near-white fill, one tight 3px halo (no wide blur = no fuzz). */
-  .fs-value.cyan   {color:color-mix(in srgb,var(--sig-cyan) 18%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-cyan) 60%,transparent);}
-  .fs-value.magenta{color:color-mix(in srgb,var(--sig-pink) 20%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-pink) 60%,transparent);}
-  .fs-value.gold   {color:color-mix(in srgb,var(--sig-gold) 28%,#ffffff);text-shadow:0 0 3px color-mix(in srgb,var(--sig-gold) 55%,transparent);}
+  /* R119: the three live values were three different tinted whites with three
+     coloured text-shadows - balance cyan, win magenta, bet gold. A player
+     comparing BALANCE against BET was comparing two different colours of
+     number. They are now one near-white, which is what a value is. The class
+     names are kept so the markup, the autofit action and the testids are
+     untouched. */
+  .fs-value.cyan,
+  .fs-value.magenta,
+  .fs-value.gold   {color:var(--hud-text);text-shadow:none;}
   .fs-bet .fs-label,.fs-bet .fs-value{text-align:right;width:100%;}
 
   /* Cost-visibility mode badge (Fable 2026-07-07 item 0): a plain (unclipped)
@@ -1559,8 +1622,13 @@
   }
 
   /* WIN plate lit - win present. Rail + face bloom, value count-pulse. */
-  .fs-win.lit{--sig:var(--sig-pink);}
-  .fs-win.lit{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--sig-pink) 70%,transparent));}
+  /* A live win is the one state on this bar worth an accent, so it keeps one -
+     but through the single shell accent, and without the 12px full-plate bloom
+     that used to wash the plate's own edges out. */
+  .fs-win.lit{--sig:var(--hud-accent);}
+  .fs-win.lit .fs-rail{background:var(--hud-accent);
+    box-shadow:0 0 8px color-mix(in srgb,var(--hud-accent) 55%,transparent);}
+  .fs-win.lit .fs-value{color:var(--hud-text);}
   .fs-win.lit .fs-rail{animation:fs-rail-bloom 1.1s ease-in-out infinite;}
   .fs-win.lit .fs-value{animation:fs-win-pop 1.1s ease-in-out infinite;}
   @keyframes fs-rail-bloom{0%,100%{box-shadow:0 0 8px var(--sig-pink);}50%{box-shadow:0 0 16px var(--sig-pink),0 0 28px var(--sig-pink);}}
@@ -1579,12 +1647,14 @@
   }
   .fs-arrow::before{                              /* chrome cap */
     content:'';position:absolute;inset:0;border-radius:5px;
-    background:linear-gradient(180deg,#c8d8e2,#5c6c78 55%,#26313a);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.6);
+    background:var(--hud-surface-raised);
+    border:1px solid var(--hud-border);
+    box-shadow:var(--hud-shadow-soft);
   }
   .fs-arrow svg{position:relative;z-index:1;width:15px;height:9px;
     filter:drop-shadow(0 0 4px color-mix(in srgb,var(--acc) 80%,transparent));}
-  .fs-arrow svg path{fill:var(--acc);}
+  .fs-arrow svg path{fill:var(--hud-text-dim);}
+  .fs-arrow:hover:not(:disabled) svg path{fill:var(--hud-accent);}
   .fs-arrow:hover:not(:disabled)::before{filter:brightness(1.18);}
   .fs-arrow:active:not(:disabled){transform:translateY(1px);}
   .fs-arrow:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4);}
@@ -1597,12 +1667,14 @@
      (docs/HUD_SPEC.md). ============================================== */
   .fs-max{position:absolute;left:var(--fs-x-max);top:580px;width:var(--fs-w-max);height:48px;padding:0;
     border:none;border-radius:50%;cursor:pointer;z-index:60;
-    background:radial-gradient(circle at 36% 28%,#2a2410,#0d0b04 72%);
-    box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);
+    /* Was an amber well, the only warm control in a cool row. */
+    background:var(--hud-surface-raised);
+    border:1px solid var(--hud-border);
+    box-shadow:var(--hud-shadow-soft);
     display:flex;align-items:center;justify-content:center;}
   .fs-max .cap{
     font-family: var(--fs-font-numeric);font-size:.62rem;font-weight:800;letter-spacing:.02em;
-    color:#ffe58a;text-shadow:0 0 6px var(--sig-gold);
+    color:var(--hud-text);text-shadow:none;
   }
   .fs-max:hover:not(:disabled){filter:brightness(1.2);}
   .fs-max:active:not(:disabled){transform:translateY(1px);}
@@ -1614,14 +1686,14 @@
      values are inert when wrapped there but kept in sync for clarity. ==== */
   .fs-menu{position:absolute;left:var(--fs-x-menu);top:582px;width:var(--fs-w-menu);height:44px;z-index:60;
     padding:0;border:none;cursor:pointer;border-radius:9px;
-    background:linear-gradient(160deg,#c6d6e0,#55656f 52%,#222c34);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.55);
+    background:var(--hud-border);
+    box-shadow:var(--hud-shadow-soft);
     display:flex;align-items:center;justify-content:center;}
-  .fs-menu .inset{width:35px;height:35px;border-radius:6px;
-    background:radial-gradient(circle at 38% 30%,#15222b,#070d14 72%);
+  .fs-menu .inset{width:calc(100% - 2px);height:calc(100% - 2px);border-radius:8px;
+    background:var(--hud-surface-raised);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     box-shadow:inset 0 0 8px rgba(0,0,0,.7);}
-  .fs-menu .bar{width:16px;height:2px;border-radius:1px;background:var(--acc);
+  .fs-menu .bar{width:16px;height:2px;border-radius:1px;background:var(--hud-text-dim);
     box-shadow:0 0 5px color-mix(in srgb,var(--acc) 80%,transparent);}
   .fs-menu:hover .bar{filter:brightness(1.3);}
   .fs-menu:active{transform:translateY(1px);}
@@ -1661,27 +1733,42 @@
   .fs-turbo svg{width:34px;height:34px;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
 
+  /* R119: THE THREE-STEP ESCALATION IS PRESERVED EXACTLY AS A CONCEPT, only
+     its hue changes. turbo_intensity_gate.mjs screenshots the real composited
+     control at each tier and asserts mean relative luminance rises
+     monotonically with a real contrast step between adjacent states, so the
+     steps below are deliberately spaced the same way - dark, lit, bright.
+     What goes is the AMBER: TURBO was the only warm control in a cool row and
+     it sits outside the panel where it stands alone. It now escalates through
+     the single shell accent instead. */
+
   /* Step 1 of 3, Normal. Resting: a dim bolt on a near-black face, no glow. */
   .fs-turbo[data-speed="normal"] .fs-face{
-    background:radial-gradient(circle at 36% 28%,#241505,#070502 72%);
-    box-shadow:inset 0 2px 3px rgba(255,255,255,.08),inset 0 -6px 12px rgba(0,0,0,.78);}
-  .fs-turbo[data-speed="normal"] svg path{fill:rgba(255,178,100,.40);}
+    background:var(--hud-surface-sunken);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 -6px 12px rgba(0,0,0,.6);}
+  .fs-turbo[data-speed="normal"] svg path{fill:var(--hud-text-dim);}
 
-  /* Step 2 of 3, Turbo. The face warms, the bolt lights, a glow appears. */
+  /* Step 2 of 3, Turbo. The face lifts, the bolt takes the accent, a glow appears. */
   .fs-turbo[data-speed="turbo"] .fs-face{
-    background:radial-gradient(circle at 36% 28%,#96601b,#2a1808 72%);
-    box-shadow:inset 0 2px 4px rgba(255,225,180,.3),inset 0 -6px 12px rgba(0,0,0,.5);}
-  .fs-turbo[data-speed="turbo"] svg path{fill:#ffc266;}
-  .fs-turbo[data-speed="turbo"]{filter:drop-shadow(0 0 16px rgba(255,125,30,.78));}
+    background:radial-gradient(circle at 36% 28%,
+      color-mix(in srgb,var(--hud-accent) 34%,#0b1018),
+      color-mix(in srgb,var(--hud-accent) 8%,#05080e) 72%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -6px 12px rgba(0,0,0,.45);}
+  .fs-turbo[data-speed="turbo"] svg path{fill:var(--hud-accent);}
+  .fs-turbo[data-speed="turbo"]{
+    filter:drop-shadow(0 0 14px color-mix(in srgb,var(--hud-accent) 60%,transparent));}
 
-  /* Step 3 of 3, Super Turbo. The bolt goes white hot, the face is at its
-     brightest, and the glow grows in radius and gains a second wider pass. */
+  /* Step 3 of 3, Super Turbo. The bolt goes white, the face is at its brightest,
+     and the glow grows in radius and gains a second wider pass. */
   .fs-turbo[data-speed="super"] .fs-face{
-    background:radial-gradient(circle at 36% 28%,#ffb43c,#5e3410 72%);
-    box-shadow:inset 0 2px 8px rgba(255,248,232,.62),inset 0 -6px 12px rgba(0,0,0,.3);}
-  .fs-turbo[data-speed="super"] svg path{fill:#fffaf0;}
+    background:radial-gradient(circle at 36% 28%,
+      color-mix(in srgb,var(--hud-accent) 88%,#ffffff),
+      color-mix(in srgb,var(--hud-accent) 40%,#0b1018) 72%);
+    box-shadow:inset 0 2px 8px rgba(255,255,255,.5),inset 0 -6px 12px rgba(0,0,0,.25);}
+  .fs-turbo[data-speed="super"] svg path{fill:#ffffff;}
   .fs-turbo[data-speed="super"]{
-    filter:drop-shadow(0 0 24px rgba(255,160,60,1)) drop-shadow(0 0 46px rgba(255,100,25,.72));}
+    filter:drop-shadow(0 0 22px color-mix(in srgb,var(--hud-accent) 95%,transparent))
+           drop-shadow(0 0 44px color-mix(in srgb,var(--hud-accent) 60%,transparent));}
 
   /* ===== AUTOPLAY - chrome knob. OWNER AUDIT ROUND 3 item 7: docked as a
      circle tangent to SPIN's right edge (x1111 = SPIN's left 1027 + its own
@@ -1710,18 +1797,22 @@
      spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
   .fs-spin{position:absolute;left:var(--fs-x-spin);top:562px;width:var(--fs-w-spin);height:84px;z-index:61;
     padding:0;border:none;cursor:pointer;border-radius:50%;
-    background:conic-gradient(from 216deg,#e7f1f7,#8fa3b1,#333f49,#6d8090,#eef5fa,#47565f,#a4b7c3,#e7f1f7);
-    box-shadow:0 4px 14px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),
-               0 0 20px color-mix(in srgb,var(--acc) 55%,transparent);
+    /* SPIN stays the dominant control, but through SIZE (84px, the largest in
+       the row) and through being the only control carrying the accent - not
+       through an eight-stop brushed-metal disc. */
+    background:var(--hud-border-strong);
+    box-shadow:var(--hud-shadow),
+               0 0 16px color-mix(in srgb,var(--hud-accent) 30%,transparent);
     transition:transform .12s ease,box-shadow .15s ease;}
-  .fs-spin .ring{position:absolute;inset:5px;border-radius:50%;
-    border:2px solid var(--acc);box-shadow:0 0 12px var(--acc),inset 0 0 10px color-mix(in srgb,var(--acc) 50%,transparent);}
-  .fs-spin .dome{position:absolute;inset:9px;border-radius:50%;
-    background:radial-gradient(circle at 36% 28%,#1a3a44,#05131b 70%);
-    box-shadow:inset 0 3px 5px rgba(255,255,255,.16),inset 0 -8px 16px rgba(0,0,0,.75);
+  .fs-spin .ring{position:absolute;inset:3px;border-radius:50%;
+    border:2px solid var(--hud-accent);
+    box-shadow:0 0 10px color-mix(in srgb,var(--hud-accent) 45%,transparent);}
+  .fs-spin .dome{position:absolute;inset:6px;border-radius:50%;
+    background:var(--hud-surface-raised);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
     display:flex;align-items:center;justify-content:center;}
   .fs-spin .glyph{width:30px;height:30px;}
-  .fs-spin .glyph.play path{fill:var(--acc);filter:drop-shadow(0 0 6px var(--acc));}
+  .fs-spin .glyph.play path{fill:var(--hud-accent);}
   .fs-spin .glyph.arrows{display:none;}
   .fs-spin .glyph.arrows path{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;
     filter:drop-shadow(0 0 6px var(--acc));}
@@ -1829,24 +1920,26 @@
      steps, so the row's shape never changes and only its intensity does. */
   .m-turbo-item[data-speed="normal"] {
     background: rgba(0, 0, 0, 0.22);
-    box-shadow: inset 3px 0 0 rgba(255, 200, 150, 0.26);
+    box-shadow: inset 3px 0 0 var(--hud-border-strong);
   }
-  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: rgba(255, 200, 150, 0.5); stroke-width: 1.8; fill: none; }
+  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--hud-text-dim); stroke-width: 1.8; fill: none; }
 
   .m-turbo-item[data-speed="turbo"] {
-    background: linear-gradient(90deg, rgba(255, 154, 46, 0.48), rgba(255, 154, 46, 0.12));
-    box-shadow: inset 3px 0 0 #ff9a2e;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 42%, transparent),
+                                        color-mix(in srgb, var(--hud-accent) 10%, transparent));
+    box-shadow: inset 3px 0 0 var(--hud-accent);
   }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: #ffc266; stroke-width: 1.8; fill: rgba(255, 154, 46, 0.55); }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt { filter: drop-shadow(0 0 6px rgba(255, 130, 30, 0.8)); }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--hud-accent); stroke-width: 1.8; fill: color-mix(in srgb, var(--hud-accent) 45%, transparent); }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hud-accent) 75%, transparent)); }
 
   .m-turbo-item[data-speed="super"] {
-    background: linear-gradient(90deg, rgba(255, 186, 74, 0.82), rgba(255, 150, 50, 0.26));
-    box-shadow: inset 4px 0 0 #fffaf0, 0 0 18px rgba(255, 140, 40, 0.55);
-    color: #1a0d02;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 80%, transparent),
+                                        color-mix(in srgb, var(--hud-accent) 24%, transparent));
+    box-shadow: inset 4px 0 0 #ffffff, 0 0 18px color-mix(in srgb, var(--hud-accent) 55%, transparent);
+    color: #04070d;
   }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #fffaf0; stroke-width: 1.8; fill: #ffdca8; }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt { filter: drop-shadow(0 0 10px rgba(255, 170, 70, 1)) drop-shadow(0 0 18px rgba(255, 100, 25, 0.7)); }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #ffffff; stroke-width: 1.8; fill: #ffffff; }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hud-accent) 95%, transparent)) drop-shadow(0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent)); }
 
   /* ── Audio panel - Mute toggle + MUSIC / SOUND volume sliders ─────────────── */
   .audio-panel {
@@ -2123,21 +2216,22 @@
     padding: 8px 6px;
     min-height: 52px;
     border-radius: 10px;
-    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), transparent 60%), #0c1220;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--hud-surface-sunken);
+    border: 1px solid var(--hud-border);
     position: relative;
   }
-  .p-stat.lit { border-color: color-mix(in srgb, var(--p-pink) 55%, transparent); }
-  /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, distinct
-     from .lit's stronger "there's an active win" state above. */
-  .p-stat--balance {
-    border-color: color-mix(in srgb, var(--p-cyan) 35%, transparent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--p-cyan) 20%, transparent);
+  .p-stat.lit {
+    border-color: color-mix(in srgb, var(--hud-accent) 55%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 22%, transparent);
   }
-  .p-stat--win {
-    border-color: color-mix(in srgb, var(--p-pink) 30%, transparent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--p-pink) 16%, transparent);
-  }
+  /* R119 SUPERSEDES THE "NEON LIFT" OF 2026-07-15. That pass gave each field a
+     persistent per-field neon edge - balance cyan, win magenta, bet gold - so
+     three adjacent plates carried three different colours at rest. The operator
+     shell spends the accent only on a live win, so the resting edge is now the
+     same neutral hairline on all three and the fields are told apart by their
+     LABELS, which is what labels are for. The .lit win state is kept and is now
+     the only coloured edge on the bar. */
+  .p-stat--balance, .p-stat--win { border-color: var(--hud-border); box-shadow: none; }
   .p-stat-label {
     font-size: 11px;
     font-weight: 700;
@@ -2182,9 +2276,9 @@
     padding: 8px 14px;
     min-height: 52px;
     border-radius: 10px;
-    background: linear-gradient(160deg, rgba(255, 215, 0, 0.08), transparent 60%), #0c1220;
-    border: 1px solid color-mix(in srgb, var(--p-gold) 30%, transparent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent);
+    background: var(--hud-surface-sunken);
+    border: 1px solid var(--hud-border);
+    box-shadow: none;
     transition: box-shadow 0.15s ease;
   }
   /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
@@ -2195,9 +2289,9 @@
     100% { box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent); }
   }
   .p-bet-stat.overboost-pulse { animation: overboost-bet-pulse 0.7s ease-out; }
-  .p-stat-value.cyan { color: color-mix(in srgb, var(--p-cyan) 20%, #fff); }
-  .p-stat-value.magenta { color: color-mix(in srgb, var(--p-pink) 22%, #fff); }
-  .p-stat-value.gold { color: color-mix(in srgb, var(--p-gold) 30%, #fff); }
+  .p-stat-value.cyan,
+  .p-stat-value.magenta,
+  .p-stat-value.gold { color: var(--hud-text); }
 
   .p-bet-row { display: flex; align-items: center; gap: 10px; }
   .p-bet-step {
@@ -2293,26 +2387,33 @@
      lit area as well as in brightness: a second, independent cue that survives
      a washed-out screen. Bolt grown 20px to 24px now the caption is gone. */
   .p-turbo svg { width: 24px; height: 24px; }
+  /* R119: the three steps and their spacing are unchanged - turbo_intensity_gate
+     asserts a real luminance step between adjacent tiers at seven presets - only
+     the hue moves from amber to the shell accent. */
   .p-turbo[data-speed="normal"] {
-    background: radial-gradient(circle at 36% 28%, #151d29, #04070d 72%);
+    background: var(--hud-surface-sunken);
   }
-  .p-turbo[data-speed="normal"] svg path { stroke: rgba(255, 200, 150, 0.5); fill: none; }
+  .p-turbo[data-speed="normal"] svg path { stroke: var(--hud-text-dim); fill: none; }
   .p-turbo[data-speed="turbo"] {
-    background: radial-gradient(circle at 36% 28%, #96601b, #22160a 72%);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--p-orange) 80%, transparent),
+    background: radial-gradient(circle at 36% 28%,
+      color-mix(in srgb, var(--hud-accent) 34%, #0b1018),
+      color-mix(in srgb, var(--hud-accent) 8%, #05080e) 72%);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent),
                 inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
   .p-turbo[data-speed="turbo"] svg path {
-    stroke: #ffc266;
-    fill: color-mix(in srgb, var(--p-orange) 55%, transparent);
+    stroke: var(--hud-accent);
+    fill: color-mix(in srgb, var(--hud-accent) 45%, transparent);
   }
   .p-turbo[data-speed="super"] {
-    background: radial-gradient(circle at 36% 28%, #ffb43c, #533008 72%);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--p-orange) 100%, transparent),
-                0 0 52px color-mix(in srgb, var(--p-orange) 55%, transparent),
+    background: radial-gradient(circle at 36% 28%,
+      color-mix(in srgb, var(--hud-accent) 88%, #ffffff),
+      color-mix(in srgb, var(--hud-accent) 40%, #0b1018) 72%);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--hud-accent) 95%, transparent),
+                0 0 52px color-mix(in srgb, var(--hud-accent) 55%, transparent),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
-  .p-turbo[data-speed="super"] svg path { stroke: #fffaf0; fill: #ffdca8; }
+  .p-turbo[data-speed="super"] svg path { stroke: #ffffff; fill: #ffffff; }
   .p-tier {
     font-size: 11px;
     font-weight: 800;
@@ -2323,7 +2424,7 @@
   .p-hamburger { display: flex; flex-direction: column; gap: 4px; }
   .p-hamburger-bar { width: 18px; height: 2px; border-radius: 1px; background: var(--p-acc); }
 
-  .p-max-cap { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--p-gold); }
+  .p-max-cap { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--hud-text); }
 
   /* SPIN - the single largest, most important control: 72px real diameter
      (well over the 64px floor the brief asks for), centred between the two
@@ -2428,28 +2529,32 @@
      steps as portrait at this strip's smaller 44px box. */
   .c-turbo svg { width: 22px; height: 22px; }
   .c-turbo[data-speed="normal"] {
-    background: radial-gradient(circle at 36% 28%, #151d29, #04070d 72%);
+    background: var(--hud-surface-sunken);
   }
-  .c-turbo[data-speed="normal"] svg path { stroke: rgba(255, 200, 150, 0.5); fill: none; }
+  .c-turbo[data-speed="normal"] svg path { stroke: var(--hud-text-dim); fill: none; }
   .c-turbo[data-speed="turbo"] {
-    background: radial-gradient(circle at 36% 28%, #96601b, #22160a 72%);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--c-orange) 80%, transparent),
+    background: radial-gradient(circle at 36% 28%,
+      color-mix(in srgb, var(--hud-accent) 34%, #0b1018),
+      color-mix(in srgb, var(--hud-accent) 8%, #05080e) 72%);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent),
                 inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
   .c-turbo[data-speed="turbo"] svg path {
-    stroke: #ffc266;
-    fill: color-mix(in srgb, var(--c-orange) 55%, transparent);
+    stroke: var(--hud-accent);
+    fill: color-mix(in srgb, var(--hud-accent) 45%, transparent);
   }
   .c-turbo[data-speed="super"] {
-    background: radial-gradient(circle at 36% 28%, #ffb43c, #533008 72%);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--c-orange) 100%, transparent),
-                0 0 52px color-mix(in srgb, var(--c-orange) 55%, transparent),
+    background: radial-gradient(circle at 36% 28%,
+      color-mix(in srgb, var(--hud-accent) 88%, #ffffff),
+      color-mix(in srgb, var(--hud-accent) 40%, #0b1018) 72%);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--hud-accent) 95%, transparent),
+                0 0 52px color-mix(in srgb, var(--hud-accent) 55%, transparent),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
-  .c-turbo[data-speed="super"] svg path { stroke: #fffaf0; fill: #ffdca8; }
+  .c-turbo[data-speed="super"] svg path { stroke: #ffffff; fill: #ffffff; }
 
   .c-tier { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(230, 245, 255, 0.85); }
-  .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--c-gold); }
+  .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--hud-text); }
 
   .c-menu-wrapper, .c-autoplay-wrapper { position: relative; flex: 0 0 auto; }
   .c-hud-menu, .c-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; left: auto; right: auto; transform: none; }
@@ -2469,11 +2574,14 @@
     padding: 2px 4px;
     height: 100%;
     border-radius: 8px;
-    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), transparent 60%), #0c1220;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--hud-surface-sunken);
+    border: 1px solid var(--hud-border);
     position: relative;
   }
-  .c-stat.lit { border-color: color-mix(in srgb, var(--c-pink) 55%, transparent); }
+  .c-stat.lit {
+    border-color: color-mix(in srgb, var(--hud-accent) 55%, transparent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--hud-accent) 20%, transparent);
+  }
   .c-stat-label {
     font-size: 11px;
     font-weight: 700;
@@ -2492,9 +2600,9 @@
     overflow: hidden;
     /* R059: ellipsis removed, same reasoning as .p-stat-value above. */
   }
-  .c-stat-value.cyan { color: color-mix(in srgb, var(--c-cyan) 20%, #fff); }
-  .c-stat-value.magenta { color: color-mix(in srgb, var(--c-pink) 22%, #fff); }
-  .c-stat-value.gold { color: color-mix(in srgb, var(--c-gold) 30%, #fff); }
+  .c-stat-value.cyan,
+  .c-stat-value.magenta,
+  .c-stat-value.gold { color: var(--hud-text); }
 
   /* Balance gets extra flex-basis (2026-07-14b, caught via stress-value
      screenshot: "$1,000,000.00" was truncating with ellipsis at the default
@@ -2503,19 +2611,21 @@
      the two fields most likely to carry long currency strings. */
   /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, on top
      of each cell's pre-existing flex-basis tuning. */
-  .c-stat--balance {
-    flex: 1.4 1 0;
-    border-color: color-mix(in srgb, var(--c-cyan) 35%, transparent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--c-cyan) 18%, transparent);
-  }
-  .c-stat--win {
-    border-color: color-mix(in srgb, var(--c-pink) 30%, transparent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--c-pink) 14%, transparent);
-  }
+  /* R119 SUPERSEDES THE "NEON LIFT" OF 2026-07-15. That pass gave each field a
+     persistent per-field neon edge - balance cyan, win magenta, bet gold - so
+     three adjacent plates carried three different colours at rest. The operator
+     shell spends the accent only on a live win, so the resting edge is now the
+     same neutral hairline on all three and the fields are told apart by their
+     LABELS, which is what labels are for. The .lit win state is kept and is now
+     the only coloured edge on the bar. */
+  /* The flex-basis tuning below is GEOMETRY and is untouched: it was measured
+     against a $1,000,000.00 stress value. Only colour moves. */
+  .c-stat--balance { flex: 1.4 1 0; border-color: var(--hud-border); box-shadow: none; }
+  .c-stat--win     { border-color: var(--hud-border); box-shadow: none; }
   .c-stat--bet {
     flex: 1.6 1 0;
-    border-color: color-mix(in srgb, var(--c-gold, #ffd700) 30%, transparent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent);
+    border-color: var(--hud-border);
+    box-shadow: none;
     transition: box-shadow 0.15s ease;
   }
   @keyframes overboost-bet-pulse-compact {
