@@ -26039,3 +26039,205 @@ It is the single compromise in the session and it is a budget compromise, not a 
 - **The four refused strips were not modified or partially salvaged.**
 - **Only 339,231 B of headroom remains**, against 1,749,883 at the start. The next asset change of
   any size needs something freed first.
+
+---
+
+# R127 - NOTHING FROM THE PACKAGE SHIPPED, AND THE BUDGET TURNED OUT TO MEAN TWO THINGS
+
+**2026-08-26. Branch `claude/r127-parallel-support`. Review lane.**
+
+Forty-seven runtime candidates arrived and none of them ship. Every refusal below is measured. The
+session's real output is two findings that were not in the brief: the 25MB budget means two
+different things depending on which tree you build, and a deploy from `main` renders the Overdrive
+meter with two needles today.
+
+## 1. WS1: budget first, and the budget is two numbers
+
+| | dist | headroom |
+|---|---:|---:|
+| CI, committed tree, what a deploy from main ships | 23,771,355 B = **22.67 MB** | **2,443,045 B** |
+| local, working tree, includes 30 uncommitted rasters | 25,875,171 B = **24.68 MB** | **339,229 B** |
+| gap | **+2,103,763 B** | |
+
+`npm run build` copies `frontend/public/**` straight off disk, so a LOCAL build measures the working
+tree. CI checks out the committed tree. With 30 uncommitted theme rasters in the tree those are
+different builds, and this gate reports different numbers for the same commit. The gap is the
+owner's work-in-progress art, entirely: `ui/scene_car.png` alone is +1,133,466 B of it, then
+`ui/gauge_face.png` +194,872, `ui/scene_character.png` +161,967, `symbols/m3_flame_sheet.png`
++130,066.
+
+**Confirmed against CI, not assumed**: the build diet job of run 32970759158 on `ca3b4818` reports
+`distSizeBytes: 23771355`, matching a prediction made from the file deltas to within 53 bytes.
+
+Neither number is wrong. **Plan against the smaller one**, because the uncommitted art is intended
+to land. R126's report quoted the local number without saying which tree it came from; that is
+corrected here rather than by rewriting R126. The trap is now documented at `DIST_BUDGET_BYTES` in
+`build_diet_verify.mjs`, where the next person measuring a budget will look.
+
+## 2. WS2: census
+
+47 runtime candidates, exactly as claimed: compact-banner 16 (585,411 B), features-glyph 6
+(56,261 B), gauge 2 (378,250 B), hero-masters 3 (2,343,948 B), particles 20 (102,278 B). A further
+23 files under `qa/` are contact sheets, source masters and reports: not runtime art.
+
+## 3. WS3: the Features glyph is good and has nowhere to go
+
+It passes the mark test: a front-facing grille/intake, not a turbo bolt, no baked text. It is
+refused because **there is no consumer**. R125 closed the guide mismatch by pointing the Interface
+Guide's Features row at `btn_features.png`, a headless capture of the live `.fm-entry-pill`, and the
+live control itself draws an INLINE SVG grille that is crisp at every scale and cannot be pruned
+from the bundle. Taking this raster would ship unreferenced art into a build with 339 KB of
+headroom. The brief anticipated exactly this: do not force a painted glyph back in once the guide is
+fixed with a live screenshot.
+
+## 4. WS4: the banner is not compact, and the one real slot is better filled today
+
+Measured live rather than assumed. The celebration banner `.c1-win` is **full stage width**, 1280 px,
+heights 111 / 140 / 172 by tier. Its raster consumers are exactly three: `c1-tier-burst` (from
+`ui/win/*`), `c1-shockwave` and `c1-coin` (both reusing the PARTICLE files).
+
+- **600x48 and 600x64 energy bars, 512x128 settle streaks: no slot exists.** Taking them means
+  writing new markup. A 600px-wide bar centred would also land squarely on `c1-amount`, which is
+  588.8 px wide and centred.
+- **256x256 centre-blooms: there IS a slot** (`c1-tier-burst`), and the candidates are measurably
+  weaker in it. Energy at the real draw size: mega candidate 21.56 against incumbent `bloom_mega`
+  42.23; epic candidate 24.71 against `burst_epic` 70.77. On big the candidate is punchier (26.70
+  against 19.00) but at 256px source into a 430px draw it upscales, where the incumbents are
+  665-819px.
+
+The whole set is 585,411 B against 339,229 of headroom, so it could not ship entire regardless.
+
+## 5. WS5: particles, judged at the size they are actually drawn
+
+**Every one of the four live targets is the owner's uncommitted work.** Installing candidates over
+`ui/particles/{spark,coin,shock_ring,smoke_puff}.png` destroys work that is not in git. That alone
+settles it, but the measurements do not support taking them either.
+
+| sprite | drawn at | source | candidate vs the owner's working-tree art |
+|---|---|---|---|
+| spark | 22x22 | 32px, already oversampled | +25% energy. Marginal, and invisible at 22px beyond shape and contrast |
+| coin | 16-30px randomised, 16 at once | 40px, downscaled | **worse** (103.25 against 108.85) |
+| shock_ring | **440-704px, a 3.4x to 5.5x upscale** | 128px | candidate also caps at 128px, so no resolution gain, and **72% fainter** (10.52 against 37.60, coverage 8.0% against 23.6%) |
+| smoke_puff | 90px at max opacity 0.5 | 56px | candidate is a bright blue bloom against a half-opacity deliberate blur: a different thing |
+
+`shock_ring` is the one sprite where resolution would genuinely pay, and it is the one the candidate
+most clearly loses. That is the faint filler the brief says to refuse.
+
+**Worth the owner's attention: their uncommitted particles beat what is committed in all four cases,
+sometimes heavily.** Spark energy 13.74 committed against 34.09 in the working tree; smoke_puff
+11.82 against 31.45, where the committed smoke_puff has peak luminance 0.0 and is effectively a
+black smudge. Committing them is a real improvement to what ships.
+
+## 6. WS6: THE GAUGE, AND THE DEFECT THAT SHIPS FROM main TODAY
+
+The candidate is refused three times over: it costs 378,250 B against 339,229 of headroom, both its
+targets are owner WIP, and it fixes something the owner has already fixed. Its face IS genuinely
+needle-free, which is the right gate.
+
+**But inspecting the live path, as the brief ordered, found the real problem.**
+
+A red-pixel test across all three faces:
+
+| face | strongly-red lit pixels |
+|---|---:|
+| **COMMITTED `gauge_face.png`** | **1,723** |
+| owner's working-tree face | 0 |
+| candidate face | 0 |
+
+The committed face carries a baked needle and arc spanning x 51..366, y 119..229 of a 464x464
+canvas. `BonusInstrumentColumn.svelte:85-88` and `FreeSpinsPresentation.svelte:513-514` then stack a
+**separately rotating** `gauge_needle.png` over it. **A deploy from `main` therefore renders two
+needles: the baked one frozen at 62 degrees, plus the real one.**
+
+**THE ROOT CAUSE, IN ONE SENTENCE: the pipeline has always produced the right file and the engine
+has always read the wrong one.** `scripts/assets/manifest.json` already declares the correct split -
+`match_transform: "rotate(62 512 512)"` pulls the needle group out to `out_only`, and the master with
+that group REMOVED goes to `out_base: ui/gauge_base.png` - and `build.py:90` emits it. But
+`gauge_base.png` has **zero references in `src/`**, does not exist on disk, and was once deleted as
+unreferenced, which cemented the defect. Meanwhile `manifest.json` also exports the WHOLE master,
+needle included, to `ui/gauge_face.png`, which is what both components read.
+
+Verified first-hand: `design-system/masters/H2_master_v31.svg:75` is
+`<g transform="rotate(62 512 512)">`.
+
+**A REGENERATION WOULD UNDO THE OWNER'S FIX.** Running the asset pipeline re-renders the whole master
+over `gauge_face.png`, replacing the owner's uncommitted needle-free art with a fresh two-needle
+composite. R127 added an inert `_doc_R127_HAZARD` note at that manifest entry so the next person sees
+it before regenerating. It changes no behaviour: `build.py` reads named keys only.
+
+**Not fixed here**, because the fix is either committing the owner's uncommitted art or regenerating
+into a tree full of it, and both are the owner's call under a fence that forbids sweeping
+placeholders.
+
+## 7. WS7: the punch does not fight the 16-frame win
+
+31 composed captures of the hero across the 1500ms reaction, identical fixed clip, once with
+`.hero-body[data-motion='win']` animating and once with it forced to `none`.
+
+| | punch ON | punch OFF |
+|---|---:|---:|
+| per-step change, mean | **6.871** | 4.828 |
+| per-step change, max | 24.348 | 20.423 |
+| spikiness (max/mean) | **3.54** | 4.23 |
+
+R122 diagnosed two motions FIGHTING as excursion rising while per-sample change FALLS. Here
+per-step change **rises 42.3%** with the punch on and spikiness **falls**. The punch adds motion on
+top of the frames rather than cancelling them, and it fills the still moments between discrete
+flipbook steps: with the punch off, 8 of 30 sampled steps show almost no change at all (0.03)
+because the sample lands inside a held frame; with it on, none do. The win punch is translation-led
+and the flipbook's motion is in the arms, so they sit on different axes, unlike R122's idle case
+where two LATERAL motions fought.
+
+**Left exactly as it is.** No tiny safe smoothness gain was available without another sheet, and
+another sheet is out of bounds this session.
+
+**A THIRD INSTRUMENT FAILURE OF THE SAME CLASS, CAUGHT BY A CONTROL.** The first run of this
+measurement returned 0.00 for every metric and an authoritative-sounding conclusion. The captures
+were fine, 31 distinct files, and the animation stepping worked. The ANALYSIS was broken:
+`omitBackground` did not yield transparency because the stage behind the hero is opaque, so alpha
+covered 100% of the clip and every silhouette mask was all-true. Re-run on RGB with an explicit
+control that a frame differs from itself by 0 and from its neighbour by more than 0. This is the
+third session running in which one of my own instruments produced a confident wrong answer, and the
+second in which it was a mask that measured nothing.
+
+## 8. WS8: QA
+
+Base idle on `hero_crossed_idle_6f.png` with `background-size: 1236px` (206 x 6). The 16-frame win
+resolves 16 distinct `background-position-x` values ending at -3090px. **60.3 fps.** Zero console
+errors, zero failed or 4xx requests. The feature path is exercised by `build_diet_verify`, which
+drives a real bonus buy and asserts zero console errors; my own probe could not drive the Overdrive
+store directly and that is a limitation of the probe, not a finding.
+
+Gates: `build_diet_verify` PASS (24.68MB local), `asset_reference_gate` PASS,
+`dead_wiring_scan` PASS, `dash_gate` PASS, `typecheck_baseline` PASS (0 errors),
+`audio_verify` ALL CHECKS PASS, `doc_currency_gate` PASS, `locked_paths_gate` PASS,
+`asset_guard --self-test` 11/11.
+
+Working tree: the 30 owner rasters are untouched, byte for byte.
+
+## 9. WS9: what should wait, and what is still open
+
+**Wait for the anticipation/lobby factory**: it does not exist on disk yet, so nothing was touched
+there. When it lands it will face the same budget question, and the answer depends entirely on
+whether the owner's WIP has been committed by then.
+
+**Publication gaps, unchanged by this session:**
+- **AUDIO IS THE LARGEST ONE.** The four stems mapped in R125 still do not exist:
+  feature_enter, feature_end, retrigger, win_max. Their hooks are wired and silent. The route is
+  `tools/audio_forge/` in this repo, verified runnable, and the blocker is a decision about the
+  Stability licence's revenue ceiling, not files.
+- **The two-needle gauge ships from main.** Section 6.
+- The 24-frame hero win, refused at R126 on budget: +3,353,011 B, which does not fit either budget.
+- The brace variant from R126, +521,988 B: fits the committed-tree headroom today, does not fit the
+  working-tree one, and needs its endpoints anchored first.
+- Max win still covers the hero. Eight sessions.
+- **Nothing in CI measures hero animation, particle punch, or gauge correctness.**
+
+## 10. What R127 did not do
+
+- **Took nothing.** Not a hedge: five categories, each refused with measurements.
+- Did not fix the two-needle gauge, for the reason in section 6.
+- Did not touch the owner's uncommitted art in any way.
+- Did not spend the last of the headroom on the optional brace variant.
+- Made exactly two changes, both documentation: the two-budget trap in `build_diet_verify.mjs` and
+  the regeneration hazard in `manifest.json`.

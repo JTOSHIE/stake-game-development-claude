@@ -22,7 +22,8 @@
     {"src": "brand_mark.svg",          "out": "ui/brand_mark.png",         "w": 512,  "h": 512},
     {"src": "brand_mark.svg",          "out": "ui/brand_mark_glyph.png",   "w": 192,  "h": 192},
     {"src": "M2_master_v2.svg",        "out": "ui/feature_button.png",     "w": 224,  "h": 224},
-    {"src": "H2_master_v31.svg",       "out": "ui/gauge_face.png",         "w": 464,  "h": 464},
+    {"_doc_R127_HAZARD": "THIS ENTRY IS WHY THE OVERDRIVE METER SHOWS TWO NEEDLES, AND RUNNING build.py WILL RE-CREATE THE DEFECT. It renders the WHOLE H2 master, whose needle group is baked in at rotate(62 512 512) (H2_master_v31.svg:75), into ui/gauge_face.png. Both live draw sites (BonusInstrumentColumn.svelte:85 and FreeSpinsPresentation.svelte:513) then stack a SEPARATELY ROTATING ui/gauge_needle.png on top of it, so a player sees the baked needle frozen at 62deg plus the real one. The entry below already declares the correct split (out_only: the needle alone, out_base: ui/gauge_base.png with the needle removed) and build.py:90 emits it, but gauge_base.png has 0 references in src/ and was deleted once as unreferenced, which cemented the bug. As of 2026-08-26 the working tree carries an uncommitted, needle-FREE gauge_face.png; running the asset pipeline would overwrite that fix with a fresh two-needle composite. Fix the components to read the needle-free base (or commit the needle-free face) BEFORE regenerating.",
+     "src": "H2_master_v31.svg",       "out": "ui/gauge_face.png",         "w": 464,  "h": 464},
     {"src": "scene_character_car.svg", "out": "ui/scene_character_car.png", "w": 1200, "h": 656}
   ],
   "layered": [

@@ -103,6 +103,24 @@ async function getFreePort() {
 function startPreview() { return _server }
 function killPreview() { return _server ? _server.close() : undefined }
 
+// R127: THIS NUMBER MEANS TWO DIFFERENT THINGS AND THEY DIFFER BY 2 MB. READ THIS
+// BEFORE PLANNING A BUDGET AGAINST IT.
+//
+// `npm run build` copies frontend/public/** straight off DISK, so a LOCAL run of this
+// gate measures the WORKING TREE. CI checks out the committed tree, so a CI run measures
+// what a deploy from main would actually ship. Whenever there is uncommitted art in
+// frontend/public/assets/, those are different builds and this gate reports different
+// numbers for the same commit.
+//
+// Measured 2026-08-26 at ca3b4818, with 30 modified-but-uncommitted theme rasters in the
+// working tree:
+//     CI (committed art)      23,771,355 B = 22.67 MB   headroom 2,443,045 B
+//     local (working tree)    25,875,171 B = 24.68 MB   headroom   339,229 B
+//     the gap is +2,103,763 B of owner work-in-progress art, entirely
+//
+// Neither number is wrong. Plan against the SMALLER one, because uncommitted art is
+// intended to land; but do not quote the local number as "what ships", and do not be
+// surprised when CI reports 2 MB less than your terminal did.
 const DIST_BUDGET_BYTES = 25 * 1024 * 1024
 
 function getDirSizeBytes(dir) {

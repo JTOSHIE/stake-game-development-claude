@@ -9,6 +9,68 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 125 - 2026-08-26 - R127: I took nothing from the support pack, and found two things that matter more than anything in it.
+
+**NOTHING SHIPPED, AND I THINK THAT IS THE RIGHT ANSWER.** Forty-seven candidates arrived. All five
+categories are refused, each with measurements, and the reasons are below. But two things I found
+while checking them matter more than the pack does.
+
+**FIRST: YOUR OVERDRIVE METER SHOWS TWO NEEDLES TO ANYONE WHO DEPLOYS FROM main, RIGHT NOW.** The
+committed gauge face has a needle painted into the artwork, and the game then spins a second, real
+needle on top of it. I counted the red pixels: 1,723 in the committed face, zero in the one sitting
+in your working folder. **You have already fixed this. It just is not committed**, so every clone,
+every CI run and every upload kit still builds the two-needle dial.
+
+The cause is almost funny. Your asset pipeline has always produced the correct file: the manifest
+literally describes pulling the needle out and exporting a needle-free base for the engine to spin
+the needle over. The engine has just never read it. That needle-free file has zero references in the
+code, is not on disk, and was once deleted for being unreferenced, which locked the bug in place.
+
+**And there is a trap attached: if anyone runs the asset build, it will paint the needle straight
+back over your fix.** I have put a loud note in the manifest at the exact line so the next person
+sees it before regenerating. I did not fix it myself, because the fix is either committing your art
+or regenerating on top of it, and both of those are yours to decide.
+
+**SECOND: THE 25MB BUDGET MEANS TWO DIFFERENT THINGS AND THEY ARE 2MB APART.** A build on this
+machine reads the files on disk, including your 30 uncommitted images. CI reads what is committed. So
+for the very same commit:
+
+- what CI and a real deploy see: **22.67 MB, with 2.44 MB spare**
+- what my terminal sees: **24.68 MB, with 0.32 MB spare**
+
+The 2MB gap is your work-in-progress art, almost half of it `scene_car` alone. I checked this against
+a real CI run rather than assuming, and the prediction matched to 53 bytes. Neither number is wrong,
+but I have been quoting the tight one at you, and that is the right one to plan with because your art
+is meant to land. It is now documented in the budget gate so nobody is caught out again.
+
+**WHY EACH PART OF THE PACK WAS REFUSED.** The Features glyph is genuinely good and genuinely a
+grille, not a bolt - but R125 already fixed that guide row with a photo of your real button, and the
+button itself draws a crisp SVG grille, so there is nowhere to put it. The compact banner assets
+assume a narrow bar; your banner is actually the full 1280px width, and the only art slots it has are
+the tier burst and the coins. The one asset that does fit a slot, the centre bloom, is half to a
+third as bright as what you already have. The particles all overwrite files you are still working on,
+and measured at the size they are actually drawn on screen the candidates lose - your coin is better
+than theirs, and their ring, which is the one sprite where a better source would genuinely show, is
+72% fainter than yours. The gauge costs more than the entire remaining budget on its own.
+
+**One thing worth your attention: your uncommitted particles are better than what is committed, in
+all four cases.** Your smoke puff is nearly three times brighter than the committed one, which is
+essentially a black smudge. Committing them is a straight improvement to what ships.
+
+**On R126's leftovers:** I checked whether the punch transform now fights the 16-frame win. It does
+not. It adds 42% more motion and is measurably *less* lurchy than the strip alone, and it fills the
+gaps between frames. Left alone.
+
+**I got one of my own measurements wrong again and want to flag the pattern.** My first attempt at
+that check returned all zeros and a confident conclusion. The captures were fine; my analysis was
+measuring a mask that covered the entire image, so it could not see anything. That is the third
+session running where one of my instruments produced a confident wrong answer, and the second time
+specifically a mask that measured nothing. I now put a control on every one of them.
+
+**Still the biggest gap: audio.** The four sounds from R125 still do not exist. The hooks are wired
+and silent, the tool to make them is in your repo and runs on this machine, and the only thing in the
+way is your decision on that licence.
+
 ## 124 - 2026-08-26 - R126: your win reaction is smooth at both ends now. I shipped a new fault first and a second pass caught it, so you are getting the corrected version.
 
 **THE PACKAGE IS HONEST.** 68 runtime frames exactly as claimed. Three folder names are wrong and
