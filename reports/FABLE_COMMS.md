@@ -9,6 +9,57 @@ Australian English, no em dashes or en dashes.
 
 ---
 
+## 120 - 2026-08-26 - R122: your idle finally changes pose. The other two strips have the hero's arms cut off at the edge of the canvas.
+
+**ONE OF THREE SHIPPED, AND IT IS THE ONE THAT RUNS MOST OF THE TIME.** The idle now does a real
+planted-foot weight shift, arms staying crossed, exactly as commissioned. Silhouette motion has gone
+0.278% (before R121) to 1.007% (R121's transform workaround) to **1.866%** now. And it cost you
+**nothing** - the new sheet is 685 KB SMALLER than the one it replaces, so your dist went DOWN to
+22.69 MB and headroom went UP to 2.31 MB.
+
+**THE POSE GENUINELY CHANGES NOW.** The cleanest way to show it: crossed arms sit inside the torso,
+unfolded arms stick out, so the width of the figure at chest height answers the question directly.
+Your live win reaction moves that width by **1 pixel** across the whole performance. The new
+unfold strip moves it by **68 pixels**. That is the difference between lighting and animation.
+
+---
+
+**BUT TWO STRIPS ARE REFUSED, AND NOT ON A NUMBER.**
+
+**The hero's arms are cut off by the edge of their own canvas.** On the win strip's frames 3 and 4
+there are **192 and 176 pixels of solid, flat-cut arm** lying against the left edge of the image. The
+feature brace loses both fists on frame 4. I zoomed in to be sure: the forearm's tube just ends in a
+hard vertical line where the canvas does.
+
+In game that becomes a roughly 58-pixel flat edge on a 407-pixel-tall character, sitting against your
+garage background. It would read as a rendering fault, not a celebration.
+
+**Nothing downstream can fix this.** Those pixels were painted past the edge and lost. Packing cannot
+bring them back, and insetting the figure just moves the amputation inboard, which looks worse.
+
+**Your package's QA is not wrong - it simply does not test for this.** It checks identity,
+first-frame-equals-last, ground stability and silhouette change. All four PASS on both broken
+strips. Edge contact is not among the things it looks at.
+
+**Worth saying plainly: the QA numbers themselves are sound.** They report 23.194% for the win strip
+where I measured 9.17%, and I was able to reproduce their figure to within 0.7% once I worked out
+they measure the maximum change against the rest pose as a share of the body, where I was measuring
+the average change between neighbouring frames as a share of the frame. Different conventions, both
+fair, not interchangeable.
+
+---
+
+**WHAT TO ASK FOR.** Both strips re-rendered with the arms inside the frame. Everything else about
+them is already right - identity, rest return, ground stability, and 12 times the motion of what you
+ship today. Do not let them change anything else.
+
+**And add one test to their suite**, because their existing four cannot catch this: for every frame,
+the number of pixels with any opacity in the first and last columns of the image must be **zero**.
+
+22 checks green, 60fps, zero console errors. PR on the review lane.
+
+---
+
 ## 119 - 2026-08-26 - R121: your hero's strips were never going to move him, so something else does. Head travel 1.3px to 12.6px.
 
 **THE FINDING THAT DECIDED THIS SESSION.** I measured every live hero state and all ten factory

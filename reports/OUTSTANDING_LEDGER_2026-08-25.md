@@ -4,6 +4,68 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0T. WHAT R122 CHANGED (pose-changing strip intake) AND WHY TWO OF THREE WERE REFUSED
+
+**SHIPPED: `hero_crossed_idle_6f.png`** - 6 frames, packed at **0.58** common scale, 394x780/frame,
+1,402,693 bytes replacing a 2,087,774-byte sheet: **net -685,081 bytes**. dist 23.47 -> **22.69 MB**,
+headroom **2.31 MB**, better than the session started with.
+THE IDLE FINALLY CHANGES POSE: planted-foot lateral weight shift, arms staying crossed. Silhouette
+motion 0.278% (R120) -> 1.007% (R121 transform workaround) -> **1.866%** (shipped).
+
+*** REFUSED, AND NOT ON A METRIC: `win-reaction-unfold` and `feature-brace` HAVE THE HERO'S ARMS CUT
+OFF BY THE EDGE OF THEIR OWN 680x1344 CANVAS. Fully opaque pixels lying in the first/last column:
+win frame 3 = 192px (y336-527), frame 4 = 176px (y346-534), frame 5 = 33px right, frame 6 = 24px
+right; feature-brace frame 4 = 51px left AND 56px right (y531-631). A 192px run of solid material
+flat against the boundary is a SEVERED LIMB - confirmed at 2x zoom, the forearm's tube ends in a hard
+vertical cut. At render scale that is a ~58px flat edge on a 407px figure at stage x=22, against the
+scene. THE PIXELS DO NOT EXIST IN THE SOURCE: packing cannot restore them, and insetting only moves
+the amputation inboard, which is worse. idle-weight-shift is clear of both edges on all 6 frames. ***
+
+*** THE PACKAGE'S OWN QA CANNOT SEE THIS. Its suite tests identity, first-frame-equals-last,
+ground-line stability and silhouette change - ALL FOUR PASS on both broken strips. EDGE CONTACT IS
+NOT AMONG THE THINGS IT LOOKS AT. Add to any future strip spec: for every frame, the count of pixels
+with alpha > 8 in column 0 and in the last column must be ZERO. ***
+
+**THE PACKAGE'S NUMBERS ARE SOUND, THE CONVENTION DIFFERS.** They report idle 10.742 / win 23.194 /
+feature 24.599; I measured 8.13 / 9.17 / 9.60 as maxima. Reproduced their figures to within 0.7%:
+they use **MAX XOR against the REST frame normalised by BODY pixels**; R121's floors were **MEAN
+change between CONSECUTIVE frames normalised by FRAME area**. Both legitimate, not interchangeable,
+theirs the more generous. Frame-count-independent path length: LIVE idle 2.05 / win 2.28 / energy
+2.61 vs NEW idle 16.89 / win 28.48 / feature 32.35 - all three carry 8x-12x the motion.
+
+**POSE-CHANGE TEST WORTH KEEPING:** crossed arms sit inside the torso, unfolded arms extend, so
+CHEST-BAND SILHOUETTE WIDTH answers "does the pose change" directly. LIVE win 137->138px (+1px
+across the whole reaction). NEW unfold 137->205px (+68px). NEW brace 137->203px (+66px). NEW idle
+137->137 (+0, correct - arms stay crossed).
+
+**SANITATION: ZERO RGB UNDER ALPHA 0 BOTH BEFORE *AND AFTER* THE RESAMPLE.** Before-only left a
+residual of 18 - a windowed-sinc resampler mixes opaque neighbours into pixels that end up
+transparent. The shipped sheet measures 0.
+
+**PACKING SCALE IS NOW A MEASURED CHOICE, NOT A HABIT.** R117 used 0.70; this ships 0.58. Rendering
+one master down to each realistic target, mean absolute error out of 255: at 206x407 (1x stage)
+0.70/0.58/0.50 give 0.0020/0.0023/0.0028; at 618x1221 (a 1.5x stage on a 2x display)
+0.0093/0.0140/0.0179. ALL are two orders of magnitude below visibility. **Source scale above 0.50
+buys nothing for this hero.**
+
+**THE R121 TRANSFORM WAS RETUNED, MEASURED:** a lateral rotation on top of a lateral weight shift is
+the R115 double-bob on a different axis. new strip alone 1.525%/4.350%/13.29px; + full R121 sway
+(1.05deg) 1.545%/7.025%/18.74px (per-sample silhouette FELL while excursion climbed - two motions
+cancelling at some phases, stacking at others); **+ 0.32deg de-loop (SHIPPED) 1.866%/4.813%/14.99px**
+- all three rise together. Kept, not removed, because the strip is a 6-frame loop on 4.4s and a 7.2s
+rotation beats against it so the loop never lands the same way twice. Its job is now DE-LOOPING.
+
+**MY OWN INSTRUMENT FAULTS:** (1) I stepped the TRANSFORM animation and left the FLIPBOOK running
+free - they live on different elements (.hero-body vs .hero-idle) and BOTH must be paused and
+stepped together; (2) my chest-width metric had a CEILING at the 206px capture box, so an overflowing
+figure read as exactly 206.0 regardless of pose - an implausibly round number is what led me to check
+the source canvas and find the severed limbs.
+
+### THE RE-RENDER REQUEST
+Both refused strips, same performance, arms inside the frame: **no opaque pixel touching column 0 or
+the last column on any frame**. Everything else about them is already correct (identity IoU 0.9930,
+f1==fN, ground drift 0px, 12x the incumbent motion) and must not change.
+
 ## 0S. WHAT R121 CHANGED (hero animation quality) AND THE FINDING THAT DECIDED IT
 
 *** THE FACTORY HERO STRIPS CANNOT MOVE HIM, AND IT IS MEASURED. Silhouette change per frame pair,
@@ -819,8 +881,12 @@ presence at 42% opacity in screen blend over the emblem". Safe form: a new win-o
 ## 0J. R112 - THE CROSSED-ARMS HERO IS BACK AND ANIMATED, AND THE PACKAGE HOLDS TWO FIGURES
 
 **DEFAULT HERO = the crossed-arms idle strip, played as a five-frame flipbook.**
-`frontend/src/lib/components/HeroIdle.svelte`, sheet `ui/hero/hero_crossed_idle_5f.png`
+`frontend/src/lib/components/HeroIdle.svelte`, sheet hero_crossed_idle_5f.png
 (3400x1344), `steps(5)` over `background-position-x`, 4.4s loop, same idiom as `FlameJets.svelte`.
+> **SUPERSEDED 2026-08-26 by R122**, recorded here rather than rewritten because this section is
+> R112's dated record of what was true then. The sheet named above no longer exists: it was a
+> lighting-only strip on a locked pose and is replaced by `ui/hero/hero_crossed_idle_6f.png`,
+> six frames, `steps(6)`, a real planted-foot weight shift. See section 0T.
 `SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default `'idle'`.
 
 **THE MASTER IS THE SHIPPED SPRITE.** `01-full-body-crossed-arms-master` vs

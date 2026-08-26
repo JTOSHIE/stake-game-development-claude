@@ -572,8 +572,12 @@ achievable from the modular parts. R112 resolved that from the art side instead.
 
 `SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default **`'idle'`**:
 
-- **`'idle'`** renders `HeroIdle.svelte`: a five-frame flipbook of the crossed-arms idle strip,
-  `steps(5)` over `background-position-x`, 4.4 s loop, sheet `ui/hero/hero_crossed_idle_5f.png`.
+- **`'idle'`** renders `HeroIdle.svelte`: a **six**-frame flipbook of the crossed-arms idle strip,
+  `steps(6)` over `background-position-x`, 4.4 s loop, sheet `ui/hero/hero_crossed_idle_6f.png`.
+  **AMENDED 2026-08-26 by R122**, which replaced the five-frame lighting-only strip with a
+  six-frame planted-foot weight shift: the earlier sheet changed the visor and chest glow on a
+  locked pose, this one moves the body. The component also carries a `.hero-body` transform
+  wrapper added in R121; see `reports/archive/2026-08-26_r122-pose-strips.md`.
 - **`'rig'`** is section 11's bone hierarchy, unchanged and still supported.
 - **`'static'`** is the original flat sprite.
 
