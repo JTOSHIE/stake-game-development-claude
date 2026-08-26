@@ -1,0 +1,60 @@
+{
+  "session": "R124",
+  "date": "2026-08-26",
+  "package": ".scratch/art-review/chatgpt-review-critical-closure",
+  "census": {"runtime_frame_candidates": 20, "features_icon_exports": 3, "banner_support": 6, "qa_only": 10},
+  "accepted": [
+    {
+      "source": "hero-v3-win-unfold",
+      "target": "frontend/public/assets/themes/future-spinner/ui/hero/hero_win_reaction_8f.png",
+      "frames": 8, "packed_scale": 0.58, "frame_px": "394x780",
+      "bytes": 1952154, "replaces_bytes": 1918408, "net_bytes": 33746,
+      "measured": {
+        "silhouette_mean_consecutive_frame_area_pct": 5.03,
+        "floor_pct": 5.0,
+        "floor_met": true,
+        "total_path_length_pct": 35.18,
+        "xor_vs_rest_body_normalised_pct": 30.63,
+        "chest_band_width_px": {"rest": 137, "peak": 193, "delta": 56},
+        "identity_iou_vs_live_rest": 0.9998,
+        "first_frame_equals_last": true,
+        "ground_drift_px": 0,
+        "residual_rgb_under_alpha_zero": 0,
+        "canvas_edge_px_alpha_over_8": 0,
+        "smallest_canvas_margin_px": 20,
+        "rendered_width_px": 193,
+        "hero_box_px": 206,
+        "smallest_box_margin_px": 6
+      },
+      "vs_r123_compact": {"mean_delta_pct": "3.25 -> 5.03", "path_pct": "22.76 -> 35.18",
+                          "xor_vs_rest_pct": "16.73 -> 30.63", "chest_delta_px": "+3 -> +56"},
+      "verdict": "ACCEPT. The first win strip to clear the >5% floor AND stay inside the canvas. R123's report asked for v1's gesture with v2's containment; this is it."
+    }
+  ],
+  "refused": [
+    {
+      "asset": "features-glyph 64/96/128",
+      "reason": "GLYPH COLLISION. The proposed mark is a LIGHTNING BOLT, which is already TURBO's glyph in this game and already appears THREE TIMES in the same interface guide (btn_turbo, btn_turbo_2, btn_turbo_3). Shipping it would put the same mark on two different controls in one list. It also does not match the live FEATURES control, which is a GRILLE (rect + three bars, FeatureMenu.svelte:196-199) and is the mark DESIGN_SYSTEM.md sanctions. The guide's job is to show the player the button they will actually see.",
+      "note": "The glyph is genuinely simpler and cleaner than the ornate feature_button.png badge it would replace. The objection is semantic, not aesthetic. The right fix is a capture of the live grille control, which is how every other row in this guide is produced."
+    },
+    {
+      "asset": "big/mega/epic-win-top-bottom-bars-1920x240",
+      "reason": "FULL-STAGE SURROUNDS THAT BURY CONTROLS - the fence's named refusal. Measured at every plausible scale: at the live banner's own width (522px) the bar covers 72% of the reels box; at stage width (1280px) it covers hero 53%, SPIN 77%, BET 46%, BALANCE 47%, the HUD panel 78% and the reels 56%. The live banner text plate is only 522x28 at (379,488), so there is no placement that frames it without covering something.",
+      "note": "The bars themselves are text-free with a clear centre (3.2% opaque in the centre band) and pass the baked-text and value-safety tests. They fail on geometry alone."
+    },
+    {
+      "asset": "strong-burst / quiet-settle / max-win-compact-centre-bloom (640x360)",
+      "reason": "NO PROBLEM TO SOLVE, AND A MEASURED INCUMBENT TO PROTECT. These would replace tier art that R113/R115 measured and placed deliberately so the three banner tiers read as three things rather than one growing thing, and whose contrast was already fixed (max headline 8.41 -> 11.05:1). The candidates carry far less centre light than the incumbents (strong-burst 0.0040 against burst_big's 0.1684) - safer for text, but there is no contrast failure to fix, and less presence is a presentation regression. quiet-settle is 0.1% opaque and effectively invisible.",
+      "note": "Refused as filler rather than as defective."
+    },
+    {
+      "asset": "optional-hero-extras/approval-nod",
+      "reason": "LIGHTING-ONLY. Mean silhouette change 0.23%, chest-band width delta 0px, XOR-vs-rest 1.33% - WEAKER than the live glance (0.34%) and an order of magnitude below every pose-changing strip. The package's own QA reports max 1.316% and a 1px chest delta, so this is not in dispute."
+    },
+    {
+      "asset": "optional-hero-extras/feature-active-ambient-life",
+      "reason": "LIGHTING-ONLY. Mean 0.66%, chest delta 0px, XOR-vs-rest 2.13%. The feature-active window is already filled by the R122 weight-shift idle; adding a near-identical lighting loop is noise without motion."
+    }
+  ],
+  "totals": {"net_bytes": 33746, "dist_mb": 23.31, "headroom_mb": 1.69}
+}
