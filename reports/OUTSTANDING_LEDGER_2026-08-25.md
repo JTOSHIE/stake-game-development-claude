@@ -4,6 +4,69 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 0P. WHAT R118 CHANGED (the perimeter tone-down) AND WHAT IT FOUND INSTEAD
+
+**THE PERIMETER IS TONED, WITH A MEASURED ANCHOR.** Held opacity 0.75 to **0.50** in
+frontend/src/App.svelte. R115 chose 0.75 by judgement and the archive says so outright, so there was
+no measured incumbent to defend. The anchor used instead is the brief's own requirement that the
+reels stay primary: **the perimeter band's mean relative luminance as a multiple of the reels'.** It
+was **2.54x** at 0.75 and is **1.44x** at 0.50. Below about 0.35 it reaches parity with the reels and
+stops reading as an energised edge, which is the floor.
+
+**THREE DECLARATIONS HARD-CODED 0.75** (App.svelte:2601 enter-end, :2604 settle-start, :2609 the
+reduced-motion branch **that no gate exercises**). All three moved together. **The 1.6s settle has a
+JavaScript twin, `overdriveSettleTimer` at App.svelte:586, 1600 ms** - the two must stay equal or the
+element unmounts mid-fade, so the duration was left alone. The settle FILTER
+(`brightness(0.64) saturate(0.21)`) was also left alone because R115 genuinely measured it from the
+kit's own settle accent, and that measurement was independently reproduced this session.
+
+**ENTRY KEEPS ITS OLD STRENGTH.** The in-animation now blooms to 0.75 at its 45% keyframe and relaxes
+to 0.50. Verified per animation frame: peak 0.746 at t=446ms, exactly 0.500 by t=926ms. Settle
+verified at 1590ms, 0.500 to 0.017, then unmount.
+
+**CLEARANCE, on HEAD art (the working-tree car is NOT HEAD's: silhouette IoU 0.6772, +0.0575 body
+luminance, so HEAD's car was swapped into `dist` only and the owner's WIP raster never touched):**
+hero wash cut **45.3%**, hero edge separation **-4.31% to -1.78%**; car wash cut 43.8% and the car
+**gains** from the perimeter (+2.97% to +2.73%) because the ring lights the ground around it more
+than the car itself.
+
+**THE REELS WERE NEVER TOUCHED BY THE PERIMETER. Not reduced - exactly zero**, on both the raster and
+the render. 100% of its light falls outside the `.game-frame` box. Its light dies completely beyond
+90 stage px from the edge, with 48.9% of it in the 16-40px core.
+
+**VIEWPORTS: 52.5-53.1% reduction at every landscape scale** (1920x1080, 1280x720, 1024x576,
+800x450). At **mini-player 400x225 all four edges fall outside the screen** so it was never visible
+there. **Portrait has no hero and no car** - `SceneGroup` is mounted only when `!portrait`, and
+`portrait` is a pure aspect test (`innerHeight > innerWidth`), not a width breakpoint - so hero/car
+clearance is a **landscape-only** question. Contrary to prediction, the perimeter IS visible in
+portrait: 4.69% of a 390x844 screen, measured at page level.
+
+### THE OPEN ITEM R118 RAISES AND DID NOT ACT ON
+
+**THE PERIMETER IS THE ONLY OVERDRIVE LAYER WITH NO ROUTE COLOURWAY.** It takes only
+`class:settling` - no `route-natural`, no `nitro-active` - so it stays teal-cyan (alpha-weighted RGB
+36,87,103 over the hero box) while the default `natural` feature goes green and `nitro` goes deep
+pink. **Dimming cannot fix a hue mismatch.** This is the strongest single explanation for the
+perimeter reading as stuck on, and the fix is one class binding plus one filter rule mirroring
+`.game-frame`. **Recommended as the next change.** Not done in R118 because the brief asked for a
+tone-down, not a re-colour.
+
+**THE TWO LARGEST FEATURE LAYERS ARE NOT THE PERIMETER.** (a) The entire 100vw x 100vh backdrop takes
+`hue-rotate(-95deg) saturate(1.15)` on the default route, a measured -80.3 degree mean hue swing
+behind the hero (App.svelte:3023-3025); by area this is the biggest change in the feature. **No
+Overdrive backdrop route ADDS light - all three are darker than base** - so an "overbearing" reading
+is a colour effect, not a brightness one. (b) The `.game-frame` pulse hue-rotates 185/280/305 degrees
+and saturates 1.3-1.7x over 43.9% of its overlap with the car box, animated on a 3s loop
+(App.svelte:3176-3205).
+
+### GAPS CONFIRMED BY READING EVERY GATE
+
+**NO GATE ANYWHERE MEASURES THE HERO OR THE CAR FOR LEGIBILITY, IN ANY STATE.** Every hero and car
+change since R110 is unprotected against regression. Related: `money_fit_gate.mjs` is the **only** CI
+gate that reaches a state where the perimeter exists at all; the retrigger gate drives the feature on
+the **replay** route, where `ReplayMode` renders instead of the game tree and the perimeter does not
+exist. `smallscreen_composition_gate.mjs` exists but **is not wired into CI**.
+
 ## 0B. WHAT R105 CHANGED (the runtime-true kit)
 
 **THE BANNER PAIR IS COMMITTED.** Raster and CSS landed together, which is the only CI-safe

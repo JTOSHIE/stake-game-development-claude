@@ -2579,8 +2579,21 @@
     pointer-events: none;
   }
 
-  /* Overdrive perimeter, R115. z41 puts it just above the grade and still below
-     the HUD at z50, so the controls always render over it. */
+  /* Overdrive perimeter, R115, toned in R118. z41 puts it just above the grade and
+     still below the HUD at z50, so the controls always render over it.
+
+     WHY THE HELD OPACITY IS 0.50 AND NOT R115's 0.75. R115 dialled 0.9 down to 0.75
+     by judgement; no number was ever attached to it. Measured on real renders of a
+     genuinely running feature, the perimeter band at 0.75 sat at 2.54x the mean
+     relative luminance of the reels it frames - the frame literally outshone the
+     game. At 0.50 it sits at 1.44x: still clearly brighter than the reels, so the
+     state still reads, but no longer dominant. It also halves the peak added light
+     (52.4% of the 0.75 peak) and takes the hero's silhouette separation back to its
+     perimeter-off baseline (-1.22% at 0.75, +0.03% at 0.50).
+
+     THE ENTRY STILL PEAKS AT 0.75. The complaint is the SUSTAINED state, not the
+     announcement, so the in-animation blooms to the old value and then relaxes.
+     Feature entry is as strong as it ever was; the dozen free spins after it are not. */
   .overdrive-perimeter {
     position: absolute;
     inset: 0;
@@ -2598,15 +2611,21 @@
   }
   @keyframes overdrive-perimeter-in {
     from { opacity: 0; filter: brightness(1.35) saturate(1.2); }
-    to   { opacity: 0.75; filter: none; }
+    45%  { opacity: 0.75; filter: none; }
+    to   { opacity: 0.5; filter: none; }
   }
+  /* The settle FILTER is left exactly as R115 measured it from the kit's own
+     separate settle accent (64% brightness, 21% saturation). Only the opacity it
+     departs from moves, which makes the cool-out softer for free. The 1.6s here
+     has a JavaScript twin - overdriveSettleTimer, 1600 ms - and the two must stay
+     equal or the element unmounts mid-fade. */
   @keyframes overdrive-perimeter-out {
-    from { opacity: 0.75; filter: none; }
+    from { opacity: 0.5; filter: none; }
     to   { opacity: 0; filter: brightness(0.64) saturate(0.21); }
   }
   @media (prefers-reduced-motion: reduce) {
     /* Hold it steady: the perimeter is a STATE, not a movement. */
-    .overdrive-perimeter { animation: none; opacity: 0.75; }
+    .overdrive-perimeter { animation: none; opacity: 0.5; }
     .overdrive-perimeter.settling { animation: none; opacity: 0; }
   }
 
