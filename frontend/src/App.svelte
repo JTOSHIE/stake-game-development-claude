@@ -2319,8 +2319,33 @@
       <div class="grid-slot">
         <div class="grid-scale">
           <GameGrid bind:this={gridRef} idleAttract={idleAttractActive} />
-          <!-- Suppress standard celebration while the max-win overlay is active -->
-          <WinCelebration winMultiplier={$isWincap ? 0 : $winMultiplier} />
+          <!-- Suppress standard celebration while the max-win overlay is active, and on any
+               round that played the FEATURE, which R135 added.
+               R135: WHAT WAS HAPPENING, AND R132 CAUSED IT RATHER THAN INHERITING IT. On a
+               feature round paying between 1x and 10x, WinCelebration mounts its small "WIN!"
+               flash for 1185ms ENTIRELY underneath the feature overlay. Measured per animation
+               frame on a real NITRO super buy (?mockCategory=super_win_small, 2.30x, the only
+               curated round in that band since every other triggered category pays 19.35x or
+               more): overlay present 952 to 11710ms, flash in the DOM 8115 to 9300ms, 60 of 60
+               frames with the overlay up. On the PRE-R132 build the two share ZERO frames, the
+               flash mounting 16ms AFTER the overlay unmounts. R132 moved the settle to the
+               end-banner reveal, which dragged the flash under the overlay with it, and R132's
+               own note filed this as pre-existing. It was not.
+               AND THE OVERLAY IS NOT WHAT HIDES IT. R132 called the overlay opaque; it is a
+               radial-gradient at alpha 0.72 to 0.92 and it transmits 19.6% of the flash's ink
+               (meanDelta 8.53 against 43.60 unoccluded), which at 1:1 reads as "WIN!" ghosting
+               behind "FEATURE COMPLETE". What actually hides it is the feature-end WinBanner at
+               z-index 100, whose 1280x111 band the flash sits entirely inside for its whole life;
+               with the banner counted, transmission falls to 1.57%. So the flash was invisible
+               only by ACCIDENT of an unrelated component's geometry, and any change to the band
+               would have re-exposed it. That is why this is suppressed at the source rather than
+               left to the band, and why a gate now asserts the flash is absent while the overlay
+               is up.
+               The flag is the one already used for exactly this purpose 29 lines below on
+               WinBanner: set inside runPendingFeatureSettle BEFORE settle(), so it is true on the
+               frame winAmount rises, and cleared at the top of every spin and buy, so base-game
+               flashes are untouched. -->
+          <WinCelebration winMultiplier={$isWincap || lastRoundHadFeature ? 0 : $winMultiplier} />
           <!-- Ways breakdown, cycles group by group after the win burst settles.
                Suppressed on a capped round for the same reason as the line
                above: its 1400ms cycle has no natural end and would otherwise
