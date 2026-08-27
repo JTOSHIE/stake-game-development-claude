@@ -27759,3 +27759,38 @@ both cases was a control, not a better threshold.
 - **`.booster-flicker` renders at opacity 1 under reduced motion**, brighter than its own
   animation's peak. Pre-existing, outside this brief.
 - **Audio remains the largest publication gap**, unchanged since R125.
+
+## 9. Remote CI, per rule 10
+
+**30 of 30 PASS on `1a62d18e`**, run
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33044146049
+(`browser: replay contract` 11m12s, inside its cap, no re-run).
+
+No red on this branch. The whole static-gates job was run locally before the push, which is
+now the standing habit for this project after R130 and R131 each had a prose failure caught
+that way; this round produced none.
+
+The SHA is named in the past tense rather than as "the tip", because a section recording a CI
+run is itself a commit and therefore always postdates the run it quotes. Every commit carrying
+CODE is verified by SHA; documentation-only commits after this line are not individually
+re-verified, which is a deliberate stopping rule.
+
+**Rule 12 does not apply:** nothing landed on `main`. This is PR #172 on the review lane.
+
+## 10. Back-to-back features, verified separately
+
+The new settle fires from a reactive statement on `liveEndBannerTrigger`, and that value
+persists across rounds - it is never reset - so the cross-round case needed its own proof
+rather than an argument. Two real bonus buys in one session:
+
+| | feature 1 | feature 2 |
+|---|---|---|
+| `__qaLog` grew by | 1 | 1 |
+| banner appears / settle fires | **same instant**, t=12601 | banner t=13823 |
+| max concurrent banners | **1** | **1** |
+| that round's own total revealed early | **no** | **no** |
+| final pod | $79.50 | $107.45 |
+
+`endBannerTrigger` has exactly ONE assignment in `FreeSpinsPresentation` - `+= 1` at the
+reveal - with no reset and no other write, so the only thing that can fire the statement is a
+reveal. Read first, then measured.
