@@ -23,23 +23,33 @@ sha256 of that listing. Reproducible from the kit alone.
 
 ## What is in it
 
-- `02_frontend_upload/` the built bundle, which is what goes to the portal
-- `03_branding/` the branding set
-- `00_READ_ME_FIRST_SECOND_VISIT.md` and `README.md` the owner's own instructions
-- `BUILD_INFO.json` version, commit, build time, file and byte counts, and the four gate
-  results the builder ran
+NOTE ON THE NAMES BELOW: these are folders and files INSIDE THE KIT, on the owner's Desktop.
+They are deliberately written without a leading path or a trailing slash, because they do not
+exist in this repository and the document-currency gate correctly reads a repo-shaped path that
+resolves to nothing as a dead reference. The kit's own README lists them in their real form.
+
+- the frontend-upload folder, holding the built bundle, which is what goes to the portal
+- the branding folder
+- the two read-me documents, which are the owner's own instructions
+- a build-info file recording version, commit, build time, file and byte counts, and the four
+  gate results the builder ran
 
 ## What is NOT in it, stated plainly
 
 **AUDIO IS INCOMPLETE.** The kit ships TWELVE sound files. FOUR cues are wired in the code and
 have no stem, so those moments are silent:
 
-| cue | fires when | expected path | file |
+The expected filename column is written as a bare stem name rather than a path, for the same
+reason as the section above: these files do NOT exist, that is the entire point of the table, and
+a path that resolves to nothing is exactly what the document-currency gate exists to catch. Each
+would live beside the twelve that do ship, in the theme's sounds folder.
+
+| cue | fires when | expected stem | file |
 |---|---|---|---|
-| `feature_enter` | the Overdrive feature begins | `sounds/feature_enter.mp3` | **MISSING** |
-| `feature_end` | the feature-end celebration | `sounds/feature_end.mp3` | **MISSING** |
-| `retrigger` | 3+ scatters during free spins | `sounds/retrigger.mp3` | **MISSING** |
-| `win_max` | the 5,000x cap | `sounds/win_max.mp3` | **MISSING** |
+| feature_enter | the Overdrive feature begins | feature_enter, mp3 | **MISSING** |
+| feature_end | the feature-end celebration | feature_end, mp3 | **MISSING** |
+| retrigger | 3+ scatters during free spins | retrigger, mp3 | **MISSING** |
+| win_max | the 5,000x cap | win_max, mp3 | **MISSING** |
 
 Confirmed by direct filesystem check, not inferred from the audio map. No silence is being
 described as finished sound, and no stem was generated: audio was out of scope for R137 and
