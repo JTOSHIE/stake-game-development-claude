@@ -39,9 +39,12 @@
   //
   // Both ends of both reactions are free. That is BETTER than it was: while the
   // idle animated, a reaction could be cut into from any of six frames, up to
-  // 10.242% / 37.312 away from rest (frame 04). Frozen on frame 01, the cut in
+  // 10.242% silhouette away from rest (frame 04). Frozen on frame 01, the cut in
   // is exactly the 0.000% above. The freeze target must therefore stay frame 01,
   // which `background-position-x: 0` on .hero-idle already supplies.
+  // (The RGB companion to that 10.242% is quoted as 37.312 in this session's
+  // commit message and is nearer 36.967 - it moves with the mask convention where
+  // the silhouette figure does not, so the silhouette number is the one to cite.)
   import { onMount, onDestroy } from 'svelte'
   import { winMultiplier, isSpinning } from '../stores/gameStore'
   import { overdriveVisual } from '../stores/overdriveVisual'
@@ -59,29 +62,40 @@
   // R130 REMOVED A FOURTH STATE, 'glance'. It was a 6-frame flipbook on a 24s
   // timer plus a body turn, and it was the last idle-state motion left after the
   // freeze. Two measurements retired it, neither of them about the tick - by the
-  // tick metric the glance was innocent, at 1.360% x 283ms against the idle's
-  // 18.75% x 733ms, some 36x calmer:
+  // tick metric the glance was innocent, at 1.255% x 283ms against the idle's
+  // 18.75% x 733ms, some 46x calmer. (That 1.255% is threshold-sensitive because
+  // the glance sheet has soft edges: it reads 1.378% at alpha>=64. The idle's
+  // 18.75% is stable across the same range. Compare the two only at one threshold.)
   //   1. Its body animation rotated -1.3deg about the feet and HELD that off-rest
-  //      for 680ms, displacing the head 9.10px - 2.12x the entire peak-to-peak
-  //      swing of the sway this session deleted, and 51.5% of the feature brace's
-  //      own peak. "No left-right pendulum" cannot mean only the small one, and
-  //      once the sway went this was the ONLY transform left in the idle state.
+  //      for 680ms, displacing the head 8.96px at the top of the box - just over
+  //      TWICE the entire peak-to-peak swing of the sway this session deleted, and
+  //      about half the feature brace's own peak. The ratio is scale-invariant on
+  //      the centreline and is exactly sin(1.3deg)/(2*sin(0.32deg)) = 2.03; an
+  //      earlier draft of this comment said 2.12, which reproduces from no probe
+  //      point on the sprite and contradicted the two numbers beside it (9.10/4.41
+  //      = 2.06). Check a ratio against its own operands before writing it down.
+  //      A pendulum rule cannot mean only the small pendulum, and once the sway
+  //      went this was the ONLY transform left anywhere in the idle state.
   //   2. Its art alone could not carry it. Across all six glance frames the
-  //      silhouette bbox is invariant and the centroid drifts 0.239px, worst step
-  //      1.360%: the head turn was sold entirely by the transform, so cutting the
-  //      transform alone would have left a strip nobody could see still holding
-  //      the state machine - and react() refuses every reaction while it does.
+  //      silhouette bbox is invariant and the centroid drifts 0.239px: the head
+  //      turn was sold entirely by the transform, so cutting the transform alone
+  //      would have left a strip nobody could see still holding the state machine
+  //      - and react() refuses every reaction while it does.
   //
   // A THIRD REASON WAS OFFERED AND IT WAS WRONG, RECORDED SO IT IS NOT RE-USED.
-  // Glance frame 01 measures 0.254% silhouette / 5.825 RGB from idle frame 01,
-  // where every win and brace endpoint is byte-identical to it, which looks like
-  // "the glance is the one strip that does not land on rest". It is not: the
-  // glance sheet is authored at 475x940 a frame where the other three are 394x780,
-  // so it takes a different downsample path into the 206x407 box. CONTROL: pushing
-  // the IDLE's own frame 01 through a 475x940 detour and back reproduces meanAbs
-  // 5.220 of that 5.537 (both eroded 5px to exclude edges) - 94% of the gap is the
-  // resampler, not the art. Measure a cross-sheet difference against a resample
-  // control before calling it a pose difference.
+  // Glance frame 01 sits a small but non-zero distance from idle frame 01, where
+  // every win and brace endpoint is byte-identical to it - which looks like proof
+  // that the glance is the one strip not landing on rest. It is not: the glance
+  // sheet is authored at 475x940 a frame where the other three are 394x780, so it
+  // takes a different downsample path into the 206x407 box. CONTROL: push the
+  // IDLE's own frame 01 through a 475x940 detour and back, and it lands 5.220 mean
+  // RGB from itself against the glance's 5.537 - both measured the same way, over
+  // the intersection eroded 5px to exclude edges. So 94.3% of the gap is the
+  // resampler, not the art. QUOTE BOTH SIDES OF A RATIO FROM THE SAME MASK: an
+  // earlier draft paired that 94% with an un-eroded 5.825, which is a different
+  // denominator (and does not itself reproduce under any single convention).
+  // Measure a cross-sheet difference against a resample control before calling it
+  // a pose difference.
   //
   // hero_glance_6f.png (1,655,215 B) is consequently an ORPHAN and still ships. It
   // was left on disk deliberately - reinstating it is a revert, not a re-render.
