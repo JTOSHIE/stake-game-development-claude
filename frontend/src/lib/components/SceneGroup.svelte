@@ -337,8 +337,34 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* R130: !important ON THE ANIMATION RESET, AND THE FREEZE IS WHY.
+       These resets are correct TODAY, but only on a tie broken by source order:
+       `.antenna-light` here is (0,1,0) and `.antenna-light` at its state rule is
+       also (0,1,0), so this block wins purely because it sits later in the file.
+       Any future rule that qualifies one of these by a parent, a state attribute
+       or a modifier class - `.char-layer--rig .antenna-light`, say - lands at
+       (0,2,0) and takes the animation straight back, with nothing failing.
+       That was survivable while these were minor accents on a hero that had a
+       flipbook and a sway of its own. R130 froze the hero, so .antenna-light and
+       .visor-glint are now the ONLY motion on the resting figure: if this reset
+       ever loses, a player who asked for reduced motion gets the single moving
+       thing on screen, with nothing else moving to hide it. My own freeze raised
+       the stakes on this reset, which is the same shape as R129's finding that
+       its data-tier work widened an accessibility hole one layer down.
+       !important makes the override unconditional rather than a specificity race
+       every future rule has to remember to lose. HeroIdle.svelte's own
+       reduced-motion block does this for the same reason.
+
+       ONE ELEMENT IN THE LIST IS NOT A SOURCE-ORDER TIE, AND THE !important DOES
+       CHANGE WHICH RULE WINS FOR IT - behaviour-neutrally, which is why it stays.
+       `.char-layer.char-idle-strip` above is more specific than this reset, so
+       before !important it OUTRANKED this block for .char-layer. It declares
+       `animation: none` itself, so the computed result was, and remains, none
+       either way; this is the one place in the R130 diff where a rule newly wins
+       where it used to lose, and it was checked rather than assumed. The six
+       other elements are the plain source-order tie described above. */
     .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
-      animation: none;
+      animation: none !important;
     }
     .underglow { opacity: 0.6; }
     .car-neon  { opacity: 0.5; }

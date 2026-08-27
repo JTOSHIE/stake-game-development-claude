@@ -1,5 +1,16 @@
 # The ticking hero, diagnosed and fixed
 
+> **SUPERSEDED IN PART BY R130, 2026-08-27.** Marked rather than rewritten, which is this project's
+> convention for dated records. **The DIAGNOSIS below is still correct and is what R130 acted on** -
+> the tick was temporal, it was the idle, and 733ms a frame is a slide show. **The FIX below is
+> GONE.** R129 halved the pops with a dual-buffer cross-dissolve; the owner's verdict on the result
+> was still "an amateur ticking clock", and their ruling was that bad motion scores worse than a
+> still. R130 therefore removed the idle flipbook, the 7.2s sway, the dissolve and the glance
+> outright and froze the hero on frame 01. Section 2 onward describes machinery that no longer
+> exists: `hero-cycle-idle`, `hero-dissolve-in`, `hero-sway-idle`, `.hero-layer-a`, `.hero-layer-b`.
+> The win unfold and the feature brace are untouched and still play. Live state is read from
+> `HeroIdle.svelte`, never from this file.
+
 **R129, 2026-08-27.** The owner's complaint was not "no movement". It was that movement exists and
 ticks. This is what the tick actually was, what fixed it, and what the fix does not cover.
 
