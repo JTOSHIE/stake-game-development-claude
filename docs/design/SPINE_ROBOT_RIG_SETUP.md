@@ -581,11 +581,11 @@ achievable from the modular parts. R112 resolved that from the art side instead.
   performances this hero has. Resting micro-life comes from `SceneGroup`'s own `.antenna-light`
   and `.visor-glint`, not from this component.
   *Superseded description, kept because the surrounding sections still refer to it:* a six-frame
-  flipbook, `steps(6)` over `background-position-x`, 4.4 s loop — amended 2026-08-26 by R122,
+  flipbook, `steps(6)` over `background-position-x`, 4.4 s loop, amended 2026-08-26 by R122,
   which replaced the five-frame lighting-only strip with a six-frame planted-foot weight shift.
   The `.hero-body` transform wrapper was added in R121 and still carries the reactions; see
   `reports/archive/2026-08-26_r122-pose-strips.md`.
-  **Only frame 01 of that six-frame sheet is now reachable** — see the R130 section of
+  **Only frame 01 of that six-frame sheet is now reachable**: see the R130 section of
   `reports/SESSION_REPORT.md` for the byte cost, which is unresolved and the owner's call.
 - **`'rig'`** is section 11's bone hierarchy, unchanged and still supported.
 - **`'static'`** is the original flat sprite.

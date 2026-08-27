@@ -26939,3 +26939,150 @@ comments (94ms, 186ms) were right and I was wrong. The ranking and every conclus
   in this report came from a throwaway harness written this session and deleted with it. That is now
   the single biggest gap in this area: R128, R129 and R130 each found a real hero defect that no gate
   could have caught, and the next one will be found the same way or not at all.
+
+## 14. Corrections after an adversarial pass over this session's own diff
+
+An attack pass was run against the shipped commit, with four independent attempts to break
+it and a judging round. **It found no regression and no fourth specificity tie**, which is
+the load-bearing result: the tie table was rebuilt from the repo's own Svelte compiler for
+both the original and the new file, and every surviving pairing has identical specificity
+before and after. Independent live confirmation: idle bounding-rect peak-to-peak 0.0000px
+over 10s, big win 16/16 frames, epic 16/16 with frames landing at 1593/1710/1827/1943ms,
+tier boundaries exact at 9x/10x/100x, brace 7/7 through a real bonus buy, and a return to
+the rest pose in all 25+ reaction runs.
+
+It also found **six wrong numbers in my own record**, and the pattern behind them is worth
+more than the numbers. Several were figures I took from a subagent and published without
+re-deriving. That is the R129 lesson ("a block labelled correction gets waved through")
+arriving in a new form: **an agent's number gets waved through.**
+
+| claim as published | actual | status |
+|---|---|---|
+| glance body turn is "2.12x the sway's peak-to-peak" | **2.03x** | corrected in source |
+| glance worst step "1.360%" | **1.255%**, and threshold-sensitive | corrected in source |
+| "94% of the 5.825 RGB gap is the resampler" | 94.3% of the **5.537** eroded gap; 5.825 was a different mask | corrected in source |
+| cut-in RGB companion "37.312" | **36.967** | corrected in source |
+| headroom "up 2,188 B" | **2,179 B** by a controlled same-tree A/B | corrected here |
+| commit headline "mean RGB change 0.0000" | true only with the sibling micro-life stilled | clarified here |
+
+The 2.12x is the instructive one. The ratio is scale-invariant on the centreline and is
+exactly `sin(1.3deg) / (2*sin(0.32deg))` = **2.0311**, and my own two published operands
+give 9.10/4.41 = 2.06. **The figure contradicted the two numbers standing beside it in the
+same sentence, and no probe point on the sprite yields all three.** Check a ratio against
+its own operands before writing it down.
+
+The last row is a fair criticism of emphasis rather than arithmetic. The PR table and
+section 2 above both give the shipped configuration (0.1151) beside the hero-alone zero, so
+the record is complete; the commit message's headline sentence is not, standing alone.
+
+### Two pre-existing defects found while attacking, both in the win path
+
+Both verified byte-identical to `main` at `419eace0`, so neither is introduced here, and
+neither is this brief's to fix. Reported to the owner on the PR.
+
+1. **An epic win in flight can be hijacked by the next round's tier.** `winTier` is assigned
+   *before* the `react()` guard runs, so although `react()` correctly refuses to interrupt,
+   `data-tier` has already flipped. The epic punch is replaced by a restarted big punch
+   mid-reaction and the figure jumps. The guard is on the wrong side of the assignment.
+2. **A win that settles during the feature brace is dropped and its round latch is still
+   consumed**, so it never plays. **R130 strictly reduced this**: the glance was a third way
+   to hold that gate closed, on a free-running 24s timer, and it is gone.
+
+### One cost this session created, quantified
+
+Only frame 01 of `hero_crossed_idle_6f.png` is now reachable. The sheet ships at
+1,402,693 B; frame 01 alone re-encodes to about 366,927 B, so roughly **1.0 MB is now
+unreachable raster**, about three times the build's remaining headroom. With the orphaned
+`hero_glance_6f.png` (1,655,215 B) that is ~2.7 MB recoverable. Not done here: cropping is
+an asset change on a pipeline with the owner's 30 WIP rasters in flight and a documented
+`npm run assets` regeneration hazard (R127), and it would turn reverting this session from
+a revert into a re-render. Owner's call.
+
+### A CI failure caused by a comment, and the gate was right
+
+The first push failed `static gates`. `locale_completeness_check`'s rendered-constant rule
+takes any `{UPPERCASE}` rendered in the markup, finds `const NAME =` in the script, and
+scans **the next 400 characters** for a player-facing literal. A new comment of mine reading
+`THE FORMULA MUST NOT BE "TIDIED"` sat inside that window after both `BOX_W` and `BOX_H` and
+was reported twice at `HeroIdle.svelte:1`. Zero runtime symptom, since Svelte strips it.
+Reworded without quotes, with the reason written beside it. **The whole static-gates job is
+now run locally before pushing**, which is what should have happened first: 74 of its 77
+steps pass here, and the other three are environment rather than code (two repo-root Python
+gates invoked from `frontend/`, and `dist_hygiene_gate` failing locally only because the
+build stamp records a dirty tree, which it always will while the owner's WIP sits
+uncommitted).
+
+## 15. Convention compliance, including three gaps closed late
+
+`CLAUDE.md` surfaced to this session partway through, after the first commits had landed.
+Where that left gaps they are closed here and named rather than quietly filled:
+
+- **(b)/(f) the brief is saved verbatim** at `reports/briefs/FS_R130_IdleFreeze_Prompt.md`.
+  It was not saved at session start; it is saved now, unedited. **Its own header reads
+  "R129" although R129 closed as PR #169 and this is R130.** Verbatim means verbatim, so the
+  header stands as received and the discrepancy is recorded here instead.
+- **(h) before and after proof screenshots** are committed to
+  `reports/screens/r130-idle-freeze/`.
+- **(i) the handover block** follows below.
+- **(k) explicit paths** on every commit, and the owner's 30 WIP rasters never staged.
+- **(l.3) every number above carries its source**, and section 14 exists because six of them
+  did not survive being re-derived.
+- **(t)/(t.1)** this is code, so review lane and a pull request, correctly.
+- **rule 12** does not apply: nothing landed on `main`, the work is a PR awaiting review.
+- **The header's no-dashes rule**: my own added lines carry zero em or en dashes across the
+  source files, the commit messages and this report. Two crept into my amendment of
+  `SPINE_ROBOT_RIG_SETUP.md` and are removed. **Five remain in that file and are
+  pre-existing on main** (lines 1, 101, 102, 223, 282); left alone as outside this brief.
+
+## 16. FOR THE NEXT SESSION
+
+**Model and effort.** Opus 5, high effort, ultracode on. Two multi-agent workflows: a
+four-reader measurement fan-out with a four-claim adversarial verify, and a four-attack
+self-check with a judging round.
+
+**Approach.** Measure first, decide from numbers, then delete. The change is almost entirely
+subtractive: 546 lines changed in `HeroIdle.svelte` against 247 insertions and 329 deletions
+across the whole diff, and the freeze is achieved by removing rules rather than adding any.
+
+**Alternatives tried and rejected.**
+- *Smoothing the idle further.* Rejected on the owner's ruling; R129 already did that and the
+  answer was still "ticking".
+- *Building a chest-lamp glow.* I measured the belt lamp array (x82 y179 w22 h8, four cyan
+  bars, fully opaque with 8px padding) and was about to add a CSS glow when the parent
+  component turned out to carry `.antenna-light` and `.visor-glint` already. Not building it
+  also avoided three separate critical risks: the parent's `drop-shadow` would have pulsed
+  with the glow, a glow carrying `data-motion` would have inherited every reaction animation,
+  and one without it would have escaped all three reduced-motion resets.
+- *Keeping the glance and cutting only its body turn.* Rejected: its art alone is invisible
+  (bbox invariant, centroid drift 0.239px), so that leaves a strip nobody can see still
+  holding the state machine for 1.7s.
+- *Cropping the idle sheet to one frame.* Rejected as an asset change; quantified in
+  section 14 and left to the owner.
+
+**Files touched.** `frontend/src/lib/components/HeroIdle.svelte`,
+`frontend/src/lib/components/SceneGroup.svelte`, `docs/design/HERO_SMOOTHNESS_R129.md`,
+`docs/design/SPINE_ROBOT_RIG_SETUP.md`, `reports/SESSION_REPORT.md`,
+`reports/briefs/FS_R130_IdleFreeze_Prompt.md`, `reports/screens/r130-idle-freeze/`.
+No asset was added, changed or deleted, and the owner's 30 WIP rasters are byte-identical to
+a session-start fingerprint.
+
+**Open threads, in the order I would take them.**
+1. **The two pre-existing win-path defects in section 14.** The tier-hijack is the sharper
+   one and the fix is small: move `winTier` inside `react()`, behind the same guard.
+2. **~2.7 MB of recoverable raster** (the unreachable idle frames plus the glance orphan),
+   against 340,099 B of headroom. Needs an owner decision because it is an asset change.
+3. **Audio is still the only large publication gap** - four R125 stems absent, hooks wired
+   and silent, blocker is the Stability licence decision.
+4. **Nothing in CI measures hero animation, smoothness or reduced-motion conformance**, and
+   `data-testid="hero-idle"` has zero consumers anywhere in the repo, so no gate exercises
+   this component at all. R128, R129 and R130 each found a real hero defect that no gate
+   could have caught. Every number in this report came from a harness written this session
+   and thrown away with it.
+5. The two-needle gauge, owner's to land. Max win still covers the hero, eleven sessions.
+
+**Banners, which workstream 5 asked about.** Not re-measured this session, so this is
+REPORTED rather than VERIFIED: R126 and R129 both recorded the win banner as covering the
+hero's head band, at 12.68% of the reaction's motion for the common big tier and 29.44% at
+epic. With the hero now still at rest, the banner is the most animated thing left in that
+region, so on the evidence available it is the next presentation hole. It deserves its own
+measured pass rather than an answer inherited from this one.
