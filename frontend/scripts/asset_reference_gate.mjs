@@ -161,6 +161,27 @@ function assetBasePaths() {
     for (const m of src.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]+\.[a-z0-9]{2,5})/g)) {
       found.push({ path: SHIPPING_THEME_BASE + m[1], where: rel })
     }
+    // R135: ONE LEVEL OF INDIRECTION, BECAUSE THE COMMENT THAT SAID THIS GATE GUARDED THE HERO
+    // SHEETS WAS FALSE. HeroIdle writes `{assetBase}/ui/hero/{SHEET[motion]}`, so the FILENAME is
+    // an interpolation and the literal-path matcher above cannot see it: `{` is not in its
+    // character class and never was. vite.config.ts and build_diet_verify both named this gate as
+    // "the real guard" for the pruned hero_glance_6f.png, and it could not see that file either
+    // way round. That is precisely the class R131 recorded when it claimed a prune guard that did
+    // not exist, recurring one layer down, which is why this closes the hole rather than only
+    // correcting the sentence.
+    // The form that actually occurs is a module-scope `const NAME: Record<..., string> = { k: 'f.png' }`
+    // beside a template using `${...}/dir/${NAME[expr]}`. Resolve exactly that: take the directory
+    // from the template and every string VALUE from the same-file map. Deliberately narrow, because
+    // a collector that over-reaches produces false "referenced" verdicts, and a false referenced is
+    // how an orphan keeps shipping.
+    for (const t of src.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]*\/)\{\s*([A-Za-z_$][\w$]*)\s*\[/g)) {
+      const [, dir, mapName] = t
+      const decl = new RegExp('\\b' + mapName + '\\b[^=]*=\\s*\\{([^}]*)\\}').exec(src)
+      if (!decl) continue
+      for (const v of decl[1].matchAll(/['"]([A-Za-z0-9_\-.]+\.[a-z0-9]{2,5})['"]/g)) {
+        found.push({ path: SHIPPING_THEME_BASE + dir + v[1], where: rel + ' (via ' + mapName + ')' })
+      }
+    }
   }
   return found
 }

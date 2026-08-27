@@ -201,12 +201,20 @@ function pruneLegacyAssets() {
     // rather than deleted from the REPOSITORY, deliberately: reinstating the glance
     // should stay a revert of HeroIdle.svelte plus these two lines, never a
     // re-render.
-    // WHICH GATE ACTUALLY GUARDS THIS, corrected at R131. R130 wrote that
-    // PRUNED_PREFIXES in build_diet_verify "turns any request into a hard failure",
-    // and that is true only IF a request happens: that check is RUNTIME, and the
-    // glance only ever loaded inside a state its headless session need not reach.
-    // The real guard is the STATIC asset_reference_gate, which R131 taught to read
-    // markup-interpolated assetBase paths - see the note at PRUNED_PREFIXES.
+    // WHICH GATE ACTUALLY GUARDS THIS, corrected AGAIN at R135, because R131's correction was
+    // itself an overclaim. R130 wrote that PRUNED_PREFIXES in build_diet_verify "turns any request
+    // into a hard failure", true only IF a request happens, since that check is RUNTIME and the
+    // glance only ever loaded inside a state a headless session need not reach. R131 replaced that
+    // with "the real guard is the STATIC asset_reference_gate", and THAT WAS FALSE TOO: the gate
+    // matched only a LITERAL path after the assetBase interpolation, while HeroIdle writes
+    // `{assetBase}/ui/hero/{SHEET[motion]}`, so the filename is itself an interpolation and `{` is
+    // not in the matcher's character class. The gate could not see this file either way round.
+    // R135 CLOSED THE HOLE RATHER THAN ONLY RESTATING IT. asset_reference_gate now resolves one
+    // level of indirection through a same-file `Record<..., string>` literal, which is the form
+    // that actually occurs here. PROVED by seeding in a scratch copy: with the glance restored to
+    // the SHEET map the gate resolves /ui/hero/hero_glance_6f.png, that path is absent from dist,
+    // and the gate goes red. Without the seed it resolves the three live sheets and nothing else.
+    // So the sentence is now true, and it was not true when R131 wrote it.
     'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
     // R131: the Overdrive perimeter border. Its only consumer was App.svelte, and
     // the owner ruled the border out for overlapping the hero and the car and making
@@ -215,6 +223,16 @@ function pruneLegacyAssets() {
     // bundle so it stops costing 461,912 B. Guarded by asset_reference_gate, which
     // now fails on a re-added reference in this exact form - proved by seeding one.
     'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
+    // R135: two genuine orphans, pruned rather than deleted for the same reason as the two above.
+    // R129 listed THREE files as "the genuine orphans ... 280,806 B total" and named frame-2.png
+    // among them. frame-2.png IS LIVE: themeStore.ts:75 sets `frame` to it for this theme, and it
+    // is present in dist. Acting on R129's list would have deleted a shipping asset. (The
+    // inventory pass that re-derived this cited App.svelte for that reference; the reference is in
+    // themeStore.ts, and the citation is corrected here rather than carried.) The real figure for the two that are actually unreferenced is
+    // 185,561 B. The wrong number survived five sessions because nobody re-derived it, which is
+    // the whole argument for re-deriving a parked claim instead of repeating its note.
+    'assets/themes/future-spinner/frames/frame-1.png',
+    'assets/themes/future-spinner/ui/subtitle.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()
