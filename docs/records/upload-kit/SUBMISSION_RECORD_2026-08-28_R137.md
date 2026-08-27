@@ -17,6 +17,15 @@ portal can be tied to a commit. The upload itself is the owner's action; no sess
 | **kit manifest sha256** | `7c2931727779c2e2082e612fa953ac0a3b3bcd43c2ea733e6f7959a9a8e2a942` |
 | timestamp of portal upload | *(to be filled by the owner)* |
 
+THE ONE-COMMIT LAG, named rather than left to be rediscovered, exactly as CLAUDE.md rule 12
+names it for the owner preview. This record is itself a commit, so a kit built before it is
+written is one commit behind the moment the record lands, and chasing that is a loop. The rule
+adopted here is the same one rule 12 settles on: BUILD THE KIT AS THE LAST ACTION OF THE CLOSE,
+after the final push, so the artefact on the Desktop carries the branch tip. The SHA in the table
+above is the tip at the moment of that final build. Every build in this session produced a
+BYTE-IDENTICAL payload, 102 files and 23,455,987 bytes, so a reader comparing an older stamp
+against a newer one is looking at the same shipped bytes with a different provenance line.
+
 REBUILT AT THE BRANCH TIP, deliberately. The first build stamped `578a3a51`, and two
 documentation-only commits landed after it. A kit whose stamp is not the tip is exactly the
 condition convention (o) and TR-062 exist to prevent, so it was rebuilt rather than explained
