@@ -104,7 +104,11 @@
   const BOX_W = 206
   const BOX_H = 407
 
-  // THE SPAN IS A ONE-SHOT SPAN, AND THE FORMULA MUST NOT BE "TIDIED".
+  // THE SPAN IS A ONE-SHOT SPAN, AND THE TWO FORMULAS MUST NOT BE UNIFIED.
+  // (No quoted word in this paragraph, deliberately: BOX_W and BOX_H are rendered
+  // in the markup below, so locale_completeness_check reads the 400 characters
+  // after their declarations looking for player-facing literals, and a quoted
+  // ALL-CAPS word here fails that gate with no runtime symptom at all.)
   //
   // A one-shot must END on its final frame and hold it. A plain steps(n) would
   // yield 0, 1/n ... (n-1)/n during play and then 1 at completion, and with
