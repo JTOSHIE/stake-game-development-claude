@@ -350,10 +350,17 @@
 
      GEOMETRY, MEASURED RATHER THAN EYEBALLED. The lamp is THREE bright cyan bars in a
      housing, core hull x85..103 / y179..185 in the 206x407 .char-layer box (a previous
-     count of four included the housing bezel's right shoulder). Every pixel within 8px
-     of that hull is fully opaque sprite, alpha 255, so the glow cannot reach the
-     silhouette edge even at its widest. The box below is the hull padded by 8px:
-     centre 45.87% / 44.84%, size 17% x 5.65%.
+     count of four included the housing bezel's right shoulder).
+
+     CONTAINMENT IS VERIFIED ON THE BOX BELOW, NOT ON A NOMINAL PADDING. An earlier
+     draft of this comment said "the hull padded by 8px", which is not what the rule
+     computes: 37.37% / 42.01% / 17% / 5.65% of 206x407 lands the box at x76.98..112.00
+     and y170.98..193.98, so the real margins are 8.0px left and top and 9.0px right
+     and bottom - the box centre sits half a pixel right of the hull centre. Measured
+     over those exact pixels (x76..113, y170..194, 888 px): minimum alpha 255, with
+     ZERO pixels below 250, against a positive control box straddling the silhouette
+     edge that correctly reports alpha 0. So the glow cannot reach the silhouette edge
+     and cannot contaminate the parent drop-shadow. Centre 45.87% / 44.83%.
 
      WHY IT DOES NOT TICK, which is the bar the brief sets. Three properties, each the
      opposite of what made the old idle tick: it is CONTINUOUS (an eased opacity ramp,
@@ -440,7 +447,22 @@
        which stops animations rather than trying to out-declare them. */
     animation: none;
     opacity: 0;
-    transition: opacity 120ms linear;
+    /* NO TRANSITION HERE, AND THE ABSENCE IS DELIBERATE. This rule carried
+       `transition: opacity 120ms linear` when it first shipped, and that was a THIRD
+       inert mechanism in the same declaration - after the missing :global() and the
+       animation-origin problem above. Cancelling an animation in the SAME style
+       change leaves no transitionable before-change value, so the fade could never
+       run: measured, the accents went 0.4304 -> 0.0000 in one 20ms frame with
+       transition-property already computing to `opacity 0.12s` on the element, while
+       a probe with the same declaration and no animation faded through seven
+       intermediate values in the same rAF loop. The exit was a hard cut by
+       construction too, since the declaration leaves with the rule.
+       Making it fade would need each accent wrapped in an unanimated div carrying
+       the transition, which is real machinery for a cross-fade at the one moment it
+       is least visible: the cut happens exactly as the hero launches a large
+       reaction and the win banner fires. So the suppression is a HARD CUT, on
+       purpose, and this comment says so rather than a dead declaration implying
+       otherwise. */
   }
 
   @media (prefers-reduced-motion: reduce) {
