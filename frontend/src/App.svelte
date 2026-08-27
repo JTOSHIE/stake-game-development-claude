@@ -572,20 +572,14 @@
   // paytable flip their accents from one source of truth.
   $: overdriveVisual.set(overdriveVisualActive)
 
-  // R115. The perimeter does not snap off with the feature: it cools. `settling`
-  // holds the same raster under a dim/desaturate filter for a beat after Overdrive
-  // clears, which is what the kit's separate settle accent depicts.
-  let overdriveSettling = false
-  let overdriveSettleTimer: ReturnType<typeof setTimeout> | undefined
-  $: {
-    if (overdriveVisualActive) {
-      clearTimeout(overdriveSettleTimer)
-      overdriveSettling = true
-    } else if (overdriveSettling) {
-      clearTimeout(overdriveSettleTimer)
-      overdriveSettleTimer = setTimeout(() => { overdriveSettling = false }, 1600)
-    }
-  }
+  // R131 REMOVED THE OVERDRIVE PERIMETER, AND `overdriveSettling` WENT WITH IT.
+  // R115 added a lit border raster around the whole stage for the feature, and this
+  // pair of variables existed for one purpose: to hold that raster on screen under a
+  // dim/desaturate filter for 1600ms after Overdrive cleared, so it cooled rather
+  // than snapping off. Nothing else ever read them - verified by grep before removal.
+  // The owner's ruling was that the border overlaps the hero and the car and makes
+  // the stage too busy, so the raster, its CSS, its two keyframes and this state
+  // machine are all gone together. See the note where the markup used to be.
 
   /** Build a presentation script from a raw event list (live) or a served round. */
   function scriptFromEvents(events: RawEvent[]): PresentationScript {
@@ -2227,25 +2221,29 @@
         ></div>
       {/if}
 
-      <!-- OVERDRIVE PERIMETER (R115), z41: the stage edge energises while the
-           feature runs. Deliberately a THIN border and deliberately below the HUD,
-           because the celebration kit's full-stage frames were refused for landing
-           on the tier label, the multiplier, the BET window and the SPIN button.
-           This is the shape that fits a layout with controls in its border.
+      <!-- THE OVERDRIVE PERIMETER USED TO MOUNT HERE (R115), AND R131 REMOVED IT.
+           It drew ui/win/overdrive_perimeter.png over the whole stage at z41 under
+           mix-blend-mode: screen - a lit tech border with eight tyre rosettes,
+           inset 0, held at opacity 0.50 with a 0.75 entry peak.
 
-           ONE raster covers both states. The kit ships a separate settle accent,
-           but it is the same frame at 64% brightness and 21% saturation (alpha
-           silhouette IoU 0.9932), so `settling` reproduces it with a filter: same
-           pixels, perfect registration, 782 KB saved. -->
-      {#if overdriveVisualActive || overdriveSettling}
-        <div
-          class="overdrive-perimeter"
-          class:settling={!overdriveVisualActive}
-          data-testid="overdrive-perimeter"
-          style="background-image: url('{$themeAssets.assetBase}/ui/win/overdrive_perimeter.png');"
-          aria-hidden="true"
-        ></div>
-      {/if}
+           WHY IT WENT. The owner's ruling: the feature borders overlap the hero and
+           the car, do not fill the screen, and make the stage too busy. Measured
+           before removing: its ink covered 21.5% of the stage, and it lit 11.08% of
+           the hero's own opaque silhouette - all of it in the BOTTOM THIRD (37.27%
+           of that third, 0.00% of the top and middle), i.e. his feet and lower legs,
+           plus the car across its whole width. Peak added luminance over the hero at
+           the held 0.50 was 0.476, so it was not subtle where it landed.
+
+           WHAT STILL SIGNALS THE FEATURE, so nobody re-adds this to fix a hole that
+           is not there: .game-frame takes .overdrive-active and runs
+           frame-pulse-overdrive, turning the reel frame from cyan to bright route
+           green - the single most obvious thing on the stage; the background
+           crossfades to bg_overdrive.jpg; the jets run their colourway; and the
+           instrument column shows OVERDRIVE FREE SPINS with a live count and the
+           multiplier. The border was a SECOND frame competing with the first.
+
+           The raster is kept on disk and pruned from the bundle, so restoring this
+           is a revert rather than a re-render. -->
 
       <!-- GRID, 522x349, centred inside the frame, z20 -->
       <div class="grid-slot">
@@ -2583,55 +2581,19 @@
     pointer-events: none;
   }
 
-  /* Overdrive perimeter, R115, toned in R118. z41 puts it just above the grade and
-     still below the HUD at z50, so the controls always render over it.
+  /* THE OVERDRIVE PERIMETER'S CSS LIVED HERE AND R131 DELETED ALL OF IT: the
+     .overdrive-perimeter rule, its .settling variant, @keyframes
+     overdrive-perimeter-in and -out, and their reduced-motion block. The markup
+     note further up records why, with the measurements.
 
-     WHY THE HELD OPACITY IS 0.50 AND NOT R115's 0.75. R115 dialled 0.9 down to 0.75
-     by judgement; no number was ever attached to it. Measured on real renders of a
-     genuinely running feature, the perimeter band at 0.75 sat at 2.54x the mean
-     relative luminance of the reels it frames - the frame literally outshone the
-     game. At 0.50 it sits at 1.44x: still clearly brighter than the reels, so the
-     state still reads, but no longer dominant. It also halves the peak added light
-     (52.4% of the 0.75 peak) and takes the hero's silhouette separation back to its
-     perimeter-off baseline (-1.22% at 0.75, +0.03% at 0.50).
-
-     THE ENTRY STILL PEAKS AT 0.75. The complaint is the SUSTAINED state, not the
-     announcement, so the in-animation blooms to the old value and then relaxes.
-     Feature entry is as strong as it ever was; the dozen free spins after it are not. */
-  .overdrive-perimeter {
-    position: absolute;
-    inset: 0;
-    z-index: 41;
-    pointer-events: none;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    mix-blend-mode: screen;
-    opacity: 0;
-    animation: overdrive-perimeter-in 0.9s ease-out forwards;
-  }
-  /* The measured settle: 64% brightness, 21% saturation of the active frame. */
-  .overdrive-perimeter.settling {
-    animation: overdrive-perimeter-out 1.6s ease-in forwards;
-  }
-  @keyframes overdrive-perimeter-in {
-    from { opacity: 0; filter: brightness(1.35) saturate(1.2); }
-    45%  { opacity: 0.75; filter: none; }
-    to   { opacity: 0.5; filter: none; }
-  }
-  /* The settle FILTER is left exactly as R115 measured it from the kit's own
-     separate settle accent (64% brightness, 21% saturation). Only the opacity it
-     departs from moves, which makes the cool-out softer for free. The 1.6s here
-     has a JavaScript twin - overdriveSettleTimer, 1600 ms - and the two must stay
-     equal or the element unmounts mid-fade. */
-  @keyframes overdrive-perimeter-out {
-    from { opacity: 0.5; filter: none; }
-    to   { opacity: 0; filter: brightness(0.64) saturate(0.21); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    /* Hold it steady: the perimeter is a STATE, not a movement. */
-    .overdrive-perimeter { animation: none; opacity: 0.5; }
-    .overdrive-perimeter.settling { animation: none; opacity: 0; }
-  }
+     R115 and R118's tuning history is deliberately NOT carried forward here. It was
+     a long argument about the right HELD OPACITY - 0.9, then 0.75, then a measured
+     0.50 - and every number in it describes an element that no longer exists. Kept
+     only as the reason the element is gone rather than dimmed further: R118 had
+     already taken it from 0.75 to 0.50 on measurement, and the owner still called
+     the stage too busy, so the answer was not a smaller number. That is the same
+     shape as R130's idle - when dialling a thing down twice does not satisfy, the
+     question is whether it should be there at all. */
 
   /* ===== OPERATOR SHELL TOKENS (R119, hoisted here by R120) ==================
      One declaration of the UI shell's material, inherited by EVERY component

@@ -103,6 +103,7 @@
     {/if}
     <div class="antenna-light" aria-hidden="true"></div>
     <div class="visor-glint" aria-hidden="true"></div>
+    <div class="chest-lamp" aria-hidden="true"></div>
   </div>
 </div>
 
@@ -336,6 +337,50 @@
     98%            { opacity: 0.6; }
   }
 
+  /* Chest lamp, R131. The third and last resting accent, and the only one below the
+     head: the antenna sits at the ocular pod and the glint on the visor, so a static
+     figure had both its signs of life in the top fifth of itself. This is the belt
+     lamp array on the abdomen.
+
+     IT IS A SIBLING OF <HeroIdle>, NOT A CHILD OF .hero-body, AND THAT IS DELIBERATE.
+     .hero-body carries filter: drop-shadow(), which is computed from its whole
+     subtree, so a glow child would have made the hero's SHADOW pulse with it - the
+     defect R129 shipped once by putting the shadow on two stacked layers. Out here
+     the shadow cannot see it, and it inherits the reduced-motion reset below for free.
+
+     GEOMETRY, MEASURED RATHER THAN EYEBALLED. The lamp is THREE bright cyan bars in a
+     housing, core hull x85..103 / y179..185 in the 206x407 .char-layer box (a previous
+     count of four included the housing bezel's right shoulder). Every pixel within 8px
+     of that hull is fully opaque sprite, alpha 255, so the glow cannot reach the
+     silhouette edge even at its widest. The box below is the hull padded by 8px:
+     centre 45.87% / 44.84%, size 17% x 5.65%.
+
+     WHY IT DOES NOT TICK, which is the bar the brief sets. Three properties, each the
+     opposite of what made the old idle tick: it is CONTINUOUS (an eased opacity ramp,
+     no discrete step - the tick was a 48.9-per-sample jump held 733ms); it changes NO
+     GEOMETRY (no transform, no scale, so silhouette change is exactly zero, where the
+     tick moved 18.75% of the silhouette); and its period is 7.4s, slower than both
+     existing accents and deliberately non-harmonic with them (2.8s and 6.0s) so the
+     three never land together and read as a pulse. Measured contribution is in the
+     R131 section of the session report; the headroom against the tick is ~400x. */
+  .chest-lamp {
+    position: absolute;
+    left: 37.37%;
+    top: 42.01%;
+    width: 17%;
+    height: 5.65%;
+    border-radius: 50%;
+    /* The lamp's own measured colour, mean RGB about (40, 205, 225). */
+    background: radial-gradient(ellipse, rgba(64, 226, 245, 0.85) 0%, rgba(40, 190, 225, 0.35) 45%, transparent 72%);
+    mix-blend-mode: screen;
+    opacity: 0.18;
+    animation: chest-lamp-breathe 7.4s ease-in-out infinite;
+  }
+  @keyframes chest-lamp-breathe {
+    0%, 100% { opacity: 0.16; }
+    50%      { opacity: 0.44; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     /* R130: !important ON THE ANIMATION RESET, AND THE FREEZE IS WHY.
        These resets are correct TODAY, but only on a tie broken by source order:
@@ -363,12 +408,18 @@
        either way; this is the one place in the R130 diff where a rule newly wins
        where it used to lose, and it was checked rather than assumed. The six
        other elements are the plain source-order tie described above. */
-    .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
+    .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint, .chest-lamp {
       animation: none !important;
     }
     .underglow { opacity: 0.6; }
     .car-neon  { opacity: 0.5; }
     .visor-glint { opacity: 0; }
     .antenna-light { opacity: 0.8; }
+    /* R131: held at the low end of its own ramp rather than 0. The lamp is a lit part
+       of the sprite, so stilling it at zero would darken the figure relative to what a
+       no-preference player sees; 0.16 is the keyframe's own resting value, which makes
+       the reduced-motion presentation the same picture minus the movement. Every other
+       entry in this block follows the same principle. */
+    .chest-lamp { opacity: 0.16; }
   }
 </style>

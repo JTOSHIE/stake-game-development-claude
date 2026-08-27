@@ -205,6 +205,12 @@ function pruneLegacyAssets() {
     // future session wires the glance back up without un-pruning it, CI says so
     // instead of the player seeing a 404.
     'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
+    // R131: the Overdrive perimeter border. Its only consumer was App.svelte, and
+    // the owner ruled the border out for overlapping the hero and the car and making
+    // the stage too busy. Same treatment as the glance sheet above and for the same
+    // reason: kept in the repository so restoring it is a revert, pruned from the
+    // bundle so it stops costing 461,912 B. Keep in step with PRUNED_PREFIXES.
+    'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()

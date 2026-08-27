@@ -144,6 +144,11 @@ const PRUNED_PREFIXES = [
   // reinstatement stays a revert. This entry is what makes the prune a GUARD
   // rather than just a saving: a request for it is now a hard failure.
   'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
+  // R131: the Overdrive perimeter border, removed from App.svelte. As above, this
+  // entry is what makes the prune a GUARD: a request for it is now a hard failure,
+  // so re-adding the border without un-pruning the raster fails CI rather than
+  // showing a player a 404.
+  'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()

@@ -442,7 +442,17 @@
   .tier-mega .fs-plate { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig) 40%, transparent), 0 0 55px color-mix(in srgb, #a855f7 28%, transparent); }
   .tier-epic .fs-plate { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), 0 0 130px color-mix(in srgb, var(--sig-pink) 20%, transparent); }
 
-  .c1-tier-label { font-family: var(--fs-font-display); font-weight: 900; letter-spacing: .18em; color: var(--acc); text-shadow: 0 0 12px color-mix(in srgb, var(--acc) 70%, transparent); text-transform: uppercase; white-space: nowrap; }
+  /* R131: THE WORD THAT NAMES THE TIER NOW CARRIES THE TIER'S COLOUR.
+     This read `var(--acc)`, the banner's fixed house accent, which is cyan and does
+     not vary. Everything around it already varies: .band-edge, the .fs-plate glow and
+     the .fs-face inner tint all use `--sig`, set per tier to cyan / pink / gold. So
+     the label was the one element out of step, and it was the one element whose JOB
+     is to say which tier this is - "MEGA WIN" rendered cyan inside magenta rules, and
+     "EPIC WIN" cyan inside gold ones. `--sig` is set on .fs-plate and this element is
+     inside it, so the token is already in scope and this is a swap, not new plumbing.
+     Contrast was re-measured on the composited pixels after the change; the figures
+     are in the R131 section of the session report. */
+  .c1-tier-label { font-family: var(--fs-font-display); font-weight: 900; letter-spacing: .18em; color: var(--sig); text-shadow: 0 0 12px color-mix(in srgb, var(--sig) 70%, transparent); text-transform: uppercase; white-space: nowrap; }
   .tier-big  .c1-tier-label { font-size: 22px; }
   .tier-mega .c1-tier-label { font-size: 28px; }
   .tier-epic .c1-tier-label { font-size: 36px; }
@@ -452,8 +462,29 @@
      action's --autofit-scale so seven-digit wins ($1,000,000+) fit the
      band instead of overflowing/truncating. Fixed max-width (not 100% of a
      flex row) since the band now lays tier/amount/mult out horizontally. */
+  /* R131: THE FACE IS --fs-font-numeric, AND UNTIL NOW IT WAS NOT. See the block
+     below, which retired the per-digit boxes on the premise that this had already
+     happened. It had not: this rule still said var(--fs-font-display), which IS
+     Orbitron, the face that block names as the reason the boxes were needed. So the
+     compensation was removed and the condition it compensated for was left in place.
+
+     MEASURED BEFORE THE SWAP, at a FIXED digit count, so none of it is the number
+     legitimately getting longer:
+         big  4 digits  glyph width swing  35.84px   left edge slid  17.92px
+         mega 4 digits                     89.05px                   43.60px
+         epic 5 digits                    108.70px                   54.29px
+     The amount visibly slid left and right through every count-up.
+
+     AND THE GATE THAT EXISTS TO CATCH THIS COULD NOT SEE IT. win_countup_steady_gate
+     builds its own probe element declaring font-family: var(--fs-font-numeric) and
+     uses var(--fs-font-display) as its deliberately-failing SEED. So it proved Exo 2
+     is steady and Orbitron is not, and passed - while the element it speaks for
+     rendered in Orbitron. Its own header claims it measures "the face the money
+     surfaces actually render in"; for this surface that was false. A gate that
+     reconstructs the thing it guards can be green over a live defect, which is a
+     failure this project has now recorded more than once. */
   .c1-amount {
-    font-family: var(--fs-font-display); font-weight: 900; color: #f4fbff;
+    font-family: var(--fs-font-numeric); font-weight: 900; color: #f4fbff;
     text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; white-space: nowrap;
     width: min(46vw, 640px); box-sizing: border-box; text-align: center;
     max-width: min(46vw, 640px); overflow: hidden;
@@ -471,7 +502,25 @@
   .tier-big  .c1-amount { font-size: calc(50px * var(--autofit-scale, 1)); }
   .tier-mega .c1-amount { font-size: calc(64px * var(--autofit-scale, 1)); }
   .tier-epic .c1-amount { font-size: calc(80px * var(--autofit-scale, 1)); }
+  /* R131: THE MULTIPLIER WAS THE ONE THING THAT DID NOT ESCALATE. Measured across
+     the three tiers before the change: the band grew 111 -> 140 -> 172px, the label
+     22 -> 28 -> 36px and the amount 50 -> 64 -> 80px, while this sat at a flat 16px
+     at every tier. At epic that put a 16px "250x BET" beside an 80px amount - a 5:1
+     ratio - and the multiplier is the number that says how big the win actually was.
+     Now 16 -> 20 -> 26, which tracks the label's own 1.00 / 1.27 / 1.64 ladder.
+     Only the SIZE changes. It stays GOLD at every tier rather than taking `--sig`,
+     because gold is this game's constant value colour: it means "this is what the win
+     was worth" regardless of tier, and holding it fixed is what keeps the multiplier
+     separate from the tier furniture at big (cyan rules) and mega (magenta rules).
+     At EPIC the two coincide, since `--sig` is gold there anyway - so at that tier the
+     choice is moot and the label and the multiplier read as matching bookends around
+     the white amount. Stated plainly because an earlier draft of this comment argued
+     that taking `--sig` would dissolve the multiplier into the epic rules, which is
+     not true: it is already gold there, so `--sig` would have changed nothing. */
   .c1-mult { font-family: var(--fs-font-display); font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; }
+  .tier-big  .c1-mult { font-size: 16px; }
+  .tier-mega .c1-mult { font-size: 20px; }
+  .tier-epic .c1-mult { font-size: 26px; }
   /* SECONDARY by design, TR-068. Deliberately quieter than the amount and the
      multiplier above it: the ruling retains the gross WIN as the headline, and
      a price line competing with it for attention would be option (b), the net
