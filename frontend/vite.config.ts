@@ -194,7 +194,18 @@ function pruneLegacyAssets() {
     'assets/themes/beautiful-game', 'assets/themes/oil-and-fire',
     'assets/themes/trap-lane', 'assets/themes/source',
   ]
-  const LEGACY_FILES = ['assets/themes/future-spinner/backgrounds/bg-1.mp4']
+  const LEGACY_FILES = [
+    'assets/themes/future-spinner/backgrounds/bg-1.mp4',
+    // R130: the hero's 'glance' state was removed when the idle was frozen, so this
+    // 1,655,215 B sheet has no consumer left in src. It is pruned from the BUNDLE
+    // rather than deleted from the REPOSITORY, deliberately: reinstating the glance
+    // should stay a revert of HeroIdle.svelte plus these two lines, never a
+    // re-render. Keep it in step with PRUNED_PREFIXES in build_diet_verify.mjs,
+    // which turns any request for a pruned path into a hard failure - so if a
+    // future session wires the glance back up without un-pruning it, CI says so
+    // instead of the player seeing a 404.
+    'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
+  ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()
 

@@ -139,6 +139,11 @@ const PRUNED_PREFIXES = [
   'assets/themes/beautiful-game/', 'assets/themes/oil-and-fire/',
   'assets/themes/trap-lane/', 'assets/themes/source/',
   'assets/themes/future-spinner/backgrounds/bg-1.mp4',
+  // R130: the hero 'glance' sheet, orphaned when the idle was frozen. Pruned from
+  // the bundle by vite.config.ts's LEGACY_FILES, kept in the repository so a
+  // reinstatement stays a revert. This entry is what makes the prune a GUARD
+  // rather than just a saving: a request for it is now a hard failure.
+  'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()
