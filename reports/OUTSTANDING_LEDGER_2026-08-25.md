@@ -805,10 +805,18 @@ reels stay primary: **the perimeter band's mean relative luminance as a multiple
 was **2.54x** at 0.75 and is **1.44x** at 0.50. Below about 0.35 it reaches parity with the reels and
 stops reading as an energised edge, which is the floor.
 
+**CLOSED BY R131, 2026-08-27: THE PERIMETER NO LONGER EXISTS.** The owner ruled the feature
+border out for overlapping the hero and the car and making the stage too busy, so the element,
+its CSS, both keyframes and the JavaScript settle state were all removed together and the raster
+was pruned from the bundle. Everything below this line is therefore a DATED RECORD of tuning an
+element that has since been deleted, kept because it is the evidence for why deleting it was the
+answer: R118 had already taken the held opacity from 0.75 to 0.50 on measurement and the stage was
+still too busy. **The symbol names below no longer resolve in `App.svelte` and are not meant to.**
+
 **THREE DECLARATIONS HARD-CODED 0.75** (App.svelte:2601 enter-end, :2604 settle-start, :2609 the
-reduced-motion branch **that no gate exercises**). All three moved together. **The 1.6s settle has a
-JavaScript twin, `overdriveSettleTimer` at App.svelte:586, 1600 ms** - the two must stay equal or the
-element unmounts mid-fade, so the duration was left alone. The settle FILTER
+reduced-motion branch **that no gate exercises**). All three moved together. **The 1.6s settle had a
+JavaScript twin at App.svelte:586, 1600 ms** - the two had to stay equal or the element unmounted
+mid-fade, so the duration was left alone. The settle FILTER
 (`brightness(0.64) saturate(0.21)`) was also left alone because R115 genuinely measured it from the
 kit's own settle accent, and that measurement was independently reproduced this session.
 

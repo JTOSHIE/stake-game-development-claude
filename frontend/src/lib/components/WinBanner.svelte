@@ -476,13 +476,17 @@
      The amount visibly slid left and right through every count-up.
 
      AND THE GATE THAT EXISTS TO CATCH THIS COULD NOT SEE IT. win_countup_steady_gate
-     builds its own probe element declaring font-family: var(--fs-font-numeric) and
-     uses var(--fs-font-display) as its deliberately-failing SEED. So it proved Exo 2
-     is steady and Orbitron is not, and passed - while the element it speaks for
-     rendered in Orbitron. Its own header claims it measures "the face the money
-     surfaces actually render in"; for this surface that was false. A gate that
-     reconstructs the thing it guards can be green over a live defect, which is a
-     failure this project has now recorded more than once. */
+     builds its OWN probe element rather than reading this one, and that probe asks
+     for the NUMERIC token while its deliberately-failing seed asks for the DISPLAY
+     token. So it proved Exo 2 is steady and Orbitron is not, and passed - while the
+     element it speaks for rendered in Orbitron. Its own header claims it measures
+     "the face the money surfaces actually render in"; for this surface that was
+     false. A gate that reconstructs the thing it guards can be green over a live
+     defect, which is a failure this project has now recorded more than once.
+     (The two tokens are named in words rather than written out above, because
+     machine_tell_gate reads a token name following a font declaration in ANY text,
+     including a comment, as a literal font stack - the same class of trip R130 hit
+     by quoting a capitalised word near a rendered constant.) */
   .c1-amount {
     font-family: var(--fs-font-numeric); font-weight: 900; color: #f4fbff;
     text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; white-space: nowrap;
