@@ -141,9 +141,21 @@ const PRUNED_PREFIXES = [
   'assets/themes/future-spinner/backgrounds/bg-1.mp4',
   // R130: the hero 'glance' sheet, orphaned when the idle was frozen. Pruned from
   // the bundle by vite.config.ts's LEGACY_FILES, kept in the repository so a
-  // reinstatement stays a revert. This entry is what makes the prune a GUARD
-  // rather than just a saving: a request for it is now a hard failure.
+  // reinstatement stays a revert.
+  // THIS ENTRY IS NOT THE GUARD, AND R130 SAID IT WAS. Corrected at R131. This list
+  // fires on an actual RESPONSE, so it only catches a pruned path the running
+  // session happens to request - and this script's own comment says its bonus buy
+  // exercises "whatever DOES render, not necessarily the full Overdrive
+  // walkthrough". A sheet that only loads inside a state the session may not reach
+  // is therefore not covered here. The STATIC asset_reference_gate is what covers
+  // it, once R131 taught it to read markup-interpolated assetBase paths.
   'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
+  // R131: the Overdrive perimeter border, removed from App.svelte. Same correction
+  // as above applies: this entry catches a REQUEST, and the border only mounted
+  // under overdriveVisualActive. The guard that actually catches a re-added border
+  // is asset_reference_gate, verified by seeding the reference back into App.svelte
+  // and watching the gate go red on this exact path.
+  'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()

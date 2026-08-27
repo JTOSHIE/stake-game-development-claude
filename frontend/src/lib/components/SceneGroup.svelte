@@ -103,6 +103,7 @@
     {/if}
     <div class="antenna-light" aria-hidden="true"></div>
     <div class="visor-glint" aria-hidden="true"></div>
+    <div class="chest-lamp" aria-hidden="true"></div>
   </div>
 </div>
 
@@ -336,6 +337,134 @@
     98%            { opacity: 0.6; }
   }
 
+  /* Chest lamp, R131. The third and last resting accent, and the only one below the
+     head: the antenna sits at the ocular pod and the glint on the visor, so a static
+     figure had both its signs of life in the top fifth of itself. This is the belt
+     lamp array on the abdomen.
+
+     IT IS A SIBLING OF <HeroIdle>, NOT A CHILD OF .hero-body, AND THAT IS DELIBERATE.
+     .hero-body carries filter: drop-shadow(), which is computed from its whole
+     subtree, so a glow child would have made the hero's SHADOW pulse with it - the
+     defect R129 shipped once by putting the shadow on two stacked layers. Out here
+     the shadow cannot see it, and it inherits the reduced-motion reset below for free.
+
+     GEOMETRY, MEASURED RATHER THAN EYEBALLED. The lamp is THREE bright cyan bars in a
+     housing, core hull x85..103 / y179..185 in the 206x407 .char-layer box (a previous
+     count of four included the housing bezel's right shoulder).
+
+     CONTAINMENT IS VERIFIED ON THE BOX BELOW, NOT ON A NOMINAL PADDING. An earlier
+     draft of this comment said "the hull padded by 8px", which is not what the rule
+     computes: 37.37% / 42.01% / 17% / 5.65% of 206x407 lands the box at x76.98..112.00
+     and y170.98..193.98, so the real margins are 8.0px left and top and 9.0px right
+     and bottom - the box centre sits half a pixel right of the hull centre. Measured
+     over those exact pixels (x76..113, y170..194, 888 px): minimum alpha 255, with
+     ZERO pixels below 250, against a positive control box straddling the silhouette
+     edge that correctly reports alpha 0. So the glow cannot reach the silhouette edge
+     and cannot contaminate the parent drop-shadow. Centre 45.87% / 44.83%.
+
+     WHY IT DOES NOT TICK, which is the bar the brief sets. Three properties, each the
+     opposite of what made the old idle tick: it is CONTINUOUS (an eased opacity ramp,
+     no discrete step - the tick's worst step was 48.9 held 733ms); it changes NO
+     GEOMETRY (no transform, no scale, so silhouette change is exactly zero, where the
+     tick moved 18.75% of the silhouette); and its period is 7.4s, slower than both
+     existing accents and deliberately non-harmonic with them (2.8s and 6.0s) so the
+     three never land together and read as a pulse.
+
+     THE HEADROOM, WITH BOTH SIDES OF THE RATIO TAKEN THE SAME WAY. A first draft said
+     "6,000x quieter", which divided the tick's WORST STEP by the lamp's MEAN - two
+     different kinds of number, and exactly the mistake R130 recorded a rule against.
+     Like for like: worst-step against the lamp's max is 48.872 / 0.0166 = 2,944x, and
+     mean-step against the lamp's mean is 26.614 / 0.0081 = 3,286x. A longer 30s
+     sampling run puts the lamp's mean nearer 0.0055, which widens both rather than
+     narrowing them. Call it THREE THOUSAND TIMES quieter and it is defensible on
+     either pairing. */
+  .chest-lamp {
+    position: absolute;
+    left: 37.37%;
+    top: 42.01%;
+    width: 17%;
+    height: 5.65%;
+    border-radius: 50%;
+    /* The lamp's own measured colour, mean RGB about (40, 205, 225). */
+    background: radial-gradient(ellipse, rgba(64, 226, 245, 0.85) 0%, rgba(40, 190, 225, 0.35) 45%, transparent 72%);
+    mix-blend-mode: screen;
+    opacity: 0.18;
+    animation: chest-lamp-breathe 7.4s ease-in-out infinite;
+  }
+  @keyframes chest-lamp-breathe {
+    0%, 100% { opacity: 0.16; }
+    50%      { opacity: 0.44; }
+  }
+
+  /* THE THREE ACCENTS ARE SIBLINGS OF .hero-body, SO THEY DO NOT TRAVEL WITH IT.
+     R131, found by an adversarial pass over R131's own diff, and PRE-EXISTING: it
+     affects all three, not just the one this session added.
+
+     Each accent is positioned as a percentage of .char-layer and is painted on top
+     of the sprite. During a reaction .hero-body transforms - the epic punch lifts
+     27px, scales 1.05 and rotates 2deg - and the accents do not, so the glow slides
+     off the feature it is lighting. Measured at the epic peak, as the distance
+     between the PAINTED feature (the sprite centroid put through the live transform
+     matrix) and the CSS glow:
+
+         .antenna-light   0.36px at rest -> 44.59px mid-punch, at opacity 0.42
+         .visor-glint     0.53px        -> 45.55px, at opacity 0.00
+         .chest-lamp      0.66px        -> 39.39px, at opacity 0.42
+
+     The glow boxes are 24 to 41px wide, so at those distances the light is entirely
+     off its feature. The chest lamp drifts LEAST because it sits lowest, nearest the
+     transform-origin at the feet, where a rotation displaces least.
+
+     WHY SUPPRESS RATHER THAN FOLLOW. Making them track would mean either moving them
+     inside .hero-body - which is exactly what must not happen, because that element's
+     drop-shadow is computed from its whole subtree and a glow child would pulse the
+     shadow - or duplicating the transform, which then has to be kept in step with
+     four keyframe sets by hand. Suppression is correct on its own terms anyway:
+     these are RESTING accents. While the hero is performing a win or a brace, the
+     performance is the thing to look at, and a static glint on a moving figure was
+     never the intent.
+
+     `:has()` DEGRADES SAFELY. Where it is unsupported the rule simply does not
+     apply and the behaviour is exactly what shipped before this fix, which is why
+     it is an acceptable mechanism for a cosmetic suppression. */
+  /* :global() ON THE :has() ARGUMENT IS REQUIRED, and leaving it out is a silent
+     no-op. .hero-body belongs to HeroIdle.svelte, so Svelte's scoping appends THIS
+     component's class to it and the selector can never match. The first version of
+     this rule did exactly that: svelte-check reported three css_unused_selector
+     warnings and the measured drift was unchanged at 39 to 45px, i.e. the rule
+     shipped as decoration. The accents themselves stay scoped; only the cross-
+     component condition is global. */
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .antenna-light,
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .visor-glint,
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .chest-lamp {
+    /* THE ANIMATION HAS TO BE STOPPED, NOT JUST OVERRIDDEN, and that is the second
+       way this rule was inert before it worked. A CSS animation's keyframe values
+       sit ABOVE normal declarations in the cascade, so `opacity: 0` alone loses to
+       antenna-blink and chest-lamp-breathe, both of which set opacity at every
+       keyframe. Measured: the rule compiled, the selector matched, and the accents
+       still read 0.42 at the punch peak. Cancelling the animation first lets the
+       opacity apply. This is the same shape as the reduced-motion block below,
+       which stops animations rather than trying to out-declare them. */
+    animation: none;
+    opacity: 0;
+    /* NO TRANSITION HERE, AND THE ABSENCE IS DELIBERATE. This rule carried
+       `transition: opacity 120ms linear` when it first shipped, and that was a THIRD
+       inert mechanism in the same declaration - after the missing :global() and the
+       animation-origin problem above. Cancelling an animation in the SAME style
+       change leaves no transitionable before-change value, so the fade could never
+       run: measured, the accents went 0.4304 -> 0.0000 in one 20ms frame with
+       transition-property already computing to `opacity 0.12s` on the element, while
+       a probe with the same declaration and no animation faded through seven
+       intermediate values in the same rAF loop. The exit was a hard cut by
+       construction too, since the declaration leaves with the rule.
+       Making it fade would need each accent wrapped in an unanimated div carrying
+       the transition, which is real machinery for a cross-fade at the one moment it
+       is least visible: the cut happens exactly as the hero launches a large
+       reaction and the win banner fires. So the suppression is a HARD CUT, on
+       purpose, and this comment says so rather than a dead declaration implying
+       otherwise. */
+  }
+
   @media (prefers-reduced-motion: reduce) {
     /* R130: !important ON THE ANIMATION RESET, AND THE FREEZE IS WHY.
        These resets are correct TODAY, but only on a tie broken by source order:
@@ -363,12 +492,18 @@
        either way; this is the one place in the R130 diff where a rule newly wins
        where it used to lose, and it was checked rather than assumed. The six
        other elements are the plain source-order tie described above. */
-    .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
+    .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint, .chest-lamp {
       animation: none !important;
     }
     .underglow { opacity: 0.6; }
     .car-neon  { opacity: 0.5; }
     .visor-glint { opacity: 0; }
     .antenna-light { opacity: 0.8; }
+    /* R131: held at the low end of its own ramp rather than 0. The lamp is a lit part
+       of the sprite, so stilling it at zero would darken the figure relative to what a
+       no-preference player sees; 0.16 is the keyframe's own resting value, which makes
+       the reduced-motion presentation the same picture minus the movement. Every other
+       entry in this block follows the same principle. */
+    .chest-lamp { opacity: 0.16; }
   }
 </style>

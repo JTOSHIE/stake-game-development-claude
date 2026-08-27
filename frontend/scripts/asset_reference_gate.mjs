@@ -121,13 +121,57 @@ function literalPaths() {
   return found
 }
 
+/**
+ * Every path built by interpolating the theme's assetBase in MARKUP, R131.
+ *
+ * WHY THIS READER EXISTS, AND IT IS A HOLE THIS GATE ADVERTISED BUT DID NOT COVER.
+ * The header above says this gate catches "a path the code carries, points at a
+ * deliberately pruned file, and never requests". That was true only for the two
+ * forms the other two readers see: a `${b}/...` template in themeStore, and a
+ * quoted string that literally BEGINS `assets/`. The commonest form in this
+ * codebase is neither. It is a Svelte attribute interpolation:
+ *
+ *     url('{$themeAssets.assetBase}/ui/win/overdrive_perimeter.png')
+ *
+ * That string does not begin with `assets/`, so literalPaths() never saw it, and
+ * it is not in themeStore, so themeStorePaths() never saw it. MEASURED with both
+ * readers' own regexes and a positive control for each: the perimeter reference
+ * scored 0 and 0, while `${b}/backgrounds/bg-1.mp4` scored 1 on the first and a
+ * plain `assets/...` literal scored 1 on the second. So R130 and R131 each pruned
+ * a raster and each recorded that the prune was "guarded", and neither was.
+ *
+ * WHAT IT DELIBERATELY DOES NOT RESOLVE. Where the FILENAME is itself interpolated
+ * the path cannot be known statically and must not be guessed:
+ *
+ *     src="{assetBase}/ui/hero/{SHEET[motion]}"
+ *     src="{$themeAssets.assetBase}/ui/win/{tier === 'big' ? 'burst_big' : ...}.png"
+ *
+ * The pattern requires a literal segment ending in an extension, and the character
+ * class excludes `{`, so both of those fall out on their own rather than producing
+ * a fabricated path. That is the same class of blindness recorded at R129 - an
+ * orphan scan cannot see an interpolated filename - and the honest response is to
+ * skip them, not to invent them.
+ */
+function assetBasePaths() {
+  const found = []
+  for (const file of walk(SRC)) {
+    if (!/\.(svelte|ts|js)$/.test(file)) continue
+    const src = stripComments(readFileSync(file, 'utf-8'))
+    const rel = relative(ROOT, file)
+    for (const m of src.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]+\.[a-z0-9]{2,5})/g)) {
+      found.push({ path: SHIPPING_THEME_BASE + m[1], where: rel })
+    }
+  }
+  return found
+}
+
 function judge() {
   if (!existsSync(DIST)) {
     console.error('ASSET REFERENCE GATE: dist/ is missing. Run `npm run build` first.')
     process.exit(1)
   }
 
-  const all = [...themeStorePaths(), ...literalPaths()]
+  const all = [...themeStorePaths(), ...literalPaths(), ...assetBasePaths()]
   const seen = new Map()
   for (const r of all) {
     if (!seen.has(r.path)) seen.set(r.path, new Set())
@@ -180,13 +224,31 @@ function judge() {
     const reads = seedHits.includes('/backgrounds/bg-1.mp4')
     console.log(`  ${reads ? 'caught' : 'MISSED'}  the reader extracts that template path from source`)
 
+    // R131 SEED: the markup-interpolation form, which is what actually ships here
+    // and which neither original reader could see. This is the exact line App.svelte
+    // carried until R131 removed the Overdrive perimeter.
+    const mkSeed = `style="background-image: url('{$themeAssets.assetBase}/ui/win/overdrive_perimeter.png');"`
+    const mkHits = [...mkSeed.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]+\.[a-z0-9]{2,5})/g)].map((m) => m[1])
+    const mkReads = mkHits.includes('/ui/win/overdrive_perimeter.png')
+    console.log(`  ${mkReads ? 'caught' : 'MISSED'}  the reader extracts a markup-interpolated assetBase path`)
+    const mkMissing = !existsSync(join(DIST, SHIPPING_THEME_BASE + '/ui/win/overdrive_perimeter.png'))
+    console.log(`  ${mkMissing ? 'caught' : 'MISSED'}  that path is pruned from dist, so re-adding the reference must fail`)
+
+    // R131 NEGATIVE CONTROL, and it is the one that matters for this reader: where
+    // the FILENAME is interpolated the path is unknowable, so the reader must stay
+    // silent rather than fabricate one.
+    const dynSeed = `src="{assetBase}/ui/hero/{SHEET[motion]}"`
+    const dynHits = [...dynSeed.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]+\.[a-z0-9]{2,5})/g)]
+    const dynQuiet = dynHits.length === 0
+    console.log(`  ${dynQuiet ? 'clean ' : 'FALSE+'}an interpolated FILENAME yields no path rather than a guessed one`)
+
     // Negative control: a path that DOES exist must not be reported.
     const control = SHIPPING_THEME_BASE + '/backgrounds/bg_base.jpg'
     const controlOk = existsSync(join(DIST, control))
     console.log(`  ${controlOk ? 'clean ' : 'FAIL  '}negative control: a real shipped asset is present and is not flagged`)
 
     console.log('')
-    if (!caught || !reads || !controlOk) {
+    if (!caught || !reads || !controlOk || !mkReads || !mkMissing || !dynQuiet) {
       console.error('ASSET REFERENCE GATE SELF-TEST: FAIL. A seeded dangling reference this gate '
         + 'did not catch means its PASS means nothing.')
       process.exit(1)
