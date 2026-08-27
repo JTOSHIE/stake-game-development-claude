@@ -200,16 +200,20 @@ function pruneLegacyAssets() {
     // 1,655,215 B sheet has no consumer left in src. It is pruned from the BUNDLE
     // rather than deleted from the REPOSITORY, deliberately: reinstating the glance
     // should stay a revert of HeroIdle.svelte plus these two lines, never a
-    // re-render. Keep it in step with PRUNED_PREFIXES in build_diet_verify.mjs,
-    // which turns any request for a pruned path into a hard failure - so if a
-    // future session wires the glance back up without un-pruning it, CI says so
-    // instead of the player seeing a 404.
+    // re-render.
+    // WHICH GATE ACTUALLY GUARDS THIS, corrected at R131. R130 wrote that
+    // PRUNED_PREFIXES in build_diet_verify "turns any request into a hard failure",
+    // and that is true only IF a request happens: that check is RUNTIME, and the
+    // glance only ever loaded inside a state its headless session need not reach.
+    // The real guard is the STATIC asset_reference_gate, which R131 taught to read
+    // markup-interpolated assetBase paths - see the note at PRUNED_PREFIXES.
     'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
     // R131: the Overdrive perimeter border. Its only consumer was App.svelte, and
     // the owner ruled the border out for overlapping the hero and the car and making
     // the stage too busy. Same treatment as the glance sheet above and for the same
     // reason: kept in the repository so restoring it is a revert, pruned from the
-    // bundle so it stops costing 461,912 B. Keep in step with PRUNED_PREFIXES.
+    // bundle so it stops costing 461,912 B. Guarded by asset_reference_gate, which
+    // now fails on a re-added reference in this exact form - proved by seeding one.
     'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
   ]
   const UI_DIR = 'assets/ui'
