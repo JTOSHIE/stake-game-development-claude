@@ -9,13 +9,20 @@ portal can be tied to a commit. The upload itself is the owner's action; no sess
 |---|---|
 | kit path | `~/Desktop/FS_UPLOAD_KIT` (the fixed single-use path, convention (s)) |
 | kit version | v10 |
-| **source SHA** | `578a3a51444f1f08a6def5bb9426abb3055e4305` |
+| **source SHA** | `a4e8612c9b81b5b9bff9399337bb027181152f30` |
 | branch | `claude/r137-placeholders-kit` |
-| built at | 2026-08-27T19:59:42Z |
+| built at | 2026-08-27T20:35:15Z |
 | upload payload | 102 files, 23,455,987 bytes |
 | whole kit on disk | 109 files, 24,842,865 bytes (payload plus the two READMEs and BUILD_INFO) |
-| **kit manifest sha256** | `e5a879a40471928095d8d5033b6b42b6d53ca8fbabd1ae34a71aa10845129e4c` |
+| **kit manifest sha256** | `7c2931727779c2e2082e612fa953ac0a3b3bcd43c2ea733e6f7959a9a8e2a942` |
 | timestamp of portal upload | *(to be filled by the owner)* |
+
+REBUILT AT THE BRANCH TIP, deliberately. The first build stamped `578a3a51`, and two
+documentation-only commits landed after it. A kit whose stamp is not the tip is exactly the
+condition convention (o) and TR-062 exist to prevent, so it was rebuilt rather than explained
+away. The PAYLOAD is byte-identical across both builds, 102 files and 23,455,987 bytes, which is
+the proof that those two commits changed no shipped byte; only the recorded commit and build time
+differ, and the manifest hash moved with them.
 
 The kit is a FOLDER, not an archive, so its single sha256 is taken over the sorted per-file
 manifest: `find . -type f ! -name .DS_Store -print0 | sort -z | xargs -0 shasum -a 256` then
