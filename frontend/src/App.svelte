@@ -2738,7 +2738,13 @@
   .game-wrapper.mini-player.shake { animation: screen-shake-portrait 0.42s ease-in-out; }
 
   @media (prefers-reduced-motion: reduce) {
-    .game-wrapper.shake { animation: none; }
+    /* R135: this was (0,2,0) and the three layout variants above are (0,3,0), so on portrait,
+       compact-landscape and mini-player the screen still shook under reduced motion. Marked
+       important rather than enumerating the three, because important is unconditional and
+       enumeration makes every future layout variant a specificity race somebody has to remember
+       to lose. It is also the idiom this codebase already chose for exactly this hazard, at
+       SceneGroup.svelte's reduced block and at MaxWinCelebration's. */
+    .game-wrapper.shake { animation: none !important; }
   }
 
   /* Native-HUD layout modes: portrait (2026-07-14 pass) and compact-landscape

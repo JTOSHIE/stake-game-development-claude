@@ -609,7 +609,10 @@
     background: radial-gradient(circle at center, rgba(8,8,26,0.72), rgba(4,4,14,0.92));
     font-family: var(--fs-font-display); color: #fff; text-align: center;
   }
-  .fs-entry, .fs-end { display: flex; flex-direction: column; gap: 10px; }
+  /* R135: `.fs-entry` was dropped from this rule because no element in the repository carries
+     that class. `.fs-entry-stage` and the `.stage-*` rules are a different, live thing and are
+     untouched. */
+  .fs-end { display: flex; flex-direction: column; gap: 10px; }
 
   /* TR-036 option (b): a reel that has not landed yet during the retrigger
      ladder. Dimmed and blurred rather than removed, so the grid keeps its
@@ -624,7 +627,7 @@
     transition: box-shadow 200ms ease;
   }
   .fs-title { font-size: 2rem; font-weight: 900; color: var(--theme-primary, #16f2e0); letter-spacing: 3px; text-shadow: 0 0 18px var(--theme-primary, #16f2e0); }
-  .fs-sub { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
+  /* R135: `.fs-sub` deleted, no element in the repository carries it. */
 
   /* ── Overdrive transition (Motion Polish v2), staged entry sequence ───── */
   .fs-entry-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -812,8 +815,16 @@
     }
     .entry-smoke-wisp, .entry-shockwave { display: none; }
     .entry-continue { animation: none; }
-    .fs-cell.win { animation: none; }
-    .fs-spin-win { animation: none; }
+    /* R135: these two were INERT. Both are (0,2,0) and both lose to a later, more specific rule
+       further down this file, so the cells and the spin counter kept animating under reduced
+       motion while the block claimed to have stopped them. Measured: 9 distinct transform values
+       across the sample under reduce, collapsing to 1 with these marked important, against
+       `.antenna-light` held frozen in the same run as the control.
+       Marked important rather than moved: relocating the @media block below the winning rules
+       would work today and break the next time a rule is appended to this file, which is the
+       failure mode R062 already logged once in this very component. */
+    .fs-cell.win { animation: none !important; }
+    .fs-spin-win { animation: none !important; }
     .fs-retrigger-moment { animation: none; }
   }
   /* OWNER AUDIT ROUND 3, item 8: this width cap (92vw, a REAL viewport unit)

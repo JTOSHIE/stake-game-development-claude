@@ -523,10 +523,15 @@
     font-family: var(--fs-font-display);
   }
 
-  /* Swappable schemes, identical token set to the HUD (template layer). */
-  .fs-pt.scheme-trap  { --sig-cyan: #39ff14; --sig-pink: #ff7a1a; --sig-gold: #ebff5a; --sig-orange: #ff6600; --sig-green: #b6ff3c; }
-  .fs-pt.scheme-oil   { --sig-cyan: #ff8a3d; --sig-pink: #d9a86a; --sig-gold: #f5d061; --sig-orange: #ff5a1f; --sig-green: #f0b24a; }
-  .fs-pt.scheme-pitch { --sig-cyan: #2fd24f; --sig-pink: #ffd700; --sig-gold: #ede7c8; --sig-orange: #4ce06b; --sig-green: #5be07a; }
+  /* R135: THE THREE SWAPPABLE SCHEME RULES ARE GONE, HERE AND IN HudOverlay.
+     Nothing in the repository ever added those classes to any element, so Svelte pruned all six
+     rules out of the bundle and they were three of the four standing css_unused_selector build
+     warnings. RESKIN_BOUNDARY.md GAP 2 already records this class of thing: the repository looks
+     multi-theme and in the shipped build it is not.
+     They are deleted rather than left as a hook, because a hook needs a WRITER before it needs
+     CSS, and CSS with no writer is the "documented as live, inert in pixels" third state this
+     project has now banned. If a scheme swap is wanted, the code that applies the class comes
+     first and these rules come back with it. */
   .fs-pt--overdrive   { --acc: var(--sig-pink); --acc2: var(--sig-orange); }
 
   /* ---- shared chrome primitives (same as B1) ---- */

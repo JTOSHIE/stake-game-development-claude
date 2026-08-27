@@ -612,7 +612,5 @@ export function playUIClick(): void {
 /** Alias for backward compatibility with any existing call sites */
 export const playClick = playUIClick
 
-export function playScatter(): void {
-  // Legacy alias, now use playScatterLand for individual scatter events
-  playScatterLand()
-}
+// R135: `playScatter` deleted. It was a legacy alias with ZERO call sites anywhere in the
+// repository, forwarding to playScatterLand, which every real caller already uses directly.
