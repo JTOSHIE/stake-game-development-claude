@@ -206,3 +206,86 @@ rather than an argument. Two real bonus buys in one session:
 `endBannerTrigger` has exactly ONE assignment in `FreeSpinsPresentation` - `+= 1` at the
 reveal - with no reset and no other write, so the only thing that can fire the statement is a
 reveal. Read first, then measured.
+
+## 11. An adversarial pass over R132's own diff found two real defects IN THE FIX
+
+Three attack agents were run against the shipped change. They confirmed the headline result
+and then found two defects that are mine, plus two false comments and several record
+corrections. Both defects are fixed.
+
+### 11a. My own fix opened a smaller version of the spoiler it closed
+
+Making the pod count DURING the celebration exposed a duration mismatch that did not matter
+while the pod was silent. `WinBanner` always counts a feature-end celebration over a TIER
+length - `ownCountUp.to(v, mult, TIER_COUNT_UP_MS[t])`, and `winCountUpTier()` floors at
+'big' - while the pod's own rule uses the short 400..800ms curve below the big-win threshold:
+
+| multiplier | pod | banner | pod finishes early by |
+|---:|---:|---:|---:|
+| 2x | 416ms | 1400ms | **984ms** |
+| 9x | 472ms | 1400ms | **928ms** |
+| 10x and above | 1400ms | 1400ms | 0ms |
+
+On a feature paying under 10x the pod reached the total roughly 950ms before the banner and
+revealed the number the celebration was still counting towards. **That is the very class
+OWNER AUDIT ROUND 2 exists to prevent, reintroduced at smaller scale by my own fix.** The
+attack measured it at 843ms early with a peak divergence of 49% of the round total.
+
+Fixed with a ONE-SHOT duration override on the shared count-up, set from the same multiplier
+and the same table `WinBanner` uses, so the pod borrows the celebration's own length for that
+rise. One-shot rather than a mode: consumed by the next rise and cleared.
+
+**What I could and could not verify.** The arithmetic and the code path are confirmed by
+reading and direct computation. Base wins are proven unaffected end to end - the pod reaches
+the total in 362 / 395 / 444ms at 2x / 4x / 9x and 1314 / 1913 / 2729ms at 15x / 50x / 250x,
+each at its own expected duration, so the override does not leak. The feature path still lands
+pod and banner on the same number, now agreeing to $0.02 through the climb. But **I could not
+reproduce a sub-10x FEATURE locally**: fourteen bonus buys produced none, because the average
+bought outcome is 96x. The fix is verified in mechanism, not in that specific round, and that
+distinction is the honest one to record.
+
+### 11b. The gate I widened still had the hole it claimed to close
+
+My parse matched only a rule whose selector is exactly `.c1-amount`. `WinBanner` carries SIX
+rules targeting that class, three of them tier-scoped. A `font-family` on
+`.tier-epic .c1-amount` would have re-broken one tier while the gate read the base rule and
+passed - **the same defect class, one scope down.**
+
+Now every rule in the component that sets a font-family on the amount is read and asserted.
+Seeding a tier-scoped override goes red naming the selector:
+
+```
+FAIL  every WinBanner rule that sets a font-family on .c1-amount asks for
+      var(--fs-font-numeric) (2 such rule(s); offending:
+      ".tier-epic .c1-amount" -> var(--fs-font-display))
+```
+
+### 11c. Two comments of mine were false
+
+- The fallback's justification said a zero-paying feature "never bumps the trigger". It does;
+  the bump at the reveal is unconditional. The fallback is a backstop for a feature that never
+  reaches its reveal at all.
+- **"It cannot simply measure the live element" was too strong and is withdrawn.** The attack
+  mounted a real `WinBanner` in that same production preview by driving a mock round. The
+  declaration check is kept because it is cheap and TOTAL - it sees tier-scoped rules a single
+  live measurement at one tier would not - and measuring the mounted element at all three
+  tiers is now an open item rather than a claim.
+
+### 11d. Reported, not fixed
+
+- **Both money surfaces can render a negative amount on the first frame of a count-up.**
+  Measured at 15x: exactly one frame at t=10ms reading `-0.10` on the pod AND the banner, none
+  at 50x. They agree, so it is a shared easing artefact rather than a divergence, and it
+  predates R132 on the base-win path where I measured it.
+- **The 1x-10x grid flash plays under the free-spins overlay.** `WinCelebration` fires for
+  `1 <= multiplier < 10`; my own before-and-after timelines both show `[fs overlay]` present
+  through the settle and the whole pod count-up, so this predates R132 rather than being caused
+  by it.
+
+### 11e. Record corrections
+
+| published | corrected |
+|---|---|
+| pod caught up "about 2.2 seconds" after the banner left | **1.86s** on the attack's round |
+| "banners=1 on every frame of the round" | literally false - 8,034 of 8,833 frames carry ZERO banners. The invariant that holds, and the one that matters, is **never more than one** |
+| "the residual ~0.1 during the climb" | it is a FRACTION of the total, not a constant: 0.70 on an $862 round, 0.081% against 0.072% on mine |
