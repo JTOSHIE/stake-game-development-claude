@@ -192,13 +192,41 @@ export const sharedWinCountUp = createWinCountUp()
 // `betAmount` is a plain writable, so `get()` on it is always current, and
 // `next / bet` is the same closed form gameStore.ts:84 declares. The gate now
 // asserts the observed duration against the tier, so this cannot regress quietly.
+// ── R132: A ONE-SHOT DURATION OVERRIDE FOR THE NEXT RISE ────────────────────
+//
+// WHY IT EXISTS. A feature-end celebration always counts over a TIER length,
+// because WinBanner calls `ownCountUp.to(v, mult, TIER_COUNT_UP_MS[t])` and
+// `winCountUpTier()` floors at 'big'. The HUD pod, driven from here, uses
+// `countUpDurationMs(multiplier)` instead - and BELOW the big-win threshold that
+// is the short 400..800ms curve. The two agreed while the pod was not counting
+// during a feature at all. R132 made the pod count with the celebration, which
+// exposed the gap: on a feature paying under 10x the pod FINISHES FIRST and
+// shows the round total while the banner is still counting towards it.
+//
+//     multiplier   pod    banner   pod finishes early by
+//        2x        416ms  1400ms        984ms
+//        9x        472ms  1400ms        928ms
+//       10x+      1400ms  1400ms          0ms
+//
+// That is a spoiler, and it is exactly the class OWNER AUDIT ROUND 2 set out to
+// prevent, so the pod must borrow the celebration's own length for that rise.
+// One-shot rather than a mode: it is consumed by the next rise and cleared, so
+// nothing can leave the pod permanently on a feature duration.
+let nextRiseDurationMs: number | null = null
+/** Make the NEXT rise of the shared count-up take exactly `ms`. Consumed once. */
+export function setNextRiseDurationMs(ms: number | null): void {
+  nextRiseDurationMs = ms != null && ms > 0 ? ms : null
+}
+
 let lastWinAmountSeen = 0
 winAmount.subscribe((next) => {
   const previous = lastWinAmountSeen
   lastWinAmountSeen = next
+  const override = nextRiseDurationMs
+  nextRiseDurationMs = null
   if (next > previous) {
     const bet = get(betAmount)
-    sharedWinCountUp.to(next, bet > 0 ? next / bet : 0)
+    sharedWinCountUp.to(next, bet > 0 ? next / bet : 0, override ?? undefined)
   } else {
     sharedWinCountUp.snap(next)
   }

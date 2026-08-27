@@ -102,15 +102,31 @@ const SHIPPED_RULE = readFileSync(join(ROOT, 'src/app.css'), 'utf-8')
 // 108.70px in width and slid 54.29px sideways. A GATE THAT RECONSTRUCTS THE
 // THING IT GUARDS CAN BE GREEN OVER A LIVE DEFECT.
 //
-// It cannot simply measure the live element instead: this gate runs against a
-// PRODUCTION preview of dist, where `import.meta.env.DEV` is false, so
-// `__testStores` does not exist and no win can be driven, so the banner never
-// mounts. The honest alternative is to read what the component DECLARES and
-// measure that, which is what follows: the family is parsed out of
-// WinBanner.svelte and fed to the probe, so the probe cannot describe a face the
-// component is not asking for, and it is asserted directly in judge().
-const AMOUNT_RULE = (BANNER.match(/\n\s*\.c1-amount\s*\{[\s\S]*?\}/) || [''])[0]
-const AMOUNT_FAMILY = ((AMOUNT_RULE.match(/font-family:\s*([^;]+);/) || [])[1] || '').trim()
+// WHY IT READS THE DECLARATION RATHER THAN A LIVE ELEMENT, stated accurately after
+// an adversarial pass corrected the first version of this note. It is TRUE that
+// this gate runs against a PRODUCTION preview of dist where `import.meta.env.DEV`
+// is false, so `__testStores` is absent and no win can be driven through it. It is
+// NOT true that the banner therefore cannot be mounted: the attack showed a real
+// WinBanner can be brought up in that same preview by driving a mock round, so
+// "it cannot measure the live element" was too strong and is withdrawn.
+// What follows is a declaration check, and it is kept because it is CHEAP and
+// TOTAL - it reads every rule in the component that sets a font-family on the
+// amount, including tier-scoped ones, which a single live measurement at one tier
+// would not. Measuring the mounted element at all three tiers as well would be a
+// genuine improvement and is left as an open item rather than claimed.
+// EVERY RULE THAT TARGETS THE AMOUNT IS READ, NOT JUST THE BASE ONE. A first
+// version of this matched only a rule whose selector is exactly `.c1-amount`,
+// and an adversarial pass showed that is a hole big enough to drive the original
+// defect back through: WinBanner carries SIX rules targeting .c1-amount, three of
+// them tier-scoped (`.tier-epic .c1-amount { ... }`). A font-family on any one of
+// those would have re-broken a single tier while this gate reported the base rule
+// and passed. That is the same shape as the defect the gate exists to catch, so
+// it is the last shape it may be blind to.
+const AMOUNT_RULES = [...BANNER.matchAll(/^\s*([^{}\n]*\.c1-amount[^{}\n]*)\{([^}]*)\}/gm)]
+  .map((m) => ({ selector: m[1].trim(), family: ((m[2].match(/font-family:\s*([^;]+);/) || [])[1] || '').trim() }))
+  .filter((r) => r.family)
+// The base rule's family drives the probe; every declaring rule is asserted.
+const AMOUNT_FAMILY = (AMOUNT_RULES.find((r) => r.selector === '.c1-amount') || AMOUNT_RULES[0] || { family: '' }).family
 // The token the R071 ruling puts every money and counting surface on.
 const NUMERIC_TOKEN = 'var(--fs-font-numeric)'
 
@@ -263,9 +279,11 @@ function judge(m, label) {
   // rather than inferred from the geometry, because the geometry can be right by
   // luck - any uniform-advance face passes it - whereas the ruling is that money
   // and counting surfaces render in the numeric face specifically.
-  ok(AMOUNT_FAMILY === NUMERIC_TOKEN,
-    `${label}: WinBanner's .c1-amount declares ${NUMERIC_TOKEN} `
-    + `(found ${AMOUNT_FAMILY ? `"${AMOUNT_FAMILY}"` : 'no font-family at all'})`)
+  const wrongFamily = AMOUNT_RULES.filter((r) => r.family !== NUMERIC_TOKEN)
+  ok(AMOUNT_RULES.length > 0 && wrongFamily.length === 0,
+    `${label}: every WinBanner rule that sets a font-family on .c1-amount asks for ${NUMERIC_TOKEN} `
+    + `(${AMOUNT_RULES.length} such rule(s)`
+    + `${wrongFamily.length ? `; offending: ${wrongFamily.map((r) => `"${r.selector}" -> ${r.family}`).join(', ')}` : ''})`)
 
   // AND THE SHIPPED RULE MUST STILL BE THERE. The probe now leans on app.css for
   // the numeric treatment rather than restating it, which is the right way round,

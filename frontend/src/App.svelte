@@ -62,6 +62,9 @@
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, type BetMode } from './lib/stores/betMode'
   import { spinCostMicros, canAffordSpin } from './lib/stores/buyAffordability'
+  // R132: the pod borrows the celebration's own count-up length for a feature
+  // settle - see runPendingFeatureSettle().
+  import { TIER_COUNT_UP_MS, winCountUpTier, setNextRiseDurationMs } from './lib/stores/winCountUp'
   import { boughtRound } from './lib/stores/boughtRound'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
@@ -545,9 +548,16 @@
   //
   // The deferred settle is parked here and run the moment FreeSpinsPresentation
   // bumps its end-banner trigger, which is the frame the total becomes visible.
-  // The post-presentFeature call is kept as a FALLBACK for a feature that ends
-  // without a celebration at all (a triggered round that pays nothing never bumps
-  // the trigger), and it is idempotent because the slot is cleared on use.
+  //
+  // THE POST-presentFeature CALL IS KEPT, AND ITS FIRST JUSTIFICATION WAS WRONG.
+  // It said the fallback covers "a triggered round that pays nothing", on the
+  // assumption that such a round never bumps the trigger. It does: the bump at
+  // FreeSpinsPresentation's reveal is UNCONDITIONAL, so every feature that reaches
+  // its end reveals and settles through the reactive path above. The fallback is
+  // therefore a backstop for a feature that never reaches that reveal at all - an
+  // error path, a teardown mid-round - rather than for a zero-paying one. It stays
+  // because a round that silently never settles would leave the balance wrong, and
+  // it is idempotent because the slot is cleared on use.
   let pendingFeatureSettle: (() => void) | null = null
   function runPendingFeatureSettle(): void {
     const settle = pendingFeatureSettle
@@ -558,6 +568,14 @@
     // is what that banner watches. The feature has its own celebration and must
     // not get a second one on top.
     lastRoundHadFeature = true
+    // THE POD MUST COUNT FOR EXACTLY AS LONG AS THE CELEBRATION DOES. The
+    // feature-end banner always counts over a TIER length; the pod's own rule
+    // uses a short 400..800ms curve below the big-win threshold. Once R132 made
+    // the pod count DURING the celebration, that gap became a spoiler on any
+    // feature paying under 10x: the pod reached the total roughly 950ms before
+    // the banner did. Borrowing the celebration's own length closes it, and this
+    // is the same multiplier and the same table WinBanner uses.
+    setNextRiseDurationMs(TIER_COUNT_UP_MS[winCountUpTier(liveEndBannerMultiplier)])
     settle()
   }
   // Fires on the frame FreeSpinsPresentation reveals the total. Guarded on > 0 so
