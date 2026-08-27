@@ -26733,3 +26733,209 @@ measured and written down rather than guessed at.
 - **Audio untouched.** The four R125 stems still do not exist.
 - **Portrait still has no hero**, and no CI gate measures animation smoothness, reduced-motion
   conformance, or the endpoint behaviour of a one-shot.
+
+---
+
+# R130 - THE IDLE IS A PLANTED STILL NOW, AND THE GLANCE WAS THE LAST PENDULUM
+
+**2026-08-27.** Branch `claude/r130-idle-freeze`, off `main` at `419eace0`. PR #170, review lane.
+Unattended. No kit packaging, no art intake, no audio, no asset guard weakened, no WIP raster
+touched. Every number below was measured first-hand this session; where a number came from a
+subagent I re-ran it myself before using it, and where one of mine was wrong I have said so.
+
+## 1. The ruling, and why this pass is subtractive
+
+R129 diagnosed the tick correctly - it was temporal, it was the idle, 733ms a frame is a slide show -
+and then **smoothed** it with a dual-buffer cross-dissolve that halved the pops for zero bytes. The
+owner looked at the result and still said *"an amateur ticking clock"*. Their ruling:
+
+> bad motion scores worse than a still - idle should be a planted character with tiny life only -
+> win and feature remain the only real performances
+
+The transferable lesson is the shape of the correction, not the CSS: **when a smoothing pass does not
+satisfy, stop smoothing and ask whether the motion should exist at all.** R129 spent a session making
+a bad motion better. R130 deleted it.
+
+## 2. What the idle does now: nothing
+
+Frame 01 of the six-frame strip, held. Measured over the hero's **own 28,804 opaque pixels** (the
+frame-01 alpha mask, eroded 3px), 55 samples across 9 seconds:
+
+| state | mean RGB delta | max delta | samples > 1.0 |
+|---|---:|---:|---:|
+| idle, hero alone | **0.0000** | **0.0000** | 0 / 54 |
+| idle, as shipped (micro-life on) | 0.1151 | 1.1322 | 2 / 53 |
+| reduced motion | 0.0000 | 0.0000 | 0 / 59 |
+| *control* - win big | 23.32 | 58.75 | 12 / 17 |
+| *control* - win epic | 25.67 | 55.09 | 17 / 17 |
+
+The controls are in the same run as the zeros, which is the only reason the zeros mean anything.
+This project has shipped a silently-blind alpha mask three sessions running.
+
+| | before | after |
+|---|---:|---:|
+| idle body rotation range | 0.6400deg | **0.0000deg** |
+| idle lateral head travel | 4.41px | **0.00px** |
+| distinct sheet frames in idle | 6 | **1** (`background-position-x: 0`) |
+
+## 3. The freeze is by deletion, and that is the whole trick
+
+The natural way to write "the sheet never animates" is a rule that switches it off:
+
+```css
+.hero-idle[data-motion] { animation: none; background-position-x: 0; }
+```
+
+That selector is `(0,2,0)`. It **exactly ties** `.hero-idle[data-motion='win']`,
+`[data-motion='energy']` and the rest, and any rule added at the end of the block sits later in
+source order - so it wins, and **silently deletes the 16-frame win unfold and the 7-frame feature
+brace**, with nothing thrown, no 404, and no failing gate. That would have been the fourth
+specificity tie this file has lost, after R121, R128 and R129.
+
+Deleting the idle rules instead leaves nothing matching, and nothing matching is what a frozen sheet
+is. **To stop a CSS state animating, delete its rule - never add a rule that switches it off.**
+
+A subagent found this before it shipped. That single finding paid for the whole fan-out.
+
+## 4. The glance went, and not because of the tick
+
+By the tick metric the glance was **innocent**: 1.360% worst step x 283ms held, against the idle's
+18.75% x 733ms. It is 36x calmer. Two other things retired it.
+
+1. **Its body turn was the largest motion the freeze would have left behind.** `hero-turn-glance`
+   rotates -1.3deg about the feet and *holds* it from 30% to 70% of 1.7s - the figure is at true rest
+   only at t=0 and t=1700. Head displacement 9.10px, held dead still off-rest for 680ms. That is
+   **2.12x the entire peak-to-peak swing of the sway this brief deleted**, and 51.5% of the feature
+   brace's own peak. Once the sway went, this was the only transform left anywhere in the idle state.
+2. **Its art could not carry it alone.** Across all six glance frames the silhouette bbox is
+   invariant and the centroid drifts 0.239px. The head turn was sold *entirely* by the CSS transform.
+   Cutting only the transform would have left a strip nobody can see, still holding the state machine
+   for 1.7s - during which `react()` refuses the feature brace.
+
+`hero_glance_6f.png` (1,655,215 B) is consequently a **shipping orphan**, confirmed present in
+`dist/`. Left on disk deliberately: reinstating the glance is a revert, not a re-render. This is the
+one clear cost of the session and it is the owner's call.
+
+## 5. A third reason was offered for cutting the glance, and it was wrong
+
+Glance frame 01 measures 0.254% silhouette / **5.825 mean RGB** from idle frame 01, where every win
+and brace endpoint is byte-identical to it. That reads as *"the glance is the one strip whose ends
+miss the rest pose"* - a clean argument, and I had already written it into a code comment as fact.
+
+It is false. The glance sheet is authored at **475x940 a frame** where the other three are 394x780,
+so it takes a different downsample path into the 206x407 render box. **Control:** push the *idle's
+own* frame 01 through a 475x940 detour and back, then compare to the plain idle. Result 5.220 against
+the observed 5.537, both eroded 5px to exclude edges - **94% of the gap is the resampler, not the
+art.** A subagent flagged it, I built the detour control myself, and the subagent was right.
+
+**A cross-sheet difference is not a pose difference until it has been measured against a resample
+control.** Recorded in the component so it is not re-derived and re-believed.
+
+## 6. The freeze improved the protected states
+
+Verified with a pure-node PNG decoder (zlib inflate + manual unfiltering) that never touches a
+canvas, so no premultiply or resample can manufacture agreement:
+
+**`idle f1`, `idle f6`, `win f1`, `win f16`, `brace f1` and `brace f7` are one single byte-identical
+master raster** - 0 of 1,229,280 bytes differ across all of them.
+
+So a reaction used to be cut into from whichever of six frames the loop happened to be on, up to
+10.24% from rest. Frozen on frame 01, the cut in and the cut out are **both exactly 0.00%**. The
+freeze did not merely leave the reactions alone; it made their seams free.
+
+## 7. Win and feature, verified through the real trigger paths
+
+Forced attributes prove the rule graph; they do not prove the state machine. Both were run.
+
+| check | result |
+|---|---|
+| win big | `hero-punch-win` 1.5s + `hero-cycle-win` 1.5s, 16/16 frames, 14.75px travel - identical to before |
+| win epic | `hero-punch-epic` 1.9s + sheet **1.9s**, 16/16 frames, state spans 1899ms, last frame advance at **1819ms not 1500ms** - R129's truncated-epic fix intact |
+| feature brace | **real Overdrive buy**: `idle -> energy` at 852ms -> `idle` at 2152ms (exactly `holdFor()`'s 1300ms), 7/7 frames |
+| small win 3x | stays `idle`, no body animation - correctly below `BIG_WIN_THRESHOLD` |
+| reduced motion | everything `none`, bpx `0px`, RGB change 0.0000, epic travel 0.000px |
+| frame pacing | 58.7fps through an epic win, 4 frames >32ms, **0 frames >50ms** |
+| console | zero errors in every run, landscape and portrait |
+| portrait 430x900 | hero absent by design (SceneGroup mounts landscape-only), no errors |
+
+## 8. No micro-life was added, because it already existed one level up
+
+I had measured a belt-lamp rect on the sprite (x82 y179 w22 h8, four cyan bars, fully opaque with 8px
+padding) and was about to build a CSS glow. A subagent found that `SceneGroup.svelte` already mounts
+`.antenna-light` (an amber orb on 2.8s) and `.visor-glint` (a specular sweep on 6s, silent for 92% of
+its cycle) as **siblings of `<HeroIdle>`**, inside the same 206x407 `.char-layer` box - so their
+percentages land on this sprite 1:1. Measured live: the antenna at x53.9..76.9 / y61..83.7, which is
+the ocular pod, and the glint at x66..107 / y45.3..94.1, which is the visor's cyan half.
+
+That is the brief's *"if a breathe already exists and is smaller than the sway, keep the smaller
+one"*, literally. Kept, at zero bytes and zero new code.
+
+**Not building it also avoided three separate critical risks at once**, all identified before the
+fact: a glow child of `.hero-body` is drawn into that element's `drop-shadow`, so pulsing the glow
+would pulse the shadow (R129's double-shadow defect by a new route); a glow carrying `hero-idle` and
+`data-motion` would inherit every reaction animation exactly as layer B did; and a glow *without*
+`data-motion` would escape all three reduced-motion resets, which are gated on that attribute.
+
+**Before adding a feature, grep the parent component.**
+
+## 9. Two things kept on purpose
+
+- **`transform-origin: 50% 97%`.** Its comment sat inside the sway essay and reads as sway machinery.
+  It is not: `hero-punch-win` (-1.2deg), `hero-punch-epic` (-2.0deg) and `hero-brace-energy` (-0.8deg)
+  all rotate and all three pivot on it. Removing it with the sway would swing the **feet** instead of
+  the head, with nothing erroring. The comment has been moved out of the essay and rewritten to say so.
+- **The `.hero-idle[data-motion]` reduced-motion reset**, which now reads as redundant because there
+  is no idle animation left to stop. It is what stills the win and brace flipbooks, and it is the
+  second line of defence behind the live `matchMedia` listener for a player who enables reduce with a
+  reaction already in flight. Deleting it restores the exact R128 defect one layer down.
+
+## 10. An accessibility reset hardened, because my own change raised its stakes
+
+`SceneGroup`'s reduced-motion block stills `.antenna-light` and `.visor-glint` with a bare
+`animation: none` at `(0,1,0)`, tying their state rules and winning **only on source order**. It was
+correct today, and I verified it in a reduced-motion browser.
+
+But the freeze makes those two the **only motion on the resting hero**. If that reset ever loses -
+to any future rule that qualifies them by a parent or a modifier class - a player who asked for
+reduced motion gets the single moving thing on screen, with nothing else moving to hide it. That is
+the same shape as R129's finding that its own `data-tier` work widened a hole one layer down, so it
+gets `!important` rather than a specificity race every future rule must remember to lose.
+
+## 11. My instruments failed twice more, and both were caught by assertion rather than luck
+
+- The **session-start WIP fingerprint file was empty**. BSD `xargs` has no `-a` flag, so the very
+  first fingerprint of the owner's 30 rasters hashed nothing and produced the SHA of an empty file.
+  Caught because the rollup looked like `e3b0c442...`, which is the empty-input hash.
+- A later re-check reported **all 30 rasters missing** and printed `!!! WIP CHANGED !!!`. The shell's
+  working directory had persisted into `frontend/`, so the relative paths did not resolve.
+
+Both were false in opposite directions, and both were caught only because the check asserts a line
+count. **Always assert non-emptiness and line count on a fingerprint before trusting either a match
+or a mismatch.** Fourth and fifth instrument failures in four sessions.
+
+One arithmetic error of my own: I computed the one-shots' ms-per-frame as `duration/(n-1)`.
+`steps(n, jump-none)` divides the domain into **n** intervals, so it is `duration/n` - the file's own
+comments (94ms, 186ms) were right and I was wrong. The ranking and every conclusion were unaffected.
+
+## 12. Guards
+
+- `svelte-check`: **0 errors**, 7 warnings, none in either touched component. No `css_unused_selector`
+  warnings, confirming every layer-B rule was removed rather than orphaned.
+- `build_diet_verify`: **ALL CHECKS PASS** - zero 404s, zero pruned-path requests, zero console
+  errors, reduced-motion CSS present, spin clean.
+- dist **24.68 MB / 25 MB**, headroom **340,099 B** - up **2,188 B** on R129's 337,911. Zero asset
+  bytes added. This is the local working-tree measure, the larger of the two per R127.
+- The owner's **30 WIP rasters verified byte-identical** to the session-start fingerprint
+  (5,126,464 B, rollup `76ad0712...`) and not staged.
+
+## 13. What R130 did not do
+
+- **No raster changed, added or deleted.** The glance sheet was orphaned, not removed.
+- **Audio untouched.** The four R125 stems still do not exist; it remains the only large publication
+  gap, and the blocker is still the Stability licence decision.
+- **The two-needle gauge** is still the owner's to land.
+- **Max win still covers the hero** - eleven sessions.
+- **Nothing in CI measures hero animation, smoothness, or reduced-motion conformance.** Every number
+  in this report came from a throwaway harness written this session and deleted with it. That is now
+  the single biggest gap in this area: R128, R129 and R130 each found a real hero defect that no gate
+  could have caught, and the next one will be found the same way or not at all.
