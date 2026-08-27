@@ -90,6 +90,30 @@ const RETIRED_RULE = /\.c1-amount \.c1-digit \{/.test(BANNER)
 // regression this gate must refuse, not just its effect.
 const SHIPPED_RULE = readFileSync(join(ROOT, 'src/app.css'), 'utf-8')
 
+// ── R132: THE PROBE NOW TAKES ITS FACE FROM THE SHIPPED COMPONENT ────────────
+//
+// WHY THIS EXISTS. Until R132 the probe below declared
+// `font-family: var(--fs-font-numeric)` in its OWN stylesheet and used
+// `var(--fs-font-display)` as its deliberately-failing seed. So it proved that
+// Exo 2 has tabular figures and Orbitron does not - both true, and neither a
+// statement about the game. The shipped `.c1-amount` rule asked for the DISPLAY
+// face for months while this gate ran green, and the amount visibly danced
+// through every count-up: measured at R131, a fixed-length epic amount swung
+// 108.70px in width and slid 54.29px sideways. A GATE THAT RECONSTRUCTS THE
+// THING IT GUARDS CAN BE GREEN OVER A LIVE DEFECT.
+//
+// It cannot simply measure the live element instead: this gate runs against a
+// PRODUCTION preview of dist, where `import.meta.env.DEV` is false, so
+// `__testStores` does not exist and no win can be driven, so the banner never
+// mounts. The honest alternative is to read what the component DECLARES and
+// measure that, which is what follows: the family is parsed out of
+// WinBanner.svelte and fed to the probe, so the probe cannot describe a face the
+// component is not asking for, and it is asserted directly in judge().
+const AMOUNT_RULE = (BANNER.match(/\n\s*\.c1-amount\s*\{[\s\S]*?\}/) || [''])[0]
+const AMOUNT_FAMILY = ((AMOUNT_RULE.match(/font-family:\s*([^;]+);/) || [])[1] || '').trim()
+// The token the R071 ruling puts every money and counting surface on.
+const NUMERIC_TOKEN = 'var(--fs-font-numeric)'
+
 // The two strings, chosen so the narrowest and widest digits are compared.
 const NARROW = '$1,111.11'
 const WIDE = '$8,888.88'
@@ -181,7 +205,12 @@ async function measure(selfTest) {
       // The elements carry `fs-num`, so the SHIPPED rule is what supplies the
       // numeric treatment now and the gate fails if it is removed or weakened.
       content: `.probe-host{position:fixed;left:-9999px;top:0;}
-                .probe-host .c1-amount{font-family:var(--fs-font-numeric);font-weight:900;
+                /* R132: the family is whatever WinBanner.svelte's own .c1-amount
+                   rule asks for, parsed at load. Change the component to the
+                   display face and this probe measures the display face and the
+                   spread assertion below goes red, which is the behaviour that
+                   was missing when the component actually did that. */
+                .probe-host .c1-amount{font-family:${AMOUNT_FAMILY};font-weight:900;
                   letter-spacing:2px;white-space:nowrap;font-size:64px;}
                 /* THE SEED, and it is the world before the ruling: the DISPLAY
                    face, which is Orbitron, with tabular-nums asked for and
@@ -228,6 +257,15 @@ function judge(m, label) {
   const ok = (cond, msg) => { console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${msg}`); if (!cond) failures.push(msg) }
 
   ok(!RETIRED_RULE, `${label}: the retired per-digit box rule is absent from the component`)
+
+  // R132: THE ASSERTION THAT WOULD HAVE CAUGHT THE REAL DEFECT. The component's
+  // own .c1-amount rule must ask for the NUMERIC token. This is stated directly
+  // rather than inferred from the geometry, because the geometry can be right by
+  // luck - any uniform-advance face passes it - whereas the ruling is that money
+  // and counting surfaces render in the numeric face specifically.
+  ok(AMOUNT_FAMILY === NUMERIC_TOKEN,
+    `${label}: WinBanner's .c1-amount declares ${NUMERIC_TOKEN} `
+    + `(found ${AMOUNT_FAMILY ? `"${AMOUNT_FAMILY}"` : 'no font-family at all'})`)
 
   // AND THE SHIPPED RULE MUST STILL BE THERE. The probe now leans on app.css for
   // the numeric treatment rather than restating it, which is the right way round,
