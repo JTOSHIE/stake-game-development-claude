@@ -503,6 +503,14 @@
       strip.style.transform = `translateY(${startY}px)`
       const begin = performance.now() + delayMs
       const fall = (now: number) => {
+        // R135: THIS GUARD IS LOAD-BEARING AND IT LOOKS REDUNDANT. `begin` is captured from
+        // performance.now() while `now` is the requestAnimationFrame timestamp, which is the time
+        // the FRAME began, so when this tween is created during a long frame `now` can PRECEDE
+        // `begin`. That is exactly the mixed-clock read R134 fixed in both money count-ups, where
+        // the unclamped negative rendered as a NEGATIVE WIN. Here it would reach `f` below.
+        // Deleting this line as dead weight reintroduces the class on the shipping reel path.
+        // Held by frontend/scripts/raf_clock_mixing_gate.mjs, whose seeded self-test removes
+        // exactly this line and requires the gate to go red.
         if (now < begin) { requestAnimationFrame(fall); return }
         const f = Math.min((now - begin) / FALL, 1)
         // gravity: accelerating fall (f^2)

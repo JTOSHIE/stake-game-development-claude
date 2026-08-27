@@ -147,7 +147,13 @@ const PRUNED_PREFIXES = [
   // session happens to request - and this script's own comment says its bonus buy
   // exercises "whatever DOES render, not necessarily the full Overdrive
   // walkthrough". A sheet that only loads inside a state the session may not reach
-  // is therefore not covered here. The STATIC asset_reference_gate is what covers
+  // is therefore not covered here. R135 NOTE: the sentence below was an OVERCLAIM until R135.
+  // asset_reference_gate matched only a LITERAL path after the assetBase interpolation, and
+  // HeroIdle writes the hero sheet filename as an interpolation of its own, so the gate could not
+  // see this file at all. R135 taught the gate one level of indirection through a same-file
+  // Record literal and proved it by seeding the glance back in a scratch copy, where it now
+  // resolves a path absent from dist and goes red. The claim is true now; it was not before.
+  // The STATIC asset_reference_gate is what covers
   // it, once R131 taught it to read markup-interpolated assetBase paths.
   'assets/themes/future-spinner/ui/hero/hero_glance_6f.png',
   // R131: the Overdrive perimeter border, removed from App.svelte. Same correction
@@ -156,6 +162,10 @@ const PRUNED_PREFIXES = [
   // is asset_reference_gate, verified by seeding the reference back into App.svelte
   // and watching the gate go red on this exact path.
   'assets/themes/future-spinner/ui/win/overdrive_perimeter.png',
+  // R135: the two genuine orphans, 185,561 B. See the note in vite.config.ts for why R129's
+  // 280,806 B figure was wrong and why frame-2.png is NOT on this list.
+  'assets/themes/future-spinner/frames/frame-1.png',
+  'assets/themes/future-spinner/ui/subtitle.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()

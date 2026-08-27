@@ -281,7 +281,8 @@
      same defect R119 fixed on the bar. One near-white, like every other live
      value in the game. The class names stay: they are field identifiers and are
      attached to markup and autofit, not colour names. */
-  .pm-value.pink,
+  /* R135: `.pm-value.pink` dropped, no element carries it; the two live field identifiers are
+     `.cyan` and `.gold`. That was the fourth and last standing build warning. */
   .pm-value.cyan,
   .pm-value.gold { color: var(--hud-text); text-shadow: none; }
 </style>

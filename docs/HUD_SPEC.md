@@ -36,12 +36,16 @@ file in the same commit, and must keep every assert in
    failure against the platform's, and a reviewer asking where the number came
    from now gets an answer instead of a shrug.
 
-   **ONE KNOWN INCONSISTENCY IS NAMED HERE RATHER THAN QUIETLY FIXED.**
-   `popout_conformance.mjs` labels its assertion "meets the 44px touch target"
-   and tests `>= 40`. Both readings are satisfied by everything shipping, so
-   nothing is masked today, and the threshold is deliberately NOT moved in the
-   pass that documents it, for the same reason a seed is never retuned until it
-   passes. It is the one live item left on TR-164.
+   **AN INCONSISTENCY WAS NAMED HERE AND IS NOW CLOSED, 2026-08-28 by R135.** This paragraph
+   used to record that `popout_conformance.mjs` labelled its assertion "meets the 44px touch
+   target" while testing `>= 40`, and that the threshold was deliberately not moved in the pass
+   that documented it. **R075 moved it.** VERIFIED at HEAD by direct read: the assertion is
+   `geom.btnH >= 44`, and the script's own comment beside it records that it "read >= 40 beside
+   this 44 label from R14 until R075". Nothing on TR-164 remains live here.
+   **THE STALENESS IS RECORDED RATHER THAN QUIETLY DELETED**, because this is a LOCKED spec that
+   a session reads as current, and convention (h.1) exists precisely because a stale status claim
+   in a boot document does the most damage: the next reader either hunts a threshold that is
+   already correct, or "fixes" one that needs no fixing.
 4. **AUTO is tangent to SPIN.** AUTO's left edge equals SPIN's right edge
    exactly (`1027 + 84 = 1111`) — touching, never overlapping, never gapped.
 5. **MAX matches the mobile treatment.** A 48px circle (`.p-round-btn`-style

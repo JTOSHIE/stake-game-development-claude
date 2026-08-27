@@ -1810,12 +1810,11 @@
   .fs-spin.spinning .txt{opacity:.5;}
   @keyframes fs-spin-rot{to{transform:rotate(360deg);}}
 
-  /* ===== SWAPPABLE COLOUR SCHEMES (slot-template layer) =====================
-     The HUD is skin-free: every colour comes from 5 signature tokens. Drop a
-     scheme class on the .fs-hud root and the whole bar re-tints. */
-  .fs-hud.scheme-trap { --sig-cyan:#39FF14; --sig-pink:#FF7A1A; --sig-gold:#EBFF5A; --sig-orange:#FF6600; } /* Trap Lane   */
-  .fs-hud.scheme-oil  { --sig-cyan:#FF8A3D; --sig-pink:#D9A86A; --sig-gold:#F5D061; --sig-orange:#FF5A1F; } /* Oil & Fire  */
-  .fs-hud.scheme-pitch{ --sig-cyan:#2FD24F; --sig-pink:#FFD700; --sig-gold:#EDE7C8; --sig-orange:#4CE06B; } /* Beautiful Game */
+  /* R135: the three swappable scheme rules are deleted. Nothing ever added those classes, so they
+     shipped nothing and stood as build warnings. See the matching note in PaytableModal.svelte.
+     The claim above them, that the HUD is skin-free because every colour comes from five signature
+     tokens, remains TRUE and is unaffected: the tokens are still there and still drive the bar.
+     What is gone is only the three unreachable overrides. */
 
   /* ===== OVERDRIVE TWO-STATE ================================================
      App sets .fs-hud--overdrive (mirror overdriveVisual). Accents flip

@@ -618,6 +618,40 @@ jobs:
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs --source
 
+      # ── The resting hero stays planted, R135 ─────────────────────────────────
+      # R130 deleted the idle flipbook, the 7.2s sway, the cross-dissolve and the
+      # glance on the owner's ruling that bad motion scores worse than a still,
+      # and nothing guarded that afterwards. This keys on BEHAVIOUR rather than on
+      # the five retired names, so the same pendulum under a new name is still
+      # caught, and it reads only the component's CODE, because the component's own
+      # prose names all five and quotes the banned declaration verbatim.
+      - name: hero idle planted, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/hero_idle_planted_gate.mjs --self-test
+
+      - name: the resting hero neither animates nor transforms
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/hero_idle_planted_gate.mjs
+
+      # ── No unguarded mixed-clock rAF read, R135 ──────────────────────────────
+      # Generalises R134's money fix to the whole tree: a rAF frame timestamp
+      # measured against a performance.now() start must be clamped or guarded. It
+      # asserts the CLOCK SOURCE, not the Math.min shape, because R134's own report
+      # parked five safe GameGrid sites on the shape alone and was wrong about all
+      # five. What it really protects is the one early-return guard on the shipping
+      # reel path, which is a one-token deletion away.
+      - name: rAF clock mixing, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/raf_clock_mixing_gate.mjs --self-test
+
+      - name: every mixed-clock rAF read is clamped or guarded
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: node scripts/raf_clock_mixing_gate.mjs
+
       # ── asset regeneration guard (R101) ──────────────────────────────────────
       # `npm run assets` chains three generators that write straight into the
       # shipped asset tree. Measured R101 by running the chain against a copy:

@@ -609,7 +609,28 @@
     background: radial-gradient(circle at center, rgba(8,8,26,0.72), rgba(4,4,14,0.92));
     font-family: var(--fs-font-display); color: #fff; text-align: center;
   }
-  .fs-entry, .fs-end { display: flex; flex-direction: column; gap: 10px; }
+  /* R135: `.fs-entry` was dropped from this rule because no element in the repository carries
+     that class. `.fs-entry-stage` and the `.stage-*` rules are a different, live thing and are
+     untouched. */
+  /* R135: THE END TITLE IS PUSHED CLEAR OF THE WIN BAND, AND THE COLLISION WAS R133'S DOING.
+     Both this title and the feature-end WinBanner are centred on the stage, so they occupy the
+     same rows by construction. Until R133 that did not show: `.fs-face` painted an OPAQUE
+     gradient and the title was simply hidden behind the band. R133 made the face a translucent
+     scrim so the tier ART could read through it, measured exactly that, and nobody measured what
+     ELSE now reads through. The title does, straight into the band, with the banner's own amount
+     glyphs drawn on top of it.
+     MEASURED at 1280x720 on a real NITRO super buy: title 440.5x48 at y336, band 1280x111 at
+     y254.5, amount 594.4x75.7 at y272.1. 61.5% of the title's area lies inside the band and
+     23.8% lies under the amount itself, so at drawn size the headline reads "F ... MPLETE" with
+     the middle swallowed by the money.
+     84px is derived rather than dialled in: the band is centred on stage y=310 and its tallest
+     tier is 172px, so its lowest edge across every tier is y=396; the title's top moves from 336
+     to 420, clearing that by 24px. It is a translate rather than a margin so nothing in the flex
+     column reflows, and the value is in stage pixels, which scale with the stage at every
+     viewport.
+     NOT FIXED BY RE-OPAQUING `.fs-face`: that would revert R133's measured headline result and
+     put the tier art back behind the band. */
+  .fs-end { display: flex; flex-direction: column; gap: 10px; transform: translateY(84px); }
 
   /* TR-036 option (b): a reel that has not landed yet during the retrigger
      ladder. Dimmed and blurred rather than removed, so the grid keeps its
@@ -624,7 +645,7 @@
     transition: box-shadow 200ms ease;
   }
   .fs-title { font-size: 2rem; font-weight: 900; color: var(--theme-primary, #16f2e0); letter-spacing: 3px; text-shadow: 0 0 18px var(--theme-primary, #16f2e0); }
-  .fs-sub { font-size: 1.2rem; color: var(--theme-secondary, #ff2ec4); }
+  /* R135: `.fs-sub` deleted, no element in the repository carries it. */
 
   /* ── Overdrive transition (Motion Polish v2), staged entry sequence ───── */
   .fs-entry-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -812,8 +833,16 @@
     }
     .entry-smoke-wisp, .entry-shockwave { display: none; }
     .entry-continue { animation: none; }
-    .fs-cell.win { animation: none; }
-    .fs-spin-win { animation: none; }
+    /* R135: these two were INERT. Both are (0,2,0) and both lose to a later, more specific rule
+       further down this file, so the cells and the spin counter kept animating under reduced
+       motion while the block claimed to have stopped them. Measured: 9 distinct transform values
+       across the sample under reduce, collapsing to 1 with these marked important, against
+       `.antenna-light` held frozen in the same run as the control.
+       Marked important rather than moved: relocating the @media block below the winning rules
+       would work today and break the next time a rule is appended to this file, which is the
+       failure mode R062 already logged once in this very component. */
+    .fs-cell.win { animation: none !important; }
+    .fs-spin-win { animation: none !important; }
     .fs-retrigger-moment { animation: none; }
   }
   /* OWNER AUDIT ROUND 3, item 8: this width cap (92vw, a REAL viewport unit)

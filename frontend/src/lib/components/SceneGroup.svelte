@@ -505,5 +505,19 @@
        the reduced-motion presentation the same picture minus the movement. Every other
        entry in this block follows the same principle. */
     .chest-lamp { opacity: 0.16; }
+    /* R135: THE BOOSTER FLICKER WAS THE ONE ELEMENT IN THIS BLOCK WITH NO REPLACEMENT OPACITY,
+       AND STILLING IT MADE IT BRIGHTER THAN IT EVER GETS WITH MOTION ON. `animation: none` above
+       removes the keyframes, and the keyframes were the only thing supplying an opacity, so it
+       fell back to the base rule's 1 while its own animated range is 0.25 to 0.80. Measured live
+       with the media feature toggled inside ONE page load: no-preference ranges 0.250 to 0.800
+       across 23 distinct values, reduced pins at 1.000 with getAnimations() empty, and a repeat
+       of the no-preference read afterwards returns the identical 0.250/0.800/23. That is 1.25x
+       its own animated PEAK and 4.00x its resting value. In pixels over the element's own rect,
+       mean luminance went 86.09 to 108.33 and back to 85.07: a signal 22 times the 1.02 drift
+       between the two control reads.
+       0.25 is the keyframe's own 0%/100% resting value, so this is the chest lamp's principle
+       above applied literally: the same picture minus the movement. REDUCED MOTION MAY FREEZE OR
+       DIM. IT MAY NOT INTENSIFY. */
+    .booster-flicker { opacity: 0.25; }
   }
 </style>
