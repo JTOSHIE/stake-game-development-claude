@@ -191,7 +191,7 @@
     return DURATION_MS[next]
   }
 
-  function react(next: HeroReaction) {
+  function react(next: HeroReaction, tier?: 'big' | 'epic') {
     // Under reduced motion the hero holds its rest frame and nothing interrupts
     // it. A sudden one-shot is exactly the kind of motion that setting exists to
     // suppress, so reactions are not damped here, they are skipped.
@@ -202,8 +202,31 @@
     // is another real reaction, so a feature brace can no longer be swallowed by
     // an idle accent that happened to be playing.
     if (motion !== 'idle') return
+    // THE TIER IS ASSIGNED HERE, PAST THE GUARD, AND THAT PLACEMENT IS THE WHOLE FIX.
+    // It used to be assigned by the caller BEFORE this function was reached, so a
+    // refused reaction still changed `winTier` - and data-tier is bound to it on both
+    // elements. An epic in flight followed by a 10x..99x win therefore flipped
+    // data-tier 'epic' -> 'big' MID-ANIMATION, which dropped two rules at once:
+    // .hero-body[...][data-tier='epic'] stopped matching, so the animation NAME
+    // changed and CSS RESTARTED the body at its 0% keyframe (the hero visibly
+    // double-punched), and the sheet's 1.9s override was lost, remapping elapsed
+    // time onto a 1.5s timeline so steps(16) skipped frames. Then the timer, still
+    // set to the epic's 1900ms, killed the restarted 1.5s punch part-way and snapped
+    // the figure to rest from several px above it.
+    // MEASURED, not theorised: 13 to 15 of 16 frames painted, a 9 to 10px jump in a
+    // single frame, exit translateY -7.3 to -9.5px against 0.02 to 0.10 on a clean
+    // epic. An isolating control (epic -> epic at the same offset, same store churn,
+    // tier VALUE unchanged) gives 16/16 and no jump, which is what pins it on the
+    // tier flip rather than on the second round.
+    // REACHABLE BY A PLAYER, also measured: the spin button carries no disabled or
+    // aria-disabled during the epic celebration, and real spin cadence gives
+    // settle-to-settle gaps of 952 to 1050ms, well inside the 1900ms hold.
+    // Assigning past the guard makes the refusal total: a reaction that does not
+    // start now cannot repaint the one that is running.
+    if (next === 'win' && tier) winTier = tier
     motion = next
     clearTimeout(timer)
+    // holdFor() reads winTier, so the line above must stay ahead of this one.
     timer = setTimeout(() => { motion = 'idle' }, holdFor(next))
   }
 
@@ -219,8 +242,10 @@
   $: if ($isSpinning) reactedThisRound = false
   $: if (!$isSpinning && !reactedThisRound && $winMultiplier >= BIG_WIN_THRESHOLD) {
     reactedThisRound = true
-    winTier = $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic' : 'big'
-    react('win')
+    // The tier is PASSED rather than assigned here: react() applies it only if it
+    // actually starts the reaction. See the note in react() for what assigning it
+    // at this line used to do to an epic that was still playing.
+    react('win', $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic' : 'big')
   }
 
   // ── Feature: the moment Overdrive turns on ───────────────────────────────────
