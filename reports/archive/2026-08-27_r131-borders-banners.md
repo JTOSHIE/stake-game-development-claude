@@ -368,9 +368,20 @@ which reads pink label against pink rules. The idle: still planted.
 
 ## 12. Remote CI, final
 
-**30 of 30 PASS on `abd5a537`**, the last commit carrying code and corrections,
+**30 of 30 PASS on `abd5a537`**,
 run https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33039381918
 (`browser: replay contract` 11m6s, inside its cap, no re-run).
+
+**30 of 30 PASS again on `9a3cb1c1`**, which is the last commit carrying code: the
+adversarial pass produced one further source change after `abd5a537`, the third-inert-
+mechanism fix in section 11a.
+
+THREE RUNS ARE RECORDED AND THE LIST STOPS HERE ON PURPOSE. Each of these sections is
+itself a commit, so recording a run always creates a newer commit than the run it
+quotes, and chasing that to a fixed point is not possible. What is verifiable and what
+matters is stated instead: every commit that carried CODE was verified green, by SHA,
+in the past tense. Documentation-only commits after this line are not individually
+re-verified, and that is a deliberate stopping rule rather than an omission.
 
 Two runs are recorded for this branch and both are named in the past tense rather than as
 "the tip", for the reason R130 learned: `b2c8e8a5` in section 10, and `abd5a537` here after the
