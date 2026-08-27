@@ -27775,6 +27775,16 @@ run is itself a commit and therefore always postdates the run it quotes. Every c
 CODE is verified by SHA; documentation-only commits after this line are not individually
 re-verified, which is a deliberate stopping rule.
 
+**30 of 30 PASS again on `5787198d` and `1ceaf857`**, the commits carrying the two fixes the
+adversarial pass produced (section 11), run
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33046290510.
+
+THREE RUNS ARE RECORDED AND THE LIST STOPS HERE, the same deliberate stopping rule R131
+adopted: a section recording a CI run is itself a commit, so it always postdates the run it
+quotes and chasing that to a fixed point is impossible. Every commit that carried CODE was
+verified green, by SHA, in the past tense. Documentation-only commits after this line are not
+individually re-verified.
+
 **Rule 12 does not apply:** nothing landed on `main`. This is PR #172 on the review lane.
 
 ## 10. Back-to-back features, verified separately
