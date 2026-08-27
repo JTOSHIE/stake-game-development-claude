@@ -612,7 +612,25 @@
   /* R135: `.fs-entry` was dropped from this rule because no element in the repository carries
      that class. `.fs-entry-stage` and the `.stage-*` rules are a different, live thing and are
      untouched. */
-  .fs-end { display: flex; flex-direction: column; gap: 10px; }
+  /* R135: THE END TITLE IS PUSHED CLEAR OF THE WIN BAND, AND THE COLLISION WAS R133'S DOING.
+     Both this title and the feature-end WinBanner are centred on the stage, so they occupy the
+     same rows by construction. Until R133 that did not show: `.fs-face` painted an OPAQUE
+     gradient and the title was simply hidden behind the band. R133 made the face a translucent
+     scrim so the tier ART could read through it, measured exactly that, and nobody measured what
+     ELSE now reads through. The title does, straight into the band, with the banner's own amount
+     glyphs drawn on top of it.
+     MEASURED at 1280x720 on a real NITRO super buy: title 440.5x48 at y336, band 1280x111 at
+     y254.5, amount 594.4x75.7 at y272.1. 61.5% of the title's area lies inside the band and
+     23.8% lies under the amount itself, so at drawn size the headline reads "F ... MPLETE" with
+     the middle swallowed by the money.
+     84px is derived rather than dialled in: the band is centred on stage y=310 and its tallest
+     tier is 172px, so its lowest edge across every tier is y=396; the title's top moves from 336
+     to 420, clearing that by 24px. It is a translate rather than a margin so nothing in the flex
+     column reflows, and the value is in stage pixels, which scale with the stage at every
+     viewport.
+     NOT FIXED BY RE-OPAQUING `.fs-face`: that would revert R133's measured headline result and
+     put the tier art back behind the band. */
+  .fs-end { display: flex; flex-direction: column; gap: 10px; transform: translateY(84px); }
 
   /* TR-036 option (b): a reel that has not landed yet during the retrigger
      ladder. Dimmed and blurred rather than removed, so the grid keeps its
