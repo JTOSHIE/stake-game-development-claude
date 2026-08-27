@@ -2228,11 +2228,24 @@
 
            WHY IT WENT. The owner's ruling: the feature borders overlap the hero and
            the car, do not fill the screen, and make the stage too busy. Measured
-           before removing: its ink covered 21.5% of the stage, and it lit 11.08% of
-           the hero's own opaque silhouette - all of it in the BOTTOM THIRD (37.27%
-           of that third, 0.00% of the top and middle), i.e. his feet and lower legs,
-           plus the car across its whole width. Peak added luminance over the hero at
-           the held 0.50 was 0.476, so it was not subtle where it landed.
+           before removing: its ink covered roughly a fifth of the stage, and it lit
+           of the order of a tenth of the hero's own opaque silhouette - ALL OF IT IN
+           THE BOTTOM THIRD, 0.00% of the top and middle under every threshold tried,
+           i.e. his feet and lower legs, plus the car across its whole width.
+
+           THE COVERAGE FIGURES ARE THRESHOLD-DEPENDENT AND ARE GIVEN AS RANGES ON
+           PURPOSE. An adversarial pass showed that the trio 21.5% / 11.08% / 37.27%
+           this comment first carried cannot all come from ONE ink threshold: each
+           lands inside its own convention's range, so quoting them together implied
+           a precision the method does not have. Independent readings ran 17.5 to
+           30.2% of the stage and 9.4 to 14.2% of the silhouette. The part that does
+           reproduce exactly under every convention is the one the decision rested
+           on: nothing in the top or middle third.
+
+           PEAK LIGHT: the perimeter's own light over the hero at the held 0.50 was
+           0.476, but the light actually ADDED is 0.426, because screen blend gives
+           src*(1-dst) and the hero is already lit. This comment first called 0.476
+           "added luminance", which names the second quantity and reports the first.
 
            WHAT STILL SIGNALS THE FEATURE, so nobody re-adds this to fix a hole that
            is not there: .game-frame takes .overdrive-active and runs

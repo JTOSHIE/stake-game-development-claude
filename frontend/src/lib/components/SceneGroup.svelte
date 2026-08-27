@@ -357,12 +357,20 @@
 
      WHY IT DOES NOT TICK, which is the bar the brief sets. Three properties, each the
      opposite of what made the old idle tick: it is CONTINUOUS (an eased opacity ramp,
-     no discrete step - the tick was a 48.9-per-sample jump held 733ms); it changes NO
+     no discrete step - the tick's worst step was 48.9 held 733ms); it changes NO
      GEOMETRY (no transform, no scale, so silhouette change is exactly zero, where the
      tick moved 18.75% of the silhouette); and its period is 7.4s, slower than both
      existing accents and deliberately non-harmonic with them (2.8s and 6.0s) so the
-     three never land together and read as a pulse. Measured contribution is in the
-     R131 section of the session report; the headroom against the tick is ~400x. */
+     three never land together and read as a pulse.
+
+     THE HEADROOM, WITH BOTH SIDES OF THE RATIO TAKEN THE SAME WAY. A first draft said
+     "6,000x quieter", which divided the tick's WORST STEP by the lamp's MEAN - two
+     different kinds of number, and exactly the mistake R130 recorded a rule against.
+     Like for like: worst-step against the lamp's max is 48.872 / 0.0166 = 2,944x, and
+     mean-step against the lamp's mean is 26.614 / 0.0081 = 3,286x. A longer 30s
+     sampling run puts the lamp's mean nearer 0.0055, which widens both rather than
+     narrowing them. Call it THREE THOUSAND TIMES quieter and it is defensible on
+     either pairing. */
   .chest-lamp {
     position: absolute;
     left: 37.37%;

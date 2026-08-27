@@ -27495,3 +27495,64 @@ CI result is itself a commit and therefore always lands after the run it quotes.
 "the branch tip" and it went stale within one commit.
 
 **Rule 12 does not apply:** nothing landed on `main`. This is PR #171 on the review lane.
+
+## 11. Corrections after an adversarial pass over R131's own diff
+
+Three attack agents were run against the shipped change. **They found no regression in
+behaviour and confirmed the border removal was complete and correctly scoped**, but they found
+one real defect and six wrong numbers in my record. This is the second session running that an
+attack pass has found roughly six bad figures, and several of these break rules I wrote for
+myself last session, which is the part worth keeping.
+
+### 11a. The real defect: the hero accents slide off the sprite during reactions
+
+Fixed, and it is pre-existing rather than something R131 introduced - it affects all three
+accents, and the one I added is the mildest case. Full account in section 3 of the commit
+`e44379bc`; the measurement is in the code. The part worth repeating here is that **I shipped
+the fix inert twice before it worked**:
+
+1. Without `:global()` on the `:has()` argument it could never match, because `.hero-body`
+   belongs to another component and Svelte scoping appends this component's class to it.
+   `svelte-check` said so with three `css_unused_selector` warnings and the drift was
+   unchanged. The warning was the tell and I nearly read past it.
+2. With the selector fixed it was STILL inert, because **a CSS animation's keyframe values sit
+   above normal declarations in the cascade**: `opacity: 0` loses to a keyframe that sets
+   opacity. The rule compiled, the selector matched, and the accents still read 0.42.
+
+**A rule that compiles is not a rule that works**, and only the measurement caught either.
+
+### 11b. Six numbers that did not reproduce
+
+| claim as published | corrected |
+|---|---|
+| chest lamp mean 0.0081 / max 0.0166 | **0.0052 to 0.0058 mean** on 273-sample 30s runs; my 9s run over-read it by ~1.5x |
+| "sampled at 110ms" | the nominal sleep was 110ms; screenshot latency makes the real interval longer, so quote the sample count and duration instead |
+| "peak added luminance over the hero 0.476" | 0.476 is the perimeter's OWN light; the light actually **added** is **0.426**, because screen blend gives src*(1-dst) over an already-lit hero |
+| `.overdrive-active` moves 130,998 px / 14.21% | **161,245 px / 17.50%** at matched phase; the figure is phase-dependent because the frame pulses |
+| dist 23,756,186 B | **23,756,611 B** summed from the tree |
+| epic before-swing 126.06px | **89.88px** on their run; both are single samples of a stochastic count-up, so neither is a stable value |
+| "6,000x below the tick" | that divides the tick's WORST STEP by the lamp's MEAN. Like for like it is **2,944x** (max vs worst step) or **3,286x** (mean vs mean step) |
+| 21.5% / 11.08% / 37.27% together | no single ink threshold yields all three; each is inside its own convention's range. **The 0.00% top and middle third reproduces under every convention** |
+
+**Two of these are repeat offences against rules from R130.** "Quote both sides of a ratio from
+the same mask" - broken again by the 6,000x figure. "Do not adopt a subagent's number without
+re-deriving it" - broken again by the 14.21% figure, which came from the overlay inventory and
+which I published without re-measuring.
+
+**The one that is a genuine conceptual error, not a sampling difference, is the luminance
+label.** Calling 0.476 "added luminance over the hero" names one quantity and reports another.
+Screen blend cannot add its own luminance to a pixel that is already bright; it adds
+src*(1-dst). The corrected figure, 0.426, is the one the phrase was claiming.
+
+**What survives all of it unchanged:** the perimeter lit the hero's bottom third and nothing
+above, under every threshold tried; the amount's digit-advance spread went 28.36px to 0.000px;
+the post-entry swing after the fix is 0.00px at big and mega; and the chest lamp is the
+quietest of the three accents by a wide margin whichever sampling is used. The decisions rest
+on those, and none of them moved.
+
+### 11c. What the attack pass could not break
+
+The border removal: no surviving reference in behaviour, no orphaned keyframe from it, the
+prune verified, and the feature still reads. The banner: the tier colours resolve correctly in
+every state including the compound `.c1-win--overdrive` case, which I checked separately and
+which reads pink label against pink rules. The idle: still planted.
