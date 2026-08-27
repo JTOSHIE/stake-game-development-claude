@@ -27556,3 +27556,19 @@ The border removal: no surviving reference in behaviour, no orphaned keyframe fr
 prune verified, and the feature still reads. The banner: the tier colours resolve correctly in
 every state including the compound `.c1-win--overdrive` case, which I checked separately and
 which reads pink label against pink rules. The idle: still planted.
+
+## 12. Remote CI, final
+
+**30 of 30 PASS on `abd5a537`**, the last commit carrying code and corrections,
+run https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33039381918
+(`browser: replay contract` 11m6s, inside its cap, no re-run).
+
+Two runs are recorded for this branch and both are named in the past tense rather than as
+"the tip", for the reason R130 learned: `b2c8e8a5` in section 10, and `abd5a537` here after the
+adversarial pass produced two more commits.
+
+**No red at any point on this branch**, across seven commits. That is the first round in a
+while that is true of, and it is directly attributable to running the whole static-gates job
+locally before the first push and again before each later one: the three failures those runs
+produced were caught on this machine rather than on a runner, and all three were in prose
+rather than behaviour.
