@@ -27837,10 +27837,17 @@ rise. One-shot rather than a mode: consumed by the next rise and cleared.
 reading and direct computation. Base wins are proven unaffected end to end - the pod reaches
 the total in 362 / 395 / 444ms at 2x / 4x / 9x and 1314 / 1913 / 2729ms at 15x / 50x / 250x,
 each at its own expected duration, so the override does not leak. The feature path still lands
-pod and banner on the same number, now agreeing to $0.02 through the climb. But **I could not
-reproduce a sub-10x FEATURE locally**: fourteen bonus buys produced none, because the average
-bought outcome is 96x. The fix is verified in mechanism, not in that specific round, and that
-distinction is the honest one to record.
+pod and banner on the same number, now agreeing to $0.02 through the climb.
+
+**THE PARAGRAPH THAT STOOD HERE IS SUPERSEDED BY SECTION 11f AND IS NO LONGER TRUE.** It
+read: *"But I could not reproduce a sub-10x FEATURE locally: fourteen bonus buys produced
+none, because the average bought outcome is 96x. The fix is verified in mechanism, not in
+that specific round, and that distinction is the honest one to record."* That was accurate
+when written and stopped being accurate the same day. The round IS reproducible on demand,
+the fix IS verified end to end on it, and the measurement is in 11f. The sentence is kept
+rather than deleted because commit `5787198d` and the pull request both quote it, so a
+reader arriving from either needs to find the retraction attached to the claim rather than
+only in a later section.
 
 ### 11b. The gate I widened still had the hole it claimed to close
 
@@ -27887,3 +27894,74 @@ FAIL  every WinBanner rule that sets a font-family on .c1-amount asks for
 | pod caught up "about 2.2 seconds" after the banner left | **1.86s** on the attack's round |
 | "banners=1 on every frame of the round" | literally false - 8,034 of 8,833 frames carry ZERO banners. The invariant that holds, and the one that matters, is **never more than one** |
 | "the residual ~0.1 during the climb" | it is a FRACTION of the total, not a constant: 0.70 on an $862 round, 0.081% against 0.072% on mine |
+
+### 11f. The sub-10x fix IS verified end to end, and 11a's limitation is withdrawn
+
+Section 11a recorded that the sub-10x feature fix was "verified in mechanism, not in that
+specific round". **That limitation is withdrawn. The round is reproducible on demand and the
+fix is now measured end to end on it.**
+
+**What I had missed, and it was in the repository the whole time.** The adversarial pass
+supplied the hook: `?mockCategory=super_win_small` serves a curated real book round paying
+`payoutMultiplier` 230, i.e. **2.30x**, deterministically. Fourteen random bonus buys could
+not produce a sub-10x outcome because the average bought outcome is 96x, which is exactly
+why a curated round exists. **I went hunting through a random distribution for something the
+codebase already had a deterministic handle on**, and that is the reusable lesson rather than
+anything about this round: before sampling for a rare state, check whether a fixture already
+pins it.
+
+**The controlled A/B**, both halves measured by me, same script, same viewport, same curated
+round, differing in exactly one variable.
+
+The BEFORE ran in a throwaway git worktree pinned at `24b8bd8b`, the commit immediately
+before the override, serving on its own port. That commit already carries the FIRST HUD fix
+(`pendingFeatureSettle`, 5 occurrences) and does NOT carry the override
+(`setNextRiseDurationMs`, 0 occurrences), so the one-variable claim is checked rather than
+assumed. Both dev servers were queried over HTTP for the served module text before either
+run, so what each browser actually executed is verified rather than inferred.
+
+| | pod reaches total | banner reaches total | **pod leads by** | max divergence |
+|---|---:|---:|---:|---:|
+| **BEFORE** `24b8bd8b` run 1 | 382ms | 1231ms | **849ms** | **$1.14, 49.6% of total** |
+| **BEFORE** `24b8bd8b` run 2 | 383ms | 1233ms | **850ms** | **$1.14, 49.6% of total** |
+| **AFTER** `8455156f` run 1 | 1233ms | 1233ms | **0ms, in step** | **$0.01, 0.4% of total** |
+| **AFTER** `8455156f` run 2 | 1232ms | 1232ms | **0ms, in step** | **$0.01, 0.4% of total** |
+
+**The detail worth keeping is the column that does NOT move.** The banner reaches its total
+at 1231, 1233, 1233 and 1232ms across all four runs, before and after. The fix moved the POD
+to meet the banner; it did not delay the banner to hide the pod. A fix that had bought its
+agreement by slowing the celebration would show the banner column moving, and it does not.
+
+**Independent corroboration, and it is genuinely independent.** The adversarial pass measured
+the same before-state at 802 to 837ms of lead and $1.13 of peak divergence. Mine reads 849 to
+850ms and $1.14, on a separate checkout, a separate server and a separate process. Two
+measurements of the same quantity that share no input, which is the standard convention (l.4)
+sets, and they agree to within the frame quantum.
+
+### 11g. A process failure of mine on the way to 11f, recorded because the record is the point
+
+The first attempt at the BEFORE measurement was **invalid and I nearly published it.** I ran
+`git stash push -- <the two fix files>` intending to remove the fix, measured, and got numbers
+identical to the AFTER. The reason: **both files were already committed in `5787198d`, so the
+stash captured nothing at all.** `git stash push` with a pathspec and no local changes creates
+no entry, and the `git stash pop` that followed therefore popped a PRE-EXISTING and completely
+unrelated stash from another branch, landing three merge conflicts and an untracked brief in a
+clean tree.
+
+Two lessons, and the second is the one that generalises:
+
+1. **A no-op `git stash push` is silent, and the paired `pop` then targets a stranger.** The
+   pop is not a no-op just because the push was. Any stash-based save-and-restore must verify
+   that the push actually created the entry it intends to pop, by SHA, before running the pop.
+2. **The identical result was the evidence, and I nearly read it as a finding.** Numbers that
+   match the control exactly are far more often a broken instrument than a real null result.
+   This is the fourth instrument failure in four sessions, after the two `omitBackground`
+   captures and the orphan grep, and the pattern across all four is the same: **the instrument
+   failed OPEN, producing a plausible reading rather than an error.**
+
+The repair used a worktree instead, which is what rule 11 prescribes and what I should have
+reached for first: the primary checkout is never mutated, so there is no restore step to get
+wrong. **A measurement that requires mutating the tree you are standing in should be a
+worktree instead.** No work was lost; the unrelated stash was left intact, the three conflicts
+were resolved back to HEAD, and the owner's 30 WIP rasters were verified untouched at every
+step.
