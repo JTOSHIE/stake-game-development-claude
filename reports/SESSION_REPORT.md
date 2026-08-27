@@ -27161,3 +27161,17 @@ with the sheet at 1.9s tier epic, reduced motion all none at RGB 0.0000, feature
 through a real Overdrive buy returning to rest at 2202 ms. `svelte-check` 0 errors,
 `build_diet_verify` ALL CHECKS PASS, zero console errors, and the owner's 30 WIP rasters
 byte-identical to the session-start fingerprint.
+
+## 18. Remote CI, per rule 10
+
+**30 of 30 PASS** on `9d6d6d9e`, the branch tip.
+Run: https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33032586451
+
+One earlier red on this branch, and it was mine: `static gates` failed on `71a52656` at the
+locale completeness step, for the quoted ALL-CAPS word in a comment described in section 14.
+Fixed in `11d3c817`, and the whole static-gates job is now run locally before every push. No
+other red on this branch, and the `browser: replay contract` job that has tipped over a
+15-minute cap on contended runners in previous rounds ran green without a re-run.
+
+**Rule 12 does not apply:** nothing landed on `main`. The work is PR #170 on the review lane
+awaiting Fable, so the owner preview is not this session's to refresh.
