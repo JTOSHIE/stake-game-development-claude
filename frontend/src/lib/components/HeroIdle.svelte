@@ -401,7 +401,16 @@
      DO NOT RENAME `hero-idle`. It reads like idle machinery and it is the exact
      opposite: it is the class that carries the WIN and FEATURE flipbooks below,
      the epic duration stretch, and the reduced-motion sheet reset. Renaming or
-     dropping it removes all four in one edit, with no compile error. */
+     dropping it removes all four in one edit, with no compile error.
+
+     EVERY SPECIFICITY FIGURE IN THIS FILE IS WRITTEN PRE-SCOPING. Svelte appends
+     one scoping class to each of these selectors, verified in the built CSS
+     (`.hero-idle[data-motion]` ships as `.hero-idle[data-motion].svelte-xxxxxx`),
+     so a stated (0,2,0) is really (0,3,0). The shift is +1 for every selector
+     here, so every tie and every comparison above is preserved and the arguments
+     hold as written; the absolute numbers are one class light. The only shape
+     that scopes differently is the descendant form, which takes `:where()` and
+     adds nothing - and nothing in this file uses it. */
 
   /* THREE SEPARATE KEYFRAME NAMES, DELIBERATELY, even though the bodies are
      identical. CSS restarts an animation when its NAME changes, not when its

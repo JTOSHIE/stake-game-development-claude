@@ -353,7 +353,16 @@
        its data-tier work widened an accessibility hole one layer down.
        !important makes the override unconditional rather than a specificity race
        every future rule has to remember to lose. HeroIdle.svelte's own
-       reduced-motion block does this for the same reason. */
+       reduced-motion block does this for the same reason.
+
+       ONE ELEMENT IN THE LIST IS NOT A SOURCE-ORDER TIE, AND THE !important DOES
+       CHANGE WHICH RULE WINS FOR IT - behaviour-neutrally, which is why it stays.
+       `.char-layer.char-idle-strip` above is more specific than this reset, so
+       before !important it OUTRANKED this block for .char-layer. It declares
+       `animation: none` itself, so the computed result was, and remains, none
+       either way; this is the one place in the R130 diff where a rule newly wins
+       where it used to lose, and it was checked rather than assumed. The six
+       other elements are the plain source-order tie described above. */
     .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint {
       animation: none !important;
     }

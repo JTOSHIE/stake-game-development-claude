@@ -572,12 +572,21 @@ achievable from the modular parts. R112 resolved that from the art side instead.
 
 `SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default **`'idle'`**:
 
-- **`'idle'`** renders `HeroIdle.svelte`: a **six**-frame flipbook of the crossed-arms idle strip,
-  `steps(6)` over `background-position-x`, 4.4 s loop, sheet `ui/hero/hero_crossed_idle_6f.png`.
-  **AMENDED 2026-08-26 by R122**, which replaced the five-frame lighting-only strip with a
-  six-frame planted-foot weight shift: the earlier sheet changed the visor and chest glow on a
-  locked pose, this one moves the body. The component also carries a `.hero-body` transform
-  wrapper added in R121; see `reports/archive/2026-08-26_r122-pose-strips.md`.
+- **`'idle'`** renders `HeroIdle.svelte`. **AMENDED 2026-08-27 by R130: THE IDLE NO LONGER
+  ANIMATES AT ALL.** It is frame 01 of `ui/hero/hero_crossed_idle_6f.png`, held, at
+  `background-position-x: 0` with no animation on either the sheet or the `.hero-body` wrapper.
+  The owner's ruling was that bad motion scores worse than a still. R130 deleted the flipbook,
+  the 7.2 s body sway, R129's dual-buffer dissolve and the 24 s `glance` state; the 16-frame win
+  unfold and the 7-frame feature brace are untouched and still play, and are now the only
+  performances this hero has. Resting micro-life comes from `SceneGroup`'s own `.antenna-light`
+  and `.visor-glint`, not from this component.
+  *Superseded description, kept because the surrounding sections still refer to it:* a six-frame
+  flipbook, `steps(6)` over `background-position-x`, 4.4 s loop — amended 2026-08-26 by R122,
+  which replaced the five-frame lighting-only strip with a six-frame planted-foot weight shift.
+  The `.hero-body` transform wrapper was added in R121 and still carries the reactions; see
+  `reports/archive/2026-08-26_r122-pose-strips.md`.
+  **Only frame 01 of that six-frame sheet is now reachable** — see the R130 section of
+  `reports/SESSION_REPORT.md` for the byte cost, which is unresolved and the owner's call.
 - **`'rig'`** is section 11's bone hierarchy, unchanged and still supported.
 - **`'static'`** is the original flat sprite.
 
