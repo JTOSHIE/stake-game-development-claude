@@ -1,6 +1,11 @@
 <script lang="ts">
   import { winAmount, winMultiplier, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
-  import { BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD } from '../stores/winCountUp'
+  import {
+    BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD,
+    // R134: the progress rule, the easing and the money floor, all from the one module,
+    // so this component and the HUD pod and the win banner cannot diverge again.
+    countUpProgress, easeOutCubic, nonNegativeMoney,
+  } from '../stores/winCountUp'
   import { tr } from '../i18n/tr'
   import { formatBalance, CURRENCY_SCALE, formatWin, winFractionDigits } from '../utils/currency'
   import { autofitText } from '../actions/autofitText'
@@ -65,6 +70,20 @@
                 : $scatterCount === 3 ? 'scatter3'
                 : null) as 'scatter3' | 'scatter4' | 'scatter5' | null
 
+  // R134: THIS WAS THE SECOND COPY OF THE NEGATIVE-MONEY DEFECT, AND IT IS THE ONE THAT
+  // MATTERED MOST, because this component is the end-of-round banner of BET REPLAY, which
+  // the compliance rules make mandatory and which a platform reviewer opens on purpose.
+  //
+  // It read `Math.min((now - start) / duration, 1)`, bounding the top and leaving the
+  // bottom open, and then `1 - Math.pow(1 - progress, 3)` by hand: the same clamp and the
+  // same cubic amplification as `stores/winCountUp.ts`, written out twice rather than
+  // shared. Two implementations of one idea is how one bug becomes two, and fixing only
+  // the reported instance would have left a negative amount live on the replay surface
+  // while the report claimed the class was closed.
+  //
+  // Both the progress rule and the easing now come from the store module, so there is
+  // exactly one definition of each and this component cannot drift from the HUD and the
+  // banner again.
   function startCountUp(target: number): void {
     cancelAnimationFrame(animFrame)
     animating      = true
@@ -72,13 +91,12 @@
     const duration = 600
 
     function tick(now: number): void {
-      const progress = Math.min((now - start) / duration, 1)
-      const eased    = 1 - Math.pow(1 - progress, 3)
-      displayValue   = target * eased
+      const progress = countUpProgress(now - start, duration)
+      displayValue   = nonNegativeMoney(target * easeOutCubic(progress))
       if (progress < 1) {
         animFrame = requestAnimationFrame(tick)
       } else {
-        displayValue = target
+        displayValue = nonNegativeMoney(target)
         animating    = false
       }
     }

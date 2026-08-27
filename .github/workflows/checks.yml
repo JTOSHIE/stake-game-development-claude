@@ -807,6 +807,24 @@ jobs:
         working-directory: frontend
         run: npx tsx scripts/precision_law_gate.mjs
 
+      # ── No money surface renders below zero, R134 ────────────────────────────
+      # Both money count-ups clamped progress at the TOP only, so a tween created
+      # during a long frame received an rAF timestamp preceding its own start, and
+      # the cubic ease amplified the negative about threefold. The harm scaled with
+      # the win: about -$0.10 at 15x, -$22.17 at 830x, -$130 at the 5000x cap. This
+      # runs beside the precision law because it is the same subject, what a player
+      # reads as money, from the other end: precision governs the number's SHAPE and
+      # this governs its SIGN.
+      - name: count-up non-negative, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: npx tsx scripts/countup_nonnegative_gate.mjs --self-test
+
+      - name: no money surface renders below zero
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: npx tsx scripts/countup_nonnegative_gate.mjs
+
       - name: currency table, seeded-violation self-test
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend

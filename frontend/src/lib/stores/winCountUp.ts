@@ -100,6 +100,54 @@ export function easeOutCubic(progress: number): number {
   return 1 - Math.pow(1 - progress, 3)
 }
 
+/**
+ * THE PROGRESS CLAMP, and it is clamped at BOTH ends deliberately.
+ *
+ * WHAT WENT WRONG, measured rather than reasoned about. Both money count-ups in this
+ * codebase computed progress as `Math.min(elapsed / duration, 1)`, which bounds the TOP
+ * and leaves the BOTTOM open. `startTime` is taken with `performance.now()` when the
+ * tween is created, while `tick()` is handed the requestAnimationFrame timestamp, which
+ * is the time the FRAME began. When a tween is created during a long frame, that frame
+ * timestamp can PRECEDE the captured start, elapsed goes negative, and a negative
+ * progress passes straight through.
+ *
+ * `easeOutCubic` then makes it worse rather than better: it is cubic, so it AMPLIFIES a
+ * small negative by about three times. A lead of roughly 24ms, one and a half frames at
+ * 60fps, became a rendered value of about -2.6% of the round total.
+ *
+ * AND THE HARM SCALES WITH THE WIN, which is what made this worth a pass of its own. The
+ * same lead renders -$0.10 on a 15x round, -$22.17 on an 830x round, and about -$130 at
+ * the 5000x cap. R132 saw the 15x case, recorded it as a shared easing artefact, and did
+ * not pursue it; R133 measured the 830x case at -$21.35 on the HUD pod beside -$22.17 on
+ * the banner, in six of seven bonus rounds. It is one defect, and it is largest on
+ * exactly the wins a player cares most about.
+ *
+ * Returns 1 for a non-positive or non-finite duration, so a caller cannot divide by zero
+ * into an infinity, and 0 for a negative or NaN elapsed.
+ */
+export function countUpProgress(elapsedMs: number, durationMs: number): number {
+  if (!(durationMs > 0)) return 1
+  const progress = elapsedMs / durationMs
+  // Written as a negated comparison rather than Math.max so that NaN lands on 0 too.
+  if (!(progress > 0)) return 0
+  return progress < 1 ? progress : 1
+}
+
+/**
+ * THE SECOND GUARANTEE, and it is deliberately not the same one.
+ *
+ * The clamp above fixes the cause that was found. This fixes the CLASS: whatever a future
+ * caller does to a tween, no money surface reading through this module renders below
+ * zero. A single defect can be fixed at its cause; a guarantee has to hold against the
+ * next mistake as well, and the two together are what let the report claim a player never
+ * sees a negative win rather than that one arithmetic bug was corrected.
+ *
+ * The comparison is written this way on purpose: NaN and -0 both fall to 0.
+ */
+export function nonNegativeMoney(value: number): number {
+  return value > 0 ? value : 0
+}
+
 export interface WinCountUp extends Readable<number> {
   /**
    * Tween up to `target` over the duration `multiplier` implies, or over
@@ -138,13 +186,13 @@ export function createWinCountUp(): WinCountUp {
 
   function snap(next: number): void {
     cancel()
-    value.set(next)
+    value.set(nonNegativeMoney(next))
   }
 
   function to(target: number, multiplier: number, durationOverrideMs?: number): void {
     cancel()
     if (typeof requestAnimationFrame === 'undefined' || typeof performance === 'undefined') {
-      value.set(target)
+      value.set(nonNegativeMoney(target))
       return
     }
     const start = get(value)
@@ -152,12 +200,12 @@ export function createWinCountUp(): WinCountUp {
     const duration = durationOverrideMs ?? countUpDurationMs(multiplier)
 
     function tick(now: number): void {
-      const progress = Math.min((now - startTime) / duration, 1)
-      value.set(start + (target - start) * easeOutCubic(progress))
+      const progress = countUpProgress(now - startTime, duration)
+      value.set(nonNegativeMoney(start + (target - start) * easeOutCubic(progress)))
       if (progress < 1) {
         frame = requestAnimationFrame(tick)
       } else {
-        value.set(target)
+        value.set(nonNegativeMoney(target))
         frame = null
       }
     }
