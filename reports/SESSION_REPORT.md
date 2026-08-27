@@ -26440,3 +26440,296 @@ by a gate: that the anticipation path had no raster at all (the edge sparks are 
 consumer (one of five does); and that the lobby candidate was smaller than the incumbent (I compared
 it against a 2048x1152 master when the delivered file is 1920x1080, which it matches exactly). None
 of the three changed a verdict, but all three would have been wrong in the record.
+
+---
+
+# R129 - THE TICK WAS THE IDLE, AND IT WAS TEMPORAL
+
+**2026-08-27. Branch `claude/r129-smoothness-hardening`. Review lane. Overnight, multi-agent.**
+
+The owner's complaint was that the hero's movement exists and ticks. It does, it did, and the cause
+was not the one anybody would have guessed from the frame counts. The fix costs **zero bytes of
+asset**. Full technical record at `docs/design/HERO_SMOOTHNESS_R129.md`.
+
+## 0. Control room
+
+Both budget numbers recorded before any file operation, and the 30 owner WIP rasters sha256
+fingerprinted before anything was touched. Five read-only recon agents (hero playback, budget/asset
+weight, viewport, paytable/guide, Stake-facing) and a four-agent adversarial pass. Every
+load-bearing number below was re-measured first-hand by the parent before it was believed.
+
+One artifact worth recording: the hero-playback recon agent correctly reported that
+`HeroIdle.svelte` changed on disk mid-session and flagged a possible second writer. That writer was
+me. Running recon concurrently with authoring makes an agent's clean-tree assertion unreliable
+by construction, and the agent handled it exactly right by re-basing its line numbers on `git show HEAD`.
+
+## 1. WS0.2 + WS1.2: the defect, measured before anything changed
+
+| state | frames | duration | ms/frame | fps | worst neighbour step |
+|---|---:|---:|---:|---:|---:|
+| **idle** | 6 | 4400ms | **733ms** | **1.4** | **18.74%** |
+| win | 16 | 1500ms | 94ms | 10.7 | 18.63% |
+| brace | 7 | 1300ms | 186ms | 5.4 | 19.45% |
+| glance | 6 | 1700ms | 283ms | 3.5 | 1.25% |
+
+**The win and the idle take the same size step. The idle holds it 7.8x longer.** At 1.4 fps the eye
+fully resolves each still and then watches it snap. The tick is TEMPORAL, and it is the idle - the
+one state on screen almost all the time. The reactions were never the problem.
+
+Two aggravating facts, both measured on the strip:
+
+- **One step carries 100% of the lateral range.** Head-band centroid X per frame relative to frame
+  01: `0, -3, -7, +7, +3, 0`; per-step deltas `-3, -4, +14, -4, -3`. The weight shift crosses from
+  its left extreme to its right extreme in a single 733ms cut with no in-between.
+- **Frame 06 is byte-identical to frame 01** (sha256 of the decoded buffers). In a LOOP that is dead
+  air: 1466ms of the cycle shows the same pixels back to back.
+
+**All five candidate causes from WS1.2 were measured, not assumed.** Four were cleared: the sway
+runs on a deliberate 7.2s beat and is continuous rather than stepped; the banner covers hero rows
+0..100 of 415 but only during a win, and the idle is never occluded; **no ancestor clips the hero
+box** - the two `overflow:hidden` ancestors are both 1280x720 while the hero sits at (22,295) 207x408
+entirely inside; and frame count alone is not it, because the win has an identical worst step at
+10.7 fps and does not read as ticking.
+
+## 2. WS1: what shipped, and the correction inside it
+
+**A dual-buffer cross-dissolve on the idle.** Two stacked copies of the same sheet: layer A (bottom)
+at full opacity always, layer B (top) exactly one frame ahead via
+`animation-delay: calc(-1 * var(--hero-frame))`, dissolving in over one frame period. At each step
+boundary A becomes N+1 at full opacity while B becomes N+2 at zero, so the composite is continuous
+across the seam. `--hero-frame` is computed in the markup from `DURATION_MS / FRAMES`, so the
+dissolve cannot drift out of phase with the steps.
+
+**Measured on the COMPOSITE**, 45 samples at 100ms across a full cycle, identical phases: max
+per-sample change **15.33 -> 4.15**, unevenness 3.01 -> **0.67**, spikiness 11.67 -> **3.53**, and
+**spikes above 5.0: 5 -> 0**.
+
+**BUT "THE TICK IS GONE" WAS TOO STRONG, AND THE ADVERSARIAL PASS OVERTURNED IT. It was right.**
+Derived exactly on the sheet rather than from a screenshot, the pops are HALVED, not removed:
+
+| hold | old hard cut | new end-of-dissolve snap |
+|---|---:|---:|
+| f1->f2 | 5.36% | 2.80% |
+| f2->f3 | 5.38% | 2.79% |
+| **f3->f4 (the lurch)** | **18.74%** | **10.32%** |
+| f4->f5 | 5.48% | 2.80% |
+| f5->f6 | 5.44% | 2.76% |
+| **f6->f1 (the seam)** | **0.00%** | **0.00%** |
+
+The honest claim is that a hard cut out of a held still has become the end of a 733ms continuous
+move at half the magnitude, and the loop's one free transition stays free.
+
+**THE ADVERSARIAL PASS FOUND TWO REAL DEFECTS IN MY OWN FIX, AND BOTH ARE NOW FIXED.**
+
+*The drop-shadow was drawn twice.* Both layers carried `filter: drop-shadow(...)`, so it doubled
+wherever they overlapped - darkening as layer B faded in and snapping back at every step, measured
+at 2.35x on the skirt with a **3.269 pop at the f6->f1 seam**, a seam that is otherwise a perfect
+no-op because those frames are byte-identical. Moving the shadow to `.hero-body` so it is computed
+once from the composite removes both; re-measured, the seam is back to **0.00%**.
+
+*It is not a true cross-dissolve and cannot be one.* Two stacked RGBA layers composite as
+`aTop + aBottom(1 - aTop)`, so holding composite alpha at 1 REQUIRES an opaque bottom layer, which
+is precisely what leaves the old silhouette in the composite at the end of each dissolve. Fading
+both removes the union but drops alpha to **0.750** at every midpoint - a 25% translucency pulse
+across the whole figure. The algebra forces a choice. The union was chosen on area: the dip is 25%
+wrong across 100% of the figure, the union is 100% wrong across 2.8% of it, so it is **2.4x to 9x
+less wrong**, and it decays rather than pulsing.
+
+**AND A REACHABLE ACCESSIBILITY DEFECT, ALSO FOUND BY THE ADVERSARIAL PASS.** `reduced` was read
+once in `onMount` with no change listener, so a live OS toggle left it stale in both directions:
+turning reduce ON left reactions firing at someone who had just asked them to stop, and turning it
+OFF left the hero never reacting again for the whole session. Worse, **`.hero-body[data-motion='win']
+[data-tier='epic']` at (0,3,0) outranked the reduced-motion reset at (0,2,0)**, so the epic tier
+escaped the override entirely - reproduced at 1.9s of `hero-punch-epic` with 27.5px of travel while
+the media query reported reduce=true. Big wins and the brace, both (0,2,0), were correctly stilled,
+which isolated it to the epic rule. My own `data-tier` work this session widened that hole.
+
+Fixed both ways: a `matchMedia` change listener that also drops any in-flight reaction immediately,
+and `!important` on the reduced-motion resets so the override is unconditional rather than a
+specificity race every future tier rule has to remember to lose. Verified in the exact adversarial
+scenario: born no-preference an epic win travels 27.5px; **toggled to reduce mid-session the same
+epic produces 1 distinct transform and 0px of travel**; toggled back it resumes.
+
+**FIVE COMMENT NUMBERS DID NOT REPRODUCE AND ARE CORRECTED.** The beat period said the 4.4s flipbook
+and 7.2s sway "re-align every 39.6s" - **LCM(4.4, 7.2) is 79.2s**, and at 39.6s the sway is at the
+opposite extreme, so the figure named the anti-alignment. The banner block, which R126 wrote *as a
+correction*, reported the hero box as `y280.5..695.1` (a mid-punch transformed rect quoted as the
+resting box; it is `y294.98..702.02`, height 407.04 = BOX_H) and quoted one tier's coverage against
+another tier's rectangle. Its own two shares summed to 99.4, which cannot be a two-way partition.
+Re-derived per tier, each summing to exactly 100.00: big covers rows 0..73 (12.68%), mega 0..85
+(17.83%), epic 0..101 (29.44%). The chest band carries **40.07%**, not 39.00% - that figure is rows
+106..170, an off-by-one in the stated band.
+
+**THE FIRST VERSION OF THIS FIX WAS WRONG AND I CAUGHT IT BEFORE SHIPPING.** It faded layer A out
+while B faded in, which is symmetrical and wrong: two stacked semi-transparent layers do not
+composite back to solid. For a pixel opaque in both frames, source-over gives `t + (1-t)^2`, which
+dips to **0.750 at t=0.5**. The hero would have gone 25% transparent at every dissolve midpoint, 1.4
+times a second - a brightness pulse traded for a tick, which is exactly the swap R126 was burned by.
+Holding the bottom layer solid gives 1.000 at every t and the colour still lerps correctly.
+
+**Ghosting was tested before the code was written.** Per adjacent pair, the share of the union solid
+in only one frame is 5.4, 5.4, **18.7**, 5.5, 5.4 percent. Even the worst - the leg swap - leaves
+81.3% of the figure common to both, so the composite reads as one robot with a softened limb.
+Rendered at 0/25/50/75/100% and inspected.
+
+**The reactions deliberately do not get the dissolve.** They use `steps(n, jump-none)` with
+`forwards`, so a layer one frame ahead would run off the end of the sheet and the hero would fade to
+nothing at the close of every reaction. Layer B is inert unless the state is idle, enforced at
+(0,3,0) - which took three attempts, because `.hero-layer-b:not([attr])` is (0,2,0) and ties the
+reaction rules it needed to beat.
+
+**A second, separate defect found and fixed: the epic win stalled for 21.1% of its runtime.**
+`holdFor()` returns 1900ms for epic and the body runs 1.9s, but the sheet was pinned to 1.5s and
+**nothing could override it, because `data-tier` was only ever on the outer div** - no selector could
+reach the sheet element for the epic case. From 1500ms to 1900ms the sprite sat frozen on its final
+frame while the transform kept sliding it around, and since win frame 16 is 0.00% from idle rest,
+the frozen image is the rest pose. `data-tier` is now on both sheet layers and the epic override
+stretches the same 16 frames across 1.9s. Verified reaching `-3090px` at 1899ms where it previously
+froze at 1500ms.
+
+**Tried and thrown away:** shorter idle holds (tool B) - halving the loop to 2200ms still leaves
+367ms a frame, 2.7 fps, still a slide show, and a doubled-speed weight shift reads frantic. Reducing
+the sway (tool D) - R127 already measured it as composing rather than fighting, and it is the only
+thing de-looping a 6-frame strip. New art (tool F) - out of bounds and unnecessary.
+
+## 3. WS1.4 acceptance, all met
+
+Neighbouring-frame pop reduced (15.54 -> 3.98). Rest identity holds. Reduced motion freezes on frame
+01, the rest pose, with layer B hidden and `getAnimations()` empty on both layers, while a
+no-preference context is untouched. Win still resolves all 16 frames to -3090px. **60.1 fps with the
+dissolve running, 60.3 fps during a win.** Zero console errors, zero failed requests.
+
+## 4. WS2: hero box, banner, clipping
+
+Hero box 207x408 at (22,295); win peak pose 194px wide, so 6.5px clearance each side. Banner covers
+hero rows 0..100 of 415, **24%**, and 71.1% of the win strip's silhouette change falls below it
+(measured R126, unchanged). **No ancestor clips the hero box.** Nothing to fix; the banner was not
+touched.
+
+## 5. WS4: viewports
+
+| | desktop 1280x720 | compact 900x600 | portrait 390x844 |
+|---|---|---|---|
+| layout | `.fs-hud` | `.fs-hud` | `.p-hud` |
+| control collisions | none | none | none |
+| horizontal overflow | no | no | no |
+| paytable images | 10/10 loaded | 10/10 loaded | 10/10 loaded |
+| close target | 44x44 | 31x31 | 44x44 |
+| hero present | yes | yes | **no** |
+| console errors / 4xx | none | none | none |
+
+Two results that look like defects and are not, both re-verified:
+
+- **The compact close target is 31px because the whole stage is scaled.** `App.svelte:2669` is
+  `transform: scale(var(--S, 1))` and S = min(900/1280, 600/720) = 0.703; 44 x 0.703 = 30.9. Every
+  element scales together, and portrait deliberately drops that transform, which is why portrait
+  gets a true 44px. A design consequence of the fixed-stage architecture, not a bug.
+- **My first pass reported the compact paytable images as all broken.** They were not; I sampled
+  before decode. With a proper wait, 10/10 load at every viewport.
+
+**Portrait has no hero at all** - `SceneGroup` mounts landscape-only. Existing deliberate behaviour,
+but it means every smoothness improvement in this session is landscape-only, and that belongs in the
+record rather than in a footnote.
+
+## 6. WS5: paytable and guide
+
+All eight guide rows load; the Features row points at `btn_features.png`, the R125 live-control
+capture; no broken images at any viewport; close target 44px in stage units. The lightning-bolt path
+`M13 2 4 14h6l-1 8 9-12h-6z` still appears only on the turbo control. `contrast_gate`,
+`paytable_card_fill_gate` and `locale_completeness_check` all PASS. **No mismatch found, nothing
+changed.**
+
+## 7. WS3: the gauge, documented rather than freelanced
+
+The brief allowed pointing the live draw site at an already-correct needle-free asset **if that file
+exists**. It does not: `ui/gauge_base.png` is absent from the tree and has zero references in `src/`.
+The other allowed path, a CSS trick to hide the baked needle, would have to mask a fixed 62-degree
+sector of the dial and would take the dial furniture with it.
+
+Current state, re-measured: the **committed** `gauge_face.png` carries **1,276 strongly-red lit
+pixels** (the baked needle and its arc) and the **owner's uncommitted working-tree face carries 0**.
+So a deploy from `main` still renders two needles and the owner has already fixed it locally.
+
+Per the brief's fallback, this is documented and **not** actioned:
+
+- **Exact file:** `frontend/public/assets/themes/future-spinner/ui/gauge_face.png`
+- **Exact reason:** the committed version bakes a needle at 62 degrees into the art
+  (`design-system/masters/H2_master_v31.svg:75`) while `BonusInstrumentColumn.svelte:85-88` and
+  `FreeSpinsPresentation.svelte:513-514` stack a separately rotating needle over it.
+- **Exact restore command if it is ever committed and needs undoing:**
+  `git -C /Users/jt/math-sdk checkout -- frontend/public/assets/themes/future-spinner/ui/gauge_face.png`
+- **Do not run the asset pipeline first:** `manifest.json` still exports the whole master over that
+  filename, so a regeneration repaints the needle onto the owner's fix. R127 left an inert
+  `_doc_R127_HAZARD` note at that entry.
+
+## 8. WS7: backlog
+
+1. **`heroMode` is not dead** - `SceneGroup.svelte:45` still exports it and `:95` uses it to drive
+   `char-idle-strip`. It is a live one-line escape hatch, not a remnant.
+2. **Stale comments:** the banner-geometry and cut-transition figures were corrected at R128; this
+   session added a full measured header to the idle rules. The adversarial pass re-checked every
+   numeric comment in the file.
+3. **Second copy of the reduced-motion specificity bug:** swept again. Two pattern matches
+   (`App.svelte` `.overdrive-perimeter`, `GameGrid.svelte` `.idle-glint-sweep`), both already
+   handling their qualified variants inside the block. R128's fix remains the only genuine instance.
+4. **Win-tier numbers:** single source, `winCountUp.ts:61-63`. No disagreement.
+5. **Orphan rasters - and my first scan was wrong.** A literal "name.png" grep flagged ten files;
+   correcting it to match the bare stem showed all but two are referenced through interpolated
+   template expressions like `ui/win/{tier === 'big' ? 'burst_big' : ...}.png`. The genuine orphans
+   are **`frames/frame-1.png` (169,689 B), `frames/frame-2.png` (95,245 B) and `ui/subtitle.png`
+   (15,872 B), 280,806 B total**, and they DO ship - the theme's `frames/` directory is not in
+   `PRUNED_PREFIXES`, which only lists the root-level `assets/frames/`. Listed, not deleted.
+6. **Anticipation visibility, measured:** forcing the anticipation state changes **54.9% of the reel
+   grid** by more than 8/255, mean delta 12.65, max 181, with mean luminance dropping 34.0 to 29.6.
+   The existing CSS is plainly visible. No 240x240 overlays are needed, and R128 already established
+   they have no consumer.
+
+## 9. WS8: image gap memo
+
+| gap | needed? | why | size | consumer | can code cover it? |
+|---|---|---|---|---|---|
+| idle in-between at the weight-shift crossing | **optional** | one step still carries 100% of the 14px lateral range; the dissolve spreads it over 733ms rather than removing it | one frame, 394x780 packed into the existing sheet | `hero_crossed_idle_6f.png` | **partly - already done.** The dissolve is the code cover. A drawn in-between would make the *pose* travel rather than the *transition* smooth |
+| reclaiming idle frame 06 | **free** | frame 06 is byte-identical to frame 01, so the loop wastes a slot | zero net bytes | same sheet | no - needs art, but costs nothing |
+| everything else | **no** | see R127 and R128: refused for absent consumers, weaker measurements or budget | - | - | - |
+
+Nothing else is needed. The remaining publication gap is audio, not images.
+
+## 10. WS6: Stake-facing
+
+Version stamp renders at `App.svelte:2389` (`v10 <sha8> dirty`). Live Balance / Win / Bet confirmed
+live text at every viewport. Reduced motion honoured (section 3). No 404s, no console errors in base,
+win, feature or paytable. `a11y_social_terms_check`, `locale_completeness_check` and `contrast_gate`
+all PASS. Portal tile path exists at `assets/portal/` and is documented; the darker R128 lobby
+candidate was **not** forced in.
+
+**Both budget numbers, final:**
+
+| | dist | headroom |
+|---|---:|---:|
+| local / working tree | 25,876,271 B = **24.678 MB** | **338,129 B** |
+| clean / CI committed | 23,772,508 B = **22.671 MB** | **2,441,892 B** |
+
+R129 added **zero bytes of asset**; the ~1KB local change is the extra DOM element and CSS in the JS
+bundle.
+
+## 11. Would a reviewer still call the hero "ticking"?
+
+**In landscape, no.** The five hard cuts per idle cycle are gone: nothing in the composite now moves
+more than 3.98 in a 100ms sample where the worst was 15.55, and there are zero spikes above 5.0
+where there were five. The epic win no longer freezes for its last 400ms.
+
+**What a reviewer could still fairly say** is that the idle is a *soft* motion rather than a
+*travelling* one - the dissolve makes the transition continuous, but the underlying strip still has
+only one real excursion in it. That is an art-density limit, not a playback bug, and it is now
+measured and written down rather than guessed at.
+
+## 12. What R129 did not do
+
+- **No raster changed.** All 30 owner WIP files verified byte-identical to the session-start
+  fingerprint. Nothing was staged or committed from that set.
+- **The gauge was documented, not fixed**, for the reason in section 7.
+- **The orphaned 280,806 B was listed, not deleted** - removing shipped assets is a change with no
+  proven benefit to the owner this session.
+- **Audio untouched.** The four R125 stems still do not exist.
+- **Portrait still has no hero**, and no CI gate measures animation smoothness, reduced-motion
+  conformance, or the endpoint behaviour of a one-shot.

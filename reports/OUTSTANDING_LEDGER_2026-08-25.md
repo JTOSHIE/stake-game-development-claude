@@ -4,6 +4,121 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1A. R129 - THE TICK WAS THE IDLE, IT WAS TEMPORAL, AND THE FIX COST ZERO BYTES
+
+**Branch `claude/r129-smoothness-hardening`.** Overnight, multi-agent. Full technical record at
+`docs/design/HERO_SMOOTHNESS_R129.md`.
+
+*** THE DIAGNOSIS NOBODY WOULD HAVE GUESSED FROM FRAME COUNTS. Milliseconds per frame and worst
+neighbour step, measured at render size 206x407 before anything changed:
+    idle   6f / 4400ms =  733ms/frame ( 1.4 fps)  worst step 18.74%
+    win   16f / 1500ms =   94ms/frame (10.7 fps)  worst step 18.63%
+    brace  7f / 1300ms =  186ms/frame ( 5.4 fps)  worst step 19.45%
+**THE WIN AND THE IDLE TAKE THE SAME SIZE STEP. THE IDLE HOLDS IT 7.8x LONGER.** At 1.4 fps the eye
+fully resolves each still and then watches it snap. The tick is TEMPORAL and it is the IDLE - the one
+state on screen almost all the time. The reactions were never the problem. ***
+*** TWO AGGRAVATING FACTS ABOUT THE IDLE STRIP: one step carries **100% of the 14px lateral range**
+(head centroid per-step deltas -3, -4, **+14**, -4, -3), and **frame 06 is BYTE-IDENTICAL to frame
+01**, so a LOOP spends 1466ms showing the same pixels back to back. ***
+**ALL FIVE CANDIDATE CAUSES WERE MEASURED, NOT ASSUMED. Four cleared:** the sway is continuous not
+stepped and beats deliberately at 7.2s; the banner covers hero rows 0..100 of 415 but only during a
+win and the idle is never occluded; **NO ancestor clips the hero box** (both overflow:hidden
+ancestors are 1280x720, hero at (22,295) 207x408 entirely inside); frame count alone is not it,
+because the win has an identical worst step at 10.7 fps and does not tick.
+
+*** SHIPPED: A DUAL-BUFFER CROSS-DISSOLVE ON THE IDLE, ZERO BYTES OF ASSET. Two stacked copies of the
+same sheet: layer A (bottom) at full opacity always, layer B (top) exactly one frame ahead via
+animation-delay calc(-1 * var(--hero-frame)), dissolving in over one frame period. --hero-frame is
+computed in the markup from DURATION_MS/FRAMES so it CANNOT drift out of phase with the steps.
+COMPOSITE measured, 45 samples at 100ms: max per-sample change **15.33 -> 4.15**, stdev 3.01 -> 0.67,
+spikiness 11.67 -> 3.53, **spikes above 5.0: 5 -> 0**. ***
+*** BUT "THE TICK IS GONE" WAS TOO STRONG AND THE ADVERSARIAL PASS OVERTURNED IT, CORRECTLY. Derived
+exactly on the sheet, THE POPS ARE HALVED, NOT REMOVED: f3->f4 (the lurch) **18.74% -> 10.32%**, the
+other four ~5.4% -> ~2.8%, and the f6->f1 SEAM stays **0.00% -> 0.00%** (those two frames are
+byte-identical). The honest claim: a hard cut out of a HELD STILL became the end of a 733ms
+CONTINUOUS MOVE at half the magnitude. ***
+*** THE ADVERSARIAL PASS FOUND TWO REAL DEFECTS IN MY OWN FIX. (1) THE DROP-SHADOW WAS DRAWN TWICE -
+both layers carried filter: drop-shadow, so it doubled on overlap, darkened 2.35x across each hold
+and snapped back, producing a **3.269 pop at the seam that was previously a perfect no-op**. Moving
+it to .hero-body fixes both; re-measured, the seam is 0.00% again. (2) IT IS NOT A TRUE CROSS-DISSOLVE
+AND CANNOT BE: two stacked RGBA layers composite as aTop + aBottom(1-aTop), so holding alpha at 1
+REQUIRES an opaque bottom layer, which is exactly what leaves the old silhouette in the composite at
+the end of each dissolve. Fading both removes the union but drops alpha to **0.750** at every
+midpoint - a 25% translucency pulse on the whole figure. THE ALGEBRA FORCES A CHOICE. Union chosen on
+area: the dip is 25% wrong over 100% of the figure, the union 100% wrong over 2.8% of it = **2.4x to
+9x less wrong**, and it decays rather than pulsing. ***
+*** AND A REACHABLE ACCESSIBILITY DEFECT, ALSO ADVERSARIAL. `reduced` was read ONCE in onMount with no
+change listener, so a live OS toggle went stale BOTH ways (ON: reactions kept firing at someone who
+asked them to stop; OFF: the hero never reacted again all session). And
+**.hero-body[data-motion='win'][data-tier='epic'] at (0,3,0) OUTRANKED the reduced-motion reset at
+(0,2,0)**, so the epic tier escaped the override - reproduced at 1.9s of hero-punch-epic with 27.5px
+travel while the media query said reduce=true, with big and brace correctly stilled. MY OWN data-tier
+WORK THIS SESSION WIDENED THAT HOLE. Fixed with a matchMedia change listener (which also drops any
+in-flight reaction at once) and **!important on the reduced-motion resets**, so the override is
+unconditional instead of a specificity race every future tier rule must remember to lose. Verified:
+the same epic now gives 1 distinct transform and 0px travel under reduce, and recovers on toggle-off. ***
+*** FIVE COMMENT NUMBERS DID NOT REPRODUCE, CORRECTED. "4.4 and 7.2 re-align every 39.6s" - **LCM is
+79.2s**; 39.6s is where the sway sits at the OPPOSITE extreme. The banner block, which R126 wrote AS A
+CORRECTION, gave the hero box as y280.5..695.1 (a MID-PUNCH TRANSFORMED rect quoted as the resting
+box; it is y294.98..702.02, height 407.04 = BOX_H) and quoted one tier's coverage against another
+tier's rect - its own two shares summed to 99.4, which cannot be a two-way partition. Re-derived per
+tier, each summing to exactly 100.00: big rows 0..73 = 12.68%, mega 0..85 = 17.83%, epic 0..101 =
+29.44%. Chest band carries **40.07%**, not 39.00% (that is rows 106..170, an off-by-one). ***
+*** MY FIRST VERSION OF THE FIX WAS WRONG AND I CAUGHT IT BEFORE SHIPPING. It faded A out while B
+faded in, which is symmetrical and WRONG: two stacked semi-transparent layers do not composite back
+to solid. For a pixel opaque in both, source-over gives t+(1-t)^2, which **dips to 0.750 at t=0.5** -
+the hero would have gone 25% TRANSPARENT 1.4 times a second, a brightness pulse traded for a tick,
+exactly the swap R126 was burned by. Bottom layer solid gives 1.000 at every t. ***
+**GHOSTING TESTED BEFORE THE CODE WAS WRITTEN:** union-solid-in-one-frame per pair is 5.4, 5.4,
+**18.7**, 5.5, 5.4 percent; even the leg swap leaves **81.3% common**, so it reads as one robot with
+a softened limb. Rendered at 0/25/50/75/100% and inspected.
+**THE REACTIONS DELIBERATELY DO NOT GET IT:** steps(n, jump-none) + forwards means a layer one frame
+ahead runs off the END of the sheet and the hero would fade to nothing at every reaction's close.
+
+*** SECOND DEFECT FOUND AND FIXED: THE EPIC WIN STALLED FOR 21.1% OF ITS RUNTIME. holdFor() returns
+1900ms and the body runs 1.9s, but the sheet was pinned to 1.5s and **NOTHING COULD OVERRIDE IT
+BECAUSE data-tier WAS ONLY ON THE OUTER DIV** - no selector could reach the sheet element for epic at
+all. From 1500 to 1900ms the sprite sat FROZEN on its final frame while the transform slid it around,
+and since win frame 16 is 0.00% from idle rest, the frozen image is the REST pose. data-tier now on
+both sheet layers; verified reaching -3090px at 1899ms where it previously froze at 1500ms. ***
+
+**AUDIT RESULTS.** Viewports desktop/compact/portrait: no collisions, no overflow, paytable 10/10
+images at all three, zero console errors. **Two apparent defects re-verified as NOT defects:** the
+compact 31px close target is the whole stage scaled by S=0.703 (App.svelte:2669) and portrait
+deliberately drops that transform to get a true 44px; and my first pass called the compact paytable
+images broken when I had simply sampled before decode. **PORTRAIT HAS NO HERO AT ALL** (SceneGroup
+mounts landscape-only), so every smoothness gain here is landscape-only. Paytable/guide clean, bolt
+still turbo-only. Anticipation CSS measured VISIBLE: forcing it changes **54.9% of the reel grid**.
+
+**MY ORPHAN SCAN WAS WRONG FIRST TIME TOO:** a literal "name.png" grep flagged ten files; matching
+the bare STEM showed all but two are referenced through interpolated templates like
+`ui/win/{tier === 'big' ? 'burst_big' : ...}.png`. Genuine orphans: **frames/frame-1.png 169,689 B,
+frames/frame-2.png 95,245 B, ui/subtitle.png 15,872 B = 280,806 B**, and they DO ship (the theme's
+frames/ is not in PRUNED_PREFIXES, which lists only the root-level assets/frames/). Listed, not
+deleted.
+
+**GAUGE: DOCUMENTED, NOT FREELANCED, exactly as the brief's fallback directs.** The allowed
+"point at the already-correct asset" path needs ui/gauge_base.png to EXIST; it does not, and has zero
+refs in src/. Committed face still carries **1,276 red pixels**; the owner's uncommitted face carries
+**0**. Exact file, reason and restore command are in the R129 SESSION_REPORT section 7. Do NOT run the
+asset pipeline first: manifest.json still exports the whole master over that filename.
+
+**BUDGET, BOTH VIEWS:** local 25,876,271 B = 24.678 MB (headroom **338,129 B**); clean/CI 23,772,508 B
+= 22.671 MB (headroom **2,441,892 B**). R129 added ZERO bytes of asset. **All 30 owner WIP rasters
+verified byte-identical to the session-start sha256 fingerprint.**
+
+**WOULD A REVIEWER STILL CALL IT TICKING?** Not in the way they did: the five hard cuts out of held
+stills are gone and the worst pop is halved. But the honest answer is that the idle still steps - at
+2.8% typically and 10.3% at the lurch - and a reviewer looking for it would find it. That residual is
+an ART-DENSITY limit (six frames, one of them a duplicate, with one step carrying the whole lateral
+range), not a playback bug, and it is now measured rather than guessed.
+
+**STILL OPEN AFTER R129.** **AUDIO REMAINS THE ONLY LARGE PUBLICATION GAP** (four R125 stems absent,
+hooks wired and silent, forge runnable, blocker is the Stability licence decision). The two-needle
+gauge, owner's to land. Portrait has no hero. 280,806 B of shipped orphans. Max win still covers the
+hero (ten sessions). **Nothing in CI measures animation smoothness, reduced-motion conformance, or
+the endpoint behaviour of a one-shot** - and this session found two defects of exactly those kinds.
+
 ## 0Z. R128 - TOOK NOTHING AGAIN, AND FOUND THAT REDUCED MOTION NEVER WORKED FOR THE HERO
 
 **Branch `claude/r128-anticipation-symbol-lobby`.** 44 runtime candidates, **none shipped**. The
