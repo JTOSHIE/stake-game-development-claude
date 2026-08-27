@@ -123,12 +123,7 @@
   {/if}
 
   <div class="emblem-stage">
-    <!-- R135: the .ring-glow layer is deleted. It painted ZERO pixels: the emblem drawn on top of
-         it is 100% opaque and covers it entirely (inset 0 / 100% against the ring's inset -8% /
-         116%), measured as 0 changed pixels against a 35,894 px positive control in the same run.
-         The splash is byte-identical without it, and splash_calm_gate asserts geometry, which does
-         not change. Widening it to clear the emblem was the alternative and was NOT taken: that is
-         a visible change to the boot screen and therefore the owner's call, not a cleanup. -->
+    <img class="ring-glow" src="{base}/ui/particles/shock_ring.png" alt="" aria-hidden="true" draggable="false" />
     <img class="emblem-layer emblem-full" src="{base}/ui/hero_emblem_512.png" alt="We Roll Spinners" draggable="false" />
   </div>
 
@@ -205,8 +200,30 @@
     aspect-ratio: 1 / 1;
   }
 
-  /* R135: the .ring-glow rules and @keyframes emblem-glow-pulse are deleted with the element.
-     They were the only consumer of that keyframe. See the note at the markup for the measurement. */
+  .ring-glow {
+    position: absolute;
+    inset: -8%;
+    width: 116%;
+    height: 116%;
+    opacity: 0.42;
+    mix-blend-mode: screen;
+    /* Gentle steady glow. The 22s rotation is gone with the flicker sequence:
+       the owner ruling asks for a static mark with a steady glow, and a slowly
+       rotating ring behind a static emblem reads as drift, not calm.
+
+       FS VISUAL FIXPACK JOB 1 (2026-07-27): the ruling for this pass is "logo
+       sitting still with its gentle pulse", so the steady glow now breathes.
+       OPACITY only, matching the loader's filter pulse: the emblem itself does
+       not move, does not scale and does not rotate, and splash_calm_gate.mjs
+       asserts its box is identical across every sample of a ten-second window.
+       A scale pulse would have made that assertion impossible to state. */
+    animation: emblem-glow-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes emblem-glow-pulse {
+    0%, 100% { opacity: 0.34; }
+    50%      { opacity: 0.52; }
+  }
+
   .emblem-layer {
     position: absolute;
     inset: 0;
@@ -252,6 +269,7 @@
   /* Reduced motion is unaffected by this ruling (it never showed the flicker
      staging). The only remaining motion on this screen is the press-prompt
      pulse, which reduced motion still stills. */
+  .hero-splash.reduced .ring-glow { animation: none; opacity: 0.3; }
   /* SCOPED TO .is-ready, both here and in the media query below. These rules
      were unscoped, and being more specific than the base rule they won even
      before ready: under reduced motion the prompt read TAP TO CONTINUE from
@@ -261,6 +279,7 @@
   .hero-splash.reduced .press-prompt.is-ready { animation: none; opacity: 0.75; }
 
   @media (prefers-reduced-motion: reduce) {
+    .ring-glow { animation: none; opacity: 0.3; }
     .press-prompt.is-ready { animation: none; opacity: 0.75; }
   }
 </style>
