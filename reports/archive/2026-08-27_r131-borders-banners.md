@@ -286,3 +286,21 @@ four-bar chest lamp that is three).
 4. **Audio**, still the largest publication gap.
 5. **A CI gate that measures the hero and the banner at all.** R128 through R131 have each found a
    real player-visible defect that no gate could have caught.
+
+## 10. Remote CI, per rule 10
+
+**30 of 30 PASS on `b2c8e8a5`**, run
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33037367041
+(`browser: replay contract` 11m6s, inside its cap, no re-run needed).
+
+**No red on this branch at any point**, which is the first round in a while that is true of,
+and it is directly attributable to running the whole static-gates job locally before the first
+push: the two failures that job would have produced were caught and fixed on this machine
+instead of on a runner. Both were in prose rather than behaviour, and both are recorded in
+section 6.
+
+The SHA is named rather than described as "the branch tip", because a report recording its own
+CI result is itself a commit and therefore always lands after the run it quotes. R130 wrote
+"the branch tip" and it went stale within one commit.
+
+**Rule 12 does not apply:** nothing landed on `main`. This is PR #171 on the review lane.
