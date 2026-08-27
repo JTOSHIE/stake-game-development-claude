@@ -524,6 +524,45 @@
   let liveEndBannerAmount = 0
   let liveEndBannerMultiplier = 0
   let liveEndBannerTrigger = 0
+
+  // R132: THE FEATURE SETTLEMENT NOW LANDS WHEN THE CELEBRATION REVEALS THE
+  // TOTAL, NOT AFTER IT HAS BEEN DISMISSED.
+  //
+  // OWNER AUDIT ROUND 2 deferred settleRound() for a triggered round so the HUD
+  // WIN pod could not reveal the round's full total before the free spins had
+  // played. That reasoning is right and is kept. What it overshot is the END of
+  // the window: the settle waited for presentFeature() to RESOLVE, which happens
+  // after the feature-end celebration banner has counted up AND auto-dismissed.
+  //
+  // MEASURED before this change, on a real bonus buy, sampling every 140ms:
+  //     t=12181..14141   banner counts 0.00 -> 51.40   HUD WIN "$0.00"
+  //     t=16382          banner gone, winAmount becomes 51.4, HUD still "$0.00"
+  //     t=16521..18341   HUD finally counts up to $51.40
+  // So for the entire celebration the player saw the real total on the banner and
+  // $0.00 on the HUD, and the pod only agreed about 2.2s after the banner had
+  // left the screen. The spoiler was already spent; the withholding was no longer
+  // protecting anything, it was just two surfaces disagreeing.
+  //
+  // The deferred settle is parked here and run the moment FreeSpinsPresentation
+  // bumps its end-banner trigger, which is the frame the total becomes visible.
+  // The post-presentFeature call is kept as a FALLBACK for a feature that ends
+  // without a celebration at all (a triggered round that pays nothing never bumps
+  // the trigger), and it is idempotent because the slot is cleared on use.
+  let pendingFeatureSettle: (() => void) | null = null
+  function runPendingFeatureSettle(): void {
+    const settle = pendingFeatureSettle
+    if (!settle) return
+    pendingFeatureSettle = null
+    // Set BEFORE settling, exactly as the original call site did: it drives the
+    // base <WinBanner>'s `suppressed` prop, and settling raises $winAmount, which
+    // is what that banner watches. The feature has its own celebration and must
+    // not get a second one on top.
+    lastRoundHadFeature = true
+    settle()
+  }
+  // Fires on the frame FreeSpinsPresentation reveals the total. Guarded on > 0 so
+  // it cannot run on the initial value, and idempotent via the slot.
+  $: if (liveEndBannerTrigger > 0) runPendingFeatureSettle()
   // R062: the retrigger moment's flame-jet chase, bound out of the
   // presentation and handed to FlameJets.
   let liveRetriggerChaseTrigger = 0
@@ -844,7 +883,8 @@
       }
 
       const deferSettle = !roundIsWincap && !!script?.triggered
-      if (!deferSettle) settleRound()
+      if (deferSettle) pendingFeatureSettle = settleRound
+      else settleRound()
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
       // $isWincap). Wait for COLLECT, then present the complete round
@@ -858,10 +898,9 @@
         await presentFeature(script)
       }
 
-      if (deferSettle) {
-        lastRoundHadFeature = true
-        settleRound()
-      }
+      // Normally already run by the end-banner trigger above; this is the
+      // fallback for a triggered round that never showed a celebration.
+      if (deferSettle) runPendingFeatureSettle()
       playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
       console.error('[Buy error]', err)
@@ -1751,7 +1790,8 @@
       }
 
       const deferSettle = !roundIsWincap && !!script?.triggered
-      if (!deferSettle) settleRound()
+      if (deferSettle) pendingFeatureSettle = settleRound
+      else settleRound()
 
       if ($isWincap) {
         lastRoundWasWincap = true
@@ -1761,10 +1801,9 @@
         await presentFeature(script)
       }
 
-      if (deferSettle) {
-        lastRoundHadFeature = true
-        settleRound()
-      }
+      // Normally already run by the end-banner trigger above; this is the
+      // fallback for a triggered round that never showed a celebration.
+      if (deferSettle) runPendingFeatureSettle()
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)
