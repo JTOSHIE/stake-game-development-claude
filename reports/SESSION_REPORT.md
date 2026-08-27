@@ -28622,11 +28622,8 @@ broken gate rather than a clean tree, and that failure shape has cost this proje
 and the dead `playScatter` export are deleted. The build emitted FOUR `css_unused_selector` warnings
 before and emits ZERO after.
 
-`HeroSplash`'s `.ring-glow` layer painted ZERO pixels: the emblem on top of it is fully opaque and
-covers it entirely, measured as 0 changed pixels against a 35,894 px positive control. The element, its
-rules and the keyframes it solely consumed are gone. **Widening it to clear the emblem was the
-alternative and was NOT taken**: that is a visible change to the boot screen and therefore the owner's
-call, not a cleanup.
+`HeroSplash`'s `.ring-glow` was deleted on the inventory's report that it painted ZERO pixels, and
+**THAT DELETION WAS WRONG AND IS REVERTED. See section 11.**
 
 ## 8. Doc drift
 
@@ -28675,3 +28672,34 @@ that is a new instrument; the audio code defects (a warm mount firing feature cu
 a `played` counter incremented before playback starts, playMaxWin missing on the bought path) are
 diagnosed with file:line but not fixed; and the remaining document corrections are listed in the
 ledger at `scratchpad/r135/LEDGER.md`. All are code-only and inside a future fence.
+
+
+## 11. The one thing this session got wrong, and the process gap it exposed
+
+**CI went RED on `browser: splash calm`, and the cause was mine.**
+
+I deleted `HeroSplash`'s `.ring-glow` layer on the inventory pass's report that it painted ZERO pixels
+and that `splash_calm_gate` "asserts geometry, which does not change". **Both halves were wrong.**
+`splash_calm_gate.mjs:161` carries `.ring-glow` in an explicit watch list and fails when the element is
+ABSENT, which it said three times, once per profile. And my own re-measurement does not support the
+deletion either: the ring is 384x384 against a 331x331 emblem, so it extends about 26px beyond it on
+every side and the "fully occluded" premise is geometrically false to begin with. Diffing ring-on
+against ring-at-opacity-0 inside one page load gives 815 changed pixels at max delta 71, IDENTICAL to
+the drift between two frames of the same condition, against a positive control of 71,765. **That is
+inconclusive, not a confirmation**, and convention (l.6) says unsolved beats wrongly solved. Reverted
+byte-for-byte; splash_calm passes locally after a rebuild and CI is 30/30 green on the revert.
+
+**THE PROCESS GAP IS THE MORE USEFUL HALF.** My pre-push check was the local static-gates runner and it
+was green: 82 steps, one known dirty-tree red. But `splash calm` lives in the BROWSER MATRIX, not the
+static job, so the runner never exercised it and could not have caught this. **A local run of the
+static job is not a local run of CI.** The brief's precondition 5 asked for "a local static-gates
+runner", and I built exactly that and then treated it as though it covered everything. The next
+session's runner should cover both jobs, or the report should say plainly which job it covered.
+
+**Two smaller ones of the same family, recorded so the pattern is visible:** I wrote a comment
+asserting `frame-2.png` is referenced from App.svelte because the inventory said so; it is referenced
+from `themeStore.ts:75`, and I caught that by checking before the commit landed. And the very first
+verification of the grid-flash fix was run against a scratch path I had not created, which failed
+loudly rather than silently. The through-line is that an agent's report is REPORTED, not VERIFIED, and
+convention rule 16 says so; three of this session's four best findings came from re-deriving such a
+claim, and this section is what happened the one time I did not.
