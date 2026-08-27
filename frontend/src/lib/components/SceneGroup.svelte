@@ -381,6 +381,60 @@
     50%      { opacity: 0.44; }
   }
 
+  /* THE THREE ACCENTS ARE SIBLINGS OF .hero-body, SO THEY DO NOT TRAVEL WITH IT.
+     R131, found by an adversarial pass over R131's own diff, and PRE-EXISTING: it
+     affects all three, not just the one this session added.
+
+     Each accent is positioned as a percentage of .char-layer and is painted on top
+     of the sprite. During a reaction .hero-body transforms - the epic punch lifts
+     27px, scales 1.05 and rotates 2deg - and the accents do not, so the glow slides
+     off the feature it is lighting. Measured at the epic peak, as the distance
+     between the PAINTED feature (the sprite centroid put through the live transform
+     matrix) and the CSS glow:
+
+         .antenna-light   0.36px at rest -> 44.59px mid-punch, at opacity 0.42
+         .visor-glint     0.53px        -> 45.55px, at opacity 0.00
+         .chest-lamp      0.66px        -> 39.39px, at opacity 0.42
+
+     The glow boxes are 24 to 41px wide, so at those distances the light is entirely
+     off its feature. The chest lamp drifts LEAST because it sits lowest, nearest the
+     transform-origin at the feet, where a rotation displaces least.
+
+     WHY SUPPRESS RATHER THAN FOLLOW. Making them track would mean either moving them
+     inside .hero-body - which is exactly what must not happen, because that element's
+     drop-shadow is computed from its whole subtree and a glow child would pulse the
+     shadow - or duplicating the transform, which then has to be kept in step with
+     four keyframe sets by hand. Suppression is correct on its own terms anyway:
+     these are RESTING accents. While the hero is performing a win or a brace, the
+     performance is the thing to look at, and a static glint on a moving figure was
+     never the intent.
+
+     `:has()` DEGRADES SAFELY. Where it is unsupported the rule simply does not
+     apply and the behaviour is exactly what shipped before this fix, which is why
+     it is an acceptable mechanism for a cosmetic suppression. */
+  /* :global() ON THE :has() ARGUMENT IS REQUIRED, and leaving it out is a silent
+     no-op. .hero-body belongs to HeroIdle.svelte, so Svelte's scoping appends THIS
+     component's class to it and the selector can never match. The first version of
+     this rule did exactly that: svelte-check reported three css_unused_selector
+     warnings and the measured drift was unchanged at 39 to 45px, i.e. the rule
+     shipped as decoration. The accents themselves stay scoped; only the cross-
+     component condition is global. */
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .antenna-light,
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .visor-glint,
+  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .chest-lamp {
+    /* THE ANIMATION HAS TO BE STOPPED, NOT JUST OVERRIDDEN, and that is the second
+       way this rule was inert before it worked. A CSS animation's keyframe values
+       sit ABOVE normal declarations in the cascade, so `opacity: 0` alone loses to
+       antenna-blink and chest-lamp-breathe, both of which set opacity at every
+       keyframe. Measured: the rule compiled, the selector matched, and the accents
+       still read 0.42 at the punch peak. Cancelling the animation first lets the
+       opacity apply. This is the same shape as the reduced-motion block below,
+       which stops animations rather than trying to out-declare them. */
+    animation: none;
+    opacity: 0;
+    transition: opacity 120ms linear;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     /* R130: !important ON THE ANIMATION RESET, AND THE FREEZE IS WHY.
        These resets are correct TODAY, but only on a tie broken by source order:
