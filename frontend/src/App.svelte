@@ -62,6 +62,9 @@
   import FreeSpinsPresentation from './lib/components/FreeSpinsPresentation.svelte'
   import { selectedBetMode, standingMode, type BetMode } from './lib/stores/betMode'
   import { spinCostMicros, canAffordSpin } from './lib/stores/buyAffordability'
+  // R132: the pod borrows the celebration's own count-up length for a feature
+  // settle - see runPendingFeatureSettle().
+  import { TIER_COUNT_UP_MS, winCountUpTier, setNextRiseDurationMs } from './lib/stores/winCountUp'
   import { boughtRound } from './lib/stores/boughtRound'
   import { reelMode, cycleReelMode } from './lib/stores/reelMode'
   import { lastRoundEvents } from './lib/stores/roundEvents'
@@ -524,6 +527,60 @@
   let liveEndBannerAmount = 0
   let liveEndBannerMultiplier = 0
   let liveEndBannerTrigger = 0
+
+  // R132: THE FEATURE SETTLEMENT NOW LANDS WHEN THE CELEBRATION REVEALS THE
+  // TOTAL, NOT AFTER IT HAS BEEN DISMISSED.
+  //
+  // OWNER AUDIT ROUND 2 deferred settleRound() for a triggered round so the HUD
+  // WIN pod could not reveal the round's full total before the free spins had
+  // played. That reasoning is right and is kept. What it overshot is the END of
+  // the window: the settle waited for presentFeature() to RESOLVE, which happens
+  // after the feature-end celebration banner has counted up AND auto-dismissed.
+  //
+  // MEASURED before this change, on a real bonus buy, sampling every 140ms:
+  //     t=12181..14141   banner counts 0.00 -> 51.40   HUD WIN "$0.00"
+  //     t=16382          banner gone, winAmount becomes 51.4, HUD still "$0.00"
+  //     t=16521..18341   HUD finally counts up to $51.40
+  // So for the entire celebration the player saw the real total on the banner and
+  // $0.00 on the HUD, and the pod only agreed about 2.2s after the banner had
+  // left the screen. The spoiler was already spent; the withholding was no longer
+  // protecting anything, it was just two surfaces disagreeing.
+  //
+  // The deferred settle is parked here and run the moment FreeSpinsPresentation
+  // bumps its end-banner trigger, which is the frame the total becomes visible.
+  //
+  // THE POST-presentFeature CALL IS KEPT, AND ITS FIRST JUSTIFICATION WAS WRONG.
+  // It said the fallback covers "a triggered round that pays nothing", on the
+  // assumption that such a round never bumps the trigger. It does: the bump at
+  // FreeSpinsPresentation's reveal is UNCONDITIONAL, so every feature that reaches
+  // its end reveals and settles through the reactive path above. The fallback is
+  // therefore a backstop for a feature that never reaches that reveal at all - an
+  // error path, a teardown mid-round - rather than for a zero-paying one. It stays
+  // because a round that silently never settles would leave the balance wrong, and
+  // it is idempotent because the slot is cleared on use.
+  let pendingFeatureSettle: (() => void) | null = null
+  function runPendingFeatureSettle(): void {
+    const settle = pendingFeatureSettle
+    if (!settle) return
+    pendingFeatureSettle = null
+    // Set BEFORE settling, exactly as the original call site did: it drives the
+    // base <WinBanner>'s `suppressed` prop, and settling raises $winAmount, which
+    // is what that banner watches. The feature has its own celebration and must
+    // not get a second one on top.
+    lastRoundHadFeature = true
+    // THE POD MUST COUNT FOR EXACTLY AS LONG AS THE CELEBRATION DOES. The
+    // feature-end banner always counts over a TIER length; the pod's own rule
+    // uses a short 400..800ms curve below the big-win threshold. Once R132 made
+    // the pod count DURING the celebration, that gap became a spoiler on any
+    // feature paying under 10x: the pod reached the total roughly 950ms before
+    // the banner did. Borrowing the celebration's own length closes it, and this
+    // is the same multiplier and the same table WinBanner uses.
+    setNextRiseDurationMs(TIER_COUNT_UP_MS[winCountUpTier(liveEndBannerMultiplier)])
+    settle()
+  }
+  // Fires on the frame FreeSpinsPresentation reveals the total. Guarded on > 0 so
+  // it cannot run on the initial value, and idempotent via the slot.
+  $: if (liveEndBannerTrigger > 0) runPendingFeatureSettle()
   // R062: the retrigger moment's flame-jet chase, bound out of the
   // presentation and handed to FlameJets.
   let liveRetriggerChaseTrigger = 0
@@ -844,7 +901,8 @@
       }
 
       const deferSettle = !roundIsWincap && !!script?.triggered
-      if (!deferSettle) settleRound()
+      if (deferSettle) pendingFeatureSettle = settleRound
+      else settleRound()
 
       // Wincap flow: MaxWinCelebration is already showing (reactive to
       // $isWincap). Wait for COLLECT, then present the complete round
@@ -858,10 +916,9 @@
         await presentFeature(script)
       }
 
-      if (deferSettle) {
-        lastRoundHadFeature = true
-        settleRound()
-      }
+      // Normally already run by the end-banner trigger above; this is the
+      // fallback for a triggered round that never showed a celebration.
+      if (deferSettle) runPendingFeatureSettle()
       playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
       console.error('[Buy error]', err)
@@ -1751,7 +1808,8 @@
       }
 
       const deferSettle = !roundIsWincap && !!script?.triggered
-      if (!deferSettle) settleRound()
+      if (deferSettle) pendingFeatureSettle = settleRound
+      else settleRound()
 
       if ($isWincap) {
         lastRoundWasWincap = true
@@ -1761,10 +1819,9 @@
         await presentFeature(script)
       }
 
-      if (deferSettle) {
-        lastRoundHadFeature = true
-        settleRound()
-      }
+      // Normally already run by the end-banner trigger above; this is the
+      // fallback for a triggered round that never showed a celebration.
+      if (deferSettle) runPendingFeatureSettle()
 
       if ($isAutoPlay) {
         autoPlayCount.update(n => n - 1)

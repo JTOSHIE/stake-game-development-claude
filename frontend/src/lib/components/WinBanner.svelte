@@ -627,11 +627,37 @@
   }
 
   /* ── Chromatic flash frame (ANIMATION UPLIFT PASS 2026-07-16, item 3): a
-       single quick RGB-channel-split flash on the epic/max tier, layered
-       full-viewport so it reads as a screen-wide flash rather than just a
-       plate effect. ──────────────────────────────────────────────────────── */
+       single quick RGB-channel-split flash on the epic/max tier, drawn on the
+       band's own left and right edges. It said "full-viewport ... rather than
+       just a plate effect"; it has always been the plate effect, for the
+       containing-block reason set out on the rule below. ─────────────────── */
+  /* R132: `position: absolute`, AND THE DECLARATION NOW MATCHES THE RENDERING.
+     This said `position: fixed`, and the comment above still described a
+     "full-viewport" flash. It was never either. .big-win-banner sets
+     transform: translateY(-50%), and a transformed element is the containing
+     block for its FIXED descendants, so this resolved to the banner's own box:
+     measured live at epic, 1280x172 at y224, byte-identical to the banner's rect
+     rather than the 1280x720 viewport it asked for. `absolute` against the same
+     absolutely-positioned banner gives the identical rect and is what the code
+     was doing all along.
+
+     IT IS NOT DEAD CODE, AND THAT WAS WORTH CHECKING BEFORE DELETING IT. Pinned
+     at its own 12% keyframe peak, with every other animation paused and the
+     count-up text frozen so the control read a true zero, the element paints a
+     visible chromatic split on the band's left and right edges: mean delta 39.95
+     over the left 8px strip and 63.06 over the right, peaks 60.7 and 89.3. A
+     first measurement of mine reported no detectable pixels and was wrong - the
+     0.28s animation had already run to opacity 0 before that screenshot, so it
+     sampled an element that had finished.
+
+     LEFT AT BANNER SCALE ON PURPOSE. Promoting it to a true full-stage layer
+     needs the element hoisted out of this component, since no CSS escapes a
+     transformed ancestor's containing block, and the result would be a 6px fringe
+     at the extreme screen edges - further from the celebration and weaker than
+     the band-edge split it currently draws. The effect reads; only its label was
+     wrong. */
   .c1-chromatic-flash {
-    position: fixed; inset: 0; z-index: 200; pointer-events: none;
+    position: absolute; inset: 0; z-index: 200; pointer-events: none;
     animation: c1-chromatic-flash 0.28s ease-out both;
     mix-blend-mode: screen;
   }
