@@ -29690,3 +29690,27 @@ record-only material and commits direct to main under convention (t.1).
 Open threads: the dev-harness divergence above, left deliberately. The owner
 preview was NOT refreshed by a code change because there was none; rule 12's
 trigger (landing a change on main) is met only by this record commit.
+
+### Owner preview, rule 12, and a correction to the line above
+
+The paragraph above said the preview was not refreshed. It was, after the record
+commit landed, and the printed line is quoted here per convention (a):
+
+```
+OWNER PREVIEW  |  v10 line, main  |  commit 271c7165  |  built 2026-08-28T17:30:09+10:00  |  http://192.168.4.95:5173/
+  address derived from interface en0 and confirmed reachable (1 candidate probed)
+```
+
+There is no one-commit lag on this one: the record commit was already on main
+when the refresh ran, and nothing followed it but this correction.
+
+### Remote CI, rule 10, verified after the push
+
+Run **33151758259** on `271c7165`:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/33151758259
+**completed SUCCESS. 2 of 3 jobs green with 1 SKIPPED**, and the skip is the
+designed outcome rather than an accident: this is a documents-only push, so the
+`changes` job correctly gates the browser matrix out, which CLAUDE.md records as
+billing about 1.4 minutes instead of 24.1. The static job, which carries the
+document currency, dash and locked-paths gates, is never gated and ran green.
+Local before the push: static **82/82**.
