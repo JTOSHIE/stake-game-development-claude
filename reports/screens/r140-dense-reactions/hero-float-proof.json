@@ -1,0 +1,326 @@
+{
+  "baseUrl": "http://localhost:5174",
+  "sections": {
+    "A": [
+      {
+        "label": "wrapper floats 2 to 4px peak to peak",
+        "ok": true,
+        "detail": {
+          "heroAmp": 3
+        }
+      },
+      {
+        "label": "float period near 5s",
+        "ok": true,
+        "detail": {
+          "heroPeriod": 5001
+        }
+      },
+      {
+        "label": "float at or below the car amplitude",
+        "ok": true,
+        "detail": {
+          "heroAmp": 3,
+          "carAmp": 6
+        }
+      },
+      {
+        "label": "pose pixels do not tick: sheet never animates",
+        "ok": true,
+        "detail": {
+          "seen": [
+            "none"
+          ]
+        }
+      },
+      {
+        "label": "pose pixels do not tick: sheet holds frame 01",
+        "ok": true,
+        "detail": {
+          "seen": [
+            "0px"
+          ]
+        }
+      },
+      {
+        "label": "no punch at rest: body transform stays none",
+        "ok": true,
+        "detail": {
+          "seen": [
+            "none"
+          ]
+        }
+      }
+    ],
+    "A_trace": {
+      "heroAmp": 3,
+      "carAmp": 6,
+      "heroPeriod": 5001,
+      "samples": 276
+    },
+    "B": [
+      {
+        "label": "a 5x win leaves the hero at rest",
+        "ok": true,
+        "detail": {
+          "motion": "idle",
+          "tier": null,
+          "crossMounted": false
+        }
+      }
+    ],
+    "C": [
+      {
+        "label": "a 15x win starts the big-tier reaction",
+        "ok": true,
+        "detail": {
+          "motion": "win",
+          "tier": "big",
+          "crossMounted": true
+        }
+      },
+      {
+        "label": "top buffer runs the win position and fade clocks (1.5s / 48.387ms x 31)",
+        "ok": true,
+        "detail": [
+          {
+            "name": "s-GsB9uxaxff4K-hero-cross-top-win",
+            "duration": 1500,
+            "iterations": 1
+          },
+          {
+            "name": "s-GsB9uxaxff4K-hero-cross-fade-win",
+            "duration": 48.387,
+            "iterations": 31
+          }
+        ]
+      },
+      {
+        "label": "bottom buffer runs the win bottom clock (1.5s)",
+        "ok": true,
+        "detail": [
+          {
+            "name": "s-GsB9uxaxff4K-hero-cross-bottom-win",
+            "duration": 1500
+          }
+        ]
+      },
+      {
+        "label": "top buffer rides exactly one frame (206px) ahead at every sample",
+        "ok": true,
+        "detail": {
+          "n": 71,
+          "seen": [
+            -206
+          ]
+        }
+      },
+      {
+        "label": "the fade sweeps low to high",
+        "ok": true,
+        "detail": {
+          "min": 0.012,
+          "max": 0.989
+        }
+      },
+      {
+        "label": "exit lands on rest: buffer unmounted, frame 01, no transform",
+        "ok": true,
+        "detail": {
+          "after": {
+            "motion": "idle",
+            "tier": null,
+            "crossMounted": false
+          },
+          "rest": {
+            "bg": "0px",
+            "bodyT": "none"
+          }
+        }
+      },
+      {
+        "label": "frame rate holds through the dissolve (clean run)",
+        "ok": true,
+        "detail": {
+          "mean": 60,
+          "longFrames": 0,
+          "samples": 83
+        }
+      }
+    ],
+    "C_fps": {
+      "mean": 60,
+      "longFrames": 0,
+      "samples": 83
+    },
+    "C2": [
+      {
+        "label": "bottom buffer paints frames 01..31, 0 to -6180px, one 206px step each",
+        "ok": true,
+        "detail": {
+          "first": 0,
+          "last": -6180,
+          "n": 31
+        }
+      },
+      {
+        "label": "top buffer paints frames 02..32, -206 to -6386px, one frame ahead throughout",
+        "ok": true,
+        "detail": {
+          "first": -206,
+          "last": -6386,
+          "n": 31
+        }
+      },
+      {
+        "label": "the two buffers between them paint all 32 frames of the sheet",
+        "ok": true,
+        "detail": {
+          "union": 32
+        }
+      }
+    ],
+    "C2_sweep": {
+      "bottomFirst": 0,
+      "bottomLast": -6180,
+      "topFirst": -206,
+      "topLast": -6386,
+      "union": 32
+    },
+    "D": [
+      {
+        "label": "a 150x win starts the epic tier",
+        "ok": true,
+        "detail": {
+          "motion": "win",
+          "tier": "epic",
+          "crossMounted": true
+        }
+      },
+      {
+        "label": "epic stretches the position clock to 1.9s and the fade to 61.29ms",
+        "ok": true,
+        "detail": {
+          "cross": [
+            {
+              "name": "s-GsB9uxaxff4K-hero-cross-top-win",
+              "duration": 1900
+            },
+            {
+              "name": "s-GsB9uxaxff4K-hero-cross-fade-win",
+              "duration": 61.29
+            }
+          ],
+          "sheetDur": [
+            1900
+          ]
+        }
+      },
+      {
+        "label": "a 15x win mid-epic cannot flip the tier",
+        "ok": true,
+        "detail": {
+          "motion": "win",
+          "tier": "epic",
+          "crossMounted": true
+        }
+      },
+      {
+        "label": "the epic exits to rest after its own 1.9s hold",
+        "ok": true,
+        "detail": {
+          "motion": "idle",
+          "tier": null,
+          "crossMounted": false
+        }
+      }
+    ],
+    "E": [
+      {
+        "label": "overdrive-on starts the brace",
+        "ok": true,
+        "detail": {
+          "motion": "energy",
+          "tier": null,
+          "crossMounted": true
+        }
+      },
+      {
+        "label": "brace runs the energy clocks (1.3s / 86.667ms x 15)",
+        "ok": true,
+        "detail": [
+          {
+            "name": "s-GsB9uxaxff4K-hero-cross-top-energy",
+            "duration": 1300,
+            "iterations": 1
+          },
+          {
+            "name": "s-GsB9uxaxff4K-hero-cross-fade-energy",
+            "duration": 86.667,
+            "iterations": 15
+          }
+        ]
+      },
+      {
+        "label": "the brace exits to rest",
+        "ok": true,
+        "detail": {
+          "motion": "idle",
+          "tier": null,
+          "crossMounted": false
+        }
+      }
+    ],
+    "F": [
+      {
+        "label": "no float under reduced motion (wrapper and car stilled)",
+        "ok": true,
+        "detail": {
+          "charAnims": 0,
+          "carAnims": 0
+        }
+      },
+      {
+        "label": "reactions are refused under reduced motion",
+        "ok": true,
+        "detail": {
+          "motion": "idle",
+          "tier": null,
+          "crossMounted": false
+        }
+      },
+      {
+        "label": "a reaction in flight is dropped when reduce turns on",
+        "ok": true,
+        "detail": {
+          "motion": "idle",
+          "tier": null,
+          "crossMounted": false
+        }
+      }
+    ],
+    "G": [
+      {
+        "label": "scene not mounted in portrait (recorded, not failed)",
+        "ok": true,
+        "detail": {
+          "present": false
+        }
+      }
+    ],
+    "H": [
+      {
+        "label": "zero console errors",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "label": "zero page errors",
+        "ok": true,
+        "detail": []
+      }
+    ]
+  },
+  "consoleErrors": [],
+  "pageErrors": []
+}

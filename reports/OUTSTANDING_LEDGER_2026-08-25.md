@@ -287,7 +287,7 @@ never had, at exactly the seam where the strip hands back to the idle. **Max-jum
 completely, because 13.02% is nowhere near the maximum.** When you optimise a summary statistic,
 check the places the statistic cannot see.
 
-**SHIPPED: `hero_win_reaction_16f.png`, 16 of 24 frames**, anchored on rest / ease-in / peak /
+**SHIPPED: hero_win_reaction_16f.png, 16 of 24 frames**, anchored on rest / ease-in / peak /
 ease-out / rest. **Entry 0.93%, exit 0.53% - both GENTLER than the live strip's 2.08% / 2.12%.** Max
 jump 18.63%, pairs above 20% and 25% both zero, mean 11.10%. Peak pose slightly BIGGER than live
 (chest 137->193 becomes 126->194, adding an anticipation crouch). Identity IoU 1.0000, edge 0,
@@ -468,9 +468,18 @@ both strips; smallest margin 36px. The supplier ADDED the test R122 asked for an
 per-frame min/max opaque x (my figures differ by 1px only because I threshold at alpha>127). ***
 
 **BOTH SHIPPED, packed at 0.58 like R122**, drop-in (frame counts and filenames unchanged, NO code
-change): hero_win_reaction_8f.png 1,918,408 bytes (+419,131) and `hero_feature_trigger_7f.png`
+change): hero_win_reaction_8f.png 1,918,408 bytes (+419,131) and hero_feature_trigger_7f.png
 1,686,780 (+190,042). Net +609,173. dist **23.27 MB of 25**, headroom 1.73 MB. Residual RGB under
 alpha 0 = 0 (one of seven brace frames carried fringe; zeroed before AND after resample).
+
+> **R140 NOTE, 2026-08-28.** Both reaction sheets named in this document are de-backticked
+> as of this session, because neither exists at HEAD any more: R140 replaced
+> hero_win_reaction_16f.png with a 32-frame sheet and hero_feature_trigger_7f.png with a
+> 16-frame one, deleting both incumbents rather than keeping them alongside. Every figure
+> recorded above is left exactly as it was written, because it was true when written; only
+> the path citations are softened, which is the same treatment and the same reason as the
+> R126 note below. The R140 replacements measure a mean adjacent-frame step of 6.913% (win)
+> and 8.256% (brace) at render size, against the 11.098% and 13.312% recorded here.
 
 > **R126 NOTE, 2026-08-26.** The win filename above is de-backticked because that file no
 > longer exists: R126 replaced it with a 14-frame sheet, hero_win_reaction_14f.png. The R123

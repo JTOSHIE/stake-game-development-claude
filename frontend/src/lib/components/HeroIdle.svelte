@@ -18,12 +18,19 @@
   // SceneGroup's .char-layer, one level ABOVE this component (translateY only,
   // 3px over 5s, half the car's measured 6px), so the pose held here still
   // cannot tick: this sheet keeps frame 01 with no idle animation of its own.
-  // The reactions keep their 16- and 7-frame strips but now play through a
-  // two-buffer crossfade: this sheet element holds the current frame at
-  // opacity 1 while .hero-cross, mounted only for the duration of a reaction,
-  // fades the NEXT frame in over it, so each 13 to 19% adjacent-frame
-  // silhouette step (measured at R138 on the shipped sheets at render size)
-  // reads as a continuous blend instead of an 8 to 10fps cut. The idle never
+  // The reactions play through a two-buffer crossfade: this sheet element holds
+  // the current frame at opacity 1 while .hero-cross, mounted only for the
+  // duration of a reaction, fades the NEXT frame in over it, so each adjacent-frame
+  // silhouette step reads as a continuous blend instead of an 8 to 10fps cut.
+  //
+  // R140 REPLACED BOTH REACTION STRIPS WITH DENSE ONES: the win went 16 -> 32 frames
+  // and the brace 7 -> 16, which is what the crossfade was always sized to exploit.
+  // Measured at render size 206x407, alpha>127, symmetric difference over union, the
+  // mean adjacent-frame step FELL 11.098% -> 6.913% on the win and 13.312% -> 8.256%
+  // on the brace, about 38% on each, while the peak displacement from rest barely
+  // moved (27.043% -> 24.317% and 27.988% -> 26.160%). So it is the SAME performance
+  // sampled roughly twice as finely, not a different or larger one - which is exactly
+  // what the owner asked for when he called the transitions a slideshow. The idle never
   // uses the dissolve: the top buffer does not exist while motion is 'idle'.
   //
   // WHERE THE "TINY LIFE" LIVES, AND IT IS NOT IN THIS FILE. The brief allowed a
@@ -48,10 +55,18 @@
   // both STARTS and ENDS on the idle's rest pose. Measured at render size
   // 206x407 against idle frame 01, as silhouette change / mean absolute RGB:
   //
-  //     win frame 01     0.000% / 0.000      win frame 16    0.000% / 0.003
-  //     brace frame 01   0.000% / 0.000      brace frame 07  0.003% / 0.004
+  //     win frame 01     0.006% / 0.004      win frame 32    0.006% / 0.004
+  //     brace frame 01   0.006% / 0.004      brace frame 16  0.006% / 0.004
   //
-  // Both ends of both reactions are free. That is BETTER than it was: while the
+  // R140: THOSE FOUR USED TO READ 0.000% AND THE CHANGE IS NOT A REGRESSION. The dense
+  // strips derive from the stated identity master, and delivered frame 01 is
+  // BYTE-IDENTICAL to it. That master differs from the one the 16-frame sheet was cut
+  // from by 3,587 px at 680x1344, every one of them alpha delta <= 3 on an edge, with
+  // silhouette IoU exactly 1.000000 - the same pose through a different chain. Resampled
+  // into the box that reads as 0.006%, and the RESAMPLE CONTROL (the live rest frame put
+  // through a 680x1344 detour and compared with itself) is 0.027%. The endpoints are
+  // therefore FOUR TIMES CLOSER to rest than the floor of the instrument measuring them.
+  // Both ends of both reactions are still free. That is BETTER than it was: while the
   // idle animated, a reaction could be cut into from any of six frames, up to
   // 10.242% silhouette away from rest (frame 04). Frozen on frame 01, the cut in
   // is exactly the 0.000% above. The freeze target must therefore stay frame 01,
@@ -111,19 +126,25 @@
   // Measure a cross-sheet difference against a resample control before calling it
   // a pose difference.
   //
-  // hero_glance_6f.png (1,655,215 B) is consequently an ORPHAN and still ships. It
-  // was left on disk deliberately - reinstating it is a revert, not a re-render.
+  // hero_glance_6f.png (1,655,215 B) is consequently an ORPHAN. It was left on disk
+  // deliberately - reinstating it is a revert, not a re-render.
+  // R140 CORRECTION: this used to say the orphan "still ships", and it does not.
+  // vite.config.ts names it in build-diet's explicit prune list, so it is kept in the
+  // REPOSITORY and stripped from the BUNDLE. Verified by reading the build log of this
+  // session's own build: "pruned file .../hero_glance_6f.png (1.58 MB)", and the file
+  // is absent from dist afterwards. Noted here rather than left, because a stale claim
+  // in a file a reader trusts is the failure convention (h.1) was written about.
 
   const SHEET: Record<HeroMotion, string> = {
     idle: 'hero_crossed_idle_6f.png',
-    win: 'hero_win_reaction_16f.png',
-    energy: 'hero_feature_trigger_7f.png',
+    win: 'hero_win_reaction_32f.png',
+    energy: 'hero_feature_trigger_16f.png',
   }
   // FRAMES.idle SURVIVES THE FREEZE AND IS NOT DEAD MACHINERY. It looks like
   // flipbook state and it is not: background-size below is BOX_W * FRAMES[motion],
   // so it is what scales the six-frame strip such that position 0 paints frame 01
   // at the right size. Drop it and the frozen hero renders at the wrong scale.
-  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 16, energy: 7 }
+  const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 32, energy: 16 }
   // ~0.10s a transition for the win, ~0.22s for the brace (R138: the crossfade
   // divides the duration into n-1 transitions where the flipbook divided it
   // into n holds; the totals are unchanged): fast enough to read as a
@@ -525,9 +546,14 @@
      at the boundary rather than fading, because the bottom buffer must hold
      opacity 1 (fading it would show the backdrop through the body, the ghosted
      second body the brief forbids). Half of every step is smoothed; the other
-     half was measured at R138 as the acceptable residue: the strips' adjacent
-     frames overlap 81 to 99% in silhouette, and the legs carry 0.0 to 0.2% of
-     the change, so what cuts is a thin trailing edge of an arm, not a limb.
+     half was measured at R138 as the acceptable residue, and R140's denser strips
+     shrink it further: measured at render size, adjacent-frame overlap rose from
+     81.4-99.5% (mean 88.9) to 88.0-100.0% (mean 93.1) on the win, and from 80.6-98.5%
+     (mean 86.7) to 86.5-100.0% (mean 91.7) on the brace, because halving the step
+     halves what the next frame fails to cover. What cuts is a thin trailing edge of an
+     arm, not a limb. The 100.0% upper bound is real and is the delivered art's own
+     one-frame hold at the peak - win frames 16 and 17 are byte-identical, as are brace
+     frames 8 and 9, so the gesture pauses for one step at full extension.
      The spans differ by one frame width: the top buffer ends on the sheet's
      final frame (var(--hero-span)) and the bottom one step short of it
      (calc(var(--hero-span) + var(--hero-step))), because during the last
@@ -563,14 +589,16 @@
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the rest pose resuming. */
   /* R126, RESTATED FOR THE CROSSFADE: THE STEP COUNTS ARE HARDCODED HERE AND
-     ONLY HERE, and they are n-1, not n - steps(15) for the 16-frame win,
-     steps(6) for the 7-frame brace, matching fade iteration counts on the top
+     ONLY HERE, and they are n-1, not n - steps(31) for the 32-frame win,
+     steps(15) for the 16-frame brace, matching fade iteration counts on the top
      buffer's rules below. background-size, --hero-span and --hero-step all
      derive from FRAMES in the markup above, so a denser sheet with a stale
      count here does not error, it silently plays a truncated gesture - the
      same failure R126 recorded against steps(8). A new sheet changes FRAMES
-     and every literal 15 or 6 in this block, together. */
-  .hero-idle[data-motion='win']    { animation: hero-cross-bottom-win 1.5s steps(15, jump-none) 1 forwards; }
+     and every literal 31 or 15 in this block, together - R140 moved all six of
+     them at once (two step counts, two fade iteration counts, two fade
+     durations) plus the epic fade override below. */
+  .hero-idle[data-motion='win']    { animation: hero-cross-bottom-win 1.5s steps(31, jump-none) 1 forwards; }
   /* R129: THE EPIC WIN'S FLIPBOOK DIED 400ms BEFORE ITS BODY DID.
      holdFor() returns 1900ms for an epic win and .hero-body runs hero-punch-epic for
      1.9s, but this rule pinned the SHEET to 1.5s and nothing could override it,
@@ -582,12 +610,12 @@
      is the REST pose, so the hero visually finished his reaction 400ms early and was
      then just moved about.
      data-tier is now on the sheet layer too, and this override stretches the same
-     strip across the epic's own 1.9s (R138: 15 transitions at 126.7ms instead of
-     16 holds at 119ms), and the sheet still ends exactly when the body does.
+     strip across the epic's own 1.9s (R140: 31 transitions at 61.3ms instead of
+     R138's 15 at 126.7ms), and the sheet still ends exactly when the body does.
      (0,3,0) beats the (0,2,0) rule above outright rather than relying on source
      order. The epic hold stays 1.9s, per the R138 brief's own condition. */
   .hero-idle[data-motion='win'][data-tier='epic'] { animation-duration: 1.9s; }
-  .hero-idle[data-motion='energy'] { animation: hero-cross-bottom-energy 1.3s steps(6, jump-none) 1 forwards; }
+  .hero-idle[data-motion='energy'] { animation: hero-cross-bottom-energy 1.3s steps(15, jump-none) 1 forwards; }
 
   /* THE TOP BUFFER PAINTS ONLY THROUGH ITS ANIMATIONS. Base opacity is 0, so a
      buffer that loses its animations for any reason - a future rule tie, a
@@ -603,23 +631,25 @@
   /* TWO ANIMATIONS ON ONE ELEMENT, AND THEY MUST DIVIDE THE SAME TOTAL. The
      position animation steps n-1 times over the full duration; the fade runs
      n-1 ITERATIONS of duration/(n-1) each, so both change state on the same
-     boundaries. Win: 15 x 100ms = 1.5s. Brace: 6 x 216.667ms = 1.3s. A fade
+     boundaries. Win: 31 x 48.387ms = 1499.997ms. Brace: 15 x 86.667ms =
+     1300.005ms. Neither lands on the nanosecond and neither needs to: the
+     residue is 3 and 5 microseconds against step boundaries 48ms apart. A fade
      duration that does not divide the total drifts one buffer against the
      other and the dissolve shears mid-reaction, with nothing thrown. */
   .hero-cross[data-motion='win'] {
-    animation: hero-cross-top-win 1.5s steps(15, jump-none) 1 forwards,
-               hero-cross-fade-win 0.1s linear 15 forwards;
+    animation: hero-cross-top-win 1.5s steps(31, jump-none) 1 forwards,
+               hero-cross-fade-win 48.387ms linear 31 forwards;
   }
   /* The epic stretch reaches BOTH of the top buffer's clocks: the position
-     animation takes the full 1.9s and the fade takes 1.9s / 15 = 126.667ms an
+     animation takes the full 1.9s and the fade takes 1.9s / 31 = 61.29ms an
      iteration. Overriding only the first would hold the fade at 100ms and the
      buffers would disagree about where every boundary is. */
   .hero-cross[data-motion='win'][data-tier='epic'] {
-    animation-duration: 1.9s, 126.667ms;
+    animation-duration: 1.9s, 61.29ms;
   }
   .hero-cross[data-motion='energy'] {
-    animation: hero-cross-top-energy 1.3s steps(6, jump-none) 1 forwards,
-               hero-cross-fade-energy 216.667ms linear 6 forwards;
+    animation: hero-cross-top-energy 1.3s steps(15, jump-none) 1 forwards,
+               hero-cross-fade-energy 86.667ms linear 15 forwards;
   }
 
   /* The resting pose IS frame 01, so under reduced motion the hero already looks
@@ -628,7 +658,7 @@
   @media (prefers-reduced-motion: reduce) {
     /* THESE TWO RESETS ARE NOT REDUNDANT AFTER THE FREEZE, and the first one reads
        as though it were. It no longer has an idle animation to stop - but it is what
-       stills the 16-frame WIN flipbook and the 7-frame FEATURE flipbook, both of
+       stills the 32-frame WIN flipbook and the 16-frame FEATURE flipbook, both of
        which survive, and it is the second line of defence behind the live matchMedia
        listener for a player who turns reduce ON with a reaction already running.
        Deleting it restores the exact R128 defect one layer down.
