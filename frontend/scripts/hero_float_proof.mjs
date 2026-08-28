@@ -37,7 +37,7 @@ import { join } from 'node:path'
 import { evidenceDir } from './lib/evidencePaths.mjs'
 import { dismissIntro } from './lib/dismissOverlays.mjs'
 
-const OUT_DIR = evidenceDir('reports', 'screens', 'r138-idle-float')
+const OUT_DIR = evidenceDir('reports', 'screens', 'r140-dense-reactions')
 const BASE_URL = process.env.LAYOUT_AUDIT_URL ?? 'http://localhost:5173'
 
 const results = { baseUrl: BASE_URL, sections: {}, consoleErrors: [], pageErrors: [] }
@@ -140,7 +140,11 @@ async function traceReaction(page, ms) {
         top: c ? parseFloat(getComputedStyle(c).backgroundPositionX) : null,
         fade: c ? +parseFloat(getComputedStyle(c).opacity).toFixed(3) : null,
       })
-      await new Promise(r => setTimeout(r, 30))
+      // R140: rAF, not setTimeout(30). The win fade ramp fell from 100ms to
+      // 48.387ms when the sheet went 16 -> 32 frames, and a 30ms sampler on a
+      // 48ms sawtooth resolves under two samples a ramp - the low/high check
+      // below would have become a phase lottery. rAF gives ~2.9 samples a ramp.
+      await new Promise(r => requestAnimationFrame(() => r()))
     }
     return { anims, sheetAnims, frames }
   }, ms)
@@ -194,10 +198,10 @@ console.log('C. big win (15x): crossfade trace')
   const st = await motionState(page)
   assert('C', 'a 15x win starts the big-tier reaction', st.motion === 'win' && st.tier === 'big' && st.crossMounted, st)
   const tr = await traceReaction(page, 1200)
-  assert('C', 'top buffer runs the win position and fade clocks (1.5s / 100ms x 15)',
+  assert('C', 'top buffer runs the win position and fade clocks (1.5s / 48.387ms x 31)',
     tr.anims?.length === 2
     && tr.anims.some(a => a.name.includes('hero-cross-top-win') && a.duration === 1500)
-    && tr.anims.some(a => a.name.includes('hero-cross-fade-win') && a.duration === 100 && a.iterations === 15),
+    && tr.anims.some(a => a.name.includes('hero-cross-fade-win') && Math.abs(a.duration - 48.387) < 0.1 && a.iterations === 31),
     tr.anims)
   assert('C', 'bottom buffer runs the win bottom clock (1.5s)',
     tr.sheetAnims?.length === 1 && tr.sheetAnims[0].name.includes('hero-cross-bottom-win') && tr.sheetAnims[0].duration === 1500,
@@ -206,12 +210,14 @@ console.log('C. big win (15x): crossfade trace')
   assert('C', 'top buffer rides exactly one frame (206px) ahead at every sample',
     offsets.length > 20 && offsets.every(o => Math.abs(o + 206) < 0.6), { n: offsets.length, seen: [...new Set(offsets)] })
   const fades = tr.frames.map(f => f.fade).filter(f => f !== null)
-  // The 0.7 ceiling is what a 30ms sampler can honestly resolve on a 100ms
-  // sawtooth: values above ~0.85 exist for the last sixth of each ramp, so
-  // demanding one is a phase lottery (a run of this proof lost it at 0.834).
-  // The ramp's true shape is already pinned by the clock assert above - 15
-  // iterations of 100ms linear, read from the animation itself - so this
-  // sample check only confirms the fade is live, low to high.
+  // The 0.7 ceiling is what the sampler can honestly resolve: values above
+  // ~0.85 exist only for the last sixth of each ramp, so demanding one is a
+  // phase lottery (a run of this proof lost it at 0.834). R140 halved the ramp
+  // to 48.387ms and the sampler moved to rAF to keep roughly three samples a
+  // ramp; the bounds are unchanged because the resolution is. The ramp's true
+  // shape is already pinned by the clock assert above - 31 iterations of
+  // 48.387ms linear, read from the animation itself - so this sample check
+  // only confirms the fade is live, low to high.
   assert('C', 'the fade sweeps low to high', Math.min(...fades) < 0.25 && Math.max(...fades) > 0.7,
     { min: Math.min(...fades), max: Math.max(...fades) })
   await page.waitForTimeout(700)
@@ -251,6 +257,66 @@ console.log('C. big win (15x): crossfade trace')
   await page.waitForTimeout(1100)
 }
 
+// ── C2. THE WHOLE GESTURE PLAYS, WHICH IS THE FAILURE R126 RECORDED ──────────
+// A stale step count does not throw and does not fail a gate: it silently plays a
+// TRUNCATED gesture. R140 moved the win from 16 frames to 32 and the brace from 7
+// to 16, so every literal had to move with them, and this is the assertion that
+// says they did.
+//
+// IT SEEKS THE ANIMATION RATHER THAN SAMPLING THE CLOCK, and the first draft of
+// this section is why. Sampling computed style on rAF for 1460ms of a 1500ms
+// reaction captured 29 of the 31 steps and failed - not because a frame was
+// missing (every observed gap was exactly 206px) but because the trace window
+// closed before the last two steps and the buffer then unmounts at 1500ms. A
+// wall-clock sampler on a one-shot is a race with its own subject. Pausing the
+// animation and seeking currentTime to each step's midpoint reads all 31
+// deterministically, with no phase luck and no dependence on frame rate.
+//
+// The contract, derived from the component rather than copied from it:
+//   BOX_W 206, win FRAMES 32 -> span -(32-1)*206 = -6386px
+//   bottom buffer  steps(31, jump-none) from 0 to span+step = -6180px  -> frames 01..31
+//   top buffer     steps(31, jump-none) from -206 to span   = -6386px  -> frames 02..32
+// Together the two buffers paint all 32 frames; neither paints all of them alone.
+console.log('C2. the full 32-frame sweep')
+{
+  await forceWin(page, 15)
+  await page.waitForTimeout(60)
+  const sweep = await page.evaluate(async () => {
+    const sheet = document.querySelector('[data-testid="hero-idle"]')
+    const cross = document.querySelector('[data-testid="hero-cross"]')
+    if (!cross) return { error: 'no cross buffer mounted' }
+    const pos = el => el.getAnimations().find(a => a.animationName.includes('cross-') && !a.animationName.includes('fade'))
+    const ab = pos(sheet), at = pos(cross)
+    if (!ab || !at) return { error: 'position animations not found' }
+    const DUR = 1500, STEPS = 31
+    ab.pause(); at.pause()
+    const bottom = [], top = []
+    for (let k = 0; k < STEPS; k++) {
+      // the midpoint of step k, so a boundary rounding either way cannot land us
+      // on the wrong side of it
+      const t = (k + 0.5) * (DUR / STEPS)
+      ab.currentTime = t; at.currentTime = t
+      bottom.push(Math.round(parseFloat(getComputedStyle(sheet).backgroundPositionX)))
+      top.push(Math.round(parseFloat(getComputedStyle(cross).backgroundPositionX)))
+    }
+    ab.play(); at.play()
+    return { bottom, top, union: new Set([...bottom, ...top]).size }
+  })
+  const expBottom = Array.from({ length: 31 }, (_, k) => -k * 206)
+  const expTop = Array.from({ length: 31 }, (_, k) => -(k + 1) * 206)
+  assert('C2', 'bottom buffer paints frames 01..31, 0 to -6180px, one 206px step each',
+    !sweep.error && JSON.stringify(sweep.bottom) === JSON.stringify(expBottom),
+    { error: sweep.error, first: sweep.bottom?.[0], last: sweep.bottom?.[30], n: sweep.bottom?.length })
+  assert('C2', 'top buffer paints frames 02..32, -206 to -6386px, one frame ahead throughout',
+    !sweep.error && JSON.stringify(sweep.top) === JSON.stringify(expTop),
+    { error: sweep.error, first: sweep.top?.[0], last: sweep.top?.[30], n: sweep.top?.length })
+  assert('C2', 'the two buffers between them paint all 32 frames of the sheet',
+    sweep.union === 32, { union: sweep.union })
+  results.sections.C2_sweep = { bottomFirst: sweep.bottom?.[0], bottomLast: sweep.bottom?.[30],
+    topFirst: sweep.top?.[0], topLast: sweep.top?.[30], union: sweep.union }
+  await page.waitForTimeout(1600)
+}
+
 // ── D. epic: both clocks stretch, and the tier cannot flip ───────────────────
 console.log('D. epic win (150x): the 1.9s hold and the tier guard')
 {
@@ -267,9 +333,9 @@ console.log('D. epic win (150x): the 1.9s hold and the tier guard')
       sheetDur: sheet.getAnimations().map(a => a.effect.getTiming().duration),
     }
   })
-  assert('D', 'epic stretches the position clock to 1.9s and the fade to 126.667ms',
+  assert('D', 'epic stretches the position clock to 1.9s and the fade to 61.29ms',
     clocks.cross.some(a => a.name.includes('hero-cross-top-win') && Math.abs(a.duration - 1900) < 1)
-    && clocks.cross.some(a => a.name.includes('hero-cross-fade-win') && Math.abs(a.duration - 126.667) < 0.1)
+    && clocks.cross.some(a => a.name.includes('hero-cross-fade-win') && Math.abs(a.duration - 61.29) < 0.1)
     && clocks.sheetDur.every(d => Math.abs(d - 1900) < 1),
     clocks)
   // The R121/R129 class: a big win landing mid-epic must not repaint the tier.
@@ -298,9 +364,9 @@ console.log('E. feature entry: brace crossfade')
     const cross = document.querySelector('[data-testid="hero-cross"]')
     return cross ? cross.getAnimations().map(a => ({ name: a.animationName, duration: a.effect.getTiming().duration, iterations: a.effect.getTiming().iterations })) : []
   })
-  assert('E', 'brace runs the energy clocks (1.3s / 216.667ms x 6)',
+  assert('E', 'brace runs the energy clocks (1.3s / 86.667ms x 15)',
     clocks.some(a => a.name.includes('hero-cross-top-energy') && a.duration === 1300)
-    && clocks.some(a => a.name.includes('hero-cross-fade-energy') && Math.abs(a.duration - 216.667) < 0.1 && a.iterations === 6),
+    && clocks.some(a => a.name.includes('hero-cross-fade-energy') && Math.abs(a.duration - 86.667) < 0.1 && a.iterations === 15),
     clocks)
   await page.screenshot({ path: join(OUT_DIR, 'brace-mid-dissolve.png') })
   await page.evaluate(async () => {
