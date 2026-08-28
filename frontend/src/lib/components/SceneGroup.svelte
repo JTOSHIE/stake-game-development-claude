@@ -12,9 +12,10 @@
   //   scene_character.png, the pilot as a FEATURE HERO. Pulled out of hiding,
   //                         left-justified and fully visible in the gutter to the
   //                         left of the frame (never tucked behind it), scaled up
-  //                         so he reads as a presented feature. He has his own
-  //                         idle life: a slow bob and sway with a subtle breathing
-  //                         scale, plus the antenna-tip blink and visor glint.
+  //                         so he reads as a presented feature. His idle life is
+  //                         a small vertical float on this layer (R138, the same
+  //                         class of motion as the car and half its amplitude)
+  //                         plus the antenna-tip blink and visor glint.
   //
   // All motion is subtle ambient scene life and is disabled under
   // prefers-reduced-motion. The group is decorative (aria-hidden).
@@ -90,11 +91,7 @@
   </div>
 
   <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
-  <div
-    class="char-layer"
-    class:char-idle-strip={heroMode === 'idle'}
-    aria-hidden="true"
-  >
+  <div class="char-layer" aria-hidden="true">
     <div class="depth-haze" aria-hidden="true"></div>
     {#if heroMode === 'idle'}
       <HeroIdle assetBase={$themeAssets.assetBase} />
@@ -247,24 +244,35 @@
     transform-origin: 50% 92%;
     animation: char-idle 5s ease-in-out infinite;
   }
-  /* MOTION POLICY (R111). Exactly one idle runs at a time. The flat sprite has no
-     joints, so its only possible life was moving the whole picture: char-idle slides
-     it 7px and sways it. The rig articulates instead, from the waist up, with the feet
-     planted. Running both would stack a rigid slide on top of a breathe and read as a
-     double bob, so mounting the rig switches char-idle off at the source. */
-  .char-layer.char-idle-strip {
-    animation: none;
-    transform: none;
-  }
+  /* R138: THE FLOAT IS BACK, AND IT IS A DIFFERENT ANIMAL FROM WHAT R130 DELETED.
+     The owner's ruling after the live upload: a completely still idle is too dead,
+     restore the original slight floating, the same class as the car. What R130
+     deleted was POSE motion on the hero itself, the sheet flipbook, the 7.2s sway
+     and the glance, and all of that stays deleted. What returns here is whole-layer
+     travel one level ABOVE the sprite, so the pose cannot tick by construction:
+     HeroIdle's sheet still holds frame 01 with no animation of its own.
 
+     THE CAR IS THE CALIBRATION, measured live at R138 by seeking the animation
+     clock: car-hover is translateY 0 to -6px with scale 1 to 1.01 over 6s
+     ease-in-out. The hero floats HALF that, translateY only, 3px over 5s. 5s is
+     the original char-idle's own period, and it is deliberately non-harmonic with
+     the car's 6s so the two never phase-lock and read as one machine (the same
+     principle that spaced the accent periods 2.8s / 6.0s / 7.4s below).
 
+     WHAT THE OLD RULE HAD THAT THIS ONE MUST NOT GROW BACK: rotate(-0.6deg to
+     0.6deg) and scale(1.015). The rotation is the pendulum class R130's ruling
+     retired and the R138 fence names again; the scale is left out to keep this
+     strictly a float rather than a breathe. hero_idle_planted_gate.mjs now
+     enforces translateY-only on every keyframe this layer references, and that
+     the hero's amplitude stays at or below the car's, both derived from this
+     file at gate time rather than from a number written into the gate.
 
-    /* Slow bob + gentle sway + subtle breathing scale, layered so he feels alive
-     without competing with the reels. */
+     The .char-idle-strip disable rule that R111 used to switch this animation off
+     for the rig is deleted with this restore, not commented out: both hero modes
+     now share the one float, so there is nothing left for it to disable. */
   @keyframes char-idle {
-    0%   { transform: translateY(0) rotate(-0.6deg) scale(1); }
-    50%  { transform: translateY(-7px) rotate(0.6deg) scale(1.015); }
-    100% { transform: translateY(0) rotate(-0.6deg) scale(1); }
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
   }
 
   .char-img {
@@ -484,14 +492,14 @@
        every future rule has to remember to lose. HeroIdle.svelte's own
        reduced-motion block does this for the same reason.
 
-       ONE ELEMENT IN THE LIST IS NOT A SOURCE-ORDER TIE, AND THE !important DOES
-       CHANGE WHICH RULE WINS FOR IT - behaviour-neutrally, which is why it stays.
-       `.char-layer.char-idle-strip` above is more specific than this reset, so
-       before !important it OUTRANKED this block for .char-layer. It declares
-       `animation: none` itself, so the computed result was, and remains, none
-       either way; this is the one place in the R130 diff where a rule newly wins
-       where it used to lose, and it was checked rather than assumed. The six
-       other elements are the plain source-order tie described above. */
+       R138 MADE THE .char-layer ENTRY LOAD-BEARING AGAIN. While the strip idle
+       was frozen and `.char-layer.char-idle-strip` disabled the base animation,
+       this reset had nothing to stop on that element; the R130 note here recorded
+       exactly that. The strip disable rule is deleted with the R138 float restore,
+       so `.char-layer` now carries a real 5s float that THIS line is what stops
+       under reduced motion, on the same plain source-order tie as the six other
+       elements. The R138 brief's own target is explicit: reduced motion freezes
+       both the float and the reaction dissolve. */
     .car-layer, .char-layer, .underglow, .car-neon, .booster-flicker, .antenna-light, .visor-glint, .chest-lamp {
       animation: none !important;
     }
