@@ -12,6 +12,20 @@
   // the idle rules, not by adding a rule that switches them off - see the
   // FREEZE BY DELETION note in the style block, which is load-bearing.
   //
+  // R138 PUT A FLOAT UNDER HIM AND A DISSOLVE INSIDE THE REACTIONS, AND NEITHER
+  // TOUCHES THE FROZEN POSE. The owner's ruling after the live upload was that
+  // completely still is now too dead. The float is whole-layer travel on
+  // SceneGroup's .char-layer, one level ABOVE this component (translateY only,
+  // 3px over 5s, half the car's measured 6px), so the pose held here still
+  // cannot tick: this sheet keeps frame 01 with no idle animation of its own.
+  // The reactions keep their 16- and 7-frame strips but now play through a
+  // two-buffer crossfade: this sheet element holds the current frame at
+  // opacity 1 while .hero-cross, mounted only for the duration of a reaction,
+  // fades the NEXT frame in over it, so each 13 to 19% adjacent-frame
+  // silhouette step (measured at R138 on the shipped sheets at render size)
+  // reads as a continuous blend instead of an 8 to 10fps cut. The idle never
+  // uses the dissolve: the top buffer does not exist while motion is 'idle'.
+  //
   // WHERE THE "TINY LIFE" LIVES, AND IT IS NOT IN THIS FILE. The brief allowed a
   // small local accent on the resting figure. It already existed, one level up:
   // SceneGroup.svelte mounts .antenna-light (an amber orb pulsing on 2.8s) and
@@ -110,7 +124,9 @@
   // so it is what scales the six-frame strip such that position 0 paints frame 01
   // at the right size. Drop it and the frozen hero renders at the wrong scale.
   const FRAMES: Record<HeroMotion, number> = { idle: 6, win: 16, energy: 7 }
-  // ~0.09s a frame for the win, ~0.19s for the brace: fast enough to read as a
+  // ~0.10s a transition for the win, ~0.22s for the brace (R138: the crossfade
+  // divides the duration into n-1 transitions where the flipbook divided it
+  // into n holds; the totals are unchanged): fast enough to read as a
   // response, slow enough not to look twitchy at game distance. There is no idle
   // entry because a still has no duration.
   const DURATION_MS: Record<HeroReaction, number> = { win: 1500, energy: 1300 }
@@ -137,6 +153,13 @@
   // applying this (n-1) formula to a 6-frame loop drops frame 06, and applying
   // the full-span form to the win gives -3296px against a background-size of
   // 3296px, which renders a BLANK hero with nothing thrown and no gate failed.
+  //
+  // R138: the span now feeds TWO buffers. The top crossfade buffer ends exactly
+  // here, on the sheet's final frame; the bottom buffer ends one frame short of
+  // it, at calc(span + step), because during the last transition the top buffer
+  // is what carries frame n. The two keyframe sets in the style block derive
+  // both ends from this one span plus the frame-width step, so a denser sheet
+  // changes FRAMES and nothing else here.
   const SPAN_PX: Record<HeroReaction, number> = {
     win: -((FRAMES.win - 1) * BOX_W),
     energy: -((FRAMES.energy - 1) * BOX_W),
@@ -256,12 +279,18 @@
   }
 </script>
 
-<!-- TWO ELEMENTS, DELIBERATELY. The inner element paints the sheet; the outer one
-     moves the whole figure during a reaction. They are separate because the
-     flipbook CANNOT move him: every frame in every strip is the same locked pose
-     under different lighting, so body motion has to come from a transform.
-     At rest neither of them animates. -->
-<div class="hero-body" data-motion={motion} data-tier={motion === 'win' ? winTier : null} aria-hidden="true">
+<!-- TWO ELEMENTS AT REST, THREE DURING A REACTION. The inner element paints the
+     sheet; the outer one moves the whole figure during a reaction. They are
+     separate because the sheet alone cannot move him: body motion comes from a
+     transform. R138 adds .hero-cross, the crossfade's top buffer, mounted ONLY
+     while a reaction is in flight - the {#if} is what guarantees the idle can
+     never dissolve, ahead of any CSS argument. At rest nothing here animates.
+     THE CUSTOM PROPERTIES LIVE ON THE PARENT, deliberately: both buffers consume
+     them, and a custom property only inherits DOWNWARD - set on one sibling it
+     would compute to its fallback on the other, with nothing thrown (the exact
+     R133 defect class). -->
+<div class="hero-body" data-motion={motion} data-tier={motion === 'win' ? winTier : null} aria-hidden="true"
+     style="--hero-span: {motion === 'idle' ? 0 : SPAN_PX[motion]}px; --hero-step: {BOX_W}px;">
   <div
     class="hero-idle"
     data-motion={motion}
@@ -269,9 +298,19 @@
     data-testid="hero-idle"
     aria-hidden="true"
     style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
-           background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;
-           --hero-span: {motion === 'idle' ? 0 : SPAN_PX[motion]}px;"
+           background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;"
   ></div>
+  {#if motion !== 'idle'}
+    <div
+      class="hero-cross"
+      data-motion={motion}
+      data-tier={motion === 'win' ? winTier : null}
+      data-testid="hero-cross"
+      aria-hidden="true"
+      style="background-image: url('{assetBase}/ui/hero/{SHEET[motion]}');
+             background-size: {BOX_W * FRAMES[motion]}px {BOX_H}px;"
+    ></div>
+  {/if}
 </div>
 
 <style>
@@ -437,6 +476,17 @@
                                      needed. One element remains and it carries
                                      data-testid="hero-idle", as it always did.
 
+     R138 AND THE LINE IT DOES NOT CROSS. A dual buffer is back (.hero-cross,
+     above), and it is not the R129 one returning: R129's dissolve smoothed the
+     IDLE flipbook, the thing R130 deleted, and its two permanent stacked layers
+     each carried a drop-shadow, which is where the double-shadow pulse came
+     from. R138's buffer exists only while data-motion is a reaction - the
+     {#if} in the markup unmounts it at rest - and the one drop-shadow stays on
+     the parent, computed once from the composite, exactly as the R129 fix
+     left it. The IDLE still has no dissolve, no flipbook and no transform, and
+     hero_idle_planted_gate.mjs now seeds an idle-reachable .hero-cross rule to
+     prove it stays that way.
+
      DO NOT RENAME `hero-idle`. It reads like idle machinery and it is the exact
      opposite: it is the class that carries the WIN and FEATURE flipbooks below,
      the epic duration stretch, and the reduced-motion sheet reset. Renaming or
@@ -451,28 +501,76 @@
      that scopes differently is the descendant form, which takes `:where()` and
      adds nothing - and nothing in this file uses it. */
 
-  /* THREE SEPARATE KEYFRAME NAMES, DELIBERATELY, even though the bodies are
+  /* SEPARATE KEYFRAME NAMES PER STATE, DELIBERATELY, even where the bodies are
      identical. CSS restarts an animation when its NAME changes, not when its
      duration does: with one shared name, switching between states kept the
      running animation's elapsed time, which was usually already past the shorter
      duration, so the new state started at its own end. Distinct names make every
-     mode change a clean restart. (There were four until R130 retired the glance.) */
-  @keyframes hero-cycle-win {
+     mode change a clean restart. (This binds the BOTTOM buffer hard, because that
+     element persists across states. The top buffer remounts per reaction, which
+     would make sharing safe there, but one convention is cheaper than two.) */
+
+  /* THE CROSSFADE GEOMETRY, R138. The bottom buffer (.hero-idle) steps through
+     frames 01 to n-1 and the top buffer (.hero-cross) runs one frame AHEAD,
+     stepping through frames 02 to n while fading 0 to 1 over every step. At any
+     instant the screen shows frame i at full opacity with frame i+1 dissolving
+     in over it - the brief's own rule: bottom holds, top fades. Both buffers
+     divide the same duration into n-1 equal intervals, so their step boundaries
+     coincide: at each boundary the top buffer has just landed opaque on frame
+     i+1, the bottom buffer advances to that SAME frame underneath it, and the
+     fade restarts at 0 on frame i+2. The composite never changes at the boundary
+     itself, which is what makes the handoff invisible.
+     THE DEPARTING EDGE STILL CUTS, AND THAT IS THE BRIEF'S OWN TRADE. Where the
+     next frame no longer covers a pixel the old one painted, that pixel vanishes
+     at the boundary rather than fading, because the bottom buffer must hold
+     opacity 1 (fading it would show the backdrop through the body, the ghosted
+     second body the brief forbids). Half of every step is smoothed; the other
+     half was measured at R138 as the acceptable residue: the strips' adjacent
+     frames overlap 81 to 99% in silhouette, and the legs carry 0.0 to 0.2% of
+     the change, so what cuts is a thin trailing edge of an arm, not a limb.
+     The spans differ by one frame width: the top buffer ends on the sheet's
+     final frame (var(--hero-span)) and the bottom one step short of it
+     (calc(var(--hero-span) + var(--hero-step))), because during the last
+     transition the top buffer is what carries frame n. Enter and exit still
+     land on rest: frame 01 opens the bottom buffer at opacity 1, and the top
+     buffer holds frame n - 0.000% silhouette from idle rest on both strips -
+     until the state machine swaps back and unmounts it. */
+  @keyframes hero-cross-bottom-win {
     from { background-position-x: 0; }
+    to   { background-position-x: calc(var(--hero-span) + var(--hero-step)); }
+  }
+  @keyframes hero-cross-bottom-energy {
+    from { background-position-x: 0; }
+    to   { background-position-x: calc(var(--hero-span) + var(--hero-step)); }
+  }
+  @keyframes hero-cross-top-win {
+    from { background-position-x: calc(-1 * var(--hero-step)); }
     to   { background-position-x: var(--hero-span); }
   }
-  @keyframes hero-cycle-energy {
-    from { background-position-x: 0; }
+  @keyframes hero-cross-top-energy {
+    from { background-position-x: calc(-1 * var(--hero-step)); }
     to   { background-position-x: var(--hero-span); }
+  }
+  @keyframes hero-cross-fade-win {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes hero-cross-fade-energy {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
      is no flash of frame 01 between the reaction ending and the rest pose resuming. */
-  /* R126: steps(16), not steps(8). THIS IS THE ONE PLACE THE FRAME COUNT IS
-     HARDCODED - background-size and --hero-span both derive from FRAMES.win in the
-     markup above, so a denser sheet with a stale steps() here does not error, it
-     silently plays the first 8 of 16 frames and stops mid-gesture. */
-  .hero-idle[data-motion='win']    { animation: hero-cycle-win 1.5s steps(16, jump-none) 1 forwards; }
+  /* R126, RESTATED FOR THE CROSSFADE: THE STEP COUNTS ARE HARDCODED HERE AND
+     ONLY HERE, and they are n-1, not n - steps(15) for the 16-frame win,
+     steps(6) for the 7-frame brace, matching fade iteration counts on the top
+     buffer's rules below. background-size, --hero-span and --hero-step all
+     derive from FRAMES in the markup above, so a denser sheet with a stale
+     count here does not error, it silently plays a truncated gesture - the
+     same failure R126 recorded against steps(8). A new sheet changes FRAMES
+     and every literal 15 or 6 in this block, together. */
+  .hero-idle[data-motion='win']    { animation: hero-cross-bottom-win 1.5s steps(15, jump-none) 1 forwards; }
   /* R129: THE EPIC WIN'S FLIPBOOK DIED 400ms BEFORE ITS BODY DID.
      holdFor() returns 1900ms for an epic win and .hero-body runs hero-punch-epic for
      1.9s, but this rule pinned the SHEET to 1.5s and nothing could override it,
@@ -483,12 +581,46 @@
      translated. And because win frame 16 is 0.00% from idle rest, the frozen image
      is the REST pose, so the hero visually finished his reaction 400ms early and was
      then just moved about.
-     data-tier is now on the sheet layer too, and this override stretches the same 16
-     frames across the epic's own 1.9s: 119ms a frame instead of 94ms, still 8.4fps,
-     and the flipbook now ends exactly when the body does. (0,3,0) beats the (0,2,0)
-     rule above outright rather than relying on source order. */
+     data-tier is now on the sheet layer too, and this override stretches the same
+     strip across the epic's own 1.9s (R138: 15 transitions at 126.7ms instead of
+     16 holds at 119ms), and the sheet still ends exactly when the body does.
+     (0,3,0) beats the (0,2,0) rule above outright rather than relying on source
+     order. The epic hold stays 1.9s, per the R138 brief's own condition. */
   .hero-idle[data-motion='win'][data-tier='epic'] { animation-duration: 1.9s; }
-  .hero-idle[data-motion='energy'] { animation: hero-cycle-energy 1.3s steps(7, jump-none) 1 forwards; }
+  .hero-idle[data-motion='energy'] { animation: hero-cross-bottom-energy 1.3s steps(6, jump-none) 1 forwards; }
+
+  /* THE TOP BUFFER PAINTS ONLY THROUGH ITS ANIMATIONS. Base opacity is 0, so a
+     buffer that loses its animations for any reason - a future rule tie, a
+     stripped keyframe, reduced motion - paints nothing and the composite
+     degrades to exactly the pre-R138 flipbook underneath, rather than to a
+     stuck opaque frame sitting on top of it. */
+  .hero-cross {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    opacity: 0;
+  }
+  /* TWO ANIMATIONS ON ONE ELEMENT, AND THEY MUST DIVIDE THE SAME TOTAL. The
+     position animation steps n-1 times over the full duration; the fade runs
+     n-1 ITERATIONS of duration/(n-1) each, so both change state on the same
+     boundaries. Win: 15 x 100ms = 1.5s. Brace: 6 x 216.667ms = 1.3s. A fade
+     duration that does not divide the total drifts one buffer against the
+     other and the dissolve shears mid-reaction, with nothing thrown. */
+  .hero-cross[data-motion='win'] {
+    animation: hero-cross-top-win 1.5s steps(15, jump-none) 1 forwards,
+               hero-cross-fade-win 0.1s linear 15 forwards;
+  }
+  /* The epic stretch reaches BOTH of the top buffer's clocks: the position
+     animation takes the full 1.9s and the fade takes 1.9s / 15 = 126.667ms an
+     iteration. Overriding only the first would hold the fade at 100ms and the
+     buffers would disagree about where every boundary is. */
+  .hero-cross[data-motion='win'][data-tier='epic'] {
+    animation-duration: 1.9s, 126.667ms;
+  }
+  .hero-cross[data-motion='energy'] {
+    animation: hero-cross-top-energy 1.3s steps(6, jump-none) 1 forwards,
+               hero-cross-fade-energy 216.667ms linear 6 forwards;
+  }
 
   /* The resting pose IS frame 01, so under reduced motion the hero already looks
      exactly as he does at rest. Reactions never start under this setting, so these
@@ -514,6 +646,17 @@
     .hero-idle[data-motion] {
       animation: none !important;
       background-position-x: 0 !important;
+    }
+    /* R138: the crossfade's top buffer is stilled AND blanked. Stopping its
+       animations alone would leave whatever opacity the fade had reached, a
+       half-transparent second frame frozen over the rest pose. Base opacity is
+       already 0, so forcing it here returns the composite to the bottom
+       buffer's own reduced-motion rest above. The live matchMedia listener
+       unmounts the buffer anyway (motion flips to idle); this is the same
+       second line of defence the other two resets are. */
+    .hero-cross[data-motion] {
+      animation: none !important;
+      opacity: 0 !important;
     }
     /* THE ATTRIBUTE SELECTOR HAS TO BE REPEATED HERE, and this is not cosmetic.
        The state rules above are `.hero-body[data-motion='win']`, specificity

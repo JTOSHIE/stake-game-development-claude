@@ -618,19 +618,23 @@ jobs:
         working-directory: frontend
         run: node scripts/machine_tell_gate.mjs --source
 
-      # ── The resting hero stays planted, R135 ─────────────────────────────────
+      # ── The hero's pose stays planted; the float stays fenced, R135/R138 ─────
       # R130 deleted the idle flipbook, the 7.2s sway, the cross-dissolve and the
-      # glance on the owner's ruling that bad motion scores worse than a still,
-      # and nothing guarded that afterwards. This keys on BEHAVIOUR rather than on
-      # the five retired names, so the same pendulum under a new name is still
-      # caught, and it reads only the component's CODE, because the component's own
-      # prose names all five and quotes the banned declaration verbatim.
+      # glance on the owner's ruling that bad motion scores worse than a still.
+      # R138 amended that ruling on the owner's own later word: the wrapper floats
+      # again (translateY only, at or below the car's amplitude, both read from
+      # SceneGroup.svelte at gate time) and the reactions crossfade, while the
+      # POSE stays frozen and the idle can never dissolve. The gate keys on
+      # BEHAVIOUR rather than on retired names, so the same pendulum under a new
+      # name is still caught, and it reads only the components' CODE, because
+      # their own prose names the retired keyframes and quotes the banned
+      # declarations verbatim.
       - name: hero idle planted, seeded-violation self-test
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/hero_idle_planted_gate.mjs --self-test
 
-      - name: the resting hero neither animates nor transforms
+      - name: hero pose frozen, float fenced, dissolve reaction-scoped
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/hero_idle_planted_gate.mjs
