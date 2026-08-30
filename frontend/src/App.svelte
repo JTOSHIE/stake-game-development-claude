@@ -71,7 +71,7 @@
   import { overdriveVisual } from './lib/stores/overdriveVisual'
   import {
     interpretRound, cellMultipliersFromEvents,
-    type PresentationScript, type RawEvent,
+    type PresentationScript, type PresentedSpin, type RawEvent,
   } from './lib/services/roundInterpreter'
   import { cellMultipliers } from './lib/stores/cellMultipliers'
   import { currencyCode } from './lib/stores/gameStore'
@@ -1711,22 +1711,54 @@
       // in mock mode, and loss/win limits could only be soaked against
       // uncontrolled random results). Live play is unaffected either way -
       // this whole block is import.meta.env.DEV-gated.
+      // R143: THE SERVED ROUND'S OWN BASE SPIN IS CAPTURED HERE, and that is the
+      // whole fix. This block used to take ONLY the total from the curated round
+      // and leave the board, the ways lines and the scatter count reading
+      // `result`, which is a DIFFERENT round: `spin()` returned rgsService's own
+      // `_mockSpin` draw, and then this served a second, independent sample. Both
+      // figures were internally correct and they described different spins, so a
+      // local look-pass showed a ways line of one round beside the HUD total of
+      // another (R142 measured it: ?mockCategory=base_win_mid painted a $160.00
+      // footer against a $390.00 HUD).
+      //
+      // No new writer and no new formula: the events are parsed by the same
+      // `scriptFromEvents` the live path uses three lines below, and the payout
+      // conversion is the one `presentBaseSpin` above and rgsService both use,
+      // `(winCentibets / 100) * bet`. Live play cannot reach any of this - the
+      // block is import.meta.env.DEV-gated AND only runs when `lastRoundEvents`
+      // is empty, which a live round never leaves it.
       let servedTotalWin: number | null = null
+      let servedBase: PresentedSpin | null = null
       if (import.meta.env.DEV && !get(lastRoundEvents)) {
         const { serveMockRound, serveCategory } = await import('./lib/mock/roundProvider')
         const forcedCategory = new URLSearchParams(window.location.search).get('mockCategory')
         const round = forcedCategory
           ? await serveCategory(mode, forcedCategory)
           : await serveMockRound(mode)
-        if (round) servedTotalWin = (round.payoutMultiplier / 100) * bet
+        if (round) {
+          servedTotalWin = (round.payoutMultiplier / 100) * bet
+          servedBase = scriptFromEvents(round.events).baseSpin
+        }
       }
       const win = servedTotalWin ?? result.totalWin
 
-      if (gridRef) await gridRef.animateSpin(result.board)
+      // One round drives every surface. `slice(1, -1)` drops the one padding row
+      // at each end, exactly as rgsService and the feature-resume path do.
+      const presentedBoard = servedBase
+        ? servedBase.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name))
+        : result.board
+      const presentedWins = servedBase
+        ? servedBase.wins.map((w) => ({
+            symbol: w.symbol, kind: w.kind, ways: w.ways,
+            payout: (w.winCentibets / 100) * bet,
+          }))
+        : result.winEvents
 
-      boardSymbols.set(result.board)
-      activeWins.set(result.winEvents)
-      scatterCount.set(result.scatterEvent?.count ?? 0)
+      if (gridRef) await gridRef.animateSpin(presentedBoard)
+
+      boardSymbols.set(presentedBoard)
+      activeWins.set(presentedWins)
+      scatterCount.set(servedBase ? servedBase.scatterCount : (result.scatterEvent?.count ?? 0))
       // Multiplier wilds: if the round published raw events (live RGS, or a mock
       // multiwild round), surface the per-cell wild multipliers as overlay
       // badges on the winning cells. Rounds without wild multipliers yield an
