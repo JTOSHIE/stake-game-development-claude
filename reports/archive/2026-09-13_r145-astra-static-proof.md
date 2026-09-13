@@ -271,3 +271,12 @@ dated archive extract.
   `SceneGroup.svelte:37` says heroMode's one mount is `App.svelte:2159`; it is now line 2261.
 - An orphaned Playwright Firefox from about ten days ago sits at 0% CPU under launchd. Not this
   session's, left alone, named so a timing-sensitive session checks for it (R140).
+
+### Remote CI, rule 10, verified after the push
+
+Run **34751524771** on `d3246cc7`:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/34751524771
+**completed SUCCESS, 30 of 30 jobs green**, with no non-success job in the list, 10:18:55 to
+10:30:53 UTC. PR #181 is open on the review lane and awaits Fable. This paragraph is itself a commit
+and therefore postdates the run it quotes; per the R131 lesson that chase has no fixed point, so it is
+verified by SHA in the past tense and stops here.
