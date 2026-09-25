@@ -100,7 +100,7 @@ never recorded:
 
 | Family | Reproducibility anchor |
 |---|---|
-| **Audio (AudioForge)** | A REAL SEED. `BASE_SEED = 20260707` at `tools/audio_forge/generate.py:36`, `SEED_OFFSETS = [0, 1, 2, 3]` at `:37`. Four candidates per row at base+0 to base+3. |
+| **Audio (AudioForge)** | A REAL SEED. `BASE_SEED = 20260707` at `tools/audio_forge/generate.py:36`, `SEED_OFFSETS = [0, 1, 2, 3]` at `:37`. Four candidates per row at base+0 to base+3. **Since R146 (2026-09-25) this anchors only `ui_click.mp3`**: the other fifteen shipped rows are the owner's stems, which carry no recorded seed, and their WAV masters are gitignored rather than versioned. |
 | **Symbols, particles, flames, brand exports (AssetForge)** | NO seed, deterministic by construction. `scripts/assets/build.py:7-9` states "same inputs produce byte-identical outputs"; `scripts/assets/symbol_fx.py:16-17` states "fixed FRAMES tables, no RNG/time". The contract is "same SVG in, same PNG out". |
 | **Backgrounds** | NO seed. The anchor is a SHA-256 of source and shipped file in the generation note, plus a seeded self-test for the ENHANCEMENT-versus-NEW-DESIGN classifier. |
 | **Brand emblem** | NO seed, and no model version and no generation date either. `design-system/brand/hero_emblem/GENERATION_NOTE.md` records that the date was not independently captured. **This is the weakest provenance link in the chain and it is the one a reskin cannot re-roll.** |
@@ -231,12 +231,13 @@ exists to be about 124 KB rather than the 417 KB master), `tools/brand/gate_vect
 
 ### 2.5 Audio
 
-**(a)** `frontend/public/assets/themes/future-spinner/sounds/` (16 files), plus a superseded
+**(a)** `frontend/public/assets/themes/future-spinner/sounds/` (20 tracked files; the owner's WAV masters
+beside them are gitignored), plus a superseded
 legacy set formerly at frontend/public/assets/sounds/, DELETED 2026-08-09. Audio
 resolves under the THEME base (`frontend/src/lib/stores/themeStore.ts` builds every
 path as `${b}/sounds/...`), so that root tree was 1.9MB nothing could reach.
 
-**(b)** MP3 for all twelve shipped rows, plus WebM/Opus encodes for the three loop beds only
+**(b)** MP3 for all sixteen shipped rows, plus WebM/Opus encodes for the three loop beds only
 (`bgm_loop`, `bgm_tension`, `anticipation_build`). Largest `bgm_loop.mp3` 932.9 KB, smallest
 `ui_click.mp3` 5.6 KB. The codec choice is made at runtime by
 `frontend/src/lib/services/soundService.ts:34-41`.
@@ -247,7 +248,11 @@ at `:36`** with `SEED_OFFSETS = [0, 1, 2, 3]` at `:37`; candidates written as
 `<name>/<name>_s<seed>.wav`, four per row. `--fresh-seeds` re-rolls. Prompts in the
 `MANIFEST` table from `:43`. Mastering `master.py`, promotion `promote.py`. Provenance in the
 sounds `README.md`; licence Stability AI Community License Agreement, archived at
-`tools/audio_forge/LICENSE.md`. **That provenance README is pruned from `dist`**
+`tools/audio_forge/LICENSE.md`. **Since R146 (2026-09-25) only `ui_click.mp3` was generated
+this way, and that licence is recorded for it alone.** The other fifteen rows are the owner's
+stems, mastered with `master.py`'s own functions by `tools/audio_forge/r146_master_owner_stems.py`;
+their source and licence were not stated in the drop and are an open owner question
+recorded in the sounds README. **That provenance README is pruned from `dist`**
 (`frontend/vite.config.ts`), because it names the model, the seeds, the prompts and the
 licence paths, and a player can fetch anything in the bundle.
 
