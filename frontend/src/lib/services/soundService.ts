@@ -159,6 +159,14 @@ sfxVolume.subscribe((v)   => { sfxVol   = v; applyVolumes() })
 // the epic-win echo). Tracked so muting can stop them immediately, not just
 // suppress future sounds.
 const activeClones = new Set<HTMLAudioElement>()
+// The four R125 pending cues' elements, built lazily by pendingEl() further down.
+// DECLARED HERE, ABOVE the mute subscription, and that placement is load-bearing:
+// isMutedStore.subscribe() runs setMuted() synchronously during module evaluation,
+// and setMuted() pauses these. Declared below it (where it first lived at R146), a
+// returning player with a persisted mute preference hit a temporal-dead-zone
+// ReferenceError and the game never rendered. Caught by r043_replay_audio_proof's
+// global-mute case before the change was pushed.
+const pendingEls = new Map<PendingCue, HTMLAudioElement>()
 
 /**
  * Play a fresh one-shot clone of a base sound and track it so it can be
@@ -528,7 +536,7 @@ const PENDING_BASE: Record<PendingCue, number> = {
   winMax:       1.00,
 }
 
-const pendingEls = new Map<PendingCue, HTMLAudioElement>()
+// pendingEls is declared near the top of this file, beside activeClones: see there.
 
 /**
  * Dev-only instrumentation for the four pending cues (R125).

@@ -230,8 +230,13 @@ try {
     await w.page.screenshot({ path: join(EVID, '05-wincap-splash.png') })
     const aud = await w.audible()
     trace.wincap = { audibleAtSplash: aud }
-    assert(aud.some((p) => p.src.includes('win_epic')),
-      'the wincap cue (win_epic) fired at the splash, before COLLECT')
+    // R146: win_max.mp3 is live, so the replay wincap branch's playMaxWin() now plays
+    // the dedicated stem. Before R146 it fell back to win_epic, which this assertion
+    // used to require; win_epic at the splash would now mean the stem failed to play.
+    assert(aud.some((p) => p.src.includes('win_max')),
+      'the wincap cue (win_max) fired at the splash, before COLLECT')
+    assert(!aud.some((p) => p.src.includes('win_epic')),
+      'the pre-R146 fallback (win_epic) did not also fire at the splash')
     await w.page.close()
   }
 
