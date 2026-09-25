@@ -23,6 +23,11 @@ Australian English, no em dashes or en dashes.
     animated, subject to being quality-controlled, provenance-recorded and presentation-safe.
     What SHIPS at HEAD today is still in-house symbol art; that changes if and when the
     working-tree placeholder set is adopted, and this line must be re-checked at that point.**
+    **RE-CHECKED 2026-09-26 (R147): it was adopted on 2026-08-28 (commit 578a3a51, 28
+    owner-authorised OpenAI gpt-image-1 files under Ticket 456254, symbols included), and the
+    resting hero sheet derives from an externally supplied strip
+    (`docs/art/r122_pose_strip_intake.provenance.json`). The in-house sentence above no longer
+    describes what ships.**
     Owner-commissioned SCENE, TILE and MARKETING art
   is adopted from outside under the Assets rulings in `CLAUDE.md`, each carrying a generation
   note or provenance record beside the asset giving source, hashes, dimensions and the

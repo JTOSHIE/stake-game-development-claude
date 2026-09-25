@@ -11,8 +11,10 @@ FOUR THINGS THIS REFUSES TO DO, each because remembering is not a control:
   conflating them sends an API key to the wrong vendor.
 
   A BARRED PROVIDER. provider_gate.json carries the R084 TASK 0 marks and this module
-  reads them on every call. OpenAI is BARRED because its Usage Policies prohibit "real
-  money gambling" and its Services Agreement makes them contractually binding. A client
+  reads them on every call. OpenAI was BARRED at R084 because its Usage Policies prohibit
+  "real money gambling"; since R099 (2026-08-24, Ticket 456254) it is CLEARED for
+  development-stage artwork only, and CLIENTS below still refuses it for want of a client.
+  A client
   that merely omitted OpenAI would silently become wrong the day somebody added it back;
   one that refuses by mark stays right.
 

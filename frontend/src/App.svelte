@@ -912,6 +912,11 @@
       // (non-capped) feature presentation plays immediately as before.
       if ($isWincap) {
         lastRoundWasWincap = true
+        // R147, authorised call-site change: a BOUGHT max win now sounds at its
+        // reveal, as a spun one does (handleSpin's playMaxWin before the dwell).
+        // Before R147 this reveal was silent and the epic stinger played only
+        // after COLLECT and the whole feature, from the playWin below.
+        playMaxWin(bet > 0 ? $winMultiplier : 0)
         await waitForWincapCollect()
         if (script) await presentFeature(script)
       } else if (script?.triggered) {
@@ -921,7 +926,9 @@
       // Normally already run by the end-banner trigger above; this is the
       // fallback for a triggered round that never showed a celebration.
       if (deferSettle) runPendingFeatureSettle()
-      playWin(bet > 0 ? $winMultiplier : 0)
+      // A capped round already had its cue at the reveal (above), exactly as
+      // handleSpin's settleRound skips playWin for a wincap.
+      if (!roundIsWincap) playWin(bet > 0 ? $winMultiplier : 0)
     } catch (err) {
       console.error('[Buy error]', err)
       // Same clear-down as handleSpin: a failed purchase must not leave autoplay
