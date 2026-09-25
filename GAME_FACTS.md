@@ -300,17 +300,32 @@ live is exactly 5,000.00x on the wincap round itself.
   (`design-system/LAYOUT_SPEC.md` v3.1 onward, amended through v3.4 for the fixed-field HUD
   and Overdrive flame jets).
 - **Audio: shipped** (2026-07-13, previously the one open creative item per
-  `docs/CHAT_CLOSEOUT_2026-07-06.md`). Twelve mastered sound files - two music beds
-  (`bgm_loop` 100 BPM, `bgm_tension` 140 BPM, both crossfading on Overdrive entry/exit)
-  and ten SFX/stingers - generated via Stable Audio 3 open weights
-  (`tools/audio_forge/generate.py`, model `stabilityai/stable-audio-3-medium`), mastered
-  deterministically (`tools/audio_forge/master.py`: silence trim, bar-aligned loop points,
-  loudness normalisation with a verified win-tier escalation check) and wired into
-  `soundService.ts`. Provenance: `reports/audio/GENERATION_LOG_2026-07-13.md` (per-file
-  model/seed/prompt), `frontend/public/assets/themes/future-spinner/sounds/README.md`,
-  licensed under the Stability AI Community License
-  (`tools/audio_forge/LICENSE.md`/`NOTICE`). Verified via
-  `frontend/scripts/audio_verify.mjs` - ALL CHECKS PASS.
+  `docs/CHAT_CLOSEOUT_2026-07-06.md`). **Corrected 2026-09-25 (R146).** This bullet
+  previously described the July set: twelve cues generated via Stable Audio 3, beds at 100
+  and 140 BPM, and `frontend/scripts/audio_verify.mjs` passing every check. R146 replaced
+  every shipped sound but one with the owner's own stems. The shipped set is nineteen files
+  for sixteen cues: three beds (`bgm_loop` and `bgm_tension`, both crossfading on Overdrive
+  entry/exit, and `anticipation_build`), each a webm plus an mp3 fallback and each a 4-bar
+  loop at 88 BPM, 10.909 s; twelve one-shot mp3s, among them `feature_enter`,
+  `feature_end`, `retrigger` and `win_max`, the four cues that had no file before R146; and
+  `ui_click.mp3`. The owner's fifteen WAV stems are mastered through
+  `tools/audio_forge/master.py`'s own functions by
+  `tools/audio_forge/r146_master_owner_stems.py`: beds gained to -18 LUFS only, with the
+  500 ms seam fold, bar trim and silence trim skipped because each would shorten the 4-bar
+  loop; one-shots silence-trimmed and peak-normalised to -3 dBFS, each win tier alone, so
+  the win-tier escalation check did not run. All are wired into `soundService.ts`. **The
+  provenance and licence of the fifteen stems are not stated in the drop and are an open
+  owner question.** Only `ui_click.mp3` is still the July file, generated via Stable Audio 3
+  open weights (`tools/audio_forge/generate.py`, model `stabilityai/stable-audio-3-medium`)
+  and licensed under the Stability AI Community License
+  (`tools/audio_forge/LICENSE.md`/`NOTICE`); its per-file record is
+  `reports/audio/GENERATION_LOG_2026-07-13.md`, and the directory's own record is
+  `frontend/public/assets/themes/future-spinner/sounds/README.md`. At R146
+  `frontend/scripts/audio_verify.mjs` passes every check but one: loopSeamsWithinTolerance
+  fails on `bgm_loop` alone, seam RMS delta 18.61 dB webm and 18.68 dB mp3 against its
+  2.0 dB gate, because the owner's take A of that bed opens on 12 ms of digital silence
+  (commit `750259c9`). Whether to re-export it wrapped or return to the original drop is an
+  open owner question.
 
 ## 5. Compliance summary
 

@@ -4,6 +4,77 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1B. R146 (2026-09-25) - THE FOUR SILENT CUES ARE LIVE, AND EVERY SHIPPED SOUND BUT ui_click IS NOW THE OWNER'S
+
+**Branch `claude/r146-wav-intake`.** Appended to close the audio rows below, not to rewrite them.
+Every line in 1A, 0Z, 0Y, 0W, 0V, 0O and 0M that records the four stems as absent and their cues
+as silent was true when written and stays as written; this entry is where their status now lives.
+
+*** CLOSED: THE FOUR R125 CUES PLAY. feature_enter, feature_end, retrigger and win_max are declared
+in AVAILABLE_PENDING_CUES in `frontend/src/lib/services/soundService.ts` and pathed in
+`frontend/src/lib/stores/themeStore.ts`. They came from the OWNER'S drop of 15 WAV stems, already
+named to the code names, which also replaces every other shipped audio file except ui_click.mp3.
+**The shipped set is 19 files, was 15 files for 12 cues**: 6 bed files (bgm_loop, bgm_tension,
+anticipation_build, each webm plus mp3), 12 one-shot mp3 and ui_click.mp3. dist fell from
+24,296,023 B (101 files) to 18,705,003 B (105 files). ***
+
+**THE SHIPPED SET IS NO LONGER THE FORGE'S.** 0W records the twelve shipped stems as Stable Audio 3
+output from tools/audio_forge/; at R146 only ui_click.mp3 still is, unchanged since July. The
+generated beds (bgm_loop 88.3 s at 100 BPM, bgm_tension 57.8 s at 140 BPM) are gone: all three
+beds are now 10.909 s, 4 bars at 88 BPM. The owner then swapped bgm_loop to take A (smoother
+garage pulse). Mastering used `tools/audio_forge/master.py`'s own functions through
+`tools/audio_forge/r146_master_owner_stems.py`, those functions unchanged (R146 added only a guard that makes
+master.py's own main() refuse to overwrite the owner's set), calibrated first by
+re-deriving the July files (8 mp3 byte for byte, 3 webm packet for packet). Beds were gained to
+-18 LUFS only: **the 500 ms seam fold, bar trim and silence trim were SKIPPED because they shorten
+the owner's 4-bar loops** (to 3.34 to 3.82 bars). One-shots took master.py's one-shot recipe;
+master_win_family was not run (it raises on win_small, 0.37 s, below pyloudnorm's 0.4 s block), so
+each tier is peak-normalised alone, main()'s documented fallback.
+
+**THE WAV MASTERS NEVER SHIP.** They sit beside their encodes, gitignored and never versioned; the
+vite prune keeps them out of dist and `frontend/scripts/dist_hygiene_gate.mjs` asserts it, seeded.
+The owner's MANIFEST is gitignored and never committed.
+
+**WHAT CHANGED WITH THE CUES.** win_max now plays on a SPUN max win and in Bet Replay, replacing
+win_epic plus echo there; the playMaxWin fallback 0W describes now plays only if win_max.mp3 fails to
+load (a review fix: before it, a failed load left every max win of the session silent). The first
+real tap or key press of a session now fetches all four cues, so none starts late.
+Mute now also stops a pending cue already sounding. The hidden warm mount in App.svelte no longer
+plays feature_enter or feature_end at page load (a guard on skipContinueGate in
+FreeSpinsPresentation.svelte, a separate commit held for owner ruling).
+
+*** VERIFIED, WITH ONE FAILURE ON THE RECORD. `frontend/scripts/audio_verify.mjs` (not in CI, run
+locally): spin, reel stop and win cues fire, the bed swaps on a bonus buy and reverts after the
+feature, zero sound request failures, zero console errors. **IT DOES NOT PASS CLEAN:
+loopSeamsWithinTolerance fails on bgm_loop only**, seam RMS delta 18.61 dB webm / 18.68 dB mp3
+against a 2.0 dB gate, because take A opens on 12 ms of digital silence while its tail runs at
+about -12 dBFS. bgm_tension 1.30/1.21 dB and anticipation_build 1.79/1.76 dB pass; the original
+drop's bgm_loop measured 1.50/1.47 dB offline. `frontend/scripts/r043_replay_audio_proof.mjs`:
+11 of 11. In the browser: zero feature cues at page load; trigger, retrigger and wincap rounds play
+feature_enter, bgm_tension, feature_end, retrigger and win_max, all HTTP 200/206. ***
+
+**THE STABILITY LICENCE DECISION IS NO LONGER WHAT BLOCKS THE STEMS.** R125, R127, R128 and R129
+named it as the blocker. The stems came from the owner instead, so that route was not taken; the
+Stability AI Community License still applies to ui_click.mp3.
+
+**NEWLY OWNER-PARKED, NOT DECIDED BY THE BUILDER.**
+1. **Provenance and licence of the 15 owner stems: UNKNOWN.** The drop does not state them.
+2. **Seven one-shots carry a large sub-20 Hz swell** (feature_end and win_small worst, over 99% of
+   energy below 20 Hz), so peak normalisation leaves their audible part quiet: feature_end is about
+   -32 LUFS. A 20 Hz high-pass before normalisation would make feature_end about 7 LU louder.
+3. **The win ladder is not monotonic**: win_big -11.9 LUFS against win_epic -23.7. The owner's
+   MANIFEST says win_big "was win_mega.wav" and win_medium "was win_big.wav", which bears on the
+   R115 and R117 name-skew row.
+4. **win_max is 2.34 s (1.78 s after trim)** against the truth map's 5.0 s spec, and quieter than
+   win_epic (-25.2 against -23.7 LUFS).
+5. **bgm_loop take A's 12 ms head gap**, the audio_verify failure above: re-export it wrapped, or
+   revert to the original drop.
+6. **A BOUGHT max win still plays win_epic plus echo** from App.svelte's buy settle (truth map
+   section 4.5), so the bought and spun reveals still sound different. A call-site change.
+
+**STILL OPEN AFTER R146**, on audio: the six items above. The non-audio items in 1A's list are
+outside this entry and were not re-verified here.
+
 ## 1A. R129 - THE TICK WAS THE IDLE, IT WAS TEMPORAL, AND THE FIX COST ZERO BYTES
 
 **Branch `claude/r129-smoothness-hardening`.** Overnight, multi-agent. Full technical record at

@@ -1,7 +1,8 @@
 # Audio truth map
 
-**Written R125, 2026-08-26.** What sound this game actually makes, what it does not, and
-exactly what has to happen for the four missing stems to go live.
+**Written R125, 2026-08-26; status updated R146, 2026-09-25, when the four went live.** What
+sound this game actually makes, what it does not, and exactly what had to happen for the four
+missing stems to go live.
 
 Everything here was read from the code and measured from the shipped files. Where a claim
 came from running something, the command is named. Nothing in this document was inferred
@@ -11,48 +12,54 @@ from a previous document.
 
 ## 1. The one-line summary
 
-Twelve stems ship and are wired. **Four moments have no stem: `feature_enter`,
-`feature_end`, `retrigger`, `win_max`.** As of R125 all four have permanent, verified call
-sites that fire at the right moment and stay silent, so each is one line of configuration
-away from being live. No placeholder audio was created, and none should be.
+Sixteen stems ship, in nineteen files, and all are wired. **The four moments that had no
+stem, `feature_enter`, `feature_end`, `retrigger` and `win_max`, are live since R146.** R125
+gave them permanent, verified call sites that stayed silent; R146 supplied the owner's stems,
+declared all four in `AVAILABLE_PENDING_CUES` in `soundService.ts` and pathed them in
+`themeStore.ts`. The owner's fifteen WAV stems replaced every shipped file except
+`ui_click.mp3`. No placeholder audio was created, and none should be. Three spec gaps are
+owner-parked rather than fixed (§3): `win_max` is 2.34s (1.779s after trim) against a 5.0s
+spec, `feature_end` is quiet, and seven one-shots carry a sub-20 Hz swell.
 
 ---
 
 ## 2. Inventory: every cue, its file, and its call site
 
 Files live in `frontend/public/assets/themes/future-spinner/sounds/`. Paths are built in
-`frontend/src/lib/stores/themeStore.ts:88-101`; the player is
+`frontend/src/lib/stores/themeStore.ts:88-107`; the player is
 `frontend/src/lib/services/soundService.ts`.
 
 | Moment | File | Duration | Play function | Fired from | Wired? |
 |---|---|---|---|---|---|
-| BGM bed | `bgm_loop.{mp3,webm}` | 88.30s loop | `playBGM()` | `App.svelte:1402` | yes |
-| BGM, Overdrive bed | `bgm_tension.{mp3,webm}` | 57.78s loop | `setOverdriveBed()` | `overdriveVisual` store subscription | yes |
+| BGM bed | `bgm_loop.{mp3,webm}` | 10.909s loop (4 bars at 88 BPM) | `playBGM()` | `App.svelte:1402` | yes |
+| BGM, Overdrive bed | `bgm_tension.{mp3,webm}` | 10.909s loop | `setOverdriveBed()` | `overdriveVisual` store subscription | yes |
 | UI click | `ui_click.mp3` | 0.04s | `playUIClick()` / `playClick()` | HudOverlay ×9, FeatureMenu ×8, PaytableModal, IntroSplash | yes |
-| Spin start | `spin.mp3` | 0.31s | `playSpinStart()` | `GameGrid.svelte:984` | yes |
-| Reel stop | `reel_stop.mp3` | 0.18s | `playReelStop(i)` | `GameGrid.svelte:445,516`; `FreeSpinsPresentation.svelte:315,353` | yes |
-| Reel stop, last reel under anticipation | `reel_stop_anticipation.mp3` | 0.31s | `playReelStop(4)` | same, branch inside `playReelStop` | yes |
-| Anticipation build | `anticipation_build.{mp3,webm}` | 3.49s loop | `playAnticipation()` | `GameGrid.svelte:1042,1134` | yes |
+| Spin start | `spin.mp3` | 0.813s | `playSpinStart()` | `GameGrid.svelte:984` | yes |
+| Reel stop | `reel_stop.mp3` | 0.330s | `playReelStop(i)` | `GameGrid.svelte:445,516`; `FreeSpinsPresentation.svelte:315,353` | yes |
+| Reel stop, last reel under anticipation | `reel_stop_anticipation.mp3` | 0.400s | `playReelStop(4)` | same, branch inside `playReelStop` | yes |
+| Anticipation build | `anticipation_build.{mp3,webm}` | 10.909s loop | `playAnticipation()` | `GameGrid.svelte:1042,1134` | yes |
 | Anticipation stop | (same file, stopped) | - | `stopAnticipation()` | `soundService.ts` only: `playReelStop()` on the last reel, and `setMuted(true)` | yes |
-| Scatter lands | `scatter_land.mp3` | 1.50s | `playScatterLand()` | `GameGrid.svelte:446,517` | yes |
-| Win, small (<10×) | `win_small.mp3` | 0.67s | `playWin()` | `App.svelte:871,1709,1729`; `ReplayMode.svelte:320,351,395,416` | yes |
-| Win, medium (10-29.99×) | `win_medium.mp3` | 1.50s | `playWin()` | as above | yes |
-| Win, big (30-99.99×) | `win_big.mp3` | 2.34s | `playWin()` | as above | yes |
-| Win, epic (100×+) | `win_epic.mp3` | 3.66s + 800ms echo | `playWin()` | as above | yes |
+| Scatter lands | `scatter_land.mp3` | 1.177s | `playScatterLand()` | `GameGrid.svelte:446,517` | yes |
+| Win, small (<10×) | `win_small.mp3` | 0.372s | `playWin()` | `App.svelte:871,1729`; `ReplayMode.svelte:351,416` | yes |
+| Win, medium (10-29.99×) | `win_medium.mp3` | 0.822s | `playWin()` | as above | yes |
+| Win, big (30-99.99×) | `win_big.mp3` | 1.013s | `playWin()` | as above | yes |
+| Win, epic (100×+) | `win_epic.mp3` | 1.381s + 800ms echo | `playWin()` | as above | yes |
 | Mute / unmute |, (no sound of its own) |, | `setMuted()` | `isMuted` store subscription | n/a |
 | **Feature trigger** | *(no dedicated stem)* |, |, | announced by `scatter_land` ×N plus the escalation ladder | **partial** |
-| **Feature enter** | **MISSING** |, | `playFeatureEnter()` | `FreeSpinsPresentation.svelte`, `runEntrySequence()` | **hook live, silent** |
+| **Feature enter** | `feature_enter.mp3` | 1.252s | `playFeatureEnter()` | `FreeSpinsPresentation.svelte`, `runEntrySequence()` | **yes, since R146** |
 | **Feature active** | *(no dedicated stem)* |, |, | covered by the `bgm_tension` bed swap | by design |
-| **Retrigger** | **MISSING** |, | `playRetrigger()` | `FreeSpinsPresentation.svelte`, settled retrigger moment | **hook live, silent** |
-| **Feature end** | **MISSING** |, | `playFeatureEnd()` | `FreeSpinsPresentation.svelte`, `toEnd()` | **hook live, silent** |
-| **Max win / wincap** | **MISSING** (reuses `win_epic`) |, | `playMaxWin()` | `App.svelte:1709`; `ReplayMode.svelte:320,395` | **hook live, falls back** |
+| **Retrigger** | `retrigger.mp3` | 0.752s | `playRetrigger()` | `FreeSpinsPresentation.svelte`, settled retrigger moment | **yes, since R146** |
+| **Feature end** | `feature_end.mp3` | 1.112s | `playFeatureEnd()` | `FreeSpinsPresentation.svelte`, `toEnd()` | **yes, since R146** |
+| **Max win / wincap** | `win_max.mp3` | 1.779s | `playMaxWin()` | `App.svelte:1709`; `ReplayMode.svelte:320,395` | **yes, since R146**; a bought max win still plays `win_epic` (§4.5) |
 
 Three things in that table are easy to misread, so they are stated plainly:
 
-- **Max win is not silent today.** It plays the epic stinger and its 800ms echo, and has
-  done deliberately since R5 (`soundService.ts`, `playWin`'s doc comment). What it lacks is
-  a cue of its *own*. `playMaxWin()` therefore falls back to exactly today's behaviour when
-  no dedicated stem exists, turning it on is an upgrade, never a regression.
+- **Max win has a cue of its own since R146.** A spun or replayed max win plays
+  `win_max.mp3` through `playMaxWin()`. From R5 until R146 it played the epic stinger and its
+  800ms echo, deliberately (`soundService.ts`, `playWin`'s doc comment), and that is still
+  `playMaxWin()`'s fallback whenever the cue is not declared available or its file fails to
+  load. A **bought** max win
+  still plays the epic stinger and echo, owner-parked (§4.5).
 - **"Feature active" is not a gap.** The Overdrive bed swap (`bgm_loop` → `bgm_tension`,
   600ms crossfade) is the feature-active cue, and it is wired and verified.
 - **"Feature trigger" is only a partial gap.** The scatters that trigger it each sound
@@ -66,33 +73,56 @@ Three things in that table are easy to misread, so they are stated plainly:
 
 | Moment | Current file | Wired? | Status | Required filename | Spec |
 |---|---|---|---|---|---|
-| Feature enter | none | yes, silent | **MISSING** | **feature_enter.mp3** | 1.2s. Front-loaded impact, decaying tail. Turbo compresses the entry animation to ~404ms, so the cue must land its hit in the first ~300ms and not depend on its tail. Announce-and-open, not a win. |
-| Retrigger | none | yes, silent | **MISSING** | **retrigger.mp3** | 1.2s, hard cap 1.5s (the moment holds 1600ms). Bright, additive, clearly "more". Must not read as a win-tier chime, the win ladder owns that vocabulary. |
-| Feature end | none | yes, silent | **MISSING** | **feature_end.mp3** | 1.5s. Resolving, downward, closing. Plays under the total-win banner's count-up, so it must sit below it: no bright transient in the first 400ms. |
-| Max win | `win_epic.mp3` (shared) | yes, falls back | **MISSING** | **win_max.mp3** | 5.0s. The largest sound in the game; it must clearly exceed `win_epic` (3.66s). App dwells 2600ms on the board before the celebration modal, so the first 2.6s carries the reveal. |
+| Feature enter | `feature_enter.mp3` | yes | **LIVE since R146**: 1.252s, -20.8 LUFS | **feature_enter.mp3** | 1.2s. Front-loaded impact, decaying tail. Turbo compresses the entry animation to ~404ms, so the cue must land its hit in the first ~300ms and not depend on its tail. Announce-and-open, not a win. |
+| Retrigger | `retrigger.mp3` | yes | **LIVE since R146**: 0.752s, -20.5 LUFS | **retrigger.mp3** | 1.2s, hard cap 1.5s (the moment holds 1600ms). Bright, additive, clearly "more". Must not read as a win-tier chime, the win ladder owns that vocabulary. |
+| Feature end | `feature_end.mp3` | yes | **LIVE since R146**: 1.112s, and quiet at -31.9 LUFS (owner-parked, below) | **feature_end.mp3** | 1.5s. Resolving, downward, closing. Plays under the total-win banner's count-up, so it must sit below it: no bright transient in the first 400ms. |
+| Max win | `win_max.mp3` | yes, spun and replay paths | **LIVE since R146**: 2.34s stem, 1.779s after trim, -25.2 LUFS; short of this spec and quieter than `win_epic` (owner-parked, below) | **win_max.mp3** | 5.0s. The largest sound in the game; it must clearly exceed `win_epic` (3.66s at R125, 1.381s and -23.7 LUFS since R146). App dwells 2600ms on the board before the celebration modal, so the first 2.6s carries the reveal. |
 
 Byte budget: `build_diet_verify` reports dist at 23.31MB against a 25MB ceiling, so 1.69MB
 of headroom. At the shipped stems' own encode density these four come to roughly 230KB
-together. Not a constraint, but do not let `win_max` balloon.
+together. Not a constraint, but do not let `win_max` balloon. **At R146** the four shipped at
+123,682 bytes together, and dist fell from 24,296,023 B to 18,705,003 B, mostly because the
+owner's beds are 10.909s loops where the old ones ran 88.3s and 57.8s.
+
+**Owner-parked at R146, not fixed.** §5.6 refuses a stem that misses its spec; the R146 brief
+ordered all four live, so under CLAUDE.md convention (n) the brief governed, and these gaps are
+surfaced for the owner's ruling rather than decided:
+
+- `win_max` is 2.34s (1.779s after trim) against the 5.0s spec, and at -25.2 LUFS it is
+  quieter than `win_epic` (-23.7), so it does not yet clearly exceed it.
+- `feature_end` sits at about -32 LUFS. Seven one-shots carry a large sub-20 Hz swell
+  (`feature_end` and `win_small` worst, over 99% of their energy below 20 Hz), so peak
+  normalisation leaves their audible part quiet. A 20 Hz high-pass before normalisation would
+  make `feature_end` about 7 LU louder.
 
 ---
 
 ## 4. Implementation readiness, cue by cue
 
-All four hooks exist and were verified firing in R125. The verification method matters:
-a hook that is correct today fires and makes no sound, which is indistinguishable from a
-hook that is never called, so `soundService.ts` carries a dev-only `__pendingCueTrace`
-counting `fired` and `played` per cue, in the same spirit as the existing `__bedSwapTrace`.
+All four hooks exist and were verified firing in R125, and all four are live since R146. The
+verification method matters: a hook that was correct at R125 fired and made no sound, which is
+indistinguishable from a hook that is never called, so `soundService.ts` carries a dev-only
+`__pendingCueTrace` counting `fired` and `played` per cue, in the same spirit as the existing
+`__bedSwapTrace`.
 Measured at R125: `featureEnter` and `featureEnd` both `fired: 1, played: 0` on a boot that
 replayed an interrupted feature round, with the entry overlay confirmed on screen in
 `stage-flare` at t=711ms and cleared at t=2060ms, the hooks track the visible presentation.
+**Corrected at R146: that attribution was wrong.** The boot-time fires came from the hidden
+warm mount, a `FreeSpinsPresentation` instance that `App.svelte` keeps mounted from page load
+with `skipContinueGate` set (the only instance that sets it). It runs the entry sequence and
+`toEnd()` on every load outside Bet Replay, never visibly, and alone accounts for a count of 1.
+Measured once the stems shipped and before R146's guard: `feature_enter` sounded at +163 ms and
+`feature_end` at +1,498 ms on a plain load wherever autoplay was allowed. R146 guards both hooks
+on `!skipContinueGate`, and a page load now plays no feature cue.
 
 ### 4.1 `feature_enter`
 - **Exact path:** **frontend/public/assets/themes/future-spinner/sounds/feature_enter.mp3**
 - **Function that plays it:** `playFeatureEnter()` in `soundService.ts`
 - **Fires from:** `FreeSpinsPresentation.svelte`, first statement of `runEntrySequence()`
 - **When:** the instant the entry flare paints, before the dip/gauge/burst stages
-- **Hook exists?** Yes, added R125. **New hook needed?** No.
+- **Hook exists?** Yes, added R125. **Live since R146**: 1.252s, -20.8 LUFS, and guarded on
+  `!skipContinueGate` so the hidden warm mount (§4 above) plays nothing at page load.
+  **New hook needed?** No.
 - **Why there and not in `start()`:** `startFrom()` (the TR-099 resume) deliberately skips
   the entry sequence. A feature resumed mid-round must not replay its entry stinger, and
   hooking inside `runEntrySequence()` inherits that correctness instead of restating it.
@@ -107,7 +137,8 @@ replayed an interrupted feature round, with the entry overlay confirmed on scree
 - **Fires from:** `FreeSpinsPresentation.svelte`, inside `runRetriggerLadder(spin).then(...)`,
   immediately before `retriggerMoment = true`
 - **When:** after the capped per-reel ladder has finished, on the settled award
-- **Hook exists?** Yes, added R125. **New hook needed?** No.
+- **Hook exists?** Yes, added R125. **Live since R146**: 0.752s, -20.5 LUFS, inside the
+  1.5s hard cap. **New hook needed?** No.
 - **Why after the ladder:** each reel of the ladder already sounds `playReelStop(r)`. Firing
   the retrigger cue during the ladder would race those; firing it on the settled moment
   marks the award itself.
@@ -117,9 +148,10 @@ replayed an interrupted feature round, with the entry overlay confirmed on scree
 - **Exact path:** **.../sounds/feature_end.mp3**
 - **Function:** `playFeatureEnd()`
 - **Fires from:** `FreeSpinsPresentation.svelte`, first statement of `toEnd()`,
-  **guarded on `script?.triggered`**
+  **guarded on `script?.triggered`**, and since R146 on `!skipContinueGate` (the warm mount)
 - **When:** as the feature closes, immediately before the total-win banner is raised
-- **Hook exists?** Yes, added R125. **New hook needed?** No.
+- **Hook exists?** Yes, added R125. **Live since R146**: 1.112s, and quiet at -31.9 LUFS
+  (sub-20 Hz swell, owner-parked, §3). **New hook needed?** No.
 - **Why the guard:** `toEnd()` is also the exit of `start()`'s wincap *walkthrough*, a base
   game round that reached the cap and never entered the feature at all. Unguarded, the cue
   would announce the end of a feature that never happened.
@@ -133,15 +165,22 @@ replayed an interrupted feature round, with the entry overlay confirmed on scree
   both wincap reveal branches)
 - **When:** at the wincap reveal, before the 2600ms board dwell and before
   `MaxWinCelebration` takes the screen
-- **Hook exists?** Yes, added R125. **New hook needed?** No.
+- **Hook exists?** Yes, added R125. **Live since R146** on the spun and replay paths: a 2.34s
+  stem, 1.779s after trim, -25.2 LUFS, short of the 5.0s spec and quieter than `win_epic`
+  (owner-parked, §3). A bought max win still plays `win_epic`, §4.5. **New hook needed?** No.
 - **Fail-safe:** `playMaxWin()` plays the dedicated stem if present and otherwise calls
-  `playWin(multiplier)`, today's epic-plus-echo. It cannot introduce a silence.
+  `playWin(multiplier)`, the epic-plus-echo a max win played before R146. It cannot introduce
+  a silence.
 - **Duck BGM?** **Yes, and this is the one that should.** It is the loudest moment in the
   game and nothing else musical happens at that boundary. The pattern is already in this
   file: set `bgmDuck`, assign `sounds.bgm.volume = musicVol * bgmDuck`, restore on a timer,
   exactly as `playSpinStart()` does with `BGM_DUCK_SPIN`. Suggested duck 0.3 for the stem's
   length plus ~500ms. **Not implemented at R125 on purpose:** a duck's correctness is
-  audible, not structural, and cannot be judged without the file.
+  audible, not structural, and cannot be judged without the file. **Still not implemented at
+  R146:** the file now exists, but R146's brief kept the change to the files and the
+  availability list, so the duck waits for a listening ruling. Its premise has also moved: the
+  shipped `win_max` is quieter than `win_epic` (-25.2 against -23.7 LUFS), so it is not yet the
+  loudest moment in the game.
 
 ### 4.5 One inconsistency found while mapping, not fixed here
 On the **bought** feature path, `App.svelte` plays the round's win cue *after* the
@@ -149,13 +188,27 @@ presentation (`App.svelte:871`), with no reveal-time cue when a bought round hit
 whereas the ordinary spin path plays it at the splash before the COLLECT wait
 (`App.svelte:1709`). So a bought max win and a spun max win sound different. Out of scope
 for R125's fence (hooks only, no new audio), recorded here so it is not rediscovered.
+**Since R146 they differ in sound as well as timing:** a spun or replayed max win plays
+`win_max.mp3`, while a bought one still reaches `playWin()` from the buy settle and plays
+`win_epic` and its echo. Owner-parked at R146, because the fix is a call-site change.
 
 ---
 
 ## 5. Acquisition route
 
+**R146 took a different route, and this section is kept as the R125 plan.** The four arrived
+with the owner's fifteen WAV stems, dropped on 2026-09-25 into the theme sounds directory under
+the code names, which replaced every shipped file except `ui_click.mp3`. They were mastered
+with `tools/audio_forge/master.py`'s own functions, unchanged, imported by
+`tools/audio_forge/r146_master_owner_stems.py` rather than run through master.py's `main()`,
+which since R146 refuses a row whose owner master sits beside the shipped files unless
+`--july-sources` is passed. The WAV masters stay on disk beside their encodes, gitignored and
+pruned from dist. The provenance and licence of the fifteen stems are NOT STATED in the drop
+(UNKNOWN), an open owner question that §5.4's paperwork rule bears on. Of the shipped audio,
+the licence in §5.3 now covers `ui_click.mp3` alone.
+
 ### 5.1 The route already exists, in this repository
-The twelve shipped stems were not bought. They were generated by **`tools/audio_forge/`**,
+The twelve stems shipped at R125 were not bought. They were generated by **`tools/audio_forge/`**,
 a local, deterministic, licensed pipeline built for this game, and mastered by
 `tools/audio_forge/master.py`. Provenance is on record in
 `reports/audio/GENERATION_LOG_2026-07-13.md` and the sounds directory's own `README.md`.
@@ -268,10 +321,13 @@ Then wire, then re-run `audio_verify.mjs`, then confirm `__pendingCueTrace.playe
 ## 6. What this document does not cover
 
 - **The win-tier loudness ladder is not re-derived here.** It was set at R117 to an even
-  ×1.284 per step and is unchanged.
+  ×1.284 per step and is unchanged in `soundService.ts`. Since R146 the files under it are not
+  level with each other (`win_big` -11.9 LUFS against `win_epic` -23.7), so the heard ladder is
+  not monotonic; owner-parked.
 - **No listening test was performed.** Every duration and byte size here was read from a
   file header. Nothing in this document is a judgement about how anything *sounds*.
-- **`win_max`'s BGM duck is specified but not implemented**, for the reason in §4.4.
+- **`win_max`'s BGM duck is specified but not implemented**, for the reason in §4.4, and still
+  not at R146 (§4.4).
 - **The bought-max-win timing inconsistency in §4.5 is recorded, not fixed.**
 - **Localisation of audio is out of scope**, no cue in this game carries voice, so the
   sixteen locales do not bear on it.

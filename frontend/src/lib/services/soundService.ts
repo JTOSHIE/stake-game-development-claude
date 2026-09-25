@@ -159,6 +159,14 @@ sfxVolume.subscribe((v)   => { sfxVol   = v; applyVolumes() })
 // the epic-win echo). Tracked so muting can stop them immediately, not just
 // suppress future sounds.
 const activeClones = new Set<HTMLAudioElement>()
+// The four R125 pending cues' elements, built lazily by pendingEl() further down.
+// DECLARED HERE, ABOVE the mute subscription, and that placement is load-bearing:
+// isMutedStore.subscribe() runs setMuted() synchronously during module evaluation,
+// and setMuted() pauses these. Declared below it (where it first lived at R146), a
+// returning player with a persisted mute preference hit a temporal-dead-zone
+// ReferenceError and the game never rendered. Caught by r043_replay_audio_proof's
+// global-mute case before the change was pushed.
+const pendingEls = new Map<PendingCue, HTMLAudioElement>()
 
 /**
  * Play a fresh one-shot clone of a base sound and track it so it can be
@@ -195,6 +203,11 @@ export function setMuted(val: boolean): void {
     // everything at once, not only future sounds.
     activeClones.forEach(c => { c.pause(); c.currentTime = 0 })
     activeClones.clear()
+    // R146. The four pending cues live outside `sounds`, so the loop above never
+    // reached them. While they were silent that was harmless; once their stems
+    // shipped, a max win or feature stinger already sounding would have carried
+    // on for up to 2.34 s after the player turned sound off.
+    pendingEls.forEach(el => { el.pause(); el.currentTime = 0 })
     // R115, STUCK ANTICIPATION. stopAnticipation() has exactly one caller,
     // playReelStop(), and that function returns early while muted - so muting
     // during the tension build meant the build never got stopped. A muted
@@ -247,6 +260,11 @@ export function warmUpAudio(): void {
       el.muted = wasMuted
     })
   })
+  // R146. The four pending cues are live and are built lazily, so without this the
+  // first feature entry, retrigger and max win of a session would start their fetch
+  // at the moment they should sound. Building the element starts its fetch (an
+  // Audio() element preloads); nothing is played here.
+  AVAILABLE_PENDING_CUES.forEach((cue) => { pendingEl(cue) })
 }
 
 export function playBGM(): void {
@@ -436,9 +454,11 @@ export function playScatterLand(): void {
  * 0,9.99×  = small win (quiet cloneNode at 0.4 vol)
  * 10,29.99×= medium win
  * 30,99.99×= big win
- * 100×+    = epic win (plays twice with 800ms echo) - also covers the 5,000x
- *            MAX/wincap tier, reusing the epic echo rather than a dedicated
- *            MAX sound, as designed.
+ * 100×+    = epic win (plays twice with 800ms echo). A max win reached by a
+ *            spin or in Bet Replay plays its own stem through playMaxWin() since
+ *            R146; a BOUGHT max win still reaches this function from App.svelte's
+ *            buy settle and plays the epic stinger (AUDIO_TRUTH_MAP section 4.5,
+ *            owner-parked because it is a call-site change).
  */
 export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
@@ -468,12 +488,15 @@ export function playWin(multiplier: number): void {
   }
 }
 
-// ── PENDING CUES: WIRED, SILENT, NOT FAKED (R125) ────────────────────────────
+// ── PENDING CUES: WIRED AT R125, LIVE SINCE R146 ─────────────────────────────
 //
-// Four moments in this game have no stem: feature entry, feature end, retrigger,
-// and a dedicated max-win. R125 wires their CALL SITES so the moment the files
-// land the cue is one line away, WITHOUT inventing audio to fill the gap. Nothing
-// below ships a sound; nothing below pretends a cue is finished.
+// Four moments had no stem until R146: feature entry, feature end, retrigger,
+// and a dedicated max-win. R125 wired their CALL SITES so that the moment the
+// files landed each cue was one line away, WITHOUT inventing audio to fill the
+// gap. R146 landed the owner's stems and declared all four available below.
+// The machinery stays as it is because it is still the right shape: a cue is
+// requested only once it is declared, and a declared cue that fails to load is a
+// real fault left to surface as one.
 //
 // WHY AN AVAILABILITY LIST RATHER THAN A TRY-AND-FALL-BACK. The obvious shape is
 // to build these like every other sound and let makeAudio()'s error handler cope.
@@ -500,10 +523,11 @@ const PENDING_CUES = {
 } as const
 type PendingCue = keyof typeof PENDING_CUES
 
-// EMPTY ON PURPOSE, AND IT IS THE POINT OF THIS BLOCK. No stem exists for any of
-// the four as of R125. An entry here is a claim that a real mastered file ships at
-// that name - do not add one to "wire it up" ahead of the audio.
-const AVAILABLE_PENDING_CUES = new Set<PendingCue>([])
+// An entry here is a claim that a real mastered file ships at that name. All four
+// do since R146 (the owner's stems, mastered through tools/audio_forge/master.py's
+// own functions; provenance in the sounds README). Never add a name ahead of its
+// audio: an unshipped entry is a 404 on the cue's first play.
+const AVAILABLE_PENDING_CUES = new Set<PendingCue>(['featureEnter', 'featureEnd', 'retrigger', 'winMax'])
 
 // Design volumes for the four, on the same scale as BASE above. They are declared
 // now so the loudness decision is made once, in the same table as every other cue,
@@ -517,7 +541,7 @@ const PENDING_BASE: Record<PendingCue, number> = {
   winMax:       1.00,
 }
 
-const pendingEls = new Map<PendingCue, HTMLAudioElement>()
+// pendingEls is declared near the top of this file, beside activeClones: see there.
 
 /**
  * Dev-only instrumentation for the four pending cues (R125).
@@ -532,7 +556,8 @@ const pendingEls = new Map<PendingCue, HTMLAudioElement>()
  *
  * `fired` counts hook calls; `played` counts the ones that reached real audio. While
  * AVAILABLE_PENDING_CUES is empty the correct reading is fired > 0, played === 0.
- * When a stem lands, the same counter proves it started playing.
+ * Since R146 `played` is counted when play() resolves, so it proves the stem started
+ * playing; before R146 it was counted at the call, and a failed file still read 1.
  */
 export interface PendingCueTrace {
   fired: Record<PendingCue, number>
@@ -564,40 +589,55 @@ function pendingEl(cue: PendingCue): HTMLAudioElement | null {
   return el
 }
 
-/** Play a pending cue if its stem exists. Returns whether anything was played, so
- *  callers that must not go silent (max win) can fall back to what ships today. */
-function playPending(cue: PendingCue): boolean {
+/** Play a pending cue if its stem exists. Returns false when there is nothing to
+ *  play (muted, undeclared, or a declared file already known to have failed), so a
+ *  caller that must not go silent (max win) falls back at once. `onFail` covers the
+ *  late case: a declared file that fails to load or decode after play() was called.
+ *
+ *  R146. This used to count `played` and return true before play() settled, so once
+ *  win_max was declared a failed fetch left every max win of the session silent: the
+ *  dead element was cached and the epic fallback never ran. Now a failed element is
+ *  dropped (the next play fetches afresh) and the failure reaches the caller. Only a
+ *  real media error counts: an autoplay refusal or an interrupted play leaves
+ *  `el.error` null, and a fallback would be refused or interrupted just the same. */
+function playPending(cue: PendingCue, onFail?: () => void): boolean {
   pendingTrace.fired[cue]++
   if (muted) { pendingTrace.mutedSkips++; return false }
   const el = pendingEl(cue)
   if (!el) return false
+  if (el.error) { pendingEls.delete(cue); return false }
   el.currentTime = 0
   el.volume = Math.min(1, PENDING_BASE[cue] * sfxVol)
-  el.play().catch(() => {})
-  pendingTrace.played[cue]++
+  el.play().then(() => {
+    pendingTrace.played[cue]++
+  }).catch(() => {
+    if (!el.error) return
+    pendingEls.delete(cue)
+    onFail?.()
+  })
   return true
 }
 
-/** Feature entry. Silent until feature_enter.mp3 exists. */
+/** Feature entry: feature_enter.mp3. */
 export function playFeatureEnter(): void { playPending('featureEnter') }
 
-/** Feature end. Silent until feature_end.mp3 exists. */
+/** Feature end: feature_end.mp3. */
 export function playFeatureEnd(): void { playPending('featureEnd') }
 
-/** Retrigger landed. Silent until retrigger.mp3 exists. */
+/** Retrigger landed: retrigger.mp3. */
 export function playRetrigger(): void { playPending('retrigger') }
 
 /**
  * Max win / wincap.
  *
- * This one is NOT silent today and must not become silent: the max win currently
- * reuses the epic win stinger and its 800ms echo, which soundService has done
- * deliberately since R5 (see playWin's doc). So this plays the dedicated stem when
- * one exists and otherwise does exactly what the game does today - an upgrade path,
- * not a hole. `multiplier` is only used by that fallback.
+ * Plays win_max.mp3, live since R146. Before that the max win reused the epic win
+ * stinger and its 800ms echo (see playWin's doc), and that remains the fallback
+ * whenever win_max cannot sound: undeclared, or its file failed to load (at once if
+ * the failure is already known, otherwise as soon as it surfaces). So a max win is
+ * never silent unless sound is off. `multiplier` is only used by that fallback.
  */
 export function playMaxWin(multiplier: number): void {
-  if (playPending('winMax')) return
+  if (playPending('winMax', () => playWin(multiplier))) return
   playWin(multiplier)
 }
 

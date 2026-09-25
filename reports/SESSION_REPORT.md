@@ -30145,3 +30145,314 @@ https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/3475152477
 10:30:53 UTC. PR #181 is open on the review lane and awaits Fable. This paragraph is itself a commit
 and therefore postdates the run it quotes; per the R131 lesson that chase has no fixed point, so it is
 verified by SHA in the past tense and stops here.
+
+---
+
+# R146 - R145 CLOSED, THE OWNER'S FIFTEEN STEMS ARE LIVE, AND THE FOUR SILENT CUES FINALLY SOUND (2026-09-25)
+
+Two-phase brief, review lane, unattended. Brief saved verbatim at
+`reports/briefs/FS_R146_R145CloseWavIntake_Prompt.md` per convention (f). One mid-session owner
+instruction (bgm_loop take A) arrived by chat and is handled in its own section below.
+
+## Phase 0: R145 closed
+
+- PR #181 was open, 30 of 30 checks green, head `82f6fe29` with the three R145 rasters
+  (`ui/scene_character.png` `6bdd73d0`, `symbols/h2.png` `d8192d42`, `symbols/m3.png` `287f5f29`).
+- **Merged as `394165ca3401888513f440f6850c90d54aaffd0b`** with `gh pr merge 181 --merge`,
+  because a GitHub merge commit is how this repository merges (#176 to #180 have the same
+  shape). All three rasters confirmed on `main` after the pull.
+- **`main` CI after the merge: run 36118859668, push event, 30 of 30 green.**
+- `arc2-baseline` still resolves: annotated tag `b11163e4`, pointing at `618b711e`, locally and
+  on origin.
+- The working checkout left the R145 branch for `main`, then branched to
+  `claude/r146-wav-intake`.
+- **OWNER RULING B, recorded as the brief orders:** H2 and M3 are accepted as ingested at
+  R145 (the quarter-pixel resample finding). Not regenerated, not dropped. Path 1 freeze (rest
+  = `scene_character.png`) is not this session.
+
+**Two tensions surfaced rather than decided quietly, per convention (n):**
+1. Multi-track rule 7 says Fable verifies every pull request before merge. The owner's brief
+   ordered this merge explicitly and is the later instrument, so it governed; Fable's
+   verification of #181 becomes retrospective.
+2. (t.1) rule 2 says an auto-named session branch is deleted after its PR merges. About fifty
+   merged `claude/r0xx` and `claude/r1xx` heads remain on origin, so the rule has not been
+   practised since R086. Deleting only R145's would make the practice inconsistent, and a
+   bulk deletion is the owner's call (t.1 rule 3), so none was deleted. Parked for the owner.
+
+## Phase 1: the intake
+
+### Before anything moved
+
+- Session-start fingerprint: zero dirty rasters, 59 theme rasters, the 15 WAVs and
+  MANIFEST.txt hashed. MANIFEST.txt's sha256 prefixes match all 15 WAVs.
+- A seven-agent read-only map (six surfaces and a completeness critic, about 1.47M subagent
+  tokens) found five things that decided the plan. Each was then **re-measured by me**
+  rather than carried:
+  1. **The build would ship the masters.** Vite copies `public/` verbatim and no prune covered
+     `.wav`: 11,915,968 B against about 1.9 MB of headroom.
+  2. **`master.py` could not be run as it stands.** Its `main()` reads the July sources on the
+     Desktop and writes straight over the shipped files. It would also re-cut the 88 BPM beds
+     to its own 100 and 140 BPM bars and fold them again, and it raises on win_small.
+  3. **A hidden warm mount would play feature cues at every page load** once they were live.
+  4. **Mute did not reach the pending cues.**
+  5. **Seven one-shots carry a large sub-20 Hz swell.**
+
+### The WAV masters never ship (commit `59c1dfd4`)
+
+The masters stay beside their encodes as the brief orders. Three parts landed together,
+because any one alone is worse than none:
+- scoped `.gitignore` lines, for the WAVs and MANIFEST.txt in that one directory only;
+- `pruneAudioMasters` in `vite.config.ts`: extension-based and recursive, placed before the
+  build-info write so the recorded bytes still reconcile;
+- an independent "no audio master ships" check in `dist_hygiene_gate.mjs`, seeded per
+  convention (p).
+
+Proved end to end:
+- The build prunes 15 masters, and `dist` is 0 WAV.
+- A 67 KB master planted in `dist` turns the gate red; removed, it goes green. That is the
+  small-file case only the budget would otherwise catch.
+
+### The pipeline, calibrated before use
+
+The brief says to run master.py or the existing encode path. The only faithful route is to
+import `master.py`'s own functions, which is `tools/audio_forge/r146_master_owner_stems.py`.
+**Calibrated against a known answer first:** fed the July sources, the import recipe re-derives
+the shipped July files, 8 mp3 byte for byte and the 3 webm packet for packet (4,416 / 2,890 /
+175 Opus packets). Only Matroska's random 16-byte segment UID differs. Re-running the committed
+wrapper reproduces every R146 encode the same way.
+
+### Encoded sizes and loudness (ebur128, an independent meter from the pipeline's pyloudnorm)
+
+| file | bytes | rate | duration | integrated | true peak |
+|---|---|---|---|---|---|
+| bgm_loop.webm / .mp3 (take A) | 211,824 / 263,358 | 48k / 44.1k | 10.909 s | -18.0 / -18.2 LUFS | -4.6 / -5.3 dBTP |
+| bgm_tension.webm / .mp3 | 210,949 / 263,277 | 48k | 10.909 s | -18.0 / -18.2 | -9.7 / -9.8 |
+| anticipation_build.webm / .mp3 | 170,028 / 263,277 | 48k | 10.909 s | -18.0 / -18.2 | -7.3 / -7.6 |
+| spin.mp3 | 21,360 | 44.1k | 0.813 s | -11.4 | -3.2 |
+| reel_stop.mp3 | 9,448 | 44.1k | 0.330 s | too short to gate | -3.1 |
+| reel_stop_anticipation.mp3 | 10,989 | 48k | 0.400 s | -19.0 | -3.3 |
+| scatter_land.mp3 | 29,997 | 48k | 1.177 s | -15.6 | -3.3 |
+| win_small.mp3 | 10,702 | 44.1k | 0.372 s | too short to gate | -3.3 |
+| win_medium.mp3 | 21,360 | 44.1k | 0.822 s | -22.9 | -3.2 |
+| win_big.mp3 | 25,748 | 44.1k | 1.013 s | -11.9 | -3.2 |
+| win_epic.mp3 | 34,525 | 44.1k | 1.381 s | -23.7 | -3.2 |
+| **win_max.mp3** | 44,556 | 44.1k | 1.779 s | -25.2 | -3.2 |
+| **feature_enter.mp3** | 31,391 | 44.1k | 1.252 s | -20.8 | -2.9 |
+| **feature_end.mp3** | 28,256 | 44.1k | 1.112 s | -31.9 | -3.3 |
+| **retrigger.mp3** | 19,479 | 44.1k | 0.752 s | -20.5 | -3.1 |
+| ui_click.mp3 | 2,551 | unchanged | | | |
+
+Beds land at the pipeline's -18 LUFS, not the WAVs' audition -14. No ducks are baked in; the
+spin and anticipation ducks stay in `soundService.ts`. **dist fell from 24,296,023 B (101
+files) to 18,705,003 B (105 files)**, because the 10.9 s beds replace 88.3 s and 57.8 s ones.
+
+### THE 500 MS SEAM FOLD WAS SKIPPED, for all three beds
+
+`master.py`'s loop path takes the silence trim, then a re-cut to its own bar grid (100 or 140
+BPM), then the 500 ms fold, and each step shortens a pre-wrapped 88 BPM 4-bar loop. The full
+path gives:
+- 436,726 / 469,718 / 499,566 frames for the 48 kHz originals;
+- 401,299 frames for take A;
+- about 3.34 / 3.59 / 3.82 bars, so the downbeat would jump at every wrap.
+
+The beds took gain only. All six loop files decode back to exactly four bars. The seam RMS
+delta after encoding is 1.21 to 1.79 dB for bgm_tension and anticipation_build, within 0.05 dB
+of the source WAVs. anticipation_build going to -18 LUFS follows the brief and departs from
+master.py's historic peak path: it is about 2.5 LU quieter than before.
+`master_win_family` is not run, because it raises on win_small (0.37 s, under the 0.4 s
+loudness block). Each tier is peak-normalised alone, `main()`'s own documented fallback. The
+250 ms reel_stop fade was checked before it was kept: it removes 0.04 dB of the owner's stem.
+
+### The four cues that flipped from silent to live
+
+**feature_enter, feature_end, retrigger and win_max.** They are declared in
+`AVAILABLE_PENDING_CUES` and pathed in `themeStore.ts` (AUDIO_TRUTH_MAP section 5.2 step 6),
+which also puts them under the asset reference gate. The play-call sites in App / GameGrid /
+banners are unchanged, apart from the one fence exception below. `playBGM`, `setOverdriveBed`
+and `playAnticipation` still load `bgm_loop`, `bgm_tension` and `anticipation_build`: verified
+in the browser.
+
+### Defects found on the way, and what was done with each
+
+1. **BOOT STINGERS. Fixed in a separate commit held for ruling (`0d060d9f`).** App.svelte keeps
+   a hidden `FreeSpinsPresentation` mounted from page load, so the first real feature entry
+   pays no paint cost. It plays the entry sequence and `toEnd()`. A `play()` probe, with the
+   stems live and no guard:
+   - autoplay allowed: `feature_enter` at +163 ms and `feature_end` at +1,498 ms;
+   - early tap on the splash: `feature_end` at +1,408 ms;
+   - HEAD control: zero.
+   The guard skips the two hooks when `skipContinueGate` is set, which only that mount does.
+   **This touches FreeSpinsPresentation.svelte, which the TASK 1.4 fence (App / GameGrid /
+   banners) arguably covers.** If the ruling drops the commit, featureEnter and featureEnd must
+   come back out of `AVAILABLE_PENDING_CUES`.
+2. **MUTE DID NOT REACH A PLAYING PENDING CUE.** Fixed inside `soundService.ts`. Mute during
+   win_max pauses it at 0; the unmuted control is still playing at 0.49 s.
+3. **MY OWN DEFECT: a persisted mute crashed the game at load.** The mute fix referenced
+   `pendingEls` about 370 lines above its declaration. The subscription runs `setMuted()`
+   during module evaluation, so a returning muted player hit a temporal-dead-zone
+   ReferenceError and got no game at all: 0 spin buttons. **Caught by
+   r043_replay_audio_proof's global-mute case before any push**, reproduced directly, and fixed
+   structurally (`aa02a539`).
+4. **A SILENT MAX WIN on any failed win_max load, for the rest of the session.** Found by this
+   session's adversarial review of its own diff. `playPending` returned true before `play()`
+   settled, and the dead element stayed cached. Fixed (`2b5f8b72`): a failed element is
+   dropped, and the failure reaches `playMaxWin`, which plays win_epic and its echo. Proved in
+   the app's own module with win_max forced to 404, over two max wins in one page: epic both
+   times, and a fresh retry the second time.
+5. **LATE FIRST STINGERS.** The four were fetched only on first play. Now the existing
+   first-gesture warm-up builds them (`2b5f8b72`); after the first real tap all four are
+   fetched.
+6. **BOTH MASTERING ROUTES COULD OVERWRITE THE OWNER'S SET BY ACCIDENT** (`8671325b`).
+   - `master.py`, run as documented, would put the July audio back. It now refuses any row with
+     an owner master present unless `--july-sources` is passed.
+   - The wrapper's stage guard missed a case variant on this case-insensitive disk. It now
+     refuses any stage inside `frontend/public`, compared with `samefile`.
+   Both refusals were tested, and nothing was written.
+7. **ESCALATED, NOT FIXED: the warm mount deletes the TR-099 resume checkpoint** about 1.4 s
+   after every load (`FreeSpinsPresentation.svelte` `toEnd()` calls `clearCheckpoint()`).
+   `sessionRecovery.ts:309` reads it only after awaiting `authenticate()`. On a slow network,
+   an offered mid-feature resume can therefore become a replay from spin 1. This is session
+   recovery, next to the money path, and outside an audio fence, so it wants its own brief.
+8. **Pre-existing, recorded, not touched:** a bought max win still plays win_epic, because it
+   is a call-site change (AUDIO_TRUTH_MAP 4.5).
+
+## The owner's mid-session instruction: bgm_loop take A
+
+"Re-encode only bgm_loop.wav through master.py... take A... skip the 500 ms seam fold if it
+would shorten the 4-bar loop."
+
+- **Take A was not in place.** The sounds directory still held the original drop's bgm_loop
+  (sha256 `77556d1d...`), so a re-encode there would have reproduced the previous files and
+  looked like compliance.
+- Take A was at `~/Downloads/bgm_loop-take-A/`: the zip and the extracted copy agree
+  (`59cbe76c...`), and its README says "Replace only bgm_loop.wav". It was copied over the
+  gitignored master. The original drop is still in the owner's `future-spinner-sounds-ready.zip`,
+  byte-identical, and a scratchpad backup was also kept.
+- Take A is 44.1 kHz and 481,091 frames, exactly 4 bars. The fold would shorten it, so it was
+  skipped.
+- **Only bgm_loop.{webm,mp3} changed. Every other shipped audio file is byte-identical before
+  and after** (commit `750259c9`).
+- **A DEFECT IN THE TAKE, FOR THE OWNER.** Take A opens on 12 ms of exact digital silence while
+  its tail runs at about -12 dBFS, so every wrap, once every 10.9 s, drops into a 12 ms gap.
+  - The seam RMS delta is 18.67 dB against the 2.0 dB gate, confirmed in the browser by
+    `audio_verify.mjs`: 18.61 dB webm, 18.68 dB mp3.
+  - The original drop measured 1.49 dB.
+  - No length-preserving repair exists without the source audio.
+  - Fix: a re-export wrapped like the other beds.
+  - Revert to the original drop's bed: `git revert 750259c9`.
+- **My error, corrected before any push:** the first version of that commit message gave
+  458,479 frames as "master.py's loop path". That figure is the silence trim plus the fold
+  alone; the full path is 401,299. The two unpushed commits were rebuilt from their exact
+  blobs with `git restore --staged --source`, and the tree hash was verified identical.
+
+## Verification (TASK 1.5)
+
+- **audio_verify.mjs** (not in CI, run locally on its own free port):
+  - spin, reel stop and win cues fire;
+  - the bed swaps on a bonus buy and reverts after the feature;
+  - zero sound request failures, zero console errors;
+  - **one failure, loopSeamsWithinTolerance, on bgm_loop take A only**; bgm_tension 1.30 /
+    1.21 dB and anticipation_build 1.79 / 1.76 dB pass.
+- **r043_replay_audio_proof.mjs: 11 of 11, self-test PASS.** Its wincap assertion now requires
+  win_max at the replay splash and no win_epic fallback.
+- **Session browser proof** (play() instrumented from an init script, independent of the
+  service's own counter; every surface with a control):
+  - zero feature cues at page load, with autoplay allowed and with an early tap;
+  - trigger, retrigger and wincap rounds play feature_enter, bgm_tension, feature_end,
+    retrigger and win_max, all HTTP 200/206, zero 4xx, zero console errors;
+  - mute stops win_max and anticipation_build dead, while the controls keep playing;
+  - a persisted-mute load renders.
+- **Every live cue has its expected extension next to its master**: three beds as webm and
+  mp3, twelve one-shots as mp3. **The built bundle declares the four in its
+  `AVAILABLE_PENDING_CUES` literal and ships their files; dist carries 0 WAV and 19 sound
+  files.**
+- **Reduced motion unchanged**: no reduced-motion code is in the diff; the one grep hit is an
+  `Array.reduce`. No locked path is touched. **5173 untouched**: the session server was 5174.
+
+**Both suites, run locally BEFORE the push on the final code.**
+- **Browser matrix: 28 of 28 green**, against a fresh production build of the code at
+  `1c3555d2`. The commits after it are documentation only, which `pruneDocs` keeps out of
+  `dist`.
+- **Static job: 82 of 82 run steps green** on the final committed tree `285b6638`. `npm ci` was
+  skipped locally because it deletes `node_modules` under a running server; CI runs it.
+- Its build stamps 105 files and 18,705,003 B. Dist hygiene passes, including the new "no audio
+  master ships" check and its seeds. The document currency gate reports 0 new findings (272
+  frozen, unchanged).
+
+## The owner's open questions, recorded not decided
+
+1. **Licence and source of the fifteen stems: not stated in the drop, UNKNOWN.**
+2. **bgm_loop take A's 12 ms head gap**: re-export it wrapped, or `git revert 750259c9`.
+3. **Seven one-shots carry a large sub-20 Hz swell**, feature_end and win_small worst (over 99%
+   of their energy below 20 Hz). feature_end integrates at -31.9 LUFS; a 20 Hz high-pass before
+   normalisation would make it about 7 LU louder.
+4. **The win ladder is not monotonic**: win_big -11.9 against win_epic -23.7 LUFS. MANIFEST
+   says win_big "was win_mega.wav".
+5. **win_max sounds for 1.78 s** against the truth map's 5.0 s spec and the 2.6 s reveal, and
+   it is quieter than win_epic.
+6. **The warm-mount guard commit `0d060d9f`** (fence exception), and **the checkpoint
+   escalation** (item 7 above).
+7. **Bought max win still plays win_epic** (call-site change).
+
+## Restore commands if the owner hates the mix
+
+- **Back to the pre-R146 audio for everything that existed before, keeping the four new cues
+  live:**
+  `git restore --source=394165ca3401888513f440f6850c90d54aaffd0b -- frontend/public/assets/themes/future-spinner/sounds/{bgm_loop,bgm_tension,anticipation_build}.{mp3,webm} frontend/public/assets/themes/future-spinner/sounds/{spin,reel_stop,reel_stop_anticipation,scatter_land,win_small,win_medium,win_big,win_epic}.mp3`
+  then commit.
+- **Silence the four new cues again:** set `AVAILABLE_PENDING_CUES` back to an empty set in
+  `soundService.ts`. win_max then falls back to win_epic and its echo.
+- **Only bgm_loop back to the original drop:** `git revert 750259c9`.
+- **Everything, once merged:** `git revert -m 1 <the R146 merge sha>`.
+
+## FOR THE NEXT SESSION
+
+**Model and effort:** Opus 5.5, with ultracode on. Workflows were used for the pipeline map,
+the documentation sweep and an adversarial review of the session's own diff (about 1.47M,
+2.25M and 1.80M subagent tokens). **Plan of record, stated late rather than claimed:** the map
+workflow launched before a written plan, which rule 15 asks for first.
+
+**Approach:** close R145, then fingerprint, then map with readers and a critic, then re-measure every
+load-bearing claim, then close the dist leak first, then calibrate the encode path against the July
+files, then encode to a scratch stage and verify, then swap, then reproduce defects with controls before
+fixing, then review the diff adversarially, then sweep the documents, then run both suites locally, then PR.
+
+**Alternatives rejected:**
+- Running master.py as written: wrong sources, and it overwrites the shipped files.
+- Copying the owner's WAVs over the July sources in `~/Desktop/fs_audio`: that destroys the
+  July provenance.
+- master.py's loop path on the beds: it shortens them.
+- `master_win_family`: it raises.
+- Moving the WAVs out of `public/`: the brief says to leave them.
+- Committing the WAVs: 11.9 MB of binary, never versioned before.
+- Holding featureEnter and featureEnd out of the set: it contradicts TASK 1.3, and the guard
+  commit is offered instead.
+- A soundService-only boot fix: none is robust.
+- Fixing the checkpoint clear: out of fence.
+- Deleting R145's branch alone: inconsistent with practice.
+
+**Files touched:**
+- Audio: the 18 encodes, with `ui_click.mp3` untouched.
+- Runtime: `soundService.ts`, `themeStore.ts`, `FreeSpinsPresentation.svelte`, and a comment
+  in `App.svelte`.
+- Build and gates: `vite.config.ts`, `dist_hygiene_gate.mjs`, `r043_replay_audio_proof.mjs`,
+  `.gitignore`.
+- Mastering tools: `tools/audio_forge/master.py` (the guard) and the new
+  `tools/audio_forge/r146_master_owner_stems.py`.
+- Records: the sounds README, nine live documents, the brief, and this report with its dated
+  archive.
+
+**Open threads:** the seven owner questions above, and the (t.1) branch hygiene. **Owner
+preview NOT refreshed:** the brief keeps 5173 untouched, although this session did land the
+R145 merge on `main`. The checkout is left on `claude/r146-wav-intake`, so `npm run dev` from
+`frontend/` serves the new audio, and a hard refresh loads it.
+
+### Remote CI, rule 10, verified after the push
+
+Run **36129710634 2026-09-25T11:29:59Z 2026-09-25T11:41:43Z** on `68b96c24`:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/36129710634 2026-09-25T11:29:59Z 2026-09-25T11:41:43Z
+**completed SUCCESS, 30 of 30 jobs green**, with no non-success job in the list,  to
+ UTC. PR #182 is open on the review lane and awaits Fable and the owner's rulings
+above. This paragraph is itself a commit and therefore postdates the run it quotes; per the
+R131 lesson that chase has no fixed point, so it is verified by SHA in the past tense and stops
+here.

@@ -98,6 +98,12 @@ export const themeAssets = derived(activeTheme, ($t) => {
       scatterLand:          `${b}/sounds/scatter_land.mp3`,
       anticipationBuild:    `${b}/sounds/anticipation_build.mp3`,
       uiClick:              `${b}/sounds/ui_click.mp3`,
+      // R146: the four R125 pending cues, live since the owner's stems landed.
+      // soundService builds these lazily through pendingEl(), not buildSounds().
+      featureEnter:         `${b}/sounds/feature_enter.mp3`,
+      featureEnd:           `${b}/sounds/feature_end.mp3`,
+      retrigger:            `${b}/sounds/retrigger.mp3`,
+      winMax:               `${b}/sounds/win_max.mp3`,
     },
   }
 })

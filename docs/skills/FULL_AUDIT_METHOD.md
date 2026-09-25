@@ -481,6 +481,14 @@ and listed at `docs/QUALITY_CHARTER.md` 5.3 so silence is not read as coverage:
 | **Accessibility** | Only the prohibited-terms gate exists. No focus order, no keyboard-only walk, no screen-reader pass, and contrast is gated on one label class rather than all text. Screen-reader text is player-facing text: that lesson already cost 14 mislabelled controls. | Never examined |
 | **Animation quality and timing** | One of the three axes reviewers most often deduct on, and nothing gates it. Frame RATE is gated, which is a different question. | Never examined |
 
+**R146 (2026-09-25): the Audio row's premise has moved and its status has not.** The shipped
+audio set is now 19 files for 16 cues, not twelve rows: R146 took in the owner's 15 WAV stems,
+which replace every shipped audio file except ui_click.mp3 and supply the four cues that
+previously had no file. So "every one model-generated" is no longer known to be true: only
+ui_click.mp3 is still the July Stable Audio 3 generation, and the provenance and licence of the
+owner's stems are not stated in the drop, which is an owner-parked UNKNOWN rather than an
+answer. The wave itself remains never swept.
+
 **The maths package is deliberately out of scope of this document.** It is locked, and it
 wants its own audit pass with its own sanction.
 

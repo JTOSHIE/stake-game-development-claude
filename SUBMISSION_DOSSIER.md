@@ -137,6 +137,22 @@ soundtrack sentence is now restored as a draft (section 3) - **but remains
 PENDING OWNER APPROVAL**, not yet an approved claim. Do not treat the draft sentence as
 approved copy until the owner explicitly signs off on it.
 
+**R146 (2026-09-25), SUPERSEDING the parenthesis above; the correction is added and the
+old text is not edited away.** The shipped audio set is now **19 files for 16 cues**, not
+twelve: `bgm_loop`, `bgm_tension` and `anticipation_build` each ship as webm plus mp3, and
+the other thirteen cues as one mp3 each, including the four that previously had no file
+(`feature_enter`, `feature_end`, `retrigger`, `win_max`), which are now live. Every file
+except `ui_click.mp3` is now mastered from the owner's WAV stems through
+`tools/audio_forge/master.py`'s own functions, so `reports/audio/GENERATION_LOG_2026-07-13.md`
+(Stable Audio 3) is the provenance of `ui_click.mp3` alone; the provenance and licence of
+the owner's stems are not stated in the drop, an open owner question.
+**`frontend/scripts/audio_verify.mjs` does NOT report ALL CHECKS PASS at R146**: one check
+fails, `loopSeamsWithinTolerance`, on `bgm_loop` only (seam RMS delta 18.61 dB webm and
+18.68 dB mp3 against the 2.0 dB gate), because the owner's take A master opens with 12 ms of
+digital silence; `bgm_tension` and `anticipation_build` pass. Whether to re-export take A
+wrapped or revert to the original drop is the owner's call. The bed crossfade on Overdrive
+entry and exit still passes.
+
 > **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
 > 5b below is the upload steps and 5d is the one-time versus per-update checklist;
 > `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each
