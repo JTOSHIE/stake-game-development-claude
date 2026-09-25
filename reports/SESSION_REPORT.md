@@ -30446,3 +30446,13 @@ fixing, then review the diff adversarially, then sweep the documents, then run b
 preview NOT refreshed:** the brief keeps 5173 untouched, although this session did land the
 R145 merge on `main`. The checkout is left on `claude/r146-wav-intake`, so `npm run dev` from
 `frontend/` serves the new audio, and a hard refresh loads it.
+
+### Remote CI, rule 10, verified after the push
+
+Run **36129710634 2026-09-25T11:29:59Z 2026-09-25T11:41:43Z** on `68b96c24`:
+https://github.com/JTOSHIE/stake-game-development-claude/actions/runs/36129710634 2026-09-25T11:29:59Z 2026-09-25T11:41:43Z
+**completed SUCCESS, 30 of 30 jobs green**, with no non-success job in the list,  to
+ UTC. PR #182 is open on the review lane and awaits Fable and the owner's rulings
+above. This paragraph is itself a commit and therefore postdates the run it quotes; per the
+R131 lesson that chase has no fixed point, so it is verified by SHA in the past tense and stops
+here.
