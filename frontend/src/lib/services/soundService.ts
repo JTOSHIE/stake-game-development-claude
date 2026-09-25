@@ -260,6 +260,11 @@ export function warmUpAudio(): void {
       el.muted = wasMuted
     })
   })
+  // R146. The four pending cues are live and are built lazily, so without this the
+  // first feature entry, retrigger and max win of a session would start their fetch
+  // at the moment they should sound. Building the element starts its fetch (an
+  // Audio() element preloads); nothing is played here.
+  AVAILABLE_PENDING_CUES.forEach((cue) => { pendingEl(cue) })
 }
 
 export function playBGM(): void {
@@ -551,7 +556,8 @@ const PENDING_BASE: Record<PendingCue, number> = {
  *
  * `fired` counts hook calls; `played` counts the ones that reached real audio. While
  * AVAILABLE_PENDING_CUES is empty the correct reading is fired > 0, played === 0.
- * When a stem lands, the same counter proves it started playing.
+ * Since R146 `played` is counted when play() resolves, so it proves the stem started
+ * playing; before R146 it was counted at the call, and a failed file still read 1.
  */
 export interface PendingCueTrace {
   fired: Record<PendingCue, number>
@@ -583,17 +589,32 @@ function pendingEl(cue: PendingCue): HTMLAudioElement | null {
   return el
 }
 
-/** Play a pending cue if its stem exists. Returns whether anything was played, so
- *  callers that must not go silent (max win) can fall back to what ships today. */
-function playPending(cue: PendingCue): boolean {
+/** Play a pending cue if its stem exists. Returns false when there is nothing to
+ *  play (muted, undeclared, or a declared file already known to have failed), so a
+ *  caller that must not go silent (max win) falls back at once. `onFail` covers the
+ *  late case: a declared file that fails to load or decode after play() was called.
+ *
+ *  R146. This used to count `played` and return true before play() settled, so once
+ *  win_max was declared a failed fetch left every max win of the session silent: the
+ *  dead element was cached and the epic fallback never ran. Now a failed element is
+ *  dropped (the next play fetches afresh) and the failure reaches the caller. Only a
+ *  real media error counts: an autoplay refusal or an interrupted play leaves
+ *  `el.error` null, and a fallback would be refused or interrupted just the same. */
+function playPending(cue: PendingCue, onFail?: () => void): boolean {
   pendingTrace.fired[cue]++
   if (muted) { pendingTrace.mutedSkips++; return false }
   const el = pendingEl(cue)
   if (!el) return false
+  if (el.error) { pendingEls.delete(cue); return false }
   el.currentTime = 0
   el.volume = Math.min(1, PENDING_BASE[cue] * sfxVol)
-  el.play().catch(() => {})
-  pendingTrace.played[cue]++
+  el.play().then(() => {
+    pendingTrace.played[cue]++
+  }).catch(() => {
+    if (!el.error) return
+    pendingEls.delete(cue)
+    onFail?.()
+  })
   return true
 }
 
@@ -611,11 +632,12 @@ export function playRetrigger(): void { playPending('retrigger') }
  *
  * Plays win_max.mp3, live since R146. Before that the max win reused the epic win
  * stinger and its 800ms echo (see playWin's doc), and that remains the fallback
- * whenever the cue is not declared available, so a max win is never silent by
- * construction. `multiplier` is only used by that fallback.
+ * whenever win_max cannot sound: undeclared, or its file failed to load (at once if
+ * the failure is already known, otherwise as soon as it surfaces). So a max win is
+ * never silent unless sound is off. `multiplier` is only used by that fallback.
  */
 export function playMaxWin(multiplier: number): void {
-  if (playPending('winMax')) return
+  if (playPending('winMax', () => playWin(multiplier))) return
   playWin(multiplier)
 }
 
