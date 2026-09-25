@@ -431,8 +431,10 @@
   // torn down, so the first real entry reuses the live, compiled, decoded
   // subtree and pays nothing (the 182.8ms first-entry frame is gone). It is
   // never visible (fixed, opacity 0, behind everything, visibility hidden after
-  // the first paint), never audible (the subtree imports no audio), never
-  // layout-affecting (out of flow), and never focusable (aria-hidden).
+  // the first paint), never audible (R146: the subtree DOES import the feature
+  // cues since R125, and FreeSpinsPresentation skips them when skipContinueGate
+  // is set, which only this mount does), never layout-affecting (out of flow),
+  // and never focusable (aria-hidden).
   const WARM_SCRIPT = {
     roundId: 0, triggered: true,
     baseSpin: {

@@ -242,8 +242,14 @@
     // startFrom() (the TR-099 resume) deliberately skips this sequence, and a
     // feature resumed at a spin boundary must not replay its entry stinger. The
     // hook inherits that correctness instead of restating it.
-    // SILENT until feature_enter.mp3 exists - see soundService's PENDING_CUES.
-    playFeatureEnter()
+    // R146, NOT ON THE WARM MOUNT. App.svelte keeps a hidden instance of this
+    // component mounted from page load (skipContinueGate is set by that instance
+    // and by nothing else) so the first real entry pays no paint cost. It runs
+    // this sequence at load and must never be heard. Measured before this guard,
+    // once the stem shipped: feature_enter audible at +163 ms and feature_end at
+    // +1,498 ms on a plain load wherever autoplay is allowed, and feature_end at
+    // +1,408 ms after an early tap on the boot splash.
+    if (!skipContinueGate) playFeatureEnter()
     entryStage = 'flare'
     timer = setTimeout(() => {
       entryStage = 'dip'
@@ -403,9 +409,10 @@
     // R125 HOOK, feature_end. GUARDED ON script.triggered: toEnd() is also the
     // exit of start()'s wincap WALKTHROUGH, a base-game round that reached the
     // cap and never entered the feature at all. An unguarded cue there would
-    // announce the end of a feature that never happened.
-    // SILENT until feature_end.mp3 exists.
-    if (script?.triggered) playFeatureEnd()
+    // announce the end of a feature that never happened. Also guarded against
+    // the hidden warm mount (R146, see runEntrySequence), which reaches here
+    // about 1.4 s after every page load.
+    if (script?.triggered && !skipContinueGate) playFeatureEnd()
     phase = 'end'
     // TR-099. The feature is over, so the cursor is cleared here rather than
     // only on settle: a checkpoint that outlives its round is a stale cursor
