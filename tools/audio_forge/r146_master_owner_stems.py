@@ -79,16 +79,56 @@ for n, kbps in BEDS.items():
     w = STAGE / 'wav' / f'{n}.wav'; sf.write(str(w), d, sr, subtype='PCM_16')
     M.encode_opus(w, STAGE / f'{n}.webm', kbps); M.encode_mp3(w, STAGE / f'{n}.mp3', 192)
     print(f'bed {n}: {len(d)} frames, seam {M.measure_seam_rms_delta_db(d, sr):.2f} dB, peak {M.linear_to_db(abs(d).max()):.2f} dBFS')
-for n in ONESHOTS:
-    if n not in NAMES:
-        continue
+def premaster_oneshot(n):
     d, sr = sf.read(str(SRC / f'{n}.wav'))
     if n in HIGHPASS_STEMS:
         d = highpass(d, sr)
     d = M.trim_silence(d, sr)
     if n == 'reel_stop':
         d = M.fade_out(d, sr, M.REEL_STOP_FADE_MS)
-    d = M.peak_normalize(d, M.SFX_PEAK_TARGET_DBFS)
+    return M.peak_normalize(d, M.SFX_PEAK_TARGET_DBFS), sr
+
+
+# R147 1C. THE WIN LADDER. The owner's stems left it inverted (win_big about 12 LU above
+# win_epic). The brief orders a gain ladder, no new audio: after encode, integrated loudness
+# must rise at least 1 LU per step, small < medium < big < epic < max. Gains only, so the top
+# anchors it: every tier sits at the -3 dBFS peak ceiling already, and raising win_max further
+# would need a limiter. Walking down from win_max, each tier is ATTENUATED only as far as needed
+# to sit LADDER_PREENCODE_LU below the next. 1.75, the smallest margin at which the ENCODED
+# files clear 1.0 LU on both pyloudnorm and ffmpeg's ebur128 (at 1.25 the two meters disagree by
+# 0.57 LU on win_epic, and ebur128 then read the epic-to-max step as only +0.7).
+# This is master_win_family's walk, extended to win_max, with a short-clip loudness method:
+# BS.1770 gates in 400 ms blocks, so a clip shorter than that (win_small, 0.38 s) is measured
+# as one silence-padded 400 ms block. Always computed from all five tiers, so re-mastering one
+# of them gives the same gains.
+WIN_LADDER = ['win_small', 'win_medium', 'win_big', 'win_epic', 'win_max']
+LADDER_PREENCODE_LU = 1.75
+
+
+def ladder_lufs(d, sr):
+    import numpy as np, pyloudnorm as pyln
+    need = int(0.4 * sr)
+    if len(d) < need:
+        d = np.vstack([d, np.zeros((need - len(d), d.shape[1]))])
+    return pyln.Meter(sr).integrated_loudness(d)
+
+
+LADDER_GAIN_DB = {}
+if any(n in WIN_LADDER for n in NAMES):
+    level = {n: ladder_lufs(*premaster_oneshot(n)) for n in WIN_LADDER}
+    target = level[WIN_LADDER[-1]]
+    LADDER_GAIN_DB[WIN_LADDER[-1]] = 0.0
+    for n in reversed(WIN_LADDER[:-1]):
+        target = min(level[n], target - LADDER_PREENCODE_LU)
+        LADDER_GAIN_DB[n] = target - level[n]
+    print('win ladder: ' + ', '.join(f'{n} {level[n]:.2f} LUFS gain {LADDER_GAIN_DB[n]:+.2f} dB' for n in WIN_LADDER))
+
+for n in ONESHOTS:
+    if n not in NAMES:
+        continue
+    d, sr = premaster_oneshot(n)
+    if n in LADDER_GAIN_DB:
+        d = d * M.db_to_linear(LADDER_GAIN_DB[n])
     w = STAGE / 'wav' / f'{n}.wav'; sf.write(str(w), d, sr, subtype='PCM_16')
     M.encode_mp3(w, STAGE / f'{n}.mp3', 192)
     print(f'one-shot {n}: {len(d)} frames at {sr} ({len(d)/sr*1000:.0f} ms)')
