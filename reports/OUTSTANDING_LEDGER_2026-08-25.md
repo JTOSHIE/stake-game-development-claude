@@ -4,6 +4,34 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1C. R147 (2026-09-26) - FOUR OF 1B'S SIX AUDIO ITEMS CLOSED; take A PARKED
+
+**Branch `claude/r147-overnight-audit`.** Appended above 1B, which stays as written.
+
+*** CLOSED: 1B item 5, bgm_loop take A's 12 ms head gap. OWNER CHOICE recorded: "scratchy-but-
+seamless bed restored; take A parked". The brief's 40 ms equal-power fold was tried first and
+measured: take A has no audio past its loop end, so the fold either cut every cycle 40 ms short
+of the 4-bar lock (3.9853 bars, seam 0.90 dB) or replayed the last 40 ms with a click at every
+wrap (4 bars, seam 1.22 dB, wrap step 3.2x the in-loop maximum). The original drop's bgm_loop is
+back, and `frontend/scripts/audio_verify.mjs` passes EVERY check: bgm_loop 1.50 / 1.47 dB,
+bgm_tension 1.30 / 1.21, anticipation_build 1.79 / 1.76 (webm / mp3) against the 2.0 dB gate. ***
+*** CLOSED: 1B item 2, the sub-20 Hz swell. A causal 4th-order 30 Hz high-pass on the seven
+affected one-shots, before the pipeline's trim and peak step. Their energy below 20 Hz falls to
+1.9% or less, and feature_end rises from -31.9 to -26.8 LUFS, still 5.5 LU below feature_enter. ***
+*** CLOSED: 1B item 3, the win ladder. Attenuation only, walking down from win_max, which is
+unchanged: on pyloudnorm small -31.7, medium -29.9, big -28.2, epic -26.5, max -24.7 LUFS (small
+padded to one 400 ms block); ffmpeg's ebur128 reads -29.9, -28.2, -25.9, -24.7 from medium up and
+cannot meter the 0.38 s win_small. win_big comes down 16.2 dB from the owner's level. ***
+*** CLOSED: 1B item 6, the bought max win. The one call-site change the R147 brief authorised:
+App.svelte's buy path now plays win_max as the celebration appears and skips its closing playWin
+for a capped round. Proved on the bonus-mode wincap fixture (win_max at +479 ms; the control
+played nothing at the reveal and win_epic after the feature). ***
+
+**STILL OPEN from 1B:** item 1 (the stems' licence and source, not stated in the drop) and item
+4, win_max's length (1.81 s against a 5.0 s spec): OPEN ART, not padded, not recomposed. Item 4's
+other half is closed: win_max now sits above win_epic. The R147 estate audit's further findings
+are in `reports/audit/R147_ESTATE_AUDIT.md`.
+
 ## 1B. R146 (2026-09-25) - THE FOUR SILENT CUES ARE LIVE, AND EVERY SHIPPED SOUND BUT ui_click IS NOW THE OWNER'S
 
 **Branch `claude/r146-wav-intake`.** Appended to close the audio rows below, not to rewrite them.

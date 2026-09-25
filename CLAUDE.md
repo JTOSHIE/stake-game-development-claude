@@ -319,9 +319,17 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
 Owner's order, 2026-07-28 (`reports/briefs/FS_HYGIENE_AND_REGISTER_Prompt.md`, JOB 1), so a
 stale head can never again be mistaken for mergeable work.
 
-**Six branches exist on the remote and that is the whole list.** Anything not named here has
-been deleted, and if a branch appears that is not on this list, it is either new work that
-should add itself here or a stale head that should go.
+**Six branches are kept on the remote on purpose, and the table below is that whole list.**
+Three more heads from 2026-08-15 wait for the owner decision recorded in
+`reports/SESSION_REPORT.md` (R071): `analysis/2026-08-15` and `track/standback-2026-08-15`
+(0 unique commits each; PRs #124 and #123 merged) and `controlrow/2026-08-15` (3 commits on
+no other branch; PR #125 closed, not merged; its tip is still held by `refs/pull/125/head`).
+A merged session head (`claude/rNNN-*`) is not on this list: ruling (t.1) rule 2 deletes it
+when its PR merges. R147 found 50 of them left on the remote, R086 to R146, and deleted them
+on 2026-09-26, each first proven an ancestor of `main` with its merged PR's merge commit on
+`main`; the log, with every tip, merge commit and PR, is in `reports/audit/R147_ESTATE_AUDIT.md`
+section 2.1. Any other branch not named here is either new work that should add itself here
+or a stale head that should go.
 
 | Branch | Ahead of main | What it is |
 |---|---|---|

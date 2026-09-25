@@ -73,9 +73,9 @@ encodes (8 mp3 byte for byte, the 3 webm packet for packet).
   at the onset of feature_end and win_small.
 - **R147, the win ladder**: after peak normalisation each win tier is attenuated, walking
   down from win_max, until it sits 1.75 LU below the next, so the encoded files rise at least
-  1 LU a tier on both pyloudnorm and ffmpeg's ebur128: win_small -31.7, win_medium -29.9,
-  win_big -28.2, win_epic -26.5, win_max -24.7 LUFS (win_small measured as one padded 400 ms
-  block). Gains only; nothing is limited or recomposed, so the whole ladder sits well below
+  1 LU a tier on pyloudnorm: win_small -31.7, win_medium -29.9, win_big -28.2, win_epic -26.5,
+  win_max -24.7 LUFS (win_small measured as one padded 400 ms block). ffmpeg's ebur128 agrees
+  from win_medium up (-29.9, -28.2, -25.9, -24.7) and cannot meter the 0.38 s win_small. Gains only; nothing is limited or recomposed, so the whole ladder sits well below
   the other effects, and win_big comes down 16.2 dB from the owner's level.
 
 To re-master after the owner replaces a master, from the repository root:
@@ -93,10 +93,11 @@ then check the outputs and copy them here.
    end, so the fold could only either cut the loop to 3.9853 bars (seam 0.90 dB, but every
    cycle 40 ms short of the 4-bar lock) or keep 4 bars by replaying the last 40 ms (seam
    1.22 dB, but a click at every wrap, 3.2x the largest step inside the loop). Neither is a
-   pass without inventing audio, so the original drop's bed is back (seam 1.49 dB). Take A
+   pass without inventing audio, so the original drop's bed is back (audio_verify seam
+   1.50 dB webm, 1.47 dB mp3). Take A
    can return as a re-export rendered with a wrapped 40 ms tail, as the other beds were.
 3. **Closed at R147: the sub-20 Hz swell** is filtered out of the seven one-shots (above).
-   feature_end is still the quietest cue (-26.8 LUFS against feature_enter's -21.3): that is
+   feature_end is still 5.5 LU below feature_enter (-26.8 LUFS against -21.3): that is
    the stem's own level now, not the swell.
 4. **Closed at R147: the win ladder** rises monotonically (above). **Still OPEN ART:
    win_max** sounds for 1.81 s (the master is 2.34 s) against the truth map's 5.0 s spec and
