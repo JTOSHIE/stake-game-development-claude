@@ -55,6 +55,18 @@ const DOC_EXTENSIONS = ['.md', '.markdown', '.mdx', '.txt', '.rst', '.adoc', '.d
 const DOC_BASENAMES = ['LICENSE', 'LICENCE', 'NOTICE', 'CHANGELOG', 'AUTHORS', 'CONTRIBUTING', 'README']
 
 /**
+ * Audio master extensions. R146, 2026-09-25.
+ *
+ * The owner's source WAVs sit in `public/.../sounds/` beside the mp3 and webm
+ * the game loads, and Vite copies `public/` verbatim. `pruneAudioMasters` in
+ * `vite.config.ts` removes them; this is the second, independent statement of
+ * the same rule, for the same convention (l.4) reason as DOC_EXTENSIONS above.
+ * Only the budget would otherwise notice one, and a single 65 KB master fits
+ * comfortably inside the headroom.
+ */
+const AUDIO_MASTER_EXTENSIONS = ['.wav', '.wave', '.aif', '.aiff', '.aifc', '.flac']
+
+/**
  * The 25 MB budget, from `SUBMISSION_DOSSIER.md` section 5.
  * Asserted here as well as recorded, so the figure in the report is one this
  * script computed on this build rather than one carried forward.
@@ -74,6 +86,8 @@ const isDoc = (name) => {
   const lower = name.toLowerCase()
   return DOC_EXTENSIONS.some((e) => lower.endsWith(e)) || DOC_BASENAMES.includes(name.toUpperCase())
 }
+
+const isAudioMaster = (name) => AUDIO_MASTER_EXTENSIONS.some((e) => name.toLowerCase().endsWith(e))
 
 const failures = []
 const check = (name, cond, detail = '') => {
@@ -152,6 +166,7 @@ check('the relative-reference scan can actually fail', refSeeded.every((s) => s.
 
 const files = walk(DIST)
 const docs = files.filter((f) => isDoc(f.split('/').pop())).map((f) => relative(DIST, f))
+const audioMasters = files.filter((f) => isAudioMaster(f.split('/').pop())).map((f) => relative(DIST, f))
 const totalBytes = files.reduce((n, f) => n + statSync(f).size, 0)
 
 const byExt = {}
@@ -163,6 +178,7 @@ for (const f of files) {
 
 console.log(`DIST HYGIENE: ${files.length} files, ${totalBytes} bytes (${(totalBytes / 1024 / 1024).toFixed(2)} MB)`)
 check('no documentation file ships', docs.length === 0, docs.join(', '))
+check('no audio master ships', audioMasters.length === 0, audioMasters.join(', '))
 check('the bundle is inside the 25 MB budget', totalBytes <= BUDGET_BYTES,
   `${(totalBytes / 1024 / 1024).toFixed(2)} MB against ${(BUDGET_BYTES / 1024 / 1024).toFixed(0)} MB`)
 // A dist with almost nothing in it would satisfy both checks above and mean the
@@ -566,6 +582,34 @@ console.log(`  ${controlClean ? 'clean ' : 'FALSE+'}  seeded: negative control, 
 check('the documentation scan can actually fail',
   seeded.every((s) => s.caught) && controlClean)
 
+// ── SEEDED VIOLATION, convention (p): audio masters (R146) ───────────────────
+//
+// Seeded in the form the defect would really take: an owner master at its real
+// path beside the encode the game loads, plus the shapes a name list would miss.
+// The negative control is every audio file this bundle genuinely ships, which
+// must survive, including the four cues that went live at R146.
+const MASTER_SEEDS = [
+  ['an owner master at its real path, beside its encode',
+   'assets/themes/future-spinner/sounds/bgm_loop.wav'],
+  ['an uppercase extension',
+   'assets/themes/future-spinner/sounds/WIN_MAX.WAV'],
+  ['a scratch master left by an interrupted mastering run',
+   'assets/themes/future-spinner/sounds/.scratch/spin.wav'],
+  ['an AIFF master',
+   'assets/themes/future-spinner/sounds/feature_enter.aiff'],
+  ['a FLAC master',
+   'assets/themes/future-spinner/sounds/retrigger.flac'],
+]
+const masterSeeded = MASTER_SEEDS.map(([why, path]) => ({ why, caught: isAudioMaster(path.split('/').pop()) }))
+const REAL_AUDIO = ['bgm_loop.mp3', 'bgm_loop.webm', 'bgm_tension.webm', 'anticipation_build.webm',
+  'feature_enter.mp3', 'feature_end.mp3', 'retrigger.mp3', 'win_max.mp3', 'ui_click.mp3', 'wave_sprite.png']
+const masterControlClean = REAL_AUDIO.every((f) => !isAudioMaster(f))
+
+for (const s of masterSeeded) console.log(`  ${s.caught ? 'caught' : 'MISSED'}  seeded: ${s.why}`)
+console.log(`  ${masterControlClean ? 'clean ' : 'FALSE+'}  seeded: negative control, every shipped audio format must survive`)
+check('the audio master scan can actually fail',
+  masterSeeded.every((s) => s.caught) && masterControlClean)
+
 // S2-C080, convention (s). `generated` was the frozen literal '2026-07-26',
 // which is a value that changes written down as though it does not: every run
 // since that date has stamped a report with the date of a different run, and
@@ -594,6 +638,8 @@ writeFileSync(join(QA, 'dist_hygiene_2026-07-26.json'), JSON.stringify({
   budgetBytes: BUDGET_BYTES,
   filesByExtension: byExt,
   documentationFound: docs,
+  audioMastersFound: audioMasters,
+  audioMasterSeeded: masterSeeded, audioMasterNegativeControl: masterControlClean,
   buildStamp: info,
   seeded, negativeControl: controlClean,
   dataUriViolations: uriViolations,

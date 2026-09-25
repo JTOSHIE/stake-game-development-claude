@@ -104,6 +104,43 @@ function pruneDocs(root: string, base = root): string[] {
 }
 
 /**
+ * Audio masters must not ship. R146, 2026-09-25.
+ *
+ * The owner's source WAVs live in `public/.../sounds/` beside the mp3 and webm
+ * they are encoded into, by the owner's instruction, and Vite copies `public/`
+ * verbatim. Unpruned, the fifteen masters dropped at R146 are 11,915,968 bytes
+ * against about 1.9 MB of headroom under the 25 MiB budget, and a single small
+ * one would fit under the budget and pass every other gate unnoticed.
+ *
+ * Extension-based and recursive for the same reason as pruneDocs: a name list
+ * misses the file nobody added to it, including a stray `.scratch/*.wav` left
+ * by an interrupted mastering run. None of these is a format this game loads;
+ * the runtime requests mp3 and webm only (soundService.ts, themeStore.ts).
+ * scripts/dist_hygiene_gate.mjs states the same list independently and asserts
+ * that none shipped.
+ */
+const AUDIO_MASTER_EXTENSIONS = ['.wav', '.wave', '.aif', '.aiff', '.aifc', '.flac']
+
+/** Remove every audio master anywhere under `root`. Returns the paths removed and their bytes. */
+function pruneAudioMasters(root: string, base = root): { paths: string[]; bytes: number } {
+  if (!existsSync(root)) return { paths: [], bytes: 0 }
+  const out = { paths: [] as string[], bytes: 0 }
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const p = join(root, entry.name)
+    if (entry.isDirectory()) {
+      const sub = pruneAudioMasters(p, base)
+      out.paths.push(...sub.paths)
+      out.bytes += sub.bytes
+    } else if (AUDIO_MASTER_EXTENSIONS.some((e) => entry.name.toLowerCase().endsWith(e))) {
+      out.bytes += statSync(p).size
+      rmSync(p, { force: true })
+      out.paths.push(p.slice(base.length + 1))
+    }
+  }
+  return out
+}
+
+/**
  * Build provenance. JOB 4 / TR-062, 2026-07-26.
  *
  * THE FINDING. The published bundle was one commit behind `main`, and nothing
@@ -302,6 +339,15 @@ function pruneLegacyAssets() {
       if (docs.length > 0) {
         prunedCount += docs.length
         console.log(`[build-diet] pruned ${docs.length} documentation file(s): ${docs.join(', ')}`)
+      }
+
+      // R146. No audio master ships. See pruneAudioMasters above, and
+      // scripts/dist_hygiene_gate.mjs for the independent assertion.
+      const masters = pruneAudioMasters(resolve(__dirname, 'dist'))
+      if (masters.paths.length > 0) {
+        prunedCount += masters.paths.length
+        prunedBytes += masters.bytes
+        console.log(`[build-diet] pruned ${masters.paths.length} audio master(s), ${masters.bytes} bytes`)
       }
 
       console.log(`[build-diet] total pruned: ${prunedCount} paths, ${(prunedBytes / 1024 / 1024).toFixed(2)} MB`)
