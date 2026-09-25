@@ -7,11 +7,12 @@ bundle, and its `pruneAudioMasters` does the same for the WAV masters beside it.
 
 Nineteen files. Every one of them except `ui_click.mp3` comes from the OWNER'S stems,
 dropped into this directory on 2026-09-25 under their code names. bgm_loop's master was
-then swapped by the owner to "take A" the same day.
+swapped by the owner to "take A" the same day, and restored to the original drop at R147
+(2026-09-26) because take A could not be wrapped seamlessly; take A is parked, see below.
 
 | Shipped file(s) | Master (bare stem, not versioned) | Master sha256 | Rate, frames |
 |---|---|---|---|
-| `bgm_loop.{webm,mp3}` | bgm_loop, take A | 59cbe76c3787151ea61326f8ff4cb9786166ef1684b899dd25831fc697bff0eb | 44.1 kHz, 481,091 |
+| `bgm_loop.{webm,mp3}` | bgm_loop, original drop | 77556d1dd4e0c072dd4fb4a0d3437998d29ef65ec7cdcd20f46976ed3dc1f387 | 48 kHz, 523,636 |
 | `bgm_tension.{webm,mp3}` | bgm_tension | 454d3e186bb81c9f2d4f6db6f3a8a0be09361aa70243c6b48cee208f61e92812 | 48 kHz, 523,636 |
 | `anticipation_build.{webm,mp3}` | anticipation_build | 24cd9ac65db1a6be88e10eaa69af0b38643eea378ef07379cd3f4501f1c3418b | 48 kHz, 523,636 |
 | `spin.mp3` | spin | c1ee12df991c9f5a6993bcb7f379c4829d303804215d0035cb979fea9d4a6f1e | 44.1 kHz |
@@ -30,9 +31,9 @@ then swapped by the owner to "take A" the same day.
 
 The masters sit in this directory as WAV files with the stems above, gitignored and never
 committed; the sha256 column is what ties a master to its encode. The owner's own
-MANIFEST.txt (also gitignored) lists the original drop, whose bgm_loop (sha256
-77556d1dd4e0...) take A replaced; that original is still in the owner's
-future-spinner-sounds-ready.zip.
+MANIFEST.txt (also gitignored) lists the original drop, which is again what bgm_loop is
+mastered from; it is also in the owner's future-spinner-sounds-ready.zip. Take A (sha256
+59cbe76c...) is parked where the owner left it, in the bgm_loop-take-A folder in Downloads.
 
 **The three beds are 4-bar loops at 88 BPM, 10.909 s.** They replaced 88.3 s and 57.8 s
 beds at 100 and 140 BPM.
@@ -73,10 +74,15 @@ then check the outputs and copy them here.
 
 1. **Licence and source of the owner's stems: not stated in the drop.** Until it is
    recorded here, this set's licensing is UNKNOWN.
-2. **bgm_loop take A starts with 12 ms of digital silence** while its tail runs at about
-   -12 dBFS, so each wrap, once every 10.9 s, drops into a 12 ms gap. audio_verify's seam
-   check fails on it (18.6 dB against 2.0 dB); the original drop's bgm_loop measured 1.5 dB.
-   Fix: a re-export wrapped like the other two beds, or the original drop.
+2. **OWNER CHOICE, R147: "scratchy-but-seamless bed restored; take A parked".** Take A
+   starts with 12 ms of digital silence (528 zero frames) while its tail runs at about -12
+   dBFS, so each wrap dropped into a 12 ms gap (seam 18.6 dB against audio_verify's 2.0 dB).
+   R147 tried the brief's 40 ms equal-power fold first. Take A has no audio past its loop
+   end, so the fold could only either cut the loop to 3.9853 bars (seam 0.90 dB, but every
+   cycle 40 ms short of the 4-bar lock) or keep 4 bars by replaying the last 40 ms (seam
+   1.22 dB, but a click at every wrap, 3.2x the largest step inside the loop). Neither is a
+   pass without inventing audio, so the original drop's bed is back (seam 1.49 dB). Take A
+   can return as a re-export rendered with a wrapped 40 ms tail, as the other beds were.
 3. **Seven one-shots carry a large sub-20 Hz swell** (feature_end and win_small worst), so
    peak normalisation leaves their audible part quiet: feature_end integrates near -32 LUFS.
 4. **The win ladder is not monotonic** (win_big -11.9 LUFS, win_epic -23.7 LUFS), and
