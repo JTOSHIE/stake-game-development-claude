@@ -8,27 +8,39 @@ With no names, masters all fifteen; pass names to re-master only those (as maste
 e.g. `... <stage_dir> bgm_loop` after the owner swaps one master.
 
 The masters are the owner's WAVs in the theme sounds directory (gitignored, never versioned;
-their full sha256 is recorded in the sounds README). Imports tools/audio_forge/master.py's OWN functions (master.py is not
-edited and its main() is not run, because main() reads ~/Desktop/fs_audio and writes over the
-shipped files). Calibrated before use: the same import recipe re-derives 8 shipped mp3s byte for
+their full sha256 is recorded in the sounds README). Imports tools/audio_forge/master.py's OWN functions (used
+unchanged; R146 added only a refusal guard to master.py's main(), which is not run here because
+it reads ~/Desktop/fs_audio and writes over the shipped files). Calibrated before use: the same import recipe re-derives 8 shipped mp3s byte for
 byte and 3 shipped webms packet for packet from the July sources.
 Deviations from master.main(), each recorded in the session report:
   - beds: gain to BED_LUFS_TARGET only. trim_silence, trim_to_whole_bars, trim_to_seamless_cycle
     and condition_loop_seam (the 500 ms fold) are NOT applied: the owner's beds are pre-wrapped
     88 BPM 4-bar loops (523,636 frames at 48 kHz, 481,091 at 44.1 kHz), and the pipeline's
-    loop path would re-cut them to 436,726 / 469,718 / 499,566 frames. anticipation_build also goes
+    loop path would re-cut them to about 3.34 / 3.59 / 3.82 bars (bgm_loop / bgm_tension /
+    anticipation_build; the fold alone still loses 0.19 of a bar). anticipation_build also goes
     to -18 LUFS per the R146 brief, not master.py's historic peak path.
   - master_win_family is not called: it raises on win_small (0.37 s, under pyloudnorm's 0.4 s block);
     each tier is peak-normalised alone, which is main()'s own documented fallback.
   - four cues not in ROWS (feature_enter, feature_end, retrigger, win_max) take the one-shot recipe.
 """
-import sys, importlib.util, soundfile as sf
+import os, sys, importlib.util, soundfile as sf
 from pathlib import Path
 spec = importlib.util.spec_from_file_location('master', str(Path(__file__).resolve().parent / 'master.py'))
 M = importlib.util.module_from_spec(spec); spec.loader.exec_module(M)
 SRC, STAGE = M.OUT_DIR, Path(sys.argv[1])
+PUBLIC = SRC.parents[3]   # frontend/public: anything staged under it would ship
+
+
+def _inside(child: Path, parent: Path) -> bool:
+    # samefile, not a path comparison: this disk is case-insensitive, so 'Sounds' is 'sounds'.
+    for q in [child.resolve(), *child.resolve().parents]:
+        if q.exists() and os.path.samefile(q, parent):
+            return True
+    return False
+
+
+assert not _inside(STAGE, PUBLIC), 'stage into a scratch directory outside frontend/public, never over the shipped files'
 (STAGE / 'wav').mkdir(parents=True, exist_ok=True)
-assert STAGE.resolve() != SRC.resolve(), 'stage into a scratch directory, never straight over the shipped files'
 BEDS = {'bgm_loop': 128, 'bgm_tension': 128, 'anticipation_build': 96}   # = ROWS[n]['opus_kbps']
 FOUR_BARS_S = 4 * 4 * 60 / 88   # the owner's beds are 4-bar loops at 88 BPM, 10.909 s at any rate
 ONESHOTS = ['spin', 'reel_stop', 'reel_stop_anticipation', 'scatter_land', 'win_small', 'win_medium',

@@ -9,6 +9,11 @@ Usage:
 With no arguments, masters every row in MANIFEST. Pass one or more row names to
 re-master only those (e.g. `python master.py reel_stop` after a re-roll).
 
+R146 (2026-09-25): the shipped set is now the OWNER'S stems, mastered from the WAV masters
+beside the shipped files by tools/audio_forge/r146_master_owner_stems.py, which imports this
+module's functions. main() below still reads the July sources and writes over the shipped
+files, so it refuses any row whose owner master is present unless --july-sources is passed.
+
 Requires ffmpeg/ffprobe on PATH (encoding to MP3/WebM Opus) and the AudioForge venv
 (soundfile, numpy, pyloudnorm - see requirements.txt).
 """
@@ -289,12 +294,24 @@ def master_row(name: str, config: dict, out_dir: Path):
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("names", nargs="*", help="Row names to master (default: all)")
+    parser.add_argument("--july-sources", action="store_true",
+                        help="deliberately replace the owner's R146 encodes with the July set")
     args = parser.parse_args()
 
     names = args.names if args.names else list(ROWS.keys())
     unknown = [n for n in names if n not in ROWS]
     if unknown:
         print(f"Unknown row(s): {', '.join(unknown)}", file=sys.stderr)
+        sys.exit(1)
+
+    # R146. Running this as documented would silently put the July audio back over the
+    # owner's R146 set, because it reads SOURCE_DIR and writes straight into OUT_DIR.
+    owner_rows = [n for n in names if (OUT_DIR / f"{n}.wav").exists()]
+    if owner_rows and not args.july_sources:
+        print("Refusing: the shipped files for " + ", ".join(owner_rows) + " are mastered from the "
+              "owner's WAV masters beside them (R146). Re-master those with "
+              "tools/audio_forge/r146_master_owner_stems.py, or pass --july-sources to replace "
+              "them with the July set on purpose.", file=sys.stderr)
         sys.exit(1)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
