@@ -41,9 +41,10 @@ beds at 100 and 140 BPM.
 **The four cues R125 wired and left silent now have files**: feature_enter, feature_end,
 retrigger and win_max. `soundService.ts` declares them in `AVAILABLE_PENDING_CUES` and
 `themeStore.ts` paths them. A max win reached by a spin, or in Bet Replay, now plays
-win_max instead of win_epic and its echo. A BOUGHT max win still plays win_epic, because
-that route calls playWin from App.svelte's buy settle; changing it is a call-site change,
-parked for the owner (docs/audio/AUDIO_TRUTH_MAP.md section 4.5). If win_max.mp3 ever
+win_max instead of win_epic and its echo, and since R147 so does a BOUGHT max win, at the
+moment its celebration appears (the one call-site change the R147 brief authorised, in
+App.svelte's buy path; before it that reveal was silent and win_epic played only after the
+feature). If win_max.mp3 ever
 fails to load, the max win plays win_epic and its echo instead, never silence; the first
 real tap or key press of a session fetches all four cues so none starts late.
 
@@ -62,9 +63,20 @@ encodes (8 mp3 byte for byte, the 3 webm packet for packet).
   LUFS, mp3 -18.2 LUFS; the mp3 decodes to the exact 4-bar frame count. anticipation_build
   goes to -18 LUFS too; before R146 it was peak-normalised and shipped near -15.5 LUFS.
 - **One-shots**: the pipeline's one-shot recipe: silence trim, the 250 ms reel_stop fade,
-  -3 dBFS peak, 192k mp3. The win-tier escalation (master_win_family) is not run because
-  it raises on win_small, which is shorter than the loudness meter's 0.4 s block; each
-  tier is peak-normalised alone, which is main()'s own documented fallback.
+  -3 dBFS peak, 192k mp3. master.py's master_win_family is not run because it raises on
+  win_small, which is shorter than the loudness meter's 0.4 s block.
+- **R147, the rumble filter**: seven one-shots (feature_end, win_small, retrigger,
+  win_medium, win_epic, win_max, feature_enter) carried a large sub-20 Hz swell, so a causal
+  4th-order Butterworth high-pass at 30 Hz runs on them BEFORE the trim and peak step. Their
+  share of energy below 20 Hz falls to 1.9% or less, and feature_end rises from -31.9 to
+  -26.8 LUFS. The masters are not altered. Causal because a zero-phase filter left a click
+  at the onset of feature_end and win_small.
+- **R147, the win ladder**: after peak normalisation each win tier is attenuated, walking
+  down from win_max, until it sits 1.75 LU below the next, so the encoded files rise at least
+  1 LU a tier on both pyloudnorm and ffmpeg's ebur128: win_small -31.7, win_medium -29.9,
+  win_big -28.2, win_epic -26.5, win_max -24.7 LUFS (win_small measured as one padded 400 ms
+  block). Gains only; nothing is limited or recomposed, so the whole ladder sits well below
+  the other effects, and win_big comes down 16.2 dB from the owner's level.
 
 To re-master after the owner replaces a master, from the repository root:
 `tools/audio_forge/.venv/bin/python tools/audio_forge/r146_master_owner_stems.py <scratch-dir> [NAME ...]`,
@@ -83,12 +95,13 @@ then check the outputs and copy them here.
    1.22 dB, but a click at every wrap, 3.2x the largest step inside the loop). Neither is a
    pass without inventing audio, so the original drop's bed is back (seam 1.49 dB). Take A
    can return as a re-export rendered with a wrapped 40 ms tail, as the other beds were.
-3. **Seven one-shots carry a large sub-20 Hz swell** (feature_end and win_small worst), so
-   peak normalisation leaves their audible part quiet: feature_end integrates near -32 LUFS.
-4. **The win ladder is not monotonic** (win_big -11.9 LUFS, win_epic -23.7 LUFS), and
-   **win_max** sounds for 1.78 s once its silent tail is trimmed (the master is 2.34 s),
-   against the truth map's 5.0 s spec and the 2.6 s max-win reveal, and it is quieter than
-   win_epic (-25.2 against -23.7 LUFS).
+3. **Closed at R147: the sub-20 Hz swell** is filtered out of the seven one-shots (above).
+   feature_end is still the quietest cue (-26.8 LUFS against feature_enter's -21.3): that is
+   the stem's own level now, not the swell.
+4. **Closed at R147: the win ladder** rises monotonically (above). **Still OPEN ART:
+   win_max** sounds for 1.81 s (the master is 2.34 s) against the truth map's 5.0 s spec and
+   the 2.6 s max-win reveal. It is not padded and not recomposed. A longer stem from the
+   owner closes it.
 
 ## July 2026: the Stable Audio 3 set (history, and still ui_click's provenance)
 
