@@ -45,6 +45,25 @@ BEDS = {'bgm_loop': 128, 'bgm_tension': 128, 'anticipation_build': 96}   # = ROW
 FOUR_BARS_S = 4 * 4 * 60 / 88   # the owner's beds are 4-bar loops at 88 BPM, 10.909 s at any rate
 ONESHOTS = ['spin', 'reel_stop', 'reel_stop_anticipation', 'scatter_land', 'win_small', 'win_medium',
             'win_big', 'win_epic', 'win_max', 'feature_enter', 'feature_end', 'retrigger']
+# R147 1B. Seven of the owner's one-shots carry a large sub-20 Hz swell (measured share of
+# energy below 20 Hz: feature_end 99.3%, win_small 99.1%, retrigger 98.1%, win_medium 97.6%,
+# win_epic 89.3%, win_max 88.0%, feature_enter 54.5%; every other stem 0.6% or less). Peak
+# normalisation spent its headroom on that inaudible swell, so their audible part shipped
+# quiet. master.py has no rumble filter, so the filter is declared here and applied BEFORE the
+# pipeline's own trim and peak normalisation; the owner's WAV masters are not altered.
+# Causal (minimum-phase) on purpose: a zero-phase filter's pre-ringing left feature_end and
+# win_small starting on a 0.62 and 0.39 step, a click at every onset; causal leaves both ends
+# at about 0. 4th order at 30 Hz (the top of the brief's 20 to 30 Hz range) leaves at most
+# 1.9% of energy below 20 Hz and costs about 0.4 dB at 40 Hz.
+HIGHPASS_STEMS = {'feature_end', 'win_small', 'retrigger', 'win_medium', 'win_epic', 'win_max', 'feature_enter'}
+HIGHPASS_ORDER, HIGHPASS_HZ = 4, 30
+
+
+def highpass(d, sr):
+    from scipy.signal import butter, sosfilt
+    return sosfilt(butter(HIGHPASS_ORDER, HIGHPASS_HZ, 'hp', fs=sr, output='sos'), d, axis=0)
+
+
 NAMES = sys.argv[2:] or list(BEDS) + ONESHOTS
 unknown = [n for n in NAMES if n not in BEDS and n not in ONESHOTS]
 assert not unknown, f'unknown name(s): {unknown}'
@@ -64,6 +83,8 @@ for n in ONESHOTS:
     if n not in NAMES:
         continue
     d, sr = sf.read(str(SRC / f'{n}.wav'))
+    if n in HIGHPASS_STEMS:
+        d = highpass(d, sr)
     d = M.trim_silence(d, sr)
     if n == 'reel_stop':
         d = M.fade_out(d, sr, M.REEL_STOP_FADE_MS)
