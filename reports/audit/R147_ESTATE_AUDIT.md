@@ -131,8 +131,10 @@ branch, `controlrow/2026-08-15` and the four keep-list heads that are not ancest
 and `ac83c2a6` (2026-07-03, WIP on main). Nothing local was deleted and no stash was dropped: the
 brief's clause is origin-only, and a dropped stash is recoverable only from the reflog.
 
-**Process finding.** Ruling (t.1) rule 2 says a session head is deleted when its PR merges. It was
-not followed from R086 (PR #127, merged 2026-08-24) to R146, which is how 50 accumulated.
+**Process finding.** Ruling (t.1) rule 2 says a session head is deleted when its PR merges. Of the 56
+session PRs merged from R086 (#127, 2026-08-24) to R146 (#182), it was followed for 6 (R100 #140,
+R132 to R135 #172 to #175, R137 #176; their heads were already gone at the audit) and not for the
+other 50, which is how 50 accumulated.
 CLAUDE.md's BRANCHES paragraph said "Six branches exist on the remote and that is the whole list",
 false at 59 heads and still false at 9; it is corrected in this PR (2.6).
 
@@ -147,9 +149,10 @@ studio. The live portal state today is login-gated and UNKNOWN.
 
 **Walked as a studio checklist at `7463593a`: 41 met, 3 partly, 0 not met, 1 unknown, 6 n.a.**
 The walk is the 2.2 squad's, adversarially verified; this session re-counted it and ran every
-file citation in it against HEAD (84 resolve; the one that does not is a hashed dist file name). One
-citation was wrong and is corrected below (row 15: the layout gate step is `checks.yml:1284`, not
-the comment at :1054). "Green on main" means run 36168381090 (push, `0dd8105c`, 30 of 30 jobs).
+file citation in it against HEAD (84 resolve to an existing line; the one that does not is a hashed dist file name). That check
+proves a line exists, not what it says, and the self-audit then found two capture citations one
+line short. Three citations are corrected below: row 15 (the layout gate step is
+`checks.yml:1284`, not the comment at :1054), row 45 (capture :137) and row 47 (capture :135-136). "Green on main" means run 36168381090 (push, `0dd8105c`, 30 of 30 jobs).
 
 | # | Item (abridged) | Studio state | Evidence at HEAD | Note |
 |---|---|---|---|---|
@@ -197,9 +200,9 @@ the comment at :1054). "Green on main" means run 36168381090 (push, `0dd8105c`, 
 | 42 | Replay again after completion | met | ReplayMode.svelte:455, :585 | |
 | 43 | Bet cost and multiplier shown | met | replay_contract_gate.mjs:794 assertEndBannerValues | |
 | 44 | Replay in Popout S | met | replay_contract_gate.mjs:1095 (400x225); 'browser: replay fit' | |
-| 45 | Bet-level templates applied | unknown | portal only; capture :136 'Valid betlevel template found.' (2026-08-13) | login-gated |
+| 45 | Bet-level templates applied | unknown | portal only; capture :137 'Valid betlevel template found.' (2026-08-13) | login-gated |
 | 46 | Provably Fair and Replay enabled | n.a. | platform-managed, GUIDELINES_51_MAPPING_2026-08-13.md:76 | |
-| 47 | Front and Math approved | n.a. | reviewer-side; capture :135 (front v9, math v1) | no reskinned front upload recorded, SUBMISSION_RECORD_2026-08-28_R137.md:3 |
+| 47 | Front and Math approved | n.a. | reviewer-side; capture :135-136 (front v9, math v1) | no reskinned front upload recorded, SUBMISSION_RECORD_2026-08-28_R137.md:3 |
 | 48 | Posted in approved channel | n.a. | post-approval owner action | |
 | 49 | Older mobile devices | partly | reports/qa/r057_throttled_device_2026-08-13.md:7, :12 | predates the ARC 2 art; owner hand test not recorded |
 | 50 | Approval request closed, emojis | n.a. | post-live step | |
@@ -221,7 +224,7 @@ art and audio (no commit touched the future-spinner theme assets or `soundServic
 |---|---|---|
 | Assets | Of 59 tracked theme rasters, **37 changed and 12 are new** (10 unchanged). **24 still carry the bytes of `578a3a51`**, the owner-authorised OpenAI gpt-image-1 placeholder adoption (28 files; h2, m3 and scene_character were re-ingested from the same art at R145, gauge_needle at R141). REPLACE coverage is 28 of 30 (2.4). | `frames/frame-2.png` (SC-03, April art, squashed 0.800 x 0.731 on every theme); `symbols/tile_plate.png` (behind every cell) and `ui/feature_button.png`, both July art; art whose own commit calls it placeholder. |
 | Animations | frontend/src: **16 files, +2,541 / -373, 49 non-merge commits**: the six-frame hero idle strip and its R130 freeze, the 32-frame win unfold and 16-frame feature brace, the win banner and max-win celebration work. | The hero is sprite strips plus CSS transforms, frozen at rest on frame 01 (no skeletal runtime); the FEATURES menu and win breakdown still use the pre-R119 chrome; two colour divergences (2.4). **Not** the gauge hub (2.4 closes it as invisible). |
-| Sound | **15 files for 12 cues became 19 files for 16 cues**; every file but `ui_click.mp3` (same blob) is now the owner's stems; the four formerly silent cues sound; R147 restored the seamless bed, filtered the rumble, laddered the wins and gave a bought max win its cue. | `win_max` sounds 1.81 s against a 5.0 s spec; **at default sliders every win tier plays under the music bed** (2.3 D5); the base bed can stop for the session on a key-first start (2.3 D1); free-spin wins are silent. |
+| Sound | **15 files for 12 cues became 19 files for 16 cues**; every file but `ui_click.mp3` (same blob) is now the owner's stems; the four formerly silent cues sound; R147 restored the seamless bed, filtered the rumble, laddered the wins and gave a bought max win its cue. | `win_max` sounds 1.81 s against a 5.0 s spec; **at default sliders every win tier plays under the unducked music bed** (feature totals, bought rounds, wins after an anticipation build; inside the spin duck, epic and max clear it) (2.3 D5); the base bed can stop for the session on a key-first start (2.3 D1); free-spin wins are silent. |
 
 Whether any tag would recur is UNKNOWN until a second review.
 
@@ -231,8 +234,10 @@ Whether any tag would recur is UNKNOWN until a second review.
   18,705,041 B excluding build-info.json. The cap in both gates is 25 x 1024 x 1024 = **26,214,400 B**
   (`frontend/scripts/dist_hygiene_gate.mjs:74`), so **7,508,935 B of headroom, 71.36% used** (6,294,535 B
   on a decimal 25,000,000 reading). The cap is the studio's own budget from `SUBMISSION_DOSSIER.md`
-  section 5; no platform capture states a size limit. The later commits change no shipped byte
-  except comments stripped at build; the final-tree rebuild is recorded in the session report.
+  section 5; no platform capture states a size limit. Rebuilt at the final tree (session
+  report), dist is again 106 files and 18,705,465 B; only index.html and the JS bundle differ,
+  because the bundle embeds the build commit and time (`frontend/vite.config.ts:418-422`), and no
+  text of the comment-only edits reaches it.
 - **0 .wav, .aiff or .flac files in dist.** The 15 WAV masters sit gitignored beside their encodes
   (`.gitignore:81`) and the vite prune keeps them out.
 - **Locked maths untouched.** Last commit to `games/future_spinner/` is d9a6d375 (2026-07-26, TR-047
@@ -271,8 +276,10 @@ pending cues in `AVAILABLE_PENDING_CUES` (`soundService.ts:530`), pathed in
 | winMedium | `win_medium.mp3` | 21,986 | 0.8482 | -29.9 | -29.91 | -12.1 |  |
 | winSmall | `win_small.mp3` | 10,702 | 0.3798 | -70.0 (gated, too short) | -31.72 | -12.8 |  |
 
-pyloudnorm pads clips under 400 ms with silence to one block; ebur128 cannot meter them. The seam
-column is audio_verify's own metric (first and last 20 ms RMS), measured offline.
+Clips under 400 ms have no gated block (ebur128 reads -70.0 and pyloudnorm refuses them), so the
+pyloudnorm column pads them with silence to one 400 ms block; ebur128 given the same padding reads
+win_small -31.7. The seam column is audio_verify's own metric (first and last 20 ms RMS), measured
+offline.
 
 - **Mute** (`setMuted`, `soundService.ts:198-231`): mutes every eager element, pauses one-shot
   clones and the four pending cues, and stops the anticipation riser; unmuting re-applies volumes
@@ -392,9 +399,15 @@ JS or CSS; the banner spans the 1280 stage.
 **Known open art:**
 - **SC-03 is open.** `frames/frame-2.png` is 800x640, drawn into 640x468 with `object-fit: fill`
   (`App.svelte:3315`): 0.800 x by 0.731 y. Needs art at 640x468 or a call-site change; owner ruling.
-- **Homeless win overlays:** in the tracked `ui/win/` folder, 5 of 6 rasters have call sites and
-  `overdrive_perimeter.png` has none. The historical untracked homeless set (R091, R097, R115 and
-  `FX_SET_INTAKE_2026-08-25.md`) was **not reconciled** this session; the critic flagged it.
+- **Homeless win overlays, still homeless.** Every tracked theme raster is accounted for: 48
+  manifest rows plus 11 others, namely the four hero sheets (three drawn; `hero_glance_6f.png` an
+  orphan pruned from dist by name, `frontend/vite.config.ts:255`), `ui/hud_banner.png` (drawn) and
+  the six `ui/win/` files, five drawn (`burst_big` and `burst_epic` through the ternary at
+  `WinBanner.svelte:308`) and `overdrive_perimeter.png` named only in a comment
+  (`App.svelte:2323`). So nothing from the historical homeless lists (R113's 15 of 19 unadopted,
+  `docs/design/FX_SET_INTAKE_2026-08-25.md`'s 8 NO-ROW rows) is in the tracked tree beyond those
+  eleven: it is untracked and has no render site. Ledger R097-F20 stays OPEN for the owner: build
+  the surface or drop the art.
 - **The FEATURES glyph is not a bolt:** a car grille on three layouts, a sliders glyph on the
   mini-player; every bolt belongs to the turbo control (REPORTED by 2.4b, verified).
 - **Gauge hub: closes as not visible.** The shipped needle's hub disc fits a circle centred at
@@ -440,7 +453,7 @@ at the wincap splash (R146). **Stale, but not made false by R146 or R147:**
 
 | Bug | Status | Evidence |
 |---|---|---|
-| ALPHA_SNAP_FLOOR float compare | **OPEN** | `scripts/assets/assetforge/ingest.py:73` sets `2.0 / 255.0` (float64) and :266 snaps with a strict `<` on float32 alpha; float32(2/255) = 0.0078431377 > 0.0078431373, so alpha 2 is not cleared as :70 promises. Unchanged since d4378f21. |
+| ALPHA_SNAP_FLOOR float compare | **OPEN** | `scripts/assets/assetforge/ingest.py:73` sets `2.0 / 255.0` and :266 snaps with a strict `<` on float32 alpha. numpy compares in float32 (result type float32 under numpy 2.5.1 and 2.2.5), where alpha 2 EQUALS the floor, so the strict `<` keeps it although :70 promises "at or below". Measured: `<` clears alpha 0 and 1, `<=` clears 0 to 2. Unchanged since d4378f21. |
 | ingest JPEG quality on opaque full-size rows | **OPEN** | `quality=92, subsampling=0` hardcoded at `ingest.py:361`; argparse (:396-400) has no override; affects SC-01 and SC-02. |
 | `--compare-against-shipped` | **OPEN** | 0 matches in any .py, .mjs, .js, .ts or .json. |
 | `npm run assets` guard | **CLOSED for uncommitted work; residual on a clean tree** | The guard refuses while tracked theme files are modified. On a clean tree, `build.py` alone rewrites **18** tracked rasters that are not generator output (15 from `578a3a51`, h2 and m3 from R145 29f967c8, and `ui/gauge_needle.png`, R141's 0-degree ingest). Then `flame_jets.py`'s own guard refuses and prints "Nothing has been written." after build.py already has. With the override, 5 more (23). Derived from `scripts/assets/manifest.json` and each output's last commit; **not run**, because running it would rewrite them. |
@@ -459,12 +472,13 @@ only; every dated record kept as written):**
 | Audio Stable Audio only, or in-house | `GAME_FACTS.md` audio bullet; `README.md` Licence and IP (second sentence); `SUBMISSION_DOSSIER.md` R146 audio paragraph (appended, per its own rule) | owner's stems plus one Stable Audio cue; audio_verify passes; take A parked |
 | Shipped art in-house | `GAME_FACTS.md` pipeline bullet and external-art note; `COMPLIANCE_WATCH.md` Original IP (the re-check it ordered); `SUBMISSION_DOSSIER.md` section 8 note (appended; four stale 9c hashes named) | dated RE-VERIFIED notes naming `578a3a51` |
 | OpenAI BARRED | `scripts/assets/assetforge/generate.py` docstring; `docs/records/reviews/REVIEW_TRACKER.md` ARC2-LICENCE row (appended SUPERSEDED note) | CLEARED since R099 for development-stage art |
-| Old Spine ban | `docs/design/SPINE_ROBOT_RIG_SETUP.md` step 1 | the block is recorded as withdrawn by R109 |
+| Old Spine ban | `docs/design/SPINE_ROBOT_RIG_SETUP.md` step 1 | a dated R147 note records the block as withdrawn by R109; R103's amendment kept as written |
 | Made false by R147 itself | `docs/audio/AUDIO_TRUTH_MAP.md` (header note, gaps, feature_end, win_max, sections 4.4, 4.5 and 6); `WRS_MASTER_DOCUMENT.md` row and change log; `soundService.ts` playWin comment; sounds README (meters, seam, "quietest cue"); `reports/OUTSTANDING_LEDGER_2026-08-25.md` new section 1C | bought max win plays win_max; ladder figures per meter |
 | Branch list (from 2.1) | `CLAUDE.md` BRANCHES | six kept on purpose, three awaiting the owner, session heads die on merge |
 
 **Owner's to amend (legal or ruling text, not the builder's):** CLAUDE.md's Assets preamble ("All
-visual and audio assets are produced in-house from vector masters", no amendment covers audio);
+visual and audio assets are produced in-house from vector masters", no amendment covers audio; a
+dated R147 NOTE beneath it now states the facts without amending the rule);
 `README.md`'s first Licence sentence and `LICENSE` lines 5 to 6 (ownership of work that includes the
 owner's stems of UNKNOWN licence, a Stability-licensed click and OpenAI art); COMPLIANCE_WATCH's
 "Original IP: verified"; the evidence sentence of
@@ -477,8 +491,7 @@ in `SceneGroup.svelte` (heroMode's mount line, the flipbook and 0.9997 claims) a
 `frontend/scripts/scene_proof.mjs`; `docs/design/CHROME_PRIMITIVES.md` still names itself the
 paytable's basis; `HUD_SHELL_TEMPLATE.md`'s "every row is now done"; the assetforge README's SC-03
 ValueError (fixed in code at R103); the art manifest's `renders_in` citations; `RESKIN_BOUNDARY.md`'s
-audio sizes; AUDIO_TRUTH_MAP's inventory durations and some line citations (its new header note
-governs); older `soundService.ts` comments (the R115 one-caller notes and "0.4 vol"),
+audio sizes; AUDIO_TRUTH_MAP's other inventory durations (its new header note governs); older `soundService.ts` comments (the R115 one-caller notes and "0.4 vol"),
 `ReplayMode.svelte`'s cited soundService lines, and `winCountUp.ts`'s importer note.
 
 ---
@@ -512,12 +525,16 @@ governs); older `soundService.ts` comments (the R115 one-caller notes and "0.4 v
 
 ---
 
-## Phase 3 changes this audit caused, with restores
+## Every R147 byte and ref change, with its restore
 
 | Change | Commit | Restore |
 |---|---|---|
+| bgm_loop back to the original drop, take A parked (1A) | e94b1faa | `git revert e94b1faa`, then copy take A over the gitignored master |
+| 30 Hz high-pass on seven one-shots (1B) | cb7abc9a | `git restore --source=0dd8105c --` the seven mp3s named in its message |
+| Win ladder (1C) | e8cbc37a | `git restore --source=cb7abc9a --` win_small, win_medium, win_big and win_epic mp3 |
+| Bought max win plays win_max (1C, the one authorised call site) | b721febb | `git revert b721febb` (it touches only `frontend/src/App.svelte`); the R147 sentences describing it would then need reverting too |
 | 50 merged session heads deleted from origin | (no commit) | `git push origin <tip>:refs/heads/<name>` per row of the 2.1 log |
-| Live-document corrections (2.6) and the CLAUDE.md branch paragraph | this PR | `git revert` of the docs commit |
+| Live-document corrections (2.6), the CLAUDE.md notes and the self-audit fixes | this PR | `git revert` of the docs commits |
 
 No raster, WAV, MANIFEST or .scratch file was staged; no maths, HUD geometry or asset_guard
 change; no image generation; no kit.

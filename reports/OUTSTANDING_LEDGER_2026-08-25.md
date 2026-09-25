@@ -12,7 +12,7 @@
 seamless bed restored; take A parked". The brief's 40 ms equal-power fold was tried first and
 measured: take A has no audio past its loop end, so the fold either cut every cycle 40 ms short
 of the 4-bar lock (3.9853 bars, seam 0.90 dB) or replayed the last 40 ms with a click at every
-wrap (4 bars, seam 1.22 dB, wrap step 3.2x the in-loop maximum). The original drop's bgm_loop is
+wrap (4 bars, seam 1.22 dB, wrap step 3.2x the in-loop 99.9th-percentile step, 0.92x the in-loop maximum). The original drop's bgm_loop is
 back, and `frontend/scripts/audio_verify.mjs` passes EVERY check: bgm_loop 1.50 / 1.47 dB,
 bgm_tension 1.30 / 1.21, anticipation_build 1.79 / 1.76 (webm / mp3) against the 2.0 dB gate. ***
 *** CLOSED: 1B item 2, the sub-20 Hz swell. A causal 4th-order 30 Hz high-pass on the seven
@@ -20,8 +20,8 @@ affected one-shots, before the pipeline's trim and peak step. Their energy below
 1.9% or less, and feature_end rises from -31.9 to -26.8 LUFS, still 5.5 LU below feature_enter. ***
 *** CLOSED: 1B item 3, the win ladder. Attenuation only, walking down from win_max, which is
 unchanged: on pyloudnorm small -31.7, medium -29.9, big -28.2, epic -26.5, max -24.7 LUFS (small
-padded to one 400 ms block); ffmpeg's ebur128 reads -29.9, -28.2, -25.9, -24.7 from medium up and
-cannot meter the 0.38 s win_small. win_big comes down 16.2 dB from the owner's level. ***
+padded to one 400 ms block); ffmpeg's ebur128 reads -31.7 (win_small, same padding), -29.9, -28.2,
+-25.9, -24.7. win_big comes down 16.2 dB from the owner's level. ***
 *** CLOSED: 1B item 6, the bought max win. The one call-site change the R147 brief authorised:
 App.svelte's buy path now plays win_max as the celebration appears and skips its closing playWin
 for a capped round. Proved on the bonus-mode wincap fixture (win_max at +479 ms; the control

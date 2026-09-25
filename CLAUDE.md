@@ -432,6 +432,13 @@ Manus is retired. All visual and audio assets are produced in-house from vector 
 (SVG) via the asset pipeline: deterministic, exact-size rendering, front-facing symbols
 carry no baked-in text. Do not reintroduce Manus briefs.
 
+**NOTE 2026-09-26 (R147), a fact for the reader, not an amendment of the rule:** the audio half
+of the sentence above no longer describes what ships, and no amendment below covers audio. Since
+R146 every shipped sound except `ui_click.mp3` comes from the owner's stems, whose licence and
+source are not yet recorded, and `ui_click.mp3` is a Stable Audio 3 cue under the Stability AI
+Community License (`frontend/public/assets/themes/future-spinner/sounds/README.md`). Amending
+the rule text is the owner's call.
+
 **AMENDED 2026-07-25 by owner ruling: external ENHANCEMENT of existing art is permitted.
 Externally DESIGNED art is not.**
 

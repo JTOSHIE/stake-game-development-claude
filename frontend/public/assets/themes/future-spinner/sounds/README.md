@@ -75,7 +75,8 @@ encodes (8 mp3 byte for byte, the 3 webm packet for packet).
   down from win_max, until it sits 1.75 LU below the next, so the encoded files rise at least
   1 LU a tier on pyloudnorm: win_small -31.7, win_medium -29.9, win_big -28.2, win_epic -26.5,
   win_max -24.7 LUFS (win_small measured as one padded 400 ms block). ffmpeg's ebur128 agrees
-  from win_medium up (-29.9, -28.2, -25.9, -24.7) and cannot meter the 0.38 s win_small. Gains only; nothing is limited or recomposed, so the whole ladder sits well below
+  (-31.7 for win_small given the same padded block, then -29.9, -28.2, -25.9, -24.7); unpadded,
+  neither meter can read the 0.38 s win_small. Gains only; nothing is limited or recomposed, so the whole ladder sits well below
   the other effects, and win_big comes down 16.2 dB from the owner's level.
 
 To re-master after the owner replaces a master, from the repository root:
@@ -92,7 +93,8 @@ then check the outputs and copy them here.
    R147 tried the brief's 40 ms equal-power fold first. Take A has no audio past its loop
    end, so the fold could only either cut the loop to 3.9853 bars (seam 0.90 dB, but every
    cycle 40 ms short of the 4-bar lock) or keep 4 bars by replaying the last 40 ms (seam
-   1.22 dB, but a click at every wrap, 3.2x the largest step inside the loop). Neither is a
+   1.22 dB, but a jump back in the music at every wrap, a step 3.2x the loop's 99.9th-
+   percentile step and 0.92x its single largest). Neither is a
    pass without inventing audio, so the original drop's bed is back (audio_verify seam
    1.50 dB webm, 1.47 dB mp3). Take A
    can return as a re-export rendered with a wrapped 40 ms tail, as the other beds were.

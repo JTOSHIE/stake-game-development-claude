@@ -19,8 +19,11 @@ Deviations from master.main(), each recorded in the session report:
     loop path would re-cut them to about 3.34 / 3.59 / 3.82 bars (bgm_loop / bgm_tension /
     anticipation_build; the fold alone still loses 0.19 of a bar). anticipation_build also goes
     to -18 LUFS per the R146 brief, not master.py's historic peak path.
-  - master_win_family is not called: it raises on win_small (0.37 s, under pyloudnorm's 0.4 s block);
-    each tier is peak-normalised alone, which is main()'s own documented fallback.
+  - master_win_family is not called: it raises on win_small (0.37 s, under pyloudnorm's 0.4 s block).
+    Since R147 each tier is peak-normalised alone and then attenuated by the win ladder below
+    (LADDER_PREENCODE_LU): master_win_family's walk, extended to win_max, with a padded short-clip meter.
+  - R147: a causal 4th-order 30 Hz high-pass runs on the seven HIGHPASS_STEMS before the trim and
+    peak normalisation; master.py has no rumble filter.
   - four cues not in ROWS (feature_enter, feature_end, retrigger, win_max) take the one-shot recipe.
 """
 import os, sys, importlib.util, soundfile as sf
@@ -94,8 +97,9 @@ def premaster_oneshot(n):
 # must rise at least 1 LU per step, small < medium < big < epic < max. Gains only, so the top
 # anchors it: every tier sits at the -3 dBFS peak ceiling already, and raising win_max further
 # would need a limiter. Walking down from win_max, each tier is ATTENUATED only as far as needed
-# to sit LADDER_PREENCODE_LU below the next. 1.75, the smallest margin at which the ENCODED
-# files clear 1.0 LU on both pyloudnorm and ffmpeg's ebur128 (at 1.25 the two meters disagree by
+# to sit LADDER_PREENCODE_LU below the next. 1.75, the smallest of the margins tried (1.25, 1.75,
+# 2.0) at which the ENCODED files clear 1.0 LU on both pyloudnorm and ffmpeg's ebur128 (R147's
+# self-audit later found 1.6 also clears it, epic to max +1.05 on ebur128, and 1.5 does not) (at 1.25 the two meters disagree by
 # 0.57 LU on win_epic, and ebur128 then read the epic-to-max step as only +0.7).
 # This is master_win_family's walk, extended to win_max, with a short-clip loudness method:
 # BS.1770 gates in 400 ms blocks, so a clip shorter than that (win_small, 0.38 s) is measured
