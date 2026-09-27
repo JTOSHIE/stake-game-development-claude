@@ -4,6 +4,25 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1E. R149 (2026-09-27) - THE IDLE BED IS THE CHATGPT CIRCULAR REBUILD, ONE BAR PLAYED FOUR TIMES
+
+**Branch `claude/r149-circular-idle-bed`.** Appended above 1D, which stays as written.
+
+*** DONE, PENDING THE OWNER'S EAR-CHECK: the idle bed's samples are the owner's ChatGPT circular
+rebuild (master sha256 bdd217b7..., exactly 523,636 frames), encoded in commit 4b11d40d with its
+provenance in the sounds README. audio_verify passes every check (bgm_loop 0.50 / 0.45 dB); in the
+built game in Chromium, 25 s idle under three autoplay policies, the output is exactly the decoded
+bed through both wraps. No code changed. ***
+
+**NEW, FOR THE OWNER:** 1D's ear-check now applies to a different file. Its four bars are
+bit-identical, so the bed repeats every 2.73 s and the same bar-line splice recurs at every bar;
+it is darker than the original drop (37.85% of energy above 200 Hz against 74.78%). 1B's licence
+question now includes an audio file of ChatGPT origin, outside the recorded OpenAI clearance
+(image generation for artwork only). Where 1D and 1C quote a 1.50 / 1.47 dB seam, that is the
+original drop's.
+
+**STILL OPEN:** as 1D.
+
 ## 1D. R148 (2026-09-27) - THE IDLE BED NO LONGER CUTS AT THE WRAP, AND NO GESTURE KILLS IT
 
 **Branch `claude/r148-loop-join-bed-resume`.** Appended above 1C, which stays as written.

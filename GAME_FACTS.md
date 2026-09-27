@@ -341,6 +341,12 @@ live is exactly 5,000.00x on the wincap round itself.
   webm / mp3), 1.30 / 1.21 dB (`bgm_tension`) and 1.79 / 1.76 dB (`anticipation_build`)
   against its 2.0 dB gate. Since R147 a bought max win also plays `win_max` at its reveal
   (commit `b721febb`).
+  **Superseded for `bgm_loop` 2026-09-27 (R149):** the owner replaced the idle bed's master with
+  a ChatGPT circular rebuild (master sha256 bdd217b7..., 48 kHz, exactly 523,636 frames: one
+  2.727 s bar repeated four times, bit-identical), mastered through the same wrapper with the
+  fold skipped (commit `4b11d40d`). `audio_verify.mjs` still passes every check; `bgm_loop`'s
+  seam RMS deltas are now 0.50 / 0.45 dB (webm / mp3). Its licence and source are open: the
+  recorded OpenAI clearance covers image generation for artwork, not audio. Take A stays parked.
 
 ## 5. Compliance summary
 
