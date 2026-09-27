@@ -78,6 +78,14 @@ encodes (8 mp3 byte for byte, the 3 webm packet for packet).
   (-31.7 for win_small given the same padded block, then -29.9, -28.2, -25.9, -24.7); unpadded,
   neither meter can read the 0.38 s win_small. Gains only; nothing is limited or recomposed, so the whole ladder sits well below
   the other effects, and win_big comes down 16.2 dB from the owner's level.
+- **R148, the playback path (no file changed)**: the base bed (bgm_loop) now plays through
+  Web Audio, one AudioBufferSourceNode looping the decoded buffer
+  (`frontend/src/lib/services/loopBed.ts`). A looping audio element stalls about 50 to 60 ms
+  at every wrap in Chromium whatever the file (measured with nothing attached: a 10,959 to
+  10,969 ms period against 10,909 ms of audio), and a 16-bar encode only made the stall
+  rarer (43 to 48 ms every 43.6 s), so it was not shipped. The encodes above are unchanged
+  and still pass audio_verify's seam check. The tension bed and the anticipation riser still
+  loop as audio elements.
 
 To re-master after the owner replaces a master, from the repository root:
 `tools/audio_forge/.venv/bin/python tools/audio_forge/r146_master_owner_stems.py <scratch-dir> [NAME ...]`,

@@ -7,6 +7,7 @@ import { isMuted as isMutedStore } from '../stores/gameStore'
 import { musicVolume, sfxVolume } from '../stores/audioSettings'
 import { themeAssets } from '../stores/themeStore'
 import { overdriveVisual } from '../stores/overdriveVisual'
+import { makeLoopBed, LoopBed, type Voice } from './loopBed'
 
 const FS_BASE = 'assets/themes/future-spinner/sounds'
 
@@ -40,6 +41,13 @@ function pickLoopUrl(mp3Url: string): string {
   const supportsOpus =
     typeof Audio !== 'undefined' && new Audio().canPlayType('audio/webm; codecs="opus"') !== ''
   return supportsOpus ? webmUrl : mp3Url
+}
+
+/** R148. The same choice as pickLoopUrl, as an ordered list for the Web Audio bed, which
+ * tries each encode in turn: the WebM/Opus first where it plays, then the MP3. */
+function loopUrls(mp3Url: string): string[] {
+  const picked = pickLoopUrl(mp3Url)
+  return picked === mp3Url ? [mp3Url] : [picked, mp3Url]
 }
 
 // ── Base volumes ──────────────────────────────────────────────────────────────
@@ -91,7 +99,12 @@ function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
 function buildSounds() {
   const p = get(themeAssets).sounds
   const s = {
-    bgm:                  makeAudio(pickLoopUrl(p.bgm),               'bgm_loop'),
+    // R148 BUG 1, THE IDLE BED CUT AT EVERY WRAP. A looping <audio> element stalls about
+    // 55 ms at each wrap in Chromium (a 10,959 to 10,969 ms period against 10,909 ms of
+    // audio, measured with nothing attached to it), whatever the file length or codec.
+    // The base bed is therefore a Web Audio buffer loop, which is sample-exact (loopBed.ts),
+    // falling back to this same element where Web Audio is missing or cannot decode it.
+    bgm:                  makeLoopBed(loopUrls(p.bgm), () => makeAudio(pickLoopUrl(p.bgm), 'bgm_loop')),
     bgmTension:           makeAudio(pickLoopUrl(p.bgmTension),        'bgm_tension'),
     spin:                 makeAudio(p.spin,                 'spin'),
     reelStop:             makeAudio(p.reelStop,             'reel_stop'),
@@ -113,8 +126,10 @@ function buildSounds() {
 }
 
 let sounds = buildSounds()
+// R148: if the browser suspends the Web Audio context under the playing bed (iOS: a call, the
+// app backgrounded), the bed reports itself paused and the next gesture must bring it back.
+if (sounds.bgm instanceof LoopBed) sounds.bgm.onInterrupted = () => armBedStarter()
 
-let bgmStarted = false
 let muted = false
 let anticipationActive = false
 
@@ -168,6 +183,19 @@ const activeClones = new Set<HTMLAudioElement>()
 // global-mute case before the change was pushed.
 const pendingEls = new Map<PendingCue, HTMLAudioElement>()
 
+// R148. The bed state playBGM() reads, DECLARED HERE for the same reason as pendingEls:
+// the mute subscription below runs setMuted(), and through it playBGM(), during module
+// evaluation, so anything playBGM() touches must already be initialised.
+// overdriveBedActive: true while the Overdrive tension bed is the one that should sound
+//   (moved up from the bed-swap section, which still owns it).
+// bedSwapsInFlight: setOverdriveBed()'s 600 ms crossfades still running, during which
+//   both beds sound on purpose.
+// bedStarterArmed: whether the gesture starter below is listening.
+let overdriveBedActive = false
+let bedSwapsInFlight = 0
+let bedStarterArmed = false
+const BED_START_EVENTS = ['pointerdown', 'click', 'keydown'] as const
+
 /**
  * Play a fresh one-shot clone of a base sound and track it so it can be
  * stopped on mute. The clone removes itself from the set when it finishes.
@@ -220,12 +248,12 @@ export function setMuted(val: boolean): void {
   } else {
     // On unmute, restore every volume to the current slider-derived values.
     applyVolumes()
-    // R115, SILENT SESSION. playBGM() has exactly one caller, App.svelte:1402,
-    // and it returns early when muted WITHOUT setting `bgmStarted`. Nothing
-    // called it a second time, so a player whose mute preference was restored
-    // from a previous session and who then unmuted got no music at all, for the
-    // whole session. Retrying here is safe: playBGM() is idempotent through
-    // `bgmStarted`, so this is a no-op whenever the bed is already running.
+    // R115, SILENT SESSION. Before R115 playBGM() had one caller, App.svelte's
+    // onMount, and it returned early while muted, so a player whose mute preference
+    // was restored from a previous session and who then unmuted got no music at all.
+    // R148: playBGM() is now idempotent on the beds' own state rather than on a
+    // latch, so this also restores a bed that something paused, and it settles which
+    // bed sounds if an Overdrive boundary passed while muted.
     playBGM()
   }
 }
@@ -245,19 +273,29 @@ let audioWarmedUp = false
  * GameGrid.svelte's own _prewarmArt() already decodes symbol/fx textures at
  * component mount (before the first gesture in the normal flow), so this is
  * audio-only - textures don't need a second, gesture-gated warm-up pass.
+ *
+ * R148, THE WARM-UP KILLED THE BED. It used to pause and rewind EVERY element in
+ * its .then, the music bed included, 16 to 45 ms after the gesture, and nothing
+ * restarted it: a key press first, a fast click, or a bed already playing from a
+ * reload all left the game silent until a feature ended. Now an element that is
+ * already playing is left alone (it is decoded, and muting it would punch a hole
+ * in it), a primed element that should be sounding keeps sounding, and .muted is
+ * restored from the live mute flag rather than a captured one.
  */
 export function warmUpAudio(): void {
   if (audioWarmedUp) return
   audioWarmedUp = true
   Object.values(sounds).forEach((el) => {
-    const wasMuted = el.muted
+    if (!el.paused) return
     el.muted = true
     el.play().then(() => {
-      el.pause()
-      el.currentTime = 0
-      el.muted = wasMuted
+      if (!shouldBeSounding(el)) {
+        el.pause()
+        el.currentTime = 0
+      }
+      el.muted = muted
     }).catch(() => {
-      el.muted = wasMuted
+      el.muted = muted
     })
   })
   // R146. The four pending cues are live and are built lazily, so without this the
@@ -267,25 +305,70 @@ export function warmUpAudio(): void {
   AVAILABLE_PENDING_CUES.forEach((cue) => { pendingEl(cue) })
 }
 
+/** R148. Whether a looping element is one that should be audible right now: the bed
+ * that matches the Overdrive state, or the anticipation riser while it runs. */
+function shouldBeSounding(el: Voice): boolean {
+  if (muted) return false
+  if (el === sounds.bgm) return !overdriveBedActive
+  if (el === sounds.bgmTension) return overdriveBedActive
+  if (el === sounds.anticipationBuild) return anticipationActive
+  return false
+}
+
+/**
+ * Make the bed that should be sounding, sound. Idempotent, and safe to call at any
+ * time: from module load, App's onMount, unmute, and every gesture until a start
+ * succeeds.
+ *
+ * R148, THE LATCH. This used to return on a one-way `bgmStarted` flag, which a
+ * gesture starter set BEFORE its own play() settled, so once anything paused the bed
+ * (the warm-up did, on the first gesture) no later call could restart it: not a
+ * gesture, not unmute, not a spin. It now decides from the beds themselves:
+ * - muted: nothing (a muted player hears no voice);
+ * - the bed for the current state (tension during Overdrive, base otherwise) is
+ *   played if it is paused;
+ * - the other bed is stopped if it is running outside a crossfade, which happens
+ *   when an Overdrive boundary passes while muted (setOverdriveBed swaps nothing
+ *   then), so unmuting never leaves two beds, or the wrong one;
+ * - a refused start (autoplay policy) arms ONE gesture starter on pointerdown,
+ *   click and keydown, in the capture phase so no handler's stopPropagation can
+ *   hide the gesture from it, and it stays armed until a start succeeds.
+ */
 export function playBGM(): void {
-  if (muted || bgmStarted) return
-  sounds.bgm.play().then(() => {
-    bgmStarted = true
+  if (muted) return
+  const active = overdriveBedActive ? sounds.bgmTension : sounds.bgm
+  const other = overdriveBedActive ? sounds.bgm : sounds.bgmTension
+  if (bedSwapsInFlight === 0 && !other.paused) {
+    other.pause()
+    // The tension bed always restarts from its top (setOverdriveBed); the base bed
+    // resumes where it was, as it does on a normal feature exit.
+    if (other === sounds.bgmTension) other.currentTime = 0
+  }
+  if (!active.paused) {
+    disarmBedStarter()
+    return
+  }
+  active.play().then(() => {
+    disarmBedStarter()
   }).catch(() => {
-    // Autoplay blocked, start BGM on the first genuine user gesture, whether
-    // that is a click/tap or a key press (for example the spacebar to spin).
-    // One-shot and idempotent: whichever fires first starts the music once and
-    // removes both listeners so the music never double-starts.
-    const startOnce = (): void => {
-      if (bgmStarted) return
-      bgmStarted = true
-      sounds.bgm.play().catch(() => {})
-      document.removeEventListener('click', startOnce)
-      document.removeEventListener('keydown', startOnce)
-    }
-    document.addEventListener('click', startOnce)
-    document.addEventListener('keydown', startOnce)
+    armBedStarter()
   })
+}
+
+function onBedStartGesture(): void {
+  playBGM()
+}
+
+function armBedStarter(): void {
+  if (bedStarterArmed || typeof document === 'undefined') return
+  bedStarterArmed = true
+  BED_START_EVENTS.forEach((t) => document.addEventListener(t, onBedStartGesture, true))
+}
+
+function disarmBedStarter(): void {
+  if (!bedStarterArmed) return
+  bedStarterArmed = false
+  BED_START_EVENTS.forEach((t) => document.removeEventListener(t, onBedStartGesture, true))
 }
 
 // ── SPIN ────────────────────────────────────────────────────────────────────
@@ -351,14 +434,14 @@ export function stopAnticipation(): void {
 
 const BED_CROSSFADE_MS = 600
 
-let overdriveBedActive = false
+// `overdriveBedActive` is declared near the top of this file, beside pendingEls (R148).
 
 /**
  * Ramps an element's volume linearly from `from` to `to` over `durationMs`,
  * reusing the same "duck by adjusting .volume over time" idea as the existing
  * spin/anticipation ducks above, just interpolated instead of a single step.
  */
-function rampVolume(el: HTMLAudioElement, from: number, to: number, durationMs: number, onDone?: () => void): void {
+function rampVolume(el: Voice, from: number, to: number, durationMs: number, onDone?: () => void): void {
   const steps = 20
   const stepMs = durationMs / steps
   let i = 0
@@ -414,17 +497,23 @@ function setOverdriveBed(active: boolean): void {
   else bedTrace.crossfadeToBase++
   const target = musicVol * bgmDuck
 
+  // R148: counted, so playBGM() leaves the outgoing bed to finish its fade.
+  bedSwapsInFlight += 1
   if (active) {
     sounds.bgmTension.currentTime = 0
     sounds.bgmTension.play().catch(() => {})
     rampVolume(sounds.bgmTension, 0, target, BED_CROSSFADE_MS)
-    rampVolume(sounds.bgm, sounds.bgm.volume, 0, BED_CROSSFADE_MS, () => sounds.bgm.pause())
+    rampVolume(sounds.bgm, sounds.bgm.volume, 0, BED_CROSSFADE_MS, () => {
+      sounds.bgm.pause()
+      bedSwapsInFlight -= 1
+    })
   } else {
     sounds.bgm.play().catch(() => {})
     rampVolume(sounds.bgm, sounds.bgm.volume, target, BED_CROSSFADE_MS)
     rampVolume(sounds.bgmTension, sounds.bgmTension.volume, 0, BED_CROSSFADE_MS, () => {
       sounds.bgmTension.pause()
       sounds.bgmTension.currentTime = 0
+      bedSwapsInFlight -= 1
     })
   }
 }
