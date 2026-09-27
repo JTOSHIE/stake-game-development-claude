@@ -97,7 +97,10 @@ Historical briefs, handovers and superseded documents are retained under
 ## Licence and IP
 
 All game design, artwork, audio and code in this repository are original works of
-We Roll Spinners. The visual and audio assets are produced in-house from vector masters.
+We Roll Spinners. The visual assets began as in-house vector masters; the shipped set now
+also carries owner-commissioned external art admitted under `CLAUDE.md`'s Assets rulings, and
+the audio is the owner's stems plus one Stable Audio 3 cue
+(`frontend/public/assets/themes/future-spinner/sounds/README.md`).
 
 Every mark in the game is We Roll Spinners' own, with the single exception the platform
 itself requires: the General Disclaimer shown on the rules screen is Stake Engine's own

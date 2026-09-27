@@ -391,7 +391,7 @@
       runRetriggerLadder(spin).then(() => {
         // R125 HOOK, retrigger. On the SETTLED moment, after the capped ladder
         // has run, so it marks the award rather than racing the per-reel stops
-        // the ladder already sounds. SILENT until retrigger.mp3 exists.
+        // the ladder already sounds. Live since R146, when retrigger.mp3 shipped.
         playRetrigger()
         retriggerMoment = true
         retriggerChaseTrigger += 1

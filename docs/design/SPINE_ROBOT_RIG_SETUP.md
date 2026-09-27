@@ -212,6 +212,10 @@ So the honest deliverable is this specification plus the ranked brief below.
 
 ### The next brief, if the owner wants the rig
 
+**RE-CHECKED 2026-09-26 (R147): the block recorded below no longer holds. It was WITHDRAWN the
+same day by owner ruling (R109, section 8), and the parts are unblocked. R103's amendment is kept
+as written.**
+
 **AMENDED 2026-08-25 BY R103. Step 1 as originally written is BLOCKED, and the reason is a
 system law rather than a preference.** The original step 1 read "Adopt the parts into the
 repository under the design-system, with a provenance record per the Assets convention, since

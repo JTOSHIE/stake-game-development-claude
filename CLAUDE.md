@@ -319,9 +319,17 @@ ride along with the next sanctioned locked pass rather than being rediscovered c
 Owner's order, 2026-07-28 (`reports/briefs/FS_HYGIENE_AND_REGISTER_Prompt.md`, JOB 1), so a
 stale head can never again be mistaken for mergeable work.
 
-**Six branches exist on the remote and that is the whole list.** Anything not named here has
-been deleted, and if a branch appears that is not on this list, it is either new work that
-should add itself here or a stale head that should go.
+**Six branches are kept on the remote on purpose, and the table below is that whole list.**
+Three more heads from 2026-08-15 wait for the owner decision recorded in
+`reports/SESSION_REPORT.md` (R071): `analysis/2026-08-15` and `track/standback-2026-08-15`
+(0 unique commits each; PRs #124 and #123 merged) and `controlrow/2026-08-15` (3 commits on
+no other branch; PR #125 closed, not merged; its tip is still held by `refs/pull/125/head`).
+A merged session head (`claude/rNNN-*`) is not on this list: ruling (t.1) rule 2 deletes it
+when its PR merges. R147 found 50 of them left on the remote, R086 to R146, and deleted them
+on 2026-09-26, each first proven an ancestor of `main` with its merged PR's merge commit on
+`main`; the log, with every tip, merge commit and PR, is in `reports/audit/R147_ESTATE_AUDIT.md`
+section 2.1. Any other branch not named here is either new work that should add itself here
+or a stale head that should go.
 
 | Branch | Ahead of main | What it is |
 |---|---|---|
@@ -423,6 +431,13 @@ jackpot, gamble, or continuation.
 Manus is retired. All visual and audio assets are produced in-house from vector masters
 (SVG) via the asset pipeline: deterministic, exact-size rendering, front-facing symbols
 carry no baked-in text. Do not reintroduce Manus briefs.
+
+**NOTE 2026-09-26 (R147), a fact for the reader, not an amendment of the rule:** the audio half
+of the sentence above no longer describes what ships, and no amendment below covers audio. Since
+R146 every shipped sound except `ui_click.mp3` comes from the owner's stems, whose licence and
+source are not yet recorded, and `ui_click.mp3` is a Stable Audio 3 cue under the Stability AI
+Community License (`frontend/public/assets/themes/future-spinner/sounds/README.md`). Amending
+the rule text is the owner's call.
 
 **AMENDED 2026-07-25 by owner ruling: external ENHANCEMENT of existing art is permitted.
 Externally DESIGNED art is not.**

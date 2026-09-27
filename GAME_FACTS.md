@@ -248,8 +248,10 @@ live is exactly 5,000.00x on the wincap round itself.
 - **Frontend:** Svelte + PixiJS. Reel motion is ticker-driven (PixiJS `app.ticker`, 60fps);
   win-line highlighting and win particle bursts render on a transparent Pixi canvas layered
   over the symbol grid (`reports/archive/2026-07-04_motion-polish-v2.md`).
-- **Asset pipeline:** deterministic, in-house, vector-to-raster. Every visual asset derives
-  from SVG masters in `design-system/masters/` via `npm run assets`
+- **Asset pipeline:** deterministic, in-house, vector-to-raster. **Not every shipped visual
+  asset comes from it** (corrected 2026-09-26, R147): the external adoptions are in the next
+  bullet, and since commit `578a3a51` (2026-08-28) they include the symbols. Every asset the
+  pipeline does produce derives from SVG masters in `design-system/masters/` via `npm run assets`
   (`scripts/assets/build.py` + `manifest.json`), reproducible byte-identical on re-run. Layered
   exports (e.g. H1's rotating spoke sprite, H2's needle, the Overdrive flame jets) isolate
   named SVG groups so the engine animates parts independently of the static base art
@@ -286,6 +288,13 @@ live is exactly 5,000.00x on the wincap round itself.
   therefore no longer barred from being animated. **The sentence above is a fact about the
   shipped set, not a claim about the rule**, and it must be re-verified before any submission
   that adopts the externally generated development-stage art currently held under review.
+  **RE-VERIFIED 2026-09-26 (R147): that sentence is no longer true of the shipped set.** Commit
+  `578a3a51` (2026-08-28) adopted 28 owner-authorised OpenAI gpt-image-1 development-stage
+  files under Ticket 456254, the symbols, particles, gauge, jets, logo, backgrounds and scene
+  art among them; four of those paths (h2, m3, scene_character, gauge_needle) have since been
+  re-ingested from the same art at R141 and R145. The resting hero sheet derives from an
+  externally supplied strip (`docs/art/r122_pose_strip_intake.provenance.json`). The four-row
+  table above is the 2026-07-27 register, not the shipped set.
 - **Backgrounds:** static graded stills (one base scene, one Overdrive-state variant), no
   background video ships (`design-system/DESIGN_SYSTEM.md` ADDENDUM "Static environment
   backgrounds"). Since 2026-07-27 the base is owner-commissioned art and the Overdrive
@@ -312,8 +321,10 @@ live is exactly 5,000.00x on the wincap round itself.
   `tools/audio_forge/master.py`'s own functions by
   `tools/audio_forge/r146_master_owner_stems.py`: beds gained to -18 LUFS only, with the
   500 ms seam fold, bar trim and silence trim skipped because each would shorten the 4-bar
-  loop; one-shots silence-trimmed and peak-normalised to -3 dBFS, each win tier alone, so
-  the win-tier escalation check did not run. All are wired into `soundService.ts`. **The
+  loop; one-shots silence-trimmed and peak-normalised to -3 dBFS. At R146 each win tier was
+  normalised alone; since R147 seven one-shots are high-passed at 30 Hz first (commit
+  `cb7abc9a`), and the four win tiers below `win_max` are attenuated into a ladder that rises at
+  least 1 LU a tier (commit `e8cbc37a`; figures in the sounds README). All are wired into `soundService.ts`. **The
   provenance and licence of the fifteen stems are not stated in the drop and are an open
   owner question.** Only `ui_click.mp3` is still the July file, generated via Stable Audio 3
   open weights (`tools/audio_forge/generate.py`, model `stabilityai/stable-audio-3-medium`)
@@ -321,11 +332,15 @@ live is exactly 5,000.00x on the wincap round itself.
   (`tools/audio_forge/LICENSE.md`/`NOTICE`); its per-file record is
   `reports/audio/GENERATION_LOG_2026-07-13.md`, and the directory's own record is
   `frontend/public/assets/themes/future-spinner/sounds/README.md`. At R146
-  `frontend/scripts/audio_verify.mjs` passes every check but one: loopSeamsWithinTolerance
-  fails on `bgm_loop` alone, seam RMS delta 18.61 dB webm and 18.68 dB mp3 against its
-  2.0 dB gate, because the owner's take A of that bed opens on 12 ms of digital silence
-  (commit `750259c9`). Whether to re-export it wrapped or return to the original drop is an
-  open owner question.
+  `frontend/scripts/audio_verify.mjs` failed one check, loopSeamsWithinTolerance, on the
+  owner's take A of `bgm_loop`, which opens on 12 ms of digital silence (commit `750259c9`).
+  **Corrected 2026-09-26 (R147):** take A could not be wrapped seamlessly without inventing
+  audio, so the original drop's `bgm_loop` is restored and take A is parked (commit
+  `e94b1faa`, OWNER CHOICE "scratchy-but-seamless bed restored; take A parked"), and
+  `audio_verify.mjs` now passes every check: bed seam RMS deltas 1.50 / 1.47 dB (`bgm_loop`,
+  webm / mp3), 1.30 / 1.21 dB (`bgm_tension`) and 1.79 / 1.76 dB (`anticipation_build`)
+  against its 2.0 dB gate. Since R147 a bought max win also plays `win_max` at its reveal
+  (commit `b721febb`).
 
 ## 5. Compliance summary
 

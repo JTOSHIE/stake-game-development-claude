@@ -456,9 +456,9 @@ export function playScatterLand(): void {
  * 30,99.99×= big win
  * 100×+    = epic win (plays twice with 800ms echo). A max win reached by a
  *            spin or in Bet Replay plays its own stem through playMaxWin() since
- *            R146; a BOUGHT max win still reaches this function from App.svelte's
- *            buy settle and plays the epic stinger (AUDIO_TRUTH_MAP section 4.5,
- *            owner-parked because it is a call-site change).
+ *            R146, and a BOUGHT max win too since R147: App.svelte's buy path calls
+ *            playMaxWin() as the celebration appears and skips this function for a
+ *            capped round. Here a max win plays only as playMaxWin()'s fallback.
  */
 export function playWin(multiplier: number): void {
   if (muted || multiplier <= 0) return
@@ -546,7 +546,7 @@ const PENDING_BASE: Record<PendingCue, number> = {
 /**
  * Dev-only instrumentation for the four pending cues (R125).
  *
- * A hook that is CORRECT today is a hook that fires and makes no sound, and those
+ * At R125 a CORRECT hook fired and made no sound (no stem existed yet), and those
  * two facts are indistinguishable from a hook that was never called at all - which
  * is how dead wiring survives review. `__playedSounds` in audio_verify.mjs patches
  * HTMLMediaElement.play(), so by construction it cannot see a cue that deliberately

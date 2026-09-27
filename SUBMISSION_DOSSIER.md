@@ -153,6 +153,16 @@ digital silence; `bgm_tension` and `anticipation_build` pass. Whether to re-expo
 wrapped or revert to the original drop is the owner's call. The bed crossfade on Overdrive
 entry and exit still passes.
 
+**R147 (2026-09-26), SUPERSEDING the `bgm_loop` sentences of the R146 paragraph above; that
+paragraph is kept as written.** Take A could not be wrapped seamlessly without inventing
+audio, so the original drop's `bgm_loop` is restored and take A is parked (commit e94b1faa,
+OWNER CHOICE "scratchy-but-seamless bed restored; take A parked").
+`frontend/scripts/audio_verify.mjs` now reports ALL CHECKS PASS, `loopSeamsWithinTolerance`
+included (webm / mp3 seam RMS deltas: bgm_loop 1.50 / 1.47 dB, bgm_tension 1.30 / 1.21 dB,
+anticipation_build 1.79 / 1.76 dB, against the 2.0 dB gate). R147 also high-passes seven
+one-shots at 30 Hz, sets the win tiers to rise at least 1 LU apiece, and makes a bought max
+win play `win_max` at its reveal (commits cb7abc9a, e8cbc37a and b721febb).
+
 > **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
 > 5b below is the upload steps and 5d is the one-time versus per-update checklist;
 > `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each
@@ -711,6 +721,14 @@ in the committed set still derives from the in-house SVG masters, and section 9c
 accurate. **This paragraph exists so a reviewer is not shown a rule the project has since
 withdrawn**, and so that any future submission adopting externally generated symbol art is
 described accurately rather than against a superseded line.
+
+**RE-CHECKED 2026-09-26 (R147): the shipped set has since changed, so the paragraph above is a
+dated record.** Commit 578a3a51 (2026-08-28) adopted 28 owner-authorised OpenAI gpt-image-1
+development-stage files under Ticket 456254, symbols included, and the resting hero sheet
+derives from an externally supplied strip (`docs/art/r122_pose_strip_intake.provenance.json`).
+Section 9c's register predates that commit: its bg_base, bg_overdrive, scene_character and
+scene_car hashes no longer match the shipped files (SHA-256 now begins 193d6936, 5c4eae88,
+6bdd73d0 and 4760156c); the tile row still matches.
 
 ---
 
