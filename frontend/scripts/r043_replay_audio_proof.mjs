@@ -41,6 +41,14 @@
 // must report zero audible cues for it, proving assertion 1 can actually go
 // red. The unmuted run is the negative control.
 //
+// R148: THE BED IS NO LONGER AN ELEMENT. Since R148 the base music bed is a Web Audio buffer
+// loop (src/lib/services/loopBed.ts), which never calls HTMLMediaElement.play(), so the
+// element instrument alone could no longer see it: assertion 3 (mute) and assertion 4 (nothing
+// after the end) would pass without measuring the bed. The instrument therefore also records
+// every AudioBufferSourceNode.start(), reading `muted` from the gain the source feeds (0 means
+// muted), in the same log, so both assertions cover the bed again. The self-test gains a second
+// seed for it: an audible Web Audio start under the global mute must read as audible.
+//
 // Frames and the audio trace go to reports/screens/r043-replay-audio/ under
 // FS_WRITE_EVIDENCE=1 (convention h.1), scratch otherwise.
 //
@@ -100,9 +108,9 @@ function serve() {
 }
 
 /** Drive one replay page. Returns helpers bound to the page. */
-async function open(browser, { round, muted = false, qs = {} }) {
+async function open(browser, { round, muted = false, qs = {}, seedWebAudio = false }) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } })
-  await page.addInitScript(({ mutedFlag }) => {
+  await page.addInitScript(({ mutedFlag, seed }) => {
     // The instrument: every play() that reaches the audio pipeline is logged
     // with the element's mute state at the moment of the call, so warm-up
     // primes (muted by design, soundService.warmUpAudio) are separable from
@@ -116,8 +124,39 @@ async function open(browser, { round, muted = false, qs = {} }) {
       })
       return orig.apply(this, a)
     }
+    // R148: the Web Audio bed. Record the node a source feeds, then log each start; `muted`
+    // is read a moment later from that gain, once the bed has applied its level (loopBed
+    // glides gain changes over a few milliseconds). Until then it counts as audible.
+    if (typeof AudioBufferSourceNode !== 'undefined') {
+      const oConnect = AudioNode.prototype.connect
+      AudioNode.prototype.connect = function (dest, ...r) {
+        if (this instanceof AudioBufferSourceNode) this.__dest = dest
+        return oConnect.call(this, dest, ...r)
+      }
+      const oStart = AudioBufferSourceNode.prototype.start
+      AudioBufferSourceNode.prototype.start = function (...a) {
+        const rec = { src: 'bgm_loop(webaudio)', muted: false, volume: null, at: Math.round(performance.now()) }
+        window.__audioPlays.push(rec)
+        setTimeout(() => {
+          const g = this.__dest && this.__dest.gain
+          rec.volume = g ? g.value : null
+          rec.muted = !!g && g.value === 0
+        }, 60)
+        return oStart.apply(this, a)
+      }
+    }
     if (mutedFlag) localStorage.setItem('fs_muted', '1')
-  }, { mutedFlag: muted })
+    if (seed) {
+      // THE WEB AUDIO SEED (self-test only): an audible buffer start that ignores the mute,
+      // made on the first click, which the instrument must count as audible.
+      document.addEventListener('click', () => {
+        const C = window.AudioContext
+        const c = new C()
+        const g = c.createGain(); g.gain.value = 0.5; g.connect(c.destination)
+        const s = c.createBufferSource(); s.buffer = c.createBuffer(2, 4800, c.sampleRate); s.connect(g); s.start()
+      }, { once: true, capture: true })
+    }
+  }, { mutedFlag: muted, seed: seedWebAudio })
   await page.route('**/bet/replay/**', (route) => route.fulfill({
     status: 200, contentType: 'application/json',
     body: JSON.stringify({
@@ -166,7 +205,18 @@ try {
     console.log(`  ${clean ? 'clean  ' : 'FALSE+ '} unmuted control: detector reads ${caud.length} audible cue(s)`)
     await c.page.close()
 
-    if (!red || !clean) {
+    // THE WEB AUDIO SEED (R148): the same muted replay, plus one audible Web Audio start that
+    // ignores the mute. Assertion 3's detector must read it as audible, which proves the bed's
+    // new observation can go red; without it a bed playing under mute would pass unseen.
+    const wa = await open(browser, { round: FIX.base.win, muted: true, seedWebAudio: true })
+    await wa.page.locator('.start-replay').click({ timeout: 10_000 })
+    await wa.page.locator('.play-again').waitFor({ state: 'visible', timeout: 30_000 })
+    const waud = await wa.audible()
+    const waRed = waud.some((p) => p.src.includes('webaudio'))
+    console.log(`  ${waRed ? 'caught ' : 'MISSED '} seeded audible Web Audio start under mute: detector reads ${waud.length} audible cue(s)`)
+    await wa.page.close()
+
+    if (!red || !clean || !waRed) {
       console.error('\nR043 REPLAY AUDIO PROOF SELF-TEST: FAIL')
       process.exit(1)
     }

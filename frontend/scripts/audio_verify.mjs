@@ -148,6 +148,9 @@ async function run() {
     // Intercept HTMLMediaElement.play() before any app code runs, so every
     // soundService.ts Audio element's real .play() calls get recorded - not
     // just "the file was fetched" (which only ever happens once, on load).
+    // R148: the base bed is a Web Audio loop since then (loopBed.ts) and never
+    // reaches this hook; no check here relies on it (the bed swap is read from
+    // __bedSwapTrace, and its file still loads as a /sounds/ request).
     await page.addInitScript(() => {
       window.__playedSounds = []
       const origPlay = HTMLMediaElement.prototype.play
