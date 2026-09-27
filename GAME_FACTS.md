@@ -347,6 +347,13 @@ live is exactly 5,000.00x on the wincap round itself.
   fold skipped (commit `4b11d40d`). `audio_verify.mjs` still passes every check; `bgm_loop`'s
   seam RMS deltas are now 0.50 / 0.45 dB (webm / mp3). Its licence and source are open: the
   recorded OpenAI clearance covers image generation for artwork, not audio. Take A stays parked.
+  **Superseded for `bgm_loop` 2026-09-28 (R150):** the circular bed is retired. The idle master is
+  now the owner's take A with a ChatGPT join-edit (master sha256 99643c41..., 44.1 kHz, 481,091
+  frames, four bars): take A at -2.38 dB with its first 139.9 ms, where it opened on 12.0 ms of
+  silence, rebuilt from a copy of the bed's own bar 4 beat 3 hit and a crossfade (commit `b5949859`). **`audio_verify.mjs` does NOT
+  report every check passing at R150:** `loopSeamsWithinTolerance` fails on `bgm_loop` (4.11 /
+  4.16 dB, webm / mp3, against 2.0 dB) because the take starts on its downbeat; the file's own bar
+  lines read 6.8 to 8.5 dB on the same metric and the join is sample-continuous. An owner ruling.
 
 ## 5. Compliance summary
 

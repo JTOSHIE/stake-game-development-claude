@@ -4,6 +4,26 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1F. R150 (2026-09-28) - THE IDLE BED IS TAKE A WITH A CHATGPT JOIN-EDIT; THE CIRCULAR BED IS RETIRED
+
+**Branch `claude/r150-drum-machine-idle-bed`.** Appended above 1E, which stays as written.
+
+*** DONE, PENDING THE OWNER'S EAR-CHECK (the brief makes it the gate): the idle master is the
+owner's take A with a ChatGPT join-edit (sha256 99643c41..., 481,091 frames at 44.1 kHz), encoded
+in commit b5949859, provenance in the sounds README. In the built game in Chromium, 25 s idle
+under three autoplay policies, the output is exactly 0.5 x the decoded bed (the bed's gain) through
+both wraps. For the ear-check: bar 1 opens on a copy of bar 4's beat 3 hit, so the first downbeat
+of each cycle lacks the treble tick the other three carry and dips in the mid-bass for 40 ms. ***
+
+**OPEN, AN OWNER RULING:** audio_verify's `loopSeamsWithinTolerance` fails on bgm_loop (4.11 / 4.16
+dB against 2.0 dB). The check compares the first and last 20 ms, and this take starts on its
+downbeat: the file's own bar lines read 6.8 to 8.5 dB on the same metric, and the join is
+sample-continuous. Options: accept it for this take, sanction a gate that measures the join
+itself, or ask for a take that starts off the downbeat. 1E's ear-check (the 2.73 s repetition) no
+longer applies; 1B's licence question now covers a 140 ms ChatGPT edit of the owner's own stem.
+
+**STILL OPEN:** as 1D.
+
 ## 1E. R149 (2026-09-27) - THE IDLE BED IS THE CHATGPT CIRCULAR REBUILD, ONE BAR PLAYED FOUR TIMES
 
 **Branch `claude/r149-circular-idle-bed`.** Appended above 1D, which stays as written.
