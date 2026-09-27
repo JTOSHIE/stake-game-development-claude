@@ -8,11 +8,12 @@ bundle, and its `pruneAudioMasters` does the same for the WAV masters beside it.
 Nineteen files. Every one of them except `ui_click.mp3` comes from the OWNER'S stems,
 dropped into this directory on 2026-09-25 under their code names. bgm_loop's master was
 swapped by the owner to "take A" the same day, and restored to the original drop at R147
-(2026-09-26) because take A could not be wrapped seamlessly; take A is parked, see below.
+(2026-09-26) because take A could not be wrapped seamlessly; take A is parked, see below. At
+R149 (2026-09-27) the owner replaced it with a ChatGPT circular rebuild (section below).
 
 | Shipped file(s) | Master (bare stem, not versioned) | Master sha256 | Rate, frames |
 |---|---|---|---|
-| `bgm_loop.{webm,mp3}` | bgm_loop, original drop | 77556d1dd4e0c072dd4fb4a0d3437998d29ef65ec7cdcd20f46976ed3dc1f387 | 48 kHz, 523,636 |
+| `bgm_loop.{webm,mp3}` | bgm_loop, ChatGPT circular rebuild (R149) | bdd217b7280b93e18aea0cf9fbda83a567777e9a09443e7d2bd58f4e5ab8dcea | 48 kHz, 523,636 |
 | `bgm_tension.{webm,mp3}` | bgm_tension | 454d3e186bb81c9f2d4f6db6f3a8a0be09361aa70243c6b48cee208f61e92812 | 48 kHz, 523,636 |
 | `anticipation_build.{webm,mp3}` | anticipation_build | 24cd9ac65db1a6be88e10eaa69af0b38643eea378ef07379cd3f4501f1c3418b | 48 kHz, 523,636 |
 | `spin.mp3` | spin | c1ee12df991c9f5a6993bcb7f379c4829d303804215d0035cb979fea9d4a6f1e | 44.1 kHz |
@@ -31,9 +32,10 @@ swapped by the owner to "take A" the same day, and restored to the original drop
 
 The masters sit in this directory as WAV files with the stems above, gitignored and never
 committed; the sha256 column is what ties a master to its encode. The owner's own
-MANIFEST.txt (also gitignored) lists the original drop, which is again what bgm_loop is
-mastered from; it is also in the owner's future-spinner-sounds-ready.zip. Take A (sha256
-59cbe76c...) is parked where the owner left it, in the bgm_loop-take-A folder in Downloads.
+MANIFEST.txt (also gitignored) lists the original drop, which bgm_loop was mastered from until
+R149 (sha256 77556d1d..., still in the owner's future-spinner-sounds-ready.zip and final pack).
+Take A (sha256 59cbe76c...) is parked where the owner left it, in the bgm_loop-take-A folder in
+Downloads.
 
 **The three beds are 4-bar loops at 88 BPM, 10.909 s.** They replaced 88.3 s and 57.8 s
 beds at 100 and 140 BPM.
@@ -91,6 +93,45 @@ To re-master after the owner replaces a master, from the repository root:
 `tools/audio_forge/.venv/bin/python tools/audio_forge/r146_master_owner_stems.py <scratch-dir> [NAME ...]`,
 then check the outputs and copy them here.
 
+## R149 (2026-09-27): the idle bed is a ChatGPT circular rebuild
+
+The owner's brief (`reports/briefs/FS_R149_CircularIdleBed_Prompt.md`) replaced the bgm_loop
+master only. Provenance, as the brief states it: **ChatGPT circular rebuild, 2026-09-27**. The
+master came from the art-review folder chatgpt-bgm-loop-circular (gitignored .scratch, never
+committed) beside a cell_raw.wav (sha256 2d38fce2..., 48 kHz, 571,636 frames), which is
+provenance only: not encoded, not shipped.
+
+- **The supplier's figures, re-derived here and matching exactly:** 0.421 dB between the first
+  and last 20 ms RMS, 37.85% of energy above 200 Hz, L/R correlation 0.776. Also measured: 48 kHz,
+  24-bit, exactly 523,636 frames (4.00000 bars at 88 BPM); the join is a step 0.37x the loop's
+  99.9th-percentile step. The master IS cell_raw's first 523,636 frames, sample for sample: no
+  fold and no crossfade (cell_raw is those four bars plus a 1.0 s tail). No wrap was added here.
+- **It is one bar played four times.** Its four bars (130,909 samples, 2.727 s each) are
+  bit-identical, and so are cell_raw's; the original drop's four bars differ. So the idle bed now
+  repeats every 2.73 s rather than every 10.9 s, and it wraps cleanly because the cut at four
+  bars joins bar 4 to bar 1 exactly as each bar joins the next. The bars were tiled, not rendered
+  through, so that same splice recurs at every bar line, every 2.727 s. How the repetition and
+  the bar line sound over a long idle is the owner's ear-check.
+- **It is not a sample-aligned edit of the original drop:** normalised cross-correlation with the
+  previous master 0.18 at the best circular lag, which is chance level for audio with this
+  spectrum. A correlation cannot rule out a re-render from the same material. It is darker: 37.85%
+  of its energy lies above 200 Hz against 74.78% for the original drop (one-sided power summed
+  over both channels, so it balances by Parseval). Worth hearing on a phone speaker.
+- **Mastered as the other beds were**, through the R146 wrapper (gain to -18 LUFS, the 500 ms fold
+  skipped): webm 206,698 B at -18.0 LUFS, mp3 263,277 B at -18.2 LUFS, both decoding to exactly
+  523,636 frames where the decoder trims the Opus pre-skip and the mp3 encoder delay (ffmpeg,
+  Chromium, WebKit; Firefox decodes the webm one frame short, 523,635, as it did the previous
+  one); seam 0.50 dB webm and 0.45 dB mp3. Since R148 the bed loops through Web Audio, so its wrap
+  in the game is sample-exact; this change is only the samples. Measured on the webm in the built
+  game in Chromium (25 s idle, no spin, three autoplay policies): the output is exactly 0.5 x the
+  decoded bed through both wraps, residual 0.0.
+- **Open for the owner:** the stems' licence and source question now extends to this file, and
+  the recorded OpenAI clearance (Ticket 456254) is scoped to image generation for artwork, not
+  to audio. Take A stays parked. The original drop's master (sha256
+  77556d1dd4e0c072dd4fb4a0d3437998d29ef65ec7cdcd20f46976ed3dc1f387) is in the owner's zip and
+  final pack; to restore it, revert R149's samples commit and copy that master back beside the
+  encodes.
+
 ## Open questions for the owner, recorded at R146
 
 1. **Licence and source of the owner's stems: not stated in the drop.** Until it is
@@ -106,6 +147,8 @@ then check the outputs and copy them here.
    pass without inventing audio, so the original drop's bed is back (audio_verify seam
    1.50 dB webm, 1.47 dB mp3). Take A
    can return as a re-export rendered with a wrapped 40 ms tail, as the other beds were.
+   **R149:** the owner then replaced the idle master with the ChatGPT circular rebuild (above);
+   take A stays parked.
 3. **Closed at R147: the sub-20 Hz swell** is filtered out of the seven one-shots (above).
    feature_end is still 5.5 LU below feature_enter (-26.8 LUFS against -21.3): that is
    the stem's own level now, not the swell.
@@ -127,7 +170,8 @@ prompt is in `tools/audio_forge/generate.py`'s `MANIFEST`.
 `ui_click.mp3` is generated audio subject to the **Stability AI Community License
 Agreement** (the model's licence, not this repo's); see `tools/audio_forge/LICENSE.md` and
 `tools/audio_forge/NOTICE` for the full text and attribution line. The owner's stems are
-covered by open question 1 above.
+covered by open question 1 above. Since R149 `bgm_loop.{webm,mp3}` is neither: it is a ChatGPT
+circular rebuild the owner supplied, and its licence is open (the R149 section above).
 
 ## Legacy files
 

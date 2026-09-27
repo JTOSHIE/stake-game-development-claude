@@ -163,6 +163,17 @@ anticipation_build 1.79 / 1.76 dB, against the 2.0 dB gate). R147 also high-pass
 one-shots at 30 Hz, sets the win tiers to rise at least 1 LU apiece, and makes a bought max
 win play `win_max` at its reveal (commits cb7abc9a, e8cbc37a and b721febb).
 
+**R149 (2026-09-27), SUPERSEDING the `bgm_loop` sentences of the R147 paragraph above; that
+paragraph is kept as written.** The owner replaced the idle bed's master with a ChatGPT circular
+rebuild (master sha256 bdd217b7..., 48 kHz, exactly 523,636 frames: one 2.727 s bar repeated four
+times, bit-identical), mastered through the same wrapper with the 500 ms fold skipped (commit
+4b11d40d). `frontend/scripts/audio_verify.mjs` still reports ALL CHECKS PASS; bgm_loop's seam RMS
+deltas are now 0.50 / 0.45 dB (webm / mp3). Since R148 the bed loops through Web Audio, and in the
+built game in Chromium its output is exactly the decoded samples through every wrap. So it is no
+longer true that every file but `ui_click.mp3` comes from the owner's stems: this one is a ChatGPT
+rendering the owner supplied, and its licence and source are an open owner question (the
+recorded OpenAI clearance covers image generation for artwork, not audio). Take A stays parked.
+
 > **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
 > 5b below is the upload steps and 5d is the one-time versus per-update checklist;
 > `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each
