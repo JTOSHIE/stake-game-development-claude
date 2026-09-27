@@ -6,7 +6,11 @@ governs:** a causal 30 Hz high-pass now runs on seven one-shots and the win tier
 so on ffmpeg's ebur128 `feature_end` is -26.8 LUFS (was -31.9), `feature_enter` -21.3 (was
 -20.8), `retrigger` -20.0 (was -20.5), and `win_max` at -24.7 sits above `win_epic` at -25.9
 (-26.5 on pyloudnorm); the re-encoded one-shots moved by up to 31 ms in duration; and a bought
-max win now plays `win_max` (section 4.5). The sounds README has the detail. What
+max win now plays `win_max` (section 4.5). The sounds README has the detail.
+**R148 (2026-09-27), no file changed:** the base bed now loops through Web Audio
+(`frontend/src/lib/services/loopBed.ts`), because a looping audio element stalls about 50 to
+60 ms at every wrap in Chromium whatever the file, and any first gesture now resumes the bed
+(the first-gesture warm-up used to pause it for the session). What
 sound this game actually makes, what it does not, and exactly what had to happen for the four
 missing stems to go live.
 
@@ -39,7 +43,7 @@ Files live in `frontend/public/assets/themes/future-spinner/sounds/`. Paths are 
 
 | Moment | File | Duration | Play function | Fired from | Wired? |
 |---|---|---|---|---|---|
-| BGM bed | `bgm_loop.{mp3,webm}` | 10.909s loop (4 bars at 88 BPM) | `playBGM()` | `App.svelte:1462` | yes |
+| BGM bed | `bgm_loop.{mp3,webm}` | 10.909s loop (4 bars at 88 BPM); since R148 a gapless Web Audio buffer loop (`loopBed.ts`) | `playBGM()` | `App.svelte:1462`, soundService's module load, unmute, and since R148 the first gesture | yes |
 | BGM, Overdrive bed | `bgm_tension.{mp3,webm}` | 10.909s loop | `setOverdriveBed()` | `overdriveVisual` store subscription | yes |
 | UI click | `ui_click.mp3` | 0.04s | `playUIClick()` / `playClick()` | HudOverlay ×9, FeatureMenu ×8, PaytableModal, IntroSplash | yes |
 | Spin start | `spin.mp3` | 0.813s | `playSpinStart()` | `GameGrid.svelte:984` | yes |

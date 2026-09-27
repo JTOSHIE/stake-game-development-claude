@@ -4,6 +4,28 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1D. R148 (2026-09-27) - THE IDLE BED NO LONGER CUTS AT THE WRAP, AND NO GESTURE KILLS IT
+
+**Branch `claude/r148-loop-join-bed-resume`.** Appended above 1C, which stays as written.
+
+*** CLOSED, PENDING THE OWNER'S EAR-CHECK AT THE WRAP: the idle bed's cut at every wrap. The file was never the fault (its seam is 1.50 dB
+and decodeAudioData returns the exact 523,636-frame loop); a looping audio element stalls about
+50 to 60 ms at each wrap in Chromium. The brief's option A (a 16-bar encode) only made the stall
+rarer (43 to 48 ms every 43.6 s) and option B (a 40 ms two-element overlap, not built into the
+game) would shorten every cycle to 3.9853 bars, the owner's rejected R147 F1, so option C shipped: the base bed loops one decoded buffer through Web Audio
+(`frontend/src/lib/services/loopBed.ts`), bit-exact over 34 s and 3 wraps in the built game, with
+a fallback to the audio element. No audio file changed. ***
+*** CLOSED: R147 audit 2.3 D1, the first-gesture warm-up stopping the bed for the session (a key
+first, a fast click, or a bed already playing), and D3, the wrong bed (or two) after unmuting
+across an Overdrive boundary. Proved in the built game under three autoplay policies, control
+build against fixed. ***
+
+**STILL OPEN:** R147 audit D2 (the tension bed stays ducked if a feature starts inside the 1.8 s
+spin duck) and D4 (the spin duck's timer lifts the bed mid-riser); the heard win levels (D5); and
+the tension bed and anticipation riser, which still loop as audio elements and so still stall at
+their wraps during features (an owner scope ruling). Web Audio under the iOS silent switch is
+UNKNOWN until checked on a device.
+
 ## 1C. R147 (2026-09-26) - FOUR OF 1B'S SIX AUDIO ITEMS CLOSED; take A PARKED
 
 **Branch `claude/r147-overnight-audit`.** Appended above 1B, which stays as written.
