@@ -7,6 +7,7 @@ import { isMuted as isMutedStore } from '../stores/gameStore'
 import { musicVolume, sfxVolume } from '../stores/audioSettings'
 import { themeAssets } from '../stores/themeStore'
 import { overdriveVisual } from '../stores/overdriveVisual'
+import { makeLoopBed, LoopBed, type Voice } from './loopBed'
 
 const FS_BASE = 'assets/themes/future-spinner/sounds'
 
@@ -40,6 +41,13 @@ function pickLoopUrl(mp3Url: string): string {
   const supportsOpus =
     typeof Audio !== 'undefined' && new Audio().canPlayType('audio/webm; codecs="opus"') !== ''
   return supportsOpus ? webmUrl : mp3Url
+}
+
+/** R148. The same choice as pickLoopUrl, as an ordered list for the Web Audio bed, which
+ * tries each encode in turn: the WebM/Opus first where it plays, then the MP3. */
+function loopUrls(mp3Url: string): string[] {
+  const picked = pickLoopUrl(mp3Url)
+  return picked === mp3Url ? [mp3Url] : [picked, mp3Url]
 }
 
 // ── Base volumes ──────────────────────────────────────────────────────────────
@@ -91,7 +99,12 @@ function makeAudio(url: string, fallbackName: string): HTMLAudioElement {
 function buildSounds() {
   const p = get(themeAssets).sounds
   const s = {
-    bgm:                  makeAudio(pickLoopUrl(p.bgm),               'bgm_loop'),
+    // R148 BUG 1, THE IDLE BED CUT AT EVERY WRAP. A looping <audio> element stalls about
+    // 55 ms at each wrap in Chromium (a 10,959 to 10,969 ms period against 10,909 ms of
+    // audio, measured with nothing attached to it), whatever the file length or codec.
+    // The base bed is therefore a Web Audio buffer loop, which is sample-exact (loopBed.ts),
+    // falling back to this same element where Web Audio is missing or cannot decode it.
+    bgm:                  makeLoopBed(loopUrls(p.bgm), () => makeAudio(pickLoopUrl(p.bgm), 'bgm_loop')),
     bgmTension:           makeAudio(pickLoopUrl(p.bgmTension),        'bgm_tension'),
     spin:                 makeAudio(p.spin,                 'spin'),
     reelStop:             makeAudio(p.reelStop,             'reel_stop'),
@@ -113,6 +126,9 @@ function buildSounds() {
 }
 
 let sounds = buildSounds()
+// R148: if the browser suspends the Web Audio context under the playing bed (iOS: a call, the
+// app backgrounded), the bed reports itself paused and the next gesture must bring it back.
+if (sounds.bgm instanceof LoopBed) sounds.bgm.onInterrupted = () => armBedStarter()
 
 let muted = false
 let anticipationActive = false
@@ -291,7 +307,7 @@ export function warmUpAudio(): void {
 
 /** R148. Whether a looping element is one that should be audible right now: the bed
  * that matches the Overdrive state, or the anticipation riser while it runs. */
-function shouldBeSounding(el: HTMLAudioElement): boolean {
+function shouldBeSounding(el: Voice): boolean {
   if (muted) return false
   if (el === sounds.bgm) return !overdriveBedActive
   if (el === sounds.bgmTension) return overdriveBedActive
@@ -425,7 +441,7 @@ const BED_CROSSFADE_MS = 600
  * reusing the same "duck by adjusting .volume over time" idea as the existing
  * spin/anticipation ducks above, just interpolated instead of a single step.
  */
-function rampVolume(el: HTMLAudioElement, from: number, to: number, durationMs: number, onDone?: () => void): void {
+function rampVolume(el: Voice, from: number, to: number, durationMs: number, onDone?: () => void): void {
   const steps = 20
   const stepMs = durationMs / steps
   let i = 0
