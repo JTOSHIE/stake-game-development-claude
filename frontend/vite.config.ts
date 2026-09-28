@@ -270,6 +270,14 @@ function pruneLegacyAssets() {
     // the whole argument for re-deriving a parked claim instead of repeating its note.
     'assets/themes/future-spinner/frames/frame-1.png',
     'assets/themes/future-spinner/ui/subtitle.png',
+    // R151 (brief workstream 3, dead pixels): 91,802 B that no component loads. Its only mention in
+    // src is a comment (SceneGroup.svelte:4), it is absent from the built JS and CSS, and it was
+    // requested 0 times across 10 production contexts and 16 real rounds while the logger saw it
+    // when asked for it directly. asset_reference_gate passes with it gone, no gate lists it, and it
+    // is already recorded DEAD in docs/art/art_manifest_arc2.csv (SC-07). Kept in the repository,
+    // pruned from the bundle, like the others here. The other dead rasters that R151 measured need
+    // a code deletion or an owner ruling first and are on the R151 owner list, not here.
+    'assets/themes/future-spinner/ui/scene_character_car.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()

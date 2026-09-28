@@ -10,7 +10,7 @@
 // swap (bgm_loop -> bgm_tension) fires on a bonus buy, and zero console errors
 // throughout.
 //
-// Run (from frontend/): npx tsx scripts/audio_verify.mjs
+// Run (from frontend/): npx tsx scripts/audio_verify.mjs   (seam exemption self-test: add --self-test)
 
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
@@ -68,6 +68,58 @@ const SEAM_ROWS = ['bgm_loop', 'bgm_tension', 'anticipation_build']
 const SEAM_RMS_WINDOW_MS = 20
 const SEAM_RMS_TOLERANCE_DB = 2.0
 
+// OWNER ACCEPTED AT HASH (the owner's R150 ruling, recorded in R151's brief,
+// reports/briefs/FS_R151_PresentationMotionPass_Prompt.md): "ACCEPT the bgm_loop seam exemption
+// at this master's hash. Do not loosen the 2.0 dB limit." The R150 take starts on its downbeat,
+// so this first-against-last metric reads the drum hit (4.11 dB webm, 4.16 dB mp3), while the
+// file's own bar lines read 6.8 to 8.5 dB on the same metric and its join is sample-continuous.
+// The exemption is these exact shipped bytes, the committed encodes of master sha256
+// 99643c41ae7cfd1e4e11ea8cc114d4fa234606525ade4c739b51766f4ae16d19, and nothing else: any other
+// bytes for these files are measured against the unchanged 2.0 dB limit, and an exempt file is
+// still measured and reported. A looser limit would have passed a real 12 ms head gap (3.58 dB on
+// that master), which is why the ruling is a hash and not a threshold.
+const SEAM_EXEMPTIONS = {
+  'bgm_loop.webm': { sha256: 'b999dd17da826886e5db47d389862ecf497d27c76880d8a74ed93ee8a0e22b5c' },
+  'bgm_loop.mp3': { sha256: 'ca1b051ee1cf94b653c311cd2b8e58984239362e5288afebd65484aba80c400b' },
+}
+const SEAM_EXEMPTION_NOTE = 'OWNER ACCEPTED AT HASH (R150 ruling; master 99643c41ae7cfd1e...)'
+
+/** The seam verdict for one shipped file: pass within the limit, pass as an owner-accepted
+ * exemption only when these exact bytes are exempt, otherwise fail. */
+function seamVerdict(file, r) {
+  if (r.error) return { pass: false, reason: `${file}: ${r.error}` }
+  if (r.deltaDb <= SEAM_RMS_TOLERANCE_DB) return { pass: true }
+  const ex = SEAM_EXEMPTIONS[file]
+  if (ex && r.sha256 === ex.sha256) {
+    return { pass: true, exempt: `${file}: seam delta ${r.deltaDb.toFixed(2)}dB over ${SEAM_RMS_TOLERANCE_DB}dB, ${SEAM_EXEMPTION_NOTE}` }
+  }
+  return { pass: false, reason: `${file}: seam delta ${r.deltaDb.toFixed(2)}dB exceeds ${SEAM_RMS_TOLERANCE_DB}dB tolerance` }
+}
+
+// Seeded self-test (convention (p)): the exemption must pass the exact bytes and nothing else.
+function seamSelfTest() {
+  const ok = SEAM_EXEMPTIONS['bgm_loop.webm'].sha256
+  const other = ok.replace(/^./, (c) => (c === '0' ? '1' : '0'))
+  const cases = [
+    ['exempt bytes over the limit pass as exempt', seamVerdict('bgm_loop.webm', { deltaDb: 4.11, sha256: ok }), (v) => v.pass && !!v.exempt],
+    ['one changed hash digit over the limit FAILS', seamVerdict('bgm_loop.webm', { deltaDb: 4.11, sha256: other }), (v) => !v.pass],
+    ['exempt hash on another row FAILS', seamVerdict('bgm_tension.webm', { deltaDb: 4.11, sha256: ok }), (v) => !v.pass],
+    ['a missing hash FAILS', seamVerdict('bgm_loop.webm', { deltaDb: 4.11 }), (v) => !v.pass],
+    ['a real head gap on other bytes FAILS', seamVerdict('bgm_loop.webm', { deltaDb: 18.67, sha256: other }), (v) => !v.pass],
+    ['a decode error FAILS even on exempt bytes', seamVerdict('bgm_loop.webm', { error: 'decode failed', sha256: ok }), (v) => !v.pass],
+    ['within the limit passes without an exemption', seamVerdict('bgm_tension.webm', { deltaDb: 1.3, sha256: 'x' }), (v) => v.pass && !v.exempt],
+    ['the limit itself is still 2.0 dB', { pass: SEAM_RMS_TOLERANCE_DB === 2.0 }, (v) => v.pass],
+  ]
+  let failed = 0
+  for (const [name, v, expect] of cases) {
+    const good = expect(v)
+    if (!good) failed++
+    console.log(`${good ? 'ok  ' : 'FAIL'} ${name}`)
+  }
+  console.log(failed ? `AUDIO VERIFY SEAM SELF-TEST: FAIL (${failed})` : 'AUDIO VERIFY SEAM SELF-TEST: PASS')
+  return failed === 0
+}
+
 // Loop-conditioning seam gate (2026-07-14 seam fix): decodes the actual shipped
 // audio (both formats) in-browser via the Web Audio API and measures the RMS
 // delta between the first and last SEAM_RMS_WINDOW_MS - the same metric
@@ -79,6 +131,10 @@ async function measureSeamRmsDeltaDb(page, url) {
     const res = await fetch(url)
     if (!res.ok) return { error: `fetch ${res.status}` }
     const buf = await res.arrayBuffer()
+    // The exact bytes' hash, taken before decodeAudioData detaches the buffer, so an
+    // owner-accepted exemption (SEAM_EXEMPTIONS) can match these bytes and nothing else.
+    const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', buf.slice(0))))
+      .map((b) => b.toString(16).padStart(2, '0')).join('')
     const ctx = new (window.AudioContext || window.webkitAudioContext)()
     let audioBuffer
     try {
@@ -104,7 +160,7 @@ async function measureSeamRmsDeltaDb(page, url) {
     const toDb = (r) => (r > 0 ? 20 * Math.log10(r) : -999)
     const startDb = toDb(rmsAllChannels(0, n))
     const endDb = toDb(rmsAllChannels(total - n, n))
-    return { startDb, endDb, deltaDb: Math.abs(startDb - endDb) }
+    return { startDb, endDb, deltaDb: Math.abs(startDb - endDb), sha256 }
   }, { url, windowMs: SEAM_RMS_WINDOW_MS })
 }
 
@@ -265,13 +321,12 @@ async function run() {
 
     const seamResults = await runSeamChecks(page, origin)
     const seamFailures = []
+    const seamExemptions = []
     for (const [name, byExt] of Object.entries(seamResults)) {
       for (const [ext, r] of Object.entries(byExt)) {
-        if (r.error) {
-          seamFailures.push(`${name}.${ext}: ${r.error}`)
-        } else if (r.deltaDb > SEAM_RMS_TOLERANCE_DB) {
-          seamFailures.push(`${name}.${ext}: seam delta ${r.deltaDb.toFixed(2)}dB exceeds ${SEAM_RMS_TOLERANCE_DB}dB tolerance`)
-        }
+        const v = seamVerdict(`${name}.${ext}`, r)
+        if (!v.pass) seamFailures.push(v.reason)
+        else if (v.exempt) seamExemptions.push(v.exempt)
       }
     }
 
@@ -300,11 +355,13 @@ async function run() {
       checks,
       seamResults,
       seamFailures,
+      seamExemptions,
       playedSoundsLog: { afterSpin: playedAfterSpin, afterBuy: playedAfterBuy, afterFeature: playedAfterFeature },
     }
     writeFileSync(OUT_PATH, JSON.stringify(result, null, 2))
 
     console.log(JSON.stringify(checks, null, 2))
+    for (const e of seamExemptions) console.log('SEAM EXEMPT:', e)
     const allPass = Object.values(checks).every(Boolean)
     if (!allPass) {
       console.error('AUDIO VERIFY: FAIL - see', OUT_PATH)
@@ -317,7 +374,11 @@ async function run() {
   }
 }
 
-run().catch((err) => {
-  console.error(err)
-  process.exitCode = 1
-})
+if (process.argv.includes('--self-test')) {
+  process.exitCode = seamSelfTest() ? 0 : 1
+} else {
+  run().catch((err) => {
+    console.error(err)
+    process.exitCode = 1
+  })
+}

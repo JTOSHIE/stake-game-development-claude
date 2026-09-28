@@ -152,7 +152,9 @@ function referencedAnimations(R, selPattern) {
   return names
 }
 
-const AT_REST = /\.hero-(body|idle|cross)\b/
+// R151: `warm` added. The warm layers (.hero-warm and .hero-warm-sheet, the \b matches both) are
+// mounted at rest and must never animate or transform; before this, a seeded animation on them passed.
+const AT_REST = /\.hero-(body|idle|cross|warm)\b/
 const NON_IDLE_STATE = /\[data-motion\s*=\s*['"]?(?!idle)[a-z]+['"]?\]/
 
 function decls(body) {
@@ -252,6 +254,16 @@ function judge(src, sceneSrc) {
     // idle cannot dissolve even if every CSS argument is lost to a future tie.
     if (!/\{#if motion !== 'idle'\}[\s\S]*?class\s*=\s*["'][^"']*hero-cross/.test(S.markupCode))
       findings.push(".hero-cross is no longer mounted inside {#if motion !== 'idle'}: the idle can reach the dissolve")
+  }
+
+  // (h) R151: the warm layers keep the three sheets painted and must stay invisible: at most 1%
+  // opacity, stated on the .hero-warm-sheet rule itself. At 1 they would paint a second, visible
+  // hero at rest, and the at-rest check above does not look at opacity.
+  if (/\bclass\s*=\s*["'][^"']*hero-warm-sheet/.test(S.markupCode)) {
+    const warm = R.find(r => r.sel.split(',').map(x => x.trim()).includes('.hero-warm-sheet'))
+    const op = warm ? decls(warm.body).find(d => d.k === 'opacity') : null
+    const v = op ? parseFloat(op.v) : NaN
+    if (!(v >= 0 && v <= 0.01)) findings.push(`.hero-warm-sheet opacity must be stated and at most 0.01, found ${op ? op.v : 'none'}`)
   }
 
   // (g) the float fence, judged on SceneGroup.svelte. R138 restored the wrapper
@@ -358,6 +370,14 @@ if (process.argv.includes('--self-test')) {
   // SEED 14: the float deleted outright - R138 regressed back to R130's still
   check('seeded: the float deleted from .char-layer (back to too dead)', id, true, sc => sc
     .replace('animation: char-idle 5s ease-in-out infinite;', ''), )
+
+  // SEED 15 (R151): a flipbook smuggled onto the warm layers, which are mounted at rest
+  check('seeded: an animation on .hero-warm-sheet (the warm layers animating at rest)', s => s
+    .replace('    background-position: 0 0;\n    opacity: 0.01;', '    background-position: 0 0;\n    opacity: 0.01;\n    animation: hero-cross-top-win 1s steps(6) infinite;'), true)
+
+  // SEED 16 (R151): the warm layers made visible, a second hero painted at rest
+  check('seeded: .hero-warm-sheet at opacity 1 (a second visible hero)', s => s
+    .replace('    background-position: 0 0;\n    opacity: 0.01;', '    background-position: 0 0;\n    opacity: 1;'), true)
 
   // NEGATIVE CONTROL A: the real files, which NAME the retired keyframes and
   // the retired rotate values in prose, must pass

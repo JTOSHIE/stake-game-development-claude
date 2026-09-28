@@ -144,6 +144,12 @@ and the measurement confirms take A. The circular one-bar bed of R149 is retired
   gitignored art-review folder chatgpt-bgm-loop-circular. The R149 section's restore line no
   longer applies as written: the original drop's two encodes now come back with `git restore
   --source=4b11d40d^` on both files, plus its master (77556d1d...).
+- **R151 (2026-09-28): OWNER ACCEPTED AT HASH.** The owner accepted the seam exemption at this
+  master's hash (sha256 99643c41ae7cfd1e4e11ea8cc114d4fa234606525ade4c739b51766f4ae16d19) and ruled
+  that the 2.0 dB limit must not loosen. `frontend/scripts/audio_verify.mjs` now exempts exactly
+  the committed encodes of that master (webm sha256 b999dd17da826886..., mp3 sha256
+  ca1b051ee1cf94b6...), still measures and reports their delta, and fails any other bytes against
+  2.0 dB; its `--self-test` plants the ways the exemption could leak and must go red on each.
 
 ## R149 (2026-09-27): the idle bed is a ChatGPT circular rebuild
 
@@ -229,6 +235,8 @@ covered by open question 1 above. From R149 to R150 `bgm_loop.{webm,mp3}` was ne
 ChatGPT circular rebuild the owner supplied (the R149 section above). Since R150
 it is the owner's take A with a 140 ms ChatGPT edit; the stems' question covers the stem, and the
 edit's licence is open (the R150 section above).
+**R151 (2026-09-28), the owner's licence line for that 140 ms edit:** an owner-commissioned
+development-stage cue, pending written audio terms; Ticket 456254 remains images-only.
 
 ## Legacy files
 

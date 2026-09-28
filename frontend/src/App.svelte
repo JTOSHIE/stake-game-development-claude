@@ -2140,13 +2140,18 @@
       {#if portraitLogoFailed}
         <span class="portrait-wordmark-text">{$activeTheme.name}</span>
       {:else}
-        <img
-          class="portrait-wordmark-img"
-          src="{$themeAssets.logo}"
-          alt="{$activeTheme.name}"
-          draggable="false"
-          on:error={() => { portraitLogoFailed = true }}
-        />
+        <span class="logo-wrap">
+          <img
+            class="portrait-wordmark-img"
+            src="{$themeAssets.logo}"
+            alt="{$activeTheme.name}"
+            draggable="false"
+            on:error={() => { portraitLogoFailed = true }}
+          />
+          <span class="logo-halo logo-halo--portrait" aria-hidden="true"
+            style="-webkit-mask-image: url('{$themeAssets.logo}'), linear-gradient(#000, #000); mask-image: url('{$themeAssets.logo}'), linear-gradient(#000, #000);"><span class="logo-halo-blur"><span class="logo-halo-shape"
+            style="-webkit-mask-image: url('{$themeAssets.logo}'); mask-image: url('{$themeAssets.logo}');"></span></span></span>
+        </span>
       {/if}
     </div>
   {/if}
@@ -2186,6 +2191,7 @@
              lockup" image, using .portrait-wordmark above instead
              (2026-07-14c). -->
         <div class="logo-box">
+          <span class="logo-wrap">
           <img
             class="game-logo-img"
             src="{$themeAssets.logo}"
@@ -2199,6 +2205,10 @@
               if (txt) (txt as HTMLElement).style.display = 'block'
             }}
           />
+          <span class="logo-halo" aria-hidden="true"
+            style="-webkit-mask-image: url('{$themeAssets.logo}'), linear-gradient(#000, #000); mask-image: url('{$themeAssets.logo}'), linear-gradient(#000, #000);"><span class="logo-halo-blur"><span class="logo-halo-shape"
+            style="-webkit-mask-image: url('{$themeAssets.logo}'); mask-image: url('{$themeAssets.logo}');"></span></span></span>
+          </span>
           <div
             class="logo-text"
             id="theme-logo-txt"
@@ -3075,6 +3085,51 @@
     display: block;
     filter: drop-shadow(0 2px 12px rgba(0,0,0,0.9));
   }
+  /* R151, BRIEF WORKSTREAM 2 D: ONE RESTRAINED EMISSIVE PULSE ON THE LOCKUP. It was fully static (0
+     animations on the image and its six ancestors, measured). The lettering is baked into logo.png
+     and the pulse must never touch it, so THE IMAGE ITSELF STAYS STATIC and paints exactly as before.
+     HOW, AND WHY THIS SHAPE (two versions failed the letter-pixel test on the production build):
+     animating a drop-shadow on the image re-rasterised the letters at five sizes; a halo layer
+     BEHIND the image did too at some scales, because its opacity animation composites it, and an
+     image painted above a composited layer is given a layer of its own ("overlap") and rasterised
+     differently. So the halo sits ABOVE the image, where nothing is painted after it, and the
+     letters are cut out of it: its mask is the full box minus logo.png's alpha (mask-composite
+     exclude). Measured at twelve size and DPR settings: the letters' raster is identical to before,
+     interior letter pixels are never touched, and near the pulse's peak the glow reaches only the
+     letters' anti-aliased rim (at most 78 rim pixels at one setting, up to 21 of 255 levels, and at
+     two settings one or two rim pixels the image draws opaque, because the mask rasterises logo.png
+     a hair differently from the image). That rim is what any glow does at an anti-aliased edge.
+     Inside it, a theme-cyan shape
+     masked by the same logo.png is blurred into the glow. Its opacity alone animates, 4.6 s, off
+     beat with the reel frame's 3 s glow six pixels below. Mask URLs are inline so they resolve
+     against the document. .logo-wrap is an inline box the size of the image. No halo under reduced
+     motion. */
+  .logo-wrap { position: relative; display: inline-block; line-height: 0; }
+  .logo-halo {
+    position: absolute; inset: -12px; pointer-events: none;
+    opacity: 0;
+    animation: logo-halo-pulse 4.6s ease-in-out infinite;
+    -webkit-mask-size: calc(100% - 24px) calc(100% - 24px), 100% 100%; mask-size: calc(100% - 24px) calc(100% - 24px), 100% 100%;
+    -webkit-mask-position: center, 0 0; mask-position: center, 0 0;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .logo-halo-blur { position: absolute; inset: 12px; filter: blur(6px); }
+  .logo-halo--portrait .logo-halo-blur { filter: blur(4px); }
+  .logo-halo-shape {
+    position: absolute; inset: 0; display: block;
+    background: var(--theme-primary, #00ffff);
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-position: center; mask-position: center;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  }
+  @keyframes logo-halo-pulse {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 0.35; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-halo { animation: none; display: none; }
+  }
 
   /* Between the grid (bottom 492.5) and the HUD panel (top 560) */
   .error-banner {
@@ -3364,6 +3419,14 @@
     .game-frame.overdrive-active.nitro-active { animation: none; }
     .bg-still.overdrive.active.nitro-active { filter: saturate(1.2) brightness(1.05); }
     .bg-still.overdrive.active.route-natural { filter: saturate(1.1) hue-rotate(-95deg); }
+    /* R151: the same picture minus the movement. The route recolour of the frame lived only inside
+       the frame-pulse keyframes, so cancelling them here left the frame cyan through the whole
+       feature (measured: 180 degrees on 16,009 of 16,009 px), and a reduced-motion player lost the
+       frame change the R131 note calls the most obvious feature signal while keeping the backdrop
+       change above. Each route now holds its keyframe's 0% filter, still. */
+    .game-frame.overdrive-active { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
+    .game-frame.overdrive-active.route-natural { filter: hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 10px color-mix(in srgb, #5dff3c 60%, transparent)); }
+    .game-frame.overdrive-active.nitro-active { filter: hue-rotate(305deg) saturate(1.7) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-secondary, #ff00ff) 75%, transparent)); }
   }
 
   /* ── Grid, 522x349, centred inside the frame, z20 ──────────────────────── */

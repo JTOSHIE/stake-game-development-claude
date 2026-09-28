@@ -43,6 +43,7 @@
   } from '../stores/scatterEscalation'
   import { activeTheme, themeAssets } from '../stores/themeStore'
   import { replayParams } from '../stores/replayStore'
+  import { overdriveVisual } from '../stores/overdriveVisual'
 
   // Idle attract mode (ANIMATION UPLIFT PASS 2026-07-16, item 5): App.svelte
   // owns the 20s timer; this is just a boolean prop, so `class:` in the
@@ -98,6 +99,15 @@
     } catch {
       plateColours = {}
     }
+    // R151: plates.json arrives after onMount, so a board painted before it (the pre-spin display
+    // board, measured with the fallback cyan on 17 of 20 cells) kept the fallback until the first
+    // spin repainted. Re-tint every painted slot from its symbol the moment the colours arrive.
+    for (let col = 0; col < REELS; col++) {
+      for (let i = 0; i < STRIP; i++) {
+        const sym = slotSym[col]?.[i]
+        if (sym) slotCell[col]?.[i]?.style.setProperty('--plate-tint', plateTint(sym))
+      }
+    }
   }
 
   function plateTint(symbol: string): string {
@@ -130,19 +140,32 @@
     return layered ? `${SYMBOL_BASE}/${layered.overlay}.png` : null
   }
 
+  // R151: the board shown before the first round (see onMount). Every symbol appears once or more
+  // so every idle is on screen; reels 1 and 2 share no symbol and carry no wild, so no way can
+  // form, and there are two scatters, never three. Columns top to bottom.
+  const PLACEHOLDER_BOARD: string[][] = Array.from({ length: 5 }, () => ['L3', 'L3', 'L3', 'L3'])
+  let displayBoardUp = false
+  const DISPLAY_BOARD: string[][] = [
+    ['H1', 'M2', 'L1', 'S'],
+    ['H2', 'L3', 'M3', 'L2'],
+    ['M1', 'S', 'L1', 'H2'],
+    ['W', 'M1', 'L3', 'H1'],
+    ['M3', 'L2', 'H1', 'M2'],
+  ]
+
   // ── Symbol Life v2 idle classes (Set A) ──────────────────────────────────
   // Each settled symbol carries a tuned idle; travelling tiles pause idles via
   // the .spinning class on the column (CSS gates the animation off).
   const IDLE_CLASS: Record<string, string> = {
     H1: 'idle-breathe',   // rotation is on the H1 spoke overlay
     H2: 'idle-charge',    // crimson charge halo + valve hiss flicker
-    M1: 'idle-rev',       // rim dash stream + rev LED chase
-    M2: 'idle-coil',      // coil highlight chase + body bob
+    M1: 'idle-rev',       // rev pulse: brightness and a 3% scale swell (R151; no fx layer)
+    M2: 'idle-coil',      // coil bob of 3.5% with a brightness and violet glow pulse
     M3: 'idle-flame',     // booster flame flipbook (fx layer)
-    L1: 'idle-glint',     // facet glint sweep + bore ring pulse
+    L1: 'idle-glint',     // one gold glint flash every 3s (a filter pulse, not a sweep)
     L2: 'idle-arc',       // fuse arc flicker (fx layer)
     L3: 'idle-pump',      // crown pump
-    W:  'idle-rings',     // dual rings opposite phase
+    W:  'idle-rings',     // magenta glow and 3% scale pulse (one pulse, not two rings)
     S:  'idle-rays',      // rays rotation + core pulse
   }
   function idleClass(symbol: string | undefined): string {
@@ -531,6 +554,9 @@
 
   function _squash(col: number): Promise<void> {
     return new Promise((resolve) => {
+      // R151: the landing squash is decoration, not the outcome reveal, so reduced motion skips
+      // it (it ran 0.857 to 1.069 over 117 ms for every reel with the setting on).
+      if (_reduceMotion) { resolve(); return }
       const start = performance.now()
       const D = 135
       const step = () => {
@@ -639,8 +665,31 @@
     assetLoadProgress.set(100)
     _prewarmArt()
 
+    // R151: A DISPLAY BOARD UNTIL THE FIRST ROUND. The store's board starts empty and a fresh
+    // session's authenticate returns no round, so every cell kept its markup default (L3, the
+    // same idle, one phase): the first thing a player saw was twenty identical pistons pumping in
+    // lockstep, with nine of the ten symbol idles never shown before a spin. This paints a fixed,
+    // non-winning board through the same _updateSymbols a real result uses. Display only: no store
+    // write, activeWins untouched, and the first real board replaces it exactly as before.
+    // Not in Bet Replay: its ready card sits over the grid under the "replay of a previously
+    // completed bet" notice, and a dealt-looking board there could be read as the round being
+    // verified (R151 self-audit). Replay keeps the neutral markup default until its round paints.
+    if (assetsReady && get(replayParams) === null && !(get(boardSymbols)?.length === REELS)) {
+      _updateSymbols(DISPLAY_BOARD)
+      displayBoardUp = true
+    }
     const unsubBoard = boardSymbols.subscribe(board => {
-      if (assetsReady && board && board.length === REELS) _updateSymbols(board)
+      if (assetsReady && board && board.length === REELS) { _updateSymbols(board); displayBoardUp = false }
+    })
+    // A bought feature as the session's first round never writes a base board, so the display
+    // board used to stay on the base grid beside that round's win, where it read as the board that
+    // paid it (R151 self-audit). When a feature starts while it is still up, the grid returns to
+    // the neutral placeholder that stood there before R151 (every cell L3), under the overlay.
+    const unsubFeature = overdriveVisual.subscribe(on => {
+      if (on && displayBoardUp && !(get(boardSymbols)?.length === REELS)) {
+        _updateSymbols(PLACEHOLDER_BOARD)
+        displayBoardUp = false
+      }
     })
     const unsubWins = activeWins.subscribe(() => {
       if (assetsReady) _applyWinHighlights()
@@ -671,7 +720,7 @@
       }
     }
 
-    return () => { unsubBoard(); unsubWins() }
+    return () => { unsubBoard(); unsubWins(); unsubFeature() }
   })
 
   onDestroy(() => {
@@ -720,6 +769,12 @@
   ): void {
     if (winBurstTimer) clearTimeout(winBurstTimer)
     const winningCells = _winningCells(wins, board)
+    // R151: SHARE THE POOL ACROSS EVERY WINNING CELL. 28 particles a cell against a pool of 140,
+    // and bursts that fire left to right, meant a board with more than five winners gave the
+    // first reels everything and the rightmost winners nothing (bigWin: 3,1,3,2,1 winners a reel,
+    // so 5 of 10 cells got no burst, since the first particle frees at 750 ms). Same pool, same
+    // look for five or fewer winners.
+    const burstCount = Math.max(6, Math.min(28, Math.floor(PARTICLE_POOL_SIZE / Math.max(1, winningCells.size))))
     const STRIP_W = CELL_W + GAP
     const STRIP_H = CELL_H + GAP
 
@@ -742,7 +797,7 @@
             img.classList.add('win-flash')
             cell?.classList.add('plate-bloom')
             if (symbol.toUpperCase() === 'H1') overlay?.classList.add('win-spin-fast')
-            spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol))
+            spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol), burstCount)
           }, 250 + col * 70)
         } else {
           // Dim losers harder (and desaturate) so winners clearly spotlight.
@@ -1380,12 +1435,14 @@
   .symbol-fx:global(.fx-flame) {
     background-size: 492px 82px;
     animation: fx-flame-cycle 0.66s steps(6) infinite;
+    animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s));
   }
   @keyframes fx-flame-cycle { from { background-position-x: 0; } to { background-position-x: -492px; } }
   /* L2 fuse arc, 4-frame flicker at an irregular cadence */
   .symbol-fx:global(.fx-arc) {
     background-size: 328px 82px;
     animation: fx-arc-cycle 0.34s steps(4) infinite;
+    animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s));
   }
   @keyframes fx-arc-cycle { from { background-position-x: 0; } to { background-position-x: -328px; } }
 
@@ -1491,9 +1548,42 @@
     100% { opacity: 0; transform: translateY(-380px) scale(1.1); }
   }
 
+  /* ── R151: IDLE PHASE OFFSETS ─────────────────────────────────────────────
+     Every idle started on the same frame (at load, and again after each win's teardown
+     re-adds the classes), so same-class symbols moved in exact lockstep across the board:
+     six boosters pulsing as one reads mechanical. Each column and each strip slot now carries
+     a negative delay that is added to every idle, flipbook and spoke spin below, so each cell
+     starts part way through its cycle. Negative, so nothing waits; win-flash and the other
+     one-shots keep their own timing.
+     THE VALUES ARE SEARCHED, NOT PICKED, AGAINST HOW THE REELS REALLY LAND. Cells start together at
+     load and after a win's teardown, but in play each reel's idles start at its own landing: 95 ms
+     after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse.
+     Three earlier sets each failed one regime (one locked every stacked row 2 and 3 flame; one
+     locked reels 4 and 5 at the landing stagger; one locked neighbours across Turbo holds on about
+     1.8% of spins). No set can clear every hold: the column offsets below were chosen reel boundary
+     by reel boundary against every landing gap the drop and escalation code can produce (every
+     scatter pattern, all three speeds, whole frames at 60 and 120 Hz), keeping cells that start
+     together at least 90 ms apart and every plain landing stagger at least 131 ms apart on all
+     twelve idle and flipbook periods (0.34 to 3.4 s), and minimising the hold cases under 50 ms.
+     Weighted by the real base, Cruise and OVERBOOST books, a side-by-side same-class pair falls
+     under 50 ms on at most 0.03% of spins at any speed (before R151: about 1% at Normal and Super,
+     and every cell in exact lockstep at load and after every win). Stacked pairs stay at least 93
+     ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
+     off-screen buffers. */
+  .symbol-col:nth-child(2) { --col-phase: -0.93s; }
+  .symbol-col:nth-child(3) { --col-phase: -1.858s; }
+  .symbol-col:nth-child(4) { --col-phase: -2.786s; }
+  .symbol-col:nth-child(5) { --col-phase: -3.714s; }
+  .symbol-cell:nth-child(2) { --slot-phase: -1.143s; }
+  .symbol-cell:nth-child(3) { --slot-phase: -0.650s; }
+  .symbol-cell:nth-child(4) { --slot-phase: -0.548s; }
+  .symbol-cell:nth-child(5) { --slot-phase: -0.455s; }
+  .symbol-cell:nth-child(6) { --slot-phase: -0.89s; }
+  .symbol-cell:nth-child(7) { --slot-phase: -1.31s; }
+
   /* ── Symbol Life v2 idles (Set A), tuned to read at 120px ─────────────── */
   @keyframes idle-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-  .symbol-img:global(.idle-breathe) { animation: idle-breathe 3.4s ease-in-out infinite; }
+  .symbol-img:global(.idle-breathe) { animation: idle-breathe 3.4s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* H2 nitro crimson charge halo (2.4s) + valve-hiss opacity flicker */
   @keyframes idle-charge {
@@ -1501,38 +1591,42 @@
     50%      { filter: brightness(1.14) drop-shadow(0 0 10px rgba(255, 45, 61, 0.9)); }
   }
   @keyframes valve-hiss { 0%,90%,100% { opacity: 1; } 93% { opacity: 0.82; } 96% { opacity: 1; } }
-  .symbol-img:global(.idle-charge) { animation: idle-charge 2.4s ease-in-out infinite, valve-hiss 1.7s steps(1) infinite; }
+  .symbol-img:global(.idle-charge) { animation: idle-charge 2.4s ease-in-out infinite, valve-hiss 1.7s steps(1) infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
-  /* M1 rev, rim dash stream + rev LED chase (the LED strip is the fx layer) */
+  /* M1 rev: a brightness and saturation pulse with a 3% swell. R151: the comment used to promise a
+     rim dash stream and an LED chase on an fx layer; M1 has no fx layer, and the swell was 1.2%,
+     under a screen pixel at 1280. 3% is about 2px there. */
   @keyframes idle-rev {
     0%, 100% { filter: brightness(1); transform: scale(1); }
-    50%      { filter: brightness(1.12) saturate(1.15); transform: scale(1.012); }
+    50%      { filter: brightness(1.12) saturate(1.15); transform: scale(1.03); }
   }
-  .symbol-img:global(.idle-rev) { animation: idle-rev 1.8s ease-in-out infinite; }
+  .symbol-img:global(.idle-rev) { animation: idle-rev 1.8s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
-  /* M2 coilover, coil highlight chase (1.4s) + body bob of 1.25%, which is
-     3px of the 240 art contract at every rendered size. */
+  /* M2 coilover: a body bob with a brightness and violet glow pulse every 1.4s. R151: the bob was
+     1.25%, 0.87 screen px at 1280 and 0.62 at 390, too small to read; 3.5% is about 2.4px at
+     1280. (There is no separate coil highlight chase; the glow is the whole highlight.) */
   @keyframes idle-coil {
     0%, 100% { transform: translateY(0); filter: brightness(1); }
-    50%      { transform: translateY(-1.25%); filter: brightness(1.12) drop-shadow(0 0 6px rgba(138, 92, 255, 0.6)); }
+    50%      { transform: translateY(-3.5%); filter: brightness(1.12) drop-shadow(0 0 6px rgba(138, 92, 255, 0.6)); }
   }
-  .symbol-img:global(.idle-coil) { animation: idle-coil 1.4s ease-in-out infinite; }
+  .symbol-img:global(.idle-coil) { animation: idle-coil 1.4s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* M3 booster, the flame flipbook lives on the fx layer; base gently breathes */
   @keyframes idle-flame { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.08); } }
-  .symbol-img:global(.idle-flame) { animation: idle-flame 1.2s ease-in-out infinite; }
+  .symbol-img:global(.idle-flame) { animation: idle-flame 1.2s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
-  /* L1 chrome lug, facet glint sweep every 3s + bore ring pulse */
+  /* L1 chrome lug: one gold glint flash every 3s (a brightness and glow pulse; there is no sweep
+     or separate bore ring). */
   @keyframes idle-glint {
     0%, 82%, 100% { filter: brightness(1); }
     88%           { filter: brightness(1.55) drop-shadow(0 0 7px rgba(255, 215, 0, 0.85)); }
     94%           { filter: brightness(1); }
   }
-  .symbol-img:global(.idle-glint) { animation: idle-glint 3s ease-in-out infinite; }
+  .symbol-img:global(.idle-glint) { animation: idle-glint 3s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* L2 fuse, arc flicker lives on the fx layer; base steady */
   @keyframes idle-arc { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.06); } }
-  .symbol-img:global(.idle-arc) { animation: idle-arc 2s ease-in-out infinite; }
+  .symbol-img:global(.idle-arc) { animation: idle-arc 2s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* L3 piston, crown pump of 2.9167% over 2.2s, which is 7px of the 240 art
      contract at every rendered size. */
@@ -1540,14 +1634,14 @@
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-2.9167%); }
   }
-  .symbol-img:global(.idle-pump) { animation: idle-pump 2.2s ease-in-out infinite; }
+  .symbol-img:global(.idle-pump) { animation: idle-pump 2.2s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
-  /* W wild, dual rings pulsing in opposite phase (approximated on the base) */
+  /* W wild: one magenta glow and 3% scale pulse on the base (there are no separate rings). */
   @keyframes idle-rings {
     0%, 100% { filter: brightness(1) drop-shadow(0 0 3px rgba(255, 0, 255, 0.4)); transform: scale(1); }
     50%      { filter: brightness(1.2) drop-shadow(0 0 11px rgba(255, 0, 255, 0.85)); transform: scale(1.03); }
   }
-  .symbol-img:global(.idle-rings) { animation: idle-rings 1.9s ease-in-out infinite; }
+  .symbol-img:global(.idle-rings) { animation: idle-rings 1.9s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* S scatter, rays rotating (1 rev / 12s) + core pulse */
   @keyframes idle-rays { to { transform: rotate(360deg); } }
@@ -1555,12 +1649,15 @@
     0%, 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(255, 215, 0, 0.5)); }
     50%      { filter: brightness(1.25) drop-shadow(0 0 12px rgba(255, 215, 0, 0.95)); }
   }
-  .symbol-img:global(.idle-rays) { animation: idle-rays 12s linear infinite, scatter-core 2s ease-in-out infinite; }
+  .symbol-img:global(.idle-rays) { animation: idle-rays 12s linear infinite, scatter-core 2s ease-in-out infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
 
   /* H1, continuous idle rotation on the spoke overlay, fast on wins. */
-  @keyframes h1-idle-spin { to { transform: rotate(72deg); } }
+  /* R151: a full turn over 40s, the same 9 degrees a second. The 72 degree loop over 8s was not a
+     symmetry of the spoke sprite, so it visibly snapped back at every wrap (33x a normal frame's
+     change). A full turn has no seam. */
+  @keyframes h1-idle-spin { to { transform: rotate(360deg); } }
   @keyframes h1-win-spin  { from { transform: rotate(0deg); } to { transform: rotate(720deg); } }
-  .symbol-overlay { animation: h1-idle-spin 8s linear infinite; }
+  .symbol-overlay { animation: h1-idle-spin 40s linear infinite; animation-delay: calc(var(--col-phase, 0s) + var(--slot-phase, 0s)); }
   .symbol-overlay:global(.win-spin-fast) { animation: h1-win-spin 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) 1; }
 
   /* ── Win state, brighten, plate bloom, punch scale ──────────────────────── */
@@ -1641,10 +1738,14 @@
     18%  { filter: brightness(var(--flash-peak, 1.6)); }
     100% { filter: brightness(1); }
   }
+  /* R151: the ring grows to the frame edge as it fades. It used to start at 124% of the grid
+     (inset -12%) and grow to 1.35x inside an overflow-hidden container, so at its 0.85 opacity
+     peak only four corner slivers showed. Now it sits at inset 2% and scales 0.55 to 1.0: whole
+     at its peak, reaching the edge as it goes. */
   @keyframes escalate-shock {
-    0%   { opacity: 0; transform: scale(0.72); }
+    0%   { opacity: 0; transform: scale(0.55); }
     35%  { opacity: 0.85; }
-    100% { opacity: 0; transform: scale(1.35); }
+    100% { opacity: 0; transform: scale(1.0); }
   }
   .symbol-grid:global(.escalate-pulse-2),
   .symbol-grid:global(.escalate-pulse-4),
@@ -1658,7 +1759,7 @@
   /* The eruption alone earns a ring. Cheapest possible: one pseudo-element,
      no extra DOM, and it is the first thing the reduced-motion block removes. */
   .symbol-grid:global(.escalate-pulse-6)::after {
-    content: ''; position: absolute; inset: -12%;
+    content: ''; position: absolute; inset: 2%;
     border: 3px solid rgba(0, 255, 255, 0.9); border-radius: 50%;
     pointer-events: none; z-index: 8;
     animation: escalate-shock 0.7s ease-out 1;
@@ -1669,13 +1770,18 @@
     50%      { box-shadow: inset 0 0 26px 6px rgba(255, 215, 0, 0.95), 0 0 22px 6px rgba(255, 215, 0, 0.8); }
   }
   .symbol-cell:global(.scatter-charge) { animation: scatter-charge-bloom 0.5s ease-in-out infinite; z-index: 6; }
-  /* scanline sweep */
+  /* scanline sweep. R151: it never moved. With background-size auto the gradient was exactly
+     the box, so the percentage positions below computed to zero travel and the scatter wore a
+     static cream band. The gradient is now three boxes tall, with its band in the middle third
+     (the stops are a third as far apart, so the band is as thick as before), and it sweeps top to
+     bottom, crossing the cell in the middle half of each 0.7s pass. */
   .symbol-cell:global(.scatter-charge)::before {
     content: ''; position: absolute; inset: 0; border-radius: 8px; pointer-events: none;
-    background: linear-gradient(to bottom, transparent 42%, rgba(255, 240, 170, 0.55) 50%, transparent 58%);
+    background: linear-gradient(to bottom, transparent 47.3%, rgba(255, 240, 170, 0.55) 50%, transparent 52.7%);
+    background-size: 100% 300%; background-repeat: no-repeat;
     animation: scatter-scanline 0.7s linear infinite; z-index: 7;
   }
-  @keyframes scatter-scanline { 0% { background-position: 0 -100%; } 100% { background-position: 0 100%; } }
+  @keyframes scatter-scanline { 0% { background-position: 0 100%; } 100% { background-position: 0 0%; } }
   /* orbiting spark */
   .symbol-cell:global(.scatter-charge)::after {
     content: ''; position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px;

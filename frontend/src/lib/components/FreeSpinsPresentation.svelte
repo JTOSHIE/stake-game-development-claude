@@ -140,6 +140,14 @@
   function dur(ms: number): number {
     return $isTurbo ? Math.max(120, Math.round(ms * 0.4)) : ms
   }
+  // R151: the entry's settle and ring lengths as CSS custom properties, derived with the same rule
+  // as dur() but written out here so the markup re-renders when Turbo changes (a template call to
+  // dur() would not). The settle stage lasts dur(300); its transitions run 50ms shorter than it,
+  // because the removal timer starts in the click handler while a transition's clock starts two or
+  // three frames later: a fade sized exactly to the stage was still 6 to 15% visible at removal at
+  // Turbo and Super (R151 self-audit). 50ms leaves it under 0.3% by the same model.
+  $: settleMs = $isTurbo ? Math.max(120, Math.round(300 * 0.4)) : 300
+  $: ringMs = $isTurbo ? Math.max(120, Math.round(500 * 0.4)) : 500
 
   function centibetsToMicros(cb: number): number {
     // cb = bet-multiple x 100; dollar win = (cb/100) * bet; micros = *SCALE
@@ -511,7 +519,8 @@
 {#if active && script}
   <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label={t(lang, 'overdriveFreeSpins', mode)}>
     {#if phase === 'entry'}
-      <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry">
+      <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry"
+           style="--settle-fade: {settleMs - 50}ms; --ring-ms: {ringMs}ms;">
         <div class="entry-scatter-flare" aria-hidden="true"></div>
         <img class="entry-smoke-wisp entry-smoke-a" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
         <img class="entry-smoke-wisp entry-smoke-b" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
@@ -637,7 +646,13 @@
      viewport.
      NOT FIXED BY RE-OPAQUING `.fs-face`: that would revert R133's measured headline result and
      put the tier art back behind the band. */
-  .fs-end { display: flex; flex-direction: column; gap: 10px; transform: translateY(84px); }
+  /* R151 CORRECTION: the 84px above was never 84 stage pixels. This element sits inside
+     .grid-scale, which is scale(0.8474), so it moved the title 71.2 stage px, and the FEATURE
+     COMPLETE title was still sliced by the band's bottom neon rule: 23.6% of its ink inside the
+     MEGA band at 1280, 70.7% inside EPIC, 62.6% inside MEGA at 390. 130px here is about 110 stage
+     px, which clears the tallest band (EPIC at 1280, bottom 436 px) and the portrait MEGA band with
+     margin, and keeps the title inside the reel window. Re-measured in the R151 report. */
+  .fs-end { display: flex; flex-direction: column; gap: 10px; transform: translateY(130px); }
 
   /* TR-036 option (b): a reel that has not landed yet during the retrigger
      ladder. Dimmed and blurred rather than removed, so the grid keeps its
@@ -675,7 +690,13 @@
     transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .stage-gauge .entry-gauge-wrap, .stage-burst .entry-gauge-wrap { opacity: 1; transform: scale(1); }
-  .stage-settle .entry-gauge-wrap { opacity: 0; transform: scale(1.18); transition: opacity 0.5s ease, transform 0.5s ease; }
+  /* R151: the settle fade ran 0.5s inside a settle stage of dur(300), 300ms at Normal and 120ms at
+     Turbo and Super, so the stage was removed with the gauge still at 0.17 to 0.85 opacity: a
+     one-frame cut, worst at Turbo. The settle transitions now take the stage's length less 50ms
+     (--settle-fade, set in the markup), so they finish before the stage is removed. */
+  .stage-settle .entry-gauge-wrap { opacity: 0; transform: scale(1.18); transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
+  /* R151: settle had no needle rule, so the needle swung back from 0 to -75 degrees as it faded. */
+  .stage-settle .entry-gauge-needle { transform: rotate(0deg); }
 
   .entry-gauge-face, .entry-gauge-needle {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
@@ -695,7 +716,12 @@
   }
   .entry-smoke-a { left: 30%; bottom: 38%; }
   .entry-smoke-b { left: 62%; bottom: 42%; animation-delay: 0.1s; }
-  .stage-flare .entry-smoke-wisp, .stage-dip .entry-smoke-wisp { animation: smoke-rise 0.9s ease-out both; }
+  /* R151: the wisps rise for 0.9s but the rule matched only the flare and dip stages, so at the
+     dip-to-gauge swap they dropped from 0.5 to 0 opacity in one frame, a third of the way up. The
+     rule now holds through gauge and burst; the animation name never changes between those
+     stages, so the rise is not restarted, it is allowed to finish. */
+  .stage-flare .entry-smoke-wisp, .stage-dip .entry-smoke-wisp,
+  .stage-gauge .entry-smoke-wisp, .stage-burst .entry-smoke-wisp { animation: smoke-rise 0.9s ease-out both; }
 
   @keyframes smoke-rise {
     0%   { opacity: 0; transform: translateY(10px) scale(0.7); }
@@ -714,7 +740,7 @@
     transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .stage-gauge .entry-title, .stage-burst .entry-title { opacity: 1; transform: scale(1); }
-  .stage-settle .entry-title { opacity: 0; transform: scale(1.08); }
+  .stage-settle .entry-title { opacity: 0; transform: scale(1.08); transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
 
   /* Shockwave ring (ANIMATION UPLIFT PASS 2026-07-16, item 2): the shared
      shock_ring particle, centred on the whole stage (same centre as the
@@ -724,7 +750,10 @@
     position: absolute; top: 50%; left: 50%; width: 260px; height: 260px;
     transform: translate(-50%, -50%) scale(0.2); opacity: 0; pointer-events: none;
   }
-  .stage-gauge .entry-shockwave { animation: shockwave-burst 0.5s ease-out both; }
+  /* R151: the ring matched only the gauge stage and was not Turbo-scaled, so at Turbo it vanished
+     mid-expansion (scale 0.82, opacity 0.81). It now holds through burst and takes its length from
+     --ring-ms (500ms, or 200ms at Turbo and Super, the same rule as dur()). */
+  .stage-gauge .entry-shockwave, .stage-burst .entry-shockwave { animation: shockwave-burst var(--ring-ms, 500ms) ease-out both; }
 
   @keyframes shockwave-burst {
     0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
@@ -750,7 +779,10 @@
     transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .stage-burst .entry-burst-text { opacity: 1; transform: scale(1); }
-  .stage-settle .entry-burst-text { opacity: 0; }
+  /* R151: transform is in this list as well as opacity. With opacity alone the burst text lost its
+     base transition's transform and snapped from scale 1 to its base 0.5 in one frame at the start
+     of settle (R151 self-audit); now it shrinks as it fades, as the gauge and title do. */
+  .stage-settle .entry-burst-text { opacity: 0; transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
 
   /* CLICK TO CONTINUE gate (OWNER AUDIT ROUND 2, item 1) - sits below the
      burst text, appears the instant the gate opens (no entrance delay of
@@ -838,6 +870,10 @@
     .entry-scatter-flare, .entry-dip, .entry-gauge-wrap, .entry-gauge-needle, .entry-title, .entry-burst-text {
       transition: none;
     }
+    /* R151: the settle rules above are (0,2,0) and declare their own transitions, so they outranked
+       this (0,1,0) reset and the gauge still zoomed to 1.15 at settle under reduced motion. The same
+       class of defect R135 fixed below, fixed the same way. */
+    .stage-settle .entry-gauge-wrap, .stage-settle .entry-title, .stage-settle .entry-burst-text { transition: none !important; }
     .entry-smoke-wisp, .entry-shockwave { display: none; }
     .entry-continue { animation: none; }
     /* R135: these two were INERT. Both are (0,2,0) and both lose to a later, more specific rule

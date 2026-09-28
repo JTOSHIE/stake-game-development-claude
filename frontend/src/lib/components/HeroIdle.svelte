@@ -154,6 +154,8 @@
 
   const BOX_W = 206
   const BOX_H = 407
+  // R151: every sheet the figure can paint, kept painted by the warm layers in the markup.
+  const WARM_SHEETS: HeroMotion[] = ['idle', 'win', 'energy']
 
   // THE SPAN IS A ONE-SHOT SPAN, AND THE TWO FORMULAS MUST NOT BE UNIFIED.
   // (No quoted word in this paragraph, deliberately: BOX_W and BOX_H are rendered
@@ -310,6 +312,23 @@
      them, and a custom property only inherits DOWNWARD - set on one sibling it
      would compute to its fallback on the other, with nothing thrown (the exact
      R133 defect class). -->
+<!-- R151: THE WARM LAYERS, AND WHY THE HERO NO LONGER BLINKS. Each reaction swaps .hero-idle's
+     background-image (idle to win or brace, and back), and in Chromium the figure vanished from
+     the presented frames for 1 to 4 frames at the start and 1 at the end of EVERY reaction: 15 of
+     15 measured, a body-less helmet or the car with no robot at all. Warming the sheets with
+     new Image() and even img.decode() did not stop it; keeping all three sheets IN USE on a
+     static layer did, 0 of 11 and 0 of 4 in two independent runs. So each sheet is painted here
+     at its rest frame (frame 01 of every strip is the rest pose), unanimated, at 1% opacity,
+     BEHIND .hero-body and outside it, so the body's drop-shadow never sees them. No new frames:
+     these are the three shipped sheets. Not named hero-cross or hero-layer-*, and never
+     animated, so hero_idle_planted_gate's rest-state checks still hold. -->
+<div class="hero-warm" aria-hidden="true">
+  {#each WARM_SHEETS as key (key)}
+    <div class="hero-warm-sheet"
+         style="background-image: url('{assetBase}/ui/hero/{SHEET[key]}');
+                background-size: {BOX_W * FRAMES[key]}px {BOX_H}px;"></div>
+  {/each}
+</div>
 <div class="hero-body" data-motion={motion} data-tier={motion === 'win' ? winTier : null} aria-hidden="true"
      style="--hero-span: {motion === 'idle' ? 0 : SPAN_PX[motion]}px; --hero-step: {BOX_W}px;">
   <div
@@ -453,6 +472,26 @@
   }
   .hero-body[data-motion='energy'] { animation: hero-brace-energy 1.3s cubic-bezier(.3,.9,.3,1) 1 both; }
 
+  /* ===== R151: THE WARM LAYERS ===============================================
+     Static, unanimated, 1% opacity, behind and outside .hero-body (see the markup note). Frame
+     01 of all three sheets is the rest pose, so at rest they sit under the idle frame they
+     match (measured at most 2 of 255 levels). During a reaction the moving body passes over the
+     three stacked 1% copies of the rest pose, about 3% together: measured at most 7 levels at the
+     win punch's peak and the brace's, with no pixel over 8. They never move, so reduced motion
+     needs no rule for them. */
+  .hero-warm {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hero-warm-sheet {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    opacity: 0.01;
+  }
+
   /* ===== THE SHEET LAYER =====================================================
      AT REST THIS RULE IS THE WHOLE IDLE: position 0 of the six-frame strip, which
      is the shipped rest pose, and no animation to move it off. */
@@ -577,13 +616,36 @@
     from { background-position-x: calc(-1 * var(--hero-step)); }
     to   { background-position-x: var(--hero-span); }
   }
+  /* R151: THE DISSOLVE RETUNE (brief R151 workstream 2 C, the dual buffer only, no new frames).
+     Until R151 the top buffer rose 0 to 1 across the whole step while the bottom held opacity 1,
+     so the departing frame's trailing edge stayed at full strength for the entire step and cut
+     out at the boundary: measured on the shipped sheets, the composite changed 5.8x more at each
+     boundary than mid-step on the brace (11.5 Hz) and 3.3x on the win (20.7 Hz), a visible tick.
+     Now the top buffer reaches 1 at mid-step and the bottom buffer fades 1 to 0 over the second
+     half (hero-cross-hold-out-*, same duration and iteration count as the fade, so both change on
+     the same boundaries). Every interior pixel is always under an opaque buffer, so the body
+     cannot ghost, and at each boundary the composite is exactly one frame: the bottom arrives at
+     1 on frame k+1 as the top leaves at 0 on frame k+2. Modelled on the shipped sheets at the
+     measured clock: brace boundary change 1.70% against 1.83% mid-step (was 5.56% against
+     0.95%), win 2.37% against 2.75% (was 4.84% against 1.47%). */
   @keyframes hero-cross-fade-win {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    0%        { opacity: 0; }
+    50%, 100% { opacity: 1; }
   }
   @keyframes hero-cross-fade-energy {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    0%        { opacity: 0; }
+    50%, 100% { opacity: 1; }
+  }
+  /* Two names for one curve, per state, like the other bottom-buffer keyframes: the bottom buffer
+     persists across states, and a shared name would carry its elapsed time into a state change
+     that skipped idle while the position animation restarted (R151 self-audit). */
+  @keyframes hero-cross-hold-out-win {
+    0%, 50% { opacity: 1; }
+    100%    { opacity: 0; }
+  }
+  @keyframes hero-cross-hold-out-energy {
+    0%, 50% { opacity: 1; }
+    100%    { opacity: 0; }
   }
 
   /* `forwards` holds the final frame until Svelte swaps the sheet back, so there
@@ -598,7 +660,8 @@
      and every literal 31 or 15 in this block, together - R140 moved all six of
      them at once (two step counts, two fade iteration counts, two fade
      durations) plus the epic fade override below. */
-  .hero-idle[data-motion='win']    { animation: hero-cross-bottom-win 1.5s steps(31, jump-none) 1 forwards; }
+  .hero-idle[data-motion='win']    { animation: hero-cross-bottom-win 1.5s steps(31, jump-none) 1 forwards,
+                                                hero-cross-hold-out-win 48.387ms linear 31 forwards; }
   /* R129: THE EPIC WIN'S FLIPBOOK DIED 400ms BEFORE ITS BODY DID.
      holdFor() returns 1900ms for an epic win and .hero-body runs hero-punch-epic for
      1.9s, but this rule pinned the SHEET to 1.5s and nothing could override it,
@@ -614,8 +677,10 @@
      R138's 15 at 126.7ms), and the sheet still ends exactly when the body does.
      (0,3,0) beats the (0,2,0) rule above outright rather than relying on source
      order. The epic hold stays 1.9s, per the R138 brief's own condition. */
-  .hero-idle[data-motion='win'][data-tier='epic'] { animation-duration: 1.9s; }
-  .hero-idle[data-motion='energy'] { animation: hero-cross-bottom-energy 1.3s steps(15, jump-none) 1 forwards; }
+  /* R151: both clocks stretch, exactly as the top buffer's do below (1.9s / 31 = 61.29ms). */
+  .hero-idle[data-motion='win'][data-tier='epic'] { animation-duration: 1.9s, 61.29ms; }
+  .hero-idle[data-motion='energy'] { animation: hero-cross-bottom-energy 1.3s steps(15, jump-none) 1 forwards,
+                                                hero-cross-hold-out-energy 86.667ms linear 15 forwards; }
 
   /* THE TOP BUFFER PAINTS ONLY THROUGH ITS ANIMATIONS. Base opacity is 0, so a
      buffer that loses its animations for any reason - a future rule tie, a

@@ -188,6 +188,13 @@ take is an owner ruling. The file is again the owner's own stem, now with a 140 
 whose licence is open (the recorded OpenAI clearance covers image generation for artwork, not
 audio).
 
+**R151 (2026-09-28), ON THE R150 PARAGRAPH ABOVE; that paragraph is kept as written.** The owner
+ruled: **OWNER ACCEPTED AT HASH** (master sha256 99643c41ae7cfd1e4e11ea8cc114d4fa234606525ade4c739b51766f4ae16d19).
+The 2.0 dB gate is not loosened: `frontend/scripts/audio_verify.mjs` exempts exactly bgm_loop's
+committed encodes of that master, still reports their seam delta, and fails any other bytes. The
+licence line for the 140 ms ChatGPT idle edit, in the owner's words: an owner-commissioned
+development-stage cue, pending written audio terms; Ticket 456254 remains images-only.
+
 > **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
 > 5b below is the upload steps and 5d is the one-time versus per-update checklist;
 > `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each

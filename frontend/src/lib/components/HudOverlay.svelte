@@ -2678,4 +2678,20 @@
   .c-spin.spinning .glyph.play { display: none; }
   .c-spin.spinning .glyph.arrows { display: block; }
   .c-spin:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* R151: PHONE SPIN FEEDBACK, THE DESKTOP'S OWN. The desktop SPIN (.fs-spin) presses to 0.96 and
+     turns its arrows every 700ms while spinning; the portrait (.p-spin), compact-landscape (.c-spin)
+     and mini-player (.m-spin) SPIN buttons read scale 1.000 at rest, on hover and when pressed, and
+     showed a static glyph while spinning (measured at 390x844, 844x390 and 400x225). Same press,
+     same rotation keyframes (fs-spin-rot, above). A transform does not reflow, so no HUD geometry
+     changes. The mini player's spinning glyph is a stop square, which is not meant to turn, so it
+     takes the press only. The border-colour fade the global button rule gave these (only .m-spin
+     has a border) is kept in the list. Under reduced motion they match the desktop exactly: the 4%
+     press stays (no travel), the arrow rotation stops. */
+  .p-spin, .c-spin, .m-spin { transition: transform .12s ease, border-color .25s; }
+  .p-spin:active:not(:disabled), .c-spin:active:not(:disabled), .m-spin:active:not(:disabled) { transform: scale(.96); }
+  .p-spin.spinning .glyph.arrows, .c-spin.spinning .glyph.arrows { animation: fs-spin-rot .7s linear infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .p-spin.spinning .glyph.arrows, .c-spin.spinning .glyph.arrows { animation: none; }
+  }
 </style>
