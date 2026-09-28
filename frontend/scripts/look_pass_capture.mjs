@@ -2,18 +2,22 @@
 //
 // look_pass_capture.mjs: the R151 look-pass harness (brief workstream 4).
 //
-// WHAT IT CAPTURES. The PRODUCTION build (dist/, or DIST=<dir>) at 1280x800 and 390x844, three
-// states each: idle (3 s after the splash and rules card are dismissed), a real 16.2x win at the
+// WHAT IT CAPTURES. The PRODUCTION build (dist/, or DIST=<dir>) at 1280x800, 390x844 and the
+// compact landscape layout at 844x390 (R152, brief Phase 4 item 2), three states each: idle (3 s after the splash and rules card are dismissed), a real 16.2x win at the
 // banner's peak (base/bigWin, a win of 10x or more), and the feature entry gate (base/feature, a
 // natural trigger). Rounds are REAL committed book rounds from
 // src/lib/services/__fixtures__/replay_rounds.json, served at the wallet boundary exactly as
 // polish_review_capture.mjs does; no DEV hook exists in this build and none is used.
 //
 // NO PLACEHOLDER ART. A shot is refused, and the run fails red, if at the moment of capture any
-// visible <img> has not decoded (complete and naturalWidth > 0), any request has returned 404, or
-// the lockup has fallen back to its text. The version string the build prints is recorded: the
+// visible <img> has not decoded (complete and naturalWidth > 0), any asset request came back missing,
+// or the lockup has fallen back to its text. R152: 'missing' includes an asset URL answered with
+// HTML. previewServer answers an unknown path with index.html at status 200 (a single-page app's
+// fallback), so a 404 test alone could never fire for a missing CSS-background raster (R152 dead
+// raster lens DR-7). The version string the build prints is recorded: the
 // game shows it only as its console boot line ("Future Spinner <version> build <sha>"), nothing on
-// screen renders it.
+// screen renders it. R152: the run also fails red if that line carries the build's dirty mark
+// ('(uncommitted changes)'), since committed screens must name a commit that exists.
 //
 // WHERE IT WRITES. Scratch by default (convention (h.1)); pass --out <dir> to write a committed
 // evidence directory, which only a job regenerating evidence should do. It also writes
@@ -46,9 +50,12 @@ setTimeout(() => { console.error('LOOK PASS: HARD TIMEOUT, failing red'); proces
 const VIEWPORTS = [
   { slug: 'desktop-1280', width: 1280, height: 800 },
   { slug: 'phone-390', width: 390, height: 844 },
+  { slug: 'compact-844', width: 844, height: 390 },
 ]
 const RGS_HOST = 'rgs.look-pass.invalid'
 const START_MICROS = 50_000_000_000
+// An asset request answered with HTML is a missing asset behind the SPA fallback (see the header).
+const ASSET_EXT = /\.(png|jpe?g|webp|gif|avif|svg|mp3|webm|ogg|wav|woff2?|ttf|json|css|js)$/i
 const FIXTURES = JSON.parse(readFileSync(join(ROOT, 'src/lib/services/__fixtures__/replay_rounds.json'), 'utf-8'))
 const MODE_COST = { base: 1, cruise: 1, antelite: 1.25, bonus: 100, super: 400 }
 
@@ -124,7 +131,7 @@ async function placeholderCheck(page, notFound) {
   const reasons = []
   if (imgs.bad.length) reasons.push(`undecoded images: ${imgs.bad.join(', ')}`)
   if (imgs.logoFallback || imgs.portraitFallback) reasons.push('lockup fell back to text')
-  if (notFound.length) reasons.push(`404s: ${notFound.join(', ')}`)
+  if (notFound.length) reasons.push(`missing assets (404, or HTML for an asset URL): ${notFound.join(', ')}`)
   return reasons
 }
 
@@ -147,7 +154,11 @@ async function captureViewport(browser, base, vp) {
   const page = await ctx.newPage()
   const notFound = []
   const pageErrors = []
-  page.on('response', (r) => { if (r.status() === 404) notFound.push(r.url().replace(base, '')) })
+  page.on('response', (r) => {
+    const path = r.url().replace(base, '')
+    const html = /text\/html/i.test(r.headers()['content-type'] || '')
+    if (r.status() === 404 || (html && ASSET_EXT.test(path.split('?')[0]))) notFound.push(path)
+  })
   page.on('pageerror', (e) => pageErrors.push(e.message))
   page.on('console', (m) => { const t = m.text(); if (t.startsWith('Future Spinner ')) version = t })
   const state = { next: 'loss', bets: 0 }
@@ -189,8 +200,9 @@ try {
 }
 writeFileSync(join(OUT, 'captures.json'), JSON.stringify({ dist: DIST, version, shots, failures }, null, 2))
 console.log(`\nversion line: ${version}`)
-if (failures.length || !version) {
-  console.error(`LOOK PASS: FAIL (${failures.length} refusal(s)${version ? '' : ', no version line'})`)
+const dirty = !!version && /uncommitted|dirty/i.test(version)
+if (failures.length || !version || dirty) {
+  console.error(`LOOK PASS: FAIL (${failures.length} refusal(s)${version ? '' : ', no version line'}${dirty ? ', the build is DIRTY' : ''})`)
   process.exitCode = 1
 } else {
   console.log(`LOOK PASS: ${shots.length} shots, no placeholder art, written to ${OUT}`)
