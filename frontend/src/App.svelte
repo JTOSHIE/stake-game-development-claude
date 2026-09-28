@@ -676,9 +676,14 @@
     shakeActive = true
     setTimeout(() => { shakeActive = false }, durationMs)
   }
-  $: if ($winAmount > 0 && $winAmount !== lastShakeWin && $winMultiplier >= 10) {
+  // R152: decided once per settled win, and re-armed when the win clears. The multiple test sat in
+  // the condition, so lowering the bet after a small win re-derived winMultiplier past 10 and shook
+  // the screen with no new round; and the latch was never cleared, so a second identical win
+  // amount (two 16.2x rounds at the same bet) got no shake at all.
+  $: if ($winAmount === 0) lastShakeWin = 0
+  $: if ($winAmount > 0 && $winAmount !== lastShakeWin) {
     lastShakeWin = $winAmount
-    triggerShake()
+    if ($winMultiplier >= 10) triggerShake()
   }
 
   function onFeatureComplete(): void {

@@ -134,9 +134,15 @@
   // Reactive (base-game) path - unchanged behaviour, now also gated on
   // `suppressed` and skipped entirely once a caller has taken over via the
   // explicit-trigger props (amount !== null).
-  $: if (amount === null && $winAmount > 0 && !$isSpinning && !suppressed && $winMultiplier >= BIG_WIN_THRESHOLD) {
-    if ($winAmount !== lastShownWin) {
-      lastShownWin = $winAmount
+  // R152: DECIDED ONCE PER SETTLED WIN. The tier test used to sit in the outer condition, so a win
+  // under 10x left lastShownWin unset and the banner kept asking; lowering the bet afterwards
+  // re-derived winMultiplier (winAmount / betAmount) and raised a MEGA banner for a round settled
+  // minutes earlier, with no new round (measured: a 3.9x win at 1.00, bet lowered to 0.10, MEGA
+  // banner at $3.90). The settled amount is now marked as seen whatever its tier, so only a new
+  // settle can raise the banner.
+  $: if (amount === null && $winAmount > 0 && !$isSpinning && !suppressed && $winAmount !== lastShownWin) {
+    lastShownWin = $winAmount
+    if ($winMultiplier >= BIG_WIN_THRESHOLD) {
       const t: Tier = $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic'
         : $winMultiplier >= MEGA_WIN_THRESHOLD ? 'mega' : 'big'
       showBanner($winAmount, t, $winMultiplier)
