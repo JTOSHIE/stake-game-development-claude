@@ -354,6 +354,11 @@ live is exactly 5,000.00x on the wincap round itself.
   report every check passing at R150:** `loopSeamsWithinTolerance` fails on `bgm_loop` (4.11 /
   4.16 dB, webm / mp3, against 2.0 dB) because the take starts on its downbeat; the file's own bar
   lines read 6.8 to 8.5 dB on the same metric and the join is sample-continuous. An owner ruling.
+  **R151 (2026-09-28): OWNER ACCEPTED AT HASH** (master sha256 99643c41..., the R150 take). The
+  2.0 dB limit is unchanged; `audio_verify.mjs` exempts exactly bgm_loop's committed encodes of that
+  master and fails any other bytes. Licence of the 140 ms ChatGPT edit, in the owner's words: an
+  owner-commissioned development-stage cue, pending written audio terms; Ticket 456254 remains
+  images-only.
 
 ## 5. Compliance summary
 
