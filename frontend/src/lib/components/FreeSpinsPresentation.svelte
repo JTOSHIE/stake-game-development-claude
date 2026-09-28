@@ -589,7 +589,7 @@
                  with kerning off, reaches this readout too. It was the only money
                  value in the tree carrying neither marker. -->
             <div class="fs-spin-win" data-money="cur">
-                {fmt(currentSpin.spinWinCentibets)}{#if currentSpin.meterBefore > 1}<span class="fs-spin-mult"> ×{currentSpin.meterBefore}</span>{/if}
+                {fmt(currentSpin.spinWinCentibets)}{#if currentSpin.meterBefore > 1}{' '}<span class="fs-spin-mult">×{currentSpin.meterBefore}</span>{/if}
               </div>
             {/key}
           {/if}

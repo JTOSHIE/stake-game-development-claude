@@ -1,7 +1,7 @@
 <script lang="ts">
   import { winAmount, winMultiplier, betAmount, isWincap, scatterCount, currencyCode, locale } from '../stores/gameStore'
   import {
-    BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD,
+    BIG_WIN_THRESHOLD, MEGA_WIN_THRESHOLD, EPIC_WIN_THRESHOLD,
     // R134: the progress rule, the easing and the money floor, all from the one module,
     // so this component and the HUD pod and the win banner cannot diverge again.
     countUpProgress, easeOutCubic, nonNegativeMoney,
@@ -36,7 +36,16 @@
   // count-up grows toward the settled string, which is therefore the widest
   // frame, and re-fitting per frame would make the row breathe. R058 TASK 1.
   $: amtRowText = formatWin(Math.round(targetValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)
-    + ($winMultiplier > 0 ? ` ${$winMultiplier.toFixed(1)}×` : '')
+    + ($winMultiplier > 0 ? ` ${multText($winMultiplier)}×` : '')
+
+  // R152: the booked multiplier at its own precision. toFixed(1) rounded every round with a
+  // hundredths digit (84% of winning base weight): a 0.25x round read '0.3×' beside '$0.25', and a
+  // 4,999.99x round read '5000.0×', the cap it did not reach. Books pay in centibets, so two
+  // decimals is exact; one trailing zero is dropped so '16.2×', '79.5×' and '1.0×' read as before.
+  function multText(m: number): string {
+    const s = (Math.round(m * 100) / 100).toFixed(2)
+    return s.endsWith('0') ? s.slice(0, -1) : s
+  }
 
   // Derive tier from targetValue (not the derived $winMultiplier store) so
   // colour/label stays correct for the full duration of the count-up animation,
@@ -51,6 +60,8 @@
   // The 'gold' and 'green' bands below are NOT celebration tiers and are left
   // exactly as they were: they are this readout's own colour treatment for
   // ordinary wins, and no other surface contradicts them.
+  // R152: epic is a label only; the panel keeps the mega treatment (see the label markup).
+  $: isEpic = ($betAmount > 0 ? targetValue / $betAmount : 0) >= EPIC_WIN_THRESHOLD
   $: winTier = (() => {
     const mult = $betAmount > 0 ? targetValue / $betAmount : 0
     if (mult >= MEGA_WIN_THRESHOLD) return 'mega'
@@ -111,10 +122,16 @@
   <div class="win-panel win-{winTier}" class:wincap-active={$isWincap}>
 
     <!-- Win category label (BIG WIN / MEGA WIN / scatter / wincap / idle) -->
-    {#if winTier === 'mega'}
-      <div class="win-label mega">{$tr('megaWin')}</div>
+    <!-- R152: the celebration tiers read the SAME words as the banner (tierEpicWin, tierMegaWin,
+         tierBigWin, which WinBanner reads through the same locale and social mode). A 171.1x replay
+         showed 'EPIC WIN' on its banner and then 'MEGA WIN!!!' here: this panel had no epic tier and
+         its own punctuated words. Epic keeps the mega panel's colours. -->
+    {#if winTier === 'mega' && isEpic}
+      <div class="win-label mega">{$tr('tierEpicWin')}</div>
+    {:else if winTier === 'mega'}
+      <div class="win-label mega">{$tr('tierMegaWin')}</div>
     {:else if winTier === 'big'}
-      <div class="win-label big">{$tr('bigWin')}</div>
+      <div class="win-label big">{$tr('tierBigWin')}</div>
     {:else if $isWincap}
       <div class="win-label wincap">{$tr('wincap')}</div>
     {:else if scatterKey}
@@ -137,7 +154,7 @@
         {formatWin(Math.round(displayValue * CURRENCY_SCALE), $currencyCode, $locale, null, winDigits)}
       </span>
       {#if $winMultiplier > 0}
-        <span class="win-mult" data-money="num">{$winMultiplier.toFixed(1)}×</span>
+        <span class="win-mult" data-money="num">{multText($winMultiplier)}×</span>
       {/if}
     </div>
 

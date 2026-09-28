@@ -763,12 +763,20 @@ async function main() {
     // self-equality. The envelope multiplier is the round's centibets / 100,
     // the platform semantic the capture pins (0.41 beside 41-centibet events).
     const FEATURE_ROUND = FIX.bonus.feature
+    // R152: the expected multiplier text is built from the round's INTEGER centibets, never from a
+    // float and never from the product's formatter: 'whole.hundredths', one trailing zero dropped
+    // ('79.5×', '4999.99×'). It used toFixed(1) on the float, the same rounding as the product, so a
+    // 4,999.99x round was expected to read '5000.0×', the cap it did not reach, and the gate passed it.
+    const exactMult = (cb) => {
+      const s = `${Math.floor(cb / 100)}.${String(cb % 100).padStart(2, '0')}`
+      return (s.endsWith('0') ? s.slice(0, -1) : s) + '×'
+    }
     const featureExpect = () => {
       const mult = FEATURE_ROUND.payoutMultiplier / 100
       const amount = mult * (Number(P.amountMicros) / 1_000_000)
       return {
         mult,
-        multText: `${mult.toFixed(1)}×`,
+        multText: exactMult(FEATURE_ROUND.payoutMultiplier),
         amountText: '$' + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       }
     }
@@ -1158,7 +1166,8 @@ async function main() {
       // R058 TASK 1, the worst case: a 4999.99x round (one centibet below the
       // cap, so the max-win hold does not gate the read) at the maximum bet in
       // the CA$ format, the widest leading form the ladder allows:
-      // CA$4,999,990.00 with 5000.0x beside it. The round's EVENTS are the
+      // CA$4,999,990.00 with 4999.99x beside it (R152: it read 5000.0x, the cap, until the replay
+      // multiplier was shown at its booked precision). The round's EVENTS are the
       // base win fixture's; only the envelope payout is raised, which is
       // honest here because the assertion under test is the banner's FIT and
       // the banner reads the envelope, not the events.
@@ -1170,7 +1179,7 @@ async function main() {
       })
       const worstExpect = {
         amountText: 'CA$4,999,990.00',
-        multText: `${(WORST.payoutMultiplier / 100).toFixed(1)}×`,
+        multText: exactMult(WORST.payoutMultiplier),
       }
       assertEndBannerValues(worst, '[worst-case] ', worstExpect)
       assertBannerFits(worst, '[worst-case] ')
@@ -1188,7 +1197,7 @@ async function main() {
       })
       assertEndBannerValues(worstSocial, '[worst-social] ', {
         amountText: '4,999,990.00 GC',
-        multText: `${(WORST.payoutMultiplier / 100).toFixed(1)}×`,
+        multText: exactMult(WORST.payoutMultiplier),
       })
       assertBannerFits(worstSocial, '[worst-social] ')
       assertNoPod(worstSocial, '[worst-social] ')
