@@ -95,6 +95,12 @@
   let particles: Particle[] = []
   let coins: Coin[] = []
   let dismissTimer: ReturnType<typeof setTimeout> | null = null
+  // R151: the exit beat. The band used to vanish in one frame at full opacity and scale; it now
+  // leaves over EXIT_MS, starting that long before the unchanged dismiss timer, so the banner's
+  // total life and the 'dismissed' moment are exactly as before.
+  const EXIT_MS = 280
+  let leaving = false
+  let leaveTimer: ReturnType<typeof setTimeout> | null = null
   let lastShownWin = 0
 
   // MID-01. The reactive (base-game) path READS the shared count-up, which the
@@ -107,6 +113,8 @@
   const ownCountUp = createWinCountUp()
   $: displayAmount = amount === null ? $sharedWinCountUp : $ownCountUp
   let lastTrigger = 0
+  // R151: the tier's text-free art, named once.
+  $: tierArt = tier === 'big' ? 'burst_big' : tier === 'mega' ? 'bloom_mega' : 'burst_epic'
   // Shown multiplier for the "Nx BET" line - the explicit-trigger path
   // passes its own bet-multiple in (independent of $winMultiplier, which the
   // deferred settlement means is not yet valid during a feature).
@@ -137,6 +145,7 @@
 
   $: if (amount === null && $isSpinning) {
     visible = false
+    leaving = false
     lastShownWin = 0
     particles = []
     coins = []
@@ -171,6 +180,8 @@
 
   function showBanner(winDollars: number, t: Tier, mult: number): void {
     if (dismissTimer) clearTimeout(dismissTimer)
+    if (leaveTimer) clearTimeout(leaveTimer)
+    leaving = false
 
     tier = t
     shownMultiplier = mult
@@ -198,8 +209,10 @@
       ownCountUp.to(winDollars, mult, TIER_COUNT_UP_MS[t])
     }
 
+    leaveTimer = setTimeout(() => { leaving = true }, TIER_COUNT_UP_MS[t] + 2200 - EXIT_MS)
     dismissTimer = setTimeout(() => {
       visible = false
+      leaving = false
       particles = []
       coins = []
       // Zero this instance's OWN figure only. The shared value belongs to the
@@ -212,6 +225,7 @@
 
   onDestroy(() => {
     if (dismissTimer) clearTimeout(dismissTimer)
+    if (leaveTimer) clearTimeout(leaveTimer)
     ownCountUp.cancel()
   })
 
@@ -292,6 +306,7 @@
     class="c1-win big-win-banner tier-{tier}"
     class:c1-win--overdrive={$overdriveVisual}
     class:active={visible}
+    class:leaving
     data-testid="win-banner"
   >
     {#if tier === 'epic' && !reduced}
@@ -305,7 +320,7 @@
            tier identity rather than calm it. -->
       <img
         class="c1-tier-burst"
-        src="{$themeAssets.assetBase}/ui/win/{tier === 'big' ? 'burst_big' : tier === 'mega' ? 'bloom_mega' : 'burst_epic'}.png"
+        src="{$themeAssets.assetBase}/ui/win/{tierArt}.png"
         alt=""
         aria-hidden="true"
         data-testid="win-tier-burst"
@@ -484,10 +499,20 @@
     width: 100%; box-sizing: border-box;
     /* R133 colour-mix fallback, plain declaration first: an engine without color-mix keeps a real
        scrim instead of losing the band entirely. */
-    background: linear-gradient(180deg, rgba(17,26,43,.80), rgba(7,11,22,.90));
+    /* R151: THE SCRIM IS LIGHTER, .66 / .82 FROM .80 / .90, so the tier art R115 placed reads THROUGH
+       the band instead of stopping at its edges (brief R151 workstream 2 B: the band still read as a
+       flat slab). Measured on the production build against the R151 baseline, 1280 and 390, BIG /
+       MEGA / EPIC: band texture (luma SD) 12.4 to 20.5 became 18.1 to 25.1, and the tier raster's
+       share inside the band rose from 11 to 20% to 20 to 34%. Contrast against the band MEAN stays
+       well clear of 4.5:1 at every tier and width: amount at least 12.6:1, tier label at least 5.56:1
+       (the MEGA label at 390, the binding text, was 6.02), multiplier at least 9.4:1. A first attempt
+       drew a second copy of the raster inside the band; it never painted (a relative URL inside a
+       custom property resolves against the stylesheet) and, fixed, it doubled the image during the
+       entry and took the MEGA label under 4.5:1, so it was removed. */
+    background: linear-gradient(180deg, rgba(17,26,43,.66), rgba(7,11,22,.82));
     background:
       linear-gradient(160deg, color-mix(in srgb, var(--sig) var(--tint, 18%), transparent), transparent 44%),
-      linear-gradient(180deg, rgba(17,26,43,.80), rgba(7,11,22,.90));
+      linear-gradient(180deg, rgba(17,26,43,.66), rgba(7,11,22,.82));
     /* R133: a real bevel, on the element that can actually be seen. The top hairline was .07 and
        there was no bottom edge at all, which is why the band had no thickness. */
     box-shadow: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.9), inset 0 -8px 18px rgba(0,0,0,.55);
@@ -747,6 +772,21 @@
          the art growing into the HUD. */
   .fs-plate { animation: c1-pulse 2.4s ease-in-out .6s infinite; }
   @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+  /* R151: the exit beat (see EXIT_MS). The banner used to be removed in one frame at full opacity
+     and scale, the one beat of the celebration that read unfinished. Now the root fades and the
+     plate eases down a touch. THE TWO ARE SPLIT ON PURPOSE: the root (.c1-win is also
+     .big-win-banner) is centred by transform: translateY(-50%), and an exit keyframe that animated
+     transform there replaced the centring and dropped the whole band by half its height on its
+     first frame (measured 55 to 70px, R151 self-audit). So the root animates opacity only, and the
+     scale rides .c1-plate-wrap, whose own transform ends c1-enter at scale(1). The reduced-motion
+     block below neutralises both with every other animation here. The animations run 200 ms inside
+     the 280 ms window, because an animation's clock starts a few frames after the class lands: at
+     280 ms the band was still at 0.17 to 0.26 opacity when the timer removed it, and 230 ms left
+     under one frame of margin. */
+  .c1-win.leaving { animation: c1-exit-fade 200ms ease-in forwards; pointer-events: none; }
+  .c1-win.leaving .c1-plate-wrap { animation: c1-exit-scale 200ms ease-in forwards; }
+  @keyframes c1-exit-fade { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes c1-exit-scale { from { transform: scale(1); } to { transform: scale(0.96); } }
   @keyframes c1-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(var(--pulse, 1.012)); } }
 
   /* ── Expanding shock ring (ANIMATION UPLIFT PASS 2026-07-16, item 3): the
@@ -914,6 +954,17 @@
       font-size: calc(clamp(26px, 9vw, 46px) * var(--autofit-scale, 1)) !important;
     }
     .c1-mult { font-size: 13px !important; }
+    /* R151: THE TIER LADDER ON A PHONE. One clamp for every tier meant BIG, MEGA and EPIC bands were
+       the same size at 390 (amount 35px, label 20px, multiplier 13px at every tier), so only colour
+       and art told them apart. Each tier now steps up, modestly, because a taller band has to stay
+       clear of the FEATURE COMPLETE title below it; autofitText still shrinks any amount that would
+       overflow. BIG keeps the old values. */
+    .tier-mega .c1-amount { font-size: calc(clamp(28px, 10vw, 50px) * var(--autofit-scale, 1)) !important; }
+    .tier-epic .c1-amount { font-size: calc(clamp(30px, 11vw, 54px) * var(--autofit-scale, 1)) !important; }
+    .tier-mega .c1-tier-label { font-size: 22px !important; }
+    .tier-epic .c1-tier-label { font-size: 24px !important; }
+    .tier-mega .c1-mult { font-size: 14px !important; }
+    .tier-epic .c1-mult { font-size: 15px !important; }
     .tier-big  .fs-face, .tier-mega .fs-face, .tier-epic .fs-face { min-height: 0; }
   }
 
