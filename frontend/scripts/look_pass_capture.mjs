@@ -174,7 +174,14 @@ async function captureViewport(browser, base, vp) {
   const banner = page.locator('[data-testid="win-banner"]')
   await banner.first().waitFor({ state: 'visible', timeout: 15000 }).catch(() => failures.push({ viewport: vp.slug, state: 'win', reasons: ['banner never showed'] }))
   await page.waitForTimeout(1300)
-  await shoot(page, vp, 'win_16x', 'base/bigWin, 16.2x', notFound, 'Win banner (BIG tier) at its peak')
+  // R152: the shot is the banner's, so the banner must be ON SCREEN when it is taken (a run on a
+  // loaded machine photographed the compact layout after its banner had gone, and the shot passed).
+  const bannerUp = await page.evaluate(() => {
+    const b = document.querySelector('[data-testid="win-banner"]')
+    return !!b && Number(getComputedStyle(b).opacity) >= 0.9 && b.getBoundingClientRect().height > 0
+  })
+  if (!bannerUp) failures.push({ viewport: vp.slug, state: 'win_16x', reasons: ['the win banner was not on screen at capture'] })
+  else await shoot(page, vp, 'win_16x', 'base/bigWin, 16.2x', notFound, 'Win banner (BIG tier) at its peak')
   await banner.first().waitFor({ state: 'detached', timeout: 12000 }).catch(() => {})
   await waitSpinDone(page).catch(() => {})
   await page.waitForTimeout(800)
