@@ -115,8 +115,16 @@
   // FS VISUAL FIXPACK JOB 2: `file` became `files`, a list, because the speed
   // control now needs three. Every other row carries a one-item list rather
   // than a second optional shape, so the markup has one branch and not two.
+  // R152 (brief Phase 4 item 1, no baked English in rasters): SPIN, FEATURES and MAX were captures
+  // of the live controls with their English word baked into the pixels ('SPIN', 'FEATURES', 'MAX'),
+  // so a Japanese, Chinese or Arabic player read English in the guide beside the translated live
+  // control, and a social player read 'SPIN' where the live button says 'PLAY'. Those three rows are
+  // now `kind: 'live'`: a non-interactive replica drawn in markup from the same tokens as the live
+  // control, carrying the SAME translated word ($tr) the control does. SPIN shows its glyph alone:
+  // at guide size its word is about 4 px, which the capture could not make legible either. No new
+  // raster is made (R152 fence); the three captures stay on disk.
   const INTERFACE_GUIDE_RAW = [
-    { kind: 'img',  files: ['spin_button.png'],    nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
+    { kind: 'live', live: 'spin', files: [],       nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
     { kind: 'img',  files: ['btn_bet_plus.png'],   nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
     { kind: 'img',  files: ['btn_bet_minus.png'],  nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
     // R125: WAS `feature_button.png`, a 224x224 painted machine badge produced by
@@ -129,7 +137,7 @@
     // `wide` because the pill is 2.95:1, not square - see .fs-guide-icon--wide.
     // feature_button.png is NOT orphaned by this: it still renders as the buy
     // dialog's header art (BuyBonus.svelte:117), which is its other role.
-    { kind: 'img',  files: ['btn_features.png'], wide: true,
+    { kind: 'live', live: 'features', files: [], wide: true,
       nameKey: 'guideFeaturesName',  descKey: 'guideFeaturesDesc' },
     { kind: 'img',  files: ['btn_autoplay.png'],   nameKey: 'guideAutoplayName',  descKey: 'guideAutoplayDesc' },
     { kind: 'img',  files: ['btn_menu.png'],       nameKey: 'guideMenuName',      descKey: 'guideMenuDesc' },
@@ -147,7 +155,7 @@
     // guide cannot drift from the button the way a hand-drawn icon would.
     { kind: 'img',  files: ['btn_turbo.png', 'btn_turbo_2.png', 'btn_turbo_3.png'],
       nameKey: 'guideTurboName', descKey: 'guideTurboDesc' },
-    { kind: 'img',  files: ['btn_max.png'],        nameKey: 'guideMaxName',       descKey: 'guideMaxDesc' },
+    { kind: 'live', live: 'max', files: [],        nameKey: 'guideMaxName',       descKey: 'guideMaxDesc' },
   ] as const
 
   // JOB 2, 2026-07-28. Was English literals run through `sv()`, so the social
@@ -396,7 +404,27 @@
                        eight INTERFACE_GUIDE entries are `kind: 'img'` and the
                        branch became unreachable. It survived as dead markup
                        referencing a `label` field no entry has, which is what the
-                       type error was reporting. Removed rather than silenced. -->
+                       type error was reporting. Removed rather than silenced.
+                       R152: three rows are now `kind: 'live'` replicas (the
+                       branches below); their `files` list is empty. -->
+                  {#if 'live' in g && g.live === 'spin'}
+                    <span class="guide-live guide-spin" role="img" aria-label={g.name}>
+                      <span class="gs-ring"></span>
+                      <span class="gs-dome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+                    </span>
+                  {:else if 'live' in g && g.live === 'features'}
+                    <span class="guide-live guide-pill" role="img" aria-label={g.name}>
+                      <svg class="gp-grille" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="6.5" width="18" height="11" rx="2.6"/>
+                        <path d="M8.6 9v6M12 9v6M15.4 9v6"/>
+                      </svg>
+                      <span class="gp-label" aria-hidden="true" use:autofitText={$tr('hudFeatures')}>{$tr('hudFeatures')}</span>
+                    </span>
+                  {:else if 'live' in g && g.live === 'max'}
+                    <span class="guide-live guide-knob" role="img" aria-label={g.name}>
+                      <span class="gk-cap" aria-hidden="true" use:autofitText={$tr('hudMax')}>{$tr('hudMax')}</span>
+                    </span>
+                  {/if}
                   {#each g.files as f, i (f)}
                     <!-- Only the first image is named. The other two are the
                          SAME control in another state, so repeating the name
@@ -836,6 +864,53 @@
     border-radius: 8px;
   }
   .fs-guide-img { width: 44px; height: 44px; object-fit: contain; }
+
+  /* R152: live replicas of SPIN, FEATURES and MAX (see INTERFACE_GUIDE_RAW). Values follow the live
+     controls in HudOverlay.svelte (.fs-spin ring and dome, .fs-max) and FeatureMenu.svelte
+     (.fm-entry-pill and its grille), scaled to the 44 px the captured rows use. Decorative: each
+     replica is one role="img" named by the row's own translated name. */
+  .guide-live { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .guide-spin {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--hud-border-strong);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 30%, transparent);
+  }
+  .gs-ring {
+    position: absolute; inset: 2px; border-radius: 50%;
+    border: 1.5px solid var(--hud-accent);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--hud-accent) 45%, transparent);
+  }
+  .gs-dome {
+    position: absolute; inset: 4px; border-radius: 50%;
+    background: var(--hud-surface-raised);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gs-dome svg { width: 18px; height: 18px; }
+  .gs-dome path { fill: var(--hud-accent); }
+  .guide-pill {
+    gap: 5px; height: 30px; max-width: 118px; padding: 0 9px;
+    border: 1px solid var(--hud-border); border-radius: 7px;
+    background: var(--hud-surface-raised); box-shadow: var(--hud-shadow-soft);
+    color: var(--hud-text); font-family: var(--fs-font-display); white-space: nowrap;
+  }
+  .gp-grille {
+    width: 13px; height: 13px; flex-shrink: 0;
+    fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .gp-label {
+    display: block; min-width: 0; max-width: 84px;
+    font-size: calc(10px * var(--autofit-scale, 1)); letter-spacing: .06em;
+  }
+  .guide-knob {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--hud-surface-raised); border: 1px solid var(--hud-border);
+    box-shadow: var(--hud-shadow-soft);
+  }
+  .gk-cap {
+    display: block; max-width: 32px; text-align: center; white-space: nowrap;
+    font-family: var(--fs-font-numeric); font-size: calc(9px * var(--autofit-scale, 1));
+    font-weight: 800; letter-spacing: .02em; color: var(--hud-text);
+  }
 
   /* FS VISUAL FIXPACK JOB 2: the speed row shows three captures, one per speed,
      so its slot widens rather than squeezing three icons into a 56px box. The
