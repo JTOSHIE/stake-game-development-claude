@@ -523,7 +523,7 @@
   <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label={t(lang, 'overdriveFreeSpins', mode)}>
     {#if phase === 'entry'}
       <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry"
-           style="--settle-fade: {settleMs - 50}ms; --ring-ms: {ringMs}ms;">
+           style="--settle-fade: {settleMs - 50}ms; --ring-ms: {ringMs}ms; --settle-scale: {$isTurbo ? 0.85 : 0.5};">
         <div class="entry-scatter-flare" aria-hidden="true"></div>
         <img class="entry-smoke-wisp entry-smoke-a" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
         <img class="entry-smoke-wisp entry-smoke-b" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
@@ -785,7 +785,11 @@
   /* R151: transform is in this list as well as opacity. With opacity alone the burst text lost its
      base transition's transform and snapped from scale 1 to its base 0.5 in one frame at the start
      of settle (R151 self-audit); now it shrinks as it fades, as the gauge and title do. */
-  .stage-settle .entry-burst-text { opacity: 0; transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
+  /* R152: at Turbo and Super Turbo the settle has only 70 ms, so the full 0.5 shrink moved 0.19 to
+     0.23 of scale per 60 Hz frame (measured); it shrinks to 0.85 there instead (0.06 a frame, measured
+     on an injected build). Normal keeps its measured 0.5. --settle-scale is set on .fs-entry-stage,
+     the ancestor, so it inherits down to this element. */
+  .stage-settle .entry-burst-text { opacity: 0; transform: scale(var(--settle-scale, 0.5)); transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
 
   /* CLICK TO CONTINUE gate (OWNER AUDIT ROUND 2, item 1) - sits below the
      burst text, appears the instant the gate opens (no entrance delay of

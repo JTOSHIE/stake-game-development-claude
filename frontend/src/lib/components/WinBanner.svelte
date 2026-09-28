@@ -777,7 +777,12 @@
          on a money readout. .fs-plate does not contain the burst, so the band can breathe without
          the art growing into the HUD. */
   .fs-plate { animation: c1-pulse 2.4s ease-in-out .6s infinite; }
-  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+  /* R152: the 55% key was scale(1.1). The easing overshoots inside that segment, so the plate peaked
+     at scale 1.1685 about 190 ms in, and at 1280 the face row's outermost items (60 px from each
+     edge) left the screen for about 180 ms: a live FEATURE PRICE and the tier word were cut
+     (measured, R152 locale lens L2). At 1.04 the peak is 0.4 + 0.64 x 1.0978 = 1.1026, under the
+     640 / 580 = 1.1034 that keeps them on screen. */
+  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.04); } 100% { transform: scale(1); } }
   /* R151: the exit beat (see EXIT_MS). The banner used to be removed in one frame at full opacity
      and scale, the one beat of the celebration that read unfinished. Now the root fades and the
      plate eases down a touch. THE TWO ARE SPLIT ON PURPOSE: the root (.c1-win is also
