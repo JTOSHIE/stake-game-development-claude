@@ -4,6 +4,44 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1G. R151 (2026-09-28) - WHAT WAS ALREADY ON SCREEN NOW MOVES LIKE A SHIPPED SLOT; THE SEAM RULING IS OPERATIVE
+
+**Branch `claude/r151-presentation-motion`, review lane.** Appended above 1F, which stays as written.
+
+**CLOSED, 1F's OPEN RULING:** the owner accepted the bgm_loop seam exemption at this master's hash
+and ruled the 2.0 dB limit does not loosen. audio_verify now exempts exactly the committed encodes
+of master 99643c41 by hash (seeded self-test, 8 cases) and still measures and reports them; any other
+bytes fail against the unchanged 2.0 dB. The sounds README, GAME_FACTS and SUBMISSION_DOSSIER record
+OWNER ACCEPTED AT HASH, and the licence line for the 140 ms edit: an owner-commissioned
+development-stage cue, pending written audio terms; Ticket 456254 remains images-only.
+
+*** DONE, IN THE PR: a measured motion inventory of the production build, then cheap motion from
+existing art only, each change measured before and after on frozen builds and re-measured by
+skeptics over three verification rounds. The hero no longer blinks out at a reaction's sheet swap
+and its dissolve no longer ticks; a dealt-looking display board replaces twenty identical pistons
+pumping in one phase before the first spin, and the idles are phase-offset per reel and row; the
+shock ring, scatter scanline and H1 spoke work; the win band lets its art through at no text under
+4.5:1, fades out instead of cutting, and steps up by tier on a phone; FEATURE COMPLETE clears the
+band; the feature entry settle finishes before removal; the lockup carries one restrained halo
+with its letters untouched; reduced motion keeps the feature frame colour and skips the squash and
+gauge zoom; the phone SPIN buttons press and turn. One dead raster (scene_character_car.png,
+91,802 B) no longer ships. A look-pass harness captures idle, a 16.2x win and the feature entry at
+1280 and 390 and refuses placeholder art. No raster, audio file, maths or HUD geometry changed. ***
+
+**OPEN, THE TITLE HALO, YOUR LOOK:** keep it or revert its commit alone. The third verification saw
+the lockup lettering go soft three times in about 24 DPR3 landscape loads and never on the baseline;
+an interleaved rerun of 16 loads each found 0 on both, with a positive control reading soft. Not
+reproduced, not explained.
+
+**OPEN, OWNER RULINGS (evidence in the session report):** scatter beats fire about 460 ms before
+their scatter lands; the band covers the hero's head during his reaction and the max-win overlay
+buries his epic (the two proposed fixes conflict); the band covers the Overdrive odometer; tier art
+preload (bandwidth); the max-win exit (an aria-modal dialog); route frame colours; the rain; Super
+Turbo no faster than Turbo; four dead rasters that need a code deletion or a ruling; the win chip's
+"1 ways".
+
+**STILL OPEN:** as 1D, less 1F's ruling.
+
 ## 1F. R150 (2026-09-28) - THE IDLE BED IS TAKE A WITH A CHATGPT JOIN-EDIT; THE CIRCULAR BED IS RETIRED
 
 **Branch `claude/r150-drum-machine-idle-bed`.** Appended above 1E, which stays as written.
