@@ -3364,6 +3364,14 @@
     .game-frame.overdrive-active.nitro-active { animation: none; }
     .bg-still.overdrive.active.nitro-active { filter: saturate(1.2) brightness(1.05); }
     .bg-still.overdrive.active.route-natural { filter: saturate(1.1) hue-rotate(-95deg); }
+    /* R151: the same picture minus the movement. The route recolour of the frame lived only inside
+       the frame-pulse keyframes, so cancelling them here left the frame cyan through the whole
+       feature (measured: 180 degrees on 16,009 of 16,009 px), and a reduced-motion player lost the
+       frame change the R131 note calls the most obvious feature signal while keeping the backdrop
+       change above. Each route now holds its keyframe's 0% filter, still. */
+    .game-frame.overdrive-active { filter: hue-rotate(280deg) saturate(1.4) drop-shadow(0 0 10px color-mix(in srgb, var(--theme-secondary, #ff00ff) 60%, transparent)); }
+    .game-frame.overdrive-active.route-natural { filter: hue-rotate(185deg) saturate(1.3) drop-shadow(0 0 10px color-mix(in srgb, #5dff3c 60%, transparent)); }
+    .game-frame.overdrive-active.nitro-active { filter: hue-rotate(305deg) saturate(1.7) drop-shadow(0 0 14px color-mix(in srgb, var(--theme-secondary, #ff00ff) 75%, transparent)); }
   }
 
   /* ── Grid, 522x349, centred inside the frame, z20 ──────────────────────── */
