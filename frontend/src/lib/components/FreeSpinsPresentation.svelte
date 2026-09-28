@@ -12,6 +12,7 @@
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
   import { themeAssets } from '../stores/themeStore'
+  import { autofitText } from '../actions/autofitText'
   // R117. This component rendered its own board and its own reveal ladder and
   // imported no audio at all, which is why the whole Overdrive feature was silent
   // apart from the music bed swapping underneath it. These are the SAME cues the
@@ -136,6 +137,8 @@
   // else in the UI (see fsModes.ts's FS_MODES - same convention as "Normal"/
   // "OVERBOOST"), so it isn't run through t() here either.
   $: entryTitleText = isNitroEntry ? 'NITRO OVERDRIVE' : t(lang, 'overdriveFreeSpins', mode)
+  // R152. A retrigger always adds 5 (game_config.py:162), agreeing in number.
+  $: retriggerAwardText = t(lang, 'freeSpinsAward', mode, { n: 5 })
 
   function dur(ms: number): number {
     return $isTurbo ? Math.max(120, Math.round(ms * 0.4)) : ms
@@ -538,7 +541,7 @@
              own touch-target height grew (Round 2 fix) - flex guarantees a
              real gap between them regardless of viewport, by construction. -->
         <div class="entry-bottom-group">
-          <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
+          <div class="entry-burst-text">{t(lang, 'freeSpinsAward', mode, { n: script.initialFreeSpins })}</div>
           {#if awaitingContinue}
             <button
               type="button"
@@ -599,7 +602,7 @@
                content-driven size. -->
           {#if retriggerMoment}
             <div class="fs-moment-wrap" data-testid="retrigger-moment-wrap">
-              <div class="fs-retrigger-moment" data-testid="retrigger-moment">+5 {t(lang, 'freeSpins', mode)}</div>
+              <div class="fs-retrigger-moment" data-testid="retrigger-moment" use:autofitText={retriggerAwardText}>{retriggerAwardText}</div>
             </div>
           {/if}
         </div>
@@ -847,7 +850,11 @@
   }
   .fs-retrigger-moment {
     font-weight: 900; color: #ffd700;
-    font-size: clamp(16px, 14cqw, 52px);
+    /* R152: max-width gives autofitText a box to measure against, and the scale it
+       writes is multiplied in here, so a long locale shrinks instead of running past
+       the board (fi and tr did at HEAD; pl's agreeing form would). */
+    max-width: 100%;
+    font-size: calc(clamp(16px, 14cqw, 52px) * var(--autofit-scale, 1));
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
     white-space: nowrap;
     animation: fs-moment-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;

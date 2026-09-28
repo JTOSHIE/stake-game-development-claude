@@ -2400,8 +2400,10 @@
           <!-- Ways breakdown, cycles group by group after the win burst settles.
                Suppressed on a capped round for the same reason as the line
                above: its 1400ms cycle has no natural end and would otherwise
-               tick for the whole of the max-win hold. -->
-          <WinBreakdown suppressed={$isWincap} />
+               tick for the whole of the max-win hold. R152: and while the feature
+               plays, when the board shows free spins and these groups are the base
+               spin's, so the chip would narrate a different spin from the one on screen. -->
+          <WinBreakdown suppressed={$isWincap || featureActive} />
           <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
           <FreeSpinsPresentation
             bind:this={featureRef}

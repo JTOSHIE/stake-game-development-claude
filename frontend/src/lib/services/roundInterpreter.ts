@@ -82,10 +82,17 @@ export interface PresentationScript {
 
 const SCATTER_NAME = 'S'
 
+// R152. The VISIBLE window only. `reveal` carries one padding row above and one
+// below each reel for the spin animation, never shown to a player, and the padded
+// count put a "3 SCATTERS: 8 FREE SPINS" label on Bet Replay for rounds that did not
+// trigger (convention (l)'s worked example, in code). Visible count >= 3 matches
+// freeSpinTrigger on all 500,000 book rows; the padded count missed 9,505 of them.
 function countScatters(board: Board): number {
   let n = 0
   for (const reel of board) {
-    for (const cell of reel) {
+    const pad = topPadding(reel.length)
+    const visible = reel.slice(pad, pad + VISIBLE_ROWS)
+    for (const cell of visible) {
       if (cell && (cell.scatter || cell.name === SCATTER_NAME)) n++
     }
   }

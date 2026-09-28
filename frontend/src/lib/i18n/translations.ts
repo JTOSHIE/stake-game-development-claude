@@ -156,7 +156,10 @@ export interface Translations {
   // ── Overdrive Free Spins feature (optional: served from featureI18n via t) ──
   overdrive?:              string
   overdriveFreeSpins?:     string
-  freeSpins?:              string
+  /** R152. The entry burst and the retrigger moment, "+{n} FREE SPINS". A COUNT
+   *  noun, so it carries a plural block. Replaces `freeSpins`, whose only two
+   *  readers were these two sites. */
+  freeSpinsAward?:         string
   totalWin?:               string
   featureComplete?:        string
   buyFeature?:             string
@@ -223,7 +226,7 @@ export interface Translations {
 // Feature strings live in a dedicated per-locale layer so the 16 base locale
 // objects stay unchanged. Every locale provides all keys (required here).
 export type FeatureKey =
-  | 'overdrive' | 'overdriveFreeSpins' | 'freeSpins' | 'totalWin' | 'featureComplete'
+  | 'overdrive' | 'overdriveFreeSpins' | 'freeSpinsAward' | 'totalWin' | 'featureComplete'
   | 'buyFeature' | 'buyConfirmTitle' | 'buyConfirmBody' | 'buyWhatYouGet' | 'buyPrice' | 'buyConfirm' | 'buyCancel'
   | 'rulesOverdriveTitle' | 'rulesOverdriveTrigger' | 'rulesOverdriveMeter'
   | 'rulesOverdriveRetriggerBuild' | 'rulesOverdriveRetrigger' | 'rulesOverdriveBuy' | 'rulesOverdriveModes' | 'introContinue'
@@ -326,7 +329,7 @@ const en: Translations = {
   replayBetLabel:       'Bet',
   replayCurrencyLabel:  'Currency',
   replayModeLabel:      'Mode:',
-  waysCount:            '{n} ways',
+  waysCount:            '{n, plural, one {# way} other {# ways}}',
   betUnit:              'bet',
   perSpinWhileOn:       'per spin while ON',
   baseBetUnit:          'base bet',
@@ -361,7 +364,7 @@ const ar: Translations = {
   selectBet:            'اختر الرهان',
   a11yOpenBetSelector:  'فتح محدد الرهان',
   resumeTitle:          'تابع جولتك',
-  resumeBody:           'شاهدت {played} من {total} لفة مجانية قبل مغادرتك. تابع من هناك، أو شاهد الجولة كاملة من جديد.',
+  resumeBody:           'شاهدت {played} من {total, plural, few {# لفات مجانية} other {# لفة مجانية}} قبل مغادرتك. تابع من هناك، أو شاهد الجولة كاملة من جديد.',
   resumeContinue:       'متابعة',
   resumeRestart:        'المشاهدة من البداية',
   maxBet:               'أقصى رهان',
@@ -404,9 +407,9 @@ const ar: Translations = {
   rgRealityCheckBody:   'لقد كنت تلعب لمدة {time}. نتيجتك الصافية في هذه الجلسة هي {amount}.',
   rgContinuePlaying:    'متابعة اللعب',
   rgStopPlaying:        'إيقاف اللعب',
-  scatter3:             '3 متناثر: 8 لفات مجانية + 1× رهان',
-  scatter4:             '4 متناثر: 12 لفات مجانية + 3× رهان',
-  scatter5:             '5 متناثر: 16 لفات مجانية + 10× رهان!',
+  scatter3:             '3 رموز سكاتر: 8 لفات مجانية + 1× رهان',
+  scatter4:             '4 رموز سكاتر: 12 لفة مجانية + 3× رهان',
+  scatter5:             '5 رموز سكاتر: 16 لفة مجانية + 10× رهان!',
   wincap:               'الفوز الأقصى, 5,000×!',
   bigWin:               'فوز كبير!',
   hugeWin:              'فوز ضخم!!',
@@ -443,7 +446,7 @@ const ar: Translations = {
   replayBetLabel:       'الرهان',
   replayCurrencyLabel:  'العملة',
   replayModeLabel:      'الوضع:',
-  waysCount:            '{n} طريقة',
+  waysCount:            '{n, plural, two {# طريقتان} few {# طرق} other {# طريقة}}',
   betUnit:              'رهان',
   perSpinWhileOn:       'لكل لفّة أثناء التفعيل',
   baseBetUnit:          'الرهان الأساسي',
@@ -560,7 +563,7 @@ const de: Translations = {
   replayBetLabel:       'Einsatz',
   replayCurrencyLabel:  'Währung',
   replayModeLabel:      'Modus:',
-  waysCount:            '{n} Gewinnwege',
+  waysCount:            '{n, plural, one {# Gewinnweg} other {# Gewinnwege}}',
   betUnit:              'Einsatz',
   perSpinWhileOn:       'pro Drehung, solange AN',
   baseBetUnit:          'Basiseinsatz',
@@ -638,9 +641,9 @@ const es: Translations = {
   rgRealityCheckBody:   'Llevas jugando {time}. Tu resultado neto en esta sesión es {amount}.',
   rgContinuePlaying:    'Seguir jugando',
   rgStopPlaying:        'Dejar de jugar',
-  scatter3:             '3 SCATTER: 8 GIROS GRATIS + 1× APUESTA',
-  scatter4:             '4 SCATTER: 12 GIROS GRATIS + 3× APUESTA',
-  scatter5:             '5 SCATTER: 16 GIROS GRATIS + 10× APUESTA!',
+  scatter3:             '3 SCATTERS: 8 GIROS GRATIS + 1× APUESTA',
+  scatter4:             '4 SCATTERS: 12 GIROS GRATIS + 3× APUESTA',
+  scatter5:             '5 SCATTERS: 16 GIROS GRATIS + 10× APUESTA!',
   wincap:               '¡GANANCIA MÁXIMA, 5.000×!',
   bigWin:               '¡GRAN GANANCIA!',
   hugeWin:              '¡¡ENORME GANANCIA!!',
@@ -677,7 +680,7 @@ const es: Translations = {
   replayBetLabel:       'Apuesta',
   replayCurrencyLabel:  'Moneda',
   replayModeLabel:      'Modo:',
-  waysCount:            '{n} formas',
+  waysCount:            '{n, plural, one {# forma} other {# formas}}',
   betUnit:              'apuesta',
   perSpinWhileOn:       'por giro mientras esté ACTIVADO',
   baseBetUnit:          'apuesta base',
@@ -755,9 +758,9 @@ const fi: Translations = {
   rgRealityCheckBody:   'Olet pelannut {time}. Nettotuloksesi tässä istunnossa on {amount}.',
   rgContinuePlaying:    'Jatka pelaamista',
   rgStopPlaying:        'Lopeta pelaaminen',
-  scatter3:             '3 SCATTER: 8 ILMAISKIERROKSET + 1× PANOS',
-  scatter4:             '4 SCATTER: 12 ILMAISKIERROKSET + 3× PANOS',
-  scatter5:             '5 SCATTER: 16 ILMAISKIERROKSET + 10× PANOS!',
+  scatter3:             '3 SCATTERIA: 8 ILMAISKIERROSTA + 1× PANOS',
+  scatter4:             '4 SCATTERIA: 12 ILMAISKIERROSTA + 3× PANOS',
+  scatter5:             '5 SCATTERIA: 16 ILMAISKIERROSTA + 10× PANOS!',
   wincap:               'MAKSIMIVOITTO, 5 000×!',
   bigWin:               'ISO VOITTO!',
   hugeWin:              'VALTAVA VOITTO!!',
@@ -794,7 +797,7 @@ const fi: Translations = {
   replayBetLabel:       'Panos',
   replayCurrencyLabel:  'Valuutta',
   replayModeLabel:      'Tila:',
-  waysCount:            '{n} voittotapaa',
+  waysCount:            '{n, plural, one {# voittotapa} other {# voittotapaa}}',
   betUnit:              'panos',
   perSpinWhileOn:       'per pyöräytys, kun PÄÄLLÄ',
   baseBetUnit:          'peruspanos',
@@ -872,9 +875,9 @@ const fr: Translations = {
   rgRealityCheckBody:   'Vous jouez depuis {time}. Votre résultat net pour cette session est de {amount}.',
   rgContinuePlaying:    'Continuer à jouer',
   rgStopPlaying:        'Arrêter de jouer',
-  scatter3:             '3 SCATTER: 8 TOURS GRATUITS + 1× MISE',
-  scatter4:             '4 SCATTER: 12 TOURS GRATUITS + 3× MISE',
-  scatter5:             '5 SCATTER: 16 TOURS GRATUITS + 10× MISE!',
+  scatter3:             '3 SCATTERS: 8 TOURS GRATUITS + 1× MISE',
+  scatter4:             '4 SCATTERS: 12 TOURS GRATUITS + 3× MISE',
+  scatter5:             '5 SCATTERS: 16 TOURS GRATUITS + 10× MISE!',
   wincap:               'GAIN MAXIMUM, 5 000×!',
   bigWin:               'GRAND GAIN!',
   hugeWin:              'ÉNORME GAIN!!',
@@ -911,7 +914,7 @@ const fr: Translations = {
   replayBetLabel:       'Mise',
   replayCurrencyLabel:  'Devise',
   replayModeLabel:      'Mode :',
-  waysCount:            '{n} façons',
+  waysCount:            '{n, plural, one {# façon} other {# façons}}',
   betUnit:              'mise',
   perSpinWhileOn:       'par tour tant qu\'ACTIVÉ',
   baseBetUnit:          'mise de base',
@@ -946,7 +949,7 @@ const hi: Translations = {
   selectBet:            'दांव चुनें',
   a11yOpenBetSelector:  'दांव चयनकर्ता खोलें',
   resumeTitle:          'अपना राउंड जारी रखें',
-  resumeBody:           'जाने से पहले आपने {total} में से {played} फ्री स्पिन देखे थे। वहीं से जारी रखें, या पूरा राउंड दोबारा देखें।',
+  resumeBody:           'जाने से पहले आपने {total} में से {played, plural, =1 {# फ्री स्पिन देखा था} other {# फ्री स्पिन देखे थे}}। वहीं से जारी रखें, या पूरा राउंड दोबारा देखें।',
   resumeContinue:       'जारी रखें',
   resumeRestart:        'शुरू से देखें',
   maxBet:               'अधिकतम दांव',
@@ -1028,7 +1031,7 @@ const hi: Translations = {
   replayBetLabel:       'बेट',
   replayCurrencyLabel:  'मुद्रा',
   replayModeLabel:      'मोड:',
-  waysCount:            '{n} तरीके',
+  waysCount:            '{n, plural, one {# तरीका} other {# तरीके}}',
   betUnit:              'बेट',
   perSpinWhileOn:       'चालू रहने पर प्रति स्पिन',
   baseBetUnit:          'बेस बेट',
@@ -1457,9 +1460,9 @@ const pl: Translations = {
   rgRealityCheckBody:   'Grasz już {time}. Twój wynik netto w tej sesji to {amount}.',
   rgContinuePlaying:    'Graj dalej',
   rgStopPlaying:        'Zakończ grę',
-  scatter3:             '3 SCATTER: 8 DARMOWE SPINY + 1× ZAKŁAD',
-  scatter4:             '4 SCATTER: 12 DARMOWE SPINY + 3× ZAKŁAD',
-  scatter5:             '5 SCATTER: 16 DARMOWE SPINY + 10× ZAKŁAD!',
+  scatter3:             '3 SCATTER: 8 DARMOWYCH SPINÓW + 1× ZAKŁAD',
+  scatter4:             '4 SCATTER: 12 DARMOWYCH SPINÓW + 3× ZAKŁAD',
+  scatter5:             '5 SCATTER: 16 DARMOWYCH SPINÓW + 10× ZAKŁAD!',
   wincap:               'MAKSYMALNA WYGRANA, 5 000×!',
   bigWin:               'DUŻA WYGRANA!',
   hugeWin:              'OGROMNA WYGRANA!!',
@@ -1496,7 +1499,7 @@ const pl: Translations = {
   replayBetLabel:       'Zakład',
   replayCurrencyLabel:  'Waluta',
   replayModeLabel:      'Tryb:',
-  waysCount:            '{n} sposobów',
+  waysCount:            '{n, plural, one {# sposób} few {# sposoby} other {# sposobów}}',
   betUnit:              'stawki',
   perSpinWhileOn:       'za obrót, gdy WŁ.',
   baseBetUnit:          'stawki bazowej',
@@ -1574,9 +1577,9 @@ const pt: Translations = {
   rgRealityCheckBody:   'Você está jogando há {time}. Seu resultado líquido nesta sessão é {amount}.',
   rgContinuePlaying:    'Continuar jogando',
   rgStopPlaying:        'Parar de jogar',
-  scatter3:             '3 SCATTER: 8 GIROS GRÁTIS + 1× APOSTA',
-  scatter4:             '4 SCATTER: 12 GIROS GRÁTIS + 3× APOSTA',
-  scatter5:             '5 SCATTER: 16 GIROS GRÁTIS + 10× APOSTA!',
+  scatter3:             '3 SCATTERS: 8 GIROS GRÁTIS + 1× APOSTA',
+  scatter4:             '4 SCATTERS: 12 GIROS GRÁTIS + 3× APOSTA',
+  scatter5:             '5 SCATTERS: 16 GIROS GRÁTIS + 10× APOSTA!',
   wincap:               'GANHO MÁXIMO, 5.000×!',
   bigWin:               'GRANDE GANHO!',
   hugeWin:              'ENORME GANHO!!',
@@ -1613,7 +1616,7 @@ const pt: Translations = {
   replayBetLabel:       'Aposta',
   replayCurrencyLabel:  'Moeda',
   replayModeLabel:      'Modo:',
-  waysCount:            '{n} formas',
+  waysCount:            '{n, plural, one {# forma} other {# formas}}',
   betUnit:              'aposta',
   perSpinWhileOn:       'por giro enquanto ATIVADO',
   baseBetUnit:          'aposta base',
@@ -1648,7 +1651,7 @@ const ru: Translations = {
   selectBet:            'ВЫБРАТЬ СТАВКУ',
   a11yOpenBetSelector:  'Открыть выбор ставки',
   resumeTitle:          'ПРОДОЛЖИТЬ РАУНД',
-  resumeBody:           'Вы посмотрели {played} из {total} бесплатных вращений перед выходом. Продолжите с этого места или посмотрите весь раунд заново.',
+  resumeBody:           'Вы посмотрели {played} из {total, plural, one {# бесплатного вращения} other {# бесплатных вращений}} перед выходом. Продолжите с этого места или посмотрите весь раунд заново.',
   resumeContinue:       'ПРОДОЛЖИТЬ',
   resumeRestart:        'СМОТРЕТЬ С НАЧАЛА',
   maxBet:               'МАКС. СТАВКА',
@@ -1691,9 +1694,9 @@ const ru: Translations = {
   rgRealityCheckBody:   'Вы играете уже {time}. Ваш чистый результат за эту сессию: {amount}.',
   rgContinuePlaying:    'Продолжить игру',
   rgStopPlaying:        'Закончить игру',
-  scatter3:             '3 СКАТТЕРА: 8 ФРИСПИНЫ + 1× СТАВКА',
-  scatter4:             '4 СКАТТЕРА: 12 ФРИСПИНЫ + 3× СТАВКА',
-  scatter5:             '5 СКАТТЕРОВ: 16 ФРИСПИНЫ + 10× СТАВКА!',
+  scatter3:             '3 СКАТТЕРА: 8 ФРИСПИНОВ + 1× СТАВКА',
+  scatter4:             '4 СКАТТЕРА: 12 ФРИСПИНОВ + 3× СТАВКА',
+  scatter5:             '5 СКАТТЕРОВ: 16 ФРИСПИНОВ + 10× СТАВКА!',
   wincap:               'МАКСИМАЛЬНЫЙ ВЫИГРЫШ, 5 000×!',
   bigWin:               'КРУПНЫЙ ВЫИГРЫШ!',
   hugeWin:              'ОГРОМНЫЙ ВЫИГРЫШ!!',
@@ -1730,7 +1733,7 @@ const ru: Translations = {
   replayBetLabel:       'Ставка',
   replayCurrencyLabel:  'Валюта',
   replayModeLabel:      'Режим:',
-  waysCount:            '{n} способов',
+  waysCount:            '{n, plural, one {# способ} few {# способа} other {# способов}}',
   betUnit:              'ставки',
   perSpinWhileOn:       'за спин, пока ВКЛ.',
   baseBetUnit:          'базовой ставки',
@@ -1808,9 +1811,9 @@ const tr: Translations = {
   rgRealityCheckBody:   '{time} süredir oynuyorsunuz. Bu oturumdaki net sonucunuz {amount}.',
   rgContinuePlaying:    'Oynamaya devam et',
   rgStopPlaying:        'Oynamayı bırak',
-  scatter3:             '3 SCATTER: 8 BEDAVA DÖNÜŞLER + 1× BAHİS',
-  scatter4:             '4 SCATTER: 12 BEDAVA DÖNÜŞLER + 3× BAHİS',
-  scatter5:             '5 SCATTER: 16 BEDAVA DÖNÜŞLER + 10× BAHİS!',
+  scatter3:             '3 SCATTER: 8 BEDAVA DÖNÜŞ + 1× BAHİS',
+  scatter4:             '4 SCATTER: 12 BEDAVA DÖNÜŞ + 3× BAHİS',
+  scatter5:             '5 SCATTER: 16 BEDAVA DÖNÜŞ + 10× BAHİS!',
   wincap:               'MAKSİMUM KAZANÇ, 5.000×!',
   bigWin:               'BÜYÜK KAZANÇ!',
   hugeWin:              'DEV KAZANÇ!!',
@@ -2109,7 +2112,8 @@ const zh: Translations = {
 // ── Overdrive feature strings, all 16 locales ─────────────────────────────────
 export const featureI18n: Record<Locale, FeatureStrings> = {
   en: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREE SPINS', freeSpins: 'FREE SPINS',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREE SPINS',
+    freeSpinsAward: '+{n, plural, one {# FREE SPIN} other {# FREE SPINS}}',
     totalWin: 'TOTAL WIN', featureComplete: 'FEATURE COMPLETE',
     buyFeature: 'BUY FEATURE', buyConfirmTitle: 'BUY OVERDRIVE FREE SPINS',
     buyConfirmBody: 'Start Overdrive Free Spins now at {cost}× your bet?', buyWhatYouGet: 'WHAT YOU GET', buyPrice: 'PRICE',
@@ -2135,7 +2139,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'TAP TO CONTINUE',
   },
   ar: {
-    overdrive: 'أوفردرايف', overdriveFreeSpins: 'لفات أوفردرايف المجانية', freeSpins: 'لفات مجانية',
+    overdrive: 'أوفردرايف', overdriveFreeSpins: 'لفات أوفردرايف المجانية',
+    freeSpinsAward: '+{n, plural, two {# لفتان مجانيتان} few {# لفات مجانية} other {# لفة مجانية}}',
     totalWin: 'إجمالي الفوز', featureComplete: 'انتهت الميزة',
     buyFeature: 'شراء الميزة', buyConfirmTitle: 'شراء لفات أوفردرايف المجانية',
     buyConfirmBody: 'ابدأ لفات أوفردرايف المجانية الآن مقابل {cost}× رهانك؟', buyWhatYouGet: 'ماذا ستحصل عليه', buyPrice: 'السعر',
@@ -2161,7 +2166,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'اضغط للمتابعة',
   },
   de: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREISPIELE', freeSpins: 'FREISPIELE',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE FREISPIELE',
+    freeSpinsAward: '+{n, plural, one {# FREISPIEL} other {# FREISPIELE}}',
     totalWin: 'GESAMTGEWINN', featureComplete: 'FEATURE BEENDET',
     buyFeature: 'FEATURE KAUFEN', buyConfirmTitle: 'OVERDRIVE FREISPIELE KAUFEN',
     buyConfirmBody: 'Overdrive Freispiele jetzt für das {cost}-fache deines Einsatzes starten?', buyWhatYouGet: 'WAS DU BEKOMMST', buyPrice: 'PREIS',
@@ -2187,7 +2193,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'TIPPEN ZUM FORTFAHREN',
   },
   es: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRATIS OVERDRIVE', freeSpins: 'GIROS GRATIS',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRATIS OVERDRIVE',
+    freeSpinsAward: '+{n, plural, one {# GIRO GRATIS} other {# GIROS GRATIS}}',
     totalWin: 'GANANCIA TOTAL', featureComplete: 'FUNCIÓN COMPLETA',
     buyFeature: 'COMPRAR FUNCIÓN', buyConfirmTitle: 'COMPRAR GIROS GRATIS OVERDRIVE',
     buyConfirmBody: '¿Iniciar los Giros Gratis Overdrive ahora por {cost}× tu apuesta?', buyWhatYouGet: 'LO QUE OBTIENES', buyPrice: 'PRECIO',
@@ -2213,7 +2220,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'TOCA PARA CONTINUAR',
   },
   fi: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE-ILMAISKIERROKSET', freeSpins: 'ILMAISKIERROKSET',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE-ILMAISKIERROKSET',
+    freeSpinsAward: '+{n, plural, one {# ILMAISKIERROS} other {# ILMAISKIERROSTA}}',
     totalWin: 'KOKONAISVOITTO', featureComplete: 'OMINAISUUS VALMIS',
     buyFeature: 'OSTA OMINAISUUS', buyConfirmTitle: 'OSTA OVERDRIVE-ILMAISKIERROKSET',
     buyConfirmBody: 'Aloitetaanko Overdrive-ilmaiskierrokset nyt hintaan {cost}× panoksesi?', buyWhatYouGet: 'MITÄ SAAT', buyPrice: 'HINTA',
@@ -2239,7 +2247,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'JATKA KOSKETTAMALLA',
   },
   fr: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'TOURS GRATUITS OVERDRIVE', freeSpins: 'TOURS GRATUITS',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'TOURS GRATUITS OVERDRIVE',
+    freeSpinsAward: '+{n, plural, one {# TOUR GRATUIT} other {# TOURS GRATUITS}}',
     totalWin: 'GAIN TOTAL', featureComplete: 'FONCTION TERMINÉE',
     buyFeature: 'ACHETER LA FONCTION', buyConfirmTitle: 'ACHETER LES TOURS GRATUITS OVERDRIVE',
     buyConfirmBody: 'Lancer les Tours Gratuits Overdrive maintenant pour {cost}× votre mise ?', buyWhatYouGet: 'CE QUE VOUS OBTENEZ', buyPrice: 'PRIX',
@@ -2265,7 +2274,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'TOUCHEZ POUR CONTINUER',
   },
   hi: {
-    overdrive: 'ओवरड्राइव', overdriveFreeSpins: 'ओवरड्राइव फ्री स्पिन', freeSpins: 'फ्री स्पिन',
+    overdrive: 'ओवरड्राइव', overdriveFreeSpins: 'ओवरड्राइव फ्री स्पिन',
+    freeSpinsAward: '+{n} फ्री स्पिन',
     totalWin: 'कुल जीत', featureComplete: 'फ़ीचर समाप्त',
     buyFeature: 'फ़ीचर खरीदें', buyConfirmTitle: 'ओवरड्राइव फ्री स्पिन खरीदें',
     buyConfirmBody: 'अभी अपनी दांव राशि के {cost}× पर ओवरड्राइव फ्री स्पिन शुरू करें?', buyWhatYouGet: 'आपको क्या मिलेगा', buyPrice: 'कीमत',
@@ -2291,7 +2301,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'जारी रखने के लिए टैप करें',
   },
   id: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'FREE SPIN OVERDRIVE', freeSpins: 'FREE SPIN',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'FREE SPIN OVERDRIVE',
+    freeSpinsAward: '+{n} FREE SPIN',
     totalWin: 'TOTAL MENANG', featureComplete: 'FITUR SELESAI',
     buyFeature: 'BELI FITUR', buyConfirmTitle: 'BELI FREE SPIN OVERDRIVE',
     buyConfirmBody: 'Mulai Free Spin Overdrive sekarang seharga {cost}× taruhan Anda?', buyWhatYouGet: 'YANG ANDA DAPATKAN', buyPrice: 'HARGA',
@@ -2317,7 +2328,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'KETUK UNTUK MELANJUTKAN',
   },
   ja: {
-    overdrive: 'オーバードライブ', overdriveFreeSpins: 'オーバードライブ フリースピン', freeSpins: 'フリースピン',
+    overdrive: 'オーバードライブ', overdriveFreeSpins: 'オーバードライブ フリースピン',
+    freeSpinsAward: '+{n} フリースピン',
     totalWin: '合計配当', featureComplete: 'フィーチャー終了',
     buyFeature: 'フィーチャー購入', buyConfirmTitle: 'オーバードライブ フリースピン購入',
     buyConfirmBody: 'ベット額の{cost}倍でオーバードライブ フリースピンを今すぐ開始しますか？', buyWhatYouGet: '獲得できる内容', buyPrice: '価格',
@@ -2343,7 +2355,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'タップして続ける',
   },
   ko: {
-    overdrive: '오버드라이브', overdriveFreeSpins: '오버드라이브 프리 스핀', freeSpins: '프리 스핀',
+    overdrive: '오버드라이브', overdriveFreeSpins: '오버드라이브 프리 스핀',
+    freeSpinsAward: '+{n} 프리 스핀',
     totalWin: '총 당첨', featureComplete: '기능 종료',
     buyFeature: '기능 구매', buyConfirmTitle: '오버드라이브 프리 스핀 구매',
     buyConfirmBody: '베팅액의 {cost}배로 지금 오버드라이브 프리 스핀을 시작하시겠습니까?', buyWhatYouGet: '받는 혜택', buyPrice: '가격',
@@ -2369,7 +2382,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: '탭하여 계속하기',
   },
   pl: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'DARMOWE SPINY OVERDRIVE', freeSpins: 'DARMOWE SPINY',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'DARMOWE SPINY OVERDRIVE',
+    freeSpinsAward: '+{n, plural, one {# DARMOWY SPIN} few {# DARMOWE SPINY} other {# DARMOWYCH SPINÓW}}',
     totalWin: 'WYGRANA CAŁKOWITA', featureComplete: 'FUNKCJA ZAKOŃCZONA',
     buyFeature: 'KUP FUNKCJĘ', buyConfirmTitle: 'KUP DARMOWE SPINY OVERDRIVE',
     buyConfirmBody: 'Rozpocząć Darmowe Spiny Overdrive teraz za {cost}× Twojego zakładu?', buyWhatYouGet: 'CO OTRZYMASZ', buyPrice: 'CENA',
@@ -2395,7 +2409,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'DOTKNIJ, ABY KONTYNUOWAĆ',
   },
   pt: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRÁTIS OVERDRIVE', freeSpins: 'GIROS GRÁTIS',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'GIROS GRÁTIS OVERDRIVE',
+    freeSpinsAward: '+{n, plural, one {# GIRO GRÁTIS} other {# GIROS GRÁTIS}}',
     totalWin: 'GANHO TOTAL', featureComplete: 'RECURSO CONCLUÍDO',
     buyFeature: 'COMPRAR RECURSO', buyConfirmTitle: 'COMPRAR GIROS GRÁTIS OVERDRIVE',
     buyConfirmBody: 'Iniciar os Giros Grátis Overdrive agora por {cost}× a sua aposta?', buyWhatYouGet: 'O QUE VOCÊ GANHA', buyPrice: 'PREÇO',
@@ -2421,7 +2436,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'TOQUE PARA CONTINUAR',
   },
   ru: {
-    overdrive: 'ОВЕРДРАЙВ', overdriveFreeSpins: 'ФРИСПИНЫ ОВЕРДРАЙВ', freeSpins: 'ФРИСПИНЫ',
+    overdrive: 'ОВЕРДРАЙВ', overdriveFreeSpins: 'ФРИСПИНЫ ОВЕРДРАЙВ',
+    freeSpinsAward: '+{n, plural, one {# ФРИСПИН} few {# ФРИСПИНА} other {# ФРИСПИНОВ}}',
     totalWin: 'ОБЩИЙ ВЫИГРЫШ', featureComplete: 'ФУНКЦИЯ ЗАВЕРШЕНА',
     buyFeature: 'КУПИТЬ ФУНКЦИЮ', buyConfirmTitle: 'КУПИТЬ ФРИСПИНЫ ОВЕРДРАЙВ',
     buyConfirmBody: 'Запустить фриспины Овердрайв сейчас за {cost}× вашей ставки?', buyWhatYouGet: 'ЧТО ВЫ ПОЛУЧАЕТЕ', buyPrice: 'ЦЕНА',
@@ -2447,7 +2463,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'НАЖМИТЕ, ЧТОБЫ ПРОДОЛЖИТЬ',
   },
   tr: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE BEDAVA DÖNÜŞLER', freeSpins: 'BEDAVA DÖNÜŞLER',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'OVERDRIVE BEDAVA DÖNÜŞLER',
+    freeSpinsAward: '+{n} BEDAVA DÖNÜŞ',
     totalWin: 'TOPLAM KAZANÇ', featureComplete: 'ÖZELLİK TAMAMLANDI',
     buyFeature: 'ÖZELLİĞİ SATIN AL', buyConfirmTitle: 'OVERDRIVE BEDAVA DÖNÜŞLERİ SATIN AL',
     buyConfirmBody: 'Overdrive Bedava Dönüşleri şimdi bahsinizin {cost} katına başlatılsın mı?', buyWhatYouGet: 'NELER KAZANIRSIN', buyPrice: 'FİYAT',
@@ -2473,7 +2490,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'DEVAM ETMEK İÇİN DOKUNUN',
   },
   vi: {
-    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE', freeSpins: 'VÒNG QUAY MIỄN PHÍ',
+    overdrive: 'OVERDRIVE', overdriveFreeSpins: 'VÒNG QUAY MIỄN PHÍ OVERDRIVE',
+    freeSpinsAward: '+{n} VÒNG QUAY MIỄN PHÍ',
     totalWin: 'TỔNG THẮNG', featureComplete: 'TÍNH NĂNG HOÀN TẤT',
     buyFeature: 'MUA TÍNH NĂNG', buyConfirmTitle: 'MUA VÒNG QUAY MIỄN PHÍ OVERDRIVE',
     buyConfirmBody: 'Bắt đầu Vòng Quay Miễn Phí Overdrive ngay với {cost}× tiền cược của bạn?', buyWhatYouGet: 'BẠN NHẬN ĐƯỢC', buyPrice: 'GIÁ',
@@ -2499,7 +2517,8 @@ export const featureI18n: Record<Locale, FeatureStrings> = {
     splashPressAnywhere: 'CHẠM ĐỂ TIẾP TỤC',
   },
   zh: {
-    overdrive: '超载', overdriveFreeSpins: '超载免费旋转', freeSpins: '免费旋转',
+    overdrive: '超载', overdriveFreeSpins: '超载免费旋转',
+    freeSpinsAward: '+{n} 免费旋转',
     totalWin: '总赢额', featureComplete: '功能结束',
     buyFeature: '购买功能', buyConfirmTitle: '购买超载免费旋转',
     buyConfirmBody: '立即以 {cost} 倍投注开始超载免费旋转？', buyWhatYouGet: '您将获得', buyPrice: '价格',
@@ -2668,9 +2687,33 @@ export const SOCIAL_I18N: Partial<Record<AnyKey, string>> = {
  * Falls back to English if the locale or key is missing.
  * In 'social' mode the locale's own social table is consulted first.
  */
-function interpolate(str: string, params?: Record<string, string | number>): string {
+// R152. COUNT NOUNS. A string may carry an ICU-style plural block,
+//   {n, plural, =1 {..} zero {..} one {..} two {..} few {..} many {..} other {..}}
+// with # inside a branch standing for the number. The branch is chosen by
+// Intl.PluralRules for the locale whose TABLE SUPPLIED THE STRING (so an English
+// fallback is pluralised as English), exact =N first, then the CLDR category,
+// then `other`. Locales with no grammatical number (ja, zh, ko, id, vi, tr) need
+// no block at all and keep plain {n}. Every locale's forms live beside its other
+// strings, so the locale gates read them like any other value.
+const pluralRules = new Map<string, Intl.PluralRules>()
+function pluralCategory(locale: string, n: number): string {
+  let pr = pluralRules.get(locale)
+  if (!pr) { pr = new Intl.PluralRules(locale); pluralRules.set(locale, pr) }
+  return pr.select(n)
+}
+const PLURAL_BLOCK = /\{(\w+),\s*plural,((?:\s*(?:=\d+|zero|one|two|few|many|other)\s*\{[^{}]*\})+)\s*\}/g
+const PLURAL_BRANCH = /(=\d+|zero|one|two|few|many|other)\s*\{([^{}]*)\}/g
+
+function interpolate(str: string, params?: Record<string, string | number>, locale: string = 'en'): string {
   if (!params) return str
-  return str.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match))
+  const plural = str.replace(PLURAL_BLOCK, (match, name: string, body: string) => {
+    if (!(name in params)) return match
+    const n = Number(params[name])
+    const branches = new Map([...body.matchAll(PLURAL_BRANCH)].map((m) => [m[1], m[2]] as const))
+    const chosen = branches.get(`=${n}`) ?? branches.get(pluralCategory(locale, n)) ?? branches.get('other')
+    return chosen === undefined ? match : chosen.replace(/#/g, String(params[name]))
+  })
+  return plural.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match))
 }
 
 export function t(
@@ -2681,7 +2724,7 @@ export function t(
 ): string {
   if (mode === 'social') {
     const social = SOCIAL_I18N[key]
-    if (social !== undefined) return interpolate(social, params)
+    if (social !== undefined) return interpolate(social, params, 'en')
     // DELIBERATE FALL-THROUGH, and the direction matters. If a locale's social
     // table is missing a key we drop to that locale's own REAL-MONEY string,
     // which is translated, rather than to the English social string, which is
@@ -2694,14 +2737,16 @@ export function t(
   }
   // Base locale strings first.
   const base = locales[locale]?.[key as keyof Translations]
-  if (base !== undefined) return interpolate(base, params)
+  if (base !== undefined) return interpolate(base, params, locale)
   // Sentence-case prose layer (all 16 locales), falling back to English.
   const pk = key as ProseKey
-  const prose = proseI18n[locale]?.[pk] ?? proseI18n.en[pk]
-  if (prose !== undefined) return interpolate(prose, params)
+  const prose = proseI18n[locale]?.[pk]
+  if (prose !== undefined) return interpolate(prose, params, locale)
+  if (proseI18n.en[pk] !== undefined) return interpolate(proseI18n.en[pk], params, 'en')
   // Overdrive feature-string layer (all 16 locales), falling back to English.
   const fk = key as FeatureKey
-  const feat = featureI18n[locale]?.[fk] ?? featureI18n.en[fk]
-  if (feat !== undefined) return interpolate(feat, params)
-  return interpolate(locales.en[key as keyof Translations] ?? '', params)
+  const feat = featureI18n[locale]?.[fk]
+  if (feat !== undefined) return interpolate(feat, params, locale)
+  if (featureI18n.en[fk] !== undefined) return interpolate(featureI18n.en[fk], params, 'en')
+  return interpolate(locales.en[key as keyof Translations] ?? '', params, 'en')
 }
