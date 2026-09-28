@@ -742,6 +742,8 @@
       // reloads a SECOND time during the same round resumes again rather than
       // being sent back to spin one.
       liveBetID = get(activeRound)?.betID ?? null
+      // R152: the recovered round's own basegame board, as for a bought round in handleBuy.
+      boardSymbols.set(script.baseSpin.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name)))
       await presentFeature(script, resumeFromIndex)
       return
     }
@@ -861,6 +863,17 @@
       const script = events ? scriptFromEvents(events) : null
       const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
       const roundIsWincap = result.newBalance !== undefined ? result.isWincap : (script?.isWincap ?? result.isWincap)
+
+      // R152, brief Phase 1 item 4. A bought round's grid shows that round's own basegame board, the
+      // book's first reveal, as Bet Replay already does (ReplayMode.svelte's startReplay). Before this
+      // the grid kept whatever stood there: the cosmetic pre-spin board on a session's first round, or
+      // the PREVIOUS round's board, beside this round's win. Written before the settle so a capped
+      // round's MAX WIN hold stands over the real board too. Snapped, not spun: no reel motion and no
+      // cue, so the accepted audio is unchanged. activeWins and scatterCount stay untouched: the base
+      // pay is already inside the feature total.
+      if (script?.triggered) {
+        boardSymbols.set(script.baseSpin.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name)))
+      }
 
       // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix, buy-flow counterpart to
       // the same fix in handleSpin above): a buy always triggers the feature,

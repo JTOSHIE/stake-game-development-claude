@@ -30,7 +30,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { Application, Graphics } from 'pixi.js'
-  import { boardSymbols, activeWins, isSpinning, isTurbo, isWincap } from '../stores/gameStore'
+  import { boardSymbols, activeWins, isSpinning, isTurbo, isWincap, winAmount } from '../stores/gameStore'
   import CellModifier from './CellModifier.svelte'
   import { cellMultipliers } from '../stores/cellMultipliers'
   import { speedTier } from '../stores/speedMode'
@@ -705,12 +705,19 @@
     // board used to stay on the base grid beside that round's win, where it read as the board that
     // paid it (R151 self-audit). When a feature starts while it is still up, the grid returns to
     // the neutral placeholder that stood there before R151 (every cell L3), under the overlay.
-    const unsubFeature = overdriveVisual.subscribe(on => {
-      if (on && displayBoardUp && !(get(boardSymbols)?.length === REELS)) {
+    // R152: and the display board may never stand beside a win, whatever path produced it. A bought
+    // round now writes its own basegame board (App.svelte handleBuy), so these are the fallbacks: a
+    // capped round's MAX WIN hold (it settles before the feature starts) and a round with nothing to
+    // present. Both stores start false and 0, so mounting is a no-op; replay never raises the board.
+    const dropDisplay = () => {
+      if (displayBoardUp && !(get(boardSymbols)?.length === REELS)) {
         _updateSymbols(PLACEHOLDER_BOARD)
         displayBoardUp = false
       }
-    })
+    }
+    const unsubFeature = overdriveVisual.subscribe(on => { if (on) dropDisplay() })
+    const unsubCap = isWincap.subscribe(cap => { if (cap) dropDisplay() })
+    const unsubWin = winAmount.subscribe(w => { if (w > 0) dropDisplay() })
     const unsubWins = activeWins.subscribe(() => {
       if (assetsReady) _applyWinHighlights()
     })
@@ -740,7 +747,7 @@
       }
     }
 
-    return () => { unsubBoard(); unsubWins(); unsubFeature() }
+    return () => { unsubBoard(); unsubWins(); unsubFeature(); unsubCap(); unsubWin() }
   })
 
   onDestroy(() => {
