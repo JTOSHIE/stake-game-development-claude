@@ -168,6 +168,11 @@ const PRUNED_PREFIXES = [
   'assets/themes/future-spinner/ui/subtitle.png',
   // R151: the dead scene_character_car.png, pruned in vite.config.ts; a request for it is a failure.
   'assets/themes/future-spinner/ui/scene_character_car.png',
+  // R152: the four dead rasters pruned in vite.config.ts; a request for any is a failure.
+  'assets/themes/future-spinner/ui/hero_icon_96.png',
+  'assets/themes/future-spinner/ui/panel_balance.png',
+  'assets/themes/future-spinner/ui/panel_win.png',
+  'assets/themes/future-spinner/ui/scene_character.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()

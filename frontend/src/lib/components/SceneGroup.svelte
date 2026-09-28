@@ -29,9 +29,13 @@
   //            flipbook (R126: this said five; it has been six since R122). This is the shipped hero's own pose and silhouette
   //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
   //            re-rendered per frame so the body relights as it breathes.
-  //   'static' The original flat sprite with its whole-body bob. The oldest and
-  //            safest path, and the one-line escape hatch: pass heroMode="static"
-  //            at the App.svelte mount and the hero reverts to the pre-R111 sprite.
+  //   'static' The original flat sprite with its whole-body bob, drawn from
+  //            ui/scene_character.png. RETIRED R152 (2026-09-29): the branch had no
+  //            mount that could reach it and its sprite was never requested, so
+  //            the owner's brief pruned the sprite from the bundle and the branch
+  //            went with it. The sprite stays in the repository. A future Path 1
+  //            is a revert of that R152 hunk plus its prune list lines, never a
+  //            re-render.
   //
   // R111's eleven-part bone hierarchy WAS a third mode here and was removed in
   // R115. It could never render: heroMode has exactly one mount, App.svelte:2159
@@ -41,9 +45,7 @@
   // is not the wanted one. The rig remains in git history and in
   // docs/design/SPINE_ROBOT_RIG_SETUP.md if a real skeletal pass is ever revived.
   //
-  // Every mode keeps the same 206x407 box, the same grounding and its own
-  // reduced-motion behaviour, so switching cannot move the scene.
-  export let heroMode: 'idle' | 'static' = 'idle'
+  // Since R152 'idle' is the only mode, so there is no heroMode prop to switch.
 
   // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
   // The car and pilot were separated from the backdrop by a flat drop-shadow
@@ -93,11 +95,7 @@
   <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
   <div class="char-layer" aria-hidden="true">
     <div class="depth-haze" aria-hidden="true"></div>
-    {#if heroMode === 'idle'}
-      <HeroIdle assetBase={$themeAssets.assetBase} />
-    {:else}
-      <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
-    {/if}
+    <HeroIdle assetBase={$themeAssets.assetBase} />
     <div class="antenna-light" aria-hidden="true"></div>
     <div class="visor-glint" aria-hidden="true"></div>
     <div class="chest-lamp" aria-hidden="true"></div>
@@ -133,7 +131,7 @@
      deliberately reduced the contrast that separated subject from background,
      something has to put that separation back, and a rim is what does it
      without flattening the haze again. */
-  .car-img, .char-img {
+  .car-img {
     filter:
       drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5))
       drop-shadow(-2px -1px 0 rgba(120, 240, 255, var(--rim, 0)))
@@ -273,14 +271,6 @@
   @keyframes char-idle {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-3px); }
-  }
-
-  .char-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
   }
 
   /* Antenna tip, the orange orb blinks. Positioned over the orb on the

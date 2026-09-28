@@ -81,9 +81,6 @@ export const themeAssets = derived(activeTheme, ($t) => {
     btnPlus:         `${b}/ui/btn_bet_plus.png`,
     btnAutoplay:     `${b}/ui/btn_autoplay.png`,
     btnMenu:         `${b}/ui/btn_menu.png`,
-    // Panels
-    panelBalance:    `${b}/ui/panel_balance.png`,
-    panelWin:        `${b}/ui/panel_win.png`,
     // Audio
     sounds: {
       bgm:                  `${b}/sounds/bgm_loop.mp3`,

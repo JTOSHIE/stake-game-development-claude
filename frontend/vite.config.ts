@@ -275,9 +275,17 @@ function pruneLegacyAssets() {
     // requested 0 times across 10 production contexts and 16 real rounds while the logger saw it
     // when asked for it directly. asset_reference_gate passes with it gone, no gate lists it, and it
     // is already recorded DEAD in docs/art/art_manifest_arc2.csv (SC-07). Kept in the repository,
-    // pruned from the bundle, like the others here. The other dead rasters that R151 measured need
-    // a code deletion or an owner ruling first and are on the R151 owner list, not here.
+    // pruned from the bundle, like the others here. (R151 left the other dead rasters it measured
+    // for a code deletion or an owner ruling; R152 made those deletions, below.)
     'assets/themes/future-spinner/ui/scene_character_car.png',
+    // R152 (brief Phase 1 item 7): 834,973 B requested 0 times in 14 production contexts. Each had a
+    // static reference in dead code, which the same commit removes: hero_icon_96.png in the unimported
+    // LoadingScreen.svelte, the two panels in unread themeStore fields, scene_character.png in
+    // SceneGroup's unreachable 'static' hero branch. hud_banner.png stays: it is requested and painted.
+    'assets/themes/future-spinner/ui/hero_icon_96.png',
+    'assets/themes/future-spinner/ui/panel_balance.png',
+    'assets/themes/future-spinner/ui/panel_win.png',
+    'assets/themes/future-spinner/ui/scene_character.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()
