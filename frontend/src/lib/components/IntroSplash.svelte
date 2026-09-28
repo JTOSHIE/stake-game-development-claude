@@ -18,7 +18,19 @@
     playClick()
     dispatch('continue')
   }
+
+  // R152: Enter or Space continues, wherever focus is, as the splash before it does.
+  // Not on a repeat, so a key held down through the splash does not also skip this card.
+  function handleKey(e: KeyboardEvent): void {
+    if (e.repeat) return
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleContinue()
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKey} />
 
 <div class="intro-backdrop fs-scrim" role="dialog" aria-modal="true" aria-label={t($locale, 'overdriveFreeSpins', mode)}>
   <div class="intro-card">

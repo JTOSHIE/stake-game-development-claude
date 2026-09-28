@@ -421,6 +421,10 @@
   // the game containers, so it can make them inert. This registry drives `inert`
   // only, so `anyModalOpen` is unchanged and autoplay behaves exactly as before.
   $: setGameBlocked('paytable', $showPaytable)
+  // R152: the boot splash and the rules card cover the whole game too, and they are
+  // siblings of the game containers, so the game is inert under them: Tab cannot walk
+  // the player onto SPIN or FEATURES behind a screen that hides them.
+  $: setGameBlocked('boot-splash', showHeroSplash || showIntroSplash)
 
   // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for

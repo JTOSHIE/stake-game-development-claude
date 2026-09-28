@@ -77,7 +77,15 @@
     dismissed = true
     dispatch('dismiss')
   }
+  // R152: listened for on the WINDOW, not on the splash element. A player who has not
+  // clicked has nothing focused, so a key press targets <body> and never reached a
+  // listener on this div: Space and Enter started the music bed (soundService's
+  // document-level starter) and left this screen up. On the window it sees the key
+  // wherever focus is, the same as a click anywhere. App.svelte's spacebar handler is
+  // registered on the window before this component mounts, so it runs first, sees the
+  // splash still showing and does not spin; the same Space cannot dismiss and spin.
   function handleKey(e: KeyboardEvent): void {
+    if (e.repeat) return
     if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
       e.preventDefault()
       dismiss()
@@ -85,6 +93,11 @@
   }
 </script>
 
+<svelte:window on:keydown={handleKey} />
+
+<!-- The keyboard handler is on the window (above), which also covers this element when
+     it has focus, so the element itself carries only the click. -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   class="hero-splash fs-scrim"
   class:reduced
@@ -93,7 +106,6 @@
   aria-label={t($locale, 'splashPressAnywhere', mode)}
   data-testid="hero-splash"
   on:click={dismiss}
-  on:keydown={handleKey}
 >
   <RainLayer count={10} opacity={0.55} variant="splash" />
 
