@@ -174,6 +174,20 @@ longer true that every file but `ui_click.mp3` comes from the owner's stems: thi
 rendering the owner supplied, and its licence and source are an open owner question (the
 recorded OpenAI clearance covers image generation for artwork, not audio). Take A stays parked.
 
+**R150 (2026-09-28), SUPERSEDING the R149 paragraph above; that paragraph is kept as written.**
+The circular bed is retired. The idle master is the owner's take A with a ChatGPT join-edit
+(master sha256 99643c41..., 44.1 kHz, 481,091 frames, exactly four bars at 88 BPM): take A at
+-2.38 dB, with its first 139.9 ms, where it opened on 12.0 ms of silence, rebuilt from a copy of
+the bed's own bar 4 beat 3 hit and a crossfade (commit b5949859). It is dual-mono and bass-heavy (4.41% of energy above 200 Hz), both
+accepted in the owner's brief. **`frontend/scripts/audio_verify.mjs` does NOT report ALL CHECKS
+PASS at R150:** `loopSeamsWithinTolerance` fails on bgm_loop (seam RMS deltas 4.11 / 4.16 dB, webm
+/ mp3, against the 2.0 dB gate). The take starts on its downbeat, so the first-against-last 20 ms
+check reads the drum hit: the same measurement reads 6.8 to 8.5 dB across the file's own bar
+lines, and the join is sample-continuous. Whether to accept it, change the gate or ask for another
+take is an owner ruling. The file is again the owner's own stem, now with a 140 ms ChatGPT edit
+whose licence is open (the recorded OpenAI clearance covers image generation for artwork, not
+audio).
+
 > **DTT SESSION: run `DTT_PROTOCOL.md` at the repository root alongside this section.**
 > 5b below is the upload steps and 5d is the one-time versus per-update checklist;
 > `DTT_PROTOCOL.md` is the ten scripted observations to make once the build is up, each
