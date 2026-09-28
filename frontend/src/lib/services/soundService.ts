@@ -141,6 +141,20 @@ let sfxVol   = get(sfxVolume)
 // Current BGM duck factor: 1 = normal, BGM_DUCK_SPIN during a spin,
 // BGM_DUCK_ANTICIPATION during anticipation. Effective BGM = musicVol * bgmDuck.
 let bgmDuck = 1
+// R152 (R147 audit D2 and D4): the spin duck's restore is a HANDLE, so it can be cancelled. It was an
+// anonymous setTimeout, so nothing could stop it: 1,800 ms after the spin cue it lifted the bed to
+// full in the middle of an anticipation riser (D4, measured: full bed for 2.8 s of the riser on the
+// natural trigger), lifted the NEXT spin's duck early when spins came faster than 1.8 s (Turbo), and
+// when a feature started inside the duck the tension bed ramped in at the ducked level and stayed
+// there for the whole feature while the timer wrote to the base bed the crossfade had paused (D2).
+// No duck number changes. Declared here, above the store subscriptions below that run synchronously
+// at module load, so no callback can reach it before it exists.
+let spinDuckTimer: ReturnType<typeof setTimeout> | null = null
+function cancelSpinDuckTimer(): void {
+  if (spinDuckTimer === null) return
+  clearTimeout(spinDuckTimer)
+  spinDuckTimer = null
+}
 
 /**
  * Recompute and assign every current volume from the two slider values. BGM is
@@ -380,7 +394,10 @@ export function playSpinStart(): void {
   // Duck BGM during spin, relative to the music slider.
   bgmDuck = BGM_DUCK_SPIN
   sounds.bgm.volume = musicVol * bgmDuck
-  setTimeout(() => {
+  // R152: one restore at a time; a new spin's duck owns the timer (D4's stacking case).
+  cancelSpinDuckTimer()
+  spinDuckTimer = setTimeout(() => {
+    spinDuckTimer = null
     bgmDuck = 1
     if (!muted) sounds.bgm.volume = musicVol * bgmDuck
   }, 1800)
@@ -413,6 +430,9 @@ export function playReelStop(reelIndex: number = 0): void {
 export function playAnticipation(): void {
   if (muted) return
   anticipationActive = true
+  // R152 (D4): the riser's duck holds until stopAnticipation() at the final reel. The spin duck's
+  // 1,800 ms restore no longer lifts the bed partway through it.
+  cancelSpinDuckTimer()
   // Duck BGM further during anticipation, relative to the music slider.
   bgmDuck = BGM_DUCK_ANTICIPATION
   sounds.bgm.volume = musicVol * bgmDuck
@@ -492,6 +512,10 @@ function setOverdriveBed(active: boolean): void {
   bedTrace.lastArg = active
   if (active === overdriveBedActive) { bedTrace.earlyReturnSameState++; return }
   overdriveBedActive = active
+  // R152 (D2): a feature that starts inside the spin duck enters at the slider level, as every other
+  // feature does. The pending restore is cancelled, so it cannot write to the base bed the crossfade
+  // below pauses. Before the muted return, so unmuting restores the full level.
+  if (active) { cancelSpinDuckTimer(); if (!anticipationActive) bgmDuck = 1 }
   if (muted) { bedTrace.earlyReturnMuted++; return }
   if (active) bedTrace.crossfadeToTension++
   else bedTrace.crossfadeToBase++
