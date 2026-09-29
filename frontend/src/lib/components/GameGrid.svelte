@@ -1641,7 +1641,8 @@
      load and after a win's teardown, but in play each reel's idles start at its own landing: 95 ms
      after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse;
      since R152 a pulse first waits for its reel to land, so the landing after a pulse also carries
-     that reel's fall (400 ms, 260 at Turbo and Super) and about 7 to 12 ms of landing-frame work.
+     that reel's fall (400 ms, 260 at Turbo and Super) and about 6 to 13 ms of landing-to-release
+     overhead (the landing callback, the pulse beat and the three timers running late).
      Three earlier sets each failed one regime (one locked every stacked row 2 and 3 flame; one
      locked reels 4 and 5 at the landing stagger; one locked neighbours across Turbo holds on about
      1.8% of spins). No set can clear every hold: the column offsets below were chosen reel boundary
@@ -1654,9 +1655,10 @@
      most 0.012% at Turbo (base 0.007%, Cruise 0.005%, OVERBOOST 0.012%: reels 4 and 5 after a
      third-scatter pulse on reel 3, the L2 arc flipbook), whole frames at 60 and 120 Hz. No column step
      clears that Turbo case without losing the Normal zero (proved over every step). Column 5 moved
-     from -3.714 s to -3.035 s in R152: the Normal zero then survives a landing-frame overhead up to
-     30 ms (it held only to 21.6 ms; measured at most 12 ms), with Turbo and Super unchanged. (Before
-     R151: about 1% at Normal and Super, and every cell in exact lockstep at load and after every win.)
+     from -3.714 s to -3.035 s in R152: the Normal zero then survives a landing-to-release overhead
+     up to 38 ms at 60 Hz, 46.6 at 120 Hz (it held only to 21.6 ms; measured 5.7 to 12.6 ms), with
+     the Turbo and Super shares unchanged. (Before R151: about 1% at Normal and Super, and every cell
+     in exact lockstep at load and after every win.)
      Stacked pairs stay at least 93 ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
      off-screen buffers. */
   .symbol-col:nth-child(2) { --col-phase: -0.93s; }

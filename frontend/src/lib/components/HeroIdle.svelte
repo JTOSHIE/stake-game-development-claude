@@ -269,8 +269,9 @@
     // Super Turbo, by hand and by autoplay at Super Turbo, and a 16.2x after a 108x at 980 to 1,184
     // ms; a drop occurs exactly when the next settle lands before the in-flight reaction ends
     // (1,500 ms, 1,900 ms epic). A win is now QUEUED and played when the in-flight reaction ends:
-    // late (measured +282 to +918 ms for one queued win; a chain of fast 10x-plus wins adds up to a
-    // hold per link) and never skipped. Nothing clears the queue but reduced motion: clearing it on
+    // late (one queued win waits out what is left of the reaction in flight, at most 1,500 ms, or
+    // 1,900 ms behind an epic, less the settle gap, plus two frames: measured +269 to +1,215 ms across
+    // the R152 runs; a chain of fast 10x-plus wins adds up to a hold per link) and never skipped. Nothing clears the queue but reduced motion: clearing it on
     // the next spin would skip the win again whenever a player spins before the in-flight reaction
     // ends. A BRACE refused by an on-time reaction is still refused, as before (it is not a paid win,
     // and queued it would land up to 1.9 s into the feature entry). A brace refused by a LATE reaction

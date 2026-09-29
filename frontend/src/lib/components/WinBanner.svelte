@@ -783,7 +783,8 @@
      (measured, R152 locale lens L2). The budget must include the win shake, which App.svelte
      starts in the same frame and which moves the whole stage up to 7 px (its shake keyframes): the
      bound is (640 - 7) / 580 = 1.0914. At 1.02 the peak is 0.4 + 0.62 x 1.0978 = 1.0806, measured
-     with the shake at 0 frames past the edge at 960, 1280, 1440 and 1920 (6.3 px to spare at 1280).
+     with the shake at 0 frames past the edge at 960, 1280, 1440 and 1920 (at least 6.2 px to spare
+     at 1280 on this bound; about 7.2 px on the combined slam and shake curves).
      A first cut at 1.04 (peak 1.1026) ignored the shake and still cut the price's last glyph by up to
      4 px for three frames (R152 verification). */
   @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.02); } 100% { transform: scale(1); } }

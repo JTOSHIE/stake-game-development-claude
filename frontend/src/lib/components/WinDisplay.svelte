@@ -39,8 +39,9 @@
     + ($winMultiplier > 0 ? ` ${multText($winMultiplier)}×` : '')
 
   // R152: the booked multiplier at its own precision. toFixed(1) rounded every round with a
-  // hundredths digit (84% of winning base weight): a 0.25x round read '0.3×' beside '$0.25', and a
-  // 4,999.99x round read '5000.0×', the cap it did not reach. Books pay in centibets, so two
+  // hundredths digit (84% of winning base weight): a 0.25x round (208 base book rows) read '0.3×'
+  // beside '$0.25', and the replay gate's synthetic 4,999.99x envelope read '5000.0×', the cap it did
+  // not reach (no published round pays between 4,779.70x and the cap). Books pay in centibets, so two
   // decimals is exact; one trailing zero is dropped so '16.2×', '79.5×' and '1.0×' read as before.
   function multText(m: number): string {
     const s = (Math.round(m * 100) / 100).toFixed(2)

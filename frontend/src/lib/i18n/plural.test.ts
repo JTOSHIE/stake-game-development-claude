@@ -54,12 +54,12 @@ for (const loc of MARKS_NUMBER) {
   ok(singularDiffers((n) => t(loc, 'waysCount', 'real', { n })), `${loc} waysCount: "${t(loc, 'waysCount', 'real', { n: 1 })}" vs "${t(loc, 'waysCount', 'real', { n: 2 })}"`)
 }
 
-console.log('3. The pinned forms at the counts real rounds reach (a change here is a translation change)')
+console.log('3. The pinned forms at counts real rounds reach (a change here is a translation change)')
 const PIN: Array<[Locale, 'waysCount' | 'freeSpinsAward', number, string]> = [
   ['en', 'waysCount', 1, '1 way'], ['en', 'waysCount', 8, '8 ways'],
   ['de', 'waysCount', 1, '1 Gewinnweg'], ['fr', 'waysCount', 1, '1 façon'],
-  ['ru', 'waysCount', 1, '1 способ'], ['ru', 'waysCount', 3, '3 способа'], ['ru', 'waysCount', 21, '21 способ'], ['ru', 'waysCount', 8, '8 способов'],
-  ['pl', 'waysCount', 1, '1 sposób'], ['pl', 'waysCount', 22, '22 sposoby'], ['pl', 'waysCount', 5, '5 sposobów'],
+  ['ru', 'waysCount', 1, '1 способ'], ['ru', 'waysCount', 3, '3 способа'], ['ru', 'waysCount', 81, '81 способ'], ['ru', 'waysCount', 8, '8 способов'],
+  ['pl', 'waysCount', 1, '1 sposób'], ['pl', 'waysCount', 24, '24 sposoby'], ['pl', 'waysCount', 6, '6 sposobów'],
   ['ar', 'waysCount', 2, '2 طريقتان'], ['ar', 'waysCount', 8, '8 طرق'], ['ar', 'waysCount', 12, '12 طريقة'],
   ['en', 'freeSpinsAward', 16, '+16 FREE SPINS'], ['ru', 'freeSpinsAward', 5, '+5 ФРИСПИНОВ'],
   ['pl', 'freeSpinsAward', 8, '+8 DARMOWYCH SPINÓW'], ['fi', 'freeSpinsAward', 12, '+12 ILMAISKIERROSTA'],
@@ -67,7 +67,19 @@ const PIN: Array<[Locale, 'waysCount' | 'freeSpinsAward', number, string]> = [
 ]
 for (const [loc, key, n, want] of PIN) ok(t(loc, key, 'real', { n }) === want, `${loc} ${key} ${n} -> ${want}`)
 
-console.log('4. A string with no plural block is unchanged by the plural pass')
+console.log('4. The paytable ways heading is the bare plural; the callout agrees with the 1,024 it follows')
+// R152 verification: waysLabel follows the numeral and waysTitle stands alone, and in these four
+// the two differ. Rewiring the heading back to waysLabel (or dropping a locale's waysTitle, which
+// falls back to English) turns this red.
+const HEADING: Array<[Locale, string, string]> = [
+  ['ar', 'طرق الفوز', 'طريقة للفوز'], ['ru', 'СПОСОБЫ ВЫИГРАТЬ', 'СПОСОБА ВЫИГРАТЬ'],
+  ['fi', 'VOITTOTAVAT', 'VOITTOTAPAA'], ['tr', 'KAZANMA YOLLARI', 'KAZANMA YOLU'],
+]
+for (const [loc, title, label] of HEADING) {
+  ok(t(loc, 'waysTitle', 'real') === title && t(loc, 'waysLabel', 'real') === label, `${loc} waysTitle "${title}", waysLabel "${label}"`)
+}
+
+console.log('5. A string with no plural block is unchanged by the plural pass')
 ok(t('en', 'rgRealityCheckBody', 'real', { time: '00:10:00', amount: '$1.00' })
   === 'You have been playing for 00:10:00. Your net result this session is $1.00.', 'rgRealityCheckBody interpolates as before')
 

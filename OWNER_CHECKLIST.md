@@ -267,6 +267,11 @@ says item 3 stays open until the console line arrives.
 is closed, folded into a live item, or recorded as reported; each row says which. Read the
 Finished column and the evidence, not the heading.
 
+NOTE 2026-09-29 (R152): the "stale Desktop kits" row at the foot of this table still reads not
+done, but the tidy-up it waits on happened on 2026-08-08 (item 3 above, "DONE 2026-08-08"). One
+frontend-only kit remains at ~/Desktop/FS_UPLOAD_KIT, built at b4455850, which is 82 commits behind
+main at 542246cf; the next kit_build overwrites it. The row is left as written.
+
 | Item | Finished | Evidence |
 |---|---|---|
 | **Twenty Cruise spins, bracketed** | 2026-07-28 | `reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. **TR-075 CLOSED.** 1000.00 minus 1.00 = 999.00, and 1000.00 minus 5.00 plus 0.84 = 995.84, both matching the HUD to the cent, at exactly 1.00x. **The last open money item in the project**, and the fifth and final mode to be proven. |
@@ -280,7 +285,7 @@ Finished column and the evidence, not the heading.
 | **USPTO wordmark searches** | 2026-07-28 | Frames `082429` and `082546`. Summary above; the register row now reads searches complete, evidence summarised, gate satisfied. |
 | **The game tile** | 2026-07-28 | Frame `085752`: the composed tile in the Tile Editor on the since-deleted -2 entry, standing as dated evidence. The owner's 2026-08-11 clear-out (R051) means the tile is again PENDING upload, now to `future-spinner` per the R050 step list restated in the 2026-08-11 session report. |
 | **Your local preview** | 2026-07-28 | Your local preview is refreshed to latest `main` at the close of every session that changes it, per protocol rule 12. Nothing for you to do. If the SHA there ever disagrees with the newest session report, tell us rather than debugging it. **The address is deliberately NOT written here any more, per convention (s).** This row carried `192.168.4.92`, which stopped being this machine's address and answered nothing; `scripts/owner_preview.mjs` carried the same literal and was corrected on 2026-08-05 to derive the address and to refuse to print one it cannot reach. **Read the address from the line that script prints.** |
-| **The stale Desktop kits** | not done | Five kit folders are on the Desktop, including the 26 July unversioned one that holds the MATHS package. Folded into item 3, because it must happen before the next upload. `ls -d ~/Desktop/FS_UPLOAD_KIT*` is the current list; do not trust this row for it. R152 2026-09-29: done 2026-08-08 per item 3; one frontend-only kit remains at ~/Desktop/FS_UPLOAD_KIT, built at b4455850 and 82 commits behind main at 542246cf; kit_build overwrites it. |
+| **The stale Desktop kits** | not done | Five kit folders are on the Desktop, including the 26 July unversioned one that holds the MATHS package. Folded into item 3, because it must happen before the next upload. `ls -d ~/Desktop/FS_UPLOAD_KIT*` is the current list; do not trust this row for it. |
 
 ---
 
