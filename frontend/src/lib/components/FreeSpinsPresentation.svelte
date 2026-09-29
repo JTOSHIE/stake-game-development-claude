@@ -856,8 +856,10 @@
     font-weight: 900; color: #ffd700;
     /* R152: max-width gives autofitText a box to measure against, and the scale it
        writes is multiplied in here, so a long locale shrinks instead of running past
-       the board (fi and tr did at HEAD; pl's agreeing form would). */
-    max-width: 100%;
+       the board (fi and tr did at HEAD; pl's agreeing form would). The box is 1/1.05 of the board,
+       not all of it, because fs-moment-in overshoots to scale 1.049 on its way in: fitted to the full
+       board, fi, fr, pl and vi ran 5 to 7 px past it for 8 frames (R152 verification). */
+    max-width: calc(100% / 1.05);
     font-size: calc(clamp(16px, 14cqw, 52px) * var(--autofit-scale, 1));
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
     white-space: nowrap;
@@ -950,6 +952,10 @@
     padding: 0.15em 0.5em; border-radius: 10px;
     background: radial-gradient(ellipse at center, rgba(8, 6, 18, 0.7) 0%, rgba(8, 6, 18, 0) 72%);
     animation: fs-winpop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    /* R152: the space before the meter (a text node since R152) is a line-break opportunity, and this
+       absolutely centred box shrinks to fit half its containing block, so a wide amount wrapped the
+       meter onto a second line (measured: '$2,692,800.00 ×17'). One line, always. */
+    white-space: nowrap;
   }
   .fs-spin-mult { color: var(--theme-secondary, #ff2ec4); font-size: 1.4rem; }
   @keyframes fs-winpop {

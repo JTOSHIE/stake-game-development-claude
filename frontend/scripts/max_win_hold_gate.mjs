@@ -173,8 +173,10 @@ const RULES = [
   {
     name: 'the ways breakdown stops cycling during the hold',
     file: APP,
-    check: (s) => /<WinBreakdown suppressed=\{\$isWincap\}\s*\/>/.test(s),
-    seed: (s) => s.replace(/<WinBreakdown suppressed=\{\$isWincap\}\s*\/>/, '<WinBreakdown />'),
+    // R152: the prop also suppresses the chip during the feature (`|| featureActive`), a superset of
+    // the hold, so the rule accepts that form too; the seed strips the prop either way.
+    check: (s) => /<WinBreakdown suppressed=\{\$isWincap(?: \|\| featureActive)?\}\s*\/>/.test(s),
+    seed: (s) => s.replace(/<WinBreakdown suppressed=\{\$isWincap(?: \|\| featureActive)?\}\s*\/>/, '<WinBreakdown />'),
     why: 'its 1400ms cycle has no natural end and ran for the whole hold',
   },
   {

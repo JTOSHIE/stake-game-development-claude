@@ -50,7 +50,7 @@ export type ProseKey =
   | 'interfaceGuideHeading' | 'rtpAllModes' | 'maxWinLabel'
   | 'responsiblePlayHeading' | 'responsiblePlayBody' | 'disclaimerHeading'
   | 'rulesWaysPay' | 'rulesSymbolValues' | 'rulesWildSub' | 'rulesScatterMult' | 'rulesMaxWin' | 'rulesMalfunction'
-  | 'comingSoonLower' | 'waysLabel' | 'scatterSummary'
+  | 'comingSoonLower' | 'waysLabel' | 'waysTitle' | 'scatterSummary'
   | 'disclaimerBody' | 'replayLoadError' | 'replayPlaybackError'
   // ── Interface guide, eight controls, each a name and a description ────────
   | 'guideSpinName'      | 'guideSpinDesc'
@@ -116,11 +116,16 @@ export const en: ProseStrings = {
   rulesWaysPay:     'Wins pay left to right on adjacent reels starting from reel 1.',
   rulesSymbolValues: 'Symbol values shown are per matching way; the total is that value times the number of ways times your bet.',
   rulesWildSub:     'WILD substitutes for all symbols except SCATTER.',
-  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant win of 1×, 3×, or 10× your base bet, added to any other wins.',
+  // R152 (brief item 9, the scatter/scatters cousin): 'SCATTERs' mixed an uppercase symbol name with a
+  // lowercase plural. The symbol keeps the name it has on its tile; the wording is otherwise unchanged.
+  rulesScatterMult: '3, 4, or 5 SCATTER symbols anywhere award an instant win of 1×, 3×, or 10× your base bet, added to any other wins.',
   rulesMaxWin:      'Maximum win per game round is capped at 5,000× your base bet. A game round includes the triggering spin and any free spins it awards.',
   rulesMalfunction: 'Malfunctions void all pays and plays.',
   comingSoonLower:  'coming soon',
   waysLabel:        'WAYS TO WIN',
+  // R152: the paytable's ways heading, on its own. waysLabel follows the numeral ('1,024 ...') and
+  // agrees with it, which in some locales is not the form a bare heading takes (ar, ru, fi, tr).
+  waysTitle:        'WAYS TO WIN',
   scatterSummary:   '3 / 4 / 5 = 1× / 3× / 10× + 8 / 12 / 16 free spins',
   disclaimerBody:   DISCLAIMER_MANDATED,
   replayLoadError:     'Failed to load replay.',
@@ -211,11 +216,13 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   modeSuperBlurb: 'Get a rich entry with the Overdrive meter pre-revved to 5×.',
   rulesWaysPay: 'Prizes are awarded left to right on adjacent reels starting from reel 1.',
   rulesSymbolValues: 'Symbol values shown are per matching way; the total is that value times the number of ways times your play.',
-  rulesScatterMult: '3, 4, or 5 SCATTERs anywhere award an instant prize of 1×, 3×, or 10× your base play, added to any other prizes.',
+  rulesScatterMult: '3, 4, or 5 SCATTER symbols anywhere award an instant prize of 1×, 3×, or 10× your base play, added to any other prizes.',
   rulesMaxWin: 'Maximum prize per game round is capped at 5,000× your base play. A game round includes the triggering spin and any free spins it awards.',
   rulesMalfunction: 'Malfunctions void all wins and plays.',
   maxWinLabel: 'Max Prize',
   maxWinFootnote: 'Max win is quoted against the base play amount.',
+  // R152: the social SPIN button reads PLAY (SOCIAL_OVERRIDES.spin), so its guide row is named Play.
+  guideSpinName: 'Play',
   guideSpinDesc: 'Start a play at the current play level.',
   guideBetPlusName: 'Increase Play',
   guideBetPlusDesc: 'Raise your play to the next level.',
@@ -228,6 +235,7 @@ export const PROSE_SOCIAL: Partial<Record<ProseKey, string>> = {
   a11yCollectMaxWin: 'Collect max prize',
   a11yMaxWinReached: 'Max Prize reached',
   waysLabel: 'WAYS',
+  waysTitle: 'WAYS',
   // disclaimerBody is deliberately ABSENT since R076, and R077 confirms it:
   // the platform-mandated disclaimer ships word for word in both modes and is
   // the whole of what the disclaimer says (disclaimer.ts is the one source),

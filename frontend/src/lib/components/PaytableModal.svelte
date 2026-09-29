@@ -37,6 +37,8 @@
   // bet) switches to social framing (prize/prizes, play), keeping the seven
   // disclaimer points intact.
   $: waysLabel = $tr('waysLabel')
+  // R152: the bare heading has its own key; waysLabel agrees with the numeral it follows.
+  $: waysTitle = $tr('waysTitle')
 
   // JOB 2, 2026-07-28. Was two parallel arrays of English literals, branched on
   // $isSocial in the component. That did the social swap and never the locale
@@ -238,7 +240,7 @@
 
         <!-- WAYS TO WIN, adjacent-reels diagram, reads left to right from reel 1 -->
         <div>
-          <h3 class="fs-heading" style="margin-bottom:10px;">{waysLabel}</h3>
+          <h3 class="fs-heading" style="margin-bottom:10px;">{waysTitle}</h3>
           <div class="fs-ways-diagram fs-plate" role="img" aria-label={$tr('a11yWaysDiagram')}>
             <div class="fs-face">
               {#each [1, 2, 3, 4, 5] as reelNum, i}
@@ -899,7 +901,9 @@
   }
   .gp-label {
     display: block; min-width: 0; max-width: 84px;
-    font-size: calc(10px * var(--autofit-scale, 1)); letter-spacing: .06em;
+    /* The live label's own typography (FeatureMenu.svelte .fm-entry-label), at guide size. */
+    font-family: var(--fs-font-numeric); font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    font-size: calc(10px * var(--autofit-scale, 1));
   }
   .guide-knob {
     width: 40px; height: 40px; border-radius: 50%;
