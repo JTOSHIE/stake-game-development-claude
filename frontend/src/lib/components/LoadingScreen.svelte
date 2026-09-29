@@ -87,7 +87,8 @@
          does, so nobody re-adds a rotation to something called brand-spin.
          R152 (2026-09-29): this component is imported by nothing (see App.svelte),
          so the hero icon image went, and its raster is pruned from the bundle. The
-         empty mark stays so this file's cited lines stay where they are. -->
+         file stays, so every line number the records cite still exists (the lines after
+         this one moved by a few). -->
     <div class="brand-mark" aria-hidden="true">
     </div>
 

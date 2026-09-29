@@ -574,6 +574,11 @@ achievable from the modular parts. R112 resolved that from the art side instead.
 
 ### What changed
 
+**NOTE 2026-09-29 (R152):** SceneGroup no longer takes heroMode. The 'static' branch was removed and
+scene_character.png pruned from the bundle (it was never requested); the file stays in the repository,
+and HeroIdle is the only hero. Path 1 is now a revert of that R152 SceneGroup hunk plus its prune list
+lines, never a re-render.
+
 `SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default **`'idle'`**:
 
 - **`'idle'`** renders `HeroIdle.svelte`. **AMENDED 2026-08-27 by R130: THE IDLE NO LONGER

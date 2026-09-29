@@ -1347,6 +1347,10 @@ Reduced motion skips every reaction.
 1. **WEBP.** dist is at **23.40 of 25 MB = 93.6%**. Every future intake is gated on this.
 2. **The max-win modal.** Restaging it to leave the hero visible would unlock the factory's
    strongest strip.
+**NOTE 2026-09-29 (R152), on item 3 below:** it no longer ships. The unreachable 'static' branch and
+the heroMode prop were removed and the file pruned from the bundle on the owner's R152 brief; the file
+stays in the repository, and Path 1 is a revert of that hunk. See section 1H.
+
 3. `scene_character.png` (791 KB) still ships and cannot render; kept as the hero's escape hatch.
 4. Six confirmed orphans (337,523 B), not swept because nine OTHER assets look like orphans to a
    grep but are built dynamically.
@@ -1450,6 +1454,9 @@ recover from 4.73; the purpose-built asset removed the need.
    first for a submission-bound bundle. dist is at 91% of the 25MB budget.
 2. **The `win_big` / `win_medium` name skew.** The NUMBERS agree exactly (10/30/100); only the file
    names are one slot out, so `win_big.mp3` plays at MEGA. Nothing records whether that was intended.
+**NOTE 2026-09-29 (R152), on item 3 below:** resolved by the owner's R152 brief. The branch, the
+heroMode prop and the prune are recorded in section 1H; the file stays in the repository.
+
 3. **`scene_character.png` (791,212 B) ships and cannot render.** The `'static'` branch is
    unreachable by the identical mechanism that made the rig unreachable: App.svelte:2159 never passes
    `heroMode`. KEPT DELIBERATELY as the hero's one-line escape hatch. Deleting it removes the
@@ -1537,6 +1544,8 @@ project**, so adopting it introduces a new format to a submission-bound bundle: 
 and compliance decision, not art work. **dist is at 23.08 of 25 MB = 92%.** This is the single
 biggest lever available.
 
+**NOTE 2026-09-29 (R152):** the heroMode prop no longer exists (section 1H).
+
 **OPEN - DEAD SHIPPED WEIGHT:** `SceneGroup` declares `heroMode: 'idle' | 'rig' | 'static'` but
 `App.svelte:2159` mounts `<SceneGroup haze={hazeLevel} />` and never passes it, so the `'rig'`
 branch ships **~1.1 MB of R111 robot parts that can never render**. Deleting returns 1.1 MB.
@@ -1618,6 +1627,8 @@ presence at 42% opacity in screen blend over the emblem". Safe form: a new win-o
 > R112's dated record of what was true then. The sheet named above no longer exists: it was a
 > lighting-only strip on a locked pose and is replaced by `ui/hero/hero_crossed_idle_6f.png`,
 > six frames, `steps(6)`, a real planted-foot weight shift. See section 0T.
+**NOTE 2026-09-29 (R152):** the heroMode prop no longer exists (section 1H).
+
 `SceneGroup` takes `heroMode: 'idle' | 'rig' | 'static'`, default `'idle'`.
 
 **THE MASTER IS THE SHIPPED SPRITE.** `01-full-body-crossed-arms-master` vs

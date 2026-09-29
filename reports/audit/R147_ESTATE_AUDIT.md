@@ -363,6 +363,10 @@ offline.
 | DEAD | 6 | unchanged; 4 still ship in dist: `ui/hero_icon_96.png`, `ui/scene_character_car.png`, `ui/panel_balance.png`, `ui/panel_win.png`, **151,962 B together**. |
 | KEEP | 1 | BR-01 `ui/hero_emblem_512.png`, unchanged, live in the splash. |
 
+**NOTE 2026-09-29 (R152), on the two paragraphs below:** the heroMode prop and its 'static' branch were
+removed from SceneGroup and scene_character.png was pruned from the bundle on the owner's R152 brief (the
+file stays in the repository). HeroIdle is the only hero; Path 1 is now a revert of that R152 hunk.
+
 **Hero at rest: HeroIdle, frame 01 of `ui/hero/hero_crossed_idle_6f.png`.** `App.svelte:2270` mounts
 `<SceneGroup haze={hazeLevel} />` with no `heroMode`; `SceneGroup.svelte:46` defaults it to `'idle'`,
 and :96-99 draw HeroIdle, which maps the idle sheet at `HeroIdle.svelte:139`. `ui/scene_character.png`

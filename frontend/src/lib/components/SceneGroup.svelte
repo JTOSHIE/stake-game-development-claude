@@ -23,9 +23,9 @@
   import HeroIdle from './HeroIdle.svelte'
 
   // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
-  // Three ways to draw the pilot, in descending order of how good he looks:
+  // One way to draw the pilot since R152; the other two it had are recorded here:
   //
-  //   'idle'   DEFAULT. The crossed-arms idle strip, played as a six-frame
+  //   'idle'   THE ONLY MODE. The crossed-arms idle strip, played as a six-frame
   //            flipbook (R126: this said five; it has been six since R122). This is the shipped hero's own pose and silhouette
   //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
   //            re-rendered per frame so the body relights as it breathes.
@@ -38,14 +38,15 @@
   //            re-render.
   //
   // R111's eleven-part bone hierarchy WAS a third mode here and was removed in
-  // R115. It could never render: heroMode has exactly one mount, App.svelte:2159
-  // `<SceneGroup haze={hazeLevel} />`, which does not pass it, so the branch was
+  // R115. It could never render: the mode prop that selected it (removed R152) was
+  // never passed by SceneGroup's one mount in App.svelte, so the branch was
   // unreachable while its eleven part rasters shipped to every player. R112
   // established that the pose those parts are drawn in, arms at sides and neutral,
   // is not the wanted one. The rig remains in git history and in
   // docs/design/SPINE_ROBOT_RIG_SETUP.md if a real skeletal pass is ever revived.
   //
-  // Since R152 'idle' is the only mode, so there is no heroMode prop to switch.
+  // Since R152 SceneGroup takes no mode prop: the heroMode prop ('idle' | 'static', default 'idle')
+  // was removed with the 'static' branch, and HeroIdle is the only hero.
 
   // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
   // The car and pilot were separated from the backdrop by a flat drop-shadow
@@ -304,6 +305,9 @@
 
   /* Visor, occasional glint sweep over the visor.
 
+     NOTE R152: .char-img no longer exists (the 'static' branch was removed); the measurement below
+     was made on it. The idle sheet frame (394x780, aspect 0.5051) fills the same 206x407 box
+     (0.5061), so the percentages still land where they did.
      top was 17% until R110, which measured where the light actually landed.
      .char-img is object-fit:contain and the box aspect (206/407) matches the
      source (680/1344) to four decimals, so layer % maps 1:1 onto the sprite at
