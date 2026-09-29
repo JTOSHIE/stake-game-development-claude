@@ -2418,7 +2418,7 @@
                WinBanner: set inside runPendingFeatureSettle BEFORE settle(), so it is true on the
                frame winAmount rises, and cleared at the top of every spin and buy, so base-game
                flashes are untouched. -->
-          <WinCelebration winMultiplier={$isWincap || lastRoundHadFeature ? 0 : $winMultiplier} />
+          <WinCelebration winMultiplier={$isWincap || lastRoundHadFeature ? 0 : $winMultiplier} winAmount={$winAmount} />
           <!-- Ways breakdown, cycles group by group after the win burst settles.
                Suppressed on a capped round for the same reason as the line
                above: its 1400ms cycle has no natural end and would otherwise

@@ -780,9 +780,13 @@
   /* R152: the 55% key was scale(1.1). The easing overshoots inside that segment, so the plate peaked
      at scale 1.1685 about 190 ms in, and at 1280 the face row's outermost items (60 px from each
      edge) left the screen for about 180 ms: a live FEATURE PRICE and the tier word were cut
-     (measured, R152 locale lens L2). At 1.04 the peak is 0.4 + 0.64 x 1.0978 = 1.1026, under the
-     640 / 580 = 1.1034 that keeps them on screen. */
-  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.04); } 100% { transform: scale(1); } }
+     (measured, R152 locale lens L2). The budget must include the win shake, which App.svelte
+     starts in the same frame and which moves the whole stage up to 7 px (its shake keyframes): the
+     bound is (640 - 7) / 580 = 1.0914. At 1.02 the peak is 0.4 + 0.62 x 1.0978 = 1.0806, measured
+     with the shake at 0 frames past the edge at 960, 1280, 1440 and 1920 (6.3 px to spare at 1280).
+     A first cut at 1.04 (peak 1.1026) ignored the shake and still cut the price's last glyph by up to
+     4 px for three frames (R152 verification). */
+  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.02); } 100% { transform: scale(1); } }
   /* R151: the exit beat (see EXIT_MS). The banner used to be removed in one frame at full opacity
      and scale, the one beat of the celebration that read unfinished. Now the root fades and the
      plate eases down a touch. THE TWO ARE SPLIT ON PURPOSE: the root (.c1-win is also

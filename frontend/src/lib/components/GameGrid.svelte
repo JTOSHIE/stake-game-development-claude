@@ -234,6 +234,10 @@
 
   // Win burst state
   let winBurstTimer: ReturnType<typeof setTimeout> | null = null
+  // R152: the per-cell flash timers of a win burst, so a new round can cancel them. They were never
+  // cancelled, so a round that replaced the board within their 250 to 530 ms window got the previous
+  // win's flash and bloom painted onto ITS cells (see the activeWins subscription).
+  let burstCellTimers: ReturnType<typeof setTimeout>[] = []
 
   // ── Weighted random passing-tile pool (cruise fill) ──────────────────────
   // Weighted toward low symbols so the blur reads like a real reel band; the
@@ -718,8 +722,15 @@
     const unsubFeature = overdriveVisual.subscribe(on => { if (on) dropDisplay() })
     const unsubCap = isWincap.subscribe(cap => { if (cap) dropDisplay() })
     const unsubWin = winAmount.subscribe(w => { if (w > 0) dropDisplay() })
-    const unsubWins = activeWins.subscribe(() => {
-      if (assetsReady) _applyWinHighlights()
+    // R152: a CLEARED win list takes its burst with it. Every writer that empties activeWins starts a
+    // new round (resetWin at a spin or a buy, replay's play again). A buy made within the previous
+    // win's 4 s teardown used to snap its own basegame board in under that win's flash, bloom and
+    // loser dim, and on a capped buy the teardown re-armed for the whole MAX WIN hold (measured: 20
+    // cells of the old pattern on the bought board for up to 22.8 s).
+    const unsubWins = activeWins.subscribe((wins) => {
+      if (!assetsReady) return
+      if (!wins.length) _resetToIdle()
+      _applyWinHighlights()
     })
 
     // Dev-only test hook (ANIMATION UPLIFT PASS 2026-07-16, item 6): forces
@@ -752,6 +763,7 @@
 
   onDestroy(() => {
     if (winBurstTimer) clearTimeout(winBurstTimer)
+    for (const t of burstCellTimers) clearTimeout(t)
     if (rafId != null) cancelAnimationFrame(rafId)
     app?.destroy(true)
   })
@@ -817,7 +829,7 @@
           // 250ms charge pre-burst, then a per-reel left-to-right stagger
           // (~70ms per reel) so the win reads as a sweep, not all-at-once.
           cell?.classList.add('pre-charge')
-          setTimeout(() => {
+          burstCellTimers.push(setTimeout(() => {
             cell?.classList.remove('pre-charge')
             img.classList.remove('loser-dim')
             img.style.opacity = '1'
@@ -825,7 +837,7 @@
             cell?.classList.add('plate-bloom')
             if (symbol.toUpperCase() === 'H1') overlay?.classList.add('win-spin-fast')
             spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol), burstCount)
-          }, 250 + col * 70)
+          }, 250 + col * 70))
         } else {
           // Dim losers harder (and desaturate) so winners clearly spotlight.
           img.style.opacity = ''
@@ -908,6 +920,8 @@
 
   function _resetToIdle(): void {
     if (winBurstTimer) { clearTimeout(winBurstTimer); winBurstTimer = null }
+    for (const t of burstCellTimers) clearTimeout(t)
+    burstCellTimers = []
     for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
         const img     = visImg(col, row)

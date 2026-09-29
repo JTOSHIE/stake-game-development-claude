@@ -200,6 +200,10 @@
   let queued: { next: HeroReaction; tier?: 'big' | 'epic' }[] = []
   let draining = false
   let drainRaf = 0
+  // R152: true while the reaction in flight is a LATE one the queue started (or one is about to
+  // start). A brace refused by such a reaction is queued at the front, so the queue never costs a
+  // brace that played before R152; a brace refused by an on-time reaction is still refused.
+  let lateInFlight = false
 
   onMount(() => {
     // R129: THIS USED TO BE A ONE-SHOT READ AND THAT WAS WRONG IN BOTH DIRECTIONS.
@@ -218,7 +222,7 @@
       if (e.matches) {
         clearTimeout(timer); cancelAnimationFrame(drainRaf)
         // A queued reaction is skipped by design under reduced motion, exactly as a new one is.
-        queued = []; draining = false
+        queued = []; draining = false; lateInFlight = false
         motion = 'idle'
       }
     }
@@ -248,7 +252,7 @@
     return DURATION_MS[next]
   }
 
-  function react(next: HeroReaction, tier?: 'big' | 'epic') {
+  function react(next: HeroReaction, tier?: 'big' | 'epic', late = false) {
     // Under reduced motion the hero holds its rest frame and nothing interrupts
     // it. A sudden one-shot is exactly the kind of motion that setting exists to
     // suppress, so reactions are not damped here, they are skipped.
@@ -264,13 +268,18 @@
     // a second 16.2x win settling 730 to 1,499 ms after the first is dropped at Normal, Turbo and
     // Super Turbo, by hand and by autoplay at Super Turbo, and a 16.2x after a 108x at 980 to 1,184
     // ms; a drop occurs exactly when the next settle lands before the in-flight reaction ends
-    // (1,500 ms, 1,900 ms epic). A win is now QUEUED and played when the in-flight reaction ends,
-    // late by at most one hold and never skipped. Nothing clears the queue but reduced motion:
-    // clearing it on the next spin would skip the win again whenever a player spins before the
-    // in-flight reaction ends. A refused BRACE is still refused, as before: it is not a paid win,
-    // and queued it would land up to 1.9 s into the feature entry.
+    // (1,500 ms, 1,900 ms epic). A win is now QUEUED and played when the in-flight reaction ends:
+    // late (measured +282 to +918 ms for one queued win; a chain of fast 10x-plus wins adds up to a
+    // hold per link) and never skipped. Nothing clears the queue but reduced motion: clearing it on
+    // the next spin would skip the win again whenever a player spins before the in-flight reaction
+    // ends. A BRACE refused by an on-time reaction is still refused, as before (it is not a paid win,
+    // and queued it would land up to 1.9 s into the feature entry). A brace refused by a LATE reaction
+    // the queue started, or while one is about to start, goes to the FRONT of the queue: the queue
+    // lengthened the busy window and cost braces that played before R152 (measured, R152
+    // verification WL2-07); fronted, they play as soon as the late one ends.
     if (motion !== 'idle' || draining) {
       if (next === 'win') queued.push({ next, tier })
+      else if (lateInFlight || draining) queued.unshift({ next })
       return
     }
     // THE TIER IS ASSIGNED HERE, PAST THE GUARD, AND THAT PLACEMENT IS THE WHOLE FIX.
@@ -295,6 +304,7 @@
     // Assigning past the guard makes the refusal total: a reaction that does not
     // start now cannot repaint the one that is running.
     if (next === 'win' && tier) winTier = tier
+    lateInFlight = late
     motion = next
     clearTimeout(timer)
     // holdFor() reads winTier, so the line above must stay ahead of this one.
@@ -314,7 +324,7 @@
       drainRaf = requestAnimationFrame(() => {
         draining = false
         const q = queued.shift()
-        if (q) react(q.next, q.tier)
+        if (q) react(q.next, q.tier, true)
       })
     })
   }

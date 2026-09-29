@@ -60,10 +60,15 @@
   // The 'gold' and 'green' bands below are NOT celebration tiers and are left
   // exactly as they were: they are this readout's own colour treatment for
   // ordinary wins, and no other surface contradicts them.
+  // R152: the multiple is taken ONCE, at centibet precision, and both tests use it. A float ratio
+  // falls just under a boundary for some bets (an exactly-100x round at a 1.10 bet read EPIC on the
+  // banner and MEGA here; 512 of 10,000 amounts on the 0.10 grid slip at 100x, 1,023 at 30x); the
+  // rounded multiple equals the book's exact centibet multiple in every book payout at every bet.
+  $: tierMult = $betAmount > 0 ? Math.round(targetValue / $betAmount * 100) / 100 : 0
   // R152: epic is a label only; the panel keeps the mega treatment (see the label markup).
-  $: isEpic = ($betAmount > 0 ? targetValue / $betAmount : 0) >= EPIC_WIN_THRESHOLD
+  $: isEpic = tierMult >= EPIC_WIN_THRESHOLD
   $: winTier = (() => {
-    const mult = $betAmount > 0 ? targetValue / $betAmount : 0
+    const mult = tierMult
     if (mult >= MEGA_WIN_THRESHOLD) return 'mega'
     if (mult >= BIG_WIN_THRESHOLD)  return 'big'
     if (mult >= 1)  return 'gold'

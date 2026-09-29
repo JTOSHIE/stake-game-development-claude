@@ -6,20 +6,25 @@
   import { tr } from '../i18n/tr'
 
   export let winMultiplier: number = 0
+  // R152: the settled amount, so the flash is decided ONCE per settled win. winMultiplier is
+  // winAmount / betAmount, re-derived by a bet change, so changing the bet after a settled round
+  // raised this flash again with no new round (measured, R152 code review CR-02); WinBanner, the hero
+  // and the shake were latched the same way in R152.
+  export let winAmount: number = 0
 
   let visible = false
   let timer: ReturnType<typeof setTimeout> | null = null
+  let decidedFor = 0
 
-  $: {
-    if (winMultiplier >= 1 && winMultiplier < 10) {
-      clearTimer()
-      visible = true
-      timer = setTimeout(() => { visible = false }, 1200)
-    } else {
-      clearTimer()
-      visible = false
-    }
+  $: if (winAmount === 0) decidedFor = 0
+  $: if (winAmount > 0 && winAmount !== decidedFor) {
+    decidedFor = winAmount
+    clearTimer()
+    visible = winMultiplier >= 1 && winMultiplier < 10
+    if (visible) timer = setTimeout(() => { visible = false }, 1200)
   }
+  // A new spin (or a suppressed round) still clears it at once, as before.
+  $: if (winMultiplier === 0) { clearTimer(); visible = false }
 
   function clearTimer(): void {
     if (timer !== null) { clearTimeout(timer); timer = null }
