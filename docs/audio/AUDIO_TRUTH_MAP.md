@@ -7,6 +7,13 @@ so on ffmpeg's ebur128 `feature_end` is -26.8 LUFS (was -31.9), `feature_enter` 
 -20.8), `retrigger` -20.0 (was -20.5), and `win_max` at -24.7 sits above `win_epic` at -25.9
 (-26.5 on pyloudnorm); the re-encoded one-shots moved by up to 31 ms in duration; and a bought
 max win now plays `win_max` (section 4.5). The sounds README has the detail.
+**R149 to R152 (2026-09-29), dated note:** R149's circular rebuild of the idle bed was retired at R150.
+The bed is now the owner's take A with a 140 ms ChatGPT join-edit (master sha256 99643c41...), exempt from
+audio_verify's 2.0 dB seam limit at that hash only (OWNER ACCEPTED AT HASH, R151), with the licence line an
+owner-commissioned development-stage cue, pending written audio terms; Ticket 456254 remains images-only.
+R152 made the spin duck's 1,800 ms restore cancellable (soundService.ts): it no longer lifts the bed mid-riser
+(R147 D4) or leaves the tension bed ducked for a feature started inside the duck (R147 D2). No duck number,
+stem or graph node changed. The sounds README has the detail.
 **R148 (2026-09-27), no file changed:** the base bed now loops through Web Audio
 (`frontend/src/lib/services/loopBed.ts`), because a looping audio element stalls about 50 to
 60 ms at every wrap in Chromium whatever the file, and any first gesture now resumes the bed

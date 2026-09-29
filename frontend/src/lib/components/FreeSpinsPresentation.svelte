@@ -12,6 +12,7 @@
   import { formatBalance, CURRENCY_SCALE, formatWin } from '../utils/currency'
   import { t, type GameMode } from '../i18n/translations'
   import { themeAssets } from '../stores/themeStore'
+  import { autofitText } from '../actions/autofitText'
   // R117. This component rendered its own board and its own reveal ladder and
   // imported no audio at all, which is why the whole Overdrive feature was silent
   // apart from the music bed swapping underneath it. These are the SAME cues the
@@ -136,6 +137,8 @@
   // else in the UI (see fsModes.ts's FS_MODES - same convention as "Normal"/
   // "OVERBOOST"), so it isn't run through t() here either.
   $: entryTitleText = isNitroEntry ? 'NITRO OVERDRIVE' : t(lang, 'overdriveFreeSpins', mode)
+  // R152. A retrigger always adds 5 (game_config.py:162), agreeing in number.
+  $: retriggerAwardText = t(lang, 'freeSpinsAward', mode, { n: 5 })
 
   function dur(ms: number): number {
     return $isTurbo ? Math.max(120, Math.round(ms * 0.4)) : ms
@@ -520,7 +523,7 @@
   <div class="fs-overlay" data-testid="freespins-overlay" role="dialog" aria-label={t(lang, 'overdriveFreeSpins', mode)}>
     {#if phase === 'entry'}
       <div class="fs-entry-stage stage-{entryStage}" data-testid="overdrive-entry"
-           style="--settle-fade: {settleMs - 50}ms; --ring-ms: {ringMs}ms;">
+           style="--settle-fade: {settleMs - 50}ms; --ring-ms: {ringMs}ms; --settle-scale: {$isTurbo ? 0.85 : 0.5};">
         <div class="entry-scatter-flare" aria-hidden="true"></div>
         <img class="entry-smoke-wisp entry-smoke-a" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
         <img class="entry-smoke-wisp entry-smoke-b" src="{$themeAssets.assetBase}/ui/particles/smoke_puff.png" alt="" aria-hidden="true" />
@@ -538,7 +541,7 @@
              own touch-target height grew (Round 2 fix) - flex guarantees a
              real gap between them regardless of viewport, by construction. -->
         <div class="entry-bottom-group">
-          <div class="entry-burst-text">+{script.initialFreeSpins} {t(lang, 'freeSpins', mode)}</div>
+          <div class="entry-burst-text">{t(lang, 'freeSpinsAward', mode, { n: script.initialFreeSpins })}</div>
           {#if awaitingContinue}
             <button
               type="button"
@@ -586,7 +589,7 @@
                  with kerning off, reaches this readout too. It was the only money
                  value in the tree carrying neither marker. -->
             <div class="fs-spin-win" data-money="cur">
-                {fmt(currentSpin.spinWinCentibets)}{#if currentSpin.meterBefore > 1}<span class="fs-spin-mult"> ×{currentSpin.meterBefore}</span>{/if}
+                {fmt(currentSpin.spinWinCentibets)}{#if currentSpin.meterBefore > 1}{' '}<span class="fs-spin-mult">×{currentSpin.meterBefore}</span>{/if}
               </div>
             {/key}
           {/if}
@@ -599,7 +602,7 @@
                content-driven size. -->
           {#if retriggerMoment}
             <div class="fs-moment-wrap" data-testid="retrigger-moment-wrap">
-              <div class="fs-retrigger-moment" data-testid="retrigger-moment">+5 {t(lang, 'freeSpins', mode)}</div>
+              <div class="fs-retrigger-moment" data-testid="retrigger-moment" use:autofitText={retriggerAwardText}>{retriggerAwardText}</div>
             </div>
           {/if}
         </div>
@@ -782,7 +785,11 @@
   /* R151: transform is in this list as well as opacity. With opacity alone the burst text lost its
      base transition's transform and snapped from scale 1 to its base 0.5 in one frame at the start
      of settle (R151 self-audit); now it shrinks as it fades, as the gauge and title do. */
-  .stage-settle .entry-burst-text { opacity: 0; transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
+  /* R152: at Turbo and Super Turbo the settle has only 70 ms, so the full 0.5 shrink moved 0.19 to
+     0.23 of scale per 60 Hz frame (measured); it shrinks to 0.85 there instead (0.06 a frame, measured
+     on an injected build). Normal keeps its measured 0.5. --settle-scale is set on .fs-entry-stage,
+     the ancestor, so it inherits down to this element. */
+  .stage-settle .entry-burst-text { opacity: 0; transform: scale(var(--settle-scale, 0.5)); transition: opacity var(--settle-fade, 250ms) ease, transform var(--settle-fade, 250ms) ease; }
 
   /* CLICK TO CONTINUE gate (OWNER AUDIT ROUND 2, item 1) - sits below the
      burst text, appears the instant the gate opens (no entrance delay of
@@ -847,7 +854,13 @@
   }
   .fs-retrigger-moment {
     font-weight: 900; color: #ffd700;
-    font-size: clamp(16px, 14cqw, 52px);
+    /* R152: max-width gives autofitText a box to measure against, and the scale it
+       writes is multiplied in here, so a long locale shrinks instead of running past
+       the board (fi and tr did at HEAD; pl's agreeing form would). The box is 1/1.05 of the board,
+       not all of it, because fs-moment-in overshoots to scale 1.049 on its way in: fitted to the full
+       board, fi, fr, pl and vi ran 5 to 7 px past it for 8 frames (R152 verification). */
+    max-width: calc(100% / 1.05);
+    font-size: calc(clamp(16px, 14cqw, 52px) * var(--autofit-scale, 1));
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
     white-space: nowrap;
     animation: fs-moment-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -939,6 +952,10 @@
     padding: 0.15em 0.5em; border-radius: 10px;
     background: radial-gradient(ellipse at center, rgba(8, 6, 18, 0.7) 0%, rgba(8, 6, 18, 0) 72%);
     animation: fs-winpop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    /* R152: the space before the meter (a text node since R152) is a line-break opportunity, and this
+       absolutely centred box shrinks to fit half its containing block, so a wide amount wrapped the
+       meter onto a second line (measured: '$2,692,800.00 ×17'). One line, always. */
+    white-space: nowrap;
   }
   .fs-spin-mult { color: var(--theme-secondary, #ff2ec4); font-size: 1.4rem; }
   @keyframes fs-winpop {

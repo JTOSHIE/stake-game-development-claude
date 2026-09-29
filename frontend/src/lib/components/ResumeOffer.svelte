@@ -41,6 +41,12 @@
 
   function handleKey(e: KeyboardEvent): void {
     if (!open) return
+    // R152: a key HELD down through the boot screens must not answer this question. Since the splash
+    // answers the keyboard (R152), a held Enter's auto-repeat reached this handler and chose RESUME,
+    // and a held Space's repeats landed on the focused RESUME button, which the browser clicked on key
+    // up (measured). An auto-repeat is ignored, and cancelled so a repeated Space cannot activate the
+    // focused button; a fresh press still answers.
+    if (e.repeat) { if (e.key === 'Enter' || e.key === ' ') e.preventDefault(); return }
     if (e.key === 'Enter') { e.preventDefault(); resume() }
   }
 </script>

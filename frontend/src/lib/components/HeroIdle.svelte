@@ -75,7 +75,7 @@
   // commit message and is nearer 36.967 - it moves with the mask convention where
   // the silhouette figure does not, so the silhouette number is the one to cite.)
   import { onMount, onDestroy } from 'svelte'
-  import { winMultiplier, isSpinning } from '../stores/gameStore'
+  import { winAmount, winMultiplier, isSpinning } from '../stores/gameStore'
   import { overdriveVisual } from '../stores/overdriveVisual'
   // The SAME constant the win banner tiers on. This codebase already carries four
   // separate declarations of the win thresholds and one of them disagrees; this
@@ -195,6 +195,15 @@
   let reduceMq: MediaQueryList | undefined
   let onReduceChange: ((e: MediaQueryListEvent) => void) | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
+  // R152: reactions refused because another was in flight, played in order when it ends. See
+  // react() for why a queue and not a dropped call, and endReaction() for the two-frame gap.
+  let queued: { next: HeroReaction; tier?: 'big' | 'epic' }[] = []
+  let draining = false
+  let drainRaf = 0
+  // R152: true while the reaction in flight is a LATE one the queue started (or one is about to
+  // start). A brace refused by such a reaction is queued at the front, so the queue never costs a
+  // brace that played before R152; a brace refused by an on-time reaction is still refused.
+  let lateInFlight = false
 
   onMount(() => {
     // R129: THIS USED TO BE A ONE-SHOT READ AND THAT WAS WRONG IN BOTH DIRECTIONS.
@@ -210,7 +219,12 @@
       reduced = e.matches
       // Drop anything in flight immediately rather than letting it play out: a player who
       // turns this on mid-reaction wants it to stop now, not in 1.9 seconds.
-      if (e.matches) { clearTimeout(timer); motion = 'idle' }
+      if (e.matches) {
+        clearTimeout(timer); cancelAnimationFrame(drainRaf)
+        // A queued reaction is skipped by design under reduced motion, exactly as a new one is.
+        queued = []; draining = false; lateInFlight = false
+        motion = 'idle'
+      }
     }
     rmq.addEventListener('change', onReduceChange)
     reduceMq = rmq
@@ -224,6 +238,7 @@
   })
   onDestroy(() => {
     clearTimeout(timer)
+    cancelAnimationFrame(drainRaf)
     if (reduceMq && onReduceChange) reduceMq.removeEventListener('change', onReduceChange)
   })
 
@@ -237,7 +252,7 @@
     return DURATION_MS[next]
   }
 
-  function react(next: HeroReaction, tier?: 'big' | 'epic') {
+  function react(next: HeroReaction, tier?: 'big' | 'epic', late = false) {
     // Under reduced motion the hero holds its rest frame and nothing interrupts
     // it. A sudden one-shot is exactly the kind of motion that setting exists to
     // suppress, so reactions are not damped here, they are skipped.
@@ -247,7 +262,27 @@
     // R130: with the glance gone, the only thing that can hold this gate closed
     // is another real reaction, so a feature brace can no longer be swallowed by
     // an idle accent that happened to be playing.
-    if (motion !== 'idle') return
+    // R152: A REFUSED WIN IS NO LONGER DROPPED. Until R152 a win arriving here while another
+    // reaction was in flight returned and was lost, and the win latch below had already been spent
+    // on it, so a paid win of 10x or more got no reaction at all. Measured on the production build:
+    // a second 16.2x win settling 730 to 1,499 ms after the first is dropped at Normal, Turbo and
+    // Super Turbo, by hand and by autoplay at Super Turbo, and a 16.2x after a 108x at 980 to 1,184
+    // ms; a drop occurs exactly when the next settle lands before the in-flight reaction ends
+    // (1,500 ms, 1,900 ms epic). A win is now QUEUED and played when the in-flight reaction ends:
+    // late (one queued win waits out what is left of the reaction in flight, at most 1,500 ms, or
+    // 1,900 ms behind an epic, less the settle gap, plus two frames: measured +269 to +1,215 ms across
+    // the R152 runs; a chain of fast 10x-plus wins adds up to a hold per link) and never skipped. Nothing clears the queue but reduced motion: clearing it on
+    // the next spin would skip the win again whenever a player spins before the in-flight reaction
+    // ends. A BRACE refused by an on-time reaction is still refused, as before (it is not a paid win,
+    // and queued it would land up to 1.9 s into the feature entry). A brace refused by a LATE reaction
+    // the queue started, or while one is about to start, goes to the FRONT of the queue: the queue
+    // lengthened the busy window and cost braces that played before R152 (measured, R152
+    // verification WL2-07); fronted, they play as soon as the late one ends.
+    if (motion !== 'idle' || draining) {
+      if (next === 'win') queued.push({ next, tier })
+      else if (lateInFlight || draining) queued.unshift({ next })
+      return
+    }
     // THE TIER IS ASSIGNED HERE, PAST THE GUARD, AND THAT PLACEMENT IS THE WHOLE FIX.
     // It used to be assigned by the caller BEFORE this function was reached, so a
     // refused reaction still changed `winTier` - and data-tier is bound to it on both
@@ -270,28 +305,51 @@
     // Assigning past the guard makes the refusal total: a reaction that does not
     // start now cannot repaint the one that is running.
     if (next === 'win' && tier) winTier = tier
+    lateInFlight = late
     motion = next
     clearTimeout(timer)
     // holdFor() reads winTier, so the line above must stay ahead of this one.
-    timer = setTimeout(() => { motion = 'idle' }, holdFor(next))
+    timer = setTimeout(endReaction, holdFor(next))
+  }
+
+  // R152: the rest pose, then the next queued reaction TWO FRAMES later, never in the same tick.
+  // win -> idle -> win inside one Svelte flush never reaches the DOM: data-motion stays 'win', so
+  // no CSS animation restarts and the queued reaction plays in state only, invisibly (and a tier
+  // change in that window is the R121 mid-animation tier flip). Two animation frames guarantee the
+  // idle state is styled and painted, so both buffers and the body restart from frame 01.
+  function endReaction() {
+    motion = 'idle'
+    if (queued.length === 0) return
+    draining = true
+    drainRaf = requestAnimationFrame(() => {
+      drainRaf = requestAnimationFrame(() => {
+        draining = false
+        const q = queued.shift()
+        if (q) react(q.next, q.tier, true)
+      })
+    })
   }
 
   // ── Win: once per round, after the reels stop ────────────────────────────────
   // Guarded by a round latch rather than by the multiplier alone, because
   // winMultiplier is derived from winAmount and stays raised for the whole
   // settled round: without the latch any unrelated re-render would re-fire it.
-  let reactedThisRound = false
+  // R152: the latch is the settled AMOUNT, decided once whatever its tier. It was a boolean spent
+  // only on a 10x-plus multiple, so after a smaller win it stayed open and lowering the bet re-derived
+  // winMultiplier (winAmount / betAmount) past 10: the hero punched for a round settled long before
+  // (measured with WinBanner's twin of this defect, R152 winlatch lens WL-10).
+  let reactedToWin = 0
   // R121: the punch is scaled to the win. The brief asks for a stronger
   // epic-class reaction "if available" - no STRIP is available (every factory
   // strip is the same locked pose), but a stronger transform costs nothing and
   // is the only axis on which this hero can express a bigger win at all.
-  $: if ($isSpinning) reactedThisRound = false
-  $: if (!$isSpinning && !reactedThisRound && $winMultiplier >= BIG_WIN_THRESHOLD) {
-    reactedThisRound = true
+  $: if ($isSpinning) reactedToWin = 0
+  $: if (!$isSpinning && $winAmount > 0 && $winAmount !== reactedToWin) {
+    reactedToWin = $winAmount
     // The tier is PASSED rather than assigned here: react() applies it only if it
-    // actually starts the reaction. See the note in react() for what assigning it
-    // at this line used to do to an epic that was still playing.
-    react('win', $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic' : 'big')
+    // actually starts the reaction (or queues it, R152). See the note in react() for
+    // what assigning it at this line used to do to an epic that was still playing.
+    if ($winMultiplier >= BIG_WIN_THRESHOLD) react('win', $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic' : 'big')
   }
 
   // ── Feature: the moment Overdrive turns on ───────────────────────────────────

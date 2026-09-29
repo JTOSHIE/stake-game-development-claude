@@ -237,6 +237,11 @@ legacy set formerly at frontend/public/assets/sounds/, DELETED 2026-08-09. Audio
 resolves under the THEME base (`frontend/src/lib/stores/themeStore.ts` builds every
 path as `${b}/sounds/...`), so that root tree was 1.9MB nothing could reach.
 
+**NOTE 2026-09-29 (R152):** the sizes in (b) are July's. Measured now: the largest mp3 is bgm_loop.mp3 at
+263,358 B (bgm_tension.mp3 and anticipation_build.mp3 are 263,277 B each), the smallest ui_click.mp3 at
+2,551 B. bgm_loop is the R150 take with a 140 ms ChatGPT join-edit (the sounds README has its provenance and
+licence line).
+
 **(b)** MP3 for all sixteen shipped rows, plus WebM/Opus encodes for the three loop beds only
 (`bgm_loop`, `bgm_tension`, `anticipation_build`). Largest `bgm_loop.mp3` 932.9 KB, smallest
 `ui_click.mp3` 5.6 KB. The codec choice is made at runtime by

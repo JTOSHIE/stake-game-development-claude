@@ -269,6 +269,11 @@ live is exactly 5,000.00x on the wincap round itself.
   recorded provenance; **symbols remain never externally designed**, and unrequested
   external design remains prohibited.
 
+  **NOTE 2026-09-29 (R152):** `ui/scene_character.png` in the table below no longer ships. It was drawn
+  only by SceneGroup's unreachable 'static' hero branch, requested 0 times in 14 production contexts;
+  R152 removed that branch and pruned the file from the bundle on the owner's brief. The file stays in
+  the repository and its provenance below stands. The car was pruned at R151.
+
   | Asset | Class | Measured against what it replaced | Provenance record |
   |---|---|---|---|
   | `backgrounds/bg_base.jpg` 1920x1080 | Owner-commissioned NEW DESIGN | Pearson r **0.3850**, 58.2% of cells moved, against a declared ENHANCEMENT control scoring 0.9966 and an identity control at 1.0000 | `design-system/brand/GENERATION_NOTE_background.md`, `reports/qa/background_candidate_ingest.json` |
@@ -422,6 +427,10 @@ live is exactly 5,000.00x on the wincap round itself.
 
 ## STATE AT HEAD, 2026-07-25
 
+**NOTE 2026-09-29 (R152):** this section is the 2026-07-25 state. It no longer outranks the dated
+corrections above it. For audio, section 4's Audio bullet is current: the R150 take, OWNER ACCEPTED AT
+HASH, the circular bed retired, and the 140 ms edit's licence line.
+
 Authoritative where it conflicts with anything above. Every figure below is either measured
 from the shipped package or cited to its source.
 
@@ -493,6 +502,9 @@ Jurisdiction flags are **enforced**, not merely derived: autoplay cap, `turboDis
 across 16 locales, and "Stop playing" halts autoplay and returns to idle.
 
 ### Audio
+
+**NOTE 2026-09-29 (R152):** superseded for audio by section 4's Audio bullet (see the note under this
+section's heading).
 
 No soundtrack claim is made here. Audio ships or it does not; this document does not
 describe it in advance.

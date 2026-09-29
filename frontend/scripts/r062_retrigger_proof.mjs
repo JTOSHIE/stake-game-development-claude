@@ -130,7 +130,16 @@ async function driveFeature(browser, base, { round, viewport, reducedMotion = fa
         const board = document.querySelector('.fs-board')
         const again = document.querySelector('.play-again')
         if (!el || !board) return { present: false, settled: !!again }
-        const r = el.getBoundingClientRect()
+        // R152: measure what PAINTS, not only the box. Since R152 the moment carries a max-width
+        // (its text autofits to the board), so a layout that squeezes its box can leave the nowrap
+        // text painting far past a zero-width box, and a box-only read called that 'inside'. The
+        // union of the box and the text's own range rect is what the player sees.
+        const b0 = el.getBoundingClientRect()
+        const range = document.createRange(); range.selectNodeContents(el)
+        const ink = range.getBoundingClientRect()
+        const hasInk = ink.width > 0 || ink.height > 0 // an empty range reads 0,0,0,0, which is not ink
+        const r = hasInk ? { left: Math.min(b0.left, ink.left), right: Math.max(b0.right, ink.right),
+          top: Math.min(b0.top, ink.top), bottom: Math.max(b0.bottom, ink.bottom) } : b0
         const b = board.getBoundingClientRect()
         return {
           present: true, settled: false,

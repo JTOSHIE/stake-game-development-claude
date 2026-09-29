@@ -30,7 +30,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { Application, Graphics } from 'pixi.js'
-  import { boardSymbols, activeWins, isSpinning, isTurbo, isWincap } from '../stores/gameStore'
+  import { boardSymbols, activeWins, isSpinning, isTurbo, isWincap, winAmount } from '../stores/gameStore'
   import CellModifier from './CellModifier.svelte'
   import { cellMultipliers } from '../stores/cellMultipliers'
   import { speedTier } from '../stores/speedMode'
@@ -234,6 +234,10 @@
 
   // Win burst state
   let winBurstTimer: ReturnType<typeof setTimeout> | null = null
+  // R152: the per-cell flash timers of a win burst, so a new round can cancel them. They were never
+  // cancelled, so a round that replaced the board within their 250 to 530 ms window got the previous
+  // win's flash and bloom painted onto ITS cells (see the activeWins subscription).
+  let burstCellTimers: ReturnType<typeof setTimeout>[] = []
 
   // ── Weighted random passing-tile pool (cruise fill) ──────────────────────
   // Weighted toward low symbols so the blur reads like a real reel band; the
@@ -321,6 +325,7 @@
     injects: number      // injections performed in decel
     queue: string[]      // injection order for landing
     onSettle: (() => void) | null
+    onLand: (() => void) | null  // R152: called in the landing frame, before the bounce
     charged: boolean     // scatter-anticipation glow applied
     lastM: number        // last applied motion factor (throttles var writes)
   }
@@ -328,11 +333,16 @@
   // beat glows the scatters that have actually landed and not the ones still to
   // come, which in drop mode are showing the previous round.
   let _landedThrough = 0
+  // R152: which reels have VISIBLY landed this spin, and whether the landed-scatter charge is live.
+  // A scatter is celebrated on the frame its reel lands, never on the reel's release: in drop mode a
+  // released reel is still a whole fall (400 ms, 260 at Turbo and Super) above the window.
+  const _reelLanded: boolean[] = Array.from({ length: REELS }, () => false)
+  let _chargeArmed = false
 
   const reels: Reel[] = Array.from({ length: REELS }, () => ({
     state: 'rest', velocity: 0, offset: 0, t: 0, cruiseV: 0,
     decelDur: 0, decelDist: 0, decelOffset0: 0, injects: 0, queue: [],
-    onSettle: null, charged: false, lastM: 0,
+    onSettle: null, onLand: null, charged: false, lastM: 0,
   }))
   let rafId: number | null = null
   let lastFrame = 0
@@ -430,9 +440,10 @@
     _ensureRaf()
   }
 
-  function _landReel(col: number, resultRows: string[], fast: boolean): Promise<void> {
+  function _landReel(col: number, resultRows: string[], fast: boolean, onLand?: () => void): Promise<void> {
     return new Promise<void>((resolve) => {
       const r = reels[col]
+      r.onLand = onLand ?? null
       // Injection order so that after Q recycles slots 1..4 = result rows 0..3.
       // (r3,r2,r1,r0) land in slots 4..1; a trailing filler pushes them home.
       const [r0, r1, r2, r3] = [resultRows[0], resultRows[1], resultRows[2], resultRows[3]]
@@ -467,11 +478,22 @@
     for (let i = 0; i < STRIP; i++) _paintSlot(col, i, slotSym[col][i], /*moving*/ false)
     playReelStop(col)
     if (resultHasScatter(col)) playScatterLand()
+    _onReelLanded(col)
+    const land = r.onLand
+    r.onLand = null
+    if (land) land()
     _bounceStrip(col, r).then(() => {
       const cb = r.onSettle
       r.onSettle = null
       if (cb) cb()
     })
+  }
+
+  /** R152: the landing frame of a reel. Marks it landed and, while the charge is live, lights its
+   *  scatters now, in the same frame the scatter_land cue is called. */
+  function _onReelLanded(col: number): void {
+    _reelLanded[col] = true
+    if (_chargeArmed) _chargeLandedScatters(col + 1)
   }
 
   function resultHasScatter(col: number): boolean {
@@ -509,7 +531,7 @@
   }
 
   // ── Drop mode, the same tiles fall from above with gravity + squash ─────
-  function _dropReel(col: number, resultRows: string[], delayMs: number): Promise<void> {
+  function _dropReel(col: number, resultRows: string[], delayMs: number, onLand?: () => void): Promise<void> {
     return new Promise<void>((resolve) => {
       const strip = stripRefs[col]
       if (!strip) { resolve(); return }
@@ -546,6 +568,8 @@
         for (let i = 0; i < STRIP; i++) _paintSlot(col, i, slotSym[col][i], /*moving*/ false)
         playReelStop(col)
         if (resultHasScatter(col)) playScatterLand()
+        _onReelLanded(col)
+        if (onLand) onLand()
         _squash(col).then(resolve)
       }
       requestAnimationFrame(fall)
@@ -685,14 +709,28 @@
     // board used to stay on the base grid beside that round's win, where it read as the board that
     // paid it (R151 self-audit). When a feature starts while it is still up, the grid returns to
     // the neutral placeholder that stood there before R151 (every cell L3), under the overlay.
-    const unsubFeature = overdriveVisual.subscribe(on => {
-      if (on && displayBoardUp && !(get(boardSymbols)?.length === REELS)) {
+    // R152: and the display board may never stand beside a win, whatever path produced it. A bought
+    // round now writes its own basegame board (App.svelte handleBuy), so these are the fallbacks: a
+    // capped round's MAX WIN hold (it settles before the feature starts) and a round with nothing to
+    // present. Both stores start false and 0, so mounting is a no-op; replay never raises the board.
+    const dropDisplay = () => {
+      if (displayBoardUp && !(get(boardSymbols)?.length === REELS)) {
         _updateSymbols(PLACEHOLDER_BOARD)
         displayBoardUp = false
       }
-    })
-    const unsubWins = activeWins.subscribe(() => {
-      if (assetsReady) _applyWinHighlights()
+    }
+    const unsubFeature = overdriveVisual.subscribe(on => { if (on) dropDisplay() })
+    const unsubCap = isWincap.subscribe(cap => { if (cap) dropDisplay() })
+    const unsubWin = winAmount.subscribe(w => { if (w > 0) dropDisplay() })
+    // R152: a CLEARED win list takes its burst with it. Every writer that empties activeWins starts a
+    // new round (resetWin at a spin or a buy, replay's play again). A buy made within the previous
+    // win's 4 s teardown used to snap its own basegame board in under that win's flash, bloom and
+    // loser dim, and on a capped buy the teardown re-armed for the whole MAX WIN hold (measured: 20
+    // cells of the old pattern on the bought board for up to 22.8 s).
+    const unsubWins = activeWins.subscribe((wins) => {
+      if (!assetsReady) return
+      if (!wins.length) _resetToIdle()
+      _applyWinHighlights()
     })
 
     // Dev-only test hook (ANIMATION UPLIFT PASS 2026-07-16, item 6): forces
@@ -720,11 +758,12 @@
       }
     }
 
-    return () => { unsubBoard(); unsubWins(); unsubFeature() }
+    return () => { unsubBoard(); unsubWins(); unsubFeature(); unsubCap(); unsubWin() }
   })
 
   onDestroy(() => {
     if (winBurstTimer) clearTimeout(winBurstTimer)
+    for (const t of burstCellTimers) clearTimeout(t)
     if (rafId != null) cancelAnimationFrame(rafId)
     app?.destroy(true)
   })
@@ -790,7 +829,7 @@
           // 250ms charge pre-burst, then a per-reel left-to-right stagger
           // (~70ms per reel) so the win reads as a sweep, not all-at-once.
           cell?.classList.add('pre-charge')
-          setTimeout(() => {
+          burstCellTimers.push(setTimeout(() => {
             cell?.classList.remove('pre-charge')
             img.classList.remove('loser-dim')
             img.style.opacity = '1'
@@ -798,7 +837,7 @@
             cell?.classList.add('plate-bloom')
             if (symbol.toUpperCase() === 'H1') overlay?.classList.add('win-spin-fast')
             spawnBurst(col * STRIP_W + CELL_W / 2, row * STRIP_H + CELL_H / 2, plateTint(symbol), burstCount)
-          }, 250 + col * 70)
+          }, 250 + col * 70))
         } else {
           // Dim losers harder (and desaturate) so winners clearly spotlight.
           img.style.opacity = ''
@@ -881,6 +920,8 @@
 
   function _resetToIdle(): void {
     if (winBurstTimer) { clearTimeout(winBurstTimer); winBurstTimer = null }
+    for (const t of burstCellTimers) clearTimeout(t)
+    burstCellTimers = []
     for (let col = 0; col < REELS; col++) {
       for (let row = 0; row < ROWS; row++) {
         const img     = visImg(col, row)
@@ -922,6 +963,7 @@
       }
     }
     gridRef?.classList.add('grid-anticipating')
+    _chargeArmed = true
     _chargeLandedScatters(fromReel)
   }
 
@@ -936,6 +978,8 @@
    */
   function _chargeLandedScatters(landedThrough: number = REELS): void {
     for (let c = 0; c < Math.min(landedThrough, REELS); c++) {
+      // R152: a reel told to stop is not a reel that has landed. Only a visible landing counts.
+      if (!_reelLanded[c]) continue
       for (let row = 0; row < ROWS; row++) {
         if (slotSym[c][visIdx(row)] === 'S') visCell(c, row)?.classList.add('scatter-charge')
       }
@@ -960,11 +1004,13 @@
     // being ignored as an unchanged class list.
     void gridRef.offsetWidth
     gridRef.classList.add(cls)
+    _chargeArmed = true
     _chargeLandedScatters(_landedThrough)
     window.setTimeout(() => gridRef?.classList.remove(cls), 900)
   }
 
   function _clearAnticipation(): void {
+    _chargeArmed = false
     for (let r = 0; r < REELS; r++) {
       stripRefs[r]?.classList.remove('anticipate')
       stripRefs[r]?.parentElement?.classList.remove('col-anticipate', 'col-focus')
@@ -1041,6 +1087,7 @@
     winHighlightLayer?.clear()
     _resetToIdle()
     _clearAnticipation()
+    _reelLanded.fill(false)
     cellMultipliers.set([]) // clear last round's per-cell wild badges on a new spin
     slamRequested = false
     isSpinning.set(true)
@@ -1107,7 +1154,12 @@
       }
 
       const landedBefore = scattersLanded
-      const p = _landReel(r, boardRows[r], slamRequested).then(() => {
+      let markLanded: () => void = () => {}
+      const landed = new Promise<void>((resolve) => { markLanded = resolve })
+      // The settle also resolves `landed`, so a reel that settles without a landing frame can never
+      // leave the waits below hanging (resolving a promise twice is a no-op).
+      const p = _landReel(r, boardRows[r], slamRequested, markLanded).then(() => {
+        markLanded()
         _clearAnticipationFor(r)
       })
       settles.push(p)
@@ -1117,13 +1169,20 @@
       // Celebratory beat on the TRANSITION, so it fires when the scatter lands
       // rather than when the round happens to end. 46.2% of triggers secure on
       // the final reel, but the other 53.8% must not wait for it.
+      // R152: and on the reel's LANDING frame, not its stop command, which is a whole
+      // deceleration (up to 460 ms) earlier.
       const pulse = pulseLevelFor(landedBefore, scattersLanded)
       if (pulse !== null && !slamRequested) {
-        scatterEscalation.set(pulse)
-        _setEscalationVar(pulse)
-        _pulseBeat(pulse)
-        await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
+        await _untilOrSlam(landed)
+        if (!slamRequested) {
+          scatterEscalation.set(pulse)
+          _setEscalationVar(pulse)
+          _pulseBeat(pulse)
+          await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
+        }
       }
+      // R152: "no reels left" is true only once the last reel has landed.
+      if (r === REELS - 1) await _untilOrSlam(landed)
 
       // Settle the gauge to what the now-visible state justifies. At rest after
       // three scatters that is level 2, not the 3 the build was pushing: the
@@ -1199,17 +1258,29 @@
       }
 
       const landedBefore = scattersLanded
-      settles.push(_dropReel(c, boardRows[c], 0).then(() => _clearAnticipationFor(c)))
+      let markLanded: () => void = () => {}
+      const landed = new Promise<void>((resolve) => { markLanded = resolve })
+      // The drop's own resolution also resolves `landed` (a missing strip resolves without a landing
+      // frame), so the waits below can never hang; resolving a promise twice is a no-op.
+      settles.push(_dropReel(c, boardRows[c], 0, markLanded).then(() => { markLanded(); _clearAnticipationFor(c) }))
       scattersLanded += boardRows[c].filter((sym) => sym === 'S').length
       _landedThrough = c + 1
 
+      // R152: the beat, the securing scatter's charge and the gauge step celebrate a scatter the
+      // player has SEEN land, so they wait for this reel's landing frame. They fired on the release,
+      // a whole fall (400 ms, 260 at Turbo and Super) before the scatter reached the window.
       const pulse = pulseLevelFor(landedBefore, scattersLanded)
       if (pulse !== null && !slamRequested) {
-        scatterEscalation.set(pulse)
-        _setEscalationVar(pulse)
-        _pulseBeat(pulse)
-        await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
+        await _untilOrSlam(landed)
+        if (!slamRequested) {
+          scatterEscalation.set(pulse)
+          _setEscalationVar(pulse)
+          _pulseBeat(pulse)
+          await _sleepOrSlam(scaledPulseMs(pulse, speedFactor))
+        }
       }
+      // R152: "no reels left" is true only once the last reel has landed.
+      if (c === REELS - 1) await _untilOrSlam(landed)
 
       const settled = escalationFor(scattersLanded, REELS - 1 - c)
       scatterEscalation.set(settled)
@@ -1233,6 +1304,17 @@
     return new Promise<void>((resolve) => {
       const t = setTimeout(() => { _pendingWaitAbort = null; resolve() }, ms)
       _pendingWaitAbort = () => { clearTimeout(t); _pendingWaitAbort = null; resolve() }
+    })
+  }
+  // R152: wait for a reel's landing frame, or not at all once the player slams. A landing resolves
+  // inside the landing frame's rAF callback, so work after this await still renders in that frame.
+  function _untilOrSlam(p: Promise<void>): Promise<void> {
+    if (slamRequested) return Promise.resolve()
+    return new Promise<void>((resolve) => {
+      let done = false
+      const finish = () => { if (done) return; done = true; _pendingWaitAbort = null; resolve() }
+      _pendingWaitAbort = finish
+      p.then(finish)
     })
   }
 </script>
@@ -1557,7 +1639,10 @@
      one-shots keep their own timing.
      THE VALUES ARE SEARCHED, NOT PICKED, AGAINST HOW THE REELS REALLY LAND. Cells start together at
      load and after a win's teardown, but in play each reel's idles start at its own landing: 95 ms
-     after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse.
+     after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse;
+     since R152 a pulse first waits for its reel to land, so the landing after a pulse also carries
+     that reel's fall (400 ms, 260 at Turbo and Super) and about 6 to 13 ms of landing-to-release
+     overhead (the landing callback, the pulse beat and the three timers running late).
      Three earlier sets each failed one regime (one locked every stacked row 2 and 3 flame; one
      locked reels 4 and 5 at the landing stagger; one locked neighbours across Turbo holds on about
      1.8% of spins). No set can clear every hold: the column offsets below were chosen reel boundary
@@ -1565,15 +1650,21 @@
      scatter pattern, all three speeds, whole frames at 60 and 120 Hz), keeping cells that start
      together at least 90 ms apart and every plain landing stagger at least 131 ms apart on all
      twelve idle and flipbook periods (0.34 to 3.4 s), and minimising the hold cases under 50 ms.
-     Weighted by the real base, Cruise and OVERBOOST books, a side-by-side same-class pair falls
-     under 50 ms on at most 0.03% of spins at any speed (before R151: about 1% at Normal and Super,
-     and every cell in exact lockstep at load and after every win). Stacked pairs stay at least 93
-     ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
+     Weighted by the real base, Cruise and OVERBOOST books (R152, re-derived after the landing-anchored
+     pulse), a side-by-side same-class pair falls under 50 ms on no spin at Normal or Super and on at
+     most 0.012% at Turbo (base 0.007%, Cruise 0.005%, OVERBOOST 0.012%: reels 4 and 5 after a
+     third-scatter pulse on reel 3, the L2 arc flipbook), whole frames at 60 and 120 Hz. No column step
+     clears that Turbo case without losing the Normal zero (proved over every step). Column 5 moved
+     from -3.714 s to -3.035 s in R152: the Normal zero then survives a landing-to-release overhead
+     up to 38 ms at 60 Hz, 46.6 at 120 Hz (it held only to 21.6 ms; measured 5.7 to 12.6 ms), with
+     the Turbo and Super shares unchanged. (Before R151: about 1% at Normal and Super, and every cell
+     in exact lockstep at load and after every win.)
+     Stacked pairs stay at least 93 ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
      off-screen buffers. */
   .symbol-col:nth-child(2) { --col-phase: -0.93s; }
   .symbol-col:nth-child(3) { --col-phase: -1.858s; }
   .symbol-col:nth-child(4) { --col-phase: -2.786s; }
-  .symbol-col:nth-child(5) { --col-phase: -3.714s; }
+  .symbol-col:nth-child(5) { --col-phase: -3.035s; }
   .symbol-cell:nth-child(2) { --slot-phase: -1.143s; }
   .symbol-cell:nth-child(3) { --slot-phase: -0.650s; }
   .symbol-cell:nth-child(4) { --slot-phase: -0.548s; }

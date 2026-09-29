@@ -84,9 +84,12 @@
          derive_hero_icon.py) as a single layer, replacing the old bespoke
          brand_mark_base/brand_mark_spin two-layer rim+blade composite.
          FS VISUAL FIXPACK JOB 1: it is STILL. The class is named for what it
-         does, so nobody re-adds a rotation to something called brand-spin. -->
+         does, so nobody re-adds a rotation to something called brand-spin.
+         R152 (2026-09-29): this component is imported by nothing (see App.svelte),
+         so the hero icon image went, and its raster is pruned from the bundle. The
+         file stays, so every line number the records cite still exists (the lines after
+         this one moved by a few). -->
     <div class="brand-mark" aria-hidden="true">
-      <img class="brand-still" src="{$themeAssets.assetBase}/ui/hero_icon_96.png" alt="" draggable="false" />
     </div>
 
     <!-- THE GAME TITLE IS TEXT, NOT ART, since 2026-08-09 on the owner's call.
@@ -164,13 +167,6 @@
     height: clamp(140px, 24vw, 220px);
     filter: drop-shadow(0 0 24px rgba(0, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 0, 255, 0.3));
     animation: brand-glow-pulse 3.2s ease-in-out infinite;
-  }
-  .brand-still {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
   /* Filter only. Nothing here may touch transform or scale: the gate asserts
      the mark's box is byte-identical across every sample of a ten-second

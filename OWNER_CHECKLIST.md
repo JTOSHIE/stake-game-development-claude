@@ -267,6 +267,11 @@ says item 3 stays open until the console line arrives.
 is closed, folded into a live item, or recorded as reported; each row says which. Read the
 Finished column and the evidence, not the heading.
 
+NOTE 2026-09-29 (R152): the "stale Desktop kits" row at the foot of this table still reads not
+done, but the tidy-up it waits on happened on 2026-08-08 (item 3 above, "DONE 2026-08-08"). One
+frontend-only kit remains at ~/Desktop/FS_UPLOAD_KIT, built at b4455850, which is 82 commits behind
+main at 542246cf; the next kit_build overwrites it. The row is left as written.
+
 | Item | Finished | Evidence |
 |---|---|---|
 | **Twenty Cruise spins, bracketed** | 2026-07-28 | `reports/screens/live-portal-2026-07-28/`, frames `072445` and `072516`. **TR-075 CLOSED.** 1000.00 minus 1.00 = 999.00, and 1000.00 minus 5.00 plus 0.84 = 995.84, both matching the HUD to the cent, at exactly 1.00x. **The last open money item in the project**, and the fifth and final mode to be proven. |

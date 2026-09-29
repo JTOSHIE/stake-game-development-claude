@@ -23,27 +23,30 @@
   import HeroIdle from './HeroIdle.svelte'
 
   // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
-  // Three ways to draw the pilot, in descending order of how good he looks:
+  // One way to draw the pilot since R152; the other two it had are recorded here:
   //
-  //   'idle'   DEFAULT. The crossed-arms idle strip, played as a six-frame
+  //   'idle'   THE ONLY MODE. The crossed-arms idle strip, played as a six-frame
   //            flipbook (R126: this said five; it has been six since R122). This is the shipped hero's own pose and silhouette
   //            (frame 01 matches ui/scene_character.png at IoU 0.9997), but
   //            re-rendered per frame so the body relights as it breathes.
-  //   'static' The original flat sprite with its whole-body bob. The oldest and
-  //            safest path, and the one-line escape hatch: pass heroMode="static"
-  //            at the App.svelte mount and the hero reverts to the pre-R111 sprite.
+  //   'static' The original flat sprite with its whole-body bob, drawn from
+  //            ui/scene_character.png. RETIRED R152 (2026-09-29): the branch had no
+  //            mount that could reach it and its sprite was never requested, so
+  //            the owner's brief pruned the sprite from the bundle and the branch
+  //            went with it. The sprite stays in the repository. A future Path 1
+  //            is a revert of that R152 hunk plus its prune list lines, never a
+  //            re-render.
   //
   // R111's eleven-part bone hierarchy WAS a third mode here and was removed in
-  // R115. It could never render: heroMode has exactly one mount, App.svelte:2159
-  // `<SceneGroup haze={hazeLevel} />`, which does not pass it, so the branch was
+  // R115. It could never render: the mode prop that selected it (removed R152) was
+  // never passed by SceneGroup's one mount in App.svelte, so the branch was
   // unreachable while its eleven part rasters shipped to every player. R112
   // established that the pose those parts are drawn in, arms at sides and neutral,
   // is not the wanted one. The rig remains in git history and in
   // docs/design/SPINE_ROBOT_RIG_SETUP.md if a real skeletal pass is ever revived.
   //
-  // Every mode keeps the same 206x407 box, the same grounding and its own
-  // reduced-motion behaviour, so switching cannot move the scene.
-  export let heroMode: 'idle' | 'static' = 'idle'
+  // Since R152 SceneGroup takes no mode prop: the heroMode prop ('idle' | 'static', default 'idle')
+  // was removed with the 'static' branch, and HeroIdle is the only hero.
 
   // ── COHESION PASS (TR-027) ─────────────────────────────────────────────────
   // The car and pilot were separated from the backdrop by a flat drop-shadow
@@ -93,11 +96,7 @@
   <!-- CHARACTER, feature hero, left-justified in the gutter, fully visible (z30) -->
   <div class="char-layer" aria-hidden="true">
     <div class="depth-haze" aria-hidden="true"></div>
-    {#if heroMode === 'idle'}
-      <HeroIdle assetBase={$themeAssets.assetBase} />
-    {:else}
-      <img class="char-img" src="{$themeAssets.assetBase}/ui/scene_character.png" alt="" draggable="false" />
-    {/if}
+    <HeroIdle assetBase={$themeAssets.assetBase} />
     <div class="antenna-light" aria-hidden="true"></div>
     <div class="visor-glint" aria-hidden="true"></div>
     <div class="chest-lamp" aria-hidden="true"></div>
@@ -133,7 +132,7 @@
      deliberately reduced the contrast that separated subject from background,
      something has to put that separation back, and a rim is what does it
      without flattening the haze again. */
-  .car-img, .char-img {
+  .car-img {
     filter:
       drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5))
       drop-shadow(-2px -1px 0 rgba(120, 240, 255, var(--rim, 0)))
@@ -275,14 +274,6 @@
     50%      { transform: translateY(-3px); }
   }
 
-  .char-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.55));
-  }
-
   /* Antenna tip, the orange orb blinks. Positioned over the orb on the
      character's upper left. */
   /* R112: re-registered onto the orb it is named for. The inherited box was
@@ -314,6 +305,9 @@
 
   /* Visor, occasional glint sweep over the visor.
 
+     NOTE R152: .char-img no longer exists (the 'static' branch was removed); the measurement below
+     was made on it. The idle sheet frame (394x780, aspect 0.5051) fills the same 206x407 box
+     (0.5061), so the percentages still land where they did.
      top was 17% until R110, which measured where the light actually landed.
      .char-img is object-fit:contain and the box aspect (206/407) matches the
      source (680/1344) to four decimals, so layer % maps 1:1 onto the sprite at

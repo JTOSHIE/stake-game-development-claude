@@ -504,6 +504,19 @@ jobs:
         working-directory: frontend
         run: npx tsx src/lib/i18n/vocabulary.test.ts
 
+      # R152: count nouns agree with their count in all sixteen locales. t() resolves
+      # ICU-style plural blocks through Intl.PluralRules; the self-test plants the shipped
+      # '{n} ways' form ("1 ways") and must go red on it (convention (p)).
+      - name: count nouns agree, seeded-violation self-test
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: npx tsx src/lib/i18n/plural.test.ts --self-test
+
+      - name: count nouns agree, sixteen locales
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: npx tsx src/lib/i18n/plural.test.ts
+
       # ── Gate 6c: the disclaimer, sixteen locales, both modes ─────────────────
       # M02 of reports/qa/session3/MECHANISMS.md. EIGHT platform requirements
       # (REQ-010 to REQ-016 and REQ-038) are properties of one artefact, the
@@ -927,6 +940,14 @@ jobs:
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: npx tsx src/lib/services/replayRounds.test.ts
+
+      # R152: a presented scatter count is the VISIBLE count. The padded count put a
+      # '3 SCATTERS: 8 FREE SPINS' label on Bet Replay for rounds that did not trigger. The
+      # seeded board (2 visible, 1 in padding) is its own red case.
+      - name: scatter count reads the visible window
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        working-directory: frontend
+        run: npx tsx src/lib/services/scatterCount.test.ts
 
       # The REPLAY route is a separate surface from the game route: App.svelte
       # branches to ReplayMode instead of the game tree, so the social

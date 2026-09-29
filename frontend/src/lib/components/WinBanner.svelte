@@ -134,9 +134,15 @@
   // Reactive (base-game) path - unchanged behaviour, now also gated on
   // `suppressed` and skipped entirely once a caller has taken over via the
   // explicit-trigger props (amount !== null).
-  $: if (amount === null && $winAmount > 0 && !$isSpinning && !suppressed && $winMultiplier >= BIG_WIN_THRESHOLD) {
-    if ($winAmount !== lastShownWin) {
-      lastShownWin = $winAmount
+  // R152: DECIDED ONCE PER SETTLED WIN. The tier test used to sit in the outer condition, so a win
+  // under 10x left lastShownWin unset and the banner kept asking; lowering the bet afterwards
+  // re-derived winMultiplier (winAmount / betAmount) and raised a MEGA banner for a round settled
+  // minutes earlier, with no new round (measured: a 3.9x win at 1.00, bet lowered to 0.10, MEGA
+  // banner at $3.90). The settled amount is now marked as seen whatever its tier, so only a new
+  // settle can raise the banner.
+  $: if (amount === null && $winAmount > 0 && !$isSpinning && !suppressed && $winAmount !== lastShownWin) {
+    lastShownWin = $winAmount
+    if ($winMultiplier >= BIG_WIN_THRESHOLD) {
       const t: Tier = $winMultiplier >= EPIC_WIN_THRESHOLD ? 'epic'
         : $winMultiplier >= MEGA_WIN_THRESHOLD ? 'mega' : 'big'
       showBanner($winAmount, t, $winMultiplier)
@@ -771,7 +777,17 @@
          on a money readout. .fs-plate does not contain the burst, so the band can breathe without
          the art growing into the HUD. */
   .fs-plate { animation: c1-pulse 2.4s ease-in-out .6s infinite; }
-  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+  /* R152: the 55% key was scale(1.1). The easing overshoots inside that segment, so the plate peaked
+     at scale 1.1685 about 190 ms in, and at 1280 the face row's outermost items (60 px from each
+     edge) left the screen for about 180 ms: a live FEATURE PRICE and the tier word were cut
+     (measured, R152 locale lens L2). The budget must include the win shake, which App.svelte
+     starts in the same frame and which moves the whole stage up to 7 px (its shake keyframes): the
+     bound is (640 - 7) / 580 = 1.0914. At 1.02 the peak is 0.4 + 0.62 x 1.0978 = 1.0806, measured
+     with the shake at 0 frames past the edge at 960, 1280, 1440 and 1920 (at least 6.2 px to spare
+     at 1280 on this bound; about 7.2 px on the combined slam and shake curves).
+     A first cut at 1.04 (peak 1.1026) ignored the shake and still cut the price's last glyph by up to
+     4 px for three frames (R152 verification). */
+  @keyframes c1-enter { 0% { opacity: 0; transform: scale(.4); } 55% { opacity: 1; transform: scale(1.02); } 100% { transform: scale(1); } }
   /* R151: the exit beat (see EXIT_MS). The banner used to be removed in one frame at full opacity
      and scale, the one beat of the celebration that read unfinished. Now the root fades and the
      plate eases down a touch. THE TWO ARE SPLIT ON PURPOSE: the root (.c1-win is also

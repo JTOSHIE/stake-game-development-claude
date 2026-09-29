@@ -421,6 +421,10 @@
   // the game containers, so it can make them inert. This registry drives `inert`
   // only, so `anyModalOpen` is unchanged and autoplay behaves exactly as before.
   $: setGameBlocked('paytable', $showPaytable)
+  // R152: the boot splash and the rules card cover the whole game too, and they are
+  // siblings of the game containers, so the game is inert under them: Tab cannot walk
+  // the player onto SPIN or FEATURES behind a screen that hides them.
+  $: setGameBlocked('boot-splash', showHeroSplash || showIntroSplash)
 
   // ── Persistent hidden mount (Reel Feel v3, Task 5) ─────────────────────────
   // The first-ever Overdrive entry pays a one-time compile/style/decode cost for
@@ -672,9 +676,14 @@
     shakeActive = true
     setTimeout(() => { shakeActive = false }, durationMs)
   }
-  $: if ($winAmount > 0 && $winAmount !== lastShakeWin && $winMultiplier >= 10) {
+  // R152: decided once per settled win, and re-armed when the win clears. The multiple test sat in
+  // the condition, so lowering the bet after a small win re-derived winMultiplier past 10 and shook
+  // the screen with no new round; and the latch was never cleared, so a second identical win
+  // amount (two 16.2x rounds at the same bet) got no shake at all.
+  $: if ($winAmount === 0) lastShakeWin = 0
+  $: if ($winAmount > 0 && $winAmount !== lastShakeWin) {
     lastShakeWin = $winAmount
-    triggerShake()
+    if ($winMultiplier >= 10) triggerShake()
   }
 
   function onFeatureComplete(): void {
@@ -738,6 +747,8 @@
       // reloads a SECOND time during the same round resumes again rather than
       // being sent back to spin one.
       liveBetID = get(activeRound)?.betID ?? null
+      // R152: the recovered round's own basegame board, as for a bought round in handleBuy.
+      boardSymbols.set(script.baseSpin.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name)))
       await presentFeature(script, resumeFromIndex)
       return
     }
@@ -857,6 +868,17 @@
       const script = events ? scriptFromEvents(events) : null
       const buyWin = result.newBalance !== undefined ? result.totalWin : (servedTotalWin ?? result.totalWin)
       const roundIsWincap = result.newBalance !== undefined ? result.isWincap : (script?.isWincap ?? result.isWincap)
+
+      // R152, brief Phase 1 item 4. A bought round's grid shows that round's own basegame board, the
+      // book's first reveal, as Bet Replay already does (ReplayMode.svelte's startReplay). Before this
+      // the grid kept whatever stood there: the cosmetic pre-spin board on a session's first round, or
+      // the PREVIOUS round's board, beside this round's win. Written before the settle so a capped
+      // round's MAX WIN hold stands over the real board too. Snapped, not spun: no reel motion and no
+      // cue, so the accepted audio is unchanged. activeWins and scatterCount stay untouched: the base
+      // pay is already inside the feature total.
+      if (script?.triggered) {
+        boardSymbols.set(script.baseSpin.board.map((reel) => reel.slice(1, reel.length - 1).map((c) => c.name)))
+      }
 
       // OWNER AUDIT ROUND 2, item 1 (spoiler-bug fix, buy-flow counterpart to
       // the same fix in handleSpin above): a buy always triggers the feature,
@@ -2396,12 +2418,14 @@
                WinBanner: set inside runPendingFeatureSettle BEFORE settle(), so it is true on the
                frame winAmount rises, and cleared at the top of every spin and buy, so base-game
                flashes are untouched. -->
-          <WinCelebration winMultiplier={$isWincap || lastRoundHadFeature ? 0 : $winMultiplier} />
+          <WinCelebration winMultiplier={$isWincap || lastRoundHadFeature ? 0 : $winMultiplier} winAmount={$winAmount} />
           <!-- Ways breakdown, cycles group by group after the win burst settles.
                Suppressed on a capped round for the same reason as the line
                above: its 1400ms cycle has no natural end and would otherwise
-               tick for the whole of the max-win hold. -->
-          <WinBreakdown suppressed={$isWincap} />
+               tick for the whole of the max-win hold. R152: and while the feature
+               plays, when the board shows free spins and these groups are the base
+               spin's, so the chip would narrate a different spin from the one on screen. -->
+          <WinBreakdown suppressed={$isWincap || featureActive} />
           <!-- Overdrive free-spins presentation overlay (feature rounds only) -->
           <FreeSpinsPresentation
             bind:this={featureRef}

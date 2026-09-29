@@ -432,6 +432,12 @@ Manus is retired. All visual and audio assets are produced in-house from vector 
 (SVG) via the asset pipeline: deterministic, exact-size rendering, front-facing symbols
 carry no baked-in text. Do not reintroduce Manus briefs.
 
+**NOTE 2026-09-29 (R152), on the note below:** since R150 the idle bed bgm_loop is the owner's take A
+with a 140 ms ChatGPT join-edit (master sha256 99643c41...), exempt from audio_verify's 2.0 dB seam
+limit at that hash only (OWNER ACCEPTED AT HASH, R151). Its licence line, as the three records carry
+it: an owner-commissioned development-stage cue, pending written audio terms; Ticket 456254 remains
+images-only (sounds README).
+
 **NOTE 2026-09-26 (R147), a fact for the reader, not an amendment of the rule:** the audio half
 of the sentence above no longer describes what ships, and no amendment below covers audio. Since
 R146 every shipped sound except `ui_click.mp3` comes from the owner's stems, whose licence and
@@ -703,6 +709,14 @@ Deleting it closed the gap to four `.DS_Store` files, which the build now strips
 clone and this machine then produced byte-identical 15,510,083-byte builds. Building from a
 clone makes that property structural rather than something to remember: whatever is on a
 working machine and not in the repository cannot reach the upload.
+
+**NOTE 2026-09-29 (R152), a tension surfaced per convention (n), not a ruling:** the rule below says
+the upload source is frontend/dist and the Desktop staging hop is retired, yet the owner's rebuild
+path in use since R137 is `node scripts/kit_build.mjs`, which builds in a fresh clone and stages
+~/Desktop/FS_UPLOAD_KIT, and the R151 and R152 briefs ask for that kit. Which one is canonical is an
+owner ruling (R152 owner list). Two builds of one commit never compare equal (the entry chunk
+carries its build time), so kit_manifest_gate.mjs cannot pass against a kit_build kit; the kit's own
+BUILD_INFO.json and the boot console line are the identity check.
 
 **(o.1) The standing staging note: the upload source is `frontend/dist` directly.
 Recorded 2026-08-13, R056 TASK 0.** The Desktop staging hop is RETIRED. The owner's

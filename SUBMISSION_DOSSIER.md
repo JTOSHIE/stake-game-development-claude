@@ -311,6 +311,12 @@ no code change. Full reasoning in **TR-102**.
 
 ### 5b. Exact portal upload steps
 
+**NOTE 2026-09-29 (R152):** the steps below upload frontend/dist, as convention (o.1) in CLAUDE.md
+says. The owner's rebuild path in use since R137 is `node scripts/kit_build.mjs`, which builds in a
+fresh clone and stages ~/Desktop/FS_UPLOAD_KIT, whose frontend upload folder is then the upload set.
+Which of the two is canonical is an owner ruling (R152 owner list). 5b0's body text is the 2026-07-28
+wording; 5b0's heading and the R051 note above it are current.
+
 1. Log in to the Stake Engine developer dashboard and open the **`future-spinner`** entry (the sole entry since the owner's 2026-08-11 deletion of -2)
    (team profile, branding and payment details must already be confirmed one-time - see 5d
    below).
@@ -854,6 +860,11 @@ rule holds in both directions.
 Four external adoptions ship. **Only one of them was recorded in this dossier before
 2026-07-27.** The operative permitting clause for all of them is `CLAUDE.md`'s Assets
 section as amended 2026-07-27; the superseding note is in section 8i above.
+
+**NOTE 2026-09-29 (R152):** scene_character.png in the table below no longer ships: SceneGroup's
+unreachable 'static' hero branch, its only reader, was removed and the file pruned from the bundle on
+the owner's R152 brief (it was requested 0 times in 14 production contexts). The file and its
+provenance stay in the repository.
 
 | Asset | Class | Dimensions | Shipped SHA-256 | What the measurement found | Record |
 |---|---|---|---|---|---|

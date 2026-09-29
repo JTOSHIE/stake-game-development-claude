@@ -1120,6 +1120,12 @@ the proof is, so you are not asked twice. What is left needs you: the Guidelines
 
 # PART 9i: THE v10 VISIT
 
+**NOTE 2026-09-29 (R152), read before this part:** the kit is always built at ~/Desktop/FS_UPLOAD_KIT, with no
+version in the folder name, and the build refuses while a versioned kit folder exists. Upload only the
+contents of its frontend upload folder, as the kit's own README says, to the entry future-spinner, the sole
+entry since the owner cleared the others on 2026-08-11 (R051). FS_UPLOAD_KIT_V10 and future-spinner-3 below
+are the 2026-07-28 wording. The rebuild sequence is in the R152 session report's owner list.
+
 **This is the whole visit and it fits on one page.** You do not need to read anything above
 it. PART 9h and everything before it are superseded.
 
@@ -1178,6 +1184,9 @@ uppercase, in the brand face, with the number and the words styled together. Any
 there, screenshot it. That is the whole check; close the paytable and move on.
 
 ## 5. Delete the kit, and the old entries
+
+**NOTE 2026-09-29 (R152):** the kit folder is now ~/Desktop/FS_UPLOAD_KIT and the entry is future-spinner (see
+the note at the top of this part); the names in this step are the 2026-07-28 wording.
 
 Delete `~/Desktop/FS_UPLOAD_KIT_V10/` when you are done, along with every older kit. Kits are
 single use. Then, once the platform's cooldown allows, delete the superseded entries so only
