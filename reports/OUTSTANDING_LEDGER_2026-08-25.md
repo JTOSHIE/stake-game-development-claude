@@ -4,6 +4,35 @@
 > written. What it changed is in section 0A; the rest of the ledger stands. **Do not read the
 > pre-R104 rows as though the kit does not exist.**
 
+## 1H. R152 (2026-09-29) - THE OVERNIGHT CLOSURE PASS: COUNTS AGREE, SCATTERS FIRE ON LANDING, NO PAID WIN IS DROPPED
+
+**Branch `claude/r152-overnight-closure`, review lane.** Appended above 1G, which stays as written. #187 (R151) was
+merged by the owner at 542246cf on 2026-09-28; main CI on it green (run 36431928991).
+
+**CLOSED, 1G's OPEN ITEMS:** the title halo is KEPT (softness 0 of 12 configurations natively; the 2 of 12 under
+emulation are identical without the halo). Scatter beats, the securing charge and the flame gauge now fire on the
+landing frame. The four dead rasters (834,973 B) leave the bundle with their dead code; sources stay; Path 1 is now a
+revert of SceneGroup's static-branch hunk. The win chip's "1 ways": count nouns agree in all sixteen locales through
+Intl.PluralRules. R147 D2 and D4 (the spin duck's restore is cancellable).
+
+*** DONE, IN THE PR: Space and Enter dismiss the boot screens and nothing behind them can be bet; a bought or
+recovered round shows its own base board; a paid 10x-plus win's hero reaction is queued, never dropped, and a bet
+change raises nothing; the Turbo settle shrink and the banner slam-in tuned so no live price leaves the screen; the
+paytable guide's SPIN, FEATURES and MAX are translated replicas, not English rasters; Bet Replay shows the booked
+multiplier and one set of tier words; idle offsets re-derived (Normal and Super zero, Turbo residual recorded);
+dated notes where docs had gone stale; the look-pass harness covers 844x390 and refuses a missing asset, a dirty
+build and a win shot without its banner; Vite's dev-server close no longer restamps dist. No raster, audio file,
+maths, locked path or HUD geometry changed; no kit built. ***
+
+**OPEN, OWNER:** the numbered owner list in the R152 session report (21 items), headed by the kit rebuild (exact
+commands there), the cover and hover clip, win_max at 1.81 s, the phone floor (4.41%), the parked layout pairs, the
+canonical upload folder, three unrequested guide captures (63,610 B), native plural review, and the two-scatter tease
+that still opens before the second scatter lands.
+
+**STILL OPEN:** 1G's other rulings (the band over the hero and the max-win overlay over his epic, the band over the
+odometer, tier art preload, the max-win exit, the route frame colours, the rain, Super Turbo's pace) and 1D's list,
+less what is closed above.
+
 ## 1G. R151 (2026-09-28) - WHAT WAS ALREADY ON SCREEN NOW MOVES LIKE A SHIPPED SLOT; THE SEAM RULING IS OPERATIVE
 
 **Branch `claude/r151-presentation-motion`, review lane.** Appended above 1F, which stays as written.
