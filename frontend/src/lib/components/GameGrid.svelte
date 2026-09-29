@@ -1639,7 +1639,9 @@
      one-shots keep their own timing.
      THE VALUES ARE SEARCHED, NOT PICKED, AGAINST HOW THE REELS REALLY LAND. Cells start together at
      load and after a win's teardown, but in play each reel's idles start at its own landing: 95 ms
-     after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse.
+     after the reel before (60 ms at Turbo and Super), plus any anticipation hold and scatter pulse;
+     since R152 a pulse first waits for its reel to land, so the landing after a pulse also carries
+     that reel's fall (400 ms, 260 at Turbo and Super) and about 7 to 12 ms of landing-frame work.
      Three earlier sets each failed one regime (one locked every stacked row 2 and 3 flame; one
      locked reels 4 and 5 at the landing stagger; one locked neighbours across Turbo holds on about
      1.8% of spins). No set can clear every hold: the column offsets below were chosen reel boundary
@@ -1647,15 +1649,20 @@
      scatter pattern, all three speeds, whole frames at 60 and 120 Hz), keeping cells that start
      together at least 90 ms apart and every plain landing stagger at least 131 ms apart on all
      twelve idle and flipbook periods (0.34 to 3.4 s), and minimising the hold cases under 50 ms.
-     Weighted by the real base, Cruise and OVERBOOST books, a side-by-side same-class pair falls
-     under 50 ms on at most 0.03% of spins at any speed (before R151: about 1% at Normal and Super,
-     and every cell in exact lockstep at load and after every win). Stacked pairs stay at least 93
-     ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
+     Weighted by the real base, Cruise and OVERBOOST books (R152, re-derived after the landing-anchored
+     pulse), a side-by-side same-class pair falls under 50 ms on no spin at Normal or Super and on at
+     most 0.012% at Turbo (base 0.007%, Cruise 0.005%, OVERBOOST 0.012%: reels 4 and 5 after a
+     third-scatter pulse on reel 3, the L2 arc flipbook), whole frames at 60 and 120 Hz. No column step
+     clears that Turbo case without losing the Normal zero (proved over every step). Column 5 moved
+     from -3.714 s to -3.035 s in R152: the Normal zero then survives a landing-frame overhead up to
+     30 ms (it held only to 21.6 ms; measured at most 12 ms), with Turbo and Super unchanged. (Before
+     R151: about 1% at Normal and Super, and every cell in exact lockstep at load and after every win.)
+     Stacked pairs stay at least 93 ms apart through the row offsets. Rows 0 to 3 are strip slots 2 to 5; slots 1, 6 and 7 are the
      off-screen buffers. */
   .symbol-col:nth-child(2) { --col-phase: -0.93s; }
   .symbol-col:nth-child(3) { --col-phase: -1.858s; }
   .symbol-col:nth-child(4) { --col-phase: -2.786s; }
-  .symbol-col:nth-child(5) { --col-phase: -3.714s; }
+  .symbol-col:nth-child(5) { --col-phase: -3.035s; }
   .symbol-cell:nth-child(2) { --slot-phase: -1.143s; }
   .symbol-cell:nth-child(3) { --slot-phase: -0.650s; }
   .symbol-cell:nth-child(4) { --slot-phase: -0.548s; }
