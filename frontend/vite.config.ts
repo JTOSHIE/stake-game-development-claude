@@ -27,9 +27,15 @@ import { resolve, join } from 'node:path'
 // `!import.meta.env.DEV`, true for every `npm run build` output, with no
 // URL param or storage override that survives it (verified by reading
 // App.svelte and themeStore.ts). The dev-only ThemeSelector that reaches them
-// is itself gated on the same flag. closeBundle only ever runs for `vite
-// build`, never `vite dev`, so the dev server keeps every theme for local
+// is itself gated on the same flag. The dev server keeps every theme for local
 // theme-selector testing; only the shipped artifact is pruned.
+// R152 CORRECTION: this comment said closeBundle 'only ever runs for vite build,
+// never vite dev'. That was false: Vite calls closeBundle when a DEV server
+// closes, so stopping `npm run dev` (or any gate that starts a dev server) pruned
+// and restamped frontend/dist/build-info.json, which dist_hygiene then failed. The
+// plugin now declares apply: 'build'. It also prunes and stamps the RESOLVED outDir
+// rather than a hard-coded frontend/dist, so a `vite build --outDir <scratch>`
+// (a gate's seeded build) no longer rewrites the real dist's build-info.json.
 // R2R3 finding 9 / TR-046, fixed R2R-R JOB F (2026-07-26). This parameter was
 // untyped, so `tsc -p tsconfig.node.json` reported TS7006 and `npm run check`
 // exited non-zero, which is why CI only ever ran the Svelte half. One
@@ -290,14 +296,20 @@ function pruneLegacyAssets() {
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()
 
+  // R152: the resolved build output directory (see the header's R152 correction).
+  let outDirAbs = resolve(__dirname, 'dist')
   return {
     name: 'build-diet-prune-legacy-assets',
+    apply: 'build' as const,
+    configResolved(config: { root: string; build: { outDir: string } }) {
+      outDirAbs = resolve(config.root, config.build.outDir)
+    },
     closeBundle() {
       let prunedBytes = 0
       let prunedCount = 0
 
       for (const rel of LEGACY_DIRS) {
-        const abs = resolve(__dirname, 'dist', rel)
+        const abs = resolve(outDirAbs, rel)
         if (existsSync(abs)) {
           const size = dirSize(abs)
           prunedBytes += size
@@ -308,7 +320,7 @@ function pruneLegacyAssets() {
       }
 
       for (const rel of LEGACY_FILES) {
-        const abs = resolve(__dirname, 'dist', rel)
+        const abs = resolve(outDirAbs, rel)
         if (existsSync(abs)) {
           const size = statSync(abs).size
           prunedBytes += size
@@ -318,7 +330,7 @@ function pruneLegacyAssets() {
         }
       }
 
-      const uiAbs = resolve(__dirname, 'dist', UI_DIR)
+      const uiAbs = resolve(outDirAbs, UI_DIR)
       if (existsSync(uiAbs)) {
         for (const f of readdirSync(uiAbs)) {
           if (KEEP_UI.has(f)) continue
@@ -342,7 +354,7 @@ function pruneLegacyAssets() {
       // entire 36,880-byte difference was four .DS_Store files. Stripping them
       // makes the two builds match FILE FOR FILE rather than within rounding,
       // which is the only version of "reproducible" worth claiming.
-      const strayCount = pruneByName(resolve(__dirname, 'dist'), '.DS_Store')
+      const strayCount = pruneByName(outDirAbs, '.DS_Store')
       if (strayCount > 0) {
         prunedCount += strayCount
         console.log(`[build-diet] pruned ${strayCount} stray .DS_Store file(s)`)
@@ -351,7 +363,7 @@ function pruneLegacyAssets() {
       // JOB 3(i), 2026-07-26. No documentation ships. See pruneDocs above for
       // why, and scripts/dist_hygiene_gate.mjs for the assertion that it did
       // not ship, which is the half that survives someone editing this plugin.
-      const docs = pruneDocs(resolve(__dirname, 'dist'))
+      const docs = pruneDocs(outDirAbs)
       if (docs.length > 0) {
         prunedCount += docs.length
         console.log(`[build-diet] pruned ${docs.length} documentation file(s): ${docs.join(', ')}`)
@@ -359,7 +371,7 @@ function pruneLegacyAssets() {
 
       // R146. No audio master ships. See pruneAudioMasters above, and
       // scripts/dist_hygiene_gate.mjs for the independent assertion.
-      const masters = pruneAudioMasters(resolve(__dirname, 'dist'))
+      const masters = pruneAudioMasters(outDirAbs)
       if (masters.paths.length > 0) {
         prunedCount += masters.paths.length
         prunedBytes += masters.bytes
@@ -378,7 +390,7 @@ function pruneLegacyAssets() {
       // how two documents start disagreeing. The gate reconciles the two
       // explicitly instead: recorded bytes plus this file's own size must equal
       // the measured total.
-      const distRoot = resolve(__dirname, 'dist')
+      const distRoot = outDirAbs
       const infoPath = join(distRoot, 'build-info.json')
       const git = gitFacts()
       const measured = measureDist(distRoot, infoPath)
