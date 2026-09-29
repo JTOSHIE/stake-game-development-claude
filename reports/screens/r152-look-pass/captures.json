@@ -1,0 +1,70 @@
+{
+  "dist": "/private/tmp/claude-501/-Users-jt/2f4baf7b-aba1-4ff3-950a-0197e236b8c2/scratchpad/r152/dist-final",
+  "version": "Future Spinner v10 build d506e710 built 2026-09-29T05:34:22.739Z",
+  "shots": [
+    {
+      "file": "desktop-1280_idle.png",
+      "viewport": "1280x800",
+      "state": "idle",
+      "fixture": "none (the pre-spin display board)",
+      "note": "At rest, 3 s after the rules card"
+    },
+    {
+      "file": "desktop-1280_win_16x.png",
+      "viewport": "1280x800",
+      "state": "win_16x",
+      "fixture": "base/bigWin, 16.2x",
+      "note": "Win banner (BIG tier) at its peak"
+    },
+    {
+      "file": "desktop-1280_feature_entry.png",
+      "viewport": "1280x800",
+      "state": "feature_entry",
+      "fixture": "base/feature, natural trigger",
+      "note": "Overdrive entry gate"
+    },
+    {
+      "file": "phone-390_idle.png",
+      "viewport": "390x844",
+      "state": "idle",
+      "fixture": "none (the pre-spin display board)",
+      "note": "At rest, 3 s after the rules card"
+    },
+    {
+      "file": "phone-390_win_16x.png",
+      "viewport": "390x844",
+      "state": "win_16x",
+      "fixture": "base/bigWin, 16.2x",
+      "note": "Win banner (BIG tier) at its peak"
+    },
+    {
+      "file": "phone-390_feature_entry.png",
+      "viewport": "390x844",
+      "state": "feature_entry",
+      "fixture": "base/feature, natural trigger",
+      "note": "Overdrive entry gate"
+    },
+    {
+      "file": "compact-844_idle.png",
+      "viewport": "844x390",
+      "state": "idle",
+      "fixture": "none (the pre-spin display board)",
+      "note": "At rest, 3 s after the rules card"
+    },
+    {
+      "file": "compact-844_win_16x.png",
+      "viewport": "844x390",
+      "state": "win_16x",
+      "fixture": "base/bigWin, 16.2x",
+      "note": "Win banner (BIG tier) at its peak"
+    },
+    {
+      "file": "compact-844_feature_entry.png",
+      "viewport": "844x390",
+      "state": "feature_entry",
+      "fixture": "base/feature, natural trigger",
+      "note": "Overdrive entry gate"
+    }
+  ],
+  "failures": []
+}
