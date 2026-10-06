@@ -126,9 +126,16 @@
   // at guide size its word is about 4 px, which the capture could not make legible either. No new
   // raster is made (R152 fence); the three captures stay on disk.
   const INTERFACE_GUIDE_RAW = [
-    { kind: 'live', live: 'spin', files: [],       nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
-    { kind: 'img',  files: ['btn_bet_plus.png'],   nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
-    { kind: 'img',  files: ['btn_bet_minus.png'],  nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
+    { kind: 'live', live: 'spin',       nameKey: 'guideSpinName',      descKey: 'guideSpinDesc' },
+    // R153: the bet, autoplay, menu and speed rows join SPIN, FEATURES and MAX as live replicas.
+    // The operator strip (brief R153 TASK 1) replaced the controls these rows were captures of: the
+    // bet keys became one stroked chevron pair, menu and autoplay hairline circles, the speed knob a
+    // hairline circle that brightens to white. Recapturing would commit rasters, which the R153
+    // fence forbids, and the captures would show a player controls that no longer exist, so each
+    // row is drawn in markup from the same tokens as the control it names. The six captures stay
+    // in the repository and leave the bundle (vite.config.ts LEGACY_FILES).
+    { kind: 'live', live: 'betup',      nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
+    { kind: 'live', live: 'betdown',    nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
     // R125: WAS `feature_button.png`, a 224x224 painted machine badge produced by
     // the manifest/build.py path. Every other row in this guide is a headless crop
     // of the live control (regen_interface_guide_icons.mjs), so this was the only
@@ -139,10 +146,10 @@
     // `wide` because the pill is 2.95:1, not square - see .fs-guide-icon--wide.
     // feature_button.png is NOT orphaned by this: it still renders as the buy
     // dialog's header art (BuyBonus.svelte:117), which is its other role.
-    { kind: 'live', live: 'features', files: [], wide: true,
+    { kind: 'live', live: 'features', wide: true,
       nameKey: 'guideFeaturesName',  descKey: 'guideFeaturesDesc' },
-    { kind: 'img',  files: ['btn_autoplay.png'],   nameKey: 'guideAutoplayName',  descKey: 'guideAutoplayDesc' },
-    { kind: 'img',  files: ['btn_menu.png'],       nameKey: 'guideMenuName',      descKey: 'guideMenuDesc' },
+    { kind: 'live', live: 'auto',       nameKey: 'guideAutoplayName',  descKey: 'guideAutoplayDesc' },
+    { kind: 'live', live: 'menu',       nameKey: 'guideMenuName',      descKey: 'guideMenuDesc' },
     // OWNER AUDIT ROUND 3, item 5: Turbo and Max were text pills with no
     // captured icon at all - now real live-component captures (each its own
     // distinct selector, see regen_interface_guide_icons.mjs), consistent
@@ -155,9 +162,11 @@
     // in order. They are real crops of the live control at each speed
     // (regen_interface_guide_icons.mjs cycles it between captures), so the
     // guide cannot drift from the button the way a hand-drawn icon would.
-    { kind: 'img',  files: ['btn_turbo.png', 'btn_turbo_2.png', 'btn_turbo_3.png'],
+    // R153: still all three speeds, in order, as the row has shown since that ruling; `set` keeps
+    // the widened slot the three captures had.
+    { kind: 'live', live: 'turbo', set: true,
       nameKey: 'guideTurboName', descKey: 'guideTurboDesc' },
-    { kind: 'live', live: 'max', files: [],        nameKey: 'guideMaxName',       descKey: 'guideMaxDesc' },
+    { kind: 'live', live: 'max',        nameKey: 'guideMaxName',       descKey: 'guideMaxDesc' },
   ] as const
 
   // JOB 2, 2026-07-28. Was English literals run through `sv()`, so the social
@@ -398,7 +407,7 @@
           <div class="fs-guide-list">
             {#each INTERFACE_GUIDE as g}
               <div class="fs-guide-row">
-                <div class="fs-guide-icon" class:fs-guide-icon--set={g.files.length > 1}
+                <div class="fs-guide-icon" class:fs-guide-icon--set={'set' in g && g.set}
                      class:fs-guide-icon--wide={'wide' in g && g.wide}>
                   <!-- R10, 2026-07-27: the former {:else} branch rendered a
                        `kind: 'pill'` text token via `g.label`. OWNER AUDIT ROUND 3
@@ -408,7 +417,8 @@
                        referencing a `label` field no entry has, which is what the
                        type error was reporting. Removed rather than silenced.
                        R152: three rows are now `kind: 'live'` replicas (the
-                       branches below); their `files` list is empty. -->
+                       branches below); their `files` list is empty.
+                       R153: all eight rows are live, and `files` is gone. -->
                   {#if 'live' in g && g.live === 'spin'}
                     <span class="guide-live guide-spin" role="img" aria-label={g.name}>
                       <span class="gs-ring"></span>
@@ -426,19 +436,34 @@
                     <span class="guide-live guide-knob" role="img" aria-label={g.name}>
                       <span class="gk-cap" aria-hidden="true" use:autofitText={$tr('hudMax')}>{$tr('hudMax')}</span>
                     </span>
+                  {:else if 'live' in g && (g.live === 'betup' || g.live === 'betdown')}
+                    <!-- R153: the strip's chevron, drawn with the same path as the live key. -->
+                    <span class="guide-live guide-chev" role="img" aria-label={g.name}>
+                      <svg viewBox="0 0 20 12" aria-hidden="true"><path d={g.live === 'betup' ? 'M4 9l6-6 6 6' : 'M4 3l6 6 6-6'}/></svg>
+                    </span>
+                  {:else if 'live' in g && g.live === 'auto'}
+                    <span class="guide-live guide-knob" role="img" aria-label={g.name}>
+                      <svg class="gk-glyph gk-auto" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6a6 6 0 1 0 5 3"/></svg>
+                    </span>
+                  {:else if 'live' in g && g.live === 'menu'}
+                    <span class="guide-live guide-knob" role="img" aria-label={g.name}>
+                      <span class="gk-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+                    </span>
+                  {:else if 'live' in g && g.live === 'turbo'}
+                    <!-- Three speeds, three luminance steps, as the live knob: an outlined bolt, a
+                         lit circle with a solid bolt, a white disc. Only the first is named; the
+                         description says what the three show. -->
+                    {#each ['normal', 'turbo', 'super'] as speed, i (speed)}
+                      <span class="guide-live guide-knob gk-speed" data-speed={speed}
+                            role={i === 0 ? 'img' : undefined} aria-label={i === 0 ? g.name : undefined}
+                            aria-hidden={i === 0 ? undefined : 'true'}>
+                        <svg class="gk-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+                      </span>
+                    {/each}
                   {/if}
-                  {#each g.files as f, i (f)}
-                    <!-- Only the first image is named. The other two are the
-                         SAME control in another state, so repeating the name
-                         would have a screen reader announce one control three
-                         times; the description carries what they show. -->
-                    <img
-                      src="{$themeAssets.assetBase}/ui/{f}"
-                      alt={i === 0 ? g.name : ''}
-                      aria-hidden={i === 0 ? undefined : 'true'}
-                      class="fs-guide-img"
-                    />
-                  {/each}
+                  <!-- R153: the raster branch that stood here ({#each g.files} of <img>) is
+                       removed, not left dormant: every row is a live replica now, so it could
+                       never render, the same reason R10 removed the pill branch above. -->
                 </div>
                 <div class="fs-guide-text">
                   <span class="fs-guide-name">{g.name}</span>
@@ -865,35 +890,34 @@
     border: 1px solid var(--hud-border);
     border-radius: 8px;
   }
-  .fs-guide-img { width: 44px; height: 44px; object-fit: contain; }
 
   /* R152: live replicas of SPIN, FEATURES and MAX (see INTERFACE_GUIDE_RAW). Values follow the live
      controls in HudOverlay.svelte (.fs-spin ring and dome, .fs-max) and FeatureMenu.svelte
      (.fm-entry-pill and its grille), scaled to the 44 px the captured rows use. Decorative: each
      replica is one role="img" named by the row's own translated name. */
   .guide-live { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  /* R153: every replica now follows the operator strip (HudOverlay.svelte, R153 OPERATOR STRIP):
+     the spin is the plate inside a 2px accent ring with a white glyph, the knobs are hairline
+     circles, the FEATURES pill is the plain plate. The previous values are at 895815b9. */
   .guide-spin {
     width: 44px; height: 44px; border-radius: 50%;
-    background: var(--hud-border-strong);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 30%, transparent);
+    background: var(--op-plate);
   }
   .gs-ring {
-    position: absolute; inset: 2px; border-radius: 50%;
-    border: 1.5px solid var(--hud-accent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--hud-accent) 45%, transparent);
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid var(--hud-accent);
   }
   .gs-dome {
-    position: absolute; inset: 4px; border-radius: 50%;
-    background: var(--hud-surface-raised);
+    position: absolute; inset: 2px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
   }
   .gs-dome svg { width: 18px; height: 18px; }
-  .gs-dome path { fill: var(--hud-accent); }
+  .gs-dome path { fill: var(--op-value); }
   .guide-pill {
     gap: 5px; height: 30px; max-width: 118px; padding: 0 9px;
-    border: 1px solid var(--hud-border); border-radius: 7px;
-    background: var(--hud-surface-raised); box-shadow: var(--hud-shadow-soft);
-    color: var(--hud-text); font-family: var(--fs-font-display); white-space: nowrap;
+    border-radius: 8px;
+    background: var(--op-plate);
+    color: var(--op-value); font-family: var(--fs-font-numeric); white-space: nowrap;
   }
   .gp-grille {
     width: 13px; height: 13px; flex-shrink: 0;
@@ -902,18 +926,37 @@
   .gp-label {
     display: block; min-width: 0; max-width: 84px;
     /* The live label's own typography (FeatureMenu.svelte .fm-entry-label), at guide size. */
-    font-family: var(--fs-font-numeric); font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    font-family: var(--fs-font-numeric); font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
     font-size: calc(10px * var(--autofit-scale, 1));
   }
   .guide-knob {
+    box-sizing: border-box;
     width: 40px; height: 40px; border-radius: 50%;
-    background: var(--hud-surface-raised); border: 1px solid var(--hud-border);
-    box-shadow: var(--hud-shadow-soft);
+    background: var(--op-plate); border: 1px solid var(--op-hairline);
   }
   .gk-cap {
     display: block; max-width: 32px; text-align: center; white-space: nowrap;
     font-family: var(--fs-font-numeric); font-size: calc(9px * var(--autofit-scale, 1));
-    font-weight: 800; letter-spacing: .02em; color: var(--hud-text);
+    font-weight: 700; letter-spacing: .08em; color: var(--op-value);
+  }
+  .gk-glyph { width: 18px; height: 18px; }
+  .gk-auto path { fill: none; stroke: var(--op-glyph); stroke-width: 2; stroke-linecap: round; }
+  .gk-bars { display: flex; flex-direction: column; gap: 3px; }
+  .gk-bars span { display: block; width: 14px; height: 2px; border-radius: 1px; background: var(--op-glyph); }
+  .gk-speed { width: 34px; height: 34px; }
+  .gk-speed .gk-glyph { width: 16px; height: 16px; }
+  .gk-speed path { stroke-width: 1.6; stroke-linejoin: round; }
+  .gk-speed[data-speed='normal'] path { fill: none; stroke: var(--op-label); }
+  .gk-speed[data-speed='turbo'] { background: color-mix(in srgb, #ffffff 22%, #12141a); border-color: var(--op-hairline-hi); }
+  .gk-speed[data-speed='turbo'] path { fill: var(--op-value); stroke: var(--op-value); }
+  .gk-speed[data-speed='super'] { background: #ffffff; border-color: #ffffff; }
+  .gk-speed[data-speed='super'] path { fill: #12141a; stroke: #12141a; }
+  /* The bet keys are bare chevrons on the strip, so their replica is too: no circle. */
+  .guide-chev { width: 40px; height: 40px; }
+  .guide-chev svg { width: 18px; height: 11px; overflow: visible; }
+  .guide-chev path { fill: none; stroke: var(--op-glyph); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  @media (max-width: 420px) {
+    .gk-speed { width: 28px; height: 28px; }
   }
 
   /* FS VISUAL FIXPACK JOB 2: the speed row shows three captures, one per speed,
@@ -921,15 +964,15 @@
      row is `min-width: 0` on its text side, so the description reflows instead
      of pushing the panel wider; verified at Popout S, where the paytable is at
      its narrowest. */
+  /* R153: the three speed replicas are 34px circles (28px at 420 and under), where the three
+     captures were 34px images. */
   .fs-guide-icon--set {
     width: auto;
     gap: 6px;
     padding: 0 8px;
   }
-  .fs-guide-icon--set .fs-guide-img { width: 34px; height: 34px; }
   @media (max-width: 420px) {
     .fs-guide-icon--set { gap: 4px; padding: 0 5px; }
-    .fs-guide-icon--set .fs-guide-img { width: 28px; height: 28px; }
   }
 
   /* R125. The FEATURES control is a 130x44 pill, not a round button, so only its
@@ -944,10 +987,8 @@
      and that is already proven at Popout S. The text side of the row is
      `min-width: 0`, so the description reflows rather than widening the panel. */
   .fs-guide-icon--wide { width: auto; padding: 0 8px; }
-  .fs-guide-icon--wide .fs-guide-img { width: auto; height: 44px; }
   @media (max-width: 420px) {
     .fs-guide-icon--wide { padding: 0 5px; }
-    .fs-guide-icon--wide .fs-guide-img { height: 36px; }
   }
   .fs-guide-pill {
     display: inline-flex;

@@ -177,6 +177,18 @@ const PRUNED_PREFIXES = [
   'assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png',
   'assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png',
   'assets/themes/future-spinner/ui/hero/hero_feature_trigger_16f.png',
+  // R153: the strip's retired texture and the ten guide captures, pruned in vite.config.ts.
+  'assets/themes/future-spinner/ui/hud_banner.png',
+  'assets/themes/future-spinner/ui/spin_button.png',
+  'assets/themes/future-spinner/ui/btn_bet_plus.png',
+  'assets/themes/future-spinner/ui/btn_bet_minus.png',
+  'assets/themes/future-spinner/ui/btn_autoplay.png',
+  'assets/themes/future-spinner/ui/btn_menu.png',
+  'assets/themes/future-spinner/ui/btn_turbo.png',
+  'assets/themes/future-spinner/ui/btn_turbo_2.png',
+  'assets/themes/future-spinner/ui/btn_turbo_3.png',
+  'assets/themes/future-spinner/ui/btn_max.png',
+  'assets/themes/future-spinner/ui/btn_features.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()

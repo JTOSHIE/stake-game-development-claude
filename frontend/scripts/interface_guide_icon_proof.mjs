@@ -1,3 +1,7 @@
+// NOTE R153 (2026-10-07): the paytable's Interface Guide draws every row as a live replica since
+// R153, so panel (b) below shows no capture any more and the icon files this compares are pruned
+// from the bundle. The byte-uniqueness check still runs against the files in public/.
+//
 // interface_guide_icon_proof.mjs — R2-7c proof grid (owner audit round 2,
 // item c: "regenerate every interface-guide icon ... with a proof grid
 // committed"), extended by OWNER AUDIT ROUND 3 item 5 (Turbo + Max join as

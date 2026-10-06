@@ -542,22 +542,25 @@
   .m-fm-entry {
     position: relative;
     flex: 0 0 auto;
-    width: 36px; height: 36px; border-radius: 8px; padding: 0;
+    box-sizing: border-box;
+    width: 36px; height: 36px; border-radius: 50%; padding: 0;
     display: flex; align-items: center; justify-content: center;
     /* R120: the FOURTH trigger. It sits OUTSIDE this component's own token
        block (`.fm-entry, .p-fm-entry, .c-fm-entry, .fm`), so none of the --sig-*
        tokens resolve on it and it was painted from raw literals in a different
        magenta from the other three. It inherits the shell tokens from
-       .game-wrapper like everything else now. */
-    background: var(--hud-surface-raised); border: 1px solid var(--hud-border);
-    color: var(--hud-text); cursor: pointer;
+       .game-wrapper like everything else now.
+       R153: the operator strip's hairline circle on the strip's plate, with a white glyph. */
+    background: var(--op-plate); border: 1px solid var(--op-hairline);
+    color: var(--op-glyph); cursor: pointer;
   }
   .m-fm-entry::after { content: ''; position: absolute; inset: -4px; }
   .m-fm-entry svg { width: 20px; height: 20px; }
   .m-fm-entry:disabled { opacity: 0.4; cursor: default; }
   .m-fm-entry:disabled::after { content: none; }
-  /* Kept warm, like the other three: OVERBOOST is a cost state, not decoration. */
-  .m-fm-entry.mode-enhancer { border-color: color-mix(in srgb, var(--sig-orange) 60%, transparent); color: color-mix(in srgb, var(--sig-orange) 22%, var(--hud-text)); }
+  /* R153: OVERBOOST engaged shows as a solid white edge, as on the other three triggers. It was
+     orange; the operator strip spends no hue but the spin ring's, and the state is still marked. */
+  .m-fm-entry.mode-enhancer { border-color: var(--op-value); color: var(--op-value); }
 
   /* ==========================================================================
      FUTURE SPINNER - FEATURES MENU
@@ -661,15 +664,17 @@
        thing on the stage. It is now the same dark glass as every other utility
        control, and the accent is spent only when a mode is actually engaged
        (.mode-enhancer below), which is the one state a player must not miss. */
-    border: 1px solid var(--hud-border);
-    border-radius: 10px;
-    background: var(--hud-surface-raised);
-    box-shadow: var(--hud-shadow-soft);
-    color: var(--hud-text);
+    /* R153: THE SAME DARK PLATE AS THE STRIP (brief TASK 1: "Paytable and feature entry
+       buttons restyle to the same dark plate so they do not sit in the old chrome beside the new
+       strip"). #12141a at 90%, 8px corners, white type, no border, no shadow. */
+    border: none;
+    border-radius: 8px;
+    background: var(--op-plate);
+    color: var(--op-value);
     cursor: pointer;
-    font-family: var(--fs-font-display);
+    font-family: var(--fs-font-numeric);
     white-space: nowrap;
-    transition: filter 0.15s ease;
+    transition: background-color 0.15s ease;
   }
   /* R125, THE ONE HUD CONTROL WITH NO PRESS. Every other utility control in the
      shell answers a press - .fs-max, .fs-menu and .fs-arrow all
@@ -688,10 +693,11 @@
      at any point is the trigger. A rule there would be dead wiring - CSS that
      can never reach a player, reading in review as a shipped affordance. The
      open affordance is the PANEL's job while the panel is what covers it. */
+  /* R153: hover lifts the plate a step instead of brightening a border the plates no longer have. */
   .fm-entry-pill:hover:not(:disabled),
   .p-fm-entry:hover:not(:disabled),
   .c-fm-entry:hover:not(:disabled),
-  .m-fm-entry:hover:not(:disabled) { border-color: var(--hud-border-strong); }
+  .m-fm-entry:hover:not(:disabled) { background: color-mix(in srgb, #ffffff 8%, #12141a); }
 
   .fm-entry-pill:active:not(:disabled),
   .p-fm-entry:active:not(:disabled),
@@ -715,34 +721,37 @@
      deliberately so: this is a COST state, not a decoration. It is the one
      place on this control where colour carries information, so it survives the
      neutral-at-rest rule - restrained, not removed. */
+  /* R153: STILL MARKED, NO LONGER ORANGE. The cost state shows as a solid white edge on the
+     plate plus the white OVERBOOST tag beside the label (.fm-entry-active.enhancer below). The
+     reasoning above still holds that this state must not be missed; it is now carried by
+     luminance and a word rather than by a second hue on a bar whose only accent is the spin ring. */
   .fm-entry-pill.mode-enhancer {
-    border-color: color-mix(in srgb, var(--sig-orange) 60%, transparent);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--sig-orange) 30%, transparent);
-    color: color-mix(in srgb, var(--sig-orange) 22%, var(--hud-text));
+    box-shadow: inset 0 0 0 1px var(--op-value);
   }
   .fm-entry-label {
     font-family: var(--fs-font-numeric);
-    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
     text-transform: uppercase;
     white-space: nowrap;
   }
   /* Active standing/enhancer mode label next to the FEATURES chip - subtle
      for Cruise (cost unchanged), a clearly-labelled persistent pill for
      OVERBOOST (real per-spin cost change while ON). */
+  /* R153: Cruise reads as a hairline tag, OVERBOOST as a solid white one: the cost state is the
+     louder of the two by luminance, with no hue spent on either. */
   .fm-entry-active {
     font-family: var(--fs-font-numeric);
-    font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
     white-space: nowrap;
     padding: 2px 8px; border-radius: 999px;
-    color: color-mix(in srgb, var(--sig-cyan) 35%, #fff);
-    background: rgba(0, 240, 255, 0.08);
-    border: 1px solid color-mix(in srgb, var(--sig-cyan) 40%, transparent);
+    color: var(--op-value);
+    background: transparent;
+    border: 1px solid var(--op-hairline-hi);
   }
   .fm-entry-active.enhancer {
-    color: #1a0d02;
-    background: var(--sig-orange);
-    border-color: var(--sig-orange);
-    box-shadow: 0 0 10px color-mix(in srgb, var(--sig-orange) 55%, transparent);
+    color: #12141a;
+    background: var(--op-value);
+    border-color: var(--op-value);
   }
 
   /* ---- modal shell ---- */
@@ -1105,9 +1114,13 @@
   .idle-shimmer {
     animation: idle-shimmer-pulse 3.2s ease-in-out infinite;
   }
+  /* R153: the attract is kept and made neutral. It was a 20px cyan bloom with a brightness lift,
+     the loudest accent on screen at idle; it is now a white hairline that breathes in and out on
+     the same 3.2s cycle, so the FEATURES entry still calls once the player has been idle 20s
+     without spending the accent the strip reserves for spin. */
   @keyframes idle-shimmer-pulse {
-    0%, 100% { box-shadow: 0 0 0 rgba(0, 255, 255, 0); filter: brightness(1); }
-    50%      { box-shadow: 0 0 20px 3px color-mix(in srgb, var(--sig-cyan, #00ffff) 55%, transparent); filter: brightness(1.18); }
+    0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0); }
+    50%      { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6); }
   }
   @media (prefers-reduced-motion: reduce) {
     .idle-shimmer { animation: none; }
@@ -1126,33 +1139,32 @@
     margin: 0 12px 8px;
     width: calc(100% - 24px);
     /* R120 supersedes the NEON LIFT of 2026-07-15 here too. See the desktop
-       pill above for the reasoning. */
-    border: 1px solid var(--hud-border);
-    border-radius: 10px;
-    background: var(--hud-surface-raised);
-    box-shadow: var(--hud-shadow-soft);
-    color: var(--hud-text);
+       pill above for the reasoning. R153: the strip's plate, as the desktop pill. */
+    border: none;
+    border-radius: 8px;
+    background: var(--op-plate);
+    color: var(--op-value);
     cursor: pointer;
-    font-family: var(--fs-font-display);
+    font-family: var(--fs-font-numeric);
   }
   .p-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
   .p-fm-entry svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
   .p-fm-entry-label {
-    font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
   }
   .p-fm-entry-active {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
     padding: 2px 8px; border-radius: 999px;
-    background: rgba(0, 240, 255, 0.1);
-    border: 1px solid color-mix(in srgb, var(--sig-cyan, #00ffff) 40%, transparent);
+    background: transparent;
+    border: 1px solid var(--op-hairline-hi);
   }
   .p-fm-entry-active.enhancer {
-    color: #1a0d02;
-    background: var(--sig-orange, #ff9a2e);
-    border-color: var(--sig-orange, #ff9a2e);
+    color: #12141a;
+    background: var(--op-value);
+    border-color: var(--op-value);
   }
   .p-fm-entry.mode-enhancer {
-    border-color: color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);
+    box-shadow: inset 0 0 0 1px var(--op-value);
   }
 
   /* Compact-landscape native-scale trigger (2026-07-14b) - icon-only round
@@ -1165,19 +1177,18 @@
     width: 48px;
     height: 48px;
     padding: 0;
-    border: 1px solid var(--hud-border);
+    /* R153: a hairline circle like the HUD's, white glyph where it was pink. */
+    box-sizing: border-box;
+    border: 1px solid var(--op-hairline);
     border-radius: 50%;
-    background: var(--hud-surface-raised);
-    box-shadow: var(--hud-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background: var(--op-plate);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
-  .c-fm-entry svg { width: 20px; height: 20px; fill: none; stroke: var(--sig-pink, #ff2ec4); stroke-width: 2.2; stroke-linecap: round; }
+  .c-fm-entry svg { width: 20px; height: 20px; fill: none; stroke: var(--op-glyph); stroke-width: 2.2; stroke-linecap: round; }
   .c-fm-entry:disabled { opacity: 0.5; cursor: not-allowed; }
-  .c-fm-entry.mode-enhancer {
-    box-shadow: 0 0 12px color-mix(in srgb, var(--sig-orange, #ff9a2e) 55%, transparent);
-  }
-  .c-fm-entry.mode-enhancer svg { stroke: var(--sig-orange, #ff9a2e); }
+  .c-fm-entry.mode-enhancer { border-color: var(--op-value); }
+  .c-fm-entry.mode-enhancer svg { stroke: var(--op-value); }
 </style>

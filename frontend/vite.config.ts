@@ -299,6 +299,24 @@ function pruneLegacyAssets() {
     'assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png',
     'assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png',
     'assets/themes/future-spinner/ui/hero/hero_feature_trigger_16f.png',
+    // R153 (brief TASK 1, the operator strip): eleven HUD rasters no component draws any more,
+    // 258,773 B. hud_banner.png was the strip's bracket texture (63,873 B) and the brief's "no
+    // texture" removed its one url(). The ten captures fed the paytable's Interface Guide, whose
+    // rows are now live replicas of the restyled controls; spin_button, btn_max and btn_features
+    // had already been unread since R152 made those three rows live, and the other five lost
+    // their last reference with the themeStore fields this commit removes. All eleven stay in the
+    // repository.
+    'assets/themes/future-spinner/ui/hud_banner.png',
+    'assets/themes/future-spinner/ui/spin_button.png',
+    'assets/themes/future-spinner/ui/btn_bet_plus.png',
+    'assets/themes/future-spinner/ui/btn_bet_minus.png',
+    'assets/themes/future-spinner/ui/btn_autoplay.png',
+    'assets/themes/future-spinner/ui/btn_menu.png',
+    'assets/themes/future-spinner/ui/btn_turbo.png',
+    'assets/themes/future-spinner/ui/btn_turbo_2.png',
+    'assets/themes/future-spinner/ui/btn_turbo_3.png',
+    'assets/themes/future-spinner/ui/btn_max.png',
+    'assets/themes/future-spinner/ui/btn_features.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()

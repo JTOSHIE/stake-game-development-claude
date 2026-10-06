@@ -170,37 +170,24 @@
        same "multi-colour neon rail" pattern that pass removed from the bar,
        still living here. Now one neutral hairline, same as a HUD plate. The
        chamfer stays: it is the title's shape language and costs no contrast. */
-    background: var(--hud-border-strong);
-    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
-    filter: none;
-  }
-  /* interior fill, inset by the bezel width */
-  .plate::before {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-    background: var(--hud-surface-sunken);
-  }
-  /* left accent rail + faint scan sheen */
-  .plate::after {
-    content: '';
-    position: absolute;
-    left: 3px;
-    top: 8px;
-    bottom: 8px;
-    width: 3px;
-    border-radius: 2px;
-    background: var(--hud-border-strong);
-    box-shadow: none;
+    /* R153: THE OPERATOR STRIP'S PLATE, because these three sit directly above SPIN and AUTO,
+       beside the new strip, and the brief asks that nothing there stays in the old chrome. The
+       chamfered hairline bezel, its sunken inner face and the left rail are gone (the previous
+       rules are at 895815b9); what remains is #12141a at 90% with 8px corners, a 10px tracked
+       label at 60% white and a white value. The geometry, 262x64 in the same column, is
+       unchanged, and the gauge above them keeps its own art. */
+    background: var(--op-plate);
+    border-radius: 8px;
+    overflow: hidden;
   }
   .plate-label,
   .plate-value { position: relative; z-index: 1; }
   .plate-label {
     font-family: var(--fs-font-numeric);
-    font-size: 12px;
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0.16em;
-    color: var(--hud-text-dim);
+    color: var(--op-label);
     text-transform: uppercase;
   }
   .plate-value {
@@ -213,8 +200,9 @@
        no-op, the recorded fitMoney trap); overflow stays hidden purely as
        containment for a value mid-fit. */
     font-size: calc(30px * var(--autofit-scale, 1));
-    font-weight: 900;
-    color: var(--hud-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--op-value);
     text-shadow: none;
     line-height: 1;
     max-width: 230px;
@@ -247,18 +235,20 @@
     gap: 2px;
     padding: 6px 4px;
     min-height: 48px;
+    /* R153: the operator plate, as the strip below it. It carried a 10px pink bloom per cell,
+       the last per-plate accent docked in the HUD slot. The transparent 1px border keeps the
+       measured height that the portrait fit was tuned against. */
     border-radius: 8px;
-    background: var(--hud-surface-sunken);
-    border: 1px solid var(--hud-border);
-    box-shadow: 0 0 10px rgba(255, 46, 196, 0.2);
+    background: var(--op-plate);
+    border: 1px solid transparent;
   }
   .pm-label {
     font-family: var(--fs-font-numeric);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--hud-text-dim);
+    color: var(--op-label);
     /* Two fields only now (item 3), one of which is the longer "OVERDRIVE
        FREE SPINS" label - let it wrap onto a second line rather than
        force-nowrap/overflow; the cell has no fixed height so it grows. */
@@ -284,5 +274,5 @@
   /* R135: `.pm-value.pink` dropped, no element carries it; the two live field identifiers are
      `.cyan` and `.gold`. That was the fourth and last standing build warning. */
   .pm-value.cyan,
-  .pm-value.gold { color: var(--hud-text); text-shadow: none; }
+  .pm-value.gold { color: var(--op-value); text-shadow: none; }
 </style>

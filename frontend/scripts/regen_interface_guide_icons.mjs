@@ -1,3 +1,9 @@
+// NOTE R153 (2026-10-07), above the header it supersedes: THE GUIDE NO LONGER READS THESE PNGS.
+// Every Interface Guide row in PaytableModal.svelte is a live markup replica since R153 (SPIN,
+// FEATURES and MAX since R152), and vite.config.ts prunes all ten captures from the bundle, so
+// running this rewrites ten files in public/ that nothing ships. It also commits rasters, which
+// the R153 brief fences. Kept for the history below and for a future owner-sanctioned recapture.
+//
 // regen_interface_guide_icons.mjs — R2-7c (owner audit round 2, item c),
 // extended by OWNER AUDIT ROUND 3 item 5 (Turbo + Max join the guide as
 // real captured icons instead of text pills, each with its own selector).

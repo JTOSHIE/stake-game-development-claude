@@ -8,6 +8,19 @@ the bottom banner. Any future change to these coordinates must update this
 file in the same commit, and must keep every assert in
 `frontend/scripts/hud_banner_spec_check.mjs` green.
 
+**NOTE R153 (2026-10-07), above the record it qualifies: PAINT CHANGED, NO COORDINATE MOVED.**
+The R153 operator strip (`reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md`, TASK 1:
+"Geometry stays inside the locked HUD spec") repainted every control in the table below and the
+panel: one flat plate (#12141a at 90%, 8px radius, no texture, so `hud_banner.png` is no longer
+drawn), 10px tracked labels, white values, hairline circles, and the spin ring as the only
+accent. Every box in the table, the panel and all eight gaps are unchanged, and
+`hud_banner_spec_check.mjs` and `control_row_symmetry_gate.mjs` were run green on the R153 tree.
+Three things a reader of the rules below should know: rule 5's "radial-gradient dark circle"
+describes the pre-R153 paint, and MAX is now a 48px hairline circle; TURBO keeps its 82x82 box
+and draws a 48px circle centred in it; and each BET STEPPERS key now takes a 44x44 tap, its hit
+area extended 20px away from the other key, so rule 3's floor holds per key and not only for the
+44x52 column, which is unchanged.
+
 ## The rules this geometry encodes
 
 1. **Shared vertical centre.** Every control's centre-Y is exactly **604px**.

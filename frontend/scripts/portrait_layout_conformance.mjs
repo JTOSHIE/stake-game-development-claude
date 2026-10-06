@@ -68,6 +68,11 @@ const DEVICE_PROFILES = [
 
 const TOUCH_TARGET_MIN = 44
 const FONT_MIN = 11
+// R153: the owner's brief sets the BALANCE, WIN and BET labels at 10px tracked caps ("Labels
+// BALANCE, WIN, BET at 10px tracked caps, 60% white"), a later and more specific instrument than
+// the 2026-07-14 floor, so under convention (n) it governs for those labels and nothing else.
+// Named per selector so the exemption cannot spread: every other text here keeps the 11px floor.
+const LABEL_FLOOR_EXEMPT = { '.p-stat-label': 10, '.c-stat-label': 10 }
 const LONG_FRAME_MS = 100
 
 async function getFreePort() {
@@ -167,7 +172,7 @@ async function auditTouchTargets(page) {
 
 /** Sample computed font-size on the portrait HUD's own text elements. */
 async function auditPortraitFontSizes(page) {
-  return page.evaluate((MIN) => {
+  return page.evaluate(({ MIN, LABEL_FLOOR }) => {
     const selectors = [
       '.p-stat-label', '.p-stat-value', '.p-spin-txt', '.p-tier',
       '.p-max-cap', '.p-fm-entry-label', '.p-fm-entry-active', '.p-mode-badge',
@@ -176,17 +181,18 @@ async function auditPortraitFontSizes(page) {
     for (const sel of selectors) {
       document.querySelectorAll(sel).forEach((el) => {
         const size = parseFloat(getComputedStyle(el).fontSize)
-        out.push({ selector: sel, text: el.textContent?.trim()?.slice(0, 20) ?? '', fontSizePx: size, pass: size >= MIN })
+        const floor = LABEL_FLOOR[sel] ?? MIN
+        out.push({ selector: sel, text: el.textContent?.trim()?.slice(0, 20) ?? '', fontSizePx: size, floorPx: floor, pass: size >= floor })
       })
     }
     return out
-  }, FONT_MIN)
+  }, { MIN: FONT_MIN, LABEL_FLOOR: LABEL_FLOOR_EXEMPT })
 }
 
 /** Sample computed font-size on the compact-landscape strip's own text
  *  elements (2026-07-14b) - the same gate as portrait's, applied to .c-*. */
 async function auditCompactLandscapeFontSizes(page) {
-  return page.evaluate((MIN) => {
+  return page.evaluate(({ MIN, LABEL_FLOOR }) => {
     const selectors = [
       '.c-stat-label', '.c-stat-value', '.c-tier', '.c-max-cap', '.c-mode-badge',
     ]
@@ -194,11 +200,12 @@ async function auditCompactLandscapeFontSizes(page) {
     for (const sel of selectors) {
       document.querySelectorAll(sel).forEach((el) => {
         const size = parseFloat(getComputedStyle(el).fontSize)
-        out.push({ selector: sel, text: el.textContent?.trim()?.slice(0, 20) ?? '', fontSizePx: size, pass: size >= MIN })
+        const floor = LABEL_FLOOR[sel] ?? MIN
+        out.push({ selector: sel, text: el.textContent?.trim()?.slice(0, 20) ?? '', fontSizePx: size, floorPx: floor, pass: size >= floor })
       })
     }
     return out
-  }, FONT_MIN)
+  }, { MIN: FONT_MIN, LABEL_FLOOR: LABEL_FLOOR_EXEMPT })
 }
 
 /** Diagnostic-only sample of known pre-existing sub-11px landscape text -
