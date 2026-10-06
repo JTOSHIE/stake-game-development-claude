@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { rmSync, existsSync, statSync, readdirSync, writeFileSync, readFileSync } from 'node:fs'
+import { rmSync, rmdirSync, existsSync, statSync, readdirSync, writeFileSync, readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
-import { resolve, join } from 'node:path'
+import { resolve, join, dirname, relative } from 'node:path'
 
 // Build Diet v2: prune every legacy asset that no longer has a live consumer
 // from the SERVED build only. public/ (and therefore the repo) is untouched,
@@ -291,7 +291,14 @@ function pruneLegacyAssets() {
     'assets/themes/future-spinner/ui/hero_icon_96.png',
     'assets/themes/future-spinner/ui/panel_balance.png',
     'assets/themes/future-spinner/ui/panel_win.png',
-    'assets/themes/future-spinner/ui/scene_character.png',
+    // R153 (brief TASK 2, the hero off the scored path): scene_character.png left this list, because
+    // HeroIdle now draws it as the one still, and the three strips that were on the render path
+    // joined it: the idle sheet (1,402,693 B), the win unfold (4,134,846 B) and the feature brace
+    // (1,772,729 B), 7,310,268 B that no component references any more. Kept in the repository so
+    // the reactions come back as a revert of HeroIdle.svelte plus these lines, never a re-render.
+    'assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png',
+    'assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png',
+    'assets/themes/future-spinner/ui/hero/hero_feature_trigger_16f.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()
@@ -327,6 +334,17 @@ function pruneLegacyAssets() {
           prunedCount += 1
           rmSync(abs)
           console.log(`[build-diet] pruned file ${rel} (${(size / 1024 / 1024).toFixed(2)} MB)`)
+        }
+      }
+
+      // R153: a directory the file prunes have emptied goes too. R153 pruned every sheet in
+      // ui/hero/, and without this the bundle shipped an empty ui/hero/ folder. Only the parent
+      // of a listed file is considered, and only when nothing at all is left in it.
+      for (const rel of LEGACY_FILES) {
+        const parent = dirname(resolve(outDirAbs, rel))
+        if (parent !== outDirAbs && existsSync(parent) && readdirSync(parent).length === 0) {
+          rmdirSync(parent)
+          console.log(`[build-diet] pruned empty dir ${relative(outDirAbs, parent)}`)
         }
       }
 

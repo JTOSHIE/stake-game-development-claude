@@ -172,7 +172,11 @@ const PRUNED_PREFIXES = [
   'assets/themes/future-spinner/ui/hero_icon_96.png',
   'assets/themes/future-spinner/ui/panel_balance.png',
   'assets/themes/future-spinner/ui/panel_win.png',
-  'assets/themes/future-spinner/ui/scene_character.png',
+  // R153: scene_character.png is the hero's one still again, so a request for it is no longer a
+  // failure; the three hero strips took its place here, pruned in vite.config.ts the same commit.
+  'assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png',
+  'assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png',
+  'assets/themes/future-spinner/ui/hero/hero_feature_trigger_16f.png',
 ]
 // assets/ui/ is fully pruned. WinPod is gone; nothing in src requests these.
 const KEEP_UI = new Set()
