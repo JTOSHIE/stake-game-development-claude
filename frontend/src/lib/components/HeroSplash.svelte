@@ -50,9 +50,28 @@
   $: mode = ($isSocial ? 'social' : 'real') as GameMode
 
   let reduced = false
+  // R154: THE PROMPT WAITS FOR ITS OWN FACE. It is set in Exo 2 700, which @fontsource serves with
+  // font-display: swap, so on a slow load the prompt drew in a fallback face and re-laid itself out
+  // when Exo 2 arrived. splash_calm_gate went red on that in CI (Popout S, "TAP TO CONTINUE" 5.20px
+  // wider), and forcing it here by holding the face back 3s moved the prompt 1.96 to 2.09px at all
+  // three profiles on main's build and on R154's alike: a race already on main, not a regression.
+  // The box no longer follows the glyphs (see .press-prompt), and the prompt is not shown until the
+  // face has loaded, so the player never sees the fallback; FACE_WAIT_MS caps the wait, so a face
+  // that never arrives cannot hide the instruction.
+  const FACE_WAIT_MS = 3000
+  let faceReady = false
+  let promptEl: HTMLDivElement
   onMount(() => {
     reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const done = () => { faceReady = true }
+    const fonts = document.fonts
+    if (!fonts || typeof fonts.load !== 'function' || !promptEl) { done(); return }
+    const cs = getComputedStyle(promptEl)
+    fonts.load(`${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, promptEl.textContent || '').then(done, done)
+    const timer = setTimeout(done, FACE_WAIT_MS)
+    return () => clearTimeout(timer)
   })
+  $: promptShown = ready && faceReady
 
   let dismissed = false
   function dismiss(): void {
@@ -144,7 +163,7 @@
        which splash_calm_gate caught as 12.73px of movement on every element at
        Popout S. Opacity changes nothing about geometry, which is the property
        that gate exists to hold. 2026-08-09. -->
-  <div class="press-prompt" class:is-ready={ready} aria-hidden={!ready}>
+  <div class="press-prompt" class:is-ready={promptShown} aria-hidden={!promptShown} bind:this={promptEl}>
     {t($locale, 'splashPressAnywhere', mode)}
   </div>
 </div>
@@ -254,6 +273,11 @@
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.22em;
+    /* R154: the box spans the column and its line height is fixed, so neither its width nor its
+       height depends on which face has loaded; the text is centred inside it. See FACE_WAIT_MS. */
+    align-self: stretch;
+    text-align: center;
+    line-height: 1.4;
     color: rgba(0, 255, 255, 0.8);
     text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
     /* Hidden but still occupying its box until ready, so the column never
