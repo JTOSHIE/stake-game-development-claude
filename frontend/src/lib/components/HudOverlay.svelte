@@ -1754,7 +1754,9 @@
   .m-turbo-item[data-speed="normal"] { background: none; }
   .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--op-label); stroke-width: 1.8; fill: none; }
 
-  .m-turbo-item[data-speed="turbo"] { background: rgba(255, 255, 255, 0.18); }
+  /* 28%, not 18%: at 18% turbo_intensity_gate measured this row's normal to turbo step at 1.246:1
+     at Popout S, a hair under its 1.25 floor. */
+  .m-turbo-item[data-speed="turbo"] { background: rgba(255, 255, 255, 0.28); }
   .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--op-value); stroke-width: 1.8; fill: var(--op-value); }
 
   .m-turbo-item[data-speed="super"] { background: rgba(255, 255, 255, 0.9); color: #12141a; }
