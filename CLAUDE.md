@@ -615,6 +615,9 @@ lives in `App.svelte` behind `import.meta.env.DEV`; reversible by removing those
 **(a) Session report.** At the end of every session write `reports/SESSION_REPORT.md`
 summarising what ran, what changed, verification results and anything needing owner
 attention. Copy it to `reports/archive/<date>_<topic>.md`. Commit and push both.
+**NOTE 2026-10-07 (R154), on the sentence below:** a session closing under rule 17 does not run the
+preview, because rule 17 forbids touching port 5173; the sentence's last clause still applies, so the
+report says so in its own line. See the note above rule 12.
 **A session that landed anything on `main` runs `npm run owner:preview` first, per
 rule 12, and pastes the printed version line into the report; if it could not be
 refreshed, the report says so in its own line.**
@@ -875,6 +878,10 @@ gap was left rather than renumbered because 10 and 11 were already cited by
 number in session reports, tracker rows and commit messages. The numbering note
 that recorded the gap is superseded by this entry.
 
+**NOTE 2026-10-07 (R154), on rule 10 below:** a session's final push is now usually the merge
+of its own pull request, under rule 17, and that merge's run on `main` starts after the session has
+stopped; the session reports its pull request's run, and the next session checks `main` at boot.
+
 **10. A red run on main stops the line** (owner's order, 2026-07-26, from the CI
 triage brief, reports/briefs/FS_CI_TRIAGE_Prompt.md). No new job starts until
 main is green. Every session verifies its own final push's REMOTE CI result
@@ -1009,6 +1016,10 @@ files of someone else's uncommitted work at risk. That track used a worktree
 instead, unprompted, and reported the gap. Rule 1 made `main` single-writer for
 the BRANCH; it never said anything about the working tree, and a shared working
 tree is a shared mutable resource that rule 1 does not protect. This closes that.
+
+**NOTE 2026-10-07 (R154), on rule 12 below:** `npm run owner:preview` serves on port 5173, and
+rule 17 forbids touching 5173, so a session closing under rule 17 does not run it and says so in
+its report's own line.
 
 **12. The owner's local preview is always current main** (owner's order,
 2026-07-28, from reports/briefs/FS_OWNER_PREVIEW_RULE_Prompt.md).
@@ -1163,40 +1174,42 @@ untranscribed ruling and an unissued one are indistinguishable to every later re
 > with a merge commit and stop. Do not leave it open. Do not ask. The only stop is a red
 > check or a locked path. Port 5173 is never touched.
 
-What this changes in practice:
+What the order requires, and only that:
 
-- **The session merges with a merge commit, never a squash or a rebase**: `gh pr merge
-  <number> --merge`. The merge commit's SHA goes in the session's closing reply. The session
-  report rides inside the pull request, so it is written before the merge and cannot carry
-  the merge's own SHA; the next session's records pick it up.
-- **"Green" means the pull request's own run, on the committed tip, completed with the
-  `static gates` job and every browser leg passing.** A run still in progress is not green;
-  the session waits for it rather than merging over it.
-- **The two stops are the only stops.** A red check stops the merge and the pull request
-  stays open with the failure reported. A pull request that touches any of the four locked
-  paths stops for the owner, whatever its checks say and whether or not it carries a
-  `LOCK-SANCTION` token.
-- **After the merge the session stops.** Under (t.1) rule 2 its branch is deleted with the
-  merge (`--delete-branch`), which needs no further work.
+- **The merge is a merge commit**, never a squash or a rebase: `gh pr merge <number> --merge
+  --delete-branch` (the flag is (t.1) rule 2, which deletes a session branch when its pull
+  request merges).
+- **"Green" is the pull request's own run on the committed tip, with the `static gates` job
+  and every browser leg passing.** A run still in progress is not green; the session waits for
+  it rather than merging over it.
+- **The two stops are the only stops.** A red check stops the merge, and the pull request stays
+  open with the failure reported. A pull request that touches a locked path stops for the owner.
+- **After the merge the session stops**, and port 5173 is never touched at any point.
 
-**THREE EARLIER INSTRUMENTS CONFLICT WITH IT, surfaced per convention (n), and the later
-order governs each.** Rule 7 says Fable verifies every pull request before merge, and (t)
-keeps code and gates in review lane; a session's own green pull request now merges without
-that block, and Fable's review becomes retrospective, as (t) already provides for record
-work. Rule 12 asks a session that lands on `main` to run `npm run owner:preview`, which
-serves on port 5173; this rule's last sentence forbids touching 5173, so the preview is
-not refreshed and the report says so in its own line. Rule 10 asks every session to
-verify its own final push's remote result; the final push is now the merge's run on `main`,
-which starts after the session stops, so the report names the pull request's run and the
-next session checks `main` at boot before starting work, as rule 10 already requires.
+**FOUR EARLIER INSTRUMENTS CONFLICT WITH IT, surfaced per convention (n), and the later order
+governs each.** Rule 7 says Fable verifies every pull request before merge, and (t) keeps code
+and gates in review lane. Rule 12, and convention (a)'s sentence on `npm run owner:preview`, ask a
+session that lands on `main` to refresh the owner's preview, which serves on port 5173; this order
+forbids touching 5173, so the preview is not refreshed and the report says so in its own line.
+Rule 10 asks every session to verify its own final push's remote result; the final push is now the
+merge's run on `main`, which starts after the session stops. Dated notes sit above rules 7, 10
+and 12 and above convention (a)'s sentence; the rules themselves are kept unedited.
 
-**TWO READINGS THE ORDER DOES NOT SETTLE, recorded as readings rather than rulings.** First,
-the browser matrix is skipped when the `what changed` job finds nothing that renders, and a
-skipped leg is neither green nor red; this file reads a skip as not a stop, because the
-order names only two stops, and the owner may rule otherwise. Second, a pull request's run
-tests the branch merged into `main` as `main` stood when the run started; if `main` has moved
-since, that run no longer describes what the merge would produce, so the session brings the
-branch up to date and lets the checks run again before merging.
+**READINGS THE ORDER DOES NOT SETTLE, recorded as readings, not as the owner's words.**
+
+1. **Fable's review becomes retrospective** for a session's own green pull request, as (t)
+   already provides for record work; the order does not mention Fable.
+2. **A locked path stops the merge whether or not the commit carries a `LOCK-SANCTION` token**,
+   because the order names a locked path as a stop without qualification.
+3. **A skipped browser matrix is not a stop.** The `what changed` job skips the matrix when a push
+   touches nothing that renders, and a skipped leg is neither green nor red; the order names only
+   two stops.
+4. **A pull request's run tests the branch merged into `main` as `main` stood when the run started**;
+   if `main` has moved since, that run no longer describes what the merge produces, so the session
+   brings the branch up to date and lets the checks run again before merging.
+5. **The merge SHA goes in the session's closing reply.** The session report rides inside the pull
+   request, so it is written before the merge and cannot carry the merge's own SHA, nor the result
+   of `main`'s run on it; the next session reads both at boot, which rule 10 already has it do.
 
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
