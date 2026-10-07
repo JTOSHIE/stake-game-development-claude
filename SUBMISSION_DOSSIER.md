@@ -760,6 +760,11 @@ accurate. **This paragraph exists so a reviewer is not shown a rule the project 
 withdrawn**, and so that any future submission adopting externally generated symbol art is
 described accurately rather than against a superseded line.
 
+**NOTE 2026-10-07 (R153):** the resting hero sheet the paragraph below names (hero_crossed_idle_6f.png,
+from the R122 strip) no longer ships. R153 pruned it from the bundle with the win and brace sheets, and
+the hero on stage is now the one still scene_character.png, whose sha256 6bdd73d0 below is the shipped
+file. Section 9c's R153 note has the detail.
+
 **RE-CHECKED 2026-09-26 (R147): the shipped set has since changed, so the paragraph above is a
 dated record.** Commit 578a3a51 (2026-08-28) adopted 28 owner-authorised OpenAI gpt-image-1
 development-stage files under Ticket 456254, symbols included, and the resting hero sheet
@@ -860,6 +865,16 @@ rule holds in both directions.
 Four external adoptions ship. **Only one of them was recorded in this dossier before
 2026-07-27.** The operative permitting clause for all of them is `CLAUDE.md`'s Assets
 section as amended 2026-07-27; the superseding note is in section 8i above.
+
+**NOTE 2026-10-07 (R153):** scene_character.png ships again, as the hero's one still: R153's
+`frontend/src/lib/components/HeroIdle.svelte` draws it as a single img. The shipped file is sha256
+6bdd73d0a656f27f... (774,813 bytes), the owner-briefed R145 Astra static proof, a deterministic retouch
+of the 578a3a51 gpt-image-1 placeholder (Ticket 456254), landed in commit 29f967c8. It is NOT the
+1acbd781... (629,245 bytes) enhancement whose hash the table below records. The idle, win and brace
+sheets (hero_crossed_idle_6f.png, hero_win_reaction_32f.png, hero_feature_trigger_16f.png) are pruned
+from the bundle instead and stay in the repository. R145's record is
+`reports/archive/2026-09-13_r145-astra-static-proof.md`; no provenance file for it exists under docs/art
+or design-system.
 
 **NOTE 2026-09-29 (R152):** scene_character.png in the table below no longer ships: SceneGroup's
 unreachable 'static' hero branch, its only reader, was removed and the file pruned from the bundle on

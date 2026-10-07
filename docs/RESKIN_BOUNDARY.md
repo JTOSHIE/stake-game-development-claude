@@ -172,6 +172,9 @@ and its width follows the control); `feature_button.png` 224x224;
 1200x120 (five 240x120 frames); `scene_car.png` 2840x1000; `scene_character.png` 680x1344;
 `scene_character_car.png` 1200x656; `particles/{shock_ring 128x128, spark 32x32, coin 40x40, smoke_puff 56x56}.png`.
 
+**NOTE R153 (2026-10-07):** item 6 below no longer holds: neither scene file matches its
+design-system/incoming/ source any more (hashes and provenance in the R153 note at GAP 3).
+
 **(c)** Four pipelines and two orphan groups.
 
 1. `feature_button`, `gauge_face`, `scene_character_car`, `brand_mark*`: `build.py` from
@@ -190,6 +193,14 @@ and its width follows the control); `feature_button.png` 224x224;
 6. **SEMI-ORPHANS**: `scene_car.png` and `scene_character.png` are byte-identical to the
    files in `design-system/incoming/`, so they were placed rather than derived in the
    current tree.
+
+**NOTE R153 (2026-10-07):** `regen_interface_guide_icons.mjs` is RETIRED; do not re-run it.
+Every Interface Guide row in `frontend/src/lib/components/PaytableModal.svelte` is a live
+markup replica since R153 (SPIN, FEATURES and MAX since R152) and no guide row reads a PNG, so
+running it rewrites the item 4 files in public/ that nothing renders and commits rasters, which
+the R153 brief fences. Of those files, btn_bet_plus.png and btn_bet_minus.png are pruned from
+the bundle since R153; the other eight still ship unrequested, pending the owner (R152 owner
+list item 7).
 
 **(d)** `hud_banner_spec_check.mjs` (re-measures every desktop control against the exact
 locked coordinates in `docs/HUD_SPEC.md`; any art that changes a control's box fails on
@@ -374,6 +385,11 @@ job and crashed at `chromium.launch()` on every run from 117 to 120 on main.
 `layout_fit_gate.mjs`, `contrast_gate.mjs`, `splash_calm_gate.mjs`, `build_diet_verify.mjs`,
 `audio_verify.mjs`, and the wallet, replay, recovery, modal-guard and bet-ladder tests.
 
+**NOTE R153 (2026-10-07), on the table below:** TURBO's locked box is left 199 top 563 82x82
+(`docs/HUD_SPEC.md`; R071 moved it from 227, commit 5688e9ca). `turbo_intensity_gate.mjs` measures
+the live TURBO control on screen, not the btn_turbo PNGs. `regen_interface_guide_icons.mjs` is
+retired since R153 (see the R153 note at 2.3(d)).
+
 **Title-specific in their ASSERTIONS, and therefore not reusable without editing:**
 
 | Gate | The title-specific part |
@@ -390,6 +406,10 @@ job and crashed at `chromium.launch()` on every run from 117 to 120 on main.
 `portrait_layout_conformance.mjs`, `currency_conformance.mjs`, `popout_conformance.mjs` and
 every `*_proof.mjs`. They need a real dev server and take tens of minutes; their results are
 committed as JSON under `reports/qa/`.
+
+**NOTE R153 (2026-10-07):** leave `regen_interface_guide_icons.mjs` out of the set below. It is
+retired since R153 (see the R153 note at 2.3(d)): the guide rows are live replicas and read no
+PNG, so running it only commits rasters nothing renders.
 
 **A reskin's minimum re-run set**: the six browser gates; the static skin gates (locale
 completeness, a11y social terms, dash gate both halves, machine-tell gate both halves, dist
@@ -426,6 +446,10 @@ with no single point of control and no test that would notice a missed one.
 
 The repository looks multi-theme. In the shipped build it is not.
 
+**NOTE R153 (2026-10-07):** the second bullet below is stale. `frontend/src/lib/stores/themeStore.ts`
+no longer declares spinButton, btnMinus, btnPlus, btnAutoplay or btnMenu (R153 removed them, no
+reader), nor panelBalance and panelWin (R152) or backgroundVideo (2026-07-28).
+
 - `.scheme-trap`, `.scheme-oil` and `.scheme-pitch` are declared in `HudOverlay.svelte` and
   `PaytableModal.svelte` and **no component ever adds these classes**.
 - **Thirteen of the fifteen derived `themeAssets` fields have zero consumers**:
@@ -443,6 +467,12 @@ discovered file by file.
 
 Traced by hash rather than assumed. Two of these were re-verified independently while
 writing this document.
+
+**NOTE R153 (2026-10-07):** the last two rows describe July's files. The shipped scene_car.png
+(sha256 4760156c782132b3) came with the R137 placeholder adoption (commit 578a3a51), and the
+shipped scene_character.png (sha256 6bdd73d0a656f27f, 774,813 B) is the R145 Astra static proof
+(commit 29f967c8), drawn by HeroIdle as the hero's one still since R153. The files in
+`design-system/incoming/` are the July enhancements they replaced.
 
 | Shipped file | Traced to | SHA-256 prefix |
 |---|---|---|
@@ -570,6 +600,12 @@ the whole app is `plates.json`.
 `backgrounds.py`, `background_overdrive_derive.py`, `background_candidate_ingest.py`,
 `compose_side_by_side.py`, all of `tools/brand/`, all of `tools/audio_forge/`, and
 `regen_interface_guide_icons.mjs`.
+
+**NOTE R153 (2026-10-07):** the paragraph below no longer holds. Every Interface Guide row is a
+live markup replica of its control since R153 (SPIN, FEATURES and MAX since R152) and no guide
+row reads a PNG, so the guide restyles with the HUD. `regen_interface_guide_icons.mjs` is
+retired: running it rewrites PNGs in public/ that nothing renders and commits rasters, which the
+R153 brief fences.
 
 That last is the sharpest: the interface-guide icons ARE screenshots of the live HUD chrome,
 so a reskin that does not re-run it **leaves the in-game user manual showing the previous

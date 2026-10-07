@@ -161,6 +161,10 @@ function assetBasePaths() {
     for (const m of src.matchAll(/assetBase\}(\/[A-Za-z0-9_\-./]+\.[a-z0-9]{2,5})/g)) {
       found.push({ path: SHIPPING_THEME_BASE + m[1], where: rel })
     }
+    // NOTE R153 (2026-10-07): the R135 paragraph below is a dated record. HeroIdle now draws one
+    // literal path, {assetBase}/ui/scene_character.png, which the matcher above sees, and the
+    // map-indexed form this loop resolves (the header's first example too) has zero sites in src.
+    // The loop is kept as a guard, so that form is still resolved if it returns.
     // R135: ONE LEVEL OF INDIRECTION, BECAUSE THE COMMENT THAT SAID THIS GATE GUARDED THE HERO
     // SHEETS WAS FALSE. HeroIdle writes `{assetBase}/ui/hero/{SHEET[motion]}`, so the FILENAME is
     // an interpolation and the literal-path matcher above cannot see it: `{` is not in its
