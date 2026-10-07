@@ -201,6 +201,8 @@ running it rewrites the item 4 files in public/ that nothing renders and commits
 the R153 brief fences. Of those files, btn_bet_plus.png and btn_bet_minus.png are pruned from
 the bundle since R153; the other eight still ship unrequested, pending the owner (R152 owner
 list item 7).
+**NOTE R153, owner ruling the same day (2026-10-07,** `reports/briefs/FS_R153_OwnerRulings_Prompt.md`
+**item 3):** the other eight are pruned from the bundle too; all ten stay in the repository.
 
 **(d)** `hud_banner_spec_check.mjs` (re-measures every desktop control against the exact
 locked coordinates in `docs/HUD_SPEC.md`; any art that changes a control's box fails on

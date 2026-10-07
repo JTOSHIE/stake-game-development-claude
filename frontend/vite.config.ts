@@ -308,12 +308,22 @@ function pruneLegacyAssets() {
     // 81,339 B. hud_banner.png was the strip's bracket texture ("no texture" removed its one url());
     // btn_bet_plus.png and btn_bet_minus.png are the plus/minus artwork ("Delete the plus/minus
     // artwork from this control"), read only by the paytable guide rows that are live replicas
-    // since R153. The other eight guide captures (spin_button, btn_max, btn_features, btn_autoplay,
-    // btn_menu and the three btn_turbo) are unread too and still ship: pruning them is the owner's
-    // call, R152 owner list item 7, not a sanction this brief gives. All three stay in the repository.
+    // since R153. All three stay in the repository.
     'assets/themes/future-spinner/ui/hud_banner.png',
     'assets/themes/future-spinner/ui/btn_bet_plus.png',
     'assets/themes/future-spinner/ui/btn_bet_minus.png',
+    // R153, OWNER RULING (2026-10-07, reports/briefs/FS_R153_OwnerRulings_Prompt.md, item 3): "Drop the
+    // eight unused button screenshots from the build only. Leave the files in the repository." The
+    // other eight guide captures, 177,434 B that no guide row reads since R152 and R153 made every
+    // row a live replica. This closes R152's owner list item 7.
+    'assets/themes/future-spinner/ui/spin_button.png',
+    'assets/themes/future-spinner/ui/btn_max.png',
+    'assets/themes/future-spinner/ui/btn_features.png',
+    'assets/themes/future-spinner/ui/btn_autoplay.png',
+    'assets/themes/future-spinner/ui/btn_menu.png',
+    'assets/themes/future-spinner/ui/btn_turbo.png',
+    'assets/themes/future-spinner/ui/btn_turbo_2.png',
+    'assets/themes/future-spinner/ui/btn_turbo_3.png',
   ]
   const UI_DIR = 'assets/ui'
   const KEEP_UI = new Set<string>()

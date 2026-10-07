@@ -137,8 +137,8 @@
     // fence forbids, and the captures would show a player controls that no longer exist, so each
     // row is drawn in markup from the same tokens as the control it names. The seven captures stay
     // in the repository. Two of them, btn_bet_plus and btn_bet_minus (the plus/minus artwork the
-    // brief deletes), leave the bundle; the other five still ship unread, with the three R152
-    // left, pending the owner (R152 owner list item 7).
+    // brief deletes), leave the bundle with R153; by the owner's ruling of the same day the other
+    // five and the three R152 left leave it too. All ten stay in the repository.
     { kind: 'live', live: 'betup',      nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
     { kind: 'live', live: 'betdown',    nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
     // R125: WAS `feature_button.png`, a 224x224 painted machine badge produced by
