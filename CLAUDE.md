@@ -835,6 +835,10 @@ contain a genuinely hard bounded problem, it is written up as its own surgical
 brief and handed back, rather than absorbed into the session that found it. A hard
 problem solved in the margins of another job gets the attention that was left over.
 
+**NOTE 2026-10-07 (R154), on rule 7 below:** a session's own green pull request now
+merges without a prior Fable block, under rule 17; the rule below is kept unedited as
+the dated record it is.
+
 **7. Fable verifies every pull request before merge**, and the scope gate enforces
 the manifests in CI, so a track that wanders outside its declared paths fails
 before a human has to notice.
@@ -1151,6 +1155,48 @@ into an unbacked citation inside four days**, exactly the failure it describes. 
 strongest available argument for `WAYS_OF_WORKING.md` section 6: the Product Owner is
 read-only, so a ruling enters the record only when a session transcribes it, and an
 untranscribed ruling and an unissued one are indistinguishable to every later reader.
+
+**17. A session merges its own green pull request** (owner's order, 2026-10-07, R154,
+`reports/briefs/FS_R154_MergeRuleWinBanner_Prompt.md`, standing). In the owner's words:
+
+> If the session's PR is green on the static job and the browser matrix, merge it to main
+> with a merge commit and stop. Do not leave it open. Do not ask. The only stop is a red
+> check or a locked path. Port 5173 is never touched.
+
+What this changes in practice:
+
+- **The session merges with a merge commit, never a squash or a rebase**: `gh pr merge
+  <number> --merge`. The merge commit's SHA goes in the session's closing reply. The session
+  report rides inside the pull request, so it is written before the merge and cannot carry
+  the merge's own SHA; the next session's records pick it up.
+- **"Green" means the pull request's own run, on the committed tip, completed with the
+  `static gates` job and every browser leg passing.** A run still in progress is not green;
+  the session waits for it rather than merging over it.
+- **The two stops are the only stops.** A red check stops the merge and the pull request
+  stays open with the failure reported. A pull request that touches any of the four locked
+  paths stops for the owner, whatever its checks say and whether or not it carries a
+  `LOCK-SANCTION` token.
+- **After the merge the session stops.** Under (t.1) rule 2 its branch is deleted with the
+  merge (`--delete-branch`), which needs no further work.
+
+**THREE EARLIER INSTRUMENTS CONFLICT WITH IT, surfaced per convention (n), and the later
+order governs each.** Rule 7 says Fable verifies every pull request before merge, and (t)
+keeps code and gates in review lane; a session's own green pull request now merges without
+that block, and Fable's review becomes retrospective, as (t) already provides for record
+work. Rule 12 asks a session that lands on `main` to run `npm run owner:preview`, which
+serves on port 5173; this rule's last sentence forbids touching 5173, so the preview is
+not refreshed and the report says so in its own line. Rule 10 asks every session to
+verify its own final push's remote result; the final push is now the merge's run on `main`,
+which starts after the session stops, so the report names the pull request's run and the
+next session checks `main` at boot before starting work, as rule 10 already requires.
+
+**TWO READINGS THE ORDER DOES NOT SETTLE, recorded as readings rather than rulings.** First,
+the browser matrix is skipped when the `what changed` job finds nothing that renders, and a
+skipped leg is neither green nor red; this file reads a skip as not a stop, because the
+order names only two stops, and the owner may rule otherwise. Second, a pull request's run
+tests the branch merged into `main` as `main` stood when the run started; if `main` has moved
+since, that run no longer describes what the merge would produce, so the session brings the
+branch up to date and lets the checks run again before merging.
 
 A NOTE ON THE NUMBERING: the rule 9 gap this note used to record was FILLED on
 2026-07-26 by the replay-blocker session, on the owner's instruction, with the
