@@ -642,12 +642,18 @@ jobs:
       # name is still caught, and it reads only the components' CODE, because
       # their own prose names the retired keyframes and quotes the banned
       # declarations verbatim.
+      # R153 (2026-10-07) replaced the reactions with ONE STILL on the owner's
+      # brief: no strip on the render path, no state in the hero, the float the
+      # ceiling. The gate now asserts exactly that (one <img>, no `ui/hero/` or
+      # sheet reference anywhere in src outside comments, no import, timer or
+      # store write in HeroIdle, no handler on its mount) and keeps the R138
+      # float fence unchanged.
       - name: hero idle planted, seeded-violation self-test
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/hero_idle_planted_gate.mjs --self-test
 
-      - name: hero pose frozen, float fenced, dissolve reaction-scoped
+      - name: hero is one still, no strip in src, no state, float fenced
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         working-directory: frontend
         run: node scripts/hero_idle_planted_gate.mjs

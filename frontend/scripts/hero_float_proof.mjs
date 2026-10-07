@@ -1,3 +1,13 @@
+// NOTE R153 (2026-10-07), above the header it supersedes: since R153 HeroIdle is one
+// <img data-testid="hero-still"> of ui/scene_character.png. Sections B to E, F's reaction
+// checks, and every hero-idle, .hero-body and hero-cross query (in A and G too) measure the
+// reaction system R153 removed, so this script fails at its first selector, the hero-idle
+// wait, by design. Its float measurement is superseded by
+// frontend/scripts/r153_operator_strip_proof.mjs section H (live: the hero is one unchanging
+// still and nothing on it runs but the float and its three accents) and the float fence (f),
+// with the reduced-motion check (g), in hero_idle_planted_gate.mjs (static: translateY only,
+// present, at or below the car's amplitude). Neither samples the live travel or period.
+//
 // hero_float_proof.mjs - R138 proof: the idle float, the reaction crossfade,
 // and the fences around both.
 //

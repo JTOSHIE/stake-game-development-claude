@@ -2328,7 +2328,11 @@
              this the whole feature would be correct and invisible, which is the
              failure mode the dead-wiring gate exists for and which a store
              assertion alone would not have caught. -->
-        <div class="jets-holder" class:above-overlay={retriggerBeatActive}>
+        <!-- R153: clear-of-strip takes the flame gauge out of the operator strip on the one
+             layout that draws the strip on this stage (the same condition that mounts the
+             desktop HudOverlay below). -->
+        <div class="jets-holder" class:above-overlay={retriggerBeatActive}
+             class:clear-of-strip={!portrait && !compactLandscape && !miniPlayer}>
           <FlameJets active={overdriveVisualActive || retriggerBeatActive} colourway={flameColourway} chaseTrigger={liveRetriggerChaseTrigger} />
         </div>
       {/if}
@@ -2613,6 +2617,27 @@
 .native-hud-slot.mini-player { flex-direction: row; align-items: center; gap: 4px; padding: 0 4px; }
 
   .jets-holder { position: absolute; inset: 0; pointer-events: none; }
+  /* R153, THE GAUGE OUT OF THE BAR (brief TASK 1: "Move the gauge out of the bar or remove it
+     from the bar"). FlameJets is the tension gauge, and its two bottom-edge jets sit on the
+     frame's bottom edge at stage y 552 and fire DOWN, so their flames land inside the strip's
+     own box (x 281..999, y 560..648, docs/HUD_SPEC.md). At rest they were under the plate, and
+     the plate is now 90% opaque, so they glowed through it; during a retrigger beat this holder
+     goes to z90 and they painted straight over BALANCE, WIN and BET. An even-odd polygon cuts
+     the strip's rectangle out of everything the jets draw, so the gauge keeps its eight nozzles,
+     its chase and its readout everywhere else and nothing of it reaches the bar. The rectangle
+     is the locked panel geometry, so it moves only if HUD_SPEC.md does. Desktop only: in
+     portrait, compact and mini the strip is native DOM outside this stage, and the flames below
+     the frame are clear of it already. */
+  /* The z-index is what the clip costs. clip-path makes the holder a stacking context, which on
+     its own would paint the jets in the z-index:auto layer, under the frame (z10) they are mounted
+     on; 15 is .jets' own z-index, so the stage order is exactly what it was. The above-overlay
+     rule after this one still wins during the beat (same specificity, later in the file). */
+  .jets-holder.clear-of-strip {
+    z-index: 15;
+    clip-path: polygon(evenodd,
+      0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+      281px 560px, 999px 560px, 999px 648px, 281px 648px, 281px 560px);
+  }
   /* Above the free-spins overlay (z80) only while the retrigger beat runs. */
   .jets-holder.above-overlay { z-index: 90; }
 
@@ -2791,6 +2816,22 @@
     --hud-accent:         var(--theme-primary, #00FFFF);
     --hud-shadow:         0 6px 20px rgba(0, 0, 0, 0.45);
     --hud-shadow-soft:    0 2px 8px rgba(0, 0, 0, 0.40);
+
+    /* R153, THE OPERATOR STRIP (reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md, TASK 1).
+       The control bar stops being a designed object and becomes a control: one flat dark plate,
+       small tracked labels at 60% white, values in one white face, hairline circles, and the spin
+       ring as the only accent. The first three values are the brief's numbers (the fill, the 60%
+       label, the white value); the glyph and hairline strengths (0.86, 0.32, 0.72) are R153's own
+       choices for the hairline treatment the brief names. Declared once here so the HUD, the
+       FEATURES entry, the hamburger and autoplay menus, the bet picker and the paytable's guide
+       replicas all read the same plate. The --hud-* tokens above stay for the surfaces R153 did
+       not restyle. */
+    --op-plate:       rgba(18, 20, 26, 0.9);     /* #12141a at 90% opacity, the brief's fill */
+    --op-label:       rgba(255, 255, 255, 0.6);  /* BALANCE, WIN, BET: 60% white */
+    --op-value:       #ffffff;                   /* values: one white face */
+    --op-glyph:       rgba(255, 255, 255, 0.86); /* icons inside the hairline circles */
+    --op-hairline:    rgba(255, 255, 255, 0.32); /* the 1px circle edge at rest */
+    --op-hairline-hi: rgba(255, 255, 255, 0.72); /* the same edge on hover, focus or engaged */
   }
 
   .game-wrapper {

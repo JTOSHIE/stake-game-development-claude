@@ -75,12 +75,10 @@ export const themeAssets = derived(activeTheme, ($t) => {
     frame:           `${b}/frames/frame-2.png`,
     // Logo
     logo:            `${b}/ui/logo.png`,
-    // Buttons
-    spinButton:      `${b}/ui/spin_button.png`,
-    btnMinus:        `${b}/ui/btn_bet_minus.png`,
-    btnPlus:         `${b}/ui/btn_bet_plus.png`,
-    btnAutoplay:     `${b}/ui/btn_autoplay.png`,
-    btnMenu:         `${b}/ui/btn_menu.png`,
+    // Buttons: R153 removed spinButton, btnMinus, btnPlus, btnAutoplay and btnMenu. None had a
+    // reader anywhere in src (every HUD control is drawn in markup, and the paytable guide's rows
+    // are live replicas since R153), so the five fields were the only thing keeping five dead
+    // captures in the bundle through asset_reference_gate. Same treatment R152 gave the panels.
     // Audio
     sounds: {
       bgm:                  `${b}/sounds/bgm_loop.mp3`,

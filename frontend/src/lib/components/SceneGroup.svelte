@@ -23,6 +23,16 @@
   import HeroIdle from './HeroIdle.svelte'
 
   // ── HERO PRESENTATION (R111, revised R112) ─────────────────────────────────
+  // NOTE R153 (2026-10-07), above the record it supersedes rather than edited into it: the
+  // hero is now ONE STILL. HeroIdle draws ui/scene_character.png as a single <img> (the
+  // owner's R145 Astra still), with no reaction, no strip and no state; the float on
+  // .char-layer below is the ceiling of his motion. So the 'static' path described below is
+  // live again in substance, through HeroIdle rather than a branch here, and the 'idle'
+  // flipbook it describes is off the render path. HeroIdle.svelte's header has the
+  // measurements and the revert. The "IoU 0.9997" below was measured against the file
+  // scene_character.png held before R145; the R145 Astra still that now ships measures 0.9565
+  // against idle frame 01 (206x407, alpha > 127).
+  //
   // One way to draw the pilot since R152; the other two it had are recorded here:
   //
   //   'idle'   THE ONLY MODE. The crossed-arms idle strip, played as a six-frame
@@ -243,6 +253,9 @@
     transform-origin: 50% 92%;
     animation: char-idle 5s ease-in-out infinite;
   }
+  /* NOTE R153: the record below says HeroIdle's sheet holds frame 01. Since R153 there is no
+     sheet: HeroIdle is one <img> of scene_character.png. The float itself is unchanged and is
+     the ceiling of the hero's motion. */
   /* R138: THE FLOAT IS BACK, AND IT IS A DIFFERENT ANIMAL FROM WHAT R130 DELETED.
      The owner's ruling after the live upload: a completely still idle is too dead,
      restore the original slight floating, the same class as the car. What R130
@@ -276,6 +289,8 @@
 
   /* Antenna tip, the orange orb blinks. Positioned over the orb on the
      character's upper left. */
+  /* NOTE R153: "the same image (IoU 0.9997)" below is the pre-R145 file; the shipped still now
+     measures 0.9565 against idle frame 01, and the orb sits within 1.4 px of where it did. */
   /* R112: re-registered onto the orb it is named for. The inherited box was
      centred at layer (37.1, 97.7); the orange earpiece orb it lights sits at
      (65.3, 71.9), measured on the shipped sprite and confirmed across all five
@@ -304,6 +319,10 @@
   }
 
   /* Visor, occasional glint sweep over the visor.
+
+     NOTE R153: the figure is scene_character.png again, drawn by HeroIdle's .hero-still with
+     object-fit: contain, so the measurement below describes the live sprite once more. Re-checked
+     on it: 99.9% of the glint's weight lands on the figure (100% on the idle frame it replaced).
 
      NOTE R152: .char-img no longer exists (the 'static' branch was removed); the measurement below
      was made on it. The idle sheet frame (394x780, aspect 0.5051) fills the same 206x407 box
@@ -344,6 +363,8 @@
      figure had both its signs of life in the top fifth of itself. This is the belt
      lamp array on the abdomen.
 
+     (R153: .hero-body is gone and the drop-shadow now sits on HeroIdle's .hero-still, an <img>,
+     which cannot carry a child at all. The sibling placement below still holds for that reason.)
      IT IS A SIBLING OF <HeroIdle>, NOT A CHILD OF .hero-body, AND THAT IS DELIBERATE.
      .hero-body carries filter: drop-shadow(), which is computed from its whole
      subtree, so a glow child would have made the hero's SHADOW pulse with it - the
@@ -398,74 +419,14 @@
     50%      { opacity: 0.44; }
   }
 
-  /* THE THREE ACCENTS ARE SIBLINGS OF .hero-body, SO THEY DO NOT TRAVEL WITH IT.
-     R131, found by an adversarial pass over R131's own diff, and PRE-EXISTING: it
-     affects all three, not just the one this session added.
-
-     Each accent is positioned as a percentage of .char-layer and is painted on top
-     of the sprite. During a reaction .hero-body transforms - the epic punch lifts
-     27px, scales 1.05 and rotates 2deg - and the accents do not, so the glow slides
-     off the feature it is lighting. Measured at the epic peak, as the distance
-     between the PAINTED feature (the sprite centroid put through the live transform
-     matrix) and the CSS glow:
-
-         .antenna-light   0.36px at rest -> 44.59px mid-punch, at opacity 0.42
-         .visor-glint     0.53px        -> 45.55px, at opacity 0.00
-         .chest-lamp      0.66px        -> 39.39px, at opacity 0.42
-
-     The glow boxes are 24 to 41px wide, so at those distances the light is entirely
-     off its feature. The chest lamp drifts LEAST because it sits lowest, nearest the
-     transform-origin at the feet, where a rotation displaces least.
-
-     WHY SUPPRESS RATHER THAN FOLLOW. Making them track would mean either moving them
-     inside .hero-body - which is exactly what must not happen, because that element's
-     drop-shadow is computed from its whole subtree and a glow child would pulse the
-     shadow - or duplicating the transform, which then has to be kept in step with
-     four keyframe sets by hand. Suppression is correct on its own terms anyway:
-     these are RESTING accents. While the hero is performing a win or a brace, the
-     performance is the thing to look at, and a static glint on a moving figure was
-     never the intent.
-
-     `:has()` DEGRADES SAFELY. Where it is unsupported the rule simply does not
-     apply and the behaviour is exactly what shipped before this fix, which is why
-     it is an acceptable mechanism for a cosmetic suppression. */
-  /* :global() ON THE :has() ARGUMENT IS REQUIRED, and leaving it out is a silent
-     no-op. .hero-body belongs to HeroIdle.svelte, so Svelte's scoping appends THIS
-     component's class to it and the selector can never match. The first version of
-     this rule did exactly that: svelte-check reported three css_unused_selector
-     warnings and the measured drift was unchanged at 39 to 45px, i.e. the rule
-     shipped as decoration. The accents themselves stay scoped; only the cross-
-     component condition is global. */
-  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .antenna-light,
-  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .visor-glint,
-  .char-layer:has(:global(.hero-body[data-motion]:not([data-motion='idle']))) .chest-lamp {
-    /* THE ANIMATION HAS TO BE STOPPED, NOT JUST OVERRIDDEN, and that is the second
-       way this rule was inert before it worked. A CSS animation's keyframe values
-       sit ABOVE normal declarations in the cascade, so `opacity: 0` alone loses to
-       antenna-blink and chest-lamp-breathe, both of which set opacity at every
-       keyframe. Measured: the rule compiled, the selector matched, and the accents
-       still read 0.42 at the punch peak. Cancelling the animation first lets the
-       opacity apply. This is the same shape as the reduced-motion block below,
-       which stops animations rather than trying to out-declare them. */
-    animation: none;
-    opacity: 0;
-    /* NO TRANSITION HERE, AND THE ABSENCE IS DELIBERATE. This rule carried
-       `transition: opacity 120ms linear` when it first shipped, and that was a THIRD
-       inert mechanism in the same declaration - after the missing :global() and the
-       animation-origin problem above. Cancelling an animation in the SAME style
-       change leaves no transitionable before-change value, so the fade could never
-       run: measured, the accents went 0.4304 -> 0.0000 in one 20ms frame with
-       transition-property already computing to `opacity 0.12s` on the element, while
-       a probe with the same declaration and no animation faded through seven
-       intermediate values in the same rAF loop. The exit was a hard cut by
-       construction too, since the declaration leaves with the rule.
-       Making it fade would need each accent wrapped in an unanimated div carrying
-       the transition, which is real machinery for a cross-fade at the one moment it
-       is least visible: the cut happens exactly as the hero launches a large
-       reaction and the win banner fires. So the suppression is a HARD CUT, on
-       purpose, and this comment says so rather than a dead declaration implying
-       otherwise. */
-  }
+  /* R153: THE REACTION SUPPRESSION THAT STOOD HERE IS DELETED, NOT LEFT DORMANT. From R131 to R152
+     a :has(.hero-body[data-motion]:not([data-motion='idle'])) rule cut these three accents to
+     opacity 0 while the hero performed a win or a brace, because .hero-body moved and the accents
+     did not. R153 removed the reactions and .hero-body with them, so the selector could never
+     match again; a :global() condition is invisible to svelte-check, so it would have shipped as
+     dead CSS that reads in review like a live guard. The accents now sit on a figure that only
+     floats, and the float moves .char-layer, which carries them, so they cannot slide off it.
+     The rule and its measurements are in this file at 895815b9. */
 
   @media (prefers-reduced-motion: reduce) {
     /* R130: !important ON THE ANIMATION RESET, AND THE FREEZE IS WHY.
@@ -485,6 +446,8 @@
        !important makes the override unconditional rather than a specificity race
        every future rule has to remember to lose. HeroIdle.svelte's own
        reduced-motion block does this for the same reason.
+       (NOTE R153: HeroIdle has had no media block since R153; it is one unanimated <img>. The
+       float and the three accents, all reset here, are the only motion on the figure.)
 
        R138 MADE THE .char-layer ENTRY LOAD-BEARING AGAIN. While the strip idle
        was frozen and `.char-layer.char-idle-strip` disabled the base animation,

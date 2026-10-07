@@ -1,5 +1,15 @@
 # HUD_SHELL_TEMPLATE.md — the operator-standard control shell
 
+**NOTE R153 (2026-10-07): sections 1, 2, 3, 5 and 6 no longer describe the shell as shipped, and
+the style block this file mirrors has moved on.** Since R153
+(`reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md`, TASK 1) every HUD profile paints the
+operator strip: one flat plate, labels at 60% white, white values, hairline circles, and the SPIN
+ring as the only accent. The desktop rules are the R153 OPERATOR STRIP section of
+`frontend/src/lib/components/HudOverlay.svelte`, and the other three profiles carry the same paint
+in their own sections. They read six `--op-*` tokens declared beside the `--hud-*` block on
+`.game-wrapper` in `frontend/src/App.svelte`. No coordinate moved, so section 4 stands. A note above
+each falsified passage says what is now true.
+
 **Established 2026-08-26 by R119.** This file is workstream 5 of the R119 brief:
 what a future WRS title inherits unchanged, what it re-skins, and what it must
 not touch. It describes the shell as SHIPPED, not as aspired to.
@@ -10,6 +20,14 @@ The canonical implementation is the `<style>` block of
 ---
 
 ## 1. The one thing that makes it a template: a shell token block
+
+**NOTE R153 (2026-10-07): the block below still exists and no longer paints the bar.** The four
+profiles paint from six tokens declared after it in the same `.game-wrapper` rule: `--op-plate`
+rgba(18, 20, 26, 0.9), `--op-label` 60% white, `--op-value` #ffffff, `--op-glyph` 86% white,
+`--op-hairline` 32% white and `--op-hairline-hi` 72% white. Of the block below, the HUD reads only
+`--hud-accent`, on its four SPIN rings; the paytable modal reads eight of the other nine, and
+`--hud-surface` has no reader. The Overdrive flip now covers four roots, `.m-hud--overdrive`
+included.
 
 All four HUD layouts inherit one declaration:
 
@@ -59,6 +77,16 @@ while the same token on the wrapper rendered the theme colour.
 
 ## 2. What a new title inherits UNCHANGED
 
+**NOTE R153 (2026-10-07): four of the six bullets below are no longer true of the bar.** The accent
+is spent in ONE place, the 2px SPIN ring in `--hud-accent` (magenta under the Overdrive flip). A
+live win lights nothing (no `.lit` rule remains), and active toggles and the three TURBO speeds are
+white luminance steps. Keyboard focus rings sit outside this count: `frontend/src/app.css` draws
+them in `--theme-primary`. Values are `--op-value`, pure white, not `--hud-text`. Labels are
+`--op-label`, 60% white, in 10px tracked caps (7px in the 400x225 mini profile, where a 10px
+label leaves a $50,000.00 balance too little room). There is one surface, `--op-plate`, not three
+steps: the strip, every hairline circle at rest and the SPIN face share it. The first bullet and
+the SPIN bullet stand.
+
 - **Every token NAME above.** A new title re-points `--theme-primary` and
   `--theme-secondary` and gets a coherent shell for free.
 - **The accent discipline.** Chrome at rest is neutral. The accent is spent in
@@ -74,6 +102,12 @@ while the same token on the wrapper rendered the theme colour.
   by having a more elaborate material than its neighbours.
 
 ## 3. What stays GAME-SPECIFIC
+
+**NOTE R153 (2026-10-07): the HUD has no raster and no chamfer left to re-skin.** No rule draws
+`frontend/public/assets/themes/future-spinner/ui/hud_banner.png` since R153, and the build prunes
+it (LEGACY_FILES in `frontend/vite.config.ts`); the file stays in the repository. The desktop strip
+is one flat plate with an 8px radius and no `clip-path`, so the `.fs-plate` chamfer bullet no
+longer applies to the HUD (the paytable's own `.fs-plate` keeps it). The other three bullets stand.
 
 - `--theme-primary` / `--theme-secondary` — the two hues the shell reads.
 - `ui/hud_banner.png` — the desktop panel's 718x88 backdrop raster. Optional: the
@@ -102,6 +136,11 @@ while the same token on the wrapper rendered the theme colour.
 
 ## 5. Known surfaces this shell does NOT cover
 
+**NOTE R153 (2026-10-07): two of the three surfaces below left the `--hud-*` shell.**
+`FeatureMenu.svelte` and `BonusInstrumentColumn.svelte` read no `--hud-*` token since R153: the
+FEATURES entry triggers and the instrument column paint from the `--op-*` tokens. The paytable body
+and its own `.fs-plate` still read `--hud-*`; its Interface Guide replicas read `--op-*`.
+
 **AMENDED 2026-08-26 by R120: all three were brought onto the shell.** The table
 below is kept as the record of what R119 left behind; every row is now done.
 `BonusInstrumentColumn` and `FeatureMenu` consume the shell tokens directly, and
@@ -120,6 +159,14 @@ the previous chrome language and read as inconsistent beside the shell:
 They are the natural next pass and each is a token re-point, not a rewrite.
 
 ## 6. The interface-guide dependency, which bites on every reskin
+
+**NOTE R153 (2026-10-07): the regenerator is RETIRED; do not run it.** Every Interface Guide row in
+`frontend/src/lib/components/PaytableModal.svelte` is a live markup replica since R153 (SPIN,
+FEATURES and MAX since R152; bet up, bet down, autoplay, menu and the three speeds since R153), and
+no guide row reads a PNG. Running the regenerator rewrites PNGs in public/ that no guide reads, and
+commits rasters, which the R153 brief fences. The dependency remains in a new form: each replica is
+its own markup and rules in that file, not the live control's, so a control restyle restyles its
+replica in the same pass.
 
 `frontend/scripts/regen_interface_guide_icons.mjs` screenshot-crops the LIVE
 controls into eight shipped PNGs that `PaytableModal.svelte` renders in the

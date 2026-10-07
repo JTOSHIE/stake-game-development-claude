@@ -1,74 +1,65 @@
 #!/usr/bin/env node
 /**
- * HERO IDLE PLANTED GATE: the resting hero's POSE may not animate; the layer
- * above him may float, translateY only, at or below the car's amplitude; the
- * reactions may crossfade; the idle may not.
+ * HERO IDLE PLANTED GATE, R153 FORM: the hero is ONE STILL. No strip is on the render path, the
+ * hero component holds no state and emits nothing, and the float one level above him is the
+ * ceiling of his motion: translateY only, at or below the car's amplitude, and present.
  *
- * WHAT THIS GUARDS, AND WHY IT IS BEHAVIOURAL RATHER THAN A LIST OF NAMES.
- * The owner's ruling at R130 was that bad motion scores worse than a still, and R130 acted on it
- * by DELETING the idle flipbook, the 7.2s pendulum sway, the two-layer cross-dissolve and the
- * glance outright, freezing the hero on frame 01. The win unfold and the feature brace survive and
- * still play; those are reactions, not idle.
+ * THE RULING THIS ENCODES, AND ITS HISTORY. R130 froze the idle flipbook; R138 put a wrapper float
+ * back ("float yes, tick no") and kept the win unfold and the feature brace as reactions behind a
+ * crossfade. The owner's R153 brief (reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md,
+ * TASK 2) took the hero off the scored path altogether: "Stop rendering the win-unfold,
+ * feature-brace, glance and ambient strips. One still remains, with the existing float as the
+ * ceiling ... A win must settle without waiting on a character animation." So the reaction
+ * exemptions this gate carried from R138 to R152 (a non-idle [data-motion] selector, the
+ * .hero-cross buffer, the warm layers) are gone: there is no state in which the hero may animate.
+ * The R138 float fence is kept unchanged, because the brief keeps the float and names it the
+ * ceiling. The previous form of this file is in git at 895815b9.
  *
- * AMENDED AT R138, ON THE OWNER'S OWN LATER RULING, which is exactly the caveat the first version
- * of this header recorded ("a gate cannot know an owner changed their mind, so what it encodes is
- * the ruling, not the taste"). After the live upload the owner ruled a completely still idle too
- * dead and ordered the float back, the same class as the car, with the fence holding everywhere
- * else. So the ruling this gate now encodes is R130 AS AMENDED BY R138:
+ * WHAT IT CHECKS, each one behaviour-keyed rather than name-keyed:
+ *   (a) HeroIdle.svelte's style declares no animation, no transform and no @keyframes, under any
+ *       name and at any nesting depth (seeds 3, 4 and 5).
+ *   (b) HeroIdle.svelte's markup is exactly ONE element, an <img> carrying
+ *       data-testid="hero-still" whose source is ui/scene_character.png, with exactly the
+ *       attributes class, data-testid, src, alt and draggable: no style=, style:, class:, use:,
+ *       transition: or animate: can put motion on it inline (seeds 1, 2 and 14).
+ *   (c) No strip is referenced anywhere in frontend/src or frontend/index.html outside comments,
+ *       .css files included: no `ui/hero/` path and no `_<n>f.png` sheet name (seeds 1, 12, 16).
+ *       asset_reference_gate would catch a strip that is both referenced and pruned; this catches
+ *       the reference itself, pruned or not. A name assembled at runtime from parts is out of any
+ *       static reader's reach; build_diet_verify's pruned-path check is the runtime net for it.
+ *   (d) HeroIdle.svelte's script holds no state: no import at all, no reactive statement, no
+ *       timer or frame callback, no dispatcher and no store write. That is what makes "a win never
+ *       waits on the hero" structural rather than measured: a component that reads nothing and
+ *       emits nothing cannot be awaited (seeds 6 and 7).
+ *   (e) SceneGroup mounts HeroIdle with no binding and no event handler, as a DIRECT child of
+ *       .char-layer, so no wrapper element can carry motion the float fence does not see (seeds 8
+ *       and 15); and no stylesheet anywhere in src (a component's <style> or a .css file) targets
+ *       the still (`hero-still`, or an img under .char-layer) with an animation or a transform
+ *       (seed 17).
+ *   (f) The float fence on SceneGroup.svelte, as R138 wrote it: the keyframes .char-layer references
+ *       transform by translateY only, their amplitude is at or below the car's, both derived from
+ *       the file at gate time, and the float exists (seeds 9, 10 and 11).
+ *   (g) SceneGroup's reduced-motion block still stops .char-layer with `animation: none !important`
+ *       (seed 13).
  *
- *   - the POSE stays frozen: no rule reaching .hero-body, .hero-idle or .hero-cross at rest may
- *     animate or transform. The sheet still holds frame 01.
- *   - the WRAPPER may float: SceneGroup's .char-layer may reference keyframes whose transforms
- *     are translateY ONLY - no rotate (the pendulum stays dead), no translateX, no scale - and
- *     the float's amplitude must sit at or below the car's own, BOTH amplitudes derived from
- *     SceneGroup.svelte at gate time rather than from a number written in here (convention (s)).
- *     And the float must EXIST: R138's close is "float yes, tick no", so a deleted float is as
- *     much a regression now as a restored sway.
- *   - the REACTIONS may dissolve: .hero-cross, the crossfade's top buffer, is lawful ONLY behind
- *     a non-idle [data-motion=...] and only mounted inside {#if motion !== 'idle'}. An
- *     idle-reachable dissolve rule is a finding whatever its keyframes are called.
- *
- * THE GATE KEYS ON BEHAVIOUR, NOT ON THE RETIRED NAMES. Any selector that can match the hero
- * AT REST, and that carries an `animation`, `animation-name` or `transform` other than `none`, is a
- * finding whatever the keyframe is called. That is what makes seed 2 of the self-test meaningful:
- * it restores exactly the same pendulum under a BRAND-NEW name, `hero-drift-idle`, and a
- * name-matching gate would sail past it. Seed 7 hides the same rule inside an `@media (min-width)`
- * block, which a depth-limited walker would miss, so the rule walker is nesting-aware and drops
- * keyframe STEPS by their `@keyframes` ancestor rather than by depth. The float fence is
- * behaviour-keyed the same way: it resolves the keyframes .char-layer actually REFERENCES, so a
- * rotation smuggled back under a renamed keyframe (seed 12) is still caught.
- * Selectors carrying a non-idle `[data-motion=...]` are exempt: those are the reactions R130 kept.
- *
- * THE COMMENT TRAP, WHICH IS THE REASON THIS FILE EXISTS IN THIS SHAPE. HeroIdle.svelte's own prose
- * NAMES ALL FIVE retired keyframes and quotes the banned declaration `animation: hero-sway-idle
- * 7.2s` verbatim, because the file explains what was removed and why; SceneGroup.svelte's prose now
- * quotes the retired rotate values for the same reason. A grep-for-the-name gate is therefore a
- * permanent false positive on the very files it guards. Each component is split into CODE and
- * PROSE first (CSS block comments out of the style block, line and block comments out of the
- * script, HTML comments out of the markup) and only CODE is judged. The self-test carries negative
- * controls that plant the banned declarations inside comments and require silence, and it prints
- * how many of the five names the real file's prose actually contains, so the immunity is evidenced
- * on every run rather than asserted once.
- *
- * WHAT IT ALSO HOLDS: the R129 dissolve buffers (.hero-layer-a/.hero-layer-b, permanent and
- * shadow-carrying) must not return by name; exactly one element carries data-testid="hero-idle";
- * the script must not re-declare a `glance` state or reference the pruned hero_glance sheet; and
- * the three reduced-motion resets must keep their `!important`, which R130 added deliberately
- * after three specificity ties and which a tidy-up would strip as noise. The .hero-cross reset
- * must also force opacity 0, because stilling the fade without blanking the buffer would freeze a
- * half-transparent second frame over the rest pose.
+ * THE COMMENT TRAP. HeroIdle.svelte keeps part of the reaction system's dated history in its
+ * header (it names one strip, hero_glance_6f, and the hero-body and hero-cross classes). Each file
+ * is split into CODE and PROSE first and only CODE is judged; the seeded negative control, which
+ * plants every banned form inside comments of all three syntaxes and requires silence, is what
+ * proves the immunity, and the run prints how many strip names the real prose carries.
  *
  * Run:
  *   node scripts/hero_idle_planted_gate.mjs
  *   node scripts/hero_idle_planted_gate.mjs --self-test
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { dirname, join, relative } from 'node:path'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
-const FILE = join(HERE, '..', 'src', 'lib', 'components', 'HeroIdle.svelte')
-const SCENE_FILE = join(HERE, '..', 'src', 'lib', 'components', 'SceneGroup.svelte')
+const SRC = join(HERE, '..', 'src')
+const FILE = join(SRC, 'lib', 'components', 'HeroIdle.svelte')
+const SCENE_FILE = join(SRC, 'lib', 'components', 'SceneGroup.svelte')
 
 // ── 1. Split a component into CODE and PROSE, and scan only CODE ───────────
 function sections(src) {
@@ -76,11 +67,20 @@ function sections(src) {
   const script = (src.match(/<script[^>]*>([\s\S]*?)<\/script>/) || [, ''])[1]
   const markup = src.replace(/<style>[\s\S]*?<\/style>/, '').replace(/<script[^>]*>[\s\S]*?<\/script>/, '')
   return {
-    styleCode: style.replace(/\/\*[\s\S]*?\*\//g, ' '),          // CSS comments
+    styleCode: style.replace(/\/\*[\s\S]*?\*\//g, ' '),
     scriptCode: script.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 '),
-    markupCode: markup.replace(/<!--[\s\S]*?-->/g, ' '),          // HTML comments
-    stylePROSE: (style.match(/\/\*[\s\S]*?\*\//g) || []).join('\n'),
+    markupCode: markup.replace(/<!--[\s\S]*?-->/g, ' '),
+    prose: [
+      ...(style.match(/\/\*[\s\S]*?\*\//g) || []),
+      ...(script.match(/\/\/[^\n]*/g) || []),
+      ...(markup.match(/<!--[\s\S]*?-->/g) || []),
+    ].join('\n'),
   }
+}
+
+// A plain .ts module has no sections: strip its comments and judge the rest as script.
+function tsCode(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
 }
 
 // ── 2. Nesting-aware rule walker over the comment-free CSS ───────────────
@@ -98,10 +98,20 @@ function rules(css) {
   return out.filter(f => f.sel && !f.sel.startsWith('@') && !f.anc.some(a => a.startsWith('@keyframes')))
 }
 
+// Every rule including those inside @media, WITH its at-rule ancestors, for check (g).
+function rulesWithAncestors(css) {
+  const out = []
+  const stack = []
+  let cur = ''
+  for (const c of css) {
+    if (c === '{') { stack.push({ sel: cur.trim(), body: '', anc: stack.map(f => f.sel) }); cur = '' }
+    else if (c === '}') { const f = stack.pop(); if (!f) continue; f.body += cur; cur = ''; out.push(f) }
+    else cur += c
+  }
+  return out
+}
+
 // ── 2b. Keyframes extractor: name -> concatenated step bodies ────────────────
-// The rule walker above deliberately DROPS keyframe steps; the float fence
-// needs them, so this walks the same brace stream and keeps only frames whose
-// ancestor chain contains `@keyframes <name>`.
 function keyframes(css) {
   const out = {}
   const stack = []
@@ -123,12 +133,8 @@ function keyframes(css) {
 }
 
 // ── 2c. Animation names referenced by rules matching a selector pattern ──────
-// Resolves the shorthand lexically: parenthesised groups (steps(...),
-// cubic-bezier(...)) are collapsed first so their commas and spaces cannot
-// split a token, then anything that is not a keyword, a time or a count is a
-// keyframe name. Deliberately over-collects, like the css liveness gate: a
-// stray token here means one extra keyframes lookup, while an under-collect is
-// the exact miss the fence exists to prevent.
+// Deliberately over-collects: a stray token means one extra keyframes lookup,
+// while an under-collect is the exact miss the fence exists to prevent.
 const ANIM_KEYWORDS = new Set(['none', 'infinite', 'normal', 'reverse', 'alternate', 'alternate-reverse',
   'forwards', 'backwards', 'both', 'running', 'paused', 'ease', 'ease-in', 'ease-out', 'ease-in-out',
   'linear', 'step-start', 'step-end'])
@@ -152,11 +158,6 @@ function referencedAnimations(R, selPattern) {
   return names
 }
 
-// R151: `warm` added. The warm layers (.hero-warm and .hero-warm-sheet, the \b matches both) are
-// mounted at rest and must never animate or transform; before this, a seeded animation on them passed.
-const AT_REST = /\.hero-(body|idle|cross|warm)\b/
-const NON_IDLE_STATE = /\[data-motion\s*=\s*['"]?(?!idle)[a-z]+['"]?\]/
-
 function decls(body) {
   return body.split(';').map(d => d.trim()).filter(Boolean).map(d => {
     const k = d.slice(0, d.indexOf(':')).trim().toLowerCase()
@@ -166,11 +167,10 @@ function decls(body) {
 }
 
 // Largest |translateY| in px across a set of keyframe names, plus a flag for
-// any transform function that is not translateY. Returns null amplitude when
-// no named keyframe declares a transform at all.
+// any transform function that is not translateY.
 function floatShape(kfMap, names) {
   let amp = null
-  let foreign = []
+  const foreign = []
   for (const name of names) {
     const body = kfMap[name]
     if (!body) continue
@@ -189,118 +189,157 @@ function floatShape(kfMap, names) {
   return { amp, foreign }
 }
 
-function judge(src, sceneSrc) {
+// ── 3. The source tree, for check (c) ────────────────────────────────────────
+function walk(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name)
+    if (statSync(p).isDirectory()) walk(p, out)
+    else if (/\.(svelte|ts|js|mjs|css)$/.test(name) && !/\.test\.(ts|mjs|js)$/.test(name)) out.push(p)
+  }
+  return out
+}
+const STRIP_REF = /ui\/hero\/|_\d+f\.png/
+
+function judge(src, sceneSrc, tree) {
   const S = sections(src)
   const findings = []
-  const R = rules(S.styleCode)
 
-  // (a) at-rest-reachable rules must not animate or transform. This covers the
-  // crossfade buffer too: a .hero-cross rule without a non-idle state qualifier
-  // is reachable at rest, and an idle-reachable dissolve is exactly what R138
-  // forbids.
-  for (const r of R) {
-    for (const one of r.sel.split(',').map(s => s.trim()).filter(Boolean)) {
-      if (!AT_REST.test(one)) continue
-      if (NON_IDLE_STATE.test(one)) continue           // a reaction rule, allowed
+  // (a) no motion of any kind in the hero component's own style
+  for (const r of rules(S.styleCode)) {
+    for (const d of decls(r.body)) {
+      const val = d.v.replace(/!important/i, '').trim()
+      if ((d.k === 'animation' || d.k === 'animation-name') && val !== 'none' && val !== '')
+        findings.push(`HeroIdle \`${r.sel}\` animates: ${d.k}: ${d.v}`)
+      if (d.k === 'transform' && val !== 'none')
+        findings.push(`HeroIdle \`${r.sel}\` transforms: ${d.k}: ${d.v}`)
+      if (d.k === 'will-change' && /transform/.test(val))
+        findings.push(`HeroIdle \`${r.sel}\` declares will-change: transform, a motion hint on a still`)
+    }
+  }
+  for (const m of S.styleCode.matchAll(/@keyframes\s+([\w-]+)/g))
+    findings.push(`HeroIdle declares \`@keyframes ${m[1]}\`: the still has no motion of its own`)
+
+  // (b) exactly one element, the still
+  const tags = [...S.markupCode.matchAll(/<([a-zA-Z][\w:-]*)(\s|\/|>)/g)].map(m => m[1])
+  const blocks = (S.markupCode.match(/\{[#:@]/g) || []).length
+  if (tags.length !== 1 || tags[0] !== 'img')
+    findings.push(`HeroIdle's markup must be exactly one <img>, found ${tags.length} element(s): ${tags.join(', ') || 'none'}`)
+  if (blocks) findings.push(`HeroIdle's markup carries ${blocks} control block(s) ({#if}, {#each}, ...): the still has no states`)
+  if ((S.markupCode.match(/data-testid="hero-still"/g) || []).length !== 1)
+    findings.push('expected exactly one data-testid="hero-still"')
+  if (!/src\s*=\s*"\{assetBase\}\/ui\/scene_character\.png"/.test(S.markupCode))
+    findings.push('the still is not ui/scene_character.png (src="{assetBase}/ui/scene_character.png")')
+  const imgTag = (S.markupCode.match(/<img\b([\s\S]*?)\/?>/) || [, ''])[1]
+  // Attribute NAMES only: quoted values and {expressions} are removed first, so a word inside a
+  // value can never read as an attribute.
+  const bare = imgTag.replace(/"[^"]*"|'[^']*'|\{[^}]*\}/g, ' ')
+  const attrs = [...bare.matchAll(/([a-zA-Z][\w:|-]*)/g)].map((m) => m[1])
+  const ALLOWED = new Set(['class', 'data-testid', 'src', 'alt', 'draggable'])
+  const extraAttrs = attrs.filter((a) => !ALLOWED.has(a))
+  if (extraAttrs.length) findings.push(`the still carries attributes beyond class, data-testid, src, alt and draggable: ${extraAttrs.join(', ')}`)
+
+  // (c) no strip referenced anywhere in src, outside comments
+  for (const [path, text] of Object.entries(tree)) {
+    const code = path.endsWith('.svelte')
+      ? (() => { const T = sections(text); return T.styleCode + '\n' + T.scriptCode + '\n' + T.markupCode })()
+      : path.endsWith('.html') ? text.replace(/<!--[\s\S]*?-->/g, ' ')
+      : tsCode(text)
+    const m = code.match(STRIP_REF)
+    if (m) findings.push(`${path} references a hero strip (\`${m[0]}\`) outside a comment`)
+  }
+
+  // (d) no state in the hero component
+  const script = S.scriptCode
+  if (/^\s*import\b/m.test(script)) findings.push('HeroIdle imports something: the still reads no store and needs no module')
+  if (/^\s*\$:/m.test(script)) findings.push('HeroIdle has a reactive statement: the still has no state to derive')
+  for (const [re, what] of [
+    [/\bsetTimeout\b|\bsetInterval\b/, 'a timer'],
+    [/\brequestAnimationFrame\b/, 'a frame callback'],
+    [/\bcreateEventDispatcher\b|\bdispatch\s*\(/, 'an event dispatcher'],
+    [/\.(set|update)\s*\(/, 'a store write'],
+    [/\bonMount\b|\bonDestroy\b/, 'a lifecycle hook'],
+  ]) if (re.test(script)) findings.push(`HeroIdle carries ${what}: a win would have something to wait on`)
+  const lets = [...script.matchAll(/\b(?:let|const|var|function)\s+([\w$]+)/g)].map(m => m[1])
+  const extra = lets.filter(n => n !== 'assetBase')
+  if (extra.length) findings.push(`HeroIdle declares state beyond its one prop: ${extra.join(', ')}`)
+
+  // (e) SceneGroup mounts it with no binding and no handler
+  const G = sections(sceneSrc)
+  const mounts = [...G.markupCode.matchAll(/<HeroIdle\b([^>]*)\/?>/g)].map(m => m[1])
+  if (mounts.length !== 1) findings.push(`SceneGroup must mount HeroIdle exactly once, found ${mounts.length}`)
+  for (const attrs of mounts) {
+    if (/\b(bind|on):/.test(attrs)) findings.push(`SceneGroup's HeroIdle mount carries a binding or handler: ${attrs.trim()}`)
+  }
+  // Direct child of .char-layer: the nearest element opened before the mount and not yet closed
+  // must be the .char-layer div.
+  const at = G.markupCode.indexOf('<HeroIdle')
+  if (at >= 0) {
+    const before = G.markupCode.slice(0, at)
+    const stack = []
+    for (const m of before.matchAll(/<(\/?)([a-zA-Z][\w:-]*)([^>]*?)(\/?)>/g)) {
+      if (m[1]) stack.pop()
+      else if (!m[4]) stack.push({ tag: m[2], attrs: m[3] })
+    }
+    const parent = stack[stack.length - 1]
+    if (!parent || !/class\s*=\s*"[^"]*\bchar-layer\b/.test(parent.attrs))
+      findings.push(`HeroIdle is not a direct child of .char-layer (its parent is <${parent ? parent.tag + parent.attrs : '?'}>): a wrapper could carry motion the float fence does not see`)
+  }
+  // No stylesheet anywhere targets the still with motion.
+  for (const [path, text] of Object.entries(tree)) {
+    if (path.endsWith('HeroIdle.svelte')) continue
+    const css = path.endsWith('.svelte') ? sections(text).styleCode : path.endsWith('.css') ? text.replace(/\/\*[\s\S]*?\*\//g, ' ') : null
+    if (!css) continue
+    for (const r of rules(css)) {
+      const hits = r.sel.split(',').map((x) => x.trim()).filter((one) => /hero-still/.test(one) || /\.char-layer\b[^,]*\s(img\b|:global\(\s*img)/.test(one))
+      if (!hits.length) continue
       for (const d of decls(r.body)) {
         const val = d.v.replace(/!important/i, '').trim()
-        if ((d.k === 'animation' || d.k === 'animation-name') && val !== 'none' && val !== '') {
-          findings.push(`at-rest selector \`${one}\` animates: ${d.k}: ${d.v}`)
-        }
-        if (d.k === 'transform' && val !== 'none') {
-          findings.push(`at-rest selector \`${one}\` transforms: ${d.k}: ${d.v}`)
-        }
+        if (((d.k === 'animation' || d.k === 'animation-name') && val !== 'none') || (d.k === 'transform' && val !== 'none'))
+          findings.push(`${path} targets the still (\`${hits[0]}\`) with ${d.k}: ${d.v}`)
       }
     }
   }
 
-  // (b) the retired keyframes must not come back BY NAME (cheap, name-specific)
-  const RETIRED = ['hero-sway-idle', 'hero-cycle-idle', 'hero-dissolve-in', 'hero-turn-glance', 'hero-cycle-glance']
-  for (const name of RETIRED) {
-    const re = new RegExp('@keyframes\\s+' + name + '\\b')
-    if (re.test(S.styleCode)) findings.push(`retired keyframe \`@keyframes ${name}\` is back in the style block`)
+  // (f) the float fence, unchanged from R138
+  const GR = rules(G.styleCode)
+  const kf = keyframes(G.styleCode)
+  const heroNames = referencedAnimations(GR, /\.char-layer\b/)
+  const carNames = referencedAnimations(GR, /\.car-layer\b/)
+  const hero = floatShape(kf, heroNames)
+  const car = floatShape(kf, carNames)
+  for (const f of hero.foreign) findings.push(`the hero float's keyframes carry a non-translateY transform: ${f}`)
+  if (hero.amp === null || hero.amp === 0) {
+    findings.push('the hero float is gone: no keyframe referenced by .char-layer declares a translateY (the brief keeps it as the ceiling)')
+  } else if (car.amp !== null && hero.amp > car.amp) {
+    findings.push(`the hero float's amplitude (${hero.amp}px) exceeds the car's (${car.amp}px)`)
   }
+  const floatEvidence = `hero float ${hero.amp ?? 'none'}px vs car ${car.amp ?? 'none'}px, from ${[...heroNames].join('/') || 'no'} and ${[...carNames].join('/') || 'no'} keyframes`
 
-  // (c) the R129 dissolve buffers must not come back. R138's .hero-cross is a
-  // different design (reaction-mounted, no shadow of its own) and is judged by
-  // checks (a), (f) and (e+) rather than banned by name.
-  for (const cls of ['hero-layer-a', 'hero-layer-b']) {
-    if (new RegExp('\\bclass\\s*=\\s*["\'][^"\']*' + cls).test(S.markupCode) || new RegExp('\\.' + cls + '\\b').test(S.styleCode)) {
-      findings.push(`dissolve buffer element \`.${cls}\` is back (markup or style)`)
-    }
-  }
-  // exactly one element owns the sheet testid; the crossfade buffer is not it
-  const sheets = (S.markupCode.match(/data-testid="hero-idle"/g) || []).length
-  if (sheets !== 1) findings.push(`expected exactly 1 sheet element, found ${sheets}`)
+  // (g) reduced motion still stops the float, unconditionally
+  const rm = rulesWithAncestors(G.styleCode).filter(r => r.anc.some(a => /prefers-reduced-motion:\s*reduce/.test(a)))
+  const stopsFloat = rm.some(r => r.sel.split(',').map(s => s.trim()).includes('.char-layer') &&
+    /animation:\s*none\s*!important/.test(r.body))
+  if (!stopsFloat) findings.push("SceneGroup's reduced-motion block no longer stops .char-layer with `animation: none !important`")
 
-  // (d) the glance state must not return through the script's sheet/frame maps
-  if (/\bglance\b/.test(S.scriptCode)) findings.push('the script declares a `glance` state again')
-  if (/hero_glance/.test(S.scriptCode) || /hero_glance/.test(S.markupCode)) findings.push('the pruned hero_glance sheet is referenced again')
-
-  // (e) the accessibility floor must survive
-  if (!/\.hero-idle\[data-motion\]\s*\{[^}]*animation:\s*none\s*!important/.test(S.styleCode))
-    findings.push('the reduced-motion reset on .hero-idle[data-motion] is missing or lost its !important')
-  if (!/\.hero-body\[data-motion\]\s*\{[^}]*animation:\s*none\s*!important/.test(S.styleCode))
-    findings.push('the reduced-motion reset on .hero-body[data-motion] is missing or lost its !important')
-
-  // (e+) the crossfade buffer's own floor: stilled AND blanked. If the markup
-  // carries no .hero-cross at all this is not required (nothing to reset).
-  const hasCross = /\bclass\s*=\s*["'][^"']*hero-cross/.test(S.markupCode)
-  if (hasCross) {
-    if (!/\.hero-cross\[data-motion\]\s*\{[^}]*animation:\s*none\s*!important[^}]*opacity:\s*0\s*!important/.test(S.styleCode))
-      findings.push('the reduced-motion reset on .hero-cross[data-motion] is missing, lost its !important, or no longer blanks the buffer (opacity 0)')
-
-    // (f) the crossfade buffer must be mount-gated on a non-idle motion, so the
-    // idle cannot dissolve even if every CSS argument is lost to a future tie.
-    if (!/\{#if motion !== 'idle'\}[\s\S]*?class\s*=\s*["'][^"']*hero-cross/.test(S.markupCode))
-      findings.push(".hero-cross is no longer mounted inside {#if motion !== 'idle'}: the idle can reach the dissolve")
-  }
-
-  // (h) R151: the warm layers keep the three sheets painted and must stay invisible: at most 1%
-  // opacity, stated on the .hero-warm-sheet rule itself. At 1 they would paint a second, visible
-  // hero at rest, and the at-rest check above does not look at opacity.
-  if (/\bclass\s*=\s*["'][^"']*hero-warm-sheet/.test(S.markupCode)) {
-    const warm = R.find(r => r.sel.split(',').map(x => x.trim()).includes('.hero-warm-sheet'))
-    const op = warm ? decls(warm.body).find(d => d.k === 'opacity') : null
-    const v = op ? parseFloat(op.v) : NaN
-    if (!(v >= 0 && v <= 0.01)) findings.push(`.hero-warm-sheet opacity must be stated and at most 0.01, found ${op ? op.v : 'none'}`)
-  }
-
-  // (g) the float fence, judged on SceneGroup.svelte. R138 restored the wrapper
-  // float as translateY only, at or below the car's amplitude, and R138's close
-  // is "float yes, tick no" - so absence is a finding exactly as excess is.
-  let floatEvidence = ''
-  if (sceneSrc) {
-    const G = sections(sceneSrc)
-    const GR = rules(G.styleCode)
-    const kf = keyframes(G.styleCode)
-    const heroNames = referencedAnimations(GR, /\.char-layer\b/)
-    const carNames = referencedAnimations(GR, /\.car-layer\b/)
-    const hero = floatShape(kf, heroNames)
-    const car = floatShape(kf, carNames)
-    for (const f of hero.foreign) {
-      findings.push(`the hero float's keyframes carry a non-translateY transform: ${f}`)
-    }
-    if (hero.amp === null || hero.amp === 0) {
-      findings.push('the hero float is gone: no keyframe referenced by .char-layer declares a translateY (R138: float yes, tick no)')
-    } else if (car.amp !== null && hero.amp > car.amp) {
-      findings.push(`the hero float's amplitude (${hero.amp}px) exceeds the car's (${car.amp}px); R138 requires at or below`)
-    }
-    floatEvidence = `hero float ${hero.amp ?? 'none'}px vs car ${car.amp ?? 'none'}px, from ${[...heroNames].join('/') || 'no'} and ${[...carNames].join('/') || 'no'} keyframes`
-  }
-
-  return { findings, prose: S.stylePROSE, rules: R.length, floatEvidence }
+  return { findings, prose: S.prose, floatEvidence }
 }
 
 // ── entry ────────────────────────────────────────────────────────────────────
 const real = readFileSync(FILE, 'utf-8')
 const realScene = readFileSync(SCENE_FILE, 'utf-8')
+const INDEX_HTML = join(HERE, '..', 'index.html')
+const realTree = Object.fromEntries([...walk(SRC), INDEX_HTML].map(p => [relative(join(HERE, '..'), p), readFileSync(p, 'utf-8')]))
 
 if (process.argv.includes('--self-test')) {
-  console.log('HERO IDLE PLANTED GATE, seeded self-test\n')
+  console.log('HERO IDLE PLANTED GATE (R153, one still), seeded self-test\n')
   let bad = 0
-  const check = (label, mutate, expectCatch, mutateScene) => {
-    const { findings } = judge(mutate(real), mutateScene ? mutateScene(realScene) : realScene)
+  const heroKey = relative(join(HERE, '..'), FILE)
+  const check = (label, mutate, expectCatch, mutateScene, mutateTree) => {
+    const hero = mutate(real)
+    const scene = mutateScene ? mutateScene(realScene) : realScene
+    const tree = { ...realTree, [heroKey]: hero, [relative(join(HERE, '..'), SCENE_FILE)]: scene }
+    if (mutateTree) mutateTree(tree)
+    const { findings } = judge(hero, scene, tree)
     const caught = findings.length > 0
     const ok = caught === expectCatch
     if (!ok) bad++
@@ -308,93 +347,87 @@ if (process.argv.includes('--self-test')) {
     for (const f of findings.slice(0, 3)) console.log(`            ${f}`)
   }
   const id = s => s
+  const must = (s, needle) => { if (!s.includes(needle)) throw new Error(`seed anchor not found: ${needle}`); return s }
 
-  // SEED 1: the sway back, by its own name (R122's exact rule)
-  check('seeded: R122 hero-sway-idle restored on .hero-body', s => s
-    .replace('  .hero-body {\n    position: absolute;', '  @keyframes hero-sway-idle { 0%,100% { transform: rotate(-0.32deg) } 50% { transform: rotate(0.32deg) } }\n  .hero-body {\n    animation: hero-sway-idle 7.2s ease-in-out infinite;\n    position: absolute;'), true)
+  // SEED 1: a strip back on the render path, as the still's own source
+  check('seeded: the still swapped for the idle strip (ui/hero/hero_crossed_idle_6f.png)', s =>
+    must(s, '/ui/scene_character.png').replace('/ui/scene_character.png', '/ui/hero/hero_crossed_idle_6f.png'), true)
+  // SEED 2: a reaction buffer element back beside the still
+  check('seeded: a second element (a reaction buffer) beside the still', s =>
+    must(s, '<img\n  class="hero-still"').replace('<img\n  class="hero-still"', '<div class="hero-cross" aria-hidden="true"></div>\n<img\n  class="hero-still"'), true)
+  // SEED 3: an animation on the still itself
+  check('seeded: an animation on .hero-still', s =>
+    must(s, '    display: block;\n').replace('    display: block;\n', '    display: block;\n    animation: hero-cross-top-win 1.5s steps(31) 1 forwards;\n'), true)
+  // SEED 4: a pendulum under a brand-new name, keyframes and all
+  check('seeded: a renamed pendulum keyframe on the still', s =>
+    must(s, '</style>').replace('</style>', '  @keyframes hero-drift { 0%,100% { transform: rotate(-0.3deg) } 50% { transform: rotate(0.3deg) } }\n  .hero-still { animation: hero-drift 7s ease-in-out infinite; }\n</style>'), true)
+  // SEED 5: the same hidden inside an @media block
+  check('seeded: a transform hidden inside an @media (min-width) block', s =>
+    must(s, '</style>').replace('</style>', '  @media (min-width: 900px) {\n    .hero-still { transform: translateY(-4px); }\n  }\n</style>'), true)
+  // SEED 6: the reaction state machine's first two lines back
+  check('seeded: a store import and a reactive win trigger back in the script', s =>
+    must(s, '  export let assetBase: string').replace('  export let assetBase: string', "  import { winAmount } from '../stores/gameStore'\n  export let assetBase: string\n  let motion = 'idle'\n  $: if ($winAmount > 0) motion = 'win'"), true)
+  // SEED 7: a hold timer, the shape the old reactions settled on
+  check('seeded: a setTimeout hold in the script', s =>
+    must(s, '  export let assetBase: string').replace('  export let assetBase: string', '  export let assetBase: string\n  setTimeout(() => {}, 1500)'), true)
+  // SEED 8: SceneGroup listening for the hero, the shape a win would wait on
+  check('seeded: SceneGroup mounts HeroIdle with an on:done handler', id, true, sc =>
+    must(sc, '<HeroIdle assetBase={$themeAssets.assetBase} />').replace('<HeroIdle assetBase={$themeAssets.assetBase} />', '<HeroIdle assetBase={$themeAssets.assetBase} on:done={() => {}} />'))
+  // SEED 9: the R122 rotation restored inside the float's own keyframes
+  check('seeded: rotate back inside the char-idle float keyframes', id, true, sc =>
+    must(sc, '50%      { transform: translateY(-3px); }').replace('50%      { transform: translateY(-3px); }', '50%      { transform: translateY(-3px) rotate(0.6deg); }'))
+  // SEED 10: the float's amplitude raised past the car's own
+  check('seeded: the float amplitude raised above the car (8px vs 6px)', id, true, sc =>
+    must(sc, '50%      { transform: translateY(-3px); }').replace('50%      { transform: translateY(-3px); }', '50%      { transform: translateY(-8px); }'))
+  // SEED 11: the float deleted outright
+  check('seeded: the float deleted from .char-layer', id, true, sc =>
+    must(sc, 'animation: char-idle 5s ease-in-out infinite;').replace('animation: char-idle 5s ease-in-out infinite;', ''))
+  // SEED 12: a strip preloaded from ANOTHER file, which no HeroIdle check could see
+  check('seeded: App.svelte preloads the win strip', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('App.svelte'))
+    tree[k] = tree[k].replace('</script>', "  new Image().src = '/assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png'\n</script>")
+  })
+  // SEED 13: the reduced-motion reset on the float loses its !important
+  check('seeded: the .char-layer reduced-motion reset loses !important', id, true, sc =>
+    must(sc, '.chest-lamp {\n      animation: none !important;').replace('.chest-lamp {\n      animation: none !important;', '.chest-lamp {\n      animation: none;'))
 
-  // SEED 2: the SAME motion under a BRAND-NEW name - a name-only gate misses this
-  check('seeded: the same pendulum under a new name (hero-drift-idle)', s => s
-    .replace('  .hero-body {\n    position: absolute;', '  @keyframes hero-drift-idle { 0%,100% { transform: rotate(-0.32deg) } 50% { transform: rotate(0.32deg) } }\n  .hero-body {\n    animation: hero-drift-idle 7.2s ease-in-out infinite;\n    position: absolute;'), true)
+  // SEED 14 (R153 review): motion put on the still inline, the form check (a) cannot read
+  check('seeded: an inline style animation on the <img>', s =>
+    must(s, '  class="hero-still"\n').replace('  class="hero-still"\n', '  class="hero-still"\n  style="animation: hero-probe 2.4s infinite"\n'), true)
+  // SEED 15 (R153 review): a wrapper element around the mount, carrying its own animation
+  check('seeded: SceneGroup wraps the mount in an animated div', id, true, sc =>
+    must(sc, '<HeroIdle assetBase={$themeAssets.assetBase} />').replace('<HeroIdle assetBase={$themeAssets.assetBase} />', '<div class="hero-sway"><HeroIdle assetBase={$themeAssets.assetBase} /></div>')
+      .replace('</style>', '  .hero-sway { animation: char-idle 2s infinite; }\n</style>'))
+  // SEED 16 (R153 review): a strip url() in app.css, which the walker skipped before R153's review
+  check('seeded: app.css carries a hero strip url()', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('app.css'))
+    tree[k] = tree[k] + '\n.x { background-image: url(/assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png); }\n'
+  })
+  // SEED 17 (R153 review): app.css animating the still by its class
+  check('seeded: app.css animates .hero-still', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('app.css'))
+    tree[k] = tree[k] + '\n.hero-still { animation: spin 3s linear infinite; }\n'
+  })
+  // SEED 18: a strip preloaded from index.html
+  check('seeded: index.html preloads the idle strip', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('index.html'))
+    tree[k] = tree[k].replace('</head>', '<link rel="preload" as="image" href="/assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png"></head>')
+  })
 
-  // SEED 3: the idle flipbook back on the sheet layer
-  check('seeded: hero-cycle-idle flipbook restored on .hero-idle', s => s
-    .replace(".hero-idle[data-motion='win']    {", "@keyframes hero-cycle-idle { from { background-position-x: 0 } to { background-position-x: var(--hero-span) } }\n  .hero-idle { animation: hero-cycle-idle 4.4s steps(6) infinite; }\n  .hero-idle[data-motion='win']    {"), true)
-
-  // SEED 4: the R129 dual-buffer dissolve elements back in the markup
-  check('seeded: .hero-layer-b dissolve buffer back in the markup', s => s
-    .replace('<div\n    class="hero-idle"', '<div class="hero-layer-b" aria-hidden="true"></div>\n  <div\n    class="hero-idle"'), true)
-
-  // SEED 5: the glance state back in the script
-  check('seeded: the glance state back in the SHEET map', s => s
-    .replace("const SHEET", "const GLANCE_SHEET = 'hero_glance_6f.png' // glance\n  const SHEET"), true)
-
-  // SEED 6: the accessibility floor quietly weakened
-  check('seeded: the reduced-motion reset loses its !important', s => s
-    .replace('animation: none !important;\n      background-position-x: 0 !important;', 'animation: none;\n      background-position-x: 0;'), true)
-
-  // SEED 7: the same pendulum HIDDEN INSIDE an @media block - a depth-only walker misses it
-  check('seeded: hero drift restored inside an @media (min-width) block', s => s
-    .replace('</style>', "  @media (min-width: 900px) {\n    @keyframes hero-drift-idle { 0%,100% { transform: rotate(-0.32deg) } 50% { transform: rotate(0.32deg) } }\n    .hero-body { animation: hero-drift-idle 7.2s ease-in-out infinite; }\n  }\n</style>"), true)
-
-  // SEED 8: an IDLE-REACHABLE dissolve - the exact class R138 forbids. A bare
-  // .hero-cross rule animates with no state qualifier, so the resting hero
-  // would fade a second frame over himself.
-  check('seeded: .hero-cross animates with no state qualifier (idle dissolve)', s => s
-    .replace('  .hero-cross {\n    position: absolute;', '  .hero-cross {\n    animation: hero-cross-fade-win 1s linear infinite;\n    position: absolute;'), true)
-
-  // SEED 9: the mount gate removed - the buffer exists at rest even though its
-  // CSS is still reaction-scoped
-  check("seeded: .hero-cross mounted outside {#if motion !== 'idle'}", s => s
-    .replace("{#if motion !== 'idle'}", '{#if true}'), true)
-
-  // SEED 10: the crossfade buffer's reduced-motion reset stops blanking it
-  check('seeded: the .hero-cross reduced-motion reset loses opacity 0', s => s
-    .replace('    .hero-cross[data-motion] {\n      animation: none !important;\n      opacity: 0 !important;\n    }', '    .hero-cross[data-motion] {\n      animation: none !important;\n    }'), true)
-
-  // SEED 11: the R122 rotation restored INSIDE the float's own keyframes, the
-  // exact form the old char-idle shipped
-  check('seeded: rotate back inside the char-idle float keyframes', id, true, sc => sc
-    .replace('50%      { transform: translateY(-3px); }', '50%      { transform: translateY(-3px) rotate(0.6deg); }'), )
-
-  // SEED 12: the same pendulum under a RENAMED keyframe referenced from
-  // .char-layer - behaviour-keyed, so the reference is what convicts it
-  check('seeded: a renamed pendulum keyframe referenced by .char-layer', id, true, sc => sc
-    .replace('animation: char-idle 5s ease-in-out infinite;', 'animation: char-drift 5s ease-in-out infinite;')
-    .replace('@keyframes char-idle {', '@keyframes char-drift {\n    0%, 100% { transform: translateY(0) rotate(-0.6deg); }\n    50% { transform: translateY(-3px) rotate(0.6deg); }\n  }\n  @keyframes char-idle {'), )
-
-  // SEED 13: the float's amplitude raised past the car's own
-  check('seeded: the float amplitude raised above the car (8px vs 6px)', id, true, sc => sc
-    .replace('50%      { transform: translateY(-3px); }', '50%      { transform: translateY(-8px); }'), )
-
-  // SEED 14: the float deleted outright - R138 regressed back to R130's still
-  check('seeded: the float deleted from .char-layer (back to too dead)', id, true, sc => sc
-    .replace('animation: char-idle 5s ease-in-out infinite;', ''), )
-
-  // SEED 15 (R151): a flipbook smuggled onto the warm layers, which are mounted at rest
-  check('seeded: an animation on .hero-warm-sheet (the warm layers animating at rest)', s => s
-    .replace('    background-position: 0 0;\n    opacity: 0.01;', '    background-position: 0 0;\n    opacity: 0.01;\n    animation: hero-cross-top-win 1s steps(6) infinite;'), true)
-
-  // SEED 16 (R151): the warm layers made visible, a second hero painted at rest
-  check('seeded: .hero-warm-sheet at opacity 1 (a second visible hero)', s => s
-    .replace('    background-position: 0 0;\n    opacity: 0.01;', '    background-position: 0 0;\n    opacity: 1;'), true)
-
-  // NEGATIVE CONTROL A: the real files, which NAME the retired keyframes and
-  // the retired rotate values in prose, must pass
+  // NEGATIVE CONTROL A: the real files as they stand
   check('NEGATIVE CONTROL: the real files as they stand must pass', id, false)
-
-  // NEGATIVE CONTROL B: prose that quotes the banned rules verbatim, as CSS and
-  // HTML comments in BOTH files, must not trip it
-  check('NEGATIVE CONTROL: comments quoting `animation: hero-sway-idle 7.2s` and rotate(0.6deg) must not trip it', s => s
-    .replace('<style>', '<style>\n  /* R130 deleted `.hero-body { animation: hero-sway-idle 7.2s ease-in-out infinite; }`\n     and `@keyframes hero-sway-idle`, plus .hero-layer-a / .hero-layer-b and the glance. */')
-    .replace('<div class="hero-body"', '<!-- was: <div class="hero-layer-b"></div>, hero_glance_6f.png, glance -->\n<div class="hero-body"'), false, sc => sc
-    .replace('<style>', '<style>\n  /* the old rule was transform: translateY(-7px) rotate(0.6deg) scale(1.015) and it is dead */'))
+  // NEGATIVE CONTROL B: prose quoting every banned form, in all three comment syntaxes
+  check('NEGATIVE CONTROL: comments quoting strips, timers, keyframes and transforms must not trip it', s => s
+    .replace('<style>', '<style>\n  /* was: .hero-body { animation: hero-sway-idle 7.2s; transform: rotate(0.3deg) } @keyframes hero-sway-idle, ui/hero/hero_win_reaction_32f.png */')
+    .replace('<img\n  class="hero-still"', '<!-- was: <div class="hero-cross"></div> {#if motion} ui/hero/hero_feature_trigger_16f.png -->\n<img\n  class="hero-still"')
+    .replace('  export let assetBase: string', "  // was: import { winAmount } from '../stores/gameStore'; setTimeout(endReaction, 1500); $: react('win')\n  export let assetBase: string"),
+  false, sc => sc.replace('<style>', '<style>\n  /* the old rule was transform: translateY(-7px) rotate(0.6deg) scale(1.015) and it is dead */'))
 
   console.log('')
-  const { prose, floatEvidence } = judge(real, realScene)
-  const named = ['hero-sway-idle', 'hero-cycle-idle', 'hero-dissolve-in', 'hero-turn-glance', 'hero-cycle-glance']
+  const { prose, floatEvidence } = judge(real, realScene, realTree)
+  const named = ['hero_crossed_idle_6f', 'hero_win_reaction_32f', 'hero_feature_trigger_16f', 'hero_glance_6f']
     .filter(n => prose.includes(n))
-  console.log(`  comment-immunity evidence: the real file's CSS prose names ${named.length}/5 retired keyframes (${named.join(', ')}) and the gate is silent.`)
+  console.log(`  comment-immunity evidence: HeroIdle's prose names ${named.length}/4 hero strips (${named.join(', ')}) and the gate is silent.`)
   console.log(`  float fence evidence: ${floatEvidence}`)
   console.log('')
   if (bad) { console.error(`HERO IDLE PLANTED GATE SELF-TEST: FAIL (${bad} case(s) wrong)`); process.exit(1) }
@@ -402,11 +435,11 @@ if (process.argv.includes('--self-test')) {
   process.exit(0)
 }
 
-const { findings, rules: n, floatEvidence } = judge(real, realScene)
-console.log(`HERO IDLE PLANTED GATE: ${n} CSS rule(s) walked in HeroIdle.svelte; ${floatEvidence}`)
+const { findings, floatEvidence } = judge(real, realScene, realTree)
+console.log(`HERO IDLE PLANTED GATE: ${Object.keys(realTree).length} source file(s) scanned for strips; ${floatEvidence}`)
 if (findings.length) {
   console.error('\nHERO IDLE PLANTED GATE: FAIL')
   for (const f of findings) console.error('  ' + f)
   process.exit(1)
 }
-console.log('HERO IDLE PLANTED GATE: PASS (pose frozen, float translateY-only at or below the car, dissolve reaction-scoped)')
+console.log('HERO IDLE PLANTED GATE: PASS (one still, no strip in src, no state in the hero, float translateY-only at or below the car)')

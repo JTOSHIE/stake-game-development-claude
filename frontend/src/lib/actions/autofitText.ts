@@ -53,11 +53,33 @@ function fit(node: HTMLElement) {
   })
 }
 
+// R153: RE-FIT WHEN A WEB FONT ARRIVES. fit() measures two frames after mount, and a node whose
+// face is not loaded yet is measured in the fallback font; when the real face lands the text
+// widens and nothing re-measured it. That was latent until R153 moved the hamburger menu's
+// MUSIC/SOUND labels from Orbitron to Exo 2: on main those labels fetched Orbitron 700 when the
+// menu opened, so the face was already there when PAYTABLE opened from it; on the R153 tip it
+// arrived only with the paytable, after the fit, and money_fit_gate caught the Bet Modes prices
+// overflowing by 5 to 9px (main passed the same load, measured side by side). So every live node
+// is kept in one set, and one `loadingdone` listener re-fits them all whenever a face finishes.
+const live = new Set<HTMLElement>()
+let listening = false
+function onFontsLoaded() {
+  for (const node of live) fit(node)
+}
+
 export function autofitText(node: HTMLElement, value: unknown) {
+  live.add(node)
+  if (!listening && typeof document !== 'undefined' && document.fonts?.addEventListener) {
+    document.fonts.addEventListener('loadingdone', onFontsLoaded)
+    listening = true
+  }
   fit(node)
   return {
     update() {
       fit(node)
+    },
+    destroy() {
+      live.delete(node)
     },
   }
 }

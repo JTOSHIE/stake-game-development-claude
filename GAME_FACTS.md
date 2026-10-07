@@ -269,6 +269,15 @@ live is exactly 5,000.00x on the wincap round itself.
   recorded provenance; **symbols remain never externally designed**, and unrequested
   external design remains prohibited.
 
+  **NOTE 2026-10-07 (R153):** ui/scene_character.png ships again, as the hero's one still, drawn as a
+  single img by `frontend/src/lib/components/HeroIdle.svelte`. The shipped file is sha256
+  6bdd73d0a656f27f... (774,813 bytes), the owner-briefed R145 Astra static proof, landed in commit
+  29f967c8 (record `reports/archive/2026-09-13_r145-astra-static-proof.md`; no provenance file for it
+  exists under docs/art or design-system). It is NOT the 1acbd781... (629,245 bytes) enhancement whose
+  hash the table below cites from the dossier. The idle, win and brace sheets are pruned from the bundle
+  instead and stay in the repository, so the resting hero sheet the R147 paragraph below names (from the
+  R122 strip) no longer ships.
+
   **NOTE 2026-09-29 (R152):** `ui/scene_character.png` in the table below no longer ships. It was drawn
   only by SceneGroup's unreachable 'static' hero branch, requested 0 times in 14 production contexts;
   R152 removed that branch and pruned the file from the bundle on the owner's brief. The file stays in

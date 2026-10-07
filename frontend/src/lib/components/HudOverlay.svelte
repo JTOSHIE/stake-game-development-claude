@@ -1,11 +1,14 @@
 <script lang="ts">
   // HudOverlay.svelte - LAYOUT_SPEC v3.2 AMENDMENT: fixed-field HUD.
+  // NOTE R153 (2026-10-07): the accent sentence below is retired. Since R153 the
+  // only accent on the bar is the spin ring's 2px edge; TURBO steps in white with
+  // no glow. See R153 OPERATOR STRIP in the style block.
   // Reskin-free per DESIGN_SYSTEM (the only themed accent is TURBO, which
   // reuses the existing turbo treatment with an engage glow). Every field
   // inside the panel is a fixed box that never moves or resizes as its value
   // grows (stress-tested against $10,000.00 balance / $5,000.00 win /
   // $5,000.00 bet); every numeric value uses tabular numerals.
-  import { createEventDispatcher, onMount, onDestroy } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
   import {
     betAmount, balance, currencyCode,
     isSpinning, isAutoPlay, autoPlayCount,
@@ -306,21 +309,10 @@
   $: overboostLabel = $tr(FS_MODES.find((m) => m.serverMode === 'antelite')!.labelKey)
   $: cruiseLabel    = $tr(FS_MODES.find((m) => m.serverMode === 'cruise')!.labelKey)
 
-  // NEON LIFT (2026-07-15, item 3): a brief glow pulse on the bet figure the
-  // moment OVERBOOST toggles ON (the effective cost jumping to 1.25x is
-  // otherwise a silent number change) - triggers only on the OFF->ON
-  // transition, not on every reactive re-run, by comparing against the
-  // previous value. Cleared after one pulse cycle so it never becomes a
-  // permanent state.
-  let overboostPulse = false
-  let prevOverboost = false
-  let overboostPulseTimer: ReturnType<typeof setTimeout> | null = null
-  $: if (isOverboost && !prevOverboost) {
-    overboostPulse = true
-    if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
-    overboostPulseTimer = setTimeout(() => { overboostPulse = false }, 700)
-  }
-  $: prevOverboost = isOverboost
+  // R153: the NEON LIFT bet pulse of 2026-07-15 is gone with its glow. It flashed an orange
+  // bloom round the BET plate on the OFF->ON edge of OVERBOOST, and the operator strip carries
+  // no per-plate accent. The change is still never silent: the BET value reads the effective
+  // 1.25x cost the moment the mode engages, and the OVERBOOST badge appears above it.
 
   // Derived from the session's currency, and placed on the side that currency
   // places it, exactly as formatBalance() does for every other money readout.
@@ -405,10 +397,6 @@
   // threshold the HUD's own 400ms-to-800ms curve still governs, so ordinary
   // wins tick exactly as they did.
 
-  onDestroy(() => {
-    if (overboostPulseTimer) clearTimeout(overboostPulseTimer)
-  })
-
   // Digits come from the SETTLED $winAmount, not from the eased frame value.
   // Deriving per frame makes the readout flicker between two and four places for
   // the whole count-up; measured before this landed.
@@ -438,7 +426,7 @@
         <span class="p-stat-label">{$tr('balance')}</span>
         <span class="p-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
       </div>
-      <div class="p-stat p-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+      <div class="p-stat p-stat--win" data-testid="hud-win">
         <span class="p-stat-label">{$tr('win')}</span>
         <span class="p-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
       </div>
@@ -448,15 +436,15 @@
          clipping the currency text or shrinking the steppers below the
          touch-target floor (caught by the committed portrait screenshots
          showing "$1,000,000.00" overflowing its card - see session report). -->
-    <div class="p-bet-stat" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
+    <div class="p-bet-stat" data-testid="hud-bet">
       <span class="p-stat-label">{$tr('bet')}</span>
       <div class="p-bet-row" data-testid="bet-arrows">
         <button class="p-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
-          <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+          <svg viewBox="0 0 20 12"><path d="M4 3l6 6 6-6"/></svg>
         </button>
         <button class="p-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
         <button class="p-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
-          <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+          <svg viewBox="0 0 20 12"><path d="M4 9l6-6 6 6"/></svg>
         </button>
       </div>
       {#if isOverboost}
@@ -665,17 +653,17 @@
     <span class="m-stat-label">{$tr('hudBalanceShort')}</span>
     <span class="m-stat-value cyan" data-money="cur" use:fitMoney={{ full: balanceLabel, compact: balanceCompact }}></span>
   </div>
-  <div class="m-stat m-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="m-stat m-stat--win" data-testid="hud-win">
     <span class="m-stat-label">{$tr('hudWinShort')}</span>
     <span class="m-stat-value magenta" data-money="cur" use:fitMoney={{ full: winLabel, compact: winCompact }}></span>
   </div>
   <div class="m-stat m-stat--bet" data-testid="hud-bet">
     <button class="m-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
-      <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+      <svg viewBox="0 0 20 12"><path d="M4 3l6 6 6-6"/></svg>
     </button>
     <button class="m-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
     <button class="m-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
-      <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+      <svg viewBox="0 0 20 12"><path d="M4 9l6-6 6 6"/></svg>
     </button>
   </div>
 
@@ -746,19 +734,19 @@
     <span class="c-stat-label">{$tr('balance')}</span>
     <span class="c-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
   </div>
-  <div class="c-stat c-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="c-stat c-stat--win" data-testid="hud-win">
     <span class="c-stat-label">{$tr('win')}</span>
     <span class="c-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
   </div>
-  <div class="c-stat c-stat--bet" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
+  <div class="c-stat c-stat--bet" data-testid="hud-bet">
     <span class="c-stat-label">{$tr('bet')}</span>
     <div class="c-bet-row" data-testid="bet-arrows">
       <button class="c-bet-step" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}>
-        <svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg>
+        <svg viewBox="0 0 20 12"><path d="M4 3l6 6 6-6"/></svg>
       </button>
       <button class="c-stat-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
       <button class="c-bet-step" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}>
-        <svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg>
+        <svg viewBox="0 0 20 12"><path d="M4 9l6-6 6 6"/></svg>
       </button>
     </div>
     {#if isOverboost}
@@ -847,7 +835,7 @@
   </button>
 </div><!-- /c-hud -->
 {:else}
-<!-- HUD - B1 reskin. .fs-hud is a display:contents token-scope wrapper only;
+<!-- HUD - R153 operator strip (was the B1 reskin). .fs-hud is a display:contents token-scope wrapper only;
      every control keeps its own position:absolute against the same stage
      ancestor, so nothing shifts. Overdrive flips accents from the shared flag. -->
 <div class="fs-hud" class:fs-hud--overdrive={$overdriveVisual}>
@@ -933,8 +921,7 @@
   </div>
 
   <!-- BALANCE - fixed box x 400, width 200 -->
-  <div class="fs-box fs-balance fs-plate" data-testid="hud-balance">
-    <span class="fs-rail"></span>
+  <div class="fs-box fs-balance" data-testid="hud-balance">
     <span class="fs-face">
       <span class="fs-label">{$tr('balance')}</span>
       <span class="fs-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
@@ -942,8 +929,7 @@
   </div>
 
   <!-- WIN - fixed box x 616, width 150 -->
-  <div class="fs-box fs-win fs-plate" class:lit={$winAmount > 0} data-testid="hud-win">
-    <span class="fs-rail"></span>
+  <div class="fs-box fs-win" data-testid="hud-win">
     <span class="fs-face">
       <span class="fs-label">{$tr('win')}</span>
       <span class="fs-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
@@ -953,8 +939,7 @@
   <!-- BET - fixed box x 782, width 120, value right-aligned. Shows the
        EFFECTIVE debit (bet x MODE_COST[standingMode]), not the nominal bet
        level, whenever a standing/enhancer mode changes the real cost. -->
-  <div class="fs-box fs-bet fs-plate" class:overboost-pulse={overboostPulse} data-testid="hud-bet">
-    <span class="fs-rail"></span>
+  <div class="fs-box fs-bet" data-testid="hud-bet">
     <span class="fs-face">
       <span class="fs-label">{$tr('bet')}</span>
       <button class="fs-value gold bet-open" data-money="cur" use:autofitText={betLabel} on:click={openBetSelector} aria-haspopup="dialog" aria-expanded={showBetSelector} aria-label={$tr("a11yOpenBetSelector")} data-testid="bet-window"><span class="bet-open-text">{betLabel}</span></button>
@@ -963,7 +948,10 @@
 
   <!-- Mode badge anchor - a plain (unclipped) sibling matching the BET box's
        own geometry exactly. .fs-plate's clip-path would otherwise clip any
-       child poking above the box, so this sits outside it, not inside. -->
+       child poking above the box, so this sits outside it, not inside.
+       R153: the plate and its clip-path are gone, but the face now clips with
+       overflow:hidden, so the badge still has to sit outside the box to reach
+       above the strip's top edge. -->
   {#if isOverboost || isCruise}
     <div class="fs-bet-badge-anchor">
       {#if isOverboost}
@@ -974,10 +962,10 @@
     </div>
   {/if}
 
-  <!-- Stacked cyan bet arrows - own FIXED column x 906 (v3.3), independent of BET box -->
+  <!-- R153: one chevron pair, stroked, in the locked STEPPERS column beside BET. -->
   <div class="fs-arrows" data-testid="bet-arrows">
-    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 1 19 11H1z"/></svg></button>
-    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}><svg viewBox="0 0 20 12"><path d="M10 11 1 1h18z"/></svg></button>
+    <button class="fs-arrow" on:click={increaseBet} disabled={$isSpinning || !$canIncreaseBetLevel} aria-label={$tr('a11yIncreaseBet')}><svg viewBox="0 0 20 12"><path d="M4 9l6-6 6 6"/></svg></button>
+    <button class="fs-arrow" on:click={decreaseBet} disabled={$isSpinning || !$canDecreaseBetLevel} aria-label={$tr('a11yDecreaseBet')}><svg viewBox="0 0 20 12"><path d="M4 3l6 6 6-6"/></svg></button>
   </div>
 
   <!-- SPIN - v3.2: centre (1004,604), 84 diameter. Stays clickable mid-spin
@@ -1113,6 +1101,10 @@
      it is a fixed-geometry 120px box with a clip-path, it is not a touch
      profile, and forcing height into it would push the label out of its own
      plate to satisfy a bar that does not apply there. */
+  /* NOTE R153: the landscape exclusion described above still stands, for a different reason. The
+     plate has no clip-path since R153, and it IS treated as a touch target now: it meets the 44px
+     floor through .fs-bet .bet-open::after (in R153 OPERATOR STRIP below), which covers the whole
+     120x62 BET box, not through this min-height. */
   .p-stat-value.bet-open,
   .c-stat-value.bet-open {
     min-height: 44px;
@@ -1163,8 +1155,9 @@
        trigger; a full-width strip would push that trigger out of the row, which
        is how the FEATURES control went missing in the first place. */
     flex: 1 1 auto; min-width: 0; height: 44px; padding: 0 4px 0 2px;
-    background: linear-gradient(180deg, rgba(10, 14, 26, 0.94), rgba(6, 8, 18, 0.98));
-    border-top: 1px solid rgba(0, 255, 255, 0.22);
+    /* R153: the operator plate, flat. The cyan top rule was a neon rail by another name. */
+    background: var(--op-plate);
+    border-radius: 8px;
     font-family: var(--fs-font-numeric);
     /* THE MENU BUTTON'S ICON WAS INVISIBLE HERE. Found 2026-07-26 while
        comparing the rebuilt Popout S against the owner's live capture, where
@@ -1182,11 +1175,8 @@
        Declaring the accent here is the fix, rather than rewriting the bar rule,
        because the same borrowing happens in `.c-hud` and any future profile
        that reuses the markup would inherit the same silence. */
-    --p-acc: var(--theme-primary, #00ffff);
-  }
-  .m-hud--overdrive {
-    border-top-color: rgba(255, 0, 255, 0.35);
-    --p-acc: var(--theme-secondary, #ff00ff);
+    /* R153: white, in both states, like the other three profiles. */
+    --p-acc: var(--op-glyph);
   }
 
   .m-menu-wrapper { position: relative; flex: 0 0 auto; }
@@ -1194,10 +1184,11 @@
      full size without the button itself eating the row. */
   .m-round-btn {
     position: relative;
-    width: 36px; height: 36px; border-radius: 8px;
+    box-sizing: border-box;
+    width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(0, 255, 255, 0.08); border: 1px solid rgba(0, 255, 255, 0.3);
-    color: #bff; cursor: pointer; padding: 0;
+    background: transparent; border: 1px solid var(--op-hairline);
+    color: var(--op-glyph); cursor: pointer; padding: 0;
   }
   .m-round-btn::after { content: ''; position: absolute; inset: -4px; }
   .m-hud-menu { bottom: 44px; left: 0; }
@@ -1230,7 +1221,7 @@
      which is worse than the defect it replaced. Measured both ways before
      choosing. 2026-08-10. */
   .m-hud .m-hud-menu { max-height: calc(100vh - 52px); overflow-y: auto; }
-  .m-hud-menu .hud-menu-item { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  .m-hud-menu .hud-menu-item { padding-top: 0.25rem; padding-bottom: 0.25rem; min-height: 0; }
 
   /* Stats read INLINE. This is the change that removes the overlap: nothing is
      stacked in 44px, so nothing can collide with the line above it. */
@@ -1245,7 +1236,14 @@
   }
   .m-stat-label {
     flex: 0 0 auto;
-    font-size: 7px; letter-spacing: 0.04em; color: #6f8a9a; text-transform: uppercase;
+    /* R153 keeps 7px here, under the brief's 10px, and that is the one profile where it does.
+       MEASURED IN R153 at 400x225 with the label forced to 10px: the BALANCE value slot shrank
+       from 64 to 58px, a $50,000.00 balance no longer fitted it, and $1,234,567.89 fell back to
+       the abbreviated $1.234M where 7px shows it in full (the WIN slot went 52 to 45px). The
+       values are what this strip exists to show (the .m-stat-value note below). The brief's proof
+       sizes are 1280 and 390; this exception is on the R153 owner list. Colour and face follow
+       the strip. */
+    font-size: 7px; font-weight: 700; letter-spacing: 0.08em; color: var(--op-label); text-transform: uppercase;
   }
   .m-stat-value {
     flex: 1 1 auto; min-width: 0;
@@ -1282,10 +1280,7 @@
   }
   .m-stat-value.cyan,
   .m-stat-value.magenta,
-  .m-stat-value.gold { color: var(--hud-text); }
-  .m-stat.lit .m-stat-value.magenta {
-    text-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 55%, transparent);
-  }
+  .m-stat-value.gold { color: var(--op-value); }
 
   /* Weighted by string length, and by EXPLICIT CLASS rather than by position.
      The first attempt used .m-stat:nth-of-type(2), which counts among sibling
@@ -1304,7 +1299,7 @@
     position: relative;
     width: 24px; height: 30px; border-radius: 6px; padding: 0;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255, 213, 74, 0.10); border: 1px solid rgba(255, 213, 74, 0.34);
+    background: transparent; border: none;
     cursor: pointer;
   }
   /* Same trick as the menu button: 26x30 visual, 44px effective target.
@@ -1312,7 +1307,8 @@
      so the horizontal extension was one step short of the floor. Measured,
      then corrected, rather than assumed from the visual size. */
   .m-bet-step::after { content: ''; position: absolute; inset: -10px; }
-  .m-bet-step svg { width: 12px; height: 8px; fill: #ffd54a; }
+  .m-bet-step svg { width: 12px; height: 8px; overflow: visible; }
+  .m-bet-step svg path { fill: none; stroke: var(--op-glyph); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
   .m-bet-step:disabled { opacity: 0.35; cursor: default; }
   .m-bet-step:disabled::after { content: none; }
 
@@ -1325,19 +1321,25 @@
        The proof measured 44x38 on the first pass: wide enough and two pixels
        short vertically, which is exactly the kind of miss a screenshot cannot
        show and a measurement can. */
-    width: 44px; height: 40px; border-radius: 10px; padding: 0;
+    /* R153: a 40px circle with the 2px accent ring, the same object as SPIN everywhere else,
+       where it was a 44x40 cyan gradient tile. The ::after extension below takes the effective
+       target to 46x46, still over the 44 floor the measurement above was taken against. */
+    box-sizing: border-box;
+    width: 40px; height: 40px; border-radius: 50%; padding: 0;
     display: flex; align-items: center; justify-content: center;
-    background: radial-gradient(circle at 50% 40%, rgba(0, 255, 255, 0.35), rgba(0, 120, 150, 0.5));
-    border: 1px solid rgba(0, 255, 255, 0.7);
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.35);
+    background: transparent;
+    border: 2px solid var(--hud-accent);
     cursor: pointer;
   }
   .m-spin::after { content: ''; position: absolute; inset: -3px; }
-  .m-spin svg { width: 20px; height: 20px; fill: #eafeff; }
-  .m-spin:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
-  .m-spin.spinning { background: radial-gradient(circle at 50% 40%, rgba(255, 0, 255, 0.3), rgba(120, 0, 150, 0.5)); border-color: rgba(255, 0, 255, 0.7); }
+  .m-spin svg { width: 18px; height: 18px; fill: var(--op-value); }
+  .m-spin:disabled { opacity: 0.4; cursor: default; }
 
-  /* ============================================================================
+  /* NOTE R153 (2026-10-07), above the B1 header it supersedes: the material language that header
+     names (brushed chrome, gunmetal, gold, one signature colour per field, matched to the gauge
+     bezel) is retired. Since R153 every HUD profile paints the operator strip: one flat plate,
+     white type, hairline circles, the spin ring as the only accent. See R153 OPERATOR STRIP below.
+     ============================================================================
      FUTURE SPINNER - B1 HUD & CONTROL-BAR RESKIN  (production CSS)
      Fixed 1280x720 design surface (LAYOUT_SPEC v3.2/v3.6). Every coordinate
      below is the real spec coordinate already used by HudOverlay.svelte.
@@ -1360,7 +1362,9 @@
      rendered the theme colour.
 
      Only the state flip stays here, because it is scoped to a HUD state. */
-  .fs-hud--overdrive, .p-hud--overdrive, .c-hud--overdrive{
+  /* R153: the mini strip joins the flip. Its spin ring now reads --hud-accent like the other three
+     profiles; before R153 it hard-coded cyan and switched to a magenta gradient while spinning. */
+  .fs-hud--overdrive, .p-hud--overdrive, .c-hud--overdrive, .m-hud--overdrive{
     --hud-accent: var(--theme-secondary, #FF2EC4);
   }
 
@@ -1426,416 +1430,249 @@
     --sig-gold:    #FFD700;
     --sig-orange:  #FF9A2E;
     --navy:        #060610;
-    /* live accents - flipped by the Overdrive skin below */
-    --acc:  var(--sig-cyan);
-    --acc2: var(--sig-pink);
+    /* R153: --acc and --acc2 ("live accents - flipped by the Overdrive skin below") are deleted.
+       R153 removed every rule that read them and the Overdrive flip that set them, so they had no
+       reader; --hud-accent is the one accent token. */
   }
 
-  /* ===== REUSABLE CHROME PRIMITIVES ==========================================
-     .fs-plate  notched instrument plate (bezel + face + optional rail)
-     .fs-knob   round chrome bezel (buttons)
-     .fs-rail   left neon accent rail
-     ========================================================================== */
-  .fs-plate{
-    position:absolute;
-    --sig:var(--sig-cyan);
-    padding:1px;                                   /* rim thickness */
-    clip-path:polygon(0 0,calc(100% - 11px) 0,100% 11px,100% 100%,11px 100%,0 calc(100% - 11px));
-    /* Was a six-stop brushed-metal gradient, the single loudest thing in the
-       bar: it read near-white at the bezel and out-contrasted the reels it
-       sits under. Now a neutral hairline. The chamfer is kept because it is
-       the game's own shape language and it costs no contrast. */
-    background:var(--hud-border-strong);
-    box-shadow:var(--hud-shadow);
-  }
-  .fs-plate > .fs-face{
-    position:absolute;inset:2px;
-    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
-    /* The per-plate --sig colour wash is gone: at rest every plate is the same
-       neutral glass, so the row reads as one instrument rather than three. */
-    /* Sunken, not level: the plates sit INSIDE the panel, so they read a step
-       darker than it. This is what replaces the metal bezel as the thing that
-       separates a value from its background. */
-    background:var(--hud-surface-sunken);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 0 12px rgba(0,0,0,.45);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  }
-  .fs-rail{
-    position:absolute;left:2px;top:9px;bottom:9px;width:3px;border-radius:2px;
-    /* Neutral at rest. The accent is spent on a LIVE WIN only (.fs-win.lit
-       below), which is the one thing on this bar worth colouring. */
-    background:var(--hud-border-strong);box-shadow:none;
-    z-index:2;
-  }
-  .fs-knob{
-    border-radius:50%;padding:1px;
-    /* Was an eight-stop conic brushed-metal ring. Secondary controls are meant
-       to be quieter than SPIN, and a metal bezel is not quiet. */
-    background:var(--hud-border);
-    box-shadow:var(--hud-shadow-soft);
-  }
-  .fs-knob > .fs-face{
-    position:absolute;inset:1px;border-radius:50%;
-    background:var(--hud-surface-raised);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-  }
+  /* ===== R153 OPERATOR STRIP, DESKTOP ========================================
+     The owner's brief R153 TASK 1 (reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md),
+     after a 4.3/9 score tagged "poor bet UI bar": the pattern of one dark strip under the reels
+     with small tracked labels, white values, a chevron pair on BET, a ringed spin circle and
+     hairline circles for everything else. "The theme lives on the grid. The bar is a control."
 
-  /* ===== PANEL ================================================================
-     v3.2: x296..984 (688 wide), y560..648, radius18. Slim chrome sub-frame. */
-  /* OWNER AUDIT ROUND 3 item 7: widened/reflowed to keep underlying MAX
-     through STEPPERS (the whole re-measured banner shifted right and
-     widened slightly) - see docs/HUD_SPEC.md. TURBO and SPIN/AUTO stay
-     outside the panel, as before. */
+     WHAT WENT, so a reader does not go looking for it: the hud_banner.png bracket texture and
+     the glass gradient over it, the chamfered .fs-plate bezels and their sunken faces, the
+     .fs-rail neon rails (markup and rules), the win plate's rail bloom and its 1.1s value pop,
+     the OVERBOOST bet glow pulse, the chrome caps under the bet arrows and their cyan glow, the
+     triangle glyphs, the .fs-knob bezels, the brightness and scale hovers, the spin button's
+     accent bloom and dome, and the Overdrive panel edge pulse and hue rotations. The previous
+     rules are in this file at 895815b9.
+
+     WHAT DID NOT MOVE: every coordinate. The --fs-* chain above, the slab and every control box
+     are exactly what docs/HUD_SPEC.md locks and hud_banner_spec_check.mjs and
+     control_row_symmetry_gate.mjs measure. This section changes paint only.
+
+     THE ONE ACCENT is the spin ring, through --hud-accent, which the Overdrive flip above turns
+     magenta. Everything else is white at three strengths (--op-value, --op-glyph, --op-label)
+     on the one plate, declared once on App.svelte's .game-wrapper. */
+
+  /* ---- the strip: MAX through STEPPERS, one flat plate ----------------------- */
   .fs-panel{
     position:absolute;left:var(--fs-x-slab);top:560px;width:var(--fs-w-slab);height:88px;z-index:59;
-    border-radius:18px;pointer-events:none;
-    background:linear-gradient(135deg,rgba(6,9,20,.86) 0%,rgba(10,15,34,.74) 100%);
-    border:1px solid transparent;
-    /* R119 ORDER SWAP, one line, fully reversible. The committed hud_banner.png
-       raster is KEPT - it is an owner-level decision from R105 and its CSS and
-       raster landed together. But it was the TOPMOST layer, painted over the
-       glass, and it is a bright metal-bracket graphic drawn to sit UNDER metal
-       plates. With the plates now dark glass its struts poked out between them
-       and read as debris. Moving the glass above it keeps the asset, its
-       reference and its budget line intact while letting it read as faint
-       structure instead of competing chrome. */
-    background-image:
-      linear-gradient(135deg,rgba(7,10,17,.94),rgba(11,16,26,.90)),
-      url('/assets/themes/future-spinner/ui/hud_banner.png'),
-      linear-gradient(180deg,var(--hud-border),var(--hud-border));
-    background-size:auto,100% 100%,auto;background-repeat:repeat,no-repeat,repeat;
-    background-origin:border-box;background-clip:padding-box,padding-box,border-box;
-    /* The committed hud_banner.png raster is deliberately KEPT - it is the
-       panel's own art and prior sessions committed it as a pair. What goes is
-       the chrome-gradient border and the 22px accent bloom around the whole
-       bar, which is what made the bar glow rather than sit. */
-    box-shadow:
-      0 6px 22px rgba(0,0,0,.5),
-      inset 0 1px 0 rgba(255,255,255,.05);
+    border-radius:8px;pointer-events:none;
+    background:var(--op-plate);
   }
 
-  /* ===== BALANCE / WIN / BET =================================================
-     Fixed geometry (never reflow). Signature colour per field. OWNER AUDIT
-     ROUND 3 item 7: shifted right as part of the whole-banner re-measure
-     (locked spec, docs/HUD_SPEC.md) - a consistent 16px gap now separates
-     every distinct control across the entire row, MENU through AUTO. ---- */
+  /* ---- BALANCE / WIN / BET: label over value, straight on the strip ---------- */
   .fs-box{position:absolute;top:573px;height:62px;z-index:60;}
-  .fs-box .fs-face{padding:0 10px;}
-  .fs-balance{left:var(--fs-x-bal);width:var(--fs-w-bal);--sig:var(--sig-cyan);}
-  .fs-win    {left:var(--fs-x-win);width:var(--fs-w-win);--sig:var(--sig-pink);}
-  .fs-bet    {left:var(--fs-x-bet);width:var(--fs-w-bet);--sig:var(--sig-gold);}
-  .fs-bet .fs-face{align-items:flex-end;padding-right:14px;}
-  /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
-     transition (see HudOverlay's script section) - overrides .fs-plate's
-     static glow for one cycle, then reverts. */
-  @keyframes overboost-bet-pulse-landscape {
-    0%   { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig-gold) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
-    35%  { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 22px 4px color-mix(in srgb,var(--sig-orange, #ff9a2e) 75%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
-    100% { box-shadow:0 3px 10px rgba(0,0,0,.6),0 0 9px color-mix(in srgb,var(--sig-gold) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.35); }
+  .fs-balance{left:var(--fs-x-bal);width:var(--fs-w-bal);}
+  .fs-win    {left:var(--fs-x-win);width:var(--fs-w-win);}
+  .fs-bet    {left:var(--fs-x-bet);width:var(--fs-w-bet);}
+  /* overflow:hidden is load-bearing. The .fs-plate clip-path used to be the value's clipping
+     ancestor, and money_fit_gate.mjs's seed 5 needs one within three levels of .fs-value to
+     prove that a value escaping its box is caught; the face now provides it. */
+  .fs-box > .fs-face{
+    position:absolute;inset:0;padding:0 10px;overflow:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
   }
-  .fs-bet.overboost-pulse { animation: overboost-bet-pulse-landscape 0.7s ease-out; }
+  /* BET reads right-aligned so its value sits against the chevrons it is changed by. */
+  .fs-bet > .fs-face{align-items:flex-end;padding-right:6px;}
 
   .fs-label{
-    font-family: var(--fs-font-numeric);font-size:.52rem;font-weight:700;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--hud-text-dim);
-    position:relative;z-index:1;
+    font-family:var(--fs-font-numeric);font-size:10px;font-weight:700;line-height:1;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--op-label);
   }
+  /* One white face, tabular figures, live: the value is the markup's own text, fed by the
+     stores every frame, never a raster. max-width plus overflow keep an over-wide string inside
+     its own box so autofitText sees the overflow and shrinks it (R061). */
   .fs-value{
-    font-family: var(--fs-font-numeric);
-    font-size:calc(1.02rem * var(--autofit-scale, 1));
-    font-weight:700;
-    letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums;
-    position:relative;z-index:1;
+    font-family:var(--fs-font-numeric);
+    font-size:calc(18px * var(--autofit-scale, 1));
+    font-weight:700;line-height:1.1;letter-spacing:.02em;
+    white-space:nowrap;font-variant-numeric:tabular-nums;
+    color:var(--op-value);
     -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
-    /* R061 TASK 1, the root cause named by measurement: this was the ONE
-       profile value class with no width bound, so inside the face's centred
-       flex column a ten-figure string grew PAST the plate (text rect 190px
-       in a 187px plate, gaps negative both sides) while never overflowing
-       ITSELF: scrollWidth equalled clientWidth, the fit action saw nothing,
-       scale stayed 1, and the face's 10px corner notches cut the leading
-       edge of COINS and PRIZE in the owner's captures. The bound below is
-       what every other profile already had, and it is why the owner found
-       the small sizes correct: with it, an over-wide string overflows its
-       OWN box, the fit fires, and the value shrinks into the face's safe
-       interior, whose 10px side padding clears the notch geometry. */
-    max-width:100%;
-    overflow:hidden;
+    max-width:100%;overflow:hidden;
   }
-  /* Crisp glyphs: near-white fill, one tight 3px halo (no wide blur = no fuzz). */
-  /* R119: the three live values were three different tinted whites with three
-     coloured text-shadows - balance cyan, win magenta, bet gold. A player
-     comparing BALANCE against BET was comparing two different colours of
-     number. They are now one near-white, which is what a value is. The class
-     names are kept so the markup, the autofit action and the testids are
-     untouched. */
+  /* The cyan / magenta / gold classes stay on the markup (tests and the autofit hook read
+     them) and all three resolve to the one white. */
   .fs-value.cyan,
   .fs-value.magenta,
-  .fs-value.gold   {color:var(--hud-text);text-shadow:none;}
+  .fs-value.gold{color:var(--op-value);text-shadow:none;}
   .fs-bet .fs-label,.fs-bet .fs-value{text-align:right;width:100%;}
+  /* THE WHOLE BET BOX OPENS THE PICKER. The readout button is the size of its digits (about
+     104x20), and this layout is also the one a landscape tablet gets, scaled, so it is a touch
+     target that sat far under the 44px floor. The ::after covers the face (120x62), the
+     button's containing block: the button itself is position:static, so its own overflow:hidden
+     does not clip the pseudo-element, and a press anywhere in the BET box is a press on the
+     button. Nothing moves and nothing new is drawn. */
+  .fs-bet .bet-open::after{content:'';position:absolute;inset:0;}
+  .fs-bet .bet-open:disabled::after{content:none;}
 
-  /* Cost-visibility mode badge (Fable 2026-07-07 item 0): a plain (unclipped)
-     anchor matching the BET box's own fixed geometry exactly, sitting just
-     above it - kept OUTSIDE .fs-bet/.fs-plate deliberately, since .fs-plate's
-     clip-path would otherwise clip a child poking above its own bounds. */
+  /* Cost-visibility badge above BET. Neutral now: the word carries the state, and the value
+     under it already reads the effective 1.25x cost. R153 also corrected its anchor, which sat
+     at a hand-set left:831px, the BET box's position before R071 moved the row 28px left, so it
+     had been floating 28px right of the box it labels since 2026-08-15. */
   .fs-bet-badge-anchor{
-    position:absolute; left:831px; top:557px; width:120px; height:16px;
-    z-index:61; display:flex; justify-content:flex-end; pointer-events:none;
+    position:absolute;left:var(--fs-x-bet);top:555px;width:var(--fs-w-bet);height:16px;
+    z-index:61;display:flex;justify-content:flex-end;pointer-events:none;
   }
   .fs-mode-badge{
-    font-family: var(--fs-font-numeric); font-size:.5rem; font-weight:800;
-    letter-spacing:.1em; white-space:nowrap;
-    /* text-transform: uppercase REMOVED 2026-07-28 (TR-092). It made the HUD
-       badge render CRUISE while the features menu, the paytable mode row and
-       the buy dialog all render Cruise, from the SAME modeLabel() source. The
-       specification's own spelling is `Cruise` (CLAUDE.md True game facts and
-       fsModes.ts), so the badge was the outlier. OVERBOOST and NITRO OVERDRIVE
-       are unaffected: they are already capitals in the specification. */
-    padding:2px 7px; border-radius:999px;
-  }
-  .fs-mode-badge.overboost{
-    color:#1a0d02; background:var(--sig-orange);
-    box-shadow:0 0 8px color-mix(in srgb,var(--sig-orange) 55%,transparent);
-  }
-  .fs-mode-badge.cruise{
-    color:color-mix(in srgb,var(--sig-cyan) 30%,#fff);
-    background:rgba(0,240,255,.08);
-    border:1px solid color-mix(in srgb,var(--sig-cyan) 40%,transparent);
+    font-family:var(--fs-font-numeric);font-size:10px;font-weight:700;line-height:12px;
+    letter-spacing:.12em;white-space:nowrap;
+    /* No text-transform: TR-092, OVERBOOST is capitals in the specification and Cruise is not. */
+    padding:1px 7px;border-radius:999px;
+    color:var(--op-value);background:var(--op-plate);border:1px solid var(--op-hairline-hi);
   }
 
-  /* WIN plate lit - win present. Rail + face bloom, value count-pulse. */
-  /* A live win is the one state on this bar worth an accent, so it keeps one -
-     but through the single shell accent, and without the 12px full-plate bloom
-     that used to wash the plate's own edges out. */
-  .fs-win.lit{--sig:var(--hud-accent);}
-  .fs-win.lit .fs-rail{background:var(--hud-accent);
-    box-shadow:0 0 8px color-mix(in srgb,var(--hud-accent) 55%,transparent);}
-  .fs-win.lit .fs-value{color:var(--hud-text);}
-  .fs-win.lit .fs-rail{animation:fs-rail-bloom 1.1s ease-in-out infinite;}
-  .fs-win.lit .fs-value{animation:fs-win-pop 1.1s ease-in-out infinite;}
-  @keyframes fs-rail-bloom{0%,100%{box-shadow:0 0 8px var(--sig-pink);}50%{box-shadow:0 0 16px var(--sig-pink),0 0 28px var(--sig-pink);}}
-  @keyframes fs-win-pop{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
-
-  /* ===== BET ARROWS - chrome nubs, cyan chevrons ============================
-     OWNER AUDIT ROUND 3 item 7: shifted to x967 as part of the whole-banner
-     re-measure (locked spec, docs/HUD_SPEC.md) - a consistent 16px gap from
-     the BET plate's new right edge at x951. */
+  /* ---- BET: one chevron pair --------------------------------------------------
+     Two 44x24 keys in the locked 44x52 column, each with a 44x44 hit area (below), an up and a
+     down chevron drawn as strokes.
+     No cap, no fill, no glow: the plus/minus caps and their triangles are gone from the control. */
   .fs-arrows{position:absolute;left:var(--fs-x-step);top:578px;width:var(--fs-w-step);height:52px;z-index:60;
     display:flex;flex-direction:column;gap:4px;}
   .fs-arrow{
-    width:44px;height:24px;padding:0;border:none;cursor:pointer;position:relative;
-    border-radius:5px;background:transparent;
-    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    width:44px;height:24px;padding:0;border:none;border-radius:6px;cursor:pointer;
+    background:transparent;display:flex;align-items:center;justify-content:center;
   }
-  .fs-arrow::before{                              /* chrome cap */
-    content:'';position:absolute;inset:0;border-radius:5px;
-    background:var(--hud-surface-raised);
-    border:1px solid var(--hud-border);
-    box-shadow:var(--hud-shadow-soft);
-  }
-  .fs-arrow svg{position:relative;z-index:1;width:15px;height:9px;
-    filter:drop-shadow(0 0 4px color-mix(in srgb,var(--acc) 80%,transparent));}
-  .fs-arrow svg path{fill:var(--hud-text-dim);}
-  .fs-arrow:hover:not(:disabled) svg path{fill:var(--hud-accent);}
-  .fs-arrow:hover:not(:disabled)::before{filter:brightness(1.18);}
+  /* 44x44 TARGETS IN A 44x52 COLUMN, WITHOUT MOVING IT. Each key was 44x24, under the 44px floor
+     HUD_SPEC.md rule 3 sets and the R153 brief restates; only the column was ever measured. Each
+     key's hit area now extends 20px AWAY from the other, up for the up key and down for the down
+     key, so the two stay 4px apart and never overlap. Up to y 558 crosses only the strip's own top
+     edge (the badge anchor ends at x 923, 16px left of this column); down to y 650 is clear scene. The drawn chevrons and the
+     locked column are unchanged. */
+  .fs-arrow::after{content:'';position:absolute;left:0;right:0;}
+  .fs-arrow:first-child::after{top:-20px;bottom:0;}
+  .fs-arrow:last-child::after{top:0;bottom:-20px;}
+  .fs-arrow:disabled::after{content:none;}
+  .fs-arrow svg{width:16px;height:10px;overflow:visible;}
+  .fs-arrow svg path{fill:none;stroke:var(--op-glyph);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .fs-arrow:hover:not(:disabled){background:rgba(255,255,255,.07);}
+  .fs-arrow:hover:not(:disabled) svg path{stroke:var(--op-value);}
   .fs-arrow:active:not(:disabled){transform:translateY(1px);}
-  .fs-arrow:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.4);}
+  .fs-arrow:disabled{opacity:.3;cursor:not-allowed;}
 
-  /* ===== MAX chip - OWNER AUDIT ROUND 3 item 7: adopts the mobile
-     .p-round-btn/.p-max-cap circular treatment (was a narrow 26x44
-     rectangular "cap", the one control that didn't match the rest of the
-     banner's circular-button language) - 48px circle, same shared vertical
-     centre (y=604) as every other control in the locked spec
-     (docs/HUD_SPEC.md). ============================================== */
+  /* ---- the hairline circles: MAX, MENU, TURBO, AUTO -----------------------------
+     One treatment for all four: the strip's own plate inside a 1px edge at 32% white, the glyph
+     at 86% white. MAX and MENU sit on the strip, so only their edge shows there; TURBO and AUTO
+     sit off it, over the scene, where the plate is what keeps their glyph legible. */
   .fs-max{position:absolute;left:var(--fs-x-max);top:580px;width:var(--fs-w-max);height:48px;padding:0;
-    border:none;border-radius:50%;cursor:pointer;z-index:60;
-    /* Was an amber well, the only warm control in a cool row. */
-    background:var(--hud-surface-raised);
-    border:1px solid var(--hud-border);
-    box-shadow:var(--hud-shadow-soft);
+    border-radius:50%;cursor:pointer;z-index:60;
+    background:var(--op-plate);border:1px solid var(--op-hairline);
     display:flex;align-items:center;justify-content:center;}
   .fs-max .cap{
-    font-family: var(--fs-font-numeric);font-size:.62rem;font-weight:800;letter-spacing:.02em;
-    color:var(--hud-text);text-shadow:none;
+    font-family:var(--fs-font-numeric);font-size:11px;font-weight:700;letter-spacing:.08em;
+    color:var(--op-value);
   }
-  .fs-max:hover:not(:disabled){filter:brightness(1.2);}
+  .fs-max:hover:not(:disabled){border-color:var(--op-hairline-hi);}
   .fs-max:active:not(:disabled){transform:translateY(1px);}
-  .fs-max:disabled{opacity:.4;cursor:not-allowed;}
+  .fs-max:disabled{opacity:.35;cursor:not-allowed;}
 
-  /* ===== HAMBURGER menu - chrome square. OWNER AUDIT ROUND 3 item 7: bumped
-     40px -> 44px (was under the 44px touch-target floor); position now set
-     by .menu-wrapper below (locked spec, docs/HUD_SPEC.md), these left/top
-     values are inert when wrapped there but kept in sync for clarity. ==== */
+  /* MENU keeps its locked 44x44 box (.menu-wrapper below is the positioning authority) and
+     becomes a circle like its neighbours. */
   .fs-menu{position:absolute;left:var(--fs-x-menu);top:582px;width:var(--fs-w-menu);height:44px;z-index:60;
-    padding:0;border:none;cursor:pointer;border-radius:9px;
-    background:var(--hud-border);
-    box-shadow:var(--hud-shadow-soft);
+    padding:0;cursor:pointer;border-radius:50%;
+    background:var(--op-plate);border:1px solid var(--op-hairline);
     display:flex;align-items:center;justify-content:center;}
-  .fs-menu .inset{width:calc(100% - 2px);height:calc(100% - 2px);border-radius:8px;
-    background:var(--hud-surface-raised);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-    box-shadow:inset 0 0 8px rgba(0,0,0,.7);}
-  .fs-menu .bar{width:16px;height:2px;border-radius:1px;background:var(--hud-text-dim);
-    box-shadow:0 0 5px color-mix(in srgb,var(--acc) 80%,transparent);}
-  .fs-menu:hover .bar{filter:brightness(1.3);}
+  .fs-menu .inset{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+  .fs-menu .bar{width:16px;height:2px;border-radius:1px;background:var(--op-glyph);}
+  .fs-menu:hover{border-color:var(--op-hairline-hi);}
   .fs-menu:active{transform:translateY(1px);}
 
-  /* ===== TURBO - chrome knob, orange flame accent (x227 top563, 82) =======
-     2026-07-14 portrait pass, landscape touch-target audit: at the typical
-     landscape-phone scale factor (~0.54, e.g. iPhone 14 landscape 844x390),
-     the previous 72x72 box read as ~39x39 effective - under the 44px floor.
-     Bumped to 82x82 (recentred on the old 72x72 box) so it clears 44px
-     effective at 0.54 scale with margin (82*0.54=~44.3px); the 40px gap to
-     .fs-menu absorbs the size increase without collision. */
-  /* FS VISUAL FIXPACK JOB 2 (owner-specified, 2026-07-27): THE NUMERAL IS GONE.
-     The control was a bolt with a 0.5rem "1x / 2x / 4x" caption underneath it,
-     which the owner called too small and silly. The new design is the bolt
-     alone, and the three speeds are carried by the CONTROL INTENSIFYING:
-     brighter face, brighter bolt, stronger glow at each step.
+  /* TURBO and AUTO carry their circle on the inner .fs-face, so the button box keeps the locked
+     geometry while the drawn circle matches its neighbours. TURBO's box is 82x82 by HUD_SPEC (it
+     was sized for a 44px effective target at a 0.54 stage scale) and its circle is drawn at 48,
+     the size of MAX and AUTO: an 82px circle beside an 84px SPIN would have made the speed
+     control read as a second primary. The whole 82x82 box still takes the tap.
+     THE CIRCLE SITS AT THE BOX'S RIGHT EDGE, NOT ITS CENTRE (corrected in R153's own review).
+     Centred it spanned x 216..264, leaving a visible 33px gap to MAX where every other visible gap
+     in the row is 16 (HUD_SPEC rule 2), and floating 17px off the strip's left end while SPIN
+     meets the right end. At left:34px it spans 233..281: 16px to MAX, flush with the strip's left
+     end as SPIN is flush with its right. Centre-Y stays 604; the box and its tap are unchanged. */
+  .fs-knob{padding:0;border:none;border-radius:50%;background:none;}
+  .fs-knob > .fs-face{
+    position:absolute;border-radius:50%;box-sizing:border-box;
+    background:var(--op-plate);border:1px solid var(--op-hairline);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  }
 
-     WHY THE STEPS ARE LUMINANCE STEPS, NOT HUE STEPS. Encoding state in hue
-     alone fails WCAG 1.4.1 for a colour-blind player and fails again on a
-     washed-out phone screen in daylight. Every step here raises brightness,
-     which is the channel that survives both, and it is the channel
-     turbo_intensity_gate.mjs measures: it screenshots the real composited
-     control at each tier and asserts the mean relative luminance rises
-     monotonically with a real contrast step between adjacent states.
-
-     THE FLAME ANIMATION IS REMOVED, and that is deliberate rather than
-     collateral. It ran `fs-flame .8s alternate`, swinging brightness 1.0 to
-     1.28 twice a second on any engaged tier. Once intensity IS the state, an
-     animation that changes intensity makes the state ambiguous: a pulsing
-     Turbo passes through the brightness of Super Turbo on every cycle, so at a
-     glance the two are not distinguishable, which is exactly what the ruling
-     asks for. It also made the states unmeasurable.
-
-     The bolt grew 26px to 34px: it no longer shares the face with a caption. */
-  .fs-turbo{position:absolute;left:var(--fs-x-turbo);top:563px;width:var(--fs-w-turbo);height:82px;z-index:60;
-    padding:0;border:none;cursor:pointer;}
-  .fs-turbo svg{width:34px;height:34px;}
+  .fs-turbo{position:absolute;left:var(--fs-x-turbo);top:563px;width:var(--fs-w-turbo);height:82px;z-index:60;cursor:pointer;}
+  .fs-turbo > .fs-face{left:34px;top:17px;width:48px;height:48px;}
+  .fs-turbo svg{width:22px;height:22px;}
+  .fs-turbo svg path{stroke-width:1.6;stroke-linejoin:round;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
 
-  /* R119: THE THREE-STEP ESCALATION IS PRESERVED EXACTLY AS A CONCEPT, only
-     its hue changes. turbo_intensity_gate.mjs screenshots the real composited
-     control at each tier and asserts mean relative luminance rises
-     monotonically with a real contrast step between adjacent states, so the
-     steps below are deliberately spaced the same way - dark, lit, bright.
-     What goes is the AMBER: TURBO was the only warm control in a cool row and
-     it sits outside the panel where it stands alone. It now escalates through
-     the single shell accent instead. */
+  /* THE THREE SPEEDS ARE THREE LUMINANCE STEPS, AS BEFORE, NOW IN WHITE. FS VISUAL FIXPACK JOB 2
+     made intensity the state (no numeral, no hue-only cue, WCAG 1.4.1) and turbo_intensity_gate
+     measures mean luminance over the control rising by at least 1.25:1 per step. With the spin
+     ring the only accent, the steps are spent in white: an outlined bolt at rest, a lit circle
+     with a solid white bolt, then a solid white disc with the bolt cut out of it. */
+  .fs-turbo[data-speed="normal"] svg path{fill:none;stroke:var(--op-label);}
+  /* 40% white, not 22%: at 22% the Desktop normal-to-turbo step measured 1.165:1 against the
+     gate's 1.25 floor (the 48px circle is about 14% of the measured area). */
+  .fs-turbo[data-speed="turbo"] > .fs-face{
+    background:color-mix(in srgb,#ffffff 40%,#12141a);border-color:var(--op-hairline-hi);}
+  .fs-turbo[data-speed="turbo"] svg path{fill:var(--op-value);stroke:var(--op-value);}
+  .fs-turbo[data-speed="super"] > .fs-face{background:#ffffff;border-color:#ffffff;}
+  .fs-turbo[data-speed="super"] svg path{fill:#12141a;stroke:#12141a;}
 
-  /* Step 1 of 3, Normal. Resting: a dim bolt on a near-black face, no glow. */
-  .fs-turbo[data-speed="normal"] .fs-face{
-    background:var(--hud-surface-sunken);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 -6px 12px rgba(0,0,0,.6);}
-  .fs-turbo[data-speed="normal"] svg path{fill:var(--hud-text-dim);}
-
-  /* Step 2 of 3, Turbo. The face lifts, the bolt takes the accent, a glow appears. */
-  .fs-turbo[data-speed="turbo"] .fs-face{
-    background:radial-gradient(circle at 36% 28%,
-      color-mix(in srgb,var(--hud-accent) 34%,#0b1018),
-      color-mix(in srgb,var(--hud-accent) 8%,#05080e) 72%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -6px 12px rgba(0,0,0,.45);}
-  .fs-turbo[data-speed="turbo"] svg path{fill:var(--hud-accent);}
-  .fs-turbo[data-speed="turbo"]{
-    filter:drop-shadow(0 0 14px color-mix(in srgb,var(--hud-accent) 60%,transparent));}
-
-  /* Step 3 of 3, Super Turbo. The bolt goes white, the face is at its brightest,
-     and the glow grows in radius and gains a second wider pass. */
-  .fs-turbo[data-speed="super"] .fs-face{
-    background:radial-gradient(circle at 36% 28%,
-      color-mix(in srgb,var(--hud-accent) 88%,#ffffff),
-      color-mix(in srgb,var(--hud-accent) 40%,#0b1018) 72%);
-    box-shadow:inset 0 2px 8px rgba(255,255,255,.5),inset 0 -6px 12px rgba(0,0,0,.25);}
-  .fs-turbo[data-speed="super"] svg path{fill:#ffffff;}
-  .fs-turbo[data-speed="super"]{
-    filter:drop-shadow(0 0 22px color-mix(in srgb,var(--hud-accent) 95%,transparent))
-           drop-shadow(0 0 44px color-mix(in srgb,var(--hud-accent) 60%,transparent));}
-
-  /* ===== AUTOPLAY - chrome knob. OWNER AUDIT ROUND 3 item 7: docked as a
-     circle tangent to SPIN's right edge (x1111 = SPIN's left 1027 + its own
-     width 84 - touching, never overlapping), same shared vertical centre
-     y=604 as the rest of the locked spec (docs/HUD_SPEC.md) - was sitting
-     well below-left of SPIN entirely unaligned (top:648 vs SPIN's top:562,
-     centres 68px apart). ================================================ */
-  .fs-auto{position:absolute;left:var(--fs-x-auto);top:580px;width:var(--fs-w-auto);height:48px;z-index:60;
-    padding:0;border:none;cursor:pointer;}
-  .fs-auto .fs-face{gap:0;}
+  .fs-auto{position:absolute;left:var(--fs-x-auto);top:580px;width:var(--fs-w-auto);height:48px;z-index:60;cursor:pointer;}
+  .fs-auto > .fs-face{inset:0;gap:0;}
   .fs-auto svg{width:20px;height:20px;}
-  .fs-auto svg path{fill:none;stroke:rgba(200,236,255,.7);stroke-width:5;}
-  .fs-auto .count{font-family: var(--fs-font-numeric);font-size:.9rem;font-weight:800;
-    color:var(--acc);font-variant-numeric:tabular-nums;text-shadow:0 0 8px var(--acc);}
+  .fs-auto svg path{fill:none;stroke:var(--op-glyph);stroke-width:2;stroke-linecap:round;}
+  .fs-auto .count{font-family:var(--fs-font-numeric);font-size:14px;font-weight:700;
+    color:var(--op-value);font-variant-numeric:tabular-nums;}
+  .fs-auto:hover:not(:disabled) > .fs-face{border-color:var(--op-hairline-hi);}
   .fs-auto:disabled{opacity:.4;cursor:not-allowed;}
-  .fs-auto.active{filter:drop-shadow(0 0 12px color-mix(in srgb,var(--acc) 75%,transparent));
-    animation:fs-auto-pulse 1s ease-in-out infinite alternate;}
-  .fs-auto.active svg path{stroke:var(--acc);}
-  @keyframes fs-auto-pulse{from{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--acc) 40%,transparent));}
-    to{filter:drop-shadow(0 0 16px color-mix(in srgb,var(--acc) 90%,transparent));}}
+  /* Running: the edge goes solid white and the remaining count replaces the glyph. No pulse. */
+  .fs-auto.active > .fs-face,
+  .fs-auto.active:hover:not(:disabled) > .fs-face{border-color:var(--op-value);}
 
-  /* ===== SPIN - crafted chrome, cyan redline ring (x1027 top562, 84) ======
-     OWNER AUDIT ROUND 3 item 7: shifted to x1027 (was x962) as part of the
-     whole-banner re-measure (locked spec, docs/HUD_SPEC.md) - a consistent
-     16px gap from the bet-steppers' new right edge at x1011. Replaces
-     spin_button.png. Bezel + dark dome + emissive ring + SVG glyph. */
+  /* ---- SPIN: a circle with a 2px ring, the only accent --------------------------
+     84px, the largest control, on the strip's plate, with the ring in --hud-accent (cyan, and
+     magenta under Overdrive through the flip above). The glyph and its word are white so the
+     ring is the only colour on the bar. The spinning arrows still turn: that is feedback that a
+     press was taken, not decoration, and reduced motion stops it below. */
   .fs-spin{position:absolute;left:var(--fs-x-spin);top:562px;width:var(--fs-w-spin);height:84px;z-index:61;
     padding:0;border:none;cursor:pointer;border-radius:50%;
-    /* SPIN stays the dominant control, but through SIZE (84px, the largest in
-       the row) and through being the only control carrying the accent - not
-       through an eight-stop brushed-metal disc. */
-    background:var(--hud-border-strong);
-    box-shadow:var(--hud-shadow),
-               0 0 16px color-mix(in srgb,var(--hud-accent) 30%,transparent);
-    transition:transform .12s ease,box-shadow .15s ease;}
-  .fs-spin .ring{position:absolute;inset:3px;border-radius:50%;
-    border:2px solid var(--hud-accent);
-    box-shadow:0 0 10px color-mix(in srgb,var(--hud-accent) 45%,transparent);}
-  .fs-spin .dome{position:absolute;inset:6px;border-radius:50%;
-    background:var(--hud-surface-raised);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    background:var(--op-plate);
+    transition:transform .12s ease,background-color .15s ease;}
+  .fs-spin .ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--hud-accent);}
+  .fs-spin .dome{position:absolute;inset:2px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;}
-  .fs-spin .glyph{width:30px;height:30px;}
-  .fs-spin .glyph.play path{fill:var(--hud-accent);}
+  .fs-spin .glyph{width:28px;height:28px;margin-bottom:8px;}
+  .fs-spin .glyph.play path{fill:var(--op-value);}
   .fs-spin .glyph.arrows{display:none;}
-  .fs-spin .glyph.arrows path{fill:none;stroke:var(--acc);stroke-width:5;stroke-linecap:round;
-    filter:drop-shadow(0 0 6px var(--acc));}
-  .fs-spin .txt{position:absolute;bottom:14px;left:0;right:0;text-align:center;
-    font-family: var(--fs-font-numeric);font-size:.46rem;font-weight:800;letter-spacing:.14em;
-    color:var(--acc);text-shadow:0 0 6px var(--acc);}
-  .fs-spin:hover:not(:disabled){transform:scale(1.05);
-    box-shadow:0 4px 18px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.6),0 0 30px var(--acc);}
+  .fs-spin .glyph.arrows path{fill:none;stroke:var(--op-value);stroke-width:2.4;stroke-linecap:round;}
+  .fs-spin .txt{position:absolute;bottom:15px;left:0;right:0;text-align:center;
+    font-family:var(--fs-font-numeric);font-size:10px;font-weight:700;letter-spacing:.16em;
+    color:var(--op-label);}
+  .fs-spin:hover:not(:disabled){background:color-mix(in srgb,#ffffff 8%,#12141a);}
   .fs-spin:active:not(:disabled){transform:scale(.96);}
-  .fs-spin:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4);box-shadow:none;}
+  .fs-spin:disabled{opacity:.45;cursor:not-allowed;}
   .fs-spin.spinning .glyph.play{display:none;}
   .fs-spin.spinning .glyph.arrows{display:block;animation:fs-spin-rot .7s linear infinite;}
   .fs-spin.spinning .txt{opacity:.5;}
   @keyframes fs-spin-rot{to{transform:rotate(360deg);}}
 
+  /* NOTE R153 (2026-10-07): the R135 note below says the five signature tokens drive the bar.
+     Since R153 the bar paints from the --op-* plate tokens and --hud-accent; the --sig-* tokens
+     still exist on .fs-hud, and the only rule in this file that reads one is the .bet-open focus ring. */
   /* R135: the three swappable scheme rules are deleted. Nothing ever added those classes, so they
      shipped nothing and stood as build warnings. See the matching note in PaytableModal.svelte.
      The claim above them, that the HUD is skin-free because every colour comes from five signature
      tokens, remains TRUE and is unaffected: the tokens are still there and still drive the bar.
      What is gone is only the three unreachable overrides. */
 
-  /* ===== OVERDRIVE TWO-STATE ================================================
-     App sets .fs-hud--overdrive (mirror overdriveVisual). Accents flip
-     cyan->magenta, spin ring goes redline, panel edge warms. */
-  .fs-hud--overdrive{--acc:var(--sig-pink);--acc2:var(--sig-orange);}
-  .fs-hud--overdrive .fs-spin .dome{background:radial-gradient(circle at 36% 28%,#4a1030,#1a0510 70%);}
-  .fs-hud--overdrive .fs-spin .ring{border-color:var(--sig-pink);
-    box-shadow:0 0 14px var(--sig-pink),0 0 26px color-mix(in srgb,var(--sig-orange) 45%,transparent);}
-  .fs-hud--overdrive .fs-panel{animation:fs-od-edge 3s ease-in-out infinite;}
-  @keyframes fs-od-edge{0%,100%{box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 20px color-mix(in srgb,var(--sig-pink) 30%,transparent);}
-    50%{box-shadow:0 6px 22px rgba(0,0,0,.5),0 0 34px color-mix(in srgb,var(--sig-pink) 65%,transparent);}}
-  .fs-hud--overdrive .fs-arrows,
-  .fs-hud--overdrive .fs-menu,
-  .fs-hud--overdrive .fs-auto{filter:hue-rotate(-6deg) saturate(1.08);}
+  /* ===== OVERDRIVE =============================================================
+     R153: the whole Overdrive state on this bar is the accent flip at the top of this section,
+     which turns the spin ring magenta. The edge pulse, the dome gradient and the hue rotations on
+     the arrows, menu and auto controls are gone with the chrome they decorated. */
 
   @media (prefers-reduced-motion:reduce){
-    /* .fs-turbo.engaged is no longer listed: the flame animation it stilled
-       was removed outright by FS VISUAL FIXPACK JOB 2, so the control is
-       already motionless at every tier for every player. */
-    .fs-win.lit .fs-rail,.fs-win.lit .fs-value,.fs-auto.active,
-    .fs-spin.spinning .glyph.arrows,.fs-hud--overdrive .fs-panel{animation:none;}
+    .fs-spin.spinning .glyph.arrows{animation:none;}
   }
 
   /* ============================================================================
@@ -1857,29 +1694,39 @@
   }
   .menu-wrapper .fs-menu { position: static; left: auto; top: auto; }
 
+  /* R153: the menu that holds the PAYTABLE entry is the same dark plate as the strip it opens
+     from (the brief: "Paytable and feature entry buttons restyle to the same dark plate"). It was
+     a 96% navy panel with a white hairline border. */
   .hud-menu {
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
     min-width: 200px;
-    background: rgba(6, 6, 18, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--op-plate);
     border-radius: 8px;
     overflow: hidden;
     z-index: 65;
   }
+  /* R153: 44px tall, the floor the brief restates. PAYTABLE is the first item here and the
+     paytable's only entry, and it measured about 32px. The mini menu keeps its compressed rows
+     (see .m-hud-menu below): Popout S is a 400x225 desktop popout whose six items only fit the
+     space above the row when compressed, measured at R2R-R JOB C. */
   .hud-menu-item {
     display: block;
     width: 100%;
+    min-height: 44px;
     padding: 0.5rem 0.9rem;
     background: none;
     border: none;
-    color: #fff;
+    color: var(--op-value);
     text-align: left;
+    font-family: var(--fs-font-numeric);
     font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     cursor: pointer;
   }
-  .hud-menu-item:hover { background: rgba(255, 255, 255, 0.08); }
+  .hud-menu-item:hover { background: rgba(255, 255, 255, 0.07); }
 
   /* FS VISUAL FIXPACK JOB 2: at Popout S the speed control lives ONLY in this
      menu, so the menu item has to carry the same three-step intensity the knob
@@ -1897,34 +1744,27 @@
     gap: 0.5rem;
   }
   .m-turbo-bolt { width: 20px; height: 20px; flex: 0 0 auto; }
-  /* All three tiers carry the leading edge; it is the edge's brightness that
-     steps, so the row's shape never changes and only its intensity does. */
-  .m-turbo-item[data-speed="normal"] {
-    background: rgba(0, 0, 0, 0.22);
-    box-shadow: inset 3px 0 0 var(--hud-border-strong);
-  }
-  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--hud-text-dim); stroke-width: 1.8; fill: none; }
+  /* R153: the three steps in WHITE, like the knob in every other profile. Before R153 the row
+     stepped through accent gradients behind an accent leading-edge rail, with accent glows on the
+     bolt and an 18px accent bloom at Super, the last accent left on the bar outside the spin ring
+     (the R153 review found it here, in the Popout S menu). The row's fill still carries the step,
+     which is what turbo_intensity_gate measures at Popout S: clear at Normal, a white wash with a
+     solid white bolt at Turbo, a white row with the bolt and label cut out of it at Super. No rail,
+     no glow, no gradient. The previous rules are in this file at 895815b9. */
+  .m-turbo-item[data-speed="normal"] { background: none; }
+  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--op-label); stroke-width: 1.8; fill: none; }
 
-  .m-turbo-item[data-speed="turbo"] {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 42%, transparent),
-                                        color-mix(in srgb, var(--hud-accent) 10%, transparent));
-    box-shadow: inset 3px 0 0 var(--hud-accent);
-  }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--hud-accent); stroke-width: 1.8; fill: color-mix(in srgb, var(--hud-accent) 45%, transparent); }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hud-accent) 75%, transparent)); }
+  /* 28%, not 18%: at 18% turbo_intensity_gate measured this row's normal to turbo step at 1.246:1
+     at Popout S, a hair under its 1.25 floor. */
+  .m-turbo-item[data-speed="turbo"] { background: rgba(255, 255, 255, 0.28); }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--op-value); stroke-width: 1.8; fill: var(--op-value); }
 
-  .m-turbo-item[data-speed="super"] {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 80%, transparent),
-                                        color-mix(in srgb, var(--hud-accent) 24%, transparent));
-    box-shadow: inset 4px 0 0 #ffffff, 0 0 18px color-mix(in srgb, var(--hud-accent) 55%, transparent);
-    color: #04070d;
-  }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #ffffff; stroke-width: 1.8; fill: #ffffff; }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hud-accent) 95%, transparent)) drop-shadow(0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent)); }
+  .m-turbo-item[data-speed="super"] { background: rgba(255, 255, 255, 0.9); color: #12141a; }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #12141a; stroke-width: 1.8; fill: #12141a; }
 
   /* ── Audio panel - Mute toggle + MUSIC / SOUND volume sliders ─────────────── */
   .audio-panel {
-    border-top: 1px solid rgba(0, 255, 255, 0.14);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 0.4rem;
     transition: opacity 0.15s;
   }
@@ -1957,33 +1797,43 @@
     gap: 8px;
     padding: 0.3rem 0.9rem;
   }
+  /* R153: MUSIC and SOUND read as the strip's labels do, and the percentage as its values. */
   .audio-label {
     flex: 0 0 42px;
-    font-family: var(--fs-font-display);
-    font-size: 0.5rem;
+    font-family: var(--fs-font-numeric);
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    color: rgba(159, 239, 255, 0.75);
+    letter-spacing: 0.14em;
+    color: var(--op-label);
   }
   .audio-pct {
     flex: 0 0 30px;
     text-align: right;
-    font-size: 0.58rem;
+    font-family: var(--fs-font-numeric);
+    font-size: 0.62rem;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
-    color: var(--sig-cyan, #00ffff);
+    color: var(--op-value);
   }
 
-  /* Range slider styled on the HUD's cyan accent (track + thumb). */
+  /* Range slider. R153: a flat white track and a white thumb, no cyan gradient and no glow. */
   .audio-slider {
     flex: 1 1 auto;
     -webkit-appearance: none;
     appearance: none;
     height: 4px;
     border-radius: 2px;
-    background: linear-gradient(90deg, rgba(0, 255, 255, 0.55), rgba(0, 255, 255, 0.15));
+    background: rgba(255, 255, 255, 0.24);
     outline: none;
     cursor: pointer;
     margin: 0;
+  }
+  /* R153, A FOUND DEFECT CLOSED IN PASSING: the slider has carried `outline: none` with no
+     replacement since it was written, so a keyboard player tabbing to MUSIC or SOUND saw no
+     focus at all. The ring below is the one every other HUD control gets from app.css. */
+  .audio-slider:focus-visible {
+    outline: 2px solid var(--theme-primary, #00ffff);
+    outline-offset: 3px;
   }
   .audio-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -1991,24 +1841,22 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--sig-cyan, #00ffff);
-    border: 1px solid rgba(4, 6, 18, 0.9);
-    box-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    background: var(--op-value);
+    border: none;
     cursor: pointer;
   }
   .audio-slider::-moz-range-thumb {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: var(--sig-cyan, #00ffff);
-    border: 1px solid rgba(4, 6, 18, 0.9);
-    box-shadow: 0 0 6px rgba(0, 255, 255, 0.7);
+    background: var(--op-value);
+    border: none;
     cursor: pointer;
   }
   .audio-slider::-moz-range-track {
     height: 4px;
     border-radius: 2px;
-    background: rgba(0, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.24);
   }
 
   /* OWNER AUDIT ROUND 3 item 7: this wrapper (not .fs-auto itself, which it
@@ -2038,9 +1886,9 @@
     bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(10, 10, 30, 0.97);
-    border: 1px solid rgba(255, 200, 50, 0.35);
-    border-radius: 12px;
+    /* R153: the operator plate, as the hamburger menu. It was navy with a gold hairline. */
+    background: var(--op-plate);
+    border-radius: 8px;
     overflow-x: hidden;
     overflow-y: auto;
     max-height: calc(100vh - 90px);
@@ -2055,21 +1903,24 @@
     padding: 0.6rem 1rem;
     background: none;
     border: none;
-    color: #ffc832;
+    color: var(--op-value);
     cursor: pointer;
+    font-family: var(--fs-font-numeric);
     font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
     text-align: center;
     box-sizing: border-box;
   }
-  .auto-menu-item:hover { background: rgba(255, 200, 50, 0.15); }
+  .auto-menu-item:hover { background: rgba(255, 255, 255, 0.07); }
 
   /* R042 BRIEF B. The chosen count has to be VISIBLE, or a two-step flow reads
      as a broken one-step flow: the player taps a number, nothing appears to
      happen, and they tap again. The selected state and the Start control are
      what make the second step legible. */
   .auto-menu-item.is-selected {
-    background: rgba(255, 200, 50, 0.22);
-    box-shadow: inset 3px 0 0 #ffc832;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 3px 0 0 var(--op-value);
     font-weight: 700;
   }
   .auto-menu-start {
@@ -2078,17 +1929,18 @@
     min-height: 44px;
     margin-top: 4px;
     padding: 0.6rem 1rem;
-    background: rgba(255, 200, 50, 0.18);
-    border: 1px solid rgba(255, 200, 50, 0.55);
-    border-radius: 6px;
-    color: #ffc832;
+    background: transparent;
+    border: 1px solid var(--op-hairline-hi);
+    border-radius: 999px;
+    color: var(--op-value);
     font: inherit;
+    font-family: var(--fs-font-numeric);
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-align: center;
     cursor: pointer;
   }
-  .auto-menu-start:hover { background: rgba(255, 200, 50, 0.3); }
+  .auto-menu-start:hover { background: rgba(255, 255, 255, 0.08); }
 
   .auto-menu-toggle {
     display: flex;
@@ -2104,7 +1956,7 @@
     box-sizing: border-box;
   }
   .auto-menu-toggle input {
-    accent-color: #00ffff;
+    accent-color: #e9ecf2;
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -2128,9 +1980,9 @@
     /* R071 TASK 4: this field holds a money amount, so it takes the NUMERIC
        face like every other money surface rather than the brand face. */
     font-family: var(--fs-font-numeric);
-    color: #fff;
-    background: rgba(0, 255, 255, 0.1);
-    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: var(--op-value);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--op-hairline);
     border-radius: 6px;
     box-sizing: border-box;
   }
@@ -2138,9 +1990,9 @@
   .auto-menu-sep {
     padding: 0.5rem 1rem 0.25rem;
     font-size: 0.66rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255, 200, 50, 0.5);
+    color: var(--op-label);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     margin-top: 2px;
   }
@@ -2161,7 +2013,9 @@
     --p-pink: var(--theme-secondary, #ff00ff);
     --p-gold: #ffd700;
     --p-orange: #ff9a2e;
-    --p-acc: var(--p-cyan);
+    /* R153: the glyph colour every portrait control draws with. It was the cyan accent, and
+       the operator strip spends the accent on the spin ring only. */
+    --p-acc: var(--op-glyph);
     /* 2026-07-14c grid-first recomposition: fills all of App.svelte's
        .native-hud-slot.portrait (flex:1, grows to the viewport bottom)
        instead of v1's content-sized block, then space-between pins
@@ -2179,11 +2033,22 @@
     width: 100%;
     box-sizing: border-box;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-    font-family: var(--fs-font-display);
-    background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
+    /* R153: one face for labels and values, Exo 2, which carries real tabular figures.
+       Orbitron, which this was, ships no tnum, so tabular-nums was inert here. */
+    font-family: var(--fs-font-numeric);
+    /* R153: no gradient. The region shows the stage's own backdrop and the strip below is the
+       one plate, so the bar is a control on the scene rather than a panel over it. */
+    background: none;
   }
-  .p-hud--overdrive { --p-acc: var(--p-pink); }
-  .p-top-group { display: flex; flex-direction: column; gap: 10px; flex: 0 0 auto; }
+  /* R153: the Overdrive pink glyph shift is gone; the spin ring alone flips (--hud-accent). */
+  /* THE STRIP, PORTRAIT. BALANCE and WIN over BET, as before, but one plate rather than three
+     bezelled cards: #12141a at 90%, 8px corners, nothing else. */
+  .p-top-group {
+    display: flex; flex-direction: column; gap: 0; flex: 0 0 auto;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: var(--op-plate);
+  }
 
   .p-stats-row { display: flex; flex-direction: row; gap: 8px; }
   .p-stat {
@@ -2196,15 +2061,12 @@
     gap: 2px;
     padding: 8px 6px;
     min-height: 52px;
-    border-radius: 10px;
-    background: var(--hud-surface-sunken);
-    border: 1px solid var(--hud-border);
+    /* R153: no card. The transparent 1px border keeps the measured box exactly where it was. */
+    border: 1px solid transparent;
+    background: none;
     position: relative;
   }
-  .p-stat.lit {
-    border-color: color-mix(in srgb, var(--hud-accent) 55%, transparent);
-    box-shadow: 0 0 8px color-mix(in srgb, var(--hud-accent) 22%, transparent);
-  }
+  /* R153: a live win no longer lights its field. The value counting up is the signal. */
   /* R119 SUPERSEDES THE "NEON LIFT" OF 2026-07-15. That pass gave each field a
      persistent per-field neon edge - balance cyan, win magenta, bet gold - so
      three adjacent plates carried three different colours at rest. The operator
@@ -2212,13 +2074,17 @@
      same neutral hairline on all three and the fields are told apart by their
      LABELS, which is what labels are for. The .lit win state is kept and is now
      the only coloured edge on the bar. */
-  .p-stat--balance, .p-stat--win { border-color: var(--hud-border); box-shadow: none; }
+  /* R153 SETS THE LABEL AT 10PX, AND THAT IS UNDER THIS BLOCK'S 11PX FLOOR ON PURPOSE. The
+     owner's brief names the figure ("Labels BALANCE, WIN, BET at 10px tracked caps, 60% white"),
+     a later and more specific instrument than the 2026-07-14 floor, so it governs under
+     convention (n); portrait_layout_conformance.mjs carries the exemption, named, for these
+     labels only. Values and every other text here stay at or above 11px. */
   .p-stat-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(190, 232, 255, 0.65);
+    color: var(--op-label);
     white-space: nowrap;
   }
   .p-stat-value {
@@ -2230,11 +2096,12 @@
        that renders dots over a balance is not a defence, it is the defect
        (the m-stat rule below reasoned this out first and never carried
        one). Overflow stays hidden purely as containment mid-fit. */
-    font-size: calc(16px * var(--autofit-scale, 1));
+    font-size: calc(18px * var(--autofit-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    color: var(--op-value);
     max-width: 100%;
     overflow: hidden;
   }
@@ -2254,25 +2121,18 @@
        for a more generous, full-width feel now that it already has the
        whole row to itself (44px+ targets below are unaffected either way). */
     gap: 16px;
-    padding: 8px 14px;
+    padding: 4px 8px;
     min-height: 52px;
-    border-radius: 10px;
-    background: var(--hud-surface-sunken);
-    border: 1px solid var(--hud-border);
-    box-shadow: none;
-    transition: box-shadow 0.15s ease;
+    /* R153: the BET row sits in the same plate as BALANCE and WIN, divided from them by a
+       hairline rather than boxed as its own card. The OVERBOOST glow pulse that lived here
+       went with the per-plate accents (see the script note). */
+    background: none;
+    border: 1px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.08);
   }
-  /* OVERBOOST glow pulse (2026-07-15, item 3): fires once on the OFF->ON
-     transition (see HudOverlay's script section), not a permanent state. */
-  @keyframes overboost-bet-pulse {
-    0%   { box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent); }
-    35%  { box-shadow: 0 0 22px 4px color-mix(in srgb, var(--p-orange) 70%, transparent); }
-    100% { box-shadow: 0 0 8px color-mix(in srgb, var(--p-gold) 16%, transparent); }
-  }
-  .p-bet-stat.overboost-pulse { animation: overboost-bet-pulse 0.7s ease-out; }
   .p-stat-value.cyan,
   .p-stat-value.magenta,
-  .p-stat-value.gold { color: var(--hud-text); }
+  .p-stat-value.gold { color: var(--op-value); }
 
   .p-bet-row { display: flex; align-items: center; gap: 10px; }
   .p-bet-step {
@@ -2286,15 +2146,17 @@
     padding: 0;
     border: none;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    /* R153: a chevron, not a filled key. The 44x44 target is unchanged; only its paint went. */
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
-  .p-bet-step svg { width: 12px; height: 8px; }
-  .p-bet-step svg path { fill: var(--p-acc); }
-  .p-bet-step:disabled { opacity: 0.4; cursor: not-allowed; }
+  .p-bet-step svg { width: 16px; height: 10px; overflow: visible; }
+  .p-bet-step svg path { fill: none; stroke: var(--op-glyph); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .p-bet-step:active:not(:disabled) { background: rgba(255, 255, 255, 0.07); }
+  .p-bet-step:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .p-mode-badge {
     position: absolute;
@@ -2313,11 +2175,13 @@
     padding: 2px 8px;
     border-radius: 999px;
   }
-  .p-mode-badge.overboost { color: #1a0d02; background: var(--p-orange); }
+  /* R153: one neutral badge for both modes. The word carries the state; colour carried none of
+     it that the word did not, and the strip has no per-plate accent. */
+  .p-mode-badge.overboost,
   .p-mode-badge.cruise {
-    color: color-mix(in srgb, var(--p-cyan) 30%, #fff);
-    background: rgba(0, 240, 255, 0.1);
-    border: 1px solid color-mix(in srgb, var(--p-cyan) 40%, transparent);
+    color: var(--op-value);
+    background: var(--op-plate);
+    border: 1px solid var(--op-hairline-hi);
   }
 
   .p-controls-row {
@@ -2337,18 +2201,19 @@
   .p-controls-side:last-child { justify-content: flex-end; }
 
   /* Every round control button: 48x48 real box (>=44px touch-target floor
-     with headroom), circular chrome-on-navy, one accent colour via --p-acc. */
+     with headroom). R153: a hairline circle on the strip's plate, white glyph,
+     where it was chrome on navy with a cyan glyph. */
   .p-round-btn {
     position: relative;
+    box-sizing: border-box;
     width: 48px;
     height: 48px;
     min-width: 48px;
     min-height: 48px;
     padding: 0;
-    border: none;
+    border: 1px solid var(--op-hairline);
     border-radius: 50%;
-    background: radial-gradient(circle at 36% 28%, #1a2636, #060b16 72%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    background: var(--op-plate);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2359,7 +2224,9 @@
   .p-round-btn svg { width: 20px; height: 20px; }
   .p-round-btn svg path { fill: none; stroke: var(--p-acc); stroke-width: 1.8; }
   .p-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .p-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--p-acc) 70%, transparent); }
+  .p-round-btn:active:not(:disabled) { border-color: var(--op-hairline-hi); }
+  /* Autoplay running: the edge goes solid white. No glow. */
+  .p-round-btn.active { border-color: var(--op-value); }
 
   /* FS VISUAL FIXPACK JOB 2: the portrait speed control, three intensity steps.
      Replaces the former boolean `.engaged`, which lit Turbo and Super Turbo
@@ -2371,57 +2238,49 @@
   /* R119: the three steps and their spacing are unchanged - turbo_intensity_gate
      asserts a real luminance step between adjacent tiers at seven presets - only
      the hue moves from amber to the shell accent. */
-  .p-turbo[data-speed="normal"] {
-    background: var(--hud-surface-sunken);
-  }
-  .p-turbo[data-speed="normal"] svg path { stroke: var(--hud-text-dim); fill: none; }
+  /* R153: the same three luminance steps as the desktop knob, in white rather than the accent:
+     an outlined bolt, then a lit circle and a solid bolt, then a white disc with a dark bolt. */
+  .p-turbo[data-speed="normal"] svg path { stroke: var(--op-label); fill: none; }
   .p-turbo[data-speed="turbo"] {
-    background: radial-gradient(circle at 36% 28%,
-      color-mix(in srgb, var(--hud-accent) 34%, #0b1018),
-      color-mix(in srgb, var(--hud-accent) 8%, #05080e) 72%);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    background: color-mix(in srgb, #ffffff 40%, #12141a);
+    border-color: var(--op-hairline-hi);
   }
-  .p-turbo[data-speed="turbo"] svg path {
-    stroke: var(--hud-accent);
-    fill: color-mix(in srgb, var(--hud-accent) 45%, transparent);
-  }
+  .p-turbo[data-speed="turbo"] svg path { stroke: var(--op-value); fill: var(--op-value); }
   .p-turbo[data-speed="super"] {
-    background: radial-gradient(circle at 36% 28%,
-      color-mix(in srgb, var(--hud-accent) 88%, #ffffff),
-      color-mix(in srgb, var(--hud-accent) 40%, #0b1018) 72%);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--hud-accent) 95%, transparent),
-                0 0 52px color-mix(in srgb, var(--hud-accent) 55%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: #ffffff;
+    border-color: #ffffff;
   }
-  .p-turbo[data-speed="super"] svg path { stroke: #ffffff; fill: #ffffff; }
+  .p-turbo[data-speed="super"] svg path { stroke: #12141a; fill: #12141a; }
   .p-tier {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: rgba(230, 245, 255, 0.85);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--op-value);
   }
 
   .p-hamburger { display: flex; flex-direction: column; gap: 4px; }
   .p-hamburger-bar { width: 18px; height: 2px; border-radius: 1px; background: var(--p-acc); }
 
-  .p-max-cap { font-size: 12px; font-weight: 800; letter-spacing: 0.04em; color: var(--hud-text); }
+  .p-max-cap { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--op-value); }
 
   /* SPIN - the single largest, most important control: 72px real diameter
      (well over the 64px floor the brief asks for), centred between the two
      control clusters. */
+  /* R153: a circle with a 2px ring, the only accent, on the strip's plate. It was a conic
+     gradient disc with an accent bloom. Same 72px box. */
   .p-spin {
     position: relative;
+    box-sizing: border-box;
     width: 72px;
     height: 72px;
     min-width: 72px;
     min-height: 72px;
     padding: 0;
-    border: none;
+    border: 2px solid var(--hud-accent);
     border-radius: 50%;
     flex: 0 0 auto;
-    background: conic-gradient(from 200deg, var(--p-acc), color-mix(in srgb, var(--p-acc) 40%, #0c1220), var(--p-acc));
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 18px color-mix(in srgb, var(--p-acc) 45%, transparent);
+    background: var(--op-plate);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2430,16 +2289,17 @@
     cursor: pointer;
   }
   .p-spin .glyph { width: 22px; height: 22px; }
-  .p-spin .glyph path { fill: #04070f; }
-  .p-spin .glyph.arrows { display: none; fill: none; stroke: #04070f; stroke-width: 2; }
+  .p-spin .glyph path { fill: var(--op-value); }
+  .p-spin .glyph.arrows { display: none; }
+  .p-spin .glyph.arrows path { fill: none; stroke: var(--op-value); stroke-width: 2.2; stroke-linecap: round; }
   .p-spin.spinning .glyph.play { display: none; }
   .p-spin.spinning .glyph.arrows { display: block; }
   .p-spin:disabled { opacity: 0.5; cursor: not-allowed; }
   .p-spin-txt {
     font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: #04070f;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--op-label);
   }
 
   .p-menu-wrapper, .p-autoplay-wrapper { position: relative; }
@@ -2464,7 +2324,7 @@
     --c-pink: var(--theme-secondary, #ff00ff);
     --c-gold: #ffd700;
     --c-orange: #ff9a2e;
-    --c-acc: var(--c-cyan);
+    --c-acc: var(--op-glyph);
     /* Same borrowed-rule defect as `.m-hud` above: this profile's menu button
        reuses `.p-hamburger-bar`, which paints from `--p-acc`, and `--p-acc` is
        declared only on `.p-hud`. Aliased onto this profile's own accent so the
@@ -2479,21 +2339,25 @@
     height: 100%;
     box-sizing: border-box;
     padding: 8px 12px 8px 8px;
-    font-family: var(--fs-font-display);
-    background: linear-gradient(180deg, rgba(6, 9, 20, 0.92), rgba(4, 6, 14, 0.98));
+    /* R153: Exo 2 for labels and values (real tabular figures), and the strip itself is the one
+       operator plate: #12141a at 90%, 8px corners, no gradient. */
+    font-family: var(--fs-font-numeric);
+    border-radius: 8px;
+    background: var(--op-plate);
   }
-  .c-hud--overdrive { --c-acc: var(--c-pink); }
+  /* R153: the compact glyph colour is white in both states; only the spin ring flips. */
 
+  /* R153: hairline circles, as portrait. */
   .c-round-btn {
     position: relative;
+    box-sizing: border-box;
     flex: 0 0 auto;
     width: 44px;
     height: 44px;
     padding: 0;
-    border: none;
+    border: 1px solid var(--op-hairline);
     border-radius: 50%;
-    background: radial-gradient(circle at 36% 28%, #1a2636, #060b16 72%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    background: var(--op-plate);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2504,38 +2368,26 @@
   .c-round-btn svg { width: 18px; height: 18px; }
   .c-round-btn svg path { fill: none; stroke: var(--c-acc); stroke-width: 1.8; }
   .c-round-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .c-round-btn.active { box-shadow: 0 0 12px color-mix(in srgb, var(--c-acc) 70%, transparent); }
+  .c-round-btn:active:not(:disabled) { border-color: var(--op-hairline-hi); }
+  .c-round-btn.active { border-color: var(--op-value); }
 
   /* FS VISUAL FIXPACK JOB 2: the compact-landscape speed control, same three
      steps as portrait at this strip's smaller 44px box. */
   .c-turbo svg { width: 22px; height: 22px; }
-  .c-turbo[data-speed="normal"] {
-    background: var(--hud-surface-sunken);
-  }
-  .c-turbo[data-speed="normal"] svg path { stroke: var(--hud-text-dim); fill: none; }
+  .c-turbo[data-speed="normal"] svg path { stroke: var(--op-label); fill: none; }
   .c-turbo[data-speed="turbo"] {
-    background: radial-gradient(circle at 36% 28%,
-      color-mix(in srgb, var(--hud-accent) 34%, #0b1018),
-      color-mix(in srgb, var(--hud-accent) 8%, #05080e) 72%);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    background: color-mix(in srgb, #ffffff 40%, #12141a);
+    border-color: var(--op-hairline-hi);
   }
-  .c-turbo[data-speed="turbo"] svg path {
-    stroke: var(--hud-accent);
-    fill: color-mix(in srgb, var(--hud-accent) 45%, transparent);
-  }
+  .c-turbo[data-speed="turbo"] svg path { stroke: var(--op-value); fill: var(--op-value); }
   .c-turbo[data-speed="super"] {
-    background: radial-gradient(circle at 36% 28%,
-      color-mix(in srgb, var(--hud-accent) 88%, #ffffff),
-      color-mix(in srgb, var(--hud-accent) 40%, #0b1018) 72%);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--hud-accent) 95%, transparent),
-                0 0 52px color-mix(in srgb, var(--hud-accent) 55%, transparent),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: #ffffff;
+    border-color: #ffffff;
   }
-  .c-turbo[data-speed="super"] svg path { stroke: #ffffff; fill: #ffffff; }
+  .c-turbo[data-speed="super"] svg path { stroke: #12141a; fill: #12141a; }
 
-  .c-tier { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: rgba(230, 245, 255, 0.85); }
-  .c-max-cap { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; color: var(--hud-text); }
+  .c-tier { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--op-value); }
+  .c-max-cap { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--op-value); }
 
   .c-menu-wrapper, .c-autoplay-wrapper { position: relative; flex: 0 0 auto; }
   .c-hud-menu, .c-auto-menu { position: absolute; bottom: calc(100% + 8px); z-index: 65; left: auto; right: auto; transform: none; }
@@ -2554,21 +2406,19 @@
        (2026-07-14b) - narrow margin, not a font/flex-ratio problem. */
     padding: 2px 4px;
     height: 100%;
-    border-radius: 8px;
-    background: var(--hud-surface-sunken);
-    border: 1px solid var(--hud-border);
+    /* R153: no card inside the strip; the transparent border keeps the measured box. */
+    background: none;
+    border: 1px solid transparent;
     position: relative;
   }
-  .c-stat.lit {
-    border-color: color-mix(in srgb, var(--hud-accent) 55%, transparent);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--hud-accent) 20%, transparent);
-  }
+  /* R153: as portrait, the 10px label is the brief's figure and sits under the 11px floor by
+     that sanction; the exemption is named in portrait_layout_conformance.mjs. */
   .c-stat-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(190, 232, 255, 0.65);
+    color: var(--op-label);
     white-space: nowrap;
   }
   .c-stat-value {
@@ -2577,13 +2427,14 @@
     letter-spacing: 0.02em;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    color: var(--op-value);
     max-width: 100%;
     overflow: hidden;
     /* R059: ellipsis removed, same reasoning as .p-stat-value above. */
   }
   .c-stat-value.cyan,
   .c-stat-value.magenta,
-  .c-stat-value.gold { color: var(--hud-text); }
+  .c-stat-value.gold { color: var(--op-value); }
 
   /* Balance gets extra flex-basis (2026-07-14b, caught via stress-value
      screenshot: "$1,000,000.00" was truncating with ellipsis at the default
@@ -2592,6 +2443,9 @@
      the two fields most likely to carry long currency strings. */
   /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, on top
      of each cell's pre-existing flex-basis tuning. */
+  /* R153: a live win no longer lights its field (the .lit rules are gone in every profile, and so
+     are the markup's class:lit directives). The value counting up is the signal. The R119 record
+     below says the .lit state is kept; it describes the bar before R153. */
   /* R119 SUPERSEDES THE "NEON LIFT" OF 2026-07-15. That pass gave each field a
      persistent per-field neon edge - balance cyan, win magenta, bet gold - so
      three adjacent plates carried three different colours at rest. The operator
@@ -2601,20 +2455,8 @@
      the only coloured edge on the bar. */
   /* The flex-basis tuning below is GEOMETRY and is untouched: it was measured
      against a $1,000,000.00 stress value. Only colour moves. */
-  .c-stat--balance { flex: 1.4 1 0; border-color: var(--hud-border); box-shadow: none; }
-  .c-stat--win     { border-color: var(--hud-border); box-shadow: none; }
-  .c-stat--bet {
-    flex: 1.6 1 0;
-    border-color: var(--hud-border);
-    box-shadow: none;
-    transition: box-shadow 0.15s ease;
-  }
-  @keyframes overboost-bet-pulse-compact {
-    0%   { box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent); }
-    35%  { box-shadow: 0 0 18px 3px color-mix(in srgb, var(--c-orange, #ff9a2e) 70%, transparent); }
-    100% { box-shadow: 0 0 6px color-mix(in srgb, var(--c-gold, #ffd700) 14%, transparent); }
-  }
-  .c-stat--bet.overboost-pulse { animation: overboost-bet-pulse-compact 0.7s ease-out; }
+  .c-stat--balance { flex: 1.4 1 0; }
+  .c-stat--bet { flex: 1.6 1 0; }
   .c-bet-row { display: flex; align-items: center; gap: 2px; }
   .c-bet-step {
     width: 44px;
@@ -2623,15 +2465,16 @@
     padding: 0;
     border: none;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
-  .c-bet-step svg { width: 12px; height: 8px; }
-  .c-bet-step svg path { fill: var(--c-acc); }
-  .c-bet-step:disabled { opacity: 0.4; cursor: not-allowed; }
+  .c-bet-step svg { width: 16px; height: 10px; overflow: visible; }
+  .c-bet-step svg path { fill: none; stroke: var(--op-glyph); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .c-bet-step:active:not(:disabled) { background: rgba(255, 255, 255, 0.07); }
+  .c-bet-step:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .c-mode-badge {
     position: absolute;
@@ -2650,31 +2493,33 @@
     padding: 2px 8px;
     border-radius: 999px;
   }
-  .c-mode-badge.overboost { color: #1a0d02; background: var(--c-orange); }
+  .c-mode-badge.overboost,
   .c-mode-badge.cruise {
-    color: color-mix(in srgb, var(--c-cyan) 30%, #fff);
-    background: rgba(0, 240, 255, 0.08);
-    border: 1px solid color-mix(in srgb, var(--c-cyan) 40%, transparent);
+    color: var(--op-value);
+    background: var(--op-plate);
+    border: 1px solid var(--op-hairline-hi);
   }
 
+  /* R153: the ringed circle, as portrait and desktop. */
   .c-spin {
     position: relative;
+    box-sizing: border-box;
     flex: 0 0 auto;
     width: 60px;
     height: 60px;
     padding: 0;
-    border: none;
+    border: 2px solid var(--hud-accent);
     border-radius: 50%;
-    background: conic-gradient(from 200deg, var(--c-acc), color-mix(in srgb, var(--c-acc) 40%, #0c1220), var(--c-acc));
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 18px color-mix(in srgb, var(--c-acc) 45%, transparent);
+    background: var(--op-plate);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
   }
   .c-spin .glyph { width: 22px; height: 22px; }
-  .c-spin .glyph path { fill: #04070f; }
-  .c-spin .glyph.arrows { display: none; fill: none; stroke: #04070f; stroke-width: 2; }
+  .c-spin .glyph path { fill: var(--op-value); }
+  .c-spin .glyph.arrows { display: none; }
+  .c-spin .glyph.arrows path { fill: none; stroke: var(--op-value); stroke-width: 2.2; stroke-linecap: round; }
   .c-spin.spinning .glyph.play { display: none; }
   .c-spin.spinning .glyph.arrows { display: block; }
   .c-spin:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -2688,6 +2533,8 @@
      takes the press only. The border-colour fade the global button rule gave these (only .m-spin
      has a border) is kept in the list. Under reduced motion they match the desktop exactly: the 4%
      press stays (no travel), the arrow rotation stops. */
+  /* NOTE R153: the R151 record above says only .m-spin has a border. Since R153 all three carry the
+     2px accent ring, so the border-colour fade in the list below applies to each of them. */
   .p-spin, .c-spin, .m-spin { transition: transform .12s ease, border-color .25s; }
   .p-spin:active:not(:disabled), .c-spin:active:not(:disabled), .m-spin:active:not(:disabled) { transform: scale(.96); }
   .p-spin.spinning .glyph.arrows, .c-spin.spinning .glyph.arrows { animation: fs-spin-rot .7s linear infinite; }

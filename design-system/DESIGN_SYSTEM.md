@@ -124,6 +124,15 @@ design-system statement, not a second authority.
   shell accent. FEATURE still carries no Grille art. The accent count is now ONE
   in the HUD, spent on SPIN, on a live win, and on active toggles.
 
+  **AMENDED 2026-10-07 by R153.** The count is still ONE and it is now spent once:
+  the bar's only accent is the 2px edge of the SPIN ring, in every HUD profile,
+  magenta under Overdrive. A live win lights nothing, and active toggles and the
+  three TURBO speeds are white luminance steps on the strip's dark plate, so the
+  escalation no longer rides the shell accent; turbo_intensity_gate.mjs still
+  measures the three steps. Keyboard focus rings stay in the theme primary and
+  sit outside this count. The shell is docs/design/HUD_SHELL_TEMPLATE.md; the
+  brief is reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md, TASK 1.
+
 ## APPROVED SYMBOL LINEUP (art is skin level; maths IDs never change)
 | ID | Object | Win animation | Master status |
 |----|--------|---------------|---------------|
