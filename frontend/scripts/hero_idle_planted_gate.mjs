@@ -19,25 +19,34 @@
  *   (a) HeroIdle.svelte's style declares no animation, no transform and no @keyframes, under any
  *       name and at any nesting depth (seeds 3, 4 and 5).
  *   (b) HeroIdle.svelte's markup is exactly ONE element, an <img> carrying
- *       data-testid="hero-still" whose source is ui/scene_character.png (seeds 1 and 2).
- *   (c) No strip is referenced anywhere in frontend/src outside comments: no `ui/hero/` path and no
- *       `_<n>f.png` sheet name (seeds 1 and 12). asset_reference_gate would catch a strip that is
- *       both referenced and pruned; this catches the reference itself, pruned or not.
+ *       data-testid="hero-still" whose source is ui/scene_character.png, with exactly the
+ *       attributes class, data-testid, src, alt and draggable: no style=, style:, class:, use:,
+ *       transition: or animate: can put motion on it inline (seeds 1, 2 and 14).
+ *   (c) No strip is referenced anywhere in frontend/src or frontend/index.html outside comments,
+ *       .css files included: no `ui/hero/` path and no `_<n>f.png` sheet name (seeds 1, 12, 16).
+ *       asset_reference_gate would catch a strip that is both referenced and pruned; this catches
+ *       the reference itself, pruned or not. A name assembled at runtime from parts is out of any
+ *       static reader's reach; build_diet_verify's pruned-path check is the runtime net for it.
  *   (d) HeroIdle.svelte's script holds no state: no import at all, no reactive statement, no
  *       timer or frame callback, no dispatcher and no store write. That is what makes "a win never
  *       waits on the hero" structural rather than measured: a component that reads nothing and
  *       emits nothing cannot be awaited (seeds 6 and 7).
- *   (e) SceneGroup mounts HeroIdle with no binding and no event handler (seed 8).
+ *   (e) SceneGroup mounts HeroIdle with no binding and no event handler, as a DIRECT child of
+ *       .char-layer, so no wrapper element can carry motion the float fence does not see (seeds 8
+ *       and 15); and no stylesheet anywhere in src (a component's <style> or a .css file) targets
+ *       the still (`hero-still`, or an img under .char-layer) with an animation or a transform
+ *       (seed 17).
  *   (f) The float fence on SceneGroup.svelte, as R138 wrote it: the keyframes .char-layer references
  *       transform by translateY only, their amplitude is at or below the car's, both derived from
  *       the file at gate time, and the float exists (seeds 9, 10 and 11).
  *   (g) SceneGroup's reduced-motion block still stops .char-layer with `animation: none !important`
  *       (seed 13).
  *
- * THE COMMENT TRAP. HeroIdle.svelte keeps the dated history of the reaction system in its header,
- * so its prose names every strip and every retired keyframe. Each file is split into CODE and PROSE
- * first and only CODE is judged; the self-test's negative control plants the banned forms inside
- * comments and requires silence, and the run prints how many strip names the real prose carries.
+ * THE COMMENT TRAP. HeroIdle.svelte keeps part of the reaction system's dated history in its
+ * header (it names one strip, hero_glance_6f, and the hero-body and hero-cross classes). Each file
+ * is split into CODE and PROSE first and only CODE is judged; the seeded negative control, which
+ * plants every banned form inside comments of all three syntaxes and requires silence, is what
+ * proves the immunity, and the run prints how many strip names the real prose carries.
  *
  * Run:
  *   node scripts/hero_idle_planted_gate.mjs
@@ -185,7 +194,7 @@ function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name)
     if (statSync(p).isDirectory()) walk(p, out)
-    else if (/\.(svelte|ts|js|mjs)$/.test(name) && !/\.test\.(ts|mjs|js)$/.test(name)) out.push(p)
+    else if (/\.(svelte|ts|js|mjs|css)$/.test(name) && !/\.test\.(ts|mjs|js)$/.test(name)) out.push(p)
   }
   return out
 }
@@ -220,11 +229,20 @@ function judge(src, sceneSrc, tree) {
     findings.push('expected exactly one data-testid="hero-still"')
   if (!/src\s*=\s*"\{assetBase\}\/ui\/scene_character\.png"/.test(S.markupCode))
     findings.push('the still is not ui/scene_character.png (src="{assetBase}/ui/scene_character.png")')
+  const imgTag = (S.markupCode.match(/<img\b([\s\S]*?)\/?>/) || [, ''])[1]
+  // Attribute NAMES only: quoted values and {expressions} are removed first, so a word inside a
+  // value can never read as an attribute.
+  const bare = imgTag.replace(/"[^"]*"|'[^']*'|\{[^}]*\}/g, ' ')
+  const attrs = [...bare.matchAll(/([a-zA-Z][\w:|-]*)/g)].map((m) => m[1])
+  const ALLOWED = new Set(['class', 'data-testid', 'src', 'alt', 'draggable'])
+  const extraAttrs = attrs.filter((a) => !ALLOWED.has(a))
+  if (extraAttrs.length) findings.push(`the still carries attributes beyond class, data-testid, src, alt and draggable: ${extraAttrs.join(', ')}`)
 
   // (c) no strip referenced anywhere in src, outside comments
   for (const [path, text] of Object.entries(tree)) {
     const code = path.endsWith('.svelte')
       ? (() => { const T = sections(text); return T.styleCode + '\n' + T.scriptCode + '\n' + T.markupCode })()
+      : path.endsWith('.html') ? text.replace(/<!--[\s\S]*?-->/g, ' ')
       : tsCode(text)
     const m = code.match(STRIP_REF)
     if (m) findings.push(`${path} references a hero strip (\`${m[0]}\`) outside a comment`)
@@ -251,6 +269,35 @@ function judge(src, sceneSrc, tree) {
   if (mounts.length !== 1) findings.push(`SceneGroup must mount HeroIdle exactly once, found ${mounts.length}`)
   for (const attrs of mounts) {
     if (/\b(bind|on):/.test(attrs)) findings.push(`SceneGroup's HeroIdle mount carries a binding or handler: ${attrs.trim()}`)
+  }
+  // Direct child of .char-layer: the nearest element opened before the mount and not yet closed
+  // must be the .char-layer div.
+  const at = G.markupCode.indexOf('<HeroIdle')
+  if (at >= 0) {
+    const before = G.markupCode.slice(0, at)
+    const stack = []
+    for (const m of before.matchAll(/<(\/?)([a-zA-Z][\w:-]*)([^>]*?)(\/?)>/g)) {
+      if (m[1]) stack.pop()
+      else if (!m[4]) stack.push({ tag: m[2], attrs: m[3] })
+    }
+    const parent = stack[stack.length - 1]
+    if (!parent || !/class\s*=\s*"[^"]*\bchar-layer\b/.test(parent.attrs))
+      findings.push(`HeroIdle is not a direct child of .char-layer (its parent is <${parent ? parent.tag + parent.attrs : '?'}>): a wrapper could carry motion the float fence does not see`)
+  }
+  // No stylesheet anywhere targets the still with motion.
+  for (const [path, text] of Object.entries(tree)) {
+    if (path.endsWith('HeroIdle.svelte')) continue
+    const css = path.endsWith('.svelte') ? sections(text).styleCode : path.endsWith('.css') ? text.replace(/\/\*[\s\S]*?\*\//g, ' ') : null
+    if (!css) continue
+    for (const r of rules(css)) {
+      const hits = r.sel.split(',').map((x) => x.trim()).filter((one) => /hero-still/.test(one) || /\.char-layer\b[^,]*\s(img\b|:global\(\s*img)/.test(one))
+      if (!hits.length) continue
+      for (const d of decls(r.body)) {
+        const val = d.v.replace(/!important/i, '').trim()
+        if (((d.k === 'animation' || d.k === 'animation-name') && val !== 'none') || (d.k === 'transform' && val !== 'none'))
+          findings.push(`${path} targets the still (\`${hits[0]}\`) with ${d.k}: ${d.v}`)
+      }
+    }
   }
 
   // (f) the float fence, unchanged from R138
@@ -280,7 +327,8 @@ function judge(src, sceneSrc, tree) {
 // ── entry ────────────────────────────────────────────────────────────────────
 const real = readFileSync(FILE, 'utf-8')
 const realScene = readFileSync(SCENE_FILE, 'utf-8')
-const realTree = Object.fromEntries(walk(SRC).map(p => [relative(join(HERE, '..'), p), readFileSync(p, 'utf-8')]))
+const INDEX_HTML = join(HERE, '..', 'index.html')
+const realTree = Object.fromEntries([...walk(SRC), INDEX_HTML].map(p => [relative(join(HERE, '..'), p), readFileSync(p, 'utf-8')]))
 
 if (process.argv.includes('--self-test')) {
   console.log('HERO IDLE PLANTED GATE (R153, one still), seeded self-test\n')
@@ -342,6 +390,29 @@ if (process.argv.includes('--self-test')) {
   // SEED 13: the reduced-motion reset on the float loses its !important
   check('seeded: the .char-layer reduced-motion reset loses !important', id, true, sc =>
     must(sc, '.chest-lamp {\n      animation: none !important;').replace('.chest-lamp {\n      animation: none !important;', '.chest-lamp {\n      animation: none;'))
+
+  // SEED 14 (R153 review): motion put on the still inline, the form check (a) cannot read
+  check('seeded: an inline style animation on the <img>', s =>
+    must(s, '  class="hero-still"\n').replace('  class="hero-still"\n', '  class="hero-still"\n  style="animation: hero-probe 2.4s infinite"\n'), true)
+  // SEED 15 (R153 review): a wrapper element around the mount, carrying its own animation
+  check('seeded: SceneGroup wraps the mount in an animated div', id, true, sc =>
+    must(sc, '<HeroIdle assetBase={$themeAssets.assetBase} />').replace('<HeroIdle assetBase={$themeAssets.assetBase} />', '<div class="hero-sway"><HeroIdle assetBase={$themeAssets.assetBase} /></div>')
+      .replace('</style>', '  .hero-sway { animation: char-idle 2s infinite; }\n</style>'))
+  // SEED 16 (R153 review): a strip url() in app.css, which the walker skipped before R153's review
+  check('seeded: app.css carries a hero strip url()', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('app.css'))
+    tree[k] = tree[k] + '\n.x { background-image: url(/assets/themes/future-spinner/ui/hero/hero_win_reaction_32f.png); }\n'
+  })
+  // SEED 17 (R153 review): app.css animating the still by its class
+  check('seeded: app.css animates .hero-still', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('app.css'))
+    tree[k] = tree[k] + '\n.hero-still { animation: spin 3s linear infinite; }\n'
+  })
+  // SEED 18: a strip preloaded from index.html
+  check('seeded: index.html preloads the idle strip', id, true, null, tree => {
+    const k = Object.keys(tree).find(p => p.endsWith('index.html'))
+    tree[k] = tree[k].replace('</head>', '<link rel="preload" as="image" href="/assets/themes/future-spinner/ui/hero/hero_crossed_idle_6f.png"></head>')
+  })
 
   // NEGATIVE CONTROL A: the real files as they stand
   check('NEGATIVE CONTROL: the real files as they stand must pass', id, false)

@@ -2820,9 +2820,12 @@
     /* R153, THE OPERATOR STRIP (reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md, TASK 1).
        The control bar stops being a designed object and becomes a control: one flat dark plate,
        small tracked labels at 60% white, values in one white face, hairline circles, and the spin
-       ring as the only accent. These six values are the brief's numbers, declared once here so
-       the HUD, the FEATURES entry, the hamburger menu and the paytable's guide replicas all read
-       the same plate. The --hud-* tokens above stay for the surfaces R153 did not restyle. */
+       ring as the only accent. The first three values are the brief's numbers (the fill, the 60%
+       label, the white value); the glyph and hairline strengths (0.86, 0.32, 0.72) are R153's own
+       choices for the hairline treatment the brief names. Declared once here so the HUD, the
+       FEATURES entry, the hamburger and autoplay menus, the bet picker and the paytable's guide
+       replicas all read the same plate. The --hud-* tokens above stay for the surfaces R153 did
+       not restyle. */
     --op-plate:       rgba(18, 20, 26, 0.9);     /* #12141a at 90% opacity, the brief's fill */
     --op-label:       rgba(255, 255, 255, 0.6);  /* BALANCE, WIN, BET: 60% white */
     --op-value:       #ffffff;                   /* values: one white face */

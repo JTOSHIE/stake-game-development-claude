@@ -8,7 +8,9 @@
   // owner's R145 Astra still, as one <img>. It has no state, reads no store, sets no timer and
   // emits nothing, so no part of a round can wait on it.
   //
-  // WHY THIS STILL. It is the only committed single-frame raster of the pilot (680x1344). The
+  // WHY THIS STILL. It is the only single-frame raster of the pilot in the shipped theme tree
+  // under public/ (680x1344); the repository also holds the pre-R145 enhancement in
+  // design-system/incoming and a render under frontend/screens, neither of them theme art. The
   // idle sheet's frame 01, which stood in for a still from R130 to R152, is one frame of a
   // six-frame strip, so drawing it still fetches and paints the strip; cutting that frame out
   // would be a raster commit and so would a new render, and the brief forbids both. Measured
@@ -16,18 +18,27 @@
   // x extent (27..178), the crown 1 px and the feet 3 px higher (11..399 becomes 10..396).
   //
   // THE THREE ACCENTS STILL SIT, SO THEY WERE NOT RE-PINNED. SceneGroup's .antenna-light,
-  // .visor-glint and .chest-lamp are percentages of the same box. The features they light
-  // moved by at most 1.9 px on this still (orb centroid -0.4/-1.3 px, lamp bars -0.2/-1.9 px),
-  // and the share of each glow's weight that lands on the figure is 91.3%, 99.9% and 100%,
-  // against 90.8%, 100% and 100% on the frame they were pinned to. The underglow the brief
-  // names is the CAR's (.underglow inside .car-layer) and the car did not change.
+  // .visor-glint and .chest-lamp are percentages of the same box. The features they light moved
+  // by at most 1.9 px on this still (orb colour centroid -0.4/-1.3 px, lamp bars -0.2/-1.9 px);
+  // the same centroid method puts the old pin 1.0 px off the orb on the frame it was pinned to,
+  // so a re-pin would move each light by less than the method's own residual. Measured as CSS
+  // renders them (farthest-corner gradients, the stops as written, the border-radius clip,
+  // figure = alpha > 127, 4x supersampled), the share of each glow on the figure is antenna
+  // 73.7%, visor 96.5%, lamp 100% on this still, against 77.7%, 97.8% and 100% on frame 01: the
+  // antenna lost 3.9 points over the head's edge, the light itself still centred on the orb.
+  // (A first draft quoted 91.3/99.9/100 from a simplified falloff; R153's review could not
+  // reproduce them and these replace them.) The underglow the brief names is the CAR's
+  // (.underglow inside .car-layer) and the car did not change.
   //
-  // REVERTING is this file at 895815b9 plus the R153 prune-list lines in vite.config.ts and
-  // build_diet_verify.mjs, never a re-render.
+  // REVERTING is a revert of dd573727 whole, never a re-render: this file, SceneGroup's :has()
+  // accent suppression (without it the accents slide 39 to 45 px off a performing figure, R131),
+  // hero_idle_planted_gate.mjs and its checks.yml step, and the prune-list lines in vite.config.ts
+  // and build_diet_verify.mjs.
   //
-  // EVERYTHING BELOW THIS LINE AND ABOVE `export let` IS THE DATED HISTORY (R130 to R152) OF
-  // THE REACTION SYSTEM THIS FILE NO LONGER CONTAINS. It is kept unedited as the record;
-  // none of it describes the live component.
+  // EVERYTHING BELOW THIS LINE AND ABOVE `export let` IS THE DATED HISTORY (R130 to R140) OF
+  // THE REACTION SYSTEM THIS FILE NO LONGER CONTAINS. It is kept unedited as the record; none of
+  // it describes the live component. The R151 warm-layer and R152 queue and latch notes lived in
+  // the code body and went with it; they are in this file at 895815b9.
   //
   // HeroIdle.svelte, the crossed-arms pilot: PLANTED at rest, reacting when
   // something happens.
@@ -169,7 +180,7 @@
      on the scene exactly as it did. No animation, no transform and no will-change here: the
      float on SceneGroup's .char-layer is the only motion, and it moves this element with it.
      object-fit: contain lands the 680x1344 still in the 206x407 box at one scale (0.30283);
-     the two aspects differ by 0.0002, so contain is a 0.03 px letterbox, not a crop. */
+     the two aspects differ by 0.0002, so contain is a 0.04 px letterbox each side, not a crop. */
   .hero-still {
     position: absolute;
     inset: 0;

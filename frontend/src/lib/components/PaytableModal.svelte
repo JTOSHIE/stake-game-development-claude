@@ -105,6 +105,9 @@
     { scatters: 5, spins: 16, award: '10×' },
   ]
 
+  // NOTE R153 (2026-10-07): every row below is `kind: 'live'` since R153 and no row carries a
+  // `files` list; the `kind: 'img'` and `files` description that follows is the record of the
+  // shape before R152 and R153.
   // Interface Guide, each game control with its rendered UI art and a
   // one-line description. `kind: 'img'` rows use the theme's UI PNGs; `kind:
   // 'pill'` rows have no dedicated art and render a styled text token instead.
@@ -132,8 +135,10 @@
     // bet keys became one stroked chevron pair, menu and autoplay hairline circles, the speed knob a
     // hairline circle that brightens to white. Recapturing would commit rasters, which the R153
     // fence forbids, and the captures would show a player controls that no longer exist, so each
-    // row is drawn in markup from the same tokens as the control it names. The six captures stay
-    // in the repository and leave the bundle (vite.config.ts LEGACY_FILES).
+    // row is drawn in markup from the same tokens as the control it names. The seven captures stay
+    // in the repository. Two of them, btn_bet_plus and btn_bet_minus (the plus/minus artwork the
+    // brief deletes), leave the bundle; the other five still ship unread, with the three R152
+    // left, pending the owner (R152 owner list item 7).
     { kind: 'live', live: 'betup',      nameKey: 'guideBetPlusName',   descKey: 'guideBetPlusDesc' },
     { kind: 'live', live: 'betdown',    nameKey: 'guideBetMinusName',  descKey: 'guideBetMinusDesc' },
     // R125: WAS `feature_button.png`, a 224x224 painted machine badge produced by
@@ -947,7 +952,7 @@
   .gk-speed .gk-glyph { width: 16px; height: 16px; }
   .gk-speed path { stroke-width: 1.6; stroke-linejoin: round; }
   .gk-speed[data-speed='normal'] path { fill: none; stroke: var(--op-label); }
-  .gk-speed[data-speed='turbo'] { background: color-mix(in srgb, #ffffff 22%, #12141a); border-color: var(--op-hairline-hi); }
+  .gk-speed[data-speed='turbo'] { background: color-mix(in srgb, #ffffff 40%, #12141a); border-color: var(--op-hairline-hi); }
   .gk-speed[data-speed='turbo'] path { fill: var(--op-value); stroke: var(--op-value); }
   .gk-speed[data-speed='super'] { background: #ffffff; border-color: #ffffff; }
   .gk-speed[data-speed='super'] path { fill: #12141a; stroke: #12141a; }

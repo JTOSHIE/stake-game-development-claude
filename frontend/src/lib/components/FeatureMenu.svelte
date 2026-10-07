@@ -562,7 +562,10 @@
      orange; the operator strip spends no hue but the spin ring's, and the state is still marked. */
   .m-fm-entry.mode-enhancer { border-color: var(--op-value); color: var(--op-value); }
 
-  /* ==========================================================================
+  /* NOTE R153 (2026-10-07): HudOverlay no longer uses .fs-plate, .fs-knob as a bezel, or .fs-rail
+     (the operator strip), so "identical to HudOverlay" below no longer holds. The menu's own panel
+     still uses these primitives; the four entry triggers above paint from the --op-* tokens.
+     ==========================================================================
      FUTURE SPINNER - FEATURES MENU
      Built on the shared chrome vocabulary (.fs-plate / .fs-knob / .fs-rail /
      .fs-face) so it reads as part of the same instrument set as the HUD and
@@ -1122,8 +1125,24 @@
     0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0); }
     50%      { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6); }
   }
+  /* OVERBOOST ENGAGED KEEPS ITS EDGE THROUGH THE ATTRACT (found by R153's own review). The desktop
+     pill and the portrait trigger mark the engaged cost state with an inset white box-shadow, and
+     the attract animates box-shadow; an animated value outranks a normal declaration, so after 20s
+     idle with OVERBOOST on, the cost marker would have vanished under the breathing hairline. This
+     variant carries the inset edge in every keyframe. The compact and mini triggers mark it with
+     border-color, which the attract does not touch. */
+  .fm-entry-pill.mode-enhancer.idle-shimmer,
+  .p-fm-entry.mode-enhancer.idle-shimmer { animation-name: idle-shimmer-pulse-engaged; }
+  @keyframes idle-shimmer-pulse-engaged {
+    0%, 100% { box-shadow: inset 0 0 0 1px #ffffff, 0 0 0 1px rgba(255, 255, 255, 0); }
+    50%      { box-shadow: inset 0 0 0 1px #ffffff, 0 0 0 1px rgba(255, 255, 255, 0.6); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .idle-shimmer { animation: none; }
+    /* The engaged rule above sets animation-name at higher specificity, so it is stopped here by
+       name too; the static inset edge from .mode-enhancer then applies. */
+    .idle-shimmer,
+    .fm-entry-pill.mode-enhancer.idle-shimmer,
+    .p-fm-entry.mode-enhancer.idle-shimmer { animation: none; }
   }
 
   /* Portrait native-scale trigger (2026-07-14 portrait pass) - fully

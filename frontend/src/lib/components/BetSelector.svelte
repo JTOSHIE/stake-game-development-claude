@@ -189,11 +189,11 @@
 
 <style>
   /* Tokens mirror the HUD's own signature set so the panel reads as part of the
-     same chrome rather than as a generic dialog. */
+     same chrome rather than as a generic dialog.
+     R153: the panel now reads the --op-* plate tokens like the strip; only --sig-cyan is left, for
+     the keyboard focus ring. --sig-gold and --sig-orange had no reader after R153 and are gone. */
   .bs-panel {
     --sig-cyan:   var(--theme-primary, #00FFFF);
-    --sig-gold:   #FFD700;
-    --sig-orange: #FF9A2E;
 
     position: fixed;
     left: 50%;
@@ -214,12 +214,14 @@
     max-height: min(70vh, 560px);
     overflow-y: auto;
     padding: 16px 18px 18px;
-    border-radius: 12px;
-    background: linear-gradient(180deg, rgba(14, 10, 30, 0.98), rgba(8, 6, 20, 0.99));
-    border: 1px solid color-mix(in srgb, var(--sig-cyan) 38%, transparent);
-    box-shadow:
-      0 0 28px color-mix(in srgb, var(--sig-cyan) 22%, transparent),
-      0 18px 44px rgba(0, 0, 0, 0.6);
+    /* R153: the picker the strip's BET value opens is the strip's own plate, with white type and
+       a white edge on the current level. It was a navy gradient with a cyan border and a 28px cyan
+       glow, the current level gold with a gold glow and the footer value orange: three hues on a
+       control whose bar now carries one. The drop shadow stays; it lifts the panel off the scrim.
+       The previous rules are in this file at 895815b9. */
+    border-radius: 8px;
+    background: var(--op-plate, rgba(18, 20, 26, 0.9));
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
     /* OPACITY ONLY. A transform keyframe here would overwrite the counter-scale
        above for the length of the animation and the panel would pop from the
        wrong size, so the entrance does not touch transform at all. */
@@ -240,11 +242,11 @@
     margin-bottom: 12px;
   }
   .bs-title {
-    font-family: var(--fs-font-display);
-    font-weight: 900;
-    font-size: 14px;
-    letter-spacing: 0.18em;
-    color: color-mix(in srgb, var(--sig-cyan) 88%, #fff);
+    font-family: var(--fs-font-numeric);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--op-value, #ffffff);
   }
   .bs-close {
     width: 44px; height: 44px;      /* touch minimum, same floor as the HUD */
@@ -276,19 +278,20 @@
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.045);
-    font-family: var(--fs-font-display);
+    font-family: var(--fs-font-numeric);
     transition: border-color 0.12s, background 0.12s, transform 0.08s;
   }
-  .bs-level:hover { border-color: color-mix(in srgb, var(--sig-cyan) 60%, transparent); background: rgba(255, 255, 255, 0.08); }
+  .bs-level:hover { border-color: var(--op-hairline-hi, rgba(255, 255, 255, 0.72)); background: rgba(255, 255, 255, 0.08); }
   .bs-level:active { transform: translateY(1px); }
   .bs-level:focus-visible {
     outline: 2px solid var(--sig-cyan);
     outline-offset: 2px;
   }
   .bs-level-value {
-    font-weight: 800;
+    font-weight: 700;
     font-size: 15px;
-    color: #f4f1ff;
+    font-variant-numeric: tabular-nums;
+    color: var(--op-value, #ffffff);
   }
   .bs-level-tag {
     position: absolute;
@@ -299,18 +302,18 @@
   }
 
   /* The current level is the one thing a player scans for, so it carries the
-     gold the BET readout already uses rather than a fourth accent colour. */
+     gold the BET readout already uses rather than a fourth accent colour.
+     R153: the BET readout is white since R153, so the current level is marked by luminance
+     instead: a solid white edge and a lifted fill, no glow. */
   .bs-level.is-current {
-    border-color: var(--sig-gold);
-    background: color-mix(in srgb, var(--sig-gold) 14%, transparent);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--sig-gold) 30%, transparent);
+    border-color: var(--op-value, #ffffff);
+    background: rgba(255, 255, 255, 0.12);
   }
-  .bs-level.is-current .bs-level-value { color: var(--sig-gold); }
 
   /* Dimmed, NOT disabled. A level above the current balance is still a legal
      selection and the SPIN button already refuses an unaffordable bet; removing
      it from the list would make the ladder look shorter than it is. */
-  .bs-level.is-unaffordable .bs-level-value { color: rgba(244, 241, 255, 0.42); }
+  .bs-level.is-unaffordable .bs-level-value { color: rgba(255, 255, 255, 0.42); }
 
   .bs-foot {
     display: flex;
@@ -320,17 +323,19 @@
     margin-top: 14px;
     padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    font-family: var(--fs-font-display);
+    font-family: var(--fs-font-numeric);
   }
   .bs-foot-label {
     font-size: 10px;
-    letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--op-label, rgba(255, 255, 255, 0.6));
   }
   .bs-foot-value {
     font-size: 16px;
-    font-weight: 800;
-    color: var(--sig-orange);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--op-value, #ffffff);
   }
 
   /* Popout S and other very small stages: the panel is fixed to the VIEWPORT,

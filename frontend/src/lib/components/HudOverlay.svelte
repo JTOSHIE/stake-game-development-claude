@@ -1,5 +1,8 @@
 <script lang="ts">
   // HudOverlay.svelte - LAYOUT_SPEC v3.2 AMENDMENT: fixed-field HUD.
+  // NOTE R153 (2026-10-07): the accent sentence below is retired. Since R153 the
+  // only accent on the bar is the spin ring's 2px edge; TURBO steps in white with
+  // no glow. See R153 OPERATOR STRIP in the style block.
   // Reskin-free per DESIGN_SYSTEM (the only themed accent is TURBO, which
   // reuses the existing turbo treatment with an engage glow). Every field
   // inside the panel is a fixed box that never moves or resizes as its value
@@ -423,7 +426,7 @@
         <span class="p-stat-label">{$tr('balance')}</span>
         <span class="p-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
       </div>
-      <div class="p-stat p-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+      <div class="p-stat p-stat--win" data-testid="hud-win">
         <span class="p-stat-label">{$tr('win')}</span>
         <span class="p-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
       </div>
@@ -650,7 +653,7 @@
     <span class="m-stat-label">{$tr('hudBalanceShort')}</span>
     <span class="m-stat-value cyan" data-money="cur" use:fitMoney={{ full: balanceLabel, compact: balanceCompact }}></span>
   </div>
-  <div class="m-stat m-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="m-stat m-stat--win" data-testid="hud-win">
     <span class="m-stat-label">{$tr('hudWinShort')}</span>
     <span class="m-stat-value magenta" data-money="cur" use:fitMoney={{ full: winLabel, compact: winCompact }}></span>
   </div>
@@ -731,7 +734,7 @@
     <span class="c-stat-label">{$tr('balance')}</span>
     <span class="c-stat-value cyan" data-money="cur" use:autofitText={balanceLabel}>{balanceLabel}</span>
   </div>
-  <div class="c-stat c-stat--win" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="c-stat c-stat--win" data-testid="hud-win">
     <span class="c-stat-label">{$tr('win')}</span>
     <span class="c-stat-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
   </div>
@@ -926,7 +929,7 @@
   </div>
 
   <!-- WIN - fixed box x 616, width 150 -->
-  <div class="fs-box fs-win" class:lit={$winAmount > 0} data-testid="hud-win">
+  <div class="fs-box fs-win" data-testid="hud-win">
     <span class="fs-face">
       <span class="fs-label">{$tr('win')}</span>
       <span class="fs-value magenta" data-money="cur" use:autofitText={winLabel}>{winLabel}</span>
@@ -1098,6 +1101,10 @@
      it is a fixed-geometry 120px box with a clip-path, it is not a touch
      profile, and forcing height into it would push the label out of its own
      plate to satisfy a bar that does not apply there. */
+  /* NOTE R153: the landscape exclusion described above still stands, for a different reason. The
+     plate has no clip-path since R153, and it IS treated as a touch target now: it meets the 44px
+     floor through .fs-bet .bet-open::after (in R153 OPERATOR STRIP below), which covers the whole
+     120x62 BET box, not through this min-height. */
   .p-stat-value.bet-open,
   .c-stat-value.bet-open {
     min-height: 44px;
@@ -1229,9 +1236,13 @@
   }
   .m-stat-label {
     flex: 0 0 auto;
-    /* R153 keeps 7px here, under the brief's 10px, and that is the one profile where it does:
-       at 400x225 the 10px label measured truncating the VALUE (see the note above), and the
-       brief's proof sizes are 1280 and 390. Colour and face follow the strip. */
+    /* R153 keeps 7px here, under the brief's 10px, and that is the one profile where it does.
+       MEASURED IN R153 at 400x225 with the label forced to 10px: the BALANCE value slot shrank
+       from 64 to 58px, a $50,000.00 balance no longer fitted it, and $1,234,567.89 fell back to
+       the abbreviated $1.234M where 7px shows it in full (the WIN slot went 52 to 45px). The
+       values are what this strip exists to show (the .m-stat-value note below). The brief's proof
+       sizes are 1280 and 390; this exception is on the R153 owner list. Colour and face follow
+       the strip. */
     font-size: 7px; font-weight: 700; letter-spacing: 0.08em; color: var(--op-label); text-transform: uppercase;
   }
   .m-stat-value {
@@ -1419,9 +1430,9 @@
     --sig-gold:    #FFD700;
     --sig-orange:  #FF9A2E;
     --navy:        #060610;
-    /* live accents - flipped by the Overdrive skin below */
-    --acc:  var(--sig-cyan);
-    --acc2: var(--sig-pink);
+    /* R153: --acc and --acc2 ("live accents - flipped by the Overdrive skin below") are deleted.
+       R153 removed every rule that read them and the Overdrive flip that set them, so they had no
+       reader; --hud-accent is the one accent token. */
   }
 
   /* ===== R153 OPERATOR STRIP, DESKTOP ========================================
@@ -1516,7 +1527,8 @@
   }
 
   /* ---- BET: one chevron pair --------------------------------------------------
-     Two 44x24 hit boxes in the locked 44x52 column, an up and a down chevron drawn as strokes.
+     Two 44x24 keys in the locked 44x52 column, each with a 44x44 hit area (below), an up and a
+     down chevron drawn as strokes.
      No cap, no fill, no glow: the plus/minus caps and their triangles are gone from the control. */
   .fs-arrows{position:absolute;left:var(--fs-x-step);top:578px;width:var(--fs-w-step);height:52px;z-index:60;
     display:flex;flex-direction:column;gap:4px;}
@@ -1528,8 +1540,8 @@
   /* 44x44 TARGETS IN A 44x52 COLUMN, WITHOUT MOVING IT. Each key was 44x24, under the 44px floor
      HUD_SPEC.md rule 3 sets and the R153 brief restates; only the column was ever measured. Each
      key's hit area now extends 20px AWAY from the other, up for the up key and down for the down
-     key, so the two stay 4px apart and never overlap. Up to y 558 crosses only the inert badge
-     anchor and the strip's own edge; down to y 650 is clear scene. The drawn chevrons and the
+     key, so the two stay 4px apart and never overlap. Up to y 558 crosses only the strip's own top
+     edge (the badge anchor ends at x 923, 16px left of this column); down to y 650 is clear scene. The drawn chevrons and the
      locked column are unchanged. */
   .fs-arrow::after{content:'';position:absolute;left:0;right:0;}
   .fs-arrow:first-child::after{top:-20px;bottom:0;}
@@ -1572,8 +1584,13 @@
   /* TURBO and AUTO carry their circle on the inner .fs-face, so the button box keeps the locked
      geometry while the drawn circle matches its neighbours. TURBO's box is 82x82 by HUD_SPEC (it
      was sized for a 44px effective target at a 0.54 stage scale) and its circle is drawn at 48,
-     centred, the size of MAX and AUTO: an 82px circle beside an 84px SPIN would have made the
-     speed control read as a second primary. The whole 82x82 box still takes the tap. */
+     the size of MAX and AUTO: an 82px circle beside an 84px SPIN would have made the speed
+     control read as a second primary. The whole 82x82 box still takes the tap.
+     THE CIRCLE SITS AT THE BOX'S RIGHT EDGE, NOT ITS CENTRE (corrected in R153's own review).
+     Centred it spanned x 216..264, leaving a visible 33px gap to MAX where every other visible gap
+     in the row is 16 (HUD_SPEC rule 2), and floating 17px off the strip's left end while SPIN
+     meets the right end. At left:34px it spans 233..281: 16px to MAX, flush with the strip's left
+     end as SPIN is flush with its right. Centre-Y stays 604; the box and its tap are unchanged. */
   .fs-knob{padding:0;border:none;border-radius:50%;background:none;}
   .fs-knob > .fs-face{
     position:absolute;border-radius:50%;box-sizing:border-box;
@@ -1582,7 +1599,7 @@
   }
 
   .fs-turbo{position:absolute;left:var(--fs-x-turbo);top:563px;width:var(--fs-w-turbo);height:82px;z-index:60;cursor:pointer;}
-  .fs-turbo > .fs-face{left:17px;top:17px;width:48px;height:48px;}
+  .fs-turbo > .fs-face{left:34px;top:17px;width:48px;height:48px;}
   .fs-turbo svg{width:22px;height:22px;}
   .fs-turbo svg path{stroke-width:1.6;stroke-linejoin:round;}
   .fs-turbo:disabled{opacity:.5;cursor:not-allowed;}
@@ -1593,8 +1610,10 @@
      ring the only accent, the steps are spent in white: an outlined bolt at rest, a lit circle
      with a solid white bolt, then a solid white disc with the bolt cut out of it. */
   .fs-turbo[data-speed="normal"] svg path{fill:none;stroke:var(--op-label);}
+  /* 40% white, not 22%: at 22% the Desktop normal-to-turbo step measured 1.165:1 against the
+     gate's 1.25 floor (the 48px circle is about 14% of the measured area). */
   .fs-turbo[data-speed="turbo"] > .fs-face{
-    background:color-mix(in srgb,#ffffff 22%,#12141a);border-color:var(--op-hairline-hi);}
+    background:color-mix(in srgb,#ffffff 40%,#12141a);border-color:var(--op-hairline-hi);}
   .fs-turbo[data-speed="turbo"] svg path{fill:var(--op-value);stroke:var(--op-value);}
   .fs-turbo[data-speed="super"] > .fs-face{background:#ffffff;border-color:#ffffff;}
   .fs-turbo[data-speed="super"] svg path{fill:#12141a;stroke:#12141a;}
@@ -1608,7 +1627,8 @@
   .fs-auto:hover:not(:disabled) > .fs-face{border-color:var(--op-hairline-hi);}
   .fs-auto:disabled{opacity:.4;cursor:not-allowed;}
   /* Running: the edge goes solid white and the remaining count replaces the glyph. No pulse. */
-  .fs-auto.active > .fs-face{border-color:var(--op-value);}
+  .fs-auto.active > .fs-face,
+  .fs-auto.active:hover:not(:disabled) > .fs-face{border-color:var(--op-value);}
 
   /* ---- SPIN: a circle with a 2px ring, the only accent --------------------------
      84px, the largest control, on the strip's plate, with the ring in --hud-accent (cyan, and
@@ -1637,10 +1657,14 @@
   .fs-spin.spinning .txt{opacity:.5;}
   @keyframes fs-spin-rot{to{transform:rotate(360deg);}}
 
+  /* NOTE R153 (2026-10-07): the R135 note below says the five signature tokens drive the bar.
+     Since R153 the bar paints from the --op-* plate tokens and --hud-accent; the --sig-* tokens
+     still exist on .fs-hud, and the only rule in this file that reads one is the .bet-open focus ring. */
   /* R135: the three swappable scheme rules are deleted. Nothing ever added those classes, so they
      shipped nothing and stood as build warnings. See the matching note in PaytableModal.svelte.
-     (R153: the five signature tokens still exist on .fs-hud, but since R153 the bar paints from
-     the --op-* plate tokens and --hud-accent, so the claim that they drive the bar is retired.) */
+     The claim above them, that the HUD is skin-free because every colour comes from five signature
+     tokens, remains TRUE and is unaffected: the tokens are still there and still drive the bar.
+     What is gone is only the three unreachable overrides. */
 
   /* ===== OVERDRIVE =============================================================
      R153: the whole Overdrive state on this bar is the accent flip at the top of this section,
@@ -1720,30 +1744,21 @@
     gap: 0.5rem;
   }
   .m-turbo-bolt { width: 20px; height: 20px; flex: 0 0 auto; }
-  /* All three tiers carry the leading edge; it is the edge's brightness that
-     steps, so the row's shape never changes and only its intensity does. */
-  .m-turbo-item[data-speed="normal"] {
-    background: rgba(0, 0, 0, 0.22);
-    box-shadow: inset 3px 0 0 var(--hud-border-strong);
-  }
-  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--hud-text-dim); stroke-width: 1.8; fill: none; }
+  /* R153: the three steps in WHITE, like the knob in every other profile. Before R153 the row
+     stepped through accent gradients behind an accent leading-edge rail, with accent glows on the
+     bolt and an 18px accent bloom at Super, the last accent left on the bar outside the spin ring
+     (the R153 review found it here, in the Popout S menu). The row's fill still carries the step,
+     which is what turbo_intensity_gate measures at Popout S: clear at Normal, a white wash with a
+     solid white bolt at Turbo, a white row with the bolt and label cut out of it at Super. No rail,
+     no glow, no gradient. The previous rules are in this file at 895815b9. */
+  .m-turbo-item[data-speed="normal"] { background: none; }
+  .m-turbo-item[data-speed="normal"] .m-turbo-bolt path { stroke: var(--op-label); stroke-width: 1.8; fill: none; }
 
-  .m-turbo-item[data-speed="turbo"] {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 42%, transparent),
-                                        color-mix(in srgb, var(--hud-accent) 10%, transparent));
-    box-shadow: inset 3px 0 0 var(--hud-accent);
-  }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--hud-accent); stroke-width: 1.8; fill: color-mix(in srgb, var(--hud-accent) 45%, transparent); }
-  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hud-accent) 75%, transparent)); }
+  .m-turbo-item[data-speed="turbo"] { background: rgba(255, 255, 255, 0.18); }
+  .m-turbo-item[data-speed="turbo"] .m-turbo-bolt path { stroke: var(--op-value); stroke-width: 1.8; fill: var(--op-value); }
 
-  .m-turbo-item[data-speed="super"] {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--hud-accent) 80%, transparent),
-                                        color-mix(in srgb, var(--hud-accent) 24%, transparent));
-    box-shadow: inset 4px 0 0 #ffffff, 0 0 18px color-mix(in srgb, var(--hud-accent) 55%, transparent);
-    color: #04070d;
-  }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #ffffff; stroke-width: 1.8; fill: #ffffff; }
-  .m-turbo-item[data-speed="super"] .m-turbo-bolt { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hud-accent) 95%, transparent)) drop-shadow(0 0 18px color-mix(in srgb, var(--hud-accent) 60%, transparent)); }
+  .m-turbo-item[data-speed="super"] { background: rgba(255, 255, 255, 0.9); color: #12141a; }
+  .m-turbo-item[data-speed="super"] .m-turbo-bolt path { stroke: #12141a; stroke-width: 1.8; fill: #12141a; }
 
   /* ── Audio panel - Mute toggle + MUSIC / SOUND volume sliders ─────────────── */
   .audio-panel {
@@ -2225,7 +2240,7 @@
      an outlined bolt, then a lit circle and a solid bolt, then a white disc with a dark bolt. */
   .p-turbo[data-speed="normal"] svg path { stroke: var(--op-label); fill: none; }
   .p-turbo[data-speed="turbo"] {
-    background: color-mix(in srgb, #ffffff 22%, #12141a);
+    background: color-mix(in srgb, #ffffff 40%, #12141a);
     border-color: var(--op-hairline-hi);
   }
   .p-turbo[data-speed="turbo"] svg path { stroke: var(--op-value); fill: var(--op-value); }
@@ -2359,7 +2374,7 @@
   .c-turbo svg { width: 22px; height: 22px; }
   .c-turbo[data-speed="normal"] svg path { stroke: var(--op-label); fill: none; }
   .c-turbo[data-speed="turbo"] {
-    background: color-mix(in srgb, #ffffff 22%, #12141a);
+    background: color-mix(in srgb, #ffffff 40%, #12141a);
     border-color: var(--op-hairline-hi);
   }
   .c-turbo[data-speed="turbo"] svg path { stroke: var(--op-value); fill: var(--op-value); }
@@ -2426,6 +2441,9 @@
      the two fields most likely to carry long currency strings. */
   /* NEON LIFT (2026-07-15): subtle persistent per-field neon edge, on top
      of each cell's pre-existing flex-basis tuning. */
+  /* R153: a live win no longer lights its field (the .lit rules are gone in every profile, and so
+     are the markup's class:lit directives). The value counting up is the signal. The R119 record
+     below says the .lit state is kept; it describes the bar before R153. */
   /* R119 SUPERSEDES THE "NEON LIFT" OF 2026-07-15. That pass gave each field a
      persistent per-field neon edge - balance cyan, win magenta, bet gold - so
      three adjacent plates carried three different colours at rest. The operator
@@ -2513,6 +2531,8 @@
      takes the press only. The border-colour fade the global button rule gave these (only .m-spin
      has a border) is kept in the list. Under reduced motion they match the desktop exactly: the 4%
      press stays (no travel), the arrow rotation stops. */
+  /* NOTE R153: the R151 record above says only .m-spin has a border. Since R153 all three carry the
+     2px accent ring, so the border-colour fade in the list below applies to each of them. */
   .p-spin, .c-spin, .m-spin { transition: transform .12s ease, border-color .25s; }
   .p-spin:active:not(:disabled), .c-spin:active:not(:disabled), .m-spin:active:not(:disabled) { transform: scale(.96); }
   .p-spin.spinning .glyph.arrows, .c-spin.spinning .glyph.arrows { animation: fs-spin-rot .7s linear infinite; }

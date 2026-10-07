@@ -29,7 +29,9 @@
   // .char-layer below is the ceiling of his motion. So the 'static' path described below is
   // live again in substance, through HeroIdle rather than a branch here, and the 'idle'
   // flipbook it describes is off the render path. HeroIdle.svelte's header has the
-  // measurements and the revert.
+  // measurements and the revert. The "IoU 0.9997" below was measured against the file
+  // scene_character.png held before R145; the R145 Astra still that now ships measures 0.9565
+  // against idle frame 01 (206x407, alpha > 127).
   //
   // One way to draw the pilot since R152; the other two it had are recorded here:
   //
@@ -251,6 +253,9 @@
     transform-origin: 50% 92%;
     animation: char-idle 5s ease-in-out infinite;
   }
+  /* NOTE R153: the record below says HeroIdle's sheet holds frame 01. Since R153 there is no
+     sheet: HeroIdle is one <img> of scene_character.png. The float itself is unchanged and is
+     the ceiling of the hero's motion. */
   /* R138: THE FLOAT IS BACK, AND IT IS A DIFFERENT ANIMAL FROM WHAT R130 DELETED.
      The owner's ruling after the live upload: a completely still idle is too dead,
      restore the original slight floating, the same class as the car. What R130
@@ -284,6 +289,8 @@
 
   /* Antenna tip, the orange orb blinks. Positioned over the orb on the
      character's upper left. */
+  /* NOTE R153: "the same image (IoU 0.9997)" below is the pre-R145 file; the shipped still now
+     measures 0.9565 against idle frame 01, and the orb sits within 1.4 px of where it did. */
   /* R112: re-registered onto the orb it is named for. The inherited box was
      centred at layer (37.1, 97.7); the orange earpiece orb it lights sits at
      (65.3, 71.9), measured on the shipped sprite and confirmed across all five
@@ -439,6 +446,8 @@
        !important makes the override unconditional rather than a specificity race
        every future rule has to remember to lose. HeroIdle.svelte's own
        reduced-motion block does this for the same reason.
+       (NOTE R153: HeroIdle has had no media block since R153; it is one unanimated <img>. The
+       float and the three accents, all reset here, are the only motion on the figure.)
 
        R138 MADE THE .char-layer ENTRY LOAD-BEARING AGAIN. While the strip idle
        was frozen and `.char-layer.char-idle-strip` disabled the base animation,
