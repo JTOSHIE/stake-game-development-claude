@@ -1,9 +1,9 @@
 // NOTE R153 (2026-10-07), above the header it supersedes: THE GUIDE NO LONGER READS THESE PNGS.
 // Every Interface Guide row in PaytableModal.svelte is a live markup replica since R153 (SPIN,
-// FEATURES and MAX since R152), so running this rewrites ten files in public/ that no guide reads:
-// two of them (btn_bet_plus, btn_bet_minus) are pruned from the bundle since R153 and the other
-// eight ship unread pending the owner (R152 owner list item 7). It also commits rasters, which the
-// R153 brief fences. Kept for the history below and for a future owner-sanctioned recapture.
+// FEATURES and MAX since R152), so running this rewrites ten files in public/ that no guide reads
+// and that the bundle no longer carries (all ten pruned in R153, eight of them by the owner's
+// ruling of 2026-10-07). It also commits rasters, which the R153 brief fences. Kept for the
+// history below and for a future owner-sanctioned recapture.
 //
 // regen_interface_guide_icons.mjs — R2-7c (owner audit round 2, item c),
 // extended by OWNER AUDIT ROUND 3 item 5 (Turbo + Max join the guide as
