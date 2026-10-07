@@ -613,7 +613,10 @@
            stage-level sibling in App.svelte (bound out via endBannerAmount/
            endBannerMultiplier/endBannerTrigger below) so it shares the same
            full-width stage coordinate space rather than this dialog's own
-           scaled grid-slot box. This dialog only shows the small title. -->
+           scaled grid-slot box. This dialog only shows the small title.
+           R154: that banner is a framed plaque now, not a neon band; it still
+           stands on the band's old bottom edge, so this title's clearance
+           below it is unchanged. -->
       <div class="fs-end">
         <div class="fs-title">{t(lang, 'featureComplete', mode)}</div>
       </div>

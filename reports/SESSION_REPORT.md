@@ -31947,3 +31947,580 @@ latch on the settled amount; a comment's "measured" range must come from the wid
 the tested range is a floor, not a limit; a box-only bounds check is blind to nowrap text painting past a squeezed
 box; Vite runs closeBundle when a dev server closes, so a build-only plugin must say apply: 'build'; and a byte-equal
 logo proves nothing about which build is served.
+
+# R153 - THE BET BAR IS AN OPERATOR STRIP, THE HERO IS ONE STILL, AND THE GAUGE IS OUT OF THE BAR (2026-10-07)
+
+**NOTE 2026-10-07 (R154), the records commit, written above the record rather than into it.** R153 closed without
+committing this report: the owner stopped the session at the pull request, so the text below lived only in PR #189's
+body. R154's TASK 1 (`reports/briefs/FS_R154_MergeRuleWinBanner_Prompt.md`) commits it here and to
+`reports/archive/2026-10-07_r153-operator-strip-hero-still.md`, byte for byte as the PR body held it from its own
+heading down, with the PR's opening summary and footer left off. Everything below is the record as R153 wrote it, in
+its own tense; four facts arrived after it was written, VERIFIED 2026-10-07 by `gh pr view` and `gh run list`:
+
+- **PR #189 merged** at 07:27:59Z by the owner, head afa58195, merge commit c9319124. Its PR run 37586404158 on
+  afa58195 and main's run 37587486483 on c9319124 both completed success. "Remote CI on the PR: pending at PR open"
+  below was true when written.
+- **The owner's three rulings** (`reports/briefs/FS_R153_OwnerRulings_Prompt.md`) arrived after the PR opened: the
+  gauge is the flame jets and the clip stays, with the speedometer dial above SPIN; the still stays and the strips are
+  not restored; the eight unused guide captures leave the build and stay in the repository.
+- **Ruling 3 landed after the merge.** Commit 4395afef reached the branch once #189 had already merged, so it rode a
+  second PR, #190, which the owner merged at 07:52:58Z as 2ffae8ef. Its PR run 37588106781 completed success. A
+  correction comment on #189 records that an earlier comment there wrongly said the merge was still the owner's.
+- **"Not merged" and "the checkout is left on this branch"** in the PR's opening summary were true at PR open and are
+  not carried here; R154 branched from main at 2ffae8ef.
+
+Brief: `reports/briefs/FS_R153_OperatorStripHeroStill_Prompt.md`, saved verbatim first (a162480e). Review lane,
+unattended. Branch `claude/r153-operator-strip-hero-still` from main at 895815b9 (PR #188 merged by the owner; main
+CI on it green, run 36560999697). Port 5173 untouched: the dev server ran on 5174 and every proof served its own build
+on a free port.
+
+**Bar structure, in one line, as the brief asks:** label BALANCE / WIN / BET at 10px tracked caps in 60% white, value
+in white Exo 2 with tabular figures read live from the stores, one stroked chevron pair beside BET, and a 2px ring on
+the spin circle, the only colour on the bar.
+
+**A win no longer waits on the hero:** in a five-spin session on the production build, pressed the moment SPIN
+re-enabled each time, the hero was the same single still at all ten press and settle points, nothing ran on him but
+the float and its three light accents, and no request reached `ui/hero/`. The same session on main's build found a
+win reaction running at every press after the first big win.
+
+**Fence:** zero rasters staged, zero rasters generated (`git diff main..HEAD --name-only` carries no image, audio,
+Spine or data file).
+
+## Preconditions
+
+- Session-start protocol: CLAUDE.md read, brief saved first, checkout clean on main at 895815b9 (PR #188's merge),
+  main CI green. No dirty rasters (fingerprint: `git status` empty at start).
+- The owner's 5173 was not running and was not started. The R153 dev server was `fs-dev` on 5174.
+- Wave 1, mapping (workflow r153-understand, 4 agents, none lost): the hero render path, every gate that reads the
+  HUD, the paytable and feature entry buttons and the gauge candidates, and the HUD's own style block.
+
+## TASK 1: the operator strip (71788941, review fixes 7e8ca921)
+
+**What the bar is now, at every profile.** One plate, `rgba(18, 20, 26, 0.9)` with 8px corners and nothing else:
+no `hud_banner.png` (the bracket texture), no gradient, no bezel, no shadow, no rail, no per-field colour. Six
+`--op-*` tokens on App.svelte's `.game-wrapper` carry the brief's numbers once (plate, 60% label, white value, 86%
+glyph, 32% and 72% hairlines). BALANCE, WIN and BET sit straight on the plate as a 10px label (0.16em tracking,
+uppercase, 60% white) over an 18px value (white, Exo 2, `tabular-nums`, the markup's own text fed by the stores).
+BET changes with one stroked chevron pair; the chrome caps and filled triangles are gone, from the control and from
+the paytable guide. MAX, MENU, TURBO and AUTO are 1px hairline circles on the plate (TURBO's three speeds are three
+white luminance steps: an outlined bolt, a 40% white face with a solid bolt, a white disc with the bolt cut out); SPIN is the plate inside a 2px
+ring in `--hud-accent` (cyan, magenta under Overdrive), with a white glyph and word. Portrait, compact landscape and
+the 400x225 mini strip take the same treatment; their values moved from Orbitron, which ships no tabular figures, to
+Exo 2. The mini strip keeps 7px labels, the one place under 10px, because at 400x225 a 10px label measured cutting
+the value (R2R-R JOB C); the brief's proof sizes are 1280 and 390.
+
+**Geometry stayed inside the locked spec.** Paint only: `hud_banner_spec_check.mjs` PASS on every locked box,
+centre-Y 604, all seven 16px gaps, AUTO tangent to SPIN, every target at least 44, and a $1,234,567.89 balance and a
+$1,000,000.00 win still fit. `docs/HUD_SPEC.md` carries a dated note. TURBO keeps its 82x82 box and draws a 48px
+circle, the size of MAX and AUTO, so the speed control does not read as a second SPIN; the circle sits at the box's
+right edge (233..281), 16px from MAX like every other visible gap and flush with the strip's left end as SPIN is with
+its right. (The first cut centred it and left a visible 33px gap; the review caught it.)
+
+**Touch targets at or above 44px, per control rather than per column.** Each desktop chevron key was 44x24 (only the
+44x52 column was ever measured); each now takes a 44x44 press, its hit area extended 20px away from the other key,
+column unchanged. The desktop BET readout was a 104x20 click target, and this layout is also what a landscape tablet
+gets, scaled; its press now covers the whole 120x62 BET box through a `::after` on the button. The hamburger menu's
+items, PAYTABLE first and the paytable's only entry, measured about 32px and are now 44px (the mini menu keeps its
+measured compressed rows).
+
+**The gauge is out of the bar.** Nothing with a dial sits in the strip: the Overdrive dial column ends 16px above it
+at 1280. What did sit in it is the flame gauge: FlameJets.svelte calls its jets the "TENSION GAUGE (the owner's
+idea)", and its two bottom jets sit on the frame's bottom edge (stage y 552) and fire down into the strip's box
+(281..999 x 560..648). At rest they were under the plate, which now lets 10% through; during every retrigger beat
+App.svelte lifts them to z90 and they painted straight over BALANCE, WIN and BET. On the desktop layout an even-odd
+clip now cuts the locked panel rectangle out of everything the jets draw, with the holder pinned at z15 so the stage
+order is exactly what it was (a clip-path alone would have dropped the jets under the frame they are mounted on).
+Measured at a real retrigger beat with every animation paused: 0 pixels of the strip change when the jets are hidden,
+against 2,056 on main's build. In portrait the Overdrive meter is the gauge component's compact form; it sits above the
+strip on its own plate (its pink per-cell glow is gone), not in it.
+
+**Entry surfaces on the same plate.** The four FEATURES triggers are the plate with white type (the compact and mini
+ones hairline circles), and OVERBOOST engaged reads as a solid white edge and a white OVERBOOST tag rather than orange;
+the 20-second idle attract is kept as a white hairline that breathes rather than a cyan bloom, and it keeps the
+OVERBOOST edge while it breathes. The hamburger menu that holds PAYTABLE (its Popout S speed rows included, which
+still glowed in the accent in the first cut), the autoplay menu (it was gold) and the bet picker the BET value opens
+(it was navy with cyan, gold and orange glows) are the plate with white type. The three instrument
+plates above SPIN during a feature are the plate with a 10px label (they were chamfered with a rail). The paytable's
+Interface Guide rows for bet up, bet down, autoplay, menu and the three speeds are live markup replicas of the new
+controls, as R152 did for SPIN, FEATURES and MAX; recapturing them would have committed rasters.
+
+**Removed from the bundle, kept in the repository:** `hud_banner.png` (63,873 B, the texture) and
+`btn_bet_plus.png` and `btn_bet_minus.png` (17,466 B, the plus/minus artwork), 81,339 B; the five themeStore button
+fields that nothing read are gone. The first cut also pruned the other eight guide captures; that went past what the
+brief orders and past R152's owner item 7, so it was withdrawn (7e8ca921) and the eight still ship unread, on the
+owner list.
+
+**Found in passing and closed:** the desktop OVERBOOST/Cruise badge anchor had been hand-set at `left:831px`, the BET
+box's position before R071 moved the row 28px left, so the badge had floated 28px right of BET since 2026-08-15; it
+now reads `--fs-x-bet`. The volume sliders had `outline: none` and no replacement, so keyboard focus on MUSIC or SOUND
+was invisible; they now carry the same ring as every other control.
+
+## TASK 2: the hero is one still (dd573727, review fixes 7e8ca921)
+
+**What renders.** HeroIdle.svelte draws `ui/scene_character.png` as one `<img>` (680x1344, the owner's R145 Astra
+still, the only committed single-frame raster of the pilot) with the drop-shadow the body always had. It has no
+state, reads no store, sets no timer and emits nothing. The win unfold (32 frames), the feature brace (16), the R138
+crossfade buffer and the R151 warm layers, which kept both reaction sheets painted at 1% even at idle, are deleted;
+the old header stays below a dated note as the record. The glance had been off the path since R130. No ambient
+strip exists in the tree or its history (the hero map searched both); the six-frame idle sheet was the strip still
+on the path, drawn at frame 01, and it goes too. The float on SceneGroup's `.char-layer` (translateY 0 to -3px over
+5s) is unchanged and is the ceiling.
+
+**Why this still and not the idle sheet's frame 01:** frame 01 is one frame of a six-frame strip, so drawing it still
+fetches and paints the strip, and cutting it out would be a raster commit. Measured in the 206x407 box against frame
+01 (alpha > 127): silhouette IoU 0.9565, the same x extent (27..178), the crown 1px and the feet 3px higher.
+
+**The overlays were measured, not re-pinned, because they still sit.** The orb, visor and lamp features move at most
+1.9px on the still (orb -0.4/-1.3, lamp bars -0.2/-1.9), and the same centroid method puts the old pin 1.0px off the
+orb on the frame it was pinned to, so a re-pin would move each light by less than the method's own residual. Measured
+as CSS renders them (farthest-corner gradients, the stops as written, the border-radius clip, figure = alpha > 127),
+the share of each glow on the figure is antenna 73.7%, visor 96.5%, lamp 100% on the still against 77.7%, 97.8% and
+100% on frame 01. **Correction:** dd573727's message and the first header quoted 91.3/99.9/100 from a simplified
+falloff, which the review could not reproduce; the figures above replace them, and the antenna's share fell rather
+than rose. The brief's underglow is the car's (`.underglow` inside `.car-layer`); the car did not
+change, so it was not touched. The `:has()` rule that cut the accents during a reaction could never match again and
+is deleted with a note.
+
+**The bundle:** the idle, win and brace sheets (7,310,268 B) are pruned, `scene_character.png` (774,813 B) returns,
+and the prune now also removes a directory its file prunes leave empty (`ui/hero/` shipped empty otherwise). The
+sheets stay in the repository: reinstating the reactions is a revert of HeroIdle.svelte plus the prune lines.
+
+**The gate.** `hero_idle_planted_gate.mjs` is rewritten to this ruling: one `<img>` of scene_character.png; no
+`ui/hero/` path or sheet name anywhere in `src` outside comments; no import, reactive statement, timer, frame
+callback, lifecycle hook, dispatcher or store write in HeroIdle; no binding or handler on its mount; the R138 float
+fence unchanged; reduced motion still stops the float. The review reproduced four bypasses of the first cut (an
+inline style on the still, a wrapper around its mount, motion targeted at it from app.css, a strip url() in a .css
+file), and 7e8ca921 closes all four: attributes whitelisted, the mount a direct child of `.char-layer`, every
+stylesheet checked for motion on the still, `.css` files and `index.html` scanned. Eighteen seeds caught, two
+controls clean, in CI's static job.
+
+## TASK 3: proof
+
+`frontend/scripts/r153_operator_strip_proof.mjs` (031faba5) serves real committed book rounds at the wallet boundary
+of the PRODUCTION build, as the look-pass harness does, with no DEV hook. On the clean build of afa58195 (boot line
+"Future Spinner v10 build afa58195"):
+
+- **S, the strip is a control, at 1280x800 and 390x844:** the plate is `rgba(18, 20, 26, 0.9)`, 8px, no image,
+  gradient, shadow or border; the three labels are 10px, uppercase, tracked, `rgba(255, 255, 255, 0.6)`; the three
+  values white, Exo 2, `tabular-nums`, with digits from the live stores; exactly one stroked chevron pair; the ring
+  2px and round; no `<img>` and no raster or gradient background anywhere in the HUD; the ring the only chromatic
+  paint on any visible HUD element; every HUD control a 44px press (box at least 44, centre and four axis points
+  hitting it). PASS at both sizes.
+- **H, a five-spin session never waits on the hero, at 1280x800:** rounds 3.9x, 16.2x, loss, 16.2x, 3.9x, each
+  pressed the moment SPIN re-enabled (0 to 1 ms after it did). At all ten press and settle points the hero was the
+  same decoded still of `ui/scene_character.png` with no reaction state and no strip; nothing on him ran but the float
+  and its three accents; zero requests reached `ui/hero/`; no page errors. Press to settle: 1,264, 1,071, 1,071,
+  1,075 and 1,082 ms.
+- **G, the gauge is out of the bar, at 1280x800:** at the natural retrigger beat of the base feature fixture, every
+  animation paused, 0 of 63,184 strip pixels change between the jets shown and hidden (noise floor 0).
+- **Positive control** (`--expect head`, the same proof against main's build, 895815b9): S finds main's bar failing
+  the contract at both sizes; H finds the win reaction running at every press and settle after the first big win
+  (spins 3, 4 and 5 all pressed while it played, the second 16.2x queued behind the first) and three strip requests;
+  G finds 1,857 strip pixels of gauge at the beat (2,056 in an earlier run). PASS, so each section can see the
+  defect where it exists.
+
+**Look-pass** (`look_pass_capture.mjs` on the same clean build): nine shots at 1280x800, 390x844 and 844x390 (idle, a
+real 16.2x win at the banner's peak, the feature entry), no placeholder art, no dirty mark, PASS. Written to scratch
+and **not committed**: the brief fences rasters ("zero rasters staged"), which governs convention (h)'s
+before-and-after screenshots under convention (n). The four the brief names (1280 and 390, idle and win) were sent to
+you with this report; the before set is the same harness on main's build.
+
+**Kill tests.** Cover the reels and the bar is a control, not a designed object: a flat plate, three labelled values,
+a chevron pair, hairline circles and one ringed SPIN, and S proves the paint. A five-spin session never waits on the
+hero: H, with the control showing that main's did.
+
+## What verification found, and what changed because of it
+
+- **Adversarial review** (workflow r153-review: five lenses, brief conformance, regressions, gates, records and the
+  hero, each followed by a refuting verifier; 10 agents). Confirmed and fixed in 7e8ca921: the Popout S menu's
+  speed rows still glowed in the accent; TURBO's centred circle left a visible 33px gap; the idle attract wiped the
+  OVERBOOST edge; AUTO's hover outranked its running edge; the bet picker was still neon; the first cut pruned
+  eight captures the brief did not order (withdrawn); the empty-directory prune ran before the .DS_Store strip; four
+  bypasses of the hero gate; and a run of comments and documents that R153 had made false (dated notes in a7dfdb22,
+  three agents on disjoint files). Refuted as defects, kept on the owner list: the volume sliders' 4px tracks
+  (unchanged since before R153). Taken to the owner rather than decided: which gauge (owner item 1).
+- **turbo intensity, twice.** The first cut's engaged face (22% white) stepped 1.165:1 on Desktop against the gate's
+  1.25 floor; at 40% it is 1.31. The Popout S row then measured 1.246:1 at an 18% wash; at 28% it is 1.44 (ae270cc9).
+  Worst adjacent step across the seven presets now 1.290:1.
+- **money fit, a latent defect that R153's timing exposed (afa58195).** Red twice in three local runs on the
+  paytable's Bet Modes prices (CA$100,000.00 +6px, CA$400,000.00 +9px), while main passed the same gate under the
+  same load, side by side. Measured: the prices are Orbitron 600, served by the 700 face. On main, opening the
+  hamburger menu (the only way to PAYTABLE) rendered MUSIC and SOUND in Orbitron 700 and so fetched the face early;
+  R153 set those labels in Exo 2, so the face arrived with the paytable, after `autofitText` had measured, and the
+  action never re-measured. Forced with the face delayed 2 s: the pre-fix tip and main both overflow by exactly 6
+  and 9px; with the fix both re-fit to 0. The fix is in the action (one `loadingdone` listener re-fits every live
+  autofit node), not Orbitron put back in the menu, so a slow network on main's code path is covered too.
+- **Instrument faults of my own, caught before they counted:** the proof's first touch probe sampled the corners of
+  a 44px square, which no circle under 62px contains; its hero allowlist used bare keyframe names where Svelte
+  scopes them; its first gauge diff counted the scene animating behind the 90% plate (fixed by pausing every
+  animation for the pair, then 0 against main's 2,056); and my first `kill` of a stopped replay did nothing,
+  because zsh does not word-split an unquoted variable (re-run per process, no survivors).
+
+## Local CI at the tip
+
+At afa58195, each suite replayed from `.github/workflows/checks.yml` against its own clean build (build-info commit
+afa58195, cleanTree true, 95 files, 11,170,532 B against main's 100 files, 17,802,215 B): **static job 85 of 85
+green** (`npm ci` skipped: it would reinstall node_modules under the 5174 dev server); **browser matrix 28 of 28
+green**, two legs at a time. Local-only: `hud_banner_spec_check.mjs` PASS (every locked box, centre-Y 604, the seven
+16px gaps, AUTO tangent, every target at least 44, stress values fit). `portrait_layout_conformance.mjs` (local, not in CI): **NOT COMPLETED.** Its first run stopped on its third profile when a DEV random mock round reached the max-win overlay, which covered the OVERBOOST button the script clicks; the re-run was stopped on the owner's instruction before it finished. Neither run reached a verdict, so it is recorded as not completed, not as a failure. Remote CI on the PR: pending at PR open.
+
+## Fence at close
+
+**Zero rasters staged, zero generated.** Every tracked raster's blob id is identical at main and at the tip (2,746 of
+2,746, `git ls-tree` compared line by line; a copy with one id flipped reads MISMATCH, the positive control), and
+`git diff main..HEAD --name-only` carries no image, audio, Spine or data file. No locked path changed
+(`locked_paths_gate.mjs` PASS in the static job), no maths, no audio, no HUD coordinate (`hud_banner_spec_check.mjs`
+PASS). Port 5173 was never started; the session's dev server ran on 5174 and every proof served its own build on a
+free port. No image generation, no kit build, no upload. The checkout is left on the branch, as the brief asks.
+
+## Restore
+
+Every change is its own commit on `claude/r153-operator-strip-hero-still`: brief a162480e, TASK 2 (the still)
+dd573727, TASK 1 (the strip) 71788941, the proof 031faba5, the review fixes 7e8ca921 (they amend both tasks), the
+dated record notes a7dfdb22, the Popout S turbo wash ae270cc9, the autofit font re-fit afa58195, and the records
+commit that carries this report. afa58195 stands on its own and is worth keeping whatever else is reverted: it closes
+a defect main also carries.
+Revert the hero with dd573727 and the hero parts of 7e8ca921 together (HeroIdle, SceneGroup, the gate); revert the
+strip with 71788941, 7e8ca921 and ae270cc9 together. Once merged: revert the merge. Not merged here (review lane).
+**Owner preview NOT refreshed:** nothing landed on main, and the brief reserves 5173 for you.
+
+## OWNER LIST
+
+1. **Which gauge did you mean? Next: your ruling.** The code calls the flame jets the "TENSION GAUGE (the owner's
+   idea)", and their bottom pair painted over the strip at every retrigger beat; that is what R153 took out of the bar
+   (0 strip pixels at the beat, against 2,056 on main). Your own briefs (R137, R141) call the Overdrive tachometer "the
+   gauge". It never entered the strip: its column ends 16px above SPIN and AUTO at 1280. But it stacks directly on
+   them, and R153 gave its three plates the strip's plate, which can read as the bar rising into the gauge. Options:
+   (a) keep as shipped; (b) lift the column 32px for a 48px gap; (c) give the column a treatment of its own; (d) drop
+   its plates and carry FREE SPINS and the multiplier elsewhere.
+2. **The still is your R145 Astra scene_character.png, not the idle frame 01 the stage showed since R130.** Silhouette
+   IoU 0.9565, crown 1px and feet 3px higher. **Next: your eye.** Going back is a revert of dd573727 whole.
+3. **The three light accents stay on the still** (antenna blink, which carries a small scale pulse; the visor glint;
+   the chest lamp), because measured they still sit. If "the float as the ceiling" means nothing else on him may
+   move, they are three rules to delete. **Next: your ruling.**
+4. **Popout S (400x225) keeps 7px labels and has no BET label.** Measured this session: a 10px label shrinks the
+   balance slot from 64 to 58px, so $50,000.00 no longer fits and $1,234,567.89 falls back to $1.234M. **Next: your
+   ruling,** keep 7px or take 10px with abbreviated values.
+5. **Eight unread guide captures still ship, 177,434 B** (R152 item 7, widened): spin_button 30,127, btn_features
+   25,075, btn_max 8,408, btn_autoplay 15,527, btn_menu 12,496, btn_turbo 14,042, btn_turbo_2 29,632, btn_turbo_3
+   42,127. Nothing reads them since R153. **Next: your authorisation to prune them from dist** (sources stay).
+6. **OVERBOOST's cost state is white, not orange** (the bet badge, the FEATURES edge and its tag). The word and the
+   1.25x BET value carry it. **Next: your eye;** the warm colour is a small revert if you want it back.
+7. **SPIN keeps its word** inside the ring (10px, 60% white; PLAY in social), where the reference has a glyph only.
+   **Next: your eye.**
+8. **The paytable modal's own body** still wears the R119 shell (chamfered plates, --hud-* tokens). The brief named
+   its entry, which is on the plate; the modal was not restyled. **Next: your word** if it should follow.
+9. **The volume sliders are 4px tracks with a 12px thumb,** under the 44px floor, as before R153 (not changed).
+   **Next: a code brief if wanted.**
+10. **The typecheck baseline is 36 where the real count is 3** (R152 item 19, still open). **Next: a gates brief.**
+11. **Kit rebuild after merging. Next: you.** Not built here. The R152 list's item 1 has the exact commands.
+12. **hero_float_proof.mjs now fails at its first selector by design** (dated note at its head); retire or retarget.
+    **Next: a gates brief.**
+13. **Still open from R152's list:** items 2 to 4, 6, 8 to 10 and 12 to 21 as written there (item 11's hero timing
+    residue is closed by TASK 2: there are no reactions left to queue).
+
+## FOR THE NEXT SESSION
+
+**Model and effort:** Opus 5.5, ultracode, unattended. Three workflows: r153-understand (4 agents, 1,205,214
+tokens), r153-review (10 agents, 2,426,904) and r153-docs (3 agents, 583,354); none lost.
+
+**Approach:** session-start protocol; brief saved; before screens of main's build; map the hero path, the HUD gates,
+the entry buttons and gauge candidates, and the HUD CSS in parallel; measure the still against frame 01 and the
+accents on it; implement in CSS with no coordinate moved; a production-bundle proof with a positive control on main's
+build; a five-lens adversarial review with a refuting verifier per lens; fix; dated notes where docs went stale;
+both local suites at the committed tip; look-pass; records; PR.
+
+**Alternatives rejected:** frame 01 of the idle sheet as the still (drawing it still fetches and paints the strip,
+and cutting it out is a raster commit); re-pinning the accents (they moved less than the method's own residual); an
+82px TURBO circle (a second primary beside SPIN); a centred 48px TURBO (a visible 33px gap); pruning all eleven
+rasters (past the brief and past R152's parked item); removing the bottom jets (the perimeter chase is ordered over
+eight); moving the tachometer (an owner ruling, item 1); 10px labels at Popout S (measured truncation).
+
+**Lessons worth keeping:** a glow-share figure must be measured with the geometry CSS renders (farthest-corner, the
+stops, the border-radius clip), not a simplified falloff: mine reported the antenna improving when it worsened. A
+44px corner probe fails every circle under 62px across; the project's rule is the box plus axis points. Svelte scopes
+keyframe names (svelte-hash-name), so an allowlist of bare names calls the float a reaction. A clip-path makes a
+stacking context: pin the z-index or the layer drops under the frame it is mounted on. An all-clean proof needs the
+old build as a positive control: main showed 2,056 px of gauge on the strip and a reaction at every press. Do not
+prune what a previous session parked for the owner, however dead it is. A dead-pixel prune can leave an empty
+directory behind, and a Finder .DS_Store keeps it alive unless the empty pass runs after the strip.
+
+# R154 - THE MERGE RULE IS RECORDED, THE R153 REPORT IS COMMITTED, AND THE WIN BANNER IS A FRAMED PLAQUE (2026-10-07)
+
+Brief: `reports/briefs/FS_R154_MergeRuleWinBanner_Prompt.md`, saved verbatim first (0386a2ef) per convention (f).
+Unattended. Branch `claude/r154-merge-rule-win-banner` from main at 2ffae8ef, PR #191. Under the brief's own standing
+rule (now CLAUDE.md rule 17) this PR merges itself once its run on the committed tip is green, and the session stops.
+Ultracode on: three workflows, eleven agents, none lost (wave 1 understand: 4 agents, 1,227,364 subagent tokens, 401
+tool calls, 29 min; wave 2 adversarial review: 5 agents, 1,748,535 tokens, 543 tool calls, 55 min; wave 3 fix
+verification: 2 agents, 725,322 tokens, 198 tool calls, 47 min). Eleven agents in all, 3,701,221 subagent tokens.
+
+**PORT 5173: ONE BREACH, BY A SUBAGENT, RECORDED SO THE NEXT BRIEF CAN NAME IT.** The session never served on 5173. A
+wave 1 agent (the gate-impact map) ran a scratch Vite probe with `port: 0`; Vite treats 0 as unset, fell back to 5173 and
+bound 127.0.0.1:5173 for about two seconds before the agent closed it. `lsof -iTCP:5173` straight afterwards showed no
+listener, and the owner had no server there (none was listening when this session started, checked at boot). Waves 2
+and 3 carried the warning in every prompt: never start Vite with port 0; take a real port from `net.listen(0)` and pass
+`--strictPort`, or serve the static dist.
+
+## FIRST: main contains 2ffae8ef
+
+VERIFIED 2026-10-07 by `git merge-base --is-ancestor 2ffae8ef origin/main` (exit 0): 2ffae8ef is the #190 merge, parents
+c9319124 and 4395afef. Main's run on it, 37590109429, completed success before any R154 work was pushed. Portrait
+conformance was not run, as the brief orders.
+
+## The standing rule: CLAUDE.md rule 17
+
+Recorded as rule 17 of the multi-track protocol (c0721077, tightened in e347de89 after wave 2 checked the
+transcription). The owner's words are quoted verbatim. What the order requires is listed as such: a merge commit
+(`gh pr merge <n> --merge --delete-branch`), "green" meaning the PR's own run on the committed tip with the static job and
+every browser leg passing, the two stops (a red check, a locked path), and stopping after the merge. **Four earlier
+instruments conflict with it and are named per convention (n), not edited**: rule 7 (Fable verifies every PR before
+merge) and (t)'s review lane; rule 12 and convention (a)'s `owner:preview` sentence, which serve on 5173; and rule 10's
+own-final-push check, whose push is now the merge that runs after the session stops. Dated notes sit above rules 7, 10
+and 12 and above convention (a)'s sentence. **Five readings the order does not settle are labelled as readings**:
+Fable's review becomes retrospective; a locked path stops the merge whatever its LOCK-SANCTION token; a skipped browser
+matrix is not a stop; a PR run made stale by a moved main is re-run before merging; and the merge SHA goes in the
+closing reply because the report is written before the merge. Wave 2's code reviewer found the first transcription had
+stated three of those readings as if the owner had ordered them, and missed convention (a) and `--delete-branch`; e347de89
+corrected all of it.
+
+## TASK 1: the R153 report is committed
+
+2893adef appends the R153 section to `reports/SESSION_REPORT.md` and copies it to
+`reports/archive/2026-10-07_r153-operator-strip-hero-still.md`. It is PR #189's body from its own `# R153 -` heading
+down, byte for byte, with the PR's opening summary and footer left off; a dated note above the record carries what came
+after it (#189 merged as c9319124 at head afa58195; ruling 3 rode #190 and merged as 2ffae8ef; the four CI runs on those
+heads all success). VERIFIED by wave 2's code reviewer: with the note removed, both copies equal the PR body from the
+heading down, 24,503 bytes.
+
+## TASK 2: the win banner
+
+### Measured before (wave 1, main's production build, c0721077 = the 2ffae8ef tree)
+
+A routed wallet served base.bigWin's events with the payout pinned per tier (16.2x, 45x, 162x of a 1.00 bet; the client
+takes the win from `round.payout` and the tier from winAmount / betAmount). Held after the count-up, timers cleared,
+animations paused, three byte-identical shots before measuring. Contrast is WCAG on the composited pixels, text fill
+against the band with that text hidden, calibrated on known pairs (21.00 / 4.69 / 4.48 against 21 / 4.69 / 4.48).
+
+| 1280x720 (stage = screen) | BIG | MEGA | EPIC |
+|---|---|---|---|
+| Band | 0,254.5 1280x111 | 0,240 1280x140 | 0,224 1280x172 |
+| Row of text, x | 206.6 to 1073.3 | 147.7 to 1132.3 | 102.0 to 1177.9 |
+| Label / amount / multiplier px | 22 / 50 / 16 | 28 / 64 / 20 | 36 / 80 / 26 |
+| Contrast amount / label / multiplier | 14.13 / 12.59 / 13.44 | 13.70 / 5.76 / 13.67 | 11.98 / 10.85 / 13.62 |
+
+| 390x844 (stage scaled 0.717) | BIG | MEGA | EPIC |
+|---|---|---|---|
+| Band, screen | y 250.71 h 99.08 | y 247.0 h 106.51 | y 243.28 h 113.94 |
+| Band, stage | 1280x138.14 | 1280x148.5 | 1280x158.86 |
+| On screen px, label / amount / multiplier | 14.3 / 25.2 / 9.3 | 15.8 / 28.0 / 10.0 | 17.2 / 30.8 / 10.8 |
+| Contrast amount / label / multiplier | 14.28 / 9.92 / 7.24 | 13.22 / 4.68 / 11.42 | 11.10 / 6.83 / 7.27 |
+
+What else the measurement found on main, unchanged by R154 unless said: at 1280 the band crossed the hero's head, the
+desktop FEATURES button (966,238) and, at the feature end, the bonus column; the 1280 EPIC burst paints 112 px of the HUD
+panel (10 px into it, 3 px above the WIN pod); the feature-end FEATURE COMPLETE title is unreadable under the EPIC burst
+(contrast 1.89 / 1.94, 15.19 / 15.25 with the banner hidden); at 390 the band's ends are off screen; and the phone text
+was shrunk twice (vw inside a scaled stage).
+
+### What the repository holds (wave 1 survey of 2,774 committed images and 28 SVGs)
+
+**One committed raster fits: `frontend/public/assets/themes/future-spinner/frames/frame-2.png`**, the reel's own neon
+bezel. 800x640 RGBA, 95,245 B, sha256 cd9e924d44888d59...; no lettering; window truly transparent (x 89 to 710, y 76 to
+563); corner brackets spanning 96 px of source top and bottom and 92 to 93 at the sides; plain rail and tube between
+them; already shipped (themeStore.ts:75), so wiring it costs 0 bytes. Provenance: committed 2026-04-04 (8eec7330) as
+`frame_clean_minimal.png`, maker not recorded (the briefs of the day name Manus, REPORTED); chosen for the reel by the
+owner-approved LAYOUT_SPEC v3.1 blueprint (f06fbce6). Everything else was refused: `overdrive_perimeter.png` is text-free
+but owner-ruled off the stage (R131) and pruned; the 1000062171/4/5/6 frames bake WIN or BONUS or a checkerboard;
+`panel_win.png` and the balance panel bake words; `plate_instrument.svg` was never exported (using it means rendering a
+new file). The "card sheet" the brief fences off is, by inference, the four gitignored `.scratch` royal-tile packages of
+2026-10-07; nothing from them was touched.
+
+### What changed
+
+`WinBanner.svelte` (65496fb5, then b59971f7 after wave 2): the live tier label, the live amount (still the shared
+count-up, Exo 2, autofit, R060 compact fallback) and the live multiplier stand stacked in `.c1-lockup`, a plaque framed
+by `.c1-frame`: frame-2.png as a CSS 9-slice (slice 96, border 26 / 28 / 30 px). The url() is inline from `assetBase`,
+because a stylesheet or custom-property url() resolves against the CSS file and 404s in production while
+asset_reference_gate passes it (wave 1, three engines). Tier colour is a filter: none (cyan), MEGA hue-rotate(142deg)
+saturate(1.4), EPIC 242deg, Overdrive 207deg. Rendered tube hue at 1280: BIG 181.8, MEGA 315.0 (label 317), EPIC 50.9
+(gold 51). A seal copy of the frame, 1.5 px wider, sits under the first to cover the 9-slice joints. The full-width scrim,
+the two full-width neon rules, the band's end mask and its full-width glow are gone; the glow ladder rings the plaque.
+The face keeps the band's measured box (`--band-h`), and the plaque stands on its bottom edge and grows upward, so the
+HUD and FEATURE COMPLETE clearances are as before. The EPIC chromatic flash, the particle field and the coin fountain
+follow the plaque. Phones use the stage-px tier ladder.
+
+**The exact size, as the brief asks.** Source: 800x640, slice 96. Drawn border: 26 / 28 / 30 stage px. Plaque, stage px:
+
+| | BIG | MEGA | EPIC |
+|---|---|---|---|
+| 1280 (screen = stage) | 440 x 165.6 at x 420 to 860, y 199.9 to 365.5 | 460 x 196.6, x 410 to 870, y 183.4 to 380.0 | 480 x 234.6, x 400 to 880, y 161.4 to 396.0 |
+| 390, stage | 440 x 165.6, bottom 379.0 | 460 x 196.6, bottom 384.3 | 480 x 234.6, bottom 389.5 |
+| 390, on screen | 315.6 x 118.8 | 329.9 x 141.0 | 344.3 x 168.2 |
+
+### What is missing
+
+- **A frame made for a banner.** Every committed text-free frame with an open window is a reel or stage frame (1.25:1 or
+  16:9). The banner uses the reel's own bezel, so at BIG the plaque is that raster at about a quarter scale inside
+  itself; three tier colourways exist only as CSS filters, not as drawn art. R113's text-free 1400x360 horizontal banner
+  backing, the nearest thing ever offered, lives only in gitignored `.scratch` and was never committed.
+- **A clean source.** frame-2.png carries 152 opaque dark-green key-residue pixels and teal specks along its inner side
+  edges (source x 88 and 704 to 711); the 9-slice draws them, and after the filter they read as off-hue flecks: 5 to 8
+  bright pixels at 1280, 60 to 92 at 390 on a 3x screen (wave 2). Cleaning them means a new raster, which the brief
+  forbids; owner list.
+
+### After (e347de89, wave 1's instrument, same cases; fa66f225 changes only the replay mount and the flash's timing)
+
+| | 1280 BIG | 1280 MEGA | 1280 EPIC | 390 BIG | 390 MEGA | 390 EPIC |
+|---|---|---|---|---|---|---|
+| Amount (before) | 14.13 | 13.70 | 11.98 | 14.28 | 13.22 | 11.10 |
+| Amount (after) | 16.00 | 15.00 | 13.93 | 15.75 | 14.99 | 13.98 |
+| Label (before) | 12.59 | 5.76 | 10.85 | 9.92 | 4.68 | 6.83 |
+| Label (after) | 12.19 | 5.11 | 9.96 | 12.44 | 5.14 | 10.00 |
+| Multiplier (before) | 13.44 | 13.67 | 13.62 | 7.24 | 11.42 | 7.27 |
+| Multiplier (after) | 10.50 | 11.49 | 10.26 | 10.54 | 11.66 | 10.33 |
+
+**One figure needs its method stated.** The amount's clip room (padding-block .2em, margin-block -.2em) makes its box
+0.4em taller without moving a pixel, and the instrument samples the backdrop inside that box, which then takes in the
+label and multiplier: it read 10.77 to 13.26. With the clip room removed by an injected rule, the band crops are
+identical (0 pixels differ by more than 10, at most 6 levels) and the amount reads the 13.93 to 16.00 above. The lowest
+label anywhere rises from 4.68 to 5.11; the 1280 MEGA label alone falls from 5.76 to 5.11, because it now sits over the
+bloom's centre rather than at the band's left end. Every text clears 4.5:1. HUD WIN pod: 0 pixels changed in every case.
+Feature end: FEATURE COMPLETE sits 11.89 px below the plaque at 1280 (11.89 on main) and 13.19 at 390 (13.24).
+
+### Proof
+
+`frontend/scripts/r154_win_frame_proof.mjs`, against a production build, ten cases: 1280 and 390 at BIG, MEGA and EPIC;
+EPIC at 1366x768 and 768x1024; EPIC paid in Egyptian pounds at 1280 and 390. F1 the frame loads (decoded 800x640, not
+just a 200), F2 nothing baked (every url on elements and pseudo-elements), F3 everything read is live text, F4 the frame
+is behind the label and amount (box and paint order), F5 fits, F6 no amount ink clipped, F7 the plaque stands on the
+band's measured edge and inside the screen, F8 the HUD WIN pod untouched, F9 no 9-slice seams. Three seeded controls in
+the defects' real forms: the production wrong-path url fails to decode; EGP without the clip room is cut; the joints
+without the seal show (38 to 49 levels). `--expect head` on main's build requires F1 to fail in all ten cases. **PASS on
+e347de89 with all three controls caught; head control PASS.** Seam figures with the seal: 10 levels or less at 390, 360,
+430, 1366, 1920 and 1280 (1x) and 390 at 3x, the residue being the corner tube's own shading (looked at 8x: no line);
+18.8 to 49 without it.
+
+### Wave 2 found, and b59971f7 fixed
+
+Five adversarial reviewers on the frozen 65496fb5 build (desktop, phones and mounts, code and records, the frame at
+drawn size, money and locales). Fixed:
+
+1. **9-slice seams** (major): one-pixel seams at every joint wherever the stage scale is not 1 (35 to 49 levels at
+   1366x768 and 390 at 3x). The seal copy covers them.
+2. **Portrait wider than 500 px** (major): EPIC at 560 overran the 543.75 stage px a portrait screen shows, cutting the
+   corners at 600 and 768 wide; and on phones the entry overshoot plus the shake bound the plaque to 485. Widths are now
+   440 / 460 / 480 everywhere, which also clears the reel's own bezel at MEGA and EPIC.
+3. **EGP sign cut** (major, a regression): the tighter 1.15 line box sliced the feet of the fallback-face pound sign (139
+   px at 1280 EPIC, 0 on main). Clip room added; the stack's height is unchanged.
+4. **MEGA hue** (minor): 153deg rendered 326 to 330 against the label's 317 (the filter acts per pixel, and the angle had
+   been solved on the tube's average). 142deg renders 315.0.
+5. **Leftovers of the band** (minor): the flash split the stage's extreme edges; particles and coins spanned the stage;
+   label and multiplier sat 1.5 to 3.5 px left from trailing letter-spacing; the replay capped the amount at 46 px beside a
+   36 px label. All fixed. Stale comment numbers corrected.
+6. **The proof was weaker than its header** (minor): no seeded url control, an F6 that could not fail for the label, F4
+   by construction, no seam check, too few viewports. All addressed above.
+
+Checked and fine by wave 2: every locale's tier label fits at EPIC and MEGA at 1280 and 390 (smallest autofit scales
+Vietnamese 0.761, Russian 0.813, German 0.845); $1,234,567.89 and the money_fit gate's 949,300.00 GC fit at every size
+(at 1280 EPIC main fell back to the compact form in German, Russian and Vietnamese; the tip shows the full figure); the
+replay mount, the mini player and a bought round's FEATURE PRICE line fit; RTL, reduced motion and Overdrive render;
+the plaque never overlaps the hero, the FEATURES button (bar the faint outer ring of the EPIC glow, 13 levels against the
+band's 169) or the HUD.
+
+### Wave 3 verified the fixes, and fa66f225 fixed what it found
+
+Two verifiers on the e347de89 build confirmed every wave 2 fix: worst joint dip 9.3 levels or less (Overdrive at 1x),
+1.6 at 390 on a 3x screen, against 26 to 58 before, with the corner brackets not doubled; the slam peak with the shake
+at its extremes keeps the frame on screen at 360, 390, 430, 600, 768 and 820 portrait (1.29 px at 360, where the first
+cut was 5.9 px off); particles and coins paint 0 px on the hero, the FEATURES button, the HUD and the logo; label,
+amount and multiplier centred to within 1 px; EGP cut 0 px at EPIC and MEGA at 1280, 390 and 320 (its control still
+cuts); the feature-end clearance 11.89 / 13.19 / 7.11 px at 1280 / 390 / 400x225 (main 11.89 / 13.24 / 6.82); a bought
+round's price line inside the window; all 64 locale cases fit. It found two minors of the fixes' own making, fixed in
+fa66f225: **the replay's EPIC plaque hung 15.3 stage px out of its 412 px grid box** once the amount clamp was gone
+(lifted 20 px in that container: now inside by 4.26 / 2.72 / 1.26 px at 1280 / 390 / 400x225, nothing cut), and **the
+EPIC chromatic flash, now inside the plaque, peaked during the entry's fade** at opacity 0.41 (delayed .155 s it peaks
+on the slam: 3,503 px at 128 levels, 0 at the stage edges). The R154 proof passed again on that build with its three
+controls. Two notes stand as owner items (below): coins and particles now gather over the plaque's text for the first
+second, and in Vietnamese and Russian the autofit makes the EPIC word slightly smaller than the MEGA word.
+
+
+## A red check that was not R154's, fixed rather than re-run
+
+PR run 37597619702 on 65496fb5 went red on "browser: splash calm": at Popout S the intro's TAP TO CONTINUE grew 5.20 px.
+R154 does not touch the splash. Forced rather than waited for: holding Exo 2 700 back 3 s moved the prompt 1.96 to 2.09
+px at all three profiles on main's build and on 65496fb5 alike, so the race was already on main and a loaded runner
+exposed it (12 interleaved unforced local runs were still on both builds; 1 of 2 earlier tip runs moved 2.09 px). The
+prompt was a flex item in a centred column, so its box followed whichever face had loaded. 29d7c7ae gives it the
+column's width and a fixed line height and holds it hidden until its own face loads (capped at 3000 ms). Forced again:
+0.00 px at every profile with the face held back 3 s and 6 s; the gate's self-test and plain run pass; a tap still
+dismisses; the prompt shows at 3069 ms unforced (main 2905) and 3637 ms with the face held back 6 s. Run 37600933973 on
+29d7c7ae: 30 of 30.
+
+## TASK 3: fences
+
+No symbol ingested; no card-sheet file touched. No sound touched (`git diff 2ffae8ef..HEAD --stat -- '*.mp3' '*.wav'
+'*sounds*'` empty). Hero strips not restored (hero_idle_planted gate green in the static job). No image generated, no
+raster added or changed (`git diff 2ffae8ef..HEAD --name-only` carries no image). Portrait conformance not run. No
+locked path touched.
+
+## Verification
+
+- **Local static job** (scratch replay of every `run:` step of checks.yml's static job): 85 of 85 at c0721077 (records),
+  65496fb5, e347de89 and fa66f225.
+- **R154 proof**: PASS on e347de89 and on fa66f225's build with three controls; head control PASS on main's build.
+- **Remote CI on PR #191**: run 37597619702 (65496fb5) red on splash calm only, fixed by 29d7c7ae; run 37600933973
+  (29d7c7ae) 30 of 30; run 37607810471 (e347de89) 30 of 30; the run on this report's commit decides the merge.
+- **Bundle**: 87 files, 10,993,529 B at fa66f225 against 10,993,098 B on main (+431 B of CSS and JS); 0 raster bytes.
+- **Owner preview NOT refreshed:** rule 17 and the brief keep port 5173 untouched.
+
+## OWNER LIST
+
+1. **The banner's shape against the V3 ruling.** The Audit Round 2 ruling made the banner "a full-width neon band ...
+   no box"; R154's brief asks for a frame behind the label and amount, and the later order governs (convention (n)). The
+   plaque is that box. Confirm, or rule otherwise.
+2. **A purpose-made banner frame.** The plaque uses the reel's own bezel (see What is missing). If wanted: a text-free
+   wide frame in three drawn colourways, commissioned under the R109 conditions, would replace it at one path.
+3. **frame-2.png's specks** are drawn into the plaque (and were always in the reel frame). A cleaned copy is a new raster:
+   your call.
+4. **FEATURE COMPLETE under the EPIC burst** (R151 item 7, still open): unreadable on main (1.89) and after R154 (2.22 on
+   65496fb5, wave 2).
+5. **844x390 and the FEATURE PRICE line on phones are small** (unchanged from main): label 9.6 px at BIG on 844x390;
+   price 7.2 / 9.3 px at 390.
+6. **Overdrive MEGA and EPIC frames are both orange**, following the existing tier colour mapping.
+7. **App.svelte's Overdrive reel-frame filters do not make the colours their comments name**: hue-rotate(280deg)
+   saturate(1.4) turns frame-2's cyan tube green (71,221,0), 305deg turns it pure green, 185deg coral (computed from the
+   CSS matrices, confirmed in a browser). Possibly R152 item 16 ("route frame colours are the opposite of their
+   comments"). Not touched: outside this brief.
+8. **CI has no banner leg.** The frame, its url and the seams are proved by a local script only; a CI leg would need a
+   second build for the head control.
+9. **The multiplier rounds to nearest** (R152 item 15): a 99.99x MEGA reads "100x".
+10. **Coins and particles gather over the plaque's text** for the first second (16 of 16 coins on the label row at their
+    peak, against 9 or 10 when they spanned the stage): the cost of keeping them off the hero and the FEATURES button.
+    Widening the coin start positions is a one-line change if you prefer.
+11. **Vietnamese and Russian EPIC words come out slightly smaller than their MEGA words** (25.8 against 28 px at 1280 in
+    Vietnamese), because autofit fits the longer EPIC word to the 480 px plaque. A wider EPIC plaque would lay its
+    chrome on the reel's bezel again. Your call.
+
+## FOR THE NEXT SESSION
+
+**Model and effort:** Opus 5.5, ultracode on. **Approach:** confirm main, record the rule, commit the records; wave 1 to
+measure the live banner and survey every committed asset before touching code; prototype the 9-slice in scratch;
+implement; measure against wave 1's baseline; wave 2's five lenses; fix; wave 3 on the fixes; close under rule 17.
+
+**Alternatives rejected:** keeping the full-width band with a plaque on it (still a strip); overdrive_perimeter.png
+(owner-ruled off the stage, pruned, mid-edge ornaments that smear under a 9-slice); plate_instrument.svg (never
+exported); 560 / 600 / 640 and 480 / 520 / 560 widths (frame on frame, and EPIC overran portrait screens); a 2.5 px
+seal (no better at 1x, worse at 3x); re-running the red splash leg instead of fixing the race.
+
+**Files touched:** `CLAUDE.md`; `reports/SESSION_REPORT.md` and two dated archives; the brief;
+`frontend/src/lib/components/WinBanner.svelte`, `HeroSplash.svelte`, `FreeSpinsPresentation.svelte` (comment),
+`App.svelte` (comment); `frontend/scripts/r154_win_frame_proof.mjs`. Commits: 0386a2ef, 2893adef, c0721077, 65496fb5,
+29d7c7ae, b59971f7, e347de89, fa66f225, and the records commit that carries this report.
+
+**Lessons worth keeping:** a CSS 9-slice inside a transform-scaled stage seams at every joint unless the scale is exactly
+1, and the only viewport most proofs use is the one where it does not show; a filter angle solved on a colour's average
+is wrong for the pixels around it, so sweep it live; tightening a line box under `overflow: hidden` cuts any glyph drawn
+in a taller fallback face, and a USD-only check cannot see it; a box made taller by invisible padding changes what a
+contrast instrument samples, so isolate with the padding removed before believing a drop; a 200 from a SPA server proves
+nothing about an image, decode it; a subagent told never to touch a port can still bind it through a tool's default;
+and, again, an unquoted heredoc runs backticked words as commands (it happened once here while filling this report;
+nothing executable matched and the file was untouched, but the rule in memory stands: quote the heredoc).

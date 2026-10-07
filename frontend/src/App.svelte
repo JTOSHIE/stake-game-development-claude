@@ -2452,7 +2452,8 @@
         </div>
       </div>
 
-      <!-- BANNER, full-width neon band, edge to edge across the stage, z100 -->
+      <!-- BANNER, z100. Was the full-width neon band, edge to edge across the stage; since R154
+           a framed plaque (WinBanner.svelte's header says why). -->
       <WinBanner suppressed={lastRoundHadFeature || lastRoundWasWincap} />
 
       <!-- FEATURE-END CELEBRATION, WIN BANNER V3 reuse (OWNER AUDIT ROUND 2,
