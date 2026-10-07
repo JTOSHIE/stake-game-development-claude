@@ -454,12 +454,15 @@
      --lockup-w keeps the plaque inside the reel frame's window: the reel bezel is opaque from x 325.6
      to 390.4 at 1280, so 440 / 460 / 480 leaves reel showing either side at every tier (11.5px at
      EPIC). Clear of the hero's head, the desktop FEATURES button (x 966) and the bonus column, all
-     three of which the edge-to-edge band crossed; only the faint outer ring of the EPIC glow reaches
-     the button (13 levels at most, against 169 from the band). Two wider cuts were measured and
+     three of which the edge-to-edge band crossed; the plaque with its glow paints 0 pixels of the
+     button at 1280 and 1920 and 145 at 15 levels at 1366, against 5,716 at 169 from the band (wave 3).
+     Two wider cuts were measured and
      dropped: 560 / 600 / 640 and then 480 / 520 / 560 both laid the plaque's chrome on the reel's own
      bezel at MEGA and EPIC, a frame on a frame (R154 wave 2). 480 is also the bound that matters on
      a phone: a portrait screen shows 543.75 stage px across, and the entry overshoot (1.0806) plus
-     the portrait shake need (271.875 - 9.76) / 1.0806 x 2 = 485 or less.
+     the portrait shake need (271.875 - 9.76) / 1.0806 x 2 = 485 or less at 390. At 320 the shake is
+     11.9 stage px and the bound 481.2, so EPIC's 480 is at the limit there: 0.37px clear with the shake
+     frozen at its extremes, 1.9px with it running (wave 3).
      The three tokens sit on the banner's own root, not the plate, so the particle and coin fields
      (siblings of the plate) can size themselves to the plaque as well. */
   .tier-big  { --band-h: 111px; --lockup-w: 440px; --frame-w: 26px; }
@@ -619,8 +622,10 @@
      THE TIER COLOUR IS A FILTER, NOT ANOTHER FILE. The angles were first solved on the tube's average
      colour (RGB 20,211,217 over the source pixels with alpha above 200 and saturation above 0.6), but
      the filter acts pixel by pixel and the tube's darker teal bands carry it redder, so MEGA was
-     re-set from a live sweep: 142deg renders the tube at hue 316 to 318 against the label's 317 (153deg
-     had rendered 326 to 330). Measured on the build, EPIC's 242deg renders 50 to 53 against the gold's
+     re-set from a live sweep. The tube is not one hue: at 142deg its outer rows render 329 to 331 and
+     its clipped core about 300, so its mean is 312 to 318 depending on the weighting (315.0 over its
+     saturated bright pixels), against the label's 317; 153deg read 322 to 330 by the same measures. At
+     drawn size both read as one hot-pink family with the label. EPIC's 242deg renders 50 to 53 against the gold's
      51 and the Overdrive 207deg 29 to 30 against the orange's 31. The chrome is not neutral in the
      source (a faint cyan cast, mean 128,136,137), so the filter tints it toward the tier as well: a
      reflection of the tube, kept rather than masked. */
@@ -634,7 +639,8 @@
      fractional pixels and each joint drew a one-pixel seam across the rail and the tube: the neon core
      dipped by 35 to 49 levels at 1366x768 and at 390 on a 3x screen, and by 0 to 1 only at 1280x720,
      where the scale is exactly 1 (R154 wave 2, then the session's own joint-dip instrument). A second
-     copy drawn underneath with a border 1.5px wider puts its joints where the first copy is opaque, and
+     copy drawn underneath with a border 1.5px wider (Chromium floors a border to whole device pixels, so
+     1px wider at 1x) puts its joints where the first copy is opaque, and
      the first copy is opaque where the second's joints fall, so neither seam shows. */
   .c1-frame--seal { border-width: calc(var(--frame-w) + 1.5px); }
   .tier-mega .c1-frame { filter: hue-rotate(142deg) saturate(1.4); }
@@ -835,7 +841,10 @@
        as the band's column did here before: there is no stage-anchored edge to stand on in that
        mount, and nothing below it was measured against one. */
     .fs-plate > .fs-face { height: auto; padding: 14px 0; }
-    .c1-lockup { position: relative; left: auto; bottom: auto; transform: none; margin: 0 auto; }
+    /* top: -20px because the banner's root is centred at y=310 of a 412px box, so half of any growth
+       lands below it: with the tier ladder restored here the EPIC plaque hung 15.3 stage px out of the
+       replay's grid box at 1280, 390 and Popout S (wave 3; -16px measured inside at every size). */
+    .c1-lockup { position: relative; left: auto; bottom: auto; top: -20px; transform: none; margin: 0 auto; }
     /* R133: the font-size here was INERT. `.c1-amount` is (0,1,0) and lost every time to
        `.tier-big/.tier-mega/.tier-epic .c1-amount` at (0,2,0), so with the container forced to
        616px and to 400px the computed size stayed at the tier's 50px rather than the 46px and
@@ -1036,7 +1045,10 @@
      the plaque's box and the split lands on the frame's own rails. */
   .c1-chromatic-flash {
     position: absolute; inset: 0; z-index: 200; pointer-events: none;
-    animation: c1-chromatic-flash 0.28s ease-out both;
+    /* R154: delayed .155s so its 12% peak lands on the entry's slam peak. Inside the plaque it inherits
+       the entry's fade and scale, and undelayed it peaked at opacity 0.41 and scale 0.654, painting 1,117
+       pixels at 52 levels against 3,503 at 128 delayed (wave 3). The both fill keeps it dark meanwhile. */
+    animation: c1-chromatic-flash 0.28s ease-out .155s both;
     mix-blend-mode: screen;
   }
   @keyframes c1-chromatic-flash {
