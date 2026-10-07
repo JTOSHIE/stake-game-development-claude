@@ -15,6 +15,12 @@
    * instance and drives it via the explicit `amount`/`multiplier`/`trigger`
    * props instead of the reactive $winAmount path, so the exact same visual
    * component covers both moments rather than a bespoke duplicate.
+   *
+   * R154 (2026-10-07, brief reports/briefs/FS_R154_MergeRuleWinBanner_Prompt.md): the edge-to-edge
+   * band is retired. BIG, MEGA and EPIC read as type on a strip, so the live label, amount and
+   * multiplier now stand stacked in a plaque framed by the reel's own committed text-free bezel,
+   * frames/frame-2.png, recoloured per tier. Nothing in the frame is lettered and every word and
+   * number is live text. The tier art, shockwave, particles, coins, timing and count-up are as before.
    */
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import { winMultiplier, winAmount, isSpinning, currencyCode } from '../stores/gameStore'
@@ -366,30 +372,40 @@
         {/each}
       </div>
       <div class="fs-plate">
-        <span class="band-edge band-edge-top" aria-hidden="true"></span>
-        <span class="band-edge band-edge-bottom" aria-hidden="true"></span>
         <div class="fs-face">
-          <div class="c1-tier-label">{tierLabel}</div>
-          <!-- TR-089. Each DIGIT gets a fixed-width box so the count-up cannot
-               shimmy as it rolls. It needs one because `font-variant-numeric:
-               tabular-nums` on .fs-num is INERT against Orbitron: that property
-               maps to the OpenType `tnum` feature and Orbitron ships no GSUB
-               features at all. Measured on the shipped woff, the digit advances
-               are 834 391 830 826 730 830 820 660 834 828 of 1000, so `1` is
-               less than half the width of `0` and a rolling total visibly
-               danced. Non-digits keep their natural width: only the digits need
-               to be monospaced, and boxing the currency symbol and separators
-               too would space them oddly. -->
-          <div class="c1-amount fs-num" use:autofitText={amountLabel} data-money="cur" data-testid="win-amount" on:fitoverflow={onFitOverflow}>
-            {amountLabel}
-          </div>
-          <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
-          {#if $boughtRound}
-            <div class="c1-price fs-num" data-testid="win-feature-price">
-              <span class="c1-price-label">{featurePriceLabel}</span>
-              <span class="c1-price-value">{featurePriceValue}</span>
+          <!-- R154. The live label, amount and multiplier sit inside a framed plaque. The frame is
+               frames/frame-2.png, the committed text-free neon bezel already drawn round the reels,
+               drawn here as a CSS 9-slice; its url() is inline so it resolves against the document
+               in every build (see the .c1-frame note below). -->
+          <div class="c1-lockup" data-testid="win-lockup">
+            <span
+              class="c1-frame"
+              aria-hidden="true"
+              data-testid="win-frame"
+              style="border-image-source: url({$themeAssets.assetBase}/frames/frame-2.png)"
+            ></span>
+            <div class="c1-tier-label" use:autofitText={tierLabel}>{tierLabel}</div>
+            <!-- TR-089. Each DIGIT gets a fixed-width box so the count-up cannot
+                 shimmy as it rolls. It needs one because `font-variant-numeric:
+                 tabular-nums` on .fs-num is INERT against Orbitron: that property
+                 maps to the OpenType `tnum` feature and Orbitron ships no GSUB
+                 features at all. Measured on the shipped woff, the digit advances
+                 are 834 391 830 826 730 830 820 660 834 828 of 1000, so `1` is
+                 less than half the width of `0` and a rolling total visibly
+                 danced. Non-digits keep their natural width: only the digits need
+                 to be monospaced, and boxing the currency symbol and separators
+                 too would space them oddly. -->
+            <div class="c1-amount fs-num" use:autofitText={amountLabel} data-money="cur" data-testid="win-amount" on:fitoverflow={onFitOverflow}>
+              {amountLabel}
             </div>
-          {/if}
+            <div class="c1-mult fs-num">{multLabel} {multUnitLabel}</div>
+            {#if $boughtRound}
+              <div class="c1-price fs-num" data-testid="win-feature-price">
+                <span class="c1-price-label">{featurePriceLabel}</span>
+                <span class="c1-price-value">{featurePriceValue}</span>
+              </div>
+            {/if}
+          </div>
         </div>
       </div>
     </div>
@@ -416,12 +432,26 @@
      against 37.7 for the strip of game behind it, so the celebration made that part of the screen
      dimmer than the spin it was celebrating. Big was 47.5 against 41.3 and epic 46.6 against 36.2,
      both correctly brighter. Mega is lifted, and the ladder now rises across all three. */
-  .tier-big  .fs-plate { --sig: var(--sig-cyan); --tint: 20%; --pulse: 1.010; }
-  .tier-mega .fs-plate { --sig: var(--sig-pink); --tint: 32%; --pulse: 1.014; }
-  .tier-epic .fs-plate { --sig: var(--sig-gold); --tint: 26%; --pulse: 1.020; }
+  /* R154: --tint (20 / 32 / 26%) left these three lines with the strip; the plaque's window uses a
+     flat 12% (see .c1-lockup::before), so the property had no reader. */
+  .tier-big  .fs-plate { --sig: var(--sig-cyan); --pulse: 1.010; }
+  .tier-mega .fs-plate { --sig: var(--sig-pink); --pulse: 1.014; }
+  .tier-epic .fs-plate { --sig: var(--sig-gold); --pulse: 1.020; }
   .c1-win--overdrive.tier-big  .fs-plate { --sig: var(--sig-pink); }
   .c1-win--overdrive.tier-mega .fs-plate { --sig: var(--sig-orange); }
   .c1-win--overdrive.tier-epic .fs-plate { --sig: var(--sig-orange); }
+  /* R154: the plaque's geometry per tier, in stage px. --band-h is the height the R133 band
+     measured at 1280 (111 / 140 / 172, R154 wave 1 on c0721077): the face keeps that box, so the
+     banner's own rect, the burst's centre and every clearance measured against the band's bottom
+     edge (the HUD row, FEATURE COMPLETE) are unchanged, and the plaque grows UPWARD from that edge.
+     --lockup-w stays inside the reel frame's own 640, so at 1280 the plaque sits within x 320 to 960:
+     clear of the hero's head, the desktop FEATURES button (x 966) and the bonus column, all three of
+     which the edge-to-edge band crossed. A first cut at 560 / 600 / 640 put the plaque's chrome on
+     top of the reel frame's own rails, a frame inside a frame; 480 / 520 / 560 leaves reel showing
+     either side. */
+  .tier-big  .fs-plate { --band-h: 111px; --lockup-w: 480px; --frame-w: 26px; }
+  .tier-mega .fs-plate { --band-h: 140px; --lockup-w: 520px; --frame-w: 28px; }
+  .tier-epic .fs-plate { --band-h: 172px; --lockup-w: 560px; --frame-w: 30px; }
 
   /* ── WIN BANNER V3 (OWNER AUDIT ROUND 2, item 2): full-width neon band,
        stage edge to edge, vertically centred on the grid at stage y=310 -
@@ -475,17 +505,13 @@
        The full-opacity plateau starts at 72px, which clears both the centred burst and the tier
        label: at epic the label's own ink begins at x=97, and an earlier 132px plateau put it
        INSIDE the ramp and faded live text onto the moving game behind it. */
-    -webkit-mask-image: var(--band-fade);
-    mask-image: var(--band-fade);
+    /* R154: THE MASK IS GONE BECAUSE THE STRIP IS GONE. Nothing in this element paints edge to edge
+       any more, so there are no band ends to fade, and a mask would clip the plaque wherever it
+       rises above this box (a mask clips everything outside the border box, as recorded above). */
   }
-  .c1-win {
-    /* R133, CORRECTED: the plateau starts at 72px, not 132px. My first version checked that the
-       plateau cleared the centred BURST and never checked the TEXT. At epic the tier label's ink
-       begins at x=97, which sat inside a 132px ramp at a measured mask alpha of 0.847, so live
-       text was being faded onto the moving game behind it and "EPIC WIN" fell to 3.96:1. */
-    --band-fade: linear-gradient(90deg, transparent 0, rgba(0,0,0,.30) 14px, #000 72px,
-                                 #000 calc(100% - 72px), rgba(0,0,0,.30) calc(100% - 14px), transparent 100%);
-  }
+  /* R133 declared --band-fade here, the end-fade gradient the mask above consumed, with a correction
+     (its plateau moved from 132px to 72px once the epic label's ink at x=97 was found inside the
+     ramp at 3.96:1). R154 removed the mask, so the property had no reader and went with it. */
   /* R133: THE FACE IS A SCRIM NOW, NOT A SLAB, AND THAT IS THE HEADLINE FIX.
      This gradient was OPAQUE, and .c1-tier-burst sat at z-index 0 underneath it, so the band
      covered the celebration's own art: burst_big contributed ZERO of 86,400 pixels inside the BIG
@@ -500,9 +526,19 @@
      while the text still paints on top of the art. Masking a hole in the burst was the other
      candidate and was rejected: the burst is centred, so a centred hole discards precisely its
      brightest core. */
+  /* R154: THE FACE IS NO LONGER PAINTED. It was the strip: a full-width scrim with a bevel, under
+     two full-width neon rules, and the brief's finding was that BIG, MEGA and EPIC read as type on
+     that strip. The scrim, the R151 lightening and the bevel below now dress the plaque instead
+     (.c1-lockup::before), so the measured R151 contrast work carries over to the box the text
+     actually sits in. The face keeps the band's box (--band-h) as the anchor the plaque stands on. */
   .fs-plate > .fs-face {
-    position: relative; display: flex; flex-direction: row; align-items: baseline; justify-content: center;
-    width: 100%; box-sizing: border-box;
+    position: relative; width: 100%; box-sizing: border-box; height: var(--band-h, 111px);
+  }
+  .c1-lockup::before {
+    /* R154: the plaque's window. Inset by just under half the frame's width so it runs under the
+       frame's inner neon tube and no game shows through a seam between the two. */
+    content: ''; position: absolute; z-index: 0; inset: calc(var(--frame-w) * .45);
+    border-radius: 4px; pointer-events: none;
     /* R133 colour-mix fallback, plain declaration first: an engine without color-mix keeps a real
        scrim instead of losing the band entirely. */
     /* R151: THE SCRIM IS LIGHTER, .66 / .82 FROM .80 / .90, so the tier art R115 placed reads THROUGH
@@ -515,10 +551,17 @@
        drew a second copy of the raster inside the band; it never painted (a relative URL inside a
        custom property resolves against the stylesheet) and, fixed, it doubled the image during the
        entry and took the MEGA label under 4.5:1, so it was removed. */
-    background: linear-gradient(180deg, rgba(17,26,43,.66), rgba(7,11,22,.82));
+    /* R154: .78 / .88 FROM R151's .66 / .82. R151 lightened the band so the tier art read through a
+       strip that otherwise looked like a flat slab; the art now shows whole round the plaque, and the
+       plaque is where the text lives. At .66 / .82 the plaque's first measurement put the MEGA label
+       at 4.51 (1280) and 4.39 (390), and the multiplier at 9.0 and 8.5 beside the frame's lower tube. */
+    /* The tier tint drops to 12% at every tier here. R133 raised it to 20 / 32 / 26% so the strip was
+       never darker than the reels it covered; inside the plaque it sat as a pink wash right behind the
+       pink MEGA label, the one text whose contrast binds. */
+    background: linear-gradient(180deg, rgba(17,26,43,.78), rgba(7,11,22,.88));
     background:
-      linear-gradient(160deg, color-mix(in srgb, var(--sig) var(--tint, 18%), transparent), transparent 44%),
-      linear-gradient(180deg, rgba(17,26,43,.66), rgba(7,11,22,.82));
+      linear-gradient(160deg, color-mix(in srgb, var(--sig) 12%, transparent), transparent 44%),
+      linear-gradient(180deg, rgba(17,26,43,.78), rgba(7,11,22,.88));
     /* R133: a real bevel, on the element that can actually be seen. The top hairline was .07 and
        there was no bottom edge at all, which is why the band had no thickness. */
     box-shadow: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(0,0,0,.9), inset 0 -8px 18px rgba(0,0,0,.55);
@@ -527,48 +570,55 @@
      already except .fs-plate, which relied on DOM order, and that omission is what put the tier
      art behind the band. Written out so the next change to this file cannot re-create it. */
   .fs-plate { z-index: 2; }
-  /* Layered glow borders: a bright hairline plus a soft blurred halo on
-     each edge of the band, so it reads as a lit neon tube top and bottom. */
-  /* R133. Two changes, both measured.
-     A WHITE-HOT CORE, because a real neon tube has one and because it is how you equalise
-     PERCEIVED brightness across hues. The three tier rules measured 200.8 (cyan), 101.3 (pink) and
-     208.0 (gold): the middle rung of a three-rung ladder was half the brightness of the rung below
-     it, purely because magenta is intrinsically darker than cyan and gold. The core fixes that
-     without touching tier identity, since the halo either side stays the tier's own colour.
-     AND THE RULE NOW FADES WITH THE OBJECT. The glow moves from box-shadow to drop-shadow because
-     the two follow different things: box-shadow follows the BORDER BOX, so it stayed a full-width
-     bar however the band was masked, while drop-shadow follows the rendered ALPHA, so a rule whose
-     background fades at the ends gets a glow that fades with it. Belt and braces with the plate's
-     own mask above: if `mask-clip: no-clip` ever degrades to border-box on another engine, the
-     rule and its halo still resolve at the ends and only the plate's tier glow is lost.
-     Measured at the far end, x0-10: 182.45 before, 27.38 after, against an unchanged 181 at centre. */
-  .band-edge {
-    position: absolute; left: 0; right: 0; height: 3px; z-index: 2;
-    /* R133 colour-mix fallback: the plain declaration FIRST, the color-mix one immediately after.
-       A declaration is all-or-nothing, so an engine without color-mix keeps the first and still
-       gets a lit rule. My first version folded the color-mix into the only declaration, and on
-       such an engine the band AND both rules vanished, where HEAD had only lost its glows. */
-    background: linear-gradient(180deg, #fff, var(--sig) 60%);
-    background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--sig) 88%, #fff) 55%, var(--sig));
-    /* R133: THE GLOW GOES BACK TO box-shadow AND THIS ELEMENT IS NO LONGER MASKED ITSELF.
-       My first version gave it mask-image plus filter: drop-shadow, and the mask's default
-       mask-clip: border-box clipped the filter output to this element's own 3px box. Measured in
-       Chromium, WebKit and Firefox: removing the glow entirely changed ZERO pixels outside the
-       band, and so did replacing it with a 40px pure-white drop-shadow AND a 40px pure-white
-       box-shadow. At HEAD the same glow was worth 68,709 to 69,416 pixels. So the first version
-       deleted a real, large halo and replaced it with nothing, while the comment beside it claimed
-       the halo still resolved. It inherits the fade from its masked .fs-plate parent instead, which
-       is what makes the rule taper without this element needing a mask of its own. */
-    box-shadow: 0 0 6px var(--sig), 0 0 18px color-mix(in srgb, var(--sig) 70%, transparent), 0 0 36px color-mix(in srgb, var(--sig) 40%, transparent);
+  /* R154: THE TWO FULL-WIDTH NEON RULES (.band-edge, top and bottom) ARE GONE. They were the strip's
+     two long edges and the brightest thing in it, which is why BIG, MEGA and EPIC read as type on a
+     strip. Their R133 history is kept in brief: a white-hot core evened the three tier hues (200.8 /
+     101.3 / 208.0 measured before it), and the glow lived on box-shadow, unmasked, because a mask
+     clipped a drop-shadow to the rule's own 3px box (zero halo pixels in all three engines). */
+
+  /* R154: THE PLAQUE. One box holds the live tier label, the live amount and the live multiplier,
+     stacked, and stands on the bottom edge of the band's old box so it grows upward from it. It is
+     positioned rather than laid out because its height is the text's (a bought round adds a price
+     line), while the face it stands on must keep the band's height exactly. The width is capped by
+     96cqw of .c1-plate-wrap, the container R060 set up, so the replay's 616px mount and a phone
+     both get a plaque that fits the box this mount was given. */
+  .c1-lockup {
+    position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+    width: min(var(--lockup-w, 560px), 96cqw); box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    padding: calc(var(--frame-w) * .8 + 6px) calc(var(--frame-w) * .8 + 16px) calc(var(--frame-w) * .8 + 12px);
   }
-  .band-edge-top { top: 0; }
-  .band-edge-bottom { bottom: 0; }
+  .c1-lockup > :not(.c1-frame) { position: relative; z-index: 2; }
+  /* R154: THE FRAME. frames/frame-2.png (800x640, sha256 cd9e924d...), the reel's own text-free neon
+     bezel, already shipped by themeStore's `frame`, drawn as a 9-slice: its corner brackets span
+     96px of source on every side and its edges carry no ornament between them (wave 1 survey), so
+     a 96 slice keeps the corners whole and stretches only the plain rail and tube. No new raster:
+     the file is the one already in the bundle, so this costs 0 bytes.
+     THE url() IS INLINE ON PURPOSE. assetBase is relative and the build's base is './', so a url()
+     in this stylesheet, or one passed in through a custom property, resolves against the CSS file
+     and 404s in production while asset_reference_gate still passes it (R151 met the custom-property
+     form; R154 wave 1 proved both in Chromium, WebKit and Firefox). An inline declaration resolves
+     against the document, in dev and in production, and the gate reads its literal path.
+     THE TIER COLOUR IS A FILTER, NOT ANOTHER FILE. The tube measures RGB 20,211,217 on average;
+     solving the CSS hue-rotate and saturate matrices for it, 153deg lands on the mega pink (255,108,
+     216), 242deg on the epic gold (213,180,0) and 207deg on the Overdrive orange (255,142,20). The
+     chrome rail is grey, which both matrices leave grey. */
+  .c1-frame {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    border-style: solid; border-width: var(--frame-w);
+    border-image-slice: 96; border-image-repeat: stretch;
+  }
+  .tier-mega .c1-frame { filter: hue-rotate(153deg) saturate(1.4); }
+  .tier-epic .c1-frame { filter: hue-rotate(242deg) saturate(1.4); }
+  .c1-win--overdrive.tier-big  .c1-frame { filter: hue-rotate(153deg) saturate(1.4); }
+  .c1-win--overdrive.tier-mega .c1-frame,
+  .c1-win--overdrive.tier-epic .c1-frame { filter: hue-rotate(207deg) saturate(1.4); }
   .fs-num { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
 
   /* ── Tier escalation: taller band + bigger bloom, same tokens ─────────── */
-  .tier-big  .fs-face { min-height: 110px; padding: 18px 60px; gap: 32px; }
-  .tier-mega .fs-face { min-height: 140px; padding: 22px 60px; gap: 36px; }
-  .tier-epic .fs-face { min-height: 170px; padding: 26px 60px; gap: 40px; }
+  /* R154: the face's min-height 110 / 140 / 170, padding 18-26px by 60px and gap 32-40px laid the
+     three items out in a row across the band; that row is now the plaque's stack, so the band's
+     height is carried by --band-h above and the face has no padding or gap of its own. */
   /* NEON LIFT (2026-07-15): a secondary purple/pink accent glow layered
      under each tier's own signature colour (unchanged from before), rather
      than replacing the existing cyan/pink/gold escalation - "richer"
@@ -602,6 +652,11 @@
   .c1-tier-label {
     font-family: var(--fs-font-display); font-weight: 900; letter-spacing: .18em;
     text-transform: uppercase; white-space: nowrap;
+    /* R154: the label now has a box of its own width, the plaque's, and the same autofit the amount
+       uses. In the band's row it had the stage's width to spare; in the plaque the longest tier word
+       in the sixteen locales, the Vietnamese epic label (17 characters), needs about 630px at 36px
+       against an epic plaque's 560px content box, so it shrinks to fit rather than run out of it. */
+    width: 100%; box-sizing: border-box; text-align: center; line-height: 1.15;
     /* R133: THE LABEL IS LIFTED 20% TOWARD WHITE, AND THAT REVISES AN R131 DECISION, SO HERE IS WHY.
        R131 gave this element `color: var(--sig)` deliberately, so the word naming the tier carries
        the tier's own colour, and that reasoning still stands: the hue is unchanged and #FF58D0
@@ -622,9 +677,9 @@
        glyph carries its own backing wherever the scrim lets the game through. */
     text-shadow: 0 1px 2px rgba(0,0,0,.98), 0 0 5px rgba(0,0,0,.92), 0 0 14px color-mix(in srgb, var(--sig) 70%, transparent);
   }
-  .tier-big  .c1-tier-label { font-size: 22px; }
-  .tier-mega .c1-tier-label { font-size: 28px; }
-  .tier-epic .c1-tier-label { font-size: 36px; }
+  .tier-big  .c1-tier-label { font-size: calc(22px * var(--autofit-scale, 1)); }
+  .tier-mega .c1-tier-label { font-size: calc(28px * var(--autofit-scale, 1)); }
+  .tier-epic .c1-tier-label { font-size: calc(36px * var(--autofit-scale, 1)); }
 
   /* B1 sharp numeral: near-white fill, tight 3px halo, no wide double glow.
      OWNER AUDIT REMEDIATION B2: font-size scales down via the autofitText
@@ -659,8 +714,11 @@
   .c1-amount {
     font-family: var(--fs-font-numeric); font-weight: 900; color: #f4fbff;
     text-shadow: 0 0 3px var(--acc); letter-spacing: 2px; white-space: nowrap;
-    width: min(46vw, 640px); box-sizing: border-box; text-align: center;
-    max-width: min(46vw, 640px); overflow: hidden;
+    box-sizing: border-box; text-align: center; overflow: hidden;
+    /* R154: the plaque's content width, where the band's row gave it min(46vw, 640px). The line box
+       is tightened from normal (1.5 of the size, measured 75px at 50px) to 1.15, because the stack
+       spends that height three times; the ink stays inside it (checked in the R154 proof). */
+    width: 100%; max-width: 100%; line-height: 1.15;
   }
   /* THE PER-DIGIT BOXES ARE RETIRED, R071 TASK 4, and the reason is recorded
      rather than the rule quietly deleted. TR-089 boxed every digit at 0.834em,
@@ -690,7 +748,7 @@
      the white amount. Stated plainly because an earlier draft of this comment argued
      that taking `--sig` would dissolve the multiplier into the epic rules, which is
      not true: it is already gold there, so `--sig` would have changed nothing. */
-  .c1-mult { font-family: var(--fs-font-display); font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; }
+  .c1-mult { font-family: var(--fs-font-display); font-weight: 800; font-size: 16px; letter-spacing: .16em; color: var(--sig-gold); text-shadow: 0 0 8px color-mix(in srgb, var(--sig-gold) 55%, transparent); white-space: nowrap; line-height: 1.2; }
   .tier-big  .c1-mult { font-size: 16px; }
   .tier-mega .c1-mult { font-size: 20px; }
   .tier-epic .c1-mult { font-size: 26px; }
@@ -720,9 +778,11 @@
   /* R133: THE TIER GLOW LADDER LIVES HERE NOW, not on .fs-plate, and this element is deliberately
      unmasked. Same rect, so it renders identically, but nothing clips it. See the note on .fs-plate
      for the WebKit failure that forced this. */
-  .tier-big  .c1-plate-wrap { box-shadow: 0 3px 10px rgba(0,0,0,.6), 0 0 9px color-mix(in srgb, var(--sig-cyan) 20%, transparent), 0 0 30px color-mix(in srgb, var(--sig-pink) 16%, transparent); }
-  .tier-mega .c1-plate-wrap { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig-pink) 40%, transparent), 0 0 55px color-mix(in srgb, #a855f7 28%, transparent); }
-  .tier-epic .c1-plate-wrap { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig-gold) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), 0 0 130px color-mix(in srgb, var(--sig-pink) 20%, transparent); }
+  /* R154: AND NOW IT LIVES ON THE PLAQUE. On the full-width wrapper it drew a 1280px glowing bar,
+     the strip again in light; the same three ladders now ring the plaque's own box. */
+  .tier-big  .c1-lockup { box-shadow: 0 3px 10px rgba(0,0,0,.6), 0 0 9px color-mix(in srgb, var(--sig-cyan) 20%, transparent), 0 0 30px color-mix(in srgb, var(--sig-pink) 16%, transparent); }
+  .tier-mega .c1-lockup { box-shadow: 0 3px 14px rgba(0,0,0,.6), 0 0 22px color-mix(in srgb, var(--sig-pink) 40%, transparent), 0 0 55px color-mix(in srgb, #a855f7 28%, transparent); }
+  .tier-epic .c1-lockup { box-shadow: 0 4px 20px rgba(0,0,0,.65), 0 0 46px color-mix(in srgb, var(--sig-gold) 55%, transparent), 0 0 95px color-mix(in srgb, var(--sig-cyan) 22%, transparent), 0 0 130px color-mix(in srgb, var(--sig-pink) 20%, transparent); }
   .c1-plate-wrap { position: relative; animation: c1-enter .6s cubic-bezier(.34,1.56,.64,1) both;
     /* R060 TASK 1: the band's layout keys on the width this mount actually
        received, not the viewport. The live stage hands the banner 1280px and
@@ -734,18 +794,20 @@
     container-type: inline-size;
   }
   @container (max-width: 700px) {
-    .fs-plate > .fs-face { flex-direction: column; align-items: center; gap: 4px; padding: 14px 4cqw; }
+    /* R154: in the replay's 616px box the plaque is laid out in flow and the face takes its height,
+       as the band's column did here before: there is no stage-anchored edge to stand on in that
+       mount, and nothing below it was measured against one. */
+    .fs-plate > .fs-face { height: auto; padding: 14px 0; }
+    .c1-lockup { position: relative; left: auto; bottom: auto; transform: none; margin: 0 auto; }
     /* R133: the font-size here was INERT. `.c1-amount` is (0,1,0) and lost every time to
        `.tier-big/.tier-mega/.tier-epic .c1-amount` at (0,2,0), so with the container forced to
        616px and to 400px the computed size stayed at the tier's 50px rather than the 46px and
        36px this clamp asks for. Tier-scoping it makes it (0,2,0), which TIES those rules and wins
        on source order, because this block is later in the file. The width and max-width beside it
        were never affected: `.c1-amount` at (0,1,0) is the only rule setting either. */
-    .c1-amount { width: 88cqw; max-width: 88cqw; }
     .tier-big .c1-amount, .tier-mega .c1-amount, .tier-epic .c1-amount {
       font-size: calc(clamp(26px, 9cqw, 46px) * var(--autofit-scale, 1));
     }
-    .tier-big .fs-face, .tier-mega .fs-face, .tier-epic .fs-face { min-height: 0; }
   }
   /* R133: THE BANNER WAS A STILL IMAGE FOR MOST OF ITS LIFE, and that is the measured reason it
      read as a notification rather than a celebration. Every transient finished by about 1400ms
@@ -954,34 +1016,22 @@
      comfortably centred in the visible (cropped) window regardless of the
      underlying stage width. ─────────────────────────────────────────── */
   @media (max-width: 500px) {
-    /* R133: `gap: 4px` was INERT here for the same reason, and this one had a measured cost.
-       `.fs-face` is (0,1,0) and lost to `.tier-* .fs-face { gap: 32/36/40px }` at (0,2,0), so the
-       stacked narrow layout ran a 32px gap it never asked for: 32 stage px of empty band between
-       the tier word and the amount and another 32 between the amount and the multiplier, which is
-       why three elements read as three separate announcements instead of one lockup. Forcing the
-       declared value measured the cost exactly: the band drops 209 to 153 at 500px wide, 206 to 150
-       at 480 and 194 to 138 at 390. Fifty-six stage pixels of unnecessary band at every narrow
-       width, and every one of them covers grid and hero. Marked important to match its neighbours
-       in this block, which already win that way. */
-    .fs-face { flex-direction: column !important; align-items: center !important; gap: 4px !important; padding: 14px 4vw !important; }
-    .c1-tier-label { font-size: 20px !important; }
-    .c1-amount {
-      width: 88vw; max-width: 88vw;
-      font-size: calc(clamp(26px, 9vw, 46px) * var(--autofit-scale, 1)) !important;
-    }
-    .c1-mult { font-size: 13px !important; }
-    /* R151: THE TIER LADDER ON A PHONE. One clamp for every tier meant BIG, MEGA and EPIC bands were
-       the same size at 390 (amount 35px, label 20px, multiplier 13px at every tier), so only colour
-       and art told them apart. Each tier now steps up, modestly, because a taller band has to stay
-       clear of the FEATURE COMPLETE title below it; autofitText still shrinks any amount that would
-       overflow. BIG keeps the old values. */
-    .tier-mega .c1-amount { font-size: calc(clamp(28px, 10vw, 50px) * var(--autofit-scale, 1)) !important; }
-    .tier-epic .c1-amount { font-size: calc(clamp(30px, 11vw, 54px) * var(--autofit-scale, 1)) !important; }
-    .tier-mega .c1-tier-label { font-size: 22px !important; }
-    .tier-epic .c1-tier-label { font-size: 24px !important; }
-    .tier-mega .c1-mult { font-size: 14px !important; }
-    .tier-epic .c1-mult { font-size: 15px !important; }
-    .tier-big  .fs-face, .tier-mega .fs-face, .tier-epic .fs-face { min-height: 0; }
+    /* R154: A PHONE GETS THE SAME PLAQUE, 500 STAGE PX WIDE, AND THE TIER LADDER IN STAGE PX.
+       This block used to restack the row into a column and size its text in vw. vw resolves against
+       the viewport but is then drawn inside a stage scaled by 0.96 x the viewport width / 522 (0.717
+       at 390), so the text was shrunk twice: R154 wave 1 measured the label, amount and multiplier at
+       14.3 / 25.2 / 9.3 screen px at BIG and 17.2 / 30.8 / 10.8 at EPIC. The plaque is already a
+       column, and stage px scale with the stage, so the ladder above applies unchanged and comes out
+       at 15.8 / 35.9 / 11.5 (BIG) to 25.8 / 57.4 / 18.6 (EPIC) on a 390 screen. 500 stage px is 92%
+       of the 543.75 a width-bound phone shows. --band-h keeps the band's measured phone heights (138.1
+       / 148.5 / 158.9 stage px), so the plaque stands on the same bottom edge it had there.
+       The history this replaces: R133 found this block's gap: 4px inert at (0,1,0) against the tier
+       rules' 32px gaps, a cost of 56 stage px of band at every narrow width; R151 gave the phone its
+       own modest ladder (amount 35 / 39 / 43, label 20 / 22 / 24, multiplier 13 / 14 / 15, in vw
+       clamps). */
+    .tier-big  .fs-plate { --band-h: 138px;   --lockup-w: 500px; }
+    .tier-mega .fs-plate { --band-h: 148.5px; --lockup-w: 500px; }
+    .tier-epic .fs-plate { --band-h: 159px;   --lockup-w: 500px; }
   }
 
   /* ── Reduced motion guard ─────────────────────────────────────────────── */
